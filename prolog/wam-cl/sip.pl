@@ -69,7 +69,7 @@ example, we could (and do) do:
 
 */
 
-:- if(current_prolog_flag(sip_main,sip1)).
+:- if(                                                                  ).
 	
 %% SIP - Scheme In Prolog
 

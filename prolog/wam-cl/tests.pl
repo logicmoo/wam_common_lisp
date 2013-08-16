@@ -26,7 +26,7 @@ lisp_append_2(l1, l2) <<==
 
 lisp_error(x) <<== setq(y, 5).
 
-
+%:- rtrace.
 lisp_let() <<==
 	let([bind(x, 3), bind(y, 5)], 
 		[	x, 		% implicit progn here

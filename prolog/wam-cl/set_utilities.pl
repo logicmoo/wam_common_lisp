@@ -27,7 +27,9 @@
 	symdiff/3,		%  Set x Set -> Set
 	union/3 		%  Set x Set -> Set
       ]).
- 
+
+:- ensure_loaded(library(lpa_to_swi)).
+
 /**********************
  *:- mode
 *	memberchk(+, +),

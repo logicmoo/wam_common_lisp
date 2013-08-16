@@ -211,7 +211,7 @@ wf_act(102, List, List) :-              %   Flush
         ttyflush.
 
 wf_act(103, [Head|Tail], Tail) :-       %   aGglutinated
-        functor(Head, F, N),
+        cfunctor(Head, F, N),
         praggl(1, N, F, Head).
 
 wf_act(105, [Format,List|Tail], Tail):- %   Indirect

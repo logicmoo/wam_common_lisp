@@ -38,6 +38,7 @@
       ]).
 
 
+:- ensure_loaded((lpa_to_swi)).
 :- ensure_loaded(library(set_utilities)).
 :- ensure_loaded(library(higher_order)).
 
@@ -102,7 +103,8 @@ delete([Head|Tail], Kill, [Head|Rest]) :- !,
 
 removeallL([], X, X).
 removeallL([A|As], Bs, Cs):-
-	removeall(A, Bs, SmallBs),
+	%removeall(A, Bs, SmallBs),
+        delete(Bs,A,SmallBs),
 	removeallL(As, SmallBs, Cs).
 
 

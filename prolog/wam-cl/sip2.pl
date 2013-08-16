@@ -18,7 +18,7 @@
 sip :- create0Env, sipREP.
 
 %  sipREP -  enters a read-eval-print loop for SIP.
-sipREP :-
+sipREP2 :-
   repeat,
   writeln('SIP> '),
   read(E),
@@ -128,9 +128,9 @@ apply(pf(X),Args,C) :-
   applyC(C,V).
 
 % apply a compound function.
-apply(closure(Parameters,Body,Env),Args,C) :- !,
+apply(closure(Parameters,Body,Env),Args,Value) :- !,
   makeEnv(Parameters,Args,New/Env),
-  eval3(Body,New/Env,C),
+  eval3(Body,New/Env,Value),
   !.
 
 % this should never happen.
@@ -155,6 +155,13 @@ applyPrim(print,[X],true) :- !,writeln(X).
 applyPrim(F,Args,error) :- 
  Call =.. [F|Args],
  err('bad call to a primitive function',Call).
+
+% evalList(listOfArguments,listOfValues,environment)
+% evlas a list of expressions and returns a list of the results.
+evalList([],[],_).
+evalList([A1|Arest],[V1|Vrest],E) :-
+  eval3(A1,E,V1),
+  evalList(Arest,Vrest,E).
 
 % makeEnv(+Parameters,+Arguments,-Environment) -  creates a new environment
 % in which the variables in the 1st arg are bound to the values in the

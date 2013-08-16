@@ -18,13 +18,14 @@
 sip :- create0Env, sipREP.
 
 %  sipREP -  enters a read-eval-print loop for SIP.
-sipREP :-
+sipREP1 :-
   repeat,
   writeln('SIP> '),
   read(E),
   once(eval3(E,0,V)),
   writeln(V),
   fail.
+
 
 % create0Env sets up E as the inital Scheme environment.
 create0Env :-
@@ -120,6 +121,8 @@ applyPrim(begin,[A1,A2],A2).
 applyPrim(force,[promise(B,E,V)],V) :-  var(V)->eval3(B,E,V);true.
 applyPrim(load,[File],File) :- !,load(File).
 applyPrim(prolog,[X],V) :- !,call(X) -> V=X;V=false.
+applyPrim(print,[X],true) :- !,writeln(X).
+
 
 applyPrim(F,Args,error) :- 
  Call =.. [F|Args],
@@ -157,7 +160,7 @@ addBindings([],[_|_],_) :-  !, err('too many arguments').
 % looks up the values associated with a symbol in an environment.  It's
 % an error if there is no binding.
 lookUp(Symbol,Value,Env) :- value(Symbol,Value,Env,_),!.
-lookUp(S,_,Env) :-  err('unbound symbol: ',S-Env).
+lookUp(S,_,Env) :-  err('unbound symbol: ',S/Env).
 
 % value(+symbol,-value,+frameSought,-frameFound) like lookUp but also
 % returns the frame in which the variable was bound.

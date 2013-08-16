@@ -282,8 +282,8 @@ Tim
                           tail(X) ==> force(cdr(X)).
 
 */
-:-swi_module(moo_ext_scheme_sip,[proccessInSip/1,eval/1]).
-:-ensure_loaded(moo_ext_lisp_triska).
+:-module(moo_ext_scheme_sip,[proccessInSip/1,eval/1]).
+%:-ensure_loaded(moo_ext_lisp_triska).
 
 %% SIPC - Scheme In Prolog with Continuation Semantics
 
@@ -323,7 +323,7 @@ sipREP :-
   once(eval3(print(E),0,k(nil))),
   fail.
 
-%  sipREP -  enters a read-eval-print loop for SIP.
+%  sipREP -  enters a read-eval-print loop for SSIP.
 ssipREP :-
   repeat,
   writeln('SSIP> '),
@@ -451,8 +451,8 @@ applyPrim('-',[A1,A2],V) :- V is A1-A2.
 applyPrim('*',[A1,A2],V) :- V is A1*A2.
 applyPrim('=',[A1,A2],V) :- A1=A2->V=true;V=false.
 applyPrim(cons,[A1,A2],[A1|A2]).
-applyPrim(car,[[H|_]],H).
-applyPrim(cdr,[[_|T]],T).
+applyPrim(car,[LIST],H):-LIST=[H|_]->true;H=[].
+applyPrim(cdr,[LIST],T):-LIST=[_|T]->true;T=[].
 applyPrim(begin,[_A1,A2],A2).
 applyPrim(force,[promise(B,E,V)],V) :-  var(V)->evalReturn(B,E,V);true.
 applyPrim(load,[File],File) :- !,load(File).

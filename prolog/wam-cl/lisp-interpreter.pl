@@ -33,32 +33,43 @@
 :- initialization(lisp,main).
 
 
-eval_string(Str):-
-  with_input_from_string(Str,
-        read_and_parse(Expression)),
+
+str_to_expression(Str, Expression):- parse_sexpr_untyped(string(Str), Expression),!.
+str_to_expression(Str, Expression):- with_input_from_string(Str,read_and_parse(Expression)),!.
+
+print_eval_string(Str):-
+  str_to_expression(Str, Expression),
+   dmsg(print_eval_string(Expression)),
    eval(Expression, Result),
-     writeExpression(Result),
+   dmsg(print_Result(Result)),
+     writeExpression(Expression),
+     !.
+
+eval_string(Str):-
+  str_to_expression(Str, Expression),
+   eval(Expression, Result),
+        writeExpression(Result),
      !.
 
 trace_eval_string(Str):-
-  with_input_from_string(Str,
-        read_and_parse(Expression)),
+  str_to_expression(Str, Expression),
    redo_call_cleanup(trace,eval(Expression, Result),notrace),
      writeExpression(Result),
      !.
 
 rtrace_eval_string(Str):-
-  with_input_from_string(Str,
-        read_and_parse(Expression)),
+  str_to_expression(Str, Expression),
    rtrace(eval(Expression, Result)),
      writeExpression(Result),
      !.
 
-  
+:- meta_predicate(with_input_from_string(+,:)).
 with_input_from_string(Str,Goal):-
  open_string(Str,In),
  with_input_from_stream(In,Goal).
 
+
+:- meta_predicate(with_input_from_stream(+,:)).
 with_input_from_stream(In,Goal):- 
    each_call_cleanup(see(In),Goal,seen).
 
@@ -127,11 +138,11 @@ is_self_evaluationing_object(X):- (is_dict(X);is_array(X);is_rbtree(X)),!.
 
 
 eval(X, Bindings, Val):-
-	atom(X),
-      (member(binding(X, Val), Bindings)
+	notrace((atom(X),
+      (member(bv(X, Val), Bindings)
 	;	(bindings(GlobalBindings),
-		 member(binding(X, Val), GlobalBindings))),
-	!.
+		 member(bv(X, Val), GlobalBindings)))
+	)),!.
 eval(X, _, X):- notrace(is_self_evaluationing_object(X)),!. 
 eval(quit, _, quit):-!.
 eval(nil, _, []):-!.
@@ -140,15 +151,15 @@ eval([quit], _, quit):-!.
 eval([defvar, Name], _, Name):-
 	!,
 	retract(bindings(GlobalBindings)),
-	assert(bindings([binding(Name, [])|GlobalBindings])),
+	assert(bindings([bv(Name, [])|GlobalBindings])),
 	!.
 eval([setq, Name, Value], Bindings, EvalValue):-
 	!,
 	bindings(GlobalBindings),
-	append(Pre, [binding(Name, _)|Post], GlobalBindings),
+	append(Pre, [bv(Name, _)|Post], GlobalBindings),
 	eval(Value, Bindings, EvalValue),
 	retract(bindings(GlobalBindings)),
-	append(Pre, [binding(Name, EvalValue)|Post], GlobalBindings1),
+	append(Pre, [bv(Name, EvalValue)|Post], GlobalBindings1),
 	assert(bindings(GlobalBindings1)),
 	!.
 eval([defmacro, Name, FormalParms | Body], _, Name):-
@@ -159,15 +170,23 @@ eval([defun, Name, FormalParms, Body], _, Name):-
 	!,
 	assert(named_lambda(Name, [lambda, FormalParms, Body])),
 	!.
-eval([lpa_apply|Arguments], Bindings, Result):- !, eval([apply|Arguments], Bindings, Result).
+
+eval(['$BQ',One], Bindings, Out):-!, expand_commas(Bindings,One,Out).
+eval([('`'),One], Bindings, Out):-!, expand_commas(Bindings,One,Out).
 
 eval([apply|Arguments], Bindings, Result):-
 	!,
 	evalL(Arguments, Bindings, [Function, ActualParams]),
-	lpa_apply(Function, ActualParams, Result),
+	apply_f(Bindings,Function, ActualParams, Result),
 	!.
+
+
 eval([function, [lambda,  FormalParams, Body]], Bindings, 
 		[closure, FormalParams, Body, Bindings]):-!.
+
+eval([Procedure|Arguments], Bindings, Result):-	lisp_operator(Procedure),!,
+  apply_f(Bindings,Procedure, Arguments, Result),
+  !.
 
 eval([Procedure|Arguments], Bindings1, Result):-
        macro_lambda(Procedure,FormalParams, LambdaExpression),
@@ -175,17 +194,29 @@ eval([Procedure|Arguments], Bindings1, Result):-
         append(Bindings1,Bindings2,Bindings),
         eval(LambdaExpression, Bindings, Result),
 	!.
+
 eval([Procedure|Arguments], Bindings, Result):-
 	evalL(Arguments, Bindings, EvalArguments),
-	lpa_apply(Procedure, EvalArguments, Result),
+	apply_f(Bindings,Procedure, EvalArguments, Result),
 	!.
 
 eval(X, _, []):-
-	write('ERROR!  Cannot find a binding for `'),
+	write('ERROR!  Cannot find a bv for `'),
 	write(X),
 	write('`'),nl,
 	!.
 
+lisp_operator(if).
+
+expand_commas(_,One,Out):- \+ compound(One),!,One=Out.
+expand_commas(Bindings,['$COMMA',One],Out):- !, eval(One,Bindings,Out).
+expand_commas(Bindings,['$BQ',One],Out):- !, expand_commas(Bindings,One,Mid), (One==Mid ->  Out=['$BQ',Mid] ; Out=Mid),!.
+expand_commas(Bindings,'$COMMA'(One),Out):- !, eval(One,Bindings,Out).
+expand_commas(Bindings,One,Out):- is_list(One),!,maplist(expand_commas(Bindings),One,Out).
+expand_commas(Bindings,One,Out):-
+  compound_name_arguments(One,F,Args),
+  maplist(expand_commas(Bindings),Args,ArgsOut),
+  Out=..[F|ArgsOut],!.
 
 evalL([], _, []):-!.
 evalL([H|T], Bindings, [EvalH|EvalT]):-
@@ -193,44 +224,53 @@ evalL([H|T], Bindings, [EvalH|EvalT]):-
 	evalL(T, Bindings, EvalT),
 	!.
 
+% pf_car(A,Out):- \+ is_list(A),type_error(list,A,car(A),pf_car(A,Out)).
+pf_car([A|_],A).
+pf_car(A,[]).
 
-lpa_apply(car, [[Result|_]], Result):-!.
-lpa_apply(cdr, [[_|Result]], Result):-!.
-lpa_apply(list, Args, Args):-!.
-lpa_apply(cons, [Arg1, Arg2], [Arg1|Arg2]):-!.
-lpa_apply(eq, [Arg1, Arg2], Result):-
+apply_f(_Binds,function, [A],[function,A]).
+apply_f(_Binds,car, LIST, Result):-!,(LIST=[[Result|_]]->true;Result=[]).
+apply_f(_Binds,cdr, LIST, Result):-!,(LIST=[[_|Result]]->true;Result=[]).
+apply_f(_Binds,list, Args, Args):-!.
+apply_f(_Binds,cons, [Arg1, Arg2], [Arg1|Arg2]):-!.
+apply_f(_Binds,eq, [Arg1, Arg2], Result):-
 	(Arg1 = Arg2 -> Result = Arg1 
 		      ; Result = []),
 	!.
-lpa_apply(if, [Test, Success, Failure], Result):-
-	eval(Test, TestResult),
-	eval(Success, EvalSuccess),
-	eval(Failure, EvalFailure),
+apply_f(Bindings,if_wrong, [Test, Success, Failure], Result):-
+	eval(Test,Bindings, TestResult),
+	eval(Success,Bindings, EvalSuccess),
+	eval(Failure,Bindings, EvalFailure),
 	(TestResult = [] -> Result = EvalFailure
 			  ; Result = EvalSuccess),
 	!.
-lpa_apply([lambda, FormalParams, Body], ActualParams, Result):-
-	!,
-	bind_variables(FormalParams, ActualParams, Bindings),
-	eval(Body, Bindings, Result),
+apply_f(Bindings,if, [Test, Success, Failure], Result):-  !,
+	eval(Test, Bindings, TestResult),
+	(TestResult \== [] -> eval(Success, Bindings, Result)
+			  ; eval(Failure, Bindings, Result)),
 	!.
-lpa_apply([closure, FormalParams, Body, Bindings0], ActualParams, Result):-
+apply_f(Binds,[lambda, FormalParams, Body], ActualParams, Result):-
+	!,
+	bind_variables(FormalParams, ActualParams,Binds, Bindings),!,
+	trace,eval(Body, Bindings, Result),
+	!.
+apply_f(_Binds,[closure, FormalParams, Body, Bindings0], ActualParams, Result):-
 	!,
 	bind_variables(FormalParams, ActualParams, Bindings0, Bindings),
 	eval(Body, Bindings, Result),
 	!.
 
-lpa_apply(ProcedureName, ActualParams, Result):-
-	macro_lambda(ProcedureName,FormalParams, LambdaExpression),
+apply_f(_Binds,ProcedureName, ActualParams, Result):-
+	macro_lambda(ProcedureName,FormalParams, LambdaExpression),!,
 	bind_variables(FormalParams, ActualParams, Bindings),
         eval(LambdaExpression, Bindings, Result),
 	!.
-lpa_apply(ProcedureName, Args, Result):-
-	named_lambda(ProcedureName, LambdaExpression),
-	lpa_apply(LambdaExpression, Args, Result),
+apply_f(Bindings,ProcedureName, Args, Result):-
+	named_lambda(ProcedureName, LambdaExpression),!,
+	apply_f(Bindings,LambdaExpression, Args, Result),
 	!.
-lpa_apply(X, _, []):-
-	write('ERROR!  Cannot find a procedure description for `'),
+apply_f(_Binds,X, _, []):-
+	write('ERROR!  Cannot apply a procedure description for `'),
 	write(X),
 	write('`'),nl,
 	!.
@@ -244,15 +284,20 @@ bind_variables([], [], Bindings, Bindings).
 bind_variables([FormalParam|FormalParams], [ActualParam|ActualParams],
 		Bindings0, Bindings):- 
 	bind_variables(FormalParams, ActualParams, 
-		[binding(FormalParam, ActualParam)|Bindings0], Bindings).
+		[bv(FormalParam, ActualParam)|Bindings0], Bindings).
 
 
+
+
+:- if(exists_source(library(sexpr_reader))).
+:- use_module(library(sexpr_reader)).
+read_and_parse(Expr):- current_input(In), parse_sexpr_untyped(In, Expr).
+:- endif.
 
 % read and parse a line of Lisp
-
 read_and_parse(Expression):-
 	read_words(TokenL),
-	(	sexpr(Expression, TokenL, [])
+	(	sexpr1(Expression, TokenL, [])
 	;
 		( write('ERROR!  Could not parse `'),
 		  writeTokenL(TokenL),
@@ -345,15 +390,18 @@ other(Char):-
 % Given a list of tokens, lisplist does all the nesting of lists
 
 
-sexpr([function, Expression]) --> [#, ''''], !, sexpr(Expression).
-sexpr([quote, Expression]) --> [''''], !, sexpr(Expression).
-sexpr(Xs) --> ['('], lisplist(Xs), !.
-sexpr(X) --> [X], {atomic(X), X \= '.'}, !.
+sexpr1([function, Expression]) --> [#, ''''], !, sexpr1(Expression).
+sexpr1([quote, Expression]) --> [''''], !, sexpr1(Expression).
+sexpr1(X) --> {is_ftVar(X),get_var_name(X,N)},[',',N].
+sexpr1(['$BQ',X])--> ['`'],sexpr1(X).
+sexpr1('$COMMA'(X)) --> [','],sexpr1(X).
+sexpr1(Xs) --> ['('], lisplist(Xs), !.
+sexpr1(X) --> [X], {atomic(X), X \= '.'}, !.
 
 
 lisplist([]) --> [')'], !.
-lisplist([X|Xs]) --> sexpr(X), lisplist(Xs), !.
-lisplist([X|Y]) --> sexpr(X), ['.'], sexpr(Y), [')'], !.
+lisplist([X|Xs]) --> sexpr1(X), lisplist(Xs), !.
+lisplist([X|Y]) --> sexpr1(X), ['.'], sexpr1(Y), [')'], !.
 
 
 
@@ -363,7 +411,7 @@ writeExpression(quit):-
 	!,
 	write('Terminating Pro-Lisp'),nl.
 writeExpression(Expression):-
-	sexpr(Expression, TokenL, []),
+	sexpr1(Expression, TokenL, []),
 %	write('  '),
 	writeTokenL(TokenL),
 	nl.
@@ -388,6 +436,99 @@ writeTokenL([Token|TokenL]):-
 	write(' '),
 	writeTokenL(TokenL).
 
+
+run666(S):-'format'('~n~s~n',[S]),run666(S,V),writeq(V).
+
+parsing(Program, Forms0):- sformat(S,'(\n~s\n)\n',[Program]),str_to_expression(S,Forms0).
+run666(Program, Values) :-
+    quietly(parsing(Program, Forms)),
+    maplist(see_and_do(eval),Forms,Values),
+    last(Values,Last),
+    writeExpression(Last).
+
+see_and_do(Pred2, I,O):-
+  dmsg(seeingFormala(I)),
+  call(Pred2,I,O),
+  dmsg(result(O)).
+
+
+% if_script_file_time666(_):-!.
+if_script_file_time666(X):- prolog_statistics:time(user:X).
+
+% Append:
+test(0) :- if_script_file_time666(run666("
+        (defun append (x y)
+          (if x
+              (cons (car x) (append (cdr x) y))
+            y))
+
+        (append '(a b) '(3 4 5))")).
+
+    %@ V = [append, [a, b, 3, 4, 5]].
+    
+
+% Fibonacci, naive version:
+test(1) :- if_script_file_time666(run666("
+        (defun fib (n)
+          (if (= 0 n)
+              0
+            (if (= 1 n)
+                1
+              (+ (fib (- n 1)) (fib (- n 2))))))
+        (fib 24)")).
+
+    %@ % 14,255,802 inferences, 3.71 CPU in 3.87 seconds (96% CPU, 3842534 Lips)
+    %@ V = [fib, 46368].
+    
+
+% Fibonacci, accumulating version:
+test(2) :- if_script_file_time666(run666("
+        (defun fib (n)
+          (if (= 0 n) 0 (fib1 0 1 1 n)))
+
+        (defun fib1 (f1 f2 i to)
+          (if (= i to)
+              f2
+            (fib1 f2 (+ f1 f2) (+ i 1) to)))
+
+        (fib 250)")).
+
+    %@ % 39,882 inferences, 0.010 CPU in 0.013 seconds (80% CPU, 3988200 Lips)
+    %@ V = [fib, fib1, 7896325826131730509282738943634332893686268675876375].
+    
+
+% Fibonacci, iterative version:
+test(3):- if_script_file_time666(run666("
+        (defun fib (n)
+          (setq f (cons 0 1))
+          (setq i 0)
+          (while (< i n)
+            (setq f (cons (cdr f) (+ (car f) (cdr f))))
+            (setq i (+ i 1)))
+          (car f))
+
+        (fib 350)")).
+
+    %@ % 34,233 inferences, 0.010 CPU in 0.010 seconds (98% CPU, 3423300 Lips)
+    %@ V = [fib, 6254449428820551641549772190170184190608177514674331726439961915653414425].
+    
+
+% Higher-order programming and eval:
+test(4):- if_script_file_time666(run666("
+        (defun map (f xs)
+          (if xs
+              (cons (eval (list f (car xs))) (map f (cdr xs)))
+            ()))
+
+        (defun plus1 (x) (+ 1 x))
+
+        (map 'plus1 '(1 2 3))
+        "
+        )).
+
+    %@ V = [map, plus1, [2, 3, 4]].
+ 
+
 :- writeln('
 | ?- lisp.
 Welcome to Pro-Lisp!
@@ -398,9 +539,17 @@ This is a miniscule Lisp interpreter, written in Prolog
 MY_SECOND 
 > (my_second \'(a b c))
 B 
+> (defun fib (n)
+  (if (> n 1)
+    (+ (fib (- n 1))
+       (fib (- n 2)))
+    1))
+
 > quit
 Terminating Pro-Lisp
 yes
 '
 ).
+
+:- eval_string("(defun append (x y) (if x (cons (car x) (append (cdr x) y))  y))").
 

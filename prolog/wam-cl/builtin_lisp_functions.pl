@@ -17,12 +17,12 @@
 :- ensure_loaded(library(writef)).
 
 
-first(List, Result):-
+first(List, Result):- List==[]->Result=[];
 	one (	List = [Result|_]
 	    ;	error(first_not_cons, ErrNo, _),
 		throw(ErrNo)	).
 
-rest(List, Result):-
+rest(List, Result):- List==[]->Result=[];
 	one (	List = [_|Result]
 	    ;	error(rest_not_cons, ErrNo, _),
 		throw(ErrNo)	).
@@ -74,7 +74,7 @@ and(Bool1, Bool2, Result):-
 
 lisp_apply(FunctionObject, Arguments, Result):-
 		FunctionObject = closure(FormalArgs, Body, Environment)
-	->	zip_with(FormalArgs, Arguments, [Arg, Val, binding(Arg, [Val|_])]^true, Bindings),
+	->	zip_with(FormalArgs, Arguments, [Arg, Val, bv(Arg, [Val|_])]^true, Bindings),
 		apply(Body, [[Bindings|Environment], Result])
 	;	FunctionObject = function(FunctionName), 
 		append(Arguments, [Result], ArgumentsResult),
