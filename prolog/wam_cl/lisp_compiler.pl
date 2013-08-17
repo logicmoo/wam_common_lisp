@@ -90,7 +90,7 @@ read_and_parse(Expr):- current_input(In),parse_sexpr_untyped(In, Expr).
 
 :- ensure_loaded(library(higher_order)).
 :- ensure_loaded(library(list_utilities)).
-:- require([dmsg/1]).
+:- require([dbmsg/1]).
 
 
 :- ensure_loaded(library(must_trace)).
@@ -107,6 +107,37 @@ read_and_parse(Expr):- current_input(In),parse_sexpr_untyped(In, Expr).
 :- op(1200,  fx, <<== ).	% functional imperative definition
 
 :- dynamic special_var/2.	% closure environments
+
+
+
+% debug_var(_A,_Var):-!.
+debug_var(X,Y):- notrace(catch(debug_var0(X,Y),_,fail)) -> true ; rtrace(debug_var0(X,Y)).
+
+p_n_atom(Cmpd,UP):- sub_term(Atom,Cmpd),nonvar(Atom),\+ number(Atom), Atom\==[], catch(p_n_atom0(Atom,UP),_,fail),!.
+p_n_atom(Cmpd,UP):- term_to_atom(Cmpd,Atom),p_n_atom0(Atom,UP),!.
+
+filter_var_chars([],[]).
+filter_var_chars([H|T],[H|Rest]):-  code_type(H, prolog_identifier_continue),!,filter_var_chars(T,Rest).
+filter_var_chars([_|T],[90|Rest]):- filter_var_chars(T,Rest).
+
+p_n_atom0(Atom,UP):- atom(Atom),!,name(Atom,Was),filter_var_chars(Was,[C|S]),to_upper(C,U),name(UP,[U|S]).
+p_n_atom0(String,UP):- string(String),!,string_to_atom(String,Atom),!,p_n_atom0(Atom,UP).
+p_n_atom0([C|S],UP):- !,(catch(atom_codes(Atom,[C|S]),_,fail)),!,p_n_atom0(Atom,UP).
+
+debug_var0(_,NonVar):-nonvar(NonVar),!.
+debug_var0([C|S],Var):- (catch(atom_codes(Atom,[C|S]),_,fail)),!,debug_var0(Atom,Var).
+debug_var0([AtomI|Rest],Var):-!,maplist(p_n_atom,[AtomI|Rest],UPS),atomic_list_concat(UPS,NAME),debug_var0(NAME,Var),!.
+debug_var0(Atom,Var):- p_n_atom(Atom,UP),  
+  check_varname(UP),
+  add_var_to_env_loco(UP,Var),!.
+
+add_var_to_env_loco(UP,Var):- \+ atom_concat('_',_,UP), var(Var),
+  get_var_name(Var,Name),atomic(Name),\+ atom_concat('_',_,Name),
+  
+  atom_concat(UP,Name,New),add_var_to_env(New,Var).
+add_var_to_env_loco(UP,Var):-add_var_to_env(UP,Var).
+
+check_varname(UP):- name(UP,[C|_]),(char_type(C,digit)->throw(check_varname(UP));true).
 
 
 % Connection to LPA's built-in error handler
@@ -159,14 +190,29 @@ lisp_compiler_term_expansion( ( <<== FunctionBodyP),
    maplist(del_attr_rev2(freeze),AttVars),
    mize_body(',',Body,BodyOO))).
  
+compile_1form(Ctx,Env,FunctionBody,Body):- 
+   debug_var('_Ignored',Result),
+   compile_forms(Ctx,Env,Result,[FunctionBody],Body).
+
+compile_forms(Ctx,Env,Result,FunctionBody,Body):-
+   expand_function_body_e(Ctx,implicit_progn(FunctionBody), Result, Body, Env),!.
 
 
 lisp_eval(FunctionBody,Result):-
-  expand_function_body_e(_:[],implicit_progn([FunctionBody]), Result, Body, []),!,
-  dmsg(body:-Body),
+   expand_function_body_e(_:[],implicit_progn([FunctionBody]), Result, Body, []),!,
+  dbmsg(body:-Body),
   call(Body),!.
 
-lisp_eval(FunctionBody):- lisp_eval(FunctionBody,Result),dmsg(result(Result)).
+dbmsg((Textbody:-Body)):-body==Textbody,dmsg('==>'(body)),!,dbmsg(Body).
+dbmsg(Var):- var(Var),!,dmsg(x_var(Var)).
+dbmsg((A,B)):-compound(A),compound(B),!,dbmsg(A),dbmsg(B).
+%dbmsg(asserta(Body)):- !, dmsg(Body).
+dbmsg(ABody):- ABody=..[A,Body],nonvar(Body), Body = (H :- B) , !, HH=..[A,H],  dmsg((HH :- B)).
+dbmsg(Body):-dmsg(Body),!.
+% dbmsg(:- Body):- !, dmsg(:- Body).
+
+
+lisp_eval(FunctionBody):- lisp_eval(FunctionBody,Result),dbmsg(result(Result)).
 
 del_attr_rev2(Name,Var):- del_attr(Var,Name).
 
@@ -175,7 +221,7 @@ del_attr_rev2(Name,Var):- del_attr(Var,Name).
 
 
 expand_function_head([FunctionName | FormalArgs], Head, ArgBindings, Result):-!,
-        freeze(Arg,debug_var([Arg,''],Val)),
+        freeze(Arg,debug_var(Arg,Val)),
 	zip_with(FormalArgs, ActualArgs, [Arg, Val, bv(Arg, [Val|_])]^true, ArgBindings),
 	append(ActualArgs, [Result], HeadArgs),
 	Head =.. [FunctionName | HeadArgs].
@@ -207,12 +253,12 @@ expand_function_body(Ctx,Form, Result, CompileBody, Environment):-
 
 expand_function_body(_Ctx,[defun,Name,Args|FunctionBody], Name, CompileBody, Environment):-
     FunctionHead=[Name|Args],
-    CompileBody = (asserta(Head  :- fail, <<==(FunctionHead , FunctionBody)),
-                  asserta((Head   :- !,  BodyOO))),                  
+    CompileBody = (asserta((Head  :- (fail, <<==(FunctionHead , FunctionBody)))),
+                   asserta((Head  :- (!,  BodyOO)))),
       expand_function_head(FunctionHead, Head, ArgBindings, Result),
       expand_function_body_e(Head:ArgBindings,implicit_progn(FunctionBody), Result, Body0, Environment),
       debug_var("RET",Result),
-      debug_var("Env",Environment),
+      debug_var("DEnv",Environment),
       Body = (Environment=[ArgBindings],Body0),
       term_attvars(Body,AttVars),
       maplist(del_attr_rev2(freeze),AttVars),
@@ -338,14 +384,27 @@ expand_function_body(Ctx,[setq, Atom, ValueForm], Result, Body, Environment):-
 expand_function_body(_Ctx,[quote, Item], Item, true, _Environment):-
 	!.
 
-expand_function_body(Ctx,[let, NewBindings| BodyForms], Result, Body, Environment):-
-        !,        
+
+normalize_let([],[]).
+normalize_let([Decl|NewBindingsIn],[Norm|NewBindings]):-
+  must(normalize_let1(Decl,Norm)),
+  normalize_let(NewBindingsIn,NewBindings).
+
+normalize_let1([bind, Variable, Form],[bind, Variable, Form]).
+normalize_let1([Variable, Form],[bind, Variable, Form]).
+normalize_let1(Variable,[bind, Variable, []]).
+
+
+expand_function_body(Ctx,[let, NewBindingsIn| BodyForms], Result, Body, Environment):-
+     must(normalize_let(NewBindingsIn,NewBindings)),!,        
 	zip_with(Variables, ValueForms, [Variable, Form, [bind, Variable, Form]]^true, NewBindings),
 	expand_arguments(Ctx,ValueForms, ValueBody, Values, Environment),
 	zip_with(Variables, Values, [Var, Val, bv(Var, [Val|Unused])]^true,Bindings),
+
    must((debug_var("_U",Unused),
    debug_var("LETENV",BindingsEnvironment),
-   ignore((member(VarN,[Variable,Var]),atom(VarN),debug_var([VarN,'_Let'],Val))))),       
+   ignore((member(VarN,[Variable,Var]),atom(VarN),debug_var([VarN,'_Let'],Val))))), 
+
 	expand_function_body_e(Ctx,implicit_progn(BodyForms), Result, BodyFormsBody,
 		BindingsEnvironment),
          Body = ( ValueBody,BindingsEnvironment=[Bindings|Environment], BodyFormsBody ).
@@ -409,7 +468,7 @@ expand_function_body(Ctx,Atom, InValue, Body, _Environment):-
 initState:attr_unify_hook(_,_).
 
 expand_function_body(Ctx,Atom, Value, Body, Environment):- Atom==mapcar,!,
-  dmsg(expand_function_body(Ctx,Atom, Value, Body, Environment)),
+  dbmsg(expand_function_body(Ctx,Atom, Value, Body, Environment)),
   dumpST,break.
 
 expand_function_body(Ctx,Atom, Value, Body, Environment):- \+ current_prolog_flag(lisp_inline,true),
@@ -449,6 +508,10 @@ expand_function_body(Ctx,[- | FunctionArgs], Result, Body, Environment):-!,
 expand_function_body(Ctx,[FunctionName | FunctionArgs], Result, Body, Environment):- \+ atom(FunctionName),!,
   expand_function_body(Ctx,[funcall,FunctionName | FunctionArgs], Result, Body, Environment).
 
+expand_function_body(Ctx,[FunctionName | FunctionArgs], Result, Body, Environment):- FunctionName\==funcall,
+   (Ctx = _:ArgBindings), member(bv(Atom0,_),ArgBindings),Atom0==FunctionName,
+  expand_function_body(Ctx,[funcall,FunctionName | FunctionArgs], Result, Body, Environment).
+
 % Non built-in function expands into an explicit function call
 expand_function_body(Ctx,[FunctionName | FunctionArgs], Result, Body, Environment):-
 	!,
@@ -464,23 +527,6 @@ expand_function_body(Ctx,[FunctionName | FunctionArgs], Result, Body, Environmen
 		expand_function_body_e(Ctx,Arg, Result, ArgBody, Environment),
                 Body = (ArgBody, ArgsBody),
 		expand_arguments(Ctx,Args, ArgsBody, Results, Environment).
-
-p_n_atom(Cmpd,UP):- sub_term(Atom,Cmpd),nonvar(Atom),catch(p_n_atom0(Atom,UP),_,fail),!.
-p_n_atom(Cmpd,UP):- term_to_atom(Cmpd,Atom),p_n_atom0(Atom,UP),!.
-
-filter_var_chars([],[]).
-filter_var_chars([H|T],[H|Rest]):-  code_type(H, prolog_identifier_continue),!,filter_var_chars(T,Rest).
-filter_var_chars([_|T],[95|Rest]):- filter_var_chars(T,Rest).
-
-p_n_atom0(Atom,UP):- string(Atom),!,string_to_atom(String,Atom),!,p_n_atom0(Atom,UP).
-p_n_atom0([C|S],UP):- !,(catch(atom_codes(Atom,[C|S]),_,fail)),!,p_n_atom0(Atom,UP).
-p_n_atom0(Atom,UP):- atom(Atom),!,name(Atom,Was),filter_var_chars(Was,[C|S]),to_upper(C,U),name(UP,[U|S]).
-
-% debug_var(_A,_Var):-!.
-debug_var(A,Var):- var(Var),get_var_name(Var,Name),atomic(Name),\+ atom_concat('_',_,Name),flatten([A,Name],Flat),notrace(ignore(catch(debug_var0(Flat,Var),_,fail))),!.
-debug_var(A,B):- notrace(ignore(catch(debug_var0(A,B),_,fail))).
-debug_var0([AtomI|Rest],Var):-!,maplist(p_n_atom,[AtomI|Rest],UPS),atomics_to_string(UPS,NAME),add_var_to_env(NAME,Var),!.
-debug_var0(Atom,Var):- p_n_atom(Atom,UP),add_var_to_env(UP,Var),!.
 
 expand_progn(_Ctx,[], Result, Result, true, _Environment).
 expand_progn(Ctx,[Form | Forms], _PreviousResult, Result, Body, Environment):-  !,
@@ -535,10 +581,11 @@ ssip_compiler_term_expansion(Symbol,Symbol2,ssip_define(Symbol,Symbol2)):-!.
 % The hook into the compiler
 term_expansion(Symbol==Function,O) :- I= (Symbol==Function),ssip_compiler_term_expansion(Symbol,Function,O),nl,nl,
   flatten([I,O],L),
-  in_cmt(maplist(portray_clause,L)),!.
+  maplist(dbmsg,L),!.
+  % in_cmt(maplist(portray_clause,L)),!.
 term_expansion(I,O) :- lisp_compiler_term_expansion(I,O),I\==O,nl,nl,
   flatten([I,O],L),
-  maplist(dmsg,L),!.
+  maplist(dbmsg,L),!.
 
 
 % Now Prolog can understand them, compile the additional library files
@@ -554,10 +601,13 @@ term_expansion(I,O) :- lisp_compiler_term_expansion(I,O),I\==O,nl,nl,
 %% this file contains samples for SIP.
 
 
+:- fixup_exports.
+
 
 
 
 fact == lambda([n], if(=(n,0),1,n*fact(sub1(n)))).
+
 
 add1 == lambda([n], n+1).
 
@@ -566,10 +616,10 @@ sub1 == lambda([n], n-1).
 % higher order functions
 
 mapcar ==
-  lambda([f,l],
+  lambda([fun,l],
          if(null(l),
             nil,
-            cons(f(car(l)),mapcar(f,cdr(l))))).
+            cons(fun(car(l)),mapcar(fun,cdr(l))))).
 
 % simple list manipulation functions.
 
@@ -581,12 +631,12 @@ append == lambda([l1,l2],if(null(l1),l2,cons(car(l1),append(cdr(l1),l2)))).
 % stuff for streams.
 
 filter ==
-  lambda([f,s],
+  lambda([fun,s],
          if('emptyStream?'(s),
             s,
-            if(f(head(s)),
-               consStream(head(s),filter(f,tail(s))),
-               filter(f,tail(s))))).
+            if(fun(head(s)),
+               consStream(head(s),filter(fun,tail(s))),
+               filter(fun,tail(s))))).
 
 from(n) <<== consStream(n,from(n+1)).
 % from == lambda([n],consStream(n,from(n+1))).
@@ -641,6 +691,5 @@ c2:- lisp_compile(s("
        (mapcar summer  xs) running_total)))
  "
   ),O),writeln(O).
-
 
 
