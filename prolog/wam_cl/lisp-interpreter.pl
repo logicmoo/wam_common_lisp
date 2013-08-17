@@ -41,7 +41,7 @@
 	named_lambda/2,
         macro_lambda/3.
 
-:- initialization(lisp,main).
+:- initialization((lisp,prolog),main).
 
 :- meta_predicate(timel(:)).
 timel(M:X):- prolog_statistics:time(M:X).

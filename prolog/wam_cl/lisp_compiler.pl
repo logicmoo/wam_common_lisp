@@ -338,7 +338,7 @@ expand_function_body(Ctx,[setq, Atom, ValueForm], Result, Body, Environment):-
 expand_function_body(_Ctx,[quote, Item], Item, true, _Environment):-
 	!.
 
-expand_function_body(Ctx,[let, NewBindings, BodyForms], Result, Body, Environment):-
+expand_function_body(Ctx,[let, NewBindings| BodyForms], Result, Body, Environment):-
         !,        
 	zip_with(Variables, ValueForms, [Variable, Form, [bind, Variable, Form]]^true, NewBindings),
 	expand_arguments(Ctx,ValueForms, ValueBody, Values, Environment),
@@ -349,9 +349,6 @@ expand_function_body(Ctx,[let, NewBindings, BodyForms], Result, Body, Environmen
 	expand_function_body_e(Ctx,implicit_progn(BodyForms), Result, BodyFormsBody,
 		BindingsEnvironment),
          Body = ( ValueBody,BindingsEnvironment=[Bindings|Environment], BodyFormsBody ).
-
-expand_function_body(Ctx,[let, NewBindings| BodyForms], Result, Body, Environment):-
-      expand_function_body(Ctx,[let, NewBindings,[progn| BodyForms]], Result, Body, Environment).
 
 
 expand_function_body(Ctx,[function, [lambda,LambdaArgs| LambdaBody]], Result, Body, Environment):-
@@ -411,7 +408,11 @@ expand_function_body(Ctx,Atom, InValue, Body, _Environment):-
 
 initState:attr_unify_hook(_,_).
 
-expand_function_body(Ctx,Atom, Value, Body, Environment):-  \+ current_prolog_flag(lisp_inline,true),
+expand_function_body(Ctx,Atom, Value, Body, Environment):- Atom==mapcar,!,
+  dmsg(expand_function_body(Ctx,Atom, Value, Body, Environment)),
+  dumpST,break.
+
+expand_function_body(Ctx,Atom, Value, Body, Environment):- \+ current_prolog_flag(lisp_inline,true),
 	atom(Atom),
         find_incoming_value(Ctx,Atom,InValue,Value),
         put_attr(Value,initState,t),
@@ -444,6 +445,10 @@ expand_function_body(Ctx,[+ | FunctionArgs], Result, Body, Environment):-!,
 expand_function_body(Ctx,[- | FunctionArgs], Result, Body, Environment):-!,
   expand_function_body(Ctx,[minus | FunctionArgs], Result, Body, Environment).
 
+
+expand_function_body(Ctx,[FunctionName | FunctionArgs], Result, Body, Environment):- \+ atom(FunctionName),!,
+  expand_function_body(Ctx,[funcall,FunctionName | FunctionArgs], Result, Body, Environment).
+
 % Non built-in function expands into an explicit function call
 expand_function_body(Ctx,[FunctionName | FunctionArgs], Result, Body, Environment):-
 	!,
@@ -460,13 +465,21 @@ expand_function_body(Ctx,[FunctionName | FunctionArgs], Result, Body, Environmen
                 Body = (ArgBody, ArgsBody),
 		expand_arguments(Ctx,Args, ArgsBody, Results, Environment).
 
-p_n_atom(Atom,UP):- string(Atom),name(Atom,[C|S]),to_upper(C,U),name(UP,[U|S]).
-p_n_atom(Atom,UP):- atom(Atom),name(Atom,[C|S]),to_upper(C,U),name(UP,[U|S]).
-p_n_atom([C|S],UP):- to_upper(C,U),name(UP,[U|S]).
+p_n_atom(Cmpd,UP):- sub_term(Atom,Cmpd),nonvar(Atom),catch(p_n_atom0(Atom,UP),_,fail),!.
+p_n_atom(Cmpd,UP):- term_to_atom(Cmpd,Atom),p_n_atom0(Atom,UP),!.
 
-% debug_var(_,_):-!.
-debug_var(A,B):- ignore(catch(debug_var0(A,B),E,dmsg(A=E))).
-debug_var0([Atom|Rest],Var):-p_n_atom(Atom,UP),atomics_to_string([UP|Rest],NAME),add_var_to_env(NAME,Var),!.
+filter_var_chars([],[]).
+filter_var_chars([H|T],[H|Rest]):-  code_type(H, prolog_identifier_continue),!,filter_var_chars(T,Rest).
+filter_var_chars([_|T],[95|Rest]):- filter_var_chars(T,Rest).
+
+p_n_atom0(Atom,UP):- string(Atom),!,string_to_atom(String,Atom),!,p_n_atom0(Atom,UP).
+p_n_atom0([C|S],UP):- !,(catch(atom_codes(Atom,[C|S]),_,fail)),!,p_n_atom0(Atom,UP).
+p_n_atom0(Atom,UP):- atom(Atom),!,name(Atom,Was),filter_var_chars(Was,[C|S]),to_upper(C,U),name(UP,[U|S]).
+
+% debug_var(_A,_Var):-!.
+debug_var(A,Var):- var(Var),get_var_name(Var,Name),atomic(Name),\+ atom_concat('_',_,Name),flatten([A,Name],Flat),notrace(ignore(catch(debug_var0(Flat,Var),_,fail))),!.
+debug_var(A,B):- notrace(ignore(catch(debug_var0(A,B),_,fail))).
+debug_var0([AtomI|Rest],Var):-!,maplist(p_n_atom,[AtomI|Rest],UPS),atomics_to_string(UPS,NAME),add_var_to_env(NAME,Var),!.
 debug_var0(Atom,Var):- p_n_atom(Atom,UP),add_var_to_env(UP,Var),!.
 
 expand_progn(_Ctx,[], Result, Result, true, _Environment).
