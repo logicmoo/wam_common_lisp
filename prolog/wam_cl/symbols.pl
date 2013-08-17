@@ -19,11 +19,16 @@
 wl:type_checked(f_symbol_name(claz_symbol,claz_string)).
 f_symbol_name(Symbol,Str):- pl_symbol_name(Symbol,Name),to_lisp_string(Name,Str).
 pl_symbol_name(Symbol,Name):- package_external_symbols(pkg_kw,Name,Symbol)->true;get_opv(Symbol,symbol_name,Name).
-f_symbol_package(Symbol,Package):- is_keywordp(Symbol)->Package=pkg_kw;get_opv(Symbol,symbol_package,Package).
 f_symbol_value(Symbol,Value):- is_keywordp(Symbol)->Symbol=Value;do_or_die(get_opv(Symbol,symbol_value,Value)).
 f_symbol_function(Symbol,Function):- do_or_die(get_opv(Symbol,symbol_function,Function)),!.
 do_or_die(G):- G->true;throw(do_or_die(G)).
 
+f_symbol_package(Symbol,Package):- nonvar(Symbol),
+ ((fail,dif(kw_inherited,Local),package_find_symbol(_String,Package,Symbol,Local))->true;
+ (quietly(is_keywordp(Symbol))->Package=pkg_kw;
+  (Symbol==sys_name->Package=pkg_sys;
+   (get_opv(Symbol,symbol_package,Package))))).
+ 
 wl:interned_eval(("`sys:set-symbol-function")).
 f_sys_set_symbol_function(Symbol,Function):- 
   as_funcallable(Symbol,Function,Funcallable),
@@ -242,7 +247,12 @@ f_sys_put_sysprop(Symbol,Prop,Value,Optionals,Ret):- %assertion(is_symbolp(Symbo
       ->true; 
    (Ret=Value, set_opv(Symbol,sysprops,[Prop,Value|PList]))))).
 
+correct_missing_symbols:- 
+ wdmsg(correct_missing_symbols),
+     ignore(((package_external_symbols(Pkg,Str,Sym);package_internal_symbols(Pkg,Str,Sym)),
+  Pkg\==pkg_kw,atom(Sym),create_symbol(Str,Pkg,Sym),fail)).
 
+wl:interned_eval(call(correct_missing_symbols)).
 
 :- fixup_exports.
 

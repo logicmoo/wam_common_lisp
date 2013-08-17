@@ -86,7 +86,8 @@ atom_symbol_s("#",[SymbolName],_UPackage,Symbol):- f_make_symbol(SymbolName,Symb
 % SYMBOL
 atom_symbol_s(SymbolName,[],Package,Symbol):- !,intern_symbol(SymbolName,Package,Symbol,_).
 % PACKAGE::SYMBOL
-atom_symbol_s(PName,   ["", SymbolName],_UPackage,Symbol):- !, find_package_or_die(PName,Package),intern_symbol(SymbolName,Package,Symbol,_IntExt).
+atom_symbol_s(PName,   ["", SymbolName],_UPackage,Symbol):- !, find_package_or_die(PName,Package),
+  intern_symbol(SymbolName,Package,Symbol,_IntExt).
 % PACKAGE:SYMBOL must exist AND also exported
 atom_symbol_s(PName,   [SymbolName],_UPackage,Symbol):- find_package_or_die(PName,Package),atom_symbol_public(SymbolName,Package,Symbol).
 

@@ -33,6 +33,7 @@ is_self_evaluationing_const(X):- atomic(X),is_self_evaluationing_const0(X),!.
 is_self_evaluationing_const0(X):- (X==t;X==[];number(X);is_keywordp(X);string(X);(blob(X,T),T\==text)),!.
 is_self_evaluationing_const0(X):- is_packagep(X),!.
 is_self_evaluationing_const0(X):- is_functionp(X),!.
+is_self_evaluationing_const0(X):- is_classp(X),!.
 
 i_class(Atom,Class):- atom(Atom),!,a_class(Atom,Class).
 i_class(Obj,Type):- compound(Obj),!,c_class(Obj,Type),!.
@@ -78,9 +79,13 @@ i_type(function(OP),Class):- get_opv(OP,symbol_function,Obj),f_type_of(Obj,Class
 
 % atomics
 %a_type(Obj,Type):- get_opv_iiii(Obj,classof,Class),claz_to_symbol(Class,Type),!.
-a_type(Obj,Type):- b_type(Obj,Type).
+a_type(Obj,Type):- b_type(Obj,Type),!.
 
 b_type(Obj,Type):- nonvar(Type),b_type(Obj,Type0),!,Type=Type0.
+b_type(Obj,_):- \+ atom(Obj),!,fail.
+b_type(Obj,keyword):- package_external_symbols(pkg_kw,_,Obj).
+b_type(Obj,symbol):- package_external_symbols(_,_,Obj).
+b_type(Obj,symbol):- package_internal_symbols(_,_,Obj).
 b_type(Obj,Type):- get_opv_iiii(Obj,type_of,Type),!.
 b_type(Obj,Type):- get_opv_iiii(Obj,dims,List),(List=[N] -> Type = [simple_vector,N]; Type = [array,List]),!.
 b_type(Atom,Type):- atomic_list_concat([Type,_Name],'_znst_',Atom),!.
@@ -91,18 +96,20 @@ type_ges(Obj,Type):- compound(Obj),functor(Obj,Type,_).
 type_ges(Atom,Type):- atom(Atom),atomic_list_concat([Prefix|Rest],'_',Atom),prefix_to_typeof(Prefix,Rest,Atom,Type),!.
 
 
-type_or_class_nameof(Obj,Type):- quietly(f_type_of(Obj,Type)).
+type_or_class_nameof(Obj,Type):- quietly(f_type_of(Obj,Type)),!.
 
 type_named('$OBJ'(_,Type),Type):- atom(Type),!.
 type_named(Type,Type):- atomic(Type).
 
 
 f_typep(Obj,Type,Result):- t_or_nil(is_typep(Obj,Type),Result),f_values_list([Result,t],_).
-
-is_subtypep(SubType,Type):- find_class(SubType,SubClass),find_class(Type,Class),is_subclass(SubClass,Class).
-is_subclass(Class,Class).
-is_subclass(SubClass,Class):- get_struct_opv(SubClass,include,Class);(get_struct_opv(SubClass,super_priority,Classes),memberchk(Class,Classes)).
 is_typep(Obj,Type):- i_type(Obj,SubType),is_subtypep(SubType,Type),!.
+
+f_subtypep(SubType,Type,Result):- t_or_nil(is_subtypep(SubType,Type),Result).
+is_subtypep(SubType,Type):- find_class(SubType,SubClass),find_class(Type,Class),is_subclass(SubClass,Class).
+
+is_subclass(SubClass,Class):- SubClass=Class; get_super_class(SubClass,Class).
+
 
 f_type_of(O,T):- i_type(O,T),!.
 f_type_of(O,T):- type_ges(O,T),!.

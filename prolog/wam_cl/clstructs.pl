@@ -45,6 +45,7 @@ notify_assert(G):- assertz(G),wdmsg(G).
 
 is_class_prop(class_name).
 is_class_prop(type_of).
+is_class_prop(type).
 is_class_prop(kw_include).
 
 add_ci_p2(Claz,kw_subclass,S0):- to_claz(S0,S1),!,add_ci_p2(S1,kw_include,Claz).
@@ -52,12 +53,12 @@ add_ci_p2(Claz,Prop,S1):- is_class_prop(Prop),!,notify_assert(soops:struct_opv(C
 add_ci_p2(Claz,Prop,S0):- to_claz(S0,S1),!,notify_assert(soops:struct_opv(Claz,Prop,S1)).
 
 
-get_zlot(Claz,SlotName,ZLOT):- get_szlot('zlot_',Claz,SlotName,ZLOT).
+get_zlot(Claz,SlotName,ZLOT):- always(gen_slot_name('',Claz,SlotName,ZLOT)).
 
-add_ci_p2(Claz,kw_slot,  SlotName,SlotProp,SlotPropValue):- 
-    get_zlot(Claz,SlotName,ZLOT),
-    notify_assert(soops:struct_opv(Claz,slotname,SlotName,ZLOT)),
-    notify_assert(soops:struct_opv(Claz,SlotProp,SlotPropValue,ZLOT)).
+add_ci_p2(Claz,kw_slot,  SlotName,SlotProp,SlotPropValue):- !,
+    always((get_zlot(Claz,SlotName,ZLOT),
+    notify_assert(soops:struct_opv(Claz,sys_name,SlotName,ZLOT)),
+    notify_assert(soops:struct_opv(Claz,SlotProp,SlotPropValue,ZLOT)))).
 add_ci_p2(Claz,kw_method,SlotName,SlotProp,SlotPropValue):- notify_assert(added_method(Claz,SlotName,SlotProp,SlotPropValue)).
 add_ci_p2(Claz,KW,       SlotName,SlotProp,SlotPropValue):- trace, notify_assert(added_ci(Claz,KW,SlotName,SlotProp,SlotPropValue)).
 

@@ -201,7 +201,7 @@ del_attrs_of(CodeIn,Name):- term_variables(CodeIn,AttVars),maplist(del_attr_rev2
 
 sanitize_true(_, C1,C2):- \+ compound(C1),!,C2=C1.
 sanitize_true(_, C1,C2):- non_compound_code(C1),!,C2=C1.
-sanitize_true(_,f_sys_pf_set_slot_value(A,B,C,D),set_slot(A,B,C)):-C=D.
+%sanitize_true(_,f_sys_pf_set_slot_value(A,B,C,D),set_slot(A,B,C)):-C=D.
 sanitize_true(_,f_slot_value(A,B,C),get_opv(A,B,C)).
 sanitize_true(Ctx,(C1,C2),Joined):-!,sanitize_true(Ctx,C1,C1O),sanitize_true(Ctx,C2,C2O),conjoin_0(Ctx,C1O,C2O,Joined).
 sanitize_true(Ctx,(C2 ; CodeC),( C2O ; CodeCCO)):-!,sanitize_true(Ctx,C2,C2O),sanitize_true(Ctx,CodeC,CodeCCO).
@@ -511,7 +511,7 @@ simple_inline(set_var(E, OP, N, V),set_var(E, N, V)):- atom(N),atom(OP),memberch
 simple_inline(set_place(E, OP, N, V),set_var(E, N, V)):- var(V), atom(N),atom(OP),memberchk(OP,[psetq,setq]).
 %simple_inline(set_var(E, OP, [PLACE, N], V),set_place(E, OP, [PLACE, N], V)):- var(V), atom(N),atom(OP),memberchk(OP,[setf]).
 simple_inline(f_list(A,B),B=A).
-simple_inline(f_sys_pf_set_slot_value(A,B,C,D),set_slot(A,B,C)):-C=D.
+%simple_inline(f_sys_pf_set_slot_value(A,B,C,D),set_slot(A,B,C)):-C=D.
 simple_inline(f_cdr(I,O),(I==[]->O=[];I=[_|O])):- wam_cl_option(debug,0).
 simple_inline(f_car(I,O),(I==[]->O=[];I=[O|_])):- wam_cl_option(debug,0).
 list_to_disj([C1],(C1O)):-!, list_to_disj(C1,C1O).

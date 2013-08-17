@@ -50,6 +50,7 @@ to_prolog_string('#\\'(Code),Str):- !, (\+ number(Code)->Char=Code;char_code(Cha
 
 
 to_prolog_string_anyways(I,O):- to_prolog_string(I,O),!.
+to_prolog_string_anyways(sys_name,O):-!,O="NAME".
 to_prolog_string_anyways(I,O):- always(atom_string(I,O)),!.
 
 

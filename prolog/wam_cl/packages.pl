@@ -100,6 +100,8 @@ package_unintern_symbol(Package,Symbol):-
   retractall(package:package_internal_symbols(Package,_,Symbol)),
   retractall(package:package_external_symbols(Package,_,Symbol)).
 
+
+
 package_find_symbol_or_missing(String,Package,OldSymbol,IntExt):- package_find_symbol(String,Package,OldSymbol,IntExt),!.
 package_find_symbol_or_missing(_String,_Package,_NoSymbol,'$missing').
 
@@ -108,7 +110,7 @@ package_find_symbol_or_missing(_String,_Package,_NoSymbol,'$missing').
 package_find_symbol(String,Package,Symbol,Found):- to_prolog_string_if_needed(String,PlString),!,package_find_symbol(PlString,Package,Symbol,Found).
 package_find_symbol(String,Package,Symbol,kw_external):- package_external_symbols(Package,String,Symbol),!.
 package_find_symbol(String,Package,Symbol,kw_internal):- package_internal_symbols(Package,String,Symbol),!.
-package_find_symbol(String,Package,Symbol,kw_internal):- get_opv(Symbol,symbol_name,String),get_opv(Symbol,symbol_package,Package),
+package_find_symbol(String,Package,Symbol,kw_internal):- fail, get_opv(Symbol,symbol_name,String),get_opv(Symbol,symbol_package,Package),
   ((Package == pkg_cl -> (retract_all_1(soops:o_p_v(Symbol,_,_)), writeq(retract_all_1(soops:o_p_v(Symbol,_,_))))
     ;
   ((assertz(package:package_internal_symbols(Package,String,Symbol)),!,
@@ -373,7 +375,7 @@ package_use_list(pkg_sys, pkg_socket).
 */
 
 package_use_list(pkg_sys, pkg_threads).
-package_use_list(pkg_sys, pkg_os).
+%package_use_list(pkg_sys, pkg_os).
 package_use_list(pkg_sys, pkg_cl).
 package_use_list(pkg_sys, pkg_ext).
 
@@ -453,9 +455,10 @@ package_fprefix(kw_special,Pk,Pre):- package_symbol_prefix(Pk,Pre0),atom_concat_
 package_fprefix(kw_macro,Pk,Pre):- package_symbol_prefix(Pk,Pre0),atom_concat_or_rtrace('mf_',Pre0,Pre).
 package_fprefix(kw_operator,Pk,Pre):- trace,package_symbol_prefix(Pk,Pre0),atom_concat_or_rtrace('sf_',Pre0,Pre).
 
-package_symbol_prefix(A,B):- no_repeats(A,package_prefix(A,B)).
+package_symbol_prefix(A,B):- no_repeats(B,package_prefix(A,B)).
 package_prefix(pkg_cl,'').
 package_prefix(pkg_sys,'sys_').
+package_prefix(pkg_sys,'clos_').
 package_prefix(pkg_ext,'ext_').
 package_prefix(pkg_user,'u_').
 package_prefix(pkg_kw,'kw_').
@@ -465,9 +468,9 @@ package_prefix(Pk,Pre):- is_packagep(Pk),atom_concat_or_rtrace('pkg_',Package,Pk
 
 save_pi:- tell('pi2.data'),
    forall(member(Assert,[
-     package_shadowing_symbols(_,_),
      package_external_symbols(_,_,_),
-     package_internal_symbols(_,_,_)]),
+     package_internal_symbols(_,_,_),
+     package_shadowing_symbols(_,_)]),
    forall(clause(package:Assert,true),
       ignore((format('~q.~n',[Assert]))))), told.
 

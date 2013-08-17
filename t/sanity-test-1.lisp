@@ -222,7 +222,9 @@
 (#-allegro class-precedence-list #+allegro aclmop:class-precedence-list
              (find-class 'figurine-aardvark))
 
-(setf Eric (make-instance 'figurine-aardvark
+;; (break)
+
+#+TODO (setf Eric (make-instance 'figurine-aardvark
                           :legs 4
                           :made-by "Jen"
                           :made-in "Brittany"
@@ -231,7 +233,7 @@
 #+HAS_SHIFTF
 (shiftf (cute-p Eric) t)
 
-(slot-value Eric 'diet)
+#+TODO (slot-value Eric 'diet)
 
 
 
