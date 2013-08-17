@@ -129,7 +129,7 @@ compile_funop(_Ctx,_Env,Result,[FN | FunctionArgs],f_eval([FN|FunctionArgs],Resu
 
 check_foc_operator(Ctx,Env,BindType,F,Args,BetterName,PushPreArgs):-
    foc_operator(Ctx,Env,BindType,F,Args,ProposedName),
-   show_call_trace(do_check_foc_operator(Ctx,Env,BindType,F,Args,ProposedName, BetterName,PushPreArgs)),!.
+   always(do_check_foc_operator(Ctx,Env,BindType,F,Args,ProposedName, BetterName,PushPreArgs)),!.
 
 
 do_check_foc_operator(_Ctx,Env,_BindType,_F,_Args,ProposedName, BetterName,[Env]):-
