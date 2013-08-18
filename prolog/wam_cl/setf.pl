@@ -716,7 +716,7 @@ doc: doc_string(incf,
 	      function,
 	      "The first argument is some location holding a number.  This number is\r\nincremented by the second argument, DELTA, which defaults to 1.").
 
-wl:lambda_def(defmacro, incf, mf_incf, [sys_place, c38_optional, [sys_delta, 1], c38_environment, env], [progn, [if, [and, [symbolp, [setq, sys_place, [sys_pf_symbol_macroexpand, sys_place, env]]], [or, [constantp, sys_delta], [and, [symbolp, sys_delta], [not, [nth_value, 1, [sys_pf_symbol_macroexpand, sys_delta, env]]]]]], ['#BQ', [setq, ['#COMMA', sys_place], [+, ['#COMMA', sys_place], ['#COMMA', sys_delta]]]], [multiple_value_bind, [sys_dummies, sys_vals, sys_newval, sys_setter, sys_getter], [ext_get_setf_method, sys_place, env], [let, [[sys_d, [gensym]]], ['#BQ', [let_xx, [['#BQ-COMMA-ELIPSE', [mapcar, function(list), sys_dummies, sys_vals]], [['#COMMA', sys_d], ['#COMMA', sys_delta]], [['#COMMA', [car, sys_newval]], [+, ['#COMMA', sys_getter], ['#COMMA', sys_d]]]], ['#COMMA', sys_setter]]]]]]]).
+wl:lambda_def(defmacro, incf, mf_incf, [sys_place, c38_optional, [sys_delta, 1], c38_environment, env], [progn, [if, [and, [symbolp, [setq, sys_place, [sys_pf_symbol_macroexpand, sys_place, env]]], [or, [constantp, sys_delta], [and, [symbolp, sys_delta], [not, [nth_value, 1, [sys_pf_symbol_macroexpand, sys_delta, env]]]]]], ['#BQ', [setq, ['#COMMA', sys_place], [+, ['#COMMA', sys_place], ['#COMMA', sys_delta]]]], [multiple_value_bind, [sys_dummies, sys_vals, sys_newval, sys_setter, sys_getter], [sys_get_setf_method, sys_place, env], [let, [[sys_d, [gensym]]], ['#BQ', [let_xx, [['#BQ-COMMA-ELIPSE', [mapcar, function(list), sys_dummies, sys_vals]], [['#COMMA', sys_d], ['#COMMA', sys_delta]], [['#COMMA', [car, sys_newval]], [+, ['#COMMA', sys_getter], ['#COMMA', sys_d]]]], ['#COMMA', sys_setter]]]]]]]).
 wl: declared(mf_incf, env_arg1).
 
 wl:arglist_info(incf, mf_incf, [sys_place, c38_optional, [sys_delta, 1], c38_environment, env], arginfo{all:[sys_place, sys_delta], allow_other_keys:0, aux:0, body:0, complex:[environment], env:[env], key:0, names:[sys_place, sys_delta, env], opt:[sys_delta], req:[sys_place], rest:0, sublists:0, whole:0}).
@@ -767,7 +767,7 @@ mf_incf(Place_In, RestNKeys, MFResult) :-
 		;   LEnv=[bv(sys_dummies, []), bv(sys_vals, []), bv(sys_newval, []), bv(sys_setter, []), bv(sys_getter, [])|AEnv],
 		    get_var(LEnv, env, Env_Get31),
 		    get_var(LEnv, sys_place, Place_Get30),
-		    f_ext_get_setf_method(Place_Get30,
+		    f_sys_get_setf_method(Place_Get30,
 					  Env_Get31,
 					  Setf_method_Ret),
 		    setq_from_values(LEnv,
@@ -993,13 +993,13 @@ mf_setf(RestNKeys, FnResult) :- slow_trace,
 
 
 
-wl:lambda_def(defun, ext_get_setf_method_multiple_value, f_ext_get_setf_method_multiple_value, [u_form, c38_optional, env, c38_aux, u_tem], [[cond, [[symbolp, u_form], [let, [[u_store, [gensym]]], [values, [], [], [list, u_store], ['#BQ', [setq, ['#COMMA', u_form], ['#COMMA', u_store]]], u_form]]], [[or, [not, [consp, u_form]], [not, [symbolp, [car, u_form]]]], [error, '$ARRAY'([*], claz_base_character, "Cannot get the setf-method of ~S."), u_form]], [[multiple_value_bind, [u_t1, exp], [macroexpand, u_form, env], [when, exp, [setq, u_tem, u_t1]]], [ext_get_setf_method_multiple_value, u_tem, env]], [[get, [car, u_form], [quote, u_setf_method]], [apply, [get, [car, u_form], [quote, u_setf_method]], env, [cdr, u_form]]], [[or, [get, [car, u_form], [quote, u_setf_update_fn]], [setq, u_tem, [get, [car, u_form], [quote, sys_structure_access]]]], [let, [[u_vars, [u_to_gensyms, [cdr, u_form]]], [u_store, [gensym]]], [values, u_vars, [cdr, u_form], [list, u_store], [cond, [u_tem, [u_setf_structure_access, [car, u_vars], [car, u_tem], [cdr, u_tem], u_store]], [[let, [[u_f, [get, [car, u_form], [quote, u_setf_update_fn]]]], ['#BQ', [['#COMMA', u_f], ['#BQ-COMMA-ELIPSE', u_vars], ['#COMMA', u_store]]]]]], [cons, [car, u_form], u_vars]]]], [[get, [car, u_form], [quote, u_setf_lambda]], [let_xx, [[u_vars, [u_to_gensyms, [cdr, u_form]]], [u_store, [gensym]], [u_f, [get, [car, u_form], [quote, u_setf_lambda]]]], [values, u_vars, [cdr, u_form], [list, u_store], [funcall, [apply, u_f, u_vars], u_store], [cons, [car, u_form], u_vars]]]], [[symbol_function, [car, u_form]], [ext_get_setf_method_multiple_value, [macroexpand, u_form, env]]], [t, [let, [[u_vars, [u_to_gensyms, [cdr, u_form]]], [u_store, [gensym]]], [values, u_vars, [cdr, u_form], [list, u_store], ['#BQ', [funcall, function([setf, ['#COMMA', [car, u_form]]]), ['#COMMA', u_store], ['#BQ-COMMA-ELIPSE', u_vars]]], [cons, [car, u_form], u_vars]]]]]]).
-wl:arglist_info(ext_get_setf_method_multiple_value, f_ext_get_setf_method_multiple_value, [u_form, c38_optional, env, c38_aux, u_tem], arginfo{all:[u_form, env], allow_other_keys:0, aux:[u_tem], body:0, complex:0, env:0, key:0, names:[u_form, env, u_tem], opt:[env], req:[u_form], rest:0, sublists:0, whole:0}).
- wl:init_args(1,ext_get_setf_method_multiple_value).
+wl:lambda_def(defun, sys_get_setf_method_multiple_value, f_sys_get_setf_method_multiple_value, [u_form, c38_optional, env, c38_aux, u_tem], [[cond, [[symbolp, u_form], [let, [[u_store, [gensym]]], [values, [], [], [list, u_store], ['#BQ', [setq, ['#COMMA', u_form], ['#COMMA', u_store]]], u_form]]], [[or, [not, [consp, u_form]], [not, [symbolp, [car, u_form]]]], [error, '$ARRAY'([*], claz_base_character, "Cannot get the setf-method of ~S."), u_form]], [[multiple_value_bind, [u_t1, exp], [macroexpand, u_form, env], [when, exp, [setq, u_tem, u_t1]]], [sys_get_setf_method_multiple_value, u_tem, env]], [[get, [car, u_form], [quote, u_setf_method]], [apply, [get, [car, u_form], [quote, u_setf_method]], env, [cdr, u_form]]], [[or, [get, [car, u_form], [quote, u_setf_update_fn]], [setq, u_tem, [get, [car, u_form], [quote, sys_structure_access]]]], [let, [[u_vars, [u_to_gensyms, [cdr, u_form]]], [u_store, [gensym]]], [values, u_vars, [cdr, u_form], [list, u_store], [cond, [u_tem, [sys_setf_structure_access, [car, u_vars], [car, u_tem], [cdr, u_tem], u_store]], [[let, [[u_f, [get, [car, u_form], [quote, u_setf_update_fn]]]], ['#BQ', [['#COMMA', u_f], ['#BQ-COMMA-ELIPSE', u_vars], ['#COMMA', u_store]]]]]], [cons, [car, u_form], u_vars]]]], [[get, [car, u_form], [quote, u_setf_lambda]], [let_xx, [[u_vars, [u_to_gensyms, [cdr, u_form]]], [u_store, [gensym]], [u_f, [get, [car, u_form], [quote, u_setf_lambda]]]], [values, u_vars, [cdr, u_form], [list, u_store], [funcall, [apply, u_f, u_vars], u_store], [cons, [car, u_form], u_vars]]]], [[symbol_function, [car, u_form]], [sys_get_setf_method_multiple_value, [macroexpand, u_form, env]]], [t, [let, [[u_vars, [u_to_gensyms, [cdr, u_form]]], [u_store, [gensym]]], [values, u_vars, [cdr, u_form], [list, u_store], ['#BQ', [funcall, function([setf, ['#COMMA', [car, u_form]]]), ['#COMMA', u_store], ['#BQ-COMMA-ELIPSE', u_vars]]], [cons, [car, u_form], u_vars]]]]]]).
+wl:arglist_info(sys_get_setf_method_multiple_value, f_sys_get_setf_method_multiple_value, [u_form, c38_optional, env, c38_aux, u_tem], arginfo{all:[u_form, env], allow_other_keys:0, aux:[u_tem], body:0, complex:0, env:0, key:0, names:[u_form, env, u_tem], opt:[env], req:[u_form], rest:0, sublists:0, whole:0}).
+ wl:init_args(1,sys_get_setf_method_multiple_value).
 
  % ### Compiled:  `EXT:GET-SETF-METHOD-MULTIPLE-VALUE`
 % ```prolog
-f_ext_get_setf_method_multiple_value(Form_In, RestNKeys, FnResult) :-
+f_sys_get_setf_method_multiple_value(Form_In, RestNKeys, FnResult) :-
         AEnv51=[bv(u_form, Form_In), bv(env, Env_In), bv(u_tem, Tem_In)|ReplEnv],
         global_env(ReplEnv),
         opt_var(ReplEnv, env, Env_In, true, [], 1, RestNKeys),
@@ -1058,7 +1058,7 @@ f_ext_get_setf_method_multiple_value(Form_In, RestNKeys, FnResult) :-
                           (   IFTEST27\==[]
                           ->  get_var(AEnv51, env, Env_Get41),
                               get_var(AEnv51, u_tem, Tem_Get),
-                              f_ext_get_setf_method_multiple_value(Tem_Get,
+                              f_sys_get_setf_method_multiple_value(Tem_Get,
                                                                    [Env_Get41],
                                                                    TrueResult124),
                               ElseResult127=TrueResult124
@@ -1118,7 +1118,7 @@ f_ext_get_setf_method_multiple_value(Form_In, RestNKeys, FnResult) :-
                                           get_var(LEnv56, u_tem, Tem_Get67),
                                           f_cdr(Tem_Get67, Cdr_Ret156),
                                           get_var(LEnv56, u_store, Store_Get68),
-                                          f_u_setf_structure_access(Structure_access_Param,
+                                          f_sys_setf_structure_access(Structure_access_Param,
                                                                     Car_Ret,
                                                                     Cdr_Ret156,
                                                                     Store_Get68,
@@ -1218,7 +1218,7 @@ f_ext_get_setf_method_multiple_value(Form_In, RestNKeys, FnResult) :-
                                                                Env_Get106
                                                              ],
                                                              Multiple_value_Param),
-                                              f_ext_get_setf_method_multiple_value(Multiple_value_Param,
+                                              f_sys_get_setf_method_multiple_value(Multiple_value_Param,
                                                                                    [],
                                                                                    TrueResult119),
                                               ElseResult120=TrueResult119
@@ -1289,30 +1289,30 @@ f_ext_get_setf_method_multiple_value(Form_In, RestNKeys, FnResult) :-
                 ),
                 _9544=FnResult
               ),
-              block_exit(ext_get_setf_method_multiple_value, FnResult),
+              block_exit(sys_get_setf_method_multiple_value, FnResult),
               true).
-:- set_opv(f_ext_get_setf_method_multiple_value,type_of,compiled_function),
-   set_opv(ext_get_setf_method_multiple_value,
+:- set_opv(f_sys_get_setf_method_multiple_value,type_of,compiled_function),
+   set_opv(sys_get_setf_method_multiple_value,
            symbol_function,
-           f_ext_get_setf_method_multiple_value),
-   DefunResult=ext_get_setf_method_multiple_value.
+           f_sys_get_setf_method_multiple_value),
+   DefunResult=sys_get_setf_method_multiple_value.
 
 % ## EXEC
 % 971 inferences, 0.001 CPU in 0.001 seconds (97% CPU, 1350006 Lips)
 /*
 Warning: f_macro_function/2, which is referenced by
-Warning:        1-st clause of f_ext_get_setf_method_multiple_value/3: 1-st clause of f_ext_get_setf_method_multiple_value/3
-Warning: f_u_setf_structure_access/5, which is referenced by
-Warning:        1-st clause of f_ext_get_setf_method_multiple_value/3: 1-st clause of f_ext_get_setf_method_multiple_value/3
+Warning:        1-st clause of f_sys_get_setf_method_multiple_value/3: 1-st clause of f_sys_get_setf_method_multiple_value/3
+Warning: f_sys_setf_structure_access/5, which is referenced by
+Warning:        1-st clause of f_sys_get_setf_method_multiple_value/3: 1-st clause of f_sys_get_setf_method_multiple_value/3
 Warning: f_u_to_gensyms/2, which is referenced by
-Warning:        1-st clause of f_ext_get_setf_method_multiple_value/3: 1-st clause of f_ext_get_setf_method_multiple_value/3
+Warning:        1-st clause of f_sys_get_setf_method_multiple_value/3: 1-st clause of f_sys_get_setf_method_multiple_value/3
 
 */
-wl:lambda_def(defun, u_setf_structure_access, f_u_setf_structure_access, [u_struct, type, index, u_newvalue], [[case, type, [list, ['#BQ', [setf, [nth, ['#COMMA', index], ['#COMMA', u_struct]], ['#COMMA', u_newvalue]]]], [vector, ['#BQ', [sys_elt_set, ['#COMMA', u_struct], ['#COMMA', index], ['#COMMA', u_newvalue]]]], [t, ['#BQ', [sys_structure_set, ['#COMMA', u_struct], [quote, ['#COMMA', type]], ['#COMMA', index], ['#COMMA', u_newvalue]]]]]]).
-wl:arglist_info(u_setf_structure_access, f_u_setf_structure_access, [u_struct, type, index, u_newvalue], arginfo{all:[u_struct, type, index, u_newvalue], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[u_struct, type, index, u_newvalue], opt:0, req:[u_struct, type, index, u_newvalue], rest:0, sublists:0, whole:0}).
-wl: init_args(x, f_u_setf_structure_access).
+wl:lambda_def(defun, sys_setf_structure_access, f_sys_setf_structure_access, [u_struct, type, index, u_newvalue], [[case, type, [list, ['#BQ', [setf, [nth, ['#COMMA', index], ['#COMMA', u_struct]], ['#COMMA', u_newvalue]]]], [vector, ['#BQ', [sys_elt_set, ['#COMMA', u_struct], ['#COMMA', index], ['#COMMA', u_newvalue]]]], [t, ['#BQ', [sys_structure_set, ['#COMMA', u_struct], [quote, ['#COMMA', type]], ['#COMMA', index], ['#COMMA', u_newvalue]]]]]]).
+wl:arglist_info(sys_setf_structure_access, f_sys_setf_structure_access, [u_struct, type, index, u_newvalue], arginfo{all:[u_struct, type, index, u_newvalue], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[u_struct, type, index, u_newvalue], opt:0, req:[u_struct, type, index, u_newvalue], rest:0, sublists:0, whole:0}).
+wl: init_args(x, f_sys_setf_structure_access).
 
-f_u_setf_structure_access(Struct_In, Type_In, Index_In, Newvalue_In, FnResult) :-
+f_sys_setf_structure_access(Struct_In, Type_In, Index_In, Newvalue_In, FnResult) :-
         Env28=[bv(u_struct, Struct_In), bv(type, Type_In), bv(index, Index_In), bv(u_newvalue, Newvalue_In)|ReplEnv],
         global_env(ReplEnv),
         catch(( ( get_var(Env28, type, Key),
@@ -1337,12 +1337,12 @@ f_u_setf_structure_access(Struct_In, Type_In, Index_In, Newvalue_In, FnResult) :
                 ),
                 _5704=FnResult
               ),
-              block_exit(u_setf_structure_access, FnResult),
+              block_exit(sys_setf_structure_access, FnResult),
               true).
-:- set_opv(f_u_setf_structure_access,type_of,compiled_function),
+:- set_opv(f_sys_setf_structure_access,type_of,compiled_function),
    
-   set_opv(u_setf_structure_access, function, f_u_setf_structure_access),
-   DefunResult=u_setf_structure_access.
+   set_opv(sys_setf_structure_access, function, f_sys_setf_structure_access),
+   DefunResult=sys_setf_structure_access.
 
 /*
 (defmacro define-setf-expander (access-fn &rest rest)
@@ -1351,9 +1351,9 @@ f_u_setf_structure_access(Struct_In, Type_In, Index_In, Newvalue_In, FnResult) :
 
 */
 
-wl:lambda_def(defun, ext_get_setf_method, f_ext_get_setf_method, [u_form, c38_optional, env], [[multiple_value_bind, [u_vars, u_vals, u_stores, u_store_form, u_access_form], [ext_get_setf_method_multiple_value, u_form, env], [unless, [=, [list_length, u_stores], 1], [error, '$ARRAY'([*], claz_base_character, "Multiple store-variables are not allowed.")]], [values, u_vars, u_vals, u_stores, u_store_form, u_access_form]]]).
-wl:arglist_info(ext_get_setf_method, f_ext_get_setf_method, [u_form, c38_optional, env], arginfo{all:[u_form, env], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[u_form, env], opt:[env], req:[u_form], rest:0, sublists:0, whole:0}).
-wl: init_args(1,ext_get_setf_method).
+wl:lambda_def(defun, sys_get_setf_method, f_sys_get_setf_method, [u_form, c38_optional, env], [[multiple_value_bind, [u_vars, u_vals, u_stores, u_store_form, u_access_form], [sys_get_setf_method_multiple_value, u_form, env], [unless, [=, [list_length, u_stores], 1], [error, '$ARRAY'([*], claz_base_character, "Multiple store-variables are not allowed.")]], [values, u_vars, u_vals, u_stores, u_store_form, u_access_form]]]).
+wl:arglist_info(sys_get_setf_method, f_sys_get_setf_method, [u_form, c38_optional, env], arginfo{all:[u_form, env], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[u_form, env], opt:[env], req:[u_form], rest:0, sublists:0, whole:0}).
+wl: init_args(1,sys_get_setf_method).
 
 
 wl:interned_eval_devel('
@@ -1372,17 +1372,17 @@ wl:interned_eval_devel('
 %### Compiled:  `EXT:GET-SETF-METHOD`
 %```prolog
 
-f_ext_get_setf_method(Form_In, RestNKeys, FnResult):- !,
+f_sys_get_setf_method(Form_In, RestNKeys, FnResult):- !,
   f_get_setf_expansion(Form_In, RestNKeys, FnResult).
 
-f_ext_get_setf_method(Form_In, RestNKeys, FnResult) :-
+f_sys_get_setf_method(Form_In, RestNKeys, FnResult) :-
         Env24=[bv(u_form, Form_In), bv(env, Env_In)|ReplEnv],
         global_env(ReplEnv),
         opt_var(ReplEnv, env, Env_In, true, [], 1, RestNKeys),
         catch(( ( LEnv=[bv(u_vars, []), bv(u_vals, []), bv(u_stores, []), bv(u_store_form, []), bv(u_access_form, [])|Env24],
                   get_var(LEnv, env, Env_Get),
                   get_var(LEnv, u_form, Form_Get),
-                  f_ext_get_setf_method_multiple_value(Form_Get,
+                  f_sys_get_setf_method_multiple_value(Form_Get,
                                                        [Env_Get],
                                                        Multiple_value_Ret),
                   setq_from_values(LEnv,
@@ -1421,9 +1421,9 @@ f_ext_get_setf_method(Form_In, RestNKeys, FnResult) :-
                 ),
                 u_vars=FnResult
               ),
-              block_exit(ext_get_setf_method, FnResult),
+              block_exit(sys_get_setf_method, FnResult),
               true).
-:- set_opv(f_ext_get_setf_method,type_of,compiled_function),   
-   set_opv(ext_get_setf_method, symbol_function, f_ext_get_setf_method),
-   DefunResult=ext_get_setf_method.
+:- set_opv(f_sys_get_setf_method,type_of,compiled_function),   
+   set_opv(sys_get_setf_method, symbol_function, f_sys_get_setf_method),
+   DefunResult=sys_get_setf_method.
 

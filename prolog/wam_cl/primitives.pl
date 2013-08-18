@@ -50,7 +50,7 @@ is_equalp(X,Y):- is_equal(X,Y)->true;((f_sys_to_pvs(X,XX),f_sys_to_pvs(Y,YY), XX
 
 
 
-f_ext_quit(ExitCode,Ret):- trace,t_or_nil(halt(ExitCode),Ret).
+f_sys_quit(ExitCode,Ret):- trace,t_or_nil(halt(ExitCode),Ret).
 
 
 

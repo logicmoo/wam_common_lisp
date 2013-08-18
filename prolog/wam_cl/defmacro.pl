@@ -142,13 +142,13 @@ f_macroexpand([LispCode|Optionals],Result):-
 
 f_sys_pf_symbol_macroexpand(_Place_Get, _Env_Get,Result):- Result=[].
 
-wl:interned_eval(("`ext:set-symbol-macro-function")).
-f_ext_set_symbol_macro_function(Symbol,FunctionSpec,ResultIsMacro):- 
+wl:interned_eval(("`sys:set-symbol-macro-function")).
+f_sys_set_symbol_macro_function(Symbol,FunctionSpec,ResultIsMacro):- 
   as_symbol_macro_function(_Ctx,_Env,Symbol,FunctionSpec,ResultIsMacro),
   set_opv(Symbol,symbol_function,ResultIsMacro),set_opv(ResultIsMacro,type_of,sys_macro).
 
-wl:interned_eval(("`ext:set-symbol-macro")).
-f_ext_set_symbol_macro(Symbol,FunctionSpec,ResultIsMacro):- 
+wl:interned_eval(("`sys:set-symbol-macro")).
+f_sys_set_symbol_macro(Symbol,FunctionSpec,ResultIsMacro):- 
   as_symbol_macro_function(_Ctx,_Env,Symbol,FunctionSpec,ResultIsMacro),
   set_opv(Symbol,symbol_function,ResultIsMacro),set_opv(ResultIsMacro,type_of,sys_macro).
 

@@ -226,14 +226,14 @@ print_package_or_hash(P):-short_package_or_hash(P,O),write(O).
    short_package_or_hash(P,O):- pl_package_name(P,N),!,O=(N).
    short_package_or_hash(P,O):- O=(failed_short_package_or_hash(P)).
 
-   shorter_name(PN,NN):- package_nicknames(PN,NN),atom_length(PN,B),atom_length(NN,A),A<B.
-   shorter_name("SYSTEM","SYS").
-   shorter_name("COMMON-LISP","CL").
-   %symbol printer might just use 
    shorter_name("COMMON-LISP-USER","U").
-   %shorter_name("COMMON-LISP-USER","CL-USER").
+   shorter_name("COMMON-LISP","CL").
    shorter_name("SYSTEM","SYS").
-   shorter_name("EXTENSIONS","EXT").
+   shorter_name(PN,NN):- package_nicknames(PN,NN),atom_length(PN,B),atom_length(NN,A),A<B.
+   %symbol printer might just use 
+   %shorter_name("COMMON-LISP-USER","CL-USER").
+   %shorter_name("SYSTEM","SYS").
+   %shorter_name("EXTENSIONS","SB-EXT").
    shorter_name(S,S).
 
 
@@ -245,23 +245,20 @@ print_package_or_hash(P):-short_package_or_hash(P,O),write(O).
 :- dynamic package_internal_symbols/3.
 
 package_name(pkg_kw,"KEYWORD").
-package_name(pkg_prolog,"PROLOG").
 package_name(pkg_user,"COMMON-LISP-USER").
 package_name(pkg_cl,"COMMON-LISP").
 package_name(pkg_clos,"CLOS").
+package_name(pkg_prolog,"PROLOG").
 package_name(pkg_custom,"CUSTOM").
 package_name(pkg_debug,"DEBUG").
-package_name(pkg_ext,"EXTENSIONS").
+package_name(pkg_ext,"SB-EXT").
 package_name(pkg_ffi,"FFI").
 package_name(pkg_format,"FORMAT").
 package_name(pkg_loop,"LOOP").
 package_name(pkg_os,"POSIX").
-package_name(pkg_precompiler,"PRECOMPILER").
-package_name(pkg_profiler,"PROFILER").
 package_name(pkg_readline,"READLINE").
 package_name(pkg_regexp,"REGEXP").
 package_name(pkg_screen,"SCREEN").
-package_name(pkg_sequence,"SEQUENCE").
 package_name(pkg_socket,"SOCKET").
 package_name(pkg_sys,"SYSTEM").
 package_name(pkg_threads,"THREADS").
@@ -273,6 +270,9 @@ package_name(pkg_gstream,"GSTREAM").
 package_name(pkg_i18n,"I18N").
 package_name(pkg_java,"JAVA").
 package_name(pkg_jvm,"JVM").
+package_name(pkg_precompiler,"PRECOMPILER").
+package_name(pkg_profiler,"PROFILER").
+package_name(pkg_sequence,"SEQUENCE").
 
 :- decl_mapped_opv(claz_package,[name=package_name]).
 
@@ -285,12 +285,15 @@ package_nicknames(pkg_user, "USER").
 package_nicknames(pkg_user, "CL-USER").
 package_nicknames(pkg_user, "EMACS-CL-USER").
 
-package_nicknames(pkg_ext, "EXT").
+package_nicknames(pkg_ext, "SB!EXT").
 
 package_nicknames(pkg_prolog, "P").
 package_nicknames(pkg_prolog, "INT").
 
 package_nicknames(pkg_sys, "SYS").
+package_nicknames(pkg_sys, "EXCL").
+package_nicknames(pkg_sys, "EXT").
+package_nicknames(pkg_sys, "EXTENSIONS").
 package_nicknames(pkg_sys, "C").
 package_nicknames(pkg_sys, "SI").
 package_nicknames(pkg_sys, "SB!C").
@@ -310,11 +313,11 @@ package_nicknames(pkg_profiler, "PROF").
 :- decl_mapped_opv(claz_package,[nicknames=package_nicknames]).
 
 package_use_list(pkg_user, pkg_cl).
+package_use_list(pkg_user, pkg_sys).
+package_use_list(pkg_user, pkg_prolog).
 package_use_list(pkg_user, pkg_custom).
 package_use_list(pkg_user, pkg_clos).
 package_use_list(pkg_user, pkg_ext).
-package_use_list(pkg_user, pkg_prolog).
-package_use_list(pkg_user, pkg_sys).
 
 package_use_list(pkg_cl, pkg_ext).
 package_use_list(pkg_cl, pkg_prolog).
@@ -355,11 +358,9 @@ package_use_list(pkg_ext, pkg_i18n).
 package_use_list(pkg_ext, pkg_os).
 package_use_list(pkg_ext, pkg_socket).
 package_use_list(pkg_ext, pkg_threads).
-/*
 package_use_list(pkg_ext, pkg_clos).
 package_use_list(pkg_ext, pkg_sys).
 package_use_list(pkg_ext, pkg_prolog).
-*/
 
 package_use_list(pkg_ffi, pkg_cl).
 package_use_list(pkg_ffi, pkg_ext).

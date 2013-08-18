@@ -98,8 +98,8 @@ or_nil(G):- G ->true;nil_lastvar(G).
 
 
 path_probe(Dir):- f_symbol_value(xx_default_pathname_defaults_xx,Str),to_prolog_pathname(Str,Path),(Path\==''-> Dir=Path;Dir='.').
-path_probe(Path):-f_symbol_value(ext_xx_file_search_xx,Str),(member(E,Str)*->to_prolog_pathname(E,Path);Path='.').
-path_probe(Str):- f_symbol_value(ext_xx_lisp_home_xx,Str),to_prolog_pathname(Str,Path),Path\==''.
+path_probe(Path):-f_symbol_value(sys_xx_file_search_xx,Str),(member(E,Str)*->to_prolog_pathname(E,Path);Path='.').
+path_probe(Str):- f_symbol_value(sys_xx_lisp_home_xx,Str),to_prolog_pathname(Str,Path),Path\==''.
 path_probe(FD):- stream_property(_,file_name(FD)).
 
 pl_probe_file(In,M):- path_probe(FD),once((with_fstem(FD,In,M))),!.
@@ -111,7 +111,7 @@ set_default_path_early:-
 
 :- prolog_load_context(directory,X),
    assertz(wl:interned_eval(call((to_lisp_pathname(X,Path),
-     set_opv(sym('ext:*LISP-HOME*'),symbol_value,Path))))).
+     set_opv(sym('sys:*LISP-HOME*'),symbol_value,Path))))).
 
 wl:interned_eval(call((to_lisp_pathname("",Path),
      set_opv(sym('cl:*default-pathname-defaults*'),symbol_value,Path)))).

@@ -62,7 +62,7 @@ f_maphash(Fn,HT,RetVal):-  RetVal=[],
   forall(rb_in(Name,Value,Tree),ignore(ht_match(MapFn,Name,Value))).
 
 
-f_ext_maphash_iter(Function, Hash_table, FnResult) :-
+f_sys_maphash_iter(Function, Hash_table, FnResult) :-
         global_env(ReplEnv5),
         _Env10=[bv(function, Function), bv(hash_table, Hash_table)|ReplEnv5],
         f_with_hash_table_iterator([u_next_entry, hash_table],

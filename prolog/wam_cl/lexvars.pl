@@ -118,8 +118,8 @@ get_symbol_value(Env,Obj,Value):- get_var(Env,Obj,Value).
 
 get_var(Var,Value):- current_env(Env), get_var(Env,Var,Value).
 get_var(Env,Var,Value):-
-  symbol_value_or(Env,Var,
-    symbol_value_error(Env,Var,Value),Value).
+  notrace(symbol_value_or(Env,Var,
+    symbol_value_error(Env,Var,Value),Value)).
 
 symbol_value_or(Env,Var,G,Value):-
  ensure_env(Env), 
@@ -249,7 +249,7 @@ maybe_specials_in_body(SpecialBindings,BodyFormsBody,SpecialBody):-
 
 is_special_var(Var):- atom(Var),!,get_opv_i(Var,symbol_value,_).
 
-make_letvar(ext_letf,Place,Value,place(Place,Value,_OldValue)):- is_list(Place).
+make_letvar(sys_letf,Place,Value,place(Place,Value,_OldValue)):- is_list(Place).
 make_letvar(_,Var,Value,sv(Var,Value,symbol_value,_OldValue)):- is_special_var(Var),!.
 make_letvar(_,Var,Value,bv(Var,Value)).
 %make_letvar(_,Var,Value,vv(Var,Value)).

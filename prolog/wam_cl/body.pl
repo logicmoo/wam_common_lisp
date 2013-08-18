@@ -92,8 +92,8 @@ compile_body_form(Ctx,Env,Result,[BinOP,Form1|Form2],Code):- binary_macro(BinOP,
   Code = (Code1,Code2,Code3).
 
 % EXT::XOR
-binary_macro(ext_xor,[]).
-compile_body_form(Ctx,Env,Result,[ext_xor,Form1,Form2],Code):-
+binary_macro(sys_xor,[]).
+compile_body_form(Ctx,Env,Result,[sys_xor,Form1,Form2],Code):-
   compile_body_form(Ctx,Env,Result1,Form1,Code1),
   compile_body_form(Ctx,Env,Result2,Form2,Code2),
   Code3 = (((Result1 \==[]) -> (Result2 ==[]) ; (Result2 \==[])) -> Result=t;Result=[]),
@@ -182,10 +182,10 @@ compiler_macro_left_right(prog,[Vars|Forms], [block,[],[let,Vars,[tagbody|Forms]
 % =============================================================================
 % = LET/EXT:LETF = 
 % =============================================================================
-%compile_body_form(Ctx,Env,Result,[OP, []| BodyForms], Body):- memberchk(OP,ext_letf_xx,ext_letf,let,let_xx),
+%compile_body_form(Ctx,Env,Result,[OP, []| BodyForms], Body):- memberchk(OP,sys_letf_xx,sys_letf,let,let_xx),
 %  must_compile_body(Ctx,Env,Result,[progn| BodyForms], Body).
 
-compile_body_form(Ctx,Env,Result,[OP, NewBindingsIn| BodyForms], Body):- memberchk(OP,[ext_letf_xx,ext_letf,let,let_xx]), 
+compile_body_form(Ctx,Env,Result,[OP, NewBindingsIn| BodyForms], Body):- memberchk(OP,[sys_letf_xx,sys_letf,let,let_xx]), 
   assertion(is_list(NewBindingsIn)),!,
   always(compile_let(Ctx,Env,Result,[OP, NewBindingsIn| BodyForms], Body)).
 

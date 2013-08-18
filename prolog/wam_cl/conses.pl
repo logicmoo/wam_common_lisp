@@ -66,7 +66,7 @@ f_list(ListI,ListO):- ListI=ListO.
 
 %:- dynamic(op_replacement/2).
 wl:op_replacement(first,car).
-f_ext_pf_car(List, Result):-f_car(List, Result).
+f_sys_pf_car(List, Result):-f_car(List, Result).
 f_first(List, Result):-f_car(List, Result).
 f_car(List, Result):- 
   (List = [Result|_] -> true;
@@ -75,8 +75,8 @@ f_car(List, Result):-
 		throw(ErrNo)))).
 
 wl:op_replacement(rest,cdr).
-wl:op_replacement(ext_pf_cdr,cdr).
-f_ext_pf_cdr(List, Result):-f_cdr(List, Result).
+wl:op_replacement(sys_pf_cdr,cdr).
+f_sys_pf_cdr(List, Result):-f_cdr(List, Result).
 f_u_pf_cdr(List, Result):-f_cdr(List, Result).
 f_cdr(List, Result):- List==[]->Result=[];
 	once( (	List = [_|Result]
@@ -140,7 +140,7 @@ f_assoc(_,_,_,[]).
 % assoc item alist
 
 f_second(List,R):- List=[_,R|_]->true;R=[].
-f_ext_pf_cadr(List,R):- List=[_,R|_]->true;R=[].
+f_sys_pf_cadr(List,R):- List=[_,R|_]->true;R=[].
 f_cadr(List,R):- List=[_,R|_]->true;R=[].
 
 
@@ -321,7 +321,7 @@ Warning: f_values/2, which is referenced by
 Warning:        1-st clause of f_values_list/2: 1-st clause of f_values_list/2
 Warning: f_with_simple_restart/3, which is referenced by
 Warning:        1-st clause of f_break/2: 1-st clause of f_break/2
-Warning: f_ext_neq/3, which is referenced by
+Warning: f_sys_neq/3, which is referenced by
 Warning:        1-st clause of f_sys_compiler_macroexpand_1/3: 1-st clause of f_sys_compiler_macroexpand_1/3
 Warning: f_sys_all_car/2, which is referenced by
 Warning:        1-st clause of f_sys_all_car1/2: 1-st clause of f_sys_all_car1/2

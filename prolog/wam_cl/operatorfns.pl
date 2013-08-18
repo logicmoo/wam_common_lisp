@@ -329,7 +329,7 @@ is_special_op('%escape-fun', pkg_sbc).
 is_special_op('%funcall', pkg_sbc).
 is_special_op('%primitive', pkg_sys).
 is_special_op('%within-cleanup', pkg_sbc).
-is_special_op('compiler-let', pkg_ext).
+is_special_op('compiler-let', pkg_sys).
 is_special_op('do*', pkg_cl).
 is_special_op('eval-when', pkg_cl).
 is_special_op('global-function', pkg_sbc).
@@ -344,7 +344,7 @@ is_special_op('nth-value', pkg_cl).
 is_special_op('prog*', pkg_cl).
 is_special_op('return-from', pkg_cl).
 is_special_op('symbol-macrolet', pkg_cl).
-is_special_op('truly-the', pkg_ext).
+is_special_op('truly-the', pkg_sys).
 is_special_op('unwind-protect', pkg_cl).
 
 is_special_op(block, pkg_cl).

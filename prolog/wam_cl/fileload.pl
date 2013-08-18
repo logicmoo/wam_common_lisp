@@ -368,7 +368,7 @@ f_require(Name_Param, RestNKeys, FResult) :-
 % asserting... u
 wl:arglist_info(f_provide, [sys_name], [_Name_Param], arginfo{all:[sys_name], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_name], opt:0, req:[sys_name], rest:0, whole:0}).
 % asserting... u
-wl:init_args(x, f_provide).
+wl:init_args(x, provide).
 % asserting... u
 wl:lambda_def(defun, provide, f_provide, [sys_name], [[let, [[string, [string, sys_name]]], [pushnew, string, xx_modules_xx, kw_test, function(string_c61)], string]]).
 % asserting... u

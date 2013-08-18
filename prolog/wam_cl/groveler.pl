@@ -23,11 +23,11 @@
 wl:body_compiled(multiple_value_bind).  wl:body_compiled(multiple_value_call).  wl:body_compiled(multiple_value_list).  
 wl:body_compiled(values).  wl:body_compiled(values_list).  
 wl:body_compiled(let).  wl:body_compiled(let_xx). 
-wl:body_compiled(ext_letf).  wl:body_compiled(ext_letf_xx).  
+wl:body_compiled(sys_letf).  wl:body_compiled(sys_letf_xx).  
 wl:body_compiled(eval). wl:body_compiled(apply). 
 wl:body_compiled(function). wl:body_compiled(lambda).
 wl:body_compiled(macrolet). wl:body_compiled(flet). wl:body_compiled(labels). 
-wl:body_compiled(or).  wl:body_compiled(and). wl:body_compiled(ext_xor).
+wl:body_compiled(or).  wl:body_compiled(and). wl:body_compiled(sys_xor).
 wl:body_compiled(progn).  wl:body_compiled(prog).  
 wl:body_compiled(prog1).  wl:body_compiled(prog2).  wl:body_compiled(progv). 
 wl:body_compiled(tagbody). wl:body_compiled(go).
@@ -44,7 +44,7 @@ wl:body_compiled(setq).
 
 
 was_pkg_prefix(sys,pkg_sys).
-was_pkg_prefix(ext,pkg_ext).
+was_pkg_prefix(sys,pkg_sys).
 was_pkg_prefix(u,pkg_user).
 was_pkg_prefix(clos,pkg_clos).
 
@@ -104,7 +104,7 @@ wl:grovel_pred(M,F,1):-
 make_special_operator(Symbol):-
   atom_concat('sf_',Symbol,SF),
   set_opv(Symbol,symbol_function,SF),
-  set_opv(SF,type_of,ext_special_operator).
+  set_opv(SF,type_of,sys_special_operator).
 
 :- assertz(wl:interned_eval(call(maplist(make_special_operator,[
          block,

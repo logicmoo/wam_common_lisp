@@ -292,14 +292,14 @@ wl:arglist_info(f_sys_setf_function_name_p, [sys_name], [_Name_Param], arginfo{a
 % asserting... u
 wl:init_args(x, f_sys_setf_function_name_p).
 % asserting... u
-wl:lambda_def(defun, sys_setf_function_name_p, f_sys_setf_function_name_p, [sys_name], [[and, [consp, sys_name], [consp, [ext_pf_cdr, sys_name]], [null, [u_pf_cddr, sys_name]], [symbolp, [ext_pf_cadr, sys_name]], [eq, [car, sys_name], [quote, setf]]]]).
+wl:lambda_def(defun, sys_setf_function_name_p, f_sys_setf_function_name_p, [sys_name], [[and, [consp, sys_name], [consp, [sys_pf_cdr, sys_name]], [null, [u_pf_cddr, sys_name]], [symbolp, [sys_pf_cadr, sys_name]], [eq, [car, sys_name], [quote, setf]]]]).
 f_sys_setf_function_name_p(Name_Param, TrueResult66) :-
         (   is_consp(Name_Param)
-        ->  f_ext_pf_cdr(Name_Param, PredArgResult35),
+        ->  f_sys_pf_cdr(Name_Param, PredArgResult35),
             (   is_consp(PredArgResult35)
             ->  f_u_pf_cddr(Name_Param, IFTEST40),
                 (   IFTEST40==[]
-                ->  f_ext_pf_cadr(Name_Param, PredArgResult53),
+                ->  f_sys_pf_cadr(Name_Param, PredArgResult53),
                     (   is_symbolp(PredArgResult53)
                     ->  f_car(Name_Param, Is_eq_Param),
                         t_or_nil(is_eq(Is_eq_Param, setf), TrueResult),

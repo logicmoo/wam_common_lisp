@@ -459,7 +459,7 @@ reduce_atom0(X,XX):- atom_concat_or_rtrace('f_',XX,X).
 reduce_atom(X,XX):- atom_concat_or_rtrace('u_',XX,X).
 reduce_atom(X,XX):- atom_concat_or_rtrace('kw_',XX,X).
 reduce_atom(X,XX):- atom_concat_or_rtrace('sys_',XX,X).
-reduce_atom(X,XX):- atom_concat_or_rtrace('ext_',XX,X).
+reduce_atom(X,XX):- atom_concat_or_rtrace('sys_',XX,X).
 reduce_atom(X,XX):- atom_concat_or_rtrace(XX,'_mexpand1',X).
 */
 

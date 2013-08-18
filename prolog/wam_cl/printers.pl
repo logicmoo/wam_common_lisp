@@ -46,7 +46,7 @@ sexpr1(X)--> {atom(X)},!,[X].
 sexpr1(X)--> {\+compound(X),format(atom(NN),'~q',[X])},!,[NN].
 sexpr1(['quote', Expression]) --> [''''], !, sexpr1(Expression).
 sexpr1(['#COMMA',X]) --> [','],sexpr1(X).
-sexpr1(['#BQ',X])--> ['`'],sexpr1(X).
+sexpr1(['#BQ',X])--> ['`'],!,sexpr1(X).
 sexpr1(['#BQ-COMMA-ELIPSE',X])--> [',@'],sexpr1(X).
 sexpr1([X|Y]) --> ['('],  sexpr1(X), lisplist(Y,')').
 sexpr1([function,Expression]) --> ['#'''], !, sexpr1(Expression).

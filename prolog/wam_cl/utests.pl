@@ -276,7 +276,7 @@ mf_u_is(Eqf_In, Expected_In, Actual_In, MFResult) :-
               block_exit(u_is, MFResult),
               true).
 :- set_opv(mf_u_is,type_of,sys_macro),
-   set_opv(sf_u_is,type_of,ext_special_operator),
+   set_opv(sf_u_is,type_of,sys_special_operator),
    set_opv(u_is, symbol_function, sf_u_is).
 
 :- fixup_exports.

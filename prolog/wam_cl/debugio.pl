@@ -18,7 +18,7 @@
 
 :- include('header').
 
-wl:interned_eval("(defparameter ext:*markdown* cl:t)").
+wl:interned_eval("(defparameter sys:*markdown* cl:t)").
 
 
 

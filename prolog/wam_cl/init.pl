@@ -117,7 +117,7 @@ handle_all_program_args([N|More]):- handle_1program_arg(N),!,handle_all_program_
 handle_all_program_args([N|More]):- exists_file(N),imply_flag(verbose,0),imply_interactive(false),!,do_after_load(((set_program_args(More),f_load(N,_)))).
 handle_all_program_args(More):- do_after_load(((set_program_args(More)))).
 
-set_program_args(More):- maplist(to_lisp_string,More,List),set_var(ext_xx_args_xx,List).
+set_program_args(More):- maplist(to_lisp_string,More,List),set_var(sys_xx_args_xx,List).
 
 
 
