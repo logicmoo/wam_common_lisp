@@ -1341,7 +1341,7 @@ f_sys_setf_structure_access(Struct_In, Type_In, Index_In, Newvalue_In, FnResult)
               true).
 :- set_opv(f_sys_setf_structure_access,type_of,compiled_function),
    
-   set_opv(sys_setf_structure_access, function, f_sys_setf_structure_access),
+   set_opv(sys_setf_structure_access, symbol_function, f_sys_setf_structure_access),
    DefunResult=sys_setf_structure_access.
 
 /*

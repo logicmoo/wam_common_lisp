@@ -444,7 +444,7 @@ expand_function_head(Ctx,Env,Symbol,FN,FormalParms,Whole,HeadParms,ZippedArgEnv,
    HeadParms = [WholeMinusSymbol])).
 
 % align_args_local
-expand_function_head(Ctx,Env,Symbol,FN,FormalParms,Whole,HeadParms,[ZippedArgEnv|Env],ArgInfo, (HeadDefCode,assert_lsp(Symbol,Used)),
+expand_function_head(Ctx,Env,Symbol,FN,FormalParms,Whole,HeadParms,ZippedArgEnv,ArgInfo, (HeadDefCode,assert_lsp(Symbol,Used)),
   HeadCodeOut):-
    Whole = [_|WholeMinusSymbol],
    debug_var('RestNKeys',RestNKeys),
@@ -461,7 +461,7 @@ expand_function_head(Ctx,Env,Symbol,FN,FormalParms,Whole,HeadParms,[ZippedArgEnv
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function_head_params(Ctx,Env,_Symbol,FormalParms,[ZippedArgEnv|Env],RestNKeys,Whole,RequiredArgs,ArgInfo,Names,PVars,Code):-!,
+function_head_params(Ctx,Env,_Symbol,FormalParms,ZippedArgEnv,RestNKeys,Whole,RequiredArgs,ArgInfo,Names,PVars,Code):-!,
    ArgInfo = arginfo{req:0,all:0,sublists:0,opt:0,rest:0,whole:0,body:0,key:0,aux:0,env:0,allow_other_keys:0,names:Names,complex:0},
    enter_ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,required,FormalParms,RequiredArgs,Names,PVars,Code),
 	zip_with(Names, PVars, [Var, Val, bv(Var,Val)]^true, ZippedArgEnv),!.

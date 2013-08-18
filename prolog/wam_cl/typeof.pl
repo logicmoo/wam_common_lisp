@@ -17,6 +17,7 @@
 :- include('header').
 
 f_class_of(Obj,Class):- quietly(i_class(Obj,Class0)),!,Class=Class0.
+f_class_of(_,claz_t).
 
 :- user:use_module(library('dialect/sicstus/arrays'),[is_array/1]).
 % :- use_module(library('dialect/sicstus')).
@@ -33,36 +34,39 @@ is_self_evaluationing_const0(X):- (X==t;X==[];number(X);is_keywordp(X);string(X)
 is_self_evaluationing_const0(X):- is_packagep(X),!.
 is_self_evaluationing_const0(X):- is_functionp(X),!.
 
-i_class(Var,Class):-attvar(Var),get_attr(Var,classof,Class).
+i_class(Atom,Class):- atom(Atom),!,a_class(Atom,Class).
+i_class(Obj,Type):- compound(Obj),!,c_class(Obj,Type),!.
+i_class(Var,Class):-attvar(Var),get_attr(Var,type_of,Class).
 i_class(Var,claz_locative):-var(Var).
-%i_class(symbol, claz_symbol):-!.
-% compounds
-i_class(function(OP),Class):- atom(OP),get_opv(OP,symbol_function,Obj),f_class_of(Obj,Class).
-i_class([_|_],claz_cons):-!.
-i_class('$OBJ'(Type,_Data),Type).
-i_class('#\\'(_),claz_character).
-i_class('$COMPLEX'(_,_),claz_complex).
-i_class('$NUMBER'(Type,_),Type).
-i_class(Str,claz_string):- is_stringp(Str).
-i_class(function(_),claz_function).
 % atomics
-i_class(X,claz_package):- is_packagep(X),!.
 i_class([],claz_null):-!.
-i_class(t,claz_symbol).
-i_class(symbol,claz_symbol).
-i_class(Dict,Class):- is_dict(Dict,Class).
 i_class(Number,claz_integer):- integer(Number).
 i_class(Number,claz_float):- float(Number).
-i_class(Obj,Class):- get_opv_iiii(Obj,classof,Class).
-i_class(Obj,Class):- get_opv_iiii(Obj,type_of,Type),always_find_class(Type,Class).
-i_class(Atom,Class):- atom(Atom),atomic_list_concat([Type,_Name],'_znst_',Atom),always_find_class(Type,Class).
+i_class(Str,claz_string):- is_stringp(Str).
+% atom
+a_class(t,claz_symbol).
+a_class(symbol,claz_symbol).
+a_class(Obj,Class):- b_type(Obj,Type),always_find_class(Type,Class).
+% compounds
+c_class(function(OP),Class):- atom(OP),get_opv(OP,symbol_function,Obj),f_class_of(Obj,Class).
+c_class(function(_),claz_function).
+c_class([_|_],claz_cons):-!.
+c_class('$OBJ'(Type,_Data),Type).
+c_class('#\\'(_),claz_character).
+c_class('$COMPLEX'(_,_),claz_complex).
+c_class('$NUMBER'(Type,_),Type).
+c_class(Dict,Class):- is_dict(Dict,Class).
+c_class(Str,claz_string):- is_stringp(Str).
 
+always_find_class(keyword,claz_symbol).
+always_find_class(boolean,claz_symbol).
 always_find_class(Type,Class):- find_class(Type,Class),!.
 always_find_class(Type,Class):- atom_concat_or_rtrace('claz_',Type,Class).
 
 i_type(Var,sys_locative):-var(Var).
+i_type(t,boolean).
+i_type([],null).
 i_type(Obj,Type):- atom(Obj),!,a_type(Obj,Type),!.
-i_type([],null):-!.
 i_type([_|_],cons):-!.
 i_type(Dict,Type):- is_dict(Dict,Type).
 i_type(Str,string):- is_stringp(Str).
@@ -72,13 +76,14 @@ i_type(Obj,Type):- compound(Obj),i_class(Obj,Class),claz_to_symbol(Class,Type).
 i_type('$NUMBER'(Type,_),Type).
 i_type(function(OP),Class):- get_opv(OP,symbol_function,Obj),f_type_of(Obj,Class).
 
-a_type(Obj,Type):- get_opv_iiii(Obj,type_of,Type),!.
+% atomics
 a_type(Obj,Type):- get_opv_iiii(Obj,classof,Class),claz_to_symbol(Class,Type),!.
-a_type(Obj,Type):- get_opv_iiii(Obj,dims,List),(List=[N] -> Type = [simple_vector,N]; Type = [array,List]),!.
-a_type(Atom,Type):- atomic_list_concat([Type,_Name],'_znst_',Atom),!.
-a_type(t,boolean).
-a_type(Atom,Type):- atomic_list_concat([Prefix|Rest],'_',Atom),prefix_to_typeof(Prefix,Rest,Atom,Type),!.
+a_type(Obj,Type):- b_type(Obj,Type).
 
+b_type(Obj,Type):- get_opv_iiii(Obj,type_of,Type),!.
+b_type(Obj,Type):- get_opv_iiii(Obj,dims,List),(List=[N] -> Type = [simple_vector,N]; Type = [array,List]),!.
+b_type(Atom,Type):- atomic_list_concat([Type,_Name],'_znst_',Atom),!.
+b_type(Atom,Type):- atomic_list_concat([Prefix|Rest],'_',Atom),prefix_to_typeof(Prefix,Rest,Atom,Type),!.
 
 type_ges(function(_),function).
 type_ges(Obj,Type):- compound(Obj),functor(Obj,Type,_).
@@ -105,10 +110,13 @@ f_type_of(_Obj,t).
 
 
 % prefix_to_typeof(Prefix,Rest,Atom,Type).
-prefix_to_typeof(pkg,[_],_,package).
-prefix_to_typeof(f,[_,_|_],_,function).
+prefix_to_typeof(pkg,[_|_],_,package).
+prefix_to_typeof(f,[_|_],_,function).
+prefix_to_typeof(sf,[_|_],_,sys_special_operator).
+prefix_to_typeof(mf,[_|_],_,sys_macro).
 prefix_to_typeof(kw,[_|_],_,keyword).
-prefix_to_typeof(cl,[_|_],_,function).
+prefix_to_typeof(claz,[_|_],_,standard_class).
+%prefix_to_typeof(sys,[_|_],_,symbol).
 prefix_to_typeof(_,symbol).
 
 float_bits(_,32).

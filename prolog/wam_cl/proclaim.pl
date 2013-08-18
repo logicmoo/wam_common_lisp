@@ -30,15 +30,15 @@ f_sys_psxhash(O,H):- f_sys_to_pvs(O,HT),term_hash(HT,H).
 ;;;             &rest {:no-sp-change|:pure|:reader|:no-side-effects})
 */
 wl:init_args(3,sys_proclamation).
-wl:interned_eval("(sys:set-opv `sys:proclamation :compile-as :operator)").
 sf_sys_proclamation(Name,ArgumentTypes,ResultType,List,NameO):- 
   store_meta_info(set_proclamation,Name,ArgumentTypes,ResultType,[List],NameO).
 set_proclamation(O,P,V):- atom_concat(P,'_proclaimed',PP), set_opv(O,PP,V).
 
-wl:init_args(3,deftype).
-wl:interned_eval("(sys:set-opv `cl:deftype :compile-as :operator)").
-sf_deftype(Name,Lambda,Doc,Test,NameO):- set_opv(Name,typedoc,Doc),sf_deftype(Name,Lambda,Test,NameO).
-sf_deftype(Name,Lambda,Test,NameO):- store_meta_info(set_deftype,Name,Lambda,Test,[],NameO).
+wl:init_args(2,deftype).
+sf_deftype(Name,Lambda,DocWithTest,NameO):-
+   maybe_get_docs('class',Name,DocWithTest,Test,Call),
+   always(Call),
+   store_meta_info(set_deftype,Name,Lambda,Test,[],NameO).
 set_deftype(O,P,V):- atom_concat(P,'_deftype',PP), set_opv(O,PP,V).
 
 
@@ -46,7 +46,7 @@ sf_defsetf(Get,Set,[],Res):- trace,
    f_defsetf(Get,Set,Res),!.
 
 wl:init_args(3,sys_defknown).
-wl:interned_eval("(sys:set-opv `SYS:defknown :compile-as :operator)").
+%wl:interned_eval("(sys:set-opv `SYS:defknown :compile-as :operator)").
 sf_sys_defknown(Name,ArgumentTypes,ResultType,List,NameO):- store_meta_info(set_defknown,Name,ArgumentTypes,ResultType,List,NameO).
 set_defknown(O,P,V):- set_opv(O,P,V).
  

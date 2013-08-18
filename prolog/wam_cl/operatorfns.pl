@@ -278,7 +278,9 @@ only_arity(ProposedName,N):-
 is_defined(ProposedName,N):- integer(N),atom(ProposedName),!,functor(G,ProposedName,N),current_predicate(_,G),!.
 is_defined(ProposedName,N):- current_predicate(ProposedName/N).
 
-maybe_symbol_package(Symbol,Package):-  get_opv(Symbol,package,Package),!.
+is_defined(FN):- is_fboundp(FN),foc_operator(_Ctx,_Env,_BindType,FN,_,ProposedName),is_defined(ProposedName,_).
+
+maybe_symbol_package(Symbol,Package):-  get_opv(Symbol,symbol_package,Package),!.
 maybe_symbol_package(_Symbol,Package):- reading_package(Package).
 
 

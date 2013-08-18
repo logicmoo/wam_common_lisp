@@ -334,8 +334,9 @@ plist_to_names_values([Name,Value|Keys],[Name|Names],[Value|Values]):-
    plist_to_names_values(Keys,Names,Values).
 
 % (lcompile ...)
-wl:interned_eval("(sys:set-opv `SYS:LCOMPILE :compile-as :function)").
-compile_body(Ctx,Env,ResultO,[sys_lcompile,Form|Keys], Body):- !,
+%wl:interned_eval("(sys:set-opv `SYS:LCOMPILE :compile-as :function)").
+init_args(1,sys_lcompile).
+f_sys_lcompile(Form,Keys, ResultO):- 
    lisp_compile(Ctx,Env,FormValue,Form,Part1),
    plist_to_names_values(Keys,Names,Values),
    maplist(f_sys_get_wam_cl_option,Names,Was),
@@ -349,15 +350,17 @@ compile_body(Ctx,Env,ResultO,[sys_lcompile,Form|Keys], Body):- !,
    Symbol = sys_lcompile,
    % closure(FType,ClosureEnvironment,Whole,Result,FormalParams,ClosureBody,Symbol,ActualParams,ResultO)
    ResultO = closure(kw_function,[CompileEnvironment|Env],Whole,CompileResult,[],Opt,Symbol),   
-   Body = (nl,nl,Part1,Part2,Part3,cmpout(:- Opt),maplist(f_sys_set_wam_cl_option,Names,Was)).
+   Body = (nl,nl,Part1,Part2,Part3,cmpout(:- Opt),maplist(f_sys_set_wam_cl_option,Names,Was)),
+   always(Body),
 
 % (lcompilen ...)
-wl:interned_eval("(sys:set-opv `SYS:LCOMPILEN :compile-as :function)").
-compile_body(Ctx,Env,Result,[sys_lcompilen|Forms], Body):- !,
+% wl:interned_eval("(sys:set-opv `SYS:LCOMPILEN :compile-as :function)").
+init_args(1,sys_lcompile).
+f_sys_lcompilen(Form,Forms, Result):- 
   ((append(Progn,[KW|More],Forms),is_keywordp(KW))->Keys=[KW|More];(Progn=Forms,Keys=[])),
-  compile_body(Ctx,Env,Result,[sys_lcompile,[progn|Progn]|Keys], Body).
+    f_sys_lcompile([progn,Form|Progn],Keys,Result).
 
-
+%compile_body(Ctx,Env,Result,[sys_lcompilen|Forms], Body):- !,compile_body(Ctx,Env,Result,[sys_lcompile,[progn|Progn]|Keys], Body).
 
 
 compile_body(Ctx,Env,Result,Form1,Body):- compile_body_form(Ctx,Env,Result,Form1,Body).

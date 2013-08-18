@@ -1929,7 +1929,7 @@ o_p_v(class_name,symbol_package,pkg_cl).
 o_p_v(class_name,sys_flushable,t).
 o_p_v(class_name,type_of,symbol).
 o_p_v(class_of,ftype_lambda_list,[t]).
-o_p_v(class_of,ftype_result_type,class).
+o_p_v(class_of,ftype_result_type,standard_class).
 o_p_v(class_of,symbol_function,f_class_of).
 o_p_v(class_of,symbol_name,"CLASS-OF").
 o_p_v(class_of,symbol_package,pkg_cl).
@@ -3140,7 +3140,7 @@ o_p_v(clos_c60_cons_c62,type_of,symbol).
 o_p_v(clos_c60_defined_class_c62,declared_as,defparameter).
 o_p_v(clos_c60_defined_class_c62,symbol_name,"<DEFINED-CLASS>").
 o_p_v(clos_c60_defined_class_c62,symbol_package,pkg_clos).
-o_p_v(clos_c60_defined_class_c62,symbol_value,'$OBJ'(claz_standard_class,"CLASS")).
+%o_p_v(clos_c60_defined_class_c62,symbol_value,'$OBJ'(claz_standard_class,"CLASS")).
 o_p_v(clos_c60_defined_class_c62,type_of,symbol).
 o_p_v(clos_c60_direct_slot_definition_c62,declared_as,defparameter).
 o_p_v(clos_c60_direct_slot_definition_c62,symbol_name,"<DIRECT-SLOT-DEFINITION>").
@@ -8634,8 +8634,8 @@ o_p_v(coerce,type_of,symbol).
 o_p_v(compilation_speed,symbol_name,"COMPILATION-SPEED").
 o_p_v(compilation_speed,symbol_package,pkg_cl).
 o_p_v(compilation_speed,type_of,symbol).
-o_p_v(compile,ftype_lambda_list,[[or,symbol,cons],c38_optional,[or,list,function,null]]).
-o_p_v(compile,ftype_result_type,[values,[or,function,symbol,cons],boolean,boolean]).
+o_p_v(compile,ftype_lambda_list,[[or,symbol,cons],c38_optional,[or,list, function,null]]).
+o_p_v(compile,ftype_result_type,[values,[or, function,symbol,cons],boolean,boolean]).
 o_p_v(compile,lambda_list(ecl2),[sys_function_name,c38_optional,[or,list,function]]).
 o_p_v(compile,result_type(ecl2),[values,[or,sys_function_name,function],boolean,boolean]).
 o_p_v(compile,symbol_function,f_compile).
@@ -8684,7 +8684,7 @@ o_p_v(compiler_macro,symbol_name,"COMPILER-MACRO").
 o_p_v(compiler_macro,symbol_package,pkg_cl).
 o_p_v(compiler_macro,type_of,symbol).
 o_p_v(compiler_macro_function,ftype_lambda_list,[t,c38_optional,sys_lexenv_designator]).
-o_p_v(compiler_macro_function,ftype_result_type,[or,function,null]).
+o_p_v(compiler_macro_function,ftype_result_type,[or, function,null]).
 o_p_v(compiler_macro_function,lambda_list(ecl2),[sys_function_name,c38_optional,sys_environment]).
 o_p_v(compiler_macro_function,result_type(ecl2),function).
 o_p_v(compiler_macro_function,symbol_function,f_compiler_macro_function).
@@ -9342,7 +9342,7 @@ o_p_v(custom_xx_with_html_output_doctype_xx,symbol_name,"*WITH-HTML-OUTPUT-DOCTY
 o_p_v(custom_xx_with_html_output_doctype_xx,symbol_package,pkg_custom).
 o_p_v(custom_xx_with_html_output_doctype_xx,symbol_value,[html,'PUBLIC',"-//W3C//DTD XHTML 1.0 Strict//EN","http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"]).
 o_p_v(custom_xx_with_html_output_doctype_xx,type_of,symbol).
-o_p_v(d1_c43,function,cl_1_c43).
+o_p_v(d1_c43,symbol_function,cl_1_c43).
 o_p_v(d1_c43,symbol_name,"1+").
 o_p_v(d1_c43,symbol_package,pkg_cl).
 o_p_v(d1_c43,type_of,symbol).
@@ -9635,8 +9635,6 @@ o_p_v(debug_wherein,type_of,symbol).
 o_p_v(debug_xx_trace_encapsulate_default_xx,symbol_name,"*TRACE-ENCAPSULATE-DEFAULT*").
 o_p_v(debug_xx_trace_encapsulate_default_xx,symbol_package,pkg_debug).
 o_p_v(debug_xx_trace_encapsulate_default_xx,type_of,symbol).
-o_p_v(decf,compile_as,kw_operator).
-o_p_v(decf,function,mf_decf).
 o_p_v(decf,symbol_function,mf_decf).
 o_p_v(decf,symbol_name,"DECF").
 o_p_v(decf,symbol_package,pkg_cl).
@@ -9746,8 +9744,7 @@ o_p_v(defstruct_1,type_of,symbol).
 o_p_v(defstruct_2,symbol_name,"DEFSTRUCT-2").
 o_p_v(defstruct_2,symbol_package,pkg_cl).
 o_p_v(defstruct_2,type_of,symbol).
-o_p_v(deftype,kw_compile_as,kw_operator).
-o_p_v(deftype,symbol_function,mf_deftype).
+o_p_v(deftype,symbol_function,sf_deftype).
 o_p_v(deftype,symbol_name,"DEFTYPE").
 o_p_v(deftype,symbol_package,pkg_cl).
 o_p_v(deftype,type_of,symbol).
@@ -15981,7 +15978,7 @@ o_p_v(fdefinition,ftype_lambda_list,[[or,symbol,cons]]).
 o_p_v(fdefinition,ftype_result_type,function).
 o_p_v(fdefinition,kw_reader,t).
 o_p_v(fdefinition,lambda_list(ecl2),[sys_function_name]).
-o_p_v(fdefinition,result_type(ecl2),[or,list,function,[member,[quote,special]]]).
+o_p_v(fdefinition,result_type(ecl2),[or,list, function,[member,[quote,special]]]).
 o_p_v(fdefinition,symbol_function,f_fdefinition).
 o_p_v(fdefinition,symbol_name,"FDEFINITION").
 o_p_v(fdefinition,symbol_package,pkg_cl).
@@ -17347,7 +17344,7 @@ o_p_v(find_all_symbols,symbol_package,pkg_cl).
 o_p_v(find_all_symbols,sys_flushable,t).
 o_p_v(find_all_symbols,type_of,symbol).
 o_p_v(find_class,ftype_lambda_list,[symbol,c38_optional,t,sys_lexenv_designator]).
-o_p_v(find_class,ftype_result_type,[or,class,null]).
+o_p_v(find_class,ftype_result_type,[or,standard_class,null]).
 o_p_v(find_class,symbol_function,f_find_class).
 o_p_v(find_class,symbol_name,"FIND-CLASS").
 o_p_v(find_class,symbol_package,pkg_cl).
@@ -18640,7 +18637,6 @@ o_p_v(get_properties,symbol_package,pkg_cl).
 o_p_v(get_properties,sys_flushable,t).
 o_p_v(get_properties,sys_foldable,t).
 o_p_v(get_properties,type_of,symbol).
-o_p_v(get_setf_expansion,compile_as,kw_function).
 o_p_v(get_setf_expansion,lambda_list(ecl2),[t,c38_optional,sys_environment]).
 o_p_v(get_setf_expansion,result_type(ecl2),[values,t,t,t,t,t]).
 o_p_v(get_setf_expansion,symbol_function,f_get_setf_expansion).
@@ -19420,8 +19416,6 @@ o_p_v(in_package,symbol_function,mf_in_package).
 o_p_v(in_package,symbol_name,"IN-PACKAGE").
 o_p_v(in_package,symbol_package,pkg_cl).
 o_p_v(in_package,type_of,symbol).
-o_p_v(incf,compile_as,kw_operator).
-o_p_v(incf,function,mf_incf).
 o_p_v(incf,symbol_function,mf_incf).
 o_p_v(incf,symbol_name,"INCF").
 o_p_v(incf,symbol_package,pkg_cl).
@@ -23280,7 +23274,7 @@ o_p_v(machine_version,symbol_package,pkg_cl).
 o_p_v(machine_version,sys_flushable,t).
 o_p_v(machine_version,type_of,symbol).
 o_p_v(macro_function,ftype_lambda_list,[symbol,c38_optional,sys_lexenv_designator]).
-o_p_v(macro_function,ftype_result_type,[or,function,null]).
+o_p_v(macro_function,ftype_result_type,[or, function,null]).
 o_p_v(macro_function,lambda_list(ecl2),[symbol,c38_optional,sys_environment]).
 o_p_v(macro_function,result_type(ecl2),function).
 o_p_v(macro_function,symbol_function,f_macro_function).
@@ -24770,8 +24764,6 @@ o_p_v(plusp,sys_flushable,t).
 o_p_v(plusp,sys_foldable,t).
 o_p_v(plusp,sys_movable,t).
 o_p_v(plusp,type_of,symbol).
-o_p_v(pop,compile_as,kw_operator).
-o_p_v(pop,function,mf_pop).
 o_p_v(pop,symbol_function,mf_pop).
 o_p_v(pop,symbol_name,"POP").
 o_p_v(pop,symbol_package,pkg_cl).
@@ -26566,14 +26558,10 @@ o_p_v(psetq,symbol_function,mf_psetq).
 o_p_v(psetq,symbol_name,"PSETQ").
 o_p_v(psetq,symbol_package,pkg_cl).
 o_p_v(psetq,type_of,symbol).
-o_p_v(push,compile_as,kw_operator).
-o_p_v(push,function,mf_push).
 o_p_v(push,symbol_function,mf_push).
 o_p_v(push,symbol_name,"PUSH").
 o_p_v(push,symbol_package,pkg_cl).
 o_p_v(push,type_of,symbol).
-o_p_v(pushnew,compile_as,kw_operator).
-o_p_v(pushnew,function,mf_pushnew).
 o_p_v(pushnew,symbol_function,mf_pushnew).
 o_p_v(pushnew,symbol_name,"PUSHNEW").
 o_p_v(pushnew,symbol_package,pkg_cl).
@@ -27953,8 +27941,6 @@ o_p_v(room,symbol_function,f_room).
 o_p_v(room,symbol_name,"ROOM").
 o_p_v(room,symbol_package,pkg_cl).
 o_p_v(room,type_of,symbol).
-o_p_v(rotatef,compile_as,kw_operator).
-o_p_v(rotatef,function,mf_rotatef).
 o_p_v(rotatef,symbol_function,mf_rotatef).
 o_p_v(rotatef,symbol_name,"ROTATEF").
 o_p_v(rotatef,symbol_package,pkg_cl).
@@ -28357,11 +28343,9 @@ o_p_v(set_syntax_from_char,symbol_name,"SET-SYNTAX-FROM-CHAR").
 o_p_v(set_syntax_from_char,symbol_package,pkg_cl).
 o_p_v(set_syntax_from_char,type_of,symbol).
 o_p_v(setf,call_type_deriver,function(sys_array_call_type_deriver)).
-o_p_v(setf,compile_as,kw_operator).
 o_p_v(setf,destroyed_constant_args,[sys_nth_constant_args,2]).
 o_p_v(setf,ftype_lambda_list,[t,function]).
 o_p_v(setf,ftype_result_type,t).
-o_p_v(setf,function,mf_setf).
 o_p_v(setf,symbol_function,mf_setf).
 o_p_v(setf,symbol_name,"SETF").
 o_p_v(setf,symbol_package,pkg_cl).
@@ -28424,8 +28408,6 @@ o_p_v(shared_initialize,symbol_function,f_shared_initialize).
 o_p_v(shared_initialize,symbol_name,"SHARED-INITIALIZE").
 o_p_v(shared_initialize,symbol_package,pkg_cl).
 o_p_v(shared_initialize,type_of,symbol).
-o_p_v(shiftf,compile_as,kw_operator).
-o_p_v(shiftf,function,mf_shiftf).
 o_p_v(shiftf,symbol_function,mf_shiftf).
 o_p_v(shiftf,symbol_name,"SHIFTF").
 o_p_v(shiftf,symbol_package,pkg_cl).
@@ -34503,8 +34485,7 @@ o_p_v(sys_definternational_default,type_of,symbol).
 o_p_v(sys_definternational_default_1,symbol_name,"DEFINTERNATIONAL-DEFAULT-1").
 o_p_v(sys_definternational_default_1,symbol_package,pkg_sys).
 o_p_v(sys_definternational_default_1,type_of,symbol).
-o_p_v(sys_defknown,kw_compile_as,kw_operator).
-o_p_v(sys_defknown,symbol_function,mf_sys_defknown).
+o_p_v(sys_defknown,symbol_function,sf_sys_defknown).
 o_p_v(sys_defknown,symbol_name,"DEFKNOWN").
 o_p_v(sys_defknown,symbol_package,pkg_sys).
 o_p_v(sys_defknown,type_of,symbol).
@@ -35827,7 +35808,6 @@ o_p_v(sys_expand_loop_parse_var_typespec,type_of,symbol).
 o_p_v(sys_expand_loop_preamble,symbol_name,"EXPAND-LOOP-PREAMBLE").
 o_p_v(sys_expand_loop_preamble,symbol_package,pkg_sys).
 o_p_v(sys_expand_loop_preamble,type_of,symbol).
-o_p_v(sys_expand_or_get_setf_inverse,compile_as,kw_function).
 o_p_v(sys_expand_or_get_setf_inverse,symbol_function,f_sys_expand_or_get_setf_inverse).
 o_p_v(sys_expand_or_get_setf_inverse,symbol_name,"EXPAND-OR-GET-SETF-INVERSE").
 o_p_v(sys_expand_or_get_setf_inverse,symbol_package,pkg_sys).
@@ -37603,17 +37583,14 @@ o_p_v(sys_get_pid,symbol_function,f_sys_get_pid).
 o_p_v(sys_get_pid,symbol_name,"GET-PID").
 o_p_v(sys_get_pid,symbol_package,pkg_sys).
 o_p_v(sys_get_pid,type_of,symbol).
-o_p_v(sys_get_setf_method,compile_as,kw_function).
 o_p_v(sys_get_setf_method,symbol_function,f_sys_get_setf_method).
 o_p_v(sys_get_setf_method,symbol_name,"GET-SETF-METHOD").
 o_p_v(sys_get_setf_method,symbol_package,pkg_sys).
 o_p_v(sys_get_setf_method,type_of,symbol).
-o_p_v(sys_get_setf_method_inverse,compile_as,kw_function).
 o_p_v(sys_get_setf_method_inverse,symbol_function,f_sys_get_setf_method_inverse).
 o_p_v(sys_get_setf_method_inverse,symbol_name,"GET-SETF-METHOD-INVERSE").
 o_p_v(sys_get_setf_method_inverse,symbol_package,pkg_sys).
 o_p_v(sys_get_setf_method_inverse,type_of,symbol).
-o_p_v(sys_get_setf_method_multiple_value,compile_as,kw_function).
 o_p_v(sys_get_setf_method_multiple_value,symbol_function,f_sys_get_setf_method_multiple_value).
 o_p_v(sys_get_setf_method_multiple_value,symbol_name,"GET-SETF-METHOD-MULTIPLE-VALUE").
 o_p_v(sys_get_setf_method_multiple_value,symbol_package,pkg_sys).
@@ -39253,11 +39230,11 @@ o_p_v(sys_layout_slot_location,symbol_function,f_sys_layout_slot_location).
 o_p_v(sys_layout_slot_location,symbol_name,"LAYOUT-SLOT-LOCATION").
 o_p_v(sys_layout_slot_location,symbol_package,pkg_sys).
 o_p_v(sys_layout_slot_location,type_of,symbol).
-o_p_v(sys_lcompile,kw_compile_as,kw_function).
+o_p_v(sys_lcompile,symbol_function,f_sys_lcompile).
 o_p_v(sys_lcompile,symbol_name,"LCOMPILE").
 o_p_v(sys_lcompile,symbol_package,pkg_sys).
 o_p_v(sys_lcompile,type_of,symbol).
-o_p_v(sys_lcompilen,kw_compile_as,kw_function).
+o_p_v(sys_lcompilen,symbol_function,f_sys_lcompilen).
 o_p_v(sys_lcompilen,symbol_name,"LCOMPILEN").
 o_p_v(sys_lcompilen,symbol_package,pkg_sys).
 o_p_v(sys_lcompilen,type_of,symbol).
@@ -44487,8 +44464,7 @@ o_p_v(sys_proclaimed_type,symbol_function,f_sys_proclaimed_type).
 o_p_v(sys_proclaimed_type,symbol_name,"PROCLAIMED-TYPE").
 o_p_v(sys_proclaimed_type,symbol_package,pkg_sys).
 o_p_v(sys_proclaimed_type,type_of,symbol).
-o_p_v(sys_proclamation,compile_as,kw_operator).
-o_p_v(sys_proclamation,kw_compile_as,kw_operator).
+o_p_v(sys_proclamation,symbol_function,sf_sys_proclamation).
 o_p_v(sys_proclamation,symbol_name,"PROCLAMATION").
 o_p_v(sys_proclamation,symbol_package,pkg_sys).
 o_p_v(sys_proclamation,type_of,symbol).
@@ -46016,7 +45992,6 @@ o_p_v(sys_setf_sixth,type_of,symbol).
 o_p_v(sys_setf_stream_external_format,symbol_name,"SETF-STREAM-EXTERNAL-FORMAT").
 o_p_v(sys_setf_stream_external_format,symbol_package,pkg_sys).
 o_p_v(sys_setf_stream_external_format,type_of,symbol).
-o_p_v(sys_setf_structure_access,function,f_sys_setf_structure_access).
 o_p_v(sys_setf_structure_access,symbol_function,f_sys_setf_structure_access).
 o_p_v(sys_setf_structure_access,symbol_name,"SETF-STRUCTURE-ACCESS").
 o_p_v(sys_setf_structure_access,symbol_package,pkg_user).
@@ -48674,7 +48649,7 @@ o_p_v(sys_type_restrictions,symbol_package,pkg_sys).
 o_p_v(sys_type_restrictions,type_of,symbol).
 o_p_v(sys_type_specifier,doc_deftype,'$ARRAY'([*],claz_base_character,[#\('N'),#\(a),#\(m),#\(e),#\(' '),#\(o),#\(r),#\(' '),#\(o),#\(b),#\(j),#\(e),#\(c),#\(t),#\(' '),#\(r),#\(e),#\(p),#\(r),#\(e),#\(s),#\(e),#\(n),#\(t),#\(i),#\(n),#\(g),#\(' '),#\(a),#\(' '),#\(t),#\(i),#\(m),#\(e),#\('.')])).
 o_p_v(sys_type_specifier,lambda_list_deftype,[]).
-o_p_v(sys_type_specifier,result_deftype,[quote,[or,symbol,class,list]]).
+o_p_v(sys_type_specifier,result_deftype,[quote,[or,symbol,standard_class,list]]).
 o_p_v(sys_type_specifier,symbol_name,"TYPE-SPECIFIER").
 o_p_v(sys_type_specifier,symbol_package,pkg_sys).
 o_p_v(sys_type_specifier,type_of,symbol).
@@ -51677,7 +51652,7 @@ o_p_v(type_error_expected_type_1,symbol_name,"TYPE-ERROR-EXPECTED-TYPE-1").
 o_p_v(type_error_expected_type_1,symbol_package,pkg_cl).
 o_p_v(type_error_expected_type_1,type_of,symbol).
 o_p_v(type_of,ftype_lambda_list,[t]).
-o_p_v(type_of,ftype_result_type,[or,list,symbol,class]).
+o_p_v(type_of,ftype_result_type,[or,list,symbol,standard_class]).
 o_p_v(type_of,result_type(ecl2),sys_type_specifier).
 o_p_v(type_of,symbol_function,f_type_of).
 o_p_v(type_of,symbol_name,"TYPE-OF").
@@ -51721,8 +51696,6 @@ o_p_v(u_gen_bool,type_of,symbol).
 o_p_v(u_input_stream,symbol_name,"INPUT-STREAM").
 o_p_v(u_input_stream,symbol_package,pkg_user).
 o_p_v(u_input_stream,type_of,symbol).
-o_p_v(u_is,compile_as,kw_operator).
-o_p_v(u_is,special_function,sf_u_is).
 o_p_v(u_is,symbol_function,sf_u_is).
 o_p_v(u_is,symbol_name,"IS").
 o_p_v(u_is,symbol_package,pkg_user).

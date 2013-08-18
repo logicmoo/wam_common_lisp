@@ -160,7 +160,7 @@
    (y :accessor daft-y :initform 3.14159)
    (z :reader daft-z :allocation :class)))
 
-(setf (slot-value (make-instance 'daft-point) 'z) 42)
+#+CLASS_ALLOC (setf (slot-value (make-instance 'daft-point) 'z) 42)
 
 (setf my-daft-point (make-instance 'daft-point :x 19))
 
@@ -170,7 +170,8 @@
       (daft-y my-daft-point)
       (progn #+WAM-CL (prolog-trace) (daft-z my-daft-point)))
 
-(let ((temp (make-instance 'daft-point)))
+#+CLASS_ALLOC 
+ (let ((temp (make-instance 'daft-point)))
   (setf (daft-y temp) 999
         (slot-value temp 'z) 0))
 
