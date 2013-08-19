@@ -42,11 +42,11 @@ call_block_interp(Name,Value):-
 
 btba(Name,InstrS,Addrs):-
    t_l:btb(Name,InstrS),
-   must(get_addrs(0,InstrS,Addrs)).
+   must_or_rtrace(get_addrs(0,InstrS,Addrs)).
 
 % TODO - dont bother recording adresses until after the first 'GO'/1
 get_addrs(_,[],[]):-!.
-get_addrs(N,[TagInstr|InstrS],[addr(Label,N)|Addrs]):- is_tag_name(TagInstr,Label),!,
+get_addrs(N,[TagInstr|InstrS],[addr(Label,N)|Addrs]):- is_label(TagInstr,Label),!,
   N1 is N + 1,
   get_addrs(N1,InstrS,Addrs).
 get_addrs(N,[_|InstrS],Addrs):- 
@@ -58,12 +58,12 @@ call_instructions_pc(PC,InstrS,Addrs,Value):-
    nth0(PC,InstrS,I)->call_i_pc(I,PC,InstrS,Addrs,Value);true.
 
 % #:LABEL allows rearrangments and address changes
-call_i_pc(TagInstr,PC,InstrS,Addrs,Value):- is_tag_name(TagInstr,Label),!,
+call_i_pc(TagInstr,PC,InstrS,Addrs,Value):- is_label(TagInstr,Label),!,
    PC2 is PC + 1,
    call_instructions_pc(PC2,InstrS,[addr(Label,PC)|Addrs],Value).
 % #:GO 
 call_i_pc([go,Label],_PC,InstrS,Addrs,Value):-!,
-   must(member(addr(Label,Where),Addrs)),
+   must_or_rtrace(member(addr(Label,Where),Addrs)),
    call_instructions_pc(Where,InstrS,Addrs,Value).
 % #:RETURN
 call_i_pc('return-from'(_,Value),_PC,_Instr,_Addrs,Value):-!.
@@ -134,13 +134,14 @@ call_then_return(G):- G,'return-from'([]).
 setq(Var,X):-Var=X.
 
 call_block_compiled(Name,Value):- 
-  must(compile_btba(Name,Code)),
+  must_or_rtrace(compile_btba(Name,Code)),
   catch(Code,'return-from'(_,Value),true).
 
 compile_btba(Name,Code):-
    t_l:btb(Name,InstrS),
    compile_tagbody([]:[],[],_Result,InstrS,Code).
 
+compile_tagbody_forms(Ctx,Env,Result,[begin(_)|InstrS],BInstrS):- !,compile_tagbody_forms(Ctx,Env,Result,InstrS,BInstrS).
 compile_tagbody_forms(Ctx,Env,Result,InstrS,BInstrS):-
    maplist(label_atoms(),InstrS,TInstrS),
    trim_tagbody(TInstrS,CInstrS),
@@ -149,45 +150,98 @@ compile_tagbody_forms(Ctx,Env,Result,InstrS,BInstrS):-
 trim_tagbody(InstrS,TInstrS):- append(Left,[R|_],InstrS),is_reflow(R,_),!,append(Left,[R],TInstrS).
 trim_tagbody(InstrS,InstrS).
 
-label_atoms(Instr,[label,Tag]):- is_tag_name(Instr,Tag),!.
+%label_atoms(Instr,[label,Tag]):- is_label(Instr,Tag),!.
+label_atoms(Tag,[label,Tag]):-atomic(Tag),!.
 label_atoms(Instr,Instr).
 
-shared_lisp_compiler:plugin_expand_function_body(Ctx,Forms, Result, CompileBody, Environment):- 
-  compile_tagbody_hook(Ctx,Forms, Result, CompileBody, Environment),!.
+shared_lisp_compiler:plugin_expand_function_body(Ctx,Env,Result,InstrS,Code):- 
+  compile_tagbody_hook(Ctx,Env,Result,InstrS,Code),!.
 
-compile_tagbody_hook(_Ctx, nop(X), Result, nop(X), _Environment):- !, debug_var("_NopResult",Result).
-compile_tagbody_hook(_Ctx,[label, Item], Result, push_label(Item) , _Environment):- debug_var("_LABELRES",Result).
-compile_tagbody_hook(_Ctx,[go, Item],Result, goto(Item) , _Environment):- debug_var("_GORES",Result).
-compile_tagbody_hook( Ctx,[tagbody| Forms], Result, CompileBody, Environment):- debug_var("_TBResult",Result),!,
-  compile_tagbody(Ctx,Environment,Result,Forms,CompileBody).
+compile_tagbody_hook(_Ctx,_Env,Result, nop(X),  nop(X)):- !, debug_var("_NopResult",Result).
+compile_tagbody_hook(_Ctx,_Env,Result,[label, Item], push_label(Item) ):- debug_var("_LABELRES",Result).
+compile_tagbody_hook(_Ctx,_Env,Result,[go, Item], goto(Item) ):- debug_var("_GORES",Result).
+compile_tagbody_hook(_Ctx,_Env,Result,go( Item), goto(Item) ):- debug_var("_GORES",Result).
+compile_tagbody_hook(Ctx,Env,Result,[tagbody| InstrS], Code):- debug_var("_TBResult",Result),!,
+  compile_tagbody(Ctx,Env,Result,InstrS,Code).
 
-% compile_tagbody(Ctx,Env,Result,InstrS,Code):- compile_tagbody0(Ctx,Env,Result,InstrS,Code),!.
-compile_tagbody(Ctx,Env,Result,InstrS,Code):-
- append([[go,tagbody],tagbody|InstrS],[[go,exit_tagbody],exit_tagbody],WInstrS),
- compile_tagbody0(Ctx,Env,Result,WInstrS,Code).
+compile_tagbody(Ctx,Env,Result,InstrS,Code):- compile_tagbody_real(Ctx,Env,Result,InstrS,Code),!.
+/*compile_tagbody(Ctx,Env,Result,InstrS,Code):- Tag= tagbody,          &optional
+ append([[go,begin(Tag)],begin(Tag)|InstrS],[[go,end(Tag)],end(Tag)],WInstrS),
+ compile_tagbody_real(Ctx,Env,Result,WInstrS,Code).
+*/
 
-compile_tagbody0(Ctx,Env,Result,InstrS,Code):-
-   must(get_go_points(InstrS,Gos)),
-   must(get_tags(InstrS,Gos,Addrs)), 
+
+shared_lisp_compiler:plugin_expand_function_body(Ctx,Env,Result,[block,Tag|InstrS], Code):- 
+  compile_block(Ctx,Env,Result,Tag,InstrS,Code),!.
+
+compile_block(Ctx,Env,Result,Tag,InstrS,Code):-
+ append([[go,begin(Tag)],begin(Tag)|InstrS],[[go,end(Tag)],end(Tag)],WInstrS),
+ compile_tagbody_real(Ctx,Env,Result,WInstrS,Code).
+
+block_tagbody_test(0.0):- 
+ local_test_2(
+"(do ((temp-one 1 (1+ temp-one))
+       (temp-two 0 (1- temp-two)))
+      ((> (- temp-one temp-two) 5) temp-one))", 4).
+
+block_tagbody_test(0.1):- 
+ local_test_2(
+"(do ((temp-one 1 (1+ temp-one))
+       (temp-two 0 (1+ temp-one)))     
+      ((= 3 temp-two) temp-one))",  3).
+
+shared_lisp_compiler:plugin_expand_function_body(Ctx,Env,Result,[do,LoopVars,[EndTest|ResultForms]|TagBody], Code):- 
+   loop_vars_to_let_n_step(LoopVars,LetVars,[],PSetQStepCode),
+   gensym(dosym,Tag),
+   must_compile_body(Ctx,Env,Result,
+     [block,[],
+       [let,LetVars,
+          [tagbody,
+            [label,Tag],
+            [if,
+              EndTest,
+               ['return-from',[],[progn|ResultForms]],
+               [progn,[progn|TagBody],[psetq|PSetQStepCode]]
+            ],
+            go(Tag)]
+       ]
+     ],  Code).
+
+ 
+ loop_vars_to_let_n_step([],[],InOut,InOut).
+loop_vars_to_let_n_step([Decl|LoopVars],[Norm|LetVars],In,Out):-
+  must_or_rtrace(loop_1var_n_step(Decl,Norm,More)),
+  append(In,More,Mid),
+  loop_vars_to_let_n_step(LoopVars,LetVars,Mid,Out).
+
+% loop_1var_n_step([bind, Variable, Form],[bind, Variable, Form],[]).
+loop_1var_n_step([Variable, Form, Step],[bind, Variable, Form],[Variable,Step]).
+loop_1var_n_step([Variable, Form],[bind, Variable, Form],[]).
+loop_1var_n_step(Variable,[bind, Variable, []],[]).
+
+
+compile_tagbody_real(Ctx,Env,Result,InstrS,Code):-
+   must_or_rtrace(get_go_points(InstrS,Gos)),
+   must_or_rtrace(get_tags(InstrS,Gos,Addrs)), 
    check_missing_gos(Gos),   
    compile_addrs(Ctx,Env,Result,Addrs),
    compile_tagbody_forms(Ctx,Env,Result,InstrS,CInstrS),
    copy_term(CInstrS,Copy),
-   Code = call_compiled_tagbody(Copy,Addrs,Result).
+   Code = call_addr_block(Copy,Addrs,Result).
 
 
-call_compiled_tagbody([],'return-from'([]),_Result).
+call_addr_block([],'return-from'([]),_Result).
 % #:ATOM or #:LABEL allows rearrangments and address changes
-call_compiled_tagbody([(TagInstr)|InstrS],Addrs,Result):- is_tag_name(TagInstr,Label),!,
-   call_compiled_tagbody(InstrS,[addr(Label,'$late',InstrS)|Addrs],Result).
+call_addr_block([(TagInstr)|InstrS],Addrs,Result):- is_label(TagInstr,Label),!,
+   call_addr_block(InstrS,[addr(Label,'$late',InstrS)|Addrs],Result).
 % #:GO 
-call_compiled_tagbody([goto(Label)|_],Addrs,Result):-!,
-   must(member(addr(Label,_,Where),Addrs)),
+call_addr_block([goto(Label)|_],Addrs,Result):-!,
+   must_or_rtrace(member(addr(Label,_,Where),Addrs)),
    copy_term(Where,Copy),
-   call_compiled_tagbody(Copy,Addrs,Result).
+   call_addr_block(Copy,Addrs,Result).
 % #normal call
-call_compiled_tagbody([I|InstrS],Addrs,Result):- call(I),
-  call_compiled_tagbody(InstrS,Addrs,Result).
+call_addr_block([I|InstrS],Addrs,Result):- call(I),
+  call_addr_block(InstrS,Addrs,Result).
 
 
 is_reflow([OP|ARGS],Label):- is_reflow(OP,ARGS,Label).
@@ -199,22 +253,37 @@ is_reflow('return',_,[]).
 is_reflow('return-from',[Label|_],Label).
 is_reflow('throw',[Label|_],Label).
 
+is_label(Atom,Atom):- atomic(Atom),!,Atom\==[].
+is_label([OP|ARGS],Label):- is_label(OP,ARGS,Label).
+is_label(OPARGS,Label):- OPARGS=..[OP|ARGS],is_label(OP,ARGS,Label).
+is_label('begin',[Label|_],Label).
+is_label('end',[Label|_],Label).
+is_label('label',[Label|_],Label).
+
+is_branched([Op|_]):- fail,member(Op,[if,or,and,progn]).
+
+
+
 get_go_points([FlowInst|InstrS],[addr(Label,'$used','$missing')|Addrs]):- is_reflow(FlowInst,Label),!,
-  get_go_points(InstrS,Addrs).
-get_go_points([_|InstrS],Addrs):-
   get_go_points(InstrS,Addrs).
 get_go_points([],[]).
 get_go_points([I|InstrS],Addrs):-% #branching call
   is_branched(I),get_go_points(I,IAddrs),
   get_go_points(InstrS,NAddrs),
   append(IAddrs,NAddrs,Addrs).
+get_go_points([_|InstrS],Addrs):-
+  get_go_points(InstrS,Addrs).
 
+get_tags([Label|InstrS],Gos,[GAddrs|Addrs]):- atomic(Label),
+  member(GAddrs,Gos),GAddrs=addr(Label,_Used,_Missing), !,
+  setarg(3,GAddrs,InstrS),
+  get_tags(InstrS,Gos,Addrs).
 get_tags([Label|InstrS],Gos,[GAddrs|Addrs]):-
   member(GAddrs,Gos),GAddrs=addr(Label,_Used,_Missing),
   setarg(3,GAddrs,[Label|InstrS]),
   get_tags(InstrS,Gos,Addrs).
-get_tags([TagInstr|InstrS],Gos,[GAddrs|Addrs]):- is_tag_name(TagInstr,Label),
-  GAddrs = addr(Label,'$unused',[TagInstr|InstrS]),
+get_tags([TagInstr|InstrS],Gos,[GAddrs|Addrs]):- is_label(TagInstr,Label),
+  GAddrs = addr(Label,'$unused',InstrS),
   get_tags(InstrS,[GAddrs|Gos],Addrs).
 get_tags([],_,[]).
 get_tags([I|InstrS],Gos,Addrs):- % #branching call
@@ -227,7 +296,7 @@ get_tags([_|InstrS],Gos,Addrs):-
 check_missing_gos(_).
 
 % asserta((fifteen(Val_Thru23):-!, []=[[]], LETENV=[[bv(val, [[]|_832])]], 
-%   call_compiled_tagbody((symbol_setq(val, 1, _1398), goto('point-a')), [addr('point-c', '$used',  (push_label('point-c'), sym_arg_val_env(val, Val_In, Val_Thru, LETENV), incf(Val_Thru, 4, Incf_Ret), goto('point-b'))), addr('point-a', '$used',  (push_label('point-a'), push_label('point-d-unused'), sym_arg_val_env(val, Val_In12, Val_Thru13, LETENV), incf(Val_Thru13, 2, Incf_Ret14), goto('point-c'))), addr('point-d-unused', '$unused',  (push_label('point-d-unused'), sym_arg_val_env(val, Val_In17, Val_Thru18, LETENV), incf(Val_Thru18, 2, Incf_Ret19), goto('point-c'))), addr('point-b', '$used', ['point-b', [incf, val, 8]])], _GORES15), sym_arg_val_env(val, Val_In22, Val_Thru23, LETENV)))
+%   call_addr_block((symbol_setq(val, 1, _1398), goto('point-a')), [addr('point-c', '$used',  (push_label('point-c'), sym_arg_val_env(val, Val_In, Val_Thru, LETENV), incf(Val_Thru, 4, Incf_Ret), goto('point-b'))), addr('point-a', '$used',  (push_label('point-a'), push_label('point-d-unused'), sym_arg_val_env(val, Val_In12, Val_Thru13, LETENV), incf(Val_Thru13, 2, Incf_Ret14), goto('point-c'))), addr('point-d-unused', '$unused',  (push_label('point-d-unused'), sym_arg_val_env(val, Val_In17, Val_Thru18, LETENV), incf(Val_Thru18, 2, Incf_Ret19), goto('point-c'))), addr('point-b', '$used', ['point-b', [incf, val, 8]])], _GORES15), sym_arg_val_env(val, Val_In22, Val_Thru23, LETENV)))
 
 
 compile_addrs(Ctx,Env,Result,[A|Addrs]):-
@@ -236,78 +305,17 @@ compile_addrs(Ctx,Env,Result,[A|Addrs]):-
 compile_addrs(_Ctx,_Env,_Result,_).
 
 compile_addr1(Ctx,Env,Result,A):- A= addr(_Tag,_Unused,InstrS),   
-   compile_tagbody_forms(Ctx,Env,Result,InstrS,CInstrS),
+   must_or_rtrace(compile_tagbody_forms(Ctx,Env,Result,InstrS,CInstrS)),
    setarg(3,A,CInstrS),!.
 compile_addr1(_Ctx,_Env,_Result,_):- !.
 
 
 
 
-is_tag_name(Atom,Atom):- atomic(Atom).
-is_branched([Op|_]):- member(Op,[if,or,and,progn]).
-
-
 
 t_l:btb(block3,[setq(b,2),[go,tag1],setq(a,1),(tag1),setq(a,4),print(plus(a,b)),'return-from'(block3,plus(a,b))]).
 
-:- lisp_read(
-"(defun let_simple ()
-  (let (val)
-    val))
-    ",O),
-   dbmsg(O),
-   must(lisp_compile(O,R)),
-   dbmsg(R).
 
-:- lisp_read(
-"(defun let_simple1 ()
-  (let ((val 1))
-    val))
-    ",O),
-   dbmsg(O),
-   must(lisp_compile(O,R)),
-   dbmsg(R).
-
-   
-:- lisp_read(
-"(defun fifteen ()
-  (let (val)
-    (tagbody
-      (setq val 1)
-      (go point-a)
-      (incf val 16)
-     point-c
-      (incf val 04)
-      (go point-b)
-      (incf val 32)
-     point-a
-     point-u ;; unused
-      (incf val 02)
-      (go point-c)
-      (incf val 64)
-     point-b
-      (incf val 08))
-    val))
-    ",O),
-   dbmsg(O),
-   must(lisp_compile(O,R)),
-   dbmsg(R).
-
- % [let,[val],[tagbody,[setq,val,1],[go,'point-a'],[incf,val,16],'point-c',[incf,val,4],[go,'point-b'],[incf,val,32],
-   % 'point-a',[incf,val,2],[go,'point-c'],[incf,val,64], 
-   % 'point-b',[incf,val,8]],val]
-
-
-/*
-   call_compiled_tagbody(
-     (symbol_setq(val, 1, _1398), goto('point-a')),
-       [addr('point-c', '$used',  (sym_arg_val_env(val, Val_In, Val_Thru, LETENV), incf(Val_Thru, 4, Incf_Ret), goto('point-b'))), 
-        addr('point-a', '$used',  (push_label('point-d-unused'), sym_arg_val_env(val, Val_In12, Val_Thru13, LETENV), incf(Val_Thru13, 2, Incf_Ret14), goto('point-c'))), 
-        addr('point-d-unused', '$unused',  (sym_arg_val_env(val, Val_In17, Val_Thru18, LETENV), incf(Val_Thru18, 2, Incf_Ret19), goto('point-c'))), 
-        addr('point-b', '$used', ['point-b', [incf, val, 8]])], _GORES15),
-   sym_arg_val_env(val, Val_In22, Val_Thru23, LETENV)
-
-      */
 make_cont(G,Cont):-
   	reset(((   
           shift(mc(G))
@@ -329,6 +337,80 @@ loop_cont:-
    call(Cont1).
 
 
+local_test_1(Forms):- 
+   lisp_read(Forms,O),
+   dbmsg(O),
+   must_or_rtrace(lisp_compile(O,R)),
+   dbmsg(R).
+
+local_test_2(Forms,_Res):- 
+   lisp_read(Forms,O),
+   dbmsg(O),
+   must_or_rtrace(lisp_compile(O,R)),
+   dbmsg(:-R).
+
 
 :- fixup_exports.
+
+:- local_test_1(
+"(defun let_simple ()
+  (let (val)
+    val))
+    ").
+
+:- local_test_1(
+"(defun let_simple1 ()
+  (let ((val 1))
+    val))
+    ").
+
+   
+:- local_test_1(
+"(defun fifteen ()
+  (let (val)
+    (tagbody
+      (setq val 1)
+      (go point-a)
+      (incf val 16)
+     point-c
+      (incf val 04)
+      (go point-b)
+      (incf val 32)
+     point-a
+     point-u ;; unused
+      (incf val 02)
+      (go point-c)
+      (incf val 64)
+     point-b
+      (incf val 08))
+    val))
+    ").
+
+ % [let,[val],[tagbody,[setq,val,1],[go,'point-a'],[incf,val,16],'point-c',[incf,val,4],[go,'point-b'],[incf,val,32],
+   % 'point-a',[incf,val,2],[go,'point-c'],[incf,val,64], 
+   % 'point-b',[incf,val,8]],val]
+
+
+:- 
+ local_test_2("(do ((temp-one 1 (1+ temp-one))
+       (temp-two 0 (1- temp-two)))
+      ((> (- temp-one temp-two) 5) temp-one))",4).
+
+:- 
+ local_test_2("(do ((temp-one 1 (1+ temp-one))
+       (temp-two 0 (1+ temp-one)))     
+      ((= 3 temp-two) temp-one))",  3).
+
+:- forall(clause(block_tagbody_test(_N),B),B).
+
+/*
+   call_addr_block(
+     (symbol_setq(val, 1, _1398), goto('point-a')),
+       [addr('point-c', '$used',  (sym_arg_val_env(val, Val_In, Val_Thru, LETENV), incf(Val_Thru, 4, Incf_Ret), goto('point-b'))), 
+        addr('point-a', '$used',  (push_label('point-d-unused'), sym_arg_val_env(val, Val_In12, Val_Thru13, LETENV), incf(Val_Thru13, 2, Incf_Ret14), goto('point-c'))), 
+        addr('point-d-unused', '$unused',  (sym_arg_val_env(val, Val_In17, Val_Thru18, LETENV), incf(Val_Thru18, 2, Incf_Ret19), goto('point-c'))), 
+        addr('point-b', '$used', ['point-b', [incf, val, 8]])], _GORES15),
+   sym_arg_val_env(val, Val_In22, Val_Thru23, LETENV)
+
+      */
 

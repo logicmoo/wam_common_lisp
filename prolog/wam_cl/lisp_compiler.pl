@@ -116,16 +116,20 @@ debug_var(X,Y):- notrace(catch(debug_var0(X,Y),_,fail)) -> true ; rtrace(debug_v
 p_n_atom(Cmpd,UP):- sub_term(Atom,Cmpd),nonvar(Atom),\+ number(Atom), Atom\==[], catch(p_n_atom0(Atom,UP),_,fail),!.
 p_n_atom(Cmpd,UP):- term_to_atom(Cmpd,Atom),p_n_atom0(Atom,UP),!.
 
-filter_var_chars([],[]).
-filter_var_chars([H|T],[H|Rest]):-  code_type(H, prolog_identifier_continue),!,filter_var_chars(T,Rest).
-filter_var_chars([_|T],[90|Rest]):- filter_var_chars(T,Rest).
+filter_var_chars([H|X],Y):- \+ char_type(H,prolog_var_start),!,filter_var_chars0([86,118,H|X],Y).
+filter_var_chars(X,Y):- filter_var_chars0(X,Y).
 
-p_n_atom0(Atom,UP):- atom(Atom),!,name(Atom,Was),filter_var_chars(Was,[C|S]),to_upper(C,U),name(UP,[U|S]).
+filter_var_chars0([],[]).
+filter_var_chars0([45|T],[95|Rest]):-!,filter_var_chars0(T,Rest).
+filter_var_chars0([H|T],[H|Rest]):-  code_type(H, prolog_identifier_continue),!,filter_var_chars0(T,Rest).
+filter_var_chars0([H|T],Rest):- number_codes(H,Codes), filter_var_chars0(T,Mid),append([95, 99|Codes],[95|Mid],Rest).
+
+p_n_atom0(Atom,UP):- atom(Atom),!,name(Atom,[C|Was]),to_upper(C,U),filter_var_chars([U|Was],CS),name(UP,CS).
 p_n_atom0(String,UP):- string(String),!,string_to_atom(String,Atom),!,p_n_atom0(Atom,UP).
-p_n_atom0([C|S],UP):- !,(catch(atom_codes(Atom,[C|S]),_,fail)),!,p_n_atom0(Atom,UP).
+p_n_atom0([C|S],UP):- !,notrace(catch(atom_codes(Atom,[C|S]),_,fail)),!,p_n_atom0(Atom,UP).
 
 debug_var0(_,NonVar):-nonvar(NonVar),!.
-debug_var0([C|S],Var):- (catch(atom_codes(Atom,[C|S]),_,fail)),!,debug_var0(Atom,Var).
+debug_var0([C|S],Var):- notrace(catch(atom_codes(Atom,[C|S]),_,fail)),!,debug_var0(Atom,Var).
 debug_var0([AtomI|Rest],Var):-!,maplist(p_n_atom,[AtomI|Rest],UPS),atomic_list_concat(UPS,NAME),debug_var0(NAME,Var),!.
 debug_var0(Atom,Var):- p_n_atom(Atom,UP),  
   check_varname(UP),
@@ -156,63 +160,95 @@ bvof(E,L):-member(E,L).
 env_memb(E,L):-member(E,L).
 
 lisp_error_description(unbound_atom,        100, 'No value found for atom: ').
-lisp_error_description(atom_does_not_exist, 101, 'Setq: Variable does not exist: ').
+lisp_error_description(atom_does_not_exist, 101, 'SetQ: Variable does not exist: ').
 lisp_error_description(first_not_cons,      102, 'First: This is not a cons cell: ').
 lisp_error_description(rest_not_cons,       103, 'Rest: This is not a cons cell: ').
 
-find_incoming_value(_Head:ArgBindings,Atom,InValue,Value):-
+find_incoming_value(Ctx,_Env,Atom,InValue,Value):-
       debug_var([Atom,'_In'],InValue),
       debug_var([Atom,'_Thru'],Value),
-      ignore((member(bv(Atom0,[Value0|Unused]),ArgBindings),
+      ignore((member(bv(Atom0,[Value0|Unused]),Ctx.argbindings),
          Atom0==Atom,Value0=InValue,debug_var("__",Unused))).
 
 % The hook into the compiler
 
 lisp_compiler_term_expansion( (FunctionHeadP <<== FunctionBodyP),
-		[(Head         :- !,  BodyOO),
+		[(Head         :- !,  Code),
                  (Head         :- fail, <<==(FunctionHead , FunctionBody))] ):-
         must_det_l((expand_pterm_to_sterm(FunctionHeadP,FunctionHead),
         expand_pterm_to_sterm(FunctionBodyP,FunctionBody),
 	expand_function_head(FunctionHead, Head, ArgBindings, Result),
-	expand_function_body_e(Head:ArgBindings,implicit_progn([FunctionBody]), Result, Body0, Environment),
-        debug_var("RET",Result),
-        debug_var("Env",Environment),
-        Body = (Environment=[ArgBindings],Body0),
-   term_attvars(Body,AttVars),
-   maplist(del_attr_rev2(freeze),AttVars),
-   mize_body(',',Body,BodyOO))).
+                    debug_var("RET",Result),
+                    debug_var("Env",Env),
+	must_compile_body(ctx{head:Head,argbindings:ArgBindings},Env,Result,implicit_progn([FunctionBody]),Body0),
+        Body = (Env=[ArgBindings],Body0),
+    body_cleanup(Body,Code))).
 
 lisp_compiler_term_expansion( ( <<== FunctionBodyP),
-		( :-   BodyOO) ):-
+		( :-   Code) ):-
         must_det_l((expand_pterm_to_sterm(FunctionBodyP,FunctionBody),
-	expand_function_body_e(_Ctx,implicit_progn([FunctionBody]), _Result, Body, []),
+	must_compile_body(_Cxt,toplevel,_Result,implicit_progn([FunctionBody]), Body),
+   body_cleanup(Body,Code))).
+
+body_cleanup(Body,Code):-
    term_attvars(Body,AttVars),
    maplist(del_attr_rev2(freeze),AttVars),
-   mize_body(',',Body,BodyOO))).
- 
-compile_1form(Ctx,Env,FunctionBody,Body):- 
+   mize_body(',',Body,Code).
+
+
+lisp_compiled_eval(SExpression):- 
+  as_sexp(SExpression,Expression),
+  lisp_compiled_eval(Expression,Result),
+  dbmsg(result(Result)).
+
+lisp_compiled_eval(SExpression,Result):-
+  as_sexp(SExpression,Expression),
+  dbmsg(Expression),
+  lisp_compile(Result,Expression,Code),
+  dbmsg(Code),
+  call(Code),!.
+
+
+lisp_compile(SExpression):-
+  as_sexp(SExpression,Expression),
+  dbmsg(Expression),
+  lisp_compile(Expression,Code),!,
+  dbmsg(Code).
+
+lisp_compile(SExpression,Body):-
    debug_var('_Ignored',Result),
+   as_sexp(SExpression,Expression),
+   lisp_compile(Result,Expression,Body).
+
+lisp_compile(Result,SExpression,Body):- 
+   as_sexp(SExpression,Expression),
+   lisp_compile(ctx{head:lisp_compile(),argbindings:[]},[],Result,Expression,Body).
+
+lisp_compile(Ctx,Env,Result,FunctionBody,Body):- 
    compile_forms(Ctx,Env,Result,[FunctionBody],Body).
 
-compile_forms(Ctx,Env,Result,FunctionBody,Body):-
-   expand_function_body_e(Ctx,implicit_progn(FunctionBody), Result, Body, Env),!.
+
+compile_forms(Ctx,Env,Result,FunctionBody,Code):-
+   must_compile_body(Ctx,Env,Result,implicit_progn(FunctionBody), Body),!,
+   body_cleanup(Body,Code).
 
 
-lisp_eval(FunctionBody,Result):-
-   expand_function_body_e(_:[],implicit_progn([FunctionBody]), Result, Body, []),!,
-  dbmsg(body:-Body),
-  call(Body),!.
+as_sexp(Stream,Expression):- is_stream(Stream),!,must(parse_sexpr_untyped(Stream,Expression)).
+as_sexp(s(Str),Expression):- must(parse_sexpr_untyped(string(Str),Expression)),!.
+as_sexp(Str,Expression):- notrace(catch(text_to_string(Str,String),_,fail)),!, must(parse_sexpr_untyped(string(String),Expression)),!.
+as_sexp(Str,Expression):- is_list(Str),!,Expression=Str.
+as_sexp(Str,Expression):- Expression=Str.
 
 dbmsg((Textbody:-Body)):-body==Textbody,dmsg('==>'(body)),!,dbmsg(Body).
-dbmsg(Var):- var(Var),!,dmsg(x_var(Var)).
+dbmsg(Var):- var(Var),!,dmsg(dbmsg_var(Var)).
 dbmsg((A,B)):-compound(A),compound(B),!,dbmsg(A),dbmsg(B).
 %dbmsg(asserta(Body)):- !, dmsg(Body).
-dbmsg(ABody):- ABody=..[A,Body],nonvar(Body), Body = (H :- B) , !, HH=..[A,H],  dmsg((HH :- B)).
-dbmsg(Body):-dmsg(Body),!.
+dbmsg(ABody):- ABody=..[A,Body],nonvar(Body), Body = (H :- B) , !, dmsg((dbmsg(A,H) :- B)).
+dbmsg(H :- Body):- !,dmsg(H :- Body),!.
+dbmsg(:- Body):- !,dmsg(:- Body),!.
+dbmsg(Body):- !,dmsg(:- Body),!.
 % dbmsg(:- Body):- !, dmsg(:- Body).
 
-
-lisp_eval(FunctionBody):- lisp_eval(FunctionBody,Result),dbmsg(result(Result)).
 
 del_attr_rev2(Name,Var):- del_attr(Var,Name).
 
@@ -229,12 +265,18 @@ expand_function_head(FunctionName , Head, ArgBindings, Result):-
     expand_function_head([FunctionName], Head, ArgBindings, Result).
 
 
-% expand_function_body(Ctx,Function, Result, Body, Environment).
+% compile_body(Ctx,Env,Result,Function, Body).
 % Expands a Lisp-like function body into its Prolog equivalent
 
-expand_function_body_e(Ctx,Function, Result, Body, Environment):-
-  must(expand_function_body(Ctx,Function, Result, Body, Environment)),!.
+must_compile_body(Ctx,Env,Result,Function, Body):-
+  must_or_rtrace(compile_body(Ctx,Env,Result,Function, Body)).
 
+
+must_or_rtrace(G):-
+  (notrace(G)->true;rtrace(G)),!.
+
+must_expand_progn(Ctx,Env,ResultFormsResult,ResultForms, TestResult, ResultFormsBody):-
+   must_or_rtrace(expand_progn(Ctx,Env,ResultFormsResult,ResultForms, TestResult, ResultFormsBody)).
 
 expand_pterm_to_sterm(VAR,VAR):- \+ compound(VAR),!.
 expand_pterm_to_sterm([X|L],[Y|Ls]):-!,expand_pterm_to_sterm(X,Y),expand_pterm_to_sterm(L,Ls),!.
@@ -246,57 +288,74 @@ expand_pterm_to_sterm(X,X).
 :- multifile(shared_lisp_compiler:plugin_expand_function_body/5).
 :- discontiguous(shared_lisp_compiler:plugin_expand_function_body/5).
 
-:- discontiguous(expand_function_body/5).
+:- discontiguous(compile_body/5).
 
-expand_function_body(Ctx,Form, Result, CompileBody, Environment):-
-  shared_lisp_compiler:plugin_expand_function_body(Ctx,Form, Result, CompileBody, Environment),!.
 
-expand_function_body(_Ctx,[defun,Name,Args|FunctionBody], Name, CompileBody, Environment):-
+
+/*(defmacro prog (inits &rest forms)
+  `(block nil
+    (let ,inits
+      (tagbody ,@forms))))
+*/
+compiler_macro_left_right(prog,[Vars|TagBody], [block,[],[let,Vars,[tagbody|TagBody]]]).
+% (defmacro unless (test-form &rest forms) `(if (not ,test-form) (progn ,@forms)))
+compiler_macro_left_right(unless,[Test|IfFalse] , [if, Test, [], [progn|IfFalse]]).
+% (defmacro when (test-form &rest forms) `(if ,test-form (progn ,@forms)))
+compiler_macro_left_right( when,[Test|IfTrue]  , [if, Test, [progn|IfTrue], []]).
+
+compile_body(Ctx,Env,Result,[M|MACROLEFT], Code):- 
+  term_variables([M|MACROLEFT],VarsS),
+  compiler_macro_left_right(M,MACROLEFT,MACRORIGHT),
+  term_variables(MACRORIGHT,VarsE),
+  VarsE==VarsS,!,
+  must_compile_body(Ctx,Env,Result,MACRORIGHT, Code).
+
+compile_body(Ctx,Env,Result,InstrS,Code):-
+  shared_lisp_compiler:plugin_expand_function_body(Ctx,Env,Result,InstrS,Code),!.
+
+compile_body(_Cxt,_Env,Name,[defun,Name,Args|FunctionBody], CompileBody):-
     FunctionHead=[Name|Args],
     CompileBody = (asserta((Head  :- (fail, <<==(FunctionHead , FunctionBody)))),
-                   asserta((Head  :- (!,  BodyOO)))),
+                   asserta((Head  :- (!,  Code)))),
       expand_function_head(FunctionHead, Head, ArgBindings, Result),
-      expand_function_body_e(Head:ArgBindings,implicit_progn(FunctionBody), Result, Body0, Environment),
+      must_compile_body(ctx{head:Head,argbindings:ArgBindings},Env,Result,implicit_progn(FunctionBody),  Body0),
       debug_var("RET",Result),
-      debug_var("DEnv",Environment),
-      Body = (Environment=[ArgBindings],Body0),
+      debug_var("DEnv",Env),
+      Body = (Env=[ArgBindings],Body0),
       term_attvars(Body,AttVars),
       maplist(del_attr_rev2(freeze),AttVars),
-      mize_body(',',Body,BodyOO).
+      mize_body(',',Body,Code).
 
-expand_function_body(Ctx,implicit_progn(Forms), Result, Body, Environment):-
-	!,
-      must((
-	(once(Forms = [] ; Forms = [_|_] )
-	->  expand_progn(Ctx,Forms, [], Result, Body, Environment)
-	;   expand_function_body_e(Ctx,Forms, Result, Body, Environment)))).
 
-expand_function_body(_Ctx,nil, [], true, _Environment):-
-	!.
-expand_function_body(_Ctx,[], [], true, _Environment):-
-	!.
-expand_function_body(_Ctx,t,   t,  true, _Environment):-
-	!.
-expand_function_body(_Ctx,SelfEval,  SelfEval,  true, _Environment):-is_self_evaluationing_object(SelfEval),!.
+compile_body(_Cxt,_Env,SelfEval,SelfEval,true):- notrace(is_self_evaluationing_object(SelfEval)),!.
+compile_body(_Cxt,_Env, [],nil,true):- !.
+compile_body(_Cxt,_Env,Item,[quote, Item],  true):- !.
 
-expand_function_body(Ctx, 's'(Str),  Result,  Body, Environment):-
+compile_body(_Cxt,_Env,[],[progn],  true):- !.
+compile_body(Ctx,Env,Result,[progn,Forms], Body):- !, must_expand_progn(Ctx,Env,Result,Forms, [],Body).
+compile_body(Ctx,Env,Result,[progn|Forms], Body):- !, must_expand_progn(Ctx,Env,Result,Forms, [],Body).
+compile_body(Ctx,Env,Result,implicit_progn(Forms), Body):- is_list(Forms),!,must_expand_progn(Ctx,Env,Result,Forms, [],Body).
+compile_body(Ctx,Env,Result,implicit_progn(Forms), Body):- !,must_compile_body(Ctx,Env,Result,Forms, Body).
+
+
+
+compile_body(Ctx,Env,Result, 's'(Str),  Body):-
   parse_sexpr_untyped(string(Str),Expression),!,
-  expand_function_body(Ctx, Expression,  Result,  Body, Environment).
+  must_compile_body(Ctx,Env,Result, Expression,  Body).
 
 /*
-expand_function_body(Ctx, List,  Result,  Body, Environment):-  \+ is_list(List),!,
+compile_body(Ctx,Env,Result, List,  Body):-  \+ is_list(List),!,
   expand_pterm_to_sterm(List,PTerm),
-  expand_function_body(Ctx, PTerm,  Result,  Body, Environment).
+  compile_body(Ctx,Env,Result, PTerm,  Body).
 */
+compile_body(Ctx,Env,Result,[if, Test, IfTrue], Body):-must_compile_body(Ctx,Env,Result,[if, Test, IfTrue, []],Body).
 
-expand_function_body(Ctx,[unless,Test, IfFalse], Result, Body, Environment):-expand_function_body(Ctx,[if, Test, [], IfFalse], Result, Body, Environment).
-expand_function_body(Ctx,[when,Test, IfTrue], Result, Body, Environment):-expand_function_body(Ctx,[if, Test, IfTrue, []], Result, Body, Environment).
-expand_function_body(Ctx,[if, Test, IfTrue], Result, Body, Environment):-expand_function_body(Ctx,[if, Test, IfTrue, []], Result, Body, Environment).
-expand_function_body(Ctx,[if, [null,Test], IfTrue, IfFalse], Result, Body, Environment):-
+
+compile_body(Ctx,Env,Result,[if, [null,Test], IfTrue, IfFalse], Body):-
 	!,
-	expand_function_body_e(Ctx,Test,    TestResult,  TestBody,  Environment),
-	expand_function_body_e(Ctx,IfTrue,  TrueResult,  TrueBody,  Environment),
-	expand_function_body_e(Ctx,IfFalse, FalseResult, FalseBody, Environment),
+   must_compile_body(Ctx,Env,TestResult,Test,  TestBody),
+   must_compile_body(Ctx,Env,TrueResult,IfTrue, TrueBody),
+   must_compile_body(Ctx,Env,FalseResult,IfFalse, FalseBody),
         debug_var("IF",TestResult),
         Body = (	TestBody,
 			( TestResult == []
@@ -305,11 +364,11 @@ expand_function_body(Ctx,[if, [null,Test], IfTrue, IfFalse], Result, Body, Envir
 				;  	FalseBody,
 					Result      = FalseResult	) ).
 
-expand_function_body(Ctx,[if, Test, IfTrue, IfFalse], Result, Body, Environment):-
+compile_body(Ctx,Env,Result,[if, Test, IfTrue, IfFalse], Body):-
 	!,
-	expand_function_body_e(Ctx,Test,    TestResult,  TestBody,  Environment),
-	expand_function_body_e(Ctx,IfTrue,  TrueResult,  TrueBody,  Environment),
-	expand_function_body_e(Ctx,IfFalse, FalseResult, FalseBody, Environment),
+   must_compile_body(Ctx,Env,TestResult,Test,  TestBody),
+   must_compile_body(Ctx,Env,TrueResult,IfTrue, TrueBody),
+   must_compile_body(Ctx,Env,FalseResult,IfFalse, FalseBody),
         debug_var("IF",TestResult),
         Body = (	TestBody,
 			( TestResult \= []
@@ -318,13 +377,12 @@ expand_function_body(Ctx,[if, Test, IfTrue, IfFalse], Result, Body, Environment)
 				;  	FalseBody,
 					Result      = FalseResult	) ).
 
-expand_function_body(_Ctx,[cond, []], [], true, _Environment):-
-	!.
-expand_function_body(Ctx,[cond, [ [Test|ResultForms] |Clauses]], Result, Body, Environment):-
+compile_body(_Cxt,_Env,[],[cond, []], true):- !.
+compile_body(Ctx,Env,Result,[cond, [ [Test|ResultForms] |Clauses]], Body):-
 	!,
-	expand_function_body_e(Ctx,Test, TestResult, TestBody, Environment),
-	expand_progn(Ctx,ResultForms, TestResult, ResultFormsResult, ResultFormsBody, Environment),
-	expand_function_body_e(Ctx,[cond, Clauses], ClausesResult, ClausesBody, Environment),
+	must_compile_body(Ctx,Env,TestResult,Test,  TestBody),
+	must_expand_progn(Ctx,Env,ResultFormsResult,ResultForms, TestResult, ResultFormsBody),
+	must_compile_body(Ctx,Env,ClausesResult,[cond, Clauses],  ClausesBody),
 	Body = (	TestBody,
 			( TestResult \= []
 				->	ResultFormsBody,
@@ -332,57 +390,46 @@ expand_function_body(Ctx,[cond, [ [Test|ResultForms] |Clauses]], Result, Body, E
 				;	ClausesBody,
 					Result      = ClausesResult )	).
 
-expand_function_body(Ctx,[progn, Forms], Result, Body, Environment):-
-	!,
-	expand_progn(Ctx,Forms, [], Result, Body, Environment).
 
-expand_function_body(Ctx,[progn|Forms], Result, Body, Environment):-
+expand_function_body_unused_needs_throw(Ctx,Env,Result,[car, IN], Body):- \+ current_prolog_flag(lisp_inline,false),
 	!,
-	expand_progn(Ctx,Forms, [], Result, Body, Environment).
-
-expand_function_body_unused_needs_throw(Ctx,[car, IN], Result, Body, Environment):- \+ current_prolog_flag(lisp_inline,false),
-	!,
-        expand_function_body_e(Ctx,IN, MID, ValueBody, Environment),
+        must_compile_body(Ctx,Env,MID,IN, ValueBody),
         Body = (ValueBody,(MID =[Result|_]->true;Result=MID)).
 
-expand_function_body(Ctx,[cons, IN1,IN2], Result, Body, Environment):- \+ current_prolog_flag(lisp_inline,false),
+compile_body(Ctx,Env,Result,[cons, IN1,IN2], Body):- \+ current_prolog_flag(lisp_inline,false),
 	!,
-        expand_function_body_e(Ctx,IN1, MID1, ValueBody1, Environment),
-        expand_function_body_e(Ctx,IN2, MID2, ValueBody2, Environment),
+        must_compile_body(Ctx,Env,MID1,IN1,  ValueBody1),
+        must_compile_body(Ctx,Env,MID2,IN2,  ValueBody2),
         Body = (ValueBody1,ValueBody2,Result=[MID1|MID2]).
 
-symbol_setq(Atom, Result, Environment):-
-      (	env_memb(Bindings, Environment),
-                bvof(bv(Atom, Value0),Bindings)
-      ->	extract_variable_value(Value0, _, Hole),
-                Hole = [Result|_]
-      ;	special_var(Atom, Old)
-      ->	once(retract(special_var(Atom, Old))),
-                assert(special_var(Atom, Result))
-      ;         (lisp_error_description(atom_does_not_exist, ErrNo, _),throw(ErrNo, Atom))).
-
-expand_function_body(Ctx,[setq, Atom, ValueForm], Result, Body, Environment):- \+ current_prolog_flag(lisp_inline,true),
-	!,	
-	expand_function_body_e(Ctx,ValueForm, Result, ValueBody, Environment),
-	Body = (ValueBody, symbol_setq(Atom, Result, Environment)).
 
 
-expand_function_body(Ctx,[setq, Atom, ValueForm], Result, Body, Environment):-
+
+compile_body(Ctx,Env,Result,[function, [lambda,LambdaArgs| LambdaBody]], Body):-
 	!,
-	lisp_error_description(atom_does_not_exist, ErrNo, _),
-	expand_function_body_e(Ctx,ValueForm, Result, ValueBody, Environment),
-	Body = (	ValueBody,
-			(	env_memb(Bindings, Environment),
-				bvof(bv(Atom, Value0),Bindings)
-			->	extract_variable_value(Value0, _, Hole),
-				Hole = [Result|_]
-			;	special_var(Atom, Old)
-			->	once(retract(special_var(Atom, Old))),
-				assert(special_var(Atom, Result))
-			;	throw(ErrNo, Atom)	)	).
+	must_compile_body(Ctx,ClosureEnvironment,ClosureResult,implicit_progn(LambdaBody),  ClosureBody),
+        debug_var('LArgs',LambdaArgs),
+        debug_var('LResult',ClosureResult),
+        debug_var('LEnv',ClosureEnvironment),
+                     Result = [closure,LambdaArgs,
+			[ClosureEnvironment, ClosureResult]^ClosureBody,
+			Env],
+	Body = true.
+compile_body(_Cxt,_Env,[function|Function], [function|Function], true):- !.
 
-expand_function_body(_Ctx,[quote, Item], Item, true, _Environment):-
-	!.
+
+compile_body(Ctx,Env,Result,[lambda,LambdaArgs|LambdaBody], Body):-
+	!,
+	must_compile_body(Ctx,ClosureEnvironment,ClosureResult,implicit_progn(LambdaBody),  ClosureBody),
+        debug_var('LArgs',LambdaArgs),
+        debug_var('LResult',ClosureResult),
+        debug_var('LEnv',ClosureEnvironment),
+                     Result = [closure,LambdaArgs,
+			[ClosureEnvironment, ClosureResult]^ClosureBody,
+			Env],
+	Body = true.
+
+
 
 
 normalize_let([],[]).
@@ -395,146 +442,176 @@ normalize_let1([Variable, Form],[bind, Variable, Form]).
 normalize_let1(Variable,[bind, Variable, []]).
 
 
-expand_function_body(Ctx,[let, NewBindingsIn| BodyForms], Result, Body, Environment):-
+compile_body(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body):-
      must(normalize_let(NewBindingsIn,NewBindings)),!,        
 	zip_with(Variables, ValueForms, [Variable, Form, [bind, Variable, Form]]^true, NewBindings),
-	expand_arguments(Ctx,ValueForms, ValueBody, Values, Environment),
+	expand_arguments(Ctx,ValueForms, ValueBody, Values, Env),
 	zip_with(Variables, Values, [Var, Val, bv(Var, [Val|Unused])]^true,Bindings),
 
    must((debug_var("_U",Unused),
    debug_var("LETENV",BindingsEnvironment),
    ignore((member(VarN,[Variable,Var]),atom(VarN),debug_var([VarN,'_Let'],Val))))), 
 
-	expand_function_body_e(Ctx,implicit_progn(BodyForms), Result, BodyFormsBody,
-		BindingsEnvironment),
-         Body = ( ValueBody,BindingsEnvironment=[Bindings|Environment], BodyFormsBody ).
+	must_compile_body(Ctx,BindingsEnvironment,Result,implicit_progn(BodyForms), BodyFormsBody),
+         Body = ( ValueBody,BindingsEnvironment=[Bindings|Env], BodyFormsBody ).
+
+compile_body(Ctx,Env,Result,[SetQ, Atom, ValueForm, Atom2| Rest], Body):- is_parallel_op(SetQ),!, 
+   pairify([Atom, ValueForm, Atom2| Rest],Atoms,Forms),
+   maplist(expand_ctx_env_forms(Ctx,Env),Forms,BodyS1,Results),
+   maplist(set_with_prolog_var(Ctx,Env,SetQ),Atoms,Results,BodyS2),   
+   ((op_return_type(SetQ,RT),RT=name) ->  last(Atoms,Result) ; last(Results,Result)),
+   append(BodyS1,BodyS2,BodyS),list_to_conjuncts(BodyS,Body).
 
 
-expand_function_body(Ctx,[function, [lambda,LambdaArgs| LambdaBody]], Result, Body, Environment):-
-	!,
-	expand_function_body_e(Ctx,implicit_progn(LambdaBody), ClosureResult, ClosureBody, ClosureEnvironment),
-        debug_var('LArgs',LambdaArgs),
-        debug_var('LResult',ClosureResult),
-        debug_var('LEnv',ClosureEnvironment),
-                     Result = [closure,LambdaArgs,
-			[ClosureEnvironment, ClosureResult]^ClosureBody,
-			Environment],
-	Body = true.
+compile_body(Ctx,Env,Result,[SetQ, Atom, ValueForm, Atom2| Rest], Body):- is_pair_op(SetQ), 
+   must_compile_body(Ctx,Env,_ResultU,[SetQ, Atom, ValueForm], Body1),
+   must_compile_body(Ctx,Env,Result,[SetQ, Atom2| Rest],  Body2),
+   Body = (Body1 , Body2).
 
-expand_function_body(Ctx,[lambda,LambdaArgs, LambdaBody], Result, Body, Environment):-
-	!,
-	expand_function_body_e(Ctx,implicit_progn([LambdaBody]), ClosureResult, ClosureBody, ClosureEnvironment),
-        debug_var('LArgs',LambdaArgs),
-        debug_var('LResult',ClosureResult),
-        debug_var('LEnv',ClosureEnvironment),
-                     Result = [closure,LambdaArgs,
-			[ClosureEnvironment, ClosureResult]^ClosureBody,
-			Environment],
-	Body = true.
+compile_body(Ctx,Env,Result,[Defvar, Var], Body):- is_def_nil(Defvar),!,
+  must_compile_body(Ctx,Env,Result,[Defvar, Var , nil],Body).
+
+compile_body(Ctx,Env,Result,[SetQ, Atom, ValueForm], Body):- is_symbol_setter(SetQ),
+       % (EnvIn\==[]-> true ; break),
+	!,	
+	must_compile_body(Ctx,Env,ResultV,ValueForm, ValueBody),
+        Body = (ValueBody, symbol_setter(SetQ, Atom, ResultV, Env)),
+        ((op_return_type(SetQ,RT),RT=name) ->  =(Atom,Result) ; =(ResultV,Result)).
 
 
-expand_function_body(_Ctx,[function, Function], [function,Function], true, _Environment):-
-	!.
+symbol_setter(defparameter, Var, Result, _Environment):-
+   ( special_var(Var, _) -> once(retract(special_var(Var, _))); true),
+   assert(special_var(Var, Result)).
 
-expand_function_body(Ctx,[defvar, Var], Result, Body, Environment):-
-	!,
-	expand_function_body_e(Ctx,[defvar, Var, nil], Result, Body, Environment).
-expand_function_body(Ctx,[defvar, Var, Value], Result, Body, Environment):-
-	!,
-	expand_function_body_e(Ctx,Value, Result, ValueBody, Environment),
-	Body = (	ValueBody,
-			(	special_var(Var, _)
-			->	true
-			;	assert(special_var(Var, Result))	)	).
-expand_function_body(Ctx,[defparameter, Var], Result, Body, Environment):-
-	!,
-	expand_function_body_e(Ctx,[defparameter, Var, nil], Result, Body, Environment).
-expand_function_body(Ctx,[defparameter, Var, Value], Result, Body, Environment):-
-	!,
-	expand_function_body_e(Ctx,Value, Result, ValueBody, Environment),
-	Body = (	ValueBody,
-			(	special_var(Var, _)
-			->	once(retract(special_var(Var, _)))
-			;	true	),
-			assert(special_var(Var, Result))	).
+symbol_setter(defvar, Var, Result, _Environment):-
+     special_var(Var, _) -> true ; assert(special_var(Var, Result)).
 
-expand_function_body(Ctx,Atom, InValue, Body, _Environment):-
-	atom(Atom),
-        find_incoming_value(Ctx,Atom,InValue,Value),
-        (get_attr(Value,initState,t);get_attr(InValue,initState,t)),
-	!,
-        Body = true.
+symbol_setter(setq, Atom, Result, Env):-
+      (	env_memb(Bindings, Env),
+                bvof(bv(Atom, Value0),Bindings)
+      ->	extract_variable_value(Value0, _, Hole),
+                Hole = [Result|_]
+      ;	special_var(Atom, Old)
+      ->	once(retract(special_var(Atom, Old))),
+                assert(special_var(Atom, Result))
+      ;         (lisp_error_description(atom_does_not_exist, ErrNo, _),throw(ErrNo, Atom))).
+
+
+is_symbol_setter(OP):- is_pair_op(OP).
+is_symbol_setter(OP):- is_parallel_op(OP).
+is_symbol_setter(OP):- is_def_nil(OP).
+
+op_return_type(Op,name):- is_def_nil(Op).
+is_def_nil(defparameter).
+is_def_nil(defvar).
+
+is_pair_op(setq).
+
+is_pair_op(setf).
+is_pair_op(incf).
+is_pair_op(decf).
+is_pair_op(rotatef).
+is_pair_op(shiftf).
+is_pair_op(psetf).
+
+
+is_pair_op(psetq).
+
+is_parallel_op(psetf).
+is_parallel_op(psetq).
+
+pairify([],[],[]).
+pairify([Atom, ValueForm | Rest],[Atom | Atoms],[ValueForm | Forms]):-
+   pairify(Rest,Atoms,Forms).
+
+set_with_prolog_var(_Cxt,Env,SetQ,Atom,Result,symbol_setter(SetQ, Atom, Result, Env)).
+
+expand_ctx_env_forms(Ctx, Env,Forms,Body, Result):- 
+   must_compile_body(Ctx,Env,Result,Forms, Body).
+
+
+
 
 initState:attr_unify_hook(_,_).
-
-expand_function_body(Ctx,Atom, Value, Body, Environment):- Atom==mapcar,!,
-  dbmsg(expand_function_body(Ctx,Atom, Value, Body, Environment)),
-  dumpST,break.
-
-expand_function_body(Ctx,Atom, Value, Body, Environment):- \+ current_prolog_flag(lisp_inline,true),
-	atom(Atom),
-        find_incoming_value(Ctx,Atom,InValue,Value),
-        put_attr(Value,initState,t),
-        put_attr(InValue,initState,t),
-	!,
-        Body = sym_arg_val_env(Atom,InValue,Value,Environment).
-
-sym_arg_val_env(Atom,_InValue,Value,Environment):-
-  (once((	env_memb(Bindings, Environment),
+sym_arg_val_env(Atom,_InValue,Value,Env):-
+  (once((	env_memb(Bindings, Env),
 			bvof(bv(Atom, Value0),Bindings),
 			extract_variable_value(Value0, Value, _)
 		    ;	special_var(Atom, Value)
 		    ;	(lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Atom))))).
 
-expand_function_body(_Ctx,Atom, Value, Body, Environment):-
-	atom(Atom),
+
+compile_body(Ctx,Env,Result,Atom, Body):- Atom==mapcar,!, dbmsg(compile_body(Ctx,Env,Result,Atom, Body)), dumpST,break.
+
+compile_body(Ctx,Env,InValue, Atom, Body):- atom(Atom),
+        find_incoming_value(Ctx,Env,Atom,InValue,Value),
+        (get_attr(Value,initState,t);get_attr(InValue,initState,t)),
+	!,
+        Body = true.
+
+compile_body(Ctx,Env,Value,Atom, Body):- atom(Atom),
+        find_incoming_value(Ctx,Env,Atom,InValue,Value),
+        put_attr(Value,initState,t),
+        put_attr(InValue,initState,t),
+	!,
+        Body = sym_arg_val_env(Atom,InValue,Value,Env).
+
+compile_body(_Cxt,Env,Value, Atom,  Body):- atom(Atom),
    debug_var([Atom,'_Stack'],Value0),
    debug_var([Atom,'_VAL'],Value),
 	!,
 	lisp_error_description(unbound_atom, ErrNo, _),
-	Body = (once((	env_memb(Bindings, Environment),
+	Body = (once((	env_memb(Bindings, Env),
 			bvof(bv(Atom, Value0),Bindings),
 			extract_variable_value(Value0, Value, _)
 		    ;	special_var(Atom, Value)
 		    ;	throw(ErrNo, Atom)	)	)).	
 
 
-expand_function_body(Ctx,[+ | FunctionArgs], Result, Body, Environment):-!,
-  expand_function_body(Ctx,[plus | FunctionArgs], Result, Body, Environment).
-expand_function_body(Ctx,[- | FunctionArgs], Result, Body, Environment):-!,
-  expand_function_body(Ctx,[minus | FunctionArgs], Result, Body, Environment).
+op_replacement(+,plus).
+op_replacement(-,minus).
+op_replacement(*,mult).
+op_replacement(<,lessThan).
+op_replacement(>,lessThan).
+
+compile_body(Ctx,Env,Result,[Op | FunctionArgs], Body):- op_replacement(Op,Op2), !,
+  must_compile_body(Ctx,Env,Result,[Op2 | FunctionArgs],Body).
 
 
-expand_function_body(Ctx,[FunctionName | FunctionArgs], Result, Body, Environment):- \+ atom(FunctionName),!,
-  expand_function_body(Ctx,[funcall,FunctionName | FunctionArgs], Result, Body, Environment).
+compile_body(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):- \+ atom(FunctionName),!,
+  must_compile_body(Ctx,Env,Result,[funcall,FunctionName | FunctionArgs],Body).
 
-expand_function_body(Ctx,[FunctionName | FunctionArgs], Result, Body, Environment):- FunctionName\==funcall,
-   (Ctx = _:ArgBindings), member(bv(Atom0,_),ArgBindings),Atom0==FunctionName,
-  expand_function_body(Ctx,[funcall,FunctionName | FunctionArgs], Result, Body, Environment).
+compile_body(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):- FunctionName \==funcall,
+  member(bv(Atom0,_),Ctx.argbindings),Atom0==FunctionName,!,
+  must_compile_body(Ctx,Env,Result,[funcall,FunctionName | FunctionArgs],Body).
 
 % Non built-in function expands into an explicit function call
-expand_function_body(Ctx,[FunctionName | FunctionArgs], Result, Body, Environment):-
-	!,
-	expand_arguments(Ctx,FunctionArgs, ArgBody, Args, Environment),
-	append(Args, [Result], ArgsResult),
-        debug_var([FunctionName,'_Ret'],Result),
-	ExpandedFunction =.. [FunctionName | ArgsResult],
-	Body = (	ArgBody,
-			ExpandedFunction	).
+compile_body(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):-
+      !,
+      expand_arguments(Ctx,FunctionArgs, ArgBody, Args, Env),
+      append(Args, [Result], ArgsResult),
+      debug_var([FunctionName,'_Ret'],Result),
+      ExpandedFunction =.. [FunctionName | ArgsResult],
+      Body = (	ArgBody,
+                      ExpandedFunction	).
+   
 
 	expand_arguments(_Ctx,[], true, [], _Environment).
-	expand_arguments(Ctx,[Arg|Args], Body, [Result|Results], Environment):-
-		expand_function_body_e(Ctx,Arg, Result, ArgBody, Environment),
+	expand_arguments(Ctx,[Arg|Args], Body, [Result|Results], Env):-
+		must_compile_body(Ctx,Env,Result,Arg, ArgBody),
                 Body = (ArgBody, ArgsBody),
-		expand_arguments(Ctx,Args, ArgsBody, Results, Environment).
+		expand_arguments(Ctx,Args, ArgsBody, Results, Env).
 
-expand_progn(_Ctx,[], Result, Result, true, _Environment).
-expand_progn(Ctx,[Form | Forms], _PreviousResult, Result, Body, Environment):-  !,
-	expand_function_body_e(Ctx,Form, FormResult, FormBody, Environment),
-	Body = (FormBody, FormsBody),
-	expand_progn(Ctx, Forms, FormResult, Result, FormsBody, Environment).
-expand_progn(Ctx, Form , _PreviousResult, Result, Body, Environment):-
-	expand_function_body_e(Ctx,Form, Result, Body, Environment).
+
+expand_progn(_Cx,_Ev,Result,[], Result,true).
+expand_progn(Ctx,Env,Result,[Form | Forms], _PreviousResult, Body):-  !,
+	must_compile_body(Ctx,Env,FormResult, Form,  FormBody),
+	must_expand_progn(Ctx,Env,Result, Forms, FormResult, FormSBody),
+        Body = (FormBody,FormSBody).
+
+expand_progn(Ctx,Env,Result, Form , _PreviousResult, Body):-
+	must_compile_body(Ctx,Env,Result,Form, Body).
+
 
 conjoin_0(A,B,A):- B==true,!.
 conjoin_0(A,B,B):- A==true,!.
@@ -558,7 +635,7 @@ mize_body1(_F,A,B):- A=..[F|AA],must_maplist(mize_body1(F),AA,BB),B=..[F|BB].
 mize_body1(_,A,A):-!.
 
 mize_body2(_,A,A):- \+ compound(A),!.
-mize_body2(_,A=B,pass2(A=B)):- var(A),var(B),A=B,!.
+%mize_body2(_,A=B,pass2(A=B)):- var(A),var(B),A=B,!.
 mize_body2(_F,A,B):- A=..[F|AA], must_maplist(mize_body2(F),AA,BB),B=..[F|BB].
 mize_body2(_,A,A):-!.
 
@@ -661,12 +738,6 @@ reverse ==
      if(null(l),
         l,
         append(reverse(cdr(l)),(cons(car(l),nil))))).
-
-lisp_compile(s(Str),Result):-!,
-  parse_sexpr_untyped(string(Str),Expression),!,
-  lisp_eval(Expression,Result).
-lisp_compile(Expression,Result):-!,
-  lisp_eval(Expression,Result).
 
 :- set_prolog_flag(double_quotes,string).
 

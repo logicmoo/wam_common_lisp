@@ -1,4 +1,16 @@
 
+#|
+(funcall #'(setf macro-function)
+	 #'(lambda (name lambda-list &rest body)
+	     (list 'progn
+		   (list 'funcall '#'(setf macro-function)
+			 (list 'function
+			       (cons 'lambda (cons lambda-list body)))
+			 (list 'quote name))
+		   (list 'quote name)))
+	 'defmacro)
+|#
+
 (defmacro defun500 (name lambda-list &rest body)
   (list 'progn
 	(list 'funcall '#'(setf fdefinition)
@@ -76,6 +88,7 @@
 	  (cdr binding)))))"
   (if (= (ldb '(1 . 1) (iref symbol 8)) 1)
       (iref symbol 5)))
+
 (defun macroexpand-1 (form &optional env)
   (if (consp form)
       (let ((definition (macro-function (car form) env)))
@@ -85,6 +98,7 @@
       (if (and form (symbolp form) (= (ldb '(1 . 0) (iref form 8)) 1))
 	  (values (iref form 4) t)
 	  (values form nil))))
+
 (defun macroexpand (form &optional env)
   (multiple-value-bind (form expanded-p)
       (macroexpand-1 form env)
@@ -232,12 +246,14 @@
     (setf (iref ',name 4) ,initial-value)
     (setf (iref ',name 8) (dpb 1 (cons 1 2) (iref ',name 8)))
     ',name))
+
 (defparameter *type-expanders* nil)
 (defconstant call-arguments-limit 65536)
 (defconstant lambda-parameters-limit 65536)
 (defconstant multiple-values-limit 65536)
 (defconstant lambda-list-keywords
   '(&allow-other-keys &aux &body &environment &key &optional &rest &whole))
+
 (defmacro defvar (name &rest rest)
   `(progn
     (unless (or (iboundp ',name 4) ,(not rest))

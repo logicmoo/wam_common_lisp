@@ -1,6 +1,7 @@
 (funcall #'(setf iref)
 	 #'(lambda (object) (= (ldb (cons 2 0) (ival object)) 1))
 	 'consp 5)
+
 (funcall #'(setf iref)
 	 #'(lambda (new-definition function-name)
 	     (if (consp function-name)
@@ -13,6 +14,7 @@
 			    function-name 8)))
 	     new-definition)
 	 'fdefinition 6)
+
 (funcall #'(setf iref)
 	 #'(lambda (new-function symbol &optional environment)
 	     (funcall #'(setf iref) new-function symbol 5)
@@ -20,6 +22,7 @@
 		      symbol 8)
 	     new-function)
 	 'macro-function 6)
+
 (funcall #'(setf macro-function)
 	 #'(lambda (name lambda-list &rest body)
 	     (list 'progn
