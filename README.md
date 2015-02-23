@@ -3,8 +3,9 @@
 is to create a Prolog version of a Common Lisp Interpreter.   
 Initially starting out with Lisp500.  I haven't checked yet if Lisp 500 will be good enough to run most Lisp programs it's not quite common Lisp obviously but at least it's accepted widely enough that it even CL-BENCH references it.
 
-If there's a better common Lisp out there for us and we get there faster than I'll take you up on the offer to use that Lisp and said this Lisp for example one might find ABCL's *.lisp files are better than core500.lisp 
-The reason for choosing Lisp 500 is it would require you to only implement 158 initial trampolines from there core500.lisp  is loaded on top of your Prolog system initial which is the lisp500.pl.
+If there's a better common Lisp out there for us and we get there faster than I'll take you up on the offer to use that Lisp instead for example: You mightt find ABCL's *.lisp files are better than core500.lisp (And actually will get you to $2500 faster) 
+
+The reason for choosing Lisp500 is it would require you to only implement 68 initial trampolines needed by core500.lisp  is loaded on top of your Prolog system initial which is the lisp500.pl.
  
 Presently lisp500.pl has Prolog terms including comments as you can see it's manipulating memory arrays and a completely idiomatic port of the 158  C  functions would probably not be ideal but I'm allowing this to be possible if it allows you to get the job completed faster.    See,  If I was doing this work myself,  I would probably begin to work on the C idiomatically but then within a short amount of time realize that this approach is creating more work compared to implementing the exact function that the core Lisp file requires CAR/APPLY etc.  But I don't feel comfortable going straight to the Prolog version until I've at least had a crack at idiomatic C.  I leave this up to your discretion.
 
