@@ -3,12 +3,29 @@
 # dmailes says dont forget to
 #   apt-get install libc6-dev-i386 linux-libc-dev:i386 linux-libc-dev
 
+CMN     = -m32 -g -O0
+#CMN     = -m32 -O2 -fomit-frame-pointer
 
-lisp500 : lisp500.o
-	gcc -m32 -o lisp500 lisp500.o
+CFLAGS  = $(CMN) -pedantic -Wall
+CC      = gcc
+LFLAGS  = $(CMN) -lm -ldl
+LINKER  = gcc
 
-lisp500.o : lisp500.c
-	gcc -c -m32 lisp500.c
 
-clean :
-	rm lisp500 lisp500.o
+## Rules
+
+./lisp800: ./lisp800.o
+	$(LINKER) -o ./lisp800 ./lisp800.o $(LFLAGS)
+
+./lisp800.o: build ./lisp800.c
+	$(CC) $(CFLAGS) -c ./lisp800.c -o ./lisp800.o
+
+build:
+	mkdir build
+
+clean:
+	rm -rf build
+
+
+
+
