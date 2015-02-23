@@ -1,0 +1,19 @@
+bin
+target
+obj
+
+# qtcreator
+*.user
+
+# xcode + iOS
+.DS_Store
+xcuserdata
+build
+*.pbxuser
+*.perspective
+*.perspectivev3
+*.mode1v3
+*.mode2v3
+*.nib
+*.swp
+*.o

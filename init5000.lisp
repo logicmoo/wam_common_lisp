@@ -65,35 +65,36 @@
 	    (apply #'append (cdr lists))))
       (car lists)))
 (defun backquote-expand (list level)
-  (if (consp list)
-      (if (eq 'backquote (car list))
-	  (list 'list ''backquote
-		(backquote-expand (car (cdr list)) (+ level 1)))
-	  (if (eq 'unquote (car list))
-	      (if (= level 0)
-		  (car (cdr list))
-		  (list 'list ''unquote
-			(backquote-expand (car (cdr list)) (- level 1))))
-	      (if (eq 'unquote-splicing (car list))
-		  (if (= level 0)
-		      (values (car (cdr list)) t)
-		      (list 'list ''unquote-splicing
-			    (backquote-expand (car (cdr list)) (- level 1))))
-		  (labels ((collect (list)
-			     (if (consp list)
-				 (cons (multiple-value-call
-					   #'(lambda (value
-						      &optional splicingp)
-					       (if splicingp
-						   value
-						   (list 'list value)))
-				       (backquote-expand (car list) level))
-				     (collect (cdr list)))
-				 (list (list 'quote list)))))
-		    (cons 'append (collect list))))))
-      (list 'quote list)))
+  (if (consp list) 
+      (if (eq 'backquote (car list)) 
+	  (list 'list ''backquote 
+		(backquote-expand (car (cdr list)) (+ level 1))) 
+	  (if (eq 'unquote (car list)) 
+	      (if (= level 0) 
+		  (car (cdr list)) 
+		  (list 'list ''unquote 
+			(backquote-expand (car (cdr list)) (- level 1)))) 
+	      (if (eq 'unquote-splicing (car list)) 
+		  (if (= level 0) 
+		      (values (car (cdr list)) t) 
+		      (list 'list ''unquote-splicing 
+			    (backquote-expand (car (cdr list)) (- level 1)))) 
+		  (labels ((collect (list) 
+			     (if (consp list) 
+				 (cons (multiple-value-call 
+					   #'(lambda (value 
+						      &optional splicingp) 
+					       (if splicingp 
+						   value 
+						   (list 'list value))) 
+				       (backquote-expand (car list) level)) 
+				     (collect (cdr list))) 
+				 (list (list 'quote list))))) 
+		    (cons 'append (collect list)))))) 
+      (list 'quote list))) 
 (defmacro backquote (form)
   (backquote-expand form 0))
+
 (defun macro-function (symbol &optional environment)
   "(dolist (binding environment)
     (when (and (consp (car binding))
@@ -779,7 +780,7 @@
 (defun symbolp (object) (or (null object) (eq (type-of object) 'symbol)))
 (defun keywordp (object)
   (and (symbolp object)
-       (string= (package-name (symbol-package object)) "KEYWORD")))
+       (string= (package-name (symbol-package object)) "KEYwORD")))
 (defun make-symbol (name)
   (let ((symbol (makei 9 0 name nil nil nil nil (- 1) 0)))
     (imakunbound symbol 4)
@@ -3823,18 +3824,17 @@
 	 (return-from read-internal
 	   (if convertp
 	       (if symbol
-		   (let ((colon-position (position (char-code 58) string)))
+		   (let ((colon-position (position (code-char 58) string)))
 		     (if colon-position
-			 (if (= colon-position 0) (intern (subseq string 1) "KEYWORD")
-			   (multiple-value-bind (symbol status)
-			       (find-symbol (subseq string (+ 1 colon-position))
-					    (subseq string 0 colon-position))
-			     (if (eq status :external)
-				 symbol
-			       (error 'reader-error))))
-		       (intern string)))
-		 (parse-number string))
-	     string))))))
+			 (multiple-value-bind (symbol status)
+			     (find-symbol (subseq string (+ 1 colon-position))
+					  (subseq string 0 colon-position))
+			   (if (eq status :external)
+			       symbol
+			       (error 'reader-error)))
+			 (intern string)))
+		   (parse-number string))
+	       string))))))
 (defun read-preserving-whitespace (&optional input-stream (eof-error-p t)
 				   eof-value recursive-p)
   (let ((value (read-internal input-stream eof-error-p eof-value recursive-p

@@ -25,6 +25,8 @@
 #include <sys/utsname.h>
 #endif
 
+#include <sys/select.h>
+
 typedef int lval;
 lval *o2c(lval o) {
 	return (lval *) (o - 1);
@@ -62,11 +64,13 @@ int sp(lval o)
 {
 	return (o & 3) == 3;
 }
+typedef lval (*func_t)(void*, ...);
+
 struct symbol_init {
 	const char *name;
-	     lval(*fun) ();
+	func_t fun;
 	int argc;
-	    lval(*setfun) ();
+	func_t setfun;
 	int setargc;
 	lval sym;
 };
@@ -159,14 +163,15 @@ st:	t = (lval *) (v & ~3);
 		}
 	}
 }
+
 lval gc(lval * f)
 {
 	int i;
 	lval *m;
 	int l;
 	int u = 0;
-	int ml;
-	printf(";garbage collecting...\n");
+	int ml = 0;
+	//printf(";garbage collecting...\n");
 	while (memf) {
 		lval *n = (lval *) memf[0];
 		memset(memf, 0, 4 * memf[1]);
@@ -176,8 +181,8 @@ lval gc(lval * f)
 	gcm(pkgs);
 	gcm(dyns);
 	for (; f > stack; f--) {
-		if ((*f & 3) && (*f < memory || *f > memory + memory_size / 4))
-			printf("%x\n", *f);
+		if ((*f & 3) && (*f < (int)memory || *f > (int)memory + memory_size / 4))
+			//printf("%x\n", *f);
 		gcm(*f);
 	}
 	memf = 0;
@@ -208,7 +213,7 @@ lval gc(lval * f)
 		memf = m - ml;
 		i += ml;
 	}
-	printf(";done. %d free.\n", i);
+	//printf(";done. %d free.\n", i);
 	return 0;
 }
 lval *m0(lval * g, int n)
@@ -491,7 +496,7 @@ X lval call(lval * f, lval fn, unsigned d)
 		dbgr(g, 7, 0, f);
 	if (d > (unsigned) o2s(fn)[4])
 		dbgr(g, 6, 0, f);
-	return ((lval(*) ()) o2s(fn)[2]) (f, f + d + 1);
+	return ((func_t) o2s(fn)[2]) (f, f + d + 1);
 }
 lval eval_quote(lval * g, lval ex) {
 	return car(ex);
@@ -1090,12 +1095,16 @@ lval lfinish_fs(lval * f) {
 	return 0;
 }
 lval lfasl(lval * f) {
+#if 0
 	void *h;
 	lval(*s) ();
 	h = dlopen(o2z(f[1]), RTLD_NOW);
 	s = dlsym(h, "init");
 	return s(f);
+#endif
+	return 0;
 }
+lval strf(lval * f, const char *s);
 lval luname(lval * f) {
 	struct utsname un;
 	uname(&un);
@@ -1339,7 +1348,7 @@ ag:	xvalues = 8;
 			dbgr(f, 0, x, &ex);
 	} return ex == -8 ? o2a(x)[4] : ex;
 }
-int getnws() {
+int getnws(void) {
 	int c;
 	do
 		c = getc(ins);
@@ -1371,7 +1380,7 @@ lval read_string_list(lval * g)
 	return cons(g, (c << 5) | 24, read_string_list(g));
 }
 unsigned hash(lval s) {
-	unsigned char *z = o2z(s);
+	unsigned char *z = (unsigned char *) o2z(s);
 	unsigned i = 0, h = 0, g;
 	while (i < o2s(s)[0] / 64 - 4) {
 		h = (h << 4) + z[i++];
@@ -1440,8 +1449,10 @@ lval lread(lval * g) {
 		return list2(g, 39);
 	} ungetc(c, ins);
 	if (isdigit(c)) {
+		int i;
 		double d;
-		fscanf(ins, "%lf", &d);
+		fscanf(ins, "%d", &i);
+		d = i;
 		return d2o(g, d);
 	} if (c == ':')
 		getnws();
@@ -1535,9 +1546,9 @@ lval lrp(lval * f, lval * h)
 }
 #else
 lval lrp(lval * f, lval * h) {
-	pid_t p;
+	pid_t p = 0;
 	int r;
-	p = fork();
+	//p = fork();
 	if (p)
 		waitpid(p, &r, 0);
 	else {
@@ -1550,18 +1561,20 @@ lval lrp(lval * f, lval * h) {
 	} return d2o(f, r);
 }
 #endif
-int main(int argc, char *argv[])
+int lisp5000_main(int argc, char *argv[])
 {
 	lval *g;
 	int i;
 	lval sym;
-	memory_size = 4 * 2048 * 1024;
-	memory = malloc(memory_size);
+	memory_size = 1 * 1024 * 1024;
+	//memory = malloc(memory_size);
+	memory = memalign(8, memory_size);
 	memf = memory;
 	memset(memory, 0, memory_size);
 	memf[0] = 0;
 	memf[1] = memory_size / 4;
-	stack = malloc(256 * 1024);
+	//stack = malloc(256 * 1024);
+	stack = memalign(8, 256 * 1024);
 	memset(stack, 0, 256 * 1024);
 	g = stack + 5;
 	pkg = mkp(g, "CL", "COMMON-LISP");
@@ -1594,37 +1607,38 @@ int main(int argc, char *argv[])
 	do
 		printf("? ");
 	while (ep(g, lread(g)));
+	free(memory);
+	free(stack);
 	return 0;
 }
 struct symbol_init symi[] = {{"NIL"}, {"T"}, {"&REST"}, {"&BODY"},
 {"&OPTIONAL"}, {"&KEY"}, {"&WHOLE"}, {"&ENVIRONMENT"}, {"&AUX"},
-{"&ALLOW-OTHER-KEYS"}, {"DECLARE", eval_declare, -1}, {"SPECIAL"},
-{"QUOTE", eval_quote, 1}, {"LET", eval_let, -2}, {"LET*", eval_letm, -2},
-{"FLET", eval_flet, -2}, {"LABELS", eval_labels, -2}, {"MACROLET", eval_macrolet, -2},
-{"SYMBOL-MACROLET", eval_symbol_macrolet, -2}, {"SETQ", eval_setq, 2},
-{"FUNCTION", eval_function, 1}, {"TAGBODY", eval_tagbody, -1}, {"GO", eval_go, 1},
-{"BLOCK", eval_block, -2}, {"RETURN-FROM", eval_return_from, 2},
-{"CATCH", eval_catch, -2}, {"THROW", eval_throw, -2},
-{"UNWIND-PROTECT", eval_unwind_protect, -2}, {"IF", eval_if, -3},
-{"MULTIPLE-VALUE-CALL", eval_multiple_value_call, -2},
-{"MULTIPLE-VALUE-PROG1", eval_multiple_value_prog1, -2}, {"PROGN", eval_body, -1},
-{"PROGV", eval_progv, -3}, {"_SETF", eval_setf, 2},
-{"FINISH-FILE-STREAM", lfinish_fs, 1}, {"MAKEI", lmakei, -3}, {"DPB", ldpb, 3},
-{"LDB", lldb, 2}, {"BACKQUOTE"}, {"UNQUOTE"}, {"UNQUOTE-SPLICING"},
-{"IBOUNDP", liboundp, 2}, {"LISTEN-FILE-STREAM", llisten_fs, 1}, {"LIST", llist, -1},
-{"VALUES", lvalues, -1},
-{"FUNCALL", lfuncall, -2}, {"APPLY", lapply, -2}, {"EQ", leq, 2}, {"CONS", lcons, 2},
-{"CAR", lcar, 1, setfcar, 2}, {"CDR", lcdr, 1, setfcdr, 2}, {"=", lequ, -2},
-{"<", lless, -2}, {"+", lplus, -1}, {"-", lminus, -2}, {"*", ltimes, -1},
-{"/", ldivi, -2}, {"MAKE-FILE-STREAM", lmake_fs, 2}, {"HASH", lhash, 1},
-{"IERROR"}, {"GENSYM", lgensym, 0}, {"STRING", lstring, -1}, {"FASL", lfasl, 1},
-{"MAKEJ", lmakej, 2}, {"MAKEF", lmakef, 0}, {"FREF", lfref, 1},
-{"PRINT", lprint, 1}, {"GC", gc, 0}, {"CLOSE-FILE-STREAM", lclose_fs, 1},
-{"IVAL", lival, 1}, {"FLOOR", lfloor, -2}, {"READ-FILE-STREAM", lread_fs, 3},
-{"WRITE-FILE-STREAM", lwrite_fs, 4}, {"LOAD", lload, 1},
-{"IREF", liref, 2, setfiref, 3}, {"LAMBDA"}, {"CODE-CHAR", lcode_char, 1},
-{"CHAR-CODE", lchar_code, 1}, {"*STANDARD-INPUT*"}, {"*STANDARD-OUTPUT*"},
-{"*ERROR-OUTPUT*"}, {"*PACKAGES*"}, {"STRING=", lstring_equal, 2},
-{"IMAKUNBOUND", limakunbound, 2}, {"EVAL", leval, -2}, {"JREF", ljref, 2, setfjref, 3},
-{"RUN-PROGRAM", lrp, -2}, {"UNAME", luname, 0}};
-
+{"&ALLOW-OTHER-KEYS"}, {"DECLARE", (func_t)eval_declare, -1}, {"SPECIAL"},
+{"QUOTE", (func_t)eval_quote, 1}, {"LET", (func_t)eval_let, -2}, {"LET*", (func_t)eval_letm, -2},
+{"FLET", (func_t)eval_flet, -2}, {"LABELS", (func_t)eval_labels, -2}, {"MACROLET", (func_t)eval_macrolet, -2},
+{"SYMBOL-MACROLET", (func_t)eval_symbol_macrolet, -2}, {"SETQ", (func_t)eval_setq, 2},
+{"FUNCTION", (func_t)eval_function, 1}, {"TAGBODY", (func_t)eval_tagbody, -1}, {"GO", (func_t)eval_go, 1},
+{"BLOCK", (func_t)eval_block, -2}, {"RETURN-FROM", (func_t)eval_return_from, 2},
+{"CATCH", (func_t)eval_catch, -2}, {"THROW", (func_t)eval_throw, -2},
+{"UNWIND-PROTECT", (func_t)eval_unwind_protect, -2}, {"IF", (func_t)eval_if, -3},
+{"MULTIPLE-VALUE-CALL", (func_t)eval_multiple_value_call, -2},
+{"MULTIPLE-VALUE-PROG1", (func_t)eval_multiple_value_prog1, -2}, {"PROGN", (func_t)eval_body, -1},
+{"PROGV", (func_t)eval_progv, -3}, {"_SETF", (func_t)eval_setf, 2},
+{"FINISH-FILE-STREAM", (func_t)lfinish_fs, 1}, {"MAKEI", (func_t)lmakei, -3}, {"DPB", (func_t)ldpb, 3},
+{"LDB", (func_t)lldb, 2}, {"BACKQUOTE"}, {"UNQUOTE"}, {"UNQUOTE-SPLICING"},
+{"IBOUNDP", (func_t)liboundp, 2}, {"LISTEN-FILE-STREAM", (func_t)llisten_fs, 1}, {"LIST", (func_t)llist, -1},
+{"VALUES", (func_t)lvalues, -1},
+{"FUNCALL", (func_t)lfuncall, -2}, {"APPLY", (func_t)lapply, -2}, {"EQ", (func_t)leq, 2}, {"CONS", (func_t)lcons, 2},
+{"CAR", (func_t)lcar, 1, (func_t)setfcar, 2}, {"CDR", (func_t)lcdr, 1, (func_t)setfcdr, 2}, {"=", (func_t)lequ, -2},
+{"<", (func_t)lless, -2}, {"+", (func_t)lplus, -1}, {"-", (func_t)lminus, -2}, {"*", (func_t)ltimes, -1},
+{"/", (func_t)ldivi, -2}, {"MAKE-FILE-STREAM", (func_t)lmake_fs, 2}, {"HASH", (func_t)lhash, 1},
+{"IERROR"}, {"GENSYM", (func_t)lgensym, 0}, {"STRING", (func_t)lstring, -1}, {"FASL", (func_t)lfasl, 1},
+{"MAKEJ", (func_t)lmakej, 2}, {"MAKEF", (func_t)lmakef, 0}, {"FREF", (func_t)lfref, 1},
+{"PRINT", (func_t)lprint, 1}, {"GC", (func_t)gc, 0}, {"CLOSE-FILE-STREAM", (func_t)lclose_fs, 1},
+{"IVAL", (func_t)lival, 1}, {"FLOOR", (func_t)lfloor, -2}, {"READ-FILE-STREAM", (func_t)lread_fs, 3},
+{"WRITE-FILE-STREAM", (func_t)lwrite_fs, 4}, {"LOAD", (func_t)lload, 1},
+{"IREF", (func_t)liref, 2, (func_t)setfiref, 3}, {"LAMBDA"}, {"CODE-CHAR", (func_t)lcode_char, 1},
+{"CHAR-CODE", (func_t)lchar_code, 1}, {"*STANDARD-INPUT*"}, {"*STANDARD-OUTPUT*"},
+{"*ERROR-OUTPUT*"}, {"*PACKAGES*"}, {"STRING=", (func_t)lstring_equal, 2},
+{"IMAKUNBOUND", (func_t)limakunbound, 2}, {"EVAL", (func_t)leval, -2}, {"JREF", (func_t)ljref, 2, (func_t)setfjref, 3},
+{"RUN-PROGRAM", (func_t)lrp, -2}, {"UNAME", (func_t)luname, 0}};
