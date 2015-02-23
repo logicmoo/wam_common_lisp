@@ -1462,7 +1462,7 @@ lisp500_fn([lval_read_list(lval_PTR_f)]):-true.
 %=    T=lread(g);
 %=    return cons(g,T,read_list(g));
 %- }
-lisp500_fn([lval_read_string_list(lval_PTR_g)]):-true.
+lisp500_fn([lval_read_stri`ng_list(lval_PTR_g)]):-true.
 %- {
 %=    int c=getc(ins);
 %=    if(c=='\"')
@@ -1705,7 +1705,30 @@ lisp500_fn([int_main(int_argc,char_PTR_argv_ARRAY)]):-true.
 %=    while(ep(g,lread(g)));
 %=    return 0;
 %- }
-lisp500_array([struct_symbol_init_symi_ARRAY,[["NIL"],["T"],["&REST"],["&BODY"],["&OPTIONAL"],["&KEY"],["&WHOLE"],["&ENVIRONMENT"],["&AUX"],["&ALLOW-OTHER-KEYS"],["DECLARE",eval_declare,-1],["SPECIAL"],["QUOTE",eval_quote,1],["LET",eval_let,-2],["LET_PTR_",eval_letm,-2],["FLET",eval_flet,-2],["LABELS",eval_labels,-2],["MACROLET",eval_macrolet,-2],["SYMBOL-MACROLET",eval_symbol_macrolet,-2],["SETQ",eval_setq,2],["FUNCTION",eval_function,1],["TAGBODY",eval_tagbody,-1],["GO",eval_go,1],["BLOCK",eval_block,-2],["RETURN-FROM",eval_return from,2],["CATCH",eval_catch,-2],["THROW",eval_throw,-2],["UNWIND-PROTECT",eval_unwind_protect,-2],["IF",eval_if,-3],["MULTIPLE-VALUE-CALL",eval_multiple_value_call,-2],["MULTIPLE-VALUE-PROG1",eval_multiple_value_prog1,-2],["PROGN",eval_body,-1],["PROGV",eval_progv,-3],["_SETF",eval_setf,2],["FINISH-FILE-STREAM",lfinish_fs,1],["MAKEI",lmakei,-3],["DPB",ldpb,3],["LDB",lldb,2],["BACKQUOTE"],["UNQUOTE"],["UNQUOTE-SPLICING"],["IBOUNDP",liboundp,2],["LISTEN-FILE-STREAM",llisten_fs,1],["LIST",llist,-1],["VALUES",lvalues,-1],["FUNCALL",lfuncall,-2],["APPLY",lapply,-2],["EQ",leq,2],["CONS",lcons,2],["CAR",lcar,1,setfcar,2],["CDR",lcdr,1,setfcdr,2],["=",lequ,-2],["<",lless,-2],["+",lplus,-1],["-",lminus,-2],["_PTR_",ltimes,-1],["/",ldivi,-2],["MAKE-FILE-STREAM",lmake_fs,2],["HASH",lhash,1],["IERROR"],["GENSYM",lgensym,0],["STRING",lstring,-1],["FASL",lfasl,1],["MAKEJ",lmakej,2],["MAKEF",lmakef,0],["FREF",lfref,1],["PRINT",lprint,1],["GC",gc,0],["CLOSE-FILE-STREAM",lclose_fs,1],["IVAL",lival,1],["FLOOR",lfloor,-2],["READ-FILE-STREAM",lread_fs,3],["WRITE-FILE-STREAM",lwrite_fs,4],["LOAD",lload,1],["IREF",liref,2,setfiref,3],["LAMBDA"],["CODE-CHAR",lcode_char,1],["CHAR-CODE",lchar_code,1],["_PTR_STANDARD-INPUT_PTR_"],["_PTR_STANDARD-OUTPUT_PTR_"],["_PTR_ERROR-OUTPUT_PTR_"],["_PTR_PACKAGES_PTR_"],["STRING=",lstring_equal,2],["IMAKUNBOUND",limakunbound,2],["EVAL",leval,-2],["JREF",ljref,2,setfjref,3],["RUN-PROGRAM",lrp,-2],["UNAME",luname,0]]]).
+lisp500_array([struct_symbol_init_symi_ARRAY,[["NIL"],["T"],["&REST"],["&BODY"],["&OPTIONAL"],["&KEY"],["&WHOLE"],["&ENVIRONMENT"],["&AUX"],["&ALLOW-OTHER-KEYS"],
+  ["DECLARE",eval_declare,-1],["SPECIAL"],["QUOTE",eval_quote,1],["LET",eval_let,-2],
+  ["LET_PTR_",eval_letm,-2],["FLET",eval_flet,-2],["LABELS",eval_labels,-2],
+  ["MACROLET",eval_macrolet,-2],["SYMBOL-MACROLET",eval_symbol_macrolet,-2],["SETQ",eval_setq,2],
+  ["FUNCTION",eval_function,1],["TAGBODY",eval_tagbody,-1],["GO",eval_go,1],
+  ["BLOCK",eval_block,-2],["RETURN-FROM",eval_return from,2],["CATCH",eval_catch,-2],
+  ["THROW",eval_throw,-2],["UNWIND-PROTECT",eval_unwind_protect,-2],["IF",eval_if,-3],
+  ["MULTIPLE-VALUE-CALL",eval_multiple_value_call,-2],["MULTIPLE-VALUE-PROG1",eval_multiple_value_prog1,-2],
+  ["PROGN",eval_body,-1],["PROGV",eval_progv,-3],["_SETF",eval_setf,2],
+  ["FINISH-FILE-STREAM",lfinish_fs,1],["MAKEI",lmakei,-3],["DPB",ldpb,3],
+  ["LDB",lldb,2],["BACKQUOTE"],["UNQUOTE"],["UNQUOTE-SPLICING"],["IBOUNDP",liboundp,2],["LISTEN-FILE-STREAM",llisten_fs,1],
+  ["LIST",llist,-1],["VALUES",lvalues,-1],["FUNCALL",lfuncall,-2],
+  ["APPLY",lapply,-2],["EQ",leq,2],["CONS",lcons,2],
+  ["CAR",lcar,1,setfcar,2],["CDR",lcdr,1,setfcdr,2],["=",lequ,-2],
+  ["<",lless,-2],["+",lplus,-1],["-",lminus,-2],
+  ["_PTR_",ltimes,-1],["/",ldivi,-2],["MAKE-FILE-STREAM",lmake_fs,2],
+  ["HASH",lhash,1],["IERROR"],["GENSYM",lgensym,0],["STRING",lstring,-1],
+  ["FASL",lfasl,1],["MAKEJ",lmakej,2],["MAKEF",lmakef,0],
+  ["FREF",lfref,1],["PRINT",lprint,1],["GC",gc,0],["CLOSE-FILE-STREAM",lclose_fs,1],
+  ["IVAL",lival,1],["FLOOR",lfloor,-2],["READ-FILE-STREAM",lread_fs,3],
+  ["WRITE-FILE-STREAM",lwrite_fs,4],["LOAD",lload,1],["IREF",liref,2,setfiref,3],
+  ["LAMBDA"],["CODE-CHAR",lcode_char,1],["CHAR-CODE",lchar_code,1],["_PTR_STANDARD-INPUT_PTR_"],["_PTR_STANDARD-OUTPUT_PTR_"],["_PTR_ERROR-OUTPUT_PTR_"],["_PTR_PACKAGES_PTR_"],["STRING=",lstring_equal,2],
+  ["IMAKUNBOUND",limakunbound,2],["EVAL",leval,-2],["JREF",ljref,2,setfjref,3],
+  ["RUN-PROGRAM",lrp,-2],["UNAME",luname,0]]]).
 
 
 :- style_check(-singleton).
