@@ -11,7 +11,7 @@ Presently lisp500.pl has Prolog terms including comments as you can see it's man
 
 Regardless how this first part was done you would get to the point where you are loading the core500.lisp.  You now have a toy Lisp interpreter.    
 
-#BOUNTY REQUIREMENTS:
+#BOUNTY REQUIREMENTS:  (SWI-Prolog Please)
 
 $1,000 = lisp500 equality
 
