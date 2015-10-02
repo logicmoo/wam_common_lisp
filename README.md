@@ -34,6 +34,15 @@ Some work towards this can be at the doc files of [https://code.google.com/p/evi
 
 #FURTHER THOUGHTS:
 
+Look at this link "https://groups.google.com/forum/#!topic/comp.lang.lisp/g9kNQViXYbY"  
+And find the text by Nil Holm: 
+"I am really baffled by this, because implementating fibonacci 
+does not make use of any features that make Prolog interesting, 
+most importantly backtracking. Due to the nature of the IS operator, 
+the FIBO function is of rather imperative nature. "
+
+Yet if you look at the whole thread.. and see the implications you can see why I want this!
+
 Some people say it's absolutely absurd to try to implement common Lisp inside a Prolog because of the final result would be to inefficient run to slow use it too much memory etc . A week ago when the JavaScript version of miniKanren ran faster than the Scheme version because in their particular use case the user types in code and expected it to run as quickly as possible in which it did because it skipped over some compilation step.  All the JavaScript version did was create a list of uncompiled closures.  Our analogy here is that Lisp macros can almost always be compiled down into a set of Lisp functions after they been expanded properly.  However we also know that they can be interpreted and that the Lisp interpreter does not really have to compile these macros and said do term replacement.  While this is prolog chief capability that is to put terms inside of terms during unification you may ask is really Lisp just macro after macro and would we really get a speed of benefit by doing this.  This argument may be flawed but it was just a thought.
 
 My usecase .. A propositional resolution program such as CYC, SNARK or KM (knowledge machine) is an exercise into how quickly it can select properly with correct piece of code to invoke this or that .   I believe does not lend itself that greatly to compilation.   This thread will  probably quickly have very knowledgeable people helping me out by telling me why this is not a great idea.  Truthfully I rather doubt that my hypothesis is true that it would run these programs faster but I do believe they will not run is slow and some programming communities would predict.    That said the task is not to make it run fast for me but just to work at all would be wonderful.  
