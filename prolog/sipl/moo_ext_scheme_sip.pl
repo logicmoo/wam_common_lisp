@@ -50,6 +50,184 @@
 
        -- Tim
 
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+
+To: tim@linc.cis.upenn.edu (Tim Finin)
+Subject: scheme in prolog
+From: mike%acorn@oak.lcs.mit.edu
+Date: Tue ,7 Apr 87 20:38:00 EDT
+Cc: scheme@mc.lcs.mit.edu, prolog-request@sushi.stanford.edu
+Reply-to: mike%acorn@oak.lcs.mit.edu
+
+
+
+    Date: Sun, 5 Apr 87 01:42:37 EST
+    From: tim@linc.cis.upenn.edu (Tim Finin)
+    
+    What I found most interesting about the exercise has more to do with
+    Prolog than with Scheme - It is very difficult to implement an
+    efficient interpreter for a language which has side-effects in prolog.
+
+No more difficult, I think, than interpreting a language with
+side-effects in a language without side effects. Consider writing a
+scheme interpreter in Pure Scheme or in ML (not using the side
+effects). In either case, the technique you end up using makes the
+interpreter look alot like a denotational semantics (Pure Scheme or ML
+case) or a Plotkin-Style operational semantics (Prolog Case).  
+
+    I basically considered two alternatives for representing the environment:
+    
+      o represent an environment as a term which contains a sequence of
+        variable-name/variable-value pairs.  This achieves (1) in most prologs
+        but must give up on either (2) or (3).
+
+      o represent an environment as a set of assertions in the clausal
+        database of the form: bound(Symbol,Value,EnvironmentID).  This wins on
+        (2) and (3) but loses on (1).
+
+I think you should build an abstract data type for this rather than 
+expecting terms and pattern matching or the interpreter to do it for you. 
+The best you'll be able to do in prolog is a tree like representation,
+requiring logarithmic access time and update time (as well as logarithmic
+space for copying on updates.)    
+
+lookup (X, Env, Value) :- ....given X find value V in environment E.
+
+update (X, V, Env1, Env2) :- update X to value V in environment Env1 to get
+				environment Env2.
+
+    This makes me think that a side-effect predicate like RPLACARG
+    (discussed in PROLOG-DIGEST about a year ago) is not such a bad idea.
+
+Yup. The difficulty is that it is hard to use side effects in a language
+with automatic control structures. You basically can't get the level
+of operational control you need, but the declarative model also breaks down.
+In any case I'd say RPLACARG will be infinitely MORE useful than 
+assert and retract ever were. Consider for example the UPDATE predicate
+above. This, written using RPLACARG would destructively update the environment
+Env1 to make Env2, which is exactly what you need.
+
+    It also reinforces the notion that Lisp is either a (i) more general
+    or (ii) lower level language than Prolog, depending, of course, on
+    your point of view.
+
+Both I'd say. Prolog is a very high level language, and is less expressive
+than languages with side effects. What I mean by expressive here is not
+the usual formal definition, since Prolog is clearly complete in that
+all computable functions can be computed, but rather a pragmatic 
+view. Any language without side effects is restricted in that it
+cannot describe changes of state over time without having representations
+of those states separately.
+
+Try writing code for hash-tables in prolog or pure scheme and you'll
+see what I mean. Hashing (like most side effect oriented code) requires
+side effects in its essence since it has to reason about whether buckets
+in the table are in use "yet". They also lack any notion of EQ-ness
+as in Lisp or Scheme for the same reason. 
+
+
+...mike beckerle
+Gold Hill Computers
+
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+To: mike%acorn@LIVE-OAK.LCS.MIT.EDU
+Subject: Re: scheme in prolog
+From: Kahn.pa@Xerox.COM
+Date: Wed ,8 Apr 87 13:20:31 EDT
+Cc: scheme@mc.lcs.mit.edu, prolog-request@sushi.stanford.edu
+In-reply-to: "mike%acorn@LIVE-OAK.LCS.MIT.EDU's message of Tue, 7 Apr 87 19:38:00 EST"
+Tim Finin says "It is very difficult to implement an efficient
+interpreter for a language which has side-effects in prolog," while mike
+beckerle says "No more difficult, I think, than interpreting a language
+with side-effects in a language without side effects."
+
+Notice that Tim says "efficient" and mike doesn't.  I think that much of
+the argument hinges on this point.  Just to muddy the waters I want to
+bring up a paper in the 2nd international logic programming conference
+(1984) called "Mutable arrays in Prolog" (or some such).  The paper
+essentially presents a naive implementation of arrays in Pure Prolog
+where every write copies and a read entails a linear search.  It then
+goes on to describe a primitive implementation of the predicates for
+creating and accessing arrays.  The primitive implementation in some
+cases actually had the same computational complexity as array primitives
+in conventional languages.  Is there any specification of Prolog which
+would rule out a compiler that did such optimizations?
+
+The point is that something is wrong with the question of whether one
+language can EFFICIENTLY implement another.  One can ask whether a
+particular implementation of a language can efficiently implement
+another.  A more interesting question I think is whether one language
+can EASILY and NATURALLY implement another.
+
+- ken kahn
+
+References
+	mike%acorn@LIVE-OAK.LCS.MIT.EDU's message of Tue, 7 Apr 87 19:38:00 EST
+-- scheme in prolog
+
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+To: scheme@mc.lcs.mit.edu, prolog-request@sushi.stanford.edu
+Subject: Re: scheme in prolog
+From: Paul Hudak <hudak-paul@YALE.ARPA>
+Date: Wed ,8 Apr 87 17:17:56 EDT
+Cc: mike%acorn@oak.lcs.mit.edu, tim@linc.cis.upenn.edu, Kahn.pa@Xerox.COM
+Full-name: Paul Hudak
+I was about to respond to the Tim Finin / Mike Beckerle discussion
+in much the same way that Ken Kahn did, so I won't bother now, except
+to point out that the efficiency issue, in particular the "aggregate
+update" or "copy avoidance" issue, has also been addressed by the
+functional programming community.  This includes work in
+semantics-directed compilation as well as more general work by Alan
+Mycroft (in his dissertation), David Schmidt (see a recent TOPLAS
+paper about detecting "singlethreaded stores") and me (see POPL 85,
+Lisp and FP 86).
+
+The nice thing about doing all this in the functional programming
+paradigm is that the implementation of an interpreter for a language
+looks VERY MUCH (if not identical) to the formal semantics of the
+language.  At Yale we have been experimenting a bit with such "truly
+direct" semantics-directed compilation/interpretation with very
+encouraging results.  Thus, assuming one believes in denotational
+semantics (and I realize that some people don't...), then the answer
+to Ken Kahn's question:
+
+  A more interesting question I think is whether one language
+  can EASILY and NATURALLY implement another.
+     
+would have to be in the affirmative.
+
+    -Paul Hudak
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+To: Kahn.pa@xerox.com, mike%acorn@live-oak.lcs.mit.edu, hudak-paul@yale-arpa
+Subject: scheme in prolog
+From: tim@linc.cis.upenn.edu (Tim Finin)
+Date: Wed ,8 Apr 87 23:31:29 EDT
+Cc: scheme@mc.lcs.mit.edu, prolog-request@sushi.stanford.edu
+Posted-date: Wed, 8 Apr 87 23:31:29 AST
+The points that Ken, Mike and Paul make are quite valid and very
+interesting.  Implementing an interpreter for a language with side
+effects in a language without them is bit of a problem and leads to
+some known tradeoffs.  The mutable array example is a case in point.
+
+However, Prolog, as opposed to a purer and more abstact logic
+programming language does have side effects.  One is free, if one
+chooses, to dynamically assert and retract clauses in the database.  I
+was, in general, pleased with the way my scheme-in-prolog interpreter
+turned out, except when it came to implementing SET!.  I was surprised
+that Prolog's side-effecting operations did not enable handle this in
+what I considered a good way.  
+Tim
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+-----------------------------------------------------------------
+
 
           SIP, Tim Finin (tim@cis.upenn.edu), University of Pennsylvania, April 1987.
 
