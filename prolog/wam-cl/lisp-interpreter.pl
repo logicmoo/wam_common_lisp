@@ -27,9 +27,42 @@
 
 :- dynamic 
 	bindings/1,
-	lambda/2.
+	named_lambda/2,
+        macro_lambda/3.
 
 :- initialization(lisp,main).
+
+
+eval_string(Str):-
+  with_input_from_string(Str,
+        read_and_parse(Expression)),
+   eval(Expression, Result),
+     writeExpression(Result),
+     !.
+
+trace_eval_string(Str):-
+  with_input_from_string(Str,
+        read_and_parse(Expression)),
+   redo_call_cleanup(trace,eval(Expression, Result),notrace),
+     writeExpression(Result),
+     !.
+
+rtrace_eval_string(Str):-
+  with_input_from_string(Str,
+        read_and_parse(Expression)),
+   rtrace(eval(Expression, Result)),
+     writeExpression(Result),
+     !.
+
+  
+with_input_from_string(Str,Goal):-
+ open_string(Str,In),
+ with_input_from_stream(In,Goal).
+
+with_input_from_stream(In,Goal):- 
+   each_call_cleanup(see(In),Goal,seen).
+
+
 
 
 prompts(Old1,_Old2):- var(Old1) -> prompt(Old1,Old1) ; prompt(_,Old1).
@@ -87,11 +120,21 @@ macro_expand(X, X):-
 	atomic(X),
 	!.
 
+:- use_module(library('dialect/sicstus/arrays')).
+is_self_evaluationing_object(X):- var(X),!.
+is_self_evaluationing_object(X):- atomic(X),!,(number(X);string(X);blob(X,_);X=t;X=[]),!.
+is_self_evaluationing_object(X):- (is_dict(X);is_array(X);is_rbtree(X)),!.
 
+
+eval(X, Bindings, Val):-
+	atom(X),
+      (member(binding(X, Val), Bindings)
+	;	(bindings(GlobalBindings),
+		 member(binding(X, Val), GlobalBindings))),
+	!.
+eval(X, _, X):- notrace(is_self_evaluationing_object(X)),!. 
 eval(quit, _, quit):-!.
 eval(nil, _, []):-!.
-eval(t, _, t):-!.
-eval([], _, []):-!.
 eval([quote, X], _, X):-!.
 eval([quit], _, quit):-!.
 eval([defvar, Name], _, Name):-
@@ -108,30 +151,35 @@ eval([setq, Name, Value], Bindings, EvalValue):-
 	append(Pre, [binding(Name, EvalValue)|Post], GlobalBindings1),
 	assert(bindings(GlobalBindings1)),
 	!.
+eval([defmacro, Name, FormalParms | Body], _, Name):-
+	!,
+	assert(macro_lambda(Name, FormalParms, Body)),
+	!.
 eval([defun, Name, FormalParms, Body], _, Name):-
 	!,
-	assert(lambda(Name, [lambda, FormalParms, Body])),
+	assert(named_lambda(Name, [lambda, FormalParms, Body])),
 	!.
-eval([lpa_apply|Arguments], Bindings, Result):-
+eval([lpa_apply|Arguments], Bindings, Result):- !, eval([apply|Arguments], Bindings, Result).
+
+eval([apply|Arguments], Bindings, Result):-
 	!,
 	evalL(Arguments, Bindings, [Function, ActualParams]),
 	lpa_apply(Function, ActualParams, Result),
 	!.
 eval([function, [lambda,  FormalParams, Body]], Bindings, 
 		[closure, FormalParams, Body, Bindings]):-!.
+
+eval([Procedure|Arguments], Bindings1, Result):-
+       macro_lambda(Procedure,FormalParams, LambdaExpression),
+	bind_variables(FormalParams, Arguments, Bindings2),
+        append(Bindings1,Bindings2,Bindings),
+        eval(LambdaExpression, Bindings, Result),
+	!.
 eval([Procedure|Arguments], Bindings, Result):-
 	evalL(Arguments, Bindings, EvalArguments),
 	lpa_apply(Procedure, EvalArguments, Result),
 	!.
-eval(X, _, X):-
-	number(X),	
-	!.
-eval(X, Bindings, Val):-
-	atom(X),
-		member(binding(X, Val), Bindings)
-	;	(bindings(GlobalBindings),
-		 member(binding(X, Val), GlobalBindings)),
-	!.
+
 eval(X, _, []):-
 	write('ERROR!  Cannot find a binding for `'),
 	write(X),
@@ -171,8 +219,14 @@ lpa_apply([closure, FormalParams, Body, Bindings0], ActualParams, Result):-
 	bind_variables(FormalParams, ActualParams, Bindings0, Bindings),
 	eval(Body, Bindings, Result),
 	!.
+
+lpa_apply(ProcedureName, ActualParams, Result):-
+	macro_lambda(ProcedureName,FormalParams, LambdaExpression),
+	bind_variables(FormalParams, ActualParams, Bindings),
+        eval(LambdaExpression, Bindings, Result),
+	!.
 lpa_apply(ProcedureName, Args, Result):-
-	lambda(ProcedureName, LambdaExpression),
+	named_lambda(ProcedureName, LambdaExpression),
 	lpa_apply(LambdaExpression, Args, Result),
 	!.
 lpa_apply(X, _, []):-
@@ -191,7 +245,6 @@ bind_variables([FormalParam|FormalParams], [ActualParam|ActualParams],
 		Bindings0, Bindings):- 
 	bind_variables(FormalParams, ActualParams, 
 		[binding(FormalParam, ActualParam)|Bindings0], Bindings).
-
 
 
 
@@ -256,6 +309,8 @@ read_rest_of_word(C, [C|Chars], LeftOver):-
 
 ends_line(10).
 ends_line(13).
+ends_line(0).
+ends_line(-1).
 
 
 whitespace(9).

@@ -1,0 +1,279 @@
+; International Allegro CL Trial Edition  Port: 4292  Pid: 13131
+CL-USER> (load "hello_world")
+; Loading /home/erik/programs/daydreamer/latest/hello_world.cl
+;   Loading /home/erik/programs/daydreamer/latest/gate_get.cl
+=======================
+Loading GATE 2.3, Common Lisp version of 2004-12-20...
+=======================
+;     Fast loading /home/erik/programs/daydreamer/latest/compat.fasl
+;     Fast loading /home/erik/programs/daydreamer/latest/loop.fasl
+;     Fast loading
+;        /home/erik/programs/daydreamer/latest/gate_macros.fasl
+;     Fast loading /home/erik/programs/daydreamer/latest/gate_main.fasl
+;     Fast loading /home/erik/programs/daydreamer/latest/gate_ty.fasl
+;     Fast loading /home/erik/programs/daydreamer/latest/gate_cx.fasl
+;     Fast loading
+;        /home/erik/programs/daydreamer/latest/gate_instan.fasl
+;     Fast loading /home/erik/programs/daydreamer/latest/gate_prove.fasl
+;     Fast loading
+;        /home/erik/programs/daydreamer/latest/gate_read_pr.fasl
+;     Fast loading /home/erik/programs/daydreamer/latest/gate_unify.fasl
+;     Fast loading /home/erik/programs/daydreamer/latest/gate_utils.fasl
+;     Loading /home/erik/programs/daydreamer/latest/gate_obs.cl
+=======================
+Welcome to GATE 2.3, Common Lisp version of 2004-12-20
+=======================
+;   Loading /home/erik/programs/daydreamer/latest/dd_get.cl
+=======================
+Loading DAYDREAMER 3.5, Common Lisp version of 2004-12-20...
+=======================
+;     Loading /home/erik/programs/daydreamer/latest/dd_macros.cl
+;     Fast loading /home/erik/programs/daydreamer/latest/dd_cntrl.fasl
+;     Fast loading /home/erik/programs/daydreamer/latest/dd_epis.fasl
+;     Fast loading
+;        /home/erik/programs/daydreamer/latest/dd_mutation.fasl
+;     Fast loading /home/erik/programs/daydreamer/latest/dd_night.fasl
+;     Fast loading
+;        /home/erik/programs/daydreamer/latest/dd_reversal.fasl
+;     Fast loading /home/erik/programs/daydreamer/latest/dd_ri.fasl
+;     Fast loading /home/erik/programs/daydreamer/latest/dd_rule1.fasl
+;     Fast loading /home/erik/programs/daydreamer/latest/dd_rule2.fasl
+;     Fast loading /home/erik/programs/daydreamer/latest/dd_utils.fasl
+;     Loading /home/erik/programs/daydreamer/latest/dd_kb.cl
+Warning: CONCRETE? is defined more than once as `operator' in file
+         /home/erik/programs/daydreamer/latest/dd_kb.cl.
+;     Loading /home/erik/programs/daydreamer/latest/dd_gen.cl
+=======================
+Welcome to DAYDREAMER 3.5, Common Lisp version of 2004-12-20
+=======================
+Adding rule HACK-THEME
+Adding rule HACK-PLAN
+Adding rule FTP-PLAN
+DAYDREAMER 3.5, Common Lisp version of 2004-12-20
+Initialize DAYDREAMER
+Performing first-time initialization
+Creating primal reality...
+Assert #{OB.285: (ROMANTIC-INTEREST obj MOVIE-STAR1......)} in CX.3
+
+Creating initial reality context...
+#{CX.3: (CX)} --> #{CX.4: (CX)}
+Assert #{OB.1575: (HACK strength 0.1)} in CX.4
+Assert #{OB.1576: (ENTERTAINMENT strength 0.1......)} in CX.4
+State changes from SUSPENDED to DAYDREAMING
+Run inferences in #{CX.4: (CX)}, bp = (#{ME: (FEMALE-PERSON first-name "Sarah"......)})
+******************
+HACK-THEME HACK-THEME fired as inference in CX.4
+-------------------------------------------------------
+IF   level of satisfaction of HACK need below 
+     threshold 
+THEN ACTIVE-GOAL to HACK 
+-------------------------------------------------------
+
+?SELF = #{ME: (FEMALE-PERSON first-name "Sarah"......)}
+******************
+Activate top-level goal #{OB.1599: (ACTIVE-GOAL obj (HACK strength ......)......)} in #{CX.4: (CX)}
+Assert #{OB.1599: (ACTIVE-GOAL obj (HACK strength ......)......)} in CX.4
+==================================================
+ I want to hack some code.
+==================================================
+Add dependency from #{OB.1601: (POS-EMOTION strength 0.6)} to #{OB.1599: (ACTIVE-GOAL obj (HACK strength ......)......)} in #{CX.4: (CX)}
+Assert #{OB.1602: (DEPENDENCY linked-from (POS-EMOTION...)......)} in CX.4
+Assert #{OB.1601: (POS-EMOTION strength 0.6)} in CX.4
+==================================================
+ I feel interested in hacking some code.
+==================================================
+Personal goal concern OB.1599: HACK motiv 0.6 status RUNABLE
+Running emotion-driven control loop...
+:Switching to new top-level goal #{OB.1599: (ACTIVE-GOAL obj (HACK strength ......)......)}
+----------------------CX.4--------------------
+Running rules for #{OB.1599: (ACTIVE-GOAL obj (HACK strength ......)......)}
+setting last sprout concept = #{OB.1599: (ACTIVE-GOAL obj (HACK strength ......)......)} in #{CX.3: (CX)}
+Run inferences in #{CX.4: (CX)}, bp = (#{ME: (FEMALE-PERSON first-name "Sarah"......)})
+Running p-goals in #{CX.4: (CX)}
+Running plans in #{CX.4: (CX)} for #{OB.1599: (ACTIVE-GOAL obj (HACK strength ......)......)} bp (#{ME: (FEMALE-PERSON first-name "Sarah"......)})
+Run plan for #{OB.1599: (ACTIVE-GOAL obj (HACK strength ......)......)} in #{CX.4: (CX)}
+Try fact plans
+Try rules and episodes
+Find candidate rules for obj #{OB.1600: (HACK strength (UPROC proc ......))} in #{CX.4: (CX)}
+Order candidates ((#{HACK-PLAN: (RULE subgoal (FTP actor ?Self......)......)}
+                   (T
+                    (SELF
+                     #{ME: (FEMALE-PERSON first-name "Sarah"......)}))))
+Run generic plan #{HACK-PLAN: (RULE subgoal (FTP actor ?Self......)......)} for #{OB.1599: (ACTIVE-GOAL obj (HACK strength ......)......)} in #{CX.4: (CX)}
+#{CX.4: (CX)} --> #{CX.5: (CX)}
+Debugging being delayed for broadcast at a later time.
+HACK-PLAN Debugging resumed.
+Pruning possibilities from (#{CX.5: (CX)})
+:----------------------CX.5--------------------
+Running rules for #{OB.1599: (ACTIVE-GOAL obj (HACK strength ......)......)}
+setting last sprout concept = #{OB.1611: (ACTIVE-GOAL obj (FTP actor ......)......)} in #{CX.4: (CX)}
+Broadcasting delayed debugs.
+******************
+HACK-PLAN fired as plan 
+for #{OB.1599: (ACTIVE-GOAL obj (HACK strength ......)......)}
+in CX.4 sprouting CX.5
+-------------------------------------------------------
+IF   ACTIVE-GOAL to HACK 
+THEN ACTIVE-GOAL to FTP Daydreamer source code 
+-------------------------------------------------------
+
+?SELF = #{ME: (FEMALE-PERSON first-name "Sarah"......)}
+Assert #{OB.1609: (ORDERING)} in CX.5
+Instantiate and activate subgoals
+Activate subgoal for #{OB.1599: (ACTIVE-GOAL obj (HACK strength ......)......)} obj #{OB.1610: (FTP actor ME obj FILE1)} in #{CX.5: (CX)}
+Assert #{OB.1612: (INTENDS linked-from (ACTIVE-GOAL...)......)} in CX.5
+Assert #{OB.1611: (ACTIVE-GOAL obj (FTP actor ......)......)} in CX.5
+==================================================
+ I have to download the Daydreamer source code.
+==================================================
+End of delayed broadcast.
+Run inferences in #{CX.5: (CX)}, bp = (#{ME: (FEMALE-PERSON first-name "Sarah"......)})
+Running p-goals in #{CX.5: (CX)}
+Running plans in #{CX.5: (CX)} for #{OB.1599: (ACTIVE-GOAL obj (HACK strength ......)......)} bp (#{ME: (FEMALE-PERSON first-name "Sarah"......)})
+Run plan for #{OB.1611: (ACTIVE-GOAL obj (FTP actor ......)......)} in #{CX.5: (CX)}
+Try rules and episodes
+Find candidate rules for obj #{OB.1610: (FTP actor ME obj FILE1)} in #{CX.5: (CX)}
+Order candidates ((#{FTP-PLAN: (RULE subgoal (RTRUE) goal ......)}
+                   (T
+                    (FILE
+                     #{FILE1: (FILE name "the Daydreamer source code"......)})
+                    (SELF
+                     #{ME: (FEMALE-PERSON first-name "Sarah"......)}))))
+Run generic plan #{FTP-PLAN: (RULE subgoal (RTRUE) goal ......)} for #{OB.1611: (ACTIVE-GOAL obj (FTP actor ......)......)} in #{CX.5: (CX)}
+#{CX.5: (CX)} --> #{CX.6: (CX)}
+Debugging being delayed for broadcast at a later time.
+FTP-PLAN Debugging resumed.
+Pruning possibilities from (#{CX.6: (CX)})
+:----------------------CX.6--------------------
+Running rules for #{OB.1599: (ACTIVE-GOAL obj (HACK strength ......)......)}
+setting last sprout concept = NIL in #{CX.5: (CX)}
+Broadcasting delayed debugs.
+******************
+FTP-PLAN fired as plan 
+for #{OB.1611: (ACTIVE-GOAL obj (FTP actor ......)......)}
+in CX.5 sprouting CX.6
+-------------------------------------------------------
+IF   ACTIVE-GOAL to FTP 
+THEN ACTIVE-GOAL for RTRUE 
+-------------------------------------------------------
+
+?FILE = #{FILE1: (FILE name "the Daydreamer source code"......)}
+?SELF = #{ME: (FEMALE-PERSON first-name "Sarah"......)}
+Retract OB.1609 in CX.6
+Assert #{OB.1616: (ORDERING)} in CX.6
+Instantiate and activate subgoals
+Activate subgoal for #{OB.1611: (ACTIVE-GOAL obj (FTP actor ......)......)} obj #{OB.1617: (RTRUE)} in #{CX.6: (CX)}
+Assert #{OB.1619: (INTENDS linked-from (ACTIVE-GOAL...)......)} in CX.6
+Assert #{OB.1618: (ACTIVE-GOAL obj (RTRUE) top-level-goal ......)} in CX.6
+End of delayed broadcast.
+******************
+Goal #{OB.1618: (ACTIVE-GOAL obj (RTRUE) top-level-goal ......)} succeeds in #{CX.6: (CX)}
+Retract OB.1618 in CX.6
+Assert #{OB.1620: (ACTIVE-GOAL obj (RTRUE))} in CX.6
+Retract OB.1619 in CX.6
+Assert #{OB.1622: (INTENDS linked-from (ACTIVE-GOAL...)......)} in CX.6
+Retract OB.1620 in CX.6
+Assert #{OB.1620: (SUCCEEDED-GOAL obj (RTRUE...)......)} in CX.6
+Subgoals of #{OB.1611: (ACTIVE-GOAL obj (FTP actor ......)......)} completed
+About to perform real action but not in performance mode
+Change status of OB.1599: HACK to WAITINGRun inferences in #{CX.6: (CX)}, bp = (#{ME: (FEMALE-PERSON first-name "Sarah"......)})
+:Taking optional object or concept input
+Enter concepts in #{CX.4: (CX)}
+Parser> 
+end
+End of parser input
+No more goals to run; switching to performance mode
+Change status of OB.1599: HACK to RUNABLEState changes from DAYDREAMING to PERFORMANCE
+:----------------------CX.6--------------------
+Running rules for #{OB.1599: (ACTIVE-GOAL obj (HACK strength ......)......)}
+setting last sprout concept = NIL in #{CX.5: (CX)}
+Subgoals of #{OB.1611: (ACTIVE-GOAL obj (FTP actor ......)......)} completed
+Perform external action
+Perform action goal #{OB.1611: (ACTIVE-GOAL obj (FTP actor ......)......)} in #{CX.6: (CX)}
+******************
+Goal #{OB.1611: (ACTIVE-GOAL obj (FTP actor ......)......)} succeeds in #{CX.6: (CX)}
+Retract OB.1611 in CX.6
+Assert #{OB.1625: (ACTIVE-GOAL obj (FTP actor ......)......)} in CX.6
+Retract OB.1622 in CX.6
+Assert #{OB.1627: (INTENDS linked-from (ACTIVE-GOAL...)......)} in CX.6
+Retract OB.1612 in CX.6
+Assert #{OB.1628: (INTENDS linked-from (ACTIVE-GOAL...)......)} in CX.6
+Retract OB.1625 in CX.6
+Assert #{OB.1625: (SUCCEEDED-GOAL obj (FTP actor ......)......)} in CX.6
+Assert #{OB.1626: (FTP actor ME obj FILE1)} in CX.6
+==================================================
+ I download the Daydreamer source code.
+==================================================
+Run inferences in #{CX.6: (CX)}, bp = (#{ME: (FEMALE-PERSON first-name "Sarah"......)})
+Taking optional concept input
+Enter concepts in #{CX.6: (CX)}
+Parser> 
+end
+End of parser input
+Subgoals of #{OB.1599: (ACTIVE-GOAL obj (HACK strength ......)......)} completed
+******************
+Goal #{OB.1599: (ACTIVE-GOAL obj (HACK strength ......)......)} succeeds in #{CX.6: (CX)}
+Replace obj of #{OB.1599: (ACTIVE-GOAL obj (HACK strength ......)......)} with (T)
+Retract OB.1599 in CX.6
+Assert #{OB.1599: (SUCCEEDED-GOAL obj (HACK strength ......)......)} in CX.6
+==================================================
+ I succeed at hacking some code.
+==================================================
+Assert #{OB.1631: (HACK strength 1.0)} in CX.6
+==================================================
+ I hack some code.
+==================================================
+Run inferences in #{CX.6: (CX)}, bp = (#{ME: (FEMALE-PERSON first-name "Sarah"......)})
+Running p-goals in #{CX.6: (CX)}
+Running plans in #{CX.6: (CX)} for #{OB.1599: (SUCCEEDED-GOAL obj (HACK strength ......)......)} bp (#{ME: (FEMALE-PERSON first-name "Sarah"......)})
+Terminating planning for top-level goal #{OB.1599: (SUCCEEDED-GOAL obj (HACK strength ......)......)}
+Leaf context #{CX.6: (CX)}
+[OB.1599: (SG. (HACK strength 1.0))]
+  [OB.1625: (SG. (FTP actor ME obj FILE1))]
+    [OB.1620: (SG. (RTRUE))]
+Removing motivating emotions of #{OB.1599: (SUCCEEDED-GOAL obj (HACK strength ......)......)} in #{CX.6: (CX)}
+Retract OB.1602 in CX.6
+Retract OB.1601 in CX.6
+Emotional responses for #{OB.1599: (SUCCEEDED-GOAL obj (HACK strength ......)......)} in #{CX.6: (CX)}
+Add dependency from #{OB.1599: (SUCCEEDED-GOAL obj (HACK strength ......)......)} to #{OB.1634: (POS-EMOTION)} in #{CX.6: (CX)}
+Assert #{OB.1635: (DEPENDENCY linked-from (SUCCEEDED-GOAL...)......)} in CX.6
+Assert #{OB.1634: (POS-EMOTION strength 0.6)} in CX.6
+==================================================
+ I feel pleased about hacking some code.
+==================================================
+Store episode #{OB.1599: (SUCCEEDED-GOAL obj (HACK strength ......)......)} in #{CX.6: (CX)}
+Assess scenario desirability in #{CX.6: (CX)}
+#{OB.1599: (SUCCEEDED-GOAL obj (HACK strength ......)......)} (0.6)
+Scenario desirability = 0.6
+Store goal of episode #{OB.1599: (SUCCEEDED-GOAL obj (HACK strength ......)......)}, realism 1.0
+Store goal of episode #{OB.1625: (SUCCEEDED-GOAL obj (FTP actor ......)......)}, realism 1.0
+Store goal of episode #{OB.1620: (SUCCEEDED-GOAL obj (RTRUE...)......)}, realism 1.0
+Make episode for goal #{OB.1625: (SUCCEEDED-GOAL obj (FTP actor ......)......)}
+Storing #{EPISODE.1: (EPISODE rule FTP-PLAN goal ......)} under #{FTP-PLAN: (RULE subgoal (RTRUE) goal ......)}
+Make episode for goal #{OB.1599: (SUCCEEDED-GOAL obj (HACK strength ......)......)}
+Storing #{EPISODE.2: (EPISODE rule HACK-PLAN goal ......)} under #{HACK-PLAN: (RULE subgoal (FTP actor ?Self......)......)}
+Storing #{EPISODE.2: (EPISODE rule HACK-PLAN goal ......)} under #{OB.1634: (POS-EMOTION strength 0.6)}
+Assert #{OB.1634: (POS-EMOTION strength 0.6)} in EPISODIC-MEMORY
+Storing #{EPISODE.2: (EPISODE rule HACK-PLAN goal ......)} under #{FILE1: (FILE name "the Daydreamer source code"......)}
+Assert #{FILE1: (FILE name "the Daydreamer source code"......)} in EPISODIC-MEMORY
+Activate index #{HACK-PLAN: (RULE subgoal (FTP actor ?Self......)......)}
+Activate index #{FILE1: (FILE name "the Daydreamer source code"......)}
+#{CX.6: (CX)} --> #{CX.7: (CX)}
+Retract OB.1620 in CX.7
+Retract OB.1627 in CX.7
+Retract OB.1625 in CX.7
+Retract OB.1628 in CX.7
+:No more goals to run; switching to daydreaming mode
+State changes from PERFORMANCE to DAYDREAMING
+:Taking optional object or concept input
+Enter concepts in #{CX.7: (CX)}
+Parser> 
+end
+End of parser input
+No more goals to run; switching to performance mode
+State changes from DAYDREAMING to PERFORMANCE
+:No more goals to run; switching to daydreaming mode
+State changes from PERFORMANCE to DAYDREAMING
+DAYDREAMER terminates
+T
+CL-USER> 
