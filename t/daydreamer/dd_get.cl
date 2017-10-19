@@ -44,8 +44,8 @@
 
 (epmem-init)
 
-(load "dd_kb.cl")
-(load "dd_gen.cl")
+(load "dd_kb")
+(load "dd_gen")
 
 (setq *gen-stream* (make-gen-stream *gate-dbg*))
 

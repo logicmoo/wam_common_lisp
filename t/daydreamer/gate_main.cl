@@ -506,6 +506,8 @@
         (yresult (ob$add1 self slot-name slot-value)))
   slot-value)
 
+(defun ob$removes (self slot-name) (ob$set self slot-name nil) self)
+#|
 (defun ob$removes (self slot-name)
   (map 'list
    (lambda (slot)
@@ -514,6 +516,7 @@
                    (slots-value slot))))
    (obr-slots self))
   self)
+|#
 
 (defun ob$remove-all (self)
   (map 'list

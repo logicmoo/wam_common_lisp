@@ -164,9 +164,13 @@
                                             abstract omit-proc)))))))
            (setq rest (cdr rest)))
        (yresult result-ob))))))
-      
-(defun ob$instan-special (template bindings depth omit-slots include-slots
-                           substit abstract omit-proc)
+
+
+#|
+Moved to gate_instan2.cl
+
+(defun ob$instan-special 
+ (template bindings depth omit-slots include-slots substit abstract omit-proc)
   (cond
    ((ty$instance? template 'uor)
     (ob$instantiate2 (ob$get template 'obj) bindings depth omit-slots
@@ -258,6 +262,8 @@
                 bindings)
       result))
    (else (error "~A unknown special" template))))
+
+|#
 
 ;
 ;

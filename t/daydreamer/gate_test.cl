@@ -12,7 +12,7 @@
 ;*******************************************************************************
 
 (setq *question-mark-atom* '?)
-(load "gate_get.cl")
+(load "gate_get")
 
 (setq *test-succeeded* 0)
 (setq *test-total* 0)

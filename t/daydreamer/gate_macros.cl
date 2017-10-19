@@ -61,6 +61,8 @@
   `(or (null? ,x)
        (eq? ,x 'nil)))
 
+(defun symbolconc (sym suffix) (intern (CONCATENATE 'string (string sym) (format () "~A" suffix))))
+
 (defmacro pc (context-abbr)
   `(cx$print (eval (symbolconc 'CX. ,context-abbr))))
 

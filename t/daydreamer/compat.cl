@@ -13,6 +13,7 @@
 ; 19990503: more work
 ;
 ;*******************************************************************************
+(defpackage "COMMON-LISP-USER" (:nicknames "USER" "CL-USER"))
 
 (setq else t)
 (setq *repl-wont-print* nil)
@@ -40,6 +41,8 @@
 (defmacro alikeq? (a b) `(equalp ,a ,b))
 (defmacro neq? (a b) `(not (eql ,a ,b)))
 (defmacro memq? (a b) `(t-or-nil (member ,a ,b)))
+
+#-abcl
 (defmacro memq (a b) `(member ,a ,b))
 (defmacro gen-id (symbol) `(gensym ,symbol))
 (defmacro div (a b) `(/ ,a ,b))
@@ -52,9 +55,14 @@
 (defmacro string? (a) `(stringp ,a))
 (defmacro uppercase? (x) `(upper-case-p ,x))
 (defmacro delq! (a b) `(delete ,a ,b))
-(defmacro append! (a b) `(nconc ,a ,b))
+
+(defun listify (a) (if (listp a) a (list a)))
+(defmacro append! (a b) `(nconc (listify ,a) (listify ,b)))
 (defmacro ascii->char (x) `(code-char ,x))
-(defmacro assq (a b) `(assoc ,a ,b))
+
+#-abcl
+ (defmacro assq (a b) `(assoc ,a ,b))
+
 (defmacro increment-me (a) `(setq ,a (+ ,a 1)))
 (defmacro string-posq (a b) `(position ,a ,b))
 (defmacro nth-elem (a b) `(nth ,b ,a))

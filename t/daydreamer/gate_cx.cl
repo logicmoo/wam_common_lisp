@@ -22,6 +22,7 @@
 ;
 ;*******************************************************************************
 
+
 (setq *cx-ob* (ty$create 'CX nil nil))
 
 (setq *next-cx-number* 1)
@@ -306,7 +307,7 @@
 
 (defun retract-dbg (ob self)
   (ndbg-roman-nl *gate-dbg* rule "Retract ~A in ~A"
-   (ob->string ob) (ob->string self))
+   ob (ob->string self))
 ;  (ob$pr ob *gate-dbg* *ob-print-options*)
 ;  (do-newline *gate-dbg*)
 )
@@ -476,7 +477,7 @@
     new-context))
 
 (defun cx$generate (self)
-  (format *gen-stream* "~%-----~%Contents of ~A:~%" self)
+  (format *gen-stream* "~%-----~%Contents (generate) of ~A:~%" self)
   (yloop (yfor ob in (cx$sorted-all-obs self))
          (ydo (generate ob nil self)))
   (format *gen-stream* "~&-----~%"))
@@ -484,13 +485,13 @@
 (defun cx$print (self)
   (format *gate-output* "~&-----~%Contents of ~A:~%" self)
   (yloop (yfor ob in (cx$sorted-all-obs self))
-         (ydo (ob$print ob *gate-output*)
+         (ydo (progn (format t "#{~A: " (ob$name ob)) (ob$print ob *gate-output*) (format t "}"))
              (newline *gate-output*)))
   (format *gate-output* "-----~%")
   nil)
 
 (defun cx$print-actions (self)
-  (format *gate-output* "~&-----~%Contents of ~A:~%" self)
+  (format *gate-output* "~&-----~%Contents (actions) of ~A:~%" self)
   (yloop (yfor ob in (cx$sorted-all-obs self))
          (ydo (if (ty$instance? ob 'action)
                   (progn

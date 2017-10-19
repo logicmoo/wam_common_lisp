@@ -763,3 +763,7 @@
        rule))
 
 ; End of file.
+
+
+;; teh best way to immagine the differnce between the 5 AGI models: Cycorp, Daydreamer, OpenCog, GeneticAlgrythems and ML, is thing about
+;; the best way to understand the 4 models on AI/AGI would be whatever the methods are used to teach each model a task like multiplication of base 10 numbers (such as how how to carry the digits while doing so)

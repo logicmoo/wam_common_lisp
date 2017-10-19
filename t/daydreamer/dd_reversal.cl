@@ -141,9 +141,13 @@
 
 (setq *new-personal-goals* nil)
 
+#|
+Moved to dd_reversal2.cl
+
 ; Treating multiple failed-goals required a cross product of the
 ; negated leaf causes with which I am not prepared to deal.
-(defun reverse-undo-causes (failed-goals context top-level-goal rule bd goal)
+(defun reverse-undo-causes 
+  (failed-goals context top-level-goal rule bd goal)
  (let ((sprouted-contexts nil) (sprouted-context nil)
         (intends nil)
        (leaf-causes (get-leaf-causes (car failed-goals)
@@ -269,6 +273,8 @@
          (setq sprouted-contexts (cons sprouted-context
                                       sprouted-contexts)))))))))
       sprouted-contexts))
+|#
+
 
 (defun cx$input-states (cx)
   (yloop (initial (result nil))

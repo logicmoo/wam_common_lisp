@@ -7,8 +7,8 @@
 ; Load Gate and Daydreamer.
 
 (setq *gate-load-options* '(sample))
-(load "gate_get.cl")
-(load "dd_get.cl")
+(load "gate_get")
+(load "dd_get")
 
 ; Define types and objects.
 

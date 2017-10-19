@@ -84,6 +84,9 @@
   (night-pp)
 )
 
+
+(defun pretty-print (obj st) (pprint obj st))
+
 (defun night-pp ()
   (ndbg-roman-nl *gate-dbg* night "")
   (pretty-print *reversal-qplans* *gate-dbg*)

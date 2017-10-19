@@ -44,7 +44,7 @@
 (load "gate_unify")
 (load "gate_utils")
 
-(load "gate_obs.cl")
+(load "gate_obs")
 
 (interest 'ob-warn 'all)
 (interest 'context 'all)

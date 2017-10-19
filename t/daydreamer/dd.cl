@@ -36,6 +36,8 @@
 ; unused -- rule is currently never used
 ;
 
+(defpackage "COMMON-LISP-USER" (:nicknames "U" "USER" "CL-USER"))
+
 (setq *gate-load-options* '(always
                             lovers1
                             rationalization1
@@ -43,8 +45,62 @@
                             rationalization3
                             revenge1))
 
-(load "gate_get.cl")
-(load "dd_get.cl")
-(daydreamer)
+(load "gate_get")
+
+(set-macro-character #\?
+   (lambda (stream ch)
+     (let ((read-in (read stream t nil t))
+           (colon-pos nil)
+           (str nil))
+        (setq str (symbol->string read-in))
+        (cond
+         ((setq colon-pos (string-posq #\+ str))
+          (ob$fcreate
+           `(UAND
+             obj (UPROC
+                  proc (QUOTE ,(string->symbol
+                         (string-append (nthchdr str (1+ colon-pos)) "?"))))
+             obj ,(make-typed-var
+                   (string->symbol (substring str 0 colon-pos))))))
+         ((setq colon-pos (string-posq #\: str))
+          (if (= colon-pos 0)
+              (make-var nil
+               (ob$name->ob (string->symbol
+                 (nthchdr str (1+ colon-pos))))) ; e.g. for ?:person
+              (make-var (string->symbol (substring str 0 colon-pos))
+                        (ob$name->ob
+                         (string->symbol (nthchdr str (1+ colon-pos)))))))
+         (else (make-typed-var read-in)))))
+  t)
+
+(set-macro-character #\^
+  (lambda (stream ch)
+    (let ((name (read stream t nil t))
+          (ob nil))
+     (setq ob (ob$name->ob name))
+     (if ob
+         (list 'quote ob)
+         (progn
+          (format t "No such ob ^~A~%" name)
+          (list 'quote *repl-wont-print*)))))
+  t)
+
+(set-macro-character #\!
+         (lambda (stream ch)
+                 (let ((name (read stream t nil t))
+                       (ob nil))
+                      (setq ob (ob$name->ob name))
+                      (if ob
+                          (progn
+                           (po ob)
+                           (list 'quote *repl-wont-print*))
+                          (progn (format t "No such ob ^~A~%" name)
+                         (list 'quote *repl-wont-print*)))))
+  t)
+
+
+
+(load "dd_get")
+; (daydreamer)
 
 ; End of file.

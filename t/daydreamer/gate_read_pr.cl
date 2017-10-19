@@ -252,6 +252,9 @@
      (setq *ob-print-options* '(parens never-prop))
      (setq *ob-sprint-options* '(no-newline short parens never-prop))))
 
+(setq *ob-print-options* '(parens no-newline))
+(setq *ob-sprint-options* '(parens no-newline ))
+
 ;
 ; never-prop - override normal printing format and never print things in
 ;              propositional form
@@ -272,8 +275,8 @@
             (progn
              (format stream "(~A obj " (type->string type))
              (ob$fprint obj stream)
-             (format stream " ...)"))                 
-            (format stream "(~A ...)"
+             (format stream " ..LDOTZ..)"))                 
+            (format stream "(~A ..LDOTA..)"
                     (type->string type)))
         (format stream "()")))))
 
@@ -296,9 +299,26 @@
  (cond
   ((var? ob)
    (print-variable-item stream ob column))
-  ((memq? ob *visited-obs*) (do-ldots stream) (+ column 3))
-  (else
+   ((memq? ob *visited-obs*)
+       (let ((str (format nil "^~A" (ob$name ob))))
+         (princ str stream)
+	  (setq column (+ (length str) column))))
+	   
+  (else 
+     (ob$print4 ob stream column top?))))
+
+
+(defun ob$print3 (ob stream column top?)
+    (progn (let ((str (format nil "#{~A: "  
+       (ob$name ob))))
+         (princ str stream)
+	 (setq column (+ (length str) column)))
+           (ob$print4 ob stream column top?)
+	   (format stream "}") (setq column (1+ column))))
+  
+(defun ob$print4 (ob stream column top?)
    (setq *visited-obs* (cons ob *visited-obs*))
+
    (let* ((head (or (ob$get ob 'head) (ob$get ob 'type)))
         (head-string nil)
         (slot-column nil)
@@ -454,7 +474,7 @@
             (not top?)
             (not (memq? 'no-newline *ob-print-options*)))
        (format stream "\\-"))
-   (if first? column (- column 1))))))
+   (if first? column (- column 1))))
 
 (defun do-newline (stream)
  (cond
@@ -536,8 +556,10 @@
 ;      (write *switch-out-string* stream)))
 
 (setq *print-length* 60)
+(setq *print-length* 600)
 
 (setq *ob-short-length* 26)
+(setq *ob-short-length* 127)
 
 (defun type->string (type)
   (if *typeset?*
