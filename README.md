@@ -13,6 +13,109 @@ https://github.com/TeamSPoon/wam_common_lisp
 
 Run `?- pack_install(wam_common_lisp)`.
 
+
+/*
+ 
+## NOTES:
+ 
+* WAM-CL currently produces code 6 times slower than the handwritten code
+ 
+* Handwritten Prolog is 2-3 slower than SBCL
+ 
+* If WAM-CL becomes fast as handwritten code,
+** it will be 17 times faster than CLISP
+** it will be 6 times faster than ECL
+ 
+ 
+ 
+```` 
+(defun fib (n)
+  (if (> n 1)
+    (+ (fib (- n 1))
+       (fib (- n 2)))
+    1))
+````
+ 
+*/
+
+
+````
+% WAM-CL 
+fibc(A, K) :- !,
+        B=[[bv(n, [A|_])]],
+        sym_arg_val_envc(n, A, C, B),
+        >(C, 1, D),
+        (   D\=[]
+        ->  sym_arg_val_envc(n, A, E, B),
+            -(E, 1, F),
+            fibc(F, I),
+            sym_arg_val_envc(n, A, G, B),
+            -(G, 2, H),
+            fibc(H, J),
+            +(I, J, L),
+            K=L
+        ;   K=1
+        ).
+fibc(_, _) :- '<<=='(fibc(n),if(n>1, fibc(n-1)+fibc(n-2), 1)).
+````
+
+````
+% HANDWRITTEN
+fibp2(N, F) :-
+        N =< 1 
+        -> F = 1 
+        ;
+        N1 is N-1,
+        N2 is N-2,
+        fibp2(N1, F1),
+        fibp2(N2, F2),
+        F is F1+F2.
+
+
+
+
+````
+% SBCL 1.3.1
+% * (time (fib 38))
+% 1.264000 seconds of total run time (1.264000 user, 0.000000 system)
+````
+
+````
+% YAP-Prolog (Hand written)
+% ?- time(fibp2(38,O)).
+% 3.124 CPU in 3.148 seconds ( 99% CPU)
+````
+
+````
+% YAP-Lisp (WAM-CL)
+% ?- time(fibc(38,O)).
+% 20.184 CPU in 20.340 seconds ( 99% CPU)
+````
+
+````
+% SWI-Prolog (Hand written)
+% ?- timel(fibp2(38,O)).
+% 24.558 CPU in 24.826 seconds (99% CPU, 18027611 Lips)
+````
+
+````
+% ECL 15.3.7
+% > (time (fib 38))
+% run time  : 25.516 secs (real time : 26.290 secs)
+````
+
+````
+% CLISP 2.49
+% (time (fib 38))
+% 53.0 sec.
+````
+
+````
+% SWI-Lisp (WAM-CL)
+% ?- time(fibc(38,O)).
+% 113.043 CPU in 114.324 seconds (99% CPU, 15665558 Lips)
+````
+
 ## Usage
 
 ## Copyright and License

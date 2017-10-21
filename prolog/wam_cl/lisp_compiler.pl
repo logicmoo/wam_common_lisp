@@ -164,7 +164,7 @@ expand_function_head(FunctionHead, Head, ArgBindings, Result):-
 
 expand_function_body_e(Ctx,Function, Result, Body, Environment):-
   expand_function_body(Ctx,Function, Result, Body0, Environment),
-  smooth_conjucts(Body0,Body).
+  mize_body(F,Body0,Body).
 
 :- discontiguous(expand_function_body/5).
 
@@ -373,10 +373,13 @@ conjoin_0(A,B,B):- A==true,!.
 conjoin_0((A,AA),B,(A,AAB)):-!, conjoin(AA,B,AAB).
 conjoin_0(A,B,(A,B)).
 
-smooth_conjucts((A;B),(AA;BB)):-!,smooth_conjucts(A,AA),smooth_conjucts(B,BB).
-smooth_conjucts((A->B),(AA->BB)):-!,smooth_conjucts(A,AA),smooth_conjucts(B,BB).
-smooth_conjucts((A,B),AB):-!,smooth_conjucts(A,AA),smooth_conjucts(B,BB),conjoin_0(AA,BB,AB).
-smooth_conjucts(A,A):-!.
+mize_body(_,A,A):- \+ compound(A),!.
+%mize_body(F,(A;B),(AA;BB)):-!,mize_body(F,A,AA),mize_body(F,B,BB).
+%mize_body(F,(A->B),(AA->BB)):-!,mize_body(F,A,AA),mize_body(F,B,BB).
+mize_body(F,(A,B),AB):-!,mize_body(F,A,AA),mize_body(F,B,BB),conjoin_0(AA,BB,AB).
+mize_body(F,A,B):- is_list(A), must_maplist(mize_body(F),A,B).
+mize_body(_F,A,B):- A=..[F|AA], must_maplist(mize_body(F),AA,BB),B=..[F|BB].
+mize_body(_,A,A):-!.
 
 
 ssip_compiler_term_expansion(Symbol,lambda(Args,Body),OOUT):- atom(Symbol),is_list(Args),
@@ -414,6 +417,8 @@ term_expansion(I,O) :- lisp_compiler_term_expansion(I,O),I\==O,nl,nl,
 %% [tim.prolog]siptest.
 %% Tim Finin, University of Pennsylvania, Mon Oct 27 10:39:27 1986
 %% this file contains samples for SIP.
+
+
 
 
 
@@ -467,23 +472,3 @@ makeCounter ==
                lambda([],setq(counter,1+counter)))).
 
 
-
-:- writeln('
-
-
-| ?- lisp.
-Welcome to Pro-Lisp!
-This is a miniscule Lisp interpreter, written in Prolog
-> (cons 1 nil)
-( 1 ) 
-> (defun my_second (lst) (car (cdr lst)))
-MY_SECOND 
-> (my_second `(a b c))
-B 
-> quit
-Terminating Pro-Lisp
-yes
-
-
-
-').

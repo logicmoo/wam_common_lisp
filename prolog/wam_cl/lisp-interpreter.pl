@@ -22,6 +22,7 @@
  *******************************************************************/
 
 :- ensure_loaded(lpa_to_swi).
+:- ensure_loaded(('lisp_compiler')).
 
 :-style_check.
 
@@ -32,7 +33,8 @@
 
 :- initialization(lisp,main).
 
-
+:- meta_predicate(timel(:)).
+timel(M:X):- prolog_statistics:time(M:X).
 
 str_to_expression(Str, Expression):- parse_sexpr_untyped(string(Str), Expression),!.
 str_to_expression(Str, Expression):- with_input_from_string(Str,read_and_parse(Expression)),!.
@@ -45,9 +47,10 @@ print_eval_string(Str):-
      writeExpression(Expression),
      !.
 
+
 eval_string(Str):-
   str_to_expression(Str, Expression),
-   eval(Expression, Result),
+   timel(eval(Expression, Result)),
         writeExpression(Result),
      !.
 
@@ -80,7 +83,7 @@ prompts(Old1,_Old2):- var(Old1) -> prompt(Old1,Old1) ; prompt(_,Old1).
 bindings([]).
 
 lisp:-
-	write('Welcome to Pro-Lisp!'),nl,
+	write('Welcome to WAM-CL!'),nl,
 	write('This is a miniscule Lisp interpreter, written in Prolog'),nl,
 	prompt(Old, '> '),
 	prompts(Old1, Old2),
@@ -188,12 +191,11 @@ eval([Procedure|Arguments], Bindings, Result):-	lisp_operator(Procedure),!,
   apply_f(Bindings,Procedure, Arguments, Result),
   !.
 
-eval([Procedure|Arguments], Bindings1, Result):-
-       macro_lambda(Procedure,FormalParams, LambdaExpression),
-	bind_variables(FormalParams, Arguments, Bindings2),
-        append(Bindings1,Bindings2,Bindings),
-        eval(LambdaExpression, Bindings, Result),
-	!.
+eval([Procedure|Arguments], Bindings, Result):-
+  macro_lambda(Procedure, FormalParams, LambdaExpression),
+  bind_variables(FormalParams, Arguments, Bindings, NewBindings),
+  eval(LambdaExpression, NewBindings, Result),
+  !.
 
 eval([Procedure|Arguments], Bindings, Result):-
 	evalL(Arguments, Bindings, EvalArguments),
@@ -224,9 +226,9 @@ evalL([H|T], Bindings, [EvalH|EvalT]):-
 	evalL(T, Bindings, EvalT),
 	!.
 
-% pf_car(A,Out):- \+ is_list(A),type_error(list,A,car(A),pf_car(A,Out)).
+pf_car(A,Out):- \+ is_list(A),type_error(list,A,car(A),pf_car(A,Out)).
 pf_car([A|_],A).
-pf_car(A,[]).
+pf_car(_,[]).
 
 apply_f(_Binds,function, [A],[function,A]).
 apply_f(_Binds,car, LIST, Result):-!,(LIST=[[Result|_]]->true;Result=[]).
@@ -252,7 +254,7 @@ apply_f(Bindings,if, [Test, Success, Failure], Result):-  !,
 apply_f(Binds,[lambda, FormalParams, Body], ActualParams, Result):-
 	!,
 	bind_variables(FormalParams, ActualParams,Binds, Bindings),!,
-	trace,eval(Body, Bindings, Result),
+	eval(Body, Bindings, Result),
 	!.
 apply_f(_Binds,[closure, FormalParams, Body, Bindings0], ActualParams, Result):-
 	!,
@@ -268,6 +270,17 @@ apply_f(_Binds,ProcedureName, ActualParams, Result):-
 apply_f(Bindings,ProcedureName, Args, Result):-
 	named_lambda(ProcedureName, LambdaExpression),!,
 	apply_f(Bindings,LambdaExpression, Args, Result),
+	!.
+
+apply_f(_,=,[X,Y],R):-!, X \= Y -> R=[] ; R=t.
+apply_f(_,-,[X,Y],R):-!, R is X - Y.
+apply_f(_,+,[X,Y],R):-!, R is X + Y.
+apply_f(_Binds,X, _, _):-
+        dumpST,
+	write('ERROR!  Cannot apply a procedure description for `'),
+	write(X),
+	write('`'),nl,
+        break,
 	!.
 apply_f(_Binds,X, _, []):-
 	write('ERROR!  Cannot apply a procedure description for `'),
@@ -291,11 +304,11 @@ bind_variables([FormalParam|FormalParams], [ActualParam|ActualParams],
 
 :- if(exists_source(library(sexpr_reader))).
 :- use_module(library(sexpr_reader)).
-read_and_parse(Expr):- current_input(In), parse_sexpr_untyped(In, Expr).
+read_and_parse_i(Expr):- current_input(In), parse_sexpr_untyped(In, Expr).
 :- endif.
 
 % read and parse a line of Lisp
-read_and_parse(Expression):-
+read_and_parse1(Expression):-
 	read_words(TokenL),
 	(	sexpr1(Expression, TokenL, [])
 	;
@@ -452,6 +465,7 @@ see_and_do(Pred2, I,O):-
   dmsg(result(O)).
 
 
+
 % if_script_file_time666(_):-!.
 if_script_file_time666(X):- prolog_statistics:time(user:X).
 
@@ -539,11 +553,7 @@ This is a miniscule Lisp interpreter, written in Prolog
 MY_SECOND 
 > (my_second \'(a b c))
 B 
-> (defun fib (n)
-  (if (> n 1)
-    (+ (fib (- n 1))
-       (fib (- n 2)))
-    1))
+> (defun fib (n) (if (> n 1) (+ (fib (- n 1)) (fib (- n 2)))1))
 
 > quit
 Terminating Pro-Lisp

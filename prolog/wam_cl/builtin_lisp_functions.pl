@@ -12,20 +12,23 @@
  *
  *******************************************************************/
 
+:- multifile(special_var/2).
+:- dynamic(special_var/2).
 
+%module(_,_).
 
-:- ensure_loaded(library(writef)).
-
+%:- ensure_loaded((writef)).
+%:- ensure_loaded(library(lists)).
 
 first(List, Result):- List==[]->Result=[];
-	one (	List = [Result|_]
+	once( (	List = [Result|_]
 	    ;	error(first_not_cons, ErrNo, _),
-		throw(ErrNo)	).
+		throw(ErrNo)	)).
 
 rest(List, Result):- List==[]->Result=[];
-	one (	List = [_|Result]
+	once( (	List = [_|Result]
 	    ;	error(rest_not_cons, ErrNo, _),
-		throw(ErrNo)	).
+		throw(ErrNo)	)).
 
 cons(Item, List, Result):-
 	Result = [Item|List].
@@ -62,7 +65,7 @@ lisp_not(Boolean, Result):-
 	;	Result = [].
 
 or(Bool1, Bool2, Result):-
-		one (Bool1 \= [] ; Bool2 \= [])
+		once( (Bool1 \= [] ; Bool2 \= []))
 	->	Result = t
 	;	Result = [].
 
@@ -99,3 +102,4 @@ show_special:-
 	->	writef('Variable \tValue\n\n'),
 		every(SVs, [sv(Var2, Value2)]^(writef('%t :\t%t\n',[Var2, Value2])))
 	;	writef('No special variables\n').
+
