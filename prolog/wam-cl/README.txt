@@ -1,55 +1,25 @@
-SIP, Tim Finin (tim@cis.upenn.edu), University of Pennsylvania, April 1987.
-
-SIP (Scheme in Prolog) is a partial interpreter for a subset of
-Scheme.  There are two versions: one with (sip2) and one without
-(sip1) continuation semantics.  The relevant files are:
-
-	sip1	- interpreter w/o continuations.
-	sip2	- interpreter with continuations
-	sipcore	- base file for both, defines primitive variables, etc.
-	siptest - examples
-
-Start SIP by loading either "sip1" or "sip2" and issuing the query:
-
-	?- sip.
-
-This should create an initial environment (by loading the file
-"sipcore" and then enter a read-eval-print loop.  You can re-start the
-read-eval-print loop w/o recreating the initial environment by issuing
-the prolog query:
-
-	?- sipREP.
-
-A few notes:
-
-The bad news: the syntax is unLispy, due to the prolog reader. Instead
-of (foo a 1) you must say foo(a,1).  Look at the file "siptest" to see
-some samples of simple expressions.  Similarly, you must type a "."
-after every input.  The usual prolog special characters (e.g.
-operators) may cause the reader to complain.  There is no way to call
-a function with no arguments!  The good news: infix operators are
-allowed, to some degree.  In particular "S == E" means (define S E).
-
-More syntax kludges: Cal a no-argument function FOO like [FOO].  Call
-a lambda-form like: [lambda([n],n+2),3].  BEGIN only takes two
-arguments - you can embed them, of course.
-
-evaling prolog(P) invokes prolog on query P and returns #!t if it
-succeeded and #!F otherwise.
-
-The character ` acts like ' in normal Scheme in that it quotes the
-next expression in the input.
-
-evaling prolog(`abort) is the (dirty) way to exit the read-eval-print
-loop.  In fact, evaling prolog(`abort) is the only way to exit the
-read-eval-print loop.
-
-Just to make my job easier, I added a macro like facility.  Evaling S1
-==> S2 defines a rewriting type macro that transforms S1 into S2.  For
-example, we could (and do) do:
-
-		tail(X) ==> force(cdr(X)).
+My task is to create a Prolog  version of a Common Lisp Interpretor.   
+Intially starting out with Lisp500.  I haven't checked yet if Lisp 500 will be good enough to run most Lisp programs it's not quite common Lisp obviously but at least it's accepted widely enough that it even CL-BENCH references it.
+If there's a better common Lisp out there for us and we get there faster than I'll take you up on the offer to use that Lisp and said this Lisp for example one might find armed they are common Lisp.   
+The reason for choosing Lisp 500 is it would require you to only implement 158 initial trampolines from there core500.lisp  is loaded on top of your Prolog system initial Lisp500.pl.  
+Presently lisp500.pl has a C functions including comments as you can see it's manipulating memory arrays and a completely idiomatic port of the 158  C  functions would probably not be ideal but I'm allowing this to be possible if it allows you to get the job completed faster.    See,  If I was doing this work myself,  I would probably begin to work on the C idiomatically but then within a short amount of time realize that this approach is creating more work compared to implementing the exact function that the core Lisp file requires CAR/APPLY etc.  But I don't feel comfortable going straight to the core list functionality until I've at least had a crack at idiomatic C.  I leave this up to your discretion.
+Regardless how this first part was done you would get to the point where you are loading the core500.lisp.  You now have a toy Lisp interpreter.    You know that the bounty is complete when you can run the either the package or unpackaged version of knowledge machine in your Lisp implementation.      If this target was a little too far off then I would first go for passing of the ANSI Common Lisp Test Suite.  http://common-lisp.net/project/ansi-test/ or as much as possible.   After a reasonable number of ANSI tests can be passed I would then start using smaller list programs which can be added to the test directory the finalists program that I like to feel the run is called the knowledge machine and that's in the test directory right now and in there is a script file that runs the tests for the seat the KM system.
 
 
 
-	
+
+NOTES:
+CL ANSI tests I suppose at this very moment I should be testing the C version in seeing how far it gets in the ANSI tests to get his myself a baseline to find out if Lisp 500s actually really worth it.  
+I would like to also find out if there is a way of eventually getting the CLOS out of Lisp 500.  Some people suggested using closette for this particular work order getting classes in necessary but it is in the plan and if it seems like this is not an happen starting with with 500 but starting with the different lisp  I would try to figure this as soon as possible.
+
+
+
+
+FUTHER THOUHTS:
+
+Some people say it's absolutely absurd to try to implement common Lisp inside a Prolog because of the final result would be to inefficient run to slow use it too much memory etc . A week ago when the JavaScript version of miniKanren ran faster than the Scheme version because in their particular use case the user types in code and expected it to run as quickly as possible in which it did because it skipped over some compilation step.  All the JavaScript version did was create a list of uncompiled closures.  Our analogy here is that Lisp macros can almost always be compiled down into a set of Lisp functions after they been expanded properly.  However we also know that they can be interpreted and that the Lisp interpreter does not really have to compile these macros and said do term replacement.  While this is prolog chief capability that is to put terms inside of terms during unification you may ask is really Lisp just macro after macro and would we really get a speed of benefit by doing this.  This argument may be flawed but it was just a thought.
+
+My usescase .. A propositional resolution program such as CYC, SNARK or KM (knowledge machine) is an exercise into how quickly it can select properly with correct piece of code to invoke this or that .   I believe does not lend itself that greatly to compilation.   This thread will  probably quickly have very knowledgeable people helping me out by telling me why this is not a great idea.  Truthfully I rather doubt that my hypothesis is true that it would run these programs faster but I do believe they will not run is slow and some programming communities would predict.    That said the task is not to make it run fast for me but just to work at all would be wonderful.  
+
+
+

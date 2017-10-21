@@ -1,0 +1,137 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="Author" content="Neil Smith">
+   <title>Neil Smith's Prolog resources</title>
+</head>
+
+<body bgcolor="#ffffff" background="background.jpg">
+    
+<h1 align="center">Neil Smith's Prolog Resources</h1>
+ 
+
+<table>
+<tr>
+<td valign=top width=150>
+<p><a href="index.html">Neil Smith home</a></p>
+<p>Prolog</p>
+
+</td>
+
+<td bgcolor="#ffffff">
+
+<!-- begin content here -->
+
+
+<p>All I have here at present are some library files, mainly of use 
+for LPA Prolog on Windows machines, and some implementations of Lisp.</p>
+
+<h2>Library files</h2>
+
+<p>These are mainly conversions of the Edinburgh Prolog library files, 
+targetted at LPA Prolog.  However, I've extended the <code>Applic.pl</code>
+file to include more higher-order features.  These include things like
+<code>map</code>, <code>filter</code>, and <code>fold</code>.  Also, all 
+the <code>ordered set</code> predicates now optionally accept a separate 
+comparator predicate, for ordering arbitrary items</p>
+
+<ul>
+<li><a href="higher_order.pl">higher_order.pl</a>: <code>call</code>/N, 
+<code>apply</code>, <code>map</code>, <code>filter</code>, 
+<code>fold</code>, etc.  Used by most of these other library files.</li>
+<li><a href="list_utilities.pl">list_utilities.pl</a>: standard stuff, 
+plus <code>zip</code> and <code>zip_with</code>.</li>
+<li><a href="set_utilities.pl">set_utilities.pl</a></li>
+<li><a href="ordered_set_utilities.pl">ordered_set_utilities.pl</a>:
+includes versions both with and without your own comparison predicates.</li>
+<li><a href="writef.pl">writef.pl</a>: formatted writing for DOS machines.</li>
+</ul>
+
+<h2>Lisp implementations</h2>
+
+<p>I have two implementations of Lisp.  The 
+<a href="lisp-interpreter.pl">Lisp interpreter</a> is a simple interpreter
+of a small subset of Lisp.  It does, however, accept standard Lisp syntax
+input, including all the brackets. A sample interaction might go something
+like:</p>
+
+<pre>
+| ?- lisp.
+Welcome to Pro-Lisp!
+This is a miniscule Lisp interpreter, written in Prolog
+> (cons 1 nil)
+( 1 ) 
+> (defun my_second (lst) (car (cdr lst)))
+MY_SECOND 
+> (my_second '(a b c))
+B 
+> quit
+Terminating Pro-Lisp
+yes
+</pre>
+
+<p>The Lisp compiler is a more complex beast.  It uses 
+<code>term_expansion</code>/2 to rewrite function specifications into 
+Prolog clauses.  Have a look at the test files for examples of the syntax.
+The compiler consists of three files:</p>
+
+<ul>
+<li><a href="lisp_compiler.pl">lisp_compiler.pl</a>, the main compiler.</li>
+<li><a href="builtin_lisp_functions.pl">builtin_lisp_functions.pl</a>, 
+some core procedures and functions.</li>
+<li><a href="lisp_library.pl">lisp_library.pl</a>, some more functions, 
+written in 'Lisp' and compiled into Prolog.</li>
+</ul>
+
+<p>There are a two of files of examples:</p>
+<ul>
+<li><a href="tests.pl">tests.pl</a> contains a few scraps of code, used by
+me to test the compiler.  It shows off the sorts of things the compiler can do.</li>
+<li><a href="streams.pl">streams.pl</a> is an example 
+implementation of streams (lazy lists), showing that I finally managed to 
+get lexical closures working properly.</li>
+</ul>
+
+<h2>Other programs</h2>
+
+<p>This is an implementation of <a href="shortest_paths.pl">Djirkstra's 
+shortest-path algorithm</a>.  It works on both directed and undirected
+graphs.  Graphs are defined by a separate predicate that will enumerate 
+nodes adjacent to a given node.  It uses the 
+<a href="ordered_set_utilities.pl">ordered sets module</a> to 
+maintain the list of nodes to explore in order of cost.  
+Colin Barker has written 
+<a href="http://perso.wanadoo.fr/colin.barker/lpa/dijkstra.htm">another 
+version</a>, also for LPA Prolog.</p>
+
+<P>More Prolog stuff found in
+      <A HREF="news:comp.lang.prolog">comp.lang.prolog</A> and the
+      <A HREF="http://sunsite.org.uk/public/usenet/news-faqs/comp.lang.prolog/">FAQs</A>.</P>
+
+
+<!-- end content here -->
+
+</td>
+
+<td width=150 valign=top align=right>
+
+<A HREF="http://www.open.ac.uk/"><IMG SRC="48-onw-bc.gif" BORDER=0 WIDTH=73 HEIGHT=82></A>
+<br>&nbsp;<br>
+<A HREF="http://mcs.open.ac.uk/mcsexternal/"><IMG SRC="faculty-logo-small.gif" BORDER=0 WIDTH=63 HEIGHT=62><br>
+Maths &amp; Computing Faculty</a>
+<br>&nbsp;<br>
+<a href="http://computing.open.ac.uk">Computing Department website</a>
+
+</td>
+</tr>
+</table>
+
+<hr>
+
+<p><small>This page maintained by Neil Smith (<a
+href="mailto:n.smith@open.ac.uk">N.Smith@open.ac.uk</a>)
+</small></p>
+
+</BODY>
+</HTML>
