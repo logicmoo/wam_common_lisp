@@ -104,8 +104,20 @@ show_special:-
 	;	writef('No special variables\n').
 
 
+:- use_module(library(tabling)).
+:- table fibt/2.
+fibt(0, 1) :- !.
+fibt(1, 1) :- !.
+fibt(N, F) :-
+        N > 1,
+        N1 is N-1,
+        N2 is N-2,
+        fibt(N1, F1),
+        fibt(N2, F2),
+        F is F1+F2.
+
 fibp(0, 1) :- !.
-fibp(1, 1) :- !.
+fibp(1, 1) :- .
 fibp(N, F) :-
         N > 1,
         N1 is N-1,
