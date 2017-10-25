@@ -141,12 +141,12 @@ is_self_evaluationing_object(X):- (is_dict(X);is_array(X);is_rbtree(X)),!.
 
 
 eval(X, Bindings, Val):-
-	notrace((atom(X),
+	zotrace((atom(X),
       (member(bv(X, Val), Bindings)
 	;	(bindings(GlobalBindings),
 		 member(bv(X, Val), GlobalBindings)))
 	)),!.
-eval(X, _, X):- notrace(is_self_evaluationing_object(X)),!. 
+eval(X, _, X):- zotrace(is_self_evaluationing_object(X)),!. 
 eval(quit, _, quit):-!.
 eval(nil, _, []):-!.
 eval([quote, X], _, X):-!.

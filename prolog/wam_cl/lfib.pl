@@ -117,7 +117,7 @@ fibt(N, F) :-
         F is F1+F2.
 
 fibp(0, 1) :- !.
-fibp(1, 1) :- .
+fibp(1, 1) :- !.
 fibp(N, F) :-
         N > 1,
         N1 is N-1,
@@ -224,14 +224,14 @@ fibc(_, _) :- '<<=='(fibc(n),if(n>1, fibc(n-1)+fibc(n-2), 1)).
 
 % HANDWRITTEN
 
-fibp2(N, F) :-
+fibp3(N, F) :-
         N =< 1 
         -> F = 1 
         ;
         N1 is N-1,
         N2 is N-2,
-        fibp2(N1, F1),
-        fibp2(N2, F2),
+        fibp3(N1, F1),
+        fibp3(N2, F2),
         F is F1+F2.
 
 
@@ -251,7 +251,7 @@ fibp2(N, F) :-
 % 20.184 CPU in 20.340 seconds ( 99% CPU)
 
 % SWI-Prolog (Hand written)
-% ?- timel(fibp2(38,O)).
+% ?- timel(fibp3(38,O)).
 % 24.558 CPU in 24.826 seconds (99% CPU, 18027611 Lips)
 
 % ECL 15.3.7
