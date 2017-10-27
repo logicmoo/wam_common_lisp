@@ -1,5 +1,5 @@
 
-(defmacro defun (name lambda-list &rest body)
+(defmacro defun500 (name lambda-list &rest body)
   (list 'progn
 	(list 'funcall '#'(setf fdefinition)
 	      (list 'function
@@ -10,6 +10,7 @@
 					     body))))
 	      (list 'quote name))
 	(list 'quote name)))
+
 (defmacro setf (place new-value)
   (if (consp place)
       (cons 'funcall (cons (list 'function (list 'setf (car place)))

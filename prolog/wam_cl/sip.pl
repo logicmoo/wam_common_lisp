@@ -38,7 +38,7 @@
            but must give up on either (2) or (3).
 
          o represent an environment as a set of assertions in the clausal
-           database of the form: bound(Symbol,Value,EnvironmentID).  This
+           database of the form: t_l:bound(Symbol,Value,EnvironmentID).  This
            wins on
            (2) and (3) but loses on (1).
 
@@ -83,7 +83,7 @@ case) or a Plotkin-Style operational semantics (Prolog Case).
         but must give up on either (2) or (3).
 
       o represent an environment as a set of assertions in the clausal
-        database of the form: bound(Symbol,Value,EnvironmentID).  This wins on
+        database of the form: t_l:bound(Symbol,Value,EnvironmentID).  This wins on
         (2) and (3) but loses on (1).
 
 I think you should build an abstract data type for this rather than 
@@ -282,7 +282,7 @@ Tim
                           tail(X) ==> force(cdr(X)).
 
 */
-:-module(moo_ext_scheme_sip,[proccessInSip/1,eval/1]).
+:-module(moo_ext_scheme_sip,[proccessInSip/1,eval/1,sip/0,ssip/0]).
 %:-ensure_loaded(moo_ext_lisp_triska).
 
 %% SIPC - Scheme In Prolog with Continuation Semantics
@@ -298,12 +298,13 @@ Tim
 
 :- set_prolog_flag(backquoted_string,false).
 :- dynamic(((( ==> ))/2)).
-:- op( 900,xfy, (==>)).		% used for macros.
+:- op( 900,xfy, user:(==>)).		% used for macros.
 :- op(1100,xfx, (==)).	
 :- op(200,fx,'`').		% '`'(x) = quote(x).
 
-:- thread_local(bound/3).
+:- thread_local(t_l:bound/3).
 
+:- use_module(library(sexpr_reader)).
 
 % sip -  creates a virgin initial environment and enters a 
 % read-eval-print loop for SIP.  Exit by typing "prolog('`' abort)."
@@ -319,28 +320,31 @@ ssip :- create0Env, ssipREP.
 sipREP :-
   repeat,
   writeln('SIP> '),
-  read(E),
+  sip_read(curent_input,E),
   once(eval3(print(E),0,k(nil))),
   fail.
+
+sip_read(In,P):- lisp_read(In,E),sexpr_sterm_to_pterm(E,P).
 
 %  sipREP -  enters a read-eval-print loop for SSIP.
 ssipREP :-
   repeat,
   writeln('SSIP> '),
-  readCycL(E),
+  %readCycL(E),
+  read(E),
   once(eval3(print(E),0,k(nil))),
   fail.
 
 % create0Env sets up E as the inital Scheme environment.
 create0Env :-
   % flush all old environments.
-  retractall(bound(_,_,_)),
+  retractall(t_l:bound(_,_,_)),
   % (re)set the environment counter.
   %abolish(envNum,1),
   %assert(envNum(1)),
-  flag(envNum,_,1).
+  flag(envNum,_,1),
   % define the initial variables.
-  % load(sipcore).
+  load('sipcore.pl').
 
 % abbreviations for eval/3.
 eval(E) :- eval3(E,0,k(nil)),!.
@@ -465,7 +469,7 @@ applyPrim(F,Args,error) :-
  err('bad call to a primitive function',Call).
 
 % makeEnv(+Parameters,+Arguments,-Environment) -  creates a new environment
-% in which the variables in the 1st arg are bound to the values in the
+% in which the variables in the 1st arg are t_l:bound to the values in the
 % 2nd.  The new envitronment is returned in the 3rd.
 makeEnv(Ps,As,New/Old) :-
   % determine the next environment number to use.
@@ -489,36 +493,36 @@ addBindings([],[_|_],_) :-  !, err('too many arguments').
 % looks up the values associated with a symbol in an environment.  It's
 % an error if there is no binding.
 lookUp(Symbol,Value,Env) :- value(Symbol,Value,Env,_),!.
-lookUp(S,_,Env) :-  err('unbound symbol: ',S/Env).
+lookUp(S,_,Env) :-  trace, err('unbound symbol: ',S/Env).
 
 % value(+symbol,-value,+frameSought,-frameFound) like lookUp but also
-% returns the frame in which the variable was bound.
-value(S,V,Env,Env) :- bound(S,V,Env).
+% returns the frame in which the variable was t_l:bound.
+value(S,V,Env,Env) :- t_l:bound(S,V,Env).
 value(S,V,E1/E2,E) :-
-  not(bound(S,V,E1/E2)),
+  \+ (t_l:bound(S,V,E1/E2)),
   value(S,V,E2,E).
 
 % change the value associated with symbol S to V, returning the old value.
 set(S,V,Env,OldV) :-
   value(S,OldV,Env,BindingEnv),
   !,
-  retract(bound(S,OldV,BindingEnv)),
-  assert(bound(S,V,BindingEnv)).
+  retract(t_l:bound(S,OldV,BindingEnv)),
+  assert(t_l:bound(S,V,BindingEnv)).
 
 set(S,_,E,_) :-  err('symbol not bound in environment:',(S/E)).
 
 % add an initial binding for symbol S to value V in environment Env.
 define(S,V,Env) :-
-  sip_when(retract(bound(S,_,Env)), 
+  sip_when(retract(t_l:bound(S,_,Env)), 
        warn('symbol already defined in environment: ',(S,Env))),
-  assert(bound(S,V,Env)).
+  assert(t_l:bound(S,V,Env)).
 
 % load(F) reads and evals all expressions in file F.
 load(File):- see(File),
  repeat,
   call_cleanup((read(X), ((X = end_if_file ) -> true;((once(loadProcess(X)),fail)))),seen),!.
 
-:-thread_local(schemePExpansion/0).
+:-thread_local(schemePExpansion/1).
 loadProcess(end_of_file):- ignore(retract(schemePExpansion)),!.
 loadProcess(X) :- eval(X).
 
@@ -530,6 +534,7 @@ err(Msg1,Msg2) :- warn(Msg1,Msg2),!,fail.
 warn(Msg) :- writeln(Msg).
 warn(Msg1,Msg2) :-writeln(Msg1),write(' '),write(Msg2).
 
+proccessInSip(H):- \+ compound(H),!,fail.
 proccessInSip(M:H):-atom(M),!,proccessInSip(H).
 proccessInSip(H):-functor(H,==,2).
 proccessInSip(H):-functor(H,==>,2).
@@ -541,10 +546,10 @@ term_exp_process(H,H):- proccessInSip(H),!,ignore(loadProcess(H)).
 %% Tim Finin, University of Pennsylvania, Mon Oct 27 10:40:00 1986
 %% this file specifies the initial environment for SIP.
 
-user:term_expansion( T ,evaluated_term(S)):- schemePExpansion,term_exp_process(T,S).
-user:goal_expansion( T ,eval(T)):- proccessInSip(T),!.
+user:term_expansion( T ,evaluated_term(S)):- source_location(F,_), schemePExpansion(F),term_exp_process(T,S).
+user:goal_expansion( T ,eval(T)):- source_location(F,_),schemePExpansion(F),proccessInSip(T),!.
 
-:-asserta(schemePExpansion).
+:- source_location(F,_),asserta(schemePExpansion(F)).
 % PRIMITIVE "MACROS"
 
 (X==Y) ==> define(X,Y).
@@ -560,7 +565,7 @@ theEmptyStream ==> nil.
 false == quote(false).
 nil == quote([]).
 
-:-debug.
+% :-debug.
 
 %% PRIMITIVE FUNCTIONS
 
@@ -655,4 +660,6 @@ makeCounter ==
   lambda([],
          begin(counter == 0,
                lambda([],set(counter,1+counter)))).
+
+:- source_location(F,_),retract(schemePExpansion(F)).
 

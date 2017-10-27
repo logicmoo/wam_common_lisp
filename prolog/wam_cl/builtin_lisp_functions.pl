@@ -25,10 +25,14 @@ first(List, Result):- List==[]->Result=[];
 	    ;	error(first_not_cons, ErrNo, _),
 		throw(ErrNo)	)).
 
+
 rest(List, Result):- List==[]->Result=[];
 	once( (	List = [_|Result]
 	    ;	error(rest_not_cons, ErrNo, _),
 		throw(ErrNo)	)).
+
+cdr(List, Result):- rest(List, Result).
+car(List, Result):- first(List, Result).
 
 cons(Item, List, Result):-
 	Result = [Item|List].
@@ -102,4 +106,6 @@ show_special:-
 	->	writef('Variable \tValue\n\n'),
 		every(SVs, [sv(Var2, Value2)]^(writef('%t :\t%t\n',[Var2, Value2])))
 	;	writef('No special variables\n').
+
+
 

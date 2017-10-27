@@ -29,8 +29,12 @@ lisp_error(x) <<== setq(y, 5).
 %:- rtrace.
 lisp_let() <<==
 	let([bind(x, 3), bind(y, 5)], 
-		[	x, 		% implicit progn here
-			y]).
+		      progn(x,y)).
+
+lisp_let1() <<==
+	let([bind(x, 3), bind(y, 5)], 
+			x, 		% implicit progn here
+			y).
 
 
 % maps 'first' over a list of lists
@@ -52,8 +56,7 @@ make_adder(x) <<==
 
 
 scale_list(xs, scale) <<==
-	let([bind(fred, function(lambda([num], times(scale, num))))],
-		mapcar(fred, xs)).
+	let([bind(fred, function(lambda([num], times(scale, num))))], mapcar(fred, xs)).
 
 
 make_summer(total) <<== 
@@ -65,7 +68,7 @@ sum_with_map(xs) <<==
 	let([bind(running_total, 0)],
 		let([bind(summer, function(lambda([n], setq(running_total, 
 							plus(running_total, n)))))],
-		[ mapcar(summer, xs),
-		  running_total ])).
+		 mapcar(summer, xs),
+		  running_total )).
 
 

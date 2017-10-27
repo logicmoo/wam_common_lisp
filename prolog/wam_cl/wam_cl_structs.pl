@@ -1,28 +1,32 @@
 
-:- use_module(library(pfc)).
+% :- use_module(library(pfc)).
 
 :- dynamic(system_subclazz/2).
 
 
 system_subclazz(cl_simple_array__t,cl_array).
-system_subclazz(cl_simple_array__unsigned_byte16,cl_array).
-system_subclazz(cl_simple_array__unsigned_byte32,cl_array).
-system_subclazz(cl_simple_array__unsigned_byte8,cl_array).
+system_subclazz(cl_simple_array(unsigned_byte16),cl_array).
+system_subclazz(cl_simple_array(unsigned_byte32),cl_array).
+system_subclazz(cl_simple_array(unsigned_byte8),cl_array).
+system_subclazz(cl_simple_array(_Unsigned_byte8),cl_array).
 system_subclazz(cl_complex_array,cl_array).
-system_subclazz(cl_complex_array__unsigned_byte32,cl_array).
-system_subclazz(cl_complex_array__unsigned_byte8,cl_array).
+system_subclazz(cl_complex_array(unsigned_byte32),cl_array).
+system_subclazz(cl_complex_array(unsigned_byte8),cl_array).
+system_subclazz(cl_complex_array(_Unsigned_byte8),cl_array).
 system_subclazz(cl_complex_bit_vector,cl_bit_vector).
 system_subclazz(cl_complex_string,cl_string).
 system_subclazz(cl_complex_vector,cl_vector).
-system_subclazz(cl_complex_vector__unsigned_byte32,cl_vector).
-system_subclazz(cl_complex_vector__unsigned_byte8,cl_vector).
+system_subclazz(cl_complex_vector(unsigned_byte32),cl_vector).
+system_subclazz(cl_complex_vector(unsigned_byte8),cl_vector).
+system_subclazz(cl_complex_vector(_Unsigned_byte8),cl_vector).
 system_subclazz(cl_zero_rank_array,cl_array).
 system_subclazz(cl_nil_vector,cl_string).
 system_subclazz(cl_string,cl_vector).
 system_subclazz(cl_simple_vector,cl_vector).
-system_subclazz(cl_basic_vector__unsigned_byte16,cl_vector).
-system_subclazz(cl_basic_vector__unsigned_byte32,cl_vector).
-system_subclazz(cl_basic_vector__unsigned_byte8,cl_vector).
+system_subclazz(cl_basic_vector(unsigned_byte16),cl_vector).
+system_subclazz(cl_basic_vector(unsigned_byte32),cl_vector).
+system_subclazz(cl_basic_vector(unsigned_byte8),cl_vector).
+system_subclazz(cl_basic_vector(_Unsigned_byte8),cl_vector).
 system_subclazz(cl_bit_vector,cl_vector).
 system_subclazz(cl_vector,cl_array).
 system_subclazz(cl_array,cl_object).
@@ -47,7 +51,7 @@ system_subclazz(cl_funcallable_standard_class,cl_standard_class).
 system_subclazz(cl_funcallable_standard_object,cl_standard_object).
 system_subclazz(cl_hash_table,cl_object).
 system_subclazz(cl_integrity_error,prolog_error).
-system_subclazz(cl_ffi_class_loader,prolog_u_r_l_class_loader).
+system_subclazz(cl_ffi_class_loader,prolog_url_class_loader).
 system_subclazz(cl_ffi_exception,cl_lisp_error).
 system_subclazz(cl_ffi_stack_frame,cl_stack_frame).
 system_subclazz(cl_layout,cl_object).
@@ -150,7 +154,7 @@ system_subclazz(cl_unbound_slot,cl_cell_error).
 system_subclazz(cl_unbound_variable,cl_cell_error).
 system_subclazz(cl_undefined_function,cl_cell_error).
 system_subclazz(cl_upcase_stream,cl_case_frob_stream).
-system_subclazz(cl_u_r_l_stream,cl_stream).
+system_subclazz(cl_url_stream,cl_stream).
 system_subclazz(cl_wrong_number_of_arguments_exception,cl_program_error).
 
 
@@ -172,7 +176,7 @@ data_record(cl_closure_binding,[
 data_record(cl_processing_terminated,[
   m(rw,integer,status)]).
 
-data_record(prolog_r_e_p_l_console,[
+data_record(prolog_repl_console,[
   m(rw,prolog_string_buffer,input_buffer),
   m(rw,prolog_reader,reader),
   m(rw,prolog_writer,writer),
@@ -180,11 +184,18 @@ data_record(prolog_r_e_p_l_console,[
   m(ro,prolog_thread,repl_thread),
   m(ro,cl_object,debugger_hook)]).
 
-data_record(cl_complex_vector__unsigned_byte8,[
+data_record(cl_complex_vector(Kind),[
   m(rw,integer,capacity),
   m(rw,integer,fill_pointer),
   m(rw,cl_boolean,is_displaced),
-  m(rw,array(byte),elements),
+  m(rw,array_of(Kind),elements),
+  m(rw,cl_array,array),
+  m(rw,integer,displacement)]).
+data_record(cl_complex_vector,[
+  m(rw,integer,capacity),
+  m(rw,integer,fill_pointer),
+  m(rw,cl_boolean,is_displaced),
+  m(rw,cl_list,elements),
   m(rw,cl_array,array),
   m(rw,integer,displacement)]).
 
@@ -212,22 +223,21 @@ data_record(cla__aux_param,[
   m(rw,cl_boolean,special),
   m(rw,cla__init_form,initform)]).
 
-data_record(cl_simple_array__unsigned_byte16,[
-  m(ro,array(integer),dimv),
+data_record(cl_simple_array(unsigned_byte16),[
+  m(ro,array_of(integer),dimv),
   m(ro,integer,total_size),
-  m(ro,array(integer),data)]).
+  m(ro,array_of(integer),data)]).
 
 data_record(cl_package,[
   m(rw,cl_string,name),
-  m(rw,cl_simple_string,lisp_name),
   m(rw,cl_list,property_list),
-  m(rw,prolog_concurrent_hash_map(cl_string,cl_symbol),internal_symbols),
-  m(rw,prolog_concurrent_hash_map(cl_string,cl_symbol),external_symbols),
-  m(rw,prolog_hash_map(cl_string,cl_symbol),shadowing_symbols),
+  m(rw,cl_hash_table(cl_string,cl_symbol),internal_symbols),
+  m(rw,cl_hash_table(cl_string,cl_symbol),external_symbols),
+  m(rw,cl_hash_table(cl_string,cl_symbol),shadowing_symbols),
   m(rw,prolog_array_list(cl_string),nicknames),
-  m(rw,cl_object,use_list),
+  m(rw,prolog_array_list(cl_package),use_list),
   m(rw,prolog_array_list(cl_package),used_by_list),
-  m(rw,prolog_concurrent_hash_map(cl_string,cl_package),local_nicknames)]).
+  m(rw,cl_hash_table(cl_string,cl_package),local_nicknames)]).
 
 data_record(cla__arg_list,[
   m(ro,cl_list,args),
@@ -261,7 +271,7 @@ data_record(cla__required_param,[
   m(rw,cl_boolean,special)]).
 
 data_record(cl_emf_cache,[
-  m(rw,prolog_concurrent_hash_map(cl_emf_cache___cache_entry,cl_object),cache),
+  m(rw,cl_hash_table(cl_emf_cache___cache_entry,cl_object),cache),
   m(rw,index_of(cl_emf_cache___eql_specialization),eql_specializations)]).
 
 data_record(cl_random_state,[
@@ -280,7 +290,7 @@ data_record(cl_hash_table,[
   m(ro,integer,rehash_size),
   m(ro,number,rehash_threshold),
   m(rw,integer,threshold),
-  m(rw,array(cl_hash_table___hash_entry),buckets),
+  m(rw,array_of(cl_hash_table___hash_entry),buckets),
   m(rw,integer,count),
   m(ro,cl_hash_table___comparator,comparator),
   m(ro,j_reentrant_lock,lock)]).
@@ -296,20 +306,7 @@ data_record(cl_slot_class,[
   m(rw,cl_list,direct_default_initargs),
   m(rw,cl_list,default_initargs)]).
 
-data_record(cl_complex_array__unsigned_byte32,[
-  m(ro,array(integer),dimv),
-  m(rw,integer,total_size),
-  m(rw,cl_list,data),
-  m(rw,cl_array,array),
-  m(rw,integer,displacement)]).
 
-data_record(cl_complex_vector__unsigned_byte32,[
-  m(rw,integer,capacity),
-  m(rw,integer,fill_pointer),
-  m(rw,cl_boolean,is_displaced),
-  m(rw,cl_list,elements),
-  m(rw,cl_array,array),
-  m(rw,integer,displacement)]).
 
 data_record(prolog_weak_hash_entry_weak_key_or_value,[
   m(ro,cl_weak_hash_table,this__0)]).
@@ -321,7 +318,7 @@ data_record(cla__constant_init_form,[
   m(rw,cl_object,value)]).
 
 data_record(cl_lisp_thread___stack_segment,[
-  m(ro,array(prolog_object),stack),
+  m(ro,array_of(prolog_object),stack),
   m(ro,cl_lisp_thread___stack_segment,next),
   m(rw,integer,stack_ptr)]).
 
@@ -329,7 +326,7 @@ data_record(cl_socket_stream,[
   m(ro,prolog_socket,socket)]).
 
 data_record(cl_memory_class_loader,[
-  m(ro,prolog_hash_map(cl_string,cl_ffi_object),hashtable),
+  m(ro,cl_hash_table(cl_string,cl_ffi_object),hashtable),
   m(ro,cl_ffi_object,boxed_this),
   m(ro,cl_string,internal_name_prefix)]).
 
@@ -364,15 +361,8 @@ data_record(cl_go,[
   m(ro,cl_object,tagbody),
   m(ro,cl_object,tag)]).
 
-data_record(cl_complex_array__unsigned_byte8,[
-  m(ro,array(integer),dimv),
-  m(rw,integer,total_size),
-  m(rw,array(byte),data),
-  m(rw,cl_array,array),
-  m(rw,integer,displacement)]).
-
 data_record(cl_broadcast_stream,[
-  m(ro,array(cl_stream),streams)]).
+  m(ro,array_of(cl_stream),streams)]).
 
 data_record(cl_standard_object,[
   m(rw,cl_layout,layout),
@@ -386,7 +376,7 @@ data_record(cl_complex_string,[
   m(rw,integer,capacity),
   m(rw,integer,fill_pointer),
   m(rw,cl_boolean,is_displaced),
-  m(rw,array(char_code),chars),
+  m(rw,array_of(char_code),chars),
   m(rw,cl_array,array),
   m(rw,integer,displacement)]).
 
@@ -425,16 +415,16 @@ data_record(cl_weak_reference,[
 data_record(cl_emf_cache___eql_specialization,[
   m(rw,cl_object,eql_to)]).
 
-data_record(cl_simple_array__unsigned_byte8,[
-  m(ro,array(integer),dimv),
+data_record(cl_simple_array(Kind),[
+  m(ro,array_of(integer),dimv),
   m(ro,integer,total_size),
-  m(ro,array(byte),data)]).
+  m(ro,array_of(Kind),data)]).
 
 data_record(cl_string_functions___string_indices_and_chars,[
   m(rw,cl_string,string1),
   m(rw,cl_boolean,convert_case),
-  m(rw,array(char_code),array1),
-  m(rw,array(char_code),array2),
+  m(rw,array_of(char_code),array1),
+  m(rw,array_of(char_code),array2),
   m(rw,integer,start1),
   m(rw,integer,end1),
   m(rw,integer,start2),
@@ -473,9 +463,12 @@ data_record(cl_special_binding,[
   m(ro,integer,idx),
   m(rw,cl_object,value)]).
 
-data_record(cl_basic_vector__unsigned_byte16,[
+data_record(cl_basic_vector(Kind),[
   m(rw,integer,capacity),
-  m(rw,array(integer),elements)]).
+  m(rw,array_of(Kind),elements)]).
+data_record(cl_simple_vector,[
+  m(rw,integer,capacity),
+  m(rw,cl_list,data)]).
 
 data_record(cla__optional_param,[
   m(rw,cl_symbol,var),
@@ -510,14 +503,14 @@ data_record(cl_seekable_string_writer,[
 
 data_record(cl_bit_vector,[
   m(rw,integer,capacity),
-  m(rw,array(long),bits)]).
+  m(rw,array_of(long),bits)]).
 
 data_record(cl_ffi_object__2,[
   m(ro,cl_list,val__acc),
   m(ro,cl_object,val__fn)]).
 
 data_record(cl_shell_command___reader_thread,[
-  m(rw,array(char_code),buf),
+  m(rw,array_of(char_code),buf),
   m(ro,prolog_input_stream,input_stream),
   m(ro,prolog_buffered_reader,reader),                                  
   m(ro,cl_shell_command,this__0),
@@ -528,13 +521,13 @@ data_record(cl_double_float,[
 
 data_record(cl_simple_string,[
   m(rw,integer,capacity),
-  m(rw,array(char_code),chars)]).
+  m(rw,array_of(char_code),chars)]).
 
 data_record(cl_concatenated_stream,[
   m(rw,cl_object,streams)]).
 
-data_record(cl_simple_array__unsigned_byte32,[
-  m(ro,array(integer),dimv),
+data_record(cl_simple_array(unsigned_byte32),[
+  m(ro,array_of(integer),dimv),
   m(ro,integer,total_size),
   m(ro,cl_list,data)]).
 
@@ -545,7 +538,7 @@ data_record(cl_weak_hash_table,[
   m(ro,cl_object,rehash_size),
   m(ro,cl_object,rehash_threshold),
   m(rw,integer,threshold),
-  m(rw,array(prolog_weak_hash_entry),buckets),
+  m(rw,array_of(prolog_weak_hash_entry),buckets),
   m(rw,integer,count),
   m(ro,cl_weak_hash_table___comparator,comparator),
   m(ro,j_reentrant_lock,lock),
@@ -573,7 +566,7 @@ data_record(cl_jar_stream,[
 data_record(cl_char_hash_map(T),[
   m(ro,array_of(T),constants_by_char_code),
   m(ro,T,null_value),
-  m(ro,prolog_hash_map(prolog_character,T),backing)]).
+  m(ro,cl_hash_table(prolog_character,T),backing)]).
 
 data_record(cl_throw,[
   m(ro,cl_object,tag),
@@ -581,7 +574,7 @@ data_record(cl_throw,[
   m(ro,cl_list,values)]).
 
 data_record(cl_simple_array__t,[
-  m(ro,array(integer),dimv),
+  m(ro,array_of(integer),dimv),
   m(ro,cl_object,element_type),
   m(ro,integer,total_size),
   m(ro,cl_list,data)]).
@@ -605,7 +598,7 @@ data_record(cl_funcallable_standard_object,[
   m(rw,integer,call_count),
   m(rw,integer,hot_count)]).
 
-data_record(cl_u_r_l_stream,[
+data_record(cl_url_stream,[
   m(ro,cl_pathname,pathname),
   m(ro,prolog_input_stream,input),
   m(ro,prolog_reader,reader),
@@ -627,7 +620,7 @@ data_record(cl_readtable,[
   m(rw,cl_object,readtable_case)]).
 
 data_record(cl_fill_pointer_output_stream,[
-  m(rw,cl_complex_string,cl_string)]).
+  m(rw,cl_complex_string,string_buffer)]).
 
 data_record(prolog_weak_hash_entry_weak_value,[
   m(rw,prolog_weak_reference(cl_object),value),
@@ -648,11 +641,11 @@ data_record(cl_lisp_thread,[
   m(rw,cl_boolean,thread_interrupted),
   m(rw,cl_object,pending),
   m(rw,cl_symbol,wrapper),
-  m(rw,array(cl_special_binding),specials),
+  m(rw,array_of(cl_special_binding),specials),
   m(rw,cl_special_bindings_mark,saved_specials),
   m(rw,cl_object,catch_tags),
   m(rw,cl_lisp_thread___stack_segment,top_stack_segment),
-  m(rw,array(prolog_object),stack),
+  m(rw,array_of(prolog_object),stack),
   m(rw,integer,stack_ptr),
   m(rw,cl_lisp_thread___stack_segment,spare_stack_segment)]).
 
@@ -692,11 +685,11 @@ data_record(cl_ffi_class_loader_pf_get_default_classloader,[
   m(ro,cl_object,default_class_loader)]).
 
 data_record(cl_argument_list_processor,[
-  m(rw,array(cla__param),required_parameters),
-  m(rw,array(cla__param),optional_parameters),
-  m(rw,array(cla__keyword_param),keyword_parameters),
-  m(rw,array(cla__param),aux_vars),
-  m(rw,array(cla__param),positional_parameters),
+  m(rw,array_of(cla__param),required_parameters),
+  m(rw,array_of(cla__param),optional_parameters),
+  m(rw,array_of(cla__keyword_param),keyword_parameters),
+  m(rw,array_of(cla__param),aux_vars),
+  m(rw,array_of(cla__param),positional_parameters),
   m(rw,cl_symbol,rest_var),
   m(rw,cla__param,rest_param),
   m(rw,cl_symbol,env_var),
@@ -704,8 +697,8 @@ data_record(cl_argument_list_processor,[
   m(rw,integer,arity),
   m(rw,integer,min_args),
   m(rw,integer,max_args),
-  m(rw,array(cl_symbol),variables),
-  m(rw,array(cl_boolean),specials),
+  m(rw,array_of(cl_symbol),variables),
+  m(rw,array_of(cl_boolean),specials),
   m(rw,cl_boolean,and_key),
   m(rw,cl_boolean,allow_other_keys),
   m(ro,cla__argument_matcher,matcher),
@@ -720,7 +713,7 @@ data_record(cl_closure,[
   m(ro,cl_object,body),
   m(ro,cl_object,execution_body),
   m(ro,cl_environment,environment),
-  m(ro,array(cl_symbol),free_specials),
+  m(ro,array_of(cl_symbol),free_specials),
   m(ro,cl_argument_list_processor,arglist)]).
 
 data_record(cl_racf_unmappable_character_exception,[
@@ -735,7 +728,7 @@ data_record(cl_random_access_writer,[
   m(ro,cl_random_access_character_file,this__0)]).
 
 data_record(cl_random_access_reader,[
-  m(rw,array(char_code),read_buf),
+  m(rw,array_of(char_code),read_buf),
   m(ro,cl_random_access_character_file,this__0)]).
 
 data_record(cl_racf_malformed_input_exception,[
@@ -744,7 +737,7 @@ data_record(cl_racf_malformed_input_exception,[
   m(ro,cl_string,charset_name)]).
 
 data_record(cl_random_access_output_stream,[
-  m(rw,array(byte),buf),
+  m(rw,array_of(unsigned_byte8),write_buf),
   m(ro,cl_random_access_character_file,this__0)]).
 
 data_record(cl_decoding_reader,[
@@ -770,12 +763,9 @@ data_record(cl_random_access_character_file,[
   m(rw,prolog_byte_buffer,short_byte_buf)]).
 
 data_record(cl_random_access_input_stream,[
-  m(rw,array(byte),read_buf),
+  m(rw,array_of(unsigned_byte8),read_buf),
   m(ro,cl_random_access_character_file,this__0)]).
 
-data_record(cl_simple_vector,[
-  m(rw,integer,capacity),
-  m(rw,cl_list,data)]).
 
 data_record(cl_ffi_object__1,[
   m(ro,cl_list,val__acc),
@@ -789,7 +779,7 @@ data_record(cl_single_float,[
   m(ro,float,value)]).
 
 data_record(cl_compiled_closure,[
-  m(rw,array(cl_closure_binding),ctx)]).
+  m(rw,array_of(cl_closure_binding),ctx)]).
 
 data_record(cl_special_operator,[
   m(rw,integer,call_count),
@@ -810,7 +800,7 @@ data_record(cl_char_hash_map__1,[
 
 data_record(cl_layout,[
   m(ro,cl_object,lisp_class),
-  m(ro,prolog_concurrent_hash_map(cl_object,cl_object),slot_table),
+  m(ro,cl_hash_table(cl_object,cl_object),slot_table),
   m(ro,cl_list,slot_names),
   m(ro,cl_object,shared_slots),
   m(rw,cl_boolean,invalid)]).
@@ -828,14 +818,6 @@ data_record(cl_fixnum,[
 data_record(cl_ratio,[
   m(rw,prolog_big_integer,numerator),
   m(rw,prolog_big_integer,denominator)]).
-
-data_record(cl_complex_vector,[
-  m(rw,integer,capacity),
-  m(rw,integer,fill_pointer),
-  m(rw,cl_boolean,is_displaced),
-  m(rw,cl_list,elements),
-  m(rw,cl_array,array),
-  m(rw,integer,displacement)]).
 
 data_record(cl_shell_command,[
   m(rw,prolog_thread,thread),
@@ -883,12 +865,16 @@ data_record(cl_hash_table___hash_entry,[
 data_record(cl_lisp_thread___stack_marker,[
   m(ro,integer,num_args)]).
 
-data_record(cl_basic_vector__unsigned_byte32,[
-  m(rw,integer,capacity),
-  m(rw,array(long),elements)]).
+
+data_record(cl_complex_array(Kind),[
+  m(ro,array_of(integer),dimv),
+  m(rw,integer,total_size),
+  m(rw,array_of(Kind),data),
+  m(rw,cl_array,array),
+  m(rw,integer,displacement)]).
 
 data_record(cl_complex_array,[
-  m(ro,array(integer),dimv),
+  m(ro,array_of(integer),dimv),
   m(ro,cl_object,element_type),
   m(rw,integer,total_size),
   m(rw,cl_list,data),
@@ -904,12 +890,9 @@ data_record(cl_cons,[
   m(rw,cl_object,car),
   m(rw,cl_object,cdr)]).
 
-data_record(cl_basic_vector__unsigned_byte8,[
-  m(rw,integer,capacity),
-  m(rw,array(byte),elements)]).
 
 data_record(cl_lisp_class,[
-  m(ro,i\nteger,sxhash),
+  m(ro,integer,sxhash),
   m(rw,cl_object,name),
   m(rw,cl_list,property_list),
   m(rw,cl_layout,class_layout),
@@ -941,10 +924,12 @@ recognised_clazz(AA):- system_subclazz(C1,C2),(AA=C1;AA=C2).
 maybe_xform_recognised_clazz([A|B],AA):-is_list(B),!,maplist(maybe_xform_recognised_clazz,[A|B],AA).
 maybe_xform_recognised_clazz(A,AA):- (cl_OBJECT_to_object(A,AA),recognised_clazz(AA))->true;A=AA.
 
+/*
 term_expansion(mop_direct(A,P,B),mop_direct(AA,P,BB)):- 
   maybe_xform_recognised_clazz(A,AA),
   (szlot\=P -> maybe_xform_recognised_clazz(B,BB) ; B=BB),
   ((A\==AA) ; (B\==BB)).
+*/
 
 mop_direct('%METHOD-FUNCTION', supers, [t]).
 mop_direct('%METHOD-FUNCTION', szlot, 'FAST-FUNCTION').

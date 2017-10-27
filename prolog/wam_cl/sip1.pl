@@ -9,19 +9,27 @@
 
 % operators
 
-:- op(900,xfy,'==>').		% used for macros.
-:- op(500,fx,'`').		% `x = quote(x).
+:- set_prolog_flag(backquoted_string,false).
+:- dynamic(((( ==> ))/2)).
+%:- op(1100,xfx, (==)).	
+
+:- op(900,xfy,user:'==>').		% used for macros.
+:- op(500,fx,user:'`').		% `x = quote(x).
+
+:- thread_local(t_l:bound/3).
+
+%:- use_module(library(sexpr_reader)).
 
 % sip -  creates a virgin initial environment and enters a 
 % read-eval-print loop for SIP.  Exit by typing "prolog(`abort)."
 
-sip :- create0Env, sipREP.
+sip :- create0Env, sipREP1.
 
 %  sipREP -  enters a read-eval-print loop for SIP.
 sipREP1 :-
   repeat,
   writeln('SIP> '),
-  read(E),
+  read_term(E,[backquoted_string(false)]),
   once(eval3(E,0,V)),
   writeln(V),
   fail.
@@ -30,12 +38,13 @@ sipREP1 :-
 % create0Env sets up E as the inital Scheme environment.
 create0Env :-
   % flush all old environments.
-  abolish(bound,3),
+  % abolish(t_l:bound,3),
+   retractall(t_l:bound(_,_,_)),
   % (re)set the environment counter.
   abolish(envNum,1),
   assert(envNum(1)),
   % define the initial variables.
-  load(sipcore).
+  load('sipcore.pl').
 
 % abbreviations for eval/3.
 eval(E) :- eval3(E,0,V),!.
@@ -136,7 +145,7 @@ evalList([A1|Arest],[V1|Vrest],E) :-
   evalList(Arest,Vrest,E).
 
 % makeEnv(+Parameters,+Arguments,-Environment) -  creates a new environment
-% in which the variables in the 1st arg are bound to the values in the
+% in which the variables in the 1st arg are t_l:bound to the values in the
 % 2nd.  The new envitronment is returned in the 3rd.
 makeEnv(Ps,As,New/Old) :-
   % determine the next environment number to use.
@@ -163,34 +172,38 @@ lookUp(Symbol,Value,Env) :- value(Symbol,Value,Env,_),!.
 lookUp(S,_,Env) :-  err('unbound symbol: ',S/Env).
 
 % value(+symbol,-value,+frameSought,-frameFound) like lookUp but also
-% returns the frame in which the variable was bound.
-value(S,V,Env,Env) :- bound(S,V,Env).
-value(S,V,E1/E2,E) :-
-  not(bound(S,V,E1/E2)),
+% returns the frame in which the variable was t_l:bound.
+value(S,V,Env,Env) :- t_l:bound(S,V,Env),!.
+value(S,V,SIN,E) :- compound(SIN),SIN = (E1/E2),
+  \+ (t_l:bound(S,V,SS),compound(SS),SS = E1/E2 ),
   value(S,V,E2,E).
 
 % change the value associated with symbol S to V, returning the old value.
 set(S,V,Env,OldV) :-
   value(S,OldV,Env,BindingEnv),
   !,
-  retract(bound(S,OldV,BindingEnv)),
-  assert(bound(S,V,BindingEnv)).
+  retract(t_l:bound(S,OldV,BindingEnv)),
+  assert(t_l:bound(S,V,BindingEnv)).
 
-set(S,_,E,_) :-  err('symbol not bound in environment:',(S/E)).
+set(S,_,E,_) :-  err('symbol not t_l:bound in environment:',(S/E)).
 
 % add an initial binding for symbol S to value V in environment Env.
 define(S,V,Env) :-
-  when(retract(bound(S,_,Env)), 
+  sip_when(retract(t_l:bound(S,_,Env)), 
        warn('symbol already defined in environment: ',(S,Env))),
-  assert(bound(S,V,Env)).
+  assert(t_l:bound(S,V,Env)).
 
 % load(F) reads and evals all expressions in file F.
+/*
+load(File):- see(File),!,
+ repeat,
+  call_cleanup((read(X), ((X = end_if_file ) -> true;((once(loadProcess(X)),fail)))),seen),!.
+*/
+
 load(File) :-
-  see(File),
-  repeat,
-  read(X),
-  loadProcess(X),
-  seen,
+  open(File,read,S),
+  repeat,read_term(S,X,[module(user),backquoted_string(false)]),  
+  (end_of_file == X -> close(S) ; (loadProcess(X),fail)),  
   !.
 
 loadProcess(end_of_file).
@@ -205,8 +218,10 @@ warn(Msg) :- writeln(Msg).
 warn(Msg1,Msg2) :-writeln(Msg1),write(' '),write(Msg2).
 
 % once(X) executes X only once.
-once(X) :- X,!.
+%once(X) :- X,!.
 
-writeln(X) :- nl,write(X).
+%writeln(X) :- nl,write(X).
 
-when(Test,Then) :- Test->Then;true.
+sip_when(Test,Then) :- Test->Then;true.
+
+

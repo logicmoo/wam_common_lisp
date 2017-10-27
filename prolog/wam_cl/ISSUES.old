@@ -1,0 +1,1147 @@
+Installed packages (38):
+
+i clause_attvars@1.1.118    - An alternate interface to the clause database to allow attributed variables to be asserted
+i dictoo@1.1.118            - Dict-like OO Syntax
+i each_call_cleanup@1.1.118 - Each Call Redo Setup and Cleanup
+i eggdrop@1.1.118           - Hook up to an existing IRC Client called an Eggdrop
+i file_scope@1.1.118        - File local scoped efects
+i fluxplayer-prolog-engine@0.0.1 - Prolog interface to Slack http://www.slack.com
+i gvar_syntax@1.1.118       - Global Variable Syntax
+i hook_hybrid@1.1.118       - Hook assert retract call of *specific* predicates
+i instant_prolog_docs@1.1.118 - Magically document prolog source files based on predicate and variable naming conventions
+i lib_atts@1.1.118          - Common atts.pl interface like https://sicstus.sics.se/sicstus/docs/4.0.0/html/sicstus/lib_002datts.html
+i logicmoo_base@1.1.118     - LogicMOO - Extends Prolog Programming to support Dynamic Epistemic Logic (DEL) with Constraints
+i logicmoo_experimental@1.1.118 - Various experimental packages - warning: HUGE amount of test data
+i logicmoo_nlu@1.1.114      - Various English to Logic Convertors - warning: HUGE amount of test data
+i logicmoo_packages@1.1.118 - Various packages - warning: HUGE amount of test data
+i logicmoo_planner@1.1.118  - Various PDDLish planners - warning: HUGE amount of test data
+i logicmoo_planners@1.1.118 - Various Hybrid HTN Planners speaking PDDLish and OCLh
+i logicmoo_utils@1.1.118    - Common predicates used by external Logicmoo Utils and Base
+i loop_check@1.1.118        - New simple loop checking
+i mpi@1.0                   - Porting of the LAMMPI library of Yap Prolog to SWI-Prolog
+i multimodal_dcg@1.1.118    - Reduce floundering of DCGs by constraining and narrowing search
+i multivar@1.1.118          - User defined datatypes
+i must_trace@1.1.118        - Trace with your eyeballs instead of your fingers
+i no_repeats@1.1.118        - New ways to avoid duplicate solutions
+i pfc@1.1.118               - Pfc -- a package for forward chaining in Prolog
+i predicate_streams@1.1.118 - Implement your own Abstract Predicate Streams
+i prologmud@1.1.118         - Online text adventure game - MUD Server
+i prologmud_samples@1.1.118 - Online text adventure game - Sample
+i s_expression@1.1.118      - Utilities for Handling of S-Expression Lisp/Scheme-Like forms and parsing of KIF, GDL, PDDL, CLIF
+i slack_prolog@1.1.118      - Prolog interface to Slack http://www.slack.com
+i subclause_expansion@1.1.118 - More use specific versions of term/goal expansion hooks
+i tabling_dra@1.1.118       - SWI-Prolog interface to Table-handling procedures for the "dra" interpreter. Written by Feliks Kluzniak at UTD (March 2009)
+i transpiler@0.1            - A universal translator for programming languages
+i trill@4.1.0               - A tableau probabilistic reasoner in three different versions
+i wam_common_lisp@1.1.118   - ANSI Common Lisp implemented in Prolog
+i with_open_options@1.1.118 - Utilities to open various objects for read/write
+i with_thread_local@1.1.118 - Call a Goal with local assertions
+i xlisting@1.1.118          - Selective Interactive Non-Deterministic Tracing
+i xlisting_web@1.1.118      - Manipulate and browse prolog runtime over www
+index(zip/3,[1,2,3])
+index(zip_with/4,[1,2,4])
+optimize(zip/3)
+optimize(zip_with/4)
+Warning: /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_compiler.pl:165:
+        Singleton variables: [F]
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_library.pl:18
+% <<==(second(l), first(rest(l))).
+% second(L_In, First_Ret) :- !,
+%       Env=[[bv(l, [L_In|__])]],
+%       sym_arg_val_env(l, L_In, L_Thru, Env),
+%       rest(L_Thru, Rest_Ret),
+%       first(Rest_Ret, First_Ret).
+% second(L_In, First_Ret) :-
+%       ( <<==(second(l), first(rest(l)))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_library.pl:21
+% <<==(third(l), first(rest(rest(l)))).
+% third(L_In, First_Ret) :- !,
+%       Env=[[bv(l, [L_In|__])]],
+%       sym_arg_val_env(l, L_In, L_Thru, Env),
+%       rest(L_Thru, Rest_Ret),
+%       rest(Rest_Ret, Rest_Ret5),
+%       first(Rest_Ret5, First_Ret).
+% third(L_In, First_Ret) :-
+%       ( <<==(third(l), first(rest(rest(l))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_library.pl:28
+% <<==(list_1(a), cons(a, nil)).
+% list_1(A_In, Cons_Ret) :- !,
+%       Env=[[bv(a, [A_In|__])]],
+%       sym_arg_val_env(a, A_In, A_Thru, Env),
+%       cons(A_Thru, [], Cons_Ret).
+% list_1(A_In, Cons_Ret) :-
+%       ( <<==(list_1(a), cons(a, nil))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_library.pl:31
+% <<==(list_2(a, b), cons(a, list_1(b))).
+% list_2(A_In, B_In, Cons_Ret) :- !,
+%       Env=[[bv(a, [A_In|__]), bv(b, [B_In|__7])]],
+%       sym_arg_val_env(a, A_In, A_Thru, Env),
+%       sym_arg_val_env(b, B_In, B_Thru, Env),
+%       list_1(B_Thru, List_1_Ret),
+%       cons(A_Thru, List_1_Ret, Cons_Ret).
+% list_2(A_In, B_In, Cons_Ret) :-
+%       ( <<==(list_2(a, b), cons(a, list_1(b)))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_library.pl:34
+% <<==(list_3(a, b, c), cons(a, list_2(b, c))).
+% list_3(A_In, B_In, C_In, Cons_Ret) :- !,
+%       Env=[[bv(a, [A_In|__]), bv(b, [B_In|__8]), bv(c, [C_In|__11])]],
+%       sym_arg_val_env(a, A_In, A_Thru, Env),
+%       sym_arg_val_env(b, B_In, B_Thru, Env),
+%       sym_arg_val_env(c, C_In, C_Thru, Env),
+%       list_2(B_Thru, C_Thru, List_2_Ret),
+%       cons(A_Thru, List_2_Ret, Cons_Ret).
+% list_3(A_In, B_In, C_In, Cons_Ret) :-
+%       ( <<==(list_3(a, b, c), cons(a, list_2(b, c)))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_library.pl:38
+% <<==(lisp_append(l1, l2), if(null(l1), l2, cons(first(l1), lisp_append(rest(l1), l2)))).
+% lisp_append(L1_In9, L2_In15, RET) :- !,
+%       Env=[[bv(l1, [L1_In9|__]), bv(l2, [L2_In15|__8])]],
+%       sym_arg_val_env(l1, L1_In9, L1_Thru, Env),
+%       null(L1_Thru, Null_Ret),
+%       (   Null_Ret\=[]
+%       ->  sym_arg_val_env(l2, L2_In15, L2_Thru, Env),
+%           RET=L2_Thru
+%       ;   sym_arg_val_env(l1, L1_In9, L1_Thru10, Env),
+%           first(L1_Thru10, First_Ret),
+%           sym_arg_val_env(l1, L1_In9, L1_Thru13, Env),
+%           rest(L1_Thru13, Rest_Ret),
+%           sym_arg_val_env(l2, L2_In15, L2_Thru16, Env),
+%           lisp_append(Rest_Ret, L2_Thru16, Lisp_append_Ret),
+%           cons(First_Ret, Lisp_append_Ret, Cons_Ret),
+%           RET=Cons_Ret
+%       ).
+% lisp_append(L1_In9, L2_In15, RET) :-
+%       ( <<==(lisp_append(l1, l2), if(null(l1), l2, cons(first(l1), lisp_append(rest(l1), l2))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_library.pl:46
+% <<==(mapcar(func, l), if(null(l), nil, cons(lisp_apply(func, list_1(first(l))), mapcar(func, rest(l))))).
+% mapcar(Func_In14, L_In9, RET) :- !,
+%       Env=[[bv(func, [Func_In14|__8]), bv(l, [L_In9|__])]],
+%       sym_arg_val_env(l, L_In9, L_Thru, Env),
+%       null(L_Thru, Null_Ret),
+%       (   Null_Ret\=[]
+%       ->  RET=[]
+%       ;   sym_arg_val_env(func, Func_In14, Func_Thru, Env),
+%           sym_arg_val_env(l, L_In9, L_Thru10, Env),
+%           first(L_Thru10, First_Ret),
+%           list_1(First_Ret, List_1_Ret),
+%           lisp_apply(Func_Thru, List_1_Ret, Lisp_apply_Ret),
+%           sym_arg_val_env(func, Func_In14, Func_Thru15, Env),
+%           sym_arg_val_env(l, L_In9, L_Thru18, Env),
+%           rest(L_Thru18, Rest_Ret),
+%           mapcar(Func_Thru15, Rest_Ret, Mapcar_Ret),
+%           cons(Lisp_apply_Ret, Mapcar_Ret, Cons_Ret),
+%           RET=Cons_Ret
+%       ).
+% mapcar(Func_In14, L_In9, RET) :-
+%       ( <<==(mapcar(func, l), if(null(l), nil, cons(lisp_apply(func, list_1(first(l))), mapcar(func, rest(l)))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/streams.pl:19
+% <<==(stream_first(stream), first(stream)).
+% stream_first(Stream_In, First_Ret) :- !,
+%       Env=[[bv(stream, [Stream_In|__])]],
+%       sym_arg_val_env(stream, Stream_In, Stream_Thru, Env),
+%       first(Stream_Thru, First_Ret).
+% stream_first(Stream_In, First_Ret) :-
+%       ( <<==(stream_first(stream), first(stream))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/streams.pl:22
+% <<==(stream_rest(stream), lisp_apply(second(stream), [])).
+% stream_rest(Stream_In, Lisp_apply_Ret) :- !,
+%       Env=[[bv(stream, [Stream_In|__])]],
+%       sym_arg_val_env(stream, Stream_In, Stream_Thru, Env),
+%       second(Stream_Thru, Second_Ret),
+%       lisp_apply(Second_Ret, [], Lisp_apply_Ret).
+% stream_rest(Stream_In, Lisp_apply_Ret) :-
+%       ( <<==(stream_rest(stream), lisp_apply(second(stream), []))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/streams.pl:25
+% <<==(stream_cons(a, b), list_2(a, b)).
+% stream_cons(A_In, B_In, List_2_Ret) :- !,
+%       Env=[[bv(a, [A_In|__]), bv(b, [B_In|__7])]],
+%       sym_arg_val_env(a, A_In, A_Thru, Env),
+%       sym_arg_val_env(b, B_In, B_Thru, Env),
+%       list_2(A_Thru, B_Thru, List_2_Ret).
+% stream_cons(A_In, B_In, List_2_Ret) :-
+%       ( <<==(stream_cons(a, b), list_2(a, b))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/streams.pl:28
+% <<==(stream_null(stream), null(stream)).
+% stream_null(Stream_In, Null_Ret) :- !,
+%       Env=[[bv(stream, [Stream_In|__])]],
+%       sym_arg_val_env(stream, Stream_In, Stream_Thru, Env),
+%       null(Stream_Thru, Null_Ret).
+% stream_null(Stream_In, Null_Ret) :-
+%       ( <<==(stream_null(stream), null(stream))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/streams.pl:33
+% <<==(stream_take(n, stream), if(or(equalp(n, 0), stream_null(stream)), [], cons(stream_first(stream), stream_take(minus(n, 1), stream_rest(stream))))).
+% stream_take(N_In15, Stream_In11, RET) :- !,
+%       Env=[[bv(n, [N_In15|__]), bv(stream, [Stream_In11|__8])]],
+%       sym_arg_val_env(n, N_In15, N_Thru, Env),
+%       equalp(N_Thru, 0, Equalp_Ret),
+%       sym_arg_val_env(stream, Stream_In11, Stream_Thru, Env),
+%       stream_null(Stream_Thru, Stream_null_Ret),
+%       or(Equalp_Ret, Stream_null_Ret, Or_Ret),
+%       (   Or_Ret\=[]
+%       ->  RET=[]
+%       ;   sym_arg_val_env(stream, Stream_In11, Stream_Thru12, Env),
+%           stream_first(Stream_Thru12, Stream_first_Ret),
+%           sym_arg_val_env(n, N_In15, N_Thru16, Env),
+%           minus(N_Thru16, 1, Minus_Ret),
+%           sym_arg_val_env(stream, Stream_In11, Stream_Thru19, Env),
+%           stream_rest(Stream_Thru19, Stream_rest_Ret),
+%           stream_take(Minus_Ret, Stream_rest_Ret, Stream_take_Ret),
+%           cons(Stream_first_Ret, Stream_take_Ret, Cons_Ret),
+%           RET=Cons_Ret
+%       ).
+% stream_take(N_In15, Stream_In11, RET) :-
+%       ( <<==(stream_take(n, stream), if(or(equalp(n, 0), stream_null(stream)), [], cons(stream_first(stream), stream_take(minus(n, 1), stream_rest(stream)))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/streams.pl:40
+% <<==(stream_drop(n, stream), if(or(equalp(n, 0), stream_null(stream)), stream, stream_drop(minus(n, 1), stream_rest(stream)))).
+% stream_drop(N_In14, Stream_In11, RET) :- !,
+%       Env=[[bv(n, [N_In14|__]), bv(stream, [Stream_In11|__8])]],
+%       sym_arg_val_env(n, N_In14, N_Thru, Env),
+%       equalp(N_Thru, 0, Equalp_Ret),
+%       sym_arg_val_env(stream, Stream_In11, Stream_Thru, Env),
+%       stream_null(Stream_Thru, Stream_null_Ret),
+%       or(Equalp_Ret, Stream_null_Ret, Or_Ret),
+%       (   Or_Ret\=[]
+%       ->  sym_arg_val_env(stream, Stream_In11, Stream_Thru12, Env),
+%           RET=Stream_Thru12
+%       ;   sym_arg_val_env(n, N_In14, N_Thru15, Env),
+%           minus(N_Thru15, 1, Minus_Ret),
+%           sym_arg_val_env(stream, Stream_In11, Stream_Thru18, Env),
+%           stream_rest(Stream_Thru18, Stream_rest_Ret),
+%           stream_drop(Minus_Ret, Stream_rest_Ret, Stream_drop_Ret),
+%           RET=Stream_drop_Ret
+%       ).
+% stream_drop(N_In14, Stream_In11, RET) :-
+%       ( <<==(stream_drop(n, stream), if(or(equalp(n, 0), stream_null(stream)), stream, stream_drop(minus(n, 1), stream_rest(stream))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/streams.pl:47
+% <<==(stream_interval(low, high), if(equalp(low, high), [], stream_cons(low, function(lambda([], stream_interval(plus(low, 1), high)))))).
+% stream_interval(Low_In9, High_In14, RET) :- !,
+%       Env=[[bv(low, [Low_In9|__]), bv(high, [High_In14|__7])]],
+%       sym_arg_val_env(low, Low_In9, Low_Thru, Env),
+%       sym_arg_val_env(high, High_In14, High_Thru, Env),
+%       equalp(Low_Thru, High_Thru, Equalp_Ret),
+%       (   Equalp_Ret\=[]
+%       ->  RET=[]
+%       ;   sym_arg_val_env(low, Low_In9, Low_Thru10, Env),
+%           stream_cons(Low_Thru10,
+%                       closure([],
+%                               [LEnv, Stream_interval_Ret]^(sym_arg_val_env(low, Low_In9, Low_Thru12, LEnv), plus(Low_Thru12, 1, Plus_Ret), sym_arg_val_env(high, High_In14, High_Thru15, LEnv), stream_interval(Plus_Ret, High_Thru15, Stream_interval_Ret)),
+%                               Env),
+%                       Stream_cons_Ret),
+%           RET=Stream_cons_Ret
+%       ).
+% stream_interval(Low_In9, High_In14, RET) :-
+%       ( <<==(stream_interval(low, high), if(equalp(low, high), [], stream_cons(low, function(lambda([], stream_interval(plus(low, 1), high))))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/streams.pl:54
+% <<==(stream_ints_from(n), stream_cons(n, function(lambda([], stream_ints_from(plus(n, 1)))))).
+% stream_ints_from(N_In4, Stream_cons_Ret) :- !,
+%       Env=[[bv(n, [N_In4|__])]],
+%       sym_arg_val_env(n, N_In4, N_Thru, Env),
+%       stream_cons(N_Thru,
+%                   closure([],
+%                           [LEnv, Stream_ints_from_Ret]^(sym_arg_val_env(n, N_In4, N_Thru5, LEnv), plus(N_Thru5, 1, Plus_Ret), stream_ints_from(Plus_Ret, Stream_ints_from_Ret)),
+%                           Env),
+%                   Stream_cons_Ret).
+% stream_ints_from(N_In4, Stream_cons_Ret) :-
+%       ( <<==(stream_ints_from(n), stream_cons(n, function(lambda([], stream_ints_from(plus(n, 1))))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/streams.pl:59
+% <<==(t1, stream_take(3, stream_interval(1, 5))).
+% t1(Stream_take_Ret) :- !,
+%       Env=[[]],
+%       stream_interval(1, 5, Stream_interval_Ret),
+%       stream_take(3, Stream_interval_Ret, Stream_take_Ret).
+% t1(Stream_take_Ret) :-
+%       ( <<==(t1, stream_take(3, stream_interval(1, 5)))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/streams.pl:62
+% <<==(t2, stream_take(5, stream_drop(10, stream_ints_from(1)))).
+% t2(Stream_take_Ret) :- !,
+%       Env=[[]],
+%       stream_ints_from(1, Stream_ints_from_Ret),
+%       stream_drop(10, Stream_ints_from_Ret, Stream_drop_Ret),
+%       stream_take(5, Stream_drop_Ret, Stream_take_Ret).
+% t2(Stream_take_Ret) :-
+%       ( <<==(t2, stream_take(5, stream_drop(10, stream_ints_from(1))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:17
+% <<==(simple(x), x).
+% simple(X_In, X_Thru) :- !,
+%       Env=[[bv(x, [X_In|__])]],
+%       sym_arg_val_env(x, X_In, X_Thru, Env).
+% simple(X_In, X_Thru) :-
+%       ( <<==(simple(x), x)
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:20
+% <<==(lisp_append_2(l1, l2), cond([[null(l1), l2], [t, cons(first(l1), lisp_append_2(rest(l1), l2))]])).
+% lisp_append_2(L1_In9, L2_In15, RET) :- !,
+%       Env=[[bv(l1, [L1_In9|__]), bv(l2, [L2_In15|__8])]],
+%       sym_arg_val_env(l1, L1_In9, L1_Thru, Env),
+%       null(L1_Thru, Null_Ret),
+%       (   Null_Ret\=[]
+%       ->  sym_arg_val_env(l2, L2_In15, L2_Thru, Env),
+%           RET=L2_Thru
+%       ;   (   t\=[]
+%           ->  sym_arg_val_env(l1, L1_In9, L1_Thru10, Env),
+%               first(L1_Thru10, First_Ret),
+%               sym_arg_val_env(l1, L1_In9, L1_Thru13, Env),
+%               rest(L1_Thru13, Rest_Ret),
+%               sym_arg_val_env(l2, L2_In15, L2_Thru16, Env),
+%               lisp_append_2(Rest_Ret, L2_Thru16, Lisp_append_2_Ret),
+%               cons(First_Ret, Lisp_append_2_Ret, Cons_Ret),
+%               _3200=Cons_Ret
+%           ;   _3200=[]
+%           ),
+%           RET=_3200
+%       ).
+% lisp_append_2(L1_In9, L2_In15, RET) :-
+%       ( <<==(lisp_append_2(l1, l2), cond([[null(l1), l2], [t, cons(first(l1), lisp_append_2(rest(l1), l2))]]))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:27
+% <<==(lisp_error(x), setq(y, 5)).
+% lisp_error(X, 5) :- !,
+%       Env=[[bv(x, [X|_1316])]],
+%       symbol_setq(y, 5, Env).
+% lisp_error(X, 5) :-
+%       ( <<==(lisp_error(x), setq(y, 5))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:30
+% <<==(lisp_let(), let([bind(x, 3), bind(y, 5)], progn(x, y))).
+% lisp_let(Progn_Ret) :- !,
+%       Env=[[]],
+%       LETENV=[[bv(x, [3|_1490]), bv(y, [5|_1512])]|Env],
+%       sym_arg_val_env(x, X_In, X_Thru, LETENV),
+%       sym_arg_val_env(y, Y_In, Y_Thru, LETENV),
+%       progn(X_Thru, Y_Thru, Progn_Ret).
+% lisp_let(Progn_Ret) :-
+%       ( <<==(lisp_let(), let([bind(x, 3), bind(y, 5)], progn(x, y)))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:34
+% <<==(lisp_let1(),let([bind(x,3),bind(y,5)],x,y))
+% lisp_let1(_3688):-!,_1492=[[]],sym_arg_val_env(x,_1454,_1450,_1492),bind(_1450,3,_1436),sym_arg_val_env(y,_1710,_1706,_1492),bind(_1706,5,_1828),'[|]'(_1828,[],_1678),'[|]'(_1436,_1678,_2140),sym_arg_val_env(x,_2494,_2522,_1492),sym_arg_val_env(y,_2620,_2648,_1492),let(_2140,_2522,_2648,_3688)
+% lisp_let1(_3688):- <<==(lisp_let1(),let([bind(x,3),bind(y,5)],x,y))
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:41
+% <<==(mapfirst(l), mapcar(function(first), l)).
+% mapfirst(L_In, Mapcar_Ret) :- !,
+%       Env=[[bv(l, [L_In|__])]],
+%       sym_arg_val_env(l, L_In, L_Thru, Env),
+%       mapcar(function(first), L_Thru, Mapcar_Ret).
+% mapfirst(L_In, Mapcar_Ret) :-
+%       ( <<==(mapfirst(l), mapcar(function(first), l))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:45
+% <<==(defvar(fred, 13)).
+% :- (   special_var(fred, _17934)
+%    ->  true
+%    ;   assert(special_var(fred, 13))
+%    ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:47
+% <<==(defvar(george)).
+% :- (   special_var(george, _1214)
+%    ->  true
+%    ;   assert(special_var(george, []))
+%    ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:50
+% <<==(reset_george(val), setq(george, val)).
+% reset_george(Val_In, Val_Thru) :- !,
+%       Env=[[bv(val, [Val_In|__])]],
+%       sym_arg_val_env(val, Val_In, Val_Thru, Env),
+%       symbol_setq(george, Val_Thru, Env).
+% reset_george(Val_In, Val_Thru) :-
+%       ( <<==(reset_george(val), setq(george, val))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:54
+% <<==(make_adder(x), function(lambda([y], plus(x, y)))).
+% make_adder(X_In, closure([y], [LEnv, Plus_Ret]^(sym_arg_val_env(x, X_In, X_Thru, LEnv), sym_arg_val_env(y, Y_In, Y_Thru, LEnv), plus(X_Thru, Y_Thru, Plus_Ret)), Env)) :- !,
+%       Env=[[bv(x, [X_In|__])]],
+%       true.
+% make_adder(X_In, closure([y], [LEnv, Plus_Ret]^(sym_arg_val_env(x, X_In, X_Thru, LEnv), sym_arg_val_env(y, Y_In, Y_Thru, LEnv), plus(X_Thru, Y_Thru, Plus_Ret)), Env)) :-
+%       ( <<==(make_adder(x), function(lambda([y], plus(x, y))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:58
+% <<==(scale_list(xs, scale), let([bind(fred, function(lambda([num], times(scale, num))))], mapcar(fred, xs))).
+% scale_list(Xs_In, Scale_In, Mapcar_Ret) :- !,
+%       Env=[[bv(xs, [Xs_In|__17]), bv(scale, [Scale_In|__])]],
+%       LETENV=[[bv(fred, [closure([num], [LEnv, Times_Ret]^(sym_arg_val_env(scale, Scale_In, Scale_Thru, LEnv), sym_arg_val_env(num, Num_In, Num_Thru, LEnv), times(Scale_Thru, Num_Thru, Times_Ret)), Env)|_2962])]|Env],
+%       sym_arg_val_env(fred, Fred_In, Fred_Thru, LETENV),
+%       sym_arg_val_env(xs, Xs_In, Xs_Thru, LETENV),
+%       mapcar(Fred_Thru, Xs_Thru, Mapcar_Ret).
+% scale_list(Xs_In, Scale_In, Mapcar_Ret) :-
+%       ( <<==(scale_list(xs, scale), let([bind(fred, function(lambda([num], times(scale, num))))], mapcar(fred, xs)))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:62
+% <<==(make_summer(total), function(lambda([n], setq(total, plus(total, n))))).
+% make_summer(Total_In, closure([n], [LEnv, Plus_Ret]^(sym_arg_val_env(total, Total_In, Total_Thru, LEnv), sym_arg_val_env(n, N_In, N_Thru, LEnv), plus(Total_Thru, N_Thru, Plus_Ret), symbol_setq(total, Plus_Ret, LEnv)), Env)) :- !,
+%       Env=[[bv(total, [Total_In|__])]],
+%       true.
+% make_summer(Total_In, closure([n], [LEnv, Plus_Ret]^(sym_arg_val_env(total, Total_In, Total_Thru, LEnv), sym_arg_val_env(n, N_In, N_Thru, LEnv), plus(Total_Thru, N_Thru, Plus_Ret), symbol_setq(total, Plus_Ret, LEnv)), Env)) :-
+%       ( <<==(make_summer(total), function(lambda([n], setq(total, plus(total, n)))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:67
+% <<==(sum_with_map(xs),let([bind(running_total,0)],let([bind(summer,function(lambda([n],setq(running_total,plus(running_total,n)))))],mapcar(summer,xs),running_total)))
+% sum_with_map(_1614,_7416):-!,_1770=[[bv(xs,[_1614|_1636])]],_1718=[[bv(running_total,[0|_1716])]|_1770],sym_arg_val_env(summer,_1820,_1816,_1718),bind(_1816,closure([n],[_1964,_2694]^(sym_arg_val_env(running_total,_1928,_1924,_1964),sym_arg_val_env(n,_2024,_2020,_1964),plus(_1924,_2020,_2694),symbol_setq(running_total,_2694,_1964)),_1718),_1802),'[|]'(_1802,[],_1788),sym_arg_val_env(summer,_3716,_3744,_1718),sym_arg_val_env(xs,_1614,_3820,_1718),mapcar(_3744,_3820,_3682),sym_arg_val_env(running_total,_4124,_4152,_1718),let(_1788,_3682,_4152,_7416)
+% sum_with_map(_1614,_7416):- <<==(sum_with_map(xs),let([bind(running_total,0)],let([bind(summer,function(lambda([n],setq(running_total,plus(running_total,n)))))],mapcar(summer,xs),running_total)))
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_compiler.pl:425
+% fact==lambda([n],if(n=0,1,n*fact(sub1(n))))
+% fact(_1326,_1242):-!,_1290=[[bv(n,[_1326|_1222])]],sym_arg_val_env(n,_1326,_1250,_1290),=(_1250,0,_1478),(_1478\=[]->_1242=1;sym_arg_val_env(n,_1326,_1354,_1290),sym_arg_val_env(n,_1326,_1404,_1290),sub1(_1404,_1368),fact(_1368,_1366),*(_1354,_1366,_1448),_1242=_1448)
+% fact(_1326,_1242):- <<==(fact(n),if(n=0,1,n*fact(sub1(n))))
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_compiler.pl:427
+% add1==lambda([n],n+1)
+% add1(_1076,_1228):-!,_1174=[[bv(n,[_1076|_1100])]],sym_arg_val_env(n,_1076,_1128,_1174),+(_1128,1,_1228)
+% add1(_1076,_1228):- <<==(add1(n),n+1)
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_compiler.pl:429
+% sub1==lambda([n],n-1)
+% sub1(_1070,_1222):-!,_1168=[[bv(n,[_1070|_1094])]],sym_arg_val_env(n,_1070,_1122,_1168),-(_1122,1,_1222)
+% sub1(_1070,_1222):- <<==(sub1(n),n-1)
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_compiler.pl:433
+% mapcar==lambda([f, l], if(null(l), nil, cons(f(car(l)), mapcar(f, cdr(l))))).
+% mapcar1(F_In, L_In6, RET) :- !,
+%       Env=[[bv(f, [F_In|__12]), bv(l, [L_In6|__])]],
+%       sym_arg_val_env(l, L_In6, L_Thru, Env),
+%       null(L_Thru, Null_Ret),
+%       (   Null_Ret\=[]
+%       ->  RET=[]
+%       ;   sym_arg_val_env(l, L_In6, L_Thru7, Env),
+%           car(L_Thru7, Car_Ret),
+%           f(Car_Ret, F_Ret),
+%           sym_arg_val_env(f, F_In, F_Thru, Env),
+%           sym_arg_val_env(l, L_In6, L_Thru14, Env),
+%           cdr(L_Thru14, Cdr_Ret),
+%           mapcar1(F_Thru, Cdr_Ret, Mapcar1_Ret),
+%           cons(F_Ret, Mapcar1_Ret, Cons_Ret),
+%           RET=Cons_Ret
+%       ).
+% mapcar1(F_In, L_In6, RET) :-
+%       ( <<==(mapcar1(f, l), if(null(l), nil, cons(f(car(l)), mapcar1(f, cdr(l)))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_compiler.pl:441
+% length==lambda([l], if(null(l), 0, add1(length(cdr(l))))).
+% length1(L_In5, RET) :- !,
+%       Env=[[bv(l, [L_In5|__])]],
+%       sym_arg_val_env(l, L_In5, L_Thru, Env),
+%       null(L_Thru, Null_Ret),
+%       (   Null_Ret\=[]
+%       ->  RET=0
+%       ;   sym_arg_val_env(l, L_In5, L_Thru6, Env),
+%           cdr(L_Thru6, Cdr_Ret),
+%           length1(Cdr_Ret, Length1_Ret),
+%           add1(Length1_Ret, Add1_Ret),
+%           RET=Add1_Ret
+%       ).
+% length1(L_In5, RET) :-
+%       ( <<==(length1(l), if(null(l), 0, add1(length1(cdr(l)))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_compiler.pl:443
+% append==lambda([l1, l2], if(null(l1), l2, cons(car(l1), append(cdr(l1), l2)))).
+% append1(L1_In9, L2_In15, RET) :- !,
+%       Env=[[bv(l1, [L1_In9|__]), bv(l2, [L2_In15|__8])]],
+%       sym_arg_val_env(l1, L1_In9, L1_Thru, Env),
+%       null(L1_Thru, Null_Ret),
+%       (   Null_Ret\=[]
+%       ->  sym_arg_val_env(l2, L2_In15, L2_Thru, Env),
+%           RET=L2_Thru
+%       ;   sym_arg_val_env(l1, L1_In9, L1_Thru10, Env),
+%           car(L1_Thru10, Car_Ret),
+%           sym_arg_val_env(l1, L1_In9, L1_Thru13, Env),
+%           cdr(L1_Thru13, Cdr_Ret),
+%           sym_arg_val_env(l2, L2_In15, L2_Thru16, Env),
+%           append1(Cdr_Ret, L2_Thru16, Append1_Ret),
+%           cons(Car_Ret, Append1_Ret, Cons_Ret),
+%           RET=Cons_Ret
+%       ).
+% append1(L1_In9, L2_In15, RET) :-
+%       ( <<==(append1(l1, l2), if(null(l1), l2, cons(car(l1), append1(cdr(l1), l2))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_compiler.pl:445
+% reverse==lambda([l], if(null(l), l, append(reverse(cdr(l)), cons(car(l), nil)))).
+% reverse1(L_In5, RET) :- !,
+%       Env=[[bv(l, [L_In5|__])]],
+%       sym_arg_val_env(l, L_In5, L_Thru, Env),
+%       null(L_Thru, Null_Ret),
+%       (   Null_Ret\=[]
+%       ->  sym_arg_val_env(l, L_In5, L_Thru6, Env),
+%           RET=L_Thru6
+%       ;   sym_arg_val_env(l, L_In5, L_Thru8, Env),
+%           cdr(L_Thru8, Cdr_Ret),
+%           reverse1(Cdr_Ret, Reverse1_Ret),
+%           sym_arg_val_env(l, L_In5, L_Thru12, Env),
+%           car(L_Thru12, Car_Ret),
+%           cons(Car_Ret, [], Cons_Ret),
+%           append(Reverse1_Ret, Cons_Ret, Append_Ret),
+%           RET=Append_Ret
+%       ).
+% reverse1(L_In5, RET) :-
+%       ( <<==(reverse1(l), if(null(l), l, append(reverse1(cdr(l)), cons(car(l), nil))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_compiler.pl:453
+% filter==lambda([f,s],if('emptyStream?'(s),s,if(f(head(s)),consStream(head(s),filter(f,tail(s))),filter(f,tail(s)))))
+% filter1(_1940,_1584,_1502):-!,_1552=[[bv(f,[_1940|_1812]),bv(s,[_1584|_1488])]],sym_arg_val_env(s,_1584,_1512,_1552),'emptyStream?'(_1512,_2148),(_2148\=[]->sym_arg_val_env(s,_1584,_1612,_1552),_1502=_1612;sym_arg_val_env(s,_1584,_1658,_1552),head(_1658,_1624),f(_1624,_2120),(_2120\=[]->sym_arg_val_env(s,_1584,_1730,_1552),head(_1730,_1756),sym_arg_val_env(f,_1940,_1770,_1552),sym_arg_val_env(s,_1584,_1870,_1552),tail(_1870,_1824),filter1(_1770,_1824,_1768),consStream(_1756,_1768,_1908),_2132=_1908;sym_arg_val_env(f,_1940,_1966,_1552),sym_arg_val_env(s,_1584,_2038,_1552),tail(_2038,_2066),filter1(_1966,_2066,_2094),_2132=_2094),_1502=_2132)
+% filter1(_1940,_1584,_1502):- <<==(filter1(f,s),if('emptyStream?'(s),s,if(f(head(s)),consStream(head(s),filter1(f,tail(s))),filter1(f,tail(s)))))
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_compiler.pl:461
+% from==lambda([n],consStream(n,from(n+1)))
+% from(_1290,_1454):-!,_1266=[[bv(n,[_1290|_1192])]],sym_arg_val_env(n,_1290,_1220,_1266),sym_arg_val_env(n,_1290,_1318,_1266),+(_1318,1,_1270),from(_1270,_1268),consStream(_1220,_1268,_1454)
+% from(_1248,_1402):- <<==(from(n),consStream(n,from(n+1)))
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_compiler.pl:463
+% nthStream==lambda([s,n],if(n=1,head(s),nthStream(tail(s),n-1)))
+% nthStream(_1546,_1638,_1376):-!,_1432=[[bv(s,[_1546|_1496]),bv(n,[_1638|_1356])]],sym_arg_val_env(n,_1638,_1386,_1432),=(_1386,1,_1724),(_1724\=[]->sym_arg_val_env(s,_1546,_1450,_1432),head(_1450,_1510),_1376=_1510;sym_arg_val_env(s,_1546,_1574,_1432),tail(_1574,_1526),sym_arg_val_env(n,_1638,_1666,_1432),-(_1666,1,_1618),nthStream(_1526,_1618,_1694),_1376=_1694)
+% nthStream(_1512,_1596,_1358):- <<==(nthStream(s,n),if(n=1,head(s),nthStream(tail(s),n-1)))
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_compiler.pl:465
+% integers==from(1).
+% ssip_define(integers, from(1)).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_compiler.pl:469
+% makeCounter==lambda([],begin(counter==0,lambda([],setq(counter,1+counter))))
+% makeCounter(_1494):-!,_1262=[[]],sym_arg_val_env(counter,_1232,_1230,_1262),==(_1230,0,_1228),sym_arg_val_env(counter,_1300,_1328,_1262),+(1,_1328,_1280),symbol_setq(counter,_1280,_1262),lambda([],_1280,_1278),begin(_1228,_1278,_1494)
+% makeCounter(_1466):- <<==(makeCounter,begin(counter==0,lambda([],setq(counter,1+counter))))
+Warning: /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_compiler.pl:165:
+        Singleton variables: [F]
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_library.pl:18
+% <<==(second(l), first(rest(l))).
+% second(L_In, First_Ret) :- !,
+%       Env=[[bv(l, [L_In|__])]],
+%       sym_arg_val_env(l, L_In, L_Thru, Env),
+%       rest(L_Thru, Rest_Ret),
+%       first(Rest_Ret, First_Ret).
+% second(L_In, First_Ret) :-
+%       ( <<==(second(l), first(rest(l)))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_library.pl:21
+% <<==(third(l), first(rest(rest(l)))).
+% third(L_In, First_Ret) :- !,
+%       Env=[[bv(l, [L_In|__])]],
+%       sym_arg_val_env(l, L_In, L_Thru, Env),
+%       rest(L_Thru, Rest_Ret),
+%       rest(Rest_Ret, Rest_Ret5),
+%       first(Rest_Ret5, First_Ret).
+% third(L_In, First_Ret) :-
+%       ( <<==(third(l), first(rest(rest(l))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_library.pl:28
+% <<==(list_1(a), cons(a, nil)).
+% list_1(A_In, Cons_Ret) :- !,
+%       Env=[[bv(a, [A_In|__])]],
+%       sym_arg_val_env(a, A_In, A_Thru, Env),
+%       cons(A_Thru, [], Cons_Ret).
+% list_1(A_In, Cons_Ret) :-
+%       ( <<==(list_1(a), cons(a, nil))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_library.pl:31
+% <<==(list_2(a, b), cons(a, list_1(b))).
+% list_2(A_In, B_In, Cons_Ret) :- !,
+%       Env=[[bv(a, [A_In|__]), bv(b, [B_In|__7])]],
+%       sym_arg_val_env(a, A_In, A_Thru, Env),
+%       sym_arg_val_env(b, B_In, B_Thru, Env),
+%       list_1(B_Thru, List_1_Ret),
+%       cons(A_Thru, List_1_Ret, Cons_Ret).
+% list_2(A_In, B_In, Cons_Ret) :-
+%       ( <<==(list_2(a, b), cons(a, list_1(b)))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_library.pl:34
+% <<==(list_3(a, b, c), cons(a, list_2(b, c))).
+% list_3(A_In, B_In, C_In, Cons_Ret) :- !,
+%       Env=[[bv(a, [A_In|__]), bv(b, [B_In|__8]), bv(c, [C_In|__11])]],
+%       sym_arg_val_env(a, A_In, A_Thru, Env),
+%       sym_arg_val_env(b, B_In, B_Thru, Env),
+%       sym_arg_val_env(c, C_In, C_Thru, Env),
+%       list_2(B_Thru, C_Thru, List_2_Ret),
+%       cons(A_Thru, List_2_Ret, Cons_Ret).
+% list_3(A_In, B_In, C_In, Cons_Ret) :-
+%       ( <<==(list_3(a, b, c), cons(a, list_2(b, c)))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_library.pl:38
+% <<==(lisp_append(l1, l2), if(null(l1), l2, cons(first(l1), lisp_append(rest(l1), l2)))).
+% lisp_append(L1_In9, L2_In15, RET) :- !,
+%       Env=[[bv(l1, [L1_In9|__]), bv(l2, [L2_In15|__8])]],
+%       sym_arg_val_env(l1, L1_In9, L1_Thru, Env),
+%       null(L1_Thru, Null_Ret),
+%       (   Null_Ret\=[]
+%       ->  sym_arg_val_env(l2, L2_In15, L2_Thru, Env),
+%           RET=L2_Thru
+%       ;   sym_arg_val_env(l1, L1_In9, L1_Thru10, Env),
+%           first(L1_Thru10, First_Ret),
+%           sym_arg_val_env(l1, L1_In9, L1_Thru13, Env),
+%           rest(L1_Thru13, Rest_Ret),
+%           sym_arg_val_env(l2, L2_In15, L2_Thru16, Env),
+%           lisp_append(Rest_Ret, L2_Thru16, Lisp_append_Ret),
+%           cons(First_Ret, Lisp_append_Ret, Cons_Ret),
+%           RET=Cons_Ret
+%       ).
+% lisp_append(L1_In9, L2_In15, RET) :-
+%       ( <<==(lisp_append(l1, l2), if(null(l1), l2, cons(first(l1), lisp_append(rest(l1), l2))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_library.pl:46
+% <<==(mapcar(func, l), if(null(l), nil, cons(lisp_apply(func, list_1(first(l))), mapcar(func, rest(l))))).
+% mapcar(Func_In14, L_In9, RET) :- !,
+%       Env=[[bv(func, [Func_In14|__8]), bv(l, [L_In9|__])]],
+%       sym_arg_val_env(l, L_In9, L_Thru, Env),
+%       null(L_Thru, Null_Ret),
+%       (   Null_Ret\=[]
+%       ->  RET=[]
+%       ;   sym_arg_val_env(func, Func_In14, Func_Thru, Env),
+%           sym_arg_val_env(l, L_In9, L_Thru10, Env),
+%           first(L_Thru10, First_Ret),
+%           list_1(First_Ret, List_1_Ret),
+%           lisp_apply(Func_Thru, List_1_Ret, Lisp_apply_Ret),
+%           sym_arg_val_env(func, Func_In14, Func_Thru15, Env),
+%           sym_arg_val_env(l, L_In9, L_Thru18, Env),
+%           rest(L_Thru18, Rest_Ret),
+%           mapcar(Func_Thru15, Rest_Ret, Mapcar_Ret),
+%           cons(Lisp_apply_Ret, Mapcar_Ret, Cons_Ret),
+%           RET=Cons_Ret
+%       ).
+% mapcar(Func_In14, L_In9, RET) :-
+%       ( <<==(mapcar(func, l), if(null(l), nil, cons(lisp_apply(func, list_1(first(l))), mapcar(func, rest(l)))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/streams.pl:19
+% <<==(stream_first(stream), first(stream)).
+% stream_first(Stream_In, First_Ret) :- !,
+%       Env=[[bv(stream, [Stream_In|__])]],
+%       sym_arg_val_env(stream, Stream_In, Stream_Thru, Env),
+%       first(Stream_Thru, First_Ret).
+% stream_first(Stream_In, First_Ret) :-
+%       ( <<==(stream_first(stream), first(stream))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/streams.pl:22
+% <<==(stream_rest(stream), lisp_apply(second(stream), [])).
+% stream_rest(Stream_In, Lisp_apply_Ret) :- !,
+%       Env=[[bv(stream, [Stream_In|__])]],
+%       sym_arg_val_env(stream, Stream_In, Stream_Thru, Env),
+%       second(Stream_Thru, Second_Ret),
+%       lisp_apply(Second_Ret, [], Lisp_apply_Ret).
+% stream_rest(Stream_In, Lisp_apply_Ret) :-
+%       ( <<==(stream_rest(stream), lisp_apply(second(stream), []))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/streams.pl:25
+% <<==(stream_cons(a, b), list_2(a, b)).
+% stream_cons(A_In, B_In, List_2_Ret) :- !,
+%       Env=[[bv(a, [A_In|__]), bv(b, [B_In|__7])]],
+%       sym_arg_val_env(a, A_In, A_Thru, Env),
+%       sym_arg_val_env(b, B_In, B_Thru, Env),
+%       list_2(A_Thru, B_Thru, List_2_Ret).
+% stream_cons(A_In, B_In, List_2_Ret) :-
+%       ( <<==(stream_cons(a, b), list_2(a, b))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/streams.pl:28
+% <<==(stream_null(stream), null(stream)).
+% stream_null(Stream_In, Null_Ret) :- !,
+%       Env=[[bv(stream, [Stream_In|__])]],
+%       sym_arg_val_env(stream, Stream_In, Stream_Thru, Env),
+%       null(Stream_Thru, Null_Ret).
+% stream_null(Stream_In, Null_Ret) :-
+%       ( <<==(stream_null(stream), null(stream))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/streams.pl:33
+% <<==(stream_take(n, stream), if(or(equalp(n, 0), stream_null(stream)), [], cons(stream_first(stream), stream_take(minus(n, 1), stream_rest(stream))))).
+% stream_take(N_In15, Stream_In11, RET) :- !,
+%       Env=[[bv(n, [N_In15|__]), bv(stream, [Stream_In11|__8])]],
+%       sym_arg_val_env(n, N_In15, N_Thru, Env),
+%       equalp(N_Thru, 0, Equalp_Ret),
+%       sym_arg_val_env(stream, Stream_In11, Stream_Thru, Env),
+%       stream_null(Stream_Thru, Stream_null_Ret),
+%       or(Equalp_Ret, Stream_null_Ret, Or_Ret),
+%       (   Or_Ret\=[]
+%       ->  RET=[]
+%       ;   sym_arg_val_env(stream, Stream_In11, Stream_Thru12, Env),
+%           stream_first(Stream_Thru12, Stream_first_Ret),
+%           sym_arg_val_env(n, N_In15, N_Thru16, Env),
+%           minus(N_Thru16, 1, Minus_Ret),
+%           sym_arg_val_env(stream, Stream_In11, Stream_Thru19, Env),
+%           stream_rest(Stream_Thru19, Stream_rest_Ret),
+%           stream_take(Minus_Ret, Stream_rest_Ret, Stream_take_Ret),
+%           cons(Stream_first_Ret, Stream_take_Ret, Cons_Ret),
+%           RET=Cons_Ret
+%       ).
+% stream_take(N_In15, Stream_In11, RET) :-
+%       ( <<==(stream_take(n, stream), if(or(equalp(n, 0), stream_null(stream)), [], cons(stream_first(stream), stream_take(minus(n, 1), stream_rest(stream)))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/streams.pl:40
+% <<==(stream_drop(n, stream), if(or(equalp(n, 0), stream_null(stream)), stream, stream_drop(minus(n, 1), stream_rest(stream)))).
+% stream_drop(N_In14, Stream_In11, RET) :- !,
+%       Env=[[bv(n, [N_In14|__]), bv(stream, [Stream_In11|__8])]],
+%       sym_arg_val_env(n, N_In14, N_Thru, Env),
+%       equalp(N_Thru, 0, Equalp_Ret),
+%       sym_arg_val_env(stream, Stream_In11, Stream_Thru, Env),
+%       stream_null(Stream_Thru, Stream_null_Ret),
+%       or(Equalp_Ret, Stream_null_Ret, Or_Ret),
+%       (   Or_Ret\=[]
+%       ->  sym_arg_val_env(stream, Stream_In11, Stream_Thru12, Env),
+%           RET=Stream_Thru12
+%       ;   sym_arg_val_env(n, N_In14, N_Thru15, Env),
+%           minus(N_Thru15, 1, Minus_Ret),
+%           sym_arg_val_env(stream, Stream_In11, Stream_Thru18, Env),
+%           stream_rest(Stream_Thru18, Stream_rest_Ret),
+%           stream_drop(Minus_Ret, Stream_rest_Ret, Stream_drop_Ret),
+%           RET=Stream_drop_Ret
+%       ).
+% stream_drop(N_In14, Stream_In11, RET) :-
+%       ( <<==(stream_drop(n, stream), if(or(equalp(n, 0), stream_null(stream)), stream, stream_drop(minus(n, 1), stream_rest(stream))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/streams.pl:47
+% <<==(stream_interval(low, high), if(equalp(low, high), [], stream_cons(low, function(lambda([], stream_interval(plus(low, 1), high)))))).
+% stream_interval(Low_In9, High_In14, RET) :- !,
+%       Env=[[bv(low, [Low_In9|__]), bv(high, [High_In14|__7])]],
+%       sym_arg_val_env(low, Low_In9, Low_Thru, Env),
+%       sym_arg_val_env(high, High_In14, High_Thru, Env),
+%       equalp(Low_Thru, High_Thru, Equalp_Ret),
+%       (   Equalp_Ret\=[]
+%       ->  RET=[]
+%       ;   sym_arg_val_env(low, Low_In9, Low_Thru10, Env),
+%           stream_cons(Low_Thru10,
+%                       closure([],
+%                               [LEnv, Stream_interval_Ret]^(sym_arg_val_env(low, Low_In9, Low_Thru12, LEnv), plus(Low_Thru12, 1, Plus_Ret), sym_arg_val_env(high, High_In14, High_Thru15, LEnv), stream_interval(Plus_Ret, High_Thru15, Stream_interval_Ret)),
+%                               Env),
+%                       Stream_cons_Ret),
+%           RET=Stream_cons_Ret
+%       ).
+% stream_interval(Low_In9, High_In14, RET) :-
+%       ( <<==(stream_interval(low, high), if(equalp(low, high), [], stream_cons(low, function(lambda([], stream_interval(plus(low, 1), high))))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/streams.pl:54
+% <<==(stream_ints_from(n), stream_cons(n, function(lambda([], stream_ints_from(plus(n, 1)))))).
+% stream_ints_from(N_In4, Stream_cons_Ret) :- !,
+%       Env=[[bv(n, [N_In4|__])]],
+%       sym_arg_val_env(n, N_In4, N_Thru, Env),
+%       stream_cons(N_Thru,
+%                   closure([],
+%                           [LEnv, Stream_ints_from_Ret]^(sym_arg_val_env(n, N_In4, N_Thru5, LEnv), plus(N_Thru5, 1, Plus_Ret), stream_ints_from(Plus_Ret, Stream_ints_from_Ret)),
+%                           Env),
+%                   Stream_cons_Ret).
+% stream_ints_from(N_In4, Stream_cons_Ret) :-
+%       ( <<==(stream_ints_from(n), stream_cons(n, function(lambda([], stream_ints_from(plus(n, 1))))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/streams.pl:59
+% <<==(t1, stream_take(3, stream_interval(1, 5))).
+% t1(Stream_take_Ret) :- !,
+%       Env=[[]],
+%       stream_interval(1, 5, Stream_interval_Ret),
+%       stream_take(3, Stream_interval_Ret, Stream_take_Ret).
+% t1(Stream_take_Ret) :-
+%       ( <<==(t1, stream_take(3, stream_interval(1, 5)))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/streams.pl:62
+% <<==(t2, stream_take(5, stream_drop(10, stream_ints_from(1)))).
+% t2(Stream_take_Ret) :- !,
+%       Env=[[]],
+%       stream_ints_from(1, Stream_ints_from_Ret),
+%       stream_drop(10, Stream_ints_from_Ret, Stream_drop_Ret),
+%       stream_take(5, Stream_drop_Ret, Stream_take_Ret).
+% t2(Stream_take_Ret) :-
+%       ( <<==(t2, stream_take(5, stream_drop(10, stream_ints_from(1))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:17
+% <<==(simple(x), x).
+% simple(X_In, X_Thru) :- !,
+%       Env=[[bv(x, [X_In|__])]],
+%       sym_arg_val_env(x, X_In, X_Thru, Env).
+% simple(X_In, X_Thru) :-
+%       ( <<==(simple(x), x)
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:20
+% <<==(lisp_append_2(l1, l2), cond([[null(l1), l2], [t, cons(first(l1), lisp_append_2(rest(l1), l2))]])).
+% lisp_append_2(L1_In9, L2_In15, RET) :- !,
+%       Env=[[bv(l1, [L1_In9|__]), bv(l2, [L2_In15|__8])]],
+%       sym_arg_val_env(l1, L1_In9, L1_Thru, Env),
+%       null(L1_Thru, Null_Ret),
+%       (   Null_Ret\=[]
+%       ->  sym_arg_val_env(l2, L2_In15, L2_Thru, Env),
+%           RET=L2_Thru
+%       ;   (   t\=[]
+%           ->  sym_arg_val_env(l1, L1_In9, L1_Thru10, Env),
+%               first(L1_Thru10, First_Ret),
+%               sym_arg_val_env(l1, L1_In9, L1_Thru13, Env),
+%               rest(L1_Thru13, Rest_Ret),
+%               sym_arg_val_env(l2, L2_In15, L2_Thru16, Env),
+%               lisp_append_2(Rest_Ret, L2_Thru16, Lisp_append_2_Ret),
+%               cons(First_Ret, Lisp_append_2_Ret, Cons_Ret),
+%               _3056=Cons_Ret
+%           ;   _3056=[]
+%           ),
+%           RET=_3056
+%       ).
+% lisp_append_2(L1_In9, L2_In15, RET) :-
+%       ( <<==(lisp_append_2(l1, l2), cond([[null(l1), l2], [t, cons(first(l1), lisp_append_2(rest(l1), l2))]]))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:27
+% <<==(lisp_error(x), setq(y, 5)).
+% lisp_error(X, 5) :- !,
+%       Env=[[bv(x, [X|_1172])]],
+%       symbol_setq(y, 5, Env).
+% lisp_error(X, 5) :-
+%       ( <<==(lisp_error(x), setq(y, 5))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:30
+% <<==(lisp_let(), let([bind(x, 3), bind(y, 5)], progn(x, y))).
+% lisp_let(Progn_Ret) :- !,
+%       Env=[[]],
+%       LETENV=[[bv(x, [3|_7594]), bv(y, [5|_7674])]|Env],
+%       sym_arg_val_env(x, X_In, X_Thru, LETENV),
+%       sym_arg_val_env(y, Y_In, Y_Thru, LETENV),
+%       progn(X_Thru, Y_Thru, Progn_Ret).
+% lisp_let(Progn_Ret) :-
+%       ( <<==(lisp_let(), let([bind(x, 3), bind(y, 5)], progn(x, y)))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:34
+% <<==(lisp_let1(),let([bind(x,3),bind(y,5)],x,y))
+% lisp_let1(_3514):-!,_1324=[[]],sym_arg_val_env(x,_1288,_1284,_1324),bind(_1284,3,_1270),sym_arg_val_env(y,_1542,_1538,_1324),bind(_1538,5,_1658),'[|]'(_1658,[],_1510),'[|]'(_1270,_1510,_1970),sym_arg_val_env(x,_2324,_2352,_1324),sym_arg_val_env(y,_2448,_2476,_1324),let(_1970,_2352,_2476,_3514)
+% lisp_let1(_3514):- <<==(lisp_let1(),let([bind(x,3),bind(y,5)],x,y))
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:41
+% <<==(mapfirst(l), mapcar(function(first), l)).
+% mapfirst(L_In, Mapcar_Ret) :- !,
+%       Env=[[bv(l, [L_In|__])]],
+%       sym_arg_val_env(l, L_In, L_Thru, Env),
+%       mapcar(function(first), L_Thru, Mapcar_Ret).
+% mapfirst(L_In, Mapcar_Ret) :-
+%       ( <<==(mapfirst(l), mapcar(function(first), l))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:45
+% <<==(defvar(fred, 13)).
+% :- (   special_var(fred, _5584)
+%    ->  true
+%    ;   assert(special_var(fred, 13))
+%    ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:47
+% <<==(defvar(george)).
+% :- (   special_var(george, _13626)
+%    ->  true
+%    ;   assert(special_var(george, []))
+%    ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:50
+% <<==(reset_george(val), setq(george, val)).
+% reset_george(Val_In, Val_Thru) :- !,
+%       Env=[[bv(val, [Val_In|__])]],
+%       sym_arg_val_env(val, Val_In, Val_Thru, Env),
+%       symbol_setq(george, Val_Thru, Env).
+% reset_george(Val_In, Val_Thru) :-
+%       ( <<==(reset_george(val), setq(george, val))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:54
+% <<==(make_adder(x), function(lambda([y], plus(x, y)))).
+% make_adder(X_In, closure([y], [LEnv, Plus_Ret]^(sym_arg_val_env(x, X_In, X_Thru, LEnv), sym_arg_val_env(y, Y_In, Y_Thru, LEnv), plus(X_Thru, Y_Thru, Plus_Ret)), Env)) :- !,
+%       Env=[[bv(x, [X_In|__])]],
+%       true.
+% make_adder(X_In, closure([y], [LEnv, Plus_Ret]^(sym_arg_val_env(x, X_In, X_Thru, LEnv), sym_arg_val_env(y, Y_In, Y_Thru, LEnv), plus(X_Thru, Y_Thru, Plus_Ret)), Env)) :-
+%       ( <<==(make_adder(x), function(lambda([y], plus(x, y))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:58
+% <<==(scale_list(xs, scale), let([bind(fred, function(lambda([num], times(scale, num))))], mapcar(fred, xs))).
+% scale_list(Xs_In, Scale_In, Mapcar_Ret) :- !,
+%       Env=[[bv(xs, [Xs_In|__17]), bv(scale, [Scale_In|__])]],
+%       LETENV=[[bv(fred, [closure([num], [LEnv, Times_Ret]^(sym_arg_val_env(scale, Scale_In, Scale_Thru, LEnv), sym_arg_val_env(num, Num_In, Num_Thru, LEnv), times(Scale_Thru, Num_Thru, Times_Ret)), Env)|_2120])]|Env],
+%       sym_arg_val_env(fred, Fred_In, Fred_Thru, LETENV),
+%       sym_arg_val_env(xs, Xs_In, Xs_Thru, LETENV),
+%       mapcar(Fred_Thru, Xs_Thru, Mapcar_Ret).
+% scale_list(Xs_In, Scale_In, Mapcar_Ret) :-
+%       ( <<==(scale_list(xs, scale), let([bind(fred, function(lambda([num], times(scale, num))))], mapcar(fred, xs)))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:62
+% <<==(make_summer(total), function(lambda([n], setq(total, plus(total, n))))).
+% make_summer(Total_In, closure([n], [LEnv, Plus_Ret]^(sym_arg_val_env(total, Total_In, Total_Thru, LEnv), sym_arg_val_env(n, N_In, N_Thru, LEnv), plus(Total_Thru, N_Thru, Plus_Ret), symbol_setq(total, Plus_Ret, LEnv)), Env)) :- !,
+%       Env=[[bv(total, [Total_In|__])]],
+%       true.
+% make_summer(Total_In, closure([n], [LEnv, Plus_Ret]^(sym_arg_val_env(total, Total_In, Total_Thru, LEnv), sym_arg_val_env(n, N_In, N_Thru, LEnv), plus(Total_Thru, N_Thru, Plus_Ret), symbol_setq(total, Plus_Ret, LEnv)), Env)) :-
+%       ( <<==(make_summer(total), function(lambda([n], setq(total, plus(total, n)))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:67
+% <<==(sum_with_map(xs),let([bind(running_total,0)],let([bind(summer,function(lambda([n],setq(running_total,plus(running_total,n)))))],mapcar(summer,xs),running_total)))
+% sum_with_map(_1470,_7272):-!,_1626=[[bv(xs,[_1470|_1492])]],_1574=[[bv(running_total,[0|_1572])]|_1626],sym_arg_val_env(summer,_1676,_1672,_1574),bind(_1672,closure([n],[_1820,_2550]^(sym_arg_val_env(running_total,_1784,_1780,_1820),sym_arg_val_env(n,_1880,_1876,_1820),plus(_1780,_1876,_2550),symbol_setq(running_total,_2550,_1820)),_1574),_1658),'[|]'(_1658,[],_1644),sym_arg_val_env(summer,_3572,_3600,_1574),sym_arg_val_env(xs,_1470,_3676,_1574),mapcar(_3600,_3676,_3538),sym_arg_val_env(running_total,_3980,_4008,_1574),let(_1644,_3538,_4008,_7272)
+% sum_with_map(_1470,_7272):- <<==(sum_with_map(xs),let([bind(running_total,0)],let([bind(summer,function(lambda([n],setq(running_total,plus(running_total,n)))))],mapcar(summer,xs),running_total)))
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_compiler.pl:425
+% fact==lambda([n],if(n=0,1,n*fact(sub1(n))))
+% fact(_1164,_1074):-!,_1128=[[bv(n,[_1164|_1054])]],sym_arg_val_env(n,_1164,_1082,_1128),=(_1082,0,_1334),(_1334\=[]->_1074=1;sym_arg_val_env(n,_1164,_1192,_1128),sym_arg_val_env(n,_1164,_1256,_1128),sub1(_1256,_1208),fact(_1208,_1206),*(_1192,_1206,_1304),_1074=_1304)
+% fact(_1140,_1058):- <<==(fact(n),if(n=0,1,n*fact(sub1(n))))
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_compiler.pl:427
+% add1==lambda([n],n+1)
+% add1(_4294,_6490):-!,_4920=[[bv(n,[_4294|_4402])]],sym_arg_val_env(n,_4294,_4566,_4920),+(_4566,1,_6490)
+% add1(_876,_1028):- <<==(add1(n),n+1)
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_compiler.pl:429
+% sub1==lambda([n],n-1)
+% sub1(_868,_1020):-!,_966=[[bv(n,[_868|_892])]],sym_arg_val_env(n,_868,_920,_966),-(_920,1,_1020)
+% sub1(_868,_1020):- <<==(sub1(n),n-1)
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_compiler.pl:433
+% mapcar==lambda([f, l], if(null(l), nil, cons(f(car(l)), mapcar(f, cdr(l))))).
+% mapcar2(F_In, L_In6, RET) :- !,
+%       Env=[[bv(f, [F_In|__12]), bv(l, [L_In6|__])]],
+%       sym_arg_val_env(l, L_In6, L_Thru, Env),
+%       null(L_Thru, Null_Ret),
+%       (   Null_Ret\=[]
+%       ->  RET=[]
+%       ;   sym_arg_val_env(l, L_In6, L_Thru7, Env),
+%           car(L_Thru7, Car_Ret),
+%           f(Car_Ret, F_Ret),
+%           sym_arg_val_env(f, F_In, F_Thru, Env),
+%           sym_arg_val_env(l, L_In6, L_Thru14, Env),
+%           cdr(L_Thru14, Cdr_Ret),
+%           mapcar2(F_Thru, Cdr_Ret, Mapcar2_Ret),
+%           cons(F_Ret, Mapcar2_Ret, Cons_Ret),
+%           RET=Cons_Ret
+%       ).
+% mapcar2(F_In, L_In6, RET) :-
+%       ( <<==(mapcar2(f, l), if(null(l), nil, cons(f(car(l)), mapcar2(f, cdr(l)))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_compiler.pl:441
+% length==lambda([l], if(null(l), 0, add1(length(cdr(l))))).
+% length2(L_In5, RET) :- !,
+%       Env=[[bv(l, [L_In5|__])]],
+%       sym_arg_val_env(l, L_In5, L_Thru, Env),
+%       null(L_Thru, Null_Ret),
+%       (   Null_Ret\=[]
+%       ->  RET=0
+%       ;   sym_arg_val_env(l, L_In5, L_Thru6, Env),
+%           cdr(L_Thru6, Cdr_Ret),
+%           length2(Cdr_Ret, Length2_Ret),
+%           add1(Length2_Ret, Add1_Ret),
+%           RET=Add1_Ret
+%       ).
+% length2(L_In5, RET) :-
+%       ( <<==(length2(l), if(null(l), 0, add1(length2(cdr(l)))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_compiler.pl:443
+% append==lambda([l1, l2], if(null(l1), l2, cons(car(l1), append(cdr(l1), l2)))).
+% append2(L1_In9, L2_In15, RET) :- !,
+%       Env=[[bv(l1, [L1_In9|__]), bv(l2, [L2_In15|__8])]],
+%       sym_arg_val_env(l1, L1_In9, L1_Thru, Env),
+%       null(L1_Thru, Null_Ret),
+%       (   Null_Ret\=[]
+%       ->  sym_arg_val_env(l2, L2_In15, L2_Thru, Env),
+%           RET=L2_Thru
+%       ;   sym_arg_val_env(l1, L1_In9, L1_Thru10, Env),
+%           car(L1_Thru10, Car_Ret),
+%           sym_arg_val_env(l1, L1_In9, L1_Thru13, Env),
+%           cdr(L1_Thru13, Cdr_Ret),
+%           sym_arg_val_env(l2, L2_In15, L2_Thru16, Env),
+%           append2(Cdr_Ret, L2_Thru16, Append2_Ret),
+%           cons(Car_Ret, Append2_Ret, Cons_Ret),
+%           RET=Cons_Ret
+%       ).
+% append2(L1_In9, L2_In15, RET) :-
+%       ( <<==(append2(l1, l2), if(null(l1), l2, cons(car(l1), append2(cdr(l1), l2))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_compiler.pl:445
+% reverse==lambda([l], if(null(l), l, append(reverse(cdr(l)), cons(car(l), nil)))).
+% reverse2(L_In5, RET) :- !,
+%       Env=[[bv(l, [L_In5|__])]],
+%       sym_arg_val_env(l, L_In5, L_Thru, Env),
+%       null(L_Thru, Null_Ret),
+%       (   Null_Ret\=[]
+%       ->  sym_arg_val_env(l, L_In5, L_Thru6, Env),
+%           RET=L_Thru6
+%       ;   sym_arg_val_env(l, L_In5, L_Thru8, Env),
+%           cdr(L_Thru8, Cdr_Ret),
+%           reverse2(Cdr_Ret, Reverse2_Ret),
+%           sym_arg_val_env(l, L_In5, L_Thru12, Env),
+%           car(L_Thru12, Car_Ret),
+%           cons(Car_Ret, [], Cons_Ret),
+%           append(Reverse2_Ret, Cons_Ret, Append_Ret),
+%           RET=Append_Ret
+%       ).
+% reverse2(L_In5, RET) :-
+%       ( <<==(reverse2(l), if(null(l), l, append(reverse2(cdr(l)), cons(car(l), nil))))
+%       ).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_compiler.pl:453
+% filter==lambda([f,s],if('emptyStream?'(s),s,if(f(head(s)),consStream(head(s),filter(f,tail(s))),filter(f,tail(s)))))
+% filter2(_1738,_1382,_1300):-!,_1350=[[bv(f,[_1738|_1610]),bv(s,[_1382|_1286])]],sym_arg_val_env(s,_1382,_1310,_1350),'emptyStream?'(_1310,_1946),(_1946\=[]->sym_arg_val_env(s,_1382,_1410,_1350),_1300=_1410;sym_arg_val_env(s,_1382,_1456,_1350),head(_1456,_1422),f(_1422,_1918),(_1918\=[]->sym_arg_val_env(s,_1382,_1528,_1350),head(_1528,_1554),sym_arg_val_env(f,_1738,_1568,_1350),sym_arg_val_env(s,_1382,_1668,_1350),tail(_1668,_1622),filter2(_1568,_1622,_1566),consStream(_1554,_1566,_1706),_1930=_1706;sym_arg_val_env(f,_1738,_1764,_1350),sym_arg_val_env(s,_1382,_1836,_1350),tail(_1836,_1864),filter2(_1764,_1864,_1892),_1930=_1892),_1300=_1930)
+% filter2(_1738,_1382,_1300):- <<==(filter2(f,s),if('emptyStream?'(s),s,if(f(head(s)),consStream(head(s),filter2(f,tail(s))),filter2(f,tail(s)))))
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_compiler.pl:461
+% from==lambda([n],consStream(n,from(n+1)))
+% from(_1088,_1252):-!,_1064=[[bv(n,[_1088|_990])]],sym_arg_val_env(n,_1088,_1018,_1064),sym_arg_val_env(n,_1088,_1116,_1064),+(_1116,1,_1068),from(_1068,_1066),consStream(_1018,_1066,_1252)
+% from(_1046,_1200):- <<==(from(n),consStream(n,from(n+1)))
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_compiler.pl:463
+% nthStream==lambda([s,n],if(n=1,head(s),nthStream(tail(s),n-1)))
+% nthStream(_1344,_1436,_1174):-!,_1230=[[bv(s,[_1344|_1294]),bv(n,[_1436|_1154])]],sym_arg_val_env(n,_1436,_1184,_1230),=(_1184,1,_1522),(_1522\=[]->sym_arg_val_env(s,_1344,_1248,_1230),head(_1248,_1308),_1174=_1308;sym_arg_val_env(s,_1344,_1372,_1230),tail(_1372,_1324),sym_arg_val_env(n,_1436,_1464,_1230),-(_1464,1,_1416),nthStream(_1324,_1416,_1492),_1174=_1492)
+% nthStream(_1310,_1394,_1156):- <<==(nthStream(s,n),if(n=1,head(s),nthStream(tail(s),n-1)))
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_compiler.pl:465
+% integers==from(1).
+% ssip_define(integers, from(1)).
+
+
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_compiler.pl:469
+% makeCounter==lambda([],begin(counter==0,lambda([],setq(counter,1+counter))))
+% makeCounter(_1292):-!,_1060=[[]],sym_arg_val_env(counter,_1030,_1028,_1060),==(_1028,0,_1026),sym_arg_val_env(counter,_1098,_1126,_1060),+(1,_1126,_1078),symbol_setq(counter,_1078,_1060),lambda([],_1078,_1076),begin(_1026,_1076,_1292)
+% makeCounter(_1264):- <<==(makeCounter,begin(counter==0,lambda([],setq(counter,1+counter))))
+Welcome to SWI-Prolog (threaded, 64 bits, version 7.3.13-2174-gd865daf-DIRTY)
+SWI-Prolog comes with ABSOLUTELY NO WARRANTY. This is free software.
+Please run ?- license. for legal details.
+
+For online help and background, visit http://www.swi-prolog.org
+For built-in help, use ?- help(Topic). or ?- apropos(Word).
+
+?-
+
