@@ -97,6 +97,16 @@ read_and_parse(Expr):- current_input(In),parse_sexpr_untyped(In, Expr).
 :- ensure_loaded(library(logicmoo_util_terms)).
 :- ensure_loaded(library(logicmoo_util_common)).
 
+:- dynamic(tst:is_local_test/1).
+:- multifile(tst:is_local_test/1).
+:- discontiguous(tst:is_local_test/1).
+:- dynamic(tst:is_local_test/2).
+:- multifile(tst:is_local_test/2).
+:- discontiguous(tst:is_local_test/2).
+:- dynamic(tst:is_local_test/3).
+:- multifile(tst:is_local_test/3).
+:- discontiguous(tst:is_local_test/3).
+
 
 % :- ensure_loaded(builtin_lisp_functions). % Lisp primitives: this directives is at the end of the file
 % :- ensure_loaded(lisp_library).	% Functions defined in lisp: this directive is at the end of the file
@@ -473,7 +483,7 @@ compile_body(Ctx,Env,Result,[Defvar, Var], Body):- is_def_nil(Defvar),!,
 compile_body(Ctx,Env,Result,[Getf, Atom| ValuesForms], Body):- is_place_op(Getf),     
 	must_maplist(expand_ctx_env_forms(Ctx,Env),ValuesForms, ValuesBody,ResultVs),
         list_to_conjuncts(ValuesBody,BodyS),
-        Body = (BodyS, place_op(Getf, Atom, ResultVs,Result, Env)).
+        Body = (BodyS, place_op(Getf, Atom, ResultVs,Env,Result)).
 
 compile_body(Ctx,Env,Result,[SetQ, Atom, ValueForm], Body):- is_symbol_setter(SetQ),
        % (EnvIn\==[]-> true ; break),
@@ -483,6 +493,74 @@ compile_body(Ctx,Env,Result,[SetQ, Atom, ValueForm], Body):- is_symbol_setter(Se
         ((op_return_type(SetQ,RT),RT=name) ->  =(Atom,Result) ; =(ResultV,Result)).
 
 
+
+
+
+
+
+initState:attr_unify_hook(_,_).
+
+
+symbol_value(Var,Env,Value):-
+  symbol_value_or(Var,Env,
+    last_chance_symbol_value(Var,Env,Value),Value).
+
+last_chance_symbol_value(Var,_Env,Result):- nb_current(Var,Result),!.
+last_chance_symbol_value(Var,_Env,_Result):- 
+  lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Var).
+
+symbol_value_or(Var,Env,G,Value):-
+ (env_memb(Bindings, Env),bvof(bv(Var, Value0),Bindings))-> extract_variable_value(Value0, Value, _);
+   (special_var(Var, Value) -> true;  G).
+
+
+set_symbol_value(Var,Env,Result):-var(Result),!,symbol_value(Var,Env,Result).
+set_symbol_value(Var,Env,Result):- !,
+     ((	env_memb(Bindings, Env),
+                bvof(bv(Var, Value0),Bindings)
+      ->	nb_setarg(1,Value0,Result)
+      ;	special_var(Var, Old)
+      ->	once(retract(special_var(Var, Old))),
+                asserta(special_var(Var, Result))
+      ;         last_chance_set_symbol_value(Var,Env,Result))).
+set_symbol_value(Var,Env,Result):- 
+      (	env_memb(Bindings, Env),
+                bvof(bv(Var, Value0),Bindings)
+      ->	extract_variable_value(Value0, _, Hole),
+                Hole = [Result|_]
+      ;	special_var(Var, Old)
+      ->	once(retract(special_var(Var, Old))),
+                asserta(special_var(Var, Result))
+      ;         last_chance_set_symbol_value(Var,Env,Result)).
+last_chance_set_symbol_value(Var,_Env,Result):- nb_setval(Var,Result),!.
+last_chance_set_symbol_value(Var,_Env,_Result):- 
+  lisp_error_description(atom_does_not_exist, ErrNo, _),throw(ErrNo, Var).
+
+
+sym_arg_val_env(Var,InValue,Value,Env):-
+  set_symbol_value(Var,Env,InValue),
+  Value=InValue,!.
+
+sym_arg_val_env(Var,InValue,Value,Env):- !,
+  symbol_value_or(Var,Env,(nonvar(InValue),InValue=Value),Value)-> true;
+    lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Var).
+
+place_op(incf, Var, [Value], Env, Result):- atom(Var),!,
+  symbol_value(Var, Env , Old),
+  Result is Old+Value,
+  set_symbol_value(Var, Env , Result).
+place_op(decf, Var, [Value], Env, Result):- atom(Var),!,
+  symbol_value(Var, Env , Old),
+  Result is Old-Value,
+  set_symbol_value(Var, Env , Result).
+place_op(setf, Var, [Result], Env, Result):- atom(Var),!,
+  set_symbol_value(Var, Env , Result).
+
+%TODO Make it a constantp
+symbol_setter(defconstant, Var, Result, _Environment):-
+   ( special_var(Var, _) -> once(retract(special_var(Var, _))); true),
+   asserta(special_var(Var, Result)).
+
 symbol_setter(defparameter, Var, Result, _Environment):-
    ( special_var(Var, _) -> once(retract(special_var(Var, _))); true),
    asserta(special_var(Var, Result)).
@@ -490,17 +568,10 @@ symbol_setter(defparameter, Var, Result, _Environment):-
 symbol_setter(defvar, Var, Result, _Environment):-
      special_var(Var, _) -> true ; asserta(special_var(Var, Result)).
 
-symbol_setter(setq, Atom, Result, Env):-
-      (	env_memb(Bindings, Env),
-                bvof(bv(Atom, Value0),Bindings)
-      ->	extract_variable_value(Value0, _, Hole),
-                Hole = [Result|_]
-      ;	special_var(Atom, Old)
-      ->	once(retract(special_var(Atom, Old))),
-                asserta(special_var(Atom, Result))
-      ;         (lisp_error_description(atom_does_not_exist, ErrNo, _),throw(ErrNo, Atom))).
-symbol_setter(psetq, Atom, Result, Env):- !,
-  symbol_setter(setq, Atom, Result, Env).
+symbol_setter(setq, Var, Result, Env):- !, set_symbol_value(Var,Env,Result).
+
+symbol_setter(psetq, Var, Result, Env):- !,
+  symbol_setter(setq, Var, Result, Env).
 
 
 is_symbol_setter(OP):- is_pair_op(OP).
@@ -508,8 +579,12 @@ is_symbol_setter(OP):- is_parallel_op(OP).
 is_symbol_setter(OP):- is_def_nil(OP).
 
 op_return_type(Op,name):- is_def_nil(Op).
+op_return_type(defconstant,name).
+
 is_def_nil(defparameter).
 is_def_nil(defvar).
+
+is_def_nil(defconstant).
 
 is_pair_op(setq).
 is_pair_op(psetq).
@@ -539,27 +614,13 @@ set_with_prolog_var(_Cx,Env,SetQ,Atom,Result,symbol_setter(SetQ, Atom, Result, E
 expand_ctx_env_forms(Ctx, Env,Forms,Body, Result):- 
    must_compile_body(Ctx,Env,Result,Forms, Body).
 
-
-
-
-initState:attr_unify_hook(_,_).
-
-sym_arg_val_env(Atom,InValue,Value,Env):-
- (env_memb(Bindings, Env),bvof(bv(Atom, Value0),Bindings))-> extract_variable_value(Value0, Value, _)
-   (special_var(Atom, Value) -> true;
-     InValue=Value).
-      
-sym_arg_val_env(Atom,_InValue,Value,Env):-
-    lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Atom).
-
-
 compile_body(Ctx,Env,Result,Atom, Body):- Atom==mapcar,!, dbmsg(compile_body(Ctx,Env,Result,Atom, Body)), dumpST,break.
 
 compile_body(Ctx,Env,Value, Atom, Body):- atom(Atom),
         find_incoming_value(Ctx,Env,Atom,InValue,Value),
         (get_attr(Value,initState,t);get_attr(InValue,initState,t)),
 	!,
-        Body = symbol_value(Atom,Value,Env).
+        Body = symbol_value(Atom,Env, Value).
 
 compile_body(Ctx,Env,InValue, Atom, Body):- atom(Atom),
         find_incoming_value(Ctx,Env,Atom,InValue,Value),

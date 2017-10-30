@@ -522,10 +522,9 @@ other(Char):-
 % Grammar rules for parsing Lisp s-expressions.
 % Given a list of tokens, lisplist does all the nesting of lists
 
-
+sexpr1(X) --> {is_ftVar(X),(get_var_name(X,N)->sformat(NN,'~w',[N]);sformat(NN,'~w',[X]))},!,[NN].
 sexpr1([function, Expression]) --> [#, ''''], !, sexpr1(Expression).
 sexpr1([quote, Expression]) --> [''''], !, sexpr1(Expression).
-sexpr1(X) --> {is_ftVar(X),get_var_name(X,N)},[',',N].
 sexpr1(['$BQ',X])--> ['`'],sexpr1(X).
 sexpr1('$COMMA'(X)) --> [','],sexpr1(X).
 sexpr1(Xs) --> ['('], lisplist(Xs), !.
@@ -559,6 +558,12 @@ writeTokenL([Token|TokenL]):-
 	atom(Token),
 	!,
 	lwrupr(Token, UCToken),
+	write(UCToken),
+	write(' '),
+	writeTokenL(TokenL).
+writeTokenL([UCToken|TokenL]):-
+	string(UCToken),
+	!,
 	write(UCToken),
 	write(' '),
 	writeTokenL(TokenL).

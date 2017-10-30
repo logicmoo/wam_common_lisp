@@ -95,6 +95,9 @@ extract_variable_value([Val|Vals], FoundVal, Hole):-
 		Hole = Vals
 	;	extract_variable_value(Vals, FoundVal, Hole).
 
+% set_variable_value([Val|Vals], LetValue, Hole):- extract_variable_value([Val|Vals], FoundVal, Hole).
+
+
 
 lisp_call(Function, Result):-
 	apply(Function, [Result]).

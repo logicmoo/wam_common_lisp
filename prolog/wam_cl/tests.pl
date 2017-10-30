@@ -13,6 +13,47 @@
  *******************************************************************/
 
 
+:- dynamic(tst:is_local_test/1).
+:- multifile(tst:is_local_test/1).
+:- discontiguous(tst:is_local_test/1).
+:- dynamic(tst:is_local_test/2).
+:- multifile(tst:is_local_test/2).
+:- discontiguous(tst:is_local_test/2).
+:- dynamic(tst:is_local_test/3).
+:- multifile(tst:is_local_test/3).
+:- discontiguous(tst:is_local_test/3).
+
+
+tst:is_local_test(H):- tst:is_local_test(H,V).
+   
+tst:is_local_test(H,V):-
+  clause(tst:is_local_test(_,H,V),true,_).
+   
+tst:is_local_test(_,H,_):-
+  clause(tst:is_local_test(H),true,_).
+tst:is_local_test(_,H,V):-
+  clause(tst:is_local_test(H,V),true,_).
+
+call_test_compiled(Name,Value):- 
+  must_or_rtrace(compile_test(Name,Code,Return,Expected)),
+  debug_var('Return',Return),
+  debug_var('Expected',Expected),
+  debug_var('OutValue',OutValue),
+  ignore(catch((Code,Return=Value),goto(_,OutValue,_),Value=OutValue)),
+  dmsg(Expected=Value).
+
+  
+
+compile_test(Name,Code,Return,Expected):-
+   tst:is_local_test(Name,SExpression,Expected),
+   as_sexp(SExpression,Expression),
+   dbmsg(lisp_compiled_eval(Expression)),
+   must_or_rtrace(writeExpression(Expression)),
+   lisp_compile(Return,Expression,Code),
+   
+   term_attvars(Code,AttVars),maplist(del_attr_rev2(vn),AttVars).
+
+
 
 simple(x) <<== x.
 
