@@ -120,7 +120,7 @@ Instead simply grab the List''s reference at some numerical points
      Point_B =
       incf(val,08),
       nb_current(var,Value),
-      'return-from'(Value)),
+      'return-from'([],Value,Result)),
     catch(TagBody,'return-from'(_,Value),true).
 
 
@@ -128,10 +128,6 @@ Instead simply grab the List''s reference at some numerical points
 
 :-user:ensure_loaded(lisp_compiler).
 
-'return-from'(G):-throw('return-from'([],G)).
-'return-from'(Label,G):-throw('return-from'(Label,G)).
-call_then_return(G):- G,'return-from'([]).
-setq(Var,X):-Var=X.
 
 call_block_compiled(Name,Value):- 
   must_or_rtrace(compile_btba(Name,Code)),
@@ -158,11 +154,23 @@ shared_lisp_compiler:plugin_expand_function_body(Ctx,Env,Result,InstrS,Code):-
   compile_tagbody_hook(Ctx,Env,Result,InstrS,Code),!.
 
 compile_tagbody_hook(_Ctx,_Env,Result, nop(X),  nop(X)):- !, debug_var("_NopResult",Result).
-compile_tagbody_hook(_Ctx,_Env,Result,[label, Item], push_label(Item) ):- debug_var("_LABELRES",Result).
-compile_tagbody_hook(_Ctx,_Env,Result,[go, Item], goto(Item) ):- debug_var("_GORES",Result).
-compile_tagbody_hook(_Ctx,_Env,Result,go( Item), goto(Item) ):- debug_var("_GORES",Result).
+compile_tagbody_hook(_Ctx,_Env,Result,[label, Tag], push_label(Tag) ):- debug_var("_LABELRES",Result).
+compile_tagbody_hook(_Ctx,_Env,Result,end( Tag), push_label(end( Tag)) ):- debug_var("_GORES",Result).
+compile_tagbody_hook(_Ctx,_Env,Result,begin( Tag), push_label(begin( Tag)) ):- debug_var("_GORES",Result).
 compile_tagbody_hook(Ctx,Env,Result,[tagbody| InstrS], Code):- debug_var("_TBResult",Result),!,
   compile_tagbody(Ctx,Env,Result,InstrS,Code).
+
+% goto(Label,Value,Env)
+compile_tagbody_hook(_Ctx,Env,Result,[go, Tag], goto(Tag,[],Env) ):- debug_var("_GORES",Result),debug_var("GoEnv",Env).
+compile_tagbody_hook(Ctx,Env,GoResult,['return-from',Tag,ValueForm], (ValueBody, goto(exit(Tag),ValueResult,Env)) ):- 
+  compile_body(Ctx,Env,ValueResult,ValueForm, ValueBody),
+  debug_var("_GORES",GoResult),
+  debug_var("RetVal",ValueResult).
+
+compile_tagbody_hook(Ctx,Env,Result,['return',Value],Body):-!,compile_tagbody_hook(Ctx,Env,Result,['return-from',[],Value],Body).
+compile_tagbody_hook(Ctx,Env,Result,return(Value), Body ):- !,compile_tagbody_hook(Ctx,Env,Result,[return, Value],Body).
+compile_tagbody_hook(Ctx,Env,Result,go(Tag), Body ):- !,compile_tagbody_hook(Ctx,Env,Result,[go, Tag],Body).
+
 
 compile_tagbody(Ctx,Env,Result,InstrS,Code):- compile_tagbody_real(Ctx,Env,Result,InstrS,Code),!.
 /*compile_tagbody(Ctx,Env,Result,InstrS,Code):- Tag= tagbody,          &optional
@@ -207,6 +215,7 @@ shared_lisp_compiler:plugin_expand_function_body(Ctx,Env,Result,[do,LoopVars,[En
        ]
      ],  Code).
 
+
  
  loop_vars_to_let_n_step([],[],InOut,InOut).
 loop_vars_to_let_n_step([Decl|LoopVars],[Norm|LetVars],In,Out):-
@@ -227,22 +236,44 @@ compile_tagbody_real(Ctx,Env,Result,InstrS,Code):-
    compile_addrs(Ctx,Env,Result,Addrs),
    compile_tagbody_forms(Ctx,Env,Result,InstrS,CInstrS),
    copy_term(CInstrS,Copy),
-   Code = call_addr_block(Copy,Addrs,Result).
+   Code = call_addr_block(Env,Copy,Addrs,Result).
 
 
-call_addr_block([],'return-from'([]),_Result).
+call_addr_block(EnvIn,Start,Addrs,Result):-
+  catch(Start,
+      goto(Result,Label,Env),
+           (must_or_rtrace(member(addr(Label,_,Where),Addrs)),
+           copy_term(Where,Copy),
+           call_addr_block([Env|EnvIn],Copy,Addrs,Result))).
+
+
+goto(Label,Value,Env):-throw(goto(Label,Value,Env)).
+push_label(_).
+%'return-from'(Label,Result):-throw(goto(Result,exit(Label),Env)).
+%return(G):- 'return-from'([],G).
+call_then_return(G):- G,return([]).
+setq(Var,X):-Var=X.
+=(N1,N2,Result):- t_or_nil(=(N1,N2),Result). 
+
+'1+'(N,R):- R is N + 1.
+'1-'(N,R):- R is N - 1.
+
+t_or_nil(G,Result):- G->Result=t;Result=[].
+
+/*
+call_addr_block(Env,[],'return-from'([]),_Result):-!.
 % #:ATOM or #:LABEL allows rearrangments and address changes
-call_addr_block([(TagInstr)|InstrS],Addrs,Result):- is_label(TagInstr,Label),!,
-   call_addr_block(InstrS,[addr(Label,'$late',InstrS)|Addrs],Result).
+call_addr_block(Env,[(TagInstr)|InstrS],Addrs,Result):- is_label(TagInstr,Label),!,
+   call_addr_block(Env,InstrS,[addr(Label,'$late',InstrS)|Addrs],Result).
 % #:GO 
-call_addr_block([goto(Label)|_],Addrs,Result):-!,
+call_addr_block(Env,[goto(Result,Label)|_],Addrs,Result):-!,
    must_or_rtrace(member(addr(Label,_,Where),Addrs)),
    copy_term(Where,Copy),
-   call_addr_block(Copy,Addrs,Result).
+   call_addr_block(Env,Copy,Addrs,Result).
 % #normal call
-call_addr_block([I|InstrS],Addrs,Result):- call(I),
-  call_addr_block(InstrS,Addrs,Result).
-
+call_addr_block(Env,[I|InstrS],Addrs,Result):- call(I),
+  call_addr_block(Env,InstrS,Addrs,Result).
+*/
 
 is_reflow([OP|ARGS],Label):- is_reflow(OP,ARGS,Label).
 is_reflow(OPARGS,Label):- OPARGS=..[OP|ARGS],is_reflow(OP,ARGS,Label).
@@ -296,7 +327,7 @@ get_tags([_|InstrS],Gos,Addrs):-
 check_missing_gos(_).
 
 % asserta((fifteen(Val_Thru23):-!, []=[[]], LETENV=[[bv(val, [[]|_832])]], 
-%   call_addr_block((symbol_setq(val, 1, _1398), goto('point-a')), [addr('point-c', '$used',  (push_label('point-c'), sym_arg_val_env(val, Val_In, Val_Thru, LETENV), incf(Val_Thru, 4, Incf_Ret), goto('point-b'))), addr('point-a', '$used',  (push_label('point-a'), push_label('point-d-unused'), sym_arg_val_env(val, Val_In12, Val_Thru13, LETENV), incf(Val_Thru13, 2, Incf_Ret14), goto('point-c'))), addr('point-d-unused', '$unused',  (push_label('point-d-unused'), sym_arg_val_env(val, Val_In17, Val_Thru18, LETENV), incf(Val_Thru18, 2, Incf_Ret19), goto('point-c'))), addr('point-b', '$used', ['point-b', [incf, val, 8]])], _GORES15), sym_arg_val_env(val, Val_In22, Val_Thru23, LETENV)))
+%   call_addr_block(Env,(symbol_setq(val, 1, _1398), goto(Result,'point-a')), [addr('point-c', '$used',  (push_label('point-c'), sym_arg_val_env(val, Val_In, Val_Thru, LETENV), incf(Val_Thru, 4, Incf_Ret), goto(Result,'point-b'))), addr('point-a', '$used',  (push_label('point-a'), push_label('point-d-unused'), sym_arg_val_env(val, Val_In12, Val_Thru13, LETENV), incf(Val_Thru13, 2, Incf_Ret14), goto(Result,'point-c'))), addr('point-d-unused', '$unused',  (push_label('point-d-unused'), sym_arg_val_env(val, Val_In17, Val_Thru18, LETENV), incf(Val_Thru18, 2, Incf_Ret19), goto(Result,'point-c'))), addr('point-b', '$used', ['point-b', [incf, val, 8]])], _GORES15), sym_arg_val_env(val, Val_In22, Val_Thru23, LETENV)))
 
 
 compile_addrs(Ctx,Env,Result,[A|Addrs]):-
@@ -337,18 +368,20 @@ loop_cont:-
    call(Cont1).
 
 
-local_test_1(Forms):- 
-   lisp_read(Forms,O),
-   dbmsg(O),
-   must_or_rtrace(lisp_compile(O,R)),
-   dbmsg(R).
+local_test_1(SExpression):- 
+  as_sexp(SExpression,Expression),
+  dbmsg(lisp_compile(Expression)),
+  must_or_rtrace(lisp_compile(Result,Expression,Code)),
+  dbmsg(Code),
+  must_or_rtrace(call(Code)),
+  dbmsg(result(Result)).
 
-local_test_2(Forms,_Res):- 
-   lisp_read(Forms,O),
-   dbmsg(O),
-   must_or_rtrace(lisp_compile(O,R)),
-   dbmsg(:-R).
-
+local_test_2(SExpression,Result):- 
+  as_sexp(SExpression,Expression),
+  dbmsg(lisp_compiled_eval(Expression)),
+  must_or_rtrace(lisp_compile(Expression,Code)),
+  dbmsg(Code),
+  nop((must_or_rtrace(call(Code)),dbmsg(result(Result)))).
 
 :- fixup_exports.
 
@@ -404,11 +437,11 @@ local_test_2(Forms,_Res):-
 :- forall(clause(block_tagbody_test(_N),B),B).
 
 /*
-   call_addr_block(
-     (symbol_setq(val, 1, _1398), goto('point-a')),
-       [addr('point-c', '$used',  (sym_arg_val_env(val, Val_In, Val_Thru, LETENV), incf(Val_Thru, 4, Incf_Ret), goto('point-b'))), 
-        addr('point-a', '$used',  (push_label('point-d-unused'), sym_arg_val_env(val, Val_In12, Val_Thru13, LETENV), incf(Val_Thru13, 2, Incf_Ret14), goto('point-c'))), 
-        addr('point-d-unused', '$unused',  (sym_arg_val_env(val, Val_In17, Val_Thru18, LETENV), incf(Val_Thru18, 2, Incf_Ret19), goto('point-c'))), 
+   call_addr_block(Env,
+     (symbol_setq(val, 1, _1398), goto(Result,'point-a')),
+       [addr('point-c', '$used',  (sym_arg_val_env(val, Val_In, Val_Thru, LETENV), incf(Val_Thru, 4, Incf_Ret), goto(Result,'point-b'))), 
+        addr('point-a', '$used',  (push_label('point-d-unused'), sym_arg_val_env(val, Val_In12, Val_Thru13, LETENV), incf(Val_Thru13, 2, Incf_Ret14), goto(Result,'point-c'))), 
+        addr('point-d-unused', '$unused',  (sym_arg_val_env(val, Val_In17, Val_Thru18, LETENV), incf(Val_Thru18, 2, Incf_Ret19), goto(Result,'point-c'))), 
         addr('point-b', '$used', ['point-b', [incf, val, 8]])], _GORES15),
    sym_arg_val_env(val, Val_In22, Val_Thru23, LETENV)
 

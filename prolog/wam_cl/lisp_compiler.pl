@@ -90,7 +90,7 @@ read_and_parse(Expr):- current_input(In),parse_sexpr_untyped(In, Expr).
 
 :- ensure_loaded(library(higher_order)).
 :- ensure_loaded(library(list_utilities)).
-:- require([dbmsg/1]).
+:- require([colormsg1/1]).
 
 
 :- ensure_loaded(library(must_trace)).
@@ -164,7 +164,7 @@ lisp_error_description(atom_does_not_exist, 101, 'SetQ: Variable does not exist:
 lisp_error_description(first_not_cons,      102, 'First: This is not a cons cell: ').
 lisp_error_description(rest_not_cons,       103, 'Rest: This is not a cons cell: ').
 
-find_incoming_value(Ctx,_Env,Atom,InValue,Value):-
+find_incoming_value(Ctx,_Ev,Atom,InValue,Value):-
       debug_var([Atom,'_In'],InValue),
       debug_var([Atom,'_Thru'],Value),
       ignore((member(bv(Atom0,[Value0|Unused]),Ctx.argbindings),
@@ -187,7 +187,7 @@ lisp_compiler_term_expansion( (FunctionHeadP <<== FunctionBodyP),
 lisp_compiler_term_expansion( ( <<== FunctionBodyP),
 		( :-   Code) ):-
         must_det_l((expand_pterm_to_sterm(FunctionBodyP,FunctionBody),
-	must_compile_body(_Cxt,toplevel,_Result,implicit_progn([FunctionBody]), Body),
+	must_compile_body(_Cx,toplevel,_Result,implicit_progn([FunctionBody]), Body),
    body_cleanup(Body,Code))).
 
 body_cleanup(Body,Code):-
@@ -200,10 +200,10 @@ lisp_compiled_eval(SExpression):-
   as_sexp(SExpression,Expression),
   lisp_compiled_eval(Expression,Result),
   dbmsg(result(Result)).
-
+                                
 lisp_compiled_eval(SExpression,Result):-
   as_sexp(SExpression,Expression),
-  dbmsg(Expression),
+  dbmsg(lisp_compile(Expression)),
   lisp_compile(Result,Expression,Code),
   dbmsg(Code),
   call(Code),!.
@@ -211,7 +211,7 @@ lisp_compiled_eval(SExpression,Result):-
 
 lisp_compile(SExpression):-
   as_sexp(SExpression,Expression),
-  dbmsg(Expression),
+  dbmsg(lisp_compiled_eval(Expression)),
   lisp_compile(Expression,Code),!,
   dbmsg(Code).
 
@@ -222,7 +222,7 @@ lisp_compile(SExpression,Body):-
 
 lisp_compile(Result,SExpression,Body):- 
    as_sexp(SExpression,Expression),
-   lisp_compile(ctx{head:lisp_compile(),argbindings:[]},[],Result,Expression,Body).
+   lisp_compile(ctx{head:lisp_compile(),argbindings:[]},toplevel,Result,Expression,Body).
 
 lisp_compile(Ctx,Env,Result,FunctionBody,Body):- 
    compile_forms(Ctx,Env,Result,[FunctionBody],Body).
@@ -236,19 +236,21 @@ compile_forms(Ctx,Env,Result,FunctionBody,Code):-
 as_sexp(Stream,Expression):- is_stream(Stream),!,must(parse_sexpr_untyped(Stream,Expression)).
 as_sexp(s(Str),Expression):- must(parse_sexpr_untyped(string(Str),Expression)),!.
 as_sexp(Str,Expression):- notrace(catch(text_to_string(Str,String),_,fail)),!, must(parse_sexpr_untyped(string(String),Expression)),!.
-as_sexp(Str,Expression):- is_list(Str),!,Expression=Str.
-as_sexp(Str,Expression):- Expression=Str.
+as_sexp(Str,Expression):- is_list(Str),!,maplist(expand_pterm_to_sterm,Str,Expression).
+as_sexp(Str,Expression):- expand_pterm_to_sterm(Str,Expression),!.
 
-dbmsg((Textbody:-Body)):-body==Textbody,dmsg('==>'(body)),!,dbmsg(Body).
-dbmsg(Var):- var(Var),!,dmsg(dbmsg_var(Var)).
-dbmsg((A,B)):-compound(A),compound(B),!,dbmsg(A),dbmsg(B).
-%dbmsg(asserta(Body)):- !, dmsg(Body).
-dbmsg(ABody):- ABody=..[A,Body],nonvar(Body), Body = (H :- B) , !, dmsg((dbmsg(A,H) :- B)).
-dbmsg(H :- Body):- !,dmsg(H :- Body),!.
-dbmsg(:- Body):- !,dmsg(:- Body),!.
-dbmsg(Body):- !,dmsg(:- Body),!.
+dbmsg(X):- writeln('/*'), dbmsg0(X),writeln('*/').
+dbmsg0((Textbody:-Body)):-body==Textbody,colormsg1('==>'(body)),!,dbmsg0(Body).
+dbmsg0(Var):- var(Var),!,colormsg1(dbmsg_var(Var)).
+dbmsg0((A,B)):-compound(A),compound(B),functor(A,F,N),functor(B,F,N),!,dbmsg0(A),dbmsg0(B).
+%dbmsg0(asserta(Body)):- !, colormsg1(Body).
+dbmsg0(ABody):- ABody=..[A,Body],nonvar(Body), Body = (H :- B) , !, colormsg1((dbmsg(A,H) :- B)).
+dbmsg0(H :- Body):- !,colormsg1(H :- Body),!.
+dbmsg0(:- Body):- !,colormsg1(:- Body),!.
+dbmsg0(Body):- !,colormsg1(:- Body),!.
 % dbmsg(:- Body):- !, dmsg(:- Body).
 
+colormsg1(Msg):- mesg_color(Msg,Ctrl),!,ansicall(Ctrl,fmt90(Msg)).
 
 del_attr_rev2(Name,Var):- del_attr(Var,Name).
 
@@ -273,10 +275,7 @@ must_compile_body(Ctx,Env,Result,Function, Body):-
 
 
 must_or_rtrace(G):-
-  (notrace(G)->true;rtrace(G)),!.
-
-must_expand_progn(Ctx,Env,ResultFormsResult,ResultForms, TestResult, ResultFormsBody):-
-   must_or_rtrace(expand_progn(Ctx,Env,ResultFormsResult,ResultForms, TestResult, ResultFormsBody)).
+  (quietly(G)->true;rtrace(G)),!.
 
 expand_pterm_to_sterm(VAR,VAR):- \+ compound(VAR),!.
 expand_pterm_to_sterm([X|L],[Y|Ls]):-!,expand_pterm_to_sterm(X,Y),expand_pterm_to_sterm(L,Ls),!.
@@ -313,7 +312,7 @@ compile_body(Ctx,Env,Result,[M|MACROLEFT], Code):-
 compile_body(Ctx,Env,Result,InstrS,Code):-
   shared_lisp_compiler:plugin_expand_function_body(Ctx,Env,Result,InstrS,Code),!.
 
-compile_body(_Cxt,_Env,Name,[defun,Name,Args|FunctionBody], CompileBody):-
+compile_body(_Cx,_Ev,Name,[defun,Name,Args|FunctionBody], CompileBody):-
     FunctionHead=[Name|Args],
     CompileBody = (asserta((Head  :- (fail, <<==(FunctionHead , FunctionBody)))),
                    asserta((Head  :- (!,  Code)))),
@@ -327,14 +326,14 @@ compile_body(_Cxt,_Env,Name,[defun,Name,Args|FunctionBody], CompileBody):-
       mize_body(',',Body,Code).
 
 
-compile_body(_Cxt,_Env,SelfEval,SelfEval,true):- notrace(is_self_evaluationing_object(SelfEval)),!.
-compile_body(_Cxt,_Env, [],nil,true):- !.
-compile_body(_Cxt,_Env,Item,[quote, Item],  true):- !.
+compile_body(_Cx,_Ev,SelfEval,SelfEval,true):- notrace(is_self_evaluationing_object(SelfEval)),!.
+compile_body(_Cx,_Ev, [],nil,true):- !.
+compile_body(_Cx,_Ev,Item,[quote, Item],  true):- !.
 
-compile_body(_Cxt,_Env,[],[progn],  true):- !.
-compile_body(Ctx,Env,Result,[progn,Forms], Body):- !, must_expand_progn(Ctx,Env,Result,Forms, [],Body).
-compile_body(Ctx,Env,Result,[progn|Forms], Body):- !, must_expand_progn(Ctx,Env,Result,Forms, [],Body).
-compile_body(Ctx,Env,Result,implicit_progn(Forms), Body):- is_list(Forms),!,must_expand_progn(Ctx,Env,Result,Forms, [],Body).
+compile_body(_Cx,_Ev,[],[progn],  true):- !.
+compile_body(Ctx,Env,Result,[progn,Forms], Body):- !, must_compile_body(Ctx,Env,Result,Forms, Body).
+compile_body(Ctx,Env,Result,[progn|Forms], Body):- !, must_compile_progn(Ctx,Env,Result,Forms, [],Body).
+compile_body(Ctx,Env,Result,implicit_progn(Forms), Body):- is_list(Forms),!,must_compile_progn(Ctx,Env,Result,Forms, [],Body).
 compile_body(Ctx,Env,Result,implicit_progn(Forms), Body):- !,must_compile_body(Ctx,Env,Result,Forms, Body).
 
 
@@ -377,11 +376,11 @@ compile_body(Ctx,Env,Result,[if, Test, IfTrue, IfFalse], Body):-
 				;  	FalseBody,
 					Result      = FalseResult	) ).
 
-compile_body(_Cxt,_Env,[],[cond, []], true):- !.
+compile_body(_Cx,_Ev,[],[cond, []], true):- !.
 compile_body(Ctx,Env,Result,[cond, [ [Test|ResultForms] |Clauses]], Body):-
 	!,
 	must_compile_body(Ctx,Env,TestResult,Test,  TestBody),
-	must_expand_progn(Ctx,Env,ResultFormsResult,ResultForms, TestResult, ResultFormsBody),
+	must_compile_progn(Ctx,Env,ResultFormsResult,ResultForms, TestResult, ResultFormsBody),
 	must_compile_body(Ctx,Env,ClausesResult,[cond, Clauses],  ClausesBody),
 	Body = (	TestBody,
 			( TestResult \= []
@@ -415,7 +414,7 @@ compile_body(Ctx,Env,Result,[function, [lambda,LambdaArgs| LambdaBody]], Body):-
 			[ClosureEnvironment, ClosureResult]^ClosureBody,
 			Env],
 	Body = true.
-compile_body(_Cxt,_Env,[function|Function], [function|Function], true):- !.
+compile_body(_Cx,_Ev,[function|Function], [function|Function], true):- !.
 
 
 compile_body(Ctx,Env,Result,[lambda,LambdaArgs|LambdaBody], Body):-
@@ -471,6 +470,11 @@ compile_body(Ctx,Env,Result,[SetQ, Atom, ValueForm, Atom2| Rest], Body):- is_pai
 compile_body(Ctx,Env,Result,[Defvar, Var], Body):- is_def_nil(Defvar),!,
   must_compile_body(Ctx,Env,Result,[Defvar, Var , nil],Body).
 
+compile_body(Ctx,Env,Result,[Getf, Atom| ValuesForms], Body):- is_place_op(Getf),     
+	must_maplist(expand_ctx_env_forms(Ctx,Env),ValuesForms, ValuesBody,ResultVs),
+        list_to_conjuncts(ValuesBody,BodyS),
+        Body = (BodyS, place_op(Getf, Atom, ResultVs,Result, Env)).
+
 compile_body(Ctx,Env,Result,[SetQ, Atom, ValueForm], Body):- is_symbol_setter(SetQ),
        % (EnvIn\==[]-> true ; break),
 	!,	
@@ -481,10 +485,10 @@ compile_body(Ctx,Env,Result,[SetQ, Atom, ValueForm], Body):- is_symbol_setter(Se
 
 symbol_setter(defparameter, Var, Result, _Environment):-
    ( special_var(Var, _) -> once(retract(special_var(Var, _))); true),
-   assert(special_var(Var, Result)).
+   asserta(special_var(Var, Result)).
 
 symbol_setter(defvar, Var, Result, _Environment):-
-     special_var(Var, _) -> true ; assert(special_var(Var, Result)).
+     special_var(Var, _) -> true ; asserta(special_var(Var, Result)).
 
 symbol_setter(setq, Atom, Result, Env):-
       (	env_memb(Bindings, Env),
@@ -493,8 +497,10 @@ symbol_setter(setq, Atom, Result, Env):-
                 Hole = [Result|_]
       ;	special_var(Atom, Old)
       ->	once(retract(special_var(Atom, Old))),
-                assert(special_var(Atom, Result))
+                asserta(special_var(Atom, Result))
       ;         (lisp_error_description(atom_does_not_exist, ErrNo, _),throw(ErrNo, Atom))).
+symbol_setter(psetq, Atom, Result, Env):- !,
+  symbol_setter(setq, Atom, Result, Env).
 
 
 is_symbol_setter(OP):- is_pair_op(OP).
@@ -506,16 +512,20 @@ is_def_nil(defparameter).
 is_def_nil(defvar).
 
 is_pair_op(setq).
+is_pair_op(psetq).
 
 is_pair_op(setf).
-is_pair_op(incf).
-is_pair_op(decf).
-is_pair_op(rotatef).
-is_pair_op(shiftf).
 is_pair_op(psetf).
 
 
-is_pair_op(psetq).
+is_place_op(setf).
+is_place_op(psetf).
+is_place_op(getf).
+is_place_op(incf).
+is_place_op(decf).
+is_place_op(rotatef).
+is_place_op(shiftf).
+
 
 is_parallel_op(psetf).
 is_parallel_op(psetq).
@@ -524,7 +534,7 @@ pairify([],[],[]).
 pairify([Atom, ValueForm | Rest],[Atom | Atoms],[ValueForm | Forms]):-
    pairify(Rest,Atoms,Forms).
 
-set_with_prolog_var(_Cxt,Env,SetQ,Atom,Result,symbol_setter(SetQ, Atom, Result, Env)).
+set_with_prolog_var(_Cx,Env,SetQ,Atom,Result,symbol_setter(SetQ, Atom, Result, Env)).
 
 expand_ctx_env_forms(Ctx, Env,Forms,Body, Result):- 
    must_compile_body(Ctx,Env,Result,Forms, Body).
@@ -533,15 +543,23 @@ expand_ctx_env_forms(Ctx, Env,Forms,Body, Result):-
 
 
 initState:attr_unify_hook(_,_).
+
+sym_arg_val_env(Atom,InValue,Value,Env):-
+ (env_memb(Bindings, Env),bvof(bv(Atom, Value0),Bindings))-> extract_variable_value(Value0, Value, _)
+   (special_var(Atom, Value) -> true;
+     InValue=Value).
+      
 sym_arg_val_env(Atom,_InValue,Value,Env):-
-  (once((	env_memb(Bindings, Env),
-			bvof(bv(Atom, Value0),Bindings),
-			extract_variable_value(Value0, Value, _)
-		    ;	special_var(Atom, Value)
-		    ;	(lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Atom))))).
+    lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Atom).
 
 
 compile_body(Ctx,Env,Result,Atom, Body):- Atom==mapcar,!, dbmsg(compile_body(Ctx,Env,Result,Atom, Body)), dumpST,break.
+
+compile_body(Ctx,Env,Value, Atom, Body):- atom(Atom),
+        find_incoming_value(Ctx,Env,Atom,InValue,Value),
+        (get_attr(Value,initState,t);get_attr(InValue,initState,t)),
+	!,
+        Body = symbol_value(Atom,Value,Env).
 
 compile_body(Ctx,Env,InValue, Atom, Body):- atom(Atom),
         find_incoming_value(Ctx,Env,Atom,InValue,Value),
@@ -556,7 +574,7 @@ compile_body(Ctx,Env,Value,Atom, Body):- atom(Atom),
 	!,
         Body = sym_arg_val_env(Atom,InValue,Value,Env).
 
-compile_body(_Cxt,Env,Value, Atom,  Body):- atom(Atom),
+compile_body(_Cx,Env,Value, Atom,  Body):- atom(Atom),
    debug_var([Atom,'_Stack'],Value0),
    debug_var([Atom,'_VAL'],Value),
 	!,
@@ -603,15 +621,18 @@ compile_body(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):-
 		expand_arguments(Ctx,Args, ArgsBody, Results, Env).
 
 
-expand_progn(_Cx,_Ev,Result,[], Result,true).
-expand_progn(Ctx,Env,Result,[Form | Forms], _PreviousResult, Body):-  !,
-	must_compile_body(Ctx,Env,FormResult, Form,  FormBody),
-	must_expand_progn(Ctx,Env,Result, Forms, FormResult, FormSBody),
+must_compile_progn(Ctx,Env,Result,Forms, PreviousResult, Body):-
+   must_or_rtrace(compile_progn(Ctx,Env,Result,Forms, PreviousResult,Body)).
+must_compile_progn1(Ctx,Env,Result,Forms, PreviousResult, Body):-
+   must_or_rtrace(compile_progn1(Ctx,Env,Result,Forms, PreviousResult,Body)).
+
+compile_progn(_Cx,_Ev,Result,[], Result,true).
+compile_progn(Ctx,Env,Result,[Form | Forms], _PreviousResult, Body):-  !,
+	must_compile_body(Ctx,Env,FormResult, Form,FormBody),
+	must_compile_progn(Ctx,Env,Result, Forms, FormResult, FormSBody),
         Body = (FormBody,FormSBody).
-
-expand_progn(Ctx,Env,Result, Form , _PreviousResult, Body):-
+compile_progn(Ctx,Env,Result, Form , _PreviousResult, Body):-
 	must_compile_body(Ctx,Env,Result,Form, Body).
-
 
 conjoin_0(A,B,A):- B==true,!.
 conjoin_0(A,B,B):- A==true,!.
