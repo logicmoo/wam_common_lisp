@@ -34,6 +34,7 @@ rest(List, Result):- List==[]->Result=[];
 cdr(List, Result):- rest(List, Result).
 car(List, Result):- first(List, Result).
 
+
 cons(Item, List, Result):-
 	Result = [Item|List].
 

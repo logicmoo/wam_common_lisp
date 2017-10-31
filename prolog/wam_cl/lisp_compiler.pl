@@ -651,7 +651,7 @@ op_replacement(+,plus).
 op_replacement(-,minus).
 op_replacement(*,mult).
 op_replacement(<,lessThan).
-op_replacement(>,lessThan).
+op_replacement(>,greaterThan).
 
 compile_body(Ctx,Env,Result,[Op | FunctionArgs], Body):- op_replacement(Op,Op2), !,
   must_compile_body(Ctx,Env,Result,[Op2 | FunctionArgs],Body).

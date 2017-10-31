@@ -156,8 +156,6 @@ tst:is_local_test(tagbody_let3,
   b],3).
 
 
-
-
 tst:is_local_test(tagbody7_prints_8,
   [tagbody,
       setq(b,2),go(tag2),
@@ -174,7 +172,7 @@ tst:is_local_test_HIDE(tagbody6,[tagbody,
    (tag1),setq(a,4),prolog_call([a,b],plus(a,b,C)),prolog_call(writeln(C)),
    (tag2),setq(a,4),[go,tag1]],6).
 
-compile_tagbody_forms(Ctx,Env,Result,[begin(_)|InstrS],BInstrS):- !,compile_tagbody_forms(Ctx,Env,Result,InstrS,BInstrS).
+compile_tagbody_forms(Ctx,Env,Result,[enter(_)|InstrS],BInstrS):- !,compile_tagbody_forms(Ctx,Env,Result,InstrS,BInstrS).
 compile_tagbody_forms(Ctx,Env,Result,InstrS,BInstrS):-
    maplist(label_atoms(),InstrS,TInstrS),
    trim_tagbody(TInstrS,CInstrS),
@@ -192,8 +190,8 @@ shared_lisp_compiler:plugin_expand_function_body(Ctx,Env,Result,InstrS,Code):-
 
 compile_body_h(_Ctx,_Env,Result, nop(X),  nop(X)):- !, debug_var("_NopResult",Result).
 compile_body_h(_Ctx,_Env,Result,[label, Tag], push_label(Tag) ):- debug_var("_LABELRES",Result).
-compile_body_h(_Ctx,_Env,Result,end( Tag), push_label(end( Tag)) ):- debug_var("_GORES",Result).
-compile_body_h(_Ctx,_Env,Result,begin( Tag), push_label(begin( Tag)) ):- debug_var("_GORES",Result).
+compile_body_h(_Ctx,_Env,Result,exit( Tag), push_label(exit( Tag)) ):- debug_var("_GORES",Result).
+compile_body_h(_Ctx,_Env,Result,enter( Tag), push_label(enter( Tag)) ):- debug_var("_GORES",Result).
 compile_body_h(Ctx,Env,Result,[tagbody| InstrS], Code):- debug_var("_TBResult",Result),!,
   compile_as_tagbody(Ctx,Env,Result,InstrS,Code).
 
@@ -236,7 +234,7 @@ compile_body_h(Ctx,Env,Result,[block,Tag|InstrS], Code):-
   compile_block(Ctx,Env,Result,Tag,InstrS,Code),!.
 
 compile_block(Ctx,Env,Result,Tag,InstrS,Code):-
- append([[go,begin(Tag)],begin(Tag)|InstrS],[[go,end(Tag)],end(Tag)],WInstrS),
+ append([[go,enter(Tag)],enter(Tag)|InstrS],[[go,exit(Tag)],exit(Tag)],WInstrS),
  compile_as_tagbody(Ctx,Env,Result,WInstrS,Code).
 
 tst:is_local_test(do(0.0),
@@ -303,10 +301,11 @@ call_addr_block(EnvIn,Start,Addrs,Result):-  fail,
 */
 call_addr_block(EnvCatch,Start,Addrs,Result):-
   catch(Start,
-      goto(Label,Result,EnvCatch),
-           (must_or_rtrace(member(addr(Label,_,NewEnv,NewCode),Addrs)),
+      goto(Label,ResultE,EnvCatchE),
+           ((member(addr(Label,_,NewEnv,NewCode),Addrs)->!;throw(goto(Label,ResultE,EnvCatchE))),
            copy_term(NewEnv:NewCode,NewEnvCopy:NewCodeCopy),
-           NewEnvCopy = EnvCatch,
+           NewEnvCopy = EnvCatchE,
+           ignore(ResultE = Result),
            call_addr_block(EnvCatch,NewCodeCopy,Addrs,Result))).
 
 
@@ -317,6 +316,9 @@ push_label(_).
 %call_then_return(G):- G,goto(exit(_),[],Env).
 print(X,X):-writeln(X).
 =(N1,N2,Result):- t_or_nil(=(N1,N2),Result). 
+lessThan(N1,N2,Result):- t_or_nil(<(N1,N2),Result). 
+greaterThan(N1,N2,Result):- t_or_nil(>(N1,N2),Result). 
+
 
 '1+'(N,R):- R is N + 1.
 '1-'(N,R):- R is N - 1.
@@ -350,8 +352,8 @@ is_reflow('throw',[Label|_],Label).
 is_label(Atom,Atom):- atomic(Atom),!,Atom\==[].
 is_label([OP|ARGS],Label):- is_label(OP,ARGS,Label).
 is_label(OPARGS,Label):- OPARGS=..[OP|ARGS],is_label(OP,ARGS,Label).
-is_label('begin',[Label|_],Label).
-is_label('end',[Label|_],Label).
+is_label('enter',[Label|_],Label).
+is_label('exit',[Label|_],Label).
 is_label('label',[Label|_],Label).
 
 is_branched([Op|_]):- fail,member(Op,[if,or,and,progn]).
@@ -495,13 +497,13 @@ tst:is_local_test(let_tagbody,
 test123:- 
    GoEnvLETENV=[[bv('temp-one', [1|_518]), bv('temp-two', [0|_520])]|toplevel],
    call_addr_block(GoEnvLETENV,
-                   goto(begin([]), [], _2564),
+                   goto(enter([]), [], _2564),
 
-                   [ addr(begin([]),
+                   [ addr(enter([]),
                           '$used',
                           (call_addr_block(GoEnvLETENV,  
-                            (push_label(dosym1), sym_arg_val_env('temp-one', _1698, _1712, _1726), sym_arg_val_env('temp-two', _1740, _1754, _1726), minus(_1712, _1754, _1768), lessThan(_1768, 5, _1782), (_1782\=[]->sym_arg_val_env('temp-one', _1796, _1810, _1726), goto(exit([]), _1810, _1726), _1822=_1826;sym_arg_val_env('temp-one', _1840, _1854, _1726), '1+'(_1854, _1868), sym_arg_val_env('temp-two', _1882, _1896, _1726), '1-'(_1896, _1910), symbol_setter(psetq, 'temp-one', _1868, _1726), symbol_setter(psetq, 'temp-two', _1910, _1726), _1822=[[_1868, _1910]]), goto(dosym1, [], _1726)), [addr(dosym1, '$unused',  (sym_arg_val_env('temp-one', Temp_one_In, Temp_one_Thru, GoEnvLETENV), sym_arg_val_env('temp-two', Temp_two_In, Temp_two_Thru, GoEnvLETENV), minus(Temp_one_Thru, Temp_two_Thru, Minus_Ret), lessThan(Minus_Ret, 5, IFLessThan_Ret), (IFLessThan_Ret\=[]->sym_arg_val_env('temp-one', Temp_one_In13, RetValTemp_one_Thru14, GoEnvLETENV), goto(exit([]), RetValTemp_one_Thru14, GoEnvLETENV), _216=_GORES;sym_arg_val_env('temp-one', Temp_one_In17, Temp_one_Thru18, GoEnvLETENV), '1+'(Temp_one_Thru18, Vv1_c43__Ret), sym_arg_val_env('temp-two', Temp_two_In20, Temp_two_Thru21, GoEnvLETENV), '1-'(Temp_two_Thru21, Vv1__Ret), symbol_setter(psetq, 'temp-one', Vv1_c43__Ret, GoEnvLETENV), symbol_setter(psetq, 'temp-two', Vv1__Ret, GoEnvLETENV), _216=[[Vv1_c43__Ret, Vv1__Ret]]), goto(dosym1, [], GoEnvLETENV)))], _GORES44), goto(end([]), [], GoEnvLETENV))),
-                     addr(end([]), '$used', push_label(end([])))
+                            (push_label(dosym1), sym_arg_val_env('temp-one', _1698, _1712, _1726), sym_arg_val_env('temp-two', _1740, _1754, _1726), minus(_1712, _1754, _1768), lessThan(_1768, 5, _1782), (_1782\=[]->sym_arg_val_env('temp-one', _1796, _1810, _1726), goto(exit([]), _1810, _1726), _1822=_1826;sym_arg_val_env('temp-one', _1840, _1854, _1726), '1+'(_1854, _1868), sym_arg_val_env('temp-two', _1882, _1896, _1726), '1-'(_1896, _1910), symbol_setter(psetq, 'temp-one', _1868, _1726), symbol_setter(psetq, 'temp-two', _1910, _1726), _1822=[[_1868, _1910]]), goto(dosym1, [], _1726)), [addr(dosym1, '$unused',  (sym_arg_val_env('temp-one', Temp_one_In, Temp_one_Thru, GoEnvLETENV), sym_arg_val_env('temp-two', Temp_two_In, Temp_two_Thru, GoEnvLETENV), minus(Temp_one_Thru, Temp_two_Thru, Minus_Ret), lessThan(Minus_Ret, 5, IFLessThan_Ret), (IFLessThan_Ret\=[]->sym_arg_val_env('temp-one', Temp_one_In13, RetValTemp_one_Thru14, GoEnvLETENV), goto(exit([]), RetValTemp_one_Thru14, GoEnvLETENV), _216=_GORES;sym_arg_val_env('temp-one', Temp_one_In17, Temp_one_Thru18, GoEnvLETENV), '1+'(Temp_one_Thru18, Vv1_c43__Ret), sym_arg_val_env('temp-two', Temp_two_In20, Temp_two_Thru21, GoEnvLETENV), '1-'(Temp_two_Thru21, Vv1__Ret), symbol_setter(psetq, 'temp-one', Vv1_c43__Ret, GoEnvLETENV), symbol_setter(psetq, 'temp-two', Vv1__Ret, GoEnvLETENV), _216=[[Vv1_c43__Ret, Vv1__Ret]]), goto(dosym1, [], GoEnvLETENV)))], _GORES44), goto(exit([]), [], GoEnvLETENV))),
+                     addr(exit([]), '$used', push_label(exit([])))
                    ],
                    _GORES47).
 
