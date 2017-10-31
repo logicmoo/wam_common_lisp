@@ -24,7 +24,7 @@
 :- discontiguous(tst:is_local_test/3).
 
 
-tst:is_local_test(H):- tst:is_local_test(H,V).
+tst:is_local_test(H):- tst:is_local_test(H,_V).
    
 tst:is_local_test(H,V):-
   clause(tst:is_local_test(_,H,V),true,_).

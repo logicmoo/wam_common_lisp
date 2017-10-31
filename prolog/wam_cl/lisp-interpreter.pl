@@ -113,6 +113,17 @@ tidy_database:-
 
 
 read_eval_print(Result):-		% dodgy use of cuts to force a single evaluation
+	read_and_parse(SExpression),
+        lisp_add_history(SExpression),
+        as_sexp(SExpression,Expression),
+        dbmsg(lisp_compile(Expression)),
+        lisp_compile(Result,Expression,Code),
+        dbmsg(Code),
+        call(Code),!,
+      	writeExpression(Result),
+	!.
+
+read_eval_print(Result):-		% dodgy use of cuts to force a single evaluation
 	read_and_parse(Expression),
         lisp_add_history(Expression),
 	eval(Expression, Result),
@@ -522,18 +533,19 @@ other(Char):-
 % Grammar rules for parsing Lisp s-expressions.
 % Given a list of tokens, lisplist does all the nesting of lists
 
-sexpr1(X) --> {is_ftVar(X),(get_var_name(X,N)->sformat(NN,'~w',[N]);sformat(NN,'~w',[X]))},!,[NN].
+sexpr1(X) --> {is_ftVar(X),(get_var_name(X,N)->format(atom(NN),'~w',[N]);format(atom(NN),'~w',[X]))},!,[NN].
+sexpr1(Str)--> {string(Str)},!,[Str].
 sexpr1([function, Expression]) --> [#, ''''], !, sexpr1(Expression).
 sexpr1([quote, Expression]) --> [''''], !, sexpr1(Expression).
 sexpr1(['$BQ',X])--> ['`'],sexpr1(X).
+sexpr1(Xs) --> {is_list(Xs)},!,['('], lisplist(Xs), !.
+sexpr1([X|Y]) --> sexpr1(X), ['.'], sexpr1(Y), [')'], !.
 sexpr1('$COMMA'(X)) --> [','],sexpr1(X).
-sexpr1(Xs) --> ['('], lisplist(Xs), !.
-sexpr1(X) --> [X], {atomic(X), X \= '.'}, !.
+sexpr1(X) --> [X].
 
 
 lisplist([]) --> [')'], !.
 lisplist([X|Xs]) --> sexpr1(X), lisplist(Xs), !.
-lisplist([X|Y]) --> sexpr1(X), ['.'], sexpr1(Y), [')'], !.
 
 
 
@@ -557,15 +569,16 @@ writeTokenL(['(', ')'|TokenL]):-
 writeTokenL([Token|TokenL]):-
 	atom(Token),
 	!,
-	lwrupr(Token, UCToken),
+	% lwrupr(Token, UCToken),
+        =(Token, UCToken),
 	write(UCToken),
 	write(' '),
 	writeTokenL(TokenL).
 writeTokenL([UCToken|TokenL]):-
 	string(UCToken),
-	!,
-	write(UCToken),
-	write(' '),
+   write(' '),
+   writeq(UCToken),	
+   write(' '),
 	writeTokenL(TokenL).
 writeTokenL([Token|TokenL]):-
 	number(Token),
