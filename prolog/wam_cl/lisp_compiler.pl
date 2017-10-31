@@ -472,11 +472,14 @@ compile_body(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body):-
 
 compile_body(Ctx,Env,Result,BodyForms, Body):- compile_assignents(Ctx,Env,Result,BodyForms, Body).
 
+:- dynamic(op_replacement/2).
+/*
 op_replacement(+,plus).
 op_replacement(-,minus).
 op_replacement(*,mult).
 op_replacement(<,lessThan).
 op_replacement(>,greaterThan).
+*/
 
 compile_body(Ctx,Env,Result,[Op | FunctionArgs], Body):- op_replacement(Op,Op2), !,
   must_compile_body(Ctx,Env,Result,[Op2 | FunctionArgs],Body).
@@ -649,7 +652,7 @@ reverse ==
 :- set_prolog_flag(double_quotes,string).
 
 
-c1:- print_eval_string("
+tst:is_local_test("
  (defun sum_with_map (xs)
   (let (( running_total 0))
     (let ((summer 
@@ -659,7 +662,7 @@ c1:- print_eval_string("
        (mapcar summer  xs) running_total))) "
 ).
 
-c2:- lisp_compile(s("
+tst:is_local_test("
 (defun sum_with_map (xs)
   (let (( running_total 0))
     (let ((summer 
@@ -668,6 +671,6 @@ c2:- lisp_compile(s("
                 (setq running_total (+ running_total n))))))
        (mapcar summer  xs) running_total)))
  "
-  ),O),writeln(O).
+  ).
 
-
+tst:is_local_test("(defun accumulate (op seq &optional (init 0)) (if (null seq) init (funcall op (car seq) (accumulate op (cdr seq) init))))").

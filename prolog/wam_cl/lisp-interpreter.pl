@@ -92,9 +92,14 @@ with_input_from_stream(In,Goal):-
 prompts(Old1,_Old2):- var(Old1) -> prompt(Old1,Old1) ; prompt(_,Old1).
 lisp_global_bindings([]).
 
-lisp:-
-	write('Welcome to WAM-CL!'),nl,
-	write('This is a miniscule Lisp interpreter, written in Prolog'),nl,
+lisp:- write('
+__        ___    __  __        ____ _
+\\ \\      / / \\  |  \\/  |      / ___| |
+ \\ \\ /\\ / / _ \\ | |\\/| |_____| |   | |
+  \\ V  V / ___ \\| |  | |_____| |___| |___
+   \\_/\\_/_/   \\_\\_|  |_|      \\____|_____|
+'),nl,
+	write('Common Lisp, written in Prolog'),nl,
 	prompt(Old, '> '),
 	prompts(Old1, Old2),
 	prompts('> ', '> '),
@@ -181,7 +186,7 @@ is_self_evaluationing_object(X):- (is_dict(X);is_array(X);is_rbtree(X)),!.
 
 
 eval_repl(nil,  []):-!.
-eval_repl(Atom, R):- atom_concat(_,'.',Atom),notrace(catch(read_term_from_atom(Atom,Term,[variable_names(Vs),syntax_errors(true)]),_,fail)),
+eval_repl(Atom, R):- atom(Atom),atom_concat(_,'.',Atom),notrace(catch(read_term_from_atom(Atom,Term,[variable_names(Vs),syntax_errors(true)]),_,fail)),
   callable(Term),current_predicate(_,Term),b_setval('$variable_names',Vs),t_or_nil((call(Term)*->dmsg(Term);(dmsg(no(Term)),fail)),R).
 eval_repl([quote, X], X):-!.
 eval_repl([debug,A], t):- debug(lisp(A)).
