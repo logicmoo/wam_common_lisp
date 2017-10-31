@@ -101,7 +101,7 @@ lisp:-
 	% tidy_database,
 	repeat,
    	once(read_eval_print(Result)),
-   	Result = quit,!,
+   	Result == quit,!,
    	prompt(_, Old),
    	prompts(Old1, Old2),!.
 
@@ -113,21 +113,11 @@ tidy_database:-
 
 
 read_eval_print(Result):-		% dodgy use of cuts to force a single evaluation
-	read_and_parse(SExpression),
-        lisp_add_history(SExpression),
-        as_sexp(SExpression,Expression),
-        dbmsg(lisp_compile(Expression)),
-        lisp_compile(Result,Expression,Code),
-        dbmsg(Code),
-        call(Code),!,
-      	writeExpression(Result),
-	!.
-
-read_eval_print(Result):-		% dodgy use of cuts to force a single evaluation
 	read_and_parse(Expression),
         lisp_add_history(Expression),
-	eval(Expression, Result),
-	writeExpression(Result),
+        catch((
+        eval(Expression,Result),
+	writeExpression(Result)),E,dmsg(uncaught(E))),
 	!.
 
  
@@ -143,17 +133,31 @@ lisp_add_history(Expression):-
         (string_upper(S,S)->string_lower(S,Store);Store=S),
         prolog:history(user_input, add(Store)).
 
+:- set_prolog_flag(lisp_compile,true).
+eval_compiled(SExpression,Result):-
+    locally(set_prolog_flag(lisp_compile,true),eval_int(SExpression,Result)).
 
 % basic EVAL statements for built-in procedures
+eval_int(Var,  R):- var(Var),!, R=Var.
+eval_int(SExpression,Result):- 
+  as_sexp(SExpression,Expression),
+  eval(Expression,Result).
 
+eval(SExpression,Result):-eval_repl(SExpression,Result).
 eval(Expression, Result):-
-	lisp_global_bindings(Bindings),
-	eval(Expression, Bindings, Result).
+   current_prolog_flag(lisp_compile,true),!,
+   dbmsg(lisp_compile(Expression)),
+   lisp_compile(Result,Expression,Code),
+   dbmsg(Code),
+   call(Code),!.
+eval(Expression, Result):-
+   lisp_global_bindings(Bindings),
+   eval(Expression, Bindings, Result).
 
 
 macro_expand([],[]):-!.
-macro_expand([#, '''', X|Xs], [[function, MX]|MXs]
- ):-
+macro_expand([#, '''', X|Xs], [[function, MX]|MXs
+ ]):-
 	!,             
 	macro_expand(X, MX),
 	macro_expand(Xs, MXs).
@@ -167,7 +171,7 @@ macro_expand([X|Xs], [MX|MXs]):-
 	macro_expand(Xs, MXs).
 macro_expand(X, X):-
 	atomic(X),
-	!.
+	!.                        
 
 :- use_module(library('dialect/sicstus/arrays')).
 % :- use_module(library('dialect/sicstus')).
@@ -175,30 +179,32 @@ is_self_evaluationing_object(X):- var(X),!.
 is_self_evaluationing_object(X):- atomic(X),!,(number(X);string(X);(blob(X,T),T\==text);X=t;X=[]),!.
 is_self_evaluationing_object(X):- (is_dict(X);is_array(X);is_rbtree(X)),!.
 
-eval(Expression, Bindings, Result):- 
-   debug(lisp(eval),'~N~p -> ',[eval3(Expression, Bindings)]),
-   eval3(Expression, Bindings, Result),
-   debug(lisp(eval),' -> ~p ~n ',[result(Result)]),!.
 
+eval_repl(nil,  []):-!.
+eval_repl(Atom, R):- atom_concat(_,'.',Atom),notrace(catch(read_term_from_atom(Atom,Term,[variable_names(Vs),syntax_errors(true)]),_,fail)),
+  callable(Term),current_predicate(_,Term),b_setval('$variable_names',Vs),t_or_nil((call(Term)*->dmsg(Term);(dmsg(no(Term)),fail)),R).
+eval_repl([quote, X], X):-!.
+eval_repl([debug,A], t):- debug(lisp(A)).
+eval_repl([nodebug,A], t):- nodebug(lisp(A)).
+eval_repl([X], R):- eval_repl_atom( X, R),!.
+eval_repl( X , R):- eval_repl_atom( X, R),!.
 
-eval3a(end_of_file,_, quit):-!.
-eval3a(quit, _, quit):-!.
-eval3a(make, _, t):- !, make.
-eval3a(prolog, _, t):- !, prolog.
-eval3a(debug, _, t):- debug(lisp(_)).
-eval3a(nodebug, _, t):- nodebug(lisp(_)).
-eval3a(show, _, t):- 
+eval_repl_atom(end_of_file, quit):-!.
+eval_repl_atom(quit, quit):-!.
+eval_repl_atom(make, t):- !, make.
+eval_repl_atom(prolog, t):- !, prolog.
+eval_repl_atom(debug, t):- debug(lisp(_)).
+eval_repl_atom(nodebug, t):- nodebug(lisp(_)).
+eval_repl_atom(show, t):- 
   listing([named_lambda/2,
         macro_lambda/3,
         lisp_global_bindings/1]).
 
-eval3(Var, _, R):- var(Var),!, R=Var.
-eval3(nil, _, []):-!.
-eval3([quote, X], _, X):-!.
-eval3([debug,A], _, t):- debug(lisp(A)).
-eval3([nodebug,A], _, t):- nodebug(lisp(A)).
-eval3([X], _, R):- eval3a( X, _, R),!.
-eval3( X , _, R):- eval3a( X, _, R),!.
+
+eval(Expression, Bindings, Result):- 
+   debug(lisp(eval),'~N~p -> ',[eval3(Expression, Bindings)]),
+   eval3(Expression, Bindings, Result),
+   debug(lisp(eval),' -> ~p ~n ',[result(Result)]),!.
 
 eval3([defvar, Name], _, Name):-
 	!,
