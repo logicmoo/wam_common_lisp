@@ -1,4 +1,76 @@
 ````
+root@gitlab:/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl# swipl repl.pl
+Installed packages (38):
+
+i clause_attvars@1.1.118    - An alternate interface to the clause database to allow attributed variables to be asserted
+i dictoo@1.1.118            - Dict-like OO Syntax
+i each_call_cleanup@1.1.118 - Each Call Redo Setup and Cleanup
+i eggdrop@1.1.118           - Hook up to an existing IRC Client called an Eggdrop
+i file_scope@1.1.118        - File local scoped efects
+i fluxplayer-prolog-engine@0.0.1 - Prolog interface to Slack http://www.slack.com
+i gvar_syntax@1.1.118       - Global Variable Syntax
+i hook_hybrid@1.1.118       - Hook assert retract call of *specific* predicates
+i instant_prolog_docs@1.1.118 - Magically document prolog source files based on predicate and variable naming conventions
+i lib_atts@1.1.118          - Common atts.pl interface like https://sicstus.sics.se/sicstus/docs/4.0.0/html/sicstus/lib_002datts.html
+i logicmoo_base@1.1.118     - LogicMOO - Extends Prolog Programming to support Dynamic Epistemic Logic (DEL) with Constraints
+i logicmoo_experimental@1.1.118 - Various experimental packages - warning: HUGE amount of test data
+i logicmoo_nlu@1.1.114      - Various English to Logic Convertors - warning: HUGE amount of test data
+i logicmoo_packages@1.1.118 - Various packages - warning: HUGE amount of test data
+i logicmoo_planner@1.1.118  - Various PDDLish planners - warning: HUGE amount of test data
+i logicmoo_planners@1.1.118 - Various Hybrid HTN Planners speaking PDDLish and OCLh
+i logicmoo_utils@1.1.118    - Common predicates used by external Logicmoo Utils and Base
+i loop_check@1.1.118        - New simple loop checking
+i mpi@1.0                   - Porting of the LAMMPI library of Yap Prolog to SWI-Prolog
+i multimodal_dcg@1.1.118    - Reduce floundering of DCGs by constraining and narrowing search
+i multivar@1.1.118          - User defined datatypes
+i must_trace@1.1.118        - Trace with your eyeballs instead of your fingers
+i no_repeats@1.1.118        - New ways to avoid duplicate solutions
+i pfc@1.1.118               - Pfc -- a package for forward chaining in Prolog
+i predicate_streams@1.1.118 - Implement your own Abstract Predicate Streams
+i prologmud@1.1.118         - Online text adventure game - MUD Server
+i prologmud_samples@1.1.118 - Online text adventure game - Sample
+i s_expression@1.1.118      - Utilities for Handling of S-Expression Lisp/Scheme-Like forms and parsing of KIF, GDL, PDDL, CLIF
+i slack_prolog@1.1.118      - Prolog interface to Slack http://www.slack.com
+i subclause_expansion@1.1.118 - More use specific versions of term/goal expansion hooks
+i tabling_dra@1.1.118       - SWI-Prolog interface to Table-handling procedures for the "dra" interpreter. Written by Feliks Kluzniak at UTD (March 2009)
+i transpiler@0.1            - A universal translator for programming languages
+i trill@4.1.0               - A tableau probabilistic reasoner in three different versions
+i wam_common_lisp@1.1.118   - ANSI Common Lisp implemented in Prolog
+i with_open_options@1.1.118 - Utilities to open various objects for read/write
+i with_thread_local@1.1.118 - Call a Goal with local assertions
+i xlisting@1.1.118          - Selective Interactive Non-Deterministic Tracing
+i xlisting_web@1.1.118      - Manipulate and browse prolog runtime over www
+
+__        ___    __  __        ____ _
+\ \      / / \  |  \/  |      / ___| |
+ \ \ /\ / / _ \ | |\/| |_____| |   | |
+  \ V  V / ___ \| |  | |_____| |___| |___
+   \_/\_/_/   \_\_|  |_|      \____|_____|
+
+Common Lisp, written in Prolog
+> ( defmacro fooq ( a ) ` ' , a )
+/*
+:- lisp_compile([defmacro, fooq, [a], ['$BQ', [quote, '$COMMA'(a)]]]).
+*/
+/*
+:- retractall(macro_lambda(fooq, _6048, _6050)),
+   assert(macro_lambda(fooq, [a], [['$BQ', [quote, ['$COMMA', a]]]])).
+*/
+fooq
+> ( fooq ( a b c ) )
+/*
+:- lisp_compile([fooq, [a, b, c]]).
+*/
+/*
+:- commaResult([[quote, [a, b, c]]]).
+*/
+/*
+:- true.
+*/
+( a b c )
+>
+
+
 swipl -l  repl.pl -g "qsave_program(wamcl)" -t halt
 
 
