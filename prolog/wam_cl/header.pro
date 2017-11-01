@@ -48,6 +48,8 @@
 :- multifile(ssip_define/2).
 :- discontiguous(ssip_define/2).
 
+
+:- ensure_loaded(arglists).
 :- ensure_loaded(assign).
 :- ensure_loaded(backquote).
 :- ensure_loaded(prims).

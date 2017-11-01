@@ -58,27 +58,7 @@
 :- module(comp, []).
 :- set_module(class(library)).
 :- include('header.pro').
-/*******************************************************************
- *
- * Example definitions:
- * second(l) <<== first(rest(l)).
- * list_3(a, b, c) <<== cons(a, cons(b, cons(c, nil))).
- *
- * Example use:
- * ?| - lisp_call([second,[quote, [a,b,c]]], Result).
- * Result = b
- *
- * ?| - second([a,b,c], Result).
- * Result = b
- *
- * ?| - lisp_call([list_3, tom, dick, harry], Result).
- * Result = [tom, dick, harry]
- *
- * ?| - list_3(tom, dick, harry, Result).
- * Result = [tom, dick, harry]
- *
- *******************************************************************/
-:- set_module(class(library)).
+                                         :- set_module(class(library)).
 :- ensure_loaded(utils_for_swi).
 
 :- style_check.
@@ -252,8 +232,23 @@ compile_body(Ctx,Env,Result,[M|MACROLEFT], Code):-
 compile_body(Ctx,Env,Result,InstrS,Code):-
   shared_lisp_compiler:plugin_expand_function_body(Ctx,Env,Result,InstrS,Code),!.
 
-compile_body(Cx,Ev,Name,[defmacro,Name,Args|FunctionBody0], CompileBody):- !,
-  compile_body(Cx,Ev,Name,[defun,Name,Args|FunctionBody0], CompileBody).
+compile_body(_Cx,_Ev,Name,[defmacro,Name,FormalParms|Body0], CompileBody):- !,
+      maybe_get_docs(defmacro,Name,Body0,Body),
+      CompileBody =(retractall(macro_lambda(Name,_,_)),
+	assert(macro_lambda(Name, FormalParms, Body))).
+
+compile_body(Cxt,Env,Result,[Procedure|Arguments],CompileBody):-
+  macro_lambda(Procedure, FormalParams, LambdaExpression),
+  must_or_rtrace(bind_formal_parameters(FormalParams, Arguments, [], NewEnv)),
+  must_or_rtrace(expand_commas([NewEnv|Env],LambdaExpression,CommaResult)),
+  dbmsg(commaResult(CommaResult)),
+  must_compile_body(Cxt,Env,Result,[progn|CommaResult], CompileBody).
+
+
+compile_body(_Cx,Env,Result,['$BQ',Form], true):-!, expand_commas(Env,Form,Result).
+compile_body(_Cx,Env,Result,['`',Form], true):-!, expand_commas(Env,Form,Result).
+
+
 compile_body(_Cx,_Ev,Name,[defun,Name0,Args|FunctionBody0], CompileBody):- 
     combine_setfs(Name0,Name),
     must(maybe_get_docs(defun,Name,FunctionBody0,FunctionBody)),

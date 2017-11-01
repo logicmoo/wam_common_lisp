@@ -47,15 +47,15 @@ eval(Expression, Bindings, Result):-
 eval3([defvar, Name], _, Name):-
 	!,
 	retract(lisp_global_bindings(GlobalBindings)),
-	assert(lisp_global_bindings([bv(Name, [])|GlobalBindings])),
+	assert(lisp_global_bindings([bv(Name, [[]|_])|GlobalBindings])),
 	!.
 eval3([setq, Name, Value], Bindings, EvalValue):-
 	!,
 	lisp_global_bindings(GlobalBindings),
-	append(Pre, [bv(Name, _)|Post], GlobalBindings),
+	append(Pre, [bv(Name, [_|_])|Post], GlobalBindings),
 	eval(Value, Bindings, EvalValue),
 	retract(lisp_global_bindings(GlobalBindings)),
-	append(Pre, [bv(Name, EvalValue)|Post], GlobalBindings1),
+	append(Pre, [bv(Name, [EvalValue|_])|Post], GlobalBindings1),
 	assert(lisp_global_bindings(GlobalBindings1)),
 	!.
 eval3([defmacro, Name, FormalParms | Body0], _, Name):-
@@ -98,7 +98,7 @@ eval3([Procedure|Arguments], Bindings, Result):-  lisp_operator(Procedure),!,
 
 eval3([Procedure|Arguments], Bindings, Result):-
   macro_lambda(Procedure, FormalParams, LambdaExpression),
-  bind_variables(FormalParams, Arguments, Bindings, NewBindings),
+  bind_formal_parameters(FormalParams, Arguments, Bindings, NewBindings),
   eval(['eval*'|LambdaExpression], NewBindings, Result).
 
 eval3([Procedure|Arguments], Bindings, Result):-
@@ -106,10 +106,10 @@ eval3([Procedure|Arguments], Bindings, Result):-
 	apply_f(Bindings,Procedure, EvalArguments, Result),
 	!.
 eval3(X, Bindings, Val):-
-	zotrace((atom(X),
-      (member(bv(X, Val), Bindings)
+   zotrace((atom(X),
+      (member(bv(X, [Val|_]), Bindings)
 	;	(lisp_global_bindings(GlobalBindings),
-		 member(bv(X, Val), GlobalBindings)))
+		 member(bv(X, [Val|_]), GlobalBindings)))
 	)),!.
 eval3(X, _, X):- zotrace(is_self_evaluationing_object(X)),!.
 eval3(X, Bindings, Y):- \+ is_list(X),compound(X),!,X=..XL,eval3(XL, Bindings, Y).
@@ -118,15 +118,6 @@ eval3(X, _, []):- (debugging(lisp(eval))->dumpST;true),
 
 lisp_operator(if).
 
-expand_commas(_,One,Out):- \+ compound(One),!,One=Out.
-expand_commas(Bindings,['$COMMA',One],Out):- !, eval(One,Bindings,Out).
-expand_commas(Bindings,['$BQ',One],Out):- !, expand_commas(Bindings,One,Mid), (One==Mid ->  Out=['$BQ',Mid] ; Out=Mid),!.
-expand_commas(Bindings,'$COMMA'(One),Out):- !, eval(One,Bindings,Out).
-expand_commas(Bindings,One,Out):- is_list(One),!,maplist(expand_commas(Bindings),One,Out).
-expand_commas(Bindings,One,Out):-
-  compound_name_arguments(One,F,Args),
-  maplist(expand_commas(Bindings),Args,ArgsOut),
-  Out=..[F|ArgsOut],!.
 
 evalL([], _, []):-!.
 evalL([H|T], Bindings, [EvalH|EvalT]):-
@@ -161,18 +152,18 @@ apply_f(Bindings,if, [Test, Success, Failure], Result):-  !,
 	!.
 apply_f(Binds,[lambda, FormalParams, Body], ActualParams, Result):-
 	!,
-	bind_variables(FormalParams, ActualParams,Binds, Bindings),!,
+	bind_formal_parameters(FormalParams, ActualParams,Binds, Bindings),!,
 	eval(Body, Bindings, Result),
 	!.
 apply_f(_Binds,[closure, FormalParams, Body, Bindings0], ActualParams, Result):-
 	!,
-	bind_variables(FormalParams, ActualParams, Bindings0, Bindings),
+	bind_formal_parameters(FormalParams, ActualParams, Bindings0, Bindings),
 	eval(Body, Bindings, Result),
 	!.
 
 apply_f(_Binds,ProcedureName, ActualParams, Result):-
 	macro_lambda(ProcedureName,FormalParams, LambdaExpression),!,
-	bind_variables(FormalParams, ActualParams, Bindings),
+	bind_formal_parameters(FormalParams, ActualParams, Bindings),
         eval(LambdaExpression, Bindings, Result),
 	!.
 apply_f(Bindings,ProcedureName, Args, Result):-
@@ -195,15 +186,6 @@ apply_f(Binds,X, _, R):- ignore(R=[]),
         
 	!.
 
-
-bind_variables(Formal, Actual, Bindings):-
-	bind_variables(Formal, Actual, [], Bindings).
-
-bind_variables([], [], Bindings, Bindings).
-bind_variables([FormalParam|FormalParams], [ActualParam|ActualParams],
-		Bindings0, Bindings):- 
-	bind_variables(FormalParams, ActualParams, 
-		[bv(FormalParam, ActualParam)|Bindings0], Bindings).
 
 
 /*

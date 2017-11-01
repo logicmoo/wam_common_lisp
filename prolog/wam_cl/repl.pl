@@ -29,7 +29,7 @@
 timel(M:X):- prolog_statistics:time(M:X).
 
 must_or_rtrace(G):-
-  (quietly(G)->true;rtrace(G)),!.
+  (catch(quietly(G),E,(dbmsg(uncaught(E:-G)),!,fail))->true;rtrace(G)),!.
 
 expand_pterm_to_sterm(SNIL,NIL):- SNIL=='NIL',!,NIL=[].
 expand_pterm_to_sterm(SNIL,NIL):- SNIL=='nil',!,NIL=[].
@@ -180,7 +180,7 @@ eval_compiled(SExpression,Result):-
 eval_int(Var,  R):- var(Var),!, R=Var.
 eval_int(SExpression,Result):- 
   as_sexp(SExpression,Expression),
-  eval(Expression,Result).
+  must_or_rtrace(eval(Expression,Result)).
 
 eval(SExpression,Result):-eval_repl(SExpression,Result).
 eval(Expression, Result):-
@@ -218,7 +218,7 @@ eval_repl([nodebug,A], t):- nodebug(lisp(A)).
 eval_repl([X], R):- eval_repl_atom( X, R),!.
 eval_repl( X , R):- eval_repl_atom( X, R),!.
 
-maybe_ltrace(G):- current_prolog_flag(lisp_trace,true)->rtrace(G);call(G).
+maybe_ltrace(G):- current_prolog_flag(lisp_trace,true)->rtrace(G);must_or_rtrace(G).
 
 eval_repl_atom(end_of_file, quit):-!.
 eval_repl_atom(quit, quit):-!.

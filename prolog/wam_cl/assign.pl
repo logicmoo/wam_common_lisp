@@ -94,6 +94,13 @@ compile_assigns(_Cx,Env,Value, Atom,  Body):- atom(Atom),
 initState:attr_unify_hook(_,_).
 
 
+extract_variable_value([Val|Vals], FoundVal, Hole):-
+		var(Vals)
+	->	FoundVal = Val,
+		Hole = Vals
+	;	extract_variable_value(Vals, FoundVal, Hole).
+
+
 symbol_value(Var,Env,Value):-
   symbol_value_or(Var,Env,
     last_chance_symbol_value(Var,Env,Value),Value).

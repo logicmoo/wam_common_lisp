@@ -52,12 +52,12 @@ sf_null(Item, Result):-
 	->	Result = t
 	;	Result = [].
 
-eq(Item1, Item2, Result):-
+sf_eq(Item1, Item2, Result):-
 		Item1 == Item2
 	->	Result = t
 	;	Result = [].
 
-equalp(Item1, Item2, Result):-
+sf_equalp(Item1, Item2, Result):-
 		Item1 = Item2
 	->	Result = t
 	;	Result = [].
@@ -65,29 +65,33 @@ equalp(Item1, Item2, Result):-
 
 % plus(Num1, Num2, Result):-Result is Num1 + Num2.
 
-minus(Num1, Num2, Result):-
+sf_minus(Num1, Num2, Result):-
 	Result is Num1 - Num2.
-times(Num1, Num2, Result):-
+sf_times(Num1, Num2, Result):-
 	Result is Num1 * Num2.
-divide(Num1, Num2, Result):-
+sf_divide(Num1, Num2, Result):-
 	Result is Num1 / Num2.
 
 
-lisp_not(Boolean, Result):-
+sf_lisp_not(Boolean, Result):-
 		Boolean = []
 	->	Result = t
 	;	Result = [].
 
-or(Bool1, Bool2, Result):-
+
+/*
+Wrongness
+sf_or(Bool1, Bool2, Result):-
 		once( (Bool1 \= [] ; Bool2 \= []))
 	->	Result = t
 	;	Result = [].
 
-and(Bool1, Bool2, Result):-
+sf_and(Bool1, Bool2, Result):-
 		(Bool1 \= [] , Bool2 \= [])
 	->	Result = t
 	;	Result = [].
 
+*/
 
 lisp_apply(FunctionObject, Arguments, Result):-
 		FunctionObject = closure(FormalArgs, Body, Environment)
@@ -99,15 +103,24 @@ lisp_apply(FunctionObject, Arguments, Result):-
 		call(Function).
 
 
-extract_variable_value([Val|Vals], FoundVal, Hole):-
-		var(Vals)
-	->	FoundVal = Val,
-		Hole = Vals
-	;	extract_variable_value(Vals, FoundVal, Hole).
-
-
 lisp_call(Function, Result):-
 	apply(Function, [Result]).
+
+
+
+-(A, B, R):- R is A - B.
+-(A, R):- R is -A.
++(A, B, R):- R is A + B.
+*(A, B, R):- R is A * B.
+'/'(A, B, R):- R is A / B.
+
+>(A, B, R):- A > B-> R=t ; R=[].
+<(A, B, R):- A < B-> R=t ; R=[].
+% =(A, B, R):- A \= B-> R=[] ; R=t.
+
+is_special_var_c(_,_):-!,fail.
+sym_arg_val_envc(N,A,B,_) :- is_special_var_c(N,B) -> true ; A = B.
+
 
 
 
@@ -176,22 +189,6 @@ fibp2(N, F) :-
 % CLISP
 % (time (fib 38))
 % 53.0 sec.
-
-
-
-
--(A, B, R):- R is A - B.
--(A, R):- R is -A.
-+(A, B, R):- R is A + B.
-*(A, B, R):- R is A * B.
-'/'(A, B, R):- R is A / B.
-
->(A, B, R):- A > B-> R=t ; R=[].
-<(A, B, R):- A < B-> R=t ; R=[].
-% =(A, B, R):- A \= B-> R=[] ; R=t.
-
-is_special_var_c(_,_):-!,fail.
-sym_arg_val_envc(N,A,B,_) :- is_special_var_c(N,B) -> true ; A = B.
 
 
 /*

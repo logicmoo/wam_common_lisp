@@ -33,7 +33,17 @@ macro_expand([X|Xs], [MX|MXs]):-
 	macro_expand(Xs, MXs).
 macro_expand(X, X):-
 	atomic(X),
-	!.             
+	!.        
+
+expand_commas(_,One,Out):- \+ compound(One),!,One=Out.
+expand_commas(Bindings,['$COMMA',One],Out):- !, symbol_value(One,Bindings,Out).
+expand_commas(Bindings,'$COMMA'(One),Out):- !, symbol_value(One,Bindings,Out).
+expand_commas(Bindings,['$BQ',One],Out):- !, expand_commas(Bindings,One,Mid), (One==Mid ->  Out=['$BQ',Mid] ; Out=Mid),!.
+expand_commas(Bindings,One,Out):- is_list(One),!,maplist(expand_commas(Bindings),One,Out).
+expand_commas(Bindings,One,Out):-
+  compound_name_arguments(One,F,Args),
+  maplist(expand_commas(Bindings),Args,ArgsOut),
+  Out=..[F|ArgsOut],!.
 
 :- fixup_exports.
 

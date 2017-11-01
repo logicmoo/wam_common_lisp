@@ -88,6 +88,96 @@ m_arg3(m(_,_,Name),Name):-!.
 
 :- ensure_loaded(clstructs).
 
+
+/*
+
+  // Packages.
+  public static final Package PACKAGE_CL =
+    Packages.createPackage("COMMON-LISP", 2048); // EH 10-10-2010: Actual number = 1014
+  public static final Package PACKAGE_CL_USER =
+    Packages.createPackage("COMMON-LISP-USER", 1024);
+  public static final Package PACKAGE_KEYWORD =
+    Packages.createPackage("KEYWORD", 1024);
+  public static final Package PACKAGE_SYS =
+    Packages.createPackage("SYSTEM", 2048); // EH 10-10-2010: Actual number = 1216
+  public static final Package PACKAGE_MOP =
+    Packages.createPackage("MOP", 512); // EH 10-10-2010: Actual number = 277
+  public static final Package PACKAGE_TPL =
+    Packages.createPackage("TOP-LEVEL", 128); // EH 10-10-2010: Actual number = 6
+  public static final Package PACKAGE_EXT =
+    Packages.createPackage("EXTENSIONS", 256); // EH 10-10-2010: Actual number = 131
+  public static final Package PACKAGE_JVM =
+    Packages.createPackage("JVM", 2048); // EH 10-10-2010: Actual number = 1518
+  public static final Package PACKAGE_LOOP =
+    Packages.createPackage("LOOP", 512); // EH 10-10-2010: Actual number = 305
+  public static final Package PACKAGE_PROF =
+    Packages.createPackage("PROFILER");
+  public static final Package PACKAGE_JAVA =
+    Packages.createPackage("JAVA");
+  public static final Package PACKAGE_LISP =
+    Packages.createPackage("LISP");
+  public static final Package PACKAGE_THREADS =
+    Packages.createPackage("THREADS");
+  public static final Package PACKAGE_FORMAT =
+    Packages.createPackage("FORMAT");
+  public static final Package PACKAGE_XP =
+    Packages.createPackage("XP");
+  public static final Package PACKAGE_PRECOMPILER =
+    Packages.createPackage("PRECOMPILER");
+  public static final Package PACKAGE_SEQUENCE =
+    Packages.createPackage("SEQUENCE", 128); // EH 10-10-2010: Actual number 62
+
+
+  @DocString(name="nil")
+  public static final Symbol NIL = Nil.NIL;
+
+  // We need NIL before we can call usePackage().
+  static
+  {
+    PACKAGE_CL.addNickname("CL");
+    PACKAGE_CL_USER.addNickname("CL-USER");
+    PACKAGE_CL_USER.usePackage(PACKAGE_CL);
+    PACKAGE_CL_USER.usePackage(PACKAGE_EXT);
+    PACKAGE_CL_USER.usePackage(PACKAGE_JAVA);
+    PACKAGE_SYS.addNickname("SYS");
+    PACKAGE_SYS.usePackage(PACKAGE_CL);
+    PACKAGE_SYS.usePackage(PACKAGE_EXT);
+    PACKAGE_MOP.usePackage(PACKAGE_CL);
+    PACKAGE_MOP.usePackage(PACKAGE_EXT);
+    PACKAGE_MOP.usePackage(PACKAGE_SYS);
+    PACKAGE_TPL.addNickname("TPL");
+    PACKAGE_TPL.usePackage(PACKAGE_CL);
+    PACKAGE_TPL.usePackage(PACKAGE_EXT);
+    PACKAGE_EXT.addNickname("EXT");
+    PACKAGE_EXT.usePackage(PACKAGE_CL);
+    PACKAGE_EXT.usePackage(PACKAGE_THREADS);
+    PACKAGE_JVM.usePackage(PACKAGE_CL);
+    PACKAGE_JVM.usePackage(PACKAGE_EXT);
+    PACKAGE_JVM.usePackage(PACKAGE_SYS);
+    PACKAGE_LOOP.usePackage(PACKAGE_CL);
+    PACKAGE_PROF.addNickname("PROF");
+    PACKAGE_PROF.usePackage(PACKAGE_CL);
+    PACKAGE_PROF.usePackage(PACKAGE_EXT);
+    PACKAGE_JAVA.usePackage(PACKAGE_CL);
+    PACKAGE_JAVA.usePackage(PACKAGE_EXT);
+    PACKAGE_LISP.usePackage(PACKAGE_CL);
+    PACKAGE_LISP.usePackage(PACKAGE_EXT);
+    PACKAGE_LISP.usePackage(PACKAGE_SYS);
+    PACKAGE_THREADS.usePackage(PACKAGE_CL);
+    PACKAGE_THREADS.usePackage(PACKAGE_EXT);
+    PACKAGE_THREADS.usePackage(PACKAGE_SYS);
+    PACKAGE_FORMAT.usePackage(PACKAGE_CL);
+    PACKAGE_FORMAT.usePackage(PACKAGE_EXT);
+    PACKAGE_XP.usePackage(PACKAGE_CL);
+    PACKAGE_PRECOMPILER.addNickname("PRE");
+    PACKAGE_PRECOMPILER.usePackage(PACKAGE_CL);
+    PACKAGE_PRECOMPILER.usePackage(PACKAGE_EXT);
+    PACKAGE_PRECOMPILER.usePackage(PACKAGE_SYS);
+    PACKAGE_SEQUENCE.usePackage(PACKAGE_CL);
+  }
+
+*/
+
 :- fixup_exports.
 
 
