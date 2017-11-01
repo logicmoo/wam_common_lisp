@@ -1,3 +1,20 @@
+/*******************************************************************
+ *
+ * A Common Lisp compiler/interpretor, written in Prolog
+ *
+ * (xxxxx.pl)
+ *
+ *
+ * Douglas'' Notes:
+ *
+ * (c) Douglas Miles, 2017
+ *
+ * The program is a *HUGE* common-lisp compiler/interpreter. It is written for YAP/SWI-Prolog (YAP 4x faster).
+ *
+ *******************************************************************/
+:- module(clstructs, []).
+:- set_module(class(library)).
+:- include('header.pro').
 
 % :- use_module(library(pfc)).
 
@@ -4672,3 +4689,6 @@ mop_direct(t, submop, cl_structure_object).
 mop_direct(t, submop, cl_symbol).
 mop_direct(t, submop, 'SYSTEM-AREA-POINTER').
 mop_direct(t, submop, 'WEAK-POINTER').
+
+:- fixup_exports.
+

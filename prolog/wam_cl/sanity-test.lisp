@@ -2,6 +2,13 @@
 
 (in-package "CL-USER")
 
+
+(defun fib (n)
+  (if (> n 1)
+    (+ (fib (- n 1))
+       (fib (- n 2)))
+    1))
+
 ;;                          EXAMPLES.LISP
 ;;           Nick Levine, Ravenbrook Limited, 2003-08-14
 ;; 

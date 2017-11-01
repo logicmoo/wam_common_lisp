@@ -324,6 +324,7 @@
 		          ,(recur (cdr clauses)))))))
       `(let ((,temp ,keyform))
 	,(recur clauses)))))
+
 (defun type-of (object)
   (case (ldb (cons 2 0) (ival object))
     (0 (if (eq object nil)
@@ -344,6 +345,7 @@
 	 (84 'double)
 	 (116 'simple-bit-vector)
 	 (t 'file-stream)))))
+
 (defmacro ecase (keyform &rest clauses)
   (let ((temp (gensym)))
     `(let ((,temp ,keyform))

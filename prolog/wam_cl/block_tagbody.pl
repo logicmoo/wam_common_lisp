@@ -1,28 +1,28 @@
-:- module(block_tagbody,
-  [call_test_compiled/2]).
+/*******************************************************************
+ *
+ * A Common Lisp compiler/interpretor, written in Prolog
+ *
+ * (symbol_places.pl)
+ *
+ *
+ * Douglas'' Notes:
+ *
+ * (c) Douglas Miles, 2017
+ *
+ * The program is a *HUGE* common-lisp compiler/interpreter. It is written for YAP/SWI-Prolog (YAP 4x faster).
+ *
+ *******************************************************************/
+:- module(block_tagbody,[]).
 
+:- set_module(class(library)).
 
-:- dynamic(shared_lisp_compiler:plugin_expand_function_body/5).
-:- multifile(shared_lisp_compiler:plugin_expand_function_body/5).
-:- discontiguous(shared_lisp_compiler:plugin_expand_function_body/5).
+:- include('header.pro').
 
 
 %:- dynamic(compile_body_h/5).
 %:- multifile(compile_body_h/5).
 :- discontiguous(compile_body_h/5).
 
-
-
-
-:- dynamic(tst:is_local_test/1).
-:- multifile(tst:is_local_test/1).
-:- discontiguous(tst:is_local_test/1).
-:- dynamic(tst:is_local_test/2).
-:- multifile(tst:is_local_test/2).
-:- discontiguous(tst:is_local_test/2).
-:- dynamic(tst:is_local_test/3).
-:- multifile(tst:is_local_test/3).
-:- discontiguous(tst:is_local_test/3).
 
 
 /*
@@ -42,10 +42,8 @@
 => 6
      */
 
-:-user:ensure_loaded('lisp-interpreter').
-
 % :- thread_local(t_l:btb/2).
-:- discontiguous(t_l:btb/2).
+%:- discontiguous(t_l:btb/2).
 
 /*
 
@@ -142,8 +140,6 @@ Instead simply grab the List''s reference at some numerical points
 
 */
 
-:-user:ensure_loaded(lisp_compiler).
-
 tst:is_local_test(tagbody_let3,
  [let, [b],
      [tagbody,
@@ -174,7 +170,7 @@ tst:is_local_test_HIDE(tagbody6,[tagbody,
 
 compile_tagbody_forms(Ctx,Env,Result,[enter(_)|InstrS],BInstrS):- !,compile_tagbody_forms(Ctx,Env,Result,InstrS,BInstrS).
 compile_tagbody_forms(Ctx,Env,Result,InstrS,BInstrS):-
-   maplist(label_atoms(),InstrS,TInstrS),
+   maplist(label_atoms,InstrS,TInstrS),
    trim_tagbody(TInstrS,CInstrS),
    compile_forms(Ctx,Env,Result,CInstrS,BInstrS).
 
@@ -316,14 +312,16 @@ push_label(_).
 %call_then_return(G):- G,goto(exit(_),[],Env).
 print(X,X):-writeln(X).
 
+
 =(N1,N2,Result):- t_or_nil(=(N1,N2),Result). 
+/*
 <(N1,N2,Result):- t_or_nil(<(N1,N2),Result). 
 >(N1,N2,Result):- t_or_nil(>(N1,N2),Result). 
 +(N1,N2,Result):- Result is (N1 + N2).
 -(N1,N2,Result):- Result is (N1 - N2).
 *(N1,N2,Result):- Result is (N1 * N2).
 /(N1,N2,Result):- Result is (N1 / N2).
-
+*/
 
 '1+'(N,R):- R is N + 1.
 '1-'(N,R):- R is N - 1.
@@ -398,6 +396,7 @@ get_tags(Env,[I|InstrS],Gos,Addrs):- % #branching call
 get_tags(Env,[_|InstrS],Gos,Addrs):-
   get_tags(Env,InstrS,Gos,Addrs).
 
+% @todo
 check_missing_gos(_).
 
 % asserta((fifteen(Val_Thru23):-!, []=[[]], LETENV=[[bv(val, [[]|_832])]], 
@@ -499,19 +498,6 @@ tst:is_local_test(let_tagbody,
 
 %:- forall(clause(block_tagbody_test(_N),B),B).
 
-test123:- 
-   GoEnvLETENV=[[bv('temp-one', [1|_518]), bv('temp-two', [0|_520])]|toplevel],
-   call_addr_block(GoEnvLETENV,
-                   goto(enter([]), [], _2564),
-
-                   [ addr(enter([]),
-                          '$used',
-                          (call_addr_block(GoEnvLETENV,  
-                            (push_label(dosym1), sym_arg_val_env('temp-one', _1698, _1712, _1726), sym_arg_val_env('temp-two', _1740, _1754, _1726), minus(_1712, _1754, _1768), lessThan(_1768, 5, _1782), (_1782\=[]->sym_arg_val_env('temp-one', _1796, _1810, _1726), goto(exit([]), _1810, _1726), _1822=_1826;sym_arg_val_env('temp-one', _1840, _1854, _1726), '1+'(_1854, _1868), sym_arg_val_env('temp-two', _1882, _1896, _1726), '1-'(_1896, _1910), symbol_setter(psetq, 'temp-one', _1868, _1726), symbol_setter(psetq, 'temp-two', _1910, _1726), _1822=[[_1868, _1910]]), goto(dosym1, [], _1726)), [addr(dosym1, '$unused',  (sym_arg_val_env('temp-one', Temp_one_In, Temp_one_Thru, GoEnvLETENV), sym_arg_val_env('temp-two', Temp_two_In, Temp_two_Thru, GoEnvLETENV), minus(Temp_one_Thru, Temp_two_Thru, Minus_Ret), lessThan(Minus_Ret, 5, IFLessThan_Ret), (IFLessThan_Ret\=[]->sym_arg_val_env('temp-one', Temp_one_In13, RetValTemp_one_Thru14, GoEnvLETENV), goto(exit([]), RetValTemp_one_Thru14, GoEnvLETENV), _216=_GORES;sym_arg_val_env('temp-one', Temp_one_In17, Temp_one_Thru18, GoEnvLETENV), '1+'(Temp_one_Thru18, Vv1_c43__Ret), sym_arg_val_env('temp-two', Temp_two_In20, Temp_two_Thru21, GoEnvLETENV), '1-'(Temp_two_Thru21, Vv1__Ret), symbol_setter(psetq, 'temp-one', Vv1_c43__Ret, GoEnvLETENV), symbol_setter(psetq, 'temp-two', Vv1__Ret, GoEnvLETENV), _216=[[Vv1_c43__Ret, Vv1__Ret]]), goto(dosym1, [], GoEnvLETENV)))], _GORES44), goto(exit([]), [], GoEnvLETENV))),
-                     addr(exit([]), '$used', push_label(exit([])))
-                   ],
-                   _GORES47).
-
 
 :- fixup_exports.
 
@@ -524,11 +510,560 @@ test123:-
         addr('point-b', '$used', ['point-b', [incf, val, 8]])], _GORES15),
    sym_arg_val_env(val, Val_In22, Val_Thru23, LETENV)
 
-
-
-
-
-
       */
 
+end_of_file.
+
+
+(defpackage "TB"
+  (:use "CL")
+  (:shadow "TAGBODY" "GO"))
+
+(in-package "TB")
+
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defun split-tagbody (body)
+    (loop
+      :with chunks := '()
+      :with chunk := '()
+      :for item :in body
+      :if (symbolp item)
+        :do (push (nreverse chunk) chunks)
+            (setf chunk (list item))
+      :else
+        :do (push item chunk)
+      :finally (push (nreverse chunk) chunks)
+               (return (nreverse chunks)))))
+
+(defmacro go (name)
+  `(error "Cannot (go ~S) from outside of a tagbody." ',name))
+
+(defmacro tagbody (&body body)
+  (let* ((chunks (split-tagbody body))
+         (tags   (mapcar (lambda (chunk)
+                           (let ((tag (first chunk)))
+                             (cons tag
+                                   (make-symbol (format nil "tag-~S" tag)))))
+                         (rest chunks)))
+         (exit (make-symbol "exit")))
+    (flet ((expand-go (name)
+             (list (or (cdr (assoc name tags))
+                       (error "Unknown tag ~S" name)))))
+      `(macrolet ((go (name)
+                    (let ((fun (cdr (assoc name ',tags))))
+                      (if fun
+                          `(,fun)
+                          (error "Unknown tag ~S" name)))))
+         (block ,exit
+           (labels ,(mapcar (lambda (chunk next-chunk)
+                              (destructuring-bind (name &rest body) chunk
+                                `(,(cdr (assoc name tags)) ()
+                                  ,@body
+                                  ,(if next-chunk
+                                       (expand-go (first next-chunk))
+                                       `(return-from ,exit nil)))))
+                            (rest chunks) (append (rest (rest chunks)) '(())))
+             ,@(first chunks)
+             ,(expand-go (first (first (rest chunks))))))))))
+
+
+(pprint
+ (macroexpand-1 '(tagbody
+                  (print 'begin)
+                  (go test)
+                  loop
+                  (print 'hi)
+                  (print 'lo)
+                  end-of-loop
+                  test
+                  (if (plusp (decf foo))
+                      (go loop)))))
+
+(macrolet ((go (name)
+             (let ((fun
+                    (cdr (assoc name
+                                '((loop . #1=#:|tag-loop|) (end-of-loop . #2=#:|tag-end-of-loop|)
+                                  (test . #3=#:|tag-test|))))))
+               (if fun (list fun) (error "Unknown tag ~S" name)))))
+  (block #4=#:|exit|
+    (labels ((#1# nil (print 'hi) (print 'lo) (#2#))
+             (#2# nil (#3#))
+             (#3# nil (if (plusp (decf foo)) (go loop)) (return-from #4# nil)))
+      (print 'begin)
+      (go test)
+      (#1#))))
+
+
+
+
+(let ((i 3))
+  (tagbody
+     (print 'begin)
+     (go test)
+   loop
+     (print 'hi)
+     (print 'lo)
+   end-of-loop
+   test
+     (if (plusp (decf i))
+         (go loop))))
+
+
+
+
+__        ___    __  __        ____ _
+\ \      / / \  |  \/  |      / ___| |
+ \ \ /\ / / _ \ | |\/| |_____| |   | |
+  \ V  V / ___ \| |  | |_____| |___| |___
+   \_/\_/_/   \_\_|  |_|      \____|_____|
+
+Common Lisp, written in Prolog
+> ^DTerminating WAM-CL
+?- compile_test(X,Y,Z,Q),dbmsg(Y),call(Y).
+/*
+:- lisp_compiled_eval(
+                      [ defun,
+                        sum_with_map,
+                        [xs],
+
+                        [ let,
+                          [[running_total, 0]],
+
+                          [ let,
+
+                            [
+                              [ summer,
+
+                                [ function,
+
+                                  [ lambda,
+                                    [n],
+                                    [setq, running_total, [+, running_total, n]]
+                                  ]
+                                ]
+                              ]
+                            ],
+                            [mapcar, summer, xs],
+                            running_total
+                          ]
+                        ]
+                      ]).
+*/
+( defun sum_with_map ( xs ) ( let ( ( running_total 0 ) ) ( let ( ( summer # ' ( lambda ( n ) ( setq running_total ( + running_total n ) ) ) ) ) ( mapcar summer xs ) running_total ) ) )
+/*
+dbmsg(asserta, sum_with_map(Xs_In, RETRunning_total_Thru23)) :-
+        fail,
+        ( [sum_with_map, xs]<<==[[let, [[running_total, 0]], [let, [[summer, [function, [lambda, [n], [setq, running_total, [+, running_total, n]]]]]], [mapcar, summer, xs], running_total]]]
+        ).
+dbmsg(asserta, sum_with_map(Xs_In, RETRunning_total_Thru23)) :- !,
+        DEnv=[[bv(xs, [Xs_In|__])]],
+        LETENV=[[bv(running_total, [0|_178])]|DEnv],
+        LETENV15=[[bv(summer, [[closure, [n], [LEnv, LResultVv_c43__Ret]^(sym_arg_val_env(running_total, Running_total_In, Running_total_Thru, LEnv), sym_arg_val_env(n, N_In, N_Thru, LEnv), +(Running_total_Thru, N_Thru, LResultVv_c43__Ret), symbol_setter(setq, running_total, LResultVv_c43__Ret, LEnv)), LETENV]|_378])]|LETENV],
+        sym_arg_val_env(summer, Summer_In, Summer_Thru, LETENV15),
+        sym_arg_val_env(xs, Xs_In, Xs_Thru, LETENV15),
+        mapcar(Summer_Thru, Xs_Thru, Mapcar_Ret),
+        sym_arg_val_env(running_total,
+                        Running_total_In22,
+                        RETRunning_total_Thru23,
+                        LETENV15).
+*/
+Y =  (asserta((sum_with_map(_548, _616):-fail, ([sum_with_map, xs]<<==[[let, [[...|...]], [...|...]]]))), asserta((sum_with_map(_548, _616):-!, _174=[[bv(xs, [...|...])]], _180=[[bv(..., ...)]|_174], _422=[[...]|...], sym_arg_val_env(summer, _480, _466, _422), sym_arg_val_env(..., ..., ..., ...), ..., ...))),
+Z = sum_with_map ;
+/*
+:- lisp_compiled_eval(
+                      [ defun,
+                        sum_with_map,
+                        [xs],
+
+                        [ let,
+                          [[running_total, 0]],
+
+                          [ let,
+
+                            [
+                              [ summer,
+
+                                [ function,
+
+                                  [ lambda,
+                                    [n],
+                                    [setq, running_total, [+, running_total, n]]
+                                  ]
+                                ]
+                              ]
+                            ],
+                            [mapcar, summer, xs],
+                            running_total
+                          ]
+                        ]
+                      ]).
+*/
+( defun sum_with_map ( xs ) ( let ( ( running_total 0 ) ) ( let ( ( summer # ' ( lambda ( n ) ( setq running_total ( + running_total n ) ) ) ) ) ( mapcar summer xs ) running_total ) ) )
+/*
+dbmsg(asserta, sum_with_map(Xs_In, RETRunning_total_Thru23)) :-
+        fail,
+        ( [sum_with_map, xs]<<==[[let, [[running_total, 0]], [let, [[summer, [function, [lambda, [n], [setq, running_total, [+, running_total, n]]]]]], [mapcar, summer, xs], running_total]]]
+        ).
+dbmsg(asserta, sum_with_map(Xs_In, RETRunning_total_Thru23)) :- !,
+        DEnv=[[bv(xs, [Xs_In|__])]],
+        LETENV=[[bv(running_total, [0|_178])]|DEnv],
+        LETENV15=[[bv(summer, [[closure, [n], [LEnv, LResultVv_c43__Ret]^(sym_arg_val_env(running_total, Running_total_In, Running_total_Thru, LEnv), sym_arg_val_env(n, N_In, N_Thru, LEnv), +(Running_total_Thru, N_Thru, LResultVv_c43__Ret), symbol_setter(setq, running_total, LResultVv_c43__Ret, LEnv)), LETENV]|_378])]|LETENV],
+        sym_arg_val_env(summer, Summer_In, Summer_Thru, LETENV15),
+        sym_arg_val_env(xs, Xs_In, Xs_Thru, LETENV15),
+        mapcar(Summer_Thru, Xs_Thru, Mapcar_Ret),
+        sym_arg_val_env(running_total,
+                        Running_total_In22,
+                        RETRunning_total_Thru23,
+                        LETENV15).
+*/
+Y =  (asserta((sum_with_map(_548, _616):-fail, ([sum_with_map, xs]<<==[[let, [[...|...]], [...|...]]]))), asserta((sum_with_map(_548, _616):-!, _174=[[bv(xs, [...|...])]], _180=[[bv(..., ...)]|_174], _422=[[...]|...], sym_arg_val_env(summer, _480, _466, _422), sym_arg_val_env(..., ..., ..., ...), ..., ...))),
+Z = sum_with_map ;
+/*
+:- lisp_compiled_eval(
+                      [ defun,
+                        accumulate,
+                        [op, seq, '&optional', [init, 0]],
+
+                        [ if,
+                          [null, seq],
+                          init,
+
+                          [ funcall,
+                            op,
+                            [car, seq],
+                            [accumulate, op, [cdr, seq], init]
+                          ]
+                        ]
+                      ]).
+*/
+( defun accumulate ( op seq &optional ( init 0 ) ) ( if ( null seq ) init ( funcall op ( car seq ) ( accumulate op ( cdr seq ) init ) ) ) )
+/*
+dbmsg(asserta, accumulate(Op_In19, Seq_In22, Vv_c38_optional, InitVv0, RET)) :-
+        fail,
+        ( [accumulate, op, seq, '&optional', [init, 0]]<<==[[if, [null, seq], init, [funcall, op, [car, seq], [accumulate, op, [cdr, seq], init]]]]
+        ).
+dbmsg(asserta, accumulate(Op_In19, Seq_In22, Vv_c38_optional, InitVv0, RET)) :- !,
+        DEnv=[[bv(op, [Op_In19|__]), bv(seq, [Seq_In22|__]), bv('&optional', [Vv_c38_optional|_414]), bv([init, 0], [InitVv0|_430])]],
+        sym_arg_val_env(seq, Seq_In22, IFSeq_Thru, DEnv),
+        (   IFSeq_Thru==[]
+        ->  sym_arg_val_env(init, Init_In, Init_Thru, DEnv),
+            RET=Init_Thru
+        ;   sym_arg_val_env(op, Op_In19, Op_Thru, DEnv),
+            symbol_value(seq, DEnv, Seq_Thru17),
+            car(Seq_Thru17, Car_Ret),
+            symbol_value(op, DEnv, Op_Thru20),
+            symbol_value(seq, DEnv, Seq_Thru23),
+            cdr(Seq_Thru23, Cdr_Ret),
+            sym_arg_val_env(init, Init_In25, Init_Thru26, DEnv),
+            accumulate(Op_Thru20, Cdr_Ret, Init_Thru26, Accumulate_Ret),
+            funcall(Op_Thru, Car_Ret, Accumulate_Ret, Funcall_Ret),
+            RET=Funcall_Ret
+        ).
+*/
+Y =  (asserta((accumulate(_660, _518, _412, _428, _444):-fail, ([accumulate, op, seq, '&optional'|...]<<==[[if, [null|...], init|...]]))), asserta((accumulate(_660, _518, _412, _428, _444):-!, _458=[[bv(op, [...|...]), bv(..., ...)|...]], sym_arg_val_env(seq, _518, _504, _458), (_504==[]->sym_arg_val_env(..., ..., ..., ...), ... = ...;sym_arg_val_env(op, _660, _646, _458), symbol_value(..., ..., ...), ..., ...)))),
+Z = accumulate ;
+/*
+:- lisp_compiled_eval(
+                      [ let,
+                        [b],
+
+                        [ tagbody,
+                          [setq, b, 2],
+                          [go, tag2],
+                          [setq, a, 1],
+                          tag1,
+                          [setq, b, 3],
+                          [go, tag3],
+                          tag2,
+                          [setq, a, 4],
+                          [go, tag1],
+                          tag3,
+                          [print, ['1+', [plus, a, b]]]
+                        ],
+                        b
+                      ]).
+*/
+( let ( b ) ( tagbody ( setq b 2 ) ( go tag2 ) ( setq a 1 ) tag1 ( setq b 3 ) ( go tag3 ) tag2 ( setq a 4 ) ( go tag1 ) tag3 ( print ( 1+ ( plus a b ) ) ) ) b )
+/*
+:- GoEnvLETENV=[[bv(b, [[]|_942])]|toplevel],
+   call_addr_block(GoEnvLETENV,
+                   (symbol_setter(setq, b, 2, GoEnvLETENV), goto(tag2, [], GoEnvLETENV)),
+
+                   [ addr(tag1,
+                          '$used',
+                          _6250,
+                          (symbol_setter(setq, b, 3, _6250), goto(tag3, [], _6250))),
+                     addr(tag2,
+                          '$used',
+                          _6296,
+                          (symbol_setter(setq, a, 4, _6296), goto(tag1, [], _6296))),
+                     addr(tag3,
+                          '$used',
+                          _6344,
+                          (sym_arg_val_env(a, _6358, _6360, _6344), sym_arg_val_env(b, _6374, _6376, _6344), plus(_6360, _6376, _6392), '1+'(_6392, _6404), print(_6404, _6414)))
+                   ],
+                   _GORES18),
+   sym_arg_val_env(b, B_In20, B_Thru21, GoEnvLETENV).
+*/
+8
+X = tagbody_let3,
+Y =  ([[bv(b, [2|_150])]|toplevel]=[[bv(b, [2|_150])]|toplevel], call_addr_block([[bv(b, [2|_150])]|toplevel],  (symbol_setter(setq, b, 2, [[bv(b, [2|...])]|toplevel]), goto(tag2, [], [[bv(b, [2|...])]|toplevel])), [addr(tag1, '$used', _528,  (symbol_setter(setq, b, 3, _528), goto(tag3, [], _528))), addr(tag2, '$used', _532,  (symbol_setter(setq, a, 4, _532), goto(tag1, [], _532))), addr(tag3, '$used', _544,  (sym_arg_val_env(a, _546, _548, _544), sym_arg_val_env(..., ..., ..., ...), ..., ...))], []), sym_arg_val_env(b, 2, 2, [[bv(b, [2|_150])]|toplevel])),
+Z = 2,
+Q = 3 ;
+/*
+:- lisp_compiled_eval(
+                      [ tagbody,
+                        [setq, b, 2],
+                        [go, tag2],
+                        [setq, a, 1],
+                        tag1,
+                        [setq, b, 3],
+                        [go, tag3],
+                        tag2,
+                        [setq, a, 4],
+                        [go, tag1],
+                        tag3,
+                        [print, ['1+', [plus, a, b]]]
+                      ]).
+*/
+( tagbody ( setq b 2 ) ( go tag2 ) ( setq a 1 ) tag1 ( setq b 3 ) ( go tag3 ) tag2 ( setq a 4 ) ( go tag1 ) tag3 ( print ( 1+ ( plus a b ) ) ) )
+/*
+:- call_addr_block(toplevel,
+                   (symbol_setter(setq, b, 2, toplevel), goto(tag2, [], toplevel)),
+
+                   [ addr(tag1,
+                          '$used',
+                          _11024,
+                          (symbol_setter(setq, b, 3, _11024), goto(tag3, [], _11024))),
+                     addr(tag2,
+                          '$used',
+                          _11070,
+                          (symbol_setter(setq, a, 4, _11070), goto(tag1, [], _11070))),
+                     addr(tag3,
+                          '$used',
+                          _11118,
+                          (sym_arg_val_env(a, _11132, _11134, _11118), sym_arg_val_env(b, _11148, _11150, _11118), plus(_11134, _11150, _11166), '1+'(_11166, _11178), print(_11178, _11188)))
+                   ],
+                   _GORES16).
+*/
+8
+X = tagbody7_prints_8,
+Y = call_addr_block(toplevel,  (symbol_setter(setq, b, 2, toplevel), goto(tag2, [], toplevel)), [addr(tag1, '$used', _466,  (symbol_setter(setq, b, 3, _466), goto(tag3, [], _466))), addr(tag2, '$used', _470,  (symbol_setter(setq, a, 4, _470), goto(tag1, [], _470))), addr(tag3, '$used', _472,  (sym_arg_val_env(a, _474, _476, _472), sym_arg_val_env(b, _478, _480, _472), plus(_476, _480, _482), '1+'(..., ...), print(..., ...)))], []),
+Z = [],
+Q = 7 ;
+/*
+:- lisp_compiled_eval(
+                      [ do,
+
+                        [ ['temp-one', 1, ['1+', 'temp-one']],
+                          ['temp-two', 0, ['1-', 'temp-two']]
+                        ],
+                        [[>, [-, 'temp-one', 'temp-two'], 5], 'temp-one']
+                      ]).
+*/
+( do ( ( temp-one 1 ( 1+ temp-one ) ) ( temp-two 0 ( 1- temp-two ) ) ) ( ( > ( - temp-one temp-two ) 5 ) temp-one ) )
+/*
+;:- call_addr_block(toplevel,
+                   goto(enter([]), [], toplevel),
+
+                   [ addr(enter([]),
+                          '$used',
+                          _1574,
+                          (_1600=[[bv('temp-one', [1|_1634]), bv('temp-two', [0|_1652])]|_1574], call_addr_block(_1600,  (push_label(dosym1), sym_arg_val_env('temp-one', _1694, _1708, _1600), sym_arg_val_env('temp-two', _1738, _1752, _1600), -(_1708, _1752, _1780), >(_1780, 5, _1808), (_1808\=[]->sym_arg_val_env('temp-one', _1862, _1876, _1600), goto(exit([]), _1876, _1600), _1904=_1910;sym_arg_val_env('temp-one', _1940, _1954, _1600), '1+'(_1954, _1980), sym_arg_val_env('temp-two', _2010, _2024, _1324), '1-'(_1386, _1390), symbol_setter(psetq, 'temp-one', _1378, _1324), symbol_setter(psetq, 'temp-two', _1390, _1324), _1362=[[_1378, _1390]]), goto(dosym1, [], _1324)), [addr(dosym1, '$unused', _1392,  (sym_arg_val_env('temp-one', _1394, _1396, _1392), sym_arg_val_env('temp-two', _1398, _1400, _1392), -(_1396, _1400, _1402), >(_1402, 5, _1406), (_1406\=[]->sym_arg_val_env('temp-one', _1410, _1414, _1392), goto(exit([]), _1414, _1392), _1416=_1418;sym_arg_val_env('temp-one', _1422, _1426, _1392), '1+'(_1426, _1428), sym_arg_val_env('temp-two', _1432, _1436, _1392), '1-'(_1436, _1438), symbol_setter(psetq, 'temp-one', _1428, _1392), symbol_setter(psetq, 'temp-two', _1438, _1392), _1416=[[_1428, _1438]]), goto(dosym1, [], _1392)))], _1442), goto(exit([]), [], _1320))),
+                     addr(exit([]), '$used', _1444, true)
+                   ],
+                   []).
+*/
+X = do(0.0),
+Y = call_addr_block(toplevel, goto(enter([]), [], toplevel), [addr(enter([]), '$used', _1318,  (_1320=[[bv('temp-one', [1|...]), bv('temp-two', [...|...])]|_1318], call_addr_block(_1320,  (push_label(dosym1), sym_arg_val_env('temp-one', _1326, _1328, _1320), sym_arg_val_env(..., ..., ..., ...), ..., ...), [addr(dosym1, '$unused', _1358,  (sym_arg_val_env(..., ..., ..., ...), ..., ...))], _1392), goto(exit([]), [], _1318))), addr(exit([]), '$used', _1394, true)], []),
+Z = [],
+Q = 4 ;
+/*
+:- lisp_compiled_eval(
+                      [ do,
+
+                        [ ['temp-one', 1, ['1+', 'temp-one']],
+                          ['temp-two', 0, ['1+', 'temp-one']]
+                        ],
+                        [[=, 3, 'temp-two'], 'temp-one']
+                      ]).
+*/
+( do ( ( temp-one 1 ( 1+ temp-one ) ) ( temp-two 0 ( 1+ temp-one ) ) ) ( ( = 3 temp-two ) temp-one ) )
+/*
+;:- call_addr_block(toplevel,
+                   goto(enter([]), [], toplevel),
+
+                   [ addr(enter([]),
+                          '$used',
+                          _1396,
+                          (_1422=[[bv('temp-one', [1|_1456]), bv('temp-two', [0|_1474])]|_1396], call_addr_block(_1422,  (push_label(dosym2), sym_arg_val_env('temp-two', _1516, _1530, _1422), =(3, _1530, _1558), (_1558\=[]->sym_arg_val_env('temp-one', _1612, _1626, _1422), goto(exit([]), _1626, _1422), _1654=_1660;sym_arg_val_env('temp-one', _1690, _1704, _1422), '1+'(_1704, _1730), sym_arg_val_env('temp-one', _1760, _1774, _1422), '1+'(_1774, _1800), symbol_setter(psetq, 'temp-one', _1730, _1422), symbol_setter(psetq, 'temp-two', _1800, _1422), _1654=[[_1730, _1800]]), goto(dosym2, [], _1422)), [addr(dosym2, '$unused', _1888,  (sym_arg_val_env('temp-two', _1902, _1904, _1888), =(3, _1904, _1924), (_1924\=[]->sym_arg_val_env('temp-one', _1970, _1978, _1888), goto(exit([]), _1978, _1888), _2006=_2008;sym_arg_val_env('temp-one', _2028, _2042, _1888), '1+'(_2042, _2064), sym_arg_val_env('temp-one', _2084, _2098, _1888), '1+'(_2098, _2124), symbol_setter(psetq, 'temp-one', _2064, _1888), symbol_setter(psetq, 'temp-two', _2124, _1888), _2006=[[_2064, _2124]]), goto(dosym2, [], _1888)))], _1266), goto(exit([]), [], _1162))),
+                     addr(exit([]), '$used', _1268, true)
+                   ],
+                   []).
+*/
+X = do(0.1),
+Y = call_addr_block(toplevel, goto(enter([]), [], toplevel), [addr(enter([]), '$used', _1160,  (_1162=[[bv('temp-one', [1|...]), bv('temp-two', [...|...])]|_1160], call_addr_block(_1162,  (push_label(dosym2), sym_arg_val_env('temp-two', _1168, _1170, _1162), =(..., ..., ...), ..., ...), [addr(dosym2, '$unused', _1194,  (sym_arg_val_env(..., ..., ..., ...), ..., ...))], _1222), goto(exit([]), [], _1160))), addr(exit([]), '$used', _1224, true)], []),
+Z = [],
+Q = 3 ;
+/*
+:- lisp_compiled_eval(
+                      [ tagbody,
+                        [setq, b, 2],
+                        [go, tag1],
+                        [setq, a, 1],
+                        tag1,
+                        [setq, a, 4],
+                        [print, [plus, a, b]]
+                      ]).
+*/
+( tagbody ( setq b 2 ) ( go tag1 ) ( setq a 1 ) tag1 ( setq a 4 ) ( print ( plus a b ) ) )
+/*
+:- call_addr_block(toplevel,
+                   (symbol_setter(setq, b, 2, toplevel), goto(tag1, [], toplevel)),
+
+                   [ addr(tag1,
+                          '$used',
+                          _340,
+                          (symbol_setter(setq, a, 4, _340), sym_arg_val_env(a, _342, _344, _340), sym_arg_val_env(b, _346, _348, _340), plus(_344, _348, _350), print(_350, _352)))
+                   ],
+                   Z).
+*/
+6
+X = tagbody1,
+Y = call_addr_block(toplevel,  (symbol_setter(setq, b, 2, toplevel), goto(tag1, [], toplevel)), [addr(tag1, '$used', _340,  (symbol_setter(setq, a, 4, _340), sym_arg_val_env(a, _342, _344, _340), sym_arg_val_env(b, _346, _348, _340), plus(_344, _348, _350), print(_350, _352)))], []),
+Z = Q, Q = [] ;
+/*
+:- lisp_compiled_eval(
+                      [ block,
+                        block3,
+                        [setq, b, 2],
+                        [go, tag1],
+                        [setq, a, 1],
+                        tag1,
+                        [setq, a, 4],
+                        [print, [plus, a, b]],
+                        ['return-from', block3, [plus, a, b]]
+                      ]).
+*/
+( block block3 ( setq b 2 ) ( go tag1 ) ( setq a 1 ) tag1 ( setq a 4 ) ( print ( plus a b ) ) ( return-from block3 ( plus a b ) ) )
+/*
+:- call_addr_block(toplevel,
+                   goto(enter(block3), [], toplevel),
+
+                   [ addr(enter(block3),
+                          '$used',
+                          _14882,
+                          (symbol_setter(setq, b, 2, _14882), goto(tag1, [], _14882))),
+                     addr(tag1,
+                          '$used',
+                          _14922,
+                          (symbol_setter(setq, a, 4, _14922), sym_arg_val_env(a, _620, _622, _618), sym_arg_val_env(b, _624, _626, _618), plus(_622, _626, _628), print(_628, _630), sym_arg_val_env(a, _634, _638, _618), sym_arg_val_env(b, _642, _646, _618), plus(_638, _646, _650), goto(exit(block3), _650, _618))),
+                     addr(exit(block3), '$used', _652, true)
+                   ],
+                   []).
+*/
+6
+X = block3,
+Y = call_addr_block(toplevel, goto(enter(block3), [], toplevel), [addr(enter(block3), '$used', _616,  (symbol_setter(setq, b, 2, _616), goto(tag1, [], _616))), addr(tag1, '$used', _618,  (symbol_setter(setq, a, 4, _618), sym_arg_val_env(a, _620, _622, _618), sym_arg_val_env(b, _624, _626, _618), plus(_622, _626, _628), print(..., ...), ..., ...)), addr(exit(block3), '$used', _652, true)], []),
+Z = [],
+Q = 6 ;
+/*
+:- lisp_compiled_eval([defun, let_simple, [], [let, [val], val]]).
+*/
+( defun let_simple NIL ( let ( val ) val ) )
+/*
+dbmsg(asserta, let_simple(RETVal_Thru)) :-
+        fail,
+        ( [let_simple]<<==[[let, [val], val]]
+        ).
+dbmsg(asserta, let_simple(RETVal_Thru)) :- !,
+        DEnv=[[]],
+        LETENV=[[bv(val, [[]|_1024])]|DEnv],
+        sym_arg_val_env(val, Val_In, RETVal_Thru, LETENV).
+*/
+X = Z, Z = let_simple,
+Y =  (asserta((let_simple(_3888):-fail, ([let_simple]<<==[[let, [val], val]]))), asserta((let_simple(_3888):-!, _560=[[]], _1072=[[bv(..., ...)]|_560], sym_arg_val_env(val, _3902, _3888, _1072)))),
+Q = [] ;
+/*
+:- lisp_compiled_eval([defun, let_simple1, [], [let, [[val, 1]], val]]).
+*/
+( defun let_simple1 NIL ( let ( ( val 1 ) ) val ) )
+/*
+dbmsg(asserta, let_simple1(RETVal_Thru)) :-
+        fail,
+        ( [let_simple1]<<==[[let, [[val, 1]], val]]
+        ).
+dbmsg(asserta, let_simple1(RETVal_Thru)) :- !,
+        DEnv=[[]],
+        LETENV=[[bv(val, [1|_1034])]|DEnv],
+        sym_arg_val_env(val, Val_In, RETVal_Thru, LETENV).
+*/
+X = Z, Z = let_simple1,
+Y =  (asserta((let_simple1(_3898):-fail, ([let_simple1]<<==[[let, [[...|...]], val]]))), asserta((let_simple1(_3898):-!, _570=[[]], _1082=[[bv(..., ...)]|_570], sym_arg_val_env(val, _3912, _3898, _1082)))),
+Q = 1 ;
+/*
+:- lisp_compiled_eval(
+                      [ defun,
+                        fifteen,
+                        [],
+
+                        [ let,
+                          [val],
+
+                          [ tagbody,
+                            [setq, val, 1],
+                            [go, 'point-a'],
+                            [incf, val, 16],
+                            'point-c',
+                            [incf, val, 4],
+                            [go, 'point-b'],
+                            [incf, val, 32],
+                            'point-a',
+                            'point-u',
+                            [incf, val, 2],
+                            [go, 'point-c'],
+                            [incf, val, 64],
+                            'point-b',
+                            [incf, val, 8]
+                          ],
+                          val
+                        ]
+                      ]).
+*/
+( defun fifteen NIL ( let ( val ) ( tagbody ( setq val 1 ) ( go point-a ) ( incf val 16 ) point-c ( incf val 4 ) ( go point-b ) ( incf val 32 ) point-a point-u ( incf val 2 ) ( go point-c ) ( incf val 64 ) point-b ( incf val 8 ) ) val ) )
+/*
+dbmsg(asserta, fifteen(RETVal_Thru)) :-
+        fail,
+        ( [fifteen]<<==[[let, [val], [tagbody, [setq, val, 1], [go, 'point-a'], [incf, val, 16], 'point-c', [incf, val, 4], [go, 'point-b'], [incf, val, 32], 'point-a', 'point-u', [incf, val, 2], [go, 'point-c'], [incf, val, 64], 'point-b', [incf, val, 8]], val]]
+        ).
+dbmsg(asserta, fifteen(RETVal_Thru)) :- !,
+        DEnv=[[]],
+        GoEnvLETENV=[[bv(val, [[]|_152])]|DEnv],
+        call_addr_block(GoEnvLETENV,
+                        (symbol_setter(setq, val, 1, GoEnvLETENV), goto('point-a', [], GoEnvLETENV)),
+
+                        [ addr('point-c',
+                               '$used',
+                               _416,
+                               (place_op(incf, val, [4], _416, _418), goto('point-b', [], _416))),
+                          addr('point-a',
+                               '$used',
+                               _422,
+                               (push_label('point-u'), place_op(incf, val, [2], _422, _434), goto('point-c', [], _422))),
+                          addr('point-u',
+                               '$unused',
+                               _438,
+                               (place_op(incf, val, [2], _438, _450), goto('point-c', [], _438))),
+                          addr('point-b',
+                               '$used',
+                               _452,
+                               place_op(incf, val, [8], _452, _456))
+                        ],
+                        _GORES14),
+        sym_arg_val_env(val, Val_In, RETVal_Thru, GoEnvLETENV).
+*/
+X = let_tagbody,
+Y =  (asserta((fifteen(_496):-fail, ([fifteen]<<==[[let, [val], [...|...]|...]]))), asserta((fifteen(_496):-!, _148=[[]], _402=[[bv(..., ...)]|_148], call_addr_block(_402,  (symbol_setter(..., ..., ..., ...), goto(..., ..., ...)), [addr(..., ..., ..., ...)|...], _260), sym_arg_val_env(val, _498, _496, _402)))),
+Z = fifteen,
+Q = 15.
 

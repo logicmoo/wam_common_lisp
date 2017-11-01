@@ -195,7 +195,7 @@ sexpr(L)                      --> "(", !, white, sexpr_list(L), white.
 sexpr(vec(V))                 --> "#(", !, sexpr_vector(V), white.
 sexpr(boo(t))                 --> "#t", !, white.
 sexpr(boo(f))                 --> "#f", !, white.
-sexpr(chr(N))                 --> "#\", [C], !, {N is C}, white.
+sexpr(chr(N))                 --> "#\", [C], !, {N is C}, white. % "
 sexpr(str(S))                 --> """", !, sexpr_string(S), white.
 sexpr([quote,E])              --> "'", !, white, sexpr(E).
 sexpr([quasiquote,E])         --> "`", !, white, sexpr(E).
@@ -217,8 +217,8 @@ sexpr_vector([First|Rest]) --> sexpr(First), !, sexpr_vector(Rest).
 sexpr_string([]) --> """", !.
 sexpr_string([C|S]) --> chr(C), sexpr_string(S).
 
-chr(92) --> "\\", !.
-chr(34) --> "\""", !.
+chr(92) --> "\\", !.   
+chr(34) --> "\""", !.  % "
 chr(N)  --> [C], {C >= 32, N is C}.
 
 sym_or_num(E) --> [C], {sym_char(C)}, sym_string(S), {string_to_atom([C|S],E)}.

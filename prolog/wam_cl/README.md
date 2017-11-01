@@ -1,3 +1,8 @@
+````
+swipl -l  repl.pl -g "qsave_program(wamcl)" -t halt
+
+
+
 Installed packages (38):
 
 i clause_attvars@1.1.118    - An alternate interface to the clause database to allow attributed variables to be asserted
@@ -1365,4 +1370,6 @@ For built-in help, use ?- help(Topic). or ?- apropos(Word).
 % halt
 root@gitlab:/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl# vi ISSUES
 root@gitlab:/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl#
+
+````
 
