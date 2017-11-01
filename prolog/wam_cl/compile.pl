@@ -126,7 +126,7 @@ env_memb(E,L):-member(E,L).
 
 lisp_error_description(unbound_atom,        100, 'No value found for atom: ').
 lisp_error_description(atom_does_not_exist, 101, 'SetQ: Variable does not exist: ').
-lisp_error_description(first_not_cons,      102, 'First: This is not a cons cell: ').
+lisp_error_description(first_not_cons,      102, 'Form1: This is not a cons cell: ').
 lisp_error_description(rest_not_cons,       103, 'Rest: This is not a cons cell: ').
 
 find_incoming_value(Ctx,_Ev,Atom,InValue,Value):-
@@ -174,17 +174,19 @@ lisp_compile(SExpression):-
   lisp_compile(Expression,Code),!,
   dbmsg(Code).
 
-lisp_compile(SExpression,Body):-
+lisp_compile(Expression,Body):-
    debug_var('_Ignored',Result),
-   as_sexp(SExpression,Expression),
    lisp_compile(Result,Expression,Body).
 
 lisp_compile(Result,SExpression,Body):- 
-   as_sexp(SExpression,Expression),
-   lisp_compile(ctx{head:lisp_compile(),argbindings:[]},toplevel,Result,Expression,Body).
+   lisp_compile(toplevel,Result,SExpression,Body).
 
-lisp_compile(Ctx,Env,Result,FunctionBody,Body):- 
-   compile_forms(Ctx,Env,Result,[FunctionBody],Body).
+lisp_compile(Env,Result,Expression,Body):- 
+   lisp_compile(ctx{head:lisp_compile(),argbindings:[]},Env,Result,Expression,Body).
+
+lisp_compile(Ctx,Env,Result,SExpression,Body):- 
+   as_sexp(SExpression,Expression),
+   compile_forms(Ctx,Env,Result,[Expression],Body).
 
 
 compile_forms(Ctx,Env,Result,FunctionBody,Code):-
@@ -208,17 +210,33 @@ must_compile_body(Ctx,Env,Result,Function, Body):-
   must_or_rtrace(compile_body(Ctx,Env,Result,Function, Body)).
 
 
-
+% PROG
 /*(defmacro prog (inits &rest forms)
   `(block nil
     (let ,inits
       (tagbody ,@forms))))
 */
 compiler_macro_left_right(prog,[Vars|TagBody], [block,[],[let,Vars,[tagbody|TagBody]]]).
+
 % (defmacro unless (test-form &rest forms) `(if (not ,test-form) (progn ,@forms)))
 compiler_macro_left_right(unless,[Test|IfFalse] , [if, Test, [], [progn|IfFalse]]).
 % (defmacro when (test-form &rest forms) `(if ,test-form (progn ,@forms)))
 compiler_macro_left_right( when,[Test|IfTrue]  , [if, Test, [progn|IfTrue], []]).
+
+% IF/2
+compiler_macro_left_right(if,[Test, IfTrue], [if, Test, IfTrue ,[]]).
+
+% AND
+compiler_macro_left_right(and,[], []).
+compiler_macro_left_right(and,[Form1], Form1).
+compiler_macro_left_right(and,[Form1,Form2], [if,Form1,Form2]).
+compiler_macro_left_right(and,[Form1|Rest], [and,Form1,[and|Rest]]).
+
+% OR
+compiler_macro_left_right(or,[], []).
+compiler_macro_left_right(or,[Form1], Form1).
+% OR-2 needs to use body compiler below
+compiler_macro_left_right(or,[Form1,Form2,Form3|Rest], [or,Form1,[or,Form2,[or,Form3,[or|Rest]]]]).
 
 :- discontiguous(compile_body/5).
 
@@ -232,23 +250,49 @@ compile_body(Ctx,Env,Result,[M|MACROLEFT], Code):-
 compile_body(Ctx,Env,Result,InstrS,Code):-
   shared_lisp_compiler:plugin_expand_function_body(Ctx,Env,Result,InstrS,Code),!.
 
+% OR2
+compile_body(Ctx,Env,Result,[or,Form1,Form2],Code):- !,
+   must_compile_body(Ctx,Env,Result1,Form1, Body1),
+   must_compile_body(Ctx,Env,Result2,Form2, Body2),
+   debug_var("FORM1_Res",Result1),
+        Code = (	Body1,
+			( Result1 \== []
+				-> 	Result = Result1
+				;  	(Body2, Result = Result2))).
+
+% PROG1
+compile_body(Ctx,Env,Result,[prog1,Form1|FormS],Code):- !,
+   must_compile_body(Ctx,Env,Result,Form1, Body1),
+   must_compile_progn(Ctx,Env,_ResultS,FormS,Result,Body2),
+   Code = (Body1, Body2).
+
+% PROG2
+compile_body(Ctx,Env,Result,[prog2,Form1,Form2|FormS],Code):- !,
+   must_compile_body(Ctx,Env,_Result1,Form1, Body1),
+   must_compile_body(Ctx,Env,Result,Form2, Body2),
+   must_compile_progn(Ctx,Env,_ResultS,FormS,Result,BodyS),
+   Code = (Body1, Body2, BodyS).
+
+% DEFMACRO
 compile_body(_Cx,_Ev,Name,[defmacro,Name,FormalParms|Body0], CompileBody):- !,
       maybe_get_docs(defmacro,Name,Body0,Body),
       CompileBody =(retractall(macro_lambda(Name,_,_)),
 	assert(macro_lambda(Name, FormalParms, Body))).
 
+% Use a previous DEFMACRO
 compile_body(Cxt,Env,Result,[Procedure|Arguments],CompileBody):-
   macro_lambda(Procedure, FormalParams, LambdaExpression),
   must_or_rtrace(bind_formal_parameters(FormalParams, Arguments, [], NewEnv)),
   must_or_rtrace(expand_commas([NewEnv|Env],LambdaExpression,CommaResult)),
-  dbmsg(commaResult(CommaResult)),
+  dbmsg(macro(macroResult(CommaResult))),
   must_compile_body(Cxt,Env,Result,[progn|CommaResult], CompileBody).
 
+% `, Backquoted commas
+compile_body(_Cx,Env,Result,['$BQ',Form], Code):-!,compile_bq(Env,Result,Form,Code).
+compile_body(_Cx,Env,Result,['`',Form], Code):-!,compile_bq(Env,Result,Form,Code).
 
-compile_body(_Cx,Env,Result,['$BQ',Form], true):-!, expand_commas(Env,Form,Result).
-compile_body(_Cx,Env,Result,['`',Form], true):-!, expand_commas(Env,Form,Result).
 
-
+% DEFUN
 compile_body(_Cx,_Ev,Name,[defun,Name0,Args|FunctionBody0], CompileBody):- 
     combine_setfs(Name0,Name),
     must(maybe_get_docs(defun,Name,FunctionBody0,FunctionBody)),
@@ -267,10 +311,12 @@ compile_body(_Cx,_Ev,Name,[defun,Name0,Args|FunctionBody0], CompileBody):-
 combine_setfs(Name0,Name):-atom(Name0),Name0=Name.
 combine_setfs(Name0,Name):-atomic_list_concat(Name0,-,Name).
 
+% SELF EVALUATING OBJECTS
 compile_body(_Cx,_Ev,SelfEval,SelfEval,true):- notrace(is_self_evaluationing_object(SelfEval)),!.
 compile_body(_Cx,_Ev, [],nil,true):- !.
 compile_body(_Cx,_Ev,Item,[quote, Item],  true):- !.
 
+% PROGN
 compile_body(_Cx,_Ev,[],[progn],  true):- !.
 compile_body(Ctx,Env,Result,[progn,Forms], Body):- !, must_compile_body(Ctx,Env,Result,Forms, Body).
 compile_body(Ctx,Env,Result,[progn|Forms], Body):- !, must_compile_progn(Ctx,Env,Result,Forms, [],Body).
@@ -278,19 +324,13 @@ compile_body(Ctx,Env,Result,implicit_progn(Forms), Body):- is_list(Forms),!,must
 compile_body(Ctx,Env,Result,implicit_progn(Forms), Body):- !,must_compile_body(Ctx,Env,Result,Forms, Body).
 
 
-
+% Lazy Reader
 compile_body(Ctx,Env,Result, 's'(Str),  Body):-
   parse_sexpr_untyped(string(Str),Expression),!,
   must_compile_body(Ctx,Env,Result, Expression,  Body).
 
-/*
-compile_body(Ctx,Env,Result, List,  Body):-  \+ is_list(List),!,
-  expand_pterm_to_sterm(List,PTerm),
-  compile_body(Ctx,Env,Result, PTerm,  Body).
-*/
-compile_body(Ctx,Env,Result,[if, Test, IfTrue], Body):-must_compile_body(Ctx,Env,Result,[if, Test, IfTrue, []],Body).
 
-
+% IF
 compile_body(Ctx,Env,Result,[if, [null,Test], IfTrue, IfFalse], Body):-
 	!,
    must_compile_body(Ctx,Env,TestResult,Test,  TestBody),
@@ -317,6 +357,7 @@ compile_body(Ctx,Env,Result,[if, Test, IfTrue, IfFalse], Body):-
 				;  	FalseBody,
 					Result      = FalseResult	) ).
 
+% COND 
 compile_body(_Cx,_Ev,[],[cond, []], true):- !.
 compile_body(Ctx,Env,Result,[cond, [ [Test|ResultForms] |Clauses]], Body):-
 	!,
@@ -331,11 +372,7 @@ compile_body(Ctx,Env,Result,[cond, [ [Test|ResultForms] |Clauses]], Body):-
 					Result      = ClausesResult )	).
 
 
-expand_function_body_unused_needs_throw(Ctx,Env,Result,[car, IN], Body):- \+ current_prolog_flag(lisp_inline,false),
-	!,
-        must_compile_body(Ctx,Env,MID,IN, ValueBody),
-        Body = (ValueBody,(MID =[Result|_]->true;Result=MID)).
-
+% CONS inine
 compile_body(Ctx,Env,Result,[cons, IN1,IN2], Body):- \+ current_prolog_flag(lisp_inline,false),
 	!,
         must_compile_body(Ctx,Env,MID1,IN1,  ValueBody1),
@@ -344,7 +381,7 @@ compile_body(Ctx,Env,Result,[cons, IN1,IN2], Body):- \+ current_prolog_flag(lisp
 
 
 
-
+% (function (labmda
 compile_body(Ctx,Env,Result,[function, [lambda,LambdaArgs| LambdaBody]], Body):-
 	!,
 	must_compile_body(Ctx,ClosureEnvironment,ClosureResult,implicit_progn(LambdaBody),  ClosureBody),
@@ -372,16 +409,25 @@ compile_body(Ctx,Env,Result,[lambda,LambdaArgs|LambdaBody], Body):-
 
 
 
+
+% PROGV            % ( progv ' ( a ) ` ( , ( + 1 1 ) ) a ) => 2
+compile_body(Ctx,Env,Result,[progv,VarsForm,ValuesForm|FormS],Code):- !,
+   must_compile_body(Ctx,Env,VarsRs,VarsForm,Body1),
+   must_compile_body(Ctx,Env,ValuesRs,ValuesForm,Body2),
+   must_compile_progn(Ctx,Env,Result,FormS,[],BodyS),
+   Code = (Body1, Body2 , maplist(bind_dynamic_value(Env),VarsRs,ValuesRs), BodyS).
+
 normalize_let([],[]).
 normalize_let([Decl|NewBindingsIn],[Norm|NewBindings]):-
   must(normalize_let1(Decl,Norm)),
   normalize_let(NewBindingsIn,NewBindings).
 
+
 normalize_let1([bind, Variable, Form],[bind, Variable, Form]).
 normalize_let1([Variable, Form],[bind, Variable, Form]).
-normalize_let1(Variable,[bind, Variable, []]).
+normalize_let1( Variable,[bind, Variable, []]).
 
-
+% LET
 compile_body(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body):-
      must(normalize_let(NewBindingsIn,NewBindings)),!,        
 	zip_with(Variables, ValueForms, [Variable, Form, [bind, Variable, Form]]^true, NewBindings),

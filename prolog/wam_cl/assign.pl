@@ -101,6 +101,8 @@ extract_variable_value([Val|Vals], FoundVal, Hole):-
 	;	extract_variable_value(Vals, FoundVal, Hole).
 
 
+bind_dynamic_value(Env,Var,Result):- set_symbol_value(Var,Env,Result).
+
 symbol_value(Var,Env,Value):-
   symbol_value_or(Var,Env,
     last_chance_symbol_value(Var,Env,Value),Value).
@@ -132,6 +134,7 @@ set_symbol_value(Var,Env,Result):-
       ->	once(retract(special_var(Var, Old))),
                 asserta(special_var(Var, Result))
       ;         last_chance_set_symbol_value(Var,Env,Result)).
+
 last_chance_set_symbol_value(Var,_Env,Result):- nb_setval(Var,Result),!.
 last_chance_set_symbol_value(Var,_Env,_Result):- 
   lisp_error_description(atom_does_not_exist, ErrNo, _),throw(ErrNo, Var).

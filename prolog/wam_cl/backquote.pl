@@ -36,14 +36,29 @@ macro_expand(X, X):-
 	!.        
 
 expand_commas(_,One,Out):- \+ compound(One),!,One=Out.
-expand_commas(Bindings,['$COMMA',One],Out):- !, symbol_value(One,Bindings,Out).
-expand_commas(Bindings,'$COMMA'(One),Out):- !, symbol_value(One,Bindings,Out).
-expand_commas(Bindings,['$BQ',One],Out):- !, expand_commas(Bindings,One,Mid), (One==Mid ->  Out=['$BQ',Mid] ; Out=Mid),!.
-expand_commas(Bindings,One,Out):- is_list(One),!,maplist(expand_commas(Bindings),One,Out).
-expand_commas(Bindings,One,Out):-
+expand_commas(Env,['$COMMA',One],Out):- !, symbol_value(One,Env,Out).
+expand_commas(Env,'$COMMA'(One),Out):- !, symbol_value(One,Env,Out).
+expand_commas(Env,['$BQ',One],Out):- !, expand_commas(Env,One,Mid), (One==Mid ->  Out=['$BQ',Mid] ; Out=Mid),!.
+expand_commas(Env,One,Out):- is_list(One),!,maplist(expand_commas(Env),One,Out).
+expand_commas(Env,One,Out):-
   compound_name_arguments(One,F,Args),
-  maplist(expand_commas(Bindings),Args,ArgsOut),
+  maplist(expand_commas(Env),Args,ArgsOut),
   Out=..[F|ArgsOut],!.
+
+
+compile_bq(_,Result,Form,true):- \+ compound(Form),!,Result=Form.
+compile_bq(Env,Result,['$COMMA',Form],Code):- lisp_compile(Env,Result,Form,Code).
+compile_bq(Env,[quote,Result],['$BQ',Form],Code):- compile_bq(Env,Result,Form,Code).
+compile_bq(_,SelfEval,SelfEval,true):- notrace(is_self_evaluationing_object(SelfEval)),!.
+compile_bq(Env,[R|Result],[F|Forms],Code):-
+  compile_bq(Env,R,F,Code1),
+  compile_bq(Env,Result,Forms,Code2),
+  Code = (Code1,Code2).
+compile_bq(Env,Result,Forms,Code):-  
+  compound_name_arguments(Forms,F,Args),
+  compile_bq(Env,Args,ArgsOut,Code),
+  Result=..[F|ArgsOut].
+
 
 :- fixup_exports.
 
