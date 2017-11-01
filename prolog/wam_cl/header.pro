@@ -40,9 +40,9 @@
 :- discontiguous(shared_lisp_compiler:plugin_expand_function_body/5).
 
 
-%:- dynamic(compile_assigns/5).
-%:- multifile(compile_assigns/5).
-%:- discontiguous(compile_assigns/5).
+%:- dynamic(compile_assigns/4).
+%:- multifile(compile_assigns/4).
+%:- discontiguous(compile_assigns/4).
 
 %:- dynamic(ssip_define/2).
 :- multifile(ssip_define/2).
@@ -55,7 +55,8 @@
 :- ensure_loaded(clstructs).
 :- ensure_loaded(compile).
 :- ensure_loaded(docs).
-:- ensure_loaded(interp).
+:- ensure_loaded(loadfile).
+:- ensure_loaded(print).
 :- ensure_loaded(mizepro).
 :- ensure_loaded(print).
 :- ensure_loaded(repl).

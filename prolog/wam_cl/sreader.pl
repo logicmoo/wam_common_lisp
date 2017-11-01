@@ -558,7 +558,8 @@ lisp_code_name_extra(10,`Linefeed`).
 lisp_code_name_extra(8,`BCKSPC`).
 lisp_code_name_extra(7,`bell`).
 
-:- set_prolog_flag(all_lisp_char_names,true).
+% @TODO undo this temp speedup
+:- set_prolog_flag(all_lisp_char_names,false).
 :- use_module('chars.pro').
 /*
 

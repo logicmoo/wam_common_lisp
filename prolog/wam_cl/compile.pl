@@ -252,34 +252,25 @@ compile_body(Ctx,Env,Result,[M|MACROLEFT], Code):-
 compile_body(Ctx,Env,Result,InstrS,Code):-
   shared_lisp_compiler:plugin_expand_function_body(Ctx,Env,Result,InstrS,Code),!.
 
-compile_body(_Cx,_Ev,Name,[defmacro,Name,Args|FunctionBody0], CompileBody):-
-    maybe_get_docs(defmacro,Name,FunctionBody0,FunctionBody),
-    FunctionHead=[Name|Args],
-    CompileBody = (asserta((Head  :- (fail, <<==(FunctionHead , FunctionBody)))),
-                   asserta((Head  :- (!,  Code)))),
-      expand_function_head(FunctionHead, Head, ArgBindings, Result),
-      must_compile_body(ctx{head:Head,argbindings:ArgBindings},Env,Result,implicit_progn(FunctionBody),  Body0),
-      debug_var("RET",Result),
-      debug_var("DEnv",Env),
-      Body = (Env=[ArgBindings],Body0),
-      term_attvars(Body,AttVars),
-      maplist(del_attr_rev2(freeze),AttVars),
-      mize_body(',',Body,Code).
-
-compile_body(_Cx,_Ev,Name,[defun,Name,Args|FunctionBody0], CompileBody):-
+compile_body(Cx,Ev,Name,[defmacro,Name,Args|FunctionBody0], CompileBody):- !,
+  compile_body(Cx,Ev,Name,[defun,Name,Args|FunctionBody0], CompileBody).
+compile_body(_Cx,_Ev,Name,[defun,Name0,Args|FunctionBody0], CompileBody):- 
+    combine_setfs(Name0,Name),
     must(maybe_get_docs(defun,Name,FunctionBody0,FunctionBody)),
     FunctionHead=[Name|Args],
     CompileBody = (asserta((Head  :- (fail, <<==(FunctionHead , FunctionBody)))),
-                   asserta((Head  :- (!,  Code)))),
+                   asserta((Head  :- (!,  Code)))),!,
       expand_function_head(FunctionHead, Head, ArgBindings, Result),
       must_compile_body(ctx{head:Head,argbindings:ArgBindings},Env,Result,implicit_progn(FunctionBody),  Body0),
       debug_var("RET",Result),
-      debug_var("DEnv",Env),
+      debug_var("FEnv",Env),
       Body = (Env=[ArgBindings],Body0),
       term_attvars(Body,AttVars),
       maplist(del_attr_rev2(freeze),AttVars),
       mize_body(',',Body,Code).
 
+combine_setfs(Name0,Name):-atom(Name0),Name0=Name.
+combine_setfs(Name0,Name):-atomic_list_concat(Name0,-,Name).
 
 compile_body(_Cx,_Ev,SelfEval,SelfEval,true):- notrace(is_self_evaluationing_object(SelfEval)),!.
 compile_body(_Cx,_Ev, [],nil,true):- !.

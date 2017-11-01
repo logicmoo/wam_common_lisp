@@ -41,6 +41,11 @@ lisplist([X|Xs]) --> sexpr1(X), lisplist(Xs), !.
 writeExpression(quit):-
 	!,
 	write('Terminating WAM-CL'),nl.
+
+writeExpression('$COMMENT0'([])):- 	writeln(';'),!.
+writeExpression('$COMMENT'(S)):- 	write(';'),writeln(S),!.
+writeExpression('$COMMENT1'(S)):- 	write('#|'),write(S),writeln('|#').
+writeExpression('$COMMENT'(S,_,_)):- 	write('#|'),write(S),writeln('|#').
 writeExpression(Expression):-
 	sexpr1(Expression, TokenL, []),
 %	write('  '),
