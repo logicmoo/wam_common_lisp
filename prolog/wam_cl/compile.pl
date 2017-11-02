@@ -194,15 +194,6 @@ compile_forms(Ctx,Env,Result,FunctionBody,Code):-
    body_cleanup(Body,Code).
 
 
-expand_function_head([FunctionName | FormalArgs], Head, ArgBindings, Result):-!,
-        freeze(Arg,debug_var(Arg,Val)),
-	zip_with(FormalArgs, ActualArgs, [Arg, Val, bv(Arg, [Val|_])]^true, ArgBindings),
-	append(ActualArgs, [Result], HeadArgs),
-	Head =.. [FunctionName | HeadArgs].
-expand_function_head(FunctionName , Head, ArgBindings, Result):-
-    expand_function_head([FunctionName], Head, ArgBindings, Result).
-
-
 % compile_body(Ctx,Env,Result,Function, Body).
 % Expands a Lisp-like function body into its Prolog equivalent
 
@@ -496,16 +487,8 @@ compile_body(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):-
       append(Args, [Result], ArgsPlusResult),
       debug_var([FunctionName,'_Ret'],Result),
       ExpandedFunction =.. [FunctionName | ArgsPlusResult],
-      Body = (	ArgBody,
-                      ExpandedFunction	).
+      Body = (ArgBody,ExpandedFunction).
    
-
-	expand_arguments(_Ctx,_Env,_FunctionName,_ArgNum,[], true, []).
-	expand_arguments(Ctx,Env,FunctionName,ArgNum,[Arg|Args], Body, [Result|Results]):-
-		must_compile_body(Ctx,Env,Result,Arg, ArgBody),
-                Body = (ArgBody, ArgsBody),
-                ArgNum2 is ArgNum + 1,
-		expand_arguments(Ctx,Env,FunctionName,ArgNum2,Args, ArgsBody, Results).
 
 
 must_compile_progn(Ctx,Env,Result,Forms, PreviousResult, Body):-

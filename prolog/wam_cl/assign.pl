@@ -18,7 +18,6 @@
 :- ensure_loaded((utils_for_swi)).
 
 
-
 compile_assigns(Ctx,Env,Result,[SetQ, Atom, ValueForm, Atom2| Rest], Body):- is_parallel_op(SetQ),!, 
    pairify([Atom, ValueForm, Atom2| Rest],Atoms,Forms),
    maplist(expand_ctx_env_forms(Ctx,Env),Forms,BodyS1,Results),

@@ -219,7 +219,7 @@ maybe_ltrace(G):- current_prolog_flag(lisp_trace,true)->rtrace(G);must_or_rtrace
 
 eval_repl_atom(end_of_file, quit):-!.
 eval_repl_atom(quit, quit):-!.
-eval_repl_atom(make, O):- !, make,load_compile(file('wam-cl-init2.lisp'),O).
+eval_repl_atom(make, O):- !, make,compile_file('xabcl/',O).
 eval_repl_atom(prolog, t):- !, prolog.
 eval_repl_atom(debug, t):- debug(lisp(_)).
 eval_repl_atom(ltrace, t):- set_prolog_flag(lisp_trace,true).
