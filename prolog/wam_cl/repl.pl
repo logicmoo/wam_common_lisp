@@ -19,7 +19,6 @@
 :- use_module(sreader).
 
 :- dynamic 
-	lisp_global_bindings/1,
 	named_lambda/2,
         macro_lambda/3.
 
@@ -99,10 +98,7 @@ with_input_from_stream(In,Goal):-
 
 
 
-
 prompts(Old1,_Old2):- var(Old1) -> prompt(Old1,Old1) ; prompt(_,Old1).
-lisp_global_bindings([]).
-
 lisp:- write('
 __        ___    __  __        ____ _
 \\ \\      / / \\  |  \\/  |      / ___| |
@@ -190,6 +186,7 @@ eval(Expression, Result):-
    dbmsg(Code),
    maybe_ltrace(call(Code)),!.
 eval(Expression, Result):-
+   ensure_loaded(interp),
    lisp_global_bindings(Bindings),
    eval(Expression, Bindings, Result). % in interp.pl
 

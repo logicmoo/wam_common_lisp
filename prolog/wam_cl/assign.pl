@@ -87,10 +87,6 @@ compile_assigns(_Cx,Env,Value, Atom,  Body):- atom(Atom),
 
 
 
-
-
-
-
 initState:attr_unify_hook(_,_).
 
 

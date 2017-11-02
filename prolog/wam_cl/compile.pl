@@ -216,6 +216,8 @@ must_compile_body(Ctx,Env,Result,Function, Body):-
     (let ,inits
       (tagbody ,@forms))))
 */
+:- dynamic(compiler_macro_left_right/3).
+:- discontiguous(compiler_macro_left_right/3).
 compiler_macro_left_right(prog,[Vars|TagBody], [block,[],[let,Vars,[tagbody|TagBody]]]).
 
 % (defmacro unless (test-form &rest forms) `(if (not ,test-form) (progn ,@forms)))
@@ -232,11 +234,6 @@ compiler_macro_left_right(and,[Form1], Form1).
 compiler_macro_left_right(and,[Form1,Form2], [if,Form1,Form2]).
 compiler_macro_left_right(and,[Form1|Rest], [and,Form1,[and|Rest]]).
 
-% OR
-compiler_macro_left_right(or,[], []).
-compiler_macro_left_right(or,[Form1], Form1).
-% OR-2 needs to use body compiler below
-compiler_macro_left_right(or,[Form1,Form2,Form3|Rest], [or,Form1,[or,Form2,[or,Form3,[or|Rest]]]]).
 
 :- discontiguous(compile_body/5).
 
@@ -250,10 +247,15 @@ compile_body(Ctx,Env,Result,[M|MACROLEFT], Code):-
 compile_body(Ctx,Env,Result,InstrS,Code):-
   shared_lisp_compiler:plugin_expand_function_body(Ctx,Env,Result,InstrS,Code),!.
 
-% OR2
-compile_body(Ctx,Env,Result,[or,Form1,Form2],Code):- !,
+% OR
+compiler_macro_left_right(or,[], []).
+compiler_macro_left_right(or,[Form1], Form1).
+% OR-2 needs to use body compiler below
+% compiler_macro_left_right(or,[Form1,Form2,Form3|Rest], [or,Form1,[or,Form2,[or,Form3,[or|Rest]]]]).
+% OR-2+
+compile_body(Ctx,Env,Result,[or,Form1|Form2],Code):- !,
    must_compile_body(Ctx,Env,Result1,Form1, Body1),
-   must_compile_body(Ctx,Env,Result2,Form2, Body2),
+   must_compile_body(Ctx,Env,Result2,[or|Form2], Body2),
    debug_var("FORM1_Res",Result1),
         Code = (	Body1,
 			( Result1 \== []
@@ -395,6 +397,15 @@ compile_body(Ctx,Env,Result,[function, [lambda,LambdaArgs| LambdaBody]], Body):-
 compile_body(_Cx,_Ev,[function|Function], [function|Function], true):- !.
 
 
+compile_body(Ctx,Env,ClosureResult,[[closure,LambdaArgs,
+    [ClosureEnvironment, ClosureResult]^ClosureBody,
+			AltEnv]|ActualParams],Code):-
+	!,
+	bind_formal_parameters(LambdaArgs, ActualParams, [ClosureEnvironment,AltEnv], AltEnvBindings),
+	must_compile_body(Ctx,[AltEnvBindings|Env],ClosureResult,ClosureBody, Code).
+	
+
+
 compile_body(Ctx,Env,Result,[lambda,LambdaArgs|LambdaBody], Body):-
 	!,
 	must_compile_body(Ctx,ClosureEnvironment,ClosureResult,implicit_progn(LambdaBody),  ClosureBody),
@@ -428,10 +439,11 @@ normalize_let1([Variable, Form],[bind, Variable, Form]).
 normalize_let1( Variable,[bind, Variable, []]).
 
 % LET
+compile_body(Ctx,Env,Result,['let', []| BodyForms], Body):- compile_body(Ctx,Env,Result,[progn| BodyForms], Body).
 compile_body(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body):-
      must(normalize_let(NewBindingsIn,NewBindings)),!,        
 	zip_with(Variables, ValueForms, [Variable, Form, [bind, Variable, Form]]^true, NewBindings),
-	expand_arguments(Ctx,ValueForms, ValueBody, Values, Env),
+	expand_arguments(Ctx,Env,'funcall',1,ValueForms, ValueBody, Values),
 	zip_with(Variables, Values, [Var, Val, bv(Var, [Val|Unused])]^true,Bindings),
 
    must((debug_var("_U",Unused),
@@ -440,6 +452,12 @@ compile_body(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body):-
 
 	must_compile_body(Ctx,BindingsEnvironment,Result,implicit_progn(BodyForms), BodyFormsBody),
          Body = ( ValueBody,BindingsEnvironment=[Bindings|Env], BodyFormsBody ).
+
+% LET*
+compile_body(Ctx,Env,Result,['let*', []| BodyForms], Body):- compile_body(Ctx,Env,Result,[progn| BodyForms], Body).
+compile_body(Ctx,Env,Result,['let*', [Binding1|NewBindings]| BodyForms], Body):-
+   compile_body(Ctx,Env,Result,['let', [Binding1], ['let*', NewBindings| BodyForms]], Body).
+
 
 %   zip_with(Xs, Ys, Pred, Zs)
 %   is true if Pred(X, Y, Z) is true for all X, Y, Z.
@@ -474,27 +492,26 @@ compile_body(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):- FunctionName 
 % Non built-in function expands into an explicit function call
 compile_body(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):-
       !,
-      expand_arguments(Ctx,FunctionArgs, ArgBody, Args, Env),
-      append(Args, [Result], ArgsResult),
+      expand_arguments(Ctx,Env,FunctionName,0, FunctionArgs,ArgBody, Args),
+      append(Args, [Result], ArgsPlusResult),
       debug_var([FunctionName,'_Ret'],Result),
-      ExpandedFunction =.. [FunctionName | ArgsResult],
+      ExpandedFunction =.. [FunctionName | ArgsPlusResult],
       Body = (	ArgBody,
                       ExpandedFunction	).
    
 
-	expand_arguments(_Ctx,[], true, [], _Environment).
-	expand_arguments(Ctx,[Arg|Args], Body, [Result|Results], Env):-
+	expand_arguments(_Ctx,_Env,_FunctionName,_ArgNum,[], true, []).
+	expand_arguments(Ctx,Env,FunctionName,ArgNum,[Arg|Args], Body, [Result|Results]):-
 		must_compile_body(Ctx,Env,Result,Arg, ArgBody),
                 Body = (ArgBody, ArgsBody),
-		expand_arguments(Ctx,Args, ArgsBody, Results, Env).
+                ArgNum2 is ArgNum + 1,
+		expand_arguments(Ctx,Env,FunctionName,ArgNum2,Args, ArgsBody, Results).
 
 
 must_compile_progn(Ctx,Env,Result,Forms, PreviousResult, Body):-
    must_or_rtrace(compile_progn(Ctx,Env,Result,Forms, PreviousResult,Body)).
-must_compile_progn1(Ctx,Env,Result,Forms, PreviousResult, Body):-
-   must_or_rtrace(compile_progn1(Ctx,Env,Result,Forms, PreviousResult,Body)).
 
-compile_progn(_Cx,_Ev,Result,[], Result,true).
+compile_progn(_Cx,_Ev,Result,[], PreviousResult,true):- PreviousResult = Result.
 compile_progn(Ctx,Env,Result,[Form | Forms], _PreviousResult, Body):-  !,
 	must_compile_body(Ctx,Env,FormResult, Form,FormBody),
 	must_compile_progn(Ctx,Env,Result, Forms, FormResult, FormSBody),

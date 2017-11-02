@@ -94,10 +94,10 @@ sf_and(Bool1, Bool2, Result):-
 */
 
 lisp_apply(FunctionObject, Arguments, Result):-
-		FunctionObject = closure(FormalArgs, Body, Environment)
+		FunctionObject = [closure,FormalArgs, Body, Environment]
 	->	zip_with(FormalArgs, Arguments, [Arg, Val, bv(Arg, [Val|_])]^true, Bindings),
 		apply(Body, [[Bindings|Environment], Result])
-	;	FunctionObject = function(FunctionName), 
+	;	FunctionObject = [function,FunctionName], 
 		append(Arguments, [Result], ArgumentsResult),
 		Function =.. [FunctionName|ArgumentsResult],
 		call(Function).
