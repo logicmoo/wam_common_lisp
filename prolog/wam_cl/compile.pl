@@ -114,10 +114,10 @@ lisp_compiler_term_expansion( ( <<== FunctionBodyP), ( :-   Code) ):-
    body_cleanup(Body,Code))).
 
 make_compiled(FunctionHead,FunctionBody,Head,Code):-
-	expand_function_head(FunctionHead, Head, ArgBindings, Result,HeadCode),
-                    debug_var("RET",Result),
-                    debug_var("Env",Env),
-	must_compile_body(ctx{head:Head,argbindings:ArgBindings},Env,Result,implicit_progn([FunctionBody]),Body0),
+   Ctx = ctx{head:Head,argbindings:ArgBindings},
+	must_or_rtrace(expand_function_head(Ctx,Env,FunctionHead, Head, ArgBindings, Result,HeadCode)),
+        debug_var("RET",Result),debug_var("Env",Env),
+	must_compile_body(Ctx,Env,Result,implicit_progn([FunctionBody]),Body0),
         Body = (Env=[ArgBindings],Body0),
     body_cleanup((HeadCode,Body),Code).
 
@@ -194,6 +194,12 @@ compiler_macro_left_right(and,[Form1|Rest], [and,Form1,[and|Rest]]).
 
 :- discontiguous(compile_body/5).
 
+% VAR
+compile_body(Ctx,Env,Result,Var, Code):- is_ftVar(Var), !,
+  debug_var("EVAL",Var),
+  compile_body(Ctx,Env,Result,[eval,Var], Code).
+ 
+% SOURCE TRANSFORMATIONS
 compile_body(Ctx,Env,Result,[M|MACROLEFT], Code):- 
   term_variables([M|MACROLEFT],VarsS),
   compiler_macro_left_right(M,MACROLEFT,MACRORIGHT),
@@ -201,10 +207,25 @@ compile_body(Ctx,Env,Result,[M|MACROLEFT], Code):-
   VarsE==VarsS,!,
   must_compile_body(Ctx,Env,Result,MACRORIGHT, Code).
 
+% Compiler Plugin 
 compile_body(Ctx,Env,Result,InstrS,Code):-
   shared_lisp_compiler:plugin_expand_function_body(Ctx,Env,Result,InstrS,Code),!.
 
+% SELF EVALUATING OBJECTS
+compile_body(_Cx,_Ev, [],[],true):- !.
+compile_body(_Cx,_Ev, [],nil,true):- !.
+compile_body(_Cx,_Ev,SelfEval,SelfEval,true):- notrace(is_self_evaluationing_object(SelfEval)),!.
+
+% symbols
+compile_body(Ctx,Env,Value,Atom, Body):- atom(Atom),!, 
+  must_or_rtrace(compile_symbol_getter(Ctx,Env,Value, Atom, Body)).
+
+% QUOTE 
+compile_body(_Cx,_Ev,Item,[quote, Item],  true):- !.
+
+% COMMENTS
 compile_body(_Ctx,_Env,[],['$COMMENT'|_InstrS],true):-!.
+compile_body(_Ctx,_Env,[],['$COMMENT0'|_InstrS],true):-!.
 compile_body(_Ctx,_Env,[],['$COMMENT1'|_InstrS],true):-!.
 compile_body(_Ctx,_Env,[],['$COMMENT2'|_InstrS],true):-!.
 
@@ -246,7 +267,8 @@ compile_body(_Cx,_Ev,Name,[defmacro,Name,FormalParms|Body0], CompileBody):- !,
 % Use a previous DEFMACRO
 compile_body(Cxt,Env,Result,[Procedure|Arguments],CompileBodyCode):-
   macro_lambda(Procedure, FormalParams, LambdaExpression),
-  must_or_rtrace(bind_formal_parameters(FormalParams, Arguments, [], NewEnv)),
+  must_or_rtrace(bind_formal_parameters(FormalParams, Arguments, [], NewEnv,BindCode)),
+  call(BindCode),
   must_or_rtrace(expand_commas([NewEnv|Env],CommaResult,LambdaExpression,Code)),
   dbmsg(macro(macroResult(CommaResult))),
   must_compile_body(Cxt,Env,Result,[progn|CommaResult], CompileBody),
@@ -260,24 +282,38 @@ compile_body(_Cx,Env,Result,['`',Form], Code):-!,compile_bq(Env,Result,Form,Code
 % DEFUN
 compile_body(_Cx,_Ev,Name,[defun,Name0,Args|FunctionBody0], CompileBody):- 
     combine_setfs(Name0,Name),
-    must(maybe_get_docs(defun,Name,FunctionBody0,FunctionBody)),
+    must_or_rtrace(maybe_get_docs(defun,Name,FunctionBody0,FunctionBody)),
     FunctionHead=[Name|Args],
     CompileBody = (% asserta((Head  :- (fail, <<==(FunctionHead , FunctionBody)))),
                    asserta((Head  :- (!,  Code)))),!,
     make_compiled(FunctionHead,FunctionBody,Head,Code).
 
 
+is_when(X):- dbmsg(warn(free_pass(is_when(X)))).
 
 combine_setfs(Name0,Name):-atom(Name0),Name0=Name.
 combine_setfs(Name0,Name):-atomic_list_concat(Name0,-,Name).
 
-% SELF EVALUATING OBJECTS
-compile_body(_Cx,_Ev,SelfEval,SelfEval,true):- notrace(is_self_evaluationing_object(SelfEval)),!.
-compile_body(_Cx,_Ev, [],nil,true):- !.
-compile_body(_Cx,_Ev,Item,[quote, Item],  true):- !.
+% EVAL-WHEN
+compile_body(Ctx,Env,Result,['eval-when',Flags|Forms], Code):- !, 
+ ((member(X,Flags),is_when(X) )
+  -> compile_body(Ctx,Env,Result,[progn,Forms], Code) ; Code = true).
 
-compile_body(Ctx,Env,Result,['eval-when',_Flags|Forms], Body):- !, compile_body(Ctx,Env,Result,[progn,Forms], Body).
-compile_body(Ctx,Env,Result,['#+',_Flags,Form], Body):- !, compile_body(Ctx,Env,Result,Form, Body).
+% #+
+compile_body(Ctx,Env,Result,['#+',Flag,Form], Code):- !, symbol_value(Env,'*features*',List),
+   (member(Flag,List) -> compile_body(Ctx,Env,Result,Form, Code) ; Code = true).
+% #-
+compile_body(Ctx,Env,Result,['#+',Flag,Form], Code):- !, symbol_value(Env,'*features*',List),
+( \+ member(Flag,List) -> compile_body(Ctx,Env,Result,Form, Code) ; Code = true).  
+
+
+% DOLIST
+compile_body(Ctx,Env,Result,['dolist',[Var,List]|FormS], Code):- !,
+    compile_body(Ctx,Env,ResultL,List,ListBody),
+    compile_body(Ctx,Env,Result,[progn,FormS], Body),
+    Code = (ListBody,
+        forall(member(X,ResultL),
+              lexically_bind(Var,X,Body))).
 
 % PROGN
 compile_body(_Cx,_Ev,[],[progn],  true):- !.
@@ -293,7 +329,7 @@ compile_body(Ctx,Env,Result, 's'(Str),  Body):-
   must_compile_body(Ctx,Env,Result, Expression,  Body).
 
 
-% IF
+% IF (null ...)
 compile_body(Ctx,Env,Result,[if, [null,Test], IfTrue, IfFalse], Body):-
 	!,
    must_compile_body(Ctx,Env,TestResult,Test,  TestBody),
@@ -307,6 +343,7 @@ compile_body(Ctx,Env,Result,[if, [null,Test], IfTrue, IfFalse], Body):-
 				;  	FalseBody,
 					Result      = FalseResult	) ).
 
+% IF-3
 compile_body(Ctx,Env,Result,[if, Test, IfTrue, IfFalse], Body):-
 	!,
    must_compile_body(Ctx,Env,TestResult,Test,  TestBody),
@@ -344,7 +381,7 @@ compile_body(Ctx,Env,Result,[cons, IN1,IN2], Body):- \+ current_prolog_flag(lisp
 
 
 
-% (function (labmda
+% (function (lambda ... ))
 compile_body(Ctx,Env,Result,[function, [lambda,LambdaArgs| LambdaBody]], Body):-
 	!,
 	must_compile_body(Ctx,ClosureEnvironment,ClosureResult,implicit_progn(LambdaBody),  ClosureBody),
@@ -355,18 +392,21 @@ compile_body(Ctx,Env,Result,[function, [lambda,LambdaArgs| LambdaBody]], Body):-
 			[ClosureEnvironment, ClosureResult]^ClosureBody,
 			Env],
 	Body = true.
+
+% (function ?? )
 compile_body(_Cx,_Ev,[function|Function], [function|Function], true):- !.
 
-
+% ((consure ...)..)
 compile_body(Ctx,Env,ClosureResult,[[closure,LambdaArgs,
     [ClosureEnvironment, ClosureResult]^ClosureBody,
 			AltEnv]|ActualParams],Code):-
 	!,
-	bind_formal_parameters(LambdaArgs, ActualParams, [ClosureEnvironment,AltEnv], AltEnvBindings),
+	bind_formal_parameters(LambdaArgs, ActualParams, [ClosureEnvironment,AltEnv], AltEnvBindings,BindCode),
+        call(BindCode),
 	must_compile_body(Ctx,[AltEnvBindings|Env],ClosureResult,ClosureBody, Code).
 	
 
-
+% (lambda ...)
 compile_body(Ctx,Env,Result,[lambda,LambdaArgs|LambdaBody], Body):-
 	!,
 	must_compile_body(Ctx,ClosureEnvironment,ClosureResult,implicit_progn(LambdaBody),  ClosureBody),
@@ -391,7 +431,7 @@ compile_body(Ctx,Env,Result,[progv,VarsForm,ValuesForm|FormS],Code):- !,
 
 normalize_let([],[]).
 normalize_let([Decl|NewBindingsIn],[Norm|NewBindings]):-
-  must(normalize_let1(Decl,Norm)),
+  must_or_rtrace(normalize_let1(Decl,Norm)),
   normalize_let(NewBindingsIn,NewBindings).
 
 
@@ -402,12 +442,12 @@ normalize_let1( Variable,[bind, Variable, []]).
 % LET
 compile_body(Ctx,Env,Result,['let', []| BodyForms], Body):- compile_body(Ctx,Env,Result,[progn| BodyForms], Body).
 compile_body(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body):-
-     must(normalize_let(NewBindingsIn,NewBindings)),!,        
+     must_or_rtrace(normalize_let(NewBindingsIn,NewBindings)),!,        
 	zip_with(Variables, ValueForms, [Variable, Form, [bind, Variable, Form]]^true, NewBindings),
 	expand_arguments(Ctx,Env,'funcall',1,ValueForms, ValueBody, Values),
 	zip_with(Variables, Values, [Var, Val, bv(Var, [Val|Unused])]^true,Bindings),
 
-   must((debug_var("_U",Unused),
+   must_or_rtrace((debug_var("_U",Unused),
    debug_var("LETENV",BindingsEnvironment),
    ignore((member(VarN,[Variable,Var]),atom(VarN),debug_var([VarN,'_Let'],Val))))), 
 
@@ -428,6 +468,8 @@ zip_with([X|Xs], [Y|Ys], Pred, [Z|Zs]):-
 	lpa_apply(Pred, [X, Y, Z]),
 	zip_with(Xs, Ys, Pred, Zs).
 
+
+% SETQ - PSET
 compile_body(Ctx,Env,Result,BodyForms, Body):- compile_assigns(Ctx,Env,Result,BodyForms, Body).
 
 :- dynamic(op_replacement/2).
@@ -448,10 +490,26 @@ compile_body(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):- \+ atom(Funct
 
 compile_body(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):- FunctionName \==funcall,
   member(bv(Atom0,_),Ctx.argbindings),Atom0==FunctionName,!,
-  must_compile_body(Ctx,Env,Result,[funcall,FunctionName | FunctionArgs],Body).
+  must_compile_body(Ctx,Env,Result,[invoke_tl,FunctionName | FunctionArgs],Body).
+
+% Operator
+compile_body(_Ctx,_Env,Result,[FunctionName | FunctionArgs], Body):- lisp_operator(FunctionName),!,
+   append(FunctionArgs, [Result], ArgsPlusResult),
+   debug_var([FunctionName,'_Ret'],Result),
+   ExpandedFunction =.. [ FunctionName | ArgsPlusResult],
+   Body = (ExpandedFunction).
+
+% Function
+compile_body(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):- symbol_info(FunctionName,_,function_type,_O),!,
+      expand_arguments(Ctx,Env,FunctionName,0, FunctionArgs,ArgBody, Args),
+      append(Args, [Result], ArgsPlusResult),
+      debug_var([FunctionName,'_Ret'],Result),      
+   ExpandedFunction =.. [ FunctionName | ArgsPlusResult],
+   Body = (ArgBody,ExpandedFunction).
 
 % Non built-in function expands into an explicit function call
 compile_body(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):-
+    %  (FunctionArgs==[] -> (dumpST,break ); true),
       !,
       expand_arguments(Ctx,Env,FunctionName,0, FunctionArgs,ArgBody, Args),
       append(Args, [Result], ArgsPlusResult),
@@ -464,7 +522,7 @@ find_function_or_macro(FunctionName,ArgsPlusResult,ExpandedFunction):-
     length(ArgsPlusResult,Len),
     (some_function_or_macro(FunctionName,Len,['','cl_','pf_','sf_','mf_'],NewName) 
       -> ExpandedFunction =.. [NewName | ArgsPlusResult];
-    ExpandedFunction =.. [funcall, FunctionName | ArgsPlusResult]).
+    ( ExpandedFunction =.. [ FunctionName | ArgsPlusResult])).
 
 some_function_or_macro(FunctionName,Len,[Name|NameS],NewName):-
    atom_concat(Name,FunctionName,ProposedPName),   
