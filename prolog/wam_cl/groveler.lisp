@@ -23,6 +23,20 @@
 (docinfo)
 
 
+(defun get-arglists ()
+ (dolist (p (list-all-packages))
+  (let (( pn (string-downcase (package-name p))))
+   (do-all-symbols (sym)    
+    (when (eq (symbol-package sym) p)   
+        (when (fboundp sym) 
+	   (let* (( sn (string-downcase (symbol-name sym)))(sf (symbol-function sym)) 
+	     (sfll (if (SYSTEM::MACROP sf) (SYSTEM::MACRO-LAMBDA-LIST sf)  (FUNCTION-LAMBDA-EXPRESSION sf))))
+	  
+	   (when sfll (format t "arglistss('~a','~a','~a').~%" sn pn sfll)))))
+))))
+(get-arglists)
+
+
 #-sbcl
 (defun psyminfo ()
  (dolist (p (list-all-packages))

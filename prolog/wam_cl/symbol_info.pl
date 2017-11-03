@@ -1,56 +1,74 @@
+/*******************************************************************
+ *
+ * A Common Lisp compiler/interpretor, written in Prolog
+ *
+ * (xxxxx.pl)
+ *
+ *
+ * Douglas'' Notes:
+ *
+ * (c) Douglas Miles, 2017
+ *
+ * The program is a *HUGE* common-lisp compiler/interpreter. It is written for YAP/SWI-Prolog (YAP 4x faster).
+ *
+ *******************************************************************/
+:- module(sinfo, []).
+:- set_module(class(library)).
+:- include('header.pro').
+
 :- style_check(-discontiguous).
 :- dynamic symbol_info/4.
 :- dynamic package_nickname/2.
 :- dynamic package_use_list/2.
 :- dynamic package_shadowing_symbols/2.
 
-package_nickname('common-lisp', 'common-lisp').
+is_lisp_package('common-lisp').
+is_lisp_package('common-lisp-user').
+is_lisp_package('cs-common-lisp').
+is_lisp_package('cs-common-lisp-user').
+is_lisp_package('top-level').
+is_lisp_package(charset).
+is_lisp_package(clos).
+is_lisp_package(mop).
+is_lisp_package(custom).
+is_lisp_package(exporting).
+is_lisp_package(extensions).
+is_lisp_package(ffi).
+is_lisp_package(format).
+is_lisp_package(gray).
+is_lisp_package(gstream).
+is_lisp_package(i18n).
+is_lisp_package(java).
+is_lisp_package(jvm).
+is_lisp_package(keyword).
+is_lisp_package(loop).
+is_lisp_package(posix).
+is_lisp_package(precompiler).
+is_lisp_package(profiler).
+is_lisp_package(readline).
+is_lisp_package(regexp).
+is_lisp_package(screen).
+is_lisp_package(sequence).
+is_lisp_package(socket).
+is_lisp_package(system).
+is_lisp_package(threads).
+is_lisp_package(xp).
+
 package_nickname('common-lisp', cl).
 package_nickname('common-lisp', lisp).
 package_nickname('common-lisp-user', 'cl-user').
-package_nickname('common-lisp-user', 'common-lisp-user').
 package_nickname('common-lisp-user', user).
 package_nickname('cs-common-lisp', 'cs-cl').
-package_nickname('cs-common-lisp', 'cs-common-lisp').
 package_nickname('cs-common-lisp', 'cs-lisp').
 package_nickname('cs-common-lisp-user', 'cs-cl-user').
-package_nickname('cs-common-lisp-user', 'cs-common-lisp-user').
 package_nickname('cs-common-lisp-user', 'cs-user').
-package_nickname('top-level', 'top-level').
 package_nickname('top-level', tpl).
-package_nickname(charset, charset).
-package_nickname(clos, clos).
-% package_nickname(clos, mop).
-package_nickname(mop, mop).
-package_nickname(custom, custom).
-package_nickname(exporting, exporting).
 package_nickname(extensions, ext).
-package_nickname(extensions, extensions).
-package_nickname(ffi, ffi).
-package_nickname(format, format).
-package_nickname(gray, gray).
-package_nickname(gstream, gstream).
-package_nickname(i18n, i18n).
-package_nickname(java, java).
-package_nickname(jvm, jvm).
-package_nickname(keyword, keyword).
-package_nickname(lisp, lisp).
-package_nickname(loop, loop).
 package_nickname(posix, os).
-package_nickname(posix, posix).
 package_nickname(precompiler, pre).
-package_nickname(precompiler, precompiler).
 package_nickname(profiler, prof).
-package_nickname(profiler, profiler).
-package_nickname(readline, readline).
-package_nickname(regexp, regexp).
-package_nickname(screen, screen).
-package_nickname(sequence, sequence).
-package_nickname(socket, socket).
 package_nickname(system, sys).
-package_nickname(system, system).
-package_nickname(threads, threads).
-package_nickname(xp, xp).
+
 package_shadowing_symbols(exporting, 'def-c-call-out').
 package_shadowing_symbols(exporting, 'def-c-const').
 package_shadowing_symbols(exporting, 'def-c-enum').
@@ -123,6 +141,7 @@ package_shadowing_symbols(sequence, 'substitute').
 package_shadowing_symbols(sequence, 'substitute-if').
 package_shadowing_symbols(sequence, 'substitute-if-not').
 package_shadowing_symbols(system, 'version').
+
 package_use_list('common-lisp', clos).
 package_use_list('common-lisp-user', 'common-lisp').
 package_use_list('common-lisp-user', extensions).
@@ -1727,59 +1746,59 @@ symbol_info('*<built-in-class>-class-version*', clos, package, internal).
 symbol_info('*<built-in-class>-class-version*', clos, variable, '#(#<STANDARD-CLASS BUILT-IN-CLASS> #<STANDARD-CLASS BUILT-IN-CLASS> NIL 0 NIL NIL NIL NIL NIL NIL)').
 symbol_info('*<built-in-class>-defclass*', clos, package, internal).
 symbol_info('*<built-in-class>-defclass*', clos, variable, '(DEFCLASS BUILT-IN-CLASS (DEFINED-CLASS) (($PROTOTYPE TYPE T)) (FIXED-SLOT-LOCATIONS T))').
-symbol_info('*<built-in-class>-instance-size*', clos, constant, '17').
+symbol_info('*<built-in-class>-instance-size*', clos, constant, 17).
 symbol_info('*<built-in-class>-instance-size*', clos, package, internal).
-symbol_info('*<built-in-class>-prototype-location*', clos, constant, '16').
+symbol_info('*<built-in-class>-prototype-location*', clos, constant, 16).
 symbol_info('*<built-in-class>-prototype-location*', clos, package, internal).
-symbol_info('*<defined-class>-all-superclasses-location*', clos, constant, '6').
+symbol_info('*<defined-class>-all-superclasses-location*', clos, constant, 6).
 symbol_info('*<defined-class>-all-superclasses-location*', clos, package, internal).
-symbol_info('*<defined-class>-default-initargs-location*', clos, constant, '12').
+symbol_info('*<defined-class>-default-initargs-location*', clos, constant, 12).
 symbol_info('*<defined-class>-default-initargs-location*', clos, package, internal).
 symbol_info('*<defined-class>-defclass*', clos, package, internal).
 symbol_info('*<defined-class>-defclass*', clos, variable, '\r\n(DEFCLASS DEFINED-CLASS (POTENTIAL-CLASS)\r\n (($DIRECT-SUPERCLASSES TYPE LIST INITARG DIRECT-SUPERCLASSES) ($ALL-SUPERCLASSES TYPE HASH-TABLE) ($PRECEDENCE-LIST TYPE LIST)\r\n  ($DIRECT-SLOTS TYPE LIST INITARG DIRECT-SLOTS) ($SLOTS TYPE LIST) ($SLOT-LOCATION-TABLE TYPE HASH-TABLE INITFORM EMPTY-HT)\r\n  ($DIRECT-DEFAULT-INITARGS TYPE LIST INITARG DIRECT-DEFAULT-INITARGS) ($DEFAULT-INITARGS)\r\n  ($DOCUMENTATION TYPE (OR STRING NULL) INITARG DOCUMENTATION) ($LISTENERS TYPE LIST INITFORM NIL) ($INITIALIZED TYPE (INTEGER 0 6) INITFORM 0))\r\n (FIXED-SLOT-LOCATIONS T))').
-symbol_info('*<defined-class>-direct-default-initargs-location*', clos, constant, '11').
+symbol_info('*<defined-class>-direct-default-initargs-location*', clos, constant, 11).
 symbol_info('*<defined-class>-direct-default-initargs-location*', clos, package, internal).
-symbol_info('*<defined-class>-direct-slots-location*', clos, constant, '8').
+symbol_info('*<defined-class>-direct-slots-location*', clos, constant, 8).
 symbol_info('*<defined-class>-direct-slots-location*', clos, package, internal).
-symbol_info('*<defined-class>-direct-superclasses-location*', clos, constant, '5').
+symbol_info('*<defined-class>-direct-superclasses-location*', clos, constant, 5).
 symbol_info('*<defined-class>-direct-superclasses-location*', clos, package, internal).
-symbol_info('*<defined-class>-documentation-location*', clos, constant, '13').
+symbol_info('*<defined-class>-documentation-location*', clos, constant, 13).
 symbol_info('*<defined-class>-documentation-location*', clos, package, internal).
-symbol_info('*<defined-class>-initialized-location*', clos, constant, '15').
+symbol_info('*<defined-class>-initialized-location*', clos, constant, 15).
 symbol_info('*<defined-class>-initialized-location*', clos, package, internal).
-symbol_info('*<defined-class>-listeners-location*', clos, constant, '14').
+symbol_info('*<defined-class>-listeners-location*', clos, constant, 14).
 symbol_info('*<defined-class>-listeners-location*', clos, package, internal).
-symbol_info('*<defined-class>-precedence-list-location*', clos, constant, '7').
+symbol_info('*<defined-class>-precedence-list-location*', clos, constant, 7).
 symbol_info('*<defined-class>-precedence-list-location*', clos, package, internal).
-symbol_info('*<defined-class>-slot-location-table-location*', clos, constant, '10').
+symbol_info('*<defined-class>-slot-location-table-location*', clos, constant, 10).
 symbol_info('*<defined-class>-slot-location-table-location*', clos, package, internal).
-symbol_info('*<defined-class>-slots-location*', clos, constant, '9').
+symbol_info('*<defined-class>-slots-location*', clos, constant, 9).
 symbol_info('*<defined-class>-slots-location*', clos, package, internal).
 symbol_info('*<direct-slot-definition>-defclass*', clos, package, internal).
 symbol_info('*<direct-slot-definition>-defclass*', clos, variable, '\r\n(DEFCLASS DIRECT-SLOT-DEFINITION (SLOT-DEFINITION) (($READERS TYPE LIST INITARG READERS) ($WRITERS TYPE LIST INITARG WRITERS))\r\n (FIXED-SLOT-LOCATIONS T))').
-symbol_info('*<direct-slot-definition>-readers-location*', clos, constant, '7').
+symbol_info('*<direct-slot-definition>-readers-location*', clos, constant, 7).
 symbol_info('*<direct-slot-definition>-readers-location*', clos, package, internal).
-symbol_info('*<direct-slot-definition>-writers-location*', clos, constant, '8').
+symbol_info('*<direct-slot-definition>-writers-location*', clos, constant, 8).
 symbol_info('*<direct-slot-definition>-writers-location*', clos, package, internal).
 symbol_info('*<effective-slot-definition>-defclass*', clos, package, internal).
 symbol_info('*<effective-slot-definition>-defclass*', clos, variable, '\r\n(DEFCLASS EFFECTIVE-SLOT-DEFINITION (SLOT-DEFINITION)\r\n (($LOCATION TYPE (OR NULL INTEGER CONS) INITARG LOCATION) ($EFM-SVUC TYPE FUNCTION) ($EFM-SSVUC TYPE FUNCTION) ($EFM-SBUC TYPE FUNCTION)\r\n  ($EFM-SMUC TYPE FUNCTION))\r\n (FIXED-SLOT-LOCATIONS T))').
-symbol_info('*<effective-slot-definition>-efm-sbuc-location*', clos, constant, '10').
+symbol_info('*<effective-slot-definition>-efm-sbuc-location*', clos, constant, 10).
 symbol_info('*<effective-slot-definition>-efm-sbuc-location*', clos, package, internal).
-symbol_info('*<effective-slot-definition>-efm-smuc-location*', clos, constant, '11').
+symbol_info('*<effective-slot-definition>-efm-smuc-location*', clos, constant, 11).
 symbol_info('*<effective-slot-definition>-efm-smuc-location*', clos, package, internal).
-symbol_info('*<effective-slot-definition>-efm-ssvuc-location*', clos, constant, '9').
+symbol_info('*<effective-slot-definition>-efm-ssvuc-location*', clos, constant, 9).
 symbol_info('*<effective-slot-definition>-efm-ssvuc-location*', clos, package, internal).
-symbol_info('*<effective-slot-definition>-efm-svuc-location*', clos, constant, '8').
+symbol_info('*<effective-slot-definition>-efm-svuc-location*', clos, constant, 8).
 symbol_info('*<effective-slot-definition>-efm-svuc-location*', clos, package, internal).
-symbol_info('*<effective-slot-definition>-location-location*', clos, constant, '7').
+symbol_info('*<effective-slot-definition>-location-location*', clos, constant, 7).
 symbol_info('*<effective-slot-definition>-location-location*', clos, package, internal).
 symbol_info('*<eql-specializer>-class-version*', clos, package, internal).
 symbol_info('*<eql-specializer>-class-version*', clos, variable, '#(#<STANDARD-CLASS EQL-SPECIALIZER> #<STANDARD-CLASS EQL-SPECIALIZER> NIL 0 NIL NIL NIL NIL NIL NIL)').
 symbol_info('*<eql-specializer>-defclass*', clos, package, internal).
 symbol_info('*<eql-specializer>-defclass*', clos, variable, '(DEFCLASS EQL-SPECIALIZER (SPECIALIZER) (($SINGLETON INITARG SINGLETON)) (FIXED-SLOT-LOCATIONS T))').
-symbol_info('*<eql-specializer>-instance-size*', clos, constant, '4').
+symbol_info('*<eql-specializer>-instance-size*', clos, constant, 4).
 symbol_info('*<eql-specializer>-instance-size*', clos, package, internal).
-symbol_info('*<eql-specializer>-singleton-location*', clos, constant, '3').
+symbol_info('*<eql-specializer>-singleton-location*', clos, constant, 3).
 symbol_info('*<eql-specializer>-singleton-location*', clos, package, internal).
 symbol_info('*<forward-reference-to-class>-defclass*', clos, package, internal).
 symbol_info('*<forward-reference-to-class>-defclass*', clos, variable, '(DEFCLASS FORWARD-REFERENCE-TO-CLASS (SUPER-CLASS) NIL (FIXED-SLOT-LOCATIONS NIL))').
@@ -1787,7 +1806,7 @@ symbol_info('*<forward-referenced-class>-under-<class>*', clos, package, interna
 symbol_info('*<forward-referenced-class>-under-<class>*', clos, variable, []).
 symbol_info('*<funcallable-standard-class>-class-version*', clos, package, internal).
 symbol_info('*<funcallable-standard-class>-class-version*', clos, variable, '#(#<STANDARD-CLASS FUNCALLABLE-STANDARD-CLASS> #<STANDARD-CLASS FUNCALLABLE-STANDARD-CLASS> NIL 0 NIL NIL NIL NIL NIL NIL)').
-symbol_info('*<funcallable-standard-class>-instance-size*', clos, constant, '28').
+symbol_info('*<funcallable-standard-class>-instance-size*', clos, constant, 28).
 symbol_info('*<funcallable-standard-class>-instance-size*', clos, package, internal).
 symbol_info('*<funcallable-standard-class>-valid-initialization-keywords*', clos, constant, '(NAME DIRECT-SUPERCLASSES DIRECT-SLOTS DIRECT-DEFAULT-INITARGS DOCUMENTATION GENERIC-ACCESSORS FIXED-SLOT-LOCATIONS)').
 symbol_info('*<funcallable-standard-class>-valid-initialization-keywords*', clos, package, internal).
@@ -1799,57 +1818,57 @@ symbol_info('*<metaobject>-defclass*', clos, package, internal).
 symbol_info('*<metaobject>-defclass*', clos, variable, '(DEFCLASS METAOBJECT NIL NIL)').
 symbol_info('*<misdesigned-forward-referenced-class>-defclass*', clos, package, internal).
 symbol_info('*<misdesigned-forward-referenced-class>-defclass*', clos, variable, '(DEFCLASS MISDESIGNED-FORWARD-REFERENCED-CLASS (FORWARD-REFERENCE-TO-CLASS POTENTIAL-CLASS) NIL (FIXED-SLOT-LOCATIONS NIL))').
-symbol_info('*<potential-class>-classname-location*', clos, constant, '3').
+symbol_info('*<potential-class>-classname-location*', clos, constant, 3).
 symbol_info('*<potential-class>-classname-location*', clos, package, internal).
 symbol_info('*<potential-class>-defclass*', clos, package, internal).
 symbol_info('*<potential-class>-defclass*', clos, variable, '(DEFCLASS POTENTIAL-CLASS (SPECIALIZER SUPER-CLASS) NIL (FIXED-SLOT-LOCATIONS T))').
-symbol_info('*<potential-class>-direct-subclasses-location*', clos, constant, '4').
+symbol_info('*<potential-class>-direct-subclasses-location*', clos, constant, 4).
 symbol_info('*<potential-class>-direct-subclasses-location*', clos, package, internal).
-symbol_info('*<semi-standard-class>-current-version-location*', clos, constant, '21').
+symbol_info('*<semi-standard-class>-current-version-location*', clos, constant, 21).
 symbol_info('*<semi-standard-class>-current-version-location*', clos, package, internal).
 symbol_info('*<semi-standard-class>-defclass*', clos, package, internal).
 symbol_info('*<semi-standard-class>-defclass*', clos, variable, '\r\n(DEFCLASS SEMI-STANDARD-CLASS (SLOTTED-CLASS)\r\n (($CURRENT-VERSION TYPE SIMPLE-VECTOR) ($FUNCALLABLEP TYPE BOOLEAN) ($FIXED-SLOT-LOCATIONS INITARG FIXED-SLOT-LOCATIONS)\r\n  ($INSTANTIATED TYPE BOOLEAN INITFORM NIL) ($DIRECT-INSTANCE-SPECIALIZERS TYPE (OR HASH-TABLE WEAK-LIST NULL) INITFORM NIL)\r\n  ($FINALIZED-DIRECT-SUBCLASSES TYPE (OR HASH-TABLE WEAK-LIST NULL) INITFORM \'NIL) ($PROTOTYPE TYPE (OR STANDARD-OBJECT NULL)))\r\n (DEFAULT-INITARGS FIXED-SLOT-LOCATIONS NIL) (FIXED-SLOT-LOCATIONS T))').
-symbol_info('*<semi-standard-class>-direct-instance-specializers-location*', clos, constant, '25').
+symbol_info('*<semi-standard-class>-direct-instance-specializers-location*', clos, constant, 25).
 symbol_info('*<semi-standard-class>-direct-instance-specializers-location*', clos, package, internal).
-symbol_info('*<semi-standard-class>-finalized-direct-subclasses-location*', clos, constant, '26').
+symbol_info('*<semi-standard-class>-finalized-direct-subclasses-location*', clos, constant, 26).
 symbol_info('*<semi-standard-class>-finalized-direct-subclasses-location*', clos, package, internal).
-symbol_info('*<semi-standard-class>-fixed-slot-locations-location*', clos, constant, '23').
+symbol_info('*<semi-standard-class>-fixed-slot-locations-location*', clos, constant, 23).
 symbol_info('*<semi-standard-class>-fixed-slot-locations-location*', clos, package, internal).
-symbol_info('*<semi-standard-class>-funcallablep-location*', clos, constant, '22').
+symbol_info('*<semi-standard-class>-funcallablep-location*', clos, constant, 22).
 symbol_info('*<semi-standard-class>-funcallablep-location*', clos, package, internal).
-symbol_info('*<semi-standard-class>-instantiated-location*', clos, constant, '24').
+symbol_info('*<semi-standard-class>-instantiated-location*', clos, constant, 24).
 symbol_info('*<semi-standard-class>-instantiated-location*', clos, package, internal).
-symbol_info('*<semi-standard-class>-prototype-location*', clos, constant, '27').
+symbol_info('*<semi-standard-class>-prototype-location*', clos, constant, 27).
 symbol_info('*<semi-standard-class>-prototype-location*', clos, package, internal).
-symbol_info('*<slot-definition>-allocation-location*', clos, constant, '4').
+symbol_info('*<slot-definition>-allocation-location*', clos, constant, 4).
 symbol_info('*<slot-definition>-allocation-location*', clos, package, internal).
 symbol_info('*<slot-definition>-defclass*', clos, package, internal).
 symbol_info('*<slot-definition>-defclass*', clos, variable, '\r\n(DEFCLASS SLOT-DEFINITION (METAOBJECT)\r\n (($NAME TYPE SYMBOL INITARG NAME) ($INITARGS TYPE LIST INITARG INITARGS) ($TYPE TYPE T INITARG TYPE)\r\n  ($ALLOCATION TYPE SYMBOL INITARG ALLOCATION) ($INHERITABLE-INITER TYPE CONS INITARG INHERITABLE-INITER)\r\n  ($INHERITABLE-DOC TYPE CONS INITARG INHERITABLE-DOC))\r\n (FIXED-SLOT-LOCATIONS T))').
-symbol_info('*<slot-definition>-inheritable-doc-location*', clos, constant, '6').
+symbol_info('*<slot-definition>-inheritable-doc-location*', clos, constant, 6).
 symbol_info('*<slot-definition>-inheritable-doc-location*', clos, package, internal).
-symbol_info('*<slot-definition>-inheritable-initer-location*', clos, constant, '5').
+symbol_info('*<slot-definition>-inheritable-initer-location*', clos, constant, 5).
 symbol_info('*<slot-definition>-inheritable-initer-location*', clos, package, internal).
-symbol_info('*<slot-definition>-initargs-location*', clos, constant, '2').
+symbol_info('*<slot-definition>-initargs-location*', clos, constant, 2).
 symbol_info('*<slot-definition>-initargs-location*', clos, package, internal).
-symbol_info('*<slot-definition>-name-location*', clos, constant, '1').
+symbol_info('*<slot-definition>-name-location*', clos, constant, 1).
 symbol_info('*<slot-definition>-name-location*', clos, package, internal).
-symbol_info('*<slot-definition>-type-location*', clos, constant, '3').
+symbol_info('*<slot-definition>-type-location*', clos, constant, 3).
 symbol_info('*<slot-definition>-type-location*', clos, package, internal).
 symbol_info('*<slotted-class>-defclass*', clos, package, internal).
 symbol_info('*<slotted-class>-defclass*', clos, variable, '\r\n(DEFCLASS SLOTTED-CLASS (DEFINED-CLASS)\r\n (($SUBCLASS-OF-STABLEHASH-P TYPE BOOLEAN) ($GENERIC-ACCESSORS INITFORM T) ($DIRECT-ACCESSORS TYPE LIST INITFORM \'NIL)\r\n  ($VALID-INITARGS-FROM-SLOTS TYPE LIST) ($INSTANCE-SIZE TYPE (INTEGER 1 *)))\r\n (FIXED-SLOT-LOCATIONS T))').
-symbol_info('*<slotted-class>-direct-accessors-location*', clos, constant, '18').
+symbol_info('*<slotted-class>-direct-accessors-location*', clos, constant, 18).
 symbol_info('*<slotted-class>-direct-accessors-location*', clos, package, internal).
-symbol_info('*<slotted-class>-generic-accessors-location*', clos, constant, '17').
+symbol_info('*<slotted-class>-generic-accessors-location*', clos, constant, 17).
 symbol_info('*<slotted-class>-generic-accessors-location*', clos, package, internal).
-symbol_info('*<slotted-class>-instance-size-location*', clos, constant, '20').
+symbol_info('*<slotted-class>-instance-size-location*', clos, constant, 20).
 symbol_info('*<slotted-class>-instance-size-location*', clos, package, internal).
-symbol_info('*<slotted-class>-subclass-of-stablehash-p-location*', clos, constant, '16').
+symbol_info('*<slotted-class>-subclass-of-stablehash-p-location*', clos, constant, 16).
 symbol_info('*<slotted-class>-subclass-of-stablehash-p-location*', clos, package, internal).
-symbol_info('*<slotted-class>-valid-initargs-from-slots-location*', clos, constant, '19').
+symbol_info('*<slotted-class>-valid-initargs-from-slots-location*', clos, constant, 19).
 symbol_info('*<slotted-class>-valid-initargs-from-slots-location*', clos, package, internal).
 symbol_info('*<specializer>-defclass*', clos, package, internal).
 symbol_info('*<specializer>-defclass*', clos, variable, '(DEFCLASS SPECIALIZER (STANDARD-STABLEHASH METAOBJECT) (($DIRECT-METHODS INITFORM NIL)) (FIXED-SLOT-LOCATIONS T))').
-symbol_info('*<specializer>-direct-methods-location*', clos, constant, '2').
+symbol_info('*<specializer>-direct-methods-location*', clos, constant, 2).
 symbol_info('*<specializer>-direct-methods-location*', clos, package, internal).
 symbol_info('*<standard-class>-class-version*', clos, package, internal).
 symbol_info('*<standard-class>-class-version*', clos, variable, '#(#<STANDARD-CLASS STANDARD-CLASS> #<STANDARD-CLASS STANDARD-CLASS> NIL 0 NIL NIL NIL NIL NIL NIL)').
@@ -1857,7 +1876,7 @@ symbol_info('*<standard-class>-default-initargs*', clos, constant, '(FIXED-SLOT-
 symbol_info('*<standard-class>-default-initargs*', clos, package, internal).
 symbol_info('*<standard-class>-defclass*', clos, package, internal).
 symbol_info('*<standard-class>-defclass*', clos, variable, '(DEFCLASS STANDARD-CLASS (SEMI-STANDARD-CLASS) NIL (FIXED-SLOT-LOCATIONS T))').
-symbol_info('*<standard-class>-instance-size*', clos, constant, '28').
+symbol_info('*<standard-class>-instance-size*', clos, constant, 28).
 symbol_info('*<standard-class>-instance-size*', clos, package, internal).
 symbol_info('*<standard-class>-valid-initialization-keywords*', clos, constant, '(NAME DIRECT-SUPERCLASSES DIRECT-SLOTS DIRECT-DEFAULT-INITARGS DOCUMENTATION GENERIC-ACCESSORS FIXED-SLOT-LOCATIONS)').
 symbol_info('*<standard-class>-valid-initialization-keywords*', clos, package, internal).
@@ -1873,25 +1892,25 @@ symbol_info('*<standard-slot-definition>-defclass*', clos, package, internal).
 symbol_info('*<standard-slot-definition>-defclass*', clos, variable, '(DEFCLASS STANDARD-SLOT-DEFINITION (SLOT-DEFINITION) NIL (FIXED-SLOT-LOCATIONS T))').
 symbol_info('*<standard-stablehash>-defclass*', clos, package, internal).
 symbol_info('*<standard-stablehash>-defclass*', clos, variable, '(DEFCLASS STANDARD-STABLEHASH NIL (($HASHCODE INITFORM (RANDOM-POSFIXNUM))) (FIXED-SLOT-LOCATIONS T))').
-symbol_info('*<standard-stablehash>-hashcode-location*', clos, constant, '1').
+symbol_info('*<standard-stablehash>-hashcode-location*', clos, constant, 1).
 symbol_info('*<standard-stablehash>-hashcode-location*', clos, package, internal).
-symbol_info('*<structure-class>-boa-constructors-location*', clos, constant, '23').
+symbol_info('*<structure-class>-boa-constructors-location*', clos, constant, 23).
 symbol_info('*<structure-class>-boa-constructors-location*', clos, package, internal).
 symbol_info('*<structure-class>-class-version*', clos, package, internal).
 symbol_info('*<structure-class>-class-version*', clos, variable, '#(#<STANDARD-CLASS STRUCTURE-CLASS> #<STANDARD-CLASS STRUCTURE-CLASS> NIL 0 NIL NIL NIL NIL NIL NIL)').
-symbol_info('*<structure-class>-copier-location*', clos, constant, '24').
+symbol_info('*<structure-class>-copier-location*', clos, constant, 24).
 symbol_info('*<structure-class>-copier-location*', clos, package, internal).
 symbol_info('*<structure-class>-defclass*', clos, package, internal).
 symbol_info('*<structure-class>-defclass*', clos, variable, '\r\n(DEFCLASS STRUCTURE-CLASS (SLOTTED-CLASS)\r\n (($NAMES TYPE CONS) ($KCONSTRUCTOR TYPE SYMBOL) ($BOA-CONSTRUCTORS TYPE LIST) ($COPIER TYPE SYMBOL) ($PREDICATE TYPE SYMBOL)\r\n  ($PROTOTYPE TYPE (OR STRUCTURE-OBJECT NULL)))\r\n (FIXED-SLOT-LOCATIONS T))').
-symbol_info('*<structure-class>-instance-size*', clos, constant, '27').
+symbol_info('*<structure-class>-instance-size*', clos, constant, 27).
 symbol_info('*<structure-class>-instance-size*', clos, package, internal).
-symbol_info('*<structure-class>-kconstructor-location*', clos, constant, '22').
+symbol_info('*<structure-class>-kconstructor-location*', clos, constant, 22).
 symbol_info('*<structure-class>-kconstructor-location*', clos, package, internal).
-symbol_info('*<structure-class>-names-location*', clos, constant, '21').
+symbol_info('*<structure-class>-names-location*', clos, constant, 21).
 symbol_info('*<structure-class>-names-location*', clos, package, internal).
-symbol_info('*<structure-class>-predicate-location*', clos, constant, '25').
+symbol_info('*<structure-class>-predicate-location*', clos, constant, 25).
 symbol_info('*<structure-class>-predicate-location*', clos, package, internal).
-symbol_info('*<structure-class>-prototype-location*', clos, constant, '26').
+symbol_info('*<structure-class>-prototype-location*', clos, constant, 26).
 symbol_info('*<structure-class>-prototype-location*', clos, package, internal).
 symbol_info('*<structure-direct-slot-definition>-class-version*', clos, package, internal).
 symbol_info('*<structure-direct-slot-definition>-class-version*', clos, variable, '#(#<STANDARD-CLASS STRUCTURE-DIRECT-SLOT-DEFINITION> #<STANDARD-CLASS STRUCTURE-DIRECT-SLOT-DEFINITION> NIL 0 NIL NIL NIL NIL NIL NIL)').
@@ -1909,7 +1928,7 @@ symbol_info('*abcl-contrib*', system, package, external).
 symbol_info('*active-restarts*', system, package, internal).
 symbol_info('*active-restarts*', system, variable, '(Abort main loop)').
 symbol_info('*all-languages*', system, package, internal).
-symbol_info('*all-languages*', system, variable, '((ENGLISH) (DANSK) (DEUTSCH) (FRAN�AIS) (ESPA�OL) (NEDERLANDS) (???????))').
+symbol_info('*all-languages*', system, variable, '((ENGLISH) (DANSK) (DEUTSCH) (FRAN?AIS) (ESPA?OL) (NEDERLANDS) (???????))').
 symbol_info('*allow-making-generic*', clos, package, internal).
 symbol_info('*allow-making-generic*', clos, variable, []).
 symbol_info('*allow-mixing-metaclasses*', clos, package, internal).
@@ -1933,7 +1952,7 @@ symbol_info('*autoloading-cache*', system, variable, []).
 symbol_info('*backq-tokens*', system, package, internal).
 symbol_info('*backq-tokens*', system, variable, '(BACKQ-COMMA BACKQ-COMMA-AT BACKQ-COMMA-DOT BACKQ-LIST BACKQ-LIST* BACKQ-APPEND BACKQ-NCONC BACKQ-CONS BACKQ-VECTOR)').
 symbol_info('*backquote-count*', system, package, internal).
-symbol_info('*backquote-count*', system, variable, '0').
+symbol_info('*backquote-count*', system, variable, 0).
 symbol_info('*backquote-level*', system, package, internal).
 symbol_info('*backquote-optimize-append*', system, package, internal).
 symbol_info('*backquote-optimize-append*', system, variable, t).
@@ -1959,7 +1978,7 @@ symbol_info('*bq-dot-flag*', system, variable, '(,.)').
 symbol_info('*bq-vector-flag*', system, package, internal).
 symbol_info('*bq-vector-flag*', system, variable, '(bqv)').
 symbol_info('*break-count*', system, package, internal).
-symbol_info('*break-count*', system, variable, '0').
+symbol_info('*break-count*', system, variable, 0).
 symbol_info('*break-driver*', extensions, package, external).
 symbol_info('*break-driver*', extensions, variable, '#<COMPILED-FUNCTION BREAK-LOOP>').
 symbol_info('*break-on-signals*', 'common-lisp', package, external).
@@ -1997,7 +2016,7 @@ symbol_info('*clhs-root-default*', custom, variable, 'http://www.ai.mit.edu/proj
 symbol_info('*clos-booting*', mop, package, internal).
 symbol_info('*clos-booting*', mop, variable, []).
 symbol_info('*cmd-number*', 'top-level', package, internal).
-symbol_info('*cmd-number*', 'top-level', variable, '3').
+symbol_info('*cmd-number*', 'top-level', variable, 3).
 symbol_info('*code-index*', system, package, internal).
 symbol_info('*code-part*', system, package, internal).
 symbol_info('*code-parts*', system, package, internal).
@@ -2007,7 +2026,7 @@ symbol_info('*coerce-fixnum-char-ansi*', custom, variable, []).
 symbol_info('*command-char*', 'top-level', package, internal).
 symbol_info('*command-char*', 'top-level', variable, :).
 symbol_info('*command-index*', extensions, package, external).
-symbol_info('*command-index*', extensions, variable, '2').
+symbol_info('*command-index*', extensions, variable, 2).
 symbol_info('*command-line-argument-list*', extensions, package, external).
 symbol_info('*command-line-argument-list*', extensions, variable, []).
 symbol_info('*command-table*', 'top-level', package, internal).
@@ -2066,14 +2085,14 @@ symbol_info('*coutput-file*', system, variable, []).
 symbol_info('*coutput-stream*', system, package, internal).
 symbol_info('*coutput-stream*', system, variable, []).
 symbol_info('*current-error-depth*', system, package, internal).
-symbol_info('*current-error-depth*', system, variable, '0').
+symbol_info('*current-error-depth*', system, variable, 0).
 symbol_info('*current-language*', custom, package, external).
 symbol_info('*current-level*', xp, package, internal).
-symbol_info('*current-level*', xp, variable, '0').
+symbol_info('*current-level*', xp, variable, 0).
 symbol_info('*current-print-length*', system, package, external).
-symbol_info('*current-print-length*', system, variable, '0').
+symbol_info('*current-print-length*', system, variable, 0).
 symbol_info('*current-print-level*', system, package, external).
-symbol_info('*current-print-level*', system, variable, '0').
+symbol_info('*current-print-level*', system, variable, 0).
 symbol_info('*current-source-file*', system, package, internal).
 symbol_info('*current-source-file*', system, variable, []).
 symbol_info('*current-source-line-1*', system, package, internal).
@@ -2102,7 +2121,7 @@ symbol_info('*dd-slots*', system, package, internal).
 symbol_info('*dd-type*', system, package, internal).
 symbol_info('*dead-code*', system, package, internal).
 symbol_info('*debug*', system, package, external).
-symbol_info('*debug*', system, variable, '1').
+symbol_info('*debug*', system, variable, 1).
 symbol_info('*debug-condition*', extensions, package, external).
 symbol_info('*debug-condition*', extensions, variable, []).
 symbol_info('*debug-frame*', system, package, internal).
@@ -2110,7 +2129,7 @@ symbol_info('*debug-io*', 'common-lisp', package, external).
 symbol_info('*debug-io*', 'common-lisp', variable, '#<IO SYNONYM-STREAM *TERMINAL-IO*>').
 symbol_info('*debug-io*', 'common-lisp', variable, '#<TWO-WAY-STREAM {58CD571D}>').
 symbol_info('*debug-level*', extensions, package, external).
-symbol_info('*debug-level*', extensions, variable, '0').
+symbol_info('*debug-level*', extensions, variable, 0).
 symbol_info('*debug-print-frame-limit*', system, package, internal).
 symbol_info('*debug-print-frame-limit*', system, variable, []).
 symbol_info('*debug-warn*', system, package, external).
@@ -2130,23 +2149,23 @@ symbol_info('*default-pathname-defaults*', 'common-lisp', package, external).
 symbol_info('*default-pathname-defaults*', 'common-lisp', variable, '').
 symbol_info('*default-pathname-defaults*', 'common-lisp', variable, '/home/dmiles/logicmoo_workspace/packs_usr/armedbear_abcl/').
 symbol_info('*default-right-margin*', xp, package, internal).
-symbol_info('*default-right-margin*', xp, variable, '70').
+symbol_info('*default-right-margin*', xp, variable, 70).
 symbol_info('*defined-functions*', system, package, external).
-symbol_info('*defstruct-description-boa-constructors-location*', system, constant, '5').
+symbol_info('*defstruct-description-boa-constructors-location*', system, constant, 5).
 symbol_info('*defstruct-description-boa-constructors-location*', system, package, internal).
-symbol_info('*defstruct-description-copier-location*', system, constant, '6').
+symbol_info('*defstruct-description-copier-location*', system, constant, 6).
 symbol_info('*defstruct-description-copier-location*', system, package, internal).
-symbol_info('*defstruct-description-direct-slots-location*', system, constant, '4').
+symbol_info('*defstruct-description-direct-slots-location*', system, constant, 4).
 symbol_info('*defstruct-description-direct-slots-location*', system, package, internal).
-symbol_info('*defstruct-description-kconstructor-location*', system, constant, '2').
+symbol_info('*defstruct-description-kconstructor-location*', system, constant, 2).
 symbol_info('*defstruct-description-kconstructor-location*', system, package, internal).
-symbol_info('*defstruct-description-predicate-location*', system, constant, '7').
+symbol_info('*defstruct-description-predicate-location*', system, constant, 7).
 symbol_info('*defstruct-description-predicate-location*', system, package, internal).
-symbol_info('*defstruct-description-size-location*', system, constant, '1').
+symbol_info('*defstruct-description-size-location*', system, constant, 1).
 symbol_info('*defstruct-description-size-location*', system, package, internal).
-symbol_info('*defstruct-description-slots-location*', system, constant, '3').
+symbol_info('*defstruct-description-slots-location*', system, constant, 3).
 symbol_info('*defstruct-description-slots-location*', system, package, internal).
-symbol_info('*defstruct-description-type-location*', system, constant, '0').
+symbol_info('*defstruct-description-type-location*', system, constant, 0).
 symbol_info('*defstruct-description-type-location*', system, package, internal).
 symbol_info('*deftype-depth-limit*', custom, package, external).
 symbol_info('*deftype-depth-limit*', custom, variable, []).
@@ -2219,7 +2238,7 @@ symbol_info('*fasl-loader*', system, package, external).
 symbol_info('*fasl-loader*', system, variable, []).
 symbol_info('*fasl-uninterned-symbols*', system, package, internal).
 symbol_info('*fasl-uninterned-symbols*', system, variable, []).
-symbol_info('*fasl-version*', system, constant, '43').
+symbol_info('*fasl-version*', system, constant, 43).
 symbol_info('*fasl-version*', system, package, external).
 symbol_info('*fasoutput-stream*', system, package, internal).
 symbol_info('*fasoutput-stream*', system, variable, []).
@@ -2284,11 +2303,9 @@ symbol_info('*function-list*', ffi, package, internal).
 symbol_info('*functions-with-errors*', system, package, internal).
 symbol_info('*functions-with-errors*', system, variable, []).
 symbol_info('*gc-statistics*', system, package, internal).
-symbol_info('*gc-statistics*', system, variable, '-1').
+symbol_info('*gc-statistics*', system, variable, -1).
 symbol_info('*gensym-counter*', 'common-lisp', package, external).
-symbol_info('*gensym-counter*', 'common-lisp', variable, '3921').
-symbol_info('*gensym-counter*', 'common-lisp', variable, '4037').
-symbol_info('*gensym-counter*', 'common-lisp', variable, '48').
+symbol_info('*gensym-counter*', 'common-lisp', variable, 48).
 symbol_info('*genv*', system, package, internal).
 symbol_info('*gf-allocate-instance*', mop, package, internal).
 symbol_info('*gf-allocate-instance*', mop, variable, '#<STANDARD-GENERIC-FUNCTION ALLOCATE-INSTANCE {37BED0B1}>').
@@ -2303,7 +2320,7 @@ symbol_info('*gui-backend*', extensions, package, external).
 symbol_info('*handled-cmd*', 'top-level', package, internal).
 symbol_info('*handled-cmd*', 'top-level', variable, 'G41').
 symbol_info('*handler-clusters*', system, package, internal).
-symbol_info('*handler-clusters*', system, variable, '(NIL)').
+symbol_info('*handler-clusters*', system, variable, [[]]).
 symbol_info('*helpvars*', system, package, internal).
 symbol_info('*hidden-functions*', profiler, package, external).
 symbol_info('*home-package*', system, package, internal).
@@ -2314,7 +2331,7 @@ symbol_info('*http-encoding*', system, package, internal).
 symbol_info('*http-encoding*', system, variable, '#<ENCODING UTF-8 DOS>').
 symbol_info('*http-log-stream*', custom, package, external).
 symbol_info('*http-log-stream*', custom, variable, '#<IO SYNONYM-STREAM *TERMINAL-IO*>').
-symbol_info('*http-port*', system, constant, '80').
+symbol_info('*http-port*', system, constant, 80).
 symbol_info('*http-port*', system, package, internal).
 symbol_info('*http-proxy*', custom, package, external).
 symbol_info('*http-proxy*', custom, variable, []).
@@ -2353,17 +2370,17 @@ symbol_info('*inspect-break*', system, variable, []).
 symbol_info('*inspect-browser*', custom, package, external).
 symbol_info('*inspect-browser*', custom, variable, []).
 symbol_info('*inspect-debug*', system, package, internal).
-symbol_info('*inspect-debug*', system, variable, '0').
+symbol_info('*inspect-debug*', system, variable, 0).
 symbol_info('*inspect-frontend*', custom, package, external).
 symbol_info('*inspect-frontend*', custom, variable, 'TTY').
 symbol_info('*inspect-length*', custom, package, external).
-symbol_info('*inspect-length*', custom, variable, '5').
+symbol_info('*inspect-length*', custom, variable, 5).
 symbol_info('*inspect-print-length*', custom, package, external).
-symbol_info('*inspect-print-length*', custom, variable, '10').
+symbol_info('*inspect-print-length*', custom, variable, 10).
 symbol_info('*inspect-print-level*', custom, package, external).
-symbol_info('*inspect-print-level*', custom, variable, '5').
+symbol_info('*inspect-print-level*', custom, variable, 5).
 symbol_info('*inspect-print-lines*', custom, package, external).
-symbol_info('*inspect-print-lines*', custom, variable, '5').
+symbol_info('*inspect-print-lines*', custom, variable, 5).
 symbol_info('*inspect-unbound-value*', system, package, internal).
 symbol_info('*inspected-object*', 'top-level', package, internal).
 symbol_info('*inspected-object*', 'top-level', variable, []).
@@ -2382,7 +2399,7 @@ symbol_info('*invoke-debugger-hook*', system, variable, []).
 symbol_info('*ipd*', xp, package, internal).
 symbol_info('*ipd*', xp, variable, '#S(PPRINT-DISPATCH-TABLE :CONSES-WITH-CARS #<EQ HASH-TABLE 57 entries, 88 buckets {1F47E9A3}> :STRUCTURES #<EQ HASH-TABLE 1 entry, 11 buckets {5DA79F30}> :OTHERS (#S(ENTRY :TEST (LAMBDA (X) (FUNCALL #\'FUNCTION-CALL-P X)) :FN FN-CALL :FULL-SPEC ((-5) (SATISFIES FUNCTION-CALL-P))) #S(ENTRY :TEST #<CONSP {3273B82C}> :FN PPRINT-FILL :FULL-SPEC ((-10) CONS))))').
 symbol_info('*iterargs*', system, package, internal).
-symbol_info('*jmpbuf-size*', system, constant, '25').
+symbol_info('*jmpbuf-size*', system, constant, 25).
 symbol_info('*jmpbuf-size*', system, package, internal).
 symbol_info('*key-bindings*', system, package, internal).
 symbol_info('*key-bindings*', system, variable, []).
@@ -2414,7 +2431,7 @@ symbol_info('*list-documentation-hashtable*', mop, variable, '#<EQUAL HASH-TABLE
 symbol_info('*load-compiling*', custom, package, external).
 symbol_info('*load-compiling*', custom, variable, []).
 symbol_info('*load-depth*', system, package, internal).
-symbol_info('*load-depth*', system, variable, '0').
+symbol_info('*load-depth*', system, variable, 0).
 symbol_info('*load-echo*', custom, package, external).
 symbol_info('*load-echo*', custom, variable, []).
 symbol_info('*load-forms*', system, package, internal).
@@ -2422,7 +2439,7 @@ symbol_info('*load-forms*', system, variable, []).
 symbol_info('*load-input-stream*', system, package, internal).
 symbol_info('*load-input-stream*', system, variable, []).
 symbol_info('*load-level*', system, package, internal).
-symbol_info('*load-level*', system, variable, '0').
+symbol_info('*load-level*', system, variable, 0).
 symbol_info('*load-logical-pathname-translations-database*', custom, package, external).
 symbol_info('*load-logical-pathname-translations-database*', custom, variable, '(loghosts)').
 symbol_info('*load-obsolete-action*', custom, package, external).
@@ -2464,7 +2481,7 @@ symbol_info('*make-instance-table*', clos, variable, '\r\n#S(HASH-TABLE TEST STA
 symbol_info('*make-instances-obsolete-caller*', clos, package, internal).
 symbol_info('*make-instances-obsolete-caller*', clos, variable, 'MAKE-INSTANCES-OBSOLETE').
 symbol_info('*maximum-error-depth*', system, package, internal).
-symbol_info('*maximum-error-depth*', system, variable, '10').
+symbol_info('*maximum-error-depth*', system, variable, 10).
 symbol_info('*merge-pathnames-ansi*', custom, package, external).
 symbol_info('*merge-pathnames-ansi*', custom, variable, []).
 symbol_info('*method-combination*', clos, package, internal).
@@ -2514,7 +2531,7 @@ symbol_info('*output-c-variables*', ffi, package, external).
 symbol_info('*output-c-variables*', ffi, variable, []).
 symbol_info('*outside-args*', format, package, internal).
 symbol_info('*package*', 'common-lisp', package, external).
-symbol_info('*package*', 'common-lisp', variable, '#<PACKAGE COMMON-LISP-USER>').
+symbol_info('*package*', 'common-lisp', variable, ugly(package,'common-lisp-user')).
 symbol_info('*package-tasks*', system, package, internal).
 symbol_info('*package-tasks*', system, variable, []).
 symbol_info('*package-tasks-treat-specially*', custom, package, external).
@@ -2543,7 +2560,7 @@ symbol_info('*prin-l1*', system, package, internal).
 symbol_info('*prin-level*', system, package, internal).
 symbol_info('*prin-line-prefix*', system, package, internal).
 symbol_info('*prin-linelength*', system, package, internal).
-symbol_info('*prin-linelength*', system, variable, '145').
+symbol_info('*prin-linelength*', system, variable, 145).
 symbol_info('*prin-lines*', system, package, internal).
 symbol_info('*prin-lm*', system, package, internal).
 symbol_info('*prin-miserp*', system, package, internal).
@@ -2555,7 +2572,7 @@ symbol_info('*prin-traillength*', system, package, internal).
 symbol_info('*print-array*', 'common-lisp', package, external).
 symbol_info('*print-array*', 'common-lisp', variable, t).
 symbol_info('*print-base*', 'common-lisp', package, external).
-symbol_info('*print-base*', 'common-lisp', variable, '10').
+symbol_info('*print-base*', 'common-lisp', variable, 10).
 symbol_info('*print-case*', 'common-lisp', package, external).
 symbol_info('*print-case*', 'common-lisp', variable, 'UPCASE').
 symbol_info('*print-circle*', 'common-lisp', package, external).
@@ -2572,7 +2589,7 @@ symbol_info('*print-fasl*', system, variable, []).
 symbol_info('*print-gensym*', 'common-lisp', package, external).
 symbol_info('*print-gensym*', 'common-lisp', variable, t).
 symbol_info('*print-indent-lists*', custom, package, external).
-symbol_info('*print-indent-lists*', custom, variable, '1').
+symbol_info('*print-indent-lists*', custom, variable, 1).
 symbol_info('*print-length*', 'common-lisp', package, external).
 symbol_info('*print-length*', 'common-lisp', variable, []).
 symbol_info('*print-level*', 'common-lisp', package, external).
@@ -2630,7 +2647,7 @@ symbol_info('*random-state*', 'common-lisp', package, external).
 symbol_info('*random-state*', 'common-lisp', variable, '#<RANDOM-STATE {5C53FC7E}>').
 symbol_info('*random-state*', 'common-lisp', variable, '#S(RANDOM-STATE #*0101110111101000000000000110010101110010011011000011101001010001)').
 symbol_info('*read-base*', 'common-lisp', package, external).
-symbol_info('*read-base*', 'common-lisp', variable, '10').
+symbol_info('*read-base*', 'common-lisp', variable, 10).
 symbol_info('*read-default-float-format*', 'common-lisp', package, external).
 symbol_info('*read-default-float-format*', 'common-lisp', variable, 'SINGLE-FLOAT').
 symbol_info('*read-eval*', 'common-lisp', package, external).
@@ -2652,15 +2669,15 @@ symbol_info('*readtable*', 'common-lisp', package, external).
 symbol_info('*readtable*', 'common-lisp', variable, '#<org.armedbear.lisp.Readtable@3b0c5a20>').
 symbol_info('*readtable*', 'common-lisp', variable, '#<READTABLE #x000334071DD8>').
 symbol_info('*recurse-count-debug-io*', system, package, internal).
-symbol_info('*recurse-count-debug-io*', system, variable, '0').
+symbol_info('*recurse-count-debug-io*', system, variable, 0).
 symbol_info('*recurse-count-error-output*', system, package, internal).
-symbol_info('*recurse-count-error-output*', system, variable, '0').
+symbol_info('*recurse-count-error-output*', system, variable, 0).
 symbol_info('*recurse-count-gc-statistics*', system, package, internal).
-symbol_info('*recurse-count-gc-statistics*', system, variable, '0').
+symbol_info('*recurse-count-gc-statistics*', system, variable, 0).
 symbol_info('*recurse-count-standard-output*', system, package, internal).
-symbol_info('*recurse-count-standard-output*', system, variable, '0').
+symbol_info('*recurse-count-standard-output*', system, variable, 0).
 symbol_info('*recursive-error-count*', system, package, internal).
-symbol_info('*recursive-error-count*', system, variable, '0').
+symbol_info('*recursive-error-count*', system, variable, 0).
 symbol_info('*reinitialize-instance-initargs-cache*', mop, package, internal).
 symbol_info('*reinitialize-instance-initargs-cache*', mop, variable, '#<EQ HASH-TABLE 0 entries, 11 buckets {C571D3D}>').
 symbol_info('*reinitialize-instance-table*', clos, package, internal).
@@ -2681,7 +2698,7 @@ symbol_info('*restart-clusters*', system, variable, '((Return to top level.))').
 symbol_info('*result*', xp, package, internal).
 symbol_info('*result*', xp, variable, []).
 symbol_info('*safety*', system, package, external).
-symbol_info('*safety*', system, variable, '1').
+symbol_info('*safety*', system, variable, 1).
 symbol_info('*saved-backtrace*', extensions, package, external).
 symbol_info('*saved-backtrace*', extensions, variable, []).
 symbol_info('*saved-debug-package*', system, package, internal).
@@ -2717,16 +2734,16 @@ symbol_info('*source-file-types*', custom, variable, '(lisp lsp cl)').
 symbol_info('*source-position*', system, package, external).
 symbol_info('*source-position*', system, variable, []).
 symbol_info('*space*', system, package, external).
-symbol_info('*space*', system, variable, '1').
+symbol_info('*space*', system, variable, 1).
 symbol_info('*specials*', system, package, internal).
 symbol_info('*speed*', system, package, external).
-symbol_info('*speed*', system, variable, '1').
+symbol_info('*speed*', system, variable, 1).
 symbol_info('*squeeze-string-max*', system, package, internal).
-symbol_info('*squeeze-string-max*', system, variable, '100').
+symbol_info('*squeeze-string-max*', system, variable, 100).
 symbol_info('*squeeze-string-section*', system, package, internal).
-symbol_info('*squeeze-string-section*', system, variable, '10').
+symbol_info('*squeeze-string-section*', system, variable, 10).
 symbol_info('*stack-mode*', system, package, internal).
-symbol_info('*stack-mode*', system, variable, '4').
+symbol_info('*stack-mode*', system, variable, 4).
 symbol_info('*stackz*', system, package, internal).
 symbol_info('*standard-input*', 'common-lisp', package, external).
 symbol_info('*standard-input*', 'common-lisp', variable, '#<IO SYNONYM-STREAM *TERMINAL-IO*>').
@@ -2735,9 +2752,9 @@ symbol_info('*standard-output*', 'common-lisp', package, external).
 symbol_info('*standard-output*', 'common-lisp', variable, '#<IO SYNONYM-STREAM *TERMINAL-IO*>').
 symbol_info('*standard-output*', 'common-lisp', variable, '#S(SYSTEM-STREAM)').
 symbol_info('*step-level*', system, package, internal).
-symbol_info('*step-level*', system, variable, '0').
+symbol_info('*step-level*', system, variable, 0).
 symbol_info('*step-quit*', system, package, internal).
-symbol_info('*step-quit*', system, variable, '281474976710655').
+symbol_info('*step-quit*', system, variable, 281474976710655).
 symbol_info('*step-watch*', system, package, internal).
 symbol_info('*step-watch*', system, variable, []).
 symbol_info('*strict-mop*', clos, package, internal).
@@ -2775,7 +2792,7 @@ symbol_info('*trace-function*', extensions, package, external).
 symbol_info('*trace-indent*', custom, package, external).
 symbol_info('*trace-indent*', custom, variable, []).
 symbol_info('*trace-level*', system, package, internal).
-symbol_info('*trace-level*', system, variable, '0').
+symbol_info('*trace-level*', system, variable, 0).
 symbol_info('*trace-output*', 'common-lisp', package, external).
 symbol_info('*trace-output*', 'common-lisp', variable, '#<IO SYNONYM-STREAM *TERMINAL-IO*>').
 symbol_info('*trace-output*', 'common-lisp', variable, '#S(SYSTEM-STREAM)').
@@ -3398,8 +3415,8 @@ symbol_info('array-annotation-element-p', jvm, function_type, function).
 symbol_info('array-annotation-element-p', jvm, package, internal).
 symbol_info('array-dimension', 'common-lisp', function_type, 'compiled-function').
 symbol_info('array-dimension', 'common-lisp', package, external).
-symbol_info('array-dimension-limit', 'common-lisp', constant, '2147483647').
-symbol_info('array-dimension-limit', 'common-lisp', constant, '4294967296').
+symbol_info('array-dimension-limit', 'common-lisp', constant, 2147483647).
+symbol_info('array-dimension-limit', 'common-lisp', constant, 4294967296).
 symbol_info('array-dimension-limit', 'common-lisp', package, external).
 symbol_info('array-dimensions', 'common-lisp', function_type, 'compiled-function').
 symbol_info('array-dimensions', 'common-lisp', package, external).
@@ -3414,8 +3431,8 @@ symbol_info('array-in-bounds-p', 'common-lisp', function_type, 'compiled-functio
 symbol_info('array-in-bounds-p', 'common-lisp', package, external).
 symbol_info('array-rank', 'common-lisp', function_type, 'compiled-function').
 symbol_info('array-rank', 'common-lisp', package, external).
-symbol_info('array-rank-limit', 'common-lisp', constant, '4096').
-symbol_info('array-rank-limit', 'common-lisp', constant, '8').
+symbol_info('array-rank-limit', 'common-lisp', constant, 4096).
+symbol_info('array-rank-limit', 'common-lisp', constant, 8).
 symbol_info('array-rank-limit', 'common-lisp', package, external).
 symbol_info('array-readably-printable-p', system, function_type, 'compiled-function').
 symbol_info('array-readably-printable-p', system, package, internal).
@@ -3427,8 +3444,8 @@ symbol_info('array-row-major-index', 'common-lisp', function_type, 'compiled-fun
 symbol_info('array-row-major-index', 'common-lisp', package, external).
 symbol_info('array-total-size', 'common-lisp', function_type, 'compiled-function').
 symbol_info('array-total-size', 'common-lisp', package, external).
-symbol_info('array-total-size-limit', 'common-lisp', constant, '2147483647').
-symbol_info('array-total-size-limit', 'common-lisp', constant, '4294967296').
+symbol_info('array-total-size-limit', 'common-lisp', constant, 2147483647).
+symbol_info('array-total-size-limit', 'common-lisp', constant, 4294967296).
 symbol_info('array-total-size-limit', 'common-lisp', package, external).
 symbol_info('assemble-lap', system, function_type, 'compiled-function').
 symbol_info('assemble-lap', system, package, internal).
@@ -3527,7 +3544,7 @@ symbol_info('backtrace-command', 'top-level', package, internal).
 symbol_info('bad-seq-limit', 'common-lisp', function_type, function).
 symbol_info('bad-seq-limit', 'common-lisp', package, internal).
 symbol_info('base-char', 'common-lisp', package, external).
-symbol_info('base-char-code-limit', extensions, constant, '1114112').
+symbol_info('base-char-code-limit', extensions, constant, 1114112).
 symbol_info('base-char-code-limit', extensions, package, external).
 symbol_info('base-char=character', keyword, package, external).
 symbol_info('base-classname', system, function_type, function).
@@ -3653,9 +3670,9 @@ symbol_info('block-stack', keyword, package, external).
 symbol_info('block-stack', xp, function_type, function).
 symbol_info('block-stack', xp, package, internal).
 symbol_info('block-stack-entry-size', xp, package, internal).
-symbol_info('block-stack-entry-size', xp, variable, '1').
+symbol_info('block-stack-entry-size', xp, variable, 1).
 symbol_info('block-stack-min-size', xp, package, internal).
-symbol_info('block-stack-min-size', xp, variable, '35').
+symbol_info('block-stack-min-size', xp, variable, 35).
 symbol_info('block-stack-ptr', keyword, package, external).
 symbol_info('block-stack-ptr', xp, function_type, function).
 symbol_info('block-stack-ptr', xp, package, internal).
@@ -3676,51 +3693,51 @@ symbol_info('body-form', system, package, internal).
 symbol_info('body-function-name', precompiler, package, internal).
 symbol_info('bogus-sublist-error', system, function_type, function).
 symbol_info('bogus-sublist-error', system, package, internal).
-symbol_info('boole-1', 'common-lisp', constant, '10').
-symbol_info('boole-1', 'common-lisp', constant, '2').
+symbol_info('boole-1', 'common-lisp', constant, 10).
+symbol_info('boole-1', 'common-lisp', constant, 2).
 symbol_info('boole-1', 'common-lisp', package, external).
-symbol_info('boole-2', 'common-lisp', constant, '12').
-symbol_info('boole-2', 'common-lisp', constant, '3').
+symbol_info('boole-2', 'common-lisp', constant, 12).
+symbol_info('boole-2', 'common-lisp', constant, 3).
 symbol_info('boole-2', 'common-lisp', package, external).
-symbol_info('boole-and', 'common-lisp', constant, '6').
-symbol_info('boole-and', 'common-lisp', constant, '8').
+symbol_info('boole-and', 'common-lisp', constant, 6).
+symbol_info('boole-and', 'common-lisp', constant, 8).
 symbol_info('boole-and', 'common-lisp', package, external).
-symbol_info('boole-andc1', 'common-lisp', constant, '12').
-symbol_info('boole-andc1', 'common-lisp', constant, '4').
+symbol_info('boole-andc1', 'common-lisp', constant, 12).
+symbol_info('boole-andc1', 'common-lisp', constant, 4).
 symbol_info('boole-andc1', 'common-lisp', package, external).
-symbol_info('boole-andc2', 'common-lisp', constant, '13').
-symbol_info('boole-andc2', 'common-lisp', constant, '2').
+symbol_info('boole-andc2', 'common-lisp', constant, 13).
+symbol_info('boole-andc2', 'common-lisp', constant, 2).
 symbol_info('boole-andc2', 'common-lisp', package, external).
-symbol_info('boole-c1', 'common-lisp', constant, '4').
-symbol_info('boole-c1', 'common-lisp', constant, '5').
+symbol_info('boole-c1', 'common-lisp', constant, 4).
+symbol_info('boole-c1', 'common-lisp', constant, 5).
 symbol_info('boole-c1', 'common-lisp', package, external).
-symbol_info('boole-c2', 'common-lisp', constant, '3').
-symbol_info('boole-c2', 'common-lisp', constant, '5').
+symbol_info('boole-c2', 'common-lisp', constant, 3).
+symbol_info('boole-c2', 'common-lisp', constant, 5).
 symbol_info('boole-c2', 'common-lisp', package, external).
-symbol_info('boole-clr', 'common-lisp', constant, '0').
+symbol_info('boole-clr', 'common-lisp', constant, 0).
 symbol_info('boole-clr', 'common-lisp', package, external).
-symbol_info('boole-eqv', 'common-lisp', constant, '9').
+symbol_info('boole-eqv', 'common-lisp', constant, 9).
 symbol_info('boole-eqv', 'common-lisp', package, external).
-symbol_info('boole-ior', 'common-lisp', constant, '14').
-symbol_info('boole-ior', 'common-lisp', constant, '7').
+symbol_info('boole-ior', 'common-lisp', constant, 14).
+symbol_info('boole-ior', 'common-lisp', constant, 7).
 symbol_info('boole-ior', 'common-lisp', package, external).
-symbol_info('boole-nand', 'common-lisp', constant, '10').
-symbol_info('boole-nand', 'common-lisp', constant, '7').
+symbol_info('boole-nand', 'common-lisp', constant, 10).
+symbol_info('boole-nand', 'common-lisp', constant, 7).
 symbol_info('boole-nand', 'common-lisp', package, external).
-symbol_info('boole-nor', 'common-lisp', constant, '1').
-symbol_info('boole-nor', 'common-lisp', constant, '11').
+symbol_info('boole-nor', 'common-lisp', constant, 1).
+symbol_info('boole-nor', 'common-lisp', constant, 11).
 symbol_info('boole-nor', 'common-lisp', package, external).
-symbol_info('boole-orc1', 'common-lisp', constant, '13').
-symbol_info('boole-orc1', 'common-lisp', constant, '14').
+symbol_info('boole-orc1', 'common-lisp', constant, 13).
+symbol_info('boole-orc1', 'common-lisp', constant, 14).
 symbol_info('boole-orc1', 'common-lisp', package, external).
-symbol_info('boole-orc2', 'common-lisp', constant, '11').
-symbol_info('boole-orc2', 'common-lisp', constant, '15').
+symbol_info('boole-orc2', 'common-lisp', constant, 11).
+symbol_info('boole-orc2', 'common-lisp', constant, 15).
 symbol_info('boole-orc2', 'common-lisp', package, external).
-symbol_info('boole-set', 'common-lisp', constant, '1').
-symbol_info('boole-set', 'common-lisp', constant, '15').
+symbol_info('boole-set', 'common-lisp', constant, 1).
+symbol_info('boole-set', 'common-lisp', constant, 15).
 symbol_info('boole-set', 'common-lisp', package, external).
-symbol_info('boole-xor', 'common-lisp', constant, '6').
-symbol_info('boole-xor', 'common-lisp', constant, '8').
+symbol_info('boole-xor', 'common-lisp', constant, 6).
+symbol_info('boole-xor', 'common-lisp', constant, 8).
 symbol_info('boole-xor', 'common-lisp', package, external).
 symbol_info('boot-classloader', system, function_type, function).
 symbol_info('boot-classloader', system, package, internal).
@@ -3788,9 +3805,9 @@ symbol_info('browse-url-1', extensions, package, internal).
 symbol_info('browse-url-2', extensions, package, internal).
 symbol_info('browse-url-3', extensions, package, internal).
 symbol_info('buffer-entry-size', xp, package, internal).
-symbol_info('buffer-entry-size', xp, variable, '1').
+symbol_info('buffer-entry-size', xp, variable, 1).
 symbol_info('buffer-min-size', xp, package, internal).
-symbol_info('buffer-min-size', xp, variable, '256').
+symbol_info('buffer-min-size', xp, variable, 256).
 symbol_info('buffer-offset', keyword, package, external).
 symbol_info('buffer-offset', xp, function_type, function).
 symbol_info('buffer-offset', xp, package, internal).
@@ -4237,8 +4254,8 @@ symbol_info('cache-emf', system, package, external).
 symbol_info('calculate-allowable-initargs', mop, function_type, 'compiled-function').
 symbol_info('calculate-allowable-initargs', mop, package, internal).
 symbol_info('call&push', system, package, internal).
-symbol_info('call-arguments-limit', 'common-lisp', constant, '4096').
-symbol_info('call-arguments-limit', 'common-lisp', constant, '50').
+symbol_info('call-arguments-limit', 'common-lisp', constant, 4096).
+symbol_info('call-arguments-limit', 'common-lisp', constant, 50).
 symbol_info('call-arguments-limit', 'common-lisp', package, external).
 symbol_info('call-count', system, function_type, 'compiled-function').
 symbol_info('call-count', system, package, external).
@@ -4257,7 +4274,7 @@ symbol_info('call-next-method', 'common-lisp', package, external).
 symbol_info('call-next-method', clos, package, external).
 symbol_info('call-next-method-allowed', clos, package, internal).
 symbol_info('call-next-method-allowed', keyword, package, external).
-symbol_info('call-registers-limit', system, constant, '8').
+symbol_info('call-registers-limit', system, constant, 8).
 symbol_info('call-registers-limit', system, package, external).
 symbol_info('call-site', mop, package, internal).
 symbol_info('call-splicing', system, package, internal).
@@ -4392,14 +4409,14 @@ symbol_info('char-bit', extensions, function_type, 'compiled-function').
 symbol_info('char-bit', extensions, package, external).
 symbol_info('char-bits', extensions, function_type, 'compiled-function').
 symbol_info('char-bits', extensions, package, external).
-symbol_info('char-bits-limit', extensions, constant, '16').
+symbol_info('char-bits-limit', extensions, constant, 16).
 symbol_info('char-bits-limit', extensions, package, external).
 symbol_info('char-code', 'common-lisp', function_type, 'compiled-function').
 symbol_info('char-code', 'common-lisp', package, external).
-symbol_info('char-code-limit', 'common-lisp', constant, '1114112').
-symbol_info('char-code-limit', 'common-lisp', constant, '65536').
+symbol_info('char-code-limit', 'common-lisp', constant, 1114112).
+symbol_info('char-code-limit', 'common-lisp', constant, 65536).
 symbol_info('char-code-limit', 'common-lisp', package, external).
-symbol_info('char-control-bit', extensions, constant, '1').
+symbol_info('char-control-bit', extensions, constant, 1).
 symbol_info('char-control-bit', extensions, package, external).
 symbol_info('char-count', ffi, package, internal).
 symbol_info('char-downcase', 'common-lisp', function_type, 'compiled-function').
@@ -4408,15 +4425,15 @@ symbol_info('char-equal', 'common-lisp', function_type, 'compiled-function').
 symbol_info('char-equal', 'common-lisp', package, external).
 symbol_info('char-font', extensions, function_type, 'compiled-function').
 symbol_info('char-font', extensions, package, external).
-symbol_info('char-font-limit', extensions, constant, '16').
+symbol_info('char-font-limit', extensions, constant, 16).
 symbol_info('char-font-limit', extensions, package, external).
 symbol_info('char-greaterp', 'common-lisp', function_type, 'compiled-function').
 symbol_info('char-greaterp', 'common-lisp', package, external).
-symbol_info('char-hyper-bit', extensions, constant, '8').
+symbol_info('char-hyper-bit', extensions, constant, 8).
 symbol_info('char-hyper-bit', extensions, package, external).
 symbol_info('char-int', 'common-lisp', function_type, 'compiled-function').
 symbol_info('char-int', 'common-lisp', package, external).
-symbol_info('char-int-limit', system, constant, '285212672').
+symbol_info('char-int-limit', system, constant, 285212672).
 symbol_info('char-int-limit', system, package, internal).
 symbol_info('char-invertcase', extensions, function_type, 'compiled-function').
 symbol_info('char-invertcase', extensions, package, external).
@@ -4424,7 +4441,7 @@ symbol_info('char-key', extensions, function_type, 'compiled-function').
 symbol_info('char-key', extensions, package, external).
 symbol_info('char-lessp', 'common-lisp', function_type, 'compiled-function').
 symbol_info('char-lessp', 'common-lisp', package, external).
-symbol_info('char-meta-bit', extensions, constant, '2').
+symbol_info('char-meta-bit', extensions, constant, 2).
 symbol_info('char-meta-bit', extensions, package, external).
 symbol_info('char-name', 'common-lisp', function_type, 'compiled-function').
 symbol_info('char-name', 'common-lisp', package, external).
@@ -4436,7 +4453,7 @@ symbol_info('char-not-lessp', 'common-lisp', function_type, 'compiled-function')
 symbol_info('char-not-lessp', 'common-lisp', package, external).
 symbol_info('char-reader', system, function_type, 'compiled-function').
 symbol_info('char-reader', system, package, internal).
-symbol_info('char-super-bit', extensions, constant, '4').
+symbol_info('char-super-bit', extensions, constant, 4).
 symbol_info('char-super-bit', extensions, package, external).
 symbol_info('char-to-utf8', extensions, function_type, 'compiled-function').
 symbol_info('char-to-utf8', extensions, package, external).
@@ -6396,9 +6413,9 @@ symbol_info('echo-stream-p', system, package, internal).
 symbol_info('edit-file', extensions, function_type, 'compiled-function').
 symbol_info('edit-file', extensions, package, external).
 symbol_info('editing-mode', readline, package, external).
-symbol_info('editing-mode-emacs', readline, constant, '1').
+symbol_info('editing-mode-emacs', readline, constant, 1).
 symbol_info('editing-mode-emacs', readline, package, external).
-symbol_info('editing-mode-vi', readline, constant, '0').
+symbol_info('editing-mode-vi', readline, constant, 0).
 symbol_info('editing-mode-vi', readline, package, external).
 symbol_info('editor-name', extensions, function_type, 'compiled-function').
 symbol_info('editor-name', extensions, package, external).
@@ -6976,21 +6993,21 @@ symbol_info('fenv-assoc', system, function_type, 'compiled-function').
 symbol_info('fenv-assoc', system, package, internal).
 symbol_info('fenv-search', system, function_type, 'compiled-function').
 symbol_info('fenv-search', system, package, internal).
-symbol_info('ff-flag-alloca', ffi, constant, '1').
+symbol_info('ff-flag-alloca', ffi, constant, 1).
 symbol_info('ff-flag-alloca', ffi, package, internal).
-symbol_info('ff-flag-in-out', ffi, constant, '32').
+symbol_info('ff-flag-in-out', ffi, constant, 32).
 symbol_info('ff-flag-in-out', ffi, package, internal).
-symbol_info('ff-flag-malloc-free', ffi, constant, '2').
+symbol_info('ff-flag-malloc-free', ffi, constant, 2).
 symbol_info('ff-flag-malloc-free', ffi, package, internal).
-symbol_info('ff-flag-out', ffi, constant, '16').
+symbol_info('ff-flag-out', ffi, constant, 16).
 symbol_info('ff-flag-out', ffi, package, internal).
-symbol_info('ff-language-ansi-c', ffi, constant, '1024').
+symbol_info('ff-language-ansi-c', ffi, constant, 1024).
 symbol_info('ff-language-ansi-c', ffi, package, internal).
-symbol_info('ff-language-asm', ffi, constant, '256').
+symbol_info('ff-language-asm', ffi, constant, 256).
 symbol_info('ff-language-asm', ffi, package, internal).
-symbol_info('ff-language-c', ffi, constant, '512').
+symbol_info('ff-language-c', ffi, constant, 512).
 symbol_info('ff-language-c', ffi, package, internal).
-symbol_info('ff-language-stdcall', ffi, constant, '32768').
+symbol_info('ff-language-stdcall', ffi, constant, 32768).
 symbol_info('ff-language-stdcall', ffi, package, internal).
 symbol_info('ffi-module', ffi, package, internal).
 symbol_info('ffi-module-c-name', ffi, function_type, 'compiled-function').
@@ -7472,7 +7489,7 @@ symbol_info('foreign-variable', ffi, function_type, 'compiled-function').
 symbol_info('foreign-variable', ffi, package, external).
 symbol_info('form-1+', ffi, function_type, 'compiled-function').
 symbol_info('form-1+', ffi, package, internal).
-symbol_info('form-feed-char-code', system, constant, '12').
+symbol_info('form-feed-char-code', system, constant, 12).
 symbol_info('form-feed-char-code', system, package, internal).
 symbol_info('form-type', ffi, package, internal).
 symbol_info('format-absolute-tab', format, function_type, 'compiled-function').
@@ -7898,11 +7915,11 @@ symbol_info('fundamental-output-stream', gray, package, external).
 symbol_info('fundamental-stream', gray, package, external).
 symbol_info('funmap-names', readline, function_type, 'foreign-function').
 symbol_info('funmap-names', readline, package, external).
-symbol_info('funtabr-index', system, constant, '512').
+symbol_info('funtabr-index', system, constant, 512).
 symbol_info('funtabr-index', system, package, internal).
-symbol_info('fv-flag-malloc-free', ffi, constant, '2').
+symbol_info('fv-flag-malloc-free', ffi, constant, 2).
 symbol_info('fv-flag-malloc-free', ffi, package, internal).
-symbol_info('fv-flag-readonly', ffi, constant, '1').
+symbol_info('fv-flag-readonly', ffi, constant, 1).
 symbol_info('fv-flag-readonly', ffi, package, internal).
 symbol_info('g-format-directive-expander', format, function_type, 'compiled-function').
 symbol_info('g-format-directive-expander', format, package, internal).
@@ -8595,9 +8612,9 @@ symbol_info('insert-combined-laps', system, package, internal).
 symbol_info('insert-combined-laps-1', system, package, internal).
 symbol_info('insert-combined-laps-nilpusher-p', system, package, internal).
 symbol_info('insert-mode', readline, package, external).
-symbol_info('insert-mode-insert', readline, constant, '1').
+symbol_info('insert-mode-insert', readline, constant, 1).
 symbol_info('insert-mode-insert', readline, package, external).
-symbol_info('insert-mode-overwrite', readline, constant, '0').
+symbol_info('insert-mode-overwrite', readline, constant, 0).
 symbol_info('insert-mode-overwrite', readline, package, external).
 symbol_info('insert-text', readline, function_type, 'foreign-function').
 symbol_info('insert-text', readline, package, external).
@@ -8723,8 +8740,8 @@ symbol_info('internal-field-type', jvm, function_type, function).
 symbol_info('internal-field-type', jvm, package, internal).
 symbol_info('internal-symbol', system, package, internal).
 symbol_info('internal-symbols', system, package, internal).
-symbol_info('internal-time-units-per-second', 'common-lisp', constant, '1000').
-symbol_info('internal-time-units-per-second', 'common-lisp', constant, '1000000').
+symbol_info('internal-time-units-per-second', 'common-lisp', constant, 1000).
+symbol_info('internal-time-units-per-second', 'common-lisp', constant, 1000000).
 symbol_info('internal-time-units-per-second', 'common-lisp', package, external).
 symbol_info('internal-weak-alist', system, package, internal).
 symbol_info('internal-weak-hashed-alist', system, package, internal).
@@ -8969,8 +8986,8 @@ symbol_info('lambda-lists-congruent-p', mop, function_type, 'compiled-function')
 symbol_info('lambda-lists-congruent-p', mop, package, internal).
 symbol_info('lambda-name', system, function_type, 'compiled-function').
 symbol_info('lambda-name', system, package, external).
-symbol_info('lambda-parameters-limit', 'common-lisp', constant, '4096').
-symbol_info('lambda-parameters-limit', 'common-lisp', constant, '50').
+symbol_info('lambda-parameters-limit', 'common-lisp', constant, 4096).
+symbol_info('lambda-parameters-limit', 'common-lisp', constant, 50).
 symbol_info('lambda-parameters-limit', 'common-lisp', package, external).
 symbol_info('language-information', i18n, function_type, 'compiled-function').
 symbol_info('language-information', i18n, package, external).
@@ -9009,17 +9026,17 @@ symbol_info('least-negative-normalized-double-float', 'common-lisp', package, ex
 symbol_info('least-negative-normalized-long-float', 'common-lisp', constant, '-2.2250738585072014d-308').
 symbol_info('least-negative-normalized-long-float', 'common-lisp', package, external).
 symbol_info('least-negative-normalized-long-float', 'common-lisp', variable, '-5.676615526003731344L-646456994').
-symbol_info('least-negative-normalized-short-float', 'common-lisp', constant, '-1.17549435E-38').
 symbol_info('least-negative-normalized-short-float', 'common-lisp', constant, '-1.1755s-38').
+symbol_info('least-negative-normalized-short-float', 'common-lisp', constant, -1.17549435e-38).
 symbol_info('least-negative-normalized-short-float', 'common-lisp', package, external).
-symbol_info('least-negative-normalized-single-float', 'common-lisp', constant, '-1.17549435E-38').
-symbol_info('least-negative-normalized-single-float', 'common-lisp', constant, '-1.1754944E-38').
+symbol_info('least-negative-normalized-single-float', 'common-lisp', constant, -1.17549435e-38).
+symbol_info('least-negative-normalized-single-float', 'common-lisp', constant, -1.1754944e-38).
 symbol_info('least-negative-normalized-single-float', 'common-lisp', package, external).
 symbol_info('least-negative-short-float', 'common-lisp', constant, '-1.1755s-38').
-symbol_info('least-negative-short-float', 'common-lisp', constant, '-1.4E-45').
+symbol_info('least-negative-short-float', 'common-lisp', constant, -1.4e-45).
 symbol_info('least-negative-short-float', 'common-lisp', package, external).
-symbol_info('least-negative-single-float', 'common-lisp', constant, '-1.1754944E-38').
-symbol_info('least-negative-single-float', 'common-lisp', constant, '-1.4E-45').
+symbol_info('least-negative-single-float', 'common-lisp', constant, -1.1754944e-38).
+symbol_info('least-negative-single-float', 'common-lisp', constant, -1.4e-45).
 symbol_info('least-negative-single-float', 'common-lisp', package, external).
 symbol_info('least-positive-double-float', 'common-lisp', constant, '2.2250738585072014d-308').
 symbol_info('least-positive-double-float', 'common-lisp', constant, '4.9d-324').
@@ -9032,17 +9049,17 @@ symbol_info('least-positive-normalized-double-float', 'common-lisp', package, ex
 symbol_info('least-positive-normalized-long-float', 'common-lisp', constant, '2.2250738585072014d-308').
 symbol_info('least-positive-normalized-long-float', 'common-lisp', package, external).
 symbol_info('least-positive-normalized-long-float', 'common-lisp', variable, '5.676615526003731344L-646456994').
-symbol_info('least-positive-normalized-short-float', 'common-lisp', constant, '1.17549435E-38').
 symbol_info('least-positive-normalized-short-float', 'common-lisp', constant, '1.1755s-38').
+symbol_info('least-positive-normalized-short-float', 'common-lisp', constant, 1.17549435e-38).
 symbol_info('least-positive-normalized-short-float', 'common-lisp', package, external).
-symbol_info('least-positive-normalized-single-float', 'common-lisp', constant, '1.17549435E-38').
-symbol_info('least-positive-normalized-single-float', 'common-lisp', constant, '1.1754944E-38').
+symbol_info('least-positive-normalized-single-float', 'common-lisp', constant, 1.17549435e-38).
+symbol_info('least-positive-normalized-single-float', 'common-lisp', constant, 1.1754944e-38).
 symbol_info('least-positive-normalized-single-float', 'common-lisp', package, external).
 symbol_info('least-positive-short-float', 'common-lisp', constant, '1.1755s-38').
-symbol_info('least-positive-short-float', 'common-lisp', constant, '1.4E-45').
+symbol_info('least-positive-short-float', 'common-lisp', constant, 1.4e-45).
 symbol_info('least-positive-short-float', 'common-lisp', package, external).
-symbol_info('least-positive-single-float', 'common-lisp', constant, '1.1754944E-38').
-symbol_info('least-positive-single-float', 'common-lisp', constant, '1.4E-45').
+symbol_info('least-positive-single-float', 'common-lisp', constant, 1.1754944e-38).
+symbol_info('least-positive-single-float', 'common-lisp', constant, 1.4e-45).
 symbol_info('least-positive-single-float', 'common-lisp', package, external).
 symbol_info('let*', 'common-lisp', function_type, 'special-operator').
 symbol_info('let*', 'common-lisp', package, external).
@@ -10571,33 +10588,33 @@ symbol_info('more-sequences', system, package, internal).
 symbol_info('more-t', clos, package, internal).
 symbol_info('most-negative-double-float', 'common-lisp', constant, '-1.7976931348623157d308').
 symbol_info('most-negative-double-float', 'common-lisp', package, external).
-symbol_info('most-negative-fixnum', 'common-lisp', constant, '-2147483648').
-symbol_info('most-negative-fixnum', 'common-lisp', constant, '-281474976710656').
+symbol_info('most-negative-fixnum', 'common-lisp', constant, -2147483648).
+symbol_info('most-negative-fixnum', 'common-lisp', constant, -281474976710656).
 symbol_info('most-negative-fixnum', 'common-lisp', package, external).
-symbol_info('most-negative-java-long', extensions, constant, '-9223372036854775808').
+symbol_info('most-negative-java-long', extensions, constant, -9223372036854775808).
 symbol_info('most-negative-java-long', extensions, package, external).
 symbol_info('most-negative-long-float', 'common-lisp', constant, '-1.7976931348623157d308').
 symbol_info('most-negative-long-float', 'common-lisp', package, external).
 symbol_info('most-negative-long-float', 'common-lisp', variable, '-8.8080652584198167656L646456992').
-symbol_info('most-negative-short-float', 'common-lisp', constant, '-3.4028235E38').
 symbol_info('most-negative-short-float', 'common-lisp', constant, '-3.4028s38').
+symbol_info('most-negative-short-float', 'common-lisp', constant, -3.4028235e+38).
 symbol_info('most-negative-short-float', 'common-lisp', package, external).
-symbol_info('most-negative-single-float', 'common-lisp', constant, '-3.4028235E38').
+symbol_info('most-negative-single-float', 'common-lisp', constant, -3.4028235e+38).
 symbol_info('most-negative-single-float', 'common-lisp', package, external).
 symbol_info('most-positive-double-float', 'common-lisp', constant, '1.7976931348623157d308').
 symbol_info('most-positive-double-float', 'common-lisp', package, external).
-symbol_info('most-positive-fixnum', 'common-lisp', constant, '2147483647').
-symbol_info('most-positive-fixnum', 'common-lisp', constant, '281474976710655').
+symbol_info('most-positive-fixnum', 'common-lisp', constant, 2147483647).
+symbol_info('most-positive-fixnum', 'common-lisp', constant, 281474976710655).
 symbol_info('most-positive-fixnum', 'common-lisp', package, external).
-symbol_info('most-positive-java-long', extensions, constant, '9223372036854775807').
+symbol_info('most-positive-java-long', extensions, constant, 9223372036854775807).
 symbol_info('most-positive-java-long', extensions, package, external).
 symbol_info('most-positive-long-float', 'common-lisp', constant, '1.7976931348623157d308').
 symbol_info('most-positive-long-float', 'common-lisp', package, external).
 symbol_info('most-positive-long-float', 'common-lisp', variable, '8.8080652584198167656L646456992').
-symbol_info('most-positive-short-float', 'common-lisp', constant, '3.4028235E38').
 symbol_info('most-positive-short-float', 'common-lisp', constant, '3.4028s38').
+symbol_info('most-positive-short-float', 'common-lisp', constant, 3.4028235e+38).
 symbol_info('most-positive-short-float', 'common-lisp', package, external).
-symbol_info('most-positive-single-float', 'common-lisp', constant, '3.4028235E38').
+symbol_info('most-positive-single-float', 'common-lisp', constant, 3.4028235e+38).
 symbol_info('most-positive-single-float', 'common-lisp', package, external).
 symbol_info('most-specific-first', keyword, package, external).
 symbol_info('most-specific-last', keyword, package, external).
@@ -10625,8 +10642,8 @@ symbol_info('multiple-value-setf', system, function_type, macro).
 symbol_info('multiple-value-setf', system, package, internal).
 symbol_info('multiple-value-setq', 'common-lisp', function_type, 'special-operator').
 symbol_info('multiple-value-setq', 'common-lisp', package, external).
-symbol_info('multiple-values-limit', 'common-lisp', constant, '128').
-symbol_info('multiple-values-limit', 'common-lisp', constant, '32').
+symbol_info('multiple-values-limit', 'common-lisp', constant, 128).
+symbol_info('multiple-values-limit', 'common-lisp', constant, 32).
 symbol_info('multiple-values-limit', 'common-lisp', package, external).
 symbol_info('mumble-delete', system, function_type, function).
 symbol_info('mumble-delete', system, package, internal).
@@ -11911,9 +11928,9 @@ symbol_info('predicate-for-type', system, package, internal).
 symbol_info('predicate-p', clos, package, internal).
 symbol_info('prefer-env-winsize', readline, package, external).
 symbol_info('prefix-entry-size', xp, package, internal).
-symbol_info('prefix-entry-size', xp, variable, '1').
+symbol_info('prefix-entry-size', xp, variable, 1).
 symbol_info('prefix-min-size', xp, package, internal).
-symbol_info('prefix-min-size', xp, variable, '256').
+symbol_info('prefix-min-size', xp, variable, 256).
 symbol_info('prefix-p', format, package, internal).
 symbol_info('prefix-p', xp, package, internal).
 symbol_info('prefix-ptr', xp, function_type, function).
@@ -11922,9 +11939,9 @@ symbol_info('prefix-stack', keyword, package, external).
 symbol_info('prefix-stack', xp, function_type, function).
 symbol_info('prefix-stack', xp, package, internal).
 symbol_info('prefix-stack-entry-size', xp, package, internal).
-symbol_info('prefix-stack-entry-size', xp, variable, '5').
+symbol_info('prefix-stack-entry-size', xp, variable, 5).
 symbol_info('prefix-stack-min-size', xp, package, internal).
-symbol_info('prefix-stack-min-size', xp, variable, '150').
+symbol_info('prefix-stack-min-size', xp, variable, 150).
 symbol_info('prefix-stack-ptr', keyword, package, external).
 symbol_info('prefix-stack-ptr', xp, function_type, function).
 symbol_info('prefix-stack-ptr', xp, package, internal).
@@ -12262,9 +12279,9 @@ symbol_info('query-function', system, package, internal).
 symbol_info('query-readline', system, function_type, function).
 symbol_info('query-readline', system, package, internal).
 symbol_info('queue-entry-size', xp, package, internal).
-symbol_info('queue-entry-size', xp, variable, '7').
+symbol_info('queue-entry-size', xp, variable, 7).
 symbol_info('queue-min-size', xp, package, internal).
-symbol_info('queue-min-size', xp, variable, '525').
+symbol_info('queue-min-size', xp, variable, 525).
 symbol_info('quick-sort', system, function_type, 'compiled-function').
 symbol_info('quick-sort', system, package, internal).
 symbol_info('quicklisp-init', 'common-lisp-user', package, internal).
@@ -12409,11 +12426,11 @@ symbol_info('readline-reader', readline, package, external).
 symbol_info('readline-state', readline, package, external).
 symbol_info('readline-vcpfunc', readline, package, external).
 symbol_info('readline-version', readline, package, external).
-symbol_info('readline-version-major', readline, constant, '5').
+symbol_info('readline-version-major', readline, constant, 5).
 symbol_info('readline-version-major', readline, package, external).
-symbol_info('readline-version-minor', readline, constant, '2').
+symbol_info('readline-version-minor', readline, constant, 2).
 symbol_info('readline-version-minor', readline, package, external).
-symbol_info('readline-version-number', readline, constant, '1282').
+symbol_info('readline-version-number', readline, constant, 1282).
 symbol_info('readline-version-number', readline, package, external).
 symbol_info('readtable-case', 'common-lisp', function_type, 'compiled-function').
 symbol_info('readtable-case', 'common-lisp', package, external).
@@ -13180,18 +13197,18 @@ symbol_info('shift-jis', charset, constant, '#<ENCODING SHIFT-JIS UNIX>').
 symbol_info('shift-jis', charset, package, external).
 symbol_info('shift-vars', system, function_type, 'compiled-function').
 symbol_info('shift-vars', system, package, internal).
-symbol_info('short-code-base', system, constant, '157').
+symbol_info('short-code-base', system, constant, 157).
 symbol_info('short-code-base', system, package, internal).
 symbol_info('short-code-ops', system, constant, '#(157 172 197 218 248)').
 symbol_info('short-code-ops', system, package, internal).
 symbol_info('short-code-opsize', system, constant, '#(15 25 21 30 8)').
 symbol_info('short-code-opsize', system, package, internal).
 symbol_info('short-float', 'common-lisp', package, external).
-symbol_info('short-float-epsilon', 'common-lisp', constant, '5.960465E-8').
 symbol_info('short-float-epsilon', 'common-lisp', constant, '7.6295s-6').
+symbol_info('short-float-epsilon', 'common-lisp', constant, 5.960465e-8).
 symbol_info('short-float-epsilon', 'common-lisp', package, external).
-symbol_info('short-float-negative-epsilon', 'common-lisp', constant, '2.9802326E-8').
 symbol_info('short-float-negative-epsilon', 'common-lisp', constant, '3.81476s-6').
+symbol_info('short-float-negative-epsilon', 'common-lisp', constant, 2.9802326e-8).
 symbol_info('short-float-negative-epsilon', 'common-lisp', package, external).
 symbol_info('short-float-p', system, function_type, 'compiled-function').
 symbol_info('short-float-p', system, package, internal).
@@ -13400,9 +13417,9 @@ symbol_info('single-dispatching-arg', clos, package, internal).
 symbol_info('single-float', 'common-lisp', package, external).
 symbol_info('single-float-bits', system, function_type, 'compiled-function').
 symbol_info('single-float-bits', system, package, external).
-symbol_info('single-float-epsilon', 'common-lisp', constant, '5.960465E-8').
+symbol_info('single-float-epsilon', 'common-lisp', constant, 5.960465e-8).
 symbol_info('single-float-epsilon', 'common-lisp', package, external).
-symbol_info('single-float-negative-epsilon', 'common-lisp', constant, '2.9802326E-8').
+symbol_info('single-float-negative-epsilon', 'common-lisp', constant, 2.9802326e-8).
 symbol_info('single-float-negative-epsilon', 'common-lisp', package, external).
 symbol_info('single-float-negative-infinity', extensions, constant, '#.SINGLE-FLOAT-NEGATIVE-INFINITY').
 symbol_info('single-float-negative-infinity', extensions, package, external).
@@ -13825,56 +13842,56 @@ symbol_info('stat-vfs-p', posix, function_type, 'compiled-function').
 symbol_info('stat-vfs-p', posix, package, external).
 symbol_info('stat-vfs-vol-name', posix, function_type, 'compiled-function').
 symbol_info('stat-vfs-vol-name', posix, package, external).
-symbol_info('state-callback', readline, constant, '524288').
+symbol_info('state-callback', readline, constant, 524288).
 symbol_info('state-callback', readline, package, external).
-symbol_info('state-completing', readline, constant, '16384').
+symbol_info('state-completing', readline, constant, 16384).
 symbol_info('state-completing', readline, package, external).
-symbol_info('state-dispatching', readline, constant, '32').
+symbol_info('state-dispatching', readline, constant, 32).
 symbol_info('state-dispatching', readline, package, external).
-symbol_info('state-done', readline, constant, '8388608').
+symbol_info('state-done', readline, constant, 8388608).
 symbol_info('state-done', readline, package, external).
-symbol_info('state-initialized', readline, constant, '2').
+symbol_info('state-initialized', readline, constant, 2).
 symbol_info('state-initialized', readline, package, external).
-symbol_info('state-initializing', readline, constant, '1').
+symbol_info('state-initializing', readline, constant, 1).
 symbol_info('state-initializing', readline, package, external).
-symbol_info('state-inputpending', readline, constant, '131072').
+symbol_info('state-inputpending', readline, constant, 131072).
 symbol_info('state-inputpending', readline, package, external).
-symbol_info('state-isearch', readline, constant, '128').
+symbol_info('state-isearch', readline, constant, 128).
 symbol_info('state-isearch', readline, package, external).
-symbol_info('state-macrodef', readline, constant, '4096').
+symbol_info('state-macrodef', readline, constant, 4096).
 symbol_info('state-macrodef', readline, package, external).
-symbol_info('state-macroinput', readline, constant, '2048').
+symbol_info('state-macroinput', readline, constant, 2048).
 symbol_info('state-macroinput', readline, package, external).
-symbol_info('state-metanext', readline, constant, '16').
+symbol_info('state-metanext', readline, constant, 16).
 symbol_info('state-metanext', readline, package, external).
-symbol_info('state-moreinput', readline, constant, '64').
+symbol_info('state-moreinput', readline, constant, 64).
 symbol_info('state-moreinput', readline, package, external).
-symbol_info('state-multikey', readline, constant, '2097152').
+symbol_info('state-multikey', readline, constant, 2097152).
 symbol_info('state-multikey', readline, package, external).
-symbol_info('state-none', readline, constant, '0').
+symbol_info('state-none', readline, constant, 0).
 symbol_info('state-none', readline, package, external).
-symbol_info('state-nsearch', readline, constant, '256').
+symbol_info('state-nsearch', readline, constant, 256).
 symbol_info('state-nsearch', readline, package, external).
-symbol_info('state-numericarg', readline, constant, '1024').
+symbol_info('state-numericarg', readline, constant, 1024).
 symbol_info('state-numericarg', readline, package, external).
-symbol_info('state-overwrite', readline, constant, '8192').
+symbol_info('state-overwrite', readline, constant, 8192).
 symbol_info('state-overwrite', readline, package, external).
-symbol_info('state-readcmd', readline, constant, '8').
+symbol_info('state-readcmd', readline, constant, 8).
 symbol_info('state-readcmd', readline, package, external).
 symbol_info('state-redisplaying', readline, package, external).
-symbol_info('state-search', readline, constant, '512').
+symbol_info('state-search', readline, constant, 512).
 symbol_info('state-search', readline, package, external).
-symbol_info('state-sighandler', readline, constant, '32768').
+symbol_info('state-sighandler', readline, constant, 32768).
 symbol_info('state-sighandler', readline, package, external).
-symbol_info('state-termprepped', readline, constant, '4').
+symbol_info('state-termprepped', readline, constant, 4).
 symbol_info('state-termprepped', readline, package, external).
-symbol_info('state-ttycsaved', readline, constant, '262144').
+symbol_info('state-ttycsaved', readline, constant, 262144).
 symbol_info('state-ttycsaved', readline, package, external).
-symbol_info('state-undoing', readline, constant, '65536').
+symbol_info('state-undoing', readline, constant, 65536).
 symbol_info('state-undoing', readline, package, external).
-symbol_info('state-vicmdonce', readline, constant, '4194304').
+symbol_info('state-vicmdonce', readline, constant, 4194304).
 symbol_info('state-vicmdonce', readline, package, external).
-symbol_info('state-vimotion', readline, constant, '1048576').
+symbol_info('state-vimotion', readline, constant, 1048576).
 symbol_info('state-vimotion', readline, package, external).
 symbol_info('static-keys', system, package, internal).
 symbol_info('std-accessor-method-slot-definition', mop, function_type, 'compiled-function').
@@ -14155,7 +14172,7 @@ symbol_info('string-char-p', extensions, function_type, 'compiled-function').
 symbol_info('string-char-p', extensions, package, external).
 symbol_info('string-concat', extensions, function_type, 'compiled-function').
 symbol_info('string-concat', extensions, package, external).
-symbol_info('string-dimension-limit', system, constant, '67108864').
+symbol_info('string-dimension-limit', system, constant, 67108864).
 symbol_info('string-dimension-limit', system, package, internal).
 symbol_info('string-downcase', 'common-lisp', function_type, 'compiled-function').
 symbol_info('string-downcase', 'common-lisp', package, external).
@@ -14372,9 +14389,9 @@ symbol_info('subtypep-standard-object', system, package, internal).
 symbol_info('subtypep-structure-object', system, function_type, 'compiled-function').
 symbol_info('subtypep-structure-object', system, package, internal).
 symbol_info('suffix-entry-size', xp, package, internal).
-symbol_info('suffix-entry-size', xp, variable, '1').
+symbol_info('suffix-entry-size', xp, variable, 1).
 symbol_info('suffix-min-size', xp, package, internal).
-symbol_info('suffix-min-size', xp, variable, '256').
+symbol_info('suffix-min-size', xp, variable, 256).
 symbol_info('suffix-ptr', xp, function_type, function).
 symbol_info('suffix-ptr', xp, package, internal).
 symbol_info('suffix-string', xp, package, internal).
@@ -15649,20 +15666,20 @@ symbol_info(**, 'common-lisp', package, external).
 symbol_info(**, 'common-lisp', variable, []).
 symbol_info(*, 'common-lisp', function_type, 'compiled-function').
 symbol_info(*, 'common-lisp', package, external).
-symbol_info(*, 'common-lisp', variable, 'PSYMINFO').
+symbol_info(*, 'common-lisp', variable, []).
 symbol_info(+++, 'common-lisp', package, external).
 symbol_info(+++, 'common-lisp', variable, []).
 symbol_info(++, 'common-lisp', package, external).
 symbol_info(++, 'common-lisp', variable, []).
 symbol_info(+, 'common-lisp', function_type, 'compiled-function').
 symbol_info(+, 'common-lisp', package, external).
-symbol_info(+, 'common-lisp', value, nil).
+symbol_info(+, 'common-lisp', value, []).
 symbol_info(-, 'common-lisp', function_type, 'compiled-function').
 symbol_info(-, 'common-lisp', package, external).
-symbol_info(-, 'common-lisp', variable, '(PSYMINFO)').
+symbol_info(-, 'common-lisp', variable, []).
 symbol_info(/, 'common-lisp', function_type, 'compiled-function').
 symbol_info(/, 'common-lisp', package, external).
-symbol_info(/, 'common-lisp', variable, '(PSYMINFO)').
+symbol_info(/, 'common-lisp', variable, []).
 symbol_info(//, 'common-lisp', package, external).
 symbol_info(//, 'common-lisp', variable, []).
 symbol_info(///, 'common-lisp', package, external).
@@ -18277,7 +18294,7 @@ symbol_info(readable, readline, package, internal).
 symbol_info(readably, keyword, package, external).
 symbol_info(reader, keyword, package, external).
 symbol_info(reader, system, package, internal).
-symbol_info(readerr, readline, constant, '-2').
+symbol_info(readerr, readline, constant, -2).
 symbol_info(readerr, readline, package, external).
 symbol_info(readers, clos, package, internal).
 symbol_info(readers, keyword, package, external).
@@ -18955,14 +18972,14 @@ symbol_info(uncompile, extensions, function_type, 'compiled-function').
 symbol_info(uncompile, extensions, package, external).
 symbol_info(unconditional, keyword, package, external).
 symbol_info(underflow, keyword, package, external).
-symbol_info(undo_begin, readline, constant, '2').
+symbol_info(undo_begin, readline, constant, 2).
 symbol_info(undo_begin, readline, package, external).
 symbol_info(undo_code, readline, package, external).
-symbol_info(undo_delete, readline, constant, '0').
+symbol_info(undo_delete, readline, constant, 0).
 symbol_info(undo_delete, readline, package, external).
-symbol_info(undo_end, readline, constant, '3').
+symbol_info(undo_end, readline, constant, 3).
 symbol_info(undo_end, readline, package, external).
-symbol_info(undo_insert, readline, constant, '1').
+symbol_info(undo_insert, readline, constant, 1).
 symbol_info(undo_insert, readline, package, external).
 symbol_info(unexport, 'common-lisp', function_type, 'compiled-function').
 symbol_info(unexport, 'common-lisp', package, external).
@@ -19170,58 +19187,6 @@ symbol_info(zerop, 'common-lisp', package, external).
 symbol_info(zip, system, function_type, function).
 symbol_info(zip, system, package, external).
 
-is_special_op(S,P):- symbol_info(S,P,function_type,T),arg(_,v('special-operator',macro),T).
-is_special_op('%%allocate-closures', 'sb-c').
-is_special_op('%cleanup-fun', 'sb-c').
-is_special_op('%escape-fun', 'sb-c').
-is_special_op('%funcall', 'sb-c').
-is_special_op('%primitive', 'sb-sys').
-is_special_op('%within-cleanup', 'sb-c').
-is_special_op('compiler-let', ext).
-is_special_op('do*', 'common-lisp').
-is_special_op('eval-when', 'common-lisp').
-is_special_op('global-function', 'sb-c').
-is_special_op('let*', 'common-lisp').
-is_special_op('load-time-value', 'common-lisp').
-is_special_op('multiple-value-bind', 'common-lisp').
-is_special_op('multiple-value-call', 'common-lisp').
-is_special_op('multiple-value-list', 'common-lisp').
-is_special_op('multiple-value-prog1', 'common-lisp').
-is_special_op('multiple-value-setq', 'common-lisp').
-is_special_op('nth-value', 'common-lisp').
-is_special_op('prog*', 'common-lisp').
-is_special_op('return-from', 'common-lisp').
-is_special_op('symbol-macrolet', 'common-lisp').
-is_special_op('truly-the', 'sb-ext').
-is_special_op('unwind-protect', 'common-lisp').
-is_special_op(block, 'common-lisp').
-is_special_op(case, 'common-lisp').
-is_special_op(catch, 'common-lisp').
-is_special_op(cond, 'common-lisp').
-is_special_op(do, 'common-lisp').
-is_special_op(dolist, 'common-lisp').
-is_special_op(dotimes, 'common-lisp').
-is_special_op(flet, 'common-lisp').
-is_special_op(function, 'common-lisp').
-is_special_op(go, 'common-lisp').
-is_special_op(if, 'common-lisp').
-is_special_op(labels, 'common-lisp').
-is_special_op(lambda, 'common-lisp').
-is_special_op(let, 'common-lisp').
-is_special_op(locally, 'common-lisp').
-is_special_op(macrolet, 'common-lisp').
-is_special_op(prog, 'common-lisp').
-is_special_op(prog1, 'common-lisp').
-is_special_op(prog2, 'common-lisp').
-is_special_op(progn, 'common-lisp').
-is_special_op(progv, 'common-lisp').
-is_special_op(psetq, 'common-lisp').
-is_special_op(quote, 'common-lisp').
-is_special_op(return, 'common-lisp').
-is_special_op(setq, 'common-lisp').
-is_special_op(tagbody, 'common-lisp').
-is_special_op(the, 'common-lisp').
-is_special_op(throw, 'common-lisp').
-is_special_op(unless, 'common-lisp').
-is_special_op(when, 'common-lisp').
+
+:- fixup_exports.
 

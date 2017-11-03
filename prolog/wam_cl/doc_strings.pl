@@ -1,3 +1,21 @@
+/*******************************************************************
+ *
+ * A Common Lisp compiler/interpretor, written in Prolog
+ *
+ * (xxxxx.pl)
+ *
+ *
+ * Douglas'' Notes:
+ *
+ * (c) Douglas Miles, 2017
+ *
+ * The program is a *HUGE* common-lisp compiler/interpreter. It is written for YAP/SWI-Prolog (YAP 4x faster).
+ *
+ *******************************************************************/
+:- module(doc, []).
+:- set_module(class(library)).
+:- include('header.pro').
+
 :- style_check(-discontiguous).
 
 doc_string('%eql', 'sb-kernel', function, "Return T if OBJ1 and OBJ2 represent the same object, otherwise NIL.").
@@ -2360,3 +2378,6 @@ doc_string(write, 'common-lisp', function, "Function in COMMON-LISP package:\nAr
 doc_string(write, 'common-lisp', function, "Output OBJECT to the specified stream, defaulting to *STANDARD-OUTPUT*.").
 doc_string(zerop, 'common-lisp', function, "Function in COMMON-LISP package:\nArgs: (NUMBER)\n\nReturns T if the arg is zero; NIL otherwise.\n").
 doc_string(zerop, 'common-lisp', function, "Is this number zero?").
+
+:- fixup_exports.
+

@@ -24,15 +24,22 @@ sexpr1(X) --> {is_ftVar(X),(get_var_name(X,N)->format(atom(NN),'~w',[N]);format(
 sexpr1(Str)--> {string(Str)},!,[Str].
 sexpr1([function, Expression]) --> ['#'''], !, sexpr1(Expression).
 sexpr1([quote, Expression]) --> [''''], !, sexpr1(Expression).
-sexpr1(['$BQ',X])--> ['`'],sexpr1(X).
-sexpr1(Xs) --> {is_list(Xs)},!,['('], lisplist(Xs), !.
-sexpr1([X|Y]) --> sexpr1(X), ['.'], sexpr1(Y), [')'], !.
+sexpr1('ugly'(T,X)) --> ['#<'],sexpr1(T),sexpr1(X),['>'].
 sexpr1('$COMMA'(X)) --> [','],sexpr1(X).
+sexpr1(['$COMMA',X]) --> [','],sexpr1(X).
+sexpr1(['$BQ',X])--> ['`'],sexpr1(X).
+sexpr1([X|Y]) --> !, ['('],  sexpr1(X), lisplist(Y).
+sexpr1(X) --> {compound(X),X=..[F|ARGS]}, '#<',[F],lisplist_sp(ARGS,'>').
 sexpr1(X) --> [X].
 
 
 lisplist([]) --> [')'], !.
-lisplist([X|Xs]) --> sexpr1(X), lisplist(Xs), !.
+lisplist([X|Xs]) --> sexpr1(X), !, lisplist(Xs).
+lisplist(X):- ['.'], sexpr1(X), [')'].
+
+lisplist_sp([],EQ) --> [EQ], !.
+lisplist_sp([X|Xs],EQ) --> sexpr1(X), !, lisplist_sp(Xs,EQ).
+lisplist_sp(X,EQ):- ['.'], sexpr1(X), [EQ].
 
 
 

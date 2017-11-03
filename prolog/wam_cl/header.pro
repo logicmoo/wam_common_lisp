@@ -53,6 +53,8 @@
 :- ensure_loaded(assign).
 :- ensure_loaded(backquote).
 :- ensure_loaded(pnames).
+:- ensure_loaded(doc_strings).
+:- ensure_loaded(symbol_info).
 :- ensure_loaded(prims).
 :- ensure_loaded(block_tagbody).
 :- ensure_loaded(clstructs).

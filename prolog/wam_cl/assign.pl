@@ -102,6 +102,17 @@ symbol_value(Var,Env,Value):-
   symbol_value_or(Var,Env,
     last_chance_symbol_value(Var,Env,Value),Value).
 
+
+values(V1,Push,V1):- push_value(1,Push).
+
+find_symbol(Var,P,Result):- ignore(symbol_value('*package*',ugly(package,P))),find_symbol_from(Var,P,Result).
+find_symbol_from(Var,P,Result):- symbol_info(Var, P, package, IntExt), \+ package_shadowing_symbols(P, Var),!,add_mv(1,IntExt),values(Var,IntExt,Result).
+find_symbol_from(Var,P,Result):- package_use_list(P,Use),symbol_info(Var, Use, package, external),\+ package_shadowing_symbols(P, Var),!,values(Var,imported,Result).
+ 
+get_symbol_info(Var, Type, Result):- symbol_info(Var, P, Type, Result),currently_visible_package(P).
+
+last_chance_symbol_value(Var,_Env,Result):- get_symbol_info(Var, constant, Result),!.
+last_chance_symbol_value(Var,_Env,Result):- get_symbol_info(Var, variable, Result),!.
 last_chance_symbol_value(Var,_Env,Result):- nb_current(Var,Result),!.
 last_chance_symbol_value(Var,_Env,_Result):- 
   lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Var).
