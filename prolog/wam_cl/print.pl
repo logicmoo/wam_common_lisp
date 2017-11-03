@@ -28,18 +28,13 @@ sexpr1('ugly'(T,X)) --> ['#<'],sexpr1(T),sexpr1(X),['>'].
 sexpr1('$COMMA'(X)) --> [','],sexpr1(X).
 sexpr1(['$COMMA',X]) --> [','],sexpr1(X).
 sexpr1(['$BQ',X])--> ['`'],sexpr1(X).
-sexpr1([X|Y]) --> !, ['('],  sexpr1(X), lisplist(Y).
-sexpr1(X) --> {compound(X),X=..[F|ARGS]}, '#<',[F],lisplist_sp(ARGS,'>').
+sexpr1([X|Y]) --> !, ['('],  sexpr1(X), lisplist(Y,')').
+sexpr1(X) --> {compound(X),compound_name_arguments(X,F,ARGS)}, '#<',[F],lisplist(ARGS,'>').
 sexpr1(X) --> [X].
 
-
-lisplist([]) --> [')'], !.
-lisplist([X|Xs]) --> sexpr1(X), !, lisplist(Xs).
-lisplist(X):- ['.'], sexpr1(X), [')'].
-
-lisplist_sp([],EQ) --> [EQ], !.
-lisplist_sp([X|Xs],EQ) --> sexpr1(X), !, lisplist_sp(Xs,EQ).
-lisplist_sp(X,EQ):- ['.'], sexpr1(X), [EQ].
+lisplist([],EQ) --> [EQ], !.
+lisplist([X|Xs],EQ) --> sexpr1(X), !, lisplist(Xs,EQ).
+lisplist(X,EQ):- ['.'], sexpr1(X), [EQ].
 
 
 
