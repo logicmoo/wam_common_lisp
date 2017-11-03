@@ -52,6 +52,7 @@
 :- ensure_loaded(arglists).
 :- ensure_loaded(assign).
 :- ensure_loaded(backquote).
+:- ensure_loaded(pnames).
 :- ensure_loaded(prims).
 :- ensure_loaded(block_tagbody).
 :- ensure_loaded(clstructs).

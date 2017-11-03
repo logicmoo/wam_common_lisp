@@ -302,10 +302,12 @@ sexpr('$OBJ'(ugly,V))                 --> `#<`, read_string_until(V,`>`),!, swhi
 sexpr('$OBJ'(brack_vector,V))                 --> `[`, sexpr_vector(V,`]`),!, swhite.
 sexpr('#-'(C,O)) --> `#-`,!,sexpr(C),swhite,!,file_sexpr(O).
 sexpr('#+'(C,O)) --> `#+`,!,sexpr(C),swhite,!,file_sexpr(O).
+sexpr('#P'(C)) --> `#P`,!,sexpr(C),swhite,!.
 sexpr('?'(E))              --> `?`, sexpr_dcgPeek(([C],{sym_char(C)})),!, rsymbol('?',E), swhite.
 sexpr('#'(t))                 --> `#t`, !, swhite.
 sexpr('#'(f))                 --> `#f`, !, swhite.
 sexpr('#'(A))              --> `|`, !, read_string_until(S,`|`), swhite,{maybe_notrace(atom_string(A,S))}.
+sexpr('#'(E))              --> `#:`, !, rsymbol('#:',E), swhite.
 sexpr('#'(E))              --> `#$`, !, rsymbol('#$',E), swhite.
 sexpr('#'(E))              --> `&%`, !, rsymbol('#$',E), swhite.
 sexpr('#\\'(C))                 --> `#\\`,rsymbol('',C), swhite.

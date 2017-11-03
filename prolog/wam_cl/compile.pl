@@ -73,42 +73,6 @@
 :- op(1200,  fx, <<== ).	% functional imperative definition
 
 
-
-
-% debug_var(_A,_Var):-!.
-debug_var(X,Y):- notrace(catch(debug_var0(X,Y),_,fail)) -> true ; rtrace(debug_var0(X,Y)).
-
-p_n_atom(Cmpd,UP):- sub_term(Atom,Cmpd),nonvar(Atom),\+ number(Atom), Atom\==[], catch(p_n_atom0(Atom,UP),_,fail),!.
-p_n_atom(Cmpd,UP):- term_to_atom(Cmpd,Atom),p_n_atom0(Atom,UP),!.
-
-filter_var_chars([H|X],Y):- \+ char_type(H,prolog_var_start),!,filter_var_chars0([86,118,H|X],Y).
-filter_var_chars(X,Y):- filter_var_chars0(X,Y).
-
-filter_var_chars0([],[]).
-filter_var_chars0([45|T],[95|Rest]):-!,filter_var_chars0(T,Rest).
-filter_var_chars0([H|T],[H|Rest]):-  code_type(H, prolog_identifier_continue),!,filter_var_chars0(T,Rest).
-filter_var_chars0([H|T],Rest):- number_codes(H,Codes), filter_var_chars0(T,Mid),append([95, 99|Codes],[95|Mid],Rest).
-
-p_n_atom0(Atom,UP):- atom(Atom),!,name(Atom,[C|Was]),to_upper(C,U),filter_var_chars([U|Was],CS),name(UP,CS).
-p_n_atom0(String,UP):- string(String),!,string_to_atom(String,Atom),!,p_n_atom0(Atom,UP).
-p_n_atom0([C|S],UP):- !,notrace(catch(atom_codes(Atom,[C|S]),_,fail)),!,p_n_atom0(Atom,UP).
-
-debug_var0(_,NonVar):-nonvar(NonVar),!.
-debug_var0([C|S],Var):- notrace(catch(atom_codes(Atom,[C|S]),_,fail)),!,debug_var0(Atom,Var).
-debug_var0([AtomI|Rest],Var):-!,maplist(p_n_atom,[AtomI|Rest],UPS),atomic_list_concat(UPS,NAME),debug_var0(NAME,Var),!.
-debug_var0(Atom,Var):- p_n_atom(Atom,UP),  
-  check_varname(UP),
-  add_var_to_env_loco(UP,Var),!.
-
-add_var_to_env_loco(UP,Var):- \+ atom_concat('_',_,UP), var(Var),
-  get_var_name(Var,Name),atomic(Name),\+ atom_concat('_',_,Name),
-  
-  atom_concat(UP,Name,New),add_var_to_env(New,Var).
-add_var_to_env_loco(UP,Var):-add_var_to_env(UP,Var).
-
-check_varname(UP):- name(UP,[C|_]),(char_type(C,digit)->throw(check_varname(UP));true).
-
-
 % Connection to LPA's built-in error handler
 
 '?ERROR?'(Error, Form):-
@@ -142,18 +106,20 @@ lisp_compiler_term_expansion( (FunctionHeadP <<== FunctionBodyP),
                  (Head         :- fail, <<==(FunctionHead , FunctionBody))] ):-
         must_det_l((expand_pterm_to_sterm(FunctionHeadP,FunctionHead),
         expand_pterm_to_sterm(FunctionBodyP,FunctionBody),
-	expand_function_head(FunctionHead, Head, ArgBindings, Result),
+        make_compiled(FunctionHead,FunctionBody,Head,Code))).
+
+lisp_compiler_term_expansion( ( <<== FunctionBodyP), ( :-   Code) ):-
+        must_det_l((expand_pterm_to_sterm(FunctionBodyP,FunctionBody),
+	must_compile_body(_Cx,toplevel,_Result,implicit_progn([FunctionBody]), Body),
+   body_cleanup(Body,Code))).
+
+make_compiled(FunctionHead,FunctionBody,Head,Code):-
+	expand_function_head(FunctionHead, Head, ArgBindings, Result,HeadCode),
                     debug_var("RET",Result),
                     debug_var("Env",Env),
 	must_compile_body(ctx{head:Head,argbindings:ArgBindings},Env,Result,implicit_progn([FunctionBody]),Body0),
         Body = (Env=[ArgBindings],Body0),
-    body_cleanup(Body,Code))).
-
-lisp_compiler_term_expansion( ( <<== FunctionBodyP),
-		( :-   Code) ):-
-        must_det_l((expand_pterm_to_sterm(FunctionBodyP,FunctionBody),
-	must_compile_body(_Cx,toplevel,_Result,implicit_progn([FunctionBody]), Body),
-   body_cleanup(Body,Code))).
+    body_cleanup((HeadCode,Body),Code).
 
 lisp_compiled_eval(SExpression):- 
   as_sexp(SExpression,Expression),
@@ -224,7 +190,7 @@ compiler_macro_left_right(and,[], []).
 compiler_macro_left_right(and,[Form1], Form1).
 compiler_macro_left_right(and,[Form1,Form2], [if,Form1,Form2]).
 compiler_macro_left_right(and,[Form1|Rest], [and,Form1,[and|Rest]]).
-
+ 
 
 :- discontiguous(compile_body/5).
 
@@ -237,6 +203,11 @@ compile_body(Ctx,Env,Result,[M|MACROLEFT], Code):-
 
 compile_body(Ctx,Env,Result,InstrS,Code):-
   shared_lisp_compiler:plugin_expand_function_body(Ctx,Env,Result,InstrS,Code),!.
+
+compile_body(_Ctx,_Env,[],['$COMMENT'|_InstrS],true):-!.
+compile_body(_Ctx,_Env,[],['$COMMENT1'|_InstrS],true):-!.
+compile_body(_Ctx,_Env,[],['$COMMENT2'|_InstrS],true):-!.
+
 
 % OR
 compiler_macro_left_right(or,[], []).
@@ -273,12 +244,13 @@ compile_body(_Cx,_Ev,Name,[defmacro,Name,FormalParms|Body0], CompileBody):- !,
 	assert(macro_lambda(Name, FormalParms, Body))).
 
 % Use a previous DEFMACRO
-compile_body(Cxt,Env,Result,[Procedure|Arguments],CompileBody):-
+compile_body(Cxt,Env,Result,[Procedure|Arguments],CompileBodyCode):-
   macro_lambda(Procedure, FormalParams, LambdaExpression),
   must_or_rtrace(bind_formal_parameters(FormalParams, Arguments, [], NewEnv)),
-  must_or_rtrace(expand_commas([NewEnv|Env],LambdaExpression,CommaResult)),
+  must_or_rtrace(expand_commas([NewEnv|Env],CommaResult,LambdaExpression,Code)),
   dbmsg(macro(macroResult(CommaResult))),
-  must_compile_body(Cxt,Env,Result,[progn|CommaResult], CompileBody).
+  must_compile_body(Cxt,Env,Result,[progn|CommaResult], CompileBody),
+  CompileBodyCode = (Code,CompileBody).
 
 % `, Backquoted commas
 compile_body(_Cx,Env,Result,['$BQ',Form], Code):-!,compile_bq(Env,Result,Form,Code).
@@ -290,16 +262,11 @@ compile_body(_Cx,_Ev,Name,[defun,Name0,Args|FunctionBody0], CompileBody):-
     combine_setfs(Name0,Name),
     must(maybe_get_docs(defun,Name,FunctionBody0,FunctionBody)),
     FunctionHead=[Name|Args],
-    CompileBody = (asserta((Head  :- (fail, <<==(FunctionHead , FunctionBody)))),
+    CompileBody = (% asserta((Head  :- (fail, <<==(FunctionHead , FunctionBody)))),
                    asserta((Head  :- (!,  Code)))),!,
-      expand_function_head(FunctionHead, Head, ArgBindings, Result),
-      must_compile_body(ctx{head:Head,argbindings:ArgBindings},Env,Result,implicit_progn(FunctionBody),  Body0),
-      debug_var("RET",Result),
-      debug_var("FEnv",Env),
-      Body = (Env=[ArgBindings],Body0),
-      term_attvars(Body,AttVars),
-      maplist(del_attr_rev2(freeze),AttVars),
-      mize_body(',',Body,Code).
+    make_compiled(FunctionHead,FunctionBody,Head,Code).
+
+
 
 combine_setfs(Name0,Name):-atom(Name0),Name0=Name.
 combine_setfs(Name0,Name):-atomic_list_concat(Name0,-,Name).
@@ -308,6 +275,9 @@ combine_setfs(Name0,Name):-atomic_list_concat(Name0,-,Name).
 compile_body(_Cx,_Ev,SelfEval,SelfEval,true):- notrace(is_self_evaluationing_object(SelfEval)),!.
 compile_body(_Cx,_Ev, [],nil,true):- !.
 compile_body(_Cx,_Ev,Item,[quote, Item],  true):- !.
+
+compile_body(Ctx,Env,Result,['eval-when',_Flags|Forms], Body):- !, compile_body(Ctx,Env,Result,[progn,Forms], Body).
+compile_body(Ctx,Env,Result,['#+',_Flags,Form], Body):- !, compile_body(Ctx,Env,Result,Form, Body).
 
 % PROGN
 compile_body(_Cx,_Ev,[],[progn],  true):- !.
@@ -485,12 +455,24 @@ compile_body(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):-
       !,
       expand_arguments(Ctx,Env,FunctionName,0, FunctionArgs,ArgBody, Args),
       append(Args, [Result], ArgsPlusResult),
-      debug_var([FunctionName,'_Ret'],Result),
-      ExpandedFunction =.. [FunctionName | ArgsPlusResult],
+      debug_var([FunctionName,'_Ret'],Result),      
+      find_function_or_macro(FunctionName,ArgsPlusResult,ExpandedFunction),      
       Body = (ArgBody,ExpandedFunction).
    
 
+find_function_or_macro(FunctionName,ArgsPlusResult,ExpandedFunction):-
+    length(ArgsPlusResult,Len),
+    (some_function_or_macro(FunctionName,Len,['','cl_','pf_','sf_','mf_'],NewName) 
+      -> ExpandedFunction =.. [NewName | ArgsPlusResult];
+    ExpandedFunction =.. [funcall, FunctionName | ArgsPlusResult]).
 
+some_function_or_macro(FunctionName,Len,[Name|NameS],NewName):-
+   atom_concat(Name,FunctionName,ProposedPName),   
+   (((ProposedPName = ProposedName; prologcase_name(ProposedPName,ProposedName)),
+    functor(P,ProposedName,Len),current_predicate(_,P))-> ProposedName=NewName;
+   some_function_or_macro(FunctionName,Len,NameS,NewName)).
+
+ 
 must_compile_progn(Ctx,Env,Result,Forms, PreviousResult, Body):-
    must_or_rtrace(compile_progn(Ctx,Env,Result,Forms, PreviousResult,Body)).
 

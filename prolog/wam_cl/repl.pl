@@ -40,6 +40,7 @@ expand_pterm_to_sterm(X,X).
 str_to_expression(Str, Expression):- lisp_add_history(Str),parse_sexpr_untyped(string(Str), Expression),!.
 str_to_expression(Str, Expression):- with_input_from_string(Str,read_and_parse(Expression)),!.
 
+as_sexp(NIL,NIL):-NIL==[],!.
 as_sexp(Stream,Expression):- is_stream(Stream),!,must(parse_sexpr_untyped(Stream,Expression)).
 as_sexp(s(Str),Expression):- must(parse_sexpr_untyped(string(Str),Expression)),!.
 as_sexp(Str,Expression):- notrace(catch(text_to_string(Str,String),_,fail)),!, must(parse_sexpr_untyped(string(String),Expression)),!.
@@ -197,12 +198,13 @@ eval(Expression, Result):-
 */
 read_and_parse(Expr):- current_input(In),parse_sexpr_untyped(In, Expr).
 
-           
+
+is_keyword_p(X):- atom(X),atom_concat(':',_,X).
 
 :- use_module(library('dialect/sicstus/arrays')).
 % :- use_module(library('dialect/sicstus')).
 is_self_evaluationing_object(X):- var(X),!.
-is_self_evaluationing_object(X):- atomic(X),!,(number(X);string(X);(blob(X,T),T\==text);X=t;X=[]),!.
+is_self_evaluationing_object(X):- atomic(X),!,(number(X);is_keyword_p(X);string(X);(blob(X,T),T\==text);X=t;X=[]),!.
 is_self_evaluationing_object(X):- (is_dict(X);is_array(X);is_rbtree(X)),!.
 
 
@@ -219,7 +221,7 @@ maybe_ltrace(G):- current_prolog_flag(lisp_trace,true)->rtrace(G);must_or_rtrace
 
 eval_repl_atom(end_of_file, quit):-!.
 eval_repl_atom(quit, quit):-!.
-eval_repl_atom(make, O):- !, make,compile_file('xabcl/',O).
+eval_repl_atom(make, O):- !, must_or_rtrace((make, compile_file('xabcl/',O))).
 eval_repl_atom(prolog, t):- !, prolog.
 eval_repl_atom(debug, t):- debug(lisp(_)).
 eval_repl_atom(ltrace, t):- set_prolog_flag(lisp_trace,true).

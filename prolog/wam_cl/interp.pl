@@ -116,7 +116,6 @@ eval3(X, Bindings, Y):- \+ is_list(X),compound(X),!,X=..XL,eval3(XL, Bindings, Y
 eval3(X, _, []):- (debugging(lisp(eval))->dumpST;true),
 	write('SYSTEM::READ-EVAL-PRINT: variable '),write(X),write(' has no value'),nl,!.
 
-lisp_operator(if).
 
 
 evalL([], _, []):-!.

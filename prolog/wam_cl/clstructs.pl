@@ -4692,3 +4692,5 @@ mop_direct(t, submop, 'WEAK-POINTER').
 
 :- fixup_exports.
 
+
+
