@@ -91,12 +91,12 @@ lisp_error_description(rest_not_cons,       103, 'Rest: This is not a cons cell:
 
 
 lisp_compiled_eval(SExpression):- 
-  as_sexp(SExpression,Expression),
+  notrace(as_sexp(SExpression,Expression)),
   lisp_compiled_eval(Expression,Result),
   dbmsg(result(Result)).
                                 
 lisp_compiled_eval(SExpression,Result):-
-  as_sexp(SExpression,Expression),
+  notrace(as_sexp(SExpression,Expression)),
   dbmsg(lisp_compile(Expression)),
   lisp_compile(Result,Expression,Code),
   dbmsg(Code),
@@ -104,7 +104,7 @@ lisp_compiled_eval(SExpression,Result):-
 
 
 lisp_compile(SExpression):-
-  as_sexp(SExpression,Expression),
+  notrace(as_sexp(SExpression,Expression)),
   dbmsg(lisp_compiled_eval(Expression)),
   lisp_compile(Expression,Code),!,
   dbmsg(Code).
@@ -120,7 +120,7 @@ lisp_compile(Env,Result,Expression,Body):-
    lisp_compile(ctx([]),Env,Result,Expression,Body).
 
 lisp_compile(Ctx,Env,Result,SExpression,Body):- 
-   as_sexp(SExpression,Expression),
+   notrace(as_sexp(SExpression,Expression)),
    compile_forms(Ctx,Env,Result,[Expression],Body).
 
 
@@ -184,6 +184,14 @@ compile_body(Ctx,Env,Result,InstrS,Code):-
 compile_body(_Cx,_Ev, [],[],true):- !.
 compile_body(_Cx,_Ev, [],nil,true):- !.
 compile_body(_Cx,_Ev,SelfEval,SelfEval,true):- notrace(is_self_evaluationing_object(SelfEval)),!.
+
+% symbols
+compile_body(_Ctx,_Env,Value,Atom,true):- atom(Atom),atom_number_exta(Atom,Value),!.
+
+atom_number_exta(Atom,Value):- atom_number(Atom,Value).
+atom_number_exta(Atom,Value):- atom_concat('-.',R,Atom),atom_concat('-0.',R,NAtom),!,atom_number(NAtom,Value).
+atom_number_exta(Atom,Value):- atom_concat('.',R,Atom),atom_concat('0.',R,NAtom),!,atom_number(NAtom,Value).
+
 
 % symbols
 compile_body(Ctx,Env,Value,Atom, Body):- atom(Atom),!, 
@@ -265,15 +273,15 @@ compile_body(Ctx,_Env,Name,[defun,Name0,FormalParms|FunctionBody0], CompileBody)
     CompileBody = (% asserta((Head  :- (fail, <<==(FunctionHead , FunctionBody)))),
                    DocCode,
                    HeadDefCode,
-                   asserta(function_lambda(defun,Name, FormalParms, FunctionBody)),
+                   asserta(user:function_lambda(defun,Name, FormalParms, FunctionBody)),
                    asserta((Head  :- (!,  BodyCode)))),!,
     make_compiled(Ctx,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode).
 
 make_compiled(Ctx,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode):-
     expand_function_head(Ctx,CallEnv,FunctionHead, Head, HeadEnv, Result,HeadDefCode,HeadCode),
     debug_var("RET",Result),debug_var("Env",CallEnv),
-    must_compile_progn(Ctx,CallEnv,Result,FunctionBody,[],Body0),
-    body_cleanup(((CallEnv=[HeadEnv],HeadCode,Body0)),BodyCode).
+    must_compile_body(Ctx,CallEnv,Result,[progn,FunctionBody],Body0),
+    body_cleanup(((CallEnv=HeadEnv,HeadCode,Body0)),BodyCode).
 
 
 
@@ -445,7 +453,42 @@ compile_body(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body):-
 % LET*
 compile_body(Ctx,Env,Result,['let*', []| BodyForms], Body):- compile_body(Ctx,Env,Result,[progn| BodyForms], Body).
 compile_body(Ctx,Env,Result,['let*', [Binding1|NewBindings]| BodyForms], Body):-
-   compile_body(Ctx,Env,Result,['let', [Binding1], ['let*', NewBindings| BodyForms]], Body).
+   compile_body(Ctx,Env,Result,['let', [Binding1],[progn, ['let*', NewBindings| BodyForms]]], Body).
+
+% VALUES (r1 . rest )
+compile_body(Ctx,Env,Result,['values',R1|EvalList], (ArgBody,Body)):-!,
+    expand_arguments(Ctx,Env,funcall,0,[R1|EvalList], ArgBody, [Result|Results]),
+    Body = nb_setval('$mv_return',[Result|Results]).
+compile_body(_Ctx,_Env,[],['values'], nb_setval('$mv_return',[])):-!.
+
+:- nb_setval('$mv_return',[]).
+
+% Macro MULTIPLE-VALUE-BIND
+compile_body(Ctx,Env,Result,['multiple-value-bind',Vars,Eval1|ProgN], Body):-
+  must_compile_body(Ctx,Env,Result,[let,Vars,[progn,Eval1,['setq-values',Vars]|ProgN]],Body).
+
+% Macro MULTIPLE-VALUE-LIST
+compile_body(Ctx,Env,Result,['multiple-value-list',Eval1], (Body,nb_current('$mv_return',Result))):-
+  debug_var('MV_RETURN',Result),
+  debug_var('IgnoredRet',IResult),
+  must_compile_body(Ctx,Env,IResult,Eval1,Body).
+
+% Macro MULTIPLE-VALUE-CALL
+compile_body(Ctx,Env,Result,['multiple-value-call',Function|Progn], Body):-
+  compile_body(Ctx,Env,Result,[progn,[progn|Progn],['apply',Function,['return-values']]],Body).
+
+% synthetic RETURN-VALUES -> values
+compile_body(_Ctx,_Env,Values,['return-values'], nb_current('$mv_return',Values)).
+
+% synthetic SETQ-VALUES (vars*)
+compile_body(_Ctx,Env,[],['setq-values',Vars], setq_values(Env,Vars)):-!.
+setq_values(Env,Vars):- nb_current('$mv_return',Values),setq_values(Env,Vars,Values).
+setq_values(_Env,_,[]):-!.
+setq_values(_Env,[],_):-!.
+setq_values(Env,[Var|Vars],[Val|Values]):- 
+   set_symbol_value(Env,Var,Val),
+   setq_values(Env,Vars,Values).
+
 
 
 %   zip_with(Xs, Ys, Pred, Zs)
@@ -469,7 +512,7 @@ op_replacement(<,lessThan).
 op_replacement(>,greaterThan).
 */
 
-compile_body(Ctx,Env,Result,[Op | FunctionArgs], Body):- op_replacement(Op,Op2), !,
+compile_body(Ctx,Env,Result,[Op | FunctionArgs], Body):- user:op_replacement(Op,Op2), !,
   must_compile_body(Ctx,Env,Result,[Op2 | FunctionArgs],Body).
 
 
@@ -477,10 +520,10 @@ compile_body(Ctx,Env,Result,[FunctionName ], Body):- is_list(FunctionName),!,
   must_compile_body(Ctx,Env,Result,FunctionName,Body).
 
 compile_body(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):- is_list(FunctionName),!,
-  trace,must_compile_body(Ctx,Env,Result,[funcall_list,FunctionName | FunctionArgs],Body).
+  must_compile_body(Ctx,Env,Result,[funcall_list,FunctionName | FunctionArgs],Body).
 
 compile_body(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):- \+ atom(FunctionName),!,
-  must_compile_body(Ctx,Env,Result,[funcall_foo,FunctionName | FunctionArgs],Body).
+  trace,must_compile_body(Ctx,Env,Result,[funcall_foo,FunctionName | FunctionArgs],Body).
 
 % Operator
 compile_body(_Ctx,_Env,Result,[FunctionName | FunctionArgs], Body):- lisp_operator(FunctionName),!,
@@ -500,6 +543,12 @@ compile_body(Ctx,CallEnv,Result,[FunctionName | FunctionArgs], Body):- uses_rest
       find_function_or_macro(FunctionName,ArgsPlusResult,ExpandedFunction),      
       Body = (ArgBody,ExpandedFunction).
 
+/*
+% FUNCTION APPLY
+compile_body(Ctx,Env,Result,['apply',Function|ARGS], Body):- ...
+% FUNCTION FUNCALL
+compile_body(Ctx,Env,Result,['funcall',Function|ARGS], Body):- ...
+*/
 % Non built-in function expands into an explicit function call
 compile_body(Ctx,CallEnv,Result,[FunctionName | FunctionArgs], Body):-
     %  (FunctionArgs==[] -> (dumpST,break ); true),
@@ -520,7 +569,7 @@ find_function_or_macro(FunctionName,ArgsPlusResult,ExpandedFunction):-
 some_function_or_macro(FunctionName,Len,[Name|NameS],NewName):-
    atom_concat(Name,FunctionName,ProposedPName),   
    (((ProposedPName = ProposedName; prologcase_name(ProposedPName,ProposedName)),
-    functor(P,ProposedName,Len),current_predicate(_,P))-> ProposedName=NewName;
+    functor(P,ProposedName,Len),current_predicate(_,P),\+ predicate_property(user:P,imported_from(system)))-> ProposedName=NewName;
    some_function_or_macro(FunctionName,Len,NameS,NewName)).
 
  

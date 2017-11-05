@@ -340,8 +340,8 @@ set_symbol_value_if_missing(Env, Var, In, _, Thru):- set_symbol_value(Env,Var,In
 
 
 % Creates a function Head and an argument unpacker using Code to unpack
-expand_function_head(Ctx,Env,[FunctionName | FormalParms],Head,ZippedArgBindings, Result,HeadDefCode,HeadCodeOut):-!,
-   member(Mode,FormalParms),arg(_,v('&optional','&key','&aux','&rest','&body','&environment'),Mode),!,
+expand_function_head(Ctx,Env,[FunctionName | FormalParms],Head,ZippedArgBindings, Result,HeadDefCode,HeadCodeOut):-
+   member(Mode,FormalParms),arg(_, v('&optional', '&key', '&aux', '&rest', '&body', '&environment'),Mode),!,
    must_det_l((function_head_params(Ctx,Env,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,_Names,_PVars,_HeadCode),
    arginfo_incr(complex,ArgInfo),
    append([Arguments], [Result], HeadArgs),
@@ -427,6 +427,10 @@ make_bind_value([Var,_InitForm],Value,Env):-atom(Var),make_bind_value(Var,Value,
 make_bind_value([Var,_InitForm,IfPresent],Value,Env):-atom(Var),make_bind_value(IfPresent,t,Env),make_bind_value(Var,Value,Env).
 
 
+must_or(Goal,Else):- Goal->true;Else.
+
+bind_parameters(Env, [A, B|R], Arguments,BindCode):- atom(A),atom(B),atom(R),!,
+  bind_parameters(Env, [A, B, '&rest',R], Arguments,BindCode).
 bind_parameters(Env, FormalParms, Arguments,BindCode):-
   % append_open_list(Env,bind),
   bind_parameters(Env, 'required', FormalParms, Arguments, BindCode),!.
@@ -452,7 +456,7 @@ bind_parameters(Env,_,['&environment',Var|FormalParms],Params,(make_bind_value(V
   bind_parameters(Env,'&rest',FormalParms,Params,Code).
 
 % Parsing required(s)
-bind_parameters(Env,'required',[Var|FormalParms],In,Code):- !, must_or(In=[Value|Params],args_underflow),
+bind_parameters(Env,'required',[Var|FormalParms],In,Code):- !, must_or(In=[Value|Params],throw(args_underflow)),
   enforce_atomic(Var),make_bind_value(Var,Value,Env),
   bind_parameters(Env,'required',FormalParms,Params,Code).
 

@@ -13,30 +13,70 @@
  *
  *******************************************************************/
 :- module(loadfile, []).
+
 :- set_module(class(library)).
+
 :- include('header.pro').
 
 
+dd:- cl_load('../../t/daydreamer/dd_compile.cl',_).
+dd1:- cl_load('../../t/daydreamer/dd.cl',_).
+% dd1:- cl_load('../../t/daydreamer/dd.cl',_).
+% dd:- with_file('../../t/daydreamer/*.cl',_).
+defpackage(_,_,_).
+
+cl_compile_file(File,t):-
+  forall(between(1,2,N),with_file(do_file_pass(compile_file,N),File)).
+
+cl_load(File,t):-
+  forall(member(N,[1,3]),with_file(do_file_pass(load,N),File)).
+
+% pass 1 - defmacro, arginfos
+do_file_pass(_,1,Form):- lisp_grovel(Form).
+% pass 2 - :compile-toplevel - defconstant, defparameters, defuns
+do_file_pass(_,2,Form):- lisp_compile(Form).
+% pass 3 - :load-toplevel
+do_file_pass(_,3,Form):- lisp_compiled_eval(Form).
+% pass 4 - :execute
+do_file_pass(_,3,Form):- lisp_eval(Form).
+
+lisp_grovel(Form):- lisp_compile(Form,PrologCode),!,
+  grovel_prolog_code(PrologCode),!.
+
+grovel_prolog_code(PrologCode):- \+ compound(PrologCode),!.
+grovel_prolog_code(:- PrologCode):- grovel_prolog_code(PrologCode).
+grovel_prolog_code(asserta(PrologCode)):- !, grovel_prolog_code(PrologCode).
+grovel_prolog_code(assertz(PrologCode)):- !, grovel_prolog_code(PrologCode).
+grovel_prolog_code(assert(PrologCode)):- !, grovel_prolog_code(PrologCode).
+grovel_prolog_code((A,B)):-!, grovel_prolog_code(A),grovel_prolog_code(B).
+grovel_prolog_code(MP):- strip_module(MP,_,P),functor(P,F,_),arg(_,
+  v(doc_string,macro_lambda,function_lambda,arglist_info),F),!,asserta(MP).
+grovel_prolog_code(_).
+   
 
 
-dd:- cl_compile_file('../../t/daydreamer/dd_compile.cl',_).
-% dd:- cl_compile_file('../../t/daydreamer/*.cl',_).
 
-compile_file1(File):- with_lisp_translation(file(File),lisp_compile).
-cl_load1(File,t):-with_lisp_translation(file(File),lisp_compile).
 
-cl_load(File,R):- string(File),name(Atom,File),!,cl_load(Atom,R).
-cl_load(File,R):- exists_file(File),!, cl_load1(File,R).
-cl_load(File,R):- stream_property(_,file_name(F)),
-  absolute_file_name(File,Found,[relative_to(F),extensions(['','.cl','.lisp','.lsp']),access(read),file_errors(fail)]),
-  exists_file(Found),!,cl_load1(Found,R).
-cl_load(File,R):- absolute_file_name(File,Found,[extensions(['','.cl','.lisp','.lsp']),access(read),file_errors(fail)]),
-  exists_file(Found),!,cl_load1(File,R).
+with_flist(How,List):- must_maplist(with_file1(How),List).
+with_file1(How,File):- with_lisp_translation(file(File),How).
 
-cl_compile_file(File,t):- exists_file(File),!,compile_file1(File).
-cl_compile_file(Dir,R):- exists_directory(Dir),!,directory_file_path(Dir,'*.lisp',Mask),!, cl_compile_file(Mask,R).
-cl_compile_file(Mask,t):- expand_file_name(Mask,List),List\==[Mask],!,must_maplist(compile_file1,List).
-cl_compile_file(File,t):- compile_file1(File).
+expand_directory_file_path(FDir,Ext,List):- directory_file_path(FDir,Ext,Mask),expand_file_name(Mask,List),List\==[Mask].
+
+with_directory(How,FDir):- expand_directory_file_path(FDir,'*.cl',List),!,with_flist(How,List).
+with_directory(How,FDir):- expand_directory_file_path(FDir,'*.lisp',List),!,with_flist(How,List).
+with_directory(How,FDir):- expand_directory_file_path(FDir,'*.lsp',List),!,with_flist(How,List).
+
+with_fstem(F,File,Found):- 
+   absolute_file_name(File,Found,[relative_to(F),extensions(['','.cl','.lisp','.lsp']),
+   access(read),file_errors(fail)]),exists_file(Found).
+
+with_file(How,File):- string(File),name(Atom,File),!,with_file(How,Atom).
+with_file(How,File):- exists_file(File),!,with_file1(How,File).
+with_file(How,FDir):- exists_directory(FDir),with_directory(How,FDir),!.
+with_file(How,Mask):- expand_file_name(Mask,List),List\==[Mask],!,with_flist(How,List).
+with_file(How,File):- stream_property(_,file_name(FD)),with_fstem(FD,File,Found),!,with_file1(How,Found).
+with_file(How,FDir):- exists_directory(FDir),!,with_directory(How,FDir),!.
+with_file(How,File):- working_directory(CD,CD),with_fstem(CD,File,Found),!,with_file1(How,Found).
 
 
 make_pass(1,
@@ -226,7 +266,7 @@ make_pass(2,['xabcl/clos.lisp',
    'xabcl/autoloads-gen.lisp']).
 
 
-% cl_compile_file(File,t):- with_lisp_translation(File,lisp_compiled_eval).
+% with_file(How,File):- with_lisp_translation(File,lisp_compiled_eval).
 
 
 :- fixup_exports.

@@ -39,6 +39,10 @@
 :- multifile(shared_lisp_compiler:plugin_expand_function_body/5).
 :- discontiguous(shared_lisp_compiler:plugin_expand_function_body/5).
 
+:- multifile(user:op_replacement/2).
+:- dynamic(user:op_replacement/2).
+:- discontiguous(user:op_replacement/2).
+
 
 %:- dynamic(compile_assigns/4).
 %:- multifile(compile_assigns/4).

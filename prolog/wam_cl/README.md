@@ -66,7 +66,7 @@ Common Lisp, written in Prolog
                                 req:1,
                                 rest:0
                               })),
-   asserta(function_lambda(defun, foo, [a], [['1+', a]])),
+   asserta(user:function_lambda(defun, foo, [a], [['1+', a]])),
    asserta((foo(A, D1_c43_Ret):-!, Env=[[bv(a, [A|_276])]], env_sym_arg_val(Env, a, A_In, A_Thru), '1+'(A_Thru, D1_c43_Ret))).
 */
 foo

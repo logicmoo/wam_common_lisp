@@ -19,6 +19,10 @@
 body_cleanup(Body,Code):-
    term_attvars(Body,AttVars),
    maplist(del_attr_rev2(freeze),AttVars),
+   mize_body(',',Body,Code).
+
+body_cleanup_keep_debug_vars(Body,Code):-
+   term_attvars(Body,AttVars),
    maplist(del_attr_rev2(freeze),AttVars),
    mize_body(',',Body,Code).
 

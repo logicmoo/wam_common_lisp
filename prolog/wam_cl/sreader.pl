@@ -1,4 +1,4 @@
-:- module(sexpr_reader,[
+:- module(sxpr,[
   codelist_to_forms/2,
   svar_fixvarname/2,
   current_input_to_forms/2,

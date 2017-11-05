@@ -86,6 +86,21 @@ data_record(Name,InitArgs,Extras,Args):-
 
 m_arg3(m(_,_,Name),Name):-!.
 
+/*
+:- defstruct([obr, [':print-function', 'print-ob']],
+             "OB representation structure",
+             [obnames, []],
+             [slots, []],
+             [literal, []],
+             Defstruct_Ret).
+*/
+
+cl_defstruct(NameKeyWords,_String,Slots,Defstruct_Ret):-
+  % add doc for string
+  cl_defstruct(NameKeyWords,Slots,Defstruct_Ret).
+
+cl_defstruct(NameKeyWords,_String,Slots,Defstruct_Ret):- wdmsg(cl_defstruct(NameKeyWords,Slots,Defstruct_Ret)).
+
 :- ensure_loaded(clstructs).
 
 

@@ -310,23 +310,6 @@ push_label(_).
 %'return-from'(Label,Result):-throw(goto(Result,exit(Label),Env)).
 %return(G):- 'return-from'([],G).
 %call_then_return(G):- G,goto(exit(_),[],Env).
-print(X,X):-writeln(X).
-
-
-=(N1,N2,Result):- t_or_nil(=(N1,N2),Result). 
-/*
-<(N1,N2,Result):- t_or_nil(<(N1,N2),Result). 
->(N1,N2,Result):- t_or_nil(>(N1,N2),Result). 
-+(N1,N2,Result):- Result is (N1 + N2).
--(N1,N2,Result):- Result is (N1 - N2).
-*(N1,N2,Result):- Result is (N1 * N2).
-/(N1,N2,Result):- Result is (N1 / N2).
-*/
-
-'1+'(N,R):- R is N + 1.
-'1-'(N,R):- R is N - 1.
-
-t_or_nil(G,Result):- G->Result=t;Result=[].
 
 /*
 call_addr_block(Env,[],'return-from'([]),_Result):-!.

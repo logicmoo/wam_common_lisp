@@ -19,19 +19,28 @@
 :- use_module(sreader).
 
 :- dynamic 
-	named_lambda/2,
-        macro_lambda/4.
+	user:named_lambda/2,
+        user:macro_lambda/4,
+        user:function_lambda/4.
+:- multifile 
+	user:named_lambda/2,
+        user:macro_lambda/4,
+        user:function_lambda/4.
 
 :- initialization((lisp,prolog),main).
 
 :- meta_predicate(timel(:)).
 timel(M:X):- prolog_statistics:time(M:X).
 
-must_or_rtrace(G):-
-  (catch(quietly(G),E,(dbmsg(uncaught(E:-G)),!,fail))->true;rtrace(G)),!.
+%must_or_rtrace(G):- (catch(quietly(G),E,(dbmsg(uncaught(E:-G)),!,fail))->true;(dumpST,break,ignore(rtrace(G)),dumpST,break)),!.
 
-expand_pterm_to_sterm(SNIL,NIL):- SNIL=='NIL',!,NIL=[].
-expand_pterm_to_sterm(SNIL,NIL):- SNIL=='nil',!,NIL=[].
+must_or_rtrace(G):-
+  (catch(quietly(G),E,(dbmsg(uncaught(E:-G)),catch(((dumpST,dbmsg(uncaught(E:-G)),break,ignore(rtrace(G)),dumpST,break)),_,true),!,fail))
+    ->true;catch(((dumpST,break,ignore(rtrace(G)),dumpST,break)),_,true)).
+
+expand_pterm_to_sterm(VAR,VAR):- notrace(is_ftVar(VAR)),!.
+expand_pterm_to_sterm('NIL',[]):-!.
+expand_pterm_to_sterm(nil,[]):-!.
 expand_pterm_to_sterm(VAR,VAR):- \+ compound(VAR),!.
 expand_pterm_to_sterm([X|L],[Y|Ls]):-!,expand_pterm_to_sterm(X,Y),expand_pterm_to_sterm(L,Ls),!.
 expand_pterm_to_sterm(X,[F|Y]):- compound_name_arguments(X,F,L),expand_pterm_to_sterm(L,Y),!.
@@ -47,7 +56,7 @@ as_sexp(Str,Expression):- notrace(catch(text_to_string(Str,String),_,fail)),!, m
 as_sexp(Str,Expression):- is_list(Str),!,maplist(expand_pterm_to_sterm,Str,Expression).
 as_sexp(Str,Expression):- expand_pterm_to_sterm(Str,Expression),!.
 
-dbmsg(X):- writeln('/*'), dbmsg0(X),writeln('*/').
+dbmsg(X):- notrace((writeln('/*'), dbmsg0(X),writeln('*/'))).
 dbmsg0(Str):- string(Str),!,colormsg1(Str,[]).
 dbmsg0((Textbody:-Body)):-body==Textbody,colormsg1('==>'(body)),!,dbmsg0(Body).
 dbmsg0(Var):- var(Var),!,colormsg1(dbmsg_var(Var)).
@@ -150,6 +159,7 @@ read_and_parse_i(Expr):- current_input(In), parse_sexpr_untyped(In, Expr).
 */
 
 % read and parse a line of Lisp
+/*
 read_and_parse1(Expression):-
 	read_words(TokenL),
 	(	sexpr1(Expression, TokenL, [])
@@ -160,7 +170,7 @@ read_and_parse1(Expression):-
 		  Expression = [] )
 	),
 	!.
-
+*/
  
 lisp_add_history(end_of_file):-!.
 lisp_add_history(_):- prolog_load_context(reload,true),!.
@@ -181,7 +191,7 @@ eval_compiled(SExpression,Result):-
 % basic EVAL statements for built-in procedures
 eval_int(Var,  R):- var(Var),!, R=Var.
 eval_int(SExpression,Result):- 
-  as_sexp(SExpression,Expression),
+  notrace(as_sexp(SExpression,Expression)),
   must_or_rtrace(eval(Expression,Result)).
 
 eval(SExpression,Result):-eval_repl(SExpression,Result).

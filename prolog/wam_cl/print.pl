@@ -29,13 +29,18 @@ sexpr1('$COMMA'(X)) --> [','],sexpr1(X).
 sexpr1(['$COMMA',X]) --> [','],sexpr1(X).
 sexpr1(['$BQ',X])--> ['`'],sexpr1(X).
 sexpr1([X|Y]) --> !, ['('],  sexpr1(X), lisplist(Y,')').
-sexpr1(X) --> {compound(X),compound_name_arguments(X,F,ARGS)}, '#<',[F],lisplist(ARGS,'>').
+sexpr1(X) --> {compound(X),compound_name_arguments(X,F,ARGS)}, ['#<'],[F],lisplist(ARGS,'>').
 sexpr1(X) --> [X].
 
 lisplist([],EQ) --> [EQ], !.
 lisplist([X|Xs],EQ) --> sexpr1(X), !, lisplist(Xs,EQ).
-lisplist(X,EQ):- ['.'], sexpr1(X), [EQ].
+lisplist(X,EQ) --> ['.'], sexpr1(X), [EQ].
 
+
+cl_format(Stream,Fmt,Args):-wdmsg(cl_format(Stream,Fmt,Args)).
+cl_format(Stream,Fmt,Arg1,Arg2):-wdmsg(cl_format(Stream,Fmt,Arg1,Arg2)).
+
+cl_print(X,X):-writeExpression(X).
 
 
 % writeExpression/1 displays a lisp expression

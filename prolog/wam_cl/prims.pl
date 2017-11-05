@@ -32,46 +32,42 @@
 :- ensure_loaded((utils_writef)).
 :- ensure_loaded(library(lists)).
 
-sf_first(List, Result):- List==[]->Result=[];
+user:op_replacement(car,cl_first).
+cl_first(List, Result):- List==[]->Result=[];
 	once( (	List = [Result|_]
 	    ;	error(first_not_cons, ErrNo, _),
 		throw(ErrNo)	)).
 
-sf_rest(List, Result):- List==[]->Result=[];
+user:op_replacement(cdr,cl_rest).
+cl_rest(List, Result):- List==[]->Result=[];
 	once( (	List = [_|Result]
 	    ;	error(rest_not_cons, ErrNo, _),
 		throw(ErrNo)	)).
 
-sf_cons(Item, List, Result):-
+
+user:op_replacement(setcar,cl_rplaca).
+cl_rplaca(Cons,Obj,Cons):- nb_setarg(1,Cons,Obj).
+
+user:op_replacement(setcdr,cl_rplacd).
+cl_rplacd(Cons,Obj,Cons):- nb_setarg(2,Cons,Obj).
+
+cl_cons(Item,
+ List, Result):-
 	Result = [Item|List].
 
-sf_null(Item, Result):-
-		Item = []
-	->	Result = t
-	;	Result = [].
-
-sf_eq(Item1, Item2, Result):-
-		Item1 == Item2
-	->	Result = t
-	;	Result = [].
-
-sf_equalp(Item1, Item2, Result):-
-		Item1 = Item2
-	->	Result = t
-	;	Result = [].
 
 
-% plus(Num1, Num2, Result):-Result is Num1 + Num2.
+cl_plus(Num1, Num2, Result):-Result is Num1 + Num2.
 
-sf_minus(Num1, Num2, Result):-
+cl_minus(Num1, Num2, Result):-
 	Result is Num1 - Num2.
-sf_times(Num1, Num2, Result):-
+cl_times(Num1, Num2, Result):-
 	Result is Num1 * Num2.
-sf_divide(Num1, Num2, Result):-
+cl_divide(Num1, Num2, Result):-
 	Result is Num1 / Num2.
 
 
-sf_lisp_not(Boolean, Result):-
+cl_lisp_not(Boolean, Result):-
 		Boolean = []
 	->	Result = t
 	;	Result = [].
@@ -79,12 +75,12 @@ sf_lisp_not(Boolean, Result):-
 
 /*
 Wrongness
-sf_or(Bool1, Bool2, Result):-
+cl_or(Bool1, Bool2, Result):-
 		once( (Bool1 \= [] ; Bool2 \= []))
 	->	Result = t
 	;	Result = [].
 
-sf_and(Bool1, Bool2, Result):-
+cl_and(Bool1, Bool2, Result):-
 		(Bool1 \= [] , Bool2 \= [])
 	->	Result = t
 	;	Result = [].
@@ -106,14 +102,34 @@ lisp_call(Function, Result):-
 
 
 
--(A, B, R):- R is A - B.
--(A, R):- R is -A.
-+(A, B, R):- R is A + B.
-*(A, B, R):- R is A * B.
-'/'(A, B, R):- R is A / B.
 
->(A, B, R):- A > B-> R=t ; R=[].
-<(A, B, R):- A < B-> R=t ; R=[].
+t_or_nil(G,Ret):- G->Ret=t;Ret=[].
+
+cl_not(Obj,Ret):- t_or_nil(Obj == [] , Ret).
+cl_null(Obj,Ret):- t_or_nil(Obj == [] , Ret).
+
+=(N1,N2,Ret):- t_or_nil( (N1=N2),Ret). 
+cl_eq(A,B,Ret):- t_or_nil( A==B , Ret).
+cl_eql(A,B,Ret):- t_or_nil( A=@=B , Ret).
+cl_equal(A,B,Ret):- t_or_nil( A=B , Ret).
+
++(N1,N2,Ret):- Ret is (N1 + N2).
+-(N1,N2,Ret):- Ret is (N1 - N2).
+*(N1,N2,Ret):- Ret is (N1 * N2).
+'/'(N1,N2,Ret):- Ret is (N1 / N2).
+
+<(N1,N2,Ret):- t_or_nil(<(N1,N2),Ret). 
+>(N1,N2,Ret):- t_or_nil(>(N1,N2),Ret). 
+
+'1+'(N,Ret):- Ret is N + 1.
+'1-'(N,Ret):- Ret is N - 1.
+
+
+
+
+cl_constantp(Sym,R):- t_or_nil(symbol_info(Sym,_P,constant,_),R).
+cl_boundp(Sym,R):- t_or_nil((cl_constantp(Sym,t);symbol_info(Sym,_P,variable,_)),R).
+
 % =(A, B, R):- A \= B-> R=[] ; R=t.
 
 is_special_var_c(_,_):-!,fail.
@@ -218,8 +234,8 @@ fibc(A, K) :- !,
         sym_arg_val_envc(n, A, C, B),
         >(C, 1, D),
         (   D\=[]
-        ->  sym_arg_val_envc(n, A, E, B),
-            -(E, 1, F),
+        ->  sym_arg_val_envc(n, A, Obj, B),
+            -(Obj, 1, F),
             fibc(F, I),
             sym_arg_val_envc(n, A, G, B),
             -(G, 2, H),
@@ -288,8 +304,8 @@ fibd(A, K) :- !,
         sym_arg_val_envd(n, A, C, B),
         >(C, 1, D),
         (   D\=[]
-        ->  sym_arg_val_envd(n, A, E, B),
-            -(E, 1, F),
+        ->  sym_arg_val_envd(n, A, Obj, B),
+            -(Obj, 1, F),
             fibd(F, I),
             sym_arg_val_envd(n, A, G, B),
             -(G, 2, H),
