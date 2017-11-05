@@ -121,6 +121,11 @@ last_chance_symbol_value(_Env,Var,Result):- nb_current(Var,Result),!.
 last_chance_symbol_value(_Env,Var,_Result):- 
   lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Var).
 
+
+bvof(E,L):-member(E,L).
+env_memb(E,L):-member(E,L).
+env_memb(E,E).
+
 symbol_value_or(Env,Var,G,Value):-
  (env_memb(Bindings, Env),bvof(bv(Var, Value0),Bindings))-> extract_variable_value(Value0, Value, _);
    (special_var(Var, Value) -> true;  G).

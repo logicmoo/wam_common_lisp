@@ -22,8 +22,8 @@
 dd:- cl_compile_file('../../t/daydreamer/dd_compile.cl',_).
 % dd:- cl_compile_file('../../t/daydreamer/*.cl',_).
 
-compile_file1(File):- with_lisp_translation(file(File),lisp_compiled_eval).
-cl_load1(File,t):-with_lisp_translation(file(File),lisp_compiled_eval).
+compile_file1(File):- with_lisp_translation(file(File),lisp_compile).
+cl_load1(File,t):-with_lisp_translation(file(File),lisp_compile).
 
 cl_load(File,R):- string(File),name(Atom,File),!,cl_load(Atom,R).
 cl_load(File,R):- exists_file(File),!, cl_load1(File,R).

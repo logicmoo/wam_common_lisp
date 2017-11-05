@@ -63,7 +63,6 @@
 
 :- style_check.
 
-
 % :- ensure_loaded(builtin_lisp_functions). % Lisp primitives: this directives is at the end of the file
 % :- ensure_loaded(lisp_library).	% Functions defined in lisp: this directive is at the end of the file
 					% allowing them to be compiled correctly
@@ -84,9 +83,6 @@
 	nl.
 '?ERROR?'(Error, Goal):-
 	error_hook(Error, Goal).
-
-bvof(E,L):-member(E,L).
-env_memb(E,L):-member(E,L).
 
 lisp_error_description(unbound_atom,        100, 'No value found for atom: ').
 lisp_error_description(atom_does_not_exist, 101, 'SetQ: Variable does not exist: ').
@@ -112,14 +108,6 @@ lisp_compiler_term_expansion( ( <<== FunctionBodyP), ( :-   Code) ):-
         must_det_l((expand_pterm_to_sterm(FunctionBodyP,FunctionBody),
 	must_compile_body(_Cx,toplevel,_Result,implicit_progn([FunctionBody]), Body),
    body_cleanup(Body,Code))).
-
-make_compiled(FunctionHead,FunctionBody,Head,Code):-
-   Ctx = ctx{head:Head,argbindings:ArgBindings},
-	must_or_rtrace(expand_function_head(Ctx,Env,FunctionHead, Head, ArgBindings, Result,HeadCode)),
-        debug_var("RET",Result),debug_var("Env",Env),
-	must_compile_body(Ctx,Env,Result,implicit_progn([FunctionBody]),Body0),
-        Body = (Env=[ArgBindings],Body0),
-    body_cleanup((HeadCode,Body),Code).
 
 lisp_compiled_eval(SExpression):- 
   as_sexp(SExpression,Expression),
@@ -258,20 +246,22 @@ compile_body(Ctx,Env,Result,[prog2,Form1,Form2|FormS],Code):- !,
    must_compile_progn(Ctx,Env,_ResultS,FormS,Result,BodyS),
    Code = (Body1, Body2, BodyS).
 
-% DEFMACRO
-compile_body(_Cx,_Ev,Name,[defmacro,Name,FormalParms|Body0], CompileBody):- !,
-      maybe_get_docs(defmacro,Name,Body0,Body),
-      CompileBody =(retractall(macro_lambda(Name,_,_)),
-	assert(macro_lambda(Name, FormalParms, Body))).
+% EVAL 
+compile_body(Ctx,Env,Result,['eval',Form1],Code):- !,
+   must_compile_body(Ctx,Env,Result1,Form1, Body1),
+   call(Body1),
+   must_compile_body(Ctx,Env,Result,Result1, Code).
+
 
 % Use a previous DEFMACRO
 compile_body(Cxt,Env,Result,[Procedure|Arguments],CompileBodyCode):-
-  macro_lambda(Procedure, FormalParams, LambdaExpression),
-  must_or_rtrace(bind_formal_parameters(FormalParams, Arguments, [], NewEnv,BindCode)),
-  call(BindCode),
-  must_or_rtrace(expand_commas([NewEnv|Env],CommaResult,LambdaExpression,Code)),
+  macro_lambda(Procedure, FormalParams, LambdaExpression),!,
+  must_or_rtrace(bind_macro_parameters(NewEnv, FormalParams, Arguments,BindCode)),!,
+  call(BindCode),!,
+  append(_,[],NewEnv),!,
+  must_or_rtrace(expand_commas(NewEnv,CommaResult,LambdaExpression,Code)),
   dbmsg(macro(macroResult(CommaResult))),
-  must_compile_body(Cxt,Env,Result,[progn|CommaResult], CompileBody),
+  must_compile_body(Cxt,Env,Result,[eval,[progn|CommaResult]], CompileBody),
   CompileBodyCode = (Code,CompileBody).
 
 % `, Backquoted commas
@@ -279,6 +269,35 @@ compile_body(_Cx,Env,Result,['$BQ',Form], Code):-!,compile_bq(Env,Result,Form,Co
 compile_body(_Cx,Env,Result,['`',Form], Code):-!,compile_bq(Env,Result,Form,Code).
 
 
+% DEFMACRO
+compile_body(_Cx,_Ev,Name,[defmacro,Name,FormalParms|Body0], CompileBody):- !,
+      maybe_get_docs(defmacro,Name,Body0,Body),
+      CompileBody =(retractall(macro_lambda(Name,_,_)),
+	assert(macro_lambda(Name, FormalParms, Body))).
+
+/*
+% DEFMACRO (Broken version)
+compile_body_broken(Ctx,_Ev,Name,[defmacro,Name0,FormalParms|FunctionBody0], CompileBody):- 
+    combine_setfs(Name0,Name),
+    debug_var("RET",Result),debug_var("Env",Env),
+    must_or_rtrace(maybe_get_docs(defmacro,Name,FunctionBody0,FunctionBody)),
+    function_head_params(Ctx,Env,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,_Names,_PVars,HeadCode),
+    append(ActualArgs, [Result], HeadArgs),
+    Head =.. [Name|HeadArgs],
+    body_cleanup((HeadCode,Env=[ZippedArgBindings]),PreBodyCode),    
+     must_compile_body(ctx{head:Head,argbindings:ZippedArgBindings},Env,Result,implicit_progn([FunctionBody]),Body0),
+     body_cleanup(Body0,Body),
+    CompileBody =
+     ( (assert(arglist_info(Name,FormalParms,ActualArgs,ArgInfo))),
+        retractall(macro_lambda(Name,_,_,_,_)),
+	assert(macro_lambda(Name,FormalParms, HeadArgs,ArgInfo,PreBodyCode, Body))).
+
+% DEFMACRO
+compile_body(_Cx,_Ev,Name,[defmacro,Name,FormalParms|Body0], CompileBody):- !,
+      maybe_get_docs(defmacro,Name,Body0,Body),
+      CompileBody =(retractall(macro_lambda(Name,_,_)),
+	assert(macro_lambda(Name, FormalParms, Body))).
+*/
 % DEFUN
 compile_body(_Cx,_Ev,Name,[defun,Name0,Args|FunctionBody0], CompileBody):- 
     combine_setfs(Name0,Name),
@@ -287,6 +306,14 @@ compile_body(_Cx,_Ev,Name,[defun,Name0,Args|FunctionBody0], CompileBody):-
     CompileBody = (% asserta((Head  :- (fail, <<==(FunctionHead , FunctionBody)))),
                    asserta((Head  :- (!,  Code)))),!,
     make_compiled(FunctionHead,FunctionBody,Head,Code).
+make_compiled(FunctionHead,FunctionBody,Head,Code):-
+	expand_function_head(FunctionHead, Head, ArgBindings, Result,HeadCode),
+                    debug_var("RET",Result),
+                    debug_var("Env",Env),
+        must_compile_body(ctx{head:Head,argbindings:ArgBindings},Env,Result,implicit_progn([FunctionBody]),Body0),
+        Body = (Env=[ArgBindings],Body0),
+    body_cleanup((HeadCode,Body),Code).
+
 
 
 is_when(X):- dbmsg(warn(free_pass(is_when(X)))).
@@ -303,7 +330,7 @@ compile_body(Ctx,Env,Result,['eval-when',Flags|Forms], Code):- !,
 compile_body(Ctx,Env,Result,['#+',Flag,Form], Code):- !, symbol_value(Env,'*features*',List),
    (member(Flag,List) -> compile_body(Ctx,Env,Result,Form, Code) ; Code = true).
 % #-
-compile_body(Ctx,Env,Result,['#+',Flag,Form], Code):- !, symbol_value(Env,'*features*',List),
+compile_body(Ctx,Env,Result,['#-',Flag,Form], Code):- !, symbol_value(Env,'*features*',List),
 ( \+ member(Flag,List) -> compile_body(Ctx,Env,Result,Form, Code) ; Code = true).  
 
 
@@ -485,6 +512,8 @@ compile_body(Ctx,Env,Result,[Op | FunctionArgs], Body):- op_replacement(Op,Op2),
   must_compile_body(Ctx,Env,Result,[Op2 | FunctionArgs],Body).
 
 
+compile_body(Ctx,Env,Result,[FunctionName ], Body):- is_list(FunctionName),!,
+  must_compile_body(Ctx,Env,Result,FunctionName,Body).
 compile_body(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):- \+ atom(FunctionName),!,
   must_compile_body(Ctx,Env,Result,[funcall,FunctionName | FunctionArgs],Body).
 
@@ -496,16 +525,8 @@ compile_body(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):- FunctionName 
 compile_body(_Ctx,_Env,Result,[FunctionName | FunctionArgs], Body):- lisp_operator(FunctionName),!,
    append(FunctionArgs, [Result], ArgsPlusResult),
    debug_var([FunctionName,'_Ret'],Result),
-   ExpandedFunction =.. [ FunctionName | ArgsPlusResult],
+   find_function_or_macro(FunctionName,ArgsPlusResult,ExpandedFunction),
    Body = (ExpandedFunction).
-
-% Function
-compile_body(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):- symbol_info(FunctionName,_,function_type,_O),!,
-      expand_arguments(Ctx,Env,FunctionName,0, FunctionArgs,ArgBody, Args),
-      append(Args, [Result], ArgsPlusResult),
-      debug_var([FunctionName,'_Ret'],Result),      
-   ExpandedFunction =.. [ FunctionName | ArgsPlusResult],
-   Body = (ArgBody,ExpandedFunction).
 
 % Non built-in function expands into an explicit function call
 compile_body(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):-

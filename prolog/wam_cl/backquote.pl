@@ -46,7 +46,7 @@ expand_commas(Env,One,Out):-
   Out=..[F|ArgsOut],!.
 */
 
-ec_lisp_eval(Env,Result,Form,true):- atom(Form),!,symbol_value(Form,Env,Result).
+ec_lisp_eval(Env,Result,Form,true):- atom(Form),!,symbol_value(Env,Form,Result).
 %ec_lisp_eval(Env,Result,Result,true).
 % @TODO fix this workaround 
 ec_lisp_eval(Env,['eval_in_env',Result,Env],Result,true).
