@@ -41,7 +41,7 @@ compile_assigns(Ctx,Env,Result,[Getf, Var| ValuesForms], Body):- is_place_op(Get
 
 compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, String], (Code,Body)):- 
         string(String),is_def_maybe_docs(SetQ),
-        Code = assert(doc:doc_string(Var,_Package,variable,String)),
+        Code = asserta(doc:doc_string(Var,_Package,variable,String)),
 	!, compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm], Body).
 
 
@@ -52,36 +52,19 @@ compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm], Body):- is_symbol_setter(
         Body = (ValueBody, symbol_setter(Env,SetQ, Var, ResultV)),
         ((op_return_type(SetQ,RT),RT=name) ->  =(Var,Result) ; =(ResultV,Result)).
 
+ensure_rw(V,Dict):- get_attr(V,rwstate,Dict)-> true ; (Dict = rw{r:0,w:0},put_attr(V,rwstate,Dict)).
 
 
-find_incoming_value(Ctx,_Ev,Atom,InValue,Value):-
-      debug_var([Atom,'_In'],InValue),
-      debug_var([Atom,'_Thru'],Value),
-      ignore((member(bv(Atom0,[Value0|Unused]),Ctx.argbindings),
-         Atom0==Atom,Value0=InValue,debug_var("__",Unused))).
+rw_add(V,RW):- ensure_rw(V,Dict),arginfo_incr(RW,Dict).
+rw_get(V,RW,Value):- ensure_rw(V,Dict),get_dict(RW,Dict,Value).
 
 
 compile_symbol_getter(Ctx,Env,Result,Var, Body):- Var==mapcar,!, dbmsg(compile_symbol_getter(Ctx,Env,Result,Var, Body)), dumpST,break.
 
 
-compile_symbol_getter(Ctx,Env,Value, Var, Body):- 
-        find_incoming_value(Ctx,Env,Var,InValue,Value),
-        (get_attr(Value,rwstate,t);get_attr(InValue,rwstate,t)),
-	!,
+compile_symbol_getter(_Ctx,Env,Value, Var, Body):-  atom(Var),!,
+        debug_var([Var,'_Get'],Value),
         Body = symbol_value(Env, Var, Value).   
-
-compile_symbol_getter(Ctx,Env,InValue, Var, Body):-
-        find_incoming_value(Ctx,Env,Var,InValue,Value),
-        (get_attr(Value,rwstate,t);get_attr(InValue,rwstate,t)),
-	!,
-        Body = true.
-
-compile_symbol_getter(Ctx,Env,Value,Var, Body):- 
-        find_incoming_value(Ctx,Env,Var,InValue,Value),
-        put_attr(Value,rwstate,t),
-        put_attr(InValue,rwstate,t),
-	!,
-        Body = env_sym_arg_val(Env,Var,InValue,Value).
 
 compile_symbol_getter(_Cx,Env,Value, Var,  Body):- 
    debug_var([Var,'_Stack'],Value0),

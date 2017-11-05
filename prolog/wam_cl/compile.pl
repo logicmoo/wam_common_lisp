@@ -117,7 +117,7 @@ lisp_compile(Result,SExpression,Body):-
    lisp_compile(toplevel,Result,SExpression,Body).
 
 lisp_compile(Env,Result,Expression,Body):- 
-   lisp_compile(ctx{head:lisp_compile(),argbindings:[]},Env,Result,Expression,Body).
+   lisp_compile(ctx([]),Env,Result,Expression,Body).
 
 lisp_compile(Ctx,Env,Result,SExpression,Body):- 
    as_sexp(SExpression,Expression),
@@ -237,7 +237,7 @@ compile_body(Ctx,Env,Result,['eval',Form1],Code):- !,
 % Use a previous DEFMACRO
 compile_body(Cxt,Env,Result,[Procedure|Arguments],CompileBodyCode):-
   user:macro_lambda(_Scope,Procedure, FormalParams, LambdaExpression),!,
-  must_or_rtrace(bind_macro_parameters(NewEnv, FormalParams, Arguments,BindCode)),!,
+  must_or_rtrace(bind_parameters(NewEnv, FormalParams, Arguments,BindCode)),!,
   append(_,[],NewEnv),!,
   NextEnv = [NewEnv|Env],  
   call(BindCode),!,
@@ -272,9 +272,8 @@ compile_body(Ctx,_Env,Name,[defun,Name0,FormalParms|FunctionBody0], CompileBody)
 make_compiled(Ctx,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode):-
     expand_function_head(Ctx,CallEnv,FunctionHead, Head, HeadEnv, Result,HeadDefCode,HeadCode),
     debug_var("RET",Result),debug_var("Env",CallEnv),
-    ignore(Ctx=ctx{head:Head,argbindings:HeadEnv}),
-    must_compile_body(Ctx,CallEnv,Result,implicit_progn([FunctionBody]),Body0),
-    body_cleanup((HeadCode,(CallEnv=[HeadEnv],Body0)),BodyCode).
+    must_compile_progn(Ctx,CallEnv,Result,FunctionBody,[],Body0),
+    body_cleanup(((CallEnv=[HeadEnv],HeadCode,Body0)),BodyCode).
 
 
 
@@ -476,12 +475,12 @@ compile_body(Ctx,Env,Result,[Op | FunctionArgs], Body):- op_replacement(Op,Op2),
 
 compile_body(Ctx,Env,Result,[FunctionName ], Body):- is_list(FunctionName),!,
   must_compile_body(Ctx,Env,Result,FunctionName,Body).
-compile_body(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):- \+ atom(FunctionName),!,
-  must_compile_body(Ctx,Env,Result,[funcall,FunctionName | FunctionArgs],Body).
 
-compile_body(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):- FunctionName \==funcall,
-  member(bv(Atom0,_),Ctx.argbindings),Atom0==FunctionName,!,
-  must_compile_body(Ctx,Env,Result,[invoke_tl,FunctionName | FunctionArgs],Body).
+compile_body(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):- is_list(FunctionName),!,
+  trace,must_compile_body(Ctx,Env,Result,[funcall_list,FunctionName | FunctionArgs],Body).
+
+compile_body(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):- \+ atom(FunctionName),!,
+  must_compile_body(Ctx,Env,Result,[funcall_foo,FunctionName | FunctionArgs],Body).
 
 % Operator
 compile_body(_Ctx,_Env,Result,[FunctionName | FunctionArgs], Body):- lisp_operator(FunctionName),!,
@@ -489,6 +488,17 @@ compile_body(_Ctx,_Env,Result,[FunctionName | FunctionArgs], Body):- lisp_operat
    debug_var([FunctionName,'_Ret'],Result),
    find_function_or_macro(FunctionName,ArgsPlusResult,ExpandedFunction),
    Body = (ExpandedFunction).
+
+uses_rest(FunctionName,ArgInfo):-  user:arglist_info(FunctionName,_,_,ArgInfo),!,ArgInfo.complex \==0 .
+% Non built-in function expands into an explicit function call
+compile_body(Ctx,CallEnv,Result,[FunctionName | FunctionArgs], Body):- uses_rest(FunctionName,_ArgInfo),
+    %  (FunctionArgs==[] -> (dumpST,break ); true),
+      !,
+      expand_arguments(Ctx,CallEnv,FunctionName,0,FunctionArgs,ArgBody, Args),
+      append([Args], [Result], ArgsPlusResult),
+      debug_var([FunctionName,'_Ret'],Result),      
+      find_function_or_macro(FunctionName,ArgsPlusResult,ExpandedFunction),      
+      Body = (ArgBody,ExpandedFunction).
 
 % Non built-in function expands into an explicit function call
 compile_body(Ctx,CallEnv,Result,[FunctionName | FunctionArgs], Body):-

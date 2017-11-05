@@ -47,7 +47,7 @@ eval(Expression, Bindings, Result):-
 eval3([defvar, Name], _, Name):-
 	!,
 	retract(lisp_global_bindings(GlobalBindings)),
-	assert(lisp_global_bindings([bv(Name, [[]|_])|GlobalBindings])),
+	asserta(lisp_global_bindings([bv(Name, [[]|_])|GlobalBindings])),
 	!.
 eval3([setq, Name, Value], Bindings, EvalValue):-
 	!,
@@ -56,19 +56,19 @@ eval3([setq, Name, Value], Bindings, EvalValue):-
 	eval(Value, Bindings, EvalValue),
 	retract(lisp_global_bindings(GlobalBindings)),
 	append(Pre, [bv(Name, [EvalValue|_])|Post], GlobalBindings1),
-	assert(lisp_global_bindings(GlobalBindings1)),
+	asserta(lisp_global_bindings(GlobalBindings1)),
 	!.
 eval3([defmacro, Name, FormalParms | Body0], _, Name):-
       maybe_get_docs(defun,Name,Body0,Body),
 	!,
         retractall(user:macro_lambda(_Scope,Name,_,_)),
-	assert(user:macro_lambda(defmacro,Name, FormalParms, Body)),
+	asserta(user:macro_lambda(defmacro,Name, FormalParms, Body)),
 	!.
 eval3([defun, Name, FormalParms, Body0], _, Name):-
         maybe_get_docs(defun,Name,Body0,Body),
 	!,        
         retractall(named_lambda(Name, [lambda, _, _])),
-	assert(named_lambda(Name, [lambda, FormalParms, Body])),
+	asserta(named_lambda(Name, [lambda, FormalParms, Body])),
 	!.
 
 eval3(['$BQ',One], Bindings, Out):-!, expand_commas(Bindings,One,Out).

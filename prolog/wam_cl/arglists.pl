@@ -236,12 +236,12 @@ ordinary_args(ArgInfo,RestNKeysOut,RestNKeysIn,_,['&key'|FormalParms],Params,Nam
 ordinary_args(ArgInfo,RestNKeysOut,RestNKeysIn,_,['&rest',F|FormalParms],Params,[F|Names],[V|PVars],PCode):- !, 
   arginfo_set(rest,ArgInfo,F),
   ordinary_args(ArgInfo,RestNKeysOut,RestNKeysIn,rest,FormalParms,Params,Names,PVars,Code),
-  PCode = (Code,must(as_rest(F,V,RestNKeysOut))).
+  PCode = (Code,(as_rest(F,V,RestNKeysOut))).
 % &body and &rest
 ordinary_args(ArgInfo,RestNKeysOut,RestNKeysIn,_,['&body',F|FormalParms],Params,[F|Names],[V|PVars],PCode):- !, 
   arginfo_set(rest,ArgInfo,F),
   ordinary_args(ArgInfo,RestNKeysOut,RestNKeysIn,rest,FormalParms,Params,Names,PVars,Code),
-  PCode = (Code,must(as_rest(F,V,RestNKeysOut))).
+  PCode = (Code,(as_rest(F,V,RestNKeysOut))).
 
  
 % &env
@@ -256,6 +256,7 @@ ordinary_args(ArgInfo,RestNKeysOut,RestNKeysIn,Mode,['&env'],Params,Names,PVars,
 ordinary_args(ArgInfo,RestNKeysOut,RestNKeysIn,required,[F|FormalParms],[V|Params],[F|Names],[V|PVars],Code):- !,
   enforce_atomic(F),
   arginfo_incr(all,ArgInfo),arginfo_incr(req,ArgInfo),
+  rw_add(V,w),
   ordinary_args(ArgInfo,RestNKeysOut,RestNKeysIn,required,FormalParms,Params,Names,PVars,Code).
 
 
@@ -332,22 +333,39 @@ compile_init(Var,FinalResult,[InitForm|_More],
    
 % [name, 'package-designator', '&optional', [error, t]]
 
+:- dynamic(user:arglist_info/4).
+
+set_symbol_value_if_missing(Env, Var, In, G, Thru):- var(In),!,G,set_symbol_value(Env,Var,Thru).
+set_symbol_value_if_missing(Env, Var, In, _, Thru):- set_symbol_value(Env,Var,In),!,In=Thru.
+
+
+% Creates a function Head and an argument unpacker using Code to unpack
+expand_function_head(Ctx,Env,[FunctionName | FormalParms],Head,ZippedArgBindings, Result,HeadDefCode,HeadCodeOut):-!,
+   member(Mode,FormalParms),arg(_,v('&optional','&key','&aux','&rest','&body','&environment'),Mode),!,
+   must_det_l((function_head_params(Ctx,Env,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,_Names,_PVars,_HeadCode),
+   arginfo_incr(complex,ArgInfo),
+   append([Arguments], [Result], HeadArgs),
+   debug_var('ArgsIn',Arguments),
+   debug_var('BinderCode',BindCode),
+   HeadDefCode = (asserta(user:arglist_info(FunctionName,FormalParms,ActualArgs,ArgInfo))),
+   HeadCodeOut = (bind_parameters(Env,FormalParms,Arguments,BindCode),call(BindCode)),
+   Head =.. [FunctionName | HeadArgs])).
 
 % Creates a function Head and an argument unpacker using Code to unpack
 expand_function_head(Ctx,Env,[FunctionName | FormalParms],Head,ZippedArgBindings, Result,HeadDefCode,HeadCode):-!,
        function_head_params(Ctx,Env,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,_Names,_PVars,HeadCode),
        append(ActualArgs, [Result], HeadArgs),
-       HeadDefCode = (assert(arglist_info(FunctionName,FormalParms,ActualArgs,ArgInfo))),
+       HeadDefCode = (asserta(user:arglist_info(FunctionName,FormalParms,ActualArgs,ArgInfo))),
        Head =.. [FunctionName | HeadArgs].
 expand_function_head(Ctx,Env,FunctionName , Head, ZippedArgBindings, Result,HeadDefCode,HeadCode):-
     expand_function_head(Ctx,Env,[FunctionName], Head, ZippedArgBindings, Result,HeadDefCode,HeadCode).
 
-  
+
 
 function_head_params(_Ctx,Env,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,Names,PVars,Code):-!,
    debug_var("RestNKeysIn",RestNKeysIn),debug_var("Env",Env),debug_var("RestNKeysOut",RestNKeysOut),
    debug_var("Code",Code),debug_var("ActualArgs",ActualArgs),
-   ArgInfo = arginfo{req:0,all:0,opt:0,rest:0,key:0,aux:0,env:0,allow_other_keys:0,names:Names},
+   ArgInfo = arginfo{req:0,all:0,opt:0,rest:0,key:0,aux:0,env:0,allow_other_keys:0,names:Names,complex:0},
    ordinary_args(ArgInfo,RestNKeysOut,RestNKeysIn,required,FormalParms,ActualArgsMaybe,Names,PVars,Code),
    maplist(debug_var,Names,PVars),
         freeze(Arg,debug_var(Arg,Val)),
@@ -375,9 +393,9 @@ bind_formal_arginfo_no_rest(ArgInfo, Arguments, OldEnv, NewEnv, _BindCode):-
       
 % Expands the arguments 
 bind_formal_old(_LeftOver, [], Env, Env, true).
-bind_formal_old([FormalParam|FormalParams], [ActualParam|ActualParams],
+bind_formal_old([FormalParam|FormalParms], [ActualParam|ActualParams],
 		Bindings0, Bindings,BindCode):- 
-	bind_formal_old(FormalParams, ActualParams, 
+	bind_formal_old(FormalParms, ActualParams, 
 		[bv(FormalParam, [ActualParam|_])|Bindings0], Bindings,BindCode).
 
 
@@ -385,6 +403,7 @@ bind_formal_old([FormalParam|FormalParams], [ActualParam|ActualParams],
 % The idea here is that FunctionName/ArgNum may need evaluated or may have its own special evaluator 
 expand_arguments(_Ctx,_Env,_FunctionName,_ArgNum,[], true, []).
 expand_arguments(_Ctx,_Env,FunctionName,_, Args, true, Args):- lisp_operator(FunctionName),!.
+
 expand_arguments(Ctx,Env,FunctionName,ArgNum,[Arg|Args], Body, [Result|Results]):-
        must_compile_body(Ctx,Env,Result,Arg, ArgBody),
        Body = (ArgBody, ArgsBody),
@@ -408,86 +427,87 @@ make_bind_value([Var,_InitForm],Value,Env):-atom(Var),make_bind_value(Var,Value,
 make_bind_value([Var,_InitForm,IfPresent],Value,Env):-atom(Var),make_bind_value(IfPresent,t,Env),make_bind_value(Var,Value,Env).
 
 
-bind_macro_parameters(Env, FormalParams, Arguments,BindCode):-
-  append_open_list(Env,bind),
-  bind_macro_parameters(Env, 'required', FormalParams, Arguments, BindCode),!.
+bind_parameters(Env, FormalParms, Arguments,BindCode):-
+  % append_open_list(Env,bind),
+  bind_parameters(Env, 'required', FormalParms, Arguments, BindCode),!.
 
 
 append_open_list(Env,Value):- append(_,[Value|_],Env),!.
+append_open_list(EnvList,Value):- member(Env,EnvList),append(_,[Value|_],Env),!.
 
-bind_macro_parameters(_Env,_Mode, [], _, true):-!.
+bind_parameters(_Env,_Mode, [], _, true):-!.
 
 % Switch mode &optional, &key or &aux mode
-bind_macro_parameters(Env,_,[Mode|FormalParms],Params,Code):- 
+bind_parameters(Env,_,[Mode|FormalParms],Params,Code):- 
   arg(_,v('&optional','&key','&aux'),Mode), !, 
-  bind_macro_parameters(Env,Mode,FormalParms,Params,Code).
+  bind_parameters(Env,Mode,FormalParms,Params,Code).
 
 % &rest
-bind_macro_parameters(Env,_,['&rest',Var|FormalParms],Params,Code):- !, 
+bind_parameters(Env,_,['&rest',Var|FormalParms],Params,Code):- !, 
   make_bind_value(Var,Params,Env),
-  bind_macro_parameters(Env,'&rest',FormalParms,Params,Code).
+  bind_parameters(Env,'&rest',FormalParms,Params,Code).
 
 % &environment
-bind_macro_parameters(Env,_,['&environment',Var|FormalParms],Params,(make_bind_value(Var,'$env',Env),Code)):- !,   
-  bind_macro_parameters(Env,'&rest',FormalParms,Params,Code).
+bind_parameters(Env,_,['&environment',Var|FormalParms],Params,(make_bind_value(Var,'$env',Env),Code)):- !,   
+  bind_parameters(Env,'&rest',FormalParms,Params,Code).
 
 % Parsing required(s)
-bind_macro_parameters(Env,'required',[Var|FormalParms],In,Code):- !, must_or(In=[Value|Params],args_underflow),
+bind_parameters(Env,'required',[Var|FormalParms],In,Code):- !, must_or(In=[Value|Params],args_underflow),
   enforce_atomic(Var),make_bind_value(Var,Value,Env),
-  bind_macro_parameters(Env,'required',FormalParms,Params,Code).
+  bind_parameters(Env,'required',FormalParms,Params,Code).
 
 % Parsing optional(s)
-bind_macro_parameters(Env,'&optional',[NDM|FormalParms],Params,(Code1,Code)):- Params==[], !,
+bind_parameters(Env,'&optional',[NDM|FormalParms],Params,(Code1,Code)):- Params==[], !,
   make_bind_value_missing(NDM,Env,Code1),
-  bind_macro_parameters(Env,'&optional',FormalParms,Params,Code).
-bind_macro_parameters(Env,'&optional',[NDM|FormalParms],[Value|Params],Code):- !,
+  bind_parameters(Env,'&optional',FormalParms,Params,Code).
+bind_parameters(Env,'&optional',[NDM|FormalParms],[Value|Params],Code):- !,
   make_bind_value(NDM,Value,Env),
-  bind_macro_parameters(Env,'&optional',FormalParms,Params,Code).
+  bind_parameters(Env,'&optional',FormalParms,Params,Code).
 
 % Parsing aux(s)
-bind_macro_parameters(Env,'&aux',[NDM|FormalParms],Params,(Code1,Code)):- 
+bind_parameters(Env,'&aux',[NDM|FormalParms],Params,(Code1,Code)):- 
   make_bind_value_missing(NDM,Env,Code1),
-  bind_macro_parameters(Env,'&optional',FormalParms,Params,Code).
+  bind_parameters(Env,'&optional',FormalParms,Params,Code).
 
 % Parsing &allow-other-keys
-bind_macro_parameters(Env,_,['&allow-other-keys'|FormalParms],Params,Code):- !,
+bind_parameters(Env,_,['&allow-other-keys'|FormalParms],Params,Code):- !,
   make_bind_value(':allow-other-keys',t),
-  bind_macro_parameters(Env,aux,FormalParms,Params,Code).
+  bind_parameters(Env,aux,FormalParms,Params,Code).
 
 % &body TODO
-bind_macro_parameters(Env,_,['&body'.Var|FormalParms],Params,Code):- !,
+bind_parameters(Env,_,['&body'.Var|FormalParms],Params,Code):- !,
   make_bind_value(Var,Params,Env),
-  bind_macro_parameters(Env,'required',FormalParms,Params,Code).
+  bind_parameters(Env,'required',FormalParms,Params,Code).
 
 
 % Parsing &key (key var)
-bind_macro_parameters(Env,'&key',[[KWS,Var]|FormalParms],Params,Params,(Code1,Code)):- 
+bind_parameters(Env,'&key',[[KWS,Var]|FormalParms],Params,Params,(Code1,Code)):- 
    atom(KWS),atom(Var),!,
   (append(_,[KWS,Value],Params) -> (make_bind_value(Var,Value,Env),Code1=true);
    make_bind_value_missing(Var,Env,Code1)),!,
-   bind_macro_parameters(Env,'&key',FormalParms,Params,Code).
+   bind_parameters(Env,'&key',FormalParms,Params,Code).
 
 % Parsing &key key
-bind_macro_parameters(Env,'&key',[Var|FormalParms],Params,Params,Code):-
+bind_parameters(Env,'&key',[Var|FormalParms],Params,Params,Code):-
    atom(Var),!,
   (append(_,[Var,Value],Params) -> make_bind_value(Var,Value,Env); make_bind_value(Var,[],Env)),!,
-   bind_macro_parameters(Env,'&key',FormalParms,Params,Code).
+   bind_parameters(Env,'&key',FormalParms,Params,Code).
  
 % Parsing &key (key initform keyp)
 % Parsing &key ((key name) initform keyp)
-bind_macro_parameters(Env,'&key',[[KWSpec,InitForm,IfPresent]|FormalParms],Params,Params,(Code1,Code)):-
+bind_parameters(Env,'&key',[[KWSpec,InitForm,IfPresent]|FormalParms],Params,Params,(Code1,Code)):-
    from_kw_spec(KWSpec,KWS,Var),!,
   (append(_,[KWS,Value],Params) -> (make_bind_value(IfPresent,t,Env),make_bind_value(Var,Value,Env),Code1=true);
    make_bind_value_missing([KWSpec,InitForm,IfPresent],Env,Code1)),!,
-   bind_macro_parameters(Env,'&key',FormalParms,Params,Code).
+   bind_parameters(Env,'&key',FormalParms,Params,Code).
 
 % Parsing &key (key initform)
 % Parsing &key ((key name) initform)
-bind_macro_parameters(Env,'&key',[[KWSpec,InitForm]|FormalParms],Params,Params,(Code1,Code)):- 
+bind_parameters(Env,'&key',[[KWSpec,InitForm]|FormalParms],Params,Params,(Code1,Code)):- 
    from_kw_spec(KWSpec,KWS,Var),!,
   (append(_,[KWS,Value],Params) -> (make_bind_value(Var,Value,Env),Code1=true);
    make_bind_value_missing([KWSpec,InitForm],Env,Code1)),!,
-  bind_macro_parameters(Env,'&key',FormalParms,Params,Code).
+  bind_parameters(Env,'&key',FormalParms,Params,Code).
 
 
 from_kw_spec([KWS,Var],KWS,Var):- !,atom(KWS),atom(Var).
