@@ -38,7 +38,7 @@ mize_body(F,A,C):- mize_body1(F,A,B),mize_body2(F,B,C),!.
 mize_body(_F,A,B):- compound_name_arguments(A,F,AA),must_maplist(mize_body(F),AA,BB),B=..[F|BB].
 mize_body(_,A,A):-!.
 
-mize_body1(_,A,A):- var(A),del_attr(A,initState).
+mize_body1(_,A,A):- var(A),del_attr(A,rwstate).
 mize_body1(_,A,A):- \+ compound(A),!.
 mize_body1(F,(A,B),AB):-!,mize_body1(F,A,AA),mize_body1(F,B,BB),conjoin_0(AA,BB,AB).
 mize_body1(F,A,B):- is_list(A),must_maplist(mize_body1(F),A,B).

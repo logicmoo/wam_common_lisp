@@ -39,8 +39,9 @@ compile_assigns(Ctx,Env,Result,[Getf, Var| ValuesForms], Body):- is_place_op(Get
         list_to_conjuncts(ValuesBody,BodyS),
         Body = (BodyS, place_op(Env,Getf, Var, ResultVs,Result)).
 
-compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, String], (assert(type_documentation(variable,Var,String)),Body)):- 
+compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, String], (Code,Body)):- 
         string(String),is_def_maybe_docs(SetQ),
+        Code = assert(doc:doc_string(Var,_Package,variable,String)),
 	!, compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm], Body).
 
 
@@ -53,26 +54,32 @@ compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm], Body):- is_symbol_setter(
 
 
 
+find_incoming_value(Ctx,_Ev,Atom,InValue,Value):-
+      debug_var([Atom,'_In'],InValue),
+      debug_var([Atom,'_Thru'],Value),
+      ignore((member(bv(Atom0,[Value0|Unused]),Ctx.argbindings),
+         Atom0==Atom,Value0=InValue,debug_var("__",Unused))).
+
 
 compile_symbol_getter(Ctx,Env,Result,Var, Body):- Var==mapcar,!, dbmsg(compile_symbol_getter(Ctx,Env,Result,Var, Body)), dumpST,break.
 
 
 compile_symbol_getter(Ctx,Env,Value, Var, Body):- 
         find_incoming_value(Ctx,Env,Var,InValue,Value),
-        (get_attr(Value,initState,t);get_attr(InValue,initState,t)),
+        (get_attr(Value,rwstate,t);get_attr(InValue,rwstate,t)),
 	!,
         Body = symbol_value(Env, Var, Value).   
 
 compile_symbol_getter(Ctx,Env,InValue, Var, Body):-
         find_incoming_value(Ctx,Env,Var,InValue,Value),
-        (get_attr(Value,initState,t);get_attr(InValue,initState,t)),
+        (get_attr(Value,rwstate,t);get_attr(InValue,rwstate,t)),
 	!,
         Body = true.
 
 compile_symbol_getter(Ctx,Env,Value,Var, Body):- 
         find_incoming_value(Ctx,Env,Var,InValue,Value),
-        put_attr(Value,initState,t),
-        put_attr(InValue,initState,t),
+        put_attr(Value,rwstate,t),
+        put_attr(InValue,rwstate,t),
 	!,
         Body = env_sym_arg_val(Env,Var,InValue,Value).
 
@@ -84,13 +91,13 @@ compile_symbol_getter(_Cx,Env,Value, Var,  Body):-
 	Body = (once((	env_memb(Bindings, Env),
 			bvof(bv(Var, Value0),Bindings),
 			extract_variable_value(Value0, Value, _)
-		    ;	special_var(Var, Value)
+		    ;	symp:symbol_info(Var, _Package, _, Value)
 		    ;	throw(ErrNo, Var)	)	)).	
 
 
 
 
-initState:attr_unify_hook(_,_).
+rwstate:attr_unify_hook(_,_).
 
 
 extract_variable_value([Val|Vals], FoundVal, Hole):-
@@ -104,7 +111,11 @@ bind_dynamic_value(Env,Var,Result):- set_symbol_value(Env,Var,Result).
 
 symbol_value(Env,Var,Value):-
   symbol_value_or(Env,Var,
-    last_chance_symbol_value(Env,Var,Value),Value).
+    symbol_value_last_chance(Env,Var,Value),Value).
+
+symbol_value_last_chance(_Env,Var,Result):- nb_current(Var,Result),!.
+symbol_value_last_chance(_Env,Var,_Result):- 
+  lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Var).
 
 
 values(V1,Push,V1):- push_value(1,Push).
@@ -113,13 +124,6 @@ find_symbol(Var,P,Result):- ignore(symbol_value('*package*',ugly(package,P))),fi
 find_symbol_from(Var,P,Result):- symbol_info(Var, P, package, IntExt), \+ package_shadowing_symbols(P, Var),!,add_mv(1,IntExt),values(Var,IntExt,Result).
 find_symbol_from(Var,P,Result):- package_use_list(P,Use),symbol_info(Var, Use, package, external),\+ package_shadowing_symbols(P, Var),!,values(Var,imported,Result).
  
-get_symbol_info(Var, Type, Result):- symbol_info(Var, P, Type, Result),currently_visible_package(P).
-
-last_chance_symbol_value(_Env,Var,Result):- get_symbol_info(Var, constant, Result),!.
-last_chance_symbol_value(_Env,Var,Result):- get_symbol_info(Var, variable, Result),!.
-last_chance_symbol_value(_Env,Var,Result):- nb_current(Var,Result),!.
-last_chance_symbol_value(_Env,Var,_Result):- 
-  lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Var).
 
 
 bvof(E,L):-member(E,L).
@@ -127,31 +131,22 @@ env_memb(E,L):-member(E,L).
 env_memb(E,E).
 
 symbol_value_or(Env,Var,G,Value):-
- (env_memb(Bindings, Env),bvof(bv(Var, Value0),Bindings))-> extract_variable_value(Value0, Value, _);
-   (special_var(Var, Value) -> true;  G).
+ (env_memb(Bindings, Env),bvof(bv(Var, Value0),Bindings)) 
+    -> extract_variable_value(Value0, Value, _)
+      ; (symp:symbol_info(Var, _Package, _Type, Value) -> true;  G).
 
 
 set_symbol_value(Env,Var,Result):-var(Result),!,symbol_value(Env,Var,Result).
 set_symbol_value(Env,Var,Result):- !,
-     ((	env_memb(Bindings, Env),
-                bvof(bv(Var, Value0),Bindings)
-      ->	nb_setarg(1,Value0,Result)
-      ;	special_var(Var, Old)
-      ->	once(retract(special_var(Var, Old))),
-                asserta(special_var(Var, Result))
-      ;         last_chance_set_symbol_value(Env,Var,Result))).
-set_symbol_value(Env,Var,Result):- 
-      (	env_memb(Bindings, Env),
-                bvof(bv(Var, Value0),Bindings)
-      ->	extract_variable_value(Value0, _, Hole),
-                Hole = [Result|_]
-      ;	special_var(Var, Old)
-      ->	once(retract(special_var(Var, Old))),
-                asserta(special_var(Var, Result))
-      ;         last_chance_set_symbol_value(Env,Var,Result)).
+     ((	env_memb(Bindings, Env),bvof(bv(Var, Value0),Bindings))
+      -> nb_setarg(1,Value0,Result)
+      ;	(symp:symbol_info(Var, Package, Type, Old)
+        ->      ( once(retract(symp:symbol_info(Var, Package, Type, Old))),
+                asserta(symp:symbol_info(Var, Package, Type, Result)))
+          ;  set_symbol_value_last_chance(Env,Var,Result))).
 
-last_chance_set_symbol_value(_Env,Var,Result):- nb_setval(Var,Result),!.
-last_chance_set_symbol_value(_Env,Var,_Result):- 
+set_symbol_value_last_chance(_Env,Var,Result):- nb_setval(Var,Result),!.
+set_symbol_value_last_chance(_Env,Var,_Result):- 
   lisp_error_description(atom_does_not_exist, ErrNo, _),throw(ErrNo, Var).
 
 
@@ -176,15 +171,15 @@ place_op(Env,setf, Var, [Result],  Result):- atom(Var),!,
 
 %TODO Make it a constantp
 symbol_setter(_Env,defconstant, Var, Result):-
-   ( special_var(Var, _) -> once(retract(special_var(Var, _))); true),
-   asserta(special_var(Var, Result)).
+   ( symp:symbol_info(Var, Package, TypeWas, _) -> once(retract(symp:symbol_info(Var, Package, TypeWas, _))); true),
+   asserta(symp:symbol_info(Var, Package, constant, Result)).
 
 symbol_setter(_Env,defparameter, Var, Result):-
-   ( special_var(Var, _) -> once(retract(special_var(Var, _))); true),
-   asserta(special_var(Var, Result)).
+   ( symp:symbol_info(Var, Package, TypeWas, _) -> once(retract(symp:symbol_info(Var, Package, TypeWas, _))); true),
+   asserta(symp:symbol_info(Var, Package, variable, Result)).
 
 symbol_setter(_Env,defvar, Var, Result):-
-     special_var(Var, _) -> true ; asserta(special_var(Var, Result)).
+     symp:symbol_info(Var, _Package, variable, _) -> true ; asserta(symp:symbol_info(Var, _Package, variable, Result)).
 
 symbol_setter(Env,setq, Var, Result):- !, set_symbol_value(Env,Var,Result).
 

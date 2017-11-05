@@ -48,27 +48,88 @@ __        ___    __  __        ____ _
    \_/\_/_/   \_\_|  |_|      \____|_____|
 
 Common Lisp, written in Prolog
-> ( defmacro fooq ( a ) ` ' , a )
+> ( defun foo ( a ) ( 1+ a ) )
 /*
-:- lisp_compile([defmacro, fooq, [a], ['$BQ', [quote, '$COMMA'(a)]]]).
+:- lisp_compile([defun, foo, [a], ['1+', a]]).
 */
 /*
-:- retractall(macro_lambda(fooq, _6048, _6050)),
-   assert(macro_lambda(fooq, [a], [['$BQ', [quote, ['$COMMA', a]]]])).
+:- assert(arglist_info(foo,
+                       [a],
+                       [A],
+                       arginfo{ all:1,
+                                allow_other_keys:0,
+                                aux:0,
+                                env:0,
+                                key:0,
+                                names:[a],
+                                opt:0,
+                                req:1,
+                                rest:0
+                              })),
+   asserta(function_lambda(defun, foo, [a], [['1+', a]])),
+   asserta((foo(A, D1_c43_Ret):-!, Env=[[bv(a, [A|_276])]], env_sym_arg_val(Env, a, A_In, A_Thru), '1+'(A_Thru, D1_c43_Ret))).
 */
-fooq
-> ( fooq ( a b c ) )
+foo
+> ( foo 2 )
 /*
-:- lisp_compile([fooq, [a, b, c]]).
+:- lisp_compile([foo, 2]).
 */
 /*
-:- commaResult([[quote, [a, b, c]]]).
+:- foo(2, Foo_Ret).
+*/
+3
+> ( defmacro p ( &rest r ) ` ( print ' , r ) )
+/*
+:- lisp_compile([defmacro, p, ['&rest', r], ['$BQ', [print, [quote, '$COMMA'(r)]]]]).
 */
 /*
-:- true.
+:- retractall(user:macro_lambda(defmacro, p, _9932, _9934)),
+   asserta(user:macro_lambda(defmacro, p, ['&rest', r], [['$BQ', [print, [quote, ['$COMMA', r]]]]])).
 */
-( a b c )
->
+p
+> ( p car )
+/*
+:- lisp_compile([p, car]).
+*/
+/*
+:- macro(macroResult(true,
+                     ((true, (true, true, true), true), true),
+                     [[quote, [print, [quote, [car]]]]])).
+*/
+/*
+:- must_compile_body(ctx{argbindings:[], head:lisp_compile},
+                     [[bind, bv(r, [[car]|_12762])]|toplevel],
+                     _9618,
+                     [eval, [progn, [quote, [print, [quote, [car]]]]]],
+                     _14838),_14838.
+*/
+[car]
+( car )
+> *package*
+/*
+:- lisp_compile('*package*').
+*/
+/*
+:- env_sym_arg_val(toplevel, '*package*', Xx_package_xx_In, Xx_package_xx_Thru).
+*/
+#< package common-lisp-user >
+> (setq foo 'bar)
+/*
+:- lisp_compile([setq, foo, [quote, bar]]).
+*/
+/*
+:- symbol_setter(toplevel, setq, foo, bar).
+*/
+bar
+> foo
+/*
+:- lisp_compile(foo).
+*/
+/*
+:- env_sym_arg_val(toplevel, foo, Foo_In, Foo_Thru).
+*/
+bar
+
 
 
 swipl -l  repl.pl -g "qsave_program(wamcl)" -t halt

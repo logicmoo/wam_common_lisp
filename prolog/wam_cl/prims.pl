@@ -26,8 +26,6 @@
 
 
 
-:- multifile(special_var/2).
-:- dynamic(special_var/2).
 
 %module(_,_).
 
@@ -125,9 +123,9 @@ sym_arg_val_envc(N,A,B,_) :- is_special_var_c(N,B) -> true ; A = B.
 
 
 show_special:-
-		setof(sv(Var, Value), special_var(Var, Value), SVs)
+		setof(Package:Var=Type:Value, symp:symbol_info(Var, Package, Type, Value), SVs)
 	->	writef('Variable \tValue\n\n'),
-		every(SVs, [sv(Var2, Value2)]^(writef('%t :\t%t\n',[Var2, Value2])))
+		every(SVs, [(Var2 = Value2)]^(writef('%t :\t%t\n',[Var2, Value2])))
 	;	writef('No special variables\n').
 
 
@@ -278,12 +276,12 @@ fibp3(N, F) :-
 % 113.043 CPU in 114.324 seconds (99% CPU, 15665558 Lips)
 
 
-sym_arg_val_envd(Atom,_InValue,Value,Environment):- 
+sym_arg_val_envd(Var,_InValue,Value,Environment):- 
   (once((	(member(Bindings, Environment),
-			member(bv(Atom, Value0), Bindings),
+			member(bv(Var, Value0), Bindings),
 			extract_variable_value(Value0, Value, _))
-		    ;	special_var(Atom, Value)
-		    ;	(lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Atom))))).
+		    ;	symp:symbol_info(Var, _Package, _, Value)
+		    ;	(lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Var))))).
 
 fibd(A, K) :- !,
         B=[[bv(n, [A|_])]],

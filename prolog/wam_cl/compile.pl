@@ -89,12 +89,6 @@ lisp_error_description(atom_does_not_exist, 101, 'SetQ: Variable does not exist:
 lisp_error_description(first_not_cons,      102, 'Form1: This is not a cons cell: ').
 lisp_error_description(rest_not_cons,       103, 'Rest: This is not a cons cell: ').
 
-find_incoming_value(Ctx,_Ev,Atom,InValue,Value):-
-      debug_var([Atom,'_In'],InValue),
-      debug_var([Atom,'_Thru'],Value),
-      ignore((member(bv(Atom0,[Value0|Unused]),Ctx.argbindings),
-         Atom0==Atom,Value0=InValue,debug_var("__",Unused))).
-
 
 lisp_compiled_eval(SExpression):- 
   as_sexp(SExpression,Expression),

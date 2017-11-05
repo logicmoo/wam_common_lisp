@@ -12,7 +12,7 @@
  * The program is a *HUGE* common-lisp compiler/interpreter. It is written for YAP/SWI-Prolog (YAP 4x faster).
  *
  *******************************************************************/
-:- module(sinfo, []).
+:- module(symp, []).
 :- set_module(class(library)).
 :- include('header.pro').
 
