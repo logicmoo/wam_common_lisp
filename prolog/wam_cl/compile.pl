@@ -95,19 +95,6 @@ find_incoming_value(Ctx,_Ev,Atom,InValue,Value):-
       ignore((member(bv(Atom0,[Value0|Unused]),Ctx.argbindings),
          Atom0==Atom,Value0=InValue,debug_var("__",Unused))).
 
-% The hook into the compiler
-
-lisp_compiler_term_expansion( (FunctionHeadP <<== FunctionBodyP),
-		[(Head         :- !,  Code),
-                 (Head         :- fail, <<==(FunctionHead , FunctionBody))] ):-
-        must_det_l((expand_pterm_to_sterm(FunctionHeadP,FunctionHead),
-        expand_pterm_to_sterm(FunctionBodyP,FunctionBody),
-        make_compiled(FunctionHead,FunctionBody,Head,Code))).
-
-lisp_compiler_term_expansion( ( <<== FunctionBodyP), ( :-   Code) ):-
-        must_det_l((expand_pterm_to_sterm(FunctionBodyP,FunctionBody),
-	must_compile_body(_Cx,toplevel,_Result,implicit_progn([FunctionBody]), Body),
-   body_cleanup(Body,Code))).
 
 lisp_compiled_eval(SExpression):- 
   as_sexp(SExpression,Expression),
@@ -255,14 +242,15 @@ compile_body(Ctx,Env,Result,['eval',Form1],Code):- !,
 
 % Use a previous DEFMACRO
 compile_body(Cxt,Env,Result,[Procedure|Arguments],CompileBodyCode):-
-  macro_lambda(Procedure, FormalParams, LambdaExpression),!,
+  user:macro_lambda(_Scope,Procedure, FormalParams, LambdaExpression),!,
   must_or_rtrace(bind_macro_parameters(NewEnv, FormalParams, Arguments,BindCode)),!,
-  call(BindCode),!,
   append(_,[],NewEnv),!,
+  NextEnv = [NewEnv|Env],  
+  call(BindCode),!,
   must_or_rtrace(expand_commas(NewEnv,CommaResult,LambdaExpression,Code)),
-  dbmsg(macro(macroResult(CommaResult))),
-  must_compile_body(Cxt,Env,Result,[eval,[progn|CommaResult]], CompileBody),
-  CompileBodyCode = (Code,CompileBody).
+  dbmsg(macro(macroResult(BindCode,Code,CommaResult))),
+  CompileBodyCode = (must_compile_body(Cxt,NextEnv,Result,[eval,[progn|CommaResult]], CompileBody),
+  Code,CompileBody).
 
 % `, Backquoted commas
 compile_body(_Cx,Env,Result,['$BQ',Form], Code):-!,compile_bq(Env,Result,Form,Code).
@@ -271,48 +259,28 @@ compile_body(_Cx,Env,Result,['`',Form], Code):-!,compile_bq(Env,Result,Form,Code
 
 % DEFMACRO
 compile_body(_Cx,_Ev,Name,[defmacro,Name,FormalParms|Body0], CompileBody):- !,
-      maybe_get_docs(defmacro,Name,Body0,Body),
-      CompileBody =(retractall(macro_lambda(Name,_,_)),
-	assert(macro_lambda(Name, FormalParms, Body))).
+      maybe_get_docs(function,Name,Body0,Body,DocCode),
+      CompileBody =(DocCode,retractall(user:macro_lambda(defmacro,Name,_,_)),
+	asserta(user:macro_lambda(defmacro,Name, FormalParms, Body))).
 
-/*
-% DEFMACRO (Broken version)
-compile_body_broken(Ctx,_Ev,Name,[defmacro,Name0,FormalParms|FunctionBody0], CompileBody):- 
-    combine_setfs(Name0,Name),
-    debug_var("RET",Result),debug_var("Env",Env),
-    must_or_rtrace(maybe_get_docs(defmacro,Name,FunctionBody0,FunctionBody)),
-    function_head_params(Ctx,Env,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,_Names,_PVars,HeadCode),
-    append(ActualArgs, [Result], HeadArgs),
-    Head =.. [Name|HeadArgs],
-    body_cleanup((HeadCode,Env=[ZippedArgBindings]),PreBodyCode),    
-     must_compile_body(ctx{head:Head,argbindings:ZippedArgBindings},Env,Result,implicit_progn([FunctionBody]),Body0),
-     body_cleanup(Body0,Body),
-    CompileBody =
-     ( (assert(arglist_info(Name,FormalParms,ActualArgs,ArgInfo))),
-        retractall(macro_lambda(Name,_,_,_,_)),
-	assert(macro_lambda(Name,FormalParms, HeadArgs,ArgInfo,PreBodyCode, Body))).
-
-% DEFMACRO
-compile_body(_Cx,_Ev,Name,[defmacro,Name,FormalParms|Body0], CompileBody):- !,
-      maybe_get_docs(defmacro,Name,Body0,Body),
-      CompileBody =(retractall(macro_lambda(Name,_,_)),
-	assert(macro_lambda(Name, FormalParms, Body))).
-*/
 % DEFUN
-compile_body(_Cx,_Ev,Name,[defun,Name0,Args|FunctionBody0], CompileBody):- 
+compile_body(Ctx,_Env,Name,[defun,Name0,FormalParms|FunctionBody0], CompileBody):- 
     combine_setfs(Name0,Name),
-    must_or_rtrace(maybe_get_docs(defun,Name,FunctionBody0,FunctionBody)),
-    FunctionHead=[Name|Args],
+    must_or_rtrace(maybe_get_docs(function,Name,FunctionBody0,FunctionBody,DocCode)),
+    FunctionHead=[Name|FormalParms],
     CompileBody = (% asserta((Head  :- (fail, <<==(FunctionHead , FunctionBody)))),
-                   asserta((Head  :- (!,  Code)))),!,
-    make_compiled(FunctionHead,FunctionBody,Head,Code).
-make_compiled(FunctionHead,FunctionBody,Head,Code):-
-	expand_function_head(FunctionHead, Head, ArgBindings, Result,HeadCode),
-                    debug_var("RET",Result),
-                    debug_var("Env",Env),
-        must_compile_body(ctx{head:Head,argbindings:ArgBindings},Env,Result,implicit_progn([FunctionBody]),Body0),
-        Body = (Env=[ArgBindings],Body0),
-    body_cleanup((HeadCode,Body),Code).
+                   DocCode,
+                   HeadDefCode,
+                   asserta(function_lambda(defun,Name, FormalParms, FunctionBody)),
+                   asserta((Head  :- (!,  BodyCode)))),!,
+    make_compiled(Ctx,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode).
+
+make_compiled(Ctx,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode):-
+    expand_function_head(Ctx,CallEnv,FunctionHead, Head, HeadEnv, Result,HeadDefCode,HeadCode),
+    debug_var("RET",Result),debug_var("Env",CallEnv),
+    ignore(Ctx=ctx{head:Head,argbindings:HeadEnv}),
+    must_compile_body(Ctx,CallEnv,Result,implicit_progn([FunctionBody]),Body0),
+    body_cleanup((HeadCode,(CallEnv=[HeadEnv],Body0)),BodyCode).
 
 
 
@@ -529,10 +497,10 @@ compile_body(_Ctx,_Env,Result,[FunctionName | FunctionArgs], Body):- lisp_operat
    Body = (ExpandedFunction).
 
 % Non built-in function expands into an explicit function call
-compile_body(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):-
+compile_body(Ctx,CallEnv,Result,[FunctionName | FunctionArgs], Body):-
     %  (FunctionArgs==[] -> (dumpST,break ); true),
       !,
-      expand_arguments(Ctx,Env,FunctionName,0, FunctionArgs,ArgBody, Args),
+      expand_arguments(Ctx,CallEnv,FunctionName,0, FunctionArgs,ArgBody, Args),
       append(Args, [Result], ArgsPlusResult),
       debug_var([FunctionName,'_Ret'],Result),      
       find_function_or_macro(FunctionName,ArgsPlusResult,ExpandedFunction),      

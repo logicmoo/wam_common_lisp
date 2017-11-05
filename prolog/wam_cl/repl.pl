@@ -20,7 +20,7 @@
 
 :- dynamic 
 	named_lambda/2,
-        macro_lambda/3.
+        macro_lambda/4.
 
 :- initialization((lisp,prolog),main).
 
@@ -229,7 +229,7 @@ eval_repl_atom(noltrace, t):- set_prolog_flag(lisp_trace,false).
 eval_repl_atom(nodebug, t):- nodebug(lisp(_)).
 eval_repl_atom(show, t):- 
   listing([named_lambda/2,
-        macro_lambda/3,
+        user:macro_lambda/4,
         lisp_global_bindings/1]).
 
 

@@ -18,9 +18,9 @@
 
 :- include('header.pro').
 
-maybe_get_docs(Type,Name,[String|FunctionBody],FunctionBody):- string(String),!,
-  assert(lisp_documentation(Type,Name,String,FunctionBody)).
-maybe_get_docs(_Type,_Name,FunctionBody,FunctionBody).
+maybe_get_docs(Type,Name,[String|FunctionBody],FunctionBody,Code):- string(String),!,
+  Code = assert(doc:doc_string(Name,_Package,Type,String)).
+maybe_get_docs(_Type,_Name,FunctionBody,FunctionBody, true).
 
 :- fixup_exports.
 

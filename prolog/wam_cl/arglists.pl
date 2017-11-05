@@ -154,7 +154,7 @@ lisp_operator(defpackage).
 lisp_operator(if).
 lisp_operator(S):-is_special_op(S,P),currently_visible_package(P).
 lisp_operator(S):-compiler_macro_left_right(S,_,_).
-lisp_operator(S):-macro_lambda(S,_,_).
+lisp_operator(S):-user:macro_lambda(_Scope,S,_,_).
 
 is_special_op(S,P):- symbol_info(S,P,function_type,T),arg(_,v('special-operator',macro),T).
 is_special_op('%%allocate-closures', 'sb-c').
@@ -334,13 +334,13 @@ compile_init(Var,FinalResult,[InitForm|_More],
 
 
 % Creates a function Head and an argument unpacker using Code to unpack
-expand_function_head(Ctx,Env,[FunctionName | FormalParms],Head,ZippedArgBindings, Result,Code):-!,
-       function_head_params(Ctx,Env,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,_Names,_PVars,Code0),
+expand_function_head(Ctx,Env,[FunctionName | FormalParms],Head,ZippedArgBindings, Result,HeadDefCode,HeadCode):-!,
+       function_head_params(Ctx,Env,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,_Names,_PVars,HeadCode),
        append(ActualArgs, [Result], HeadArgs),
-       Code = (assert(arglist_info(FunctionName,FormalParms,ActualArgs,ArgInfo)),Code0),
+       HeadDefCode = (assert(arglist_info(FunctionName,FormalParms,ActualArgs,ArgInfo))),
        Head =.. [FunctionName | HeadArgs].
-expand_function_head(Ctx,Env,FunctionName , Head, ZippedArgBindings, Result,Code):-
-    expand_function_head(Ctx,Env,[FunctionName], Head, ZippedArgBindings, Result,Code).
+expand_function_head(Ctx,Env,FunctionName , Head, ZippedArgBindings, Result,HeadDefCode,HeadCode):-
+    expand_function_head(Ctx,Env,[FunctionName], Head, ZippedArgBindings, Result,HeadDefCode,HeadCode).
 
   
 

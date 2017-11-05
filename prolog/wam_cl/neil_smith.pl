@@ -15,6 +15,29 @@
  *
  *******************************************************************/
 
+% The hook into the compiler
+
+lisp_compiler_term_expansion( (FunctionHeadP <<== FunctionBodyP),PrologCode):-                 
+        must_det_l((expand_pterm_to_sterm(FunctionHeadP,FunctionHead),
+        expand_pterm_to_sterm(FunctionBodyP,FunctionBody),        
+        FunctionHead=[Name|FormalParams],
+        lisp_compile([defun,Head,FormalParams,FunctionBody],ResultCode),
+        asserts_to_prolog_code(ResultCode,PrologCode).
+
+asserts_to_prolog_code((A,B),PrologCode):-!,
+        asserts_to_prolog_code(A,AA),
+        asserts_to_prolog_code(B,BB),
+        append(AA,BB,PrologCode).
+asserts_to_prolog_code(:-asserta(A),[A]).
+asserts_to_prolog_code(:-assert(A),[A]).
+asserts_to_prolog_code(:-A, AA):-!,asserts_to_prolog_code(A,AA).
+asserts_to_prolog_code(A, [:-A]).
+
+lisp_compiler_term_expansion( ( <<== FunctionBodyP), ( :-   (Code, writeExpression(Result)) ):-
+        must_det_l((expand_pterm_to_sterm(FunctionBodyP,FunctionBody),
+        lisp_compile(Result,FunctionBody,Body),
+        body_cleanup(Body,Code))).
+
 
 ssip_compiler_term_expansion(Symbol,lambda(Args,Body),[OOUT]):- atom(Symbol),is_list(Args),
   length(Args,A1),
