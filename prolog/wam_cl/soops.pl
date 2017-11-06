@@ -55,7 +55,7 @@ parse_data_record_args5([m(_,Type,Name)|PARGS],[X|ARGS],[Name-Value|KVs],O1,O2):
 name_value_default(m(_,array_of(Type),Name),Name-mut([],array_of(Type))).
 name_value_default(m(_,prolog_array_list(Type),Name),Name-mut([],array_of(Type))).
 name_value_default(m(_,Type,Name),Name-Def):-value_default(Type,Def).
-name_value_default(m(_,Type,Name),Name-mut(@null,Type)).
+name_value_default(m(_,Type,Name),Name-mut(@(null),Type)).
 name_value_default(N-V,N-V).
 
 value_default(prolog_concurrent_hash_map(K,V),mut([],map(K,V))).
