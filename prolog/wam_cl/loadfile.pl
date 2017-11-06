@@ -108,6 +108,10 @@ Notes: None.
 cl_compile_file(File,t):-
   forall(between(1,2,N),with_file(do_file_pass(compile_file,N),File)).
 
+cl_grovel_file(File,t):- 
+ locally(local_override(with_forms,lisp_grovel),
+  with_file(lisp_grovel,File)).
+
 cl_load(File,t):-
   forall(member(N,[1,3]),with_file(do_file_pass(load,N),File)).
 
@@ -120,11 +124,15 @@ do_file_pass(_,3,Form):- lisp_compiled_eval(Form).
 % pass 4 - :execute
 do_file_pass(_,3,Form):- lisp_eval(Form).
 
-lisp_grovel(Form):- lisp_compile(Form,PrologCode),!,
-  grovel_prolog_code(PrologCode),!.
+
+lisp_grovel(Form):- must(lisp_compile(Form,PrologCode)),!,
+  must(grovel_prolog_code(PrologCode)),!.
 
 grovel_prolog_code(PrologCode):- \+ compound(PrologCode),!.
 grovel_prolog_code(:- PrologCode):- grovel_prolog_code(PrologCode).
+grovel_prolog_code(cl_load(File, Load_Ret)):- !, cl_grovel_file(File, Load_Ret).
+grovel_prolog_code(cl_compile_file(File, Load_Ret)):- !, cl_grovel_file(File, Load_Ret).
+grovel_prolog_code(cl_grovel_file(File, Load_Ret)):- !, cl_grovel_file(File, Load_Ret).
 grovel_prolog_code(asserta(PrologCode)):- !, grovel_prolog_code(PrologCode).
 grovel_prolog_code(assertz(PrologCode)):- !, grovel_prolog_code(PrologCode).
 grovel_prolog_code(assert(PrologCode)):- !, grovel_prolog_code(PrologCode).
@@ -138,6 +146,9 @@ grovel_prolog_code(_).
 
 
 with_flist(How,List):- must_maplist(with_file1(How),List).
+
+
+with_file1(_How,File):- local_override(with_forms,What),!,with_lisp_translation(file(File),What).
 with_file1(How,File):- with_lisp_translation(file(File),How).
 
 expand_directory_file_path(FDir,Ext,List):- directory_file_path(FDir,Ext,Mask),expand_file_name(Mask,List),List\==[Mask].
@@ -151,6 +162,7 @@ with_fstem(F,File,Found):-
    access(read),file_errors(fail)]),exists_file(Found).
 
 with_file(How,File):- string(File),name(Atom,File),!,with_file(How,Atom).
+with_file(How,File):- compound(File),!,absolute_file_name(File,Abs),file_directory_name(Abs,Dir),exists_directory(Dir),!,with_file(How,Abs).
 with_file(How,File):- exists_file(File),!,with_file1(How,File).
 with_file(How,FDir):- exists_directory(FDir),with_directory(How,FDir),!.
 with_file(How,Mask):- expand_file_name(Mask,List),List\==[Mask],!,with_flist(How,List).

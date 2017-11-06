@@ -8,6 +8,7 @@ maintainer( 'TeamSPoon', 'https://github.com/TeamSPoon/' ).
 home( 'https://github.com/TeamSPoon/wam_common_lisp' ).
 download( 'https://github.com/TeamSPoon/wam_common_lisp/release/*.zip' ).
 requires(s_expression).
+requires(predicate_streams).
 requires(dictoo).
 requires(must_trace).
 autoload(false).

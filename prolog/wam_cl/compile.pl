@@ -163,8 +163,9 @@ compiler_macro_left_right(and,[Form1|Rest], [and,Form1,[and|Rest]]).
 
 :- discontiguous(compile_body/5).
 
-% VAR
-compile_body(Ctx,Env,Result,Var, Code):- is_ftVar(Var), !,
+% Prolog vars
+compile_body(_Ctx,_Env,Result,Var, true):- is_ftVar(Var), !, Result = Var.
+compile_body(Ctx,Env,Result,Var, Code):- is_ftVar(Var), !, % NEVER SEEN
   debug_var("EVAL",Var),
   compile_body(Ctx,Env,Result,[eval,Var], Code).
  
@@ -236,10 +237,8 @@ compile_body(Ctx,Env,Result,[prog2,Form1,Form2|FormS],Code):- !,
    Code = (Body1, Body2, BodyS).
 
 % EVAL 
-compile_body(Ctx,Env,Result,['eval',Form1],Code):- !,
-   must_compile_body(Ctx,Env,Result1,Form1, Body1),
-   call(Body1),
-   must_compile_body(Ctx,Env,Result,Result1, Code).
+compile_body(Ctx,Env,Result,['eval',Form1],(Body1,cl_eval(Result1,Result))):- !,
+   must_compile_body(Ctx,Env,Result1,Form1, Body1).
 
 
 % Use a previous DEFMACRO

@@ -139,9 +139,12 @@
 (defun ob$freadlist (ppob)
   (let ((ob (ob$create-empty)))
        (if (and (pair? (car ppob))
-                (eq? 'quote (caar ppob)))
-           (ob$add ob 'type (cadar ppob))
-           (ob$add ob 'type (ob$name->ob (car ppob))))
+                (eq? 'quote (caar ppob)
+                 ))
+           (ob$add ob 'type (cadar ppob)
+            )
+           (ob$add ob 'type (ob$name->ob (car ppob))
+            ))
        (yloop
         (initial (rest (cdr ppob))
                  (elem nil)
@@ -149,11 +152,14 @@
         (ywhile rest)
         (ydo
          (setq elem (cadr rest))
-    (if t ; Uri needs nil to be OK. (not (nil? elem))
+    (if t
+      ; Uri needs nil to be OK. (not (nil? elem))
+
          (ob$add ob (car rest)
                   (cond
                    ((nil? elem) nil)
-                   ((and (eq? (car rest) 'obname)
+                   ((and (eq? (car rest) 'obname
+                          )
                          (symbol? elem))
                     elem)
                    ((and (symbol? elem) (setq temp (ob$name->ob elem)))
@@ -164,9 +170,10 @@
                              elem)
                     elem)
                    ((or (ob? elem) (string? elem) (number? elem))
-                    elem)
+                    elem)       
                    ((pair? elem)
-                    (if (eq? (car elem) 'quote)
+                    (if (eq? (car elem) 'quote
+                           )
                         (cadr elem)
                         (ob$freadlist elem)))
                    (else (error "ob$freadlist: unknown elem ~A in ~A"
@@ -176,7 +183,8 @@
                        (car rest)))
          (setq rest (cddr rest))))
        (if (eq? *notype-ob* (ob$ty ob))
-           (ob$removes ob 'type))
+           (ob$removes ob 'type
+            ))
        ob))
 
 ;

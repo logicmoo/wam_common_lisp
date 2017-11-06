@@ -216,7 +216,7 @@ reserved_symbols(_Names,_PVars).
 as_rest(_,R,R).
 as_env(_,E,E).
 
-enforce_atomic(F):- (atom(F)->true;(dumpST,break)).
+enforce_atomic(F):- (simple_atom_var(F)->true;(dumpST,break)).
 arginfo_incr(Prop,ArgInfo):- get_dict(Prop,ArgInfo,Old),New is Old +1, b_set_dict(Prop,ArgInfo,New).
 arginfo_set(Prop,ArgInfo,New):- nb_set_dict(Prop,ArgInfo,New).
 
@@ -338,6 +338,7 @@ compile_init(Var,FinalResult,[InitForm|_More],
 set_symbol_value_if_missing(Env, Var, In, G, Thru):- var(In),!,G,set_symbol_value(Env,Var,Thru).
 set_symbol_value_if_missing(Env, Var, In, _, Thru):- set_symbol_value(Env,Var,In),!,In=Thru.
 
+simple_atom_var(Atom):- atom(Atom), Atom\=nil,Atom\=[], \+ arg(_, v('&optional', '&key', '&aux', '&rest', '&body', '&environment'),Atom).
 
 % Creates a function Head and an argument unpacker using Code to unpack
 expand_function_head(Ctx,Env,[FunctionName | FormalParms],Head,ZippedArgBindings, Result,HeadDefCode,HeadCodeOut):-
@@ -418,19 +419,21 @@ find_hole([_Val|Vals], Hole):-
 
 
 
-make_bind_value_missing( Var,Env,true):-atom(Var),!,make_bind_value(Var,[],Env),!.
-make_bind_value_missing([Var,InitForm],Env,Code):-!,atom(Var),compile_init_form(Env,Value,InitForm,Code),make_bind_value(Var,Value,Env),!.
-make_bind_value_missing([Var,InitForm,IfPresent],Env,Code):-atom(Var),make_bind_value(IfPresent,[],Env),make_bind_value_missing([Var,InitForm],Env,Code).
+make_bind_value_missing( Var,Env,true):-simple_atom_var(Var),!,make_bind_value(Var,[],Env),!.
+make_bind_value_missing([Var,InitForm],Env,Code):-!,simple_atom_var(Var),compile_init_form(Env,Value,InitForm,Code),make_bind_value(Var,Value,Env),!.
+make_bind_value_missing([Var,InitForm,IfPresent],Env,Code):-simple_atom_var(Var),make_bind_value(IfPresent,[],Env),make_bind_value_missing([Var,InitForm],Env,Code).
 
-make_bind_value(Var,Value,Env):-atom(Var),!,debug_var([Var,'_In'],Value),append_open_list(Env,bv(Var,[Value|_])).
-make_bind_value([Var,_InitForm],Value,Env):-atom(Var),make_bind_value(Var,Value,Env).
-make_bind_value([Var,_InitForm,IfPresent],Value,Env):-atom(Var),make_bind_value(IfPresent,t,Env),make_bind_value(Var,Value,Env).
+make_bind_value(Var,Value,Env):-simple_atom_var(Var),!,debug_var([Var,'_In'],Value),append_open_list(Env,bv(Var,[Value|_])).
+make_bind_value([Var,_InitForm],Value,Env):-simple_atom_var(Var),make_bind_value(Var,Value,Env).
+make_bind_value([Var,_InitForm,IfPresent],Value,Env):-simple_atom_var(Var),make_bind_value(IfPresent,t,Env),make_bind_value(Var,Value,Env).
 
 
 must_or(Goal,Else):- Goal->true;Else.
 
-bind_parameters(Env, [A, B|R], Arguments,BindCode):- atom(A),atom(B),atom(R),!,
+bind_parameters(Env, [A, B|R], Arguments,BindCode):- simple_atom_var(A),simple_atom_var(B),simple_atom_var(R),!,
   bind_parameters(Env, [A, B, '&rest',R], Arguments,BindCode).
+bind_parameters(Env, [B|R], Arguments,BindCode):- simple_atom_var(B),simple_atom_var(R),!,
+  bind_parameters(Env, [B, '&rest',R], Arguments,BindCode).
 bind_parameters(Env, FormalParms, Arguments,BindCode):-
   % append_open_list(Env,bind),
   bind_parameters(Env, 'required', FormalParms, Arguments, BindCode),!.
@@ -486,14 +489,14 @@ bind_parameters(Env,_,['&body'.Var|FormalParms],Params,Code):- !,
 
 % Parsing &key (key var)
 bind_parameters(Env,'&key',[[KWS,Var]|FormalParms],Params,Params,(Code1,Code)):- 
-   atom(KWS),atom(Var),!,
+   simple_atom_var(KWS),simple_atom_var(Var),!,
   (append(_,[KWS,Value],Params) -> (make_bind_value(Var,Value,Env),Code1=true);
    make_bind_value_missing(Var,Env,Code1)),!,
    bind_parameters(Env,'&key',FormalParms,Params,Code).
 
 % Parsing &key key
 bind_parameters(Env,'&key',[Var|FormalParms],Params,Params,Code):-
-   atom(Var),!,
+   simple_atom_var(Var),!,
   (append(_,[Var,Value],Params) -> make_bind_value(Var,Value,Env); make_bind_value(Var,[],Env)),!,
    bind_parameters(Env,'&key',FormalParms,Params,Code).
  
@@ -514,8 +517,8 @@ bind_parameters(Env,'&key',[[KWSpec,InitForm]|FormalParms],Params,Params,(Code1,
   bind_parameters(Env,'&key',FormalParms,Params,Code).
 
 
-from_kw_spec([KWS,Var],KWS,Var):- !,atom(KWS),atom(Var).
-from_kw_spec(KWSVar,KWSVar,KWSVar):- atom(KWSVar).
+from_kw_spec([KWS,Var],KWS,Var):- !,simple_atom_var(KWS),simple_atom_var(Var).
+from_kw_spec(KWSVar,KWSVar,KWSVar):- simple_atom_var(KWSVar).
 
 
 :- fixup_exports.
