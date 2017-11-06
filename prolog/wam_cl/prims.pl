@@ -32,14 +32,14 @@
 :- ensure_loaded((utils_writef)).
 :- ensure_loaded(library(lists)).
 
-user:op_replacement(car,cl_first).
-cl_first(List, Result):- List==[]->Result=[];
+user:op_replacement(first,cl_car).
+cl_car(List, Result):- List==[]->Result=[];
 	once( (	List = [Result|_]
 	    ;	error(first_not_cons, ErrNo, _),
 		throw(ErrNo)	)).
 
-user:op_replacement(cdr,cl_rest).
-cl_rest(List, Result):- List==[]->Result=[];
+user:op_replacement(rest,cl_cdr).
+cl_cdr(List, Result):- List==[]->Result=[];
 	once( (	List = [_|Result]
 	    ;	error(rest_not_cons, ErrNo, _),
 		throw(ErrNo)	)).
