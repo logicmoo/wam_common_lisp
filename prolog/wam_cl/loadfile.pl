@@ -19,10 +19,14 @@
 :- include('header.pro').
 
 
-dd:- cl_load('../../t/daydreamer/dd_compile.cl',_).
-dd1:- cl_load('../../t/daydreamer/dd.cl',_).
-% dd1:- cl_load('../../t/daydreamer/dd.cl',_).
-% dd:- with_file('../../t/daydreamer/*.cl',_).
+dd:- cl_grovel_file('../../t/daydreamer/dd.cl',_).
+dd1:- cl_compile_file('../../t/daydreamer/dd_compile.cl',_).
+dd2:- cl_load('../../t/daydreamer/dd.cl',_).
+
+tdd:- cl_grovel_file('../../t/daydreamer/*.cl',_).
+tdd1:- cl_compile_file('../../t/daydreamer/*.cl',_).
+tdd2:- cl_load('../../t/daydreamer/*.cl',_).
+
 defpackage(_,_,_).
 
 /*
@@ -105,13 +109,17 @@ compile, declare, eval-when, pathname, logical-pathname, Section 20.1 (File Syst
 
 Notes: None.
 */
+cl_compile_file(File,T):-
+  local_override(with_forms,lisp_grovel),!,format('~N; Grovel.. (COMPILE-FILE ~w)~n',[File]),cl_grovel_file(File,T),!.
 cl_compile_file(File,t):-
   forall(between(1,2,N),with_file(do_file_pass(compile_file,N),File)).
 
-cl_grovel_file(File,t):- 
+cl_grovel_file(File,t):- format('~N; Grovel.. ~w~n',[File]),
  locally(local_override(with_forms,lisp_grovel),
   with_file(lisp_grovel,File)).
 
+cl_load(File,T):-
+  local_override(with_forms,lisp_grovel),!,format('~N; Grovel.. (LOAD ~w)~n',[File]),cl_grovel_file(File,T),!.
 cl_load(File,t):-
   forall(member(N,[1,3]),with_file(do_file_pass(load,N),File)).
 
@@ -125,6 +133,8 @@ do_file_pass(_,3,Form):- lisp_compiled_eval(Form).
 do_file_pass(_,3,Form):- lisp_eval(Form).
 
 
+lisp_grovel([load,File|_]):- !, cl_grovel_file(File, _Load_Ret).
+lisp_grovel(['compile-file',File|_]):- !, cl_grovel_file(File, _Load_Ret).
 lisp_grovel(Form):- must(lisp_compile(Form,PrologCode)),!,
   must(grovel_prolog_code(PrologCode)),!.
 
@@ -148,8 +158,10 @@ grovel_prolog_code(_).
 with_flist(How,List):- must_maplist(with_file1(How),List).
 
 
-with_file1(_How,File):- local_override(with_forms,What),!,with_lisp_translation(file(File),What).
-with_file1(How,File):- with_lisp_translation(file(File),How).
+with_file1(_How,File):- local_override(with_forms,What),!,with_file2(What,File).
+with_file1(How,File):- with_file2(How,File).
+
+with_file2(How,File):- dmsg(with_lisp_translation(file(File),How)),with_lisp_translation(file(File),How).
 
 expand_directory_file_path(FDir,Ext,List):- directory_file_path(FDir,Ext,Mask),expand_file_name(Mask,List),List\==[Mask].
 

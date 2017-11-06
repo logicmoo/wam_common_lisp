@@ -27,12 +27,12 @@ compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, Atom2| Rest], Body):- is_p
 
 
 compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, Atom2| Rest], Body):- is_pair_op(SetQ), 
-   must_compile_body(Ctx,Env,_ResultU,[SetQ, Var, ValueForm], Body1),
-   must_compile_body(Ctx,Env,Result,[SetQ, Atom2| Rest],  Body2),
+   if_must_compile_body(Ctx,Env,_ResultU,[SetQ, Var, ValueForm], Body1),
+   if_must_compile_body(Ctx,Env,Result,[SetQ, Atom2| Rest],  Body2),
    Body = (Body1 , Body2).
 
 compile_assigns(Ctx,Env,Result,[Defvar, Var], Body):- is_def_nil(Defvar),!,
-  must_compile_body(Ctx,Env,Result,[Defvar, Var , nil],Body).
+  compile_assigns(Ctx,Env,Result,[Defvar, Var , nil],Body).
 
 compile_assigns(Ctx,Env,Result,[Getf, Var| ValuesForms], Body):- is_place_op(Getf),     
 	must_maplist(expand_ctx_env_forms(Ctx,Env),ValuesForms, ValuesBody,ResultVs),
@@ -48,7 +48,7 @@ compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, String], (Code,Body)):-
 compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm], Body):- is_symbol_setter(Env,SetQ),
        % (EnvIn\==[]-> true ; break),
 	!,	
-	must_compile_body(Ctx,Env,ResultV,ValueForm, ValueBody),
+	if_must_compile_body(Ctx,Env,ResultV,ValueForm, ValueBody),
         Body = (ValueBody, symbol_setter(Env,SetQ, Var, ResultV)),
         ((op_return_type(SetQ,RT),RT=name) ->  =(Var,Result) ; =(ResultV,Result)).
 
@@ -65,8 +65,8 @@ compile_symbol_getter(Ctx,Env,Result,Var, Body):- Var==mapcar,!, dbmsg(compile_s
 compile_symbol_getter(_Ctx,Env,Value, Var, Body):-  atom(Var),!,
         debug_var([Var,'_Get'],Value),
         Body = symbol_value(Env, Var, Value).   
-
-compile_symbol_getter(_Cx,Env,Value, Var,  Body):- 
+        
+compile_symbol_getter(_Cx,Env,Value, Var,  Body):- % dumpST,break,
    debug_var([Var,'_Stack'],Value0),
    debug_var([Var,'_VAL'],Value),
 	!,

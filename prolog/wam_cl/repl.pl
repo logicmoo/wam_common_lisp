@@ -49,12 +49,18 @@ expand_pterm_to_sterm(X,X).
 str_to_expression(Str, Expression):- lisp_add_history(Str),parse_sexpr_untyped(string(Str), Expression),!.
 str_to_expression(Str, Expression):- with_input_from_string(Str,read_and_parse(Expression)),!.
 
-as_sexp(NIL,NIL):-NIL==[],!.
-as_sexp(Stream,Expression):- is_stream(Stream),!,must(parse_sexpr_untyped(Stream,Expression)).
-as_sexp(s(Str),Expression):- must(parse_sexpr_untyped(string(Str),Expression)),!.
-as_sexp(Str,Expression):- notrace(catch(text_to_string(Str,String),_,fail)),!, must(parse_sexpr_untyped(string(String),Expression)),!.
-as_sexp(Str,Expression):- is_list(Str),!,maplist(expand_pterm_to_sterm,Str,Expression).
-as_sexp(Str,Expression):- expand_pterm_to_sterm(Str,Expression),!.
+remove_comments(IO,IO):- \+ compound(IO),!.
+remove_comments([I|II],O):- is_comment(I),!,remove_comments(II,O).
+remove_comments([I|II],[O|OO]):-remove_comments(I,O),!,remove_comments(II,OO).
+remove_comments(IO,IO).
+
+as_sexp(I,O):- as_sexp1(I,M),remove_comments(M,O).
+as_sexp1(NIL,NIL):-NIL==[],!.
+as_sexp1(Stream,Expression):- is_stream(Stream),!,must(parse_sexpr_untyped(Stream,Expression)).
+as_sexp1(s(Str),Expression):- must(parse_sexpr_untyped(string(Str),Expression)),!.
+as_sexp1(Str,Expression):- notrace(catch(text_to_string(Str,String),_,fail)),!, must(parse_sexpr_untyped(string(String),Expression)),!.
+as_sexp1(Str,Expression):- is_list(Str),!,maplist(expand_pterm_to_sterm,Str,Expression).
+as_sexp1(Str,Expression):- expand_pterm_to_sterm(Str,Expression),!.
 
 dbmsg(X):- notrace((writeln('/*'), dbmsg0(X),writeln('*/'))).
 dbmsg0(Str):- string(Str),!,colormsg1(Str,[]).
@@ -211,7 +217,7 @@ eval(Expression, Result):-
 :- use_module(library(sexpr_reader)).
 :- endif.
 */
-read_and_parse(Expr):- current_input(In),parse_sexpr_untyped(In, Expr).
+read_and_parse(Expr):-  current_input(In),parse_sexpr_untyped(In, Expr).
 
 
 is_keyword_p(X):- atom(X),atom_concat(':',_,X).

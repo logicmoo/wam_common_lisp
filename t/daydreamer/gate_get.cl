@@ -40,7 +40,7 @@
 (load "gate_cx")
 (load "gate_instan")
 (load "gate_prove")
-(load "gate_read_pr")
+; (load "gate_read_pr")
 (load "gate_unify")
 (load "gate_utils")
 
