@@ -98,20 +98,25 @@ atomics_to_strings([A|L],[S|StrS]):-atom_string(A,S),!,atomics_to_strings(L,StrS
 atomics_to_strings([],[]).
 
 create_kw(Name,Symbol):- atom_concat(':',Make,Name),!,create_kw(Make,Symbol).
-create_kw(Name,Symbol):- downcase_atom(Name,Lower),
+create_kw(Name,Symbol):- string_upper(Name,Lower),
    atom_concat('kw_',Name,Symbol),
-   asserta(symbol_info(Symbol,keyword,name,Lower)),
-   asserta(symbol_info(Symbol,keyword,package,kw_external)).
+   asserta(symbol_info(Symbol,pkg_kw,name,Lower)),
+   asserta(symbol_info(Symbol,pkg_kw,package,kw_external)).
   
-atom_symbol(SymbolName,Symbol):- reading_package(Package),atom_symbol(SymbolName,Package,Symbol).
+atom_symbol(SymbolName,Symbol):- reading_package(Package),atom_symbol(SymbolName,Package,Symbol),!.
 atom_symbol(SymbolName,Package,Symbol):- string_upper(SymbolName,SymbolNameU), 
   string_list_concat([SymbolName1|SymbolNameS],":",SymbolNameU),
   atom_symbol_s(SymbolName1,SymbolNameS,Package,Symbol),!.
 
-atom_symbol_s('#',['',_SymbolName],_UPackage,_Symbol):- throw('@TODO *** - READ from #<INPUT CONCATENATED-STREAM #<INPUT STRING-INPUT-STREAM> #<IO TERMINAL-STREAM>>: token ":BAR" after #: should contain no colon').  
-atom_symbol_s('#',[_SymbolName],_UPackage,_Symbol):- throw('@TODO gen a temp symbol').
+% KEYWORD
+atom_symbol_s("",[SymbolName],_UPackage,Symbol):- !,atom_symbol_s(SymbolName,[],pkg_kw,Symbol).
+% NO PACKAGE
+atom_symbol_s("#",["",_SymbolName],_UPackage,_Symbol):- throw('@TODO *** - READ from #<INPUT CONCATENATED-STREAM #<INPUT STRING-INPUT-STREAM> #<IO TERMINAL-STREAM>>: token ":BAR" after #: should contain no colon').  
+% NO PACKAGE
+atom_symbol_s("#",[_SymbolName],_UPackage,_Symbol):- throw('@TODO gen a temp symbol').
+
 atom_symbol_s(SymbolName,[],Package,Symbol):- find_symbol_from(SymbolName,Package,Symbol),!.
-atom_symbol_s(PName,['',SymbolName],_UPackage,Symbol):-  find_package_or_die(PName,Package),string_upper(SymbolName,StringUpper),cl_intern([StringUpper,Package],Symbol).
+atom_symbol_s(PName,["",SymbolName],_UPackage,Symbol):-  find_package_or_die(PName,Package),string_upper(SymbolName,StringUpper),cl_intern([StringUpper,Package],Symbol).
 atom_symbol_s(PName,[SymbolName],_UPackage,Symbol):- find_package_or_die(PName,Package),atom_symbol_ext_only(SymbolName,Package,Symbol).
 atom_symbol_s(SymbolName,[],Package,Symbol):- atom_string(SymbolName,String),
   string_upper(String,StringUpper),
@@ -130,11 +135,12 @@ cl_find_package(_,[]).
 
 symbol_name(PN,SN):- symbol_info(PN,_,name,SN),!.
 
-cl_symbol_name_or_string_as_upper(PN,SN):- symbol_name(PN,SN),!.
-cl_symbol_name_or_string_as_upper(S,SN):- atom(S),!,string_upper(S,SN).
+cl_symbol_name_or_string_as_upper(S,SN):- symbol_name(S,SN),!.
 cl_symbol_name_or_string_as_upper(S,SN):- string(S),!,string_upper(S,SN).
 cl_symbol_name_or_string_as_upper(S,SN):- notrace(catch(name(SN0,S),_,fail)),SN0\==S,!,cl_symbol_name_or_string_as_upper(SN0,SN).
 cl_symbol_name_or_string_as_upper(PN,SN):- compound(PN),functor(PN,_P,A),arg(A,PN,S),!, cl_symbol_name_or_string_as_upper(S,SN).
+cl_symbol_name_or_string_as_upper(S,SN):- atom_concat(':',S0,S),!,string_upper(S0,SN).
+cl_symbol_name_or_string_as_upper(S,SN):- atom(S),!,string_upper(S,SN).
 cl_symbol_name_or_string_as_upper(S,SN):- string_upper(S,SN).
 
 cl_find_symbol([Var|P],Result):-
@@ -153,7 +159,7 @@ cl_intern([Var|P],Result):-
 
   
 cl_intern(String,P,Result):- reading_package(P),find_symbol_from(String,P,Result),!.
-%cl_intern(String,P,Result):- atom_symbol_ext_only(Name,keyword,kw_internal,Symbol):-!,create_kw(Name,Symbol),!.
+%cl_intern(String,P,Result):- atom_symbol_ext_only(Name,pkg_kw,kw_internal,Symbol):-!,create_kw(Name,Symbol),!.
 cl_intern(String,P,Result):- symbol_case_name(String,P,Symbol),
    asserta(symbol_info(Symbol,P,name,String)),
    asserta(symbol_info(Symbol,P,package,kw_internal)),
