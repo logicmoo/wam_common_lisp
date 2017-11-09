@@ -114,6 +114,7 @@ symbol_value_or(Env,Var,G,Value):-
       ; (symbol_value(Var,Value) -> true;  G).
 
 symbol_value(Var,Value):- symp:symbol_info(Var, _Package, constant, Value)-> true; symp:symbol_info(Var, _Package, variable, Value).
+symbol_value(Var,Value):- symp:symbol_info(Var, pkg_kw,_,_),!,Value=Var.
 
 
 set_symbol_value(Env,Var,Result):-var(Result),!,symbol_value(Env,Var,Result).

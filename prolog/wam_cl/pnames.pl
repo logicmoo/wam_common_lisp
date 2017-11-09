@@ -100,11 +100,12 @@ atomics_to_strings([],[]).
 create_kw(Name,Symbol):- atom_concat(':',Make,Name),!,create_kw(Make,Symbol).
 create_kw(Name,Symbol):- string_upper(Name,Lower),
    atom_concat('kw_',Name,Symbol),
-   asserta(symbol_info(Symbol,pkg_kw,name,Lower)),
-   asserta(symbol_info(Symbol,pkg_kw,package,kw_external)).
+   asserta(symp:symbol_info(Symbol,pkg_kw,name,Lower)),
+   asserta(symp:symbol_info(Symbol,pkg_kw,package,kw_external)).
   
 atom_symbol(SymbolName,Symbol):- reading_package(Package),atom_symbol(SymbolName,Package,Symbol),!.
-atom_symbol(SymbolName,Package,Symbol):- string_upper(SymbolName,SymbolNameU), 
+atom_symbol(SymbolName,Package,Symbol):-
+  string_upper(SymbolName,SymbolNameU), 
   string_list_concat([SymbolName1|SymbolNameS],":",SymbolNameU),
   atom_symbol_s(SymbolName1,SymbolNameS,Package,Symbol),!.
 
@@ -160,9 +161,13 @@ cl_intern([Var|P],Result):-
   
 cl_intern(String,P,Result):- reading_package(P),find_symbol_from(String,P,Result),!.
 %cl_intern(String,P,Result):- atom_symbol_ext_only(Name,pkg_kw,kw_internal,Symbol):-!,create_kw(Name,Symbol),!.
+cl_intern(String,P,Result):- P=pkg_kw,!,symbol_case_name(String,P,Symbol),
+   asserta(symp:symbol_info(Symbol,P,name,String)),
+   asserta(symp:symbol_info(Symbol,P,package,kw_external)),
+   push_values([Symbol,kw_external],Result).
 cl_intern(String,P,Result):- symbol_case_name(String,P,Symbol),
-   asserta(symbol_info(Symbol,P,name,String)),
-   asserta(symbol_info(Symbol,P,package,kw_internal)),
+   asserta(symp:symbol_info(Symbol,P,name,String)),
+   asserta(symp:symbol_info(Symbol,P,package,kw_internal)),
    push_values([Symbol,kw_internal],Result).
 
 
