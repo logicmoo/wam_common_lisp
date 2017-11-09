@@ -92,6 +92,11 @@ find_package_or_die(X,Y):- find_package(X,Y) -> true ; throw(find_package_or_die
 
 find_package(S,P):- cl_find_package([S],ugly(package,P)).
 
+
+string_list_concat(StrS,Sep,String):- atomic_list_concat(L,Sep,String),atomics_to_strings(L,StrS).
+atomics_to_strings([A|L],[S|StrS]):-atom_string(A,S),!,atomics_to_strings(L,StrS).
+atomics_to_strings([],[]).
+
 create_kw(Name,Symbol):- atom_concat(':',Make,Name),!,create_kw(Make,Symbol).
 create_kw(Name,Symbol):- downcase_atom(Name,Lower),
    atom_concat('kw_',Name,Symbol),
@@ -99,10 +104,8 @@ create_kw(Name,Symbol):- downcase_atom(Name,Lower),
    asserta(symbol_info(Symbol,keyword,package,kw_external)).
   
 atom_symbol(SymbolName,Symbol):- reading_package(Package),atom_symbol(SymbolName,Package,Symbol).
-atom_symbol(end_of_file,_,end_of_file):-!.
-%atom_symbol('prolog.',_,make):-!.
-%atom_symbol('prolog.',_,prolog):-!.
-atom_symbol(SymbolName,Package,Symbol):- atomic_list_concat([SymbolName1|SymbolNameS],':',SymbolName),
+atom_symbol(SymbolName,Package,Symbol):- string_upper(SymbolName,SymbolNameU), 
+  string_list_concat([SymbolName1|SymbolNameS],":",SymbolNameU),
   atom_symbol_s(SymbolName1,SymbolNameS,Package,Symbol),!.
 
 atom_symbol_s('#',['',_SymbolName],_UPackage,_Symbol):- throw('@TODO *** - READ from #<INPUT CONCATENATED-STREAM #<INPUT STRING-INPUT-STREAM> #<IO TERMINAL-STREAM>>: token ":BAR" after #: should contain no colon').  
@@ -119,25 +122,28 @@ atom_symbol_ext_only1(_SymbolName,_Package,kw_external,Symbol,Symbol):-!.
 atom_symbol_ext_only1(SymbolName,Package,kw_internal,_Result,_Symbol):- throw('symbol_not_exported'(SymbolName,Package)).
 atom_symbol_ext_only1(_SymbolName,_Package,kw_inherited,Result,Symbol):- Result=Symbol.
 
-cl_find_package([S],Obj):-
-  cl_symbol_name_or_string_as_atom(S,SN),
-  (is_lisp_package(SN)-> PN=SN ; package_nickname(PN,SN)),
+cl_find_package([S],Obj):- 
+  cl_symbol_name_or_string_as_upper(S,SN),
+  (package_name(PN,SN) ; package_nickname(PN,SN)),
   as_package_object(PN,Obj).
 cl_find_package(_,[]).
 
-cl_symbol_name_or_string_as_atom(S,S):- atom(S),!.
-cl_symbol_name_or_string_as_atom(S,SN):- notrace(catch(name(SN0,S),_,fail)),SN0\==S,!,cl_symbol_name_or_string_as_atom(SN0,SN).
-cl_symbol_name_or_string_as_atom(PN,SN):- compound(PN),functor(PN,_P,A),arg(A,PN,S),!, cl_symbol_name_or_string_as_atom(S,SN).
-cl_symbol_name_or_string_as_atom(PN,SN):- symbol_package_name(PN,_,SN0),!,cl_symbol_name_or_string_as_atom(SN0,SN).
-cl_symbol_name_or_string_as_atom(S,SN):- name(SN,S).
+symbol_name(PN,SN):- symbol_info(PN,_,name,SN),!.
+
+cl_symbol_name_or_string_as_upper(PN,SN):- symbol_name(PN,SN),!.
+cl_symbol_name_or_string_as_upper(S,SN):- atom(S),!,string_upper(S,SN).
+cl_symbol_name_or_string_as_upper(S,SN):- string(S),!,string_upper(S,SN).
+cl_symbol_name_or_string_as_upper(S,SN):- notrace(catch(name(SN0,S),_,fail)),SN0\==S,!,cl_symbol_name_or_string_as_upper(SN0,SN).
+cl_symbol_name_or_string_as_upper(PN,SN):- compound(PN),functor(PN,_P,A),arg(A,PN,S),!, cl_symbol_name_or_string_as_upper(S,SN).
+cl_symbol_name_or_string_as_upper(S,SN):- string_upper(S,SN).
 
 cl_find_symbol([Var|P],Result):-
   ignore(P=[PP]), cl_find_symbol(Var,PP,Result).
-cl_find_symbol(String,P,Result):- name(Var,String),reading_package(P),must(find_symbol_from(Var,P,Result)).
+cl_find_symbol(String,P,Result):- notrace(catch(name(SN0,String),_,fail)), string_upper(SN0,String),reading_package(P),must(find_symbol_from(String,P,Result)).
 cl_find_symbol(_Var,_P,Result):- push_values([[],[]],Result).
 
-reading_package(P):- symbol_value('xxx_package_xxx',ugly(package,P)),!.
-reading_package('common-lisp-user').
+reading_package(P):- symbol_value('xx_package_xx',ugly(package,UP)),find_package(UP,P).
+reading_package(pkg_user).
 
 writing_package(P):- reading_package(P).
 
@@ -146,14 +152,15 @@ cl_intern([Var|P],Result):-
 
 
   
-cl_intern(String,P,Result):- downcase_atom(String,Lower),reading_package(P),find_symbol_from(Lower,P,Result),!.
+cl_intern(String,P,Result):- reading_package(P),find_symbol_from(String,P,Result),!.
 %cl_intern(String,P,Result):- atom_symbol_ext_only(Name,keyword,kw_internal,Symbol):-!,create_kw(Name,Symbol),!.
-cl_intern(String,P,Result):- downcase_atom(String,Lower),symbol_case_name(String,P,Symbol),
-   asserta(symbol_info(Symbol,P,name,Lower)),asserta(symbol_info(Symbol,P,package,kw_internal)),
+cl_intern(String,P,Result):- symbol_case_name(String,P,Symbol),
+   asserta(symbol_info(Symbol,P,name,String)),
+   asserta(symbol_info(Symbol,P,package,kw_internal)),
    push_values([Symbol,kw_internal],Result).
 
 
-find_symbol_from(Name,P,Result):- downcase_atom(Name,DCName),find_symbol_from0(DCName,P,Result).
+find_symbol_from(Name,P,Result):- find_symbol_from0(Name,P,Result).
 find_symbol_from0(Name,_,Result):- atom_concat(':',KWName,Name),!,atom_concat('kw_',KWName,SymbolCI),prologcase_name(SymbolCI,Symbol),push_values([Symbol,kw_external],Result).
 find_symbol_from0(Name,P,Result):- find_symbol_from1(Name,P,Symbol,IntExt),push_values([Symbol,IntExt],Result).
 find_symbol_from1(Name,P,Symbol,IntExt):- symbol_info(Symbol, P, name, Name), \+ package_shadowing_symbols(P, Name),!,symbol_info(Symbol, P, package, IntExt).
@@ -204,17 +211,17 @@ function_case_name(Atom,Package,ProposedName):-
   atom_concat_if_new(Prefix,Atom,CasePN),prologcase_name(CasePN,ProposedName),!.
 
 package_prefix(A,B):- no_repeats(A,package_prefix0(A,B)).
-package_prefix0('common-lisp','').
-package_prefix0('keyword','kw_').
-package_prefix0('system','sys_').
-package_prefix0('common-lisp-user','u_').
-package_prefix0('extensions','ext_').
+package_prefix0(pkg_cl,'').
+package_prefix0(pkg_kw,'kw_').
+package_prefix0(pkg_sys,'sys_').
+package_prefix0(pkg_user,'u_').
+package_prefix0(pkg_ext,'ext_').
 package_prefix0(PN,Pre):- nonvar(PN),package_nickname(Pk,PN),!,package_prefix(Pk,Pre).
-package_prefix0(Pk,Pre):- is_lisp_package(Pk),atom_concat(Pk,'_',Pre).
+package_prefix0(Pk,Pre):- is_lisp_package(Pk),atom_concat('pkg_',P,Pk),atom_concat(P,'_',Pre).
 
-package_prefix_sf('common-lisp','cl_').
+package_prefix_sf(pkg_cl,'cl_').
 package_prefix_sf(PN,Pre):- package_nickname(Pk,PN),!,package_prefix_sf(Pk,Pre).
-package_prefix_sf(Pk,Pre):-package_prefix(Pk,Pre0),atom_concat('f_',Pre0,Pre).
+package_prefix_sf(Pk,Pre):- package_prefix(Pk,Pre0),atom_concat('f_',Pre0,Pre).
 
 
 atom_concat_if_new(Prefix,Atom,NewAtom):-
