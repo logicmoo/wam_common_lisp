@@ -46,7 +46,7 @@ expand_pterm_to_sterm([X|L],[Y|Ls]):-!,expand_pterm_to_sterm(X,Y),expand_pterm_t
 expand_pterm_to_sterm(X,[F|Y]):- compound_name_arguments(X,F,L),expand_pterm_to_sterm(L,Y),!.
 expand_pterm_to_sterm(X,X).
 
-str_to_expression(Str, Expression):- lisp_add_history(Str),parse_sexpr_untyped(string(Str), Expression),!.
+str_to_expression(Str, Expression):- lisp_add_history(Str),parse_sexpr_untyped_read(string(Str), Expression),!.
 str_to_expression(Str, Expression):- with_input_from_string(Str,read_and_parse(Expression)),!.
 
 remove_comments(IO,IO):- \+ compound(IO),!.
@@ -55,12 +55,15 @@ remove_comments([I|II],[O|OO]):-remove_comments(I,O),!,remove_comments(II,OO).
 remove_comments(IO,IO).
 
 as_sexp(I,O):- as_sexp1(I,M),remove_comments(M,O).
+
 as_sexp1(NIL,NIL):-NIL==[],!.
-as_sexp1(Stream,Expression):- is_stream(Stream),!,must(parse_sexpr_untyped(Stream,Expression)).
-as_sexp1(s(Str),Expression):- must(parse_sexpr_untyped(string(Str),Expression)),!.
-as_sexp1(Str,Expression):- notrace(catch(text_to_string(Str,String),_,fail)),!, must(parse_sexpr_untyped(string(String),Expression)),!.
-as_sexp1(Str,Expression):- is_list(Str),!,maplist(expand_pterm_to_sterm,Str,Expression).
-as_sexp1(Str,Expression):- expand_pterm_to_sterm(Str,Expression),!.
+as_sexp1(Stream,Expression):- is_stream(Stream),!,must(parse_sexpr_untyped(Stream,SExpression)),!,as_sexp2(SExpression,Expression).
+as_sexp1(s(Str),Expression):- !, must(parse_sexpr_untyped(string(Str),SExpression)),!,as_sexp2(SExpression,Expression).
+as_sexp1(Str,Expression):- notrace(catch(text_to_string(Str,String),_,fail)),!, must(parse_sexpr_untyped(string(String),SExpression)),!,as_sexp2(SExpression,Expression).
+as_sexp1(Str,Expression):- as_sexp2(Str,Expression),!.
+
+as_sexp2(Str,Expression):- is_list(Str),!,maplist(expand_pterm_to_sterm,Str,Expression).
+as_sexp2(Str,Expression):- expand_pterm_to_sterm(Str,Expression),!.
 
 dbmsg(X):- notrace((writeln('/*'), dbmsg0(X),writeln('*/'))).
 dbmsg0(Str):- string(Str),!,colormsg1(Str,[]).
@@ -146,21 +149,23 @@ tidy_database:-
 
 
 read_eval_print(Result):-		% dodgy use of cuts to force a single evaluation
-	read_and_parse(Expression),
-        lisp_add_history(Expression),
+	read_no_parse(Expression),
         catch((
-        eval(Expression,Result),
-	writeExpression(Result)),E,dmsg(uncaught(E))),
+           lisp_add_history(Expression),
+           eval(Expression,Result),
+	write_results(Result)),E,dmsg(uncaught(E))),
 	!.
 
-
+write_results(Result):- 
+ writeExpression(Result),
+ ignore((nb_current('$mv_return',[Result|Push])-> writeln('ExtraValues':Push))).
 
 
 
 /*
 :- if(exists_source(library(sexpr_reader))).
 :- use_module(library(sexpr_reader)).
-read_and_parse_i(Expr):- current_input(In), parse_sexpr_untyped(In, Expr).
+read_and_parse_i(Expr):- current_input(In), parse_sexpr_untyped_read(In, Expr).
 :- endif.
 */
 
@@ -200,14 +205,19 @@ eval_int(SExpression,Result):-
   notrace(as_sexp(SExpression,Expression)),
   must_or_rtrace(eval(Expression,Result)).
 
-eval(SExpression,Result):-eval_repl(SExpression,Result).
-eval(Expression, Result):-
+eval(SExpression,Result):-eval_repl(SExpression,Result),!.
+eval(ExprS, Result):-
+   as_sexp(ExprS,ExprS1),!,
+   reader_fix_symbols(ExprS1,Expression),
+   eval2(Expression, Result).
+
+eval2(Expression, Result):-
    current_prolog_flag(lisp_compile,true),!,
    dbmsg(lisp_compile(Expression)),
    maybe_ltrace(lisp_compile(Result,Expression,Code)),  % in compile.pl
    dbmsg(Code),
    maybe_ltrace(call(Code)),!.
-eval(Expression, Result):-
+eval2(Expression, Result):-
    ensure_loaded(interp),
    lisp_global_bindings(Bindings),
    eval(Expression, Bindings, Result). % in interp.pl
@@ -217,8 +227,17 @@ eval(Expression, Result):-
 :- use_module(library(sexpr_reader)).
 :- endif.
 */
-read_and_parse(Expr):-  current_input(In),parse_sexpr_untyped(In, Expr).
+read_and_parse(Expr):-  current_input(In),parse_sexpr_untyped_read(In, Expr).
+read_no_parse(Expr):-  current_input(In),parse_sexpr_untyped(In, Expr).
+  
 
+parse_sexpr_untyped_read(In, Expr):- 
+  parse_sexpr_untyped(In,ExprS),!,
+  as_sexp(ExprS,ExprS1),!,reader_fix_symbols(ExprS1,Expr).
+
+reader_fix_symbols(ExprS1,Expr):-
+  reading_package(Package),!,
+  reader_fix_symbols(Package,ExprS1,Expr),!.
 
 is_keyword_p(X):- atom(X),atom_concat(':',_,X).
 

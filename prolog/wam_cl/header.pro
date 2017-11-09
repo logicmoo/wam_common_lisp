@@ -16,14 +16,21 @@
  *
  *******************************************************************/
 
-
+:- set_prolog_flag(verbose_load,full).
+:- set_prolog_flag(verbose,normal).
+:- set_prolog_flag(verbose_autoload,true).
 :- ensure_loaded(library(must_trace)).
 :- ensure_loaded(library(logicmoo_util_terms)).
 :- ensure_loaded(library(logicmoo_util_common)).
 %:- ensure_loaded(utils_list).
 :- ensure_loaded(utils_higher_order).
 :- ensure_loaded(library(dmsg)).
-:- require([colormsg1/1]).
+
+% :- require([colormsg1/1]).
+
+:- set_prolog_flag(verbose_load,full).
+:- set_prolog_flag(verbose,normal).
+:- set_prolog_flag(verbose_autoload,true).
 
 
 :- dynamic(tst:is_local_test/1).

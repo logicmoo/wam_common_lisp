@@ -45,10 +45,9 @@ cl_print(X,X):-writeExpression(X).
 
 % writeExpression/1 displays a lisp expression
 
-writeExpression(quit):-
-	!,
-	write('Terminating WAM-CL'),nl.
-
+writeExpression(Var):- is_ftVar(Var),!,writeln(Var).
+writeExpression([]):- writeln('NIL').
+% writeExpression(quit):- !, write('Terminating WAM-CL'),nl.
 writeExpression('$COMMENT0'([])):- 	writeln(';'),!.
 writeExpression('$COMMENT'(S)):- 	write(';'),writeln(S),!.
 writeExpression('$COMMENT1'(S)):- 	write('#|'),write(S),writeln('|#').
@@ -66,11 +65,8 @@ writeTokenL(['(', ')'|TokenL]):-
 	write('NIL '),
 	writeTokenL(TokenL).
 writeTokenL([Token|TokenL]):-
-	atom(Token),
-	!,
-	% lwrupr(Token, UCToken),
-        =(Token, UCToken),
-	write(UCToken),
+	atom(Token),!,
+	write_symbol_name(Token),
 	write(' '),
 	writeTokenL(TokenL).
 writeTokenL([UCToken|TokenL]):-
@@ -87,6 +83,18 @@ writeTokenL([Token|TokenL]):-
 	writeTokenL(TokenL).
 
 
+write_symbol_name(UCToken):- 
+  writing_package(WP),
+  write_symbol_name(UCToken,WP),!.
+write_symbol_name(S):-write(S).
+ 
+write_symbol_name(Symbol,WP):- symbol_info(Symbol,SP,name,S),symbol_info(Symbol,SP,package,IntExt),must(write_symbol_name(S,WP,SP,IntExt)).
+
+write_symbol_name(S,_WP,keyword,_):- write(':'),write(S).
+write_symbol_name(S,WP,SP,_):- SP==WP, !,write(S).
+write_symbol_name(S,_P,SP,kw_internal):-!, write(SP),write('::'),write(S).
+write_symbol_name(S,WP,SP,kw_external):- package_use_list(WP,SP),!,write(S).
+write_symbol_name(S,_P,SP,kw_external):- write(SP),write(':'),write(S).
 
 :- fixup_exports.
 

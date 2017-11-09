@@ -532,14 +532,24 @@ compile_body(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):- \+ atom(Funct
 
 % Operator
 compile_body(_Ctx,_Env,Result,[FunctionName | FunctionArgs], Body):- lisp_operator(FunctionName),!,
-   append(FunctionArgs, [Result], ArgsPlusResult),
+   append([FunctionArgs], [Result], ArgsPlusResult),
    debug_var([FunctionName,'_Ret'],Result),
    find_function_or_macro(FunctionName,ArgsPlusResult,ExpandedFunction),
+   % current_predicate(_,ExpandedFunction),
    Body = (ExpandedFunction).
+
+uses_exact(FunctionName,ArgInfo):-  user:arglist_info(FunctionName,_,_,ArgInfo),!,ArgInfo.complex ==0 .
+compile_body(Ctx,CallEnv,Result,[FunctionName | FunctionArgs], Body):- uses_exact(FunctionName,_ArgInfo),
+      !,
+      expand_arguments(Ctx,CallEnv,FunctionName,0,FunctionArgs,ArgBody, Args),
+      append([Args], [Result], ArgsPlusResult),
+      debug_var([FunctionName,'_Ret'],Result),      
+      find_function_or_macro(FunctionName,ArgsPlusResult,ExpandedFunction),      
+      Body = (ArgBody,ExpandedFunction).
 
 uses_rest(FunctionName,ArgInfo):-  user:arglist_info(FunctionName,_,_,ArgInfo),!,ArgInfo.complex \==0 .
 % Non built-in function expands into an explicit function call
-compile_body(Ctx,CallEnv,Result,[FunctionName | FunctionArgs], Body):- uses_rest(FunctionName,_ArgInfo),
+compile_body(Ctx,CallEnv,Result,[FunctionName | FunctionArgs], Body):- !, % uses_rest(FunctionName,_ArgInfo),
       !,
       expand_arguments(Ctx,CallEnv,FunctionName,0,FunctionArgs,ArgBody, Args),
       append([Args], [Result], ArgsPlusResult),
@@ -567,7 +577,8 @@ find_function_or_macro(FunctionName,ArgsPlusResult,ExpandedFunction):-
     length(ArgsPlusResult,Len),
     (some_function_or_macro(FunctionName,Len,['','cl_','pf_','sf_','mf_'],NewName) 
       -> ExpandedFunction =.. [NewName | ArgsPlusResult];
-    ( ExpandedFunction =.. [ FunctionName | ArgsPlusResult])).
+    (sf_package_prefix(Prefix),atom_concat(Prefix,FunctionName,SF),prologcase_name(SF,ProposedName),
+    ( ExpandedFunction =.. [ ProposedName | ArgsPlusResult]))).
 
 some_function_or_macro(FunctionName,Len,[Name|NameS],NewName):-
    atom_concat(Name,FunctionName,ProposedPName),   
@@ -575,6 +586,7 @@ some_function_or_macro(FunctionName,Len,[Name|NameS],NewName):-
     functor(P,ProposedName,Len),current_predicate(_,P),\+ predicate_property(user:P,imported_from(system)))-> ProposedName=NewName;
    some_function_or_macro(FunctionName,Len,NameS,NewName)).
 
+sf_package_prefix('cl_').
  
 must_compile_progn(Ctx,Env,Result,Forms, PreviousResult, Body):-
    must_or_rtrace(compile_progn(Ctx,Env,Result,Forms, PreviousResult,Body)).
