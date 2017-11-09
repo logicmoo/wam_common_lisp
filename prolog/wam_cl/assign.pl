@@ -104,11 +104,6 @@ symbol_value_last_chance(_Env,Var,_Result):-
 push_values([V1|Push],V1):- nb_setval('$mv_return',[V1|Push]).
 
 
-cl_constantp([S],R):- t_or_nil(is_constantp(S),R).
-
-is_constantp(S):- symp:symbol_info(S, _Package, constant, _Value).
-is_constantp(S):- symp:symbol_info(S, pkg_kw, _, _Value).
-
 
 bvof(E,L):-member(E,L).
 env_memb(E,L):-member(E,L).

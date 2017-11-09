@@ -126,9 +126,12 @@ cl_equal(A,B,Ret):- t_or_nil( A=B , Ret).
 
 
 
+is_constantp(S):- symp:symbol_info(S, _Package, constant, _Value).
+is_constantp(S):- symp:symbol_info(S, pkg_kw, _, _Value).
 
-cl_constantp(Sym,R):- t_or_nil(symbol_info(Sym,_P,constant,_),R).
-cl_boundp(Sym,R):- t_or_nil((cl_constantp(Sym,t);symbol_info(Sym,_P,variable,_)),R).
+cl_constantp([S],R):- t_or_nil(is_constantp(S),R).
+cl_boundp([Sym],R):- t_or_nil((cl_constantp([Sym],t);symp:symbol_info(Sym,_P,variable,_)),R).
+cl_fboundp([Sym],R):- t_or_nil(symp:symbol_info(Sym,_P,function,_),R).
 
 % =(A, B, R):- A \= B-> R=[] ; R=t.
 
