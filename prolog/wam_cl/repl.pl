@@ -158,7 +158,7 @@ read_eval_print(Result):-		% dodgy use of cuts to force a single evaluation
 
 write_results(Result):- 
  writeExpression(Result),
- ignore((nb_current('$mv_return',[Result|Push])-> writeln('ExtraValues':Push))).
+ ignore((nb_current('$mv_return',[Result|Push])-> (write('extra-values: '),writeExpression(Push)))).
 
 
 
