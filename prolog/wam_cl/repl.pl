@@ -159,9 +159,11 @@ read_eval_print(Result):-		% dodgy use of cuts to force a single evaluation
 
 write_results(Result):- 
  writeExpression(Result),
- ignore((nb_current('$mv_return',[Result|Push])-> (write('extra-values: '),writeExpression(Push)))).
+ ignore((nb_current('$mv_return',[Result|Push])-> (write('extra-values = '),flush_output,writeExtraValues(Push)))),!,
+ nb_setval('$mv_return',[dead]).
 
-
+writeExtraValues([]):-write('none.'),nl.
+writeExtraValues(X):- maplist(writeExpression,X),flush_output,!.
 
 /*
 :- if(exists_source(library(sexpr_reader))).
@@ -236,6 +238,7 @@ parse_sexpr_untyped_read(In, Expr):-
   parse_sexpr_untyped(In,ExprS),!,
   as_sexp(ExprS,ExprS1),!,reader_fix_symbols(ExprS1,Expr).
 
+reader_fix_symbols(ExprS1,ExprS1):- current_prolog_flag(no_symbol_fix,true),!.
 reader_fix_symbols(ExprS1,Expr):-
   reading_package(Package),!,
   reader_fix_symbols(Package,ExprS1,Expr),!.

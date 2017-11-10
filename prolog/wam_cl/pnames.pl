@@ -128,14 +128,14 @@ atom_symbol_s("#",["",SymbolName],UPackage,_Symbol):- throw('@TODO *** - READ fr
 % NO PACKAGE
 atom_symbol_s("#",[SymbolName],_UPackage,Symbol):- gen_symbol(SymbolName,Symbol).
 
-atom_symbol_s(SymbolName,[],Package,Symbol):- find_symbol_from(SymbolName,Package,Symbol),!.
-atom_symbol_s(PName,["",SymbolName],_UPackage,Symbol):-  find_package_or_die(PName,Package),string_upper(SymbolName,StringUpper),cl_intern([StringUpper,Package],Symbol).
+atom_symbol_s(SymbolName,[],Package,Symbol):- find_symbol_from1(SymbolName,Package,Symbol,_),!.
+atom_symbol_s(PName,["",SymbolName],_UPackage,Symbol):-  find_package_or_die(PName,Package),string_upper(SymbolName,StringUpper),symbol_intern(StringUpper,Package,Symbol,_).
 atom_symbol_s(PName,[SymbolName],_UPackage,Symbol):- find_package_or_die(PName,Package),atom_symbol_ext_only(SymbolName,Package,Symbol).
 atom_symbol_s(SymbolName,[],Package,Symbol):- atom_string(SymbolName,String),
   string_upper(String,StringUpper),
-  cl_intern(StringUpper,Package,Symbol).
+  symbol_intern(StringUpper,Package,Symbol,_).
 
-atom_symbol_ext_only(SymbolName,Package,Symbol):- find_symbol_from1(SymbolName,Package,Result,KW),!,atom_symbol_ext_only1(SymbolName,Package,KW,Result,Symbol).
+atom_symbol_ext_only(SymbolName,Package,Symbol):- find_symbol_from1(SymbolName,Package,Result,IntExt),!,atom_symbol_ext_only1(SymbolName,Package,IntExt,Result,Symbol).
 atom_symbol_ext_only1(_SymbolName,_Package,kw_external,Symbol,Symbol):-!.
 atom_symbol_ext_only1(SymbolName,Package,kw_internal,_Result,_Symbol):- throw('symbol_not_exported'(SymbolName,Package)).
 atom_symbol_ext_only1(_SymbolName,_Package,kw_inherited,Result,Symbol):- Result=Symbol.
@@ -146,7 +146,8 @@ cl_symbol_name(Symbol,Name):- symp:symbol_info(Symbol,_,name,Name),!.
 cl_symbol_package(Symbol,Package):- symp:symbol_info(Symbol,Package,name,_),!.
 
 cl_find_symbol(String,Result):- reading_package(P), cl_find_symbol(String,P,Result).
-cl_find_symbol(String,P,Result):- reading_package(P),must(find_symbol_from(String,P,Result)).
+
+cl_find_symbol(String,P,Result):- cl_symbol_name_or_string(String,Name),find_symbol_from1(Name,P,Symbol,IntExt),push_values([Symbol,IntExt],Result),!.
 cl_find_symbol(_Var,_P,Result):- push_values([[],[]],Result).
 
 is_constantp(S):- symp:symbol_info(S, _Package, constant, _Value).
@@ -189,23 +190,25 @@ writing_package(P):- reading_package(P).
 
 
 cl_intern(Var,Result):- reading_package(P),cl_intern(Var,P,Result).
-  
-cl_intern(String,P,Result):- reading_package(P),find_symbol_from(String,P,Result),!.
+cl_intern(Name,P,Result):- cl_symbol_name_or_string(Name,String),cl_intern0(String,P,Symbol,IntExt),
+      push_values([Symbol,IntExt],Result),!.
+
+symbol_intern(String,P,Symbol,IntExt):- find_symbol_from1(String,P,Symbol,IntExt),!.
 %cl_intern(String,P,Result):- atom_symbol_ext_only(Name,pkg_kw,kw_internal,Symbol):-!,create_kw(Name,Symbol),!.
-cl_intern(String,P,Result):- P=pkg_kw,!,symbol_case_name(String,P,Symbol),
+symbol_intern(String,P,Symbol,kw_external):- P=pkg_kw,!,symbol_case_name(String,P,Symbol),
    asserta(symp:symbol_info(Symbol,P,name,String)),
-   asserta(symp:symbol_info(Symbol,P,package,kw_external)),
-   push_values([Symbol,kw_external],Result).
-cl_intern(String,P,Result):- symbol_case_name(String,P,Symbol),
+   asserta(symp:symbol_info(Symbol,P,package,kw_external)),!.   
+symbol_intern(String,P,Symbol,kw_internal):- symbol_case_name(String,P,Symbol),
    asserta(symp:symbol_info(Symbol,P,name,String)),
-   asserta(symp:symbol_info(Symbol,P,package,kw_internal)),
-   push_values([Symbol,kw_internal],Result).
+   asserta(symp:symbol_info(Symbol,P,package,kw_internal)).
+
+   
 
 
 
-find_symbol_from(Name,P,Result):- cl_symbol_name_or_string(Name,String), find_symbol_from0(String,P,Result).
-find_symbol_from0(Name,_,Result):- atom_concat(':',KWName,Name),!,atom_concat('kw_',KWName,SymbolCI),prologcase_name(SymbolCI,Symbol),push_values([Symbol,kw_external],Result).
-find_symbol_from0(Name,P,Result):- find_symbol_from1(Name,P,Symbol,IntExt),push_values([Symbol,IntExt],Result).
+
+
+find_symbol_from1(Name,_,Symbol,kw_external):- atom_concat(':',KWName,Name),!,atom_concat('kw_',KWName,SymbolCI),prologcase_name(SymbolCI,Symbol).
 find_symbol_from1(Name,P,Symbol,IntExt):- symp:symbol_info(Symbol, P, name, Name), \+ package_shadowing_symbols(P, Name),!,symp:symbol_info(Symbol, P, package, IntExt).
 find_symbol_from1(Name,PW,Symbol,kw_inherited):-  package_use_list(PW,P),symp:symbol_info(Symbol, P, name, Name), \+ package_shadowing_symbols(P, Name),symp:symbol_info(Symbol, P, package, kw_external),!.
 

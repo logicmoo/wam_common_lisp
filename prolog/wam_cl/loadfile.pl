@@ -115,8 +115,11 @@ cl_compile_file(File,t):-
   forall(between(1,2,N),with_file(do_file_pass(compile_file,N),File)).
 
 cl_grovel_file(File,t):- format('~N; Grovel.. ~w~n',[File]),
- locally(local_override(with_forms,lisp_grovel),
-  with_file(lisp_grovel,File)).
+   locally(local_override(with_forms,lisp_grovel),
+    with_file(lisp_grovel,File)).
+
+f_u_u_file_trans(File,t):-
+   with_file(lisp_compile,File).
 
 cl_load(File,T):-
   local_override(with_forms,lisp_grovel),!,format('~N; Grovel.. (LOAD ~w)~n',[File]),cl_grovel_file(File,T),!.

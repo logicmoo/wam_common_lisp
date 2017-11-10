@@ -149,14 +149,23 @@ method-combination-lambda-list::= (wholevar var*
 
 
 currently_visible_package(P):- reading_package(Package),
-  (P=Package;package_use_list(Package,P))
-  .
+  (P=Package;package_use_list(Package,P)).
+
+
+
 
 lisp_operator(defpackage).
 lisp_operator(if).
-lisp_operator(S):-is_special_op(S,P),currently_visible_package(P).
+lisp_operator('data-assrt').
+lisp_operator('define-caller-pattern').
+lisp_operator('define-variable-pattern').
+lisp_operator(u_define_caller_pattern).
+lisp_operator(f_u_define_caller_pattern).
 lisp_operator(S):-compiler_macro_left_right(S,_,_).
 lisp_operator(S):-user:macro_lambda(_Scope,S,_,_).
+lisp_operator(S):-is_special_op(S,P),currently_visible_package(P).
+%lisp_operator(S):-is_special_op(S,_P).
+
 
 is_special_op(S,P):- symbol_info(S,P,function_type,T),arg(_,v('special-operator',macro),T).
 is_special_op('%%allocate-closures', pkg_sbc).
@@ -182,6 +191,7 @@ is_special_op('return-from', pkg_cl).
 is_special_op('symbol-macrolet', pkg_cl).
 % is_special_op('truly-the', 'sb-ext').
 is_special_op('unwind-protect', pkg_cl).
+
 is_special_op(block, pkg_cl).
 is_special_op(case, pkg_cl).
 is_special_op(catch, pkg_cl).

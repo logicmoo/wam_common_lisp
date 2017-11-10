@@ -55,6 +55,7 @@ cl_cons(Item,
 	Result = [Item|List].
 
 
+cl_list(List,List).
 
 cl_plus(Num1, Num2, Result):-Result is Num1 + Num2.
 
@@ -397,7 +398,14 @@ make_accessor(cddddr).
 (cddadr x)      (cdr (cdr (car (cdr x))))        
 (cdddar x)      (cdr (cdr (cdr (car x))))        
 (cddddr x)      (cdr (cdr (cdr (cdr x))))  
+
+
+symbol_info(Sym,P,function,O),symbol_info(Sym,P,function_type,FT),symbol_info(Sym,P,name,Name),
+  format('~N% ~w (~w ~w)~n~q(A,Result):- ...\n\n',[Name,FT,P, O]),nl,fail.
+
 */      
+
+
 
 :- fixup_exports.
 

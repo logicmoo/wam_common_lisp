@@ -101,7 +101,7 @@ symbol_value_last_chance(_Env,Var,_Result):-
   lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Var).
 
 
-push_values([V1|Push],V1):- nb_setval('$mv_return',[V1|Push]).
+push_values([V1|Push],V1):- must(nonvar(Push)),nb_setval('$mv_return',[V1|Push]).
 
 
 
