@@ -72,3 +72,47 @@
 (psyminfo)
 
 
+
+
+
+(defun method-info (m)(list (METHOD-QUALIFIERS m)(MOP:METHOD-LAMBDA-LIST m)(MOP:METHOD-SPECIALIZERS m)(MOP:METHOD-FUNCTION m)))
+(defun print_whatnot (b)(princ b))
+(defun print-trip (str a b)(unless (eq a b)(princ "mop_direct('")(princ a)(princ "','")(princ str)(princ "','")(princ b )(princ "').")(terpri)))
+(defun print-subclasses (root &optional pre-print)
+(let ((class (typecase root (class root) (symbol (find-class root)) (t (class-of root)))))
+(dolist (item (mapcar #'MOP:slot-definition-name (MOP:class-direct-slots class)))(print-trip "slot" (class-name class) item))
+(dolist (item (mapcar #'class-name (MOP:class-direct-superclasses class)))(print-trip "subclass" item  (class-name class)))
+(print-trip "precedance" (class-name class) (mapcar #'class-name (cdr (MOP:class-precedence-list class))))
+(when pre-print (print-trip "subclass"  (class-name pre-print) (class-name class)))
+(dolist (item (mapcar #'method-info (MOP:class-direct-methods class)))  (print-trip "method"  (class-name class) item ))
+(dolist (item (MOP:class-direct-subclasses class))
+(print-subclasses item class))))
+(print-subclasses t)
+
+
+(defun method-info (m)
+ (list 
+  (METHOD-QUALIFIERS m)
+  (CLOS:METHOD-LAMBDA-LIST m)
+  (CLOS:METHOD-SPECIALIZERS m)
+  (CLOS:METHOD-FUNCTION m)
+  (CLOS:ACCESSOR-METHOD-SLOT-DEFINITION m)
+  (DOCUMENTATION m)))
+
+(defun print_whatnot (b)(princ b))
+(defun print-trip (str a b)(unless (eq a b)(princ "mop_direct('")(princ a)(princ "','")(princ str)(princ "','")(princ b )(princ "').")(terpri)))
+(defun print-subclasses (root &optional pre-print)
+(let ((class (typecase root
+(class root) (symbol (find-class root)) (t (class-of root)))))
+(dolist (item (mapcar #'sb-mop:slot-definition-name (sb-mop:class-direct-slots class)))
+  (print-trip "slot" (class-name class) item))
+(dolist (item (mapcar #'sb-mop:class-name (sb-mop:class-direct-superclasses class)))
+  (print-trip "subclass" item  (class-name class)))
+(print-trip "precedance" (class-name class) (mapcar #'sb-mop:class-name (cdr (sb-mop:compute-class-precedence-list class))))
+(when pre-print (print-trip "subclass"  (class-name pre-print) (class-name class)))
+; (dolist (item (mapcar #'method-info (sb-mop:class-direct-methods class)))  (print-trip "method"  (class-name class) item ))
+(dolist (item (sb-mop:class-direct-subclasses class))
+(print-subclasses item class))))
+
+(print-subclasses t)
+

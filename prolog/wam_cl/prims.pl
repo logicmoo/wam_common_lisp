@@ -24,8 +24,7 @@
 
 :- include('header.pro').
 
-
-
+prims:cl_exact.
 
 %module(_,_).
 
@@ -124,14 +123,6 @@ cl_equal(A,B,Ret):- t_or_nil( A=B , Ret).
 '1+'(N,Ret):- Ret is N + 1.
 '1-'(N,Ret):- Ret is N - 1.
 
-
-
-is_constantp(S):- symp:symbol_info(S, _Package, constant, _Value).
-is_constantp(S):- symp:symbol_info(S, pkg_kw, _, _Value).
-
-cl_constantp([S],R):- t_or_nil(is_constantp(S),R).
-cl_boundp([Sym],R):- t_or_nil((cl_constantp([Sym],t);symp:symbol_info(Sym,_P,variable,_)),R).
-cl_fboundp([Sym],R):- t_or_nil(symp:symbol_info(Sym,_P,function,_),R).
 
 % =(A, B, R):- A \= B-> R=[] ; R=t.
 

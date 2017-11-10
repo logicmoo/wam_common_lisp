@@ -148,7 +148,9 @@ method-combination-lambda-list::= (wholevar var*
 :- include('header.pro').
 
 
-currently_visible_package(_P).
+currently_visible_package(P):- reading_package(Package),
+  (P=Package;package_use_list(Package,P))
+  .
 
 lisp_operator(defpackage).
 lisp_operator(if).
@@ -157,59 +159,59 @@ lisp_operator(S):-compiler_macro_left_right(S,_,_).
 lisp_operator(S):-user:macro_lambda(_Scope,S,_,_).
 
 is_special_op(S,P):- symbol_info(S,P,function_type,T),arg(_,v('special-operator',macro),T).
-is_special_op('%%allocate-closures', 'sb-c').
-is_special_op('%cleanup-fun', 'sb-c').
-is_special_op('%escape-fun', 'sb-c').
-is_special_op('%funcall', 'sb-c').
-is_special_op('%primitive', 'sb-sys').
-is_special_op('%within-cleanup', 'sb-c').
-is_special_op('compiler-let', ext).
-is_special_op('do*', 'common-lisp').
-is_special_op('eval-when', 'common-lisp').
-is_special_op('global-function', 'sb-c').
-is_special_op('let*', 'common-lisp').
-is_special_op('load-time-value', 'common-lisp').
-is_special_op('multiple-value-bind', 'common-lisp').
-is_special_op('multiple-value-call', 'common-lisp').
-is_special_op('multiple-value-list', 'common-lisp').
-is_special_op('multiple-value-prog1', 'common-lisp').
-is_special_op('multiple-value-setq', 'common-lisp').
-is_special_op('nth-value', 'common-lisp').
-is_special_op('prog*', 'common-lisp').
-is_special_op('return-from', 'common-lisp').
-is_special_op('symbol-macrolet', 'common-lisp').
-is_special_op('truly-the', 'sb-ext').
-is_special_op('unwind-protect', 'common-lisp').
-is_special_op(block, 'common-lisp').
-is_special_op(case, 'common-lisp').
-is_special_op(catch, 'common-lisp').
-is_special_op(cond, 'common-lisp').
-is_special_op(do, 'common-lisp').
-is_special_op(dolist, 'common-lisp').
-is_special_op(dotimes, 'common-lisp').
-is_special_op(flet, 'common-lisp').
-is_special_op(function, 'common-lisp').
-is_special_op(go, 'common-lisp').
-is_special_op(if, 'common-lisp').
-is_special_op(labels, 'common-lisp').
-is_special_op(lambda, 'common-lisp').
-is_special_op(let, 'common-lisp').
-is_special_op(locally, 'common-lisp').
-is_special_op(macrolet, 'common-lisp').
-is_special_op(prog, 'common-lisp').
-is_special_op(prog1, 'common-lisp').
-is_special_op(prog2, 'common-lisp').
-is_special_op(progn, 'common-lisp').
-is_special_op(progv, 'common-lisp').
-is_special_op(psetq, 'common-lisp').
-is_special_op(quote, 'common-lisp').
-is_special_op(return, 'common-lisp').
-is_special_op(setq, 'common-lisp').
-is_special_op(tagbody, 'common-lisp').
-is_special_op(the, 'common-lisp').
-is_special_op(throw, 'common-lisp').
-is_special_op(unless, 'common-lisp').
-is_special_op(when, 'common-lisp').
+is_special_op('%%allocate-closures', pkg_sbc).
+is_special_op('%cleanup-fun', pkg_sbc).
+is_special_op('%escape-fun', pkg_sbc).
+is_special_op('%funcall', pkg_sbc).
+is_special_op('%primitive', pkg_sys).
+is_special_op('%within-cleanup', pkg_sbc).
+is_special_op('compiler-let', pkg_ext).
+is_special_op('do*', pkg_cl).
+is_special_op('eval-when', pkg_cl).
+is_special_op('global-function', pkg_sbc).
+is_special_op('let*', pkg_cl).
+is_special_op('load-time-value', pkg_cl).
+is_special_op('multiple-value-bind', pkg_cl).
+is_special_op('multiple-value-call', pkg_cl).
+is_special_op('multiple-value-list', pkg_cl).
+is_special_op('multiple-value-prog1', pkg_cl).
+is_special_op('multiple-value-setq', pkg_cl).
+is_special_op('nth-value', pkg_cl).
+is_special_op('prog*', pkg_cl).
+is_special_op('return-from', pkg_cl).
+is_special_op('symbol-macrolet', pkg_cl).
+% is_special_op('truly-the', 'sb-ext').
+is_special_op('unwind-protect', pkg_cl).
+is_special_op(block, pkg_cl).
+is_special_op(case, pkg_cl).
+is_special_op(catch, pkg_cl).
+is_special_op(cond, pkg_cl).
+is_special_op(do, pkg_cl).
+is_special_op(dolist, pkg_cl).
+is_special_op(dotimes, pkg_cl).
+is_special_op(flet, pkg_cl).
+is_special_op(function, pkg_cl).
+is_special_op(go, pkg_cl).
+is_special_op(if, pkg_cl).
+is_special_op(labels, pkg_cl).
+is_special_op(lambda, pkg_cl).
+is_special_op(let, pkg_cl).
+is_special_op(locally, pkg_cl).
+is_special_op(macrolet, pkg_cl).
+is_special_op(prog, pkg_cl).
+is_special_op(prog1, pkg_cl).
+is_special_op(prog2, pkg_cl).
+is_special_op(progn, pkg_cl).
+is_special_op(progv, pkg_cl).
+is_special_op(psetq, pkg_cl).
+is_special_op(quote, pkg_cl).
+is_special_op(return, pkg_cl).
+is_special_op(setq, pkg_cl).
+is_special_op(tagbody, pkg_cl).
+is_special_op(the, pkg_cl).
+is_special_op(throw, pkg_cl).
+is_special_op(unless, pkg_cl).
+is_special_op(when, pkg_cl).
 
 
 reserved_symbols(_Names,_PVars).

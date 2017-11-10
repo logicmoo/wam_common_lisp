@@ -22735,7 +22735,7 @@ symbol_info(sys_c43_keyword_package_c43,pkg_sys,package,kw_external).
 symbol_info(sys_c43_slot_unbound_c43,pkg_sys,constant,'#<UNBOUND>').
 symbol_info(sys_c43_slot_unbound_c43,pkg_sys,name,"+SLOT-UNBOUND+").
 symbol_info(sys_c43_slot_unbound_c43,pkg_sys,package,kw_external).
-symbol_info(sys_c43_standard_readtable_c43,pkg_sys,constant,'#<org.armedbear.lisp.Readtable@4303bc01>').
+symbol_info(sys_c43_standard_readtable_c43,pkg_sys,constant,ugly(standard_readtable,[])).
 symbol_info(sys_c43_standard_readtable_c43,pkg_sys,name,"+STANDARD-READTABLE+").
 symbol_info(sys_c43_standard_readtable_c43,pkg_sys,package,kw_internal).
 symbol_info(sys_c43_true_type_c43,pkg_sys,name,"+TRUE-TYPE+").

@@ -34,6 +34,7 @@ timel(M:X):- prolog_statistics:time(M:X).
 
 %must_or_rtrace(G):- (catch(quietly(G),E,(dbmsg(uncaught(E:-G)),!,fail))->true;(dumpST,break,ignore(rtrace(G)),dumpST,break)),!.
 
+must_or_rtrace(G):- notrace(tracing),!,G.
 must_or_rtrace(G):-
   (catch(quietly(G),E,(dbmsg(uncaught(E:-G)),catch(((dumpST,dbmsg(uncaught(E:-G)),break,ignore(rtrace(G)),dumpST,break)),_,true),!,fail))
     ->true;catch(((dumpST,break,ignore(rtrace(G)),dumpST,break)),_,true)).

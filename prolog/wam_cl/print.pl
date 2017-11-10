@@ -66,7 +66,7 @@ writeTokenL(['(', ')'|TokenL]):-
 	writeTokenL(TokenL).
 writeTokenL([Token|TokenL]):-
 	atom(Token),!,
-	write_symbol_name(Token),
+	write_atom_obj(Token),
 	write(' '),
 	writeTokenL(TokenL).
 writeTokenL([UCToken|TokenL]):-
@@ -83,6 +83,11 @@ writeTokenL([Token|TokenL]):-
 	writeTokenL(TokenL).
 
 
+
+write_atom_obj(SP):- symp:package_name(SP,Name),!,write('#<PACKAGE '),write(Name),write('>').
+write_atom_obj(Token):-
+  write_symbol_name(Token).
+
 write_symbol_name(UCToken):- 
   writing_package(WP),
   write_symbol_name(UCToken,WP),!.
@@ -90,11 +95,13 @@ write_symbol_name(S):-write(S).
  
 write_symbol_name(Symbol,WP):- symbol_info(Symbol,SP,name,S),symbol_info(Symbol,SP,package,IntExt),must(write_symbol_name(S,WP,SP,IntExt)).
 
+write_package_name(SP):- symp:package_name(SP,Name),write(Name).
+
 write_symbol_name(S,_WP,pkg_kw,_):- write(':'),write(S).
 write_symbol_name(S,WP,SP,_):- SP==WP, !,write(S).
-write_symbol_name(S,_P,SP,kw_internal):-!, write(SP),write('::'),write(S).
+write_symbol_name(S,_P,SP,kw_internal):-!, write_package_name(SP),write('::'),write(S).
 write_symbol_name(S,WP,SP,kw_external):- package_use_list(WP,SP),!,write(S).
-write_symbol_name(S,_P,SP,kw_external):- write(SP),write(':'),write(S).
+write_symbol_name(S,_P,SP,kw_external):- write_package_name(SP),write(':'),write(S).
 
 :- fixup_exports.
 
