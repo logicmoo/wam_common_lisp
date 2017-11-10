@@ -88,9 +88,6 @@ reader_fix_symbols(Package,[S|Some],[SR|SomeR]):-
   reader_fix_symbols(Package,Some,SomeR).
 reader_fix_symbols(_Package,Some,Some).
 
-find_package_or_die(X,Y):- find_package(X,Y) -> true ; throw(find_package_or_die(X,Y)).
-
-find_package(S,P):- cl_find_package([S],ugly(package,P)).
 
 
 string_list_concat(StrS,Sep,String):- atomic_list_concat(L,Sep,String),atomics_to_strings(L,StrS).
@@ -136,7 +133,7 @@ atom_symbol_s(PName,["",SymbolName],_UPackage,Symbol):-  find_package_or_die(PNa
 atom_symbol_s(PName,[SymbolName],_UPackage,Symbol):- find_package_or_die(PName,Package),atom_symbol_ext_only(SymbolName,Package,Symbol).
 atom_symbol_s(SymbolName,[],Package,Symbol):- atom_string(SymbolName,String),
   string_upper(String,StringUpper),
-  cl_intern([StringUpper,Package],Symbol).
+  cl_intern(StringUpper,Package,Symbol).
 
 atom_symbol_ext_only(SymbolName,Package,Symbol):- find_symbol_from1(SymbolName,Package,Result,KW),!,atom_symbol_ext_only1(SymbolName,Package,KW,Result,Symbol).
 atom_symbol_ext_only1(_SymbolName,_Package,kw_external,Symbol,Symbol):-!.
@@ -144,11 +141,12 @@ atom_symbol_ext_only1(SymbolName,Package,kw_internal,_Result,_Symbol):- throw('s
 atom_symbol_ext_only1(_SymbolName,_Package,kw_inherited,Result,Symbol):- Result=Symbol.
 
 
-cl_symbol_name(Symbol,Name):- symbol_info(Symbol,_,name,Name),!.
-cl_symbol_package(Symbol,Package):- symbol_info(Symbol,Package,name,_),!.
+
+cl_symbol_name(Symbol,Name):- symp:symbol_info(Symbol,_,name,Name),!.
+cl_symbol_package(Symbol,Package):- symp:symbol_info(Symbol,Package,name,_),!.
 
 cl_find_symbol(String,Result):- reading_package(P), cl_find_symbol(String,P,Result).
-cl_find_symbol(String,P,Result):- notrace(catch(name(SN0,String),_,fail)), string_upper(SN0,String),reading_package(P),must(find_symbol_from(String,P,Result)).
+cl_find_symbol(String,P,Result):- reading_package(P),must(find_symbol_from(String,P,Result)).
 cl_find_symbol(_Var,_P,Result):- push_values([[],[]],Result).
 
 is_constantp(S):- symp:symbol_info(S, _Package, constant, _Value).
@@ -161,30 +159,36 @@ cl_fboundp(Sym,R):- t_or_nil(symp:symbol_info(Sym,_P,function,_),R).
 cl_gensym(Symbol):- cl_gensym("G",Symbol).
 cl_gensym(S,Symbol):- gensym(S,SymbolName),gen_symbol(SymbolName,Symbol).
 
-cl_find_package(S,Obj):- 
-  cl_symbol_name_or_string_as_upper(S,SN),
-  (package_name(PN,SN) ; package_nickname(PN,SN)),
-  as_package_object(PN,Obj).
+
+cl_find_package(S,Obj):- find_package(S,P),!,must(as_package_object(P,Obj)).
 cl_find_package(_,[]).
 
+find_package(ugly(package,UP),P):-!,find_package(UP,P).
+find_package(S,S):- is_lisp_package(S),!.
+find_package(S,P):- 
+  cl_symbol_name_or_string_as_upper(S,SN),
+  (package_name(P,SN) ; package_nickname(P,SN)).
 
+find_package_or_die(X,Y):- find_package(X,Y) -> true ; throw(find_package_or_die(X,Y)).  
 
-cl_symbol_name_or_string_as_upper(S,SN):- cl_symbol_name(S,SN),!.
-cl_symbol_name_or_string_as_upper(S,SN):- string(S),!,string_upper(S,SN).
-cl_symbol_name_or_string_as_upper(S,SN):- notrace(catch(name(SN0,S),_,fail)),SN0\==S,!,cl_symbol_name_or_string_as_upper(SN0,SN).
-cl_symbol_name_or_string_as_upper(PN,SN):- compound(PN),functor(PN,_P,A),arg(A,PN,S),!, cl_symbol_name_or_string_as_upper(S,SN).
-cl_symbol_name_or_string_as_upper(S,SN):- atom_concat(':',S0,S),!,string_upper(S0,SN).
-cl_symbol_name_or_string_as_upper(S,SN):- atom(S),!,string_upper(S,SN).
-cl_symbol_name_or_string_as_upper(S,SN):- string_upper(S,SN).
+as_package_object(P,ugly(package,P)).
 
-reading_package(P):- symbol_value('xx_package_xx',ugly(package,UP)),find_package(UP,P).
+cl_symbol_name_or_string_as_upper(S,U):- cl_symbol_name_or_string(S,D),string_upper(D,U).
+
+cl_symbol_name_or_string(S,SN):- cl_symbol_name(S,SN),!.
+% grabs ugly objects
+cl_symbol_name_or_string(C,SN):- compound(C),\+ is_list(C),functor(C,_P,A),arg(A,C,S),!, cl_symbol_name_or_string(S,SN).
+cl_symbol_name_or_string(SS,SS):- string(SS),!.
+cl_symbol_name_or_string(S,SN):- atom_concat(':',S0,S),!,cl_symbol_name_or_string(S0,SN).
+cl_symbol_name_or_string(S,SN):- notrace(catch(text_to_string(S,SN),_,fail)),!.
+
+reading_package(P):- symbol_value('xx_package_xx',UP),find_package(UP,P).
 reading_package(pkg_user).
-
+% TODO
 writing_package(P):- reading_package(P).
 
-cl_intern(Var,Result):-
-  reading_package(P),
-  cl_intern(Var,P,Result).
+
+cl_intern(Var,Result):- reading_package(P),cl_intern(Var,P,Result).
   
 cl_intern(String,P,Result):- reading_package(P),find_symbol_from(String,P,Result),!.
 %cl_intern(String,P,Result):- atom_symbol_ext_only(Name,pkg_kw,kw_internal,Symbol):-!,create_kw(Name,Symbol),!.
@@ -198,28 +202,28 @@ cl_intern(String,P,Result):- symbol_case_name(String,P,Symbol),
    push_values([Symbol,kw_internal],Result).
 
 
-find_symbol_from(Name,P,Result):- find_symbol_from0(Name,P,Result).
+
+find_symbol_from(Name,P,Result):- cl_symbol_name_or_string(Name,String), find_symbol_from0(String,P,Result).
 find_symbol_from0(Name,_,Result):- atom_concat(':',KWName,Name),!,atom_concat('kw_',KWName,SymbolCI),prologcase_name(SymbolCI,Symbol),push_values([Symbol,kw_external],Result).
 find_symbol_from0(Name,P,Result):- find_symbol_from1(Name,P,Symbol,IntExt),push_values([Symbol,IntExt],Result).
-find_symbol_from1(Name,P,Symbol,IntExt):- symbol_info(Symbol, P, name, Name), \+ package_shadowing_symbols(P, Name),!,symbol_info(Symbol, P, package, IntExt).
-find_symbol_from1(Name,PW,Symbol,kw_inherited):-  package_use_list(PW,P),symbol_info(Symbol, P, name, Name), \+ package_shadowing_symbols(P, Name),symbol_info(Symbol, P, package, kw_external),!.
+find_symbol_from1(Name,P,Symbol,IntExt):- symp:symbol_info(Symbol, P, name, Name), \+ package_shadowing_symbols(P, Name),!,symp:symbol_info(Symbol, P, package, IntExt).
+find_symbol_from1(Name,PW,Symbol,kw_inherited):-  package_use_list(PW,P),symp:symbol_info(Symbol, P, name, Name), \+ package_shadowing_symbols(P, Name),symp:symbol_info(Symbol, P, package, kw_external),!.
 
-as_package_object(P,ugly(package,P)).
 
-% symbol_info(S,P,function_type,macro),dif(macro,FT),clause(symbol_info(S,P,function_type,FT),true)
-% ?- forall(symbol_info(Symbol,Package,Prop,Name),format('~q.~n',[symbol_info(Symbol,Package,Prop,Name)])).
-% ?- forall(symbol_package_name_data(Symbol,Package,Name),format('~q.~n',[symbol_info(Symbol,Package,name,Name)])).
-% ?- forall(symbol_package_function_data(Symbol,Package,FName),format('~q.~n',[symbol_info(Symbol,Package,function,FName)])).
+% symp:symbol_info(S,P,function_type,macro),dif(macro,FT),clause(symp:symbol_info(S,P,function_type,FT),true)
+% ?- forall(symp:symbol_info(Symbol,Package,Prop,Name),format('~q.~n',[symp:symbol_info(Symbol,Package,Prop,Name)])).
+% ?- forall(symbol_package_name_data(Symbol,Package,Name),format('~q.~n',[symp:symbol_info(Symbol,Package,name,Name)])).
+% ?- forall(symbol_package_function_data(Symbol,Package,FName),format('~q.~n',[symp:symbol_info(Symbol,Package,function,FName)])).
 
 % ?- forall(symbol_package_name(X,Y,Z),format('~q.~n',[symbol_package_name_data(X,Y,Z)])).
-symbol_package_name(Symbol,Package,Name):- symbol_info(Symbol,Package,name,Name).
+symbol_package_name(Symbol,Package,Name):- symp:symbol_info(Symbol,Package,name,Name).
 /*
 symbol_package_name(Symbol,Package,Name):- symbol_package_name_data(Symbol,Package,Name).
 symbol_package_name(Symbol,Package,Name):- user:old_symbol_info(Name, Package, package, _),symbol_case_name(Name,Package,Symbol), 
    \+ symbol_package_name_data(Symbol,Package,Name).
 */
 % ?- forall(symbol_package_function(X,Y,Z),format('~q.~n',[symbol_package_function_data(X,Y,Z)])).
-symbol_package_function(Symbol,Package,FName):- symbol_info(Symbol,Package,function,FName).
+symbol_package_function(Symbol,Package,FName):- symp:symbol_info(Symbol,Package,function,FName).
 /*
 symbol_package_function(Symbol,Package,FName):- symbol_package_function_data(Symbol,Package,FName).
 symbol_package_function(Symbol,Package,FName):- symbol_package_name(Symbol,Package,Name),
