@@ -295,14 +295,18 @@ sexpr((Txt))                 --> `#|`, lazy_list_location(file(_,_,I,CP)),
   {assert(t_l:s_reader_info('$COMMENT'(Txt,I,CP)))},
   sexpr((Txt)).
 */
+sexpr(['#'(quote),E])              --> `'`, !, swhite, sexpr(E).
+sexpr(['#'(backquote),E])         --> [96] , !, swhite, sexpr(E).
+sexpr(['$BQ-COMMA-ELIPSE',E]) --> `,@`, !, swhite, sexpr(E).
+sexpr('$COMMA'(E))            --> `,`, !, swhite, sexpr(E).
 sexpr(['#'(function),E])                 --> `#\'`, sexpr(E), !. %, swhite.
 sexpr('$OBJ'(vector,V))                 --> `#(`, !, sexpr_vector(V,`)`),!, swhite,!.
 sexpr('$OBJ'(vugly,V))                 --> `#<`, sexpr_vector(V,`>`),!, swhite.
 sexpr('$OBJ'(ugly,V))                 --> `#<`, read_string_until(V,`>`),!, swhite.
 sexpr('$OBJ'(brack_vector,V))                 --> `[`, sexpr_vector(V,`]`),!, swhite.
-sexpr('#-'(C,O)) --> `#-`,!,sexpr(C),swhite,!,file_sexpr(O).
-sexpr('#+'(C,O)) --> `#+`,!,sexpr(C),swhite,!,file_sexpr(O).
-sexpr('#P'(C)) --> `#P`,!,sexpr(C),swhite,!.
+sexpr('#-'(C,O)) --> `#-`,sexpr(C),swhite,!,file_sexpr(O).
+sexpr('#+'(C,O)) --> `#+`,sexpr(C),swhite,!,file_sexpr(O).
+sexpr('#P'(C)) --> `#P`,sexpr(C),swhite,!.
 sexpr('?'(E))              --> `?`, sexpr_dcgPeek(([C],{sym_char(C)})),!, rsymbol('?',E), swhite.
 sexpr('#'(t))                 --> `#t`, !, swhite.
 sexpr('#'(f))                 --> `#f`, !, swhite.
@@ -314,17 +318,15 @@ sexpr('#\\'(C))                 --> `#\\`,rsymbol('',C), swhite.
 sexpr('$CHAR'(C))                 --> `#\\`,!,sym_or_num(C), swhite.
 sexpr('$STRING'(""))             --> `""`,!, swhite.
 sexpr('$STRING'(Txt))                 --> `"`, !, sexpr_string(S), swhite,{text_to_string_safe(S,Txt)}.
-sexpr(['#'(quote),E])              --> `'`, !, swhite, sexpr(E).
-sexpr(['#'(backquote),E])         --> [96] , !, swhite, sexpr(E).
-sexpr(['$BQ-COMMA-ELIPSE',E]) --> `,@`, !, swhite, sexpr(E).
-sexpr('$COMMA'(E))            --> `,`, !, swhite, sexpr(E).
 sexpr(E)                      --> sym_or_num(E), swhite.
 
 sym_or_num('$COMPLEX'(L)) --> `#C(`,!, swhite, sexpr_list(L), swhite.
 sym_or_num((E)) --> snumber(S),{number_string(E,S)}.
 %sym_or_num((E)) --> unsigned_number(S),{number_string(E,S)}.
-%sym_or_num(('1+')) --> `1+`,!.
-%sym_or_num(('1-')) --> `1-`,!.
+sym_or_num(('1+')) --> `1+`,swhite,!.
+sym_or_num(('1-')) --> `1-`,swhite,!.
+sym_or_num(('#+')) --> `#+`,swhite,!.
+sym_or_num(('#-')) --> `#-`,swhite,!.
 sym_or_num(E) --> rsymbol_maybe('',E),!.
 sym_or_num('#'(E)) --> [C],{name(E,[C])}.
 

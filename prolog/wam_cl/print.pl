@@ -28,7 +28,8 @@ sexpr1('ugly'(T,X)) --> ['#<'],sexpr1(T),sexpr1(X),['>'].
 sexpr1('$COMMA'(X)) --> [','],sexpr1(X).
 sexpr1(['$COMMA',X]) --> [','],sexpr1(X).
 sexpr1(['$BQ',X])--> ['`'],sexpr1(X).
-sexpr1([X|Y]) --> !, ['('],  sexpr1(X), lisplist(Y,')').
+sexpr1([]) --> !, ['(',')'].
+sexpr1([X|Y]) --> ['('],  sexpr1(X), lisplist(Y,')').
 sexpr1(X) --> {compound(X),compound_name_arguments(X,F,ARGS)}, ['#<'],[F],lisplist(ARGS,'>').
 sexpr1(X) --> [X].
 
@@ -45,7 +46,7 @@ cl_print(X,X):-writeExpression(X).
 
 % writeExpression/1 displays a lisp expression
 
-writeExpression(Var):- is_ftVar(Var),!,writeln(Var).
+writeExpression(X):- is_ftVar(X),(get_var_name(X,N)->format('~w~w)',[N,X]);format('~w',[X])),!.
 writeExpression([]):- writeln('NIL').
 % writeExpression(quit):- !, write('Terminating WAM-CL'),nl.
 writeExpression('$COMMENT0'([])):- 	writeln(';'),!.
@@ -53,34 +54,31 @@ writeExpression('$COMMENT'(S)):- 	write(';'),writeln(S),!.
 writeExpression('$COMMENT1'(S)):- 	write('#|'),write(S),writeln('|#').
 writeExpression('$COMMENT'(S,_,_)):- 	write('#|'),write(S),writeln('|#').
 writeExpression(Expression):-
-	sexpr1(Expression, TokenL, []),
-%	write('  '),
+	sexpr1(Expression, TokenL, []), !, %	write('  '),
 	writeTokenL(TokenL),
 	nl.
 
 
 writeTokenL([]).
-writeTokenL(['(', ')'|TokenL]):-
-	!,
-	write('NIL '),
+writeTokenL(['(', ')'|TokenL]):- !,
+	write(' NIL'),
 	writeTokenL(TokenL).
+writeTokenL(['('|TokenL]):- write(' ('), writeTokenL(TokenL).
+writeTokenL([')'|TokenL]):- write(') '), writeTokenL(TokenL).
 writeTokenL([Token|TokenL]):-
-	atom(Token),!,
-	write_atom_obj(Token),
-	write(' '),
+	atom(Token),!,	
+        write_atom_obj(Token),
+        write(' '),
 	writeTokenL(TokenL).
-writeTokenL([UCToken|TokenL]):-
-	string(UCToken),
-   write(' '),
-   writeq(UCToken),	
-   write(' '),
-	writeTokenL(TokenL).
-writeTokenL([Token|TokenL]):-
-	number(Token),
-	!,
-	write(Token),
-	write(' '),
-	writeTokenL(TokenL).
+writeTokenL([UCToken|TokenL]):- string(UCToken),!,
+      write(' '),
+      writeq(UCToken),	
+      write(' '),
+      writeTokenL(TokenL).
+writeTokenL([Token|TokenL]):- number(Token),!,
+      write(Token),
+      write(' '),
+      writeTokenL(TokenL).
 
 
 

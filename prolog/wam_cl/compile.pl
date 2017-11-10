@@ -278,7 +278,7 @@ compile_body(Ctx,Env,Result,['#+',Flag,Form], Code):- !, symbol_value(Env,'*feat
 compile_body(Ctx,Env,Result,['#-',Flag,Form], Code):- !, symbol_value(Env,'*features*',List),
 ( \+ member(Flag,List) -> must_compile_body(Ctx,Env,Result,Form, Code) ; Code = true).  
 % EVAL-WHEN
-compile_body(Ctx,Env,Result,['eval-when',Flags|Forms], Code):- !, 
+compile_body(Ctx,Env,Result,['eval_when',Flags|Forms], Code):- !, 
  ((member(X,Flags),is_when(X) )
   -> must_compile_body(Ctx,Env,Result,[progn,Forms], Code) ; Code = true).
 % DEFMACRO
@@ -448,17 +448,17 @@ compile_body(_Ctx,_Env,[],['values'], nb_setval('$mv_return',[])):-!.
 :- nb_setval('$mv_return',[]).
 
 % Macro MULTIPLE-VALUE-BIND
-compile_body(Ctx,Env,Result,['multiple-value-bind',Vars,Eval1|ProgN], Body):-
+compile_body(Ctx,Env,Result,['multiple_value_bind',Vars,Eval1|ProgN], Body):-
   must_compile_body(Ctx,Env,Result,[let,Vars,[progn,Eval1,['setq-values',Vars]|ProgN]],Body).
 
 % Macro MULTIPLE-VALUE-LIST
-compile_body(Ctx,Env,Result,['multiple-value-list',Eval1], (Body,nb_current('$mv_return',Result))):-
+compile_body(Ctx,Env,Result,['multiple_value_list',Eval1], (Body,nb_current('$mv_return',Result))):-
   debug_var('MV_RETURN',Result),
   debug_var('IgnoredRet',IResult),
   must_compile_body(Ctx,Env,IResult,Eval1,Body).
 
 % Macro MULTIPLE-VALUE-CALL
-compile_body(Ctx,Env,Result,['multiple-value-call',Function|Progn], Body):-
+compile_body(Ctx,Env,Result,['multiple_value_call',Function|Progn], Body):-
   compile_body(Ctx,Env,Result,[progn,[progn|Progn],['apply',Function,['return-values']]],Body).
 
 % synthetic RETURN-VALUES -> values

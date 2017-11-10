@@ -148,14 +148,16 @@ tidy_database:-
 	asserta(lisp_global_bindings([])),
 	retractall(lambda(_, _)).
 
+show_uncaught_or_fail((A,B)):-!,show_uncaught_or_fail(A),show_uncaught_or_fail(B).
+show_uncaught_or_fail(G):- flush_all_output_safe,
+  (catch(G,E,wdmsg(uncaught(E)))*->true;(wdmsg(failed(G)),!,fail)).
 
 read_eval_print(Result):-		% dodgy use of cuts to force a single evaluation
-	read_no_parse(Expression),
-        catch((
-           lisp_add_history(Expression),
-           eval(Expression,Result),
-	write_results(Result)),E,dmsg(uncaught(E))),
-	!.
+	show_uncaught_or_fail(read_no_parse(Expression)),!,
+        show_uncaught_or_fail(lisp_add_history(Expression)),!,
+        show_uncaught_or_fail(eval(Expression,Result)),!,
+        show_uncaught_or_fail(write_results(Result)),!.
+	
 
 write_results(Result):- 
  writeExpression(Result),
@@ -230,9 +232,10 @@ eval2(Expression, Result):-
 :- use_module(library(sexpr_reader)).
 :- endif.
 */
-read_and_parse(Expr):-  current_input(In),parse_sexpr_untyped_read(In, Expr).
-read_no_parse(Expr):-  current_input(In),parse_sexpr_untyped(In, Expr).
-  
+read_and_parse(Expr):-  flush_all_output_safe,current_input(In),parse_sexpr_untyped_read(In, Expr).
+read_no_parse(Expr):-  flush_all_output_safe,current_input(In),parse_sexpr_untyped(In, Expr).
+
+flush_all_output_safe:- forall(stream_property(S,mode(write)),notrace(catch(flush_output(S),_,true))).
 
 parse_sexpr_untyped_read(In, Expr):- 
   parse_sexpr_untyped(In,ExprS),!,

@@ -98,7 +98,8 @@ find_function_or_macro_name(FunctionName,Len, ProposedName):-
   some_function_or_macro(FunctionName,Len,['','cl_','pf_','sf_','mf_','f_'],ProposedName),!.
 find_function_or_macro_name(FunctionName,_Len, ProposedName):-
     maybe_symbol_package(FunctionName,Package),
-    function_case_name(FunctionName,Package,ProposedName).
+    must(cl_symbol_name(FunctionName,Name)),
+    function_case_name(Name,Package,ProposedName).
 
 
 align_args(_FunctionName,ProposedName,Args,Result,ArgsPlusResult):- 
