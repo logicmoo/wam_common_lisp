@@ -118,9 +118,6 @@ cl_grovel_file(File,t):- format('~N; Grovel.. ~w~n',[File]),
    locally(local_override(with_forms,lisp_grovel),
     with_file(lisp_grovel,File)).
 
-f_u_u_file_trans(File,t):-
-   with_file(lisp_compile,File).
-
 cl_load(File,T):-
   local_override(with_forms,lisp_grovel),!,format('~N; Grovel.. (LOAD ~w)~n',[File]),cl_grovel_file(File,T),!.
 cl_load(File,t):-
@@ -185,6 +182,55 @@ with_file(How,File):- stream_property(_,file_name(FD)),with_fstem(FD,File,Found)
 with_file(How,FDir):- exists_directory(FDir),!,with_directory(How,FDir),!.
 with_file(How,File):- working_directory(CD,CD),with_fstem(CD,File,Found),!,with_file1(How,Found).
 
+
+f_u_file_trans(File,t):-
+   atom_concat(File,'.trans.pl',PLFile),
+   open(PLFile,write,Stream),
+   with_file(lisp_transl(Stream),File).
+
+
+
+lisp_transl(Stream,Expression):-
+  as_sexpr(Expression,SExpression),
+  writeln(Stream,'/* '),
+  portray_clause(Stream, (:- lisp_transl_e(SExpression))),
+  writeln(Stream,'*/ '),
+  lisp_transl_extra(SExpression),
+  with_output_to(Stream,lisp_transl_e(SExpression)),!.
+
+write_trans(P):- portray_clause(current_output,P).
+
+lisp_transl_extra([load,File|_]):- !, cl_transl_file(File, _Load_Ret).
+lisp_transl_extra(['compile-file',File|_]):- !, cl_transl_file(File, _Load_Ret).
+lisp_transl_extra(_).
+
+
+lisp_transl_e(Expression):- 
+   debug_var('_Ignored',Result),
+   reader_fix_symbols(Expression,FExpression),
+   lisp_compile(Result,FExpression,PrologCode),
+   must(transl_prolog_code(PrologCode)),!.
+
+
+transl_prolog_code(:- PrologCode):- !, transl_prolog_code_e(PrologCode).
+transl_prolog_code(PrologCode):- transl_prolog_code_e(PrologCode).
+  
+
+
+transl_prolog_code_e(PrologCode):- \+ compound(PrologCode),!.
+transl_prolog_code_e(cl_load(File, Load_Ret)):- !, cl_transl_file(File, Load_Ret).
+transl_prolog_code_e(cl_compile_file(File, Load_Ret)):- !, cl_transl_file(File, Load_Ret).
+transl_prolog_code_e(cl_transl_file(File, Load_Ret)):- !, cl_transl_file(File, Load_Ret).
+transl_prolog_code_e(asserta(PrologCode)):- !, transl_prolog_code_e(PrologCode).
+transl_prolog_code_e(assertz(PrologCode)):- !, transl_prolog_code_e(PrologCode).
+transl_prolog_code_e(assert(PrologCode)):- !, transl_prolog_code_e(PrologCode).
+transl_prolog_code_e((A,B)):-!, transl_prolog_code_e(A),transl_prolog_code_e(B).
+transl_prolog_code_e(MP):- strip_module(MP,_,P),functor(P,F,_),arg(_,
+  v(doc_string,macro_lambda,function_lambda,arglist_info),F),!,
+  asserta(MP),
+  write_trans(MP).
+transl_prolog_code_e(MP):- write_trans(MP).
+   
 
 make_pass(1,
  [ 'xabcl/abcl-contrib.lisp',

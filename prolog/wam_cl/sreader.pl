@@ -216,6 +216,12 @@ parse_sexpr_ascii(S, Expr) :- is_stream(S),!,parse_sexpr_stream(S,Expr),!.
 parse_sexpr_ascii(Text, Expr) :- txt_to_codes(Text,DCodes),
  clean_fromt_ws(DCodes,Codes),!, phrase(file_sexpr(Expr), Codes, []),!.
 
+parse_sexpr_ascii_as_list(Text, Expr) :- txt_to_codes(Text,DCodes),
+ clean_fromt_ws(DCodes,Codes),!,append(Codes,`)`,NCodes), 
+ phrase(sexpr_rest(Expr), NCodes, []),!.
+
+
+
 clean_fromt_ws([D|DCodes],Codes):- 
   ((\+ char_type(D,white), \+ char_type(D,end_of_line)) -> [D|DCodes]=Codes ; clean_fromt_ws(DCodes,Codes)).
 
@@ -277,9 +283,26 @@ file_sexpr(end_of_file) --> [].
 % file_sexpr('$ERROR'(S_EOF)) --> read_until_eof_e(Unitl_EOF),!,{sformat(S_EOF,'~s',[Unitl_EOF])}.
 % read_until_eof_e(Unitl_EOF,S,E):- append(S,E,Unitl_EOF),break,is_list(Unitl_EOF),!.
 
+%read_dispatch(E,[Disp,Char|In],Out):- read_dispatch_char([Disp,Char],E,In,Out). 
+read_dispatch(E,[DispatCH|In],Out):- read_dispatch_char([DispatCH],E,In,Out). 
+
+:- multifile(sread_dyn:plugin_read_dispatch_char/4).
+:- dynamic(sread_dyn:plugin_read_dispatch_char/4).
+read_dispatch_char(DispatCH,Form,In,Out):- sread_dyn:plugin_read_dispatch_char(DispatCH,Form,In,Out),!.
+read_dispatch_char(`@`,Form,In,Out):- phrase(sexpr(Form), In, Out),!.
+read_dispatch_char(DispatCH,Form,In,Out):-  wdmsg(DispatCH),trace,phrase(sexpr(Form), In, Out),!.
+read_dispatch_char(DispatCH,Form,In,Out):- trace_or_throw(throw(read_dispatch_char(DispatCH,Form,In,Out))).
+
+
+  
 
 implode_threse_vars([N='$VAR'(N)|Vars]):-!, implode_threse_vars(Vars).
 implode_threse_vars([]).
+
+ugly_sexpr('$OBJ'([S|V]))                 --> `#<`,rsymbol_maybe('',S), sexpr_vector(V,`>`),swhite,!.
+ugly_sexpr('$OBJ'(V))                 --> `#<`, sexpr_vector(V,`>`),swhite,!.
+ugly_sexpr('$OBJ'(V))                 --> `#<`, read_string_until(VS,`>`), swhite,{parse_sexpr_ascii_as_list(VS,V)},!.
+ugly_sexpr('$OBJ'(sugly,S))                 --> `#<`, read_string_until(S,`>`), swhite,!.
 
 %%  sexpr(L)// is det.
 %
@@ -287,6 +310,7 @@ sexpr(L)                      --> sblank,!,sexpr(L),!.
 sexpr(L)                      --> `(`, !, swhite, sexpr_list(L),!, swhite.
 sexpr((Expr))                 --> `{`, !, read_string_until(S,`}.`),!, swhite,
   {read_term_from_codes(S,Expr,[cycles(true),module(baseKB),double_quotes(string),variable_names(Vars)]),implode_threse_vars(Vars)}.
+
 
 /*
 sexpr((Txt))                 --> sblank,sexpr((Txt)).
@@ -301,11 +325,10 @@ sexpr(['$BQ-COMMA-ELIPSE',E]) --> `,@`, !, swhite, sexpr(E).
 sexpr('$COMMA'(E))            --> `,`, !, swhite, sexpr(E).
 sexpr(['#'(function),E])                 --> `#\'`, sexpr(E), !. %, swhite.
 sexpr('$OBJ'(vector,V))                 --> `#(`, !, sexpr_vector(V,`)`),!, swhite,!.
-sexpr('$OBJ'(vugly,V))                 --> `#<`, sexpr_vector(V,`>`),!, swhite.
-sexpr('$OBJ'(ugly,V))                 --> `#<`, read_string_until(V,`>`),!, swhite.
 sexpr('$OBJ'(brack_vector,V))                 --> `[`, sexpr_vector(V,`]`),!, swhite.
-sexpr('#-'(C,O)) --> `#-`,sexpr(C),swhite,!,file_sexpr(O).
-sexpr('#+'(C,O)) --> `#+`,sexpr(C),swhite,!,file_sexpr(O).
+sexpr(OBJ)--> ugly_sexpr(OBJ),!.
+sexpr('#-'(C,O)) --> `#-`,sexpr(C),swhite,file_sexpr(O),!.
+sexpr('#+'(C,O)) --> `#+`,sexpr(C),swhite,file_sexpr(O),!.
 sexpr('#P'(C)) --> `#P`,sexpr(C),swhite,!.
 sexpr('?'(E))              --> `?`, sexpr_dcgPeek(([C],{sym_char(C)})),!, rsymbol('?',E), swhite.
 sexpr('#'(t))                 --> `#t`, !, swhite.
@@ -313,9 +336,10 @@ sexpr('#'(f))                 --> `#f`, !, swhite.
 sexpr('#'(A))              --> `|`, !, read_string_until(S,`|`), swhite,{maybe_notrace(atom_string(A,S))}.
 sexpr('#'(E))              --> `#:`, !, rsymbol('#:',E), swhite.
 sexpr('#'(E))              --> `#$`, !, rsymbol('#$',E), swhite.
-sexpr('#'(E))              --> `&%`, !, rsymbol('#$',E), swhite.
+% KIF sexpr('#'(E))              --> `&%`, !, rsymbol('#$',E), swhite.
 sexpr('#\\'(C))                 --> `#\\`,rsymbol('',C), swhite.
 sexpr('$CHAR'(C))                 --> `#\\`,!,sym_or_num(C), swhite.
+sexpr(E)                      --> `#`,read_dispatch(E).
 sexpr('$STRING'(""))             --> `""`,!, swhite.
 sexpr('$STRING'(Txt))                 --> `"`, !, sexpr_string(S), swhite,{text_to_string_safe(S,Txt)}.
 sexpr(E)                      --> sym_or_num(E), swhite.
@@ -509,6 +533,7 @@ to_untyped('$CHAR'(S),'$CHAR'(S)):-!.
 to_untyped('$STRING'(S),(S)):-!.
 to_untyped('$COMMA'(S),'$COMMA'(O)):-to_untyped(S,O),!.
 to_untyped('$OBJ'(S),'$OBJ'(O)):-to_untyped(S,O),!.
+to_untyped('$OBJ'(Ungly,S),'$OBJ'(Ungly,O)):-to_untyped(S,O),!.
 to_untyped('$OBJ'(Ungly,S),O):-to_untyped(S,SO),!,O=..[Ungly,SO].
 to_untyped('$NUMBER'(S),O):-nonvar(S),to_number(S,O),to_untyped(S,O),!.
 to_untyped('$NUMBER'(S),'$NUMBER'(S)):-!. 
