@@ -16,7 +16,7 @@
 :- set_module(class(library)).
 :- include('header.pro').
 
-	
+
 new_cl_fixnum(X,R):-
   create_struct(cl_fixnum,[X],R),!.
 

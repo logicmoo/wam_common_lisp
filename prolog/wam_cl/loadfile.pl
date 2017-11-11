@@ -116,7 +116,7 @@ cl_compile_file(File,t):-
 
 cl_grovel_file(File,t):- format('~N; Grovel.. ~w~n',[File]),
    locally(local_override(with_forms,lisp_grovel),
-    with_file(lisp_grovel,File)).
+    with_file(lisp_grovel_in_package,File)).
 
 cl_load(File,T):-
   local_override(with_forms,lisp_grovel),!,format('~N; Grovel.. (LOAD ~w)~n',[File]),cl_grovel_file(File,T),!.
@@ -132,6 +132,10 @@ do_file_pass(_,3,Form):- lisp_compiled_eval(Form).
 % pass 4 - :execute
 do_file_pass(_,3,Form):- lisp_eval(Form).
 
+
+lisp_grovel_in_package(Form):-
+  reader_fix_symbols(Form,FForm),
+  lisp_grovel_in_package(FForm).
 
 lisp_grovel([load,File|_]):- !, cl_grovel_file(File, _Load_Ret).
 lisp_grovel(['compile-file',File|_]):- !, cl_grovel_file(File, _Load_Ret).
@@ -191,7 +195,7 @@ f_u_file_trans(File,t):-
 
 
 lisp_transl(Stream,Expression):-
-  as_sexpr(Expression,SExpression),
+  as_sexp(Expression,SExpression),
   writeln(Stream,'/* '),
   portray_clause(Stream, (:- lisp_transl_e(SExpression))),
   writeln(Stream,'*/ '),

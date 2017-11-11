@@ -60,7 +60,8 @@ as_sexp(I,O):- as_sexp1(I,M),remove_comments(M,O).
 as_sexp1(NIL,NIL):-NIL==[],!.
 as_sexp1(Stream,Expression):- is_stream(Stream),!,must(parse_sexpr_untyped(Stream,SExpression)),!,as_sexp2(SExpression,Expression).
 as_sexp1(s(Str),Expression):- !, must(parse_sexpr_untyped(string(Str),SExpression)),!,as_sexp2(SExpression,Expression).
-as_sexp1(Str,Expression):- notrace(catch(text_to_string(Str,String),_,fail)),!, must(parse_sexpr_untyped(string(String),SExpression)),!,as_sexp2(SExpression,Expression).
+as_sexp1(Str,Expression):- notrace(catch(text_to_string(Str,String),_,fail)),!, 
+    must_or_rtrace(parse_sexpr_untyped(string(String),SExpression)),!,as_sexp2(SExpression,Expression).
 as_sexp1(Str,Expression):- as_sexp2(Str,Expression),!.
 
 as_sexp2(Str,Expression):- is_list(Str),!,maplist(expand_pterm_to_sterm,Str,Expression).
@@ -85,30 +86,30 @@ colormsg1(Msg,Args):- mesg_color(Msg,Ctrl),!,ansicall(Ctrl,format(Msg,Args)).
 colormsg1(Msg):- mesg_color(Msg,Ctrl),!,ansicall(Ctrl,fmt90(Msg)).
 
 print_eval_string(Str):-
-  str_to_expression(Str, Expression),
+   str_to_expression(Str, Expression),
    dmsg(print_eval_string(Expression)),
    eval(Expression, Result),!,
-   dmsg(print_Result(Result)),
-     writeExpression(Expression),
-     !.
-
+   write_results(Result),
+   writeExpression(Expression),
+   !.
 
 eval_string(Str):-
-  str_to_expression(Str, Expression),
-   timel(eval(Expression, Result)),
-        writeExpression(Result),
-     !.
+   str_to_expression(Str, Expression),
+   timel(eval(Expression, Result)),!,
+   writeExpression(Expression),
+   write_results(Result),!.
+
 
 trace_eval_string(Str):-
   str_to_expression(Str, Expression),
    redo_call_cleanup(trace,eval(Expression, Result),notrace),
-     writeExpression(Result),
+     write_results(Result),
      !.
 
 rtrace_eval_string(Str):-
   str_to_expression(Str, Expression),
    rtrace(eval(Expression, Result)),
-     writeExpression(Result),
+     write_results(Result),
      !.
 
 :- meta_predicate(with_input_from_string(+,:)).
@@ -138,7 +139,7 @@ __        ___    __  __        ____ _
 	% tidy_database,
 	repeat,
    	once(read_eval_print(Result)),
-   	Result == quit,!,
+   	Result == end_of_file,!,
    	prompt(_, Old),
    	prompts(Old1, Old2),!.
 
@@ -153,19 +154,20 @@ show_uncaught_or_fail(G):- flush_all_output_safe,
   (catch(G,E,wdmsg(uncaught(E)))*->true;(wdmsg(failed(G)),!,fail)).
 
 read_eval_print(Result):-		% dodgy use of cuts to force a single evaluation
-	show_uncaught_or_fail(read_no_parse(Expression)),!,
+        show_uncaught_or_fail(read_no_parse(Expression)),!,
         show_uncaught_or_fail(lisp_add_history(Expression)),!,
+        nb_linkval('$mv_return',[Result]),
         show_uncaught_or_fail(eval(Expression,Result)),!,
         show_uncaught_or_fail(write_results(Result)),!.
 	
 
 write_results(Result):- 
  writeExpression(Result),
- ignore((nb_current('$mv_return',[Result|Push])-> (write('extra-values = '),flush_output,writeExtraValues(Push)))),!,
- nb_setval('$mv_return',[dead]).
+ ignore((nb_current('$mv_return',[Result|Push]),writeExtraValues(Push))),
+ nl.
 
-writeExtraValues([]):-write('none.'),nl.
-writeExtraValues(X):- maplist(writeExpression,X),flush_output,!.
+writeExtraValues(X):- maplist(writeExpressionEV,X),!.
+writeExpressionEV(X):- writeln(' ;'),writeExpression(X),flush_all_output_safe.
 
 /*
 :- if(exists_source(library(sexpr_reader))).
@@ -251,8 +253,10 @@ is_keyword_p(X):- atom(X),atom_concat(':',_,X).
 :- use_module(library('dialect/sicstus/arrays')).
 % :- use_module(library('dialect/sicstus')).
 is_self_evaluationing_object(X):- var(X),!.
-is_self_evaluationing_object(X):- atomic(X),!,(number(X);is_keyword_p(X);string(X);(blob(X,T),T\==text);X=t;X=[]),!.
+is_self_evaluationing_object(X):- atomic(X),!,is_self_evaluationing_const(X).
 is_self_evaluationing_object(X):- (is_dict(X);is_array(X);is_rbtree(X)),!.
+
+is_self_evaluationing_const(X):- atomic(X),!,(number(X);is_keyword_p(X);string(X);(blob(X,T),T\==text);X=t;X=[]),!.
 
 
 eval_repl(nil,  []):-!.
@@ -266,22 +270,29 @@ eval_repl( X , R):- eval_repl_atom( X, R),!.
 
 maybe_ltrace(G):- current_prolog_flag(lisp_trace,true)->rtrace(G);must_or_rtrace(G).
 
-eval_repl_atom(end_of_file, quit):-!.
-eval_repl_atom(quit, quit):-!.
-eval_repl_atom(make, O):- !, must_or_rtrace((make, cl_compile_file(pack('wam_commmon_lisp/prolog/wam_cl/xabcl'),O))).
+eval_repl_atom(end_of_file, end_of_file):-!.
+eval_repl_atom(quit, end_of_file):-!.
 eval_repl_atom(prolog, t):- !, prolog.
-eval_repl_atom(debug, t):- debug(lisp(_)).
 eval_repl_atom(ltrace, t):- set_prolog_flag(lisp_trace,true).
 eval_repl_atom(noltrace, t):- set_prolog_flag(lisp_trace,false).
-eval_repl_atom(nodebug, t):- nodebug(lisp(_)).
+
+eval_repl_atom(debug, t):- debug(lisp(_)),debug,debugging.
+eval_repl_atom(nodebug, t):- nodebug(lisp(_)),nodebug,debugging.
+
+eval_repl_atom(make, O):- !, must_or_rtrace((make, cl_compile_file(pack('wam_commmon_lisp/prolog/wam_cl/xabcl'),O))).
+
 eval_repl_atom(show, t):- 
   listing([named_lambda/2,
         user:macro_lambda/4,
         lisp_global_bindings/1]).
 
+:- fixup_exports.
 
 % invoke_eval(['in-package', "SYSTEM"], In_package_Ret):
+%lisp_add_history("prolog.")
 :- initialization((lisp,prolog),main).
-:- lisp_add_history("lisp.").
+%:- lisp_add_history("lisp.").
 
-:- fixup_exports.
+:- set_prolog_flag(verbose_autoload,false).
+
+

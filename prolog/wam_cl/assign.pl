@@ -74,7 +74,7 @@ compile_symbol_getter(_Cx,Env,Value, Var,  Body):- % dumpST,break,
 	Body = (once((	env_memb(Bindings, Env),
 			bvof(bv(Var, Value0),Bindings),
 			extract_variable_value(Value0, Value, _)
-		    ;	symp:symbol_info(Var, _Package, _, Value)
+		    ;	symbol_value(Var,Value)
 		    ;	throw(ErrNo, Var)	)	)).	
 
 
@@ -114,18 +114,17 @@ symbol_value_or(Env,Var,G,Value):-
     -> extract_variable_value(Value0, Value, _)
       ; (symbol_value(Var,Value) -> true;  G).
 
-symbol_value(Var,Value):- symp:symbol_info(Var, _Package, constant, Value)-> true; symp:symbol_info(Var, _Package, variable, Value).
-symbol_value(Var,Value):- symp:symbol_info(Var, pkg_kw,_,_),!,Value=Var.
+symbol_value(Var,Value):- symb:o_p_v(Var,value,Value).
 
 
 set_symbol_value(Env,Var,Result):-var(Result),!,symbol_value(Env,Var,Result).
 set_symbol_value(Env,Var,Result):- !,
      ((	env_memb(Bindings, Env),bvof(bv(Var, Value0),Bindings))
       -> nb_setarg(1,Value0,Result)
-      ;	( (member(Type,[variable,constant]),symp:symbol_info(Var, Package, Type, Old))
-        ->      ( once(retract(symp:symbol_info(Var, Package, Type, Old))),
-                asserta(symp:symbol_info(Var, Package, Type, Result)))
-          ;  set_symbol_value_last_chance(Env,Var,Result))).
+      ;	( 
+        (symb:o_p_v(Var, value, _Old) 
+           -> asserta(symb:o_p_v(Var, value, Result)) 
+           ; set_symbol_value_last_chance(Env,Var,Result)))).
 
 set_symbol_value_last_chance(_Env,Var,Result):- nb_setval(Var,Result),!.
 set_symbol_value_last_chance(_Env,Var,_Result):- 
@@ -152,16 +151,17 @@ place_op(Env,setf, Var, [Result],  Result):- atom(Var),!,
   set_symbol_value(Env,Var, Result).
 
 %TODO Make it a constantp
-symbol_setter(_Env,defconstant, Var, Result):-
-   ( symp:symbol_info(Var, Package, TypeWas, _) -> once(retract(symp:symbol_info(Var, Package, TypeWas, _))); true),
-   asserta(symp:symbol_info(Var, Package, constant, Result)).
+symbol_setter(_Env,defconstant, Var, Result):- 
+   set_symbol_value(Var,Result),
+   add_o_p_v(Var,kw_deftype,defconstant).
 
-symbol_setter(_Env,defparameter, Var, Result):-
-   ( symp:symbol_info(Var, Package, TypeWas, _) -> once(retract(symp:symbol_info(Var, Package, TypeWas, _))); true),
-   asserta(symp:symbol_info(Var, Package, variable, Result)).
+symbol_setter(_Env,defparameter, Var, Result):- 
+   add_o_p_v(Var,kw_deftype,defparameter),
+   set_symbol_value(Var,Result).
 
-symbol_setter(_Env,defvar, Var, Result):-
-     symp:symbol_info(Var, _Package, variable, _) -> true ; asserta(symp:symbol_info(Var, _Package, variable, Result)).
+symbol_setter(_Env,defvar, Var, Result):-   
+   (symb:o_p_v(Var, value, _) -> true ; asserta(symb:o_p_v(Var, value, Result))),
+   add_o_p_v(Var,kw_deftype,defvar).
 
 symbol_setter(Env,setq, Var, Result):- !, set_symbol_value(Env,Var,Result).
 

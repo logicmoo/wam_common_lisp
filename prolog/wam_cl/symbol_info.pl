@@ -23,6 +23,7 @@
 :- dynamic package_shadowing_symbols/2.
 :- dynamic package_external_symbols/3.
 :- dynamic package_internal_symbols/3.
+:- dynamic symbol_info/4.
 :- dynamic o_p_v/3.
 
 is_lisp_package(P):- package_name(P,_). 
@@ -171,6 +172,7 @@ package_use_list(pkg_xp, pkg_cl).
 :- dynamic get_symbol_info/4.
 
 :- include('si.pro').
+%:- include('si2.pro').
 
 get_symbol_info(A,B,C,D):- symp:symbol_info(A,B,C,D).
 
@@ -180,17 +182,34 @@ non_prop(package).
 non_prop(function_type).
 
 
-symp:o_p_v(Symbol,deftype,constant):- symp:o_p_v(Symbol,package,pkg_kw).
+add_package_external_symbol(Package,Name,Symbol):- assert_if_new(symp:package_external_symbols(Package,Name,Symbol)).
+add_package_internal_symbol(Package,Name,Symbol):- Package==pkg_kw,!,add_package_external_symbol(Package,Name,Symbol).
+add_package_internal_symbol(Package,Name,Symbol):- assert_if_new(symp:package_internal_symbols(Package,Name,Symbol)).
 
-add_o_p_v(O,P,V):- ( \+ symp:o_p_v(O,P,V) -> assert(symp:o_p_v(O,P,V)) ; true).
-add_package_external_symbol(Package,Name,Symbol):- assert_if_new(package_external_symbols(Package,Name,Symbol)).
-add_package_internal_symbol(Package,Name,Symbol):- assert_if_new(package_internal_symbols(Package,Name,Symbol)).
+symp:o_p_v(Symbol,kw_deftype,defconstant):- symp:o_p_v(Symbol,package,pkg_kw).
 
+f_u_get_opv(O,Result):- findall([P|V],get_o_p_v(O,P,V),Result).
+f_u_get_opv(O,P,V):- get_o_p_v(O,P,V).
+	
+add_o_p_v_maybe(O,P,_):- symp:o_p_v(O,P,_),!.
+add_o_p_v_maybe(O,P,V):- add_o_p_v(O,P,V),!.
 
+add_o_p_v(Symbol,value,SValue):- atom(SValue),
+ (atom_contains(SValue,'(');atom_contains(SValue,' ')),
+  (as_sexp(SValue,Value)->SValue\==Value),!,add_o_p_v(Symbol,value,Value).
+
+add_o_p_v(O,P,V):- ( \+ symp:o_p_v(O,P,_) -> assert(symp:o_p_v(O,P,V)) ; true).
+
+get_o_p_v(O,_,_):- string(O),!,fail.
+get_o_p_v(O,P,V):- no_repeats(O-P,symp:o_p_v(O,P,V)).
+
+update_o_p_v(O,P,V):- ignore(retract(symp:o_p_v(O,P,_))),assert(symp:o_p_v(O,P,V)).
+
+/*
 :- 
  forall((must(get_symbol_info(S,P,function_type,type_sub(T,ST))),must(get_symbol_info(S,P,function,F))),
   ((add_o_p_v(F,typeof,T)),
-   (add_o_p_v(S,kw_compiled_as,T)),
+   (add_o_p_v(S,kw_compile_as,T)),
    (add_o_p_v(F,classof,ST)))).
 
 
@@ -203,16 +222,6 @@ add_package_internal_symbol(Package,Name,Symbol):- assert_if_new(package_interna
    add_package_internal_symbol(P,Name,Symbol)).
 
 :- 
- forall(get_symbol_info(Symbol,_,constant,Value),
-   ((add_o_p_v(Symbol,value,Value)),
-    (add_o_p_v(Symbol,kw_deftype,constant)))).
-
-:- 
- forall(get_symbol_info(Symbol,_,variable,Value),
-   ((add_o_p_v(Symbol,value,Value)),
-    (add_o_p_v(Symbol,kw_deftype,special)))).
-
-:- 
  forall(get_symbol_info(Symbol,P,_,_),(add_o_p_v(Symbol,package,P))).
 
 :- 
@@ -222,6 +231,20 @@ add_package_internal_symbol(Package,Name,Symbol):- assert_if_new(package_interna
 :- 
  forall((get_symbol_info(Symbol,_P,Prop,Value),\+non_prop(Prop)),add_o_p_v(Symbol,Prop,Value)).
 
+dov1:- 
+ forall(get_symbol_info(Symbol,_,constant,Value),
+   ((add_o_p_v_maybe(Symbol,value,Value)),
+    (add_o_p_v(Symbol,kw_deftype,defconstant)))).
+dov2:- 
+ forall(get_symbol_info(Symbol,_,variable,Value),
+   ((add_o_p_v_maybe(Symbol,value,Value)),
+    (add_o_p_v(Symbol,kw_deftype,defparameter)))).
+
+dov3:- tell(si),forall(symp:o_p_v(O,P,V),format('~q.~n',[o_p_v(O,P,V)])),
+  forall(symp:package_external_symbols(O,P,V),format('~q.~n',[package_external_symbols(O,P,V)])),
+  forall(symp:package_internal_symbols(O,P,V),format('~q.~n',[package_internal_symbols(O,P,V)])),  
+  told.
+*/
 
 :- fixup_exports.
 

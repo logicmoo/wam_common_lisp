@@ -47,7 +47,7 @@ cl_print(X,X):-writeExpression(X).
 % writeExpression/1 displays a lisp expression
 
 writeExpression(X):- is_ftVar(X),(get_var_name(X,N)->format('~w~w)',[N,X]);format('~w',[X])),!.
-writeExpression([]):- writeln('NIL').
+writeExpression([]):- write('NIL').
 % writeExpression(quit):- !, write('Terminating WAM-CL'),nl.
 writeExpression('$COMMENT0'([])):- 	writeln(';'),!.
 writeExpression('$COMMENT'(S)):- 	write(';'),writeln(S),!.
@@ -55,16 +55,26 @@ writeExpression('$COMMENT1'(S)):- 	write('#|'),write(S),writeln('|#').
 writeExpression('$COMMENT'(S,_,_)):- 	write('#|'),write(S),writeln('|#').
 writeExpression(Expression):-
 	sexpr1(Expression, TokenL, []), !, %	write('  '),
-	writeTokenL(TokenL),
-	nl.
+	writeTokenL(TokenL).
+
+no_right_padding('(').
+no_right_padding(X):-need_right_padding(X),!,fail.
+no_right_padding(Atom):- \+ atom(Atom),!,fail.
+no_right_padding(Atom):- \+ atom_length(Atom,1),!,fail.
+no_right_padding(Atom):- upcase_atom(Atom,Atom).
+need_right_padding('.').
 
 
 writeTokenL([]).
+
 writeTokenL(['(', ')'|TokenL]):- !,
-	write(' NIL'),
+	write('NIL '),
 	writeTokenL(TokenL).
+writeTokenL([NRP|TokenL]):- no_right_padding(NRP),!, write(NRP), writeTokenL(TokenL).
+writeTokenL([')', '('|TokenL]):- !, writeTokenL([')('|TokenL]).
 writeTokenL(['('|TokenL]):- write(' ('), writeTokenL(TokenL).
 writeTokenL([')'|TokenL]):- write(') '), writeTokenL(TokenL).
+
 writeTokenL([Token|TokenL]):-
 	atom(Token),!,	
         write_atom_obj(Token),

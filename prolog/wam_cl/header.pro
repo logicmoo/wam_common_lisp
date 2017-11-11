@@ -70,6 +70,9 @@
 :- ensure_loaded(prims).
 :- ensure_loaded(block_tagbody).
 :- ensure_loaded(clstructs).
+:- ensure_loaded(readtables).
+:- ensure_loaded(symbol).
+:- ensure_loaded(package).
 :- ensure_loaded(compile).
 :- ensure_loaded(compile_funop).
 :- ensure_loaded(docs).

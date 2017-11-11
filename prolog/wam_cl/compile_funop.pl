@@ -93,12 +93,12 @@ find_function_or_macro(FunctionName,Args,Result,ExpandedFunction):-
    ExpandedFunction =.. [ ProposedName | ArgsPlusResult].
    
 find_function_or_macro_name(FunctionName,_Len, ProposedName):- 
-  symbol_package_function(FunctionName,_Package,ProposedName),!.
+  get_o_p_v(FunctionName,function,ProposedName),!.
 find_function_or_macro_name(FunctionName,Len, ProposedName):-
   some_function_or_macro(FunctionName,Len,['','cl_','pf_','sf_','mf_','f_'],ProposedName),!.
 find_function_or_macro_name(FunctionName,_Len, ProposedName):-
     maybe_symbol_package(FunctionName,Package),
-    must(cl_symbol_name(FunctionName,Name)),
+    must(cl_symbol_name(FunctionName,Name)),                                
     function_case_name(Name,Package,ProposedName).
 
 
@@ -125,7 +125,7 @@ align_args(_FunctionName,_ProposedName,Args,Result,ArgsPlusResult):-
    append(Args, [Result], ArgsPlusResult).
 
 
-maybe_symbol_package(Symbol,Package):-  symp:symbol_info(Symbol,Package,_Name,_String),!.
+maybe_symbol_package(Symbol,Package):-  get_o_p_v(Symbol,package,Package),!.
 maybe_symbol_package(_Symbol,Package):- reading_package(Package).
 
 
