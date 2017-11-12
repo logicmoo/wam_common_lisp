@@ -112,16 +112,16 @@ Notes: None.
 cl_compile_file(File,T):-
   local_override(with_forms,lisp_grovel),!,format('~N; Grovel.. (COMPILE-FILE ~w)~n',[File]),cl_grovel_file(File,T),!.
 cl_compile_file(File,t):-
-  forall(between(1,2,N),with_file(do_file_pass(compile_file,N),File)).
+  forall(between(1,2,N),with_each_file(with_each_form(do_file_pass(compile_file,N)),File)).
 
 cl_grovel_file(File,t):- format('~N; Grovel.. ~w~n',[File]),
    locally(local_override(with_forms,lisp_grovel),
-    with_file(lisp_grovel_in_package,File)).
+    with_each_file(with_each_form(lisp_grovel_in_package),File)).
 
 cl_load(File,T):-
   local_override(with_forms,lisp_grovel),!,format('~N; Grovel.. (LOAD ~w)~n',[File]),cl_grovel_file(File,T),!.
 cl_load(File,t):-
-  forall(member(N,[1,3]),with_file(do_file_pass(load,N),File)).
+  forall(member(N,[1,3]),with_each_file(with_each_form(do_file_pass(load,N)),File)).
 
 % pass 1 - defmacro, arginfos
 do_file_pass(_,1,Form):- lisp_grovel(Form).
@@ -157,15 +157,14 @@ grovel_prolog_code(_).
    
 
 
+with_flist(How,List):- must_maplist(with1file(How),List).
 
+with1file(How,File):- call(How,File).
 
-with_flist(How,List):- must_maplist(with_file1(How),List).
-
-
-with_file1(_How,File):- local_override(with_forms,What),!,with_file2(What,File).
-with_file1(How,File):- with_file2(How,File).
-
-with_file2(How,File):- dmsg(with_lisp_translation(file(File),How)),with_lisp_translation(file(File),How).
+with_each_form(How,File):- local_override(with_forms,What),What\==How,!,with_each_form(What,File).
+with_each_form(How,File):-
+   dmsg(with_lisp_translation(file(File),How)),
+   with_lisp_translation(file(File),How).
 
 expand_directory_file_path(FDir,Ext,List):- directory_file_path(FDir,Ext,Mask),expand_file_name(Mask,List),List\==[Mask].
 
@@ -174,24 +173,28 @@ with_directory(How,FDir):- expand_directory_file_path(FDir,'*.lisp',List),!,with
 with_directory(How,FDir):- expand_directory_file_path(FDir,'*.lsp',List),!,with_flist(How,List).
 
 with_fstem(F,File,Found):- 
-   absolute_file_name(File,Found,[relative_to(F),extensions(['','.cl','.lisp','.lsp']),
+   absolute_file_name(File,Found,[relative_to(F),extensions(['','.cl','.lisp','.lsp','.el']),
    access(read),file_errors(fail)]),exists_file(Found).
 
-with_file(How,File):- string(File),name(Atom,File),!,with_file(How,Atom).
-with_file(How,File):- compound(File),!,absolute_file_name(File,Abs),file_directory_name(Abs,Dir),exists_directory(Dir),!,with_file(How,Abs).
-with_file(How,File):- exists_file(File),!,with_file1(How,File).
-with_file(How,FDir):- exists_directory(FDir),with_directory(How,FDir),!.
-with_file(How,Mask):- expand_file_name(Mask,List),List\==[Mask],!,with_flist(How,List).
-with_file(How,File):- stream_property(_,file_name(FD)),with_fstem(FD,File,Found),!,with_file1(How,Found).
-with_file(How,FDir):- exists_directory(FDir),!,with_directory(How,FDir),!.
-with_file(How,File):- working_directory(CD,CD),with_fstem(CD,File,Found),!,with_file1(How,Found).
+with_each_file(How,File):- string(File),name(Atom,File),!,with_each_file(How,Atom).
+with_each_file(How,File):- compound(File),!,absolute_file_name(File,Abs),file_directory_name(Abs,Dir),exists_directory(Dir),!,with_each_file(How,Abs).
+with_each_file(How,File):- exists_file(File),!,with1file(How,File).
+with_each_file(How,FDir):- exists_directory(FDir),with_directory(How,FDir),!.
+with_each_file(How,Mask):- expand_file_name(Mask,List),List\==[Mask],!,with_flist(How,List).
+with_each_file(How,File):- stream_property(_,file_name(FD)),with_fstem(FD,File,Found),!,with1file(How,Found).
+with_each_file(How,FDir):- exists_directory(FDir),!,with_directory(How,FDir),!.
+with_each_file(How,File):- working_directory(CD,CD),with_fstem(CD,File,Found),!,with1file(How,Found).
 
 
 f_u_file_trans(File,t):-
-   atom_concat(File,'.trans.pl',PLFile),
-   open(PLFile,write,Stream),
-   with_file(lisp_transl(Stream),File).
+   with_each_file(lisp_trans_file,File).
 
+lisp_trans_file(File):-
+   atom_concat(File,'.trans.pl',PLFile),
+   setup_call_cleanup(
+   open(PLFile,write,Stream),
+         with_each_form(lisp_transl(Stream),File),
+         close(Stream)).
 
 
 lisp_transl(Stream,Expression):-
@@ -202,7 +205,7 @@ lisp_transl(Stream,Expression):-
   lisp_transl_extra(SExpression),
   with_output_to(Stream,lisp_transl_e(SExpression)),!.
 
-write_trans(P):- portray_clause(current_output,P).
+write_trans(P):- fmt9(P).
 
 lisp_transl_extra([load,File|_]):- !, cl_transl_file(File, _Load_Ret).
 lisp_transl_extra(['compile-file',File|_]):- !, cl_transl_file(File, _Load_Ret).
@@ -423,7 +426,7 @@ make_pass(2,['xabcl/clos.lisp',
    'xabcl/autoloads-gen.lisp']).
 
 
-% with_file(How,File):- with_lisp_translation(File,lisp_compiled_eval).
+% with_each_file(How,File):- with_lisp_translation(File,lisp_compiled_eval).
 
 
 :- fixup_exports.

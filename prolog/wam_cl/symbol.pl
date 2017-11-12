@@ -29,6 +29,8 @@ is_constantp(Object):- is_self_evaluationing_const(Object).
 
 
 
+cl_symbolp(S,R):-  t_or_nil(is_symbolp(S),R).
+cl_keywordp(S,R):-  t_or_nil(is_keywordp(S),R).
 cl_constantp(S,R):- t_or_nil(is_constantp(S),R).
 cl_boundp(Sym,R):- t_or_nil(get_o_p_v(Sym,value,_),R).
 cl_fboundp(Sym,R):- t_or_nil(get_o_p_v(Sym,function,_),R).

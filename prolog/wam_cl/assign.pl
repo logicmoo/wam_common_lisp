@@ -37,6 +37,8 @@ compile_assigns(Ctx,Env,Result,[Defvar, Var], Body):- is_def_nil(Defvar),!,
 compile_assigns(Ctx,Env,Result,[Getf, Var| ValuesForms], Body):- is_place_op(Getf),     
 	must_maplist(expand_ctx_env_forms(Ctx,Env),ValuesForms, ValuesBody,ResultVs),
         list_to_conjuncts(ValuesBody,BodyS),
+        debug_var([Getf,'_R'],Result),
+        debug_var([Getf,'_Env'],Env),
         Body = (BodyS, place_op(Env,Getf, Var, ResultVs,Result)).
 
 compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, String], (Code,Body)):- 
@@ -49,8 +51,9 @@ compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm], Body):- is_symbol_setter(
        % (EnvIn\==[]-> true ; break),
 	!,	
 	if_must_compile_body(Ctx,Env,ResultV,ValueForm, ValueBody),
-        Body = (ValueBody, symbol_setter(Env,SetQ, Var, ResultV)),
-        ((op_return_type(SetQ,RT),RT=name) ->  =(Var,Result) ; =(ResultV,Result)).
+        ((op_return_type(SetQ,RT),RT=name) ->  =(Var,Result) ; =(ResultV,Result)),
+        Body = (ValueBody, symbol_setter(Env,SetQ, Var, ResultV)).
+        
 
 ensure_rw(V,Dict):- get_attr(V,rwstate,Dict)-> true ; (Dict = rw{r:0,w:0},put_attr(V,rwstate,Dict)).
 
@@ -59,14 +62,14 @@ rw_add(V,RW):- ensure_rw(V,Dict),arginfo_incr(RW,Dict).
 rw_get(V,RW,Value):- ensure_rw(V,Dict),get_dict(RW,Dict,Value).
 
 
-compile_symbol_getter(Ctx,Env,Result,Var, Body):- Var==mapcar,!, dbmsg(compile_symbol_getter(Ctx,Env,Result,Var, Body)), dumpST,break.
+compile_symbol_getter(Ctx,Env,Result,Var, Body):- Var==mapcar,!, dbmsg(compile_symbol_getter(Ctx,Env,Result,Var, Body)), lisp_dumpST,break.
 
 
 compile_symbol_getter(_Ctx,Env,Value, Var, Body):-  atom(Var),!,
         debug_var([Var,'_Get'],Value),
         Body = symbol_value(Env, Var, Value).   
         
-compile_symbol_getter(_Cx,Env,Value, Var,  Body):- % dumpST,break,
+compile_symbol_getter(_Cx,Env,Value, Var,  Body):- % lisp_dumpST,break,
    debug_var([Var,'_Stack'],Value0),
    debug_var([Var,'_VAL'],Value),
 	!,
@@ -151,13 +154,15 @@ place_op(Env,setf, Var, [Result],  Result):- atom(Var),!,
   set_symbol_value(Env,Var, Result).
 
 %TODO Make it a constantp
-symbol_setter(_Env,defconstant, Var, Result):- 
-   set_symbol_value(Var,Result),
+symbol_setter(Env,defconstant, Var, Result):- 
+   set_symbol_value(Env,Var,Result),
    add_o_p_v(Var,kw_deftype,defconstant).
+symbol_setter(Env,defconst, Var, Result):- 
+  symbol_setter(Env,defconstant, Var, Result).
 
-symbol_setter(_Env,defparameter, Var, Result):- 
+symbol_setter(Env,defparameter, Var, Result):- 
    add_o_p_v(Var,kw_deftype,defparameter),
-   set_symbol_value(Var,Result).
+   set_symbol_value(Env,Var,Result).
 
 symbol_setter(_Env,defvar, Var, Result):-   
    (symb:o_p_v(Var, value, _) -> true ; asserta(symb:o_p_v(Var, value, Result))),
@@ -174,6 +179,7 @@ is_symbol_setter(_Env,OP):- is_def_maybe_docs(OP).
 
 op_return_type(Op,name):- is_def_nil(Op).
 op_return_type(defconstant,name).
+op_return_type(defconst,name).
 
 is_def_nil(defparameter).
 is_def_nil(defvar).
@@ -181,6 +187,7 @@ is_def_nil(defvar).
 is_def_maybe_docs(defparameter).
 is_def_maybe_docs(defvar).
 is_def_maybe_docs(defconstant).
+is_def_maybe_docs(defconst).
 
 is_pair_op(setq).
 is_pair_op(psetq).

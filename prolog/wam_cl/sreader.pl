@@ -279,7 +279,7 @@ file_sexpr(C) --> comment_expr(C),!.
 
 file_sexpr(Expr) --> sexpr(Expr),!.
 
-file_sexpr(Expr,H,T):- dumpST,break,rtrace(phrase(file_sexpr(Expr), H,T)).
+% file_sexpr(Expr,H,T):- lisp_dumpST,break,rtrace(phrase(file_sexpr(Expr), H,T)).
 /*
 file_sexpr(Expr) --> {fail},
    sexpr_lazy_list_character_count(Location,Stream),
@@ -301,7 +301,7 @@ read_dispatch(E,[DispatCH|In],Out):- read_dispatch_char([DispatCH],E,In,Out).
 read_dispatch_char(DispatCH,Form,In,Out):- sread_dyn:plugin_read_dispatch_char(DispatCH,Form,In,Out),!.
 % read_dispatch_char(`@`,Form,In,Out):- phrase(sexpr(Form), In, Out),!.
 
-read_dispatch_error(Form,In,Out):- dumpST,trace_or_throw((read_dispatch_error(Form,In,Out))).
+read_dispatch_error(Form,In,Out):- lisp_dumpST,trace_or_throw((read_dispatch_error(Form,In,Out))).
 
 
 

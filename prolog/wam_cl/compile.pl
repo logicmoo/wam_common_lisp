@@ -100,7 +100,7 @@ lisp_compiled_eval(SExpression,Result):-
   dbmsg(lisp_compile(Expression)),
   lisp_compile(Result,Expression,Code),
   dbmsg(Code),
-  call(Code),!.
+  must_or_rtrace(call(Code)),!.
 
 
 lisp_compile(SExpression):-
@@ -117,17 +117,19 @@ lisp_compile(Result,SExpression,Body):-
    lisp_compile(toplevel,Result,SExpression,Body).
 
 lisp_compile(Env,Result,Expression,Body):- 
-   lisp_compile(ctx([]),Env,Result,Expression,Body).
+   must_or_rtrace(lisp_compile(ctx([]),Env,Result,Expression,Body)).
 
 lisp_compile(Ctx,Env,Result,SExpression,Body):- 
    notrace(as_sexp(SExpression,Expression)),
-   compile_forms(Ctx,Env,Result,[Expression],Body).
+   quietly_must_or_rtrace(compile_forms(Ctx,Env,Result,[Expression],Body)).
 
 
 compile_forms(Ctx,Env,Result,FunctionBody,Code):-
-   must_compile_progn(Ctx,Env,Result,FunctionBody,[], Body),!,
+   must_compile_progn(Ctx,Env,Result,FunctionBody, Body),!,
    body_cleanup(Body,Code).
 
+:- nop( debug_var('FirstForm',Var)),
+   nb_linkval('$compiler_PreviousResult',the(Var)).
 
 % compile_body(Ctx,Env,Result,Function, Body).
 % Expands a Lisp-like function body into its Prolog equivalent
@@ -183,7 +185,7 @@ compile_body(Ctx,Env,Result,InstrS,Code):-
   shared_lisp_compiler:plugin_expand_function_body(Ctx,Env,Result,InstrS,Code),!.
 
 % PROGN
-compile_body(Ctx,Env,Result,[progn|Forms], Body):- !, must_compile_progn(Ctx,Env,Result,Forms, [],Body).
+compile_body(Ctx,Env,Result,[progn|Forms], Body):- !, must_compile_progn(Ctx,Env,Result,Forms,Body).
 
 % SOURCE TRANSFORMATIONS
 compile_body(Ctx,Env,Result,[M|MACROLEFT], Code):- 
@@ -253,7 +255,8 @@ compile_body(_Cx,Env,Result,['`',Form], Code):-!,compile_bq(Env,Result,Form,Code
 
 % DEFUN
 compile_body(Ctx,_Env,Name,[defun,Name0,FormalParms|FunctionBody0], CompileBody):- 
-    combine_setfs(Name0,Name),
+    combine_setfs(Name0,Name1),
+    must(find_function_or_macro_name(Name1,_Len, Name)),
     must_or_rtrace(maybe_get_docs(function,Name,FunctionBody0,FunctionBody,DocCode)),
     FunctionHead=[Name|FormalParms],
     CompileBody = (% asserta((Head  :- (fail, <<==(FunctionHead , FunctionBody)))),
@@ -270,22 +273,23 @@ make_compiled(Ctx,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode):-
     if_must_compile_body(Ctx,CallEnv,Result,[progn|FunctionBody],Body0),
     body_cleanup(((CallEnv=HeadEnv,HeadCode,Body0)),BodyCode).
 
+same_symbol(OP1,OP2):- atom(OP1),atom(OP2), prologcase_name(OP1,N1),prologcase_name(OP2,N2),!, N1==N2.
 
 % #+
-compile_body(Ctx,Env,Result,['#+',Flag,Form], Code):- !, symbol_value(Env,'*features*',List),
+compile_body(Ctx,Env,Result,[OP,Flag,Form], Code):- same_symbol(OP,'#+'),!, symbol_value(Env,'*features*',List),
    (member(Flag,List) -> must_compile_body(Ctx,Env,Result,Form, Code) ; Code = true).
 % #-
-compile_body(Ctx,Env,Result,['#-',Flag,Form], Code):- !, symbol_value(Env,'*features*',List),
+compile_body(Ctx,Env,Result,[OP,Flag,Form], Code):- same_symbol(OP,'#-'),!, symbol_value(Env,'*features*',List),
 ( \+ member(Flag,List) -> must_compile_body(Ctx,Env,Result,Form, Code) ; Code = true).  
 % EVAL-WHEN
-compile_body(Ctx,Env,Result,['eval_when',Flags|Forms], Code):- !, 
+compile_body(Ctx,Env,Result,[OP,Flags|Forms], Code):-  same_symbol(OP,'eval-when'), !, 
  ((member(X,Flags),is_when(X) )
   -> must_compile_body(Ctx,Env,Result,[progn,Forms], Code) ; Code = true).
 % DEFMACRO
 compile_body(_Cx,_Ev,Name,[defmacro,Name,FormalParms|Body0], CompileBody):- !,
       maybe_get_docs(function,Name,Body0,Body,DocCode),
       CompileBody =(DocCode,retractall(user:macro_lambda(defmacro,Name,_,_)),
-	asserta(user:macro_lambda(defmacro,Name, FormalParms, Body))).
+	asserta(user:macro_lambda(defmacro,Name, FormalParms, [progn | Body]))).
 
 
 % EVAL 
@@ -302,35 +306,40 @@ combine_setfs(Name0,Name):-atomic_list_concat(Name0,-,Name).
 
 % DOLIST
 compile_body(Ctx,Env,Result,['dolist',[Var,List]|FormS], Code):- !,
-    compile_body(Ctx,Env,ResultL,List,ListBody),
-    compile_body(Ctx,Env,Result,[progn,FormS], Body),
+    must_compile_body(Ctx,Env,ResultL,List,ListBody),
+    must_compile_body(Ctx,Env,Result,[progn,FormS], Body),
     Code = (ListBody,
         forall(member(X,ResultL),
               lexically_bind(Var,X,Body))).
 
+
+must_compile_test_body(Ctx,Env,TestResult,Test,TestBody,TestResultBody):-
+  must_or_rtrace(compile_test_body(Ctx,Env,TestResult,Test,TestBody,TestResultBody)).
+
 % IF (null ...)
-compile_body(Ctx,Env,Result,[if, [null,Test], IfTrue, IfFalse], Body):-
-	!,
+compile_test_body(Ctx,Env,TestResult,[null,Test],TestBody,TestResultBody):-
+   debug_var("TestNullResult",TestResult),
    must_compile_body(Ctx,Env,TestResult,Test,  TestBody),
-   must_compile_body(Ctx,Env,TrueResult,IfTrue, TrueBody),
-   must_compile_body(Ctx,Env,FalseResult,IfFalse, FalseBody),
-        debug_var("IF",TestResult),
-        Body = (	TestBody,
-			( TestResult == []
-				-> 	TrueBody,
-					Result      = TrueResult
-				;  	FalseBody,
-					Result      = FalseResult	) ).
+   TestResultBody = (TestResult == []).
+
+% IF TEST
+compile_test_body(Ctx,Env,TestResult,Test,TestBody,TestResultBody):-
+   debug_var("TestGenericResult",TestResult),
+   must_compile_body(Ctx,Env,TestResult,Test,  TestBody),
+   TestResultBody = (TestResult \== []).
+
+
 
 % IF-3
 compile_body(Ctx,Env,Result,[if, Test, IfTrue, IfFalse], Body):-
 	!,
-   must_compile_body(Ctx,Env,TestResult,Test,  TestBody),
+        debug_var("IFTEST",TestResult),
+   compile_test_body(Ctx,Env,TestResult,Test,TestBody,TestResultBody),
    must_compile_body(Ctx,Env,TrueResult,IfTrue, TrueBody),
    must_compile_body(Ctx,Env,FalseResult,IfFalse, FalseBody),
-        debug_var("IF",TestResult),
+
         Body = (	TestBody,
-			( TestResult \= []
+			( TestResultBody
 				-> 	TrueBody,
 					Result      = TrueResult
 				;  	FalseBody,
@@ -340,11 +349,12 @@ compile_body(Ctx,Env,Result,[if, Test, IfTrue, IfFalse], Body):-
 compile_body(_Cx,_Ev,[],[cond, []], true):- !.
 compile_body(Ctx,Env,Result,[cond, [ [Test|ResultForms] |Clauses]], Body):-
 	!,
-	must_compile_body(Ctx,Env,TestResult,Test,  TestBody),
+        debug_var("CONDTEST",TestResult),
+	compile_test_body(Ctx,Env,TestResult,Test,TestBody,TestResultBody),
 	must_compile_progn(Ctx,Env,ResultFormsResult,ResultForms, TestResult, ResultFormsBody),
 	must_compile_body(Ctx,Env,ClausesResult,[cond, Clauses],  ClausesBody),
 	Body = (	TestBody,
-			( TestResult \= []
+			( TestResultBody
 				->	ResultFormsBody,
 					Result      = ResultFormsResult
 				;	ClausesBody,
@@ -382,7 +392,7 @@ compile_body(Ctx,Env,ClosureResult,[[closure,LambdaArgs,
 			AltEnv]|ActualParams],Code):-
 	!,
 	bind_formal_parameters(LambdaArgs, ActualParams, [ClosureEnvironment,AltEnv], AltEnvBindings,BindCode),
-        call(BindCode),
+        must_or_rtrace(call(BindCode)),
 	must_compile_body(Ctx,[AltEnvBindings|Env],ClosureResult,ClosureBody, Code).
 	
 
@@ -435,9 +445,9 @@ compile_body(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body):-
          Body = ( ValueBody,BindingsEnvironment=[Bindings|Env], BodyFormsBody ).
 
 % LET*
-compile_body(Ctx,Env,Result,['let*', []| BodyForms], Body):- compile_body(Ctx,Env,Result,[progn| BodyForms], Body).
-compile_body(Ctx,Env,Result,['let*', [Binding1|NewBindings]| BodyForms], Body):-
-   compile_body(Ctx,Env,Result,['let', [Binding1],[progn, ['let*', NewBindings| BodyForms]]], Body).
+compile_body(Ctx,Env,Result,[OP, []| BodyForms], Body):- same_symbol(OP,'let*'), !, compile_body(Ctx,Env,Result,[progn| BodyForms], Body).
+compile_body(Ctx,Env,Result,[OP, [Binding1|NewBindings]| BodyForms], Body):-
+   compile_body(Ctx,Env,Result,['let', [Binding1],[progn, [OP, NewBindings| BodyForms]]], Body).
 
 % VALUES (r1 . rest )
 compile_body(Ctx,Env,Result,['values',R1|EvalList], (ArgBody,Body)):-!,
@@ -448,24 +458,26 @@ compile_body(_Ctx,_Env,[],['values'], nb_setval('$mv_return',[])):-!.
 :- nb_setval('$mv_return',[]).
 
 % Macro MULTIPLE-VALUE-BIND
-compile_body(Ctx,Env,Result,['multiple_value_bind',Vars,Eval1|ProgN], Body):-
-  must_compile_body(Ctx,Env,Result,[let,Vars,[progn,Eval1,['setq-values',Vars]|ProgN]],Body).
+compile_body(Ctx,Env,Result,[OP,Vars,Eval1|ProgN], Body):- same_symbol(OP,'multiple-value-bind'),
+  must_compile_body(Ctx,Env,Result,[let,Vars,[progn,Eval1,['setqvalues',Vars]|ProgN]],Body).
 
 % Macro MULTIPLE-VALUE-LIST
-compile_body(Ctx,Env,Result,['multiple_value_list',Eval1], (Body,nb_current('$mv_return',Result))):-
+compile_body(Ctx,Env,Result,[OP,Eval1], (Body,nb_current('$mv_return',Result))):-
+  same_symbol(OP,'multiple-value-list'),
   debug_var('MV_RETURN',Result),
   debug_var('IgnoredRet',IResult),
   must_compile_body(Ctx,Env,IResult,Eval1,Body).
 
 % Macro MULTIPLE-VALUE-CALL
-compile_body(Ctx,Env,Result,['multiple_value_call',Function|Progn], Body):-
-  compile_body(Ctx,Env,Result,[progn,[progn|Progn],['apply',Function,['return-values']]],Body).
+compile_body(Ctx,Env,Result,[OP,Function|Progn], Body):-
+  same_symbol(OP,'multiple-value-call'),
+  must_compile_body(Ctx,Env,Result,[progn,[progn|Progn],['apply',Function,['returnvalues']]],Body).
 
 % synthetic RETURN-VALUES -> values
-compile_body(_Ctx,_Env,Values,['return-values'], nb_current('$mv_return',Values)).
+compile_body(_Ctx,_Env,Values,['returnvalues'], nb_current('$mv_return',Values)).
 
 % synthetic SETQ-VALUES (vars*)
-compile_body(_Ctx,Env,[],['setq-values',Vars], setq_values(Env,Vars)):-!.
+compile_body(_Ctx,Env,[],['setqvalues',Vars], setq_values(Env,Vars)):-!.
 setq_values(Env,Vars):- nb_current('$mv_return',Values),setq_values(Env,Vars,Values).
 setq_values(_Env,_,[]):-!.
 setq_values(_Env,[],_):-!.
@@ -490,19 +502,27 @@ compile_body(Ctx,Env,Result,BodyForms, Body):- compile_assigns(Ctx,Env,Result,Bo
 % SOURCE GROVEL MODE
 compile_body(_Ctx,_Env,[],_, true):- local_override(with_forms,lisp_grovel),!.
 
-compile_body(Ctx,Env,Result,BodyForms, Body):- must_or_rtrace(compile_funop(Ctx,Env,Result,BodyForms, Body)),!.
+compile_body(Ctx,Env,Result,BodyForms, Body):- quietly_must_or_rtrace(compile_funop(Ctx,Env,Result,BodyForms, Body)),!.
+
+must_compile_progn(Ctx,Env,Result,Forms, Body):-
+   local_override('$compiler_PreviousResult',the(PreviousResult)),
+   must_compile_progn(Ctx,Env,Result,Forms, PreviousResult,Body).
  
 must_compile_progn(Ctx,Env,Result,Forms, PreviousResult, Body):-
-   must_or_rtrace(compile_progn(Ctx,Env,Result,Forms, PreviousResult,Body)).
+   quietly_must_or_rtrace(compile_progn(Ctx,Env,Result,Forms, PreviousResult,Body)).
 
 compile_progn(_Cx,_Ev,Result,Var,_PreviousResult,cl_eval([progn|Var],Result)):- is_ftVar(Var),!.
 compile_progn(_Cx,_Ev,Result,[], PreviousResult,true):-!, PreviousResult = Result.
-compile_progn(Ctx,Env,Result,[Form | Forms], _PreviousResult, Body):-  !,
-	must_compile_body(Ctx,Env,FormResult, Form,FormBody),
+compile_progn(Ctx,Env,Result,[Form | Forms], PreviousResult, Body):-  !,
+   locally(
+     local_override('$compiler_PreviousResult',the(PreviousResult)),
+	must_compile_body(Ctx,Env,FormResult, Form,FormBody)),
 	must_compile_progn(Ctx,Env,Result, Forms, FormResult, FormSBody),
         Body = (FormBody,FormSBody).
-compile_progn(Ctx,Env,Result, Form , _PreviousResult, Body):-
-	must_compile_body(Ctx,Env,Result,Form, Body).
+compile_progn(Ctx,Env,Result, Form , PreviousResult, Body):-
+        locally(
+          local_override('$compiler_PreviousResult',the(PreviousResult)),
+	     must_compile_body(Ctx,Env,Result,Form, Body)).
 
 
 :- set_prolog_flag(double_quotes,string).

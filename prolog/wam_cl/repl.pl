@@ -32,12 +32,33 @@
 :- meta_predicate(timel(:)).
 timel(M:X):- prolog_statistics:time(M:X).
 
-%must_or_rtrace(G):- (catch(quietly(G),E,(dbmsg(uncaught(E:-G)),!,fail))->true;(dumpST,break,ignore(rtrace(G)),dumpST,break)),!.
+%must_or_rtrace(G):- (catch(quietly(G),E,(dbmsg(uncaught(E:-G)),!,fail))->true;(lisp_dumpST,break,ignore(rtrace(G)),lisp_dumpST,break)),!.
 
-must_or_rtrace(G):- notrace(tracing),!,G.
-must_or_rtrace(G):-
-  (catch(quietly(G),E,(dbmsg(uncaught(E:-G)),catch(((dumpST,dbmsg(uncaught(E:-G)),break,ignore(rtrace(G)),dumpST,break)),_,true),!,fail))
-    ->true;catch(((dumpST,break,ignore(rtrace(G)),dumpST,break)),_,true)).
+both_outputs(G):-
+  notrace((current_output(O),stream_property(CO,alias(user_output)),
+  (CO\==O -> with_output_to(CO,G) ; true),G)).
+
+lisp_dumpST:- both_outputs(dumpST).
+
+always_catch(G):- catch(catch(G,'$aborted',notrace),_,notrace).
+
+gripe_problem(Problem,G):- always_catch(gripe_problem0(Problem,G)).
+gripe_problem0(Problem,G):- 
+     wdmsg((Problem:-G)),
+     lisp_dumpST,
+     dbmsg((Problem:-G)),
+     (rtrace(G)*->(notrace,break);(wdmsg(failed_rtrace(G)),notrace,break,!,fail)).
+
+  
+quietly_must_or_rtrace(G):- 
+  (catch(quietly(G),E,gripe_problem(uncaught(E),G)) 
+   *-> true ; (gripe_problem(fail_must_or_rtrace_failed,G),!,fail)),!.
+
+must_or_rtrace(G):- notrace(tracing),!,
+   (catch((G),E,gripe_problem(uncaught(E),G)) 
+    *-> true ; (gripe_problem(fail_must_or_rtrace_failed,G),!,fail)),!.
+
+must_or_rtrace(G):- quietly_must_or_rtrace(G).
 
 expand_pterm_to_sterm(VAR,VAR):- notrace(is_ftVar(VAR)),!.
 expand_pterm_to_sterm('NIL',[]):-!.
@@ -67,7 +88,9 @@ as_sexp1(Str,Expression):- as_sexp2(Str,Expression),!.
 as_sexp2(Str,Expression):- is_list(Str),!,maplist(expand_pterm_to_sterm,Str,Expression).
 as_sexp2(Str,Expression):- expand_pterm_to_sterm(Str,Expression),!.
 
-dbmsg(X):- notrace((writeln('/*'), dbmsg0(X),writeln('*/'))).
+dbmsg(X):- both_outputs(dbmsg00(X)).
+
+dbmsg00(X):- notrace((writeln('/*'), dbmsg0(X),writeln('*/'))).
 dbmsg0(Str):- string(Str),!,colormsg1(Str,[]).
 dbmsg0((Textbody:-Body)):-body==Textbody,colormsg1('==>'(body)),!,dbmsg0(Body).
 dbmsg0(Var):- var(Var),!,colormsg1(dbmsg_var(Var)).
@@ -138,7 +161,8 @@ __        ___    __  __        ____ _
 	prompts('> ', '> '),
 	% tidy_database,
 	repeat,
-   	once(read_eval_print(Result)),
+        notrace,
+   	catch(once(read_eval_print(Result)),_,notrace),
    	Result == end_of_file,!,
    	prompt(_, Old),
    	prompts(Old1, Old2),!.
@@ -202,7 +226,7 @@ lisp_add_history(Expression):-
         (string_upper(S,S)->string_lower(S,Store);Store=S),
         prolog:history(user_input, add(Store)).
 
-:- set_prolog_flag(lisp_compile,true).
+:- set_prolog_flag(lisp_no_compile,false).
 eval_compiled(SExpression,Result):-
     locally(set_prolog_flag(lisp_compile,true),eval_int(SExpression,Result)).
 
@@ -219,11 +243,12 @@ eval(ExprS, Result):-
    eval2(Expression, Result).
 
 eval2(Expression, Result):-
-   current_prolog_flag(lisp_compile,true),!,
+   \+ current_prolog_flag(lisp_interpret_only,true),
+   !,
    dbmsg(lisp_compile(Expression)),
-   maybe_ltrace(lisp_compile(Result,Expression,Code)),  % in compile.pl
+   always_catch(maybe_ltrace(lisp_compile(Result,Expression,Code))),  % in compile.pl
    dbmsg(Code),
-   maybe_ltrace(call(Code)),!.
+   always_catch(ignore(must_or_rtrace(maybe_ltrace(call(Code))))),!.
 eval2(Expression, Result):-
    ensure_loaded(interp),
    lisp_global_bindings(Bindings),

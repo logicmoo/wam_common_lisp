@@ -12,7 +12,7 @@
  * The program is a *HUGE* common-lisp compiler/interpreter. 
  *
  *******************************************************************/
-:- module(funop, [compile_funop/5]).
+:- module(funop, []).
 
 :- set_module(class(library)).
 
@@ -30,11 +30,11 @@ compile_funop(Cxt,Env,RResult,[Procedure|Arguments],CompileBodyCode):-
   must_or_rtrace(expand_commas(NewEnv,CommaResult,LambdaExpression,CodeS)),
   body_cleanup_keep_debug_vars(CodeS,Code),
   dbmsg(macro(macroResult(BindCode,Code,CommaResult))),
-  (local_override(with_forms,lisp_grovel)-> (dumpST) ; true),
+  (local_override(with_forms,lisp_grovel)-> (lisp_dumpST) ; true),
   call(Code),
-  compile_body(Cxt,NextEnv,CompileBody0Result,CommaResult, MCBR),
+  must_compile_body(Cxt,NextEnv,CompileBody0Result,CommaResult, MCBR),
   call(MCBR),
-  compile_body(Cxt,NextEnv,RResult,CompileBody0Result, CompileBody),
+  must_compile_body(Cxt,NextEnv,RResult,CompileBody0Result, CompileBody),
   CompileBodyCode = (CompileBody).
 
 
@@ -98,8 +98,10 @@ find_function_or_macro_name(FunctionName,Len, ProposedName):-
   some_function_or_macro(FunctionName,Len,['','cl_','pf_','sf_','mf_','f_'],ProposedName),!.
 find_function_or_macro_name(FunctionName,_Len, ProposedName):-
     maybe_symbol_package(FunctionName,Package),
-    must(cl_symbol_name(FunctionName,Name)),                                
-    function_case_name(Name,Package,ProposedName).
+    (cl_symbol_name(FunctionName,Name) ->
+      function_case_name(Name,Package,ProposedName);
+      function_case_name(FunctionName,Package,ProposedName)).
+
 
 
 align_args(_FunctionName,ProposedName,Args,Result,ArgsPlusResult):- 
@@ -132,9 +134,11 @@ maybe_symbol_package(_Symbol,Package):- reading_package(Package).
 some_function_or_macro(FunctionName,Len,[Name|NameS],NewName):-
    atom_concat(Name,FunctionName,ProposedPName),   
    (((ProposedPName = ProposedName; prologcase_name(ProposedPName,ProposedName)),
-    functor(P,ProposedName,Len),current_predicate(_,P),\+ predicate_property(user:P,imported_from(system)))-> ProposedName=NewName;
+    guess_functor(P,ProposedName,Len),current_predicate(_,P),\+ predicate_property(user:P,imported_from(system)))-> ProposedName=NewName;
    some_function_or_macro(FunctionName,Len,NameS,NewName)).
 
+guess_functor(P,ProposedName,Len):- var(P),var(Len),!,current_predicate(ProposedName/Len),functor(P,ProposedName,Len).
+guess_functor(P,ProposedName,Len):- functor(P,ProposedName,Len).
 
-sf_package_prefix('cl_').
+:- fixup_exports.
 

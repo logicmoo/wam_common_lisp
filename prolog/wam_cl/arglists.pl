@@ -228,9 +228,15 @@ reserved_symbols(_Names,_PVars).
 as_rest(_,R,R).
 as_env(_,E,E).
 
-enforce_atomic(F):- (simple_atom_var(F)->true;(dumpST,break)).
+enforce_atomic(F):- (simple_atom_var(F)->true;(lisp_dumpST,break)).
 arginfo_incr(Prop,ArgInfo):- get_dict(Prop,ArgInfo,Old),New is Old +1, b_set_dict(Prop,ArgInfo,New).
 arginfo_set(Prop,ArgInfo,New):- nb_set_dict(Prop,ArgInfo,New).
+
+
+enter_ordinary_args(ArgInfo,RestNKeysOut,RestNKeysIn,Required,FormalParms0,Params,Names,PVars,Code):-
+  maplist(un_c38,FormalParms0,FormalParms),
+  ordinary_args(ArgInfo,RestNKeysOut,RestNKeysIn,Required,FormalParms,Params,Names,PVars,Code).
+
 
 ordinary_args(_ArgInfo,RestNKeysInOut,RestNKeysInOut,_, [],[],[],[],true):-!.
 ordinary_args(ArgInfo,RestNKeysOut,RestNKeysIn,_,['&allow-other-keys'|FormalParms],Params,Names,PVars,Code):- !,
@@ -339,7 +345,7 @@ compile_init(Var,FinalResult,[InitForm],
     lisp_compile(Result,InitForm,Code).
 compile_init(Var,FinalResult,[InitForm|_More],
   (set_symbol_value_if_missing('$env',Var,FinalResult,Code,Result))):- 
-    dumpST,
+    lisp_dumpST,
     break,
     lisp_compile(Result,InitForm,Code).
    
@@ -379,7 +385,7 @@ function_head_params(_Ctx,Env,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,N
    debug_var("RestNKeysIn",RestNKeysIn),debug_var("Env",Env),debug_var("RestNKeysOut",RestNKeysOut),
    debug_var("Code",Code),debug_var("ActualArgs",ActualArgs),
    ArgInfo = arginfo{req:0,all:0,opt:0,rest:0,key:0,aux:0,env:0,allow_other_keys:0,names:Names,complex:0},
-   ordinary_args(ArgInfo,RestNKeysOut,RestNKeysIn,required,FormalParms,ActualArgsMaybe,Names,PVars,Code),
+   enter_ordinary_args(ArgInfo,RestNKeysOut,RestNKeysIn,required,FormalParms,ActualArgsMaybe,Names,PVars,Code),
    maplist(debug_var,Names,PVars),
         freeze(Arg,debug_var(Arg,Val)),
 	zip_with(Names, PVars, [Arg, Val, bv(Arg, [Val|_])]^true, ZippedArgBindings),!,
@@ -441,6 +447,9 @@ make_bind_value([Var,_InitForm,IfPresent],Value,Env):-simple_atom_var(Var),make_
 
 
 must_or(Goal,Else):- Goal->true;Else.
+
+un_c38(Mode,ReMode):- atom(Mode),atom_concat('c38_',Sym,Mode),!,atom_concat('&',Sym,ReMode).
+un_c38(Mode,Mode).
 
 bind_parameters(Env, [A, B|R], Arguments,BindCode):- simple_atom_var(A),simple_atom_var(B),simple_atom_var(R),!,
   bind_parameters(Env, [A, B, '&rest',R], Arguments,BindCode).
