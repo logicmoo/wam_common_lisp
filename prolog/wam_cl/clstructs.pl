@@ -1,4696 +1,5741 @@
-/*******************************************************************
- *
- * A Common Lisp compiler/interpretor, written in Prolog
- *
- * (xxxxx.pl)
- *
- *
- * Douglas'' Notes:
- *
- * (c) Douglas Miles, 2017
- *
- * The program is a *HUGE* common-lisp compiler/interpreter. It is written for YAP/SWI-Prolog (YAP 4x faster).
- *
- *******************************************************************/
-:- module(clstructs, []).
-:- set_module(class(library)).
-:- include('header.pro').
-
-% :- use_module(library(pfc)).
-
-:- dynamic(system_subclazz/2).
-
-
-system_subclazz(obj_simple_array__t,obj_array).
-system_subclazz(obj_simple_array(unsigned_byte16),obj_array).
-system_subclazz(obj_simple_array(unsigned_byte32),obj_array).
-system_subclazz(obj_simple_array(unsigned_byte8),obj_array).
-system_subclazz(obj_simple_array(_Unsigned_byte8),obj_array).
-system_subclazz(obj_complex_array,obj_array).
-system_subclazz(obj_complex_array(unsigned_byte32),obj_array).
-system_subclazz(obj_complex_array(unsigned_byte8),obj_array).
-system_subclazz(obj_complex_array(_Unsigned_byte8),obj_array).
-system_subclazz(obj_complex_bit_vector,obj_bit_vector).
-system_subclazz(obj_complex_string,obj_string).
-system_subclazz(obj_complex_vector,obj_vector).
-system_subclazz(obj_complex_vector(unsigned_byte32),obj_vector).
-system_subclazz(obj_complex_vector(unsigned_byte8),obj_vector).
-system_subclazz(obj_complex_vector(_Unsigned_byte8),obj_vector).
-system_subclazz(obj_zero_rank_array,obj_array).
-system_subclazz(obj_nil_vector,obj_string).
-system_subclazz(obj_string,obj_vector).
-system_subclazz(obj_simple_vector,obj_vector).
-system_subclazz(obj_basic_vector(unsigned_byte16),obj_vector).
-system_subclazz(obj_basic_vector(unsigned_byte32),obj_vector).
-system_subclazz(obj_basic_vector(unsigned_byte8),obj_vector).
-system_subclazz(obj_basic_vector(_Unsigned_byte8),obj_vector).
-system_subclazz(obj_bit_vector,obj_vector).
-system_subclazz(obj_vector,obj_array).
-system_subclazz(obj_array,obj_object).
-system_subclazz(obj_case_frob_stream,obj_stream).
-system_subclazz(obj_control_transfer,prolog_runtime_exception).
-system_subclazz(obj_dispatch_macro_function,obj_function).
-system_subclazz(obj_function,obj_operator).
-system_subclazz(obj_lisp_class,obj_standard_object).
-system_subclazz(obj_operator,obj_object).
-system_subclazz(obj_reader_macro_function,obj_function).
-system_subclazz(obj_stack_frame,obj_object).
-system_subclazz(obj_arithmetic_error,obj_lisp_error).
-system_subclazz(obj_autoload,obj_function).
-system_subclazz(obj_built_in_class,obj_lisp_class).
-system_subclazz(obj_cell_error,obj_lisp_error).
-system_subclazz(obj_closure,obj_function).
-system_subclazz(obj_compiled_closure,obj_closure).
-system_subclazz(obj_compiled_primitive,obj_primitive).
-system_subclazz(obj_condition,obj_standard_object).
-system_subclazz(obj_fasl_class_loader,obj_ffi_class_loader).
-system_subclazz(obj_funcallable_standard_class,obj_standard_class).
-system_subclazz(obj_funcallable_standard_object,obj_standard_object).
-system_subclazz(obj_hash_table,obj_object).
-system_subclazz(obj_integrity_error,prolog_error).
-system_subclazz(obj_ffi_class_loader,prolog_url_class_loader).
-system_subclazz(obj_ffi_exception,obj_lisp_error).
-system_subclazz(obj_ffi_stack_frame,obj_stack_frame).
-system_subclazz(obj_layout,obj_object).
-system_subclazz(obj_lisp_error,obj_serious_condition).
-system_subclazz(obj_lisp_integer,obj_object).
-system_subclazz(obj_lisp_stack_frame,obj_stack_frame).
-system_subclazz(obj_memory_class_loader,obj_ffi_class_loader).
-system_subclazz(obj_pathname,obj_object).
-system_subclazz(obj_primitive,obj_function).
-system_subclazz(obj_print_not_readable,obj_lisp_error).
-system_subclazz(obj_processing_terminated,prolog_error).
-system_subclazz(obj_program_error,obj_lisp_error).
-system_subclazz(obj_readtable,obj_object).
-system_subclazz(obj_serious_condition,obj_condition).
-system_subclazz(obj_simple_condition,obj_condition).
-system_subclazz(obj_slime_input_stream,obj_stream).
-system_subclazz(obj_slot_class,obj_lisp_class).
-system_subclazz(obj_special_operator,obj_operator).
-system_subclazz(obj_standard_class,obj_slot_class).
-system_subclazz(obj_standard_object,obj_object).
-system_subclazz(obj_storage_condition,obj_serious_condition).
-system_subclazz(obj_stream,obj_structure_object).
-system_subclazz(obj_stream_error,obj_lisp_error).
-system_subclazz(obj_structure_class,obj_slot_class).
-system_subclazz(obj_structure_object,obj_object).
-system_subclazz(obj_symbol,obj_object).
-system_subclazz(obj_thread_destroyed,prolog_error).
-system_subclazz(obj_two_way_stream,obj_stream).
-system_subclazz(obj_type_error,obj_lisp_error).
-system_subclazz(obj_decoding_reader,prolog_pushback_reader).
-system_subclazz(obj_racf_malformed_input_exception ,prolog_malformed_input_exception).
-system_subclazz(obj_racf_unmappable_character_exception ,prolog_unmappable_character_exception).
-system_subclazz(obj_warning,obj_condition).
-system_subclazz(obj_weak_hash_table,obj_object).
-system_subclazz(obj_weak_reference,obj_object).
-system_subclazz(obj_autoload_generalized_reference,obj_autoload).
-system_subclazz(obj_autoload_macro,obj_autoload).
-system_subclazz(obj_bignum,obj_lisp_integer).
-system_subclazz(obj_broadcast_stream,obj_stream).
-system_subclazz(obj_byte_array_input_stream,obj_stream).
-system_subclazz(obj_byte_array_output_stream,obj_stream).
-system_subclazz(obj_capitalize_first_stream,obj_case_frob_stream).
-system_subclazz(obj_capitalize_stream,obj_case_frob_stream).
-system_subclazz(obj_complex,obj_object).
-system_subclazz(obj_concatenated_stream,obj_stream).
-system_subclazz(obj_cons,obj_object).
-system_subclazz(obj_control_error,obj_lisp_error).
-system_subclazz(obj_division_by_zero,obj_arithmetic_error).
-system_subclazz(cldolist,obj_special_operator).
-system_subclazz(cldotimes,obj_special_operator).
-system_subclazz(obj_double_float,obj_object).
-system_subclazz(obj_downcase_stream,obj_case_frob_stream).
-system_subclazz(obj_echo_stream,obj_stream).
-system_subclazz(obj_e_m_f_cache,obj_object).
-system_subclazz(obj_end_of_file,obj_stream_error).
-system_subclazz(obj_environment,obj_object).
-system_subclazz(obj_fasl_readtable,obj_readtable).
-system_subclazz(obj_file_error,obj_lisp_error).
-system_subclazz(obj_file_stream,obj_stream).
-system_subclazz(obj_fill_pointer_output_stream,obj_stream).
-system_subclazz(obj_fixnum,obj_lisp_integer).
-system_subclazz(obj_floating_point_inexact,obj_arithmetic_error).
-system_subclazz(obj_floating_point_invalid_operation,obj_arithmetic_error).
-system_subclazz(obj_floating_point_overflow,obj_arithmetic_error).
-system_subclazz(obj_floating_point_underflow,obj_arithmetic_error).
-system_subclazz(obj_go,obj_control_transfer).
-system_subclazz(obj_illegal_monitor_state,obj_program_error).
-system_subclazz(obj_jar_stream,obj_stream).
-system_subclazz(obj_ffi_object,obj_object).
-system_subclazz(obj_character,obj_object).
-system_subclazz(obj_lisp_thread,obj_object).
-system_subclazz(obj_logical_pathname,obj_pathname).
-system_subclazz(obj_macro_object,obj_function).
-system_subclazz(obj_nil,obj_symbol).
-system_subclazz(obj_package,obj_object).
-system_subclazz(obj_package_error,obj_lisp_error).
-system_subclazz(obj_parse_error,obj_lisp_error).
-system_subclazz(obj_random_state,obj_object).
-system_subclazz(obj_ratio,obj_object).
-system_subclazz(obj_reader_error,obj_stream_error).
-system_subclazz(obj_return,obj_control_transfer).
-system_subclazz(obj_seekable_string_writer,prolog_writer).
-system_subclazz(obj_simple_bit_vector,obj_bit_vector).
-system_subclazz(obj_simple_error,obj_lisp_error).
-system_subclazz(obj_simple_string,obj_string).
-system_subclazz(obj_simple_type_error,obj_type_error).
-system_subclazz(obj_simple_warning,obj_warning).
-system_subclazz(obj_single_float,obj_object).
-system_subclazz(obj_slime_output_stream,obj_stream).
-system_subclazz(obj_slot_definition,obj_standard_object).
-system_subclazz(obj_slot_definition_class,obj_standard_class).
-system_subclazz(obj_socket_stream,obj_two_way_stream).
-system_subclazz(obj_string_input_stream,obj_stream).
-system_subclazz(obj_string_output_stream,obj_stream).
-system_subclazz(obj_style_warning,obj_warning).
-system_subclazz(obj_symbol_macro,obj_object).
-system_subclazz(obj_synonym_stream,obj_stream).
-system_subclazz(obj_throw,obj_control_transfer).
-system_subclazz(obj_unbound_slot,obj_cell_error).
-system_subclazz(obj_unbound_variable,obj_cell_error).
-system_subclazz(obj_undefined_function,obj_cell_error).
-system_subclazz(obj_upcase_stream,obj_case_frob_stream).
-system_subclazz(obj_url_stream,obj_stream).
-system_subclazz(obj_wrong_number_of_arguments_exception,obj_program_error).
-
-
-
-data_record(obj_symbol_macro,[
-  m(rw,obj_object,expansion)]).
-
-data_record(cla__non_constant_init_form,[
-  m(rw,obj_object,form)]).
-
-data_record(prolog_weak_hash_entry_weak_key_and_value,[
-  m(rw,prolog_weak_reference(obj_object),key),
-  m(rw,prolog_weak_reference(obj_object),value),
-  m(ro,obj_weak_hash_table,this__0)]).
-
-data_record(obj_closure_binding,[
-  m(rw,obj_object,value)]).
-
-data_record(obj_processing_terminated,[
-  m(rw,integer,status)]).
-
-data_record(prolog_repl_console,[
-  m(rw,prolog_string_buffer,input_buffer),
-  m(rw,prolog_reader,reader),
-  m(rw,prolog_writer,writer),
-  m(rw,obj_boolean,disposed),
-  m(ro,prolog_thread,repl_thread),
-  m(ro,obj_object,debugger_hook)]).
-
-data_record(obj_complex_vector(Kind),[
-  m(rw,integer,capacity),
-  m(rw,integer,fill_pointer),
-  m(rw,obj_boolean,is_displaced),
-  m(rw,array_of(Kind),elements),
-  m(rw,obj_array,array),
-  m(rw,integer,displacement)]).
-data_record(obj_complex_vector,[
-  m(rw,integer,capacity),
-  m(rw,integer,fill_pointer),
-  m(rw,obj_boolean,is_displaced),
-  m(rw,obj_list,elements),
-  m(rw,obj_array,array),
-  m(rw,integer,displacement)]).
-
-data_record(cla__rest_param,[
-  m(rw,obj_symbol,var),
-  m(rw,obj_boolean,special)]).
-
-data_record(obj_ffi_stack_frame,[
-  m(ro,prolog_stack_trace_element,ffi_frame)]).
-
-data_record(obj_bignum,[
-  m(ro,prolog_big_integer,value)]).
-
-data_record(obj_complex_bit_vector,[
-  m(rw,integer,fill_pointer),
-  m(rw,obj_boolean,is_displaced),
-  m(rw,obj_array,array),
-  m(rw,integer,displacement)]).
-
-data_record(cla__slow_matcher,[
-  m(ro,obj_argument_list_processor,this__0)]).
-
-data_record(cla__aux_param,[
-  m(rw,obj_symbol,var),
-  m(rw,obj_boolean,special),
-  m(rw,cla__init_form,initform)]).
-
-data_record(obj_simple_array(unsigned_byte16),[
-  m(ro,array_of(integer),dimv),
-  m(ro,integer,total_size),
-  m(ro,array_of(integer),data)]).
-
-data_record(obj_package,[
-  m(rw,obj_string,name),
-  m(rw,obj_list,property_list),
-  m(rw,obj_hash_table(obj_string,obj_symbol),internal_symbols),
-  m(rw,obj_hash_table(obj_string,obj_symbol),external_symbols),
-  m(rw,obj_hash_table(obj_string,obj_symbol),shadowing_symbols),
-  m(rw,prolog_array_list(obj_string),nicknames),
-  m(rw,prolog_array_list(obj_package),use_list),
-  m(rw,prolog_array_list(obj_package),used_by_list),
-  m(rw,obj_hash_table(obj_string,obj_package),local_nicknames)]).
-
-data_record(cla__arg_list,[
-  m(ro,obj_list,args),
-  m(rw,integer,args_consumed),
-  m(ro,integer,len),
-  m(ro,obj_environment,env)]).
-
-data_record(obj_prolog_proxy___entry,[
-  m(rw,prolog_class,iface),
-  m(rw,prolog_map,lisp_defined_methods)]).
-
-data_record(obj_interpreter___unhandled_condition,[
-  m(rw,obj_object,condition)]).
-
-data_record(obj_condition,[
-  m(rw,obj_string,message)]).
-
-data_record(prolog_weak_hash_entry,[
-  m(rw,obj_object,key),
-  m(rw,integer,hash),
-  m(rw,obj_object,value),
-  m(rw,prolog_weak_hash_entry,next),
-  m(rw,integer,slot),
-  m(ro,obj_weak_hash_table,this__0)]).
-
-data_record(obj_illegal_monitor_state,[
-  m(rw,obj_string,message)]).
-
-data_record(cla__required_param,[
-  m(rw,obj_symbol,var),
-  m(rw,obj_boolean,special)]).
-
-data_record(obj_emf_cache,[
-  m(rw,obj_hash_table(obj_emf_cache___cache_entry,obj_object),cache),
-  m(rw,index_of(obj_emf_cache___eql_specialization),eql_specializations)]).
-
-data_record(obj_random_state,[
-  m(rw,prolog_random,random)]).
-
-data_record(obj_pathname,[
-  m(rw,obj_object,host),
-  m(rw,obj_object,device),
-  m(rw,obj_object,directory),
-  m(rw,obj_object,name),
-  m(rw,obj_object,type),
-  m(rw,obj_object,version),
-  m(rw,obj_string,namestring)]).
-
-data_record(obj_hash_table,[
-  m(ro,integer,rehash_size),
-  m(ro,number,rehash_threshold),
-  m(rw,integer,threshold),
-  m(rw,array_of(obj_hash_table___hash_entry),buckets),
-  m(rw,integer,count),
-  m(ro,obj_hash_table___comparator,comparator),
-  m(ro,j_reentrant_lock,lock)]).
-
-data_record(obj_zero_rank_array,[
-  m(ro,obj_object,element_type),
-  m(ro,obj_boolean,adjustable),
-  m(rw,obj_object,data)]).
-
-data_record(obj_slot_class,[
-  m(rw,obj_list,direct_slot_definitions),
-  m(rw,obj_list,slot_definitions),
-  m(rw,obj_list,direct_default_initargs),
-  m(rw,obj_list,default_initargs)]).
-
-
-
-data_record(prolog_weak_hash_entry_weak_key_or_value,[
-  m(ro,obj_weak_hash_table,this__0)]).
-
-data_record(obj_synonym_stream,[
-  m(ro,obj_symbol,stream_name)]).
-
-data_record(cla__constant_init_form,[
-  m(rw,obj_object,value)]).
-
-data_record(obj_lisp_thread___stack_segment,[
-  m(ro,array_of(prolog_object),stack),
-  m(ro,obj_lisp_thread___stack_segment,next),
-  m(rw,integer,stack_ptr)]).
-
-data_record(obj_socket_stream,[
-  m(ro,prolog_socket,socket)]).
-
-data_record(obj_memory_class_loader,[
-  m(ro,obj_hash_table(obj_string,obj_ffi_object),hashtable),
-  m(ro,obj_ffi_object,boxed_this),
-  m(ro,obj_string,internal_name_prefix)]).
-
-data_record(obj_slime_input_stream,[
-  m(rw,obj_string,s),
-  m(rw,integer,length),
-  m(ro,obj_function,f),
-  m(ro,obj_stream,ostream)]).
-
-data_record(obj_slime_output_stream,[
-  m(ro,prolog_string_writer,string_writer),
-  m(ro,obj_function,f)]).
-
-data_record(obj_nil_vector,[
-  m(rw,integer,capacity)]).
-
-data_record(obj_string_input_stream,[
-  m(ro,prolog_string_reader,string_reader),
-  m(ro,integer,start),
-  m(ro,obj_string,sub_string)]).
-
-data_record(obj_byte_array_output_stream,[
-  m(ro,prolog_byte_array_output_stream,byte_array_output_stream)]).
-
-data_record(obj_stream_error,[
-  m(ro,prolog_throwable,cause)]).
-
-data_record(cla__fast_matcher,[
-  m(ro,obj_argument_list_processor,this__0)]).
-
-data_record(obj_go,[
-  m(ro,obj_object,tagbody),
-  m(ro,obj_object,tag)]).
-
-data_record(obj_broadcast_stream,[
-  m(ro,array_of(obj_stream),streams)]).
-
-data_record(obj_standard_object,[
-  m(rw,obj_layout,layout),
-  m(rw,obj_list,slots)]).
-
-data_record(obj_macro_object,[
-  m(ro,obj_object,name),
-  m(ro,obj_object,expander)]).
-
-data_record(obj_complex_string,[
-  m(rw,integer,capacity),
-  m(rw,integer,fill_pointer),
-  m(rw,obj_boolean,is_displaced),
-  m(rw,array_of(char_code),chars),
-  m(rw,obj_array,array),
-  m(rw,integer,displacement)]).
-
-data_record(obj_function,[
-  m(rw,obj_list,property_list),
-  m(rw,integer,call_count),
-  m(rw,integer,hot_count),
-  m(ro,obj_object,loaded_from)]).
-
-data_record(ffi_script_engine,[
-  m(rw,obj_interpreter,interpreter),
-  m(rw,obj_function,eval_script),
-  m(rw,obj_function,eval_function),
-  m(rw,obj_function,compile_script),
-  m(rw,obj_function,eval_compiled_script)]).
-
-data_record(ffi_script_engine___abobj_compiled_script,[
-  m(rw,obj_object,function),
-  m(ro,ffi_script_engine,this__0)]).
-
-data_record(obj_return,[
-  m(ro,obj_object,tag),
-  m(ro,obj_object,block),
-  m(ro,obj_object,result)]).
-
-data_record(obj_string_output_stream,[
-  m(ro,obj_seekable_string_writer,string_writer)]).
-
-data_record(obj_character,[
-  m(ro,char_code,value),
-  m(rw,obj_string,name)]).
-
-data_record(obj_weak_reference,[
-  m(rw,prolog_weak_reference(obj_object),ref)]).
-
-data_record(obj_emf_cache___eql_specialization,[
-  m(rw,obj_object,eql_to)]).
-
-data_record(obj_simple_array(Kind),[
-  m(ro,array_of(integer),dimv),
-  m(ro,integer,total_size),
-  m(ro,array_of(Kind),data)]).
-
-data_record(obj_string_functions___string_indices_and_chars,[
-  m(rw,obj_string,string1),
-  m(rw,obj_boolean,convert_case),
-  m(rw,array_of(char_code),array1),
-  m(rw,array_of(char_code),array2),
-  m(rw,integer,start1),
-  m(rw,integer,end1),
-  m(rw,integer,start2),
-  m(rw,integer,end2)]).
-
-data_record(obj_symbol,[
-  m(ro,obj_simple_string,name),
-  m(rw,integer,hash),
-  m(rw,integer,special_index),
-  m(rw,obj_object,pkg),
-  m(rw,obj_object,value),
-  m(rw,obj_object,function),
-  m(rw,obj_list,property_list),
-  m(rw,bitmask,flags)]).
-
-data_record(obj_prolog_handler___entry,[
-  m(rw,obj_function,handler),
-  m(rw,obj_object,data),
-  m(rw,integer,count),
-  m(rw,prolog_map(obj_string,obj_prolog_handler___entry),entry_table),
-  m(rw,obj_string,event)]).
-
-data_record(obj_operator,[
-  m(rw,obj_object,lambda_name),
-  m(rw,obj_object,lambda_list)]).
-
-data_record(obj_function_binding,[
-  m(rw,obj_object,name),
-  m(rw,obj_object,value),
-  m(ro,obj_function_binding,next)]).
-
-data_record(obj_capitalize_stream,[
-  m(rw,obj_boolean,in_word)]).
-
-data_record(obj_special_binding,[
-  m(ro,integer,idx),
-  m(rw,obj_object,value)]).
-
-data_record(obj_basic_vector(Kind),[
-  m(rw,integer,capacity),
-  m(rw,array_of(Kind),elements)]).
-data_record(obj_simple_vector,[
-  m(rw,integer,capacity),
-  m(rw,obj_list,data)]).
-
-data_record(cla__optional_param,[
-  m(rw,obj_symbol,var),
-  m(rw,obj_boolean,special),
-  m(rw,obj_symbol,supplied_var),
-  m(rw,obj_boolean,supplied_special),
-  m(rw,cla__init_form,init_form)]).
-
-data_record(obj_structure_object,[
-  m(ro,obj_structure_class,structure_class),
-  m(ro,obj_list,slots)]).
-
-data_record(obj_interpreter,[
-  m(ro,obj_boolean,jlisp),
-  m(ro,prolog_input_stream,input_stream),
-  m(ro,prolog_output_stream,output_stream)]).
-
-data_record(obj_capitalize_first_stream,[
-  m(rw,obj_boolean,virgin)]).
-
-data_record(obj_ffi_exception,[
-  m(ro,prolog_throwable,throwable)]).
-
-data_record(obj_file_stream,[
-  m(ro,obj_random_access_character_file,racf),
-  m(ro,obj_pathname,pathname),
-  m(ro,integer,bytes_per_unit)]).
-
-data_record(obj_seekable_string_writer,[
-  m(ro,prolog_string_buffer,string_buffer),
-  m(rw,integer,offset)]).
-
-data_record(obj_bit_vector,[
-  m(rw,integer,capacity),
-  m(rw,array_of(long),bits)]).
-
-data_record(obj_ffi_object__2,[
-  m(ro,obj_list,val__acc),
-  m(ro,obj_object,val__fn)]).
-
-data_record(obj_shell_command___reader_thread,[
-  m(rw,array_of(char_code),buf),
-  m(ro,prolog_input_stream,input_stream),
-  m(ro,prolog_buffered_reader,reader),                                  
-  m(ro,obj_shell_command,this__0),
-  m(rw,obj_boolean,done)]).
-
-data_record(obj_double_float,[
-  m(ro,double,value)]).
-
-data_record(obj_simple_string,[
-  m(rw,integer,capacity),
-  m(rw,array_of(char_code),chars)]).
-
-data_record(obj_concatenated_stream,[
-  m(rw,obj_object,streams)]).
-
-data_record(obj_simple_array(unsigned_byte32),[
-  m(ro,array_of(integer),dimv),
-  m(ro,integer,total_size),
-  m(ro,obj_list,data)]).
-
-data_record(cla__keyword_param,[
-  m(rw,obj_symbol,keyword)]).
-
-data_record(obj_weak_hash_table,[
-  m(ro,obj_object,rehash_size),
-  m(ro,obj_object,rehash_threshold),
-  m(rw,integer,threshold),
-  m(rw,array_of(prolog_weak_hash_entry),buckets),
-  m(rw,integer,count),
-  m(ro,obj_weak_hash_table___comparator,comparator),
-  m(ro,j_reentrant_lock,lock),
-  m(rw,prolog_weak_hash_entry,bucket_type),
-  m(ro,obj_object,weakness),
-  m(rw,prolog_reference_queue(obj_object),queue),
-  m(rw,prolog_map(prolog_reference,prolog_weak_hash_entry),entry_lookup)]).
-
-data_record(obj_case_frob_stream,[
-  m(ro,obj_stream,target)]).
-
-data_record(obj_complex,[
-  m(ro,obj_object,realpart),
-  m(ro,obj_object,imagpart)]).
-
-data_record(obj_fill_pointer_output_stream___writer,[
-  m(ro,obj_fill_pointer_output_stream,this__0)]).
-
-data_record(obj_jar_stream,[
-  m(ro,obj_pathname,pathname),
-  m(ro,prolog_input_stream,input),
-  m(ro,prolog_reader,reader),
-  m(ro,integer,bytes_per_unit)]).
-
-data_record(obj_char_hash_map(T),[
-  m(ro,array_of(T),constants_by_char_code),
-  m(ro,T,null_value),
-  m(ro,obj_hash_table(prolog_character,T),backing)]).
-
-data_record(obj_throw,[
-  m(ro,obj_object,tag),
-  m(ro,obj_object,result),
-  m(ro,obj_list,values)]).
-
-data_record(obj_simple_array__t,[
-  m(ro,array_of(integer),dimv),
-  m(ro,obj_object,element_type),
-  m(ro,integer,total_size),
-  m(ro,obj_list,data)]).
-
-data_record(obj_primitives__pf_finalize__1,[
-  m(rw,prolog_thread,thread),
-  m(ro,obj_object,val__fun),
-  m(ro,obj_primitives__pf_finalize,this__0)]).
-
-data_record(cla__environment_param,[
-  m(rw,obj_symbol,var),
-  m(rw,obj_boolean,special)]).
-
-data_record(obj_ffi_object,[
-  m(ro,prolog_object,obj),
-  m(ro,prolog_class,intended_class)]).
-
-data_record(obj_funcallable_standard_object,[
-  m(rw,obj_object,function),
-  m(rw,obj_emf_cache,cache),
-  m(rw,integer,call_count),
-  m(rw,integer,hot_count)]).
-
-data_record(obj_url_stream,[
-  m(ro,obj_pathname,pathname),
-  m(ro,prolog_input_stream,input),
-  m(ro,prolog_reader,reader),
-  m(ro,integer,bytes_per_unit)]).
-
-data_record(obj_lisp_stack_frame,[
-  m(ro,obj_object,operator),
-  m(ro,obj_list,args)]).
-
-data_record(obj_echo_stream,[
-  m(ro,obj_stream,in),
-  m(ro,obj_stream,out),
-  m(rw,integer,unread_char)]).
-
-data_record(obj_readtable,[
-  m(ro,obj_char_hash_map(prolog_byte),syntax),
-  m(ro,obj_char_hash_map(obj_object),reader_macro_functions),
-  m(ro,obj_char_hash_map(obj_readtable___dispatch_table),dispatch_tables),
-  m(rw,obj_object,readtable_case)]).
-
-data_record(obj_fill_pointer_output_stream,[
-  m(rw,obj_complex_string,string_buffer)]).
-
-data_record(prolog_weak_hash_entry_weak_value,[
-  m(rw,prolog_weak_reference(obj_object),value),
-  m(ro,obj_weak_hash_table,this__0)]).
-
-data_record(obj_prolog_proxy_lisp_invocation_handler,[
-  m(rw,obj_function,function)]).
-
-data_record(obj_runtime_class,[
-  m(rw,prolog_map(obj_string,obj_function),methods)]).
-
-data_record(obj_lisp_thread,[
-  m(rw,obj_object,thread_value),
-  m(ro,prolog_thread,ffi_thread),
-  m(rw,obj_boolean,destroyed),
-  m(ro,obj_object,name),
-  m(rw,obj_list,thread_values),
-  m(rw,obj_boolean,thread_interrupted),
-  m(rw,obj_object,pending),
-  m(rw,obj_symbol,wrapper),
-  m(rw,array_of(obj_special_binding),specials),
-  m(rw,obj_special_bindings_mark,saved_specials),
-  m(rw,obj_object,catch_tags),
-  m(rw,obj_lisp_thread___stack_segment,top_stack_segment),
-  m(rw,array_of(prolog_object),stack),
-  m(rw,integer,stack_ptr),
-  m(rw,obj_lisp_thread___stack_segment,spare_stack_segment)]).
-
-data_record(obj_byte_array_input_stream,[
-  m(ro,prolog_byte_array_input_stream,byte_array_input_stream)]).
-
-data_record(obj_zip_cache___entry,[
-  m(rw,long,last_modified),
-  m(rw,j_zip_file,file)]).
-
-data_record(clzip___directories,[
-  m(rw,j_zip_output_stream,out)]).
-
-data_record(obj_wrong_number_of_arguments_exception,[
-  m(rw,obj_operator,operator),
-  m(rw,integer,expected_min_args),
-  m(rw,integer,expected_max_args),
-  m(rw,obj_object,actual_args),
-  m(rw,obj_string,message)]).
-
-data_record(prolog_weak_hash_entry_weak_key,[
-  m(rw,prolog_weak_reference(obj_object),key),
-  m(ro,obj_weak_hash_table,this__0)]).
-
-data_record(obj_emf_cache___cache_entry,[
-  m(ro,obj_list,array)]).
-
-data_record(obj_special_bindings_mark,[
-  m(rw,integer,idx),
-  m(rw,obj_special_binding,binding),
-  m(rw,obj_special_bindings_mark,next)]).
-
-data_record(obj_readtable___dispatch_table,[
-  m(ro,obj_char_hash_map(obj_object),functions)]).
-
-data_record(obj_ffi_class_loader_pf_get_default_classloader,[
-  m(ro,obj_object,default_class_loader)]).
-
-data_record(obj_argument_list_processor,[
-  m(rw,array_of(cla__param),required_parameters),
-  m(rw,array_of(cla__param),optional_parameters),
-  m(rw,array_of(cla__keyword_param),keyword_parameters),
-  m(rw,array_of(cla__param),aux_vars),
-  m(rw,array_of(cla__param),positional_parameters),
-  m(rw,obj_symbol,rest_var),
-  m(rw,cla__param,rest_param),
-  m(rw,obj_symbol,env_var),
-  m(rw,cla__param,env_param),
-  m(rw,integer,arity),
-  m(rw,integer,min_args),
-  m(rw,integer,max_args),
-  m(rw,array_of(obj_symbol),variables),
-  m(rw,array_of(obj_boolean),specials),
-  m(rw,obj_boolean,and_key),
-  m(rw,obj_boolean,allow_other_keys),
-  m(ro,cla__argument_matcher,matcher),
-  m(rw,obj_boolean,matcher_needs_env),
-  m(rw,obj_operator,function)]).
-
-data_record(obj_fasl_class_loader,[
-  m(ro,obj_string,base_name),
-  m(ro,obj_ffi_object,boxed_this)]).
-
-data_record(obj_closure,[
-  m(ro,obj_object,body),
-  m(ro,obj_object,execution_body),
-  m(ro,obj_environment,environment),
-  m(ro,array_of(obj_symbol),free_specials),
-  m(ro,obj_argument_list_processor,arglist)]).
-
-data_record(obj_racf_unmappable_character_exception,[
-  m(ro,integer,position),
-  m(ro,char_code,character_value),
-  m(ro,obj_string,charset_name)]).
-
-data_record(obj_finalizer___finalizing_weak_reference,[
-  m(rw,prolog_linked_list(prolog_runnable),finalizers)]).
-
-data_record(obj_random_access_writer,[
-  m(ro,obj_random_access_character_file,this__0)]).
-
-data_record(obj_random_access_reader,[
-  m(rw,array_of(char_code),read_buf),
-  m(ro,obj_random_access_character_file,this__0)]).
-
-data_record(obj_racf_malformed_input_exception,[
-  m(ro,integer,position),
-  m(ro,char_code,character),
-  m(ro,obj_string,charset_name)]).
-
-data_record(obj_random_access_output_stream,[
-  m(rw,array_of(unsigned_byte8),write_buf),
-  m(ro,obj_random_access_character_file,this__0)]).
-
-data_record(obj_decoding_reader,[
-  m(rw,prolog_byte_buffer,bbuf),
-  m(rw,prolog_pushback_input_stream,stream),
-  m(rw,prolog_charset_decoder,cd),
-  m(rw,prolog_charset_encoder,ce)]).
-
-data_record(obj_random_access_character_file,[
-  m(rw,obj_random_access_writer,writer),
-  m(rw,obj_random_access_reader,reader),
-  m(rw,obj_random_access_input_stream,input_stream),
-  m(rw,obj_random_access_output_stream,output_stream),
-  m(rw,prolog_file_channel,fcn),
-  m(rw,prolog_charset,cset),
-  m(rw,prolog_charset_encoder,cenc),
-  m(rw,prolog_charset_decoder,cdec),
-  m(rw,prolog_byte_buffer,bbuf),
-  m(rw,obj_boolean,bbuf_is_dirty),
-  m(rw,obj_boolean,bbuf_is_readable),
-  m(rw,long,bbufpos),
-  m(rw,prolog_char_buffer,single_char_buf),
-  m(rw,prolog_byte_buffer,short_byte_buf)]).
-
-data_record(obj_random_access_input_stream,[
-  m(rw,array_of(unsigned_byte8),read_buf),
-  m(ro,obj_random_access_character_file,this__0)]).
-
-
-data_record(obj_ffi_object__1,[
-  m(ro,obj_list,val__acc),
-  m(ro,obj_ffi_object,this__0)]).
-
-data_record(obj_stack_frame,[
-  m(rw,obj_stack_frame,next),
-  m(rw,obj_environment,env)]).
-
-data_record(obj_single_float,[
-  m(ro,float,value)]).
-
-data_record(obj_compiled_closure,[
-  m(rw,array_of(obj_closure_binding),ctx)]).
-
-data_record(obj_special_operator,[
-  m(rw,integer,call_count),
-  m(rw,integer,hot_count)]).
-
-data_record(obj_prolog_proxy___lisp_handler,[
-  m(rw,prolog_map,table)]).
-
-data_record(obj_autoload,[
-  m(ro,obj_string,file_name),
-  m(ro,obj_string,class_name),
-  m(ro,obj_symbol,function_symbol)]).
-
-data_record(obj_char_hash_map__1,[
-  m(ro,prolog_iterator(prolog_character),car_it),
-  m(rw,integer,char_num),
-  m(ro,obj_char_hash_map,this__0)]).
-
-data_record(obj_layout,[
-  m(ro,obj_object,lisp_class),
-  m(ro,obj_hash_table(obj_object,obj_object),slot_table),
-  m(ro,obj_list,slot_names),
-  m(ro,obj_object,shared_slots),
-  m(rw,obj_boolean,invalid)]).
-
-data_record(obj_binding,[
-  m(ro,obj_object,bound_symbol),
-  m(rw,obj_environment,env),
-  m(rw,obj_object,value),
-  m(rw,obj_boolean,specialp),
-  m(ro,obj_binding,next)]).
-
-data_record(obj_fixnum,[
-  m(ro,integer,value)]).
-
-data_record(obj_ratio,[
-  m(rw,prolog_big_integer,numerator),
-  m(rw,prolog_big_integer,denominator)]).
-
-data_record(obj_shell_command,[
-  m(rw,prolog_thread,thread),
-  m(ro,obj_string,command),
-  m(ro,obj_string,directory),
-  m(ro,obj_stream,output_stream),
-  m(ro,prolog_string_buffer,output),
-  m(rw,integer,exit_value)]).
-
-data_record(obj_stream,[
-  m(rw,obj_object,element_type),
-  m(rw,obj_boolean,is_input_stream),
-  m(rw,obj_boolean,is_output_stream),
-  m(rw,obj_boolean,is_character_stream),
-  m(rw,obj_boolean,is_binary_stream),
-  m(rw,obj_boolean,past_end),
-  m(rw,obj_boolean,interactive),
-  m(rw,obj_boolean,open),
-  m(rw,prolog_pushback_reader,reader),
-  m(rw,integer,offset),
-  m(rw,integer,line_number),
-  m(rw,prolog_writer,writer),
-  m(rw,integer,char_pos),
-  m(rw,obj_stream___eol_style,eol_style),
-  m(rw,char_code,eol_char),
-  m(rw,obj_object,external_format),
-  m(rw,obj_string,encoding),
-  m(rw,char_code,last_char),
-  m(rw,prolog_input_stream,in),
-  m(rw,prolog_output_stream,out)]).
-
-data_record(obj_environment,[
-  m(rw,obj_binding,vars),
-  m(rw,obj_function_binding,last_function_binding),
-  m(rw,obj_binding,blocks),
-  m(rw,obj_binding,tags),
-  m(rw,obj_boolean,inactive)]).
-
-data_record(obj_hash_table___hash_entry,[
-  m(rw,obj_object,key),
-  m(rw,integer,hash),
-  m(rw,obj_object,value),
-  m(rw,obj_hash_table___hash_entry,next)]).
-
-data_record(obj_lisp_thread___stack_marker,[
-  m(ro,integer,num_args)]).
-
-
-data_record(obj_complex_array(Kind),[
-  m(ro,array_of(integer),dimv),
-  m(rw,integer,total_size),
-  m(rw,array_of(Kind),data),
-  m(rw,obj_array,array),
-  m(rw,integer,displacement)]).
-
-data_record(obj_complex_array,[
-  m(ro,array_of(integer),dimv),
-  m(ro,obj_object,element_type),
-  m(rw,integer,total_size),
-  m(rw,obj_list,data),
-  m(rw,obj_array,array),
-  m(rw,integer,displacement)]).
-
-data_record(obj_profiler__1__1,[
-  m(rw,prolog_thread,thread),
-  m(ro,obj_lisp_thread,val__thread),
-  m(ro,obj_profiler__1,this__0)]).
-
-data_record(obj_cons,[
-  m(rw,obj_object,car),
-  m(rw,obj_object,cdr)]).
-
-
-data_record(obj_lisp_class,[
-  m(ro,integer,sxhash),
-  m(rw,obj_object,name),
-  m(rw,obj_list,property_list),
-  m(rw,obj_layout,class_layout),
-  m(rw,obj_list,direct_superclasses),
-  m(rw,obj_list,direct_subclasses),
-  m(rw,obj_list,class_precedence_list),
-  m(rw,obj_list,direct_methods),
-  m(rw,obj_list,documentation),
-  m(rw,obj_boolean,finalized)]).
-
-data_record(obj_autoload_generalized_reference,[
-  m(rw,obj_symbol,indicator)]).
-
-data_record(obj_two_way_stream,[
-  m(ro,obj_stream,in),
-  m(ro,obj_stream,out)]).
-
-
-
-obj_object_to_OBJECT(Atom,OUT):-atom(Atom),atom_concat('obj_',_,Atom),upcase_atom(Atom,UPPER),UPPER\==Atom,
-  atomic_list_concat(List,'_',UPPER),atomic_list_concat(List,'-',OUT),!.
-obj_OBJECT_to_object(Atom,OUT):-
-  atom(Atom),downcase_atom(Atom,DOWN),DOWN\==Atom,
-  atomic_list_concat(List,'-',DOWN),atomic_list_concat(List,'_',CL), atom_concat('obj_',CL,OUT),!.
-
-% system_subclazz(C1,C2)==>(recognised_clazz(C1),recognised_clazz(C2)).  
-recognised_clazz(AA):- data_record(C1,Lst),(AA=C1-> true ; (member(m(_,C2,_),Lst),C2==AA)).
-recognised_clazz(AA):- system_subclazz(C1,C2),(AA=C1;AA=C2).
-maybe_xform_recognised_clazz([A|B],AA):-is_list(B),!,maplist(maybe_xform_recognised_clazz,[A|B],AA).
-maybe_xform_recognised_clazz(A,AA):- (obj_OBJECT_to_object(A,AA),recognised_clazz(AA))->true;A=AA.
-
-/*
-term_expansion(mop_direct(A,P,B),mop_direct(AA,P,BB)):- 
-  maybe_xform_recognised_clazz(A,AA),
-  (szlot\=P -> maybe_xform_recognised_clazz(B,BB) ; B=BB),
-  ((A\==AA) ; (B\==BB)).
-*/
-
-mop_direct('%METHOD-FUNCTION', supers, [t]).
-mop_direct('%METHOD-FUNCTION', szlot, 'FAST-FUNCTION').
-mop_direct('%METHOD-FUNCTION', szlot, 'NAME').
-mop_direct('ABORT-FAILURE', supers, [obj_control_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('ABSTRACT-LEXENV', submop, 'LEXENV').
-mop_direct('ABSTRACT-LEXENV', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ACCESSOR-DFUN-INFO', submop, 'N-N').
-mop_direct('ACCESSOR-DFUN-INFO', submop, 'ONE-INDEX-DFUN-INFO').
-mop_direct('ACCESSOR-DFUN-INFO', supers, ['DFUN-INFO', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ACCESSOR-DFUN-INFO', szlot, 'ACCESSOR-TYPE').
-mop_direct('ACCESSOR-METHOD', submop, 'GLOBAL-BOUNDP-METHOD').
-mop_direct('ACCESSOR-METHOD', submop, 'GLOBAL-READER-METHOD').
-mop_direct('ACCESSOR-METHOD', submop, 'GLOBAL-WRITER-METHOD').
-mop_direct('ACCESSOR-METHOD', submop, 'STANDARD-ACCESSOR-METHOD').
-mop_direct('ACCESSOR-METHOD', supers, ['STANDARD-METHOD', 'PLIST-MIXIN', 'DEFINITION-SOURCE-MIXIN', 'METHOD', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('ACCESSOR-METHOD', szlot, 'SLOT-NAME').
-mop_direct('ALIEN-ALIEN-VALUE-TYPE', submop, 'ALIEN-MEM-BLOCK-TYPE').
-mop_direct('ALIEN-ALIEN-VALUE-TYPE', submop, 'ALIEN-POINTER-TYPE').
-mop_direct('ALIEN-ALIEN-VALUE-TYPE', supers, ['ALIEN-SYSTEM-AREA-POINTER-TYPE', 'ALIEN-TYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ALIEN-ALIEN-VALUE-TYPE', szlot, 'CLASS').
-mop_direct('ALIEN-ARRAY-TYPE', supers, ['ALIEN-MEM-BLOCK-TYPE', 'ALIEN-ALIEN-VALUE-TYPE', 'ALIEN-SYSTEM-AREA-POINTER-TYPE', 'ALIEN-TYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ALIEN-ARRAY-TYPE', szlot, 'CLASS').
-mop_direct('ALIEN-ARRAY-TYPE', szlot, 'DIMENSIONS').
-mop_direct('ALIEN-ARRAY-TYPE', szlot, 'ELEMENT-TYPE').
-mop_direct('ALIEN-BOOLEAN-TYPE', supers, ['ALIEN-INTEGER-TYPE', 'ALIEN-TYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ALIEN-BOOLEAN-TYPE', szlot, 'CLASS').
-mop_direct('ALIEN-C-STRING-TYPE', supers, ['ALIEN-POINTER-TYPE', 'ALIEN-ALIEN-VALUE-TYPE', 'ALIEN-SYSTEM-AREA-POINTER-TYPE', 'ALIEN-TYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ALIEN-C-STRING-TYPE', szlot, 'CLASS').
-mop_direct('ALIEN-C-STRING-TYPE', szlot, 'ELEMENT-TYPE').
-mop_direct('ALIEN-C-STRING-TYPE', szlot, 'EXTERNAL-FORMAT').
-mop_direct('ALIEN-C-STRING-TYPE', szlot, 'NOT-NULL').
-mop_direct('ALIEN-DOUBLE-FLOAT-TYPE', supers, ['ALIEN-FLOAT-TYPE', 'ALIEN-TYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ALIEN-DOUBLE-FLOAT-TYPE', szlot, 'BITS').
-mop_direct('ALIEN-DOUBLE-FLOAT-TYPE', szlot, 'CLASS').
-mop_direct('ALIEN-ENUM-TYPE', supers, ['ALIEN-INTEGER-TYPE', 'ALIEN-TYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ALIEN-ENUM-TYPE', szlot, 'BITS').
-mop_direct('ALIEN-ENUM-TYPE', szlot, 'CLASS').
-mop_direct('ALIEN-ENUM-TYPE', szlot, 'FROM').
-mop_direct('ALIEN-ENUM-TYPE', szlot, 'KIND').
-mop_direct('ALIEN-ENUM-TYPE', szlot, 'NAME').
-mop_direct('ALIEN-ENUM-TYPE', szlot, 'OFFSET').
-mop_direct('ALIEN-ENUM-TYPE', szlot, 'TO').
-mop_direct('ALIEN-FLOAT-TYPE', submop, 'ALIEN-DOUBLE-FLOAT-TYPE').
-mop_direct('ALIEN-FLOAT-TYPE', submop, 'ALIEN-SINGLE-FLOAT-TYPE').
-mop_direct('ALIEN-FLOAT-TYPE', supers, ['ALIEN-TYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ALIEN-FLOAT-TYPE', szlot, 'CLASS').
-mop_direct('ALIEN-FLOAT-TYPE', szlot, 'TYPE').
-mop_direct('ALIEN-FUN-TYPE', supers, ['ALIEN-MEM-BLOCK-TYPE', 'ALIEN-ALIEN-VALUE-TYPE', 'ALIEN-SYSTEM-AREA-POINTER-TYPE', 'ALIEN-TYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ALIEN-FUN-TYPE', szlot, 'ARG-TYPES').
-mop_direct('ALIEN-FUN-TYPE', szlot, 'CLASS').
-mop_direct('ALIEN-FUN-TYPE', szlot, 'CONVENTION').
-mop_direct('ALIEN-FUN-TYPE', szlot, 'RESULT-TYPE').
-mop_direct('ALIEN-FUN-TYPE', szlot, 'STUB').
-mop_direct('ALIEN-INTEGER-TYPE', submop, 'ALIEN-BOOLEAN-TYPE').
-mop_direct('ALIEN-INTEGER-TYPE', submop, 'ALIEN-ENUM-TYPE').
-mop_direct('ALIEN-INTEGER-TYPE', supers, ['ALIEN-TYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ALIEN-INTEGER-TYPE', szlot, 'CLASS').
-mop_direct('ALIEN-INTEGER-TYPE', szlot, 'SIGNED').
-mop_direct('ALIEN-MEM-BLOCK-TYPE', submop, 'ALIEN-ARRAY-TYPE').
-mop_direct('ALIEN-MEM-BLOCK-TYPE', submop, 'ALIEN-FUN-TYPE').
-mop_direct('ALIEN-MEM-BLOCK-TYPE', submop, 'ALIEN-RECORD-TYPE').
-mop_direct('ALIEN-MEM-BLOCK-TYPE', supers, ['ALIEN-ALIEN-VALUE-TYPE', 'ALIEN-SYSTEM-AREA-POINTER-TYPE', 'ALIEN-TYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ALIEN-MEM-BLOCK-TYPE', szlot, 'CLASS').
-mop_direct('ALIEN-POINTER-TYPE', submop, 'ALIEN-C-STRING-TYPE').
-mop_direct('ALIEN-POINTER-TYPE', supers, ['ALIEN-ALIEN-VALUE-TYPE', 'ALIEN-SYSTEM-AREA-POINTER-TYPE', 'ALIEN-TYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ALIEN-POINTER-TYPE', szlot, 'BITS').
-mop_direct('ALIEN-POINTER-TYPE', szlot, 'CLASS').
-mop_direct('ALIEN-POINTER-TYPE', szlot, 'TO').
-mop_direct('ALIEN-RECORD-FIELD', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ALIEN-RECORD-FIELD', szlot, 'BITS').
-mop_direct('ALIEN-RECORD-FIELD', szlot, 'NAME').
-mop_direct('ALIEN-RECORD-FIELD', szlot, 'OFFSET').
-mop_direct('ALIEN-RECORD-FIELD', szlot, 'TYPE').
-mop_direct('ALIEN-RECORD-TYPE', supers, ['ALIEN-MEM-BLOCK-TYPE', 'ALIEN-ALIEN-VALUE-TYPE', 'ALIEN-SYSTEM-AREA-POINTER-TYPE', 'ALIEN-TYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ALIEN-RECORD-TYPE', szlot, 'CLASS').
-mop_direct('ALIEN-RECORD-TYPE', szlot, 'FIELDS').
-mop_direct('ALIEN-RECORD-TYPE', szlot, 'KIND').
-mop_direct('ALIEN-RECORD-TYPE', szlot, 'NAME').
-mop_direct('ALIEN-SINGLE-FLOAT-TYPE', supers, ['ALIEN-FLOAT-TYPE', 'ALIEN-TYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ALIEN-SINGLE-FLOAT-TYPE', szlot, 'BITS').
-mop_direct('ALIEN-SINGLE-FLOAT-TYPE', szlot, 'CLASS').
-mop_direct('ALIEN-STACK-EXHAUSTED', supers, [obj_storage_condition, obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('ALIEN-SYSTEM-AREA-POINTER-TYPE', submop, 'ALIEN-ALIEN-VALUE-TYPE').
-mop_direct('ALIEN-SYSTEM-AREA-POINTER-TYPE', supers, ['ALIEN-TYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ALIEN-SYSTEM-AREA-POINTER-TYPE', szlot, 'CLASS').
-mop_direct('ALIEN-TYPE', submop, 'ALIEN-FLOAT-TYPE').
-mop_direct('ALIEN-TYPE', submop, 'ALIEN-INTEGER-TYPE').
-mop_direct('ALIEN-TYPE', submop, 'ALIEN-SYSTEM-AREA-POINTER-TYPE').
-mop_direct('ALIEN-TYPE', submop, 'ALIEN-VALUES-TYPE').
-mop_direct('ALIEN-TYPE', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ALIEN-TYPE', szlot, 'ALIGNMENT').
-mop_direct('ALIEN-TYPE', szlot, 'BITS').
-mop_direct('ALIEN-TYPE', szlot, 'CLASS').
-mop_direct('ALIEN-TYPE-CLASS', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ALIEN-TYPE-CLASS', szlot, 'ALIEN-REP').
-mop_direct('ALIEN-TYPE-CLASS', szlot, 'ARG-TN').
-mop_direct('ALIEN-TYPE-CLASS', szlot, 'DEFSTRUCT-NAME').
-mop_direct('ALIEN-TYPE-CLASS', szlot, 'DEPORT-ALLOC-GEN').
-mop_direct('ALIEN-TYPE-CLASS', szlot, 'DEPORT-GEN').
-mop_direct('ALIEN-TYPE-CLASS', szlot, 'DEPORT-PIN-P').
-mop_direct('ALIEN-TYPE-CLASS', szlot, 'DEPOSIT-GEN').
-mop_direct('ALIEN-TYPE-CLASS', szlot, 'EXTRACT-GEN').
-mop_direct('ALIEN-TYPE-CLASS', szlot, 'INCLUDE').
-mop_direct('ALIEN-TYPE-CLASS', szlot, 'LISP-REP').
-mop_direct('ALIEN-TYPE-CLASS', szlot, 'NAME').
-mop_direct('ALIEN-TYPE-CLASS', szlot, 'NATURALIZE-GEN').
-mop_direct('ALIEN-TYPE-CLASS', szlot, 'RESULT-TN').
-mop_direct('ALIEN-TYPE-CLASS', szlot, 'SUBTYPEP').
-mop_direct('ALIEN-TYPE-CLASS', szlot, 'TYPE=').
-mop_direct('ALIEN-TYPE-CLASS', szlot, 'UNPARSE').
-mop_direct('ALIEN-TYPE-TYPE', supers, ['CTYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ALIEN-TYPE-TYPE', szlot, 'ALIEN-TYPE').
-mop_direct('ALIEN-TYPE-TYPE', szlot, 'CLASS-INFO').
-mop_direct('ALIEN-VALUE', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ALIEN-VALUE', szlot, 'SAP').
-mop_direct('ALIEN-VALUE', szlot, 'TYPE').
-mop_direct('ALIEN-VALUES-TYPE', supers, ['ALIEN-TYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ALIEN-VALUES-TYPE', szlot, 'CLASS').
-mop_direct('ALIEN-VALUES-TYPE', szlot, 'VALUES').
-mop_direct('ALIGNMENT-NOTE', supers, ['ANNOTATION', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ALIGNMENT-NOTE', szlot, 'BITS').
-mop_direct('ALIGNMENT-NOTE', szlot, 'PATTERN').
-mop_direct('ALIGNMENT-NOTE', szlot, 'SIZE').
-mop_direct('AMBIGUOUS-VAR-NAME', supers, ['DEBUG-CONDITION', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('AMBIGUOUS-VAR-NAME', szlot, 'FRAME').
-mop_direct('AMBIGUOUS-VAR-NAME', szlot, 'NAME').
-mop_direct('ANNOTATION', submop, 'ALIGNMENT-NOTE').
-mop_direct('ANNOTATION', submop, 'BACK-PATCH').
-mop_direct('ANNOTATION', submop, 'CHOOSER').
-mop_direct('ANNOTATION', submop, 'FILLER').
-mop_direct('ANNOTATION', submop, 'LABEL').
-mop_direct('ANNOTATION', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ANNOTATION', szlot, 'INDEX').
-mop_direct('ANNOTATION', szlot, 'POSN').
-mop_direct('ANODE', supers, [obj_structure_object, t]).
-mop_direct('ANODE', szlot, 'CODE').
-mop_direct('ANODE', szlot, 'SECLASS').
-mop_direct('ANODE', szlot, 'TYPE').
-mop_direct('ANSI-STREAM', submop, obj_broadcast_stream).
-mop_direct('ANSI-STREAM', submop, obj_case_frob_stream).
-mop_direct('ANSI-STREAM', submop, obj_concatenated_stream).
-mop_direct('ANSI-STREAM', submop, 'FD-STREAM').
-mop_direct('ANSI-STREAM', submop, obj_fill_pointer_output_stream).
-mop_direct('ANSI-STREAM', submop, 'PRETTY-STREAM').
-mop_direct('ANSI-STREAM', submop, obj_string_input_stream).
-mop_direct('ANSI-STREAM', submop, obj_string_output_stream).
-mop_direct('ANSI-STREAM', submop, obj_synonym_stream).
-mop_direct('ANSI-STREAM', submop, obj_two_way_stream).
-mop_direct('ANSI-STREAM', supers, [obj_stream, obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ANSI-STREAM', szlot, 'BIN').
-mop_direct('ANSI-STREAM', szlot, 'BOUT').
-mop_direct('ANSI-STREAM', szlot, 'CIN-BUFFER').
-mop_direct('ANSI-STREAM', szlot, 'IN').
-mop_direct('ANSI-STREAM', szlot, 'IN-BUFFER').
-mop_direct('ANSI-STREAM', szlot, 'IN-INDEX').
-mop_direct('ANSI-STREAM', szlot, 'INPUT-CHAR-POS').
-mop_direct('ANSI-STREAM', szlot, 'MISC').
-mop_direct('ANSI-STREAM', szlot, 'N-BIN').
-mop_direct('ANSI-STREAM', szlot, 'OUT').
-mop_direct('ANSI-STREAM', szlot, 'SOUT').
-mop_direct('APPROXIMATE-FUN-TYPE', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('APPROXIMATE-FUN-TYPE', szlot, 'KEYS').
-mop_direct('APPROXIMATE-FUN-TYPE', szlot, 'MAX-ARGS').
-mop_direct('APPROXIMATE-FUN-TYPE', szlot, 'MIN-ARGS').
-mop_direct('APPROXIMATE-FUN-TYPE', szlot, 'TYPES').
-mop_direct('APPROXIMATE-KEY-INFO', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('APPROXIMATE-KEY-INFO', szlot, 'ALLOWP').
-mop_direct('APPROXIMATE-KEY-INFO', szlot, 'NAME').
-mop_direct('APPROXIMATE-KEY-INFO', szlot, 'POSITION').
-mop_direct('APPROXIMATE-KEY-INFO', szlot, 'TYPES').
-mop_direct('ARG', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ARG', szlot, 'FIELDS').
-mop_direct('ARG', szlot, 'NAME').
-mop_direct('ARG', szlot, 'POSITION').
-mop_direct('ARG', szlot, 'PREFILTER').
-mop_direct('ARG', szlot, 'PRINTER').
-mop_direct('ARG', szlot, 'SIGN-EXTEND-P').
-mop_direct('ARG', szlot, 'USE-LABEL').
-mop_direct('ARG', szlot, 'VALUE').
-mop_direct('ARG-COUNT-ERROR', submop, 'ARG-COUNT-PROGRAM-ERROR').
-mop_direct('ARG-COUNT-ERROR', supers, ['DEFMACRO-LAMBDA-LIST-BIND-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('ARG-COUNT-ERROR', szlot, 'ARGS').
-mop_direct('ARG-COUNT-ERROR', szlot, 'LAMBDA-LIST').
-mop_direct('ARG-COUNT-ERROR', szlot, 'MAXIMUM').
-mop_direct('ARG-COUNT-ERROR', szlot, 'MINIMUM').
-mop_direct('ARG-COUNT-PROGRAM-ERROR', supers, ['ARG-COUNT-ERROR', 'DEFMACRO-LAMBDA-LIST-BIND-ERROR', obj_program_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('ARG-FORM-KIND', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ARG-FORM-KIND', szlot, 'CHECKER').
-mop_direct('ARG-FORM-KIND', szlot, 'NAMES').
-mop_direct('ARG-FORM-KIND', szlot, 'PRODUCER').
-mop_direct('ARG-INFO', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ARG-INFO', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ARG-INFO', szlot, 'ARG-INFO-KEY/REST-P').
-mop_direct('ARG-INFO', szlot, 'ARG-INFO-KEYS').
-mop_direct('ARG-INFO', szlot, 'ARG-INFO-LAMBDA-LIST').
-mop_direct('ARG-INFO', szlot, 'ARG-INFO-METATYPES').
-mop_direct('ARG-INFO', szlot, 'ARG-INFO-NUMBER-OPTIONAL').
-mop_direct('ARG-INFO', szlot, 'ARG-INFO-PRECEDENCE').
-mop_direct('ARG-INFO', szlot, 'DEFAULT').
-mop_direct('ARG-INFO', szlot, 'GF-INFO-C-A-M-EMF-STD-P').
-mop_direct('ARG-INFO', szlot, 'GF-INFO-FAST-MF-P').
-mop_direct('ARG-INFO', szlot, 'GF-INFO-SIMPLE-ACCESSOR-TYPE').
-mop_direct('ARG-INFO', szlot, 'GF-INFO-STATIC-C-A-M-EMF').
-mop_direct('ARG-INFO', szlot, 'GF-PRECOMPUTE-DFUN-AND-EMF-P').
-mop_direct('ARG-INFO', szlot, 'KEY').
-mop_direct('ARG-INFO', szlot, 'KIND').
-mop_direct('ARG-INFO', szlot, 'SPECIALP').
-mop_direct('ARG-INFO', szlot, 'SUPPLIED-P').
-mop_direct('ARG-INFO', szlot, 'SUPPLIED-USED-P').
-mop_direct('ARG-STATE', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ARG-STATE', szlot, 'REGISTER-ARGS').
-mop_direct('ARG-STATE', szlot, 'STACK-FRAME-SIZE').
-mop_direct('ARG-STATE', szlot, 'XMM-ARGS').
-mop_direct('ARGS-TYPE', submop, 'FUN-TYPE').
-mop_direct('ARGS-TYPE', submop, 'VALUES-TYPE').
-mop_direct('ARGS-TYPE', supers, ['CTYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ARGS-TYPE', szlot, 'ALLOWP').
-mop_direct('ARGS-TYPE', szlot, 'KEYP').
-mop_direct('ARGS-TYPE', szlot, 'KEYWORDS').
-mop_direct('ARGS-TYPE', szlot, 'OPTIONAL').
-mop_direct('ARGS-TYPE', szlot, 'REQUIRED').
-mop_direct('ARGS-TYPE', szlot, 'REST').
-mop_direct('ARGUMENT-LIST-DOTTED', submop, 'SIMPLE-ARGUMENT-LIST-DOTTED').
-mop_direct('ARGUMENT-LIST-DOTTED', supers, [obj_program_error, obj_type_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('ARGUMENTS-OUT-OF-DOMAIN-ERROR', supers, [obj_arithmetic_error, 'ERROR', obj_serious_condition, 'REFERENCE-CONDITION', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_arithmetic_error, submop, 'ARGUMENTS-OUT-OF-DOMAIN-ERROR').
-mop_direct(obj_arithmetic_error, submop, obj_division_by_zero).
-mop_direct(obj_arithmetic_error, submop, 'FLOATING-POINT-EXCEPTION').
-mop_direct(obj_arithmetic_error, submop, obj_floating_point_inexact).
-mop_direct(obj_arithmetic_error, submop, obj_floating_point_invalid_operation).
-mop_direct(obj_arithmetic_error, submop, obj_floating_point_overflow).
-mop_direct(obj_arithmetic_error, submop, obj_floating_point_underflow).
-mop_direct(obj_arithmetic_error, submop, 'SIMPLE-ARITHMETIC-ERROR').
-mop_direct(obj_arithmetic_error, supers, ['ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_arithmetic_error, supers, ['ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct(obj_arithmetic_error, szlot, '$OPERANDS').
-mop_direct(obj_arithmetic_error, szlot, '$OPERATION').
-mop_direct(obj_arithmetic_error, szlot, 'OPERANDS').
-mop_direct(obj_arithmetic_error, szlot, 'OPERATION').
-mop_direct(obj_array, submop, 'SIMPLE-ARRAY').
-mop_direct(obj_array, submop, obj_vector).
-mop_direct(obj_array, supers, [t]).
-mop_direct('ARRAY-INITIAL-ELEMENT-MISMATCH', supers, ['REFERENCE-CONDITION', obj_simple_warning, obj_simple_condition, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('ARRAY-TYPE', supers, ['CTYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ARRAY-TYPE', szlot, 'CLASS-INFO').
-mop_direct('ARRAY-TYPE', szlot, 'COMPLEXP').
-mop_direct('ARRAY-TYPE', szlot, 'DIMENSIONS').
-mop_direct('ARRAY-TYPE', szlot, 'ELEMENT-TYPE').
-mop_direct('ARRAY-TYPE', szlot, 'SPECIALIZED-ELEMENT-TYPE').
-mop_direct('ASTERISKS-AROUND-CONSTANT-VARIABLE-NAME', supers, ['DUBIOUS-ASTERISKS-AROUND-VARIABLE-NAME', obj_style_warning, obj_warning, obj_simple_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('ASTERISKS-AROUND-LEXICAL-VARIABLE-NAME', supers, ['DUBIOUS-ASTERISKS-AROUND-VARIABLE-NAME', obj_style_warning, obj_warning, obj_simple_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('BACK-PATCH', supers, ['ANNOTATION', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('BACK-PATCH', szlot, 'FUN').
-mop_direct('BACK-PATCH', szlot, 'SIZE').
-mop_direct('BASE-STRING', submop, 'SIMPLE-BASE-STRING').
-mop_direct('BASE-STRING', supers, [obj_string, obj_vector, obj_array, 'SEQUENCE', t]).
-mop_direct('BASIC-COMBINATION', submop, 'COMBINATION').
-mop_direct('BASIC-COMBINATION', submop, 'MV-COMBINATION').
-mop_direct('BASIC-COMBINATION', supers, ['VALUED-NODE', 'NODE', 'SSET-ELEMENT', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('BASIC-COMBINATION', szlot, 'ARGS').
-mop_direct('BASIC-COMBINATION', szlot, 'FUN').
-mop_direct('BASIC-COMBINATION', szlot, 'FUN-INFO').
-mop_direct('BASIC-COMBINATION', szlot, 'INFO').
-mop_direct('BASIC-COMBINATION', szlot, 'KIND').
-mop_direct('BASIC-COMBINATION', szlot, 'STEP-INFO').
-mop_direct('BASIC-COMBINATION', szlot, 'TYPE-VALIDATED-FOR-LEAF').
-mop_direct('BASIC-VAR', submop, 'GLOBAL-VAR').
-mop_direct('BASIC-VAR', submop, 'LAMBDA-VAR').
-mop_direct('BASIC-VAR', supers, ['LEAF', 'SSET-ELEMENT', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('BASIC-VAR', szlot, 'SETS').
-mop_direct(obj_bignum, supers, ['INTEGER', 'RATIONAL', 'REAL', 'NUMBER', t]).
-mop_direct('BIND', supers, ['NODE', 'SSET-ELEMENT', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('BIND', szlot, 'LAMBDA').
-mop_direct('BINDING-STACK-EXHAUSTED', supers, [obj_storage_condition, obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_bit_vector, submop, obj_simple_bit_vector).
-mop_direct(obj_bit_vector, supers, [obj_vector, obj_array, 'SEQUENCE', t]).
-mop_direct('BLOCK-ANNOTATION', submop, 'IR2-BLOCK').
-mop_direct('BLOCK-ANNOTATION', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('BLOCK-ANNOTATION', szlot, 'BLOCK').
-mop_direct('BLOCK-ANNOTATION', szlot, 'NEXT').
-mop_direct('BLOCK-ANNOTATION', szlot, 'PREV').
-mop_direct('BLOCK-END', supers, ['QUEUED-OP', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('BLOCK-END', szlot, 'SUFFIX').
-mop_direct('BLOCK-START', supers, ['SECTION-START', 'QUEUED-OP', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('BLOCK-START', szlot, 'BLOCK-END').
-mop_direct('BLOCK-START', szlot, 'PREFIX').
-mop_direct('BLOCK-START', szlot, 'SUFFIX').
-mop_direct('BOGUS-DEBUG-FUN', supers, ['DEBUG-FUN', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('BOGUS-DEBUG-FUN', szlot, '%NAME').
-mop_direct('BOOTSTRAP-PACKAGE-NOT-FOUND', supers, [obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('BOOTSTRAP-PACKAGE-NOT-FOUND', szlot, 'NAME').
-mop_direct('BOUNDING-INDICES-BAD-ERROR', supers, ['REFERENCE-CONDITION', obj_type_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('BOUNDING-INDICES-BAD-ERROR', szlot, 'OBJECT').
-mop_direct('BREAKPOINT', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('BREAKPOINT', szlot, '%INFO').
-mop_direct('BREAKPOINT', szlot, 'COOKIE-FUN').
-mop_direct('BREAKPOINT', szlot, 'HOOK-FUN').
-mop_direct('BREAKPOINT', szlot, 'INTERNAL-DATA').
-mop_direct('BREAKPOINT', szlot, 'KIND').
-mop_direct('BREAKPOINT', szlot, 'START-HELPER').
-mop_direct('BREAKPOINT', szlot, 'STATUS').
-mop_direct('BREAKPOINT', szlot, 'UNKNOWN-RETURN-PARTNER').
-mop_direct('BREAKPOINT', szlot, 'WHAT').
-mop_direct('BREAKPOINT-DATA', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('BREAKPOINT-DATA', szlot, 'BREAKPOINTS').
-mop_direct('BREAKPOINT-DATA', szlot, 'COMPONENT').
-mop_direct('BREAKPOINT-DATA', szlot, 'INSTRUCTION').
-mop_direct('BREAKPOINT-DATA', szlot, 'OFFSET').
-mop_direct('BREAKPOINT-ERROR', supers, ['SYSTEM-CONDITION', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_broadcast_stream, supers, ['ANSI-STREAM', obj_stream, obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct(obj_broadcast_stream, supers, [obj_stream, t]).
-mop_direct(obj_broadcast_stream, szlot, 'BOUT').
-mop_direct(obj_broadcast_stream, szlot, 'MISC').
-mop_direct(obj_broadcast_stream, szlot, 'OUT').
-mop_direct(obj_broadcast_stream, szlot, 'SOUT').
-mop_direct(obj_broadcast_stream, szlot, 'STREAMS').
-mop_direct('BUFFER', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('BUFFER', szlot, 'HEAD').
-mop_direct('BUFFER', szlot, 'LENGTH').
-mop_direct('BUFFER', szlot, 'SAP').
-mop_direct('BUFFER', szlot, 'TAIL').
-mop_direct('BUG', supers, [obj_simple_error, obj_simple_condition, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_built_in_class, supers, ['CLASS', 'POTENTIAL-CLASS', 'SPECIALIZER', 'SUPER-CLASS', 'STANDARD-STABLEHASH', 'METAOBJECT', obj_standard_object, t]).
-mop_direct(obj_built_in_class, supers, ['SYSTEM-CLASS', 'PCL-CLASS', 'CLASS', 'DEPENDENT-UPDATE-MIXIN', 'PLIST-MIXIN', 'DEFINITION-SOURCE-MIXIN', 'STANDARD-SPECIALIZER', 'SPECIALIZER', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct(obj_built_in_class, szlot, '$PROTOTYPE').
-mop_direct('BUILT-IN-CLASSOID', supers, ['CLASSOID', 'CTYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('BUILT-IN-CLASSOID', szlot, 'TRANSLATION').
-mop_direct('C-SOURCE-POINT', supers, [obj_structure_object, t]).
-mop_direct('C-SOURCE-POINT', szlot, 'FILE').
-mop_direct('C-SOURCE-POINT', szlot, 'LINENO1').
-mop_direct('C-SOURCE-POINT', szlot, 'LINENO2').
-mop_direct('C-STRING-DECODING-ERROR', supers, ['CHARACTER-DECODING-ERROR', 'CHARACTER-CODING-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('C-STRING-ENCODING-ERROR', supers, ['CHARACTER-ENCODING-ERROR', 'CHARACTER-CODING-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('CACHE', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CACHE', szlot, 'DEPTH').
-mop_direct('CACHE', szlot, 'KEY-COUNT').
-mop_direct('CACHE', szlot, 'LIMIT').
-mop_direct('CACHE', szlot, 'LINE-SIZE').
-mop_direct('CACHE', szlot, 'MASK').
-mop_direct('CACHE', szlot, 'VALUE').
-mop_direct('CACHE', szlot, 'VECTOR').
-mop_direct('CACHED-FUN', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CACHED-FUN', szlot, 'CONSTRAINT').
-mop_direct('CACHED-FUN', szlot, 'FUNSTATE').
-mop_direct('CACHED-FUN', szlot, 'NAME').
-mop_direct('CACHING', supers, ['DFUN-INFO', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CALLBACK-INFO', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CALLBACK-INFO', szlot, 'FUNCTION').
-mop_direct('CALLBACK-INFO', szlot, 'INDEX').
-mop_direct('CALLBACK-INFO', szlot, 'SPECIFIER').
-mop_direct('CALLBACK-INFO', szlot, 'WRAPPER').
-mop_direct('CASE-FAILURE', supers, [obj_type_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('CASE-FAILURE', szlot, 'NAME').
-mop_direct('CASE-FAILURE', szlot, 'POSSIBILITIES').
-mop_direct(obj_case_frob_stream, supers, ['ANSI-STREAM', obj_stream, obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct(obj_case_frob_stream, szlot, 'MISC').
-mop_direct(obj_case_frob_stream, szlot, 'TARGET').
-mop_direct('CAST', supers, ['VALUED-NODE', 'NODE', 'SSET-ELEMENT', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CAST', szlot, '%TYPE-CHECK').
-mop_direct('CAST', szlot, 'ASSERTED-TYPE').
-mop_direct('CAST', szlot, 'TYPE-TO-CHECK').
-mop_direct('CAST', szlot, 'VALUE').
-mop_direct('CAST', szlot, 'VESTIGIAL-EXIT-ENTRY-LEXENV').
-mop_direct('CAST', szlot, 'VESTIGIAL-EXIT-LEXENV').
-mop_direct('CBLOCK', supers, ['SSET-ELEMENT', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CBLOCK', szlot, 'COMPONENT').
-mop_direct('CBLOCK', szlot, 'DOMINATORS').
-mop_direct('CBLOCK', szlot, 'FLAG').
-mop_direct('CBLOCK', szlot, 'FLAGS').
-mop_direct('CBLOCK', szlot, 'GEN').
-mop_direct('CBLOCK', szlot, 'IN').
-mop_direct('CBLOCK', szlot, 'INFO').
-mop_direct('CBLOCK', szlot, 'KILL').
-mop_direct('CBLOCK', szlot, 'LAST').
-mop_direct('CBLOCK', szlot, 'LOOP').
-mop_direct('CBLOCK', szlot, 'LOOP-NEXT').
-mop_direct('CBLOCK', szlot, 'NEXT').
-mop_direct('CBLOCK', szlot, 'OUT').
-mop_direct('CBLOCK', szlot, 'PHYSENV-CACHE').
-mop_direct('CBLOCK', szlot, 'PRED').
-mop_direct('CBLOCK', szlot, 'PREV').
-mop_direct('CBLOCK', szlot, 'START').
-mop_direct('CBLOCK', szlot, 'SUCC').
-mop_direct('CBLOCK', szlot, 'XREFS').
-mop_direct(obj_cell_error, submop, 'SIMPLE-CELL-ERROR').
-mop_direct(obj_cell_error, submop, 'SYMBOL-VALUE-IN-THREAD-ERROR').
-mop_direct(obj_cell_error, submop, obj_unbound_slot).
-mop_direct(obj_cell_error, submop, obj_unbound_variable).
-mop_direct(obj_cell_error, submop, 'UNDEFINED-ALIEN-ERROR').
-mop_direct(obj_cell_error, submop, obj_undefined_function).
-mop_direct(obj_cell_error, supers, ['ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_cell_error, supers, ['ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct(obj_cell_error, szlot, '$NAME').
-mop_direct(obj_cell_error, szlot, 'NAME').
-mop_direct(obj_character, supers, [t]).
-mop_direct('CHARACTER-CODING-ERROR', submop, 'CHARACTER-DECODING-ERROR').
-mop_direct('CHARACTER-CODING-ERROR', submop, 'CHARACTER-ENCODING-ERROR').
-mop_direct('CHARACTER-CODING-ERROR', supers, ['ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('CHARACTER-CODING-ERROR', szlot, 'EXTERNAL-FORMAT').
-mop_direct('CHARACTER-DECODING-ERROR', submop, 'C-STRING-DECODING-ERROR').
-mop_direct('CHARACTER-DECODING-ERROR', submop, 'OCTET-DECODING-ERROR').
-mop_direct('CHARACTER-DECODING-ERROR', submop, 'STREAM-DECODING-ERROR').
-mop_direct('CHARACTER-DECODING-ERROR', supers, ['CHARACTER-CODING-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('CHARACTER-DECODING-ERROR', szlot, 'OCTETS').
-mop_direct('CHARACTER-DECODING-ERROR-IN-COMMENT', submop, 'CHARACTER-DECODING-ERROR-IN-DISPATCH-MACRO-CHAR-COMMENT').
-mop_direct('CHARACTER-DECODING-ERROR-IN-COMMENT', submop, 'CHARACTER-DECODING-ERROR-IN-MACRO-CHAR-COMMENT').
-mop_direct('CHARACTER-DECODING-ERROR-IN-COMMENT', supers, [obj_style_warning, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('CHARACTER-DECODING-ERROR-IN-COMMENT', szlot, 'POSITION').
-mop_direct('CHARACTER-DECODING-ERROR-IN-COMMENT', szlot, 'STREAM').
-mop_direct('CHARACTER-DECODING-ERROR-IN-DISPATCH-MACRO-CHAR-COMMENT', supers, ['CHARACTER-DECODING-ERROR-IN-COMMENT', obj_style_warning, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('CHARACTER-DECODING-ERROR-IN-DISPATCH-MACRO-CHAR-COMMENT', szlot, 'DISP-CHAR').
-mop_direct('CHARACTER-DECODING-ERROR-IN-DISPATCH-MACRO-CHAR-COMMENT', szlot, 'SUB-CHAR').
-mop_direct('CHARACTER-DECODING-ERROR-IN-MACRO-CHAR-COMMENT', supers, ['CHARACTER-DECODING-ERROR-IN-COMMENT', obj_style_warning, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('CHARACTER-DECODING-ERROR-IN-MACRO-CHAR-COMMENT', szlot, 'CHAR').
-mop_direct('CHARACTER-ENCODING-ERROR', submop, 'C-STRING-ENCODING-ERROR').
-mop_direct('CHARACTER-ENCODING-ERROR', submop, 'OCTETS-ENCODING-ERROR').
-mop_direct('CHARACTER-ENCODING-ERROR', submop, 'STREAM-ENCODING-ERROR').
-mop_direct('CHARACTER-ENCODING-ERROR', supers, ['CHARACTER-CODING-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('CHARACTER-ENCODING-ERROR', szlot, 'CODE').
-mop_direct('CHARACTER-OUT-OF-RANGE', supers, ['OCTET-DECODING-ERROR', 'CHARACTER-DECODING-ERROR', 'CHARACTER-CODING-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('CHARACTER-SET-TYPE', supers, ['CTYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CHARACTER-SET-TYPE', szlot, 'CLASS-INFO').
-mop_direct('CHARACTER-SET-TYPE', szlot, 'PAIRS').
-mop_direct('CHARACTER-STRING', submop, 'SIMPLE-CHARACTER-STRING').
-mop_direct('CHARACTER-STRING', supers, [obj_string, obj_vector, obj_array, 'SEQUENCE', t]).
-mop_direct('CHARSET-TYPE-ERROR', submop, 'SIMPLE-CHARSET-TYPE-ERROR').
-mop_direct('CHARSET-TYPE-ERROR', supers, [obj_type_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('CHECKING', supers, ['DFUN-INFO', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CHECKING', szlot, 'FUNCTION').
-mop_direct('CHOOSER', supers, ['ANNOTATION', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CHOOSER', szlot, 'ALIGNMENT').
-mop_direct('CHOOSER', szlot, 'MAYBE-SHRINK').
-mop_direct('CHOOSER', szlot, 'SIZE').
-mop_direct('CHOOSER', szlot, 'WORST-CASE-FUN').
-mop_direct('CIF', supers, ['NODE', 'SSET-ELEMENT', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CIF', szlot, 'ALTERNATIVE').
-mop_direct('CIF', szlot, 'ALTERNATIVE-CONSTRAINTS').
-mop_direct('CIF', szlot, 'CONSEQUENT').
-mop_direct('CIF', szlot, 'CONSEQUENT-CONSTRAINTS').
-mop_direct('CIF', szlot, 'TEST').
-mop_direct('CIRCULARITY', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CIRCULARITY', szlot, 'ENCLOSING-OBJECT').
-mop_direct('CIRCULARITY', szlot, 'INDEX').
-mop_direct('CIRCULARITY', szlot, 'OBJECT').
-mop_direct('CIRCULARITY', szlot, 'TYPE').
-mop_direct('CIRCULARITY', szlot, 'VALUE').
-mop_direct('CLAMBDA', supers, ['FUNCTIONAL', 'LEAF', 'SSET-ELEMENT', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CLAMBDA', szlot, 'ALLOW-INSTRUMENTING').
-mop_direct('CLAMBDA', szlot, 'BIND').
-mop_direct('CLAMBDA', szlot, 'CALL-LEXENV').
-mop_direct('CLAMBDA', szlot, 'CALLS-OR-CLOSES').
-mop_direct('CLAMBDA', szlot, 'CHILDREN').
-mop_direct('CLAMBDA', szlot, 'ENTRIES').
-mop_direct('CLAMBDA', szlot, 'HOME').
-mop_direct('CLAMBDA', szlot, 'LETS').
-mop_direct('CLAMBDA', szlot, 'OPTIONAL-DISPATCH').
-mop_direct('CLAMBDA', szlot, 'PARENT').
-mop_direct('CLAMBDA', szlot, 'PHYSENV').
-mop_direct('CLAMBDA', szlot, 'RETURN').
-mop_direct('CLAMBDA', szlot, 'SYSTEM-LAMBDA-P').
-mop_direct('CLAMBDA', szlot, 'TAIL-SET').
-mop_direct('CLAMBDA', szlot, 'VARS').
-mop_direct('CLASS', submop, obj_built_in_class).
-mop_direct('CLASS', submop, 'PCL-CLASS').
-mop_direct('CLASS', submop, 'SLOTTED-CLASS').
-mop_direct('CLASS', supers, ['DEPENDENT-UPDATE-MIXIN', 'PLIST-MIXIN', 'DEFINITION-SOURCE-MIXIN', 'STANDARD-SPECIALIZER', 'SPECIALIZER', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('CLASS', supers, ['POTENTIAL-CLASS', 'SPECIALIZER', 'SUPER-CLASS', 'STANDARD-STABLEHASH', 'METAOBJECT', obj_standard_object, t]).
-mop_direct('CLASS', szlot, '$ALL-SUPERCLASSES').
-mop_direct('CLASS', szlot, '$DEFAULT-INITARGS').
-mop_direct('CLASS', szlot, '$DIRECT-DEFAULT-INITARGS').
-mop_direct('CLASS', szlot, '$DIRECT-SLOTS').
-mop_direct('CLASS', szlot, '$DIRECT-SUPERCLASSES').
-mop_direct('CLASS', szlot, '$DOCUMENTATION').
-mop_direct('CLASS', szlot, '$INITIALIZED').
-mop_direct('CLASS', szlot, '$LISTENERS').
-mop_direct('CLASS', szlot, '$PRECEDENCE-LIST').
-mop_direct('CLASS', szlot, '$SLOT-LOCATION-TABLE').
-mop_direct('CLASS', szlot, '$SLOTS').
-mop_direct('CLASS', szlot, '%DOCUMENTATION').
-mop_direct('CLASS', szlot, 'CLASS-EQ-SPECIALIZER').
-mop_direct('CLASS', szlot, 'DIRECT-METHODS').
-mop_direct('CLASS', szlot, 'DIRECT-SUBCLASSES').
-mop_direct('CLASS', szlot, 'DIRECT-SUPERCLASSES').
-mop_direct('CLASS', szlot, 'FINALIZED-P').
-mop_direct('CLASS', szlot, 'NAME').
-mop_direct('CLASS', szlot, 'SAFE-P').
-mop_direct('CLASS-EQ-SPECIALIZER', supers, ['STANDARD-SPECIALIZER', 'EXACT-CLASS-SPECIALIZER', 'SPECIALIZER-WITH-OBJECT', 'SPECIALIZER', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('CLASS-EQ-SPECIALIZER', szlot, 'OBJECT').
-mop_direct('CLASS-PRECEDENCE-DESCRIPTION', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CLASS-PRECEDENCE-DESCRIPTION', szlot, 'CPD-AFTER').
-mop_direct('CLASS-PRECEDENCE-DESCRIPTION', szlot, 'CPD-CLASS').
-mop_direct('CLASS-PRECEDENCE-DESCRIPTION', szlot, 'CPD-COUNT').
-mop_direct('CLASS-PRECEDENCE-DESCRIPTION', szlot, 'CPD-SUPERS').
-mop_direct('CLASS-PROTOTYPE-SPECIALIZER', supers, ['STANDARD-SPECIALIZER', 'SPECIALIZER-WITH-OBJECT', 'SPECIALIZER', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('CLASS-PROTOTYPE-SPECIALIZER', szlot, 'OBJECT').
-mop_direct('CLASSOID', submop, 'BUILT-IN-CLASSOID').
-mop_direct('CLASSOID', submop, 'CONDITION-CLASSOID').
-mop_direct('CLASSOID', submop, 'STANDARD-CLASSOID').
-mop_direct('CLASSOID', submop, 'STATIC-CLASSOID').
-mop_direct('CLASSOID', submop, 'STRUCTURE-CLASSOID').
-mop_direct('CLASSOID', submop, 'UNDEFINED-CLASSOID').
-mop_direct('CLASSOID', supers, ['CTYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CLASSOID', szlot, 'CLASS-INFO').
-mop_direct('CLASSOID', szlot, 'DIRECT-SUPERCLASSES').
-mop_direct('CLASSOID', szlot, 'LAYOUT').
-mop_direct('CLASSOID', szlot, 'NAME').
-mop_direct('CLASSOID', szlot, 'PCL-CLASS').
-mop_direct('CLASSOID', szlot, 'STATE').
-mop_direct('CLASSOID', szlot, 'SUBCLASSES').
-mop_direct('CLASSOID-CELL', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CLASSOID-CELL', szlot, 'CLASSOID').
-mop_direct('CLASSOID-CELL', szlot, 'NAME').
-mop_direct('CLASSOID-CELL', szlot, 'PCL-CLASS').
-mop_direct('CLEANUP', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CLEANUP', szlot, 'INFO').
-mop_direct('CLEANUP', szlot, 'KIND').
-mop_direct('CLEANUP', szlot, 'MESS-UP').
-mop_direct('CLOOP', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CLOOP', szlot, 'BLOCKS').
-mop_direct('CLOOP', szlot, 'DEPTH').
-mop_direct('CLOOP', szlot, 'EXITS').
-mop_direct('CLOOP', szlot, 'HEAD').
-mop_direct('CLOOP', szlot, 'INFERIORS').
-mop_direct('CLOOP', szlot, 'INFO').
-mop_direct('CLOOP', szlot, 'KIND').
-mop_direct('CLOOP', szlot, 'SUPERIOR').
-mop_direct('CLOOP', szlot, 'TAIL').
-mop_direct('CLOS-WARNING', submop, 'GF-ALREADY-CALLED-WARNING').
-mop_direct('CLOS-WARNING', submop, 'GF-REPLACING-METHOD-WARNING').
-mop_direct('CLOS-WARNING', submop, 'SIMPLE-CLOS-WARNING').
-mop_direct('CLOS-WARNING', supers, [obj_warning, obj_condition, obj_standard_object, t]).
-mop_direct('CLOSED-STREAM-ERROR', supers, [obj_stream_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('CODE-COMPONENT', supers, [t]).
-mop_direct('CODE-DELETION-NOTE', supers, ['SIMPLE-COMPILER-NOTE', obj_simple_condition, 'COMPILER-NOTE', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('CODE-LOCATION', submop, 'COMPILED-CODE-LOCATION').
-mop_direct('CODE-LOCATION', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CODE-LOCATION', szlot, '%DEBUG-BLOCK').
-mop_direct('CODE-LOCATION', szlot, '%FORM-NUMBER').
-mop_direct('CODE-LOCATION', szlot, '%TLF-OFFSET').
-mop_direct('CODE-LOCATION', szlot, '%UNKNOWN-P').
-mop_direct('CODE-LOCATION', szlot, 'DEBUG-FUN').
-mop_direct('COMBINATION', supers, ['BASIC-COMBINATION', 'VALUED-NODE', 'NODE', 'SSET-ELEMENT', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('COMMA', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('COMMA', szlot, 'EXPR').
-mop_direct('COMMA', szlot, 'KIND').
-mop_direct('COMPILED-CODE-LOCATION', supers, ['CODE-LOCATION', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('COMPILED-CODE-LOCATION', szlot, '%LIVE-SET').
-mop_direct('COMPILED-CODE-LOCATION', szlot, 'KIND').
-mop_direct('COMPILED-CODE-LOCATION', szlot, 'PC').
-mop_direct('COMPILED-CODE-LOCATION', szlot, 'STEP-INFO').
-mop_direct('COMPILED-DEBUG-BLOCK', supers, ['DEBUG-BLOCK', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('COMPILED-DEBUG-BLOCK', szlot, 'CODE-LOCATIONS').
-mop_direct('COMPILED-DEBUG-FUN', supers, ['DEBUG-FUN', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('COMPILED-DEBUG-FUN', supers, ['DEBUG-FUN', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('COMPILED-DEBUG-FUN', szlot, 'ARGUMENTS').
-mop_direct('COMPILED-DEBUG-FUN', szlot, 'BLOCKS').
-mop_direct('COMPILED-DEBUG-FUN', szlot, 'BSP-SAVE').
-mop_direct('COMPILED-DEBUG-FUN', szlot, 'CLOSURE-SAVE').
-mop_direct('COMPILED-DEBUG-FUN', szlot, 'COMPILER-DEBUG-FUN').
-mop_direct('COMPILED-DEBUG-FUN', szlot, 'COMPONENT').
-mop_direct('COMPILED-DEBUG-FUN', szlot, 'ELSEWHERE-PC').
-mop_direct('COMPILED-DEBUG-FUN', szlot, 'END-STARTER').
-mop_direct('COMPILED-DEBUG-FUN', szlot, 'FORM-NUMBER').
-mop_direct('COMPILED-DEBUG-FUN', szlot, 'KIND').
-mop_direct('COMPILED-DEBUG-FUN', szlot, 'NAME').
-mop_direct('COMPILED-DEBUG-FUN', szlot, 'RETURNS').
-mop_direct('COMPILED-DEBUG-FUN', szlot, 'START-PC').
-mop_direct('COMPILED-DEBUG-FUN', szlot, 'TLF-NUMBER').
-mop_direct('COMPILED-DEBUG-FUN', szlot, 'VARS').
-mop_direct('COMPILED-DEBUG-INFO', supers, ['DEBUG-INFO', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('COMPILED-DEBUG-INFO', szlot, 'FUN-MAP').
-mop_direct('COMPILED-DEBUG-VAR', supers, ['DEBUG-VAR', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('COMPILED-DEBUG-VAR', szlot, 'INDIRECT-SC-OFFSET').
-mop_direct('COMPILED-DEBUG-VAR', szlot, 'INFO').
-mop_direct('COMPILED-DEBUG-VAR', szlot, 'SAVE-SC-OFFSET').
-mop_direct('COMPILED-DEBUG-VAR', szlot, 'SC-OFFSET').
-mop_direct('COMPILED-FRAME', supers, ['FRAME', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('COMPILED-FRAME', szlot, 'ESCAPED').
-mop_direct('COMPILED-PROGRAM-ERROR', supers, [obj_program_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('COMPILED-PROGRAM-ERROR', szlot, 'MESSAGE').
-mop_direct('COMPILED-PROGRAM-ERROR', szlot, 'SOURCE').
-mop_direct('COMPILER-ENVIRONMENT-TOO-COMPLEX-ERROR', supers, [obj_simple_error, obj_simple_condition, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('COMPILER-ERROR', supers, ['ENCAPSULATED-CONDITION', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('COMPILER-ERROR-CONTEXT', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('COMPILER-ERROR-CONTEXT', szlot, 'CONTEXT').
-mop_direct('COMPILER-ERROR-CONTEXT', szlot, 'ENCLOSING-SOURCE').
-mop_direct('COMPILER-ERROR-CONTEXT', szlot, 'FILE-NAME').
-mop_direct('COMPILER-ERROR-CONTEXT', szlot, 'FILE-POSITION').
-mop_direct('COMPILER-ERROR-CONTEXT', szlot, 'LEXENV').
-mop_direct('COMPILER-ERROR-CONTEXT', szlot, 'ORIGINAL-SOURCE').
-mop_direct('COMPILER-ERROR-CONTEXT', szlot, 'ORIGINAL-SOURCE-PATH').
-mop_direct('COMPILER-ERROR-CONTEXT', szlot, 'SOURCE').
-mop_direct('COMPILER-MACRO-APPLICATION-MISSED-WARNING', supers, [obj_style_warning, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('COMPILER-MACRO-APPLICATION-MISSED-WARNING', szlot, 'COUNT').
-mop_direct('COMPILER-MACRO-APPLICATION-MISSED-WARNING', szlot, 'FUNCTION').
-mop_direct('COMPILER-MACRO-KEYWORD-PROBLEM', supers, [obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('COMPILER-MACRO-KEYWORD-PROBLEM', szlot, 'ARGUMENT').
-mop_direct('COMPILER-NOTE', submop, 'SIMPLE-COMPILER-NOTE').
-mop_direct('COMPILER-NOTE', supers, [obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_complex, submop, 'COMPLEX-DOUBLE-FLOAT').
-mop_direct(obj_complex, submop, 'COMPLEX-SINGLE-FLOAT').
-mop_direct(obj_complex, supers, ['NUMBER', t]).
-mop_direct('COMPLEX-DOUBLE-FLOAT', supers, [obj_complex, 'NUMBER', t]).
-mop_direct('COMPLEX-SINGLE-FLOAT', supers, [obj_complex, 'NUMBER', t]).
-mop_direct('COMPONENT', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('COMPONENT', szlot, 'DELETE-BLOCKS').
-mop_direct('COMPONENT', szlot, 'DX-LVARS').
-mop_direct('COMPONENT', szlot, 'FAILED-OPTIMIZATIONS').
-mop_direct('COMPONENT', szlot, 'HEAD').
-mop_direct('COMPONENT', szlot, 'INFO').
-mop_direct('COMPONENT', szlot, 'INLINE-EXPANSIONS').
-mop_direct('COMPONENT', szlot, 'KIND').
-mop_direct('COMPONENT', szlot, 'LAMBDAS').
-mop_direct('COMPONENT', szlot, 'LAST-BLOCK').
-mop_direct('COMPONENT', szlot, 'NAME').
-mop_direct('COMPONENT', szlot, 'NEW-FUNCTIONALS').
-mop_direct('COMPONENT', szlot, 'NLX-INFO-GENERATED-P').
-mop_direct('COMPONENT', szlot, 'OUTER-LOOP').
-mop_direct('COMPONENT', szlot, 'REANALYZE').
-mop_direct('COMPONENT', szlot, 'REANALYZE-FUNCTIONALS').
-mop_direct('COMPONENT', szlot, 'REOPTIMIZE').
-mop_direct('COMPONENT', szlot, 'SSET-NUMBER').
-mop_direct('COMPONENT', szlot, 'TAIL').
-mop_direct('COMPOUND-TYPE', submop, 'INTERSECTION-TYPE').
-mop_direct('COMPOUND-TYPE', submop, 'UNION-TYPE').
-mop_direct('COMPOUND-TYPE', supers, ['CTYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('COMPOUND-TYPE', szlot, 'ENUMERABLE').
-mop_direct('COMPOUND-TYPE', szlot, 'TYPES').
-mop_direct(obj_concatenated_stream, supers, ['ANSI-STREAM', obj_stream, obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct(obj_concatenated_stream, supers, [obj_stream, t]).
-mop_direct(obj_concatenated_stream, szlot, 'BIN').
-mop_direct(obj_concatenated_stream, szlot, 'IN').
-mop_direct(obj_concatenated_stream, szlot, 'MISC').
-mop_direct(obj_concatenated_stream, szlot, 'N-BIN').
-mop_direct(obj_concatenated_stream, szlot, 'STREAMS').
-mop_direct(obj_condition, submop, 'BOOTSTRAP-PACKAGE-NOT-FOUND').
-mop_direct(obj_condition, submop, 'COMPILER-MACRO-KEYWORD-PROBLEM').
-mop_direct(obj_condition, submop, 'COMPILER-NOTE').
-mop_direct(obj_condition, submop, 'ENCAPSULATED-CONDITION').
-mop_direct(obj_condition, submop, 'PARSE-DEPRECATED-TYPE').
-mop_direct(obj_condition, submop, 'PARSE-UNKNOWN-TYPE').
-mop_direct(obj_condition, submop, 'PROCLAMATION-MISMATCH').
-mop_direct(obj_condition, submop, 'REFERENCE-CONDITION').
-mop_direct(obj_condition, submop, obj_serious_condition).
-mop_direct(obj_condition, submop, obj_simple_condition).
-mop_direct(obj_condition, submop, 'STEP-CONDITION').
-mop_direct(obj_condition, submop, 'SYSTEM-CONDITION').
-mop_direct(obj_condition, submop, obj_warning).
-mop_direct(obj_condition, supers, ['SLOT-OBJECT', t]).
-mop_direct(obj_condition, supers, [obj_standard_object, t]).
-mop_direct('CONDITION-CLASS', supers, [obj_slot_class, 'PCL-CLASS', 'CLASS', 'DEPENDENT-UPDATE-MIXIN', 'PLIST-MIXIN', 'DEFINITION-SOURCE-MIXIN', 'STANDARD-SPECIALIZER', 'SPECIALIZER', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('CONDITION-CLASSOID', supers, ['CLASSOID', 'CTYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CONDITION-CLASSOID', szlot, 'CLASS-SLOTS').
-mop_direct('CONDITION-CLASSOID', szlot, 'CPL').
-mop_direct('CONDITION-CLASSOID', szlot, 'DIRECT-DEFAULT-INITARGS').
-mop_direct('CONDITION-CLASSOID', szlot, 'HAIRY-SLOTS').
-mop_direct('CONDITION-CLASSOID', szlot, 'REPORT').
-mop_direct('CONDITION-CLASSOID', szlot, 'SLOTS').
-mop_direct('CONDITION-DIRECT-SLOT-DEFINITION', supers, ['CONDITION-SLOT-DEFINITION', 'DIRECT-SLOT-DEFINITION', obj_slot_definition, 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('CONDITION-EFFECTIVE-SLOT-DEFINITION', supers, ['CONDITION-SLOT-DEFINITION', 'EFFECTIVE-SLOT-DEFINITION', obj_slot_definition, 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('CONDITION-SLOT', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CONDITION-SLOT', szlot, 'ALLOCATION').
-mop_direct('CONDITION-SLOT', szlot, 'CELL').
-mop_direct('CONDITION-SLOT', szlot, 'DOCUMENTATION').
-mop_direct('CONDITION-SLOT', szlot, 'INITARGS').
-mop_direct('CONDITION-SLOT', szlot, 'INITFORM').
-mop_direct('CONDITION-SLOT', szlot, 'INITFORM-P').
-mop_direct('CONDITION-SLOT', szlot, 'INITFUNCTION').
-mop_direct('CONDITION-SLOT', szlot, 'NAME').
-mop_direct('CONDITION-SLOT', szlot, 'READERS').
-mop_direct('CONDITION-SLOT', szlot, 'WRITERS').
-mop_direct('CONDITION-SLOT-DEFINITION', submop, 'CONDITION-DIRECT-SLOT-DEFINITION').
-mop_direct('CONDITION-SLOT-DEFINITION', submop, 'CONDITION-EFFECTIVE-SLOT-DEFINITION').
-mop_direct('CONDITION-SLOT-DEFINITION', supers, [obj_slot_definition, 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('CONDITION-SLOT-DEFINITION', szlot, 'ALLOCATION').
-mop_direct('CONDITION-SLOT-DEFINITION', szlot, 'ALLOCATION-CLASS').
-mop_direct(obj_cons, supers, [obj_list, 'SEQUENCE', t]).
-mop_direct('CONS-TYPE', supers, ['CTYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CONS-TYPE', szlot, 'CAR-TYPE').
-mop_direct('CONS-TYPE', szlot, 'CDR-TYPE').
-mop_direct('CONS-TYPE', szlot, 'CLASS-INFO').
-mop_direct('CONSET', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CONSET', szlot, 'MAX').
-mop_direct('CONSET', szlot, 'MIN').
-mop_direct('CONSET', szlot, 'VECTOR').
-mop_direct('CONST', supers, [obj_structure_object, t]).
-mop_direct('CONST', szlot, 'FORM').
-mop_direct('CONST', szlot, 'HORIZON').
-mop_direct('CONST', szlot, 'LTV-FORM').
-mop_direct('CONST', szlot, 'VALUE').
-mop_direct('CONSTANT', supers, ['LEAF', 'SSET-ELEMENT', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CONSTANT', szlot, 'BOXED-TN').
-mop_direct('CONSTANT', szlot, 'VALUE').
-mop_direct('CONSTANT-FAST-METHOD-CALL', supers, ['FAST-METHOD-CALL', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CONSTANT-FAST-METHOD-CALL', szlot, 'VALUE').
-mop_direct('CONSTANT-METHOD-CALL', supers, ['METHOD-CALL', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CONSTANT-METHOD-CALL', szlot, 'VALUE').
-mop_direct('CONSTANT-MODIFIED', supers, ['REFERENCE-CONDITION', obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('CONSTANT-MODIFIED', szlot, 'FUN-NAME').
-mop_direct('CONSTANT-TYPE', supers, ['CTYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CONSTANT-TYPE', szlot, 'CLASS-INFO').
-mop_direct('CONSTANT-TYPE', szlot, 'TYPE').
-mop_direct('CONSTANT-VALUE', supers, ['DFUN-INFO', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CONSTRAINT', supers, ['SSET-ELEMENT', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CONSTRAINT', szlot, 'KIND').
-mop_direct('CONSTRAINT', szlot, 'NOT-P').
-mop_direct('CONSTRAINT', szlot, 'X').
-mop_direct('CONSTRAINT', szlot, 'Y').
-mop_direct(obj_control_error, submop, 'ABORT-FAILURE').
-mop_direct(obj_control_error, submop, 'SIMPLE-CONTROL-ERROR').
-mop_direct(obj_control_error, supers, ['ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_control_error, supers, ['ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('CONTROL-STACK-EXHAUSTED', supers, [obj_storage_condition, obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('CONTROL-STRING-DIRECTIVE', supers, [obj_structure_object, t]).
-mop_direct('CONTROL-STRING-DIRECTIVE', szlot, 'ATSIGN-P').
-mop_direct('CONTROL-STRING-DIRECTIVE', szlot, 'CLAUSE-CHAIN').
-mop_direct('CONTROL-STRING-DIRECTIVE', szlot, 'COLON-P').
-mop_direct('CONTROL-STRING-DIRECTIVE', szlot, 'CS-INDEX').
-mop_direct('CONTROL-STRING-DIRECTIVE', szlot, 'DATA').
-mop_direct('CONTROL-STRING-DIRECTIVE', szlot, 'PARM-LIST').
-mop_direct('CONTROL-STRING-DIRECTIVE', szlot, 'TYPE').
-mop_direct('CONTROL-STRING-DIRECTIVE', szlot, 'V-OR-#-P').
-mop_direct('CORE-OBJECT', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CORE-OBJECT', szlot, 'DEBUG-INFO').
-mop_direct('CORE-OBJECT', szlot, 'ENTRY-TABLE').
-mop_direct('CORE-OBJECT', szlot, 'PATCH-TABLE').
-mop_direct('COUNTER', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('COUNTER', szlot, 'OVERFLOW').
-mop_direct('COUNTER', szlot, 'WORD').
-mop_direct('CPL-PROTOCOL-VIOLATION', supers, ['REFERENCE-CONDITION', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('CPL-PROTOCOL-VIOLATION', szlot, 'CLASS').
-mop_direct('CPL-PROTOCOL-VIOLATION', szlot, 'CPL').
-mop_direct('CRETURN', supers, ['NODE', 'SSET-ELEMENT', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CRETURN', szlot, 'LAMBDA').
-mop_direct('CRETURN', szlot, 'RESULT').
-mop_direct('CRETURN', szlot, 'RESULT-TYPE').
-mop_direct('CSET', supers, ['VALUED-NODE', 'NODE', 'SSET-ELEMENT', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CSET', szlot, 'DERIVED-TYPE').
-mop_direct('CSET', szlot, 'VALUE').
-mop_direct('CSET', szlot, 'VAR').
-mop_direct('CTOR', supers, [t]).
-mop_direct('CTOR', szlot, 'CLASS').
-mop_direct('CTOR', szlot, 'CLASS-OR-NAME').
-mop_direct('CTOR', szlot, 'FUNCTION-NAME').
-mop_direct('CTOR', szlot, 'INITARGS').
-mop_direct('CTOR', szlot, 'SAFE-P').
-mop_direct('CTOR', szlot, 'STATE').
-mop_direct('CTRAN', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CTRAN', szlot, 'BLOCK').
-mop_direct('CTRAN', szlot, 'KIND').
-mop_direct('CTRAN', szlot, 'NEXT').
-mop_direct('CTRAN', szlot, 'USE').
-mop_direct('CTYPE', submop, 'ALIEN-TYPE-TYPE').
-mop_direct('CTYPE', submop, 'ARGS-TYPE').
-mop_direct('CTYPE', submop, 'ARRAY-TYPE').
-mop_direct('CTYPE', submop, 'CHARACTER-SET-TYPE').
-mop_direct('CTYPE', submop, 'CLASSOID').
-mop_direct('CTYPE', submop, 'COMPOUND-TYPE').
-mop_direct('CTYPE', submop, 'CONS-TYPE').
-mop_direct('CTYPE', submop, 'CONSTANT-TYPE').
-mop_direct('CTYPE', submop, 'HAIRY-TYPE').
-mop_direct('CTYPE', submop, 'MEMBER-TYPE').
-mop_direct('CTYPE', submop, 'NAMED-TYPE').
-mop_direct('CTYPE', submop, 'NEGATION-TYPE').
-mop_direct('CTYPE', submop, 'NUMERIC-TYPE').
-mop_direct('CTYPE', submop, 'SIMD-PACK-TYPE').
-mop_direct('CTYPE', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('CTYPE', szlot, 'CLASS-INFO').
-mop_direct('CTYPE', szlot, 'HASH-VALUE').
-mop_direct('DEAD-BEEF-STRUCTURE-OBJECT', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('DEADLINE-TIMEOUT', supers, ['TIMEOUT', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('DEBUG-BLOCK', submop, 'COMPILED-DEBUG-BLOCK').
-mop_direct('DEBUG-BLOCK', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('DEBUG-BLOCK', szlot, 'ELSEWHERE-P').
-mop_direct('DEBUG-CONDITION', submop, 'AMBIGUOUS-VAR-NAME').
-mop_direct('DEBUG-CONDITION', submop, 'INVALID-VALUE').
-mop_direct('DEBUG-CONDITION', submop, 'LAMBDA-LIST-UNAVAILABLE').
-mop_direct('DEBUG-CONDITION', submop, 'NO-DEBUG-BLOCKS').
-mop_direct('DEBUG-CONDITION', submop, 'NO-DEBUG-FUN-RETURNS').
-mop_direct('DEBUG-CONDITION', submop, 'NO-DEBUG-VARS').
-mop_direct('DEBUG-CONDITION', supers, [obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('DEBUG-ERROR', submop, 'FRAME-FUN-MISMATCH').
-mop_direct('DEBUG-ERROR', submop, 'INVALID-CONTROL-STACK-POINTER').
-mop_direct('DEBUG-ERROR', submop, 'UNHANDLED-DEBUG-CONDITION').
-mop_direct('DEBUG-ERROR', submop, 'UNKNOWN-CODE-LOCATION').
-mop_direct('DEBUG-ERROR', submop, 'UNKNOWN-DEBUG-VAR').
-mop_direct('DEBUG-ERROR', supers, ['ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('DEBUG-FUN', submop, 'BOGUS-DEBUG-FUN').
-mop_direct('DEBUG-FUN', submop, 'COMPILED-DEBUG-FUN').
-mop_direct('DEBUG-FUN', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('DEBUG-FUN', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('DEBUG-FUN', szlot, '%DEBUG-VARS').
-mop_direct('DEBUG-FUN', szlot, '%FUNCTION').
-mop_direct('DEBUG-FUN', szlot, '%LAMBDA-LIST').
-mop_direct('DEBUG-FUN', szlot, 'BLOCKS').
-mop_direct('DEBUG-INFO', submop, 'COMPILED-DEBUG-INFO').
-mop_direct('DEBUG-INFO', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('DEBUG-INFO', szlot, 'NAME').
-mop_direct('DEBUG-INFO', szlot, 'SOURCE').
-mop_direct('DEBUG-NAME-MARKER', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('DEBUG-SOURCE', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('DEBUG-SOURCE', szlot, 'COMPILED').
-mop_direct('DEBUG-SOURCE', szlot, 'CREATED').
-mop_direct('DEBUG-SOURCE', szlot, 'FORM').
-mop_direct('DEBUG-SOURCE', szlot, 'FUNCTION').
-mop_direct('DEBUG-SOURCE', szlot, 'NAMESTRING').
-mop_direct('DEBUG-SOURCE', szlot, 'PLIST').
-mop_direct('DEBUG-SOURCE', szlot, 'SOURCE-ROOT').
-mop_direct('DEBUG-SOURCE', szlot, 'START-POSITIONS').
-mop_direct('DEBUG-VAR', submop, 'COMPILED-DEBUG-VAR').
-mop_direct('DEBUG-VAR', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('DEBUG-VAR', szlot, 'ALIVE-P').
-mop_direct('DEBUG-VAR', szlot, 'ID').
-mop_direct('DEBUG-VAR', szlot, 'SYMBOL').
-mop_direct('DECLARATION-TYPE-CONFLICT-ERROR', supers, ['REFERENCE-CONDITION', obj_simple_error, obj_simple_condition, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('DEFAULT-METHOD-ONLY', supers, ['DFUN-INFO', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('DEFCONSTANT-UNEQL', supers, ['REFERENCE-CONDITION', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('DEFCONSTANT-UNEQL', szlot, 'NAME').
-mop_direct('DEFCONSTANT-UNEQL', szlot, 'NEW-VALUE').
-mop_direct('DEFCONSTANT-UNEQL', szlot, 'OLD-VALUE').
-mop_direct('DEFINED-FUN', supers, ['GLOBAL-VAR', 'BASIC-VAR', 'LEAF', 'SSET-ELEMENT', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('DEFINED-FUN', szlot, 'FUNCTIONALS').
-mop_direct('DEFINED-FUN', szlot, 'INLINE-EXPANSION').
-mop_direct('DEFINED-FUN', szlot, 'INLINEP').
-mop_direct('DEFINED-FUN', szlot, 'KIND').
-mop_direct('DEFINED-FUN', szlot, 'WHERE-FROM').
-mop_direct('DEFINITION-SOURCE-LOCATION', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('DEFINITION-SOURCE-LOCATION', szlot, 'FORM-NUMBER').
-mop_direct('DEFINITION-SOURCE-LOCATION', szlot, 'NAMESTRING').
-mop_direct('DEFINITION-SOURCE-LOCATION', szlot, 'PLIST').
-mop_direct('DEFINITION-SOURCE-LOCATION', szlot, 'TOPLEVEL-FORM-NUMBER').
-mop_direct('DEFINITION-SOURCE-MIXIN', submop, 'CLASS').
-mop_direct('DEFINITION-SOURCE-MIXIN', submop, 'GENERIC-FUNCTION').
-mop_direct('DEFINITION-SOURCE-MIXIN', submop, 'STANDARD-METHOD').
-mop_direct('DEFINITION-SOURCE-MIXIN', submop, 'STANDARD-METHOD-COMBINATION').
-mop_direct('DEFINITION-SOURCE-MIXIN', supers, [obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('DEFINITION-SOURCE-MIXIN', szlot, 'SOURCE').
-mop_direct('DEFMACRO-LAMBDA-LIST-BIND-ERROR', submop, 'ARG-COUNT-ERROR').
-mop_direct('DEFMACRO-LAMBDA-LIST-BIND-ERROR', submop, 'DEFMACRO-LAMBDA-LIST-BROKEN-KEY-LIST-ERROR').
-mop_direct('DEFMACRO-LAMBDA-LIST-BIND-ERROR', supers, ['ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('DEFMACRO-LAMBDA-LIST-BIND-ERROR', szlot, 'KIND').
-mop_direct('DEFMACRO-LAMBDA-LIST-BIND-ERROR', szlot, 'NAME').
-mop_direct('DEFMACRO-LAMBDA-LIST-BROKEN-KEY-LIST-ERROR', supers, ['DEFMACRO-LAMBDA-LIST-BIND-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('DEFMACRO-LAMBDA-LIST-BROKEN-KEY-LIST-ERROR', szlot, 'INFO').
-mop_direct('DEFMACRO-LAMBDA-LIST-BROKEN-KEY-LIST-ERROR', szlot, 'PROBLEM').
-mop_direct('DEFSTRUCT-DESCRIPTION', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('DEFSTRUCT-DESCRIPTION', szlot, 'ALTERNATE-METACLASS').
-mop_direct('DEFSTRUCT-DESCRIPTION', szlot, 'CONC-NAME').
-mop_direct('DEFSTRUCT-DESCRIPTION', szlot, 'CONSTRUCTORS').
-mop_direct('DEFSTRUCT-DESCRIPTION', szlot, 'COPIER-NAME').
-mop_direct('DEFSTRUCT-DESCRIPTION', szlot, 'DOC').
-mop_direct('DEFSTRUCT-DESCRIPTION', szlot, 'ELEMENT-TYPE').
-mop_direct('DEFSTRUCT-DESCRIPTION', szlot, 'INCLUDE').
-mop_direct('DEFSTRUCT-DESCRIPTION', szlot, 'INHERITED-ACCESSOR-ALIST').
-mop_direct('DEFSTRUCT-DESCRIPTION', szlot, 'LENGTH').
-mop_direct('DEFSTRUCT-DESCRIPTION', szlot, 'NAME').
-mop_direct('DEFSTRUCT-DESCRIPTION', szlot, 'NAMED').
-mop_direct('DEFSTRUCT-DESCRIPTION', szlot, 'NULL-LEXENV-P').
-mop_direct('DEFSTRUCT-DESCRIPTION', szlot, 'OFFSET').
-mop_direct('DEFSTRUCT-DESCRIPTION', szlot, 'PREDICATE-NAME').
-mop_direct('DEFSTRUCT-DESCRIPTION', szlot, 'PRINT-OPTION').
-mop_direct('DEFSTRUCT-DESCRIPTION', szlot, 'PRINTER-FNAME').
-mop_direct('DEFSTRUCT-DESCRIPTION', szlot, 'PURE').
-mop_direct('DEFSTRUCT-DESCRIPTION', szlot, 'SLOTS').
-mop_direct('DEFSTRUCT-DESCRIPTION', szlot, 'TYPE').
-mop_direct('DEFSTRUCT-SLOT-DESCRIPTION', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('DEFSTRUCT-SLOT-DESCRIPTION', szlot, 'ACCESSOR-NAME').
-mop_direct('DEFSTRUCT-SLOT-DESCRIPTION', szlot, 'DEFAULT').
-mop_direct('DEFSTRUCT-SLOT-DESCRIPTION', szlot, 'INDEX').
-mop_direct('DEFSTRUCT-SLOT-DESCRIPTION', szlot, 'NAME').
-mop_direct('DEFSTRUCT-SLOT-DESCRIPTION', szlot, 'RAW-TYPE').
-mop_direct('DEFSTRUCT-SLOT-DESCRIPTION', szlot, 'READ-ONLY').
-mop_direct('DEFSTRUCT-SLOT-DESCRIPTION', szlot, 'SAFE-P').
-mop_direct('DEFSTRUCT-SLOT-DESCRIPTION', szlot, 'TYPE').
-mop_direct('DEPENDENT-UPDATE-MIXIN', submop, 'CLASS').
-mop_direct('DEPENDENT-UPDATE-MIXIN', submop, 'GENERIC-FUNCTION').
-mop_direct('DEPENDENT-UPDATE-MIXIN', supers, ['PLIST-MIXIN', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('DEPRECATED-EVAL-WHEN-SITUATIONS', supers, [obj_style_warning, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('DEPRECATED-EVAL-WHEN-SITUATIONS', szlot, 'SITUATIONS').
-mop_direct('DEPRECATION-CONDITION', submop, 'DEPRECATION-ERROR').
-mop_direct('DEPRECATION-CONDITION', submop, 'EARLY-DEPRECATION-WARNING').
-mop_direct('DEPRECATION-CONDITION', submop, 'FINAL-DEPRECATION-WARNING').
-mop_direct('DEPRECATION-CONDITION', submop, 'LATE-DEPRECATION-WARNING').
-mop_direct('DEPRECATION-CONDITION', supers, ['REFERENCE-CONDITION', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('DEPRECATION-CONDITION', szlot, 'NAME').
-mop_direct('DEPRECATION-CONDITION', szlot, 'NAMESPACE').
-mop_direct('DEPRECATION-CONDITION', szlot, 'REPLACEMENTS').
-mop_direct('DEPRECATION-CONDITION', szlot, 'RUNTIME-ERROR').
-mop_direct('DEPRECATION-CONDITION', szlot, 'SOFTWARE').
-mop_direct('DEPRECATION-CONDITION', szlot, 'VERSION').
-mop_direct('DEPRECATION-ERROR', supers, ['ERROR', obj_serious_condition, 'DEPRECATION-CONDITION', 'REFERENCE-CONDITION', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('DEPRECATION-INFO', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('DEPRECATION-INFO', szlot, 'REPLACEMENTS').
-mop_direct('DEPRECATION-INFO', szlot, 'SOFTWARE').
-mop_direct('DEPRECATION-INFO', szlot, 'STATE').
-mop_direct('DEPRECATION-INFO', szlot, 'VERSION').
-mop_direct('DESCRIBE-STREAM', supers, ['FILL-STREAM', 'FUNDAMENTAL-CHARACTER-OUTPUT-STREAM', 'FUNDAMENTAL-OUTPUT-STREAM', 'FUNDAMENTAL-CHARACTER-STREAM', 'FUNDAMENTAL-STREAM', obj_stream, obj_standard_object, t]).
-mop_direct('DFUN-INFO', submop, 'ACCESSOR-DFUN-INFO').
-mop_direct('DFUN-INFO', submop, 'CACHING').
-mop_direct('DFUN-INFO', submop, 'CHECKING').
-mop_direct('DFUN-INFO', submop, 'CONSTANT-VALUE').
-mop_direct('DFUN-INFO', submop, 'DEFAULT-METHOD-ONLY').
-mop_direct('DFUN-INFO', submop, 'DISPATCH').
-mop_direct('DFUN-INFO', submop, 'INITIAL').
-mop_direct('DFUN-INFO', submop, 'NO-METHODS').
-mop_direct('DFUN-INFO', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('DFUN-INFO', szlot, 'CACHE').
-mop_direct('DIRECT-SLOT-DEFINITION', submop, 'CONDITION-DIRECT-SLOT-DEFINITION').
-mop_direct('DIRECT-SLOT-DEFINITION', submop, 'STANDARD-DIRECT-SLOT-DEFINITION').
-mop_direct('DIRECT-SLOT-DEFINITION', submop, 'STRUCTURE-DIRECT-SLOT-DEFINITION').
-mop_direct('DIRECT-SLOT-DEFINITION', supers, [obj_slot_definition, 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('DIRECT-SLOT-DEFINITION', supers, [obj_slot_definition, 'METAOBJECT', obj_standard_object, t]).
-mop_direct('DIRECT-SLOT-DEFINITION', szlot, '$READERS').
-mop_direct('DIRECT-SLOT-DEFINITION', szlot, '$WRITERS').
-mop_direct('DIRECT-SLOT-DEFINITION', szlot, 'READERS').
-mop_direct('DIRECT-SLOT-DEFINITION', szlot, 'WRITERS').
-mop_direct('DISASSEM-STATE', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('DISASSEM-STATE', szlot, 'ADDR-PRINT-LEN').
-mop_direct('DISASSEM-STATE', szlot, 'ALIGNMENT').
-mop_direct('DISASSEM-STATE', szlot, 'ARGUMENT-COLUMN').
-mop_direct('DISASSEM-STATE', szlot, 'BYTE-ORDER').
-mop_direct('DISASSEM-STATE', szlot, 'CUR-LABELS').
-mop_direct('DISASSEM-STATE', szlot, 'CUR-OFFS').
-mop_direct('DISASSEM-STATE', szlot, 'CUR-OFFS-HOOKS').
-mop_direct('DISASSEM-STATE', szlot, 'CURRENT-VALID-LOCATIONS').
-mop_direct('DISASSEM-STATE', szlot, 'FILTERED-VALUES').
-mop_direct('DISASSEM-STATE', szlot, 'FUN-HOOKS').
-mop_direct('DISASSEM-STATE', szlot, 'INST-PROPERTIES').
-mop_direct('DISASSEM-STATE', szlot, 'LABEL-HASH').
-mop_direct('DISASSEM-STATE', szlot, 'LABELS').
-mop_direct('DISASSEM-STATE', szlot, 'NEXT-OFFS').
-mop_direct('DISASSEM-STATE', szlot, 'NOTES').
-mop_direct('DISASSEM-STATE', szlot, 'OUTPUT-STATE').
-mop_direct('DISASSEM-STATE', szlot, 'PROPERTIES').
-mop_direct('DISASSEM-STATE', szlot, 'SEGMENT').
-mop_direct('DISASSEM-STATE', szlot, 'SEGMENT-SAP').
-mop_direct('DISPATCH', supers, ['DFUN-INFO', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct(obj_division_by_zero, submop, 'SIMPLE-DIVISION-BY-ZERO').
-mop_direct(obj_division_by_zero, supers, [obj_arithmetic_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_division_by_zero, supers, [obj_arithmetic_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct(obj_double_float, supers, ['FLOAT', 'REAL', 'NUMBER', t]).
-mop_direct('DUBIOUS-ASTERISKS-AROUND-VARIABLE-NAME', submop, 'ASTERISKS-AROUND-CONSTANT-VARIABLE-NAME').
-mop_direct('DUBIOUS-ASTERISKS-AROUND-VARIABLE-NAME', submop, 'ASTERISKS-AROUND-LEXICAL-VARIABLE-NAME').
-mop_direct('DUBIOUS-ASTERISKS-AROUND-VARIABLE-NAME', supers, [obj_style_warning, obj_warning, obj_simple_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('DUPLICATE-CASE-KEY-WARNING', supers, [obj_style_warning, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('DUPLICATE-CASE-KEY-WARNING', szlot, 'CASE-KIND').
-mop_direct('DUPLICATE-CASE-KEY-WARNING', szlot, 'KEY').
-mop_direct('DUPLICATE-CASE-KEY-WARNING', szlot, 'OCCURRENCES').
-mop_direct('DUPLICATE-DEFINITION', supers, ['REFERENCE-CONDITION', obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('DUPLICATE-DEFINITION', szlot, 'NAME').
-mop_direct('EA', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('EA', szlot, 'BASE').
-mop_direct('EA', szlot, 'DISP').
-mop_direct('EA', szlot, 'INDEX').
-mop_direct('EA', szlot, 'SCALE').
-mop_direct('EA', szlot, 'SIZE').
-mop_direct('EARLY-DEPRECATION-WARNING', supers, [obj_style_warning, obj_warning, 'DEPRECATION-CONDITION', 'REFERENCE-CONDITION', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_echo_stream, supers, [obj_stream, t]).
-mop_direct(obj_echo_stream, supers, [obj_two_way_stream, 'ANSI-STREAM', obj_stream, obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct(obj_echo_stream, szlot, 'BIN').
-mop_direct(obj_echo_stream, szlot, 'IN').
-mop_direct(obj_echo_stream, szlot, 'MISC').
-mop_direct(obj_echo_stream, szlot, 'N-BIN').
-mop_direct(obj_echo_stream, szlot, 'UNREAD-STUFF').
-mop_direct('EFFECTIVE-SLOT-DEFINITION', submop, 'CONDITION-EFFECTIVE-SLOT-DEFINITION').
-mop_direct('EFFECTIVE-SLOT-DEFINITION', submop, 'STANDARD-EFFECTIVE-SLOT-DEFINITION').
-mop_direct('EFFECTIVE-SLOT-DEFINITION', submop, 'STRUCTURE-EFFECTIVE-SLOT-DEFINITION').
-mop_direct('EFFECTIVE-SLOT-DEFINITION', supers, [obj_slot_definition, 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('EFFECTIVE-SLOT-DEFINITION', supers, [obj_slot_definition, 'METAOBJECT', obj_standard_object, t]).
-mop_direct('EFFECTIVE-SLOT-DEFINITION', szlot, '$EFM-SBUC').
-mop_direct('EFFECTIVE-SLOT-DEFINITION', szlot, '$EFM-SMUC').
-mop_direct('EFFECTIVE-SLOT-DEFINITION', szlot, '$EFM-SSVUC').
-mop_direct('EFFECTIVE-SLOT-DEFINITION', szlot, '$EFM-SVUC').
-mop_direct('EFFECTIVE-SLOT-DEFINITION', szlot, '$LOCATION').
-mop_direct('EFFECTIVE-SLOT-DEFINITION', szlot, 'ACCESSOR-FLAGS').
-mop_direct('EFFECTIVE-SLOT-DEFINITION', szlot, 'INFO').
-mop_direct('ENCAPSULATED-CONDITION', submop, 'COMPILER-ERROR').
-mop_direct('ENCAPSULATED-CONDITION', submop, 'EVAL-ERROR').
-mop_direct('ENCAPSULATED-CONDITION', submop, 'FATAL-COMPILER-ERROR').
-mop_direct('ENCAPSULATED-CONDITION', submop, 'INPUT-ERROR-IN-COMPILE-FILE').
-mop_direct('ENCAPSULATED-CONDITION', submop, 'INTERPRETED-PROGRAM-ERROR').
-mop_direct('ENCAPSULATED-CONDITION', supers, [obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('ENCAPSULATED-CONDITION', szlot, 'CONDITION').
-mop_direct('ENCAPSULATION-INFO', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ENCAPSULATION-INFO', szlot, 'DEFINITION').
-mop_direct('ENCAPSULATION-INFO', szlot, 'TYPE').
-mop_direct(obj_end_of_file, submop, 'READER-EOF-ERROR').
-mop_direct(obj_end_of_file, submop, 'SIMPLE-END-OF-FILE').
-mop_direct(obj_end_of_file, supers, [obj_stream_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_end_of_file, supers, [obj_stream_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('END-OF-INPUT-IN-CHARACTER', supers, ['OCTET-DECODING-ERROR', 'CHARACTER-DECODING-ERROR', 'CHARACTER-CODING-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('ENTRY', supers, ['NODE', 'SSET-ELEMENT', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ENTRY', szlot, 'CLEANUP').
-mop_direct('ENTRY', szlot, 'EXITS').
-mop_direct('ENTRY-INFO', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ENTRY-INFO', szlot, 'ARGUMENTS').
-mop_direct('ENTRY-INFO', szlot, 'CLOSURE-TN').
-mop_direct('ENTRY-INFO', szlot, 'INFO').
-mop_direct('ENTRY-INFO', szlot, 'NAME').
-mop_direct('ENTRY-INFO', szlot, 'OFFSET').
-mop_direct('ENTRY-INFO', szlot, 'TYPE').
-mop_direct('ENV', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ENV', szlot, 'BLOCKS').
-mop_direct('ENV', szlot, 'DECLARATIONS').
-mop_direct('ENV', szlot, 'EXPANDERS').
-mop_direct('ENV', szlot, 'FUNS').
-mop_direct('ENV', szlot, 'NATIVE-LEXENV').
-mop_direct('ENV', szlot, 'PARENT').
-mop_direct('ENV', szlot, 'SYMBOL-EXPANSIONS').
-mop_direct('ENV', szlot, 'TAGS').
-mop_direct('ENV', szlot, 'VARS').
-mop_direct('EQL-SPECIALIZER', supers, ['SPECIALIZER', 'STANDARD-STABLEHASH', 'METAOBJECT', obj_standard_object, t]).
-mop_direct('EQL-SPECIALIZER', supers, ['STANDARD-SPECIALIZER', 'EXACT-CLASS-SPECIALIZER', 'SPECIALIZER-WITH-OBJECT', 'SPECIALIZER', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('EQL-SPECIALIZER', szlot, '$SINGLETON').
-mop_direct('EQL-SPECIALIZER', szlot, 'DIRECT-METHODS').
-mop_direct('EQL-SPECIALIZER', szlot, 'OBJECT').
-mop_direct('ERROR', submop, obj_arithmetic_error).
-mop_direct('ERROR', submop, 'BREAKPOINT-ERROR').
-mop_direct('ERROR', submop, obj_cell_error).
-mop_direct('ERROR', submop, 'CHARACTER-CODING-ERROR').
-mop_direct('ERROR', submop, obj_control_error).
-mop_direct('ERROR', submop, 'CPL-PROTOCOL-VIOLATION').
-mop_direct('ERROR', submop, 'DEBUG-ERROR').
-mop_direct('ERROR', submop, 'DEFCONSTANT-UNEQL').
-mop_direct('ERROR', submop, 'DEFMACRO-LAMBDA-LIST-BIND-ERROR').
-mop_direct('ERROR', submop, 'DEPRECATION-ERROR').
-mop_direct('ERROR', submop, obj_file_error).
-mop_direct('ERROR', submop, 'FORMAT-ERROR').
-mop_direct('ERROR', submop, 'FTYPE-PROCLAMATION-MISMATCH-ERROR').
-mop_direct('ERROR', submop, 'INSTANCE-STRUCTURE-PROTOCOL-ERROR').
-mop_direct('ERROR', submop, 'INVALID-FASL').
-mop_direct('ERROR', submop, 'INVALID-SUPERCLASS').
-mop_direct('ERROR', submop, 'MEMORY-FAULT-ERROR').
-mop_direct('ERROR', submop, 'MISSING-LOAD-FORM').
-mop_direct('ERROR', submop, 'NEW-VALUE-SPECIALIZATION').
-mop_direct('ERROR', submop, 'NO-PRIMARY-METHOD').
-mop_direct('ERROR', submop, 'OBSOLETE-STRUCTURE').
-mop_direct('ERROR', submop, 'OS-ERROR').
-mop_direct('ERROR', submop, obj_package_error).
-mop_direct('ERROR', submop, obj_parse_error).
-mop_direct('ERROR', submop, obj_print_not_readable).
-mop_direct('ERROR', submop, obj_program_error).
-mop_direct('ERROR', submop, 'SAVE-ERROR').
-mop_direct('ERROR', submop, obj_simple_error).
-mop_direct('ERROR', submop, 'SLOTD-INITIALIZATION-ERROR').
-mop_direct('ERROR', submop, 'STANDARD-PPRINT-DISPATCH-TABLE-MODIFIED-ERROR').
-mop_direct('ERROR', submop, 'STANDARD-READTABLE-MODIFIED-ERROR').
-mop_direct('ERROR', submop, obj_stream_error).
-mop_direct('ERROR', submop, 'THREAD-ERROR').
-mop_direct('ERROR', submop, obj_type_error).
-mop_direct('ERROR', supers, [obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('ERROR', supers, [obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('EVAL-ERROR', supers, ['ENCAPSULATED-CONDITION', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('EVENT-INFO', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('EVENT-INFO', szlot, 'ACTION').
-mop_direct('EVENT-INFO', szlot, 'COUNT').
-mop_direct('EVENT-INFO', szlot, 'DESCRIPTION').
-mop_direct('EVENT-INFO', szlot, 'LEVEL').
-mop_direct('EVENT-INFO', szlot, 'NAME').
-mop_direct('EVENT-INFO', szlot, 'VAR').
-mop_direct('EXACT-CLASS-SPECIALIZER', submop, 'CLASS-EQ-SPECIALIZER').
-mop_direct('EXACT-CLASS-SPECIALIZER', submop, 'EQL-SPECIALIZER').
-mop_direct('EXACT-CLASS-SPECIALIZER', supers, ['SPECIALIZER', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('EXIT', supers, ['VALUED-NODE', 'NODE', 'SSET-ELEMENT', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('EXIT', szlot, 'ENTRY').
-mop_direct('EXIT', szlot, 'NLX-INFO').
-mop_direct('EXIT', szlot, 'VALUE').
-mop_direct('EXTENSION-FAILURE', supers, ['REFERENCE-CONDITION', obj_simple_error, obj_simple_condition, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('EXTERNAL-FORMAT', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('EXTERNAL-FORMAT', szlot, 'BYTES-FOR-CHAR-FUN').
-mop_direct('EXTERNAL-FORMAT', szlot, 'DEFAULT-REPLACEMENT-CHARACTER').
-mop_direct('EXTERNAL-FORMAT', szlot, 'NAMES').
-mop_direct('EXTERNAL-FORMAT', szlot, 'OCTETS-TO-STRING-FUN').
-mop_direct('EXTERNAL-FORMAT', szlot, 'READ-C-STRING-FUN').
-mop_direct('EXTERNAL-FORMAT', szlot, 'READ-CHAR-FUN').
-mop_direct('EXTERNAL-FORMAT', szlot, 'READ-N-CHARS-FUN').
-mop_direct('EXTERNAL-FORMAT', szlot, 'RESYNC-FUN').
-mop_direct('EXTERNAL-FORMAT', szlot, 'STRING-TO-OCTETS-FUN').
-mop_direct('EXTERNAL-FORMAT', szlot, 'WRITE-C-STRING-FUN').
-mop_direct('EXTERNAL-FORMAT', szlot, 'WRITE-CHAR-FULL-BUFFERED-FUN').
-mop_direct('EXTERNAL-FORMAT', szlot, 'WRITE-CHAR-LINE-BUFFERED-FUN').
-mop_direct('EXTERNAL-FORMAT', szlot, 'WRITE-CHAR-NONE-BUFFERED-FUN').
-mop_direct('EXTERNAL-FORMAT', szlot, 'WRITE-N-BYTES-FUN').
-mop_direct('FASL-HEADER-MISSING', supers, ['INVALID-FASL', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('FASL-HEADER-MISSING', szlot, 'FHSSS').
-mop_direct('FASL-INPUT', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('FASL-INPUT', szlot, 'DEPRECATED-STUFF').
-mop_direct('FASL-INPUT', szlot, 'SKIP-UNTIL').
-mop_direct('FASL-INPUT', szlot, 'STACK').
-mop_direct('FASL-INPUT', szlot, 'STREAM').
-mop_direct('FASL-INPUT', szlot, 'TABLE').
-mop_direct('FASL-OUTPUT', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('FASL-OUTPUT', szlot, 'CIRCULARITY-TABLE').
-mop_direct('FASL-OUTPUT', szlot, 'DEBUG-INFO').
-mop_direct('FASL-OUTPUT', szlot, 'ENTRY-TABLE').
-mop_direct('FASL-OUTPUT', szlot, 'EQ-TABLE').
-mop_direct('FASL-OUTPUT', szlot, 'EQUAL-TABLE').
-mop_direct('FASL-OUTPUT', szlot, 'PACKAGES').
-mop_direct('FASL-OUTPUT', szlot, 'PATCH-TABLE').
-mop_direct('FASL-OUTPUT', szlot, 'STREAM').
-mop_direct('FASL-OUTPUT', szlot, 'STRING=-TABLE').
-mop_direct('FASL-OUTPUT', szlot, 'TABLE-FREE').
-mop_direct('FASL-OUTPUT', szlot, 'VALID-STRUCTURES').
-mop_direct('FAST-INSTANCE-BOUNDP', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('FAST-INSTANCE-BOUNDP', szlot, 'INDEX').
-mop_direct('FAST-METHOD-CALL', submop, 'CONSTANT-FAST-METHOD-CALL').
-mop_direct('FAST-METHOD-CALL', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('FAST-METHOD-CALL', szlot, 'ARG-INFO').
-mop_direct('FAST-METHOD-CALL', szlot, 'FUNCTION').
-mop_direct('FAST-METHOD-CALL', szlot, 'NEXT-METHOD-CALL').
-mop_direct('FAST-METHOD-CALL', szlot, 'PV').
-mop_direct('FATAL-COMPILER-ERROR', supers, ['ENCAPSULATED-CONDITION', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('FD-STREAM', submop, 'FORM-TRACKING-STREAM').
-mop_direct('FD-STREAM', supers, [obj_file_stream, 'ANSI-STREAM', obj_stream, obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('FD-STREAM', szlot, 'BIVALENT-P').
-mop_direct('FD-STREAM', szlot, 'BUFFERING').
-mop_direct('FD-STREAM', szlot, 'CHAR-SIZE').
-mop_direct('FD-STREAM', szlot, 'DELETE-ORIGINAL').
-mop_direct('FD-STREAM', szlot, 'DUAL-CHANNEL-P').
-mop_direct('FD-STREAM', szlot, 'ELEMENT-SIZE').
-mop_direct('FD-STREAM', szlot, 'ELEMENT-TYPE').
-mop_direct('FD-STREAM', szlot, 'EOF-FORCED-P').
-mop_direct('FD-STREAM', szlot, 'EXTERNAL-FORMAT').
-mop_direct('FD-STREAM', szlot, 'FD').
-mop_direct('FD-STREAM', szlot, 'FD-TYPE').
-mop_direct('FD-STREAM', szlot, 'FILE').
-mop_direct('FD-STREAM', szlot, 'HANDLER').
-mop_direct('FD-STREAM', szlot, 'IBUF').
-mop_direct('FD-STREAM', szlot, 'INSTEAD').
-mop_direct('FD-STREAM', szlot, 'LISTEN').
-mop_direct('FD-STREAM', szlot, 'MISC').
-mop_direct('FD-STREAM', szlot, 'NAME').
-mop_direct('FD-STREAM', szlot, 'OBUF').
-mop_direct('FD-STREAM', szlot, 'ORIGINAL').
-mop_direct('FD-STREAM', szlot, 'OUTPUT-BYTES').
-mop_direct('FD-STREAM', szlot, 'OUTPUT-COLUMN').
-mop_direct('FD-STREAM', szlot, 'OUTPUT-QUEUE').
-mop_direct('FD-STREAM', szlot, 'PATHNAME').
-mop_direct('FD-STREAM', szlot, 'SERVE-EVENTS').
-mop_direct('FD-STREAM', szlot, 'TIMEOUT').
-mop_direct('FDEFN', supers, [t]).
-mop_direct('FFI-MODULE', supers, [obj_structure_object, t]).
-mop_direct('FFI-MODULE', szlot, 'C-NAME').
-mop_direct('FFI-MODULE', szlot, 'CONSTANT-TABLE').
-mop_direct('FFI-MODULE', szlot, 'FINI').
-mop_direct('FFI-MODULE', szlot, 'FUNCTION-LIST').
-mop_direct('FFI-MODULE', szlot, 'INIT-ALWAYS').
-mop_direct('FFI-MODULE', szlot, 'INIT-ONCE').
-mop_direct('FFI-MODULE', szlot, 'NAME').
-mop_direct('FFI-MODULE', szlot, 'OBJECT-TABLE').
-mop_direct('FFI-MODULE', szlot, 'TYPE-TABLE').
-mop_direct('FFI-MODULE', szlot, 'VARIABLE-LIST').
-mop_direct('FGEN', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('FGEN', szlot, 'GENERATOR').
-mop_direct('FGEN', szlot, 'GENERATOR-LAMBDA').
-mop_direct('FGEN', szlot, 'GENSYMS').
-mop_direct('FGEN', szlot, 'SYSTEM').
-mop_direct(obj_file_error, submop, 'SIMPLE-FILE-ERROR').
-mop_direct(obj_file_error, supers, ['ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_file_error, supers, ['ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct(obj_file_error, szlot, '$PATHNAME').
-mop_direct(obj_file_error, szlot, 'PATHNAME').
-mop_direct('FILE-INFO', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('FILE-INFO', supers, [obj_structure_object, t]).
-mop_direct('FILE-INFO', szlot, 'ATIME').
-mop_direct('FILE-INFO', szlot, 'ATTRIBUTES').
-mop_direct('FILE-INFO', szlot, 'CTIME').
-mop_direct('FILE-INFO', szlot, 'EXTERNAL-FORMAT').
-mop_direct('FILE-INFO', szlot, 'FORMS').
-mop_direct('FILE-INFO', szlot, 'NAME').
-mop_direct('FILE-INFO', szlot, 'NAME-SHORT').
-mop_direct('FILE-INFO', szlot, 'POSITIONS').
-mop_direct('FILE-INFO', szlot, 'SIZE').
-mop_direct('FILE-INFO', szlot, 'SOURCE-ROOT').
-mop_direct('FILE-INFO', szlot, 'STYLE-WARNING-TRACKER').
-mop_direct('FILE-INFO', szlot, 'SUBFORMS').
-mop_direct('FILE-INFO', szlot, 'UNTRUENAME').
-mop_direct('FILE-INFO', szlot, 'WRITE-DATE').
-mop_direct('FILE-INFO', szlot, 'WTIME').
-mop_direct('FILE-STAT', supers, [obj_structure_object, t]).
-mop_direct('FILE-STAT', szlot, 'ATIME').
-mop_direct('FILE-STAT', szlot, 'BLKSIZE').
-mop_direct('FILE-STAT', szlot, 'BLOCKS').
-mop_direct('FILE-STAT', szlot, 'CTIME').
-mop_direct('FILE-STAT', szlot, 'DEV').
-mop_direct('FILE-STAT', szlot, 'FILE').
-mop_direct('FILE-STAT', szlot, 'GID').
-mop_direct('FILE-STAT', szlot, 'INO').
-mop_direct('FILE-STAT', szlot, 'MODE').
-mop_direct('FILE-STAT', szlot, 'MTIME').
-mop_direct('FILE-STAT', szlot, 'NLINK').
-mop_direct('FILE-STAT', szlot, 'RDEV').
-mop_direct('FILE-STAT', szlot, 'SIZE').
-mop_direct('FILE-STAT', szlot, 'UID').
-mop_direct(obj_file_stream, submop, 'FD-STREAM').
-mop_direct(obj_file_stream, supers, [obj_stream, t]).
-mop_direct(obj_fill_pointer_output_stream, supers, ['STRING-STREAM', 'ANSI-STREAM', obj_stream, obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct(obj_fill_pointer_output_stream, szlot, 'MISC').
-mop_direct(obj_fill_pointer_output_stream, szlot, 'OUT').
-mop_direct(obj_fill_pointer_output_stream, szlot, 'SOUT').
-mop_direct(obj_fill_pointer_output_stream, szlot, 'STRING').
-mop_direct('FILL-STREAM', submop, 'DESCRIBE-STREAM').
-mop_direct('FILL-STREAM', supers, ['FUNDAMENTAL-CHARACTER-OUTPUT-STREAM', 'FUNDAMENTAL-OUTPUT-STREAM', 'FUNDAMENTAL-CHARACTER-STREAM', 'FUNDAMENTAL-STREAM', obj_stream, obj_standard_object, t]).
-mop_direct('FILL-STREAM', szlot, 'BUFFER').
-mop_direct('FILL-STREAM', szlot, 'CURRENT-INDENT').
-mop_direct('FILL-STREAM', szlot, 'INDENT-VAR').
-mop_direct('FILL-STREAM', szlot, 'INSIDE-SEXP').
-mop_direct('FILL-STREAM', szlot, 'PENDING-INDENT').
-mop_direct('FILL-STREAM', szlot, 'PENDING-SPACE').
-mop_direct('FILL-STREAM', szlot, 'SEXP-INDENT').
-mop_direct('FILL-STREAM', szlot, 'TARGET-STREAM').
-mop_direct('FILLER', supers, ['ANNOTATION', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('FILLER', szlot, 'BYTES').
-mop_direct('FINAL-DEPRECATION-WARNING', supers, [obj_warning, 'DEPRECATION-CONDITION', 'REFERENCE-CONDITION', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('FIND-METHOD-LENGTH-MISMATCH', supers, ['REFERENCE-CONDITION', obj_simple_error, obj_simple_condition, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('FINITE-SB', supers, ['SB', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('FINITE-SB', szlot, 'ALWAYS-LIVE').
-mop_direct('FINITE-SB', szlot, 'ALWAYS-LIVE-COUNT').
-mop_direct('FINITE-SB', szlot, 'CONFLICTS').
-mop_direct('FINITE-SB', szlot, 'CURRENT-SIZE').
-mop_direct('FINITE-SB', szlot, 'LAST-BLOCK-COUNT').
-mop_direct('FINITE-SB', szlot, 'LAST-OFFSET').
-mop_direct('FINITE-SB', szlot, 'LIVE-TNS').
-mop_direct('FINITE-SB', szlot, 'SIZE-ALIGNMENT').
-mop_direct('FINITE-SB', szlot, 'SIZE-INCREMENT').
-mop_direct(obj_fixnum, supers, ['INTEGER', 'RATIONAL', 'REAL', 'NUMBER', t]).
-mop_direct('FIXUP', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('FIXUP', szlot, 'FLAVOR').
-mop_direct('FIXUP', szlot, 'NAME').
-mop_direct('FIXUP', szlot, 'OFFSET').
-mop_direct('FIXUP-NOTE', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('FIXUP-NOTE', szlot, 'FIXUP').
-mop_direct('FIXUP-NOTE', szlot, 'KIND').
-mop_direct('FIXUP-NOTE', szlot, 'POSITION').
-mop_direct('FLOAT', submop, obj_double_float).
-mop_direct('FLOAT', submop, obj_single_float).
-mop_direct('FLOAT', supers, ['REAL', 'NUMBER', t]).
-mop_direct('FLOATING-POINT-EXCEPTION', supers, [obj_arithmetic_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('FLOATING-POINT-EXCEPTION', szlot, 'FLAGS').
-mop_direct(obj_floating_point_inexact, supers, [obj_arithmetic_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_floating_point_inexact, supers, [obj_arithmetic_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct(obj_floating_point_invalid_operation, supers, [obj_arithmetic_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_floating_point_invalid_operation, supers, [obj_arithmetic_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct(obj_floating_point_overflow, submop, 'SIMPLE-FLOATING-POINT-OVERFLOW').
-mop_direct(obj_floating_point_overflow, supers, [obj_arithmetic_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_floating_point_overflow, supers, [obj_arithmetic_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct(obj_floating_point_underflow, submop, 'SIMPLE-FLOATING-POINT-UNDERFLOW').
-mop_direct(obj_floating_point_underflow, supers, [obj_arithmetic_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_floating_point_underflow, supers, [obj_arithmetic_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('FNODE', supers, [obj_structure_object, t]).
-mop_direct('FNODE', szlot, 'ALLOW-OTHER-KEYS-FLAG').
-mop_direct('FNODE', szlot, 'BLOCKS').
-mop_direct('FNODE', szlot, 'BLOCKS-OFFSET').
-mop_direct('FNODE', szlot, 'CODE').
-mop_direct('FNODE', szlot, 'CONSTS').
-mop_direct('FNODE', szlot, 'CONSTS-FORMS').
-mop_direct('FNODE', szlot, 'CONSTS-LTV-FORMS').
-mop_direct('FNODE', szlot, 'CONSTS-OFFSET').
-mop_direct('FNODE', szlot, 'DENV').
-mop_direct('FNODE', szlot, 'DOCUMENTATION').
-mop_direct('FNODE', szlot, 'ENCLOSING').
-mop_direct('FNODE', szlot, 'FAR-ASSIGNED-VARS').
-mop_direct('FNODE', szlot, 'FAR-USED-BLOCKS').
-mop_direct('FNODE', szlot, 'FAR-USED-TAGBODYS').
-mop_direct('FNODE', szlot, 'FAR-USED-VARS').
-mop_direct('FNODE', szlot, 'GF-P').
-mop_direct('FNODE', szlot, 'IGNORABLE').
-mop_direct('FNODE', szlot, 'IGNORE').
-mop_direct('FNODE', szlot, 'KEYWORD-FLAG').
-mop_direct('FNODE', szlot, 'KEYWORD-OFFSET').
-mop_direct('FNODE', szlot, 'KEYWORDS').
-mop_direct('FNODE', szlot, 'LAMBDA-LIST').
-mop_direct('FNODE', szlot, 'NAME').
-mop_direct('FNODE', szlot, 'OPT-NUM').
-mop_direct('FNODE', szlot, 'REQ-NUM').
-mop_direct('FNODE', szlot, 'REST-FLAG').
-mop_direct('FNODE', szlot, 'TAGBODYS').
-mop_direct('FNODE', szlot, 'TAGBODYS-OFFSET').
-mop_direct('FNODE', szlot, 'TAGS').
-mop_direct('FNODE', szlot, 'USED').
-mop_direct('FNODE', szlot, 'VENVC').
-mop_direct('FNODE', szlot, 'VENVCONST').
-mop_direct('FOREIGN-THREAD', supers, ['THREAD', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('FORM-TRACKING-STREAM', supers, ['FD-STREAM', obj_file_stream, 'ANSI-STREAM', obj_stream, obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('FORM-TRACKING-STREAM', szlot, 'FORM-START-BYTE-POS').
-mop_direct('FORM-TRACKING-STREAM', szlot, 'FORM-START-CHAR-POS').
-mop_direct('FORM-TRACKING-STREAM', szlot, 'INPUT-CHAR-POS').
-mop_direct('FORM-TRACKING-STREAM', szlot, 'LAST-NEWLINE').
-mop_direct('FORM-TRACKING-STREAM', szlot, 'MISC').
-mop_direct('FORM-TRACKING-STREAM', szlot, 'NEWLINES').
-mop_direct('FORM-TRACKING-STREAM', szlot, 'OBSERVER').
-mop_direct('FORMAT-ARGS-MISMATCH', submop, 'FORMAT-TOO-FEW-ARGS-WARNING').
-mop_direct('FORMAT-ARGS-MISMATCH', submop, 'FORMAT-TOO-MANY-ARGS-WARNING').
-mop_direct('FORMAT-ARGS-MISMATCH', supers, ['REFERENCE-CONDITION', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('FORMAT-DIRECTIVE', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('FORMAT-DIRECTIVE', szlot, 'ATSIGNP').
-mop_direct('FORMAT-DIRECTIVE', szlot, 'CHARACTER').
-mop_direct('FORMAT-DIRECTIVE', szlot, 'COLONP').
-mop_direct('FORMAT-DIRECTIVE', szlot, 'END').
-mop_direct('FORMAT-DIRECTIVE', szlot, 'PARAMS').
-mop_direct('FORMAT-DIRECTIVE', szlot, 'START').
-mop_direct('FORMAT-DIRECTIVE', szlot, 'STRING').
-mop_direct('FORMAT-ERROR', supers, ['ERROR', obj_serious_condition, 'REFERENCE-CONDITION', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('FORMAT-ERROR', szlot, 'ARGS').
-mop_direct('FORMAT-ERROR', szlot, 'COMPLAINT').
-mop_direct('FORMAT-ERROR', szlot, 'CONTROL-STRING').
-mop_direct('FORMAT-ERROR', szlot, 'OFFSET').
-mop_direct('FORMAT-ERROR', szlot, 'PRINT-BANNER').
-mop_direct('FORMAT-ERROR', szlot, 'SECOND-RELATIVE').
-mop_direct('FORMAT-TOO-FEW-ARGS-WARNING', supers, ['FORMAT-ARGS-MISMATCH', 'REFERENCE-CONDITION', obj_simple_warning, obj_simple_condition, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('FORMAT-TOO-MANY-ARGS-WARNING', supers, ['FORMAT-ARGS-MISMATCH', 'REFERENCE-CONDITION', 'SIMPLE-STYLE-WARNING', obj_simple_condition, obj_style_warning, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('FORWARD-REFERENCED-CLASS', submop, 'MISDESIGNED-FORWARD-REFERENCED-CLASS').
-mop_direct('FORWARD-REFERENCED-CLASS', supers, ['PCL-CLASS', 'CLASS', 'DEPENDENT-UPDATE-MIXIN', 'PLIST-MIXIN', 'DEFINITION-SOURCE-MIXIN', 'STANDARD-SPECIALIZER', 'SPECIALIZER', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('FORWARD-REFERENCED-CLASS', supers, ['SUPER-CLASS', 'STANDARD-STABLEHASH', 'METAOBJECT', obj_standard_object, t]).
-mop_direct('FRAME', submop, 'COMPILED-FRAME').
-mop_direct('FRAME', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('FRAME', szlot, '%CATCHES').
-mop_direct('FRAME', szlot, '%DOWN').
-mop_direct('FRAME', szlot, 'CODE-LOCATION').
-mop_direct('FRAME', szlot, 'DEBUG-FUN').
-mop_direct('FRAME', szlot, 'NUMBER').
-mop_direct('FRAME', szlot, 'POINTER').
-mop_direct('FRAME', szlot, 'UP').
-mop_direct('FRAME-FUN-MISMATCH', supers, ['DEBUG-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('FRAME-FUN-MISMATCH', szlot, 'CODE-LOCATION').
-mop_direct('FRAME-FUN-MISMATCH', szlot, 'FORM').
-mop_direct('FRAME-FUN-MISMATCH', szlot, 'FRAME').
-mop_direct('FTYPE-PROCLAMATION-MISMATCH', submop, 'FTYPE-PROCLAMATION-MISMATCH-ERROR').
-mop_direct('FTYPE-PROCLAMATION-MISMATCH', submop, 'FTYPE-PROCLAMATION-MISMATCH-WARNING').
-mop_direct('FTYPE-PROCLAMATION-MISMATCH', supers, ['PROCLAMATION-MISMATCH', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('FTYPE-PROCLAMATION-MISMATCH-ERROR', supers, ['ERROR', obj_serious_condition, 'FTYPE-PROCLAMATION-MISMATCH', 'PROCLAMATION-MISMATCH', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('FTYPE-PROCLAMATION-MISMATCH-WARNING', supers, [obj_style_warning, obj_warning, 'FTYPE-PROCLAMATION-MISMATCH', 'PROCLAMATION-MISMATCH', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('FUN-CACHE', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('FUN-CACHE', szlot, 'LABELLERS').
-mop_direct('FUN-CACHE', szlot, 'PREFILTERS').
-mop_direct('FUN-CACHE', szlot, 'PRINTERS').
-mop_direct('FUN-CACHE', szlot, 'SERIAL-NUMBER').
-mop_direct('FUN-END-COOKIE', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('FUN-END-COOKIE', szlot, 'BOGUS-LRA').
-mop_direct('FUN-END-COOKIE', szlot, 'DEBUG-FUN').
-mop_direct('FUN-INFO', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('FUN-INFO', szlot, 'ATTRIBUTES').
-mop_direct('FUN-INFO', szlot, 'CONSTRAINT-PROPAGATE').
-mop_direct('FUN-INFO', szlot, 'CONSTRAINT-PROPAGATE-IF').
-mop_direct('FUN-INFO', szlot, 'DERIVE-TYPE').
-mop_direct('FUN-INFO', szlot, 'DESTROYED-CONSTANT-ARGS').
-mop_direct('FUN-INFO', szlot, 'IR2-CONVERT').
-mop_direct('FUN-INFO', szlot, 'LTN-ANNOTATE').
-mop_direct('FUN-INFO', szlot, 'OPTIMIZER').
-mop_direct('FUN-INFO', szlot, 'PREDICATE-TYPE').
-mop_direct('FUN-INFO', szlot, 'RESULT-ARG').
-mop_direct('FUN-INFO', szlot, 'STACK-ALLOCATE-RESULT').
-mop_direct('FUN-INFO', szlot, 'TEMPLATES').
-mop_direct('FUN-INFO', szlot, 'TRANSFORMS').
-mop_direct('FUN-TYPE', supers, ['ARGS-TYPE', 'CTYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('FUN-TYPE', szlot, 'CLASS-INFO').
-mop_direct('FUN-TYPE', szlot, 'RETURNS').
-mop_direct('FUN-TYPE', szlot, 'WILD-ARGS').
-mop_direct(obj_funcallable_standard_class, supers, ['SEMI-STANDARD-CLASS', 'SLOTTED-CLASS', 'CLASS', 'POTENTIAL-CLASS', 'SPECIALIZER', 'SUPER-CLASS', 'STANDARD-STABLEHASH', 'METAOBJECT', obj_standard_object, t]).
-mop_direct(obj_funcallable_standard_class, supers, ['STD-CLASS', obj_slot_class, 'PCL-CLASS', 'CLASS', 'DEPENDENT-UPDATE-MIXIN', 'PLIST-MIXIN', 'DEFINITION-SOURCE-MIXIN', 'STANDARD-SPECIALIZER', 'SPECIALIZER', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct(obj_funcallable_standard_object, submop, 'GENERIC-FUNCTION').
-mop_direct(obj_funcallable_standard_object, supers, [obj_function, obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct(obj_funcallable_standard_object, supers, [obj_function, obj_standard_object, t]).
-mop_direct(obj_funcallable_standard_object, szlot, '$NAME').
-mop_direct(obj_function, submop, '%METHOD-FUNCTION').
-mop_direct(obj_function, submop, 'CTOR').
-mop_direct(obj_function, submop, obj_funcallable_standard_object).
-mop_direct(obj_function, submop, 'INTERPRETED-FUNCTION').
-mop_direct(obj_function, submop, 'STANDARD-FUNCALLABLE-INSTANCE').
-mop_direct(obj_function, supers, [t]).
-mop_direct('FUNCTION-REDEFINITION-WARNING', submop, 'REDEFINITION-WITH-DEFMACRO').
-mop_direct('FUNCTION-REDEFINITION-WARNING', submop, 'REDEFINITION-WITH-DEFUN').
-mop_direct('FUNCTION-REDEFINITION-WARNING', supers, ['REDEFINITION-WARNING', obj_style_warning, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('FUNCTION-REDEFINITION-WARNING', szlot, 'NEW-FUNCTION').
-mop_direct('FUNCTIONAL', submop, 'CLAMBDA').
-mop_direct('FUNCTIONAL', submop, 'OPTIONAL-DISPATCH').
-mop_direct('FUNCTIONAL', supers, ['LEAF', 'SSET-ELEMENT', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('FUNCTIONAL', szlot, '%DEBUG-NAME').
-mop_direct('FUNCTIONAL', szlot, '%SOURCE-NAME').
-mop_direct('FUNCTIONAL', szlot, 'ALLOCATOR').
-mop_direct('FUNCTIONAL', szlot, 'ARG-DOCUMENTATION').
-mop_direct('FUNCTIONAL', szlot, 'DOCUMENTATION').
-mop_direct('FUNCTIONAL', szlot, 'ENTRY-FUN').
-mop_direct('FUNCTIONAL', szlot, 'HAS-EXTERNAL-REFERENCES-P').
-mop_direct('FUNCTIONAL', szlot, 'INLINE-EXPANDED').
-mop_direct('FUNCTIONAL', szlot, 'INLINE-EXPANSION').
-mop_direct('FUNCTIONAL', szlot, 'INLINEP').
-mop_direct('FUNCTIONAL', szlot, 'KIND').
-mop_direct('FUNCTIONAL', szlot, 'LEXENV').
-mop_direct('FUNCTIONAL', szlot, 'PLIST').
-mop_direct('FUNCTIONAL', szlot, 'TYPE').
-mop_direct('FUNCTIONAL', szlot, 'WHERE-FROM').
-mop_direct('FUNCTIONAL', szlot, 'XREF').
-mop_direct('FUNDAMENTAL-BINARY-INPUT-STREAM', supers, ['FUNDAMENTAL-INPUT-STREAM', 'FUNDAMENTAL-BINARY-STREAM', 'FUNDAMENTAL-STREAM', obj_standard_object, 'SLOT-OBJECT', obj_stream, t]).
-mop_direct('FUNDAMENTAL-BINARY-INPUT-STREAM', supers, ['FUNDAMENTAL-INPUT-STREAM', 'FUNDAMENTAL-BINARY-STREAM', 'FUNDAMENTAL-STREAM', obj_stream, obj_standard_object, t]).
-mop_direct('FUNDAMENTAL-BINARY-OUTPUT-STREAM', supers, ['FUNDAMENTAL-OUTPUT-STREAM', 'FUNDAMENTAL-BINARY-STREAM', 'FUNDAMENTAL-STREAM', obj_standard_object, 'SLOT-OBJECT', obj_stream, t]).
-mop_direct('FUNDAMENTAL-BINARY-OUTPUT-STREAM', supers, ['FUNDAMENTAL-OUTPUT-STREAM', 'FUNDAMENTAL-BINARY-STREAM', 'FUNDAMENTAL-STREAM', obj_stream, obj_standard_object, t]).
-mop_direct('FUNDAMENTAL-BINARY-STREAM', submop, 'FUNDAMENTAL-BINARY-INPUT-STREAM').
-mop_direct('FUNDAMENTAL-BINARY-STREAM', submop, 'FUNDAMENTAL-BINARY-OUTPUT-STREAM').
-mop_direct('FUNDAMENTAL-BINARY-STREAM', supers, ['FUNDAMENTAL-STREAM', obj_standard_object, 'SLOT-OBJECT', obj_stream, t]).
-mop_direct('FUNDAMENTAL-BINARY-STREAM', supers, ['FUNDAMENTAL-STREAM', obj_stream, obj_standard_object, t]).
-mop_direct('FUNDAMENTAL-CHARACTER-INPUT-STREAM', supers, ['FUNDAMENTAL-INPUT-STREAM', 'FUNDAMENTAL-CHARACTER-STREAM', 'FUNDAMENTAL-STREAM', obj_standard_object, 'SLOT-OBJECT', obj_stream, t]).
-mop_direct('FUNDAMENTAL-CHARACTER-INPUT-STREAM', supers, ['FUNDAMENTAL-INPUT-STREAM', 'FUNDAMENTAL-CHARACTER-STREAM', 'FUNDAMENTAL-STREAM', obj_stream, obj_standard_object, t]).
-mop_direct('FUNDAMENTAL-CHARACTER-INPUT-STREAM', szlot, '$LASTCHAR').
-mop_direct('FUNDAMENTAL-CHARACTER-OUTPUT-STREAM', submop, 'FILL-STREAM').
-mop_direct('FUNDAMENTAL-CHARACTER-OUTPUT-STREAM', submop, 'HTML-STREAM-OUT').
-mop_direct('FUNDAMENTAL-CHARACTER-OUTPUT-STREAM', supers, ['FUNDAMENTAL-OUTPUT-STREAM', 'FUNDAMENTAL-CHARACTER-STREAM', 'FUNDAMENTAL-STREAM', obj_standard_object, 'SLOT-OBJECT', obj_stream, t]).
-mop_direct('FUNDAMENTAL-CHARACTER-OUTPUT-STREAM', supers, ['FUNDAMENTAL-OUTPUT-STREAM', 'FUNDAMENTAL-CHARACTER-STREAM', 'FUNDAMENTAL-STREAM', obj_stream, obj_standard_object, t]).
-mop_direct('FUNDAMENTAL-CHARACTER-STREAM', submop, 'FUNDAMENTAL-CHARACTER-INPUT-STREAM').
-mop_direct('FUNDAMENTAL-CHARACTER-STREAM', submop, 'FUNDAMENTAL-CHARACTER-OUTPUT-STREAM').
-mop_direct('FUNDAMENTAL-CHARACTER-STREAM', supers, ['FUNDAMENTAL-STREAM', obj_standard_object, 'SLOT-OBJECT', obj_stream, t]).
-mop_direct('FUNDAMENTAL-CHARACTER-STREAM', supers, ['FUNDAMENTAL-STREAM', obj_stream, obj_standard_object, t]).
-mop_direct('FUNDAMENTAL-INPUT-STREAM', submop, 'FUNDAMENTAL-BINARY-INPUT-STREAM').
-mop_direct('FUNDAMENTAL-INPUT-STREAM', submop, 'FUNDAMENTAL-CHARACTER-INPUT-STREAM').
-mop_direct('FUNDAMENTAL-INPUT-STREAM', supers, ['FUNDAMENTAL-STREAM', obj_standard_object, 'SLOT-OBJECT', obj_stream, t]).
-mop_direct('FUNDAMENTAL-INPUT-STREAM', supers, ['FUNDAMENTAL-STREAM', obj_stream, obj_standard_object, t]).
-mop_direct('FUNDAMENTAL-OUTPUT-STREAM', submop, 'FUNDAMENTAL-BINARY-OUTPUT-STREAM').
-mop_direct('FUNDAMENTAL-OUTPUT-STREAM', submop, 'FUNDAMENTAL-CHARACTER-OUTPUT-STREAM').
-mop_direct('FUNDAMENTAL-OUTPUT-STREAM', supers, ['FUNDAMENTAL-STREAM', obj_standard_object, 'SLOT-OBJECT', obj_stream, t]).
-mop_direct('FUNDAMENTAL-OUTPUT-STREAM', supers, ['FUNDAMENTAL-STREAM', obj_stream, obj_standard_object, t]).
-mop_direct('FUNDAMENTAL-STREAM', submop, 'FUNDAMENTAL-BINARY-STREAM').
-mop_direct('FUNDAMENTAL-STREAM', submop, 'FUNDAMENTAL-CHARACTER-STREAM').
-mop_direct('FUNDAMENTAL-STREAM', submop, 'FUNDAMENTAL-INPUT-STREAM').
-mop_direct('FUNDAMENTAL-STREAM', submop, 'FUNDAMENTAL-OUTPUT-STREAM').
-mop_direct('FUNDAMENTAL-STREAM', supers, [obj_standard_object, 'SLOT-OBJECT', obj_stream, t]).
-mop_direct('FUNDAMENTAL-STREAM', supers, [obj_stream, obj_standard_object, t]).
-mop_direct('FUNDAMENTAL-STREAM', szlot, '$FASL').
-mop_direct('FUNDAMENTAL-STREAM', szlot, '$OPEN').
-mop_direct('FUNDAMENTAL-STREAM', szlot, '$PENL').
-mop_direct('FUNDAMENTAL-STREAM', szlot, 'OPEN-P').
-mop_direct('FUNSTATE', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('FUNSTATE', szlot, 'ARG-TEMPS').
-mop_direct('FUNSTATE', szlot, 'ARGS').
-mop_direct('GENERIC-FUNCTION', submop, 'STANDARD-GENERIC-FUNCTION').
-mop_direct('GENERIC-FUNCTION', supers, ['DEPENDENT-UPDATE-MIXIN', 'PLIST-MIXIN', 'DEFINITION-SOURCE-MIXIN', 'METAOBJECT', obj_funcallable_standard_object, obj_function, obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('GENERIC-FUNCTION', supers, ['METAOBJECT', obj_funcallable_standard_object, obj_function, obj_standard_object, t]).
-mop_direct('GENERIC-FUNCTION', szlot, '$LISTENERS').
-mop_direct('GENERIC-FUNCTION', szlot, '%DOCUMENTATION').
-mop_direct('GENERIC-FUNCTION', szlot, 'ENCAPSULATIONS').
-mop_direct('GENERIC-FUNCTION', szlot, 'INITIAL-METHODS').
-mop_direct('GENERIC-FUNCTION-LAMBDA-LIST-ERROR', supers, ['REFERENCE-CONDITION', 'SIMPLE-PROGRAM-ERROR', obj_simple_condition, obj_program_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('GENERIC-STREAM-CONTROLLER', supers, [obj_standard_object, t]).
-mop_direct('GF-ALREADY-CALLED-WARNING', submop, 'SIMPLE-GF-ALREADY-CALLED-WARNING').
-mop_direct('GF-ALREADY-CALLED-WARNING', supers, ['CLOS-WARNING', obj_warning, obj_condition, obj_standard_object, t]).
-mop_direct('GF-REPLACING-METHOD-WARNING', submop, 'SIMPLE-GF-REPLACING-METHOD-WARNING').
-mop_direct('GF-REPLACING-METHOD-WARNING', supers, ['CLOS-WARNING', obj_warning, obj_condition, obj_standard_object, t]).
-mop_direct('GLOBAL-BOUNDP-METHOD', supers, ['ACCESSOR-METHOD', 'STANDARD-METHOD', 'PLIST-MIXIN', 'DEFINITION-SOURCE-MIXIN', 'METHOD', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('GLOBAL-CONFLICTS', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('GLOBAL-CONFLICTS', szlot, 'BLOCK').
-mop_direct('GLOBAL-CONFLICTS', szlot, 'CONFLICTS').
-mop_direct('GLOBAL-CONFLICTS', szlot, 'KIND').
-mop_direct('GLOBAL-CONFLICTS', szlot, 'NEXT-BLOCKWISE').
-mop_direct('GLOBAL-CONFLICTS', szlot, 'NEXT-TNWISE').
-mop_direct('GLOBAL-CONFLICTS', szlot, 'NUMBER').
-mop_direct('GLOBAL-CONFLICTS', szlot, 'TN').
-mop_direct('GLOBAL-READER-METHOD', supers, ['ACCESSOR-METHOD', 'STANDARD-METHOD', 'PLIST-MIXIN', 'DEFINITION-SOURCE-MIXIN', 'METHOD', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('GLOBAL-VAR', submop, 'DEFINED-FUN').
-mop_direct('GLOBAL-VAR', supers, ['BASIC-VAR', 'LEAF', 'SSET-ELEMENT', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('GLOBAL-VAR', szlot, 'KIND').
-mop_direct('GLOBAL-WRITER-METHOD', supers, ['ACCESSOR-METHOD', 'STANDARD-METHOD', 'PLIST-MIXIN', 'DEFINITION-SOURCE-MIXIN', 'METHOD', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('GROUP-INFO', supers, [obj_structure_object, t]).
-mop_direct('GROUP-INFO', szlot, 'GID').
-mop_direct('GROUP-INFO', szlot, 'MEMBERS').
-mop_direct('GROUP-INFO', szlot, 'NAME').
-mop_direct('HAIRY-TYPE', submop, 'UNKNOWN-TYPE').
-mop_direct('HAIRY-TYPE', supers, ['CTYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('HAIRY-TYPE', szlot, 'CLASS-INFO').
-mop_direct('HAIRY-TYPE', szlot, 'SPECIFIER').
-mop_direct('HANDLER', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('HANDLER', szlot, 'ACTIVE').
-mop_direct('HANDLER', szlot, 'BOGUS').
-mop_direct('HANDLER', szlot, 'DESCRIPTOR').
-mop_direct('HANDLER', szlot, 'DIRECTION').
-mop_direct('HANDLER', szlot, 'FUNCTION').
-mop_direct(obj_hash_table, supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct(obj_hash_table, supers, [t]).
-mop_direct(obj_hash_table, szlot, 'CACHE').
-mop_direct(obj_hash_table, szlot, 'HASH-FUN').
-mop_direct(obj_hash_table, szlot, 'HASH-VECTOR').
-mop_direct(obj_hash_table, szlot, 'INDEX-VECTOR').
-mop_direct(obj_hash_table, szlot, 'LOCK').
-mop_direct(obj_hash_table, szlot, 'NEEDS-REHASH-P').
-mop_direct(obj_hash_table, szlot, 'NEXT-FREE-KV').
-mop_direct(obj_hash_table, szlot, 'NEXT-VECTOR').
-mop_direct(obj_hash_table, szlot, 'NEXT-WEAK-HASH-TABLE').
-mop_direct(obj_hash_table, szlot, 'NUMBER-ENTRIES').
-mop_direct(obj_hash_table, szlot, 'REHASH-SIZE').
-mop_direct(obj_hash_table, szlot, 'REHASH-THRESHOLD').
-mop_direct(obj_hash_table, szlot, 'REHASH-TRIGGER').
-mop_direct(obj_hash_table, szlot, 'SYNCHRONIZED-P').
-mop_direct(obj_hash_table, szlot, 'TABLE').
-mop_direct(obj_hash_table, szlot, 'TEST').
-mop_direct(obj_hash_table, szlot, 'TEST-FUN').
-mop_direct(obj_hash_table, szlot, 'WEAKNESS').
-mop_direct('HEAP-ALIEN-INFO', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('HEAP-ALIEN-INFO', szlot, 'ALIEN-NAME').
-mop_direct('HEAP-ALIEN-INFO', szlot, 'DATAP').
-mop_direct('HEAP-ALIEN-INFO', szlot, 'TYPE').
-mop_direct('HEAP-EXHAUSTED-ERROR', supers, [obj_storage_condition, obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('HOST', submop, 'LOGICAL-HOST').
-mop_direct('HOST', submop, 'UNIX-HOST').
-mop_direct('HOST', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('HOST', szlot, 'CUSTOMARY-CASE').
-mop_direct('HOST', szlot, 'PARSE').
-mop_direct('HOST', szlot, 'PARSE-NATIVE').
-mop_direct('HOST', szlot, 'SIMPLIFY-NAMESTRING').
-mop_direct('HOST', szlot, 'UNPARSE').
-mop_direct('HOST', szlot, 'UNPARSE-DIRECTORY').
-mop_direct('HOST', szlot, 'UNPARSE-DIRECTORY-SEPARATOR').
-mop_direct('HOST', szlot, 'UNPARSE-ENOUGH').
-mop_direct('HOST', szlot, 'UNPARSE-FILE').
-mop_direct('HOST', szlot, 'UNPARSE-HOST').
-mop_direct('HOST', szlot, 'UNPARSE-NATIVE').
-mop_direct('HOSTENT', supers, [obj_structure_object, t]).
-mop_direct('HOSTENT', szlot, 'ADDR-LIST').
-mop_direct('HOSTENT', szlot, 'ADDRTYPE').
-mop_direct('HOSTENT', szlot, 'ALIASES').
-mop_direct('HOSTENT', szlot, 'NAME').
-mop_direct('HTML-STREAM-OUT', supers, ['FUNDAMENTAL-CHARACTER-OUTPUT-STREAM', 'FUNDAMENTAL-OUTPUT-STREAM', 'FUNDAMENTAL-CHARACTER-STREAM', 'FUNDAMENTAL-STREAM', obj_stream, obj_standard_object, t]).
-mop_direct('HTML-STREAM-OUT', szlot, 'TARGET-STREAM').
-mop_direct('HUFFMAN-NODE', submop, 'HUFFMAN-PAIR').
-mop_direct('HUFFMAN-NODE', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('HUFFMAN-NODE', szlot, 'KEY').
-mop_direct('HUFFMAN-NODE', szlot, 'WEIGHT').
-mop_direct('HUFFMAN-PAIR', supers, ['HUFFMAN-NODE', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('HUFFMAN-PAIR', szlot, 'LEFT').
-mop_direct('HUFFMAN-PAIR', szlot, 'RIGHT').
-mop_direct('IMPLICIT-GENERIC-FUNCTION-WARNING', supers, [obj_style_warning, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('IMPLICIT-GENERIC-FUNCTION-WARNING', szlot, 'NAME').
-mop_direct('INDENTATION', supers, ['QUEUED-OP', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('INDENTATION', szlot, 'AMOUNT').
-mop_direct('INDENTATION', szlot, 'KIND').
-mop_direct('INDEX-TOO-LARGE-ERROR', supers, [obj_type_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INFO-HASHTABLE', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('INFO-HASHTABLE', szlot, 'COMPARATOR').
-mop_direct('INFO-HASHTABLE', szlot, 'COUNT').
-mop_direct('INFO-HASHTABLE', szlot, 'HASH-FUNCTION').
-mop_direct('INFO-HASHTABLE', szlot, 'MUTEX').
-mop_direct('INFO-HASHTABLE', szlot, 'STORAGE').
-mop_direct('INITARG-ERROR', supers, ['REFERENCE-CONDITION', obj_program_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INITARG-ERROR', szlot, 'CLASS').
-mop_direct('INITARG-ERROR', szlot, 'INITARGS').
-mop_direct('INITIAL', supers, ['DFUN-INFO', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('INLINING-DEPENDENCY-FAILURE', supers, ['SIMPLE-STYLE-WARNING', obj_simple_condition, obj_style_warning, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INPUT-CHARACTER', supers, [obj_structure_object, t]).
-mop_direct('INPUT-CHARACTER', szlot, 'BITS').
-mop_direct('INPUT-CHARACTER', szlot, 'CHAR').
-mop_direct('INPUT-CHARACTER', szlot, 'FONT').
-mop_direct('INPUT-CHARACTER', szlot, 'KEY').
-mop_direct('INPUT-ERROR-IN-COMPILE-FILE', submop, 'INPUT-ERROR-IN-LOAD').
-mop_direct('INPUT-ERROR-IN-COMPILE-FILE', supers, [obj_reader_error, obj_parse_error, obj_stream_error, 'ERROR', obj_serious_condition, 'ENCAPSULATED-CONDITION', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INPUT-ERROR-IN-COMPILE-FILE', szlot, 'INVOKER').
-mop_direct('INPUT-ERROR-IN-COMPILE-FILE', szlot, 'LINE/COL').
-mop_direct('INPUT-ERROR-IN-COMPILE-FILE', szlot, 'POSITION').
-mop_direct('INPUT-ERROR-IN-LOAD', supers, ['INPUT-ERROR-IN-COMPILE-FILE', obj_reader_error, obj_parse_error, obj_stream_error, 'ERROR', obj_serious_condition, 'ENCAPSULATED-CONDITION', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INSPECTION', supers, [obj_structure_object, t]).
-mop_direct('INSPECTION', szlot, 'BLURB').
-mop_direct('INSPECTION', szlot, 'ID').
-mop_direct('INSPECTION', szlot, 'NTH-SLOT').
-mop_direct('INSPECTION', szlot, 'NUM-SLOTS').
-mop_direct('INSPECTION', szlot, 'POS').
-mop_direct('INSPECTION', szlot, 'SELF').
-mop_direct('INSPECTION', szlot, 'SET-SLOT').
-mop_direct('INSPECTION', szlot, 'TITLE').
-mop_direct('INSPECTION', szlot, 'UP').
-mop_direct('INST-SPACE', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('INST-SPACE', szlot, 'CHOICES').
-mop_direct('INST-SPACE', szlot, 'VALID-MASK').
-mop_direct('INST-SPACE-CHOICE', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('INST-SPACE-CHOICE', szlot, 'COMMON-ID').
-mop_direct('INST-SPACE-CHOICE', szlot, 'SUBSPACE').
-mop_direct('INSTANCE-STRUCTURE-PROTOCOL-ERROR', supers, ['REFERENCE-CONDITION', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INSTANCE-STRUCTURE-PROTOCOL-ERROR', szlot, 'FUN').
-mop_direct('INSTANCE-STRUCTURE-PROTOCOL-ERROR', szlot, 'SLOTD').
-mop_direct('INSTRUCTION', supers, ['SSET-ELEMENT', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('INSTRUCTION', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('INSTRUCTION', szlot, 'ATTRIBUTES').
-mop_direct('INSTRUCTION', szlot, 'CONTROL').
-mop_direct('INSTRUCTION', szlot, 'DELAY').
-mop_direct('INSTRUCTION', szlot, 'DEPTH').
-mop_direct('INSTRUCTION', szlot, 'EMITTER').
-mop_direct('INSTRUCTION', szlot, 'FORMAT-NAME').
-mop_direct('INSTRUCTION', szlot, 'ID').
-mop_direct('INSTRUCTION', szlot, 'LABELLER').
-mop_direct('INSTRUCTION', szlot, 'LENGTH').
-mop_direct('INSTRUCTION', szlot, 'MASK').
-mop_direct('INSTRUCTION', szlot, 'NAME').
-mop_direct('INSTRUCTION', szlot, 'PREFILTER').
-mop_direct('INSTRUCTION', szlot, 'PRINT-NAME').
-mop_direct('INSTRUCTION', szlot, 'PRINTER').
-mop_direct('INSTRUCTION', szlot, 'READ-DEPENDENCIES').
-mop_direct('INSTRUCTION', szlot, 'READ-DEPENDENTS').
-mop_direct('INSTRUCTION', szlot, 'SPECIALIZERS').
-mop_direct('INSTRUCTION', szlot, 'WRITE-DEPENDENCIES').
-mop_direct('INSTRUCTION', szlot, 'WRITE-DEPENDENTS').
-mop_direct('INSTRUCTION-FORMAT', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('INSTRUCTION-FORMAT', szlot, 'ARGS').
-mop_direct('INSTRUCTION-FORMAT', szlot, 'DEFAULT-PRINTER').
-mop_direct('INSTRUCTION-FORMAT', szlot, 'LENGTH').
-mop_direct('INSTRUCTION-FORMAT', szlot, 'NAME').
-mop_direct('INTEGER', submop, obj_bignum).
-mop_direct('INTEGER', submop, obj_fixnum).
-mop_direct('INTEGER', supers, ['RATIONAL', 'REAL', 'NUMBER', t]).
-mop_direct('INTERACTIVE-INTERRUPT', supers, ['SYSTEM-CONDITION', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INTERFERENCE-GRAPH', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('INTERFERENCE-GRAPH', szlot, 'PRECOLORED-VERTICES').
-mop_direct('INTERFERENCE-GRAPH', szlot, 'TN-VERTEX').
-mop_direct('INTERFERENCE-GRAPH', szlot, 'TN-VERTEX-MAPPING').
-mop_direct('INTERFERENCE-GRAPH', szlot, 'VERTICES').
-mop_direct('INTERPRETED-FUNCTION', supers, [t]).
-mop_direct('INTERPRETED-FUNCTION', szlot, 'BODY').
-mop_direct('INTERPRETED-FUNCTION', szlot, 'DEBUG-LAMBDA-LIST').
-mop_direct('INTERPRETED-FUNCTION', szlot, 'DEBUG-NAME').
-mop_direct('INTERPRETED-FUNCTION', szlot, 'DECLARATIONS').
-mop_direct('INTERPRETED-FUNCTION', szlot, 'DOCUMENTATION').
-mop_direct('INTERPRETED-FUNCTION', szlot, 'ENV').
-mop_direct('INTERPRETED-FUNCTION', szlot, 'LAMBDA-LIST').
-mop_direct('INTERPRETED-FUNCTION', szlot, 'NAME').
-mop_direct('INTERPRETED-FUNCTION', szlot, 'SOURCE-LOCATION').
-mop_direct('INTERPRETED-PROGRAM-ERROR', supers, [obj_program_error, 'ERROR', obj_serious_condition, 'ENCAPSULATED-CONDITION', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INTERPRETED-PROGRAM-ERROR', supers, [obj_program_error, 'ERROR', obj_serious_condition, obj_simple_condition, 'ENCAPSULATED-CONDITION', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INTERPRETED-PROGRAM-ERROR', szlot, 'FORM').
-mop_direct('INTERPRETER-ENVIRONMENT-TOO-COMPLEX-ERROR', supers, [obj_simple_error, obj_simple_condition, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INTERRUPT-CONDITION', submop, 'SIMPLE-INTERRUPT-CONDITION').
-mop_direct('INTERRUPT-CONDITION', supers, [obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('INTERRUPT-THREAD-ERROR', supers, ['THREAD-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INTERSECTION-TYPE', supers, ['COMPOUND-TYPE', 'CTYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('INTERSECTION-TYPE', szlot, 'CLASS-INFO').
-mop_direct('INTERVAL', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('INTERVAL', szlot, 'HIGH').
-mop_direct('INTERVAL', szlot, 'LOW').
-mop_direct('INVALID-ARRAY-ERROR', supers, ['REFERENCE-CONDITION', obj_type_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INVALID-ARRAY-INDEX-ERROR', supers, [obj_type_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INVALID-ARRAY-INDEX-ERROR', szlot, 'ARRAY').
-mop_direct('INVALID-ARRAY-INDEX-ERROR', szlot, 'AXIS').
-mop_direct('INVALID-CONTROL-STACK-POINTER', supers, ['DEBUG-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INVALID-EUC-JP-CONTINUATION-BYTE', supers, ['OCTET-DECODING-ERROR', 'CHARACTER-DECODING-ERROR', 'CHARACTER-CODING-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INVALID-EUC-JP-STARTER-BYTE', supers, ['OCTET-DECODING-ERROR', 'CHARACTER-DECODING-ERROR', 'CHARACTER-CODING-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INVALID-FASL', submop, 'FASL-HEADER-MISSING').
-mop_direct('INVALID-FASL', submop, 'INVALID-FASL-FEATURES').
-mop_direct('INVALID-FASL', submop, 'INVALID-FASL-HEADER').
-mop_direct('INVALID-FASL', submop, 'INVALID-FASL-IMPLEMENTATION').
-mop_direct('INVALID-FASL', submop, 'INVALID-FASL-VERSION').
-mop_direct('INVALID-FASL', supers, ['ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INVALID-FASL', szlot, 'EXPECTED').
-mop_direct('INVALID-FASL', szlot, 'STREAM').
-mop_direct('INVALID-FASL-FEATURES', supers, ['INVALID-FASL', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INVALID-FASL-FEATURES', szlot, 'FEATURES').
-mop_direct('INVALID-FASL-FEATURES', szlot, 'POTENTIAL-FEATURES').
-mop_direct('INVALID-FASL-HEADER', supers, ['INVALID-FASL', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INVALID-FASL-HEADER', szlot, 'BYTE').
-mop_direct('INVALID-FASL-HEADER', szlot, 'BYTE-NR').
-mop_direct('INVALID-FASL-IMPLEMENTATION', supers, ['INVALID-FASL', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INVALID-FASL-IMPLEMENTATION', szlot, 'IMPLEMENTATION').
-mop_direct('INVALID-FASL-VERSION', supers, ['INVALID-FASL', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INVALID-FASL-VERSION', szlot, 'VERSION').
-mop_direct('INVALID-GBK-CONTINUATION-BYTE', supers, ['OCTET-DECODING-ERROR', 'CHARACTER-DECODING-ERROR', 'CHARACTER-CODING-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INVALID-GBK-STARTER-BYTE', supers, ['OCTET-DECODING-ERROR', 'CHARACTER-DECODING-ERROR', 'CHARACTER-CODING-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INVALID-METHOD-INITARG', supers, ['SIMPLE-PROGRAM-ERROR', obj_simple_condition, obj_program_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INVALID-METHOD-INITARG', szlot, 'METHOD').
-mop_direct('INVALID-SHIFT_JIS-CONTINUATION-BYTE', supers, ['OCTET-DECODING-ERROR', 'CHARACTER-DECODING-ERROR', 'CHARACTER-CODING-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INVALID-SHIFT_JIS-STARTER-BYTE', supers, ['OCTET-DECODING-ERROR', 'CHARACTER-DECODING-ERROR', 'CHARACTER-CODING-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INVALID-SUPERCLASS', supers, ['REFERENCE-CONDITION', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INVALID-SUPERCLASS', szlot, 'CLASS').
-mop_direct('INVALID-SUPERCLASS', szlot, 'SUPERCLASS').
-mop_direct('INVALID-UTF8-CONTINUATION-BYTE', supers, ['OCTET-DECODING-ERROR', 'CHARACTER-DECODING-ERROR', 'CHARACTER-CODING-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INVALID-UTF8-STARTER-BYTE', supers, ['OCTET-DECODING-ERROR', 'CHARACTER-DECODING-ERROR', 'CHARACTER-CODING-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INVALID-VALUE', supers, ['DEBUG-CONDITION', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('INVALID-VALUE', szlot, 'DEBUG-VAR').
-mop_direct('INVALID-VALUE', szlot, 'FRAME').
-mop_direct('IO-TIMEOUT', supers, [obj_stream_error, 'ERROR', 'TIMEOUT', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('IO-TIMEOUT', szlot, 'DIRECTION').
-mop_direct('IR2-BLOCK', supers, ['BLOCK-ANNOTATION', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('IR2-BLOCK', szlot, '%LABEL').
-mop_direct('IR2-BLOCK', szlot, '%TRAMPOLINE-LABEL').
-mop_direct('IR2-BLOCK', szlot, 'DROPPED-THRU-TO').
-mop_direct('IR2-BLOCK', szlot, 'END-STACK').
-mop_direct('IR2-BLOCK', szlot, 'GLOBAL-TNS').
-mop_direct('IR2-BLOCK', szlot, 'LAST-VOP').
-mop_direct('IR2-BLOCK', szlot, 'LIVE-IN').
-mop_direct('IR2-BLOCK', szlot, 'LIVE-OUT').
-mop_direct('IR2-BLOCK', szlot, 'LOCAL-TN-COUNT').
-mop_direct('IR2-BLOCK', szlot, 'LOCAL-TNS').
-mop_direct('IR2-BLOCK', szlot, 'LOCATIONS').
-mop_direct('IR2-BLOCK', szlot, 'NUMBER').
-mop_direct('IR2-BLOCK', szlot, 'POPPED').
-mop_direct('IR2-BLOCK', szlot, 'PUSHED').
-mop_direct('IR2-BLOCK', szlot, 'START-STACK').
-mop_direct('IR2-BLOCK', szlot, 'START-VOP').
-mop_direct('IR2-BLOCK', szlot, 'WRITTEN').
-mop_direct('IR2-COMPONENT', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('IR2-COMPONENT', szlot, 'ALIAS-TNS').
-mop_direct('IR2-COMPONENT', szlot, 'COMPONENT-TNS').
-mop_direct('IR2-COMPONENT', szlot, 'CONSTANT-TNS').
-mop_direct('IR2-COMPONENT', szlot, 'CONSTANTS').
-mop_direct('IR2-COMPONENT', szlot, 'ENTRIES').
-mop_direct('IR2-COMPONENT', szlot, 'FORMAT').
-mop_direct('IR2-COMPONENT', szlot, 'GLOBAL-TN-COUNTER').
-mop_direct('IR2-COMPONENT', szlot, 'NFP').
-mop_direct('IR2-COMPONENT', szlot, 'NORMAL-TNS').
-mop_direct('IR2-COMPONENT', szlot, 'RESTRICTED-TNS').
-mop_direct('IR2-COMPONENT', szlot, 'SPECIFIED-SAVE-TNS').
-mop_direct('IR2-COMPONENT', szlot, 'SPILLED-TNS').
-mop_direct('IR2-COMPONENT', szlot, 'SPILLED-VOPS').
-mop_direct('IR2-COMPONENT', szlot, 'VALUES-RECEIVERS').
-mop_direct('IR2-COMPONENT', szlot, 'WIRED-TNS').
-mop_direct('IR2-LVAR', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('IR2-LVAR', szlot, 'KIND').
-mop_direct('IR2-LVAR', szlot, 'LOCS').
-mop_direct('IR2-LVAR', szlot, 'PRIMITIVE-TYPE').
-mop_direct('IR2-LVAR', szlot, 'STACK-POINTER').
-mop_direct('IR2-NLX-INFO', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('IR2-NLX-INFO', szlot, 'DYNAMIC-STATE').
-mop_direct('IR2-NLX-INFO', szlot, 'HOME').
-mop_direct('IR2-NLX-INFO', szlot, 'SAVE-SP').
-mop_direct('IR2-NLX-INFO', szlot, 'TARGET').
-mop_direct('IR2-PHYSENV', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('IR2-PHYSENV', szlot, 'BSP-SAVE-TN').
-mop_direct('IR2-PHYSENV', szlot, 'CLOSURE').
-mop_direct('IR2-PHYSENV', szlot, 'CLOSURE-SAVE-TN').
-mop_direct('IR2-PHYSENV', szlot, 'DEBUG-LIVE-TNS').
-mop_direct('IR2-PHYSENV', szlot, 'ELSEWHERE-START').
-mop_direct('IR2-PHYSENV', szlot, 'ENVIRONMENT-START').
-mop_direct('IR2-PHYSENV', szlot, 'LIVE-TNS').
-mop_direct('IR2-PHYSENV', szlot, 'NUMBER-STACK-P').
-mop_direct('IR2-PHYSENV', szlot, 'OLD-FP').
-mop_direct('IR2-PHYSENV', szlot, 'RETURN-PC').
-mop_direct('IR2-PHYSENV', szlot, 'RETURN-PC-PASS').
-mop_direct('JOIN-THREAD-ERROR', supers, ['THREAD-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('JOIN-THREAD-ERROR', szlot, 'PROBLEM').
-mop_direct('KEY-INFO', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('KEY-INFO', szlot, 'NAME').
-mop_direct('KEY-INFO', szlot, 'TYPE').
-mop_direct('KEYWORD-ERROR', submop, 'SIMPLE-KEYWORD-ERROR').
-mop_direct('KEYWORD-ERROR', supers, [obj_program_error, obj_type_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('LABEL', supers, ['ANNOTATION', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('LAMBDA-LIST-UNAVAILABLE', supers, ['DEBUG-CONDITION', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('LAMBDA-LIST-UNAVAILABLE', szlot, 'DEBUG-FUN').
-mop_direct('LAMBDA-VAR', supers, ['BASIC-VAR', 'LEAF', 'SSET-ELEMENT', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('LAMBDA-VAR', szlot, 'ARG-INFO').
-mop_direct('LAMBDA-VAR', szlot, 'CONSTRAINTS').
-mop_direct('LAMBDA-VAR', szlot, 'CTYPE-CONSTRAINTS').
-mop_direct('LAMBDA-VAR', szlot, 'EQ-CONSTRAINTS').
-mop_direct('LAMBDA-VAR', szlot, 'EQL-VAR-CONSTRAINTS').
-mop_direct('LAMBDA-VAR', szlot, 'FLAGS').
-mop_direct('LAMBDA-VAR', szlot, 'FOP-VALUE').
-mop_direct('LAMBDA-VAR', szlot, 'HOME').
-mop_direct('LAMBDA-VAR', szlot, 'INHERITABLE-CONSTRAINTS').
-mop_direct('LAMBDA-VAR', szlot, 'LAST-INITIAL-TYPE').
-mop_direct('LAMBDA-VAR', szlot, 'PRIVATE-CONSTRAINTS').
-mop_direct('LAMBDA-VAR', szlot, 'SPECVAR').
-mop_direct('LATE-DEPRECATION-WARNING', supers, [obj_warning, 'DEPRECATION-CONDITION', 'REFERENCE-CONDITION', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_layout, supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct(obj_layout, szlot, '%FOR-STD-CLASS-B').
-mop_direct(obj_layout, szlot, 'CLASSOID').
-mop_direct(obj_layout, szlot, 'CLOS-HASH').
-mop_direct(obj_layout, szlot, 'DEPTHOID').
-mop_direct(obj_layout, szlot, 'EQUALP-TESTS').
-mop_direct(obj_layout, szlot, 'INFO').
-mop_direct(obj_layout, szlot, 'INHERITS').
-mop_direct(obj_layout, szlot, 'INVALID').
-mop_direct(obj_layout, szlot, 'LENGTH').
-mop_direct(obj_layout, szlot, 'PURE').
-mop_direct(obj_layout, szlot, 'SLOT-LIST').
-mop_direct(obj_layout, szlot, 'SLOT-TABLE').
-mop_direct(obj_layout, szlot, 'SOURCE-LOCATION').
-mop_direct(obj_layout, szlot, 'UNTAGGED-BITMAP').
-mop_direct('LAYOUT-INVALID', supers, [obj_type_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('LEAF', submop, 'BASIC-VAR').
-mop_direct('LEAF', submop, 'CONSTANT').
-mop_direct('LEAF', submop, 'FUNCTIONAL').
-mop_direct('LEAF', supers, ['SSET-ELEMENT', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('LEAF', szlot, '%SOURCE-NAME').
-mop_direct('LEAF', szlot, 'DEFINED-TYPE').
-mop_direct('LEAF', szlot, 'EVER-USED').
-mop_direct('LEAF', szlot, 'EXTENT').
-mop_direct('LEAF', szlot, 'INFO').
-mop_direct('LEAF', szlot, 'NUMBER').
-mop_direct('LEAF', szlot, 'REFS').
-mop_direct('LEAF', szlot, 'TYPE').
-mop_direct('LEAF', szlot, 'WHERE-FROM').
-mop_direct('LEXENV', supers, ['ABSTRACT-LEXENV', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('LEXENV', szlot, '%POLICY').
-mop_direct('LEXENV', szlot, 'BLOCKS').
-mop_direct('LEXENV', szlot, 'CLEANUP').
-mop_direct('LEXENV', szlot, 'DISABLED-PACKAGE-LOCKS').
-mop_direct('LEXENV', szlot, 'FUNS').
-mop_direct('LEXENV', szlot, 'HANDLED-CONDITIONS').
-mop_direct('LEXENV', szlot, 'LAMBDA').
-mop_direct('LEXENV', szlot, 'PARENT').
-mop_direct('LEXENV', szlot, 'TAGS').
-mop_direct('LEXENV', szlot, 'TYPE-RESTRICTIONS').
-mop_direct('LEXENV', szlot, 'USER-DATA').
-mop_direct('LEXENV', szlot, 'VARS').
-mop_direct('LEXICAL-ENVIRONMENT-TOO-COMPLEX', supers, [obj_style_warning, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('LEXICAL-ENVIRONMENT-TOO-COMPLEX', szlot, 'FORM').
-mop_direct('LEXICAL-ENVIRONMENT-TOO-COMPLEX', szlot, 'LEXENV').
-mop_direct(obj_list, submop, obj_cons).
-mop_direct(obj_list, submop, 'NULL').
-mop_direct(obj_list, supers, ['SEQUENCE', t]).
-mop_direct('LOCAL-ALIEN-INFO', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('LOCAL-ALIEN-INFO', szlot, 'FORCE-TO-MEMORY-P').
-mop_direct('LOCAL-ALIEN-INFO', szlot, 'TYPE').
-mop_direct('LOCAL-ARGUMENT-MISMATCH', supers, ['REFERENCE-CONDITION', obj_simple_warning, obj_simple_condition, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('LOCALE-CONV', supers, [obj_structure_object, t]).
-mop_direct('LOCALE-CONV', szlot, 'CURRENCY_SYMBOL').
-mop_direct('LOCALE-CONV', szlot, 'DECIMAL_POINT').
-mop_direct('LOCALE-CONV', szlot, 'FRAC_DIGITS').
-mop_direct('LOCALE-CONV', szlot, 'GROUPING').
-mop_direct('LOCALE-CONV', szlot, 'INT_CURR_SYMBOL').
-mop_direct('LOCALE-CONV', szlot, 'INT_FRAC_DIGITS').
-mop_direct('LOCALE-CONV', szlot, 'INT_N_CS_PRECEDES').
-mop_direct('LOCALE-CONV', szlot, 'INT_N_SEP_BY_SPACE').
-mop_direct('LOCALE-CONV', szlot, 'INT_N_SIGN_POSN').
-mop_direct('LOCALE-CONV', szlot, 'INT_P_CS_PRECEDES').
-mop_direct('LOCALE-CONV', szlot, 'INT_P_SEP_BY_SPACE').
-mop_direct('LOCALE-CONV', szlot, 'INT_P_SIGN_POSN').
-mop_direct('LOCALE-CONV', szlot, 'MON_DECIMAL_POINT').
-mop_direct('LOCALE-CONV', szlot, 'MON_GROUPING').
-mop_direct('LOCALE-CONV', szlot, 'MON_THOUSANDS_SEP').
-mop_direct('LOCALE-CONV', szlot, 'N_CS_PRECEDES').
-mop_direct('LOCALE-CONV', szlot, 'N_SEP_BY_SPACE').
-mop_direct('LOCALE-CONV', szlot, 'N_SIGN_POSN').
-mop_direct('LOCALE-CONV', szlot, 'NEGATIVE_SIGN').
-mop_direct('LOCALE-CONV', szlot, 'P_CS_PRECEDES').
-mop_direct('LOCALE-CONV', szlot, 'P_SEP_BY_SPACE').
-mop_direct('LOCALE-CONV', szlot, 'P_SIGN_POSN').
-mop_direct('LOCALE-CONV', szlot, 'POSITIVE_SIGN').
-mop_direct('LOCALE-CONV', szlot, 'THOUSANDS_SEP').
-mop_direct('LOCATION-GROUP', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('LOCATION-GROUP', szlot, 'LOCATIONS').
-mop_direct('LOCATION-INFO', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('LOCATION-INFO', szlot, 'KIND').
-mop_direct('LOCATION-INFO', szlot, 'LABEL').
-mop_direct('LOCATION-INFO', szlot, 'VOP').
-mop_direct('LOGICAL-BLOCK', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('LOGICAL-BLOCK', szlot, 'PER-LINE-PREFIX-END').
-mop_direct('LOGICAL-BLOCK', szlot, 'PREFIX-LENGTH').
-mop_direct('LOGICAL-BLOCK', szlot, 'SECTION-COLUMN').
-mop_direct('LOGICAL-BLOCK', szlot, 'SECTION-START-LINE').
-mop_direct('LOGICAL-BLOCK', szlot, 'START-COLUMN').
-mop_direct('LOGICAL-BLOCK', szlot, 'SUFFIX-LENGTH').
-mop_direct('LOGICAL-HOST', supers, ['HOST', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('LOGICAL-HOST', szlot, 'CANON-TRANSLS').
-mop_direct('LOGICAL-HOST', szlot, 'CUSTOMARY-CASE').
-mop_direct('LOGICAL-HOST', szlot, 'NAME').
-mop_direct('LOGICAL-HOST', szlot, 'PARSE').
-mop_direct('LOGICAL-HOST', szlot, 'PARSE-NATIVE').
-mop_direct('LOGICAL-HOST', szlot, 'SIMPLIFY-NAMESTRING').
-mop_direct('LOGICAL-HOST', szlot, 'TRANSLATIONS').
-mop_direct('LOGICAL-HOST', szlot, 'UNPARSE').
-mop_direct('LOGICAL-HOST', szlot, 'UNPARSE-DIRECTORY').
-mop_direct('LOGICAL-HOST', szlot, 'UNPARSE-DIRECTORY-SEPARATOR').
-mop_direct('LOGICAL-HOST', szlot, 'UNPARSE-ENOUGH').
-mop_direct('LOGICAL-HOST', szlot, 'UNPARSE-FILE').
-mop_direct('LOGICAL-HOST', szlot, 'UNPARSE-HOST').
-mop_direct('LOGICAL-HOST', szlot, 'UNPARSE-NATIVE').
-mop_direct(obj_logical_pathname, supers, [obj_pathname, obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct(obj_logical_pathname, supers, [obj_pathname, t]).
-mop_direct('LONG-METHOD-COMBINATION', supers, ['STANDARD-METHOD-COMBINATION', 'DEFINITION-SOURCE-MIXIN', 'METHOD-COMBINATION', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('LONG-METHOD-COMBINATION', szlot, 'ARGS-LAMBDA-LIST').
-mop_direct('LONG-METHOD-COMBINATION', szlot, 'FUNCTION').
-mop_direct('LONG-METHOD-COMBINATION-ERROR', supers, ['REFERENCE-CONDITION', obj_simple_error, obj_simple_condition, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('LOOP-COLLECTOR', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('LOOP-COLLECTOR', szlot, 'CLASS').
-mop_direct('LOOP-COLLECTOR', szlot, 'DATA').
-mop_direct('LOOP-COLLECTOR', szlot, 'DTYPE').
-mop_direct('LOOP-COLLECTOR', szlot, 'HISTORY').
-mop_direct('LOOP-COLLECTOR', szlot, 'NAME').
-mop_direct('LOOP-COLLECTOR', szlot, 'SPECIFIED-TYPE').
-mop_direct('LOOP-COLLECTOR', szlot, 'TEMPVARS').
-mop_direct('LOOP-INITIALIZATION', supers, [obj_structure_object, t]).
-mop_direct('LOOP-INITIALIZATION', szlot, 'BINDINGS').
-mop_direct('LOOP-INITIALIZATION', szlot, 'DECLSPECS').
-mop_direct('LOOP-INITIALIZATION', szlot, 'DEPENDS-PRECEDING').
-mop_direct('LOOP-INITIALIZATION', szlot, 'ENDTEST-FORMS').
-mop_direct('LOOP-INITIALIZATION', szlot, 'EVERYTIME').
-mop_direct('LOOP-INITIALIZATION', szlot, 'LATER-DEPEND').
-mop_direct('LOOP-INITIALIZATION', szlot, 'PREAMBLE').
-mop_direct('LOOP-INITIALIZATION', szlot, 'REQUIRES-STEPBEFORE').
-mop_direct('LOOP-INITIALIZATION', szlot, 'SPECFORM').
-mop_direct('LOOP-MINIMAX', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('LOOP-MINIMAX', szlot, 'ANSWER-VARIABLE').
-mop_direct('LOOP-MINIMAX', szlot, 'FLAG-VARIABLE').
-mop_direct('LOOP-MINIMAX', szlot, 'INFINITY-DATA').
-mop_direct('LOOP-MINIMAX', szlot, 'OPERATIONS').
-mop_direct('LOOP-MINIMAX', szlot, 'TEMP-VARIABLE').
-mop_direct('LOOP-MINIMAX', szlot, 'TYPE').
-mop_direct('LOOP-PATH', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('LOOP-PATH', szlot, 'FUNCTION').
-mop_direct('LOOP-PATH', szlot, 'INCLUSIVE-PERMITTED').
-mop_direct('LOOP-PATH', szlot, 'NAMES').
-mop_direct('LOOP-PATH', szlot, 'PREPOSITION-GROUPS').
-mop_direct('LOOP-PATH', szlot, 'USER-DATA').
-mop_direct('LOOP-UNIVERSE', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('LOOP-UNIVERSE', szlot, 'FOR-KEYWORDS').
-mop_direct('LOOP-UNIVERSE', szlot, 'ITERATION-KEYWORDS').
-mop_direct('LOOP-UNIVERSE', szlot, 'KEYWORDS').
-mop_direct('LOOP-UNIVERSE', szlot, 'PATH-KEYWORDS').
-mop_direct('LOOP-UNIVERSE', szlot, 'TYPE-KEYWORDS').
-mop_direct('LOOP-UNIVERSE', szlot, 'TYPE-SYMBOLS').
-mop_direct('LRA', supers, [t]).
-mop_direct('LVAR', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('LVAR', szlot, '%DERIVED-TYPE').
-mop_direct('LVAR', szlot, '%EXTERNALLY-CHECKABLE-TYPE').
-mop_direct('LVAR', szlot, 'DEST').
-mop_direct('LVAR', szlot, 'DYNAMIC-EXTENT').
-mop_direct('LVAR', szlot, 'INFO').
-mop_direct('LVAR', szlot, 'REOPTIMIZE').
-mop_direct('LVAR', szlot, 'USES').
-mop_direct('MACROEXPAND-HOOK-TYPE-ERROR', supers, [obj_type_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('MALFORMED-ASCII', supers, ['OCTET-DECODING-ERROR', 'CHARACTER-DECODING-ERROR', 'CHARACTER-CODING-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('MALFORMED-EUC-JP', supers, ['OCTET-DECODING-ERROR', 'CHARACTER-DECODING-ERROR', 'CHARACTER-CODING-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('MALFORMED-GBK', supers, ['OCTET-DECODING-ERROR', 'CHARACTER-DECODING-ERROR', 'CHARACTER-CODING-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('MALFORMED-SHIFT_JIS', supers, ['OCTET-DECODING-ERROR', 'CHARACTER-DECODING-ERROR', 'CHARACTER-CODING-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('MATCH', supers, [obj_structure_object, t]).
-mop_direct('MATCH', szlot, 'END').
-mop_direct('MATCH', szlot, 'START').
-mop_direct('MEMBER-TYPE', supers, ['CTYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('MEMBER-TYPE', szlot, 'CLASS-INFO').
-mop_direct('MEMBER-TYPE', szlot, 'FP-ZEROES').
-mop_direct('MEMBER-TYPE', szlot, 'XSET').
-mop_direct('MEMORY-FAULT-ERROR', supers, ['SYSTEM-CONDITION', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('META-INFO', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('META-INFO', szlot, 'CATEGORY').
-mop_direct('META-INFO', szlot, 'DEFAULT').
-mop_direct('META-INFO', szlot, 'KIND').
-mop_direct('META-INFO', szlot, 'NUMBER').
-mop_direct('META-INFO', szlot, 'TYPE-CHECKER').
-mop_direct('META-INFO', szlot, 'TYPE-SPEC').
-mop_direct('META-INFO', szlot, 'VALIDATE-FUNCTION').
-mop_direct('METAOBJECT', submop, 'GENERIC-FUNCTION').
-mop_direct('METAOBJECT', submop, 'METHOD').
-mop_direct('METAOBJECT', submop, 'METHOD-COMBINATION').
-mop_direct('METAOBJECT', submop, obj_slot_definition).
-mop_direct('METAOBJECT', submop, 'SPECIALIZER').
-mop_direct('METAOBJECT', submop, 'SUPER-CLASS').
-mop_direct('METAOBJECT', supers, [obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('METAOBJECT', supers, [obj_standard_object, t]).
-mop_direct('METAOBJECT-INITIALIZATION-VIOLATION', supers, ['REFERENCE-CONDITION', obj_simple_error, obj_simple_condition, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('METHOD', submop, 'STANDARD-METHOD').
-mop_direct('METHOD', supers, ['METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('METHOD', supers, ['STANDARD-STABLEHASH', 'METAOBJECT', obj_standard_object, t]).
-mop_direct('METHOD', szlot, '$FROM-DEFGENERIC').
-mop_direct('METHOD-CALL', submop, 'CONSTANT-METHOD-CALL').
-mop_direct('METHOD-CALL', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('METHOD-CALL', szlot, 'CALL-METHOD-ARGS').
-mop_direct('METHOD-CALL', szlot, 'FUNCTION').
-mop_direct('METHOD-CALL-ERROR', submop, 'METHOD-CALL-TYPE-ERROR').
-mop_direct('METHOD-CALL-ERROR', supers, [obj_simple_error, obj_simple_condition, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('METHOD-CALL-ERROR', szlot, '$ARGS').
-mop_direct('METHOD-CALL-ERROR', szlot, '$GF').
-mop_direct('METHOD-CALL-ERROR', szlot, '$METHOD').
-mop_direct('METHOD-CALL-TYPE-ERROR', supers, [obj_simple_type_error, 'METHOD-CALL-ERROR', obj_simple_error, obj_simple_condition, obj_type_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('METHOD-COMBINATION', submop, 'STANDARD-METHOD-COMBINATION').
-mop_direct('METHOD-COMBINATION', supers, ['METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('METHOD-COMBINATION', supers, ['METAOBJECT', obj_standard_object, t]).
-mop_direct('METHOD-COMBINATION', szlot, '%DOCUMENTATION').
-mop_direct('METHOD-COMBINATION', szlot, 'ARGUMENTS-LAMBDA-LIST').
-mop_direct('METHOD-COMBINATION', szlot, 'CALL-NEXT-METHOD-ALLOWED').
-mop_direct('METHOD-COMBINATION', szlot, 'CHECK-METHOD-QUALIFIERS').
-mop_direct('METHOD-COMBINATION', szlot, 'CHECK-OPTIONS').
-mop_direct('METHOD-COMBINATION', szlot, 'DECLARATIONS').
-mop_direct('METHOD-COMBINATION', szlot, 'DOCUMENTATION').
-mop_direct('METHOD-COMBINATION', szlot, 'EXPANDER').
-mop_direct('METHOD-COMBINATION', szlot, 'IDENTITY-WITH-ONE-ARGUMENT').
-mop_direct('METHOD-COMBINATION', szlot, 'LONG-EXPANDER').
-mop_direct('METHOD-COMBINATION', szlot, 'NAME').
-mop_direct('METHOD-COMBINATION', szlot, 'OPERATOR').
-mop_direct('METHOD-COMBINATION', szlot, 'OPTIONS').
-mop_direct('METHOD-COMBINATION', szlot, 'QUALIFIERS').
-mop_direct('MISDESIGNED-FORWARD-REFERENCED-CLASS', supers, ['FORWARD-REFERENCED-CLASS', 'POTENTIAL-CLASS', 'SPECIALIZER', 'SUPER-CLASS', 'STANDARD-STABLEHASH', 'METAOBJECT', obj_standard_object, t]).
-mop_direct('MISSING-LOAD-FORM', submop, 'SIMPLE-MISSING-LOAD-FORM').
-mop_direct('MISSING-LOAD-FORM', supers, ['ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('MISSING-LOAD-FORM', szlot, '$OBJECT').
-mop_direct('MODULAR-CLASS', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('MODULAR-CLASS', szlot, 'FUNS').
-mop_direct('MODULAR-CLASS', szlot, 'VERSIONS').
-mop_direct('MODULAR-CLASS', szlot, 'WIDTHS').
-mop_direct('MODULAR-FUN-INFO', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('MODULAR-FUN-INFO', szlot, 'LAMBDA-LIST').
-mop_direct('MODULAR-FUN-INFO', szlot, 'NAME').
-mop_direct('MODULAR-FUN-INFO', szlot, 'PROTOTYPE').
-mop_direct('MODULAR-FUN-INFO', szlot, 'SIGNEDP').
-mop_direct('MODULAR-FUN-INFO', szlot, 'WIDTH').
-mop_direct('MUTEX', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('MUTEX', szlot, '%OWNER').
-mop_direct('MUTEX', szlot, 'NAME').
-mop_direct('MUTEX', szlot, 'STATE').
-mop_direct('MV-COMBINATION', supers, ['BASIC-COMBINATION', 'VALUED-NODE', 'NODE', 'SSET-ELEMENT', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('N-N', supers, ['ACCESSOR-DFUN-INFO', 'DFUN-INFO', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('NAME-CONFLICT', supers, ['REFERENCE-CONDITION', obj_package_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('NAME-CONFLICT', szlot, 'DATUM').
-mop_direct('NAME-CONFLICT', szlot, 'FUNCTION').
-mop_direct('NAME-CONFLICT', szlot, 'SYMBOLS').
-mop_direct('NAMED-TYPE', supers, ['CTYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('NAMED-TYPE', szlot, 'CLASS-INFO').
-mop_direct('NAMED-TYPE', szlot, 'NAME').
-mop_direct('NAMESTRING-PARSE-ERROR', supers, [obj_parse_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('NAMESTRING-PARSE-ERROR', szlot, 'ARGS').
-mop_direct('NAMESTRING-PARSE-ERROR', szlot, 'COMPLAINT').
-mop_direct('NAMESTRING-PARSE-ERROR', szlot, 'NAMESTRING').
-mop_direct('NAMESTRING-PARSE-ERROR', szlot, 'OFFSET').
-mop_direct('NEGATION-TYPE', supers, ['CTYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('NEGATION-TYPE', szlot, 'CLASS-INFO').
-mop_direct('NEGATION-TYPE', szlot, 'TYPE').
-mop_direct('NEW-VALUE-SPECIALIZATION', supers, ['REFERENCE-CONDITION', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('NEW-VALUE-SPECIALIZATION', szlot, '%METHOD').
-mop_direct('NEWLINE', supers, ['SECTION-START', 'QUEUED-OP', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('NEWLINE', szlot, 'KIND').
-mop_direct('NIL-ARRAY-ACCESSED-ERROR', supers, ['REFERENCE-CONDITION', obj_type_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('NLX-INFO', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('NLX-INFO', szlot, 'BLOCK').
-mop_direct('NLX-INFO', szlot, 'CLEANUP').
-mop_direct('NLX-INFO', szlot, 'INFO').
-mop_direct('NLX-INFO', szlot, 'SAFE-P').
-mop_direct('NLX-INFO', szlot, 'TARGET').
-mop_direct('NO-DEBUG-BLOCKS', supers, ['DEBUG-CONDITION', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('NO-DEBUG-BLOCKS', szlot, 'DEBUG-FUN').
-mop_direct('NO-DEBUG-FUN-RETURNS', supers, ['DEBUG-CONDITION', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('NO-DEBUG-FUN-RETURNS', szlot, 'DEBUG-FUN').
-mop_direct('NO-DEBUG-VARS', supers, ['DEBUG-CONDITION', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('NO-DEBUG-VARS', szlot, 'DEBUG-FUN').
-mop_direct('NO-METHODS', supers, ['DFUN-INFO', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('NO-PRIMARY-METHOD', supers, ['REFERENCE-CONDITION', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('NO-PRIMARY-METHOD', szlot, 'ARGS').
-mop_direct('NO-PRIMARY-METHOD', szlot, 'GENERIC-FUNCTION').
-mop_direct('NODE', submop, 'BIND').
-mop_direct('NODE', submop, 'CIF').
-mop_direct('NODE', submop, 'CRETURN').
-mop_direct('NODE', submop, 'ENTRY').
-mop_direct('NODE', submop, 'VALUED-NODE').
-mop_direct('NODE', supers, ['SSET-ELEMENT', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('NODE', szlot, 'LEXENV').
-mop_direct('NODE', szlot, 'NEXT').
-mop_direct('NODE', szlot, 'NUMBER').
-mop_direct('NODE', szlot, 'PREV').
-mop_direct('NODE', szlot, 'REOPTIMIZE').
-mop_direct('NODE', szlot, 'SOURCE-PATH').
-mop_direct('NODE', szlot, 'TAIL-P').
-mop_direct('NULL', supers, [obj_symbol, obj_list, 'SEQUENCE', t]).
-mop_direct('NUMBER', submop, obj_complex).
-mop_direct('NUMBER', submop, 'REAL').
-mop_direct('NUMBER', supers, [t]).
-mop_direct('NUMERIC-TYPE', supers, ['CTYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('NUMERIC-TYPE', szlot, 'CLASS').
-mop_direct('NUMERIC-TYPE', szlot, 'CLASS-INFO').
-mop_direct('NUMERIC-TYPE', szlot, 'COMPLEXP').
-mop_direct('NUMERIC-TYPE', szlot, 'ENUMERABLE').
-mop_direct('NUMERIC-TYPE', szlot, 'FORMAT').
-mop_direct('NUMERIC-TYPE', szlot, 'HIGH').
-mop_direct('NUMERIC-TYPE', szlot, 'LOW').
-mop_direct('OBSOLETE-STRUCTURE', supers, ['ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('OBSOLETE-STRUCTURE', szlot, 'DATUM').
-mop_direct('OCTET-DECODING-ERROR', submop, 'CHARACTER-OUT-OF-RANGE').
-mop_direct('OCTET-DECODING-ERROR', submop, 'END-OF-INPUT-IN-CHARACTER').
-mop_direct('OCTET-DECODING-ERROR', submop, 'INVALID-EUC-JP-CONTINUATION-BYTE').
-mop_direct('OCTET-DECODING-ERROR', submop, 'INVALID-EUC-JP-STARTER-BYTE').
-mop_direct('OCTET-DECODING-ERROR', submop, 'INVALID-GBK-CONTINUATION-BYTE').
-mop_direct('OCTET-DECODING-ERROR', submop, 'INVALID-GBK-STARTER-BYTE').
-mop_direct('OCTET-DECODING-ERROR', submop, 'INVALID-SHIFT_JIS-CONTINUATION-BYTE').
-mop_direct('OCTET-DECODING-ERROR', submop, 'INVALID-SHIFT_JIS-STARTER-BYTE').
-mop_direct('OCTET-DECODING-ERROR', submop, 'INVALID-UTF8-CONTINUATION-BYTE').
-mop_direct('OCTET-DECODING-ERROR', submop, 'INVALID-UTF8-STARTER-BYTE').
-mop_direct('OCTET-DECODING-ERROR', submop, 'MALFORMED-ASCII').
-mop_direct('OCTET-DECODING-ERROR', submop, 'MALFORMED-EUC-JP').
-mop_direct('OCTET-DECODING-ERROR', submop, 'MALFORMED-GBK').
-mop_direct('OCTET-DECODING-ERROR', submop, 'MALFORMED-SHIFT_JIS').
-mop_direct('OCTET-DECODING-ERROR', submop, 'OVERLONG-UTF8-SEQUENCE').
-mop_direct('OCTET-DECODING-ERROR', supers, ['CHARACTER-DECODING-ERROR', 'CHARACTER-CODING-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('OCTET-DECODING-ERROR', szlot, 'ARRAY').
-mop_direct('OCTET-DECODING-ERROR', szlot, 'END').
-mop_direct('OCTET-DECODING-ERROR', szlot, 'EXTERNAL-FORMAT').
-mop_direct('OCTET-DECODING-ERROR', szlot, 'POSITION').
-mop_direct('OCTET-DECODING-ERROR', szlot, 'START').
-mop_direct('OCTETS-ENCODING-ERROR', supers, ['CHARACTER-ENCODING-ERROR', 'CHARACTER-CODING-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('OCTETS-ENCODING-ERROR', szlot, 'EXTERNAL-FORMAT').
-mop_direct('OCTETS-ENCODING-ERROR', szlot, 'POSITION').
-mop_direct('OCTETS-ENCODING-ERROR', szlot, 'STRING').
-mop_direct('OFFS-HOOK', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('OFFS-HOOK', szlot, 'BEFORE-ADDRESS').
-mop_direct('OFFS-HOOK', szlot, 'FUN').
-mop_direct('OFFS-HOOK', szlot, 'OFFSET').
-mop_direct('ONE-CLASS', submop, 'TWO-CLASS').
-mop_direct('ONE-CLASS', supers, ['ONE-INDEX-DFUN-INFO', 'ACCESSOR-DFUN-INFO', 'DFUN-INFO', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ONE-CLASS', szlot, 'WRAPPER0').
-mop_direct('ONE-INDEX', supers, ['ONE-INDEX-DFUN-INFO', 'ACCESSOR-DFUN-INFO', 'DFUN-INFO', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ONE-INDEX-DFUN-INFO', submop, 'ONE-CLASS').
-mop_direct('ONE-INDEX-DFUN-INFO', submop, 'ONE-INDEX').
-mop_direct('ONE-INDEX-DFUN-INFO', supers, ['ACCESSOR-DFUN-INFO', 'DFUN-INFO', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ONE-INDEX-DFUN-INFO', szlot, 'INDEX').
-mop_direct('OPERAND-PARSE', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('OPERAND-PARSE', szlot, 'BORN').
-mop_direct('OPERAND-PARSE', szlot, 'DIES').
-mop_direct('OPERAND-PARSE', szlot, 'KIND').
-mop_direct('OPERAND-PARSE', szlot, 'LOAD').
-mop_direct('OPERAND-PARSE', szlot, 'LOAD-TN').
-mop_direct('OPERAND-PARSE', szlot, 'NAME').
-mop_direct('OPERAND-PARSE', szlot, 'OFFSET').
-mop_direct('OPERAND-PARSE', szlot, 'SC').
-mop_direct('OPERAND-PARSE', szlot, 'SCS').
-mop_direct('OPERAND-PARSE', szlot, 'TARGET').
-mop_direct('OPERAND-PARSE', szlot, 'TEMP').
-mop_direct('OPTIONAL-DISPATCH', supers, ['FUNCTIONAL', 'LEAF', 'SSET-ELEMENT', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('OPTIONAL-DISPATCH', szlot, 'ALLOWP').
-mop_direct('OPTIONAL-DISPATCH', szlot, 'ARGLIST').
-mop_direct('OPTIONAL-DISPATCH', szlot, 'ENTRY-POINTS').
-mop_direct('OPTIONAL-DISPATCH', szlot, 'KEYP').
-mop_direct('OPTIONAL-DISPATCH', szlot, 'MAIN-ENTRY').
-mop_direct('OPTIONAL-DISPATCH', szlot, 'MAX-ARGS').
-mop_direct('OPTIONAL-DISPATCH', szlot, 'MIN-ARGS').
-mop_direct('OPTIONAL-DISPATCH', szlot, 'MORE-ENTRY').
-mop_direct('ORDERED-SET', supers, ['SSET', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ORDERED-SET', szlot, 'MEMBERS').
-mop_direct('OS-ERROR', submop, 'SIMPLE-OS-ERROR').
-mop_direct('OS-ERROR', supers, ['ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('OVERHEAD', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('OVERHEAD', szlot, 'CALL').
-mop_direct('OVERHEAD', szlot, 'INTERNAL').
-mop_direct('OVERHEAD', szlot, 'TOTAL').
-mop_direct('OVERLONG-UTF8-SEQUENCE', supers, ['OCTET-DECODING-ERROR', 'CHARACTER-DECODING-ERROR', 'CHARACTER-CODING-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_package, supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct(obj_package, supers, [t]).
-mop_direct(obj_package, szlot, '%IMPLEMENTATION-PACKAGES').
-mop_direct(obj_package, szlot, '%LOCAL-NICKNAMES').
-mop_direct(obj_package, szlot, '%LOCALLY-NICKNAMED-BY').
-mop_direct(obj_package, szlot, '%NAME').
-mop_direct(obj_package, szlot, '%NICKNAMES').
-mop_direct(obj_package, szlot, '%SHADOWING-SYMBOLS').
-mop_direct(obj_package, szlot, '%USE-LIST').
-mop_direct(obj_package, szlot, '%USED-BY-LIST').
-mop_direct(obj_package, szlot, 'DOC-STRING').
-mop_direct(obj_package, szlot, 'EXTERNAL-SYMBOLS').
-mop_direct(obj_package, szlot, 'INTERNAL-SYMBOLS').
-mop_direct(obj_package, szlot, 'LOCK').
-mop_direct(obj_package, szlot, 'MRU-TABLE-INDEX').
-mop_direct(obj_package, szlot, 'SOURCE-LOCATION').
-mop_direct(obj_package, szlot, 'TABLES').
-mop_direct('PACKAGE-AT-VARIANCE', supers, ['REFERENCE-CONDITION', obj_simple_warning, obj_simple_condition, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('PACKAGE-AT-VARIANCE-ERROR', supers, ['REFERENCE-CONDITION', obj_simple_condition, obj_package_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_package_error, submop, 'NAME-CONFLICT').
-mop_direct(obj_package_error, submop, 'PACKAGE-AT-VARIANCE-ERROR').
-mop_direct(obj_package_error, submop, 'PACKAGE-LOCK-VIOLATION').
-mop_direct(obj_package_error, submop, 'SIMPLE-PACKAGE-ERROR').
-mop_direct(obj_package_error, submop, 'SIMPLE-READER-PACKAGE-ERROR').
-mop_direct(obj_package_error, supers, ['ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_package_error, supers, ['ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct(obj_package_error, szlot, '$PACKAGE').
-mop_direct(obj_package_error, szlot, 'PACKAGE').
-mop_direct('PACKAGE-HASHTABLE', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('PACKAGE-HASHTABLE', szlot, 'CELLS').
-mop_direct('PACKAGE-HASHTABLE', szlot, 'DELETED').
-mop_direct('PACKAGE-HASHTABLE', szlot, 'FREE').
-mop_direct('PACKAGE-HASHTABLE', szlot, 'SIZE').
-mop_direct('PACKAGE-LOCK-VIOLATION', submop, 'PACKAGE-LOCKED-ERROR').
-mop_direct('PACKAGE-LOCK-VIOLATION', submop, 'SYMBOL-PACKAGE-LOCKED-ERROR').
-mop_direct('PACKAGE-LOCK-VIOLATION', supers, [obj_package_error, 'ERROR', obj_serious_condition, 'REFERENCE-CONDITION', obj_simple_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('PACKAGE-LOCK-VIOLATION', szlot, 'CURRENT-PACKAGE').
-mop_direct('PACKAGE-LOCKED-ERROR', supers, ['PACKAGE-LOCK-VIOLATION', obj_package_error, 'ERROR', obj_serious_condition, 'REFERENCE-CONDITION', obj_simple_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('PARSE-DEPRECATED-TYPE', supers, [obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('PARSE-DEPRECATED-TYPE', szlot, 'SPECIFIER').
-mop_direct(obj_parse_error, submop, 'NAMESTRING-PARSE-ERROR').
-mop_direct(obj_parse_error, submop, obj_reader_error).
-mop_direct(obj_parse_error, submop, 'SIMPLE-PARSE-ERROR').
-mop_direct(obj_parse_error, supers, ['ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_parse_error, supers, ['ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('PARSE-UNKNOWN-TYPE', supers, [obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('PARSE-UNKNOWN-TYPE', szlot, 'SPECIFIER').
-mop_direct(obj_pathname, submop, obj_logical_pathname).
-mop_direct(obj_pathname, supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct(obj_pathname, supers, [t]).
-mop_direct(obj_pathname, szlot, 'DEVICE').
-mop_direct(obj_pathname, szlot, 'DIRECTORY').
-mop_direct(obj_pathname, szlot, 'HOST').
-mop_direct(obj_pathname, szlot, 'NAME').
-mop_direct(obj_pathname, szlot, 'TYPE').
-mop_direct(obj_pathname, szlot, 'VERSION').
-mop_direct('PATTERN', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('PATTERN', szlot, 'PIECES').
-mop_direct('PCL-CLASS', submop, 'FORWARD-REFERENCED-CLASS').
-mop_direct('PCL-CLASS', submop, obj_slot_class).
-mop_direct('PCL-CLASS', submop, 'SYSTEM-CLASS').
-mop_direct('PCL-CLASS', supers, ['CLASS', 'DEPENDENT-UPDATE-MIXIN', 'PLIST-MIXIN', 'DEFINITION-SOURCE-MIXIN', 'STANDARD-SPECIALIZER', 'SPECIALIZER', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('PCL-CLASS', szlot, '%CLASS-PRECEDENCE-LIST').
-mop_direct('PCL-CLASS', szlot, 'CAN-PRECEDE-LIST').
-mop_direct('PCL-CLASS', szlot, 'CPL-AVAILABLE-P').
-mop_direct('PCL-CLASS', szlot, 'INCOMPATIBLE-SUPERCLASS-LIST').
-mop_direct('PCL-CLASS', szlot, 'PROTOTYPE').
-mop_direct('PCL-CLASS', szlot, 'WRAPPER').
-mop_direct('PHYSENV', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('PHYSENV', szlot, 'CLOSURE').
-mop_direct('PHYSENV', szlot, 'INFO').
-mop_direct('PHYSENV', szlot, 'LAMBDA').
-mop_direct('PHYSENV', szlot, 'NLX-INFO').
-mop_direct('PLIST-MIXIN', submop, 'DEPENDENT-UPDATE-MIXIN').
-mop_direct('PLIST-MIXIN', submop, 'STANDARD-METHOD').
-mop_direct('PLIST-MIXIN', supers, [obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('PLIST-MIXIN', szlot, 'PLIST').
-mop_direct('POLICY', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('POLICY', szlot, 'DEPENDENT-QUALITIES').
-mop_direct('POLICY', szlot, 'PRESENCE-BITS').
-mop_direct('POLICY', szlot, 'PRIMARY-QUALITIES').
-mop_direct('POLICY-DEPENDENT-QUALITY', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('POLICY-DEPENDENT-QUALITY', szlot, 'EXPRESSION').
-mop_direct('POLICY-DEPENDENT-QUALITY', szlot, 'GETTER').
-mop_direct('POLICY-DEPENDENT-QUALITY', szlot, 'NAME').
-mop_direct('POLICY-DEPENDENT-QUALITY', szlot, 'VALUES-DOCUMENTATION').
-mop_direct('POLLFDS', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('POLLFDS', szlot, 'FDS').
-mop_direct('POLLFDS', szlot, 'LIST').
-mop_direct('POLLFDS', szlot, 'MAP').
-mop_direct('POLLFDS', szlot, 'N-FDS').
-mop_direct('POTENTIAL-CLASS', submop, 'CLASS').
-mop_direct('POTENTIAL-CLASS', submop, 'MISDESIGNED-FORWARD-REFERENCED-CLASS').
-mop_direct('POTENTIAL-CLASS', supers, ['SPECIALIZER', 'SUPER-CLASS', 'STANDARD-STABLEHASH', 'METAOBJECT', obj_standard_object, t]).
-mop_direct('PPRINT-DISPATCH-ENTRY', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('PPRINT-DISPATCH-ENTRY', szlot, 'FUN').
-mop_direct('PPRINT-DISPATCH-ENTRY', szlot, 'INITIAL-P').
-mop_direct('PPRINT-DISPATCH-ENTRY', szlot, 'PRIORITY').
-mop_direct('PPRINT-DISPATCH-ENTRY', szlot, 'TEST-FN').
-mop_direct('PPRINT-DISPATCH-ENTRY', szlot, 'TYPE').
-mop_direct('PPRINT-DISPATCH-TABLE', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('PPRINT-DISPATCH-TABLE', szlot, 'CONS-ENTRIES').
-mop_direct('PPRINT-DISPATCH-TABLE', szlot, 'ENTRIES').
-mop_direct('PRETTY-STREAM', supers, ['ANSI-STREAM', obj_stream, obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('PRETTY-STREAM', szlot, 'BLOCKS').
-mop_direct('PRETTY-STREAM', szlot, 'BUFFER').
-mop_direct('PRETTY-STREAM', szlot, 'BUFFER-FILL-POINTER').
-mop_direct('PRETTY-STREAM', szlot, 'BUFFER-OFFSET').
-mop_direct('PRETTY-STREAM', szlot, 'BUFFER-START-COLUMN').
-mop_direct('PRETTY-STREAM', szlot, 'CHAR-OUT-ONESHOT-HOOK').
-mop_direct('PRETTY-STREAM', szlot, 'LINE-LENGTH').
-mop_direct('PRETTY-STREAM', szlot, 'LINE-NUMBER').
-mop_direct('PRETTY-STREAM', szlot, 'PENDING-BLOCKS').
-mop_direct('PRETTY-STREAM', szlot, 'PREFIX').
-mop_direct('PRETTY-STREAM', szlot, 'PRINT-LINES').
-mop_direct('PRETTY-STREAM', szlot, 'QUEUE-HEAD').
-mop_direct('PRETTY-STREAM', szlot, 'QUEUE-TAIL').
-mop_direct('PRETTY-STREAM', szlot, 'SUFFIX').
-mop_direct('PRETTY-STREAM', szlot, 'TARGET').
-mop_direct('PRIM-OBJECT-SLOT', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('PRIM-OBJECT-SLOT', szlot, 'DOCS').
-mop_direct('PRIM-OBJECT-SLOT', szlot, 'NAME').
-mop_direct('PRIM-OBJECT-SLOT', szlot, 'OFFSET').
-mop_direct('PRIM-OBJECT-SLOT', szlot, 'OPTIONS').
-mop_direct('PRIM-OBJECT-SLOT', szlot, 'REST-P').
-mop_direct('PRIM-OBJECT-SLOT', szlot, 'SPECIAL').
-mop_direct('PRIMITIVE-OBJECT', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('PRIMITIVE-OBJECT', szlot, 'LOWTAG').
-mop_direct('PRIMITIVE-OBJECT', szlot, 'NAME').
-mop_direct('PRIMITIVE-OBJECT', szlot, 'OPTIONS').
-mop_direct('PRIMITIVE-OBJECT', szlot, 'SIZE').
-mop_direct('PRIMITIVE-OBJECT', szlot, 'SLOTS').
-mop_direct('PRIMITIVE-OBJECT', szlot, 'VARIABLE-LENGTH-P').
-mop_direct('PRIMITIVE-OBJECT', szlot, 'WIDETAG').
-mop_direct('PRIMITIVE-TYPE', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('PRIMITIVE-TYPE', szlot, 'CHECK').
-mop_direct('PRIMITIVE-TYPE', szlot, 'NAME').
-mop_direct('PRIMITIVE-TYPE', szlot, 'SCS').
-mop_direct('PRIMITIVE-TYPE', szlot, 'SPECIFIER').
-mop_direct(obj_print_not_readable, submop, 'SIMPLE-PRINT-NOT-READABLE').
-mop_direct(obj_print_not_readable, supers, ['ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_print_not_readable, supers, ['ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct(obj_print_not_readable, szlot, '$OBJECT').
-mop_direct(obj_print_not_readable, szlot, 'OBJECT').
-mop_direct('PRINT-OBJECT-STREAM-SPECIALIZER', supers, ['REFERENCE-CONDITION', obj_simple_warning, obj_simple_condition, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('PRIORITY-QUEUE', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('PRIORITY-QUEUE', szlot, 'CONTENTS').
-mop_direct('PRIORITY-QUEUE', szlot, 'KEYFUN').
-mop_direct('PROCESS', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('PROCESS', szlot, '%EXIT-CODE').
-mop_direct('PROCESS', szlot, '%STATUS').
-mop_direct('PROCESS', szlot, 'COOKIE').
-mop_direct('PROCESS', szlot, 'CORE-DUMPED').
-mop_direct('PROCESS', szlot, 'ERROR').
-mop_direct('PROCESS', szlot, 'INPUT').
-mop_direct('PROCESS', szlot, 'OUTPUT').
-mop_direct('PROCESS', szlot, 'PID').
-mop_direct('PROCESS', szlot, 'PLIST').
-mop_direct('PROCESS', szlot, 'PTY').
-mop_direct('PROCESS', szlot, 'STATUS-HOOK').
-mop_direct('PROCLAMATION-MISMATCH', submop, 'FTYPE-PROCLAMATION-MISMATCH').
-mop_direct('PROCLAMATION-MISMATCH', submop, 'TYPE-PROCLAMATION-MISMATCH').
-mop_direct('PROCLAMATION-MISMATCH', supers, [obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('PROCLAMATION-MISMATCH', szlot, 'DESCRIPTION').
-mop_direct('PROCLAMATION-MISMATCH', szlot, 'KIND').
-mop_direct('PROCLAMATION-MISMATCH', szlot, 'NAME').
-mop_direct('PROCLAMATION-MISMATCH', szlot, 'NEW').
-mop_direct('PROCLAMATION-MISMATCH', szlot, 'OLD').
-mop_direct('PROFILE-INFO', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('PROFILE-INFO', szlot, 'CLEAR-STATS-FUN').
-mop_direct('PROFILE-INFO', szlot, 'ENCAPSULATED-FUN').
-mop_direct('PROFILE-INFO', szlot, 'ENCAPSULATION-FUN').
-mop_direct('PROFILE-INFO', szlot, 'NAME').
-mop_direct('PROFILE-INFO', szlot, 'READ-STATS-FUN').
-mop_direct(obj_program_error, submop, 'ARG-COUNT-PROGRAM-ERROR').
-mop_direct(obj_program_error, submop, 'ARGUMENT-LIST-DOTTED').
-mop_direct(obj_program_error, submop, 'COMPILED-PROGRAM-ERROR').
-mop_direct(obj_program_error, submop, 'INITARG-ERROR').
-mop_direct(obj_program_error, submop, 'INTERPRETED-PROGRAM-ERROR').
-mop_direct(obj_program_error, submop, 'KEYWORD-ERROR').
-mop_direct(obj_program_error, submop, 'SIMPLE-PROGRAM-ERROR').
-mop_direct(obj_program_error, submop, 'SOURCE-PROGRAM-ERROR').
-mop_direct(obj_program_error, supers, ['ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_program_error, supers, ['ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('PROTOCOL-UNIMPLEMENTED', supers, [obj_type_error, 'ERROR', obj_serious_condition, 'REFERENCE-CONDITION', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('PV-TABLE', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('PV-TABLE', szlot, 'CACHE').
-mop_direct('PV-TABLE', szlot, 'PV-SIZE').
-mop_direct('PV-TABLE', szlot, 'SLOT-NAME-LISTS').
-mop_direct('QUEUED-OP', submop, 'BLOCK-END').
-mop_direct('QUEUED-OP', submop, 'INDENTATION').
-mop_direct('QUEUED-OP', submop, 'SECTION-START').
-mop_direct('QUEUED-OP', submop, 'TAB').
-mop_direct('QUEUED-OP', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('QUEUED-OP', szlot, 'POSN').
-mop_direct('RANDOM-CLASS', supers, [t]).
-mop_direct(obj_random_state, supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct(obj_random_state, supers, [t]).
-mop_direct(obj_random_state, szlot, 'STATE').
-mop_direct(obj_ratio, supers, ['RATIONAL', 'REAL', 'NUMBER', t]).
-mop_direct('RATIONAL', submop, 'INTEGER').
-mop_direct('RATIONAL', submop, obj_ratio).
-mop_direct('RATIONAL', supers, ['REAL', 'NUMBER', t]).
-mop_direct('RAW-SLOT-DATA', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('RAW-SLOT-DATA', szlot, 'ACCESSOR-NAME').
-mop_direct('RAW-SLOT-DATA', szlot, 'ALIGNMENT').
-mop_direct('RAW-SLOT-DATA', szlot, 'COMPARER').
-mop_direct('RAW-SLOT-DATA', szlot, 'INIT-VOP').
-mop_direct('RAW-SLOT-DATA', szlot, 'N-WORDS').
-mop_direct('RAW-SLOT-DATA', szlot, 'RAW-TYPE').
-mop_direct('READER-EOF-ERROR', supers, [obj_end_of_file, obj_stream_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('READER-EOF-ERROR', szlot, 'CONTEXT').
-mop_direct(obj_reader_error, submop, 'INPUT-ERROR-IN-COMPILE-FILE').
-mop_direct(obj_reader_error, submop, 'SIMPLE-READER-ERROR').
-mop_direct(obj_reader_error, supers, [obj_parse_error, obj_stream_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_reader_error, supers, [obj_parse_error, obj_stream_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('READER-IMPOSSIBLE-NUMBER-ERROR', supers, ['SIMPLE-READER-ERROR', obj_reader_error, obj_parse_error, obj_stream_error, 'ERROR', obj_serious_condition, obj_simple_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('READER-IMPOSSIBLE-NUMBER-ERROR', szlot, 'ERROR').
-mop_direct(obj_readtable, supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct(obj_readtable, supers, [t]).
-mop_direct(obj_readtable, szlot, '%READTABLE-CASE').
-mop_direct(obj_readtable, szlot, '%READTABLE-NORMALIZATION').
-mop_direct(obj_readtable, szlot, 'CHARACTER-ATTRIBUTE-ARRAY').
-mop_direct(obj_readtable, szlot, 'CHARACTER-ATTRIBUTE-HASH-TABLE').
-mop_direct(obj_readtable, szlot, 'CHARACTER-MACRO-ARRAY').
-mop_direct(obj_readtable, szlot, 'CHARACTER-MACRO-HASH-TABLE').
-mop_direct('REAL', submop, 'FLOAT').
-mop_direct('REAL', submop, 'RATIONAL').
-mop_direct('REAL', supers, ['NUMBER', t]).
-mop_direct('REDEFINITION-WARNING', submop, 'FUNCTION-REDEFINITION-WARNING').
-mop_direct('REDEFINITION-WARNING', submop, 'REDEFINITION-WITH-DEFGENERIC').
-mop_direct('REDEFINITION-WARNING', submop, 'REDEFINITION-WITH-DEFMETHOD').
-mop_direct('REDEFINITION-WARNING', submop, 'REDEFINITION-WITH-DEFTRANSFORM').
-mop_direct('REDEFINITION-WARNING', supers, [obj_style_warning, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('REDEFINITION-WARNING', szlot, 'NAME').
-mop_direct('REDEFINITION-WARNING', szlot, 'NEW-LOCATION').
-mop_direct('REDEFINITION-WITH-DEFGENERIC', supers, ['REDEFINITION-WARNING', obj_style_warning, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('REDEFINITION-WITH-DEFMACRO', supers, ['FUNCTION-REDEFINITION-WARNING', 'REDEFINITION-WARNING', obj_style_warning, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('REDEFINITION-WITH-DEFMETHOD', supers, ['REDEFINITION-WARNING', obj_style_warning, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('REDEFINITION-WITH-DEFMETHOD', szlot, 'NEW-LOCATION').
-mop_direct('REDEFINITION-WITH-DEFMETHOD', szlot, 'OLD-METHOD').
-mop_direct('REDEFINITION-WITH-DEFMETHOD', szlot, 'QUALIFIERS').
-mop_direct('REDEFINITION-WITH-DEFMETHOD', szlot, 'SPECIALIZERS').
-mop_direct('REDEFINITION-WITH-DEFTRANSFORM', supers, ['REDEFINITION-WARNING', obj_style_warning, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('REDEFINITION-WITH-DEFTRANSFORM', szlot, 'TRANSFORM').
-mop_direct('REDEFINITION-WITH-DEFUN', supers, ['FUNCTION-REDEFINITION-WARNING', 'REDEFINITION-WARNING', obj_style_warning, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('REF', supers, ['VALUED-NODE', 'NODE', 'SSET-ELEMENT', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('REF', szlot, '%SOURCE-NAME').
-mop_direct('REF', szlot, 'LEAF').
-mop_direct('REF', szlot, 'REOPTIMIZE').
-mop_direct('REFERENCE-CONDITION', submop, 'ARGUMENTS-OUT-OF-DOMAIN-ERROR').
-mop_direct('REFERENCE-CONDITION', submop, 'ARRAY-INITIAL-ELEMENT-MISMATCH').
-mop_direct('REFERENCE-CONDITION', submop, 'BOUNDING-INDICES-BAD-ERROR').
-mop_direct('REFERENCE-CONDITION', submop, 'CONSTANT-MODIFIED').
-mop_direct('REFERENCE-CONDITION', submop, 'CPL-PROTOCOL-VIOLATION').
-mop_direct('REFERENCE-CONDITION', submop, 'DECLARATION-TYPE-CONFLICT-ERROR').
-mop_direct('REFERENCE-CONDITION', submop, 'DEFCONSTANT-UNEQL').
-mop_direct('REFERENCE-CONDITION', submop, 'DEPRECATION-CONDITION').
-mop_direct('REFERENCE-CONDITION', submop, 'DUPLICATE-DEFINITION').
-mop_direct('REFERENCE-CONDITION', submop, 'EXTENSION-FAILURE').
-mop_direct('REFERENCE-CONDITION', submop, 'FIND-METHOD-LENGTH-MISMATCH').
-mop_direct('REFERENCE-CONDITION', submop, 'FORMAT-ARGS-MISMATCH').
-mop_direct('REFERENCE-CONDITION', submop, 'FORMAT-ERROR').
-mop_direct('REFERENCE-CONDITION', submop, 'GENERIC-FUNCTION-LAMBDA-LIST-ERROR').
-mop_direct('REFERENCE-CONDITION', submop, 'INITARG-ERROR').
-mop_direct('REFERENCE-CONDITION', submop, 'INSTANCE-STRUCTURE-PROTOCOL-ERROR').
-mop_direct('REFERENCE-CONDITION', submop, 'INVALID-ARRAY-ERROR').
-mop_direct('REFERENCE-CONDITION', submop, 'INVALID-SUPERCLASS').
-mop_direct('REFERENCE-CONDITION', submop, 'LOCAL-ARGUMENT-MISMATCH').
-mop_direct('REFERENCE-CONDITION', submop, 'LONG-METHOD-COMBINATION-ERROR').
-mop_direct('REFERENCE-CONDITION', submop, 'METAOBJECT-INITIALIZATION-VIOLATION').
-mop_direct('REFERENCE-CONDITION', submop, 'NAME-CONFLICT').
-mop_direct('REFERENCE-CONDITION', submop, 'NEW-VALUE-SPECIALIZATION').
-mop_direct('REFERENCE-CONDITION', submop, 'NIL-ARRAY-ACCESSED-ERROR').
-mop_direct('REFERENCE-CONDITION', submop, 'NO-PRIMARY-METHOD').
-mop_direct('REFERENCE-CONDITION', submop, 'PACKAGE-AT-VARIANCE').
-mop_direct('REFERENCE-CONDITION', submop, 'PACKAGE-AT-VARIANCE-ERROR').
-mop_direct('REFERENCE-CONDITION', submop, 'PACKAGE-LOCK-VIOLATION').
-mop_direct('REFERENCE-CONDITION', submop, 'PRINT-OBJECT-STREAM-SPECIALIZER').
-mop_direct('REFERENCE-CONDITION', submop, 'PROTOCOL-UNIMPLEMENTED').
-mop_direct('REFERENCE-CONDITION', submop, 'SAVE-CONDITION').
-mop_direct('REFERENCE-CONDITION', submop, 'SIMPLE-REFERENCE-ERROR').
-mop_direct('REFERENCE-CONDITION', submop, 'SIMPLE-REFERENCE-WARNING').
-mop_direct('REFERENCE-CONDITION', submop, 'SLOTD-INITIALIZATION-ERROR').
-mop_direct('REFERENCE-CONDITION', submop, 'SPECIALIZED-LAMBDA-LIST-ERROR').
-mop_direct('REFERENCE-CONDITION', submop, 'STANDARD-PPRINT-DISPATCH-TABLE-MODIFIED-ERROR').
-mop_direct('REFERENCE-CONDITION', submop, 'STANDARD-READTABLE-MODIFIED-ERROR').
-mop_direct('REFERENCE-CONDITION', submop, 'STRUCTURE-INITARG-NOT-KEYWORD').
-mop_direct('REFERENCE-CONDITION', submop, 'TYPE-STYLE-WARNING').
-mop_direct('REFERENCE-CONDITION', submop, 'TYPE-WARNING').
-mop_direct('REFERENCE-CONDITION', submop, 'UNSET-FUNCALLABLE-INSTANCE-FUNCTION').
-mop_direct('REFERENCE-CONDITION', supers, [obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('REFERENCE-CONDITION', szlot, 'REFERENCES').
-mop_direct('REG-SPEC', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('REG-SPEC', szlot, 'KIND').
-mop_direct('REG-SPEC', szlot, 'NAME').
-mop_direct('REG-SPEC', szlot, 'OFFSET').
-mop_direct('REG-SPEC', szlot, 'SCS').
-mop_direct('REG-SPEC', szlot, 'TEMP').
-mop_direct('RESTART', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('RESTART', supers, [obj_structure_object, t]).
-mop_direct('RESTART', szlot, 'ASSOCIATED-CONDITIONS').
-mop_direct('RESTART', szlot, 'FUNCTION').
-mop_direct('RESTART', szlot, 'INTERACTIVE').
-mop_direct('RESTART', szlot, 'INTERACTIVE-FUNCTION').
-mop_direct('RESTART', szlot, 'INVOKE-FUNCTION').
-mop_direct('RESTART', szlot, 'INVOKE-TAG').
-mop_direct('RESTART', szlot, 'MEANINGFULP').
-mop_direct('RESTART', szlot, 'NAME').
-mop_direct('RESTART', szlot, 'REPORT').
-mop_direct('RESTART', szlot, 'REPORT-FUNCTION').
-mop_direct('RESTART', szlot, 'TEST').
-mop_direct('RESTART', szlot, 'TEST-FUNCTION').
-mop_direct('RESULT-STATE', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('RESULT-STATE', szlot, 'NUM-RESULTS').
-mop_direct('RETURN-INFO', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('RETURN-INFO', szlot, 'COUNT').
-mop_direct('RETURN-INFO', szlot, 'KIND').
-mop_direct('RETURN-INFO', szlot, 'LOCATIONS').
-mop_direct('RETURN-INFO', szlot, 'TYPES').
-mop_direct('RLIMIT', supers, [obj_structure_object, t]).
-mop_direct('RLIMIT', szlot, 'CUR').
-mop_direct('RLIMIT', szlot, 'MAX').
-mop_direct('ROOM-INFO', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('ROOM-INFO', szlot, 'KIND').
-mop_direct('ROOM-INFO', szlot, 'NAME').
-mop_direct('SAME-FILE-REDEFINITION-WARNING', supers, [obj_style_warning, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('SAME-FILE-REDEFINITION-WARNING', szlot, 'NAME').
-mop_direct('SAVE-CONDITION', submop, 'SAVE-ERROR').
-mop_direct('SAVE-CONDITION', supers, ['REFERENCE-CONDITION', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('SAVE-ERROR', submop, 'SAVE-WITH-MULTIPLE-THREADS-ERROR').
-mop_direct('SAVE-ERROR', supers, ['ERROR', obj_serious_condition, 'SAVE-CONDITION', 'REFERENCE-CONDITION', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('SAVE-WITH-MULTIPLE-THREADS-ERROR', supers, ['SAVE-ERROR', 'ERROR', obj_serious_condition, 'SAVE-CONDITION', 'REFERENCE-CONDITION', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('SAVE-WITH-MULTIPLE-THREADS-ERROR', szlot, 'INTERACTIVE-THREAD').
-mop_direct('SAVE-WITH-MULTIPLE-THREADS-ERROR', szlot, 'OTHER-THREADS').
-mop_direct('SB', submop, 'FINITE-SB').
-mop_direct('SB', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('SB', szlot, 'KIND').
-mop_direct('SB', szlot, 'NAME').
-mop_direct('SB', szlot, 'SIZE').
-mop_direct('SC', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('SC', szlot, 'ALIGNMENT').
-mop_direct('SC', szlot, 'ALTERNATE-SCS').
-mop_direct('SC', szlot, 'CONSTANT-SCS').
-mop_direct('SC', szlot, 'ELEMENT-SIZE').
-mop_direct('SC', szlot, 'LOAD-COSTS').
-mop_direct('SC', szlot, 'LOCATIONS').
-mop_direct('SC', szlot, 'MOVE-ARG-VOPS').
-mop_direct('SC', szlot, 'MOVE-COSTS').
-mop_direct('SC', szlot, 'MOVE-FUNS').
-mop_direct('SC', szlot, 'MOVE-VOPS').
-mop_direct('SC', szlot, 'NAME').
-mop_direct('SC', szlot, 'NUMBER').
-mop_direct('SC', szlot, 'NUMBER-STACK-P').
-mop_direct('SC', szlot, 'RESERVE-LOCATIONS').
-mop_direct('SC', szlot, 'SAVE-P').
-mop_direct('SC', szlot, 'SB').
-mop_direct('SECTION-START', submop, 'BLOCK-START').
-mop_direct('SECTION-START', submop, 'NEWLINE').
-mop_direct('SECTION-START', supers, ['QUEUED-OP', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('SECTION-START', szlot, 'DEPTH').
-mop_direct('SECTION-START', szlot, 'SECTION-END').
-mop_direct('SEGMENT', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('SEGMENT', szlot, '%CURRENT-INDEX').
-mop_direct('SEGMENT', szlot, 'ALIGNMENT').
-mop_direct('SEGMENT', szlot, 'ANNOTATIONS').
-mop_direct('SEGMENT', szlot, 'BRANCH-COUNTDOWN').
-mop_direct('SEGMENT', szlot, 'BUFFER').
-mop_direct('SEGMENT', szlot, 'CODE').
-mop_direct('SEGMENT', szlot, 'CURRENT-POSN').
-mop_direct('SEGMENT', szlot, 'DELAYED').
-mop_direct('SEGMENT', szlot, 'EMITTABLE-INSTS-QUEUE').
-mop_direct('SEGMENT', szlot, 'EMITTABLE-INSTS-SSET').
-mop_direct('SEGMENT', szlot, 'FINAL-INDEX').
-mop_direct('SEGMENT', szlot, 'FINAL-POSN').
-mop_direct('SEGMENT', szlot, 'HOOKS').
-mop_direct('SEGMENT', szlot, 'INST-HOOK').
-mop_direct('SEGMENT', szlot, 'INST-NUMBER').
-mop_direct('SEGMENT', szlot, 'LAST-ANNOTATION').
-mop_direct('SEGMENT', szlot, 'LENGTH').
-mop_direct('SEGMENT', szlot, 'OPCODES-LENGTH').
-mop_direct('SEGMENT', szlot, 'POSTITS').
-mop_direct('SEGMENT', szlot, 'QUEUED-BRANCHES').
-mop_direct('SEGMENT', szlot, 'READERS').
-mop_direct('SEGMENT', szlot, 'RUN-SCHEDULER').
-mop_direct('SEGMENT', szlot, 'SAP-MAKER').
-mop_direct('SEGMENT', szlot, 'STORAGE-INFO').
-mop_direct('SEGMENT', szlot, 'SYNC-POSN').
-mop_direct('SEGMENT', szlot, 'TYPE').
-mop_direct('SEGMENT', szlot, 'UNBOXED-DATA-RANGE').
-mop_direct('SEGMENT', szlot, 'VIRTUAL-LOCATION').
-mop_direct('SEGMENT', szlot, 'WRITERS').
-mop_direct('SEMAPHORE', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('SEMAPHORE', szlot, '%COUNT').
-mop_direct('SEMAPHORE', szlot, 'MUTEX').
-mop_direct('SEMAPHORE', szlot, 'NAME').
-mop_direct('SEMAPHORE', szlot, 'QUEUE').
-mop_direct('SEMAPHORE', szlot, 'WAITCOUNT').
-mop_direct('SEMAPHORE-NOTIFICATION', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('SEMAPHORE-NOTIFICATION', szlot, '%STATUS').
-mop_direct('SEMI-STANDARD-CLASS', submop, obj_funcallable_standard_class).
-mop_direct('SEMI-STANDARD-CLASS', submop, obj_standard_class).
-mop_direct('SEMI-STANDARD-CLASS', supers, ['SLOTTED-CLASS', 'CLASS', 'POTENTIAL-CLASS', 'SPECIALIZER', 'SUPER-CLASS', 'STANDARD-STABLEHASH', 'METAOBJECT', obj_standard_object, t]).
-mop_direct('SEMI-STANDARD-CLASS', szlot, '$CURRENT-VERSION').
-mop_direct('SEMI-STANDARD-CLASS', szlot, '$DIRECT-INSTANCE-SPECIALIZERS').
-mop_direct('SEMI-STANDARD-CLASS', szlot, '$FINALIZED-DIRECT-SUBCLASSES').
-mop_direct('SEMI-STANDARD-CLASS', szlot, '$FIXED-SLOT-LOCATIONS').
-mop_direct('SEMI-STANDARD-CLASS', szlot, '$FUNCALLABLEP').
-mop_direct('SEMI-STANDARD-CLASS', szlot, '$INSTANTIATED').
-mop_direct('SEMI-STANDARD-CLASS', szlot, '$PROTOTYPE').
-mop_direct('SEQUENCE', submop, obj_list).
-mop_direct('SEQUENCE', submop, obj_vector).
-mop_direct('SEQUENCE', supers, [t]).
-mop_direct(obj_serious_condition, submop, 'DEBUG-CONDITION').
-mop_direct(obj_serious_condition, submop, 'ERROR').
-mop_direct(obj_serious_condition, submop, 'INTERACTIVE-INTERRUPT').
-mop_direct(obj_serious_condition, submop, 'INTERRUPT-CONDITION').
-mop_direct(obj_serious_condition, submop, 'SIMPLE-SERIOUS-CONDITION').
-mop_direct(obj_serious_condition, submop, obj_storage_condition).
-mop_direct(obj_serious_condition, submop, 'TIMEOUT').
-mop_direct(obj_serious_condition, supers, [obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_serious_condition, supers, [obj_condition, obj_standard_object, t]).
-mop_direct('SERVICE', supers, [obj_structure_object, t]).
-mop_direct('SERVICE', szlot, 'ALIASES').
-mop_direct('SERVICE', szlot, 'NAME').
-mop_direct('SERVICE', szlot, 'PORT').
-mop_direct('SERVICE', szlot, 'PROTO').
-mop_direct('SESSION', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('SESSION', szlot, 'INTERACTIVE-THREADS').
-mop_direct('SESSION', szlot, 'INTERACTIVE-THREADS-QUEUE').
-mop_direct('SESSION', szlot, 'LOCK').
-mop_direct('SESSION', szlot, 'THREADS').
-mop_direct('SHARED-OBJECT', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('SHARED-OBJECT', szlot, 'DONT-SAVE').
-mop_direct('SHARED-OBJECT', szlot, 'HANDLE').
-mop_direct('SHARED-OBJECT', szlot, 'NAMESTRING').
-mop_direct('SHARED-OBJECT', szlot, 'PATHNAME').
-mop_direct('SHORT-METHOD-COMBINATION', supers, ['STANDARD-METHOD-COMBINATION', 'DEFINITION-SOURCE-MIXIN', 'METHOD-COMBINATION', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('SHORT-METHOD-COMBINATION', szlot, 'IDENTITY-WITH-ONE-ARGUMENT').
-mop_direct('SHORT-METHOD-COMBINATION', szlot, 'OPERATOR').
-mop_direct('SIMD-PACK', supers, [t]).
-mop_direct('SIMD-PACK-TYPE', supers, ['CTYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('SIMD-PACK-TYPE', szlot, 'CLASS-INFO').
-mop_direct('SIMD-PACK-TYPE', szlot, 'ELEMENT-TYPE').
-mop_direct('SIMPLE-ARGUMENT-LIST-DOTTED', supers, [obj_simple_error, obj_simple_condition, 'ARGUMENT-LIST-DOTTED', obj_program_error, obj_type_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-ARITHMETIC-ERROR', supers, [obj_simple_error, obj_simple_condition, obj_arithmetic_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-ARRAY', submop, 'SIMPLE-ARRAY-COMPLEX-DOUBLE-FLOAT').
-mop_direct('SIMPLE-ARRAY', submop, 'SIMPLE-ARRAY-COMPLEX-SINGLE-FLOAT').
-mop_direct('SIMPLE-ARRAY', submop, 'SIMPLE-ARRAY-DOUBLE-FLOAT').
-mop_direct('SIMPLE-ARRAY', submop, 'SIMPLE-ARRAY-FIXNUM').
-mop_direct('SIMPLE-ARRAY', submop, 'SIMPLE-ARRAY-SIGNED-BYTE-16').
-mop_direct('SIMPLE-ARRAY', submop, 'SIMPLE-ARRAY-SIGNED-BYTE-32').
-mop_direct('SIMPLE-ARRAY', submop, 'SIMPLE-ARRAY-SIGNED-BYTE-64').
-mop_direct('SIMPLE-ARRAY', submop, 'SIMPLE-ARRAY-SIGNED-BYTE-8').
-mop_direct('SIMPLE-ARRAY', submop, 'SIMPLE-ARRAY-SINGLE-FLOAT').
-mop_direct('SIMPLE-ARRAY', submop, 'SIMPLE-ARRAY-UNSIGNED-BYTE-15').
-mop_direct('SIMPLE-ARRAY', submop, 'SIMPLE-ARRAY-UNSIGNED-BYTE-16').
-mop_direct('SIMPLE-ARRAY', submop, 'SIMPLE-ARRAY-UNSIGNED-BYTE-2').
-mop_direct('SIMPLE-ARRAY', submop, 'SIMPLE-ARRAY-UNSIGNED-BYTE-31').
-mop_direct('SIMPLE-ARRAY', submop, 'SIMPLE-ARRAY-UNSIGNED-BYTE-32').
-mop_direct('SIMPLE-ARRAY', submop, 'SIMPLE-ARRAY-UNSIGNED-BYTE-4').
-mop_direct('SIMPLE-ARRAY', submop, 'SIMPLE-ARRAY-UNSIGNED-BYTE-63').
-mop_direct('SIMPLE-ARRAY', submop, 'SIMPLE-ARRAY-UNSIGNED-BYTE-64').
-mop_direct('SIMPLE-ARRAY', submop, 'SIMPLE-ARRAY-UNSIGNED-BYTE-7').
-mop_direct('SIMPLE-ARRAY', submop, 'SIMPLE-ARRAY-UNSIGNED-BYTE-8').
-mop_direct('SIMPLE-ARRAY', submop, 'SIMPLE-ARRAY-UNSIGNED-FIXNUM').
-mop_direct('SIMPLE-ARRAY', submop, obj_simple_bit_vector).
-mop_direct('SIMPLE-ARRAY', submop, obj_simple_string).
-mop_direct('SIMPLE-ARRAY', submop, obj_simple_vector).
-mop_direct('SIMPLE-ARRAY', supers, [obj_array, t]).
-mop_direct('SIMPLE-ARRAY-COMPLEX-DOUBLE-FLOAT', supers, [obj_vector, 'SIMPLE-ARRAY', obj_array, 'SEQUENCE', t]).
-mop_direct('SIMPLE-ARRAY-COMPLEX-SINGLE-FLOAT', supers, [obj_vector, 'SIMPLE-ARRAY', obj_array, 'SEQUENCE', t]).
-mop_direct('SIMPLE-ARRAY-DOUBLE-FLOAT', supers, [obj_vector, 'SIMPLE-ARRAY', obj_array, 'SEQUENCE', t]).
-mop_direct('SIMPLE-ARRAY-FIXNUM', supers, [obj_vector, 'SIMPLE-ARRAY', obj_array, 'SEQUENCE', t]).
-mop_direct('SIMPLE-ARRAY-NIL', supers, ['VECTOR-NIL', obj_simple_string, obj_string, obj_vector, 'SIMPLE-ARRAY', obj_array, 'SEQUENCE', t]).
-mop_direct('SIMPLE-ARRAY-SIGNED-BYTE-16', supers, [obj_vector, 'SIMPLE-ARRAY', obj_array, 'SEQUENCE', t]).
-mop_direct('SIMPLE-ARRAY-SIGNED-BYTE-32', supers, [obj_vector, 'SIMPLE-ARRAY', obj_array, 'SEQUENCE', t]).
-mop_direct('SIMPLE-ARRAY-SIGNED-BYTE-64', supers, [obj_vector, 'SIMPLE-ARRAY', obj_array, 'SEQUENCE', t]).
-mop_direct('SIMPLE-ARRAY-SIGNED-BYTE-8', supers, [obj_vector, 'SIMPLE-ARRAY', obj_array, 'SEQUENCE', t]).
-mop_direct('SIMPLE-ARRAY-SINGLE-FLOAT', supers, [obj_vector, 'SIMPLE-ARRAY', obj_array, 'SEQUENCE', t]).
-mop_direct('SIMPLE-ARRAY-UNSIGNED-BYTE-15', supers, [obj_vector, 'SIMPLE-ARRAY', obj_array, 'SEQUENCE', t]).
-mop_direct('SIMPLE-ARRAY-UNSIGNED-BYTE-16', supers, [obj_vector, 'SIMPLE-ARRAY', obj_array, 'SEQUENCE', t]).
-mop_direct('SIMPLE-ARRAY-UNSIGNED-BYTE-2', supers, [obj_vector, 'SIMPLE-ARRAY', obj_array, 'SEQUENCE', t]).
-mop_direct('SIMPLE-ARRAY-UNSIGNED-BYTE-31', supers, [obj_vector, 'SIMPLE-ARRAY', obj_array, 'SEQUENCE', t]).
-mop_direct('SIMPLE-ARRAY-UNSIGNED-BYTE-32', supers, [obj_vector, 'SIMPLE-ARRAY', obj_array, 'SEQUENCE', t]).
-mop_direct('SIMPLE-ARRAY-UNSIGNED-BYTE-4', supers, [obj_vector, 'SIMPLE-ARRAY', obj_array, 'SEQUENCE', t]).
-mop_direct('SIMPLE-ARRAY-UNSIGNED-BYTE-63', supers, [obj_vector, 'SIMPLE-ARRAY', obj_array, 'SEQUENCE', t]).
-mop_direct('SIMPLE-ARRAY-UNSIGNED-BYTE-64', supers, [obj_vector, 'SIMPLE-ARRAY', obj_array, 'SEQUENCE', t]).
-mop_direct('SIMPLE-ARRAY-UNSIGNED-BYTE-7', supers, [obj_vector, 'SIMPLE-ARRAY', obj_array, 'SEQUENCE', t]).
-mop_direct('SIMPLE-ARRAY-UNSIGNED-BYTE-8', supers, [obj_vector, 'SIMPLE-ARRAY', obj_array, 'SEQUENCE', t]).
-mop_direct('SIMPLE-ARRAY-UNSIGNED-FIXNUM', supers, [obj_vector, 'SIMPLE-ARRAY', obj_array, 'SEQUENCE', t]).
-mop_direct('SIMPLE-BASE-STRING', supers, ['BASE-STRING', obj_simple_string, obj_string, obj_vector, 'SIMPLE-ARRAY', obj_array, 'SEQUENCE', t]).
-mop_direct(obj_simple_bit_vector, supers, [obj_bit_vector, obj_vector, 'SIMPLE-ARRAY', obj_array, 'SEQUENCE', t]).
-mop_direct('SIMPLE-CELL-ERROR', supers, [obj_simple_error, obj_simple_condition, obj_cell_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-CHARACTER-STRING', supers, ['CHARACTER-STRING', obj_simple_string, obj_string, obj_vector, 'SIMPLE-ARRAY', obj_array, 'SEQUENCE', t]).
-mop_direct('SIMPLE-CHARSET-TYPE-ERROR', supers, [obj_simple_error, obj_simple_condition, 'CHARSET-TYPE-ERROR', obj_type_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-CLOS-WARNING', supers, [obj_simple_condition, 'CLOS-WARNING', obj_warning, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-COMPILER-NOTE', submop, 'CODE-DELETION-NOTE').
-mop_direct('SIMPLE-COMPILER-NOTE', supers, [obj_simple_condition, 'COMPILER-NOTE', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_simple_condition, submop, 'DUBIOUS-ASTERISKS-AROUND-VARIABLE-NAME').
-mop_direct(obj_simple_condition, submop, 'INTERPRETED-PROGRAM-ERROR').
-mop_direct(obj_simple_condition, submop, 'PACKAGE-AT-VARIANCE-ERROR').
-mop_direct(obj_simple_condition, submop, 'PACKAGE-LOCK-VIOLATION').
-mop_direct(obj_simple_condition, submop, 'SIMPLE-CLOS-WARNING').
-mop_direct(obj_simple_condition, submop, 'SIMPLE-COMPILER-NOTE').
-mop_direct(obj_simple_condition, submop, 'SIMPLE-CONTROL-ERROR').
-mop_direct(obj_simple_condition, submop, obj_simple_error).
-mop_direct(obj_simple_condition, submop, 'SIMPLE-FILE-ERROR').
-mop_direct(obj_simple_condition, submop, 'SIMPLE-GF-ALREADY-CALLED-WARNING').
-mop_direct(obj_simple_condition, submop, 'SIMPLE-GF-REPLACING-METHOD-WARNING').
-mop_direct(obj_simple_condition, submop, 'SIMPLE-INTERRUPT-CONDITION').
-mop_direct(obj_simple_condition, submop, 'SIMPLE-PACKAGE-ERROR').
-mop_direct(obj_simple_condition, submop, 'SIMPLE-PARSE-ERROR').
-mop_direct(obj_simple_condition, submop, 'SIMPLE-PROGRAM-ERROR').
-mop_direct(obj_simple_condition, submop, 'SIMPLE-READER-ERROR').
-mop_direct(obj_simple_condition, submop, 'SIMPLE-SERIOUS-CONDITION').
-mop_direct(obj_simple_condition, submop, 'SIMPLE-STORAGE-CONDITION').
-mop_direct(obj_simple_condition, submop, 'SIMPLE-STREAM-ERROR').
-mop_direct(obj_simple_condition, submop, 'SIMPLE-STYLE-WARNING').
-mop_direct(obj_simple_condition, submop, 'SIMPLE-THREAD-ERROR').
-mop_direct(obj_simple_condition, submop, obj_simple_type_error).
-mop_direct(obj_simple_condition, submop, obj_simple_warning).
-mop_direct(obj_simple_condition, supers, [obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_simple_condition, supers, [obj_condition, obj_standard_object, t]).
-mop_direct(obj_simple_condition, szlot, '$FORMAT-ARGUMENTS').
-mop_direct(obj_simple_condition, szlot, '$FORMAT-CONTROL').
-mop_direct(obj_simple_condition, szlot, 'FORMAT-ARGUMENTS').
-mop_direct(obj_simple_condition, szlot, 'FORMAT-CONTROL').
-mop_direct('SIMPLE-CONTROL-ERROR', supers, [obj_simple_condition, obj_control_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('SIMPLE-CONTROL-ERROR', supers, [obj_simple_error, obj_simple_condition, obj_control_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-DIVISION-BY-ZERO', supers, [obj_simple_error, obj_simple_condition, obj_division_by_zero, obj_arithmetic_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-END-OF-FILE', supers, [obj_simple_error, obj_simple_condition, obj_end_of_file, obj_stream_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct(obj_simple_error, submop, 'BUG').
-mop_direct(obj_simple_error, submop, 'COMPILER-ENVIRONMENT-TOO-COMPLEX-ERROR').
-mop_direct(obj_simple_error, submop, 'DECLARATION-TYPE-CONFLICT-ERROR').
-mop_direct(obj_simple_error, submop, 'EXTENSION-FAILURE').
-mop_direct(obj_simple_error, submop, 'FIND-METHOD-LENGTH-MISMATCH').
-mop_direct(obj_simple_error, submop, 'INTERPRETER-ENVIRONMENT-TOO-COMPLEX-ERROR').
-mop_direct(obj_simple_error, submop, 'LONG-METHOD-COMBINATION-ERROR').
-mop_direct(obj_simple_error, submop, 'METAOBJECT-INITIALIZATION-VIOLATION').
-mop_direct(obj_simple_error, submop, 'METHOD-CALL-ERROR').
-mop_direct(obj_simple_error, submop, 'SIMPLE-ARGUMENT-LIST-DOTTED').
-mop_direct(obj_simple_error, submop, 'SIMPLE-ARITHMETIC-ERROR').
-mop_direct(obj_simple_error, submop, 'SIMPLE-CELL-ERROR').
-mop_direct(obj_simple_error, submop, 'SIMPLE-CHARSET-TYPE-ERROR').
-mop_direct(obj_simple_error, submop, 'SIMPLE-CONTROL-ERROR').
-mop_direct(obj_simple_error, submop, 'SIMPLE-DIVISION-BY-ZERO').
-mop_direct(obj_simple_error, submop, 'SIMPLE-END-OF-FILE').
-mop_direct(obj_simple_error, submop, 'SIMPLE-FILE-ERROR').
-mop_direct(obj_simple_error, submop, 'SIMPLE-FLOATING-POINT-OVERFLOW').
-mop_direct(obj_simple_error, submop, 'SIMPLE-FLOATING-POINT-UNDERFLOW').
-mop_direct(obj_simple_error, submop, 'SIMPLE-KEYWORD-ERROR').
-mop_direct(obj_simple_error, submop, 'SIMPLE-MISSING-LOAD-FORM').
-mop_direct(obj_simple_error, submop, 'SIMPLE-OS-ERROR').
-mop_direct(obj_simple_error, submop, 'SIMPLE-PACKAGE-ERROR').
-mop_direct(obj_simple_error, submop, 'SIMPLE-PARSE-ERROR').
-mop_direct(obj_simple_error, submop, 'SIMPLE-PRINT-NOT-READABLE').
-mop_direct(obj_simple_error, submop, 'SIMPLE-PROGRAM-ERROR').
-mop_direct(obj_simple_error, submop, 'SIMPLE-READER-ERROR').
-mop_direct(obj_simple_error, submop, 'SIMPLE-REFERENCE-ERROR').
-mop_direct(obj_simple_error, submop, 'SIMPLE-SOURCE-PROGRAM-ERROR').
-mop_direct(obj_simple_error, submop, 'SIMPLE-STREAM-ERROR').
-mop_direct(obj_simple_error, submop, 'SIMPLE-UNBOUND-SLOT').
-mop_direct(obj_simple_error, submop, 'SIMPLE-UNBOUND-VARIABLE').
-mop_direct(obj_simple_error, submop, 'SIMPLE-UNDEFINED-FUNCTION').
-mop_direct(obj_simple_error, submop, 'UNSET-FUNCALLABLE-INSTANCE-FUNCTION').
-mop_direct(obj_simple_error, submop, 'UNSUPPORTED-OPERATOR').
-mop_direct(obj_simple_error, supers, [obj_simple_condition, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_simple_error, supers, [obj_simple_condition, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-FILE-ERROR', supers, [obj_simple_condition, obj_file_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('SIMPLE-FILE-ERROR', supers, [obj_simple_error, obj_simple_condition, obj_file_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-FLOATING-POINT-OVERFLOW', supers, [obj_simple_error, obj_simple_condition, obj_floating_point_overflow, obj_arithmetic_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-FLOATING-POINT-UNDERFLOW', supers, [obj_simple_error, obj_simple_condition, obj_floating_point_underflow, obj_arithmetic_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-GF-ALREADY-CALLED-WARNING', supers, [obj_simple_condition, 'GF-ALREADY-CALLED-WARNING', 'CLOS-WARNING', obj_warning, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-GF-REPLACING-METHOD-WARNING', supers, [obj_simple_condition, 'GF-REPLACING-METHOD-WARNING', 'CLOS-WARNING', obj_warning, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-INTERRUPT-CONDITION', supers, [obj_simple_condition, 'INTERRUPT-CONDITION', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-KEYWORD-ERROR', supers, [obj_simple_error, obj_simple_condition, 'KEYWORD-ERROR', obj_program_error, obj_type_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-MISSING-LOAD-FORM', supers, [obj_simple_error, obj_simple_condition, 'MISSING-LOAD-FORM', 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-OS-ERROR', supers, [obj_simple_error, obj_simple_condition, 'OS-ERROR', 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-PACKAGE-ERROR', supers, [obj_simple_condition, obj_package_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('SIMPLE-PACKAGE-ERROR', supers, [obj_simple_error, obj_simple_condition, obj_package_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-PARSE-ERROR', supers, [obj_simple_condition, obj_parse_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('SIMPLE-PARSE-ERROR', supers, [obj_simple_error, obj_simple_condition, obj_parse_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-PRINT-NOT-READABLE', supers, [obj_simple_error, obj_simple_condition, obj_print_not_readable, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-PROGRAM-ERROR', submop, 'GENERIC-FUNCTION-LAMBDA-LIST-ERROR').
-mop_direct('SIMPLE-PROGRAM-ERROR', submop, 'INVALID-METHOD-INITARG').
-mop_direct('SIMPLE-PROGRAM-ERROR', submop, 'SPECIALIZED-LAMBDA-LIST-ERROR').
-mop_direct('SIMPLE-PROGRAM-ERROR', supers, [obj_simple_condition, obj_program_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('SIMPLE-PROGRAM-ERROR', supers, [obj_simple_error, obj_simple_condition, obj_program_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-READER-ERROR', submop, 'READER-IMPOSSIBLE-NUMBER-ERROR').
-mop_direct('SIMPLE-READER-ERROR', submop, 'SIMPLE-READER-PACKAGE-ERROR').
-mop_direct('SIMPLE-READER-ERROR', supers, [obj_reader_error, obj_parse_error, obj_stream_error, 'ERROR', obj_serious_condition, obj_simple_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('SIMPLE-READER-ERROR', supers, [obj_simple_error, obj_simple_condition, obj_reader_error, obj_parse_error, obj_stream_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-READER-PACKAGE-ERROR', supers, ['SIMPLE-READER-ERROR', obj_reader_error, obj_parse_error, obj_stream_error, obj_simple_condition, obj_package_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('SIMPLE-REFERENCE-ERROR', supers, ['REFERENCE-CONDITION', obj_simple_error, obj_simple_condition, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('SIMPLE-REFERENCE-WARNING', supers, ['REFERENCE-CONDITION', obj_simple_warning, obj_simple_condition, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('SIMPLE-SERIOUS-CONDITION', supers, [obj_simple_condition, obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-SOURCE-PROGRAM-ERROR', supers, [obj_simple_error, obj_simple_condition, 'SOURCE-PROGRAM-ERROR', obj_program_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-STORAGE-CONDITION', supers, [obj_simple_condition, obj_storage_condition, obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-STORAGE-CONDITION', supers, [obj_storage_condition, obj_serious_condition, obj_simple_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('SIMPLE-STREAM-ERROR', supers, [obj_simple_condition, obj_stream_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('SIMPLE-STREAM-ERROR', supers, [obj_simple_error, obj_simple_condition, obj_stream_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct(obj_simple_string, submop, 'SIMPLE-ARRAY-NIL').
-mop_direct(obj_simple_string, submop, 'SIMPLE-BASE-STRING').
-mop_direct(obj_simple_string, submop, 'SIMPLE-CHARACTER-STRING').
-mop_direct(obj_simple_string, supers, [obj_string, obj_vector, 'SIMPLE-ARRAY', obj_array, 'SEQUENCE', t]).
-mop_direct('SIMPLE-STYLE-WARNING', submop, 'FORMAT-TOO-MANY-ARGS-WARNING').
-mop_direct('SIMPLE-STYLE-WARNING', submop, 'INLINING-DEPENDENCY-FAILURE').
-mop_direct('SIMPLE-STYLE-WARNING', submop, 'STRUCTURE-INITARG-NOT-KEYWORD').
-mop_direct('SIMPLE-STYLE-WARNING', submop, 'TYPE-STYLE-WARNING').
-mop_direct('SIMPLE-STYLE-WARNING', supers, [obj_simple_condition, obj_style_warning, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('SIMPLE-STYLE-WARNING', supers, [obj_simple_condition, obj_style_warning, obj_warning, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-THREAD-ERROR', supers, ['THREAD-ERROR', 'ERROR', obj_serious_condition, obj_simple_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_simple_type_error, submop, 'METHOD-CALL-TYPE-ERROR').
-mop_direct(obj_simple_type_error, supers, [obj_simple_condition, obj_type_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_simple_type_error, supers, [obj_simple_condition, obj_type_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-UNBOUND-SLOT', supers, [obj_simple_error, obj_simple_condition, obj_unbound_slot, obj_cell_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-UNBOUND-VARIABLE', supers, [obj_simple_error, obj_simple_condition, obj_unbound_variable, obj_cell_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('SIMPLE-UNDEFINED-FUNCTION', supers, [obj_simple_error, obj_simple_condition, obj_undefined_function, obj_cell_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct(obj_simple_vector, supers, [obj_vector, 'SIMPLE-ARRAY', obj_array, 'SEQUENCE', t]).
-mop_direct(obj_simple_warning, submop, 'ARRAY-INITIAL-ELEMENT-MISMATCH').
-mop_direct(obj_simple_warning, submop, 'FORMAT-TOO-FEW-ARGS-WARNING').
-mop_direct(obj_simple_warning, submop, 'LOCAL-ARGUMENT-MISMATCH').
-mop_direct(obj_simple_warning, submop, 'PACKAGE-AT-VARIANCE').
-mop_direct(obj_simple_warning, submop, 'PRINT-OBJECT-STREAM-SPECIALIZER').
-mop_direct(obj_simple_warning, submop, 'SIMPLE-REFERENCE-WARNING').
-mop_direct(obj_simple_warning, submop, 'TYPE-WARNING').
-mop_direct(obj_simple_warning, supers, [obj_simple_condition, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_simple_warning, supers, [obj_simple_condition, obj_warning, obj_condition, obj_standard_object, t]).
-mop_direct(obj_single_float, supers, ['FLOAT', 'REAL', 'NUMBER', t]).
-mop_direct(obj_slot_class, submop, 'CONDITION-CLASS').
-mop_direct(obj_slot_class, submop, 'STD-CLASS').
-mop_direct(obj_slot_class, submop, obj_structure_class).
-mop_direct(obj_slot_class, supers, ['PCL-CLASS', 'CLASS', 'DEPENDENT-UPDATE-MIXIN', 'PLIST-MIXIN', 'DEFINITION-SOURCE-MIXIN', 'STANDARD-SPECIALIZER', 'SPECIALIZER', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct(obj_slot_class, szlot, 'DIRECT-SLOTS').
-mop_direct(obj_slot_class, szlot, 'SLOTS').
-mop_direct(obj_slot_definition, submop, 'CONDITION-SLOT-DEFINITION').
-mop_direct(obj_slot_definition, submop, 'DIRECT-SLOT-DEFINITION').
-mop_direct(obj_slot_definition, submop, 'EFFECTIVE-SLOT-DEFINITION').
-mop_direct(obj_slot_definition, submop, 'STANDARD-SLOT-DEFINITION').
-mop_direct(obj_slot_definition, submop, 'STRUCTURE-SLOT-DEFINITION').
-mop_direct(obj_slot_definition, supers, ['METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct(obj_slot_definition, supers, ['METAOBJECT', obj_standard_object, t]).
-mop_direct(obj_slot_definition, szlot, '$ALLOCATION').
-mop_direct(obj_slot_definition, szlot, '$INHERITABLE-DOC').
-mop_direct(obj_slot_definition, szlot, '$INHERITABLE-INITER').
-mop_direct(obj_slot_definition, szlot, '$INITARGS').
-mop_direct(obj_slot_definition, szlot, '$NAME').
-mop_direct(obj_slot_definition, szlot, '$TYPE').
-mop_direct(obj_slot_definition, szlot, '%CLASS').
-mop_direct(obj_slot_definition, szlot, '%DOCUMENTATION').
-mop_direct(obj_slot_definition, szlot, '%TYPE').
-mop_direct(obj_slot_definition, szlot, 'INITARGS').
-mop_direct(obj_slot_definition, szlot, 'INITFORM').
-mop_direct(obj_slot_definition, szlot, 'INITFUNCTION').
-mop_direct(obj_slot_definition, szlot, 'NAME').
-mop_direct(obj_slot_definition, szlot, 'SOURCE').
-mop_direct('SLOT-INFO', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('SLOT-INFO', szlot, 'BOUNDP').
-mop_direct('SLOT-INFO', szlot, 'READER').
-mop_direct('SLOT-INFO', szlot, 'TYPECHECK').
-mop_direct('SLOT-INFO', szlot, 'WRITER').
-mop_direct('SLOT-OBJECT', submop, obj_condition).
-mop_direct('SLOT-OBJECT', submop, obj_standard_object).
-mop_direct('SLOT-OBJECT', submop, obj_structure_object).
-mop_direct('SLOT-OBJECT', supers, [t]).
-mop_direct('SLOTD-INITIALIZATION-ERROR', submop, 'SLOTD-INITIALIZATION-TYPE-ERROR').
-mop_direct('SLOTD-INITIALIZATION-ERROR', supers, ['REFERENCE-CONDITION', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('SLOTD-INITIALIZATION-ERROR', szlot, 'INITARG').
-mop_direct('SLOTD-INITIALIZATION-ERROR', szlot, 'KIND').
-mop_direct('SLOTD-INITIALIZATION-ERROR', szlot, 'VALUE').
-mop_direct('SLOTD-INITIALIZATION-TYPE-ERROR', supers, ['SLOTD-INITIALIZATION-ERROR', 'REFERENCE-CONDITION', obj_type_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('SLOTD-INITIALIZATION-TYPE-ERROR', szlot, 'VALUE').
-mop_direct('SLOTTED-CLASS', submop, 'SEMI-STANDARD-CLASS').
-mop_direct('SLOTTED-CLASS', submop, obj_structure_class).
-mop_direct('SLOTTED-CLASS', supers, ['CLASS', 'POTENTIAL-CLASS', 'SPECIALIZER', 'SUPER-CLASS', 'STANDARD-STABLEHASH', 'METAOBJECT', obj_standard_object, t]).
-mop_direct('SLOTTED-CLASS', szlot, '$DIRECT-ACCESSORS').
-mop_direct('SLOTTED-CLASS', szlot, '$GENERIC-ACCESSORS').
-mop_direct('SLOTTED-CLASS', szlot, '$INSTANCE-SIZE').
-mop_direct('SLOTTED-CLASS', szlot, '$SUBCLASS-OF-STABLEHASH-P').
-mop_direct('SLOTTED-CLASS', szlot, '$VALID-INITARGS-FROM-SLOTS').
-mop_direct('SOURCE-FORM-CACHE', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('SOURCE-FORM-CACHE', szlot, 'DEBUG-SOURCE').
-mop_direct('SOURCE-FORM-CACHE', szlot, 'LAST-FORM-RETRIEVED').
-mop_direct('SOURCE-FORM-CACHE', szlot, 'LAST-LOCATION-RETRIEVED').
-mop_direct('SOURCE-FORM-CACHE', szlot, 'TOPLEVEL-FORM-INDEX').
-mop_direct('SOURCE-INFO', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('SOURCE-INFO', szlot, 'FILE-INFO').
-mop_direct('SOURCE-INFO', szlot, 'LAST-DEFN-SOURCE-LOC').
-mop_direct('SOURCE-INFO', szlot, 'PARENT').
-mop_direct('SOURCE-INFO', szlot, 'START-REAL-TIME').
-mop_direct('SOURCE-INFO', szlot, 'START-TIME').
-mop_direct('SOURCE-INFO', szlot, 'STREAM').
-mop_direct('SOURCE-PROGRAM-ERROR', submop, 'SIMPLE-SOURCE-PROGRAM-ERROR').
-mop_direct('SOURCE-PROGRAM-ERROR', supers, [obj_program_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('SOURCE-PROGRAM-ERROR', szlot, '$DETAIL').
-mop_direct('SOURCE-PROGRAM-ERROR', szlot, '$FORM').
-mop_direct('SPECIAL-FORM-FUNCTION', supers, [obj_undefined_function, obj_cell_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('SPECIALIZED-ARRAY-ELEMENT-TYPE-PROPERTIES', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('SPECIALIZED-ARRAY-ELEMENT-TYPE-PROPERTIES', szlot, 'COMPLEX-TYPECODE').
-mop_direct('SPECIALIZED-ARRAY-ELEMENT-TYPE-PROPERTIES', szlot, 'CTYPE').
-mop_direct('SPECIALIZED-ARRAY-ELEMENT-TYPE-PROPERTIES', szlot, 'FIXNUM-P').
-mop_direct('SPECIALIZED-ARRAY-ELEMENT-TYPE-PROPERTIES', szlot, 'IMPORTANCE').
-mop_direct('SPECIALIZED-ARRAY-ELEMENT-TYPE-PROPERTIES', szlot, 'INITIAL-ELEMENT-DEFAULT').
-mop_direct('SPECIALIZED-ARRAY-ELEMENT-TYPE-PROPERTIES', szlot, 'N-BITS').
-mop_direct('SPECIALIZED-ARRAY-ELEMENT-TYPE-PROPERTIES', szlot, 'N-PAD-ELEMENTS').
-mop_direct('SPECIALIZED-ARRAY-ELEMENT-TYPE-PROPERTIES', szlot, 'PRIMITIVE-TYPE-NAME').
-mop_direct('SPECIALIZED-ARRAY-ELEMENT-TYPE-PROPERTIES', szlot, 'SPECIFIER').
-mop_direct('SPECIALIZED-ARRAY-ELEMENT-TYPE-PROPERTIES', szlot, 'TYPECODE').
-mop_direct('SPECIALIZED-LAMBDA-LIST-ERROR', supers, ['REFERENCE-CONDITION', 'SIMPLE-PROGRAM-ERROR', obj_simple_condition, obj_program_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('SPECIALIZER', submop, 'EQL-SPECIALIZER').
-mop_direct('SPECIALIZER', submop, 'EXACT-CLASS-SPECIALIZER').
-mop_direct('SPECIALIZER', submop, 'POTENTIAL-CLASS').
-mop_direct('SPECIALIZER', submop, 'SPECIALIZER-WITH-OBJECT').
-mop_direct('SPECIALIZER', submop, 'STANDARD-SPECIALIZER').
-mop_direct('SPECIALIZER', supers, ['METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('SPECIALIZER', supers, ['STANDARD-STABLEHASH', 'METAOBJECT', obj_standard_object, t]).
-mop_direct('SPECIALIZER', szlot, '$DIRECT-METHODS').
-mop_direct('SPECIALIZER', szlot, '%TYPE').
-mop_direct('SPECIALIZER-WITH-OBJECT', submop, 'CLASS-EQ-SPECIALIZER').
-mop_direct('SPECIALIZER-WITH-OBJECT', submop, 'CLASS-PROTOTYPE-SPECIALIZER').
-mop_direct('SPECIALIZER-WITH-OBJECT', submop, 'EQL-SPECIALIZER').
-mop_direct('SPECIALIZER-WITH-OBJECT', supers, ['SPECIALIZER', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('SSET', submop, 'ORDERED-SET').
-mop_direct('SSET', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('SSET', szlot, 'COUNT').
-mop_direct('SSET', szlot, 'FREE').
-mop_direct('SSET', szlot, 'VECTOR').
-mop_direct('SSET-ELEMENT', submop, 'CBLOCK').
-mop_direct('SSET-ELEMENT', submop, 'CONSTRAINT').
-mop_direct('SSET-ELEMENT', submop, 'INSTRUCTION').
-mop_direct('SSET-ELEMENT', submop, 'LEAF').
-mop_direct('SSET-ELEMENT', submop, 'NODE').
-mop_direct('SSET-ELEMENT', submop, 'TN').
-mop_direct('SSET-ELEMENT', submop, 'VERTEX').
-mop_direct('SSET-ELEMENT', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('SSET-ELEMENT', szlot, 'NUMBER').
-mop_direct('STANDARD-ACCESSOR-METHOD', submop, 'STANDARD-BOUNDP-METHOD').
-mop_direct('STANDARD-ACCESSOR-METHOD', submop, 'STANDARD-READER-METHOD').
-mop_direct('STANDARD-ACCESSOR-METHOD', submop, 'STANDARD-WRITER-METHOD').
-mop_direct('STANDARD-ACCESSOR-METHOD', supers, ['ACCESSOR-METHOD', 'STANDARD-METHOD', 'PLIST-MIXIN', 'DEFINITION-SOURCE-MIXIN', 'METHOD', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('STANDARD-ACCESSOR-METHOD', supers, ['STANDARD-METHOD', 'METHOD', 'STANDARD-STABLEHASH', 'METAOBJECT', obj_standard_object, t]).
-mop_direct('STANDARD-ACCESSOR-METHOD', szlot, '$SLOT-DEFINITION').
-mop_direct('STANDARD-ACCESSOR-METHOD', szlot, '%SLOT-DEFINITION').
-mop_direct('STANDARD-BOUNDP-METHOD', supers, ['STANDARD-ACCESSOR-METHOD', 'ACCESSOR-METHOD', 'STANDARD-METHOD', 'PLIST-MIXIN', 'DEFINITION-SOURCE-MIXIN', 'METHOD', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct(obj_standard_class, supers, ['SEMI-STANDARD-CLASS', 'SLOTTED-CLASS', 'CLASS', 'POTENTIAL-CLASS', 'SPECIALIZER', 'SUPER-CLASS', 'STANDARD-STABLEHASH', 'METAOBJECT', obj_standard_object, t]).
-mop_direct(obj_standard_class, supers, ['STD-CLASS', obj_slot_class, 'PCL-CLASS', 'CLASS', 'DEPENDENT-UPDATE-MIXIN', 'PLIST-MIXIN', 'DEFINITION-SOURCE-MIXIN', 'STANDARD-SPECIALIZER', 'SPECIALIZER', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('STANDARD-CLASSOID', supers, ['CLASSOID', 'CTYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('STANDARD-DIRECT-SLOT-DEFINITION', supers, ['DIRECT-SLOT-DEFINITION', 'STANDARD-SLOT-DEFINITION', obj_slot_definition, 'METAOBJECT', obj_standard_object, t]).
-mop_direct('STANDARD-DIRECT-SLOT-DEFINITION', supers, ['STANDARD-SLOT-DEFINITION', 'DIRECT-SLOT-DEFINITION', obj_slot_definition, 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('STANDARD-EFFECTIVE-SLOT-DEFINITION', supers, ['EFFECTIVE-SLOT-DEFINITION', 'STANDARD-SLOT-DEFINITION', obj_slot_definition, 'METAOBJECT', obj_standard_object, t]).
-mop_direct('STANDARD-EFFECTIVE-SLOT-DEFINITION', supers, ['STANDARD-SLOT-DEFINITION', 'EFFECTIVE-SLOT-DEFINITION', obj_slot_definition, 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('STANDARD-EFFECTIVE-SLOT-DEFINITION', szlot, 'LOCATION').
-mop_direct('STANDARD-FUNCALLABLE-INSTANCE', supers, [t]).
-mop_direct('STANDARD-FUNCALLABLE-INSTANCE', szlot, 'CLOS-SLOTS').
-mop_direct('STANDARD-FUNCALLABLE-INSTANCE', szlot, 'HASH-CODE').
-mop_direct('STANDARD-GENERIC-FUNCTION', supers, ['GENERIC-FUNCTION', 'DEPENDENT-UPDATE-MIXIN', 'PLIST-MIXIN', 'DEFINITION-SOURCE-MIXIN', 'METAOBJECT', obj_funcallable_standard_object, obj_function, obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('STANDARD-GENERIC-FUNCTION', supers, ['GENERIC-FUNCTION', 'METAOBJECT', obj_funcallable_standard_object, obj_function, obj_standard_object, t]).
-mop_direct('STANDARD-GENERIC-FUNCTION', szlot, '$ARGORDER').
-mop_direct('STANDARD-GENERIC-FUNCTION', szlot, '$DECLSPECS').
-mop_direct('STANDARD-GENERIC-FUNCTION', szlot, '$DEFAULT-METHOD-CLASS').
-mop_direct('STANDARD-GENERIC-FUNCTION', szlot, '$DOCUMENTATION').
-mop_direct('STANDARD-GENERIC-FUNCTION', szlot, '$EFFECTIVE-METHOD-CACHE').
-mop_direct('STANDARD-GENERIC-FUNCTION', szlot, '$INITIALIZED').
-mop_direct('STANDARD-GENERIC-FUNCTION', szlot, '$LAMBDA-LIST').
-mop_direct('STANDARD-GENERIC-FUNCTION', szlot, '$METHOD-COMBINATION').
-mop_direct('STANDARD-GENERIC-FUNCTION', szlot, '$METHODS').
-mop_direct('STANDARD-GENERIC-FUNCTION', szlot, '$SIGNATURE').
-mop_direct('STANDARD-GENERIC-FUNCTION', szlot, '%LOCK').
-mop_direct('STANDARD-GENERIC-FUNCTION', szlot, '%METHOD-COMBINATION').
-mop_direct('STANDARD-GENERIC-FUNCTION', szlot, 'ARG-INFO').
-mop_direct('STANDARD-GENERIC-FUNCTION', szlot, 'DECLARATIONS').
-mop_direct('STANDARD-GENERIC-FUNCTION', szlot, 'DFUN-STATE').
-mop_direct('STANDARD-GENERIC-FUNCTION', szlot, 'INFO-NEEDS-UPDATE').
-mop_direct('STANDARD-GENERIC-FUNCTION', szlot, 'METHOD-CLASS').
-mop_direct('STANDARD-GENERIC-FUNCTION', szlot, 'METHODS').
-mop_direct('STANDARD-GENERIC-FUNCTION', szlot, 'NAME').
-mop_direct('STANDARD-METHOD', submop, 'ACCESSOR-METHOD').
-mop_direct('STANDARD-METHOD', submop, 'STANDARD-ACCESSOR-METHOD').
-mop_direct('STANDARD-METHOD', supers, ['METHOD', 'STANDARD-STABLEHASH', 'METAOBJECT', obj_standard_object, t]).
-mop_direct('STANDARD-METHOD', supers, ['PLIST-MIXIN', 'DEFINITION-SOURCE-MIXIN', 'METHOD', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('STANDARD-METHOD', szlot, '$DOCUMENTATION').
-mop_direct('STANDARD-METHOD', szlot, '$FAST-FUNCTION').
-mop_direct('STANDARD-METHOD', szlot, '$FUNCTION').
-mop_direct('STANDARD-METHOD', szlot, '$GF').
-mop_direct('STANDARD-METHOD', szlot, '$LAMBDA-LIST').
-mop_direct('STANDARD-METHOD', szlot, '$QUALIFIERS').
-mop_direct('STANDARD-METHOD', szlot, '$SIGNATURE').
-mop_direct('STANDARD-METHOD', szlot, '$SPECIALIZERS').
-mop_direct('STANDARD-METHOD', szlot, '$WANTS-NEXT-METHOD-P').
-mop_direct('STANDARD-METHOD', szlot, '%DOCUMENTATION').
-mop_direct('STANDARD-METHOD', szlot, '%FUNCTION').
-mop_direct('STANDARD-METHOD', szlot, '%GENERIC-FUNCTION').
-mop_direct('STANDARD-METHOD', szlot, 'LAMBDA-LIST').
-mop_direct('STANDARD-METHOD', szlot, 'QUALIFIERS').
-mop_direct('STANDARD-METHOD', szlot, 'SIMPLE-NEXT-METHOD-CALL').
-mop_direct('STANDARD-METHOD', szlot, 'SPECIALIZERS').
-mop_direct('STANDARD-METHOD-COMBINATION', submop, 'LONG-METHOD-COMBINATION').
-mop_direct('STANDARD-METHOD-COMBINATION', submop, 'SHORT-METHOD-COMBINATION').
-mop_direct('STANDARD-METHOD-COMBINATION', supers, ['DEFINITION-SOURCE-MIXIN', 'METHOD-COMBINATION', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('STANDARD-METHOD-COMBINATION', szlot, 'OPTIONS').
-mop_direct('STANDARD-METHOD-COMBINATION', szlot, 'TYPE-NAME').
-mop_direct(obj_standard_object, submop, obj_condition).
-mop_direct(obj_standard_object, submop, 'DEFINITION-SOURCE-MIXIN').
-mop_direct(obj_standard_object, submop, obj_funcallable_standard_object).
-mop_direct(obj_standard_object, submop, 'FUNDAMENTAL-STREAM').
-mop_direct(obj_standard_object, submop, 'GENERIC-STREAM-CONTROLLER').
-mop_direct(obj_standard_object, submop, 'METAOBJECT').
-mop_direct(obj_standard_object, submop, 'PLIST-MIXIN').
-mop_direct(obj_standard_object, submop, 'STANDARD-STABLEHASH').
-mop_direct(obj_standard_object, supers, ['SLOT-OBJECT', t]).
-mop_direct(obj_standard_object, supers, [t]).
-mop_direct('STANDARD-PPRINT-DISPATCH-TABLE-MODIFIED-ERROR', supers, ['REFERENCE-CONDITION', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('STANDARD-PPRINT-DISPATCH-TABLE-MODIFIED-ERROR', szlot, 'OPERATION').
-mop_direct('STANDARD-READER-METHOD', supers, ['STANDARD-ACCESSOR-METHOD', 'ACCESSOR-METHOD', 'STANDARD-METHOD', 'PLIST-MIXIN', 'DEFINITION-SOURCE-MIXIN', 'METHOD', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('STANDARD-READER-METHOD', supers, ['STANDARD-ACCESSOR-METHOD', 'STANDARD-METHOD', 'METHOD', 'STANDARD-STABLEHASH', 'METAOBJECT', obj_standard_object, t]).
-mop_direct('STANDARD-READTABLE-MODIFIED-ERROR', supers, ['REFERENCE-CONDITION', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('STANDARD-READTABLE-MODIFIED-ERROR', szlot, 'OPERATION').
-mop_direct('STANDARD-SLOT-DEFINITION', submop, 'STANDARD-DIRECT-SLOT-DEFINITION').
-mop_direct('STANDARD-SLOT-DEFINITION', submop, 'STANDARD-EFFECTIVE-SLOT-DEFINITION').
-mop_direct('STANDARD-SLOT-DEFINITION', supers, [obj_slot_definition, 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('STANDARD-SLOT-DEFINITION', supers, [obj_slot_definition, 'METAOBJECT', obj_standard_object, t]).
-mop_direct('STANDARD-SLOT-DEFINITION', szlot, 'ALLOCATION').
-mop_direct('STANDARD-SLOT-DEFINITION', szlot, 'ALLOCATION-CLASS').
-mop_direct('STANDARD-SPECIALIZER', submop, 'CLASS').
-mop_direct('STANDARD-SPECIALIZER', submop, 'CLASS-EQ-SPECIALIZER').
-mop_direct('STANDARD-SPECIALIZER', submop, 'CLASS-PROTOTYPE-SPECIALIZER').
-mop_direct('STANDARD-SPECIALIZER', submop, 'EQL-SPECIALIZER').
-mop_direct('STANDARD-SPECIALIZER', supers, ['SPECIALIZER', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('STANDARD-STABLEHASH', submop, 'METHOD').
-mop_direct('STANDARD-STABLEHASH', submop, 'SPECIALIZER').
-mop_direct('STANDARD-STABLEHASH', submop, 'SUPER-CLASS').
-mop_direct('STANDARD-STABLEHASH', supers, [obj_standard_object, t]).
-mop_direct('STANDARD-STABLEHASH', szlot, '$HASHCODE').
-mop_direct('STANDARD-WRITER-METHOD', supers, ['STANDARD-ACCESSOR-METHOD', 'ACCESSOR-METHOD', 'STANDARD-METHOD', 'PLIST-MIXIN', 'DEFINITION-SOURCE-MIXIN', 'METHOD', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('STANDARD-WRITER-METHOD', supers, ['STANDARD-ACCESSOR-METHOD', 'STANDARD-METHOD', 'METHOD', 'STANDARD-STABLEHASH', 'METAOBJECT', obj_standard_object, t]).
-mop_direct('STAT-VFS', supers, [obj_structure_object, t]).
-mop_direct('STAT-VFS', szlot, 'BAVAIL').
-mop_direct('STAT-VFS', szlot, 'BFREE').
-mop_direct('STAT-VFS', szlot, 'BLOCKS').
-mop_direct('STAT-VFS', szlot, 'BSIZE').
-mop_direct('STAT-VFS', szlot, 'FAVAIL').
-mop_direct('STAT-VFS', szlot, 'FFREE').
-mop_direct('STAT-VFS', szlot, 'FILE').
-mop_direct('STAT-VFS', szlot, 'FILES').
-mop_direct('STAT-VFS', szlot, 'FLAG').
-mop_direct('STAT-VFS', szlot, 'FRSIZE').
-mop_direct('STAT-VFS', szlot, 'FS-TYPE').
-mop_direct('STAT-VFS', szlot, 'FSID').
-mop_direct('STAT-VFS', szlot, 'NAMEMAX').
-mop_direct('STAT-VFS', szlot, 'VOL-NAME').
-mop_direct('STATIC-CLASSOID', supers, ['CLASSOID', 'CTYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('STD-CLASS', submop, obj_funcallable_standard_class).
-mop_direct('STD-CLASS', submop, obj_standard_class).
-mop_direct('STD-CLASS', supers, [obj_slot_class, 'PCL-CLASS', 'CLASS', 'DEPENDENT-UPDATE-MIXIN', 'PLIST-MIXIN', 'DEFINITION-SOURCE-MIXIN', 'STANDARD-SPECIALIZER', 'SPECIALIZER', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('STEP-CONDITION', submop, 'STEP-FINISHED-CONDITION').
-mop_direct('STEP-CONDITION', submop, 'STEP-FORM-CONDITION').
-mop_direct('STEP-CONDITION', submop, 'STEP-RESULT-CONDITION').
-mop_direct('STEP-CONDITION', supers, [obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('STEP-CONDITION', szlot, 'FORM').
-mop_direct('STEP-FINISHED-CONDITION', supers, ['STEP-CONDITION', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('STEP-FORM-CONDITION', supers, ['STEP-CONDITION', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('STEP-FORM-CONDITION', szlot, 'ARGS').
-mop_direct('STEP-RESULT-CONDITION', submop, 'STEP-VALUES-CONDITION').
-mop_direct('STEP-RESULT-CONDITION', supers, ['STEP-CONDITION', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('STEP-RESULT-CONDITION', szlot, 'RESULT').
-mop_direct('STEP-VALUES-CONDITION', supers, ['STEP-RESULT-CONDITION', 'STEP-CONDITION', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_storage_condition, submop, 'ALIEN-STACK-EXHAUSTED').
-mop_direct(obj_storage_condition, submop, 'BINDING-STACK-EXHAUSTED').
-mop_direct(obj_storage_condition, submop, 'CONTROL-STACK-EXHAUSTED').
-mop_direct(obj_storage_condition, submop, 'HEAP-EXHAUSTED-ERROR').
-mop_direct(obj_storage_condition, submop, 'SIMPLE-STORAGE-CONDITION').
-mop_direct(obj_storage_condition, supers, [obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_storage_condition, supers, [obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('STORAGE-INFO', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('STORAGE-INFO', szlot, 'DEBUG-VARS').
-mop_direct('STORAGE-INFO', szlot, 'GROUPS').
-mop_direct(obj_stream, submop, 'ANSI-STREAM').
-mop_direct(obj_stream, submop, obj_broadcast_stream).
-mop_direct(obj_stream, submop, obj_concatenated_stream).
-mop_direct(obj_stream, submop, obj_echo_stream).
-mop_direct(obj_stream, submop, obj_file_stream).
-mop_direct(obj_stream, submop, 'FUNDAMENTAL-STREAM').
-mop_direct(obj_stream, submop, 'STRING-STREAM').
-mop_direct(obj_stream, submop, obj_synonym_stream).
-mop_direct(obj_stream, submop, obj_two_way_stream).
-mop_direct(obj_stream, supers, [t]).
-mop_direct('STREAM-DECODING-ERROR', supers, [obj_stream_error, 'CHARACTER-DECODING-ERROR', 'CHARACTER-CODING-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('STREAM-ENCODING-ERROR', supers, [obj_stream_error, 'CHARACTER-ENCODING-ERROR', 'CHARACTER-CODING-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_stream_error, submop, 'CLOSED-STREAM-ERROR').
-mop_direct(obj_stream_error, submop, obj_end_of_file).
-mop_direct(obj_stream_error, submop, 'IO-TIMEOUT').
-mop_direct(obj_stream_error, submop, obj_reader_error).
-mop_direct(obj_stream_error, submop, 'SIMPLE-STREAM-ERROR').
-mop_direct(obj_stream_error, submop, 'STREAM-DECODING-ERROR').
-mop_direct(obj_stream_error, submop, 'STREAM-ENCODING-ERROR').
-mop_direct(obj_stream_error, supers, ['ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_stream_error, supers, ['ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct(obj_stream_error, szlot, '$STREAM').
-mop_direct(obj_stream_error, szlot, 'STREAM').
-mop_direct(obj_string, submop, 'BASE-STRING').
-mop_direct(obj_string, submop, 'CHARACTER-STRING').
-mop_direct(obj_string, submop, obj_simple_string).
-mop_direct(obj_string, submop, 'VECTOR-NIL').
-mop_direct(obj_string, supers, [obj_vector, obj_array, 'SEQUENCE', t]).
-mop_direct(obj_string_input_stream, supers, ['STRING-STREAM', 'ANSI-STREAM', obj_stream, obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct(obj_string_input_stream, szlot, 'CURRENT').
-mop_direct(obj_string_input_stream, szlot, 'END').
-mop_direct(obj_string_input_stream, szlot, 'IN').
-mop_direct(obj_string_input_stream, szlot, 'MISC').
-mop_direct(obj_string_input_stream, szlot, 'STRING').
-mop_direct(obj_string_output_stream, supers, ['STRING-STREAM', 'ANSI-STREAM', obj_stream, obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct(obj_string_output_stream, szlot, 'BUFFER').
-mop_direct(obj_string_output_stream, szlot, 'ELEMENT-TYPE').
-mop_direct(obj_string_output_stream, szlot, 'INDEX').
-mop_direct(obj_string_output_stream, szlot, 'INDEX-CACHE').
-mop_direct(obj_string_output_stream, szlot, 'MISC').
-mop_direct(obj_string_output_stream, szlot, 'NEXT').
-mop_direct(obj_string_output_stream, szlot, 'OUT').
-mop_direct(obj_string_output_stream, szlot, 'POINTER').
-mop_direct(obj_string_output_stream, szlot, 'PREV').
-mop_direct(obj_string_output_stream, szlot, 'SOUT').
-mop_direct('STRING-STREAM', submop, obj_fill_pointer_output_stream).
-mop_direct('STRING-STREAM', submop, obj_string_input_stream).
-mop_direct('STRING-STREAM', submop, obj_string_output_stream).
-mop_direct('STRING-STREAM', supers, [obj_stream, t]).
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'ALIEN-RECORD-FIELD').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'ALIEN-TYPE').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'ANNOTATION').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'ARG-INFO').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'BLOCK-ANNOTATION').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'CLASSOID-CELL').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'CLEANUP').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'CLOOP').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'COMPONENT').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'CTRAN').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'CTYPE').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'DEBUG-FUN').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'DEBUG-INFO').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'DEBUG-NAME-MARKER').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'DEBUG-SOURCE').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'DEFINITION-SOURCE-LOCATION').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'DEFSTRUCT-DESCRIPTION').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'DEFSTRUCT-SLOT-DESCRIPTION').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'GLOBAL-CONFLICTS').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'HEAP-ALIEN-INFO').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'INTERFERENCE-GRAPH').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'IR2-COMPONENT').
-mop_direct('STRUCTURE_bang_OBJECT', submop, obj_layout).
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'LOCAL-ALIEN-INFO').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'LVAR').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'MUTEX').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'NLX-INFO').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'OPERAND-PARSE').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'PATTERN').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'PHYSENV').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'PRIM-OBJECT-SLOT').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'PRIMITIVE-OBJECT').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'ROOM-INFO').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'SB').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'SC').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'SSET-ELEMENT').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'TAIL-SET').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'TEMPLATE').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'TN-REF').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'TRACE-INFO').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'TYPE-CLASS').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'UNDEFINED-WARNING').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'VOP').
-mop_direct('STRUCTURE_bang_OBJECT', submop, 'VOP-PARSE').
-mop_direct('STRUCTURE_bang_OBJECT', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct(obj_structure_class, supers, [obj_slot_class, 'PCL-CLASS', 'CLASS', 'DEPENDENT-UPDATE-MIXIN', 'PLIST-MIXIN', 'DEFINITION-SOURCE-MIXIN', 'STANDARD-SPECIALIZER', 'SPECIALIZER', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct(obj_structure_class, supers, ['SLOTTED-CLASS', 'CLASS', 'POTENTIAL-CLASS', 'SPECIALIZER', 'SUPER-CLASS', 'STANDARD-STABLEHASH', 'METAOBJECT', obj_standard_object, t]).
-mop_direct(obj_structure_class, szlot, '$BOA-CONSTRUCTORS').
-mop_direct(obj_structure_class, szlot, '$COPIER').
-mop_direct(obj_structure_class, szlot, '$KCONSTRUCTOR').
-mop_direct(obj_structure_class, szlot, '$NAMES').
-mop_direct(obj_structure_class, szlot, '$PREDICATE').
-mop_direct(obj_structure_class, szlot, '$PROTOTYPE').
-mop_direct(obj_structure_class, szlot, 'DEFSTRUCT-CONSTRUCTOR').
-mop_direct(obj_structure_class, szlot, 'DEFSTRUCT-FORM').
-mop_direct(obj_structure_class, szlot, 'FROM-DEFCLASS-P').
-mop_direct('STRUCTURE-CLASSOID', supers, ['CLASSOID', 'CTYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('STRUCTURE-DIRECT-SLOT-DEFINITION', supers, ['DIRECT-SLOT-DEFINITION', obj_slot_definition, 'METAOBJECT', obj_standard_object, t]).
-mop_direct('STRUCTURE-DIRECT-SLOT-DEFINITION', supers, ['STRUCTURE-SLOT-DEFINITION', 'DIRECT-SLOT-DEFINITION', obj_slot_definition, 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('STRUCTURE-EFFECTIVE-SLOT-DEFINITION', supers, ['EFFECTIVE-SLOT-DEFINITION', obj_slot_definition, 'METAOBJECT', obj_standard_object, t]).
-mop_direct('STRUCTURE-EFFECTIVE-SLOT-DEFINITION', supers, ['STRUCTURE-SLOT-DEFINITION', 'EFFECTIVE-SLOT-DEFINITION', obj_slot_definition, 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('STRUCTURE-EFFECTIVE-SLOT-DEFINITION', szlot, '$EFM-SBUC').
-mop_direct('STRUCTURE-EFFECTIVE-SLOT-DEFINITION', szlot, '$EFM-SMUC').
-mop_direct('STRUCTURE-EFFECTIVE-SLOT-DEFINITION', szlot, '$EFM-SSVUC').
-mop_direct('STRUCTURE-EFFECTIVE-SLOT-DEFINITION', szlot, '$EFM-SVUC').
-mop_direct('STRUCTURE-EFFECTIVE-SLOT-DEFINITION', szlot, '$READONLY').
-mop_direct('STRUCTURE-INITARG-NOT-KEYWORD', supers, ['REFERENCE-CONDITION', 'SIMPLE-STYLE-WARNING', obj_simple_condition, obj_style_warning, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_structure_object, submop, 'ABSTRACT-LEXENV').
-mop_direct(obj_structure_object, submop, 'ALIEN-TYPE-CLASS').
-mop_direct(obj_structure_object, submop, 'ALIEN-VALUE').
-mop_direct(obj_structure_object, submop, 'ANODE').
-mop_direct(obj_structure_object, submop, 'ANSI-STREAM').
-mop_direct(obj_structure_object, submop, 'APPROXIMATE-FUN-TYPE').
-mop_direct(obj_structure_object, submop, 'APPROXIMATE-KEY-INFO').
-mop_direct(obj_structure_object, submop, 'ARG').
-mop_direct(obj_structure_object, submop, 'ARG-FORM-KIND').
-mop_direct(obj_structure_object, submop, 'ARG-INFO').
-mop_direct(obj_structure_object, submop, 'ARG-STATE').
-mop_direct(obj_structure_object, submop, 'BREAKPOINT').
-mop_direct(obj_structure_object, submop, 'BREAKPOINT-DATA').
-mop_direct(obj_structure_object, submop, 'BUFFER').
-mop_direct(obj_structure_object, submop, 'C-SOURCE-POINT').
-mop_direct(obj_structure_object, submop, 'CACHE').
-mop_direct(obj_structure_object, submop, 'CACHED-FUN').
-mop_direct(obj_structure_object, submop, 'CALLBACK-INFO').
-mop_direct(obj_structure_object, submop, 'CIRCULARITY').
-mop_direct(obj_structure_object, submop, 'CLASS-PRECEDENCE-DESCRIPTION').
-mop_direct(obj_structure_object, submop, 'CODE-LOCATION').
-mop_direct(obj_structure_object, submop, 'COMMA').
-mop_direct(obj_structure_object, submop, 'COMPILER-ERROR-CONTEXT').
-mop_direct(obj_structure_object, submop, 'CONDITION-SLOT').
-mop_direct(obj_structure_object, submop, 'CONSET').
-mop_direct(obj_structure_object, submop, 'CONST').
-mop_direct(obj_structure_object, submop, 'CONTROL-STRING-DIRECTIVE').
-mop_direct(obj_structure_object, submop, 'CORE-OBJECT').
-mop_direct(obj_structure_object, submop, 'COUNTER').
-mop_direct(obj_structure_object, submop, 'DEAD-BEEF-STRUCTURE-OBJECT').
-mop_direct(obj_structure_object, submop, 'DEBUG-BLOCK').
-mop_direct(obj_structure_object, submop, 'DEBUG-FUN').
-mop_direct(obj_structure_object, submop, 'DEBUG-VAR').
-mop_direct(obj_structure_object, submop, 'DEPRECATION-INFO').
-mop_direct(obj_structure_object, submop, 'DFUN-INFO').
-mop_direct(obj_structure_object, submop, 'DISASSEM-STATE').
-mop_direct(obj_structure_object, submop, 'EA').
-mop_direct(obj_structure_object, submop, 'ENCAPSULATION-INFO').
-mop_direct(obj_structure_object, submop, 'ENTRY-INFO').
-mop_direct(obj_structure_object, submop, 'ENV').
-mop_direct(obj_structure_object, submop, 'EVENT-INFO').
-mop_direct(obj_structure_object, submop, 'EXTERNAL-FORMAT').
-mop_direct(obj_structure_object, submop, 'FASL-INPUT').
-mop_direct(obj_structure_object, submop, 'FASL-OUTPUT').
-mop_direct(obj_structure_object, submop, 'FAST-INSTANCE-BOUNDP').
-mop_direct(obj_structure_object, submop, 'FAST-METHOD-CALL').
-mop_direct(obj_structure_object, submop, 'FFI-MODULE').
-mop_direct(obj_structure_object, submop, 'FGEN').
-mop_direct(obj_structure_object, submop, 'FILE-INFO').
-mop_direct(obj_structure_object, submop, 'FILE-STAT').
-mop_direct(obj_structure_object, submop, 'FIXUP').
-mop_direct(obj_structure_object, submop, 'FIXUP-NOTE').
-mop_direct(obj_structure_object, submop, 'FNODE').
-mop_direct(obj_structure_object, submop, 'FORMAT-DIRECTIVE').
-mop_direct(obj_structure_object, submop, 'FRAME').
-mop_direct(obj_structure_object, submop, 'FUN-CACHE').
-mop_direct(obj_structure_object, submop, 'FUN-END-COOKIE').
-mop_direct(obj_structure_object, submop, 'FUN-INFO').
-mop_direct(obj_structure_object, submop, 'FUNSTATE').
-mop_direct(obj_structure_object, submop, 'GROUP-INFO').
-mop_direct(obj_structure_object, submop, 'HANDLER').
-mop_direct(obj_structure_object, submop, obj_hash_table).
-mop_direct(obj_structure_object, submop, 'HOST').
-mop_direct(obj_structure_object, submop, 'HOSTENT').
-mop_direct(obj_structure_object, submop, 'HUFFMAN-NODE').
-mop_direct(obj_structure_object, submop, 'INFO-HASHTABLE').
-mop_direct(obj_structure_object, submop, 'INPUT-CHARACTER').
-mop_direct(obj_structure_object, submop, 'INSPECTION').
-mop_direct(obj_structure_object, submop, 'INST-SPACE').
-mop_direct(obj_structure_object, submop, 'INST-SPACE-CHOICE').
-mop_direct(obj_structure_object, submop, 'INSTRUCTION').
-mop_direct(obj_structure_object, submop, 'INSTRUCTION-FORMAT').
-mop_direct(obj_structure_object, submop, 'INTERVAL').
-mop_direct(obj_structure_object, submop, 'IR2-LVAR').
-mop_direct(obj_structure_object, submop, 'IR2-NLX-INFO').
-mop_direct(obj_structure_object, submop, 'IR2-PHYSENV').
-mop_direct(obj_structure_object, submop, 'KEY-INFO').
-mop_direct(obj_structure_object, submop, 'LOCALE-CONV').
-mop_direct(obj_structure_object, submop, 'LOCATION-GROUP').
-mop_direct(obj_structure_object, submop, 'LOCATION-INFO').
-mop_direct(obj_structure_object, submop, 'LOGICAL-BLOCK').
-mop_direct(obj_structure_object, submop, 'LOOP-COLLECTOR').
-mop_direct(obj_structure_object, submop, 'LOOP-INITIALIZATION').
-mop_direct(obj_structure_object, submop, 'LOOP-MINIMAX').
-mop_direct(obj_structure_object, submop, 'LOOP-PATH').
-mop_direct(obj_structure_object, submop, 'LOOP-UNIVERSE').
-mop_direct(obj_structure_object, submop, 'MATCH').
-mop_direct(obj_structure_object, submop, 'META-INFO').
-mop_direct(obj_structure_object, submop, 'METHOD-CALL').
-mop_direct(obj_structure_object, submop, 'MODULAR-CLASS').
-mop_direct(obj_structure_object, submop, 'MODULAR-FUN-INFO').
-mop_direct(obj_structure_object, submop, 'OFFS-HOOK').
-mop_direct(obj_structure_object, submop, 'OVERHEAD').
-mop_direct(obj_structure_object, submop, obj_package).
-mop_direct(obj_structure_object, submop, 'PACKAGE-HASHTABLE').
-mop_direct(obj_structure_object, submop, obj_pathname).
-mop_direct(obj_structure_object, submop, 'POLICY').
-mop_direct(obj_structure_object, submop, 'POLICY-DEPENDENT-QUALITY').
-mop_direct(obj_structure_object, submop, 'POLLFDS').
-mop_direct(obj_structure_object, submop, 'PPRINT-DISPATCH-ENTRY').
-mop_direct(obj_structure_object, submop, 'PPRINT-DISPATCH-TABLE').
-mop_direct(obj_structure_object, submop, 'PRIMITIVE-TYPE').
-mop_direct(obj_structure_object, submop, 'PRIORITY-QUEUE').
-mop_direct(obj_structure_object, submop, 'PROCESS').
-mop_direct(obj_structure_object, submop, 'PROFILE-INFO').
-mop_direct(obj_structure_object, submop, 'PV-TABLE').
-mop_direct(obj_structure_object, submop, 'QUEUED-OP').
-mop_direct(obj_structure_object, submop, obj_random_state).
-mop_direct(obj_structure_object, submop, 'RAW-SLOT-DATA').
-mop_direct(obj_structure_object, submop, obj_readtable).
-mop_direct(obj_structure_object, submop, 'REG-SPEC').
-mop_direct(obj_structure_object, submop, 'RESTART').
-mop_direct(obj_structure_object, submop, 'RESULT-STATE').
-mop_direct(obj_structure_object, submop, 'RETURN-INFO').
-mop_direct(obj_structure_object, submop, 'RLIMIT').
-mop_direct(obj_structure_object, submop, 'SEGMENT').
-mop_direct(obj_structure_object, submop, 'SEMAPHORE').
-mop_direct(obj_structure_object, submop, 'SEMAPHORE-NOTIFICATION').
-mop_direct(obj_structure_object, submop, 'SERVICE').
-mop_direct(obj_structure_object, submop, 'SESSION').
-mop_direct(obj_structure_object, submop, 'SHARED-OBJECT').
-mop_direct(obj_structure_object, submop, 'SLOT-INFO').
-mop_direct(obj_structure_object, submop, 'SOURCE-FORM-CACHE').
-mop_direct(obj_structure_object, submop, 'SOURCE-INFO').
-mop_direct(obj_structure_object, submop, 'SPECIALIZED-ARRAY-ELEMENT-TYPE-PROPERTIES').
-mop_direct(obj_structure_object, submop, 'SSET').
-mop_direct(obj_structure_object, submop, 'STAT-VFS').
-mop_direct(obj_structure_object, submop, 'STORAGE-INFO').
-mop_direct(obj_structure_object, submop, 'STRUCTURE_bang_OBJECT').
-mop_direct(obj_structure_object, submop, 'STRUCTURE-STABLEHASH').
-mop_direct(obj_structure_object, submop, 'THREAD').
-mop_direct(obj_structure_object, submop, 'TIME-INFO').
-mop_direct(obj_structure_object, submop, 'TIMER').
-mop_direct(obj_structure_object, submop, 'TOKEN-BUF').
-mop_direct(obj_structure_object, submop, 'TRANSFORM').
-mop_direct(obj_structure_object, submop, 'UNAME').
-mop_direct(obj_structure_object, submop, 'UNDEFINED-PACKAGE').
-mop_direct(obj_structure_object, submop, 'UNPRINTABLE-OBJECT').
-mop_direct(obj_structure_object, submop, 'USAGE').
-mop_direct(obj_structure_object, submop, 'USER-INFO').
-mop_direct(obj_structure_object, submop, 'UTMPX').
-mop_direct(obj_structure_object, submop, 'VALSRC').
-mop_direct(obj_structure_object, submop, 'VAR').
-mop_direct(obj_structure_object, submop, 'WAITQUEUE').
-mop_direct(obj_structure_object, submop, 'XSET').
-mop_direct(obj_structure_object, supers, ['SLOT-OBJECT', t]).
-mop_direct(obj_structure_object, supers, [t]).
-mop_direct('STRUCTURE-SLOT-DEFINITION', submop, 'STRUCTURE-DIRECT-SLOT-DEFINITION').
-mop_direct('STRUCTURE-SLOT-DEFINITION', submop, 'STRUCTURE-EFFECTIVE-SLOT-DEFINITION').
-mop_direct('STRUCTURE-SLOT-DEFINITION', supers, [obj_slot_definition, 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('STRUCTURE-SLOT-DEFINITION', szlot, 'DEFSTRUCT-ACCESSOR-SYMBOL').
-mop_direct('STRUCTURE-SLOT-DEFINITION', szlot, 'INTERNAL-READER-FUNCTION').
-mop_direct('STRUCTURE-SLOT-DEFINITION', szlot, 'INTERNAL-WRITER-FUNCTION').
-mop_direct('STRUCTURE-STABLEHASH', supers, [obj_structure_object, t]).
-mop_direct('STRUCTURE-STABLEHASH', szlot, 'HASHCODE').
-mop_direct(obj_style_warning, submop, 'CHARACTER-DECODING-ERROR-IN-COMMENT').
-mop_direct(obj_style_warning, submop, 'COMPILER-MACRO-APPLICATION-MISSED-WARNING').
-mop_direct(obj_style_warning, submop, 'DEPRECATED-EVAL-WHEN-SITUATIONS').
-mop_direct(obj_style_warning, submop, 'DUBIOUS-ASTERISKS-AROUND-VARIABLE-NAME').
-mop_direct(obj_style_warning, submop, 'DUPLICATE-CASE-KEY-WARNING').
-mop_direct(obj_style_warning, submop, 'EARLY-DEPRECATION-WARNING').
-mop_direct(obj_style_warning, submop, 'FTYPE-PROCLAMATION-MISMATCH-WARNING').
-mop_direct(obj_style_warning, submop, 'IMPLICIT-GENERIC-FUNCTION-WARNING').
-mop_direct(obj_style_warning, submop, 'LEXICAL-ENVIRONMENT-TOO-COMPLEX').
-mop_direct(obj_style_warning, submop, 'REDEFINITION-WARNING').
-mop_direct(obj_style_warning, submop, 'SAME-FILE-REDEFINITION-WARNING').
-mop_direct(obj_style_warning, submop, 'SIMPLE-STYLE-WARNING').
-mop_direct(obj_style_warning, submop, 'TYPE-PROCLAMATION-MISMATCH-WARNING').
-mop_direct(obj_style_warning, submop, 'UNDEFINED-ALIEN-STYLE-WARNING').
-mop_direct(obj_style_warning, supers, [obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_style_warning, supers, [obj_warning, obj_condition, obj_standard_object, t]).
-mop_direct('SUPER-CLASS', submop, 'FORWARD-REFERENCED-CLASS').
-mop_direct('SUPER-CLASS', submop, 'POTENTIAL-CLASS').
-mop_direct('SUPER-CLASS', supers, ['STANDARD-STABLEHASH', 'METAOBJECT', obj_standard_object, t]).
-mop_direct('SUPER-CLASS', szlot, '$CLASSNAME').
-mop_direct('SUPER-CLASS', szlot, '$DIRECT-SUBCLASSES').
-mop_direct(obj_symbol, submop, 'NULL').
-mop_direct(obj_symbol, supers, [t]).
-mop_direct('SYMBOL-PACKAGE-LOCKED-ERROR', supers, ['PACKAGE-LOCK-VIOLATION', obj_package_error, 'ERROR', obj_serious_condition, 'REFERENCE-CONDITION', obj_simple_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('SYMBOL-PACKAGE-LOCKED-ERROR', szlot, 'SYMBOL').
-mop_direct('SYMBOL-VALUE-IN-THREAD-ERROR', supers, [obj_cell_error, 'THREAD-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('SYMBOL-VALUE-IN-THREAD-ERROR', szlot, 'INFO').
-mop_direct(obj_synonym_stream, supers, ['ANSI-STREAM', obj_stream, obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct(obj_synonym_stream, supers, [obj_stream, t]).
-mop_direct(obj_synonym_stream, szlot, 'BIN').
-mop_direct(obj_synonym_stream, szlot, 'BOUT').
-mop_direct(obj_synonym_stream, szlot, 'IN').
-mop_direct(obj_synonym_stream, szlot, 'MISC').
-mop_direct(obj_synonym_stream, szlot, 'N-BIN').
-mop_direct(obj_synonym_stream, szlot, 'OUT').
-mop_direct(obj_synonym_stream, szlot, 'SOUT').
-mop_direct(obj_synonym_stream, szlot, 'SYMBOL').
-mop_direct('SYSTEM-AREA-POINTER', supers, [t]).
-mop_direct('SYSTEM-CLASS', submop, obj_built_in_class).
-mop_direct('SYSTEM-CLASS', supers, ['PCL-CLASS', 'CLASS', 'DEPENDENT-UPDATE-MIXIN', 'PLIST-MIXIN', 'DEFINITION-SOURCE-MIXIN', 'STANDARD-SPECIALIZER', 'SPECIALIZER', 'METAOBJECT', obj_standard_object, 'SLOT-OBJECT', t]).
-mop_direct('SYSTEM-CONDITION', submop, 'BREAKPOINT-ERROR').
-mop_direct('SYSTEM-CONDITION', submop, 'INTERACTIVE-INTERRUPT').
-mop_direct('SYSTEM-CONDITION', submop, 'MEMORY-FAULT-ERROR').
-mop_direct('SYSTEM-CONDITION', supers, [obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('SYSTEM-CONDITION', szlot, 'ADDRESS').
-mop_direct('SYSTEM-CONDITION', szlot, 'CONTEXT').
-mop_direct('TAB', supers, ['QUEUED-OP', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('TAB', szlot, 'COLINC').
-mop_direct('TAB', szlot, 'COLNUM').
-mop_direct('TAB', szlot, 'RELATIVEP').
-mop_direct('TAB', szlot, 'SECTIONP').
-mop_direct('TAIL-SET', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('TAIL-SET', szlot, 'FUNS').
-mop_direct('TAIL-SET', szlot, 'INFO').
-mop_direct('TAIL-SET', szlot, 'TYPE').
-mop_direct('TEMPLATE', submop, 'VOP-INFO').
-mop_direct('TEMPLATE', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('TEMPLATE', szlot, 'ARG-TYPES').
-mop_direct('TEMPLATE', szlot, 'COST').
-mop_direct('TEMPLATE', szlot, 'GUARD').
-mop_direct('TEMPLATE', szlot, 'INFO-ARG-COUNT').
-mop_direct('TEMPLATE', szlot, 'LTN-POLICY').
-mop_direct('TEMPLATE', szlot, 'MORE-ARGS-TYPE').
-mop_direct('TEMPLATE', szlot, 'MORE-RESULTS-TYPE').
-mop_direct('TEMPLATE', szlot, 'NAME').
-mop_direct('TEMPLATE', szlot, 'NOTE').
-mop_direct('TEMPLATE', szlot, 'RESULT-TYPES').
-mop_direct('TEMPLATE', szlot, 'TYPE').
-mop_direct('THREAD', submop, 'FOREIGN-THREAD').
-mop_direct('THREAD', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('THREAD', szlot, '%ALIVE-P').
-mop_direct('THREAD', szlot, '%EPHEMERAL-P').
-mop_direct('THREAD', szlot, 'INTERRUPTIONS').
-mop_direct('THREAD', szlot, 'INTERRUPTIONS-LOCK').
-mop_direct('THREAD', szlot, 'NAME').
-mop_direct('THREAD', szlot, 'OS-THREAD').
-mop_direct('THREAD', szlot, 'RESULT').
-mop_direct('THREAD', szlot, 'RESULT-LOCK').
-mop_direct('THREAD', szlot, 'WAITING-FOR').
-mop_direct('THREAD-DEADLOCK', supers, ['THREAD-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('THREAD-DEADLOCK', szlot, 'CYCLE').
-mop_direct('THREAD-ERROR', submop, 'INTERRUPT-THREAD-ERROR').
-mop_direct('THREAD-ERROR', submop, 'JOIN-THREAD-ERROR').
-mop_direct('THREAD-ERROR', submop, 'SIMPLE-THREAD-ERROR').
-mop_direct('THREAD-ERROR', submop, 'SYMBOL-VALUE-IN-THREAD-ERROR').
-mop_direct('THREAD-ERROR', submop, 'THREAD-DEADLOCK').
-mop_direct('THREAD-ERROR', supers, ['ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('THREAD-ERROR', szlot, 'THREAD').
-mop_direct('TIME-INFO', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('TIME-INFO', szlot, 'CALLS').
-mop_direct('TIME-INFO', szlot, 'CONSING').
-mop_direct('TIME-INFO', szlot, 'GC-RUN-TIME').
-mop_direct('TIME-INFO', szlot, 'NAME').
-mop_direct('TIME-INFO', szlot, 'SECONDS').
-mop_direct('TIMEOUT', submop, 'DEADLINE-TIMEOUT').
-mop_direct('TIMEOUT', submop, 'IO-TIMEOUT').
-mop_direct('TIMEOUT', supers, [obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('TIMEOUT', szlot, 'SECONDS').
-mop_direct('TIMER', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('TIMER', szlot, 'CANCEL-FUNCTION').
-mop_direct('TIMER', szlot, 'CATCH-UP').
-mop_direct('TIMER', szlot, 'EXPIRE-TIME').
-mop_direct('TIMER', szlot, 'FUNCTION').
-mop_direct('TIMER', szlot, 'INTERRUPT-FUNCTION').
-mop_direct('TIMER', szlot, 'NAME').
-mop_direct('TIMER', szlot, 'REPEAT-INTERVAL').
-mop_direct('TIMER', szlot, 'THREAD').
-mop_direct('TN', supers, ['SSET-ELEMENT', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('TN', szlot, 'COST').
-mop_direct('TN', szlot, 'CURRENT-CONFLICT').
-mop_direct('TN', szlot, 'GLOBAL-CONFLICTS').
-mop_direct('TN', szlot, 'KIND').
-mop_direct('TN', szlot, 'LEAF').
-mop_direct('TN', szlot, 'LOCAL').
-mop_direct('TN', szlot, 'LOCAL-CONFLICTS').
-mop_direct('TN', szlot, 'LOCAL-NUMBER').
-mop_direct('TN', szlot, 'LOOP-DEPTH').
-mop_direct('TN', szlot, 'NEXT').
-mop_direct('TN', szlot, 'NEXT*').
-mop_direct('TN', szlot, 'OFFSET').
-mop_direct('TN', szlot, 'PHYSENV').
-mop_direct('TN', szlot, 'PRIMITIVE-TYPE').
-mop_direct('TN', szlot, 'READS').
-mop_direct('TN', szlot, 'SAVE-TN').
-mop_direct('TN', szlot, 'SC').
-mop_direct('TN', szlot, 'WRITES').
-mop_direct('TN-REF', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('TN-REF', szlot, 'ACROSS').
-mop_direct('TN-REF', szlot, 'LOAD-TN').
-mop_direct('TN-REF', szlot, 'NEXT').
-mop_direct('TN-REF', szlot, 'NEXT-REF').
-mop_direct('TN-REF', szlot, 'TARGET').
-mop_direct('TN-REF', szlot, 'TN').
-mop_direct('TN-REF', szlot, 'VOP').
-mop_direct('TN-REF', szlot, 'WRITE-P').
-mop_direct('TOKEN-BUF', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('TOKEN-BUF', szlot, 'ADJUSTABLE-STRING').
-mop_direct('TOKEN-BUF', szlot, 'CURSOR').
-mop_direct('TOKEN-BUF', szlot, 'ESCAPES').
-mop_direct('TOKEN-BUF', szlot, 'FILL-PTR').
-mop_direct('TOKEN-BUF', szlot, 'INITIAL-STRING').
-mop_direct('TOKEN-BUF', szlot, 'NEXT').
-mop_direct('TOKEN-BUF', szlot, 'ONLY-BASE-CHARS').
-mop_direct('TOKEN-BUF', szlot, 'STRING').
-mop_direct('TRACE-INFO', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('TRACE-INFO', szlot, 'BREAK').
-mop_direct('TRACE-INFO', szlot, 'BREAK-AFTER').
-mop_direct('TRACE-INFO', szlot, 'CONDITION').
-mop_direct('TRACE-INFO', szlot, 'CONDITION-AFTER').
-mop_direct('TRACE-INFO', szlot, 'ENCAPSULATED').
-mop_direct('TRACE-INFO', szlot, 'END-BREAKPOINT').
-mop_direct('TRACE-INFO', szlot, 'METHODS').
-mop_direct('TRACE-INFO', szlot, 'NAMED').
-mop_direct('TRACE-INFO', szlot, 'PRINT').
-mop_direct('TRACE-INFO', szlot, 'PRINT-AFTER').
-mop_direct('TRACE-INFO', szlot, 'START-BREAKPOINT').
-mop_direct('TRACE-INFO', szlot, 'UNTRACED').
-mop_direct('TRACE-INFO', szlot, 'WHAT').
-mop_direct('TRACE-INFO', szlot, 'WHEREIN').
-mop_direct('TRANSFORM', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('TRANSFORM', szlot, 'FUNCTION').
-mop_direct('TRANSFORM', szlot, 'IMPORTANT').
-mop_direct('TRANSFORM', szlot, 'NOTE').
-mop_direct('TRANSFORM', szlot, 'TYPE').
-mop_direct('TWO-CLASS', supers, ['ONE-CLASS', 'ONE-INDEX-DFUN-INFO', 'ACCESSOR-DFUN-INFO', 'DFUN-INFO', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('TWO-CLASS', szlot, 'WRAPPER1').
-mop_direct(obj_two_way_stream, submop, obj_echo_stream).
-mop_direct(obj_two_way_stream, supers, ['ANSI-STREAM', obj_stream, obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct(obj_two_way_stream, supers, [obj_stream, t]).
-mop_direct(obj_two_way_stream, szlot, 'BIN').
-mop_direct(obj_two_way_stream, szlot, 'BOUT').
-mop_direct(obj_two_way_stream, szlot, 'IN').
-mop_direct(obj_two_way_stream, szlot, 'INPUT-STREAM').
-mop_direct(obj_two_way_stream, szlot, 'MISC').
-mop_direct(obj_two_way_stream, szlot, 'N-BIN').
-mop_direct(obj_two_way_stream, szlot, 'OUT').
-mop_direct(obj_two_way_stream, szlot, 'OUTPUT-STREAM').
-mop_direct(obj_two_way_stream, szlot, 'SOUT').
-mop_direct('TYPE-CLASS', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('TYPE-CLASS', szlot, 'COMPLEX-=').
-mop_direct('TYPE-CLASS', szlot, 'COMPLEX-INTERSECTION2').
-mop_direct('TYPE-CLASS', szlot, 'COMPLEX-SUBTYPEP-ARG1').
-mop_direct('TYPE-CLASS', szlot, 'COMPLEX-SUBTYPEP-ARG2').
-mop_direct('TYPE-CLASS', szlot, 'COMPLEX-UNION2').
-mop_direct('TYPE-CLASS', szlot, 'ENUMERABLE-P').
-mop_direct('TYPE-CLASS', szlot, 'MIGHT-CONTAIN-OTHER-TYPES-P').
-mop_direct('TYPE-CLASS', szlot, 'NAME').
-mop_direct('TYPE-CLASS', szlot, 'NEGATE').
-mop_direct('TYPE-CLASS', szlot, 'SIMPLE-=').
-mop_direct('TYPE-CLASS', szlot, 'SIMPLE-INTERSECTION2').
-mop_direct('TYPE-CLASS', szlot, 'SIMPLE-SUBTYPEP').
-mop_direct('TYPE-CLASS', szlot, 'SIMPLE-UNION2').
-mop_direct('TYPE-CLASS', szlot, 'SINGLETON-P').
-mop_direct('TYPE-CLASS', szlot, 'UNPARSE').
-mop_direct(obj_type_error, submop, 'ARGUMENT-LIST-DOTTED').
-mop_direct(obj_type_error, submop, 'BOUNDING-INDICES-BAD-ERROR').
-mop_direct(obj_type_error, submop, 'CASE-FAILURE').
-mop_direct(obj_type_error, submop, 'CHARSET-TYPE-ERROR').
-mop_direct(obj_type_error, submop, 'INDEX-TOO-LARGE-ERROR').
-mop_direct(obj_type_error, submop, 'INVALID-ARRAY-ERROR').
-mop_direct(obj_type_error, submop, 'INVALID-ARRAY-INDEX-ERROR').
-mop_direct(obj_type_error, submop, 'KEYWORD-ERROR').
-mop_direct(obj_type_error, submop, 'LAYOUT-INVALID').
-mop_direct(obj_type_error, submop, 'MACROEXPAND-HOOK-TYPE-ERROR').
-mop_direct(obj_type_error, submop, 'NIL-ARRAY-ACCESSED-ERROR').
-mop_direct(obj_type_error, submop, 'PROTOCOL-UNIMPLEMENTED').
-mop_direct(obj_type_error, submop, obj_simple_type_error).
-mop_direct(obj_type_error, submop, 'SLOTD-INITIALIZATION-TYPE-ERROR').
-mop_direct(obj_type_error, supers, ['ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_type_error, supers, ['ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct(obj_type_error, szlot, '$DATUM').
-mop_direct(obj_type_error, szlot, '$EXPECTED-TYPE').
-mop_direct(obj_type_error, szlot, 'DATUM').
-mop_direct(obj_type_error, szlot, 'EXPECTED-TYPE').
-mop_direct('TYPE-PROCLAMATION-MISMATCH', submop, 'TYPE-PROCLAMATION-MISMATCH-WARNING').
-mop_direct('TYPE-PROCLAMATION-MISMATCH', supers, ['PROCLAMATION-MISMATCH', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('TYPE-PROCLAMATION-MISMATCH-WARNING', supers, [obj_style_warning, obj_warning, 'TYPE-PROCLAMATION-MISMATCH', 'PROCLAMATION-MISMATCH', obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('TYPE-STYLE-WARNING', supers, ['REFERENCE-CONDITION', 'SIMPLE-STYLE-WARNING', obj_simple_condition, obj_style_warning, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('TYPE-WARNING', supers, ['REFERENCE-CONDITION', obj_simple_warning, obj_simple_condition, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('UNAME', supers, [obj_structure_object, t]).
-mop_direct('UNAME', szlot, 'MACHINE').
-mop_direct('UNAME', szlot, 'NODENAME').
-mop_direct('UNAME', szlot, 'RELEASE').
-mop_direct('UNAME', szlot, 'SYSNAME').
-mop_direct('UNAME', szlot, 'VERSION').
-mop_direct(obj_unbound_slot, submop, 'SIMPLE-UNBOUND-SLOT').
-mop_direct(obj_unbound_slot, supers, [obj_cell_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_unbound_slot, supers, [obj_cell_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct(obj_unbound_slot, szlot, '$INSTANCE').
-mop_direct(obj_unbound_slot, szlot, 'INSTANCE').
-mop_direct(obj_unbound_variable, submop, 'SIMPLE-UNBOUND-VARIABLE').
-mop_direct(obj_unbound_variable, supers, [obj_cell_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_unbound_variable, supers, [obj_cell_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('UNDEFINED-ALIEN-ERROR', submop, 'UNDEFINED-ALIEN-FUNCTION-ERROR').
-mop_direct('UNDEFINED-ALIEN-ERROR', submop, 'UNDEFINED-ALIEN-VARIABLE-ERROR').
-mop_direct('UNDEFINED-ALIEN-ERROR', supers, [obj_cell_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('UNDEFINED-ALIEN-FUNCTION-ERROR', supers, ['UNDEFINED-ALIEN-ERROR', obj_cell_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('UNDEFINED-ALIEN-STYLE-WARNING', supers, [obj_style_warning, obj_warning, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('UNDEFINED-ALIEN-STYLE-WARNING', szlot, 'SYMBOL').
-mop_direct('UNDEFINED-ALIEN-VARIABLE-ERROR', supers, ['UNDEFINED-ALIEN-ERROR', obj_cell_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('UNDEFINED-CLASSOID', supers, ['CLASSOID', 'CTYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct(obj_undefined_function, submop, 'SIMPLE-UNDEFINED-FUNCTION').
-mop_direct(obj_undefined_function, submop, 'SPECIAL-FORM-FUNCTION').
-mop_direct(obj_undefined_function, supers, [obj_cell_error, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_undefined_function, supers, [obj_cell_error, 'ERROR', obj_serious_condition, obj_condition, obj_standard_object, t]).
-mop_direct('UNDEFINED-PACKAGE', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('UNDEFINED-PACKAGE', szlot, 'ERROR').
-mop_direct('UNDEFINED-WARNING', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('UNDEFINED-WARNING', szlot, 'COUNT').
-mop_direct('UNDEFINED-WARNING', szlot, 'KIND').
-mop_direct('UNDEFINED-WARNING', szlot, 'NAME').
-mop_direct('UNDEFINED-WARNING', szlot, 'WARNINGS').
-mop_direct('UNHANDLED-DEBUG-CONDITION', supers, ['DEBUG-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('UNHANDLED-DEBUG-CONDITION', szlot, 'CONDITION').
-mop_direct('UNION-TYPE', supers, ['COMPOUND-TYPE', 'CTYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('UNION-TYPE', szlot, 'CLASS-INFO').
-mop_direct('UNIX-HOST', supers, ['HOST', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('UNIX-HOST', szlot, 'CUSTOMARY-CASE').
-mop_direct('UNIX-HOST', szlot, 'PARSE').
-mop_direct('UNIX-HOST', szlot, 'PARSE-NATIVE').
-mop_direct('UNIX-HOST', szlot, 'SIMPLIFY-NAMESTRING').
-mop_direct('UNIX-HOST', szlot, 'UNPARSE').
-mop_direct('UNIX-HOST', szlot, 'UNPARSE-DIRECTORY').
-mop_direct('UNIX-HOST', szlot, 'UNPARSE-DIRECTORY-SEPARATOR').
-mop_direct('UNIX-HOST', szlot, 'UNPARSE-ENOUGH').
-mop_direct('UNIX-HOST', szlot, 'UNPARSE-FILE').
-mop_direct('UNIX-HOST', szlot, 'UNPARSE-HOST').
-mop_direct('UNIX-HOST', szlot, 'UNPARSE-NATIVE').
-mop_direct('UNKNOWN-CODE-LOCATION', supers, ['DEBUG-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('UNKNOWN-CODE-LOCATION', szlot, 'CODE-LOCATION').
-mop_direct('UNKNOWN-DEBUG-VAR', supers, ['DEBUG-ERROR', 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('UNKNOWN-DEBUG-VAR', szlot, 'DEBUG-FUN').
-mop_direct('UNKNOWN-DEBUG-VAR', szlot, 'DEBUG-VAR').
-mop_direct('UNKNOWN-TYPE', supers, ['HAIRY-TYPE', 'CTYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('UNPRINTABLE-OBJECT', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('UNPRINTABLE-OBJECT', szlot, 'STRING').
-mop_direct('UNSET-FUNCALLABLE-INSTANCE-FUNCTION', supers, ['REFERENCE-CONDITION', obj_simple_error, obj_simple_condition, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('UNSUPPORTED-OPERATOR', supers, [obj_simple_error, obj_simple_condition, 'ERROR', obj_serious_condition, obj_condition, 'SLOT-OBJECT', t]).
-mop_direct('USAGE', supers, [obj_structure_object, t]).
-mop_direct('USAGE', szlot, 'BLOCKS-INPUT').
-mop_direct('USAGE', szlot, 'BLOCKS-OUTPUT').
-mop_direct('USAGE', szlot, 'CONTEXT-SWITCHES-INVOLUNTARY').
-mop_direct('USAGE', szlot, 'CONTEXT-SWITCHES-VOLUNTARY').
-mop_direct('USAGE', szlot, 'DATA-MEMORY').
-mop_direct('USAGE', szlot, 'MAJOR-PAGE-FAULTS').
-mop_direct('USAGE', szlot, 'MAX-RSS').
-mop_direct('USAGE', szlot, 'MESSAGES-RECEIVED').
-mop_direct('USAGE', szlot, 'MESSAGES-SENT').
-mop_direct('USAGE', szlot, 'MINOR-PAGE-FAULTS').
-mop_direct('USAGE', szlot, 'NUM-SWAPS').
-mop_direct('USAGE', szlot, 'SHARED-MEMORY').
-mop_direct('USAGE', szlot, 'SIGNALS').
-mop_direct('USAGE', szlot, 'STACK-MEMORY').
-mop_direct('USAGE', szlot, 'SYSTEM-TIME').
-mop_direct('USAGE', szlot, 'USER-TIME').
-mop_direct('USER-INFO', supers, [obj_structure_object, t]).
-mop_direct('USER-INFO', szlot, 'FULL-NAME').
-mop_direct('USER-INFO', szlot, 'GID').
-mop_direct('USER-INFO', szlot, 'HOME-DIR').
-mop_direct('USER-INFO', szlot, 'LOGIN-ID').
-mop_direct('USER-INFO', szlot, 'PASSWD').
-mop_direct('USER-INFO', szlot, 'SHELL').
-mop_direct('USER-INFO', szlot, 'UID').
-mop_direct('UTMPX', supers, [obj_structure_object, t]).
-mop_direct('UTMPX', szlot, 'HOST').
-mop_direct('UTMPX', szlot, 'ID').
-mop_direct('UTMPX', szlot, 'LINE').
-mop_direct('UTMPX', szlot, 'PID').
-mop_direct('UTMPX', szlot, 'TV').
-mop_direct('UTMPX', szlot, 'TYPE').
-mop_direct('UTMPX', szlot, 'USER').
-mop_direct('VALSRC', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('VALSRC', szlot, 'SOURCE').
-mop_direct('VALSRC', szlot, 'VALUE').
-mop_direct('VALUED-NODE', submop, 'BASIC-COMBINATION').
-mop_direct('VALUED-NODE', submop, 'CAST').
-mop_direct('VALUED-NODE', submop, 'CSET').
-mop_direct('VALUED-NODE', submop, 'EXIT').
-mop_direct('VALUED-NODE', submop, 'REF').
-mop_direct('VALUED-NODE', supers, ['NODE', 'SSET-ELEMENT', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('VALUED-NODE', szlot, 'DERIVED-TYPE').
-mop_direct('VALUED-NODE', szlot, 'LVAR').
-mop_direct('VALUES-TYPE', supers, ['ARGS-TYPE', 'CTYPE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('VALUES-TYPE', szlot, 'CLASS-INFO').
-mop_direct('VAR', supers, [obj_structure_object, t]).
-mop_direct('VAR', szlot, 'ASSIGNEDP').
-mop_direct('VAR', szlot, 'CLOSUREP').
-mop_direct('VAR', szlot, 'CONSTANT').
-mop_direct('VAR', szlot, 'CONSTANTP').
-mop_direct('VAR', szlot, 'FNODE').
-mop_direct('VAR', szlot, 'FOR-VALUE-USEDP').
-mop_direct('VAR', szlot, 'MODIFIED-LIST').
-mop_direct('VAR', szlot, 'NAME').
-mop_direct('VAR', szlot, 'REALLY-USEDP').
-mop_direct('VAR', szlot, 'REPLACEABLE-LIST').
-mop_direct('VAR', szlot, 'SPECIALP').
-mop_direct('VAR', szlot, 'STACKZ').
-mop_direct('VAR', szlot, 'USEDP').
-mop_direct('VAR', szlot, 'VENVC').
-mop_direct(obj_vector, submop, obj_bit_vector).
-mop_direct(obj_vector, submop, 'SIMPLE-ARRAY-COMPLEX-DOUBLE-FLOAT').
-mop_direct(obj_vector, submop, 'SIMPLE-ARRAY-COMPLEX-SINGLE-FLOAT').
-mop_direct(obj_vector, submop, 'SIMPLE-ARRAY-DOUBLE-FLOAT').
-mop_direct(obj_vector, submop, 'SIMPLE-ARRAY-FIXNUM').
-mop_direct(obj_vector, submop, 'SIMPLE-ARRAY-SIGNED-BYTE-16').
-mop_direct(obj_vector, submop, 'SIMPLE-ARRAY-SIGNED-BYTE-32').
-mop_direct(obj_vector, submop, 'SIMPLE-ARRAY-SIGNED-BYTE-64').
-mop_direct(obj_vector, submop, 'SIMPLE-ARRAY-SIGNED-BYTE-8').
-mop_direct(obj_vector, submop, 'SIMPLE-ARRAY-SINGLE-FLOAT').
-mop_direct(obj_vector, submop, 'SIMPLE-ARRAY-UNSIGNED-BYTE-15').
-mop_direct(obj_vector, submop, 'SIMPLE-ARRAY-UNSIGNED-BYTE-16').
-mop_direct(obj_vector, submop, 'SIMPLE-ARRAY-UNSIGNED-BYTE-2').
-mop_direct(obj_vector, submop, 'SIMPLE-ARRAY-UNSIGNED-BYTE-31').
-mop_direct(obj_vector, submop, 'SIMPLE-ARRAY-UNSIGNED-BYTE-32').
-mop_direct(obj_vector, submop, 'SIMPLE-ARRAY-UNSIGNED-BYTE-4').
-mop_direct(obj_vector, submop, 'SIMPLE-ARRAY-UNSIGNED-BYTE-63').
-mop_direct(obj_vector, submop, 'SIMPLE-ARRAY-UNSIGNED-BYTE-64').
-mop_direct(obj_vector, submop, 'SIMPLE-ARRAY-UNSIGNED-BYTE-7').
-mop_direct(obj_vector, submop, 'SIMPLE-ARRAY-UNSIGNED-BYTE-8').
-mop_direct(obj_vector, submop, 'SIMPLE-ARRAY-UNSIGNED-FIXNUM').
-mop_direct(obj_vector, submop, obj_simple_vector).
-mop_direct(obj_vector, submop, obj_string).
-mop_direct(obj_vector, supers, [obj_array, 'SEQUENCE', t]).
-mop_direct('VECTOR-NIL', submop, 'SIMPLE-ARRAY-NIL').
-mop_direct('VECTOR-NIL', supers, [obj_string, obj_vector, obj_array, 'SEQUENCE', t]).
-mop_direct('VERTEX', supers, ['SSET-ELEMENT', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('VERTEX', szlot, 'COLOR').
-mop_direct('VERTEX', szlot, 'INCIDENCE').
-mop_direct('VERTEX', szlot, 'INITIAL-DOMAIN').
-mop_direct('VERTEX', szlot, 'INITIAL-DOMAIN-SIZE').
-mop_direct('VERTEX', szlot, 'INVISIBLE').
-mop_direct('VERTEX', szlot, 'PACK-TYPE').
-mop_direct('VERTEX', szlot, 'SPILL-COST').
-mop_direct('VERTEX', szlot, 'TN').
-mop_direct('VOP', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('VOP', szlot, 'ARGS').
-mop_direct('VOP', szlot, 'BLOCK').
-mop_direct('VOP', szlot, 'CODEGEN-INFO').
-mop_direct('VOP', szlot, 'INFO').
-mop_direct('VOP', szlot, 'NEXT').
-mop_direct('VOP', szlot, 'NODE').
-mop_direct('VOP', szlot, 'PREV').
-mop_direct('VOP', szlot, 'REFS').
-mop_direct('VOP', szlot, 'RESULTS').
-mop_direct('VOP', szlot, 'SAVE-SET').
-mop_direct('VOP', szlot, 'TEMPS').
-mop_direct('VOP-INFO', supers, ['TEMPLATE', 'STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('VOP-INFO', szlot, 'AFFECTED').
-mop_direct('VOP-INFO', szlot, 'ARG-COSTS').
-mop_direct('VOP-INFO', szlot, 'ARG-LOAD-SCS').
-mop_direct('VOP-INFO', szlot, 'EFFECTS').
-mop_direct('VOP-INFO', szlot, 'GENERATOR-FUNCTION').
-mop_direct('VOP-INFO', szlot, 'MORE-ARG-COSTS').
-mop_direct('VOP-INFO', szlot, 'MORE-RESULT-COSTS').
-mop_direct('VOP-INFO', szlot, 'MOVE-ARGS').
-mop_direct('VOP-INFO', szlot, 'NUM-ARGS').
-mop_direct('VOP-INFO', szlot, 'NUM-RESULTS').
-mop_direct('VOP-INFO', szlot, 'REF-ORDERING').
-mop_direct('VOP-INFO', szlot, 'RESULT-COSTS').
-mop_direct('VOP-INFO', szlot, 'RESULT-LOAD-SCS').
-mop_direct('VOP-INFO', szlot, 'SAVE-P').
-mop_direct('VOP-INFO', szlot, 'TARGETS').
-mop_direct('VOP-INFO', szlot, 'TEMPS').
-mop_direct('VOP-INFO', szlot, 'VARIANT').
-mop_direct('VOP-PARSE', supers, ['STRUCTURE_bang_OBJECT', obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('VOP-PARSE', szlot, 'AFFECTED').
-mop_direct('VOP-PARSE', szlot, 'ARG-TYPES').
-mop_direct('VOP-PARSE', szlot, 'ARGS').
-mop_direct('VOP-PARSE', szlot, 'BODY').
-mop_direct('VOP-PARSE', szlot, 'CONDITIONAL-P').
-mop_direct('VOP-PARSE', szlot, 'COST').
-mop_direct('VOP-PARSE', szlot, 'EFFECTS').
-mop_direct('VOP-PARSE', szlot, 'GUARD').
-mop_direct('VOP-PARSE', szlot, 'IGNORES').
-mop_direct('VOP-PARSE', szlot, 'INFO-ARGS').
-mop_direct('VOP-PARSE', szlot, 'INHERITS').
-mop_direct('VOP-PARSE', szlot, 'LTN-POLICY').
-mop_direct('VOP-PARSE', szlot, 'MORE-ARGS').
-mop_direct('VOP-PARSE', szlot, 'MORE-RESULTS').
-mop_direct('VOP-PARSE', szlot, 'MOVE-ARGS').
-mop_direct('VOP-PARSE', szlot, 'NAME').
-mop_direct('VOP-PARSE', szlot, 'NODE-VAR').
-mop_direct('VOP-PARSE', szlot, 'NOTE').
-mop_direct('VOP-PARSE', szlot, 'OPERANDS').
-mop_direct('VOP-PARSE', szlot, 'RESULT-TYPES').
-mop_direct('VOP-PARSE', szlot, 'RESULTS').
-mop_direct('VOP-PARSE', szlot, 'SAVE-P').
-mop_direct('VOP-PARSE', szlot, 'TEMPS').
-mop_direct('VOP-PARSE', szlot, 'TRANSLATE').
-mop_direct('VOP-PARSE', szlot, 'VARIANT').
-mop_direct('VOP-PARSE', szlot, 'VARIANT-VARS').
-mop_direct('VOP-PARSE', szlot, 'VOP-VAR').
-mop_direct('WAITQUEUE', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('WAITQUEUE', szlot, 'NAME').
-mop_direct('WAITQUEUE', szlot, 'TOKEN').
-mop_direct(obj_warning, submop, 'CLOS-WARNING').
-mop_direct(obj_warning, submop, 'CONSTANT-MODIFIED').
-mop_direct(obj_warning, submop, 'DUPLICATE-DEFINITION').
-mop_direct(obj_warning, submop, 'FINAL-DEPRECATION-WARNING').
-mop_direct(obj_warning, submop, 'LATE-DEPRECATION-WARNING').
-mop_direct(obj_warning, submop, obj_simple_warning).
-mop_direct(obj_warning, submop, obj_style_warning).
-mop_direct(obj_warning, supers, [obj_condition, 'SLOT-OBJECT', t]).
-mop_direct(obj_warning, supers, [obj_condition, obj_standard_object, t]).
-mop_direct('WEAK-POINTER', supers, [t]).
-mop_direct('XSET', supers, [obj_structure_object, 'SLOT-OBJECT', t]).
-mop_direct('XSET', szlot, 'DATA').
-mop_direct('XSET', szlot, 'LIST-SIZE').
-mop_direct(t, precedance, obj_nil).
-mop_direct(t, supers, obj_nil).
-mop_direct(t, submop, obj_array).
-mop_direct(t, submop, obj_character).
-mop_direct(t, submop, 'CODE-COMPONENT').
-mop_direct(t, submop, 'FDEFN').
-mop_direct(t, submop, obj_function).
-mop_direct(t, submop, obj_hash_table).
-mop_direct(t, submop, 'LRA').
-mop_direct(t, submop, 'NUMBER').
-mop_direct(t, submop, obj_package).
-mop_direct(t, submop, obj_pathname).
-mop_direct(t, submop, 'RANDOM-CLASS').
-mop_direct(t, submop, obj_random_state).
-mop_direct(t, submop, obj_readtable).
-mop_direct(t, submop, 'SEQUENCE').
-mop_direct(t, submop, 'SIMD-PACK').
-mop_direct(t, submop, 'SLOT-OBJECT').
-mop_direct(t, submop, obj_standard_object).
-mop_direct(t, submop, obj_stream).
-mop_direct(t, submop, obj_structure_object).
-mop_direct(t, submop, obj_symbol).
-mop_direct(t, submop, 'SYSTEM-AREA-POINTER').
-mop_direct(t, submop, 'WEAK-POINTER').
-
-:- fixup_exports.
-
-
-
+struct_opv(claz_abort_failure,subtypep,claz_control_error).
+struct_opv(claz_abort_failure,super_priority,[claz_control_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_abort_failure,typeof,type_builtin_type).
+struct_opv(claz_abstract_lexenv,subtypep,claz_structure_object).
+struct_opv(claz_abstract_lexenv,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_abstract_lexenv,typeof,type_builtin_type).
+struct_opv(claz_accessor_dfun_info,has_slot,slot(claz_t,"accessor_type")).
+struct_opv(claz_accessor_dfun_info,subtypep,claz_dfun_info).
+struct_opv(claz_accessor_dfun_info,super_priority,[claz_dfun_info,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_accessor_dfun_info,typeof,type_class).
+struct_opv(claz_accessor_dfun_info,typeof,type_builtin_type).
+struct_opv(claz_accessor_method,has_slot,slot(claz_t,"slot_name")).
+struct_opv(claz_accessor_method,subtypep,claz_standard_method).
+struct_opv(claz_accessor_method,super_priority,[claz_standard_method,claz_plist_mixin,claz_definition_source_mixin,claz_method,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_accessor_method,typeof,type_class).
+struct_opv(claz_accessor_method,typeof,type_builtin_type).
+struct_opv(claz_alien_alien_value_type,has_slot,slot(claz_t,"class")).
+struct_opv(claz_alien_alien_value_type,subtypep,claz_alien_system_area_pointer_type).
+struct_opv(claz_alien_alien_value_type,super_priority,[claz_alien_system_area_pointer_type,claz_alien_type,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_alien_alien_value_type,typeof,type_class).
+struct_opv(claz_alien_alien_value_type,typeof,type_builtin_type).
+struct_opv(claz_alien_array_type,has_slot,slot(claz_t,"class")).
+struct_opv(claz_alien_array_type,has_slot,slot(claz_t,"dimensions")).
+struct_opv(claz_alien_array_type,has_slot,slot(claz_t,"element_type")).
+struct_opv(claz_alien_array_type,subtypep,claz_alien_mem_block_type).
+struct_opv(claz_alien_array_type,super_priority,[claz_alien_mem_block_type,claz_alien_alien_value_type,claz_alien_system_area_pointer_type,claz_alien_type,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_alien_array_type,typeof,type_class).
+struct_opv(claz_alien_array_type,typeof,type_builtin_type).
+struct_opv(claz_alien_boolean_type,has_slot,slot(claz_t,"class")).
+struct_opv(claz_alien_boolean_type,subtypep,claz_alien_integer_type).
+struct_opv(claz_alien_boolean_type,super_priority,[claz_alien_integer_type,claz_alien_type,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_alien_boolean_type,typeof,type_class).
+struct_opv(claz_alien_boolean_type,typeof,type_builtin_type).
+struct_opv(claz_alien_c_string_type,has_slot,slot(claz_t,"class")).
+struct_opv(claz_alien_c_string_type,has_slot,slot(claz_t,"element_type")).
+struct_opv(claz_alien_c_string_type,has_slot,slot(claz_t,"external_format")).
+struct_opv(claz_alien_c_string_type,has_slot,slot(claz_t,"not_null")).
+struct_opv(claz_alien_c_string_type,subtypep,claz_alien_pointer_type).
+struct_opv(claz_alien_c_string_type,super_priority,[claz_alien_pointer_type,claz_alien_alien_value_type,claz_alien_system_area_pointer_type,claz_alien_type,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_alien_c_string_type,typeof,type_class).
+struct_opv(claz_alien_c_string_type,typeof,type_builtin_type).
+struct_opv(claz_alien_double_float_type,has_slot,slot(claz_t,"bits")).
+struct_opv(claz_alien_double_float_type,has_slot,slot(claz_t,"class")).
+struct_opv(claz_alien_double_float_type,subtypep,claz_alien_float_type).
+struct_opv(claz_alien_double_float_type,super_priority,[claz_alien_float_type,claz_alien_type,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_alien_double_float_type,typeof,type_class).
+struct_opv(claz_alien_double_float_type,typeof,type_builtin_type).
+struct_opv(claz_alien_enum_type,has_slot,slot(claz_t,"bits")).
+struct_opv(claz_alien_enum_type,has_slot,slot(claz_t,"class")).
+struct_opv(claz_alien_enum_type,has_slot,slot(claz_t,"from")).
+struct_opv(claz_alien_enum_type,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_alien_enum_type,has_slot,slot(claz_t,"name")).
+struct_opv(claz_alien_enum_type,has_slot,slot(claz_t,"offset")).
+struct_opv(claz_alien_enum_type,has_slot,slot(claz_t,"to")).
+struct_opv(claz_alien_enum_type,subtypep,claz_alien_integer_type).
+struct_opv(claz_alien_enum_type,super_priority,[claz_alien_integer_type,claz_alien_type,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_alien_enum_type,typeof,type_class).
+struct_opv(claz_alien_enum_type,typeof,type_builtin_type).
+struct_opv(claz_alien_float_type,has_slot,slot(claz_t,"class")).
+struct_opv(claz_alien_float_type,has_slot,slot(claz_t,"type")).
+struct_opv(claz_alien_float_type,subtypep,claz_alien_type).
+struct_opv(claz_alien_float_type,super_priority,[claz_alien_type,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_alien_float_type,typeof,type_class).
+struct_opv(claz_alien_float_type,typeof,type_builtin_type).
+struct_opv(claz_alien_fun_type,has_slot,slot(claz_t,"arg_types")).
+struct_opv(claz_alien_fun_type,has_slot,slot(claz_t,"class")).
+struct_opv(claz_alien_fun_type,has_slot,slot(claz_t,"convention")).
+struct_opv(claz_alien_fun_type,has_slot,slot(claz_t,"result_type")).
+struct_opv(claz_alien_fun_type,has_slot,slot(claz_t,"stub")).
+struct_opv(claz_alien_fun_type,subtypep,claz_alien_mem_block_type).
+struct_opv(claz_alien_fun_type,super_priority,[claz_alien_mem_block_type,claz_alien_alien_value_type,claz_alien_system_area_pointer_type,claz_alien_type,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_alien_fun_type,typeof,type_class).
+struct_opv(claz_alien_fun_type,typeof,type_builtin_type).
+struct_opv(claz_alien_integer_type,has_slot,slot(claz_t,"class")).
+struct_opv(claz_alien_integer_type,has_slot,slot(claz_t,"signed")).
+struct_opv(claz_alien_integer_type,subtypep,claz_alien_type).
+struct_opv(claz_alien_integer_type,super_priority,[claz_alien_type,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_alien_integer_type,typeof,type_class).
+struct_opv(claz_alien_integer_type,typeof,type_builtin_type).
+struct_opv(claz_alien_mem_block_type,has_slot,slot(claz_t,"class")).
+struct_opv(claz_alien_mem_block_type,subtypep,claz_alien_alien_value_type).
+struct_opv(claz_alien_mem_block_type,super_priority,[claz_alien_alien_value_type,claz_alien_system_area_pointer_type,claz_alien_type,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_alien_mem_block_type,typeof,type_class).
+struct_opv(claz_alien_mem_block_type,typeof,type_builtin_type).
+struct_opv(claz_alien_pointer_type,has_slot,slot(claz_t,"bits")).
+struct_opv(claz_alien_pointer_type,has_slot,slot(claz_t,"class")).
+struct_opv(claz_alien_pointer_type,has_slot,slot(claz_t,"to")).
+struct_opv(claz_alien_pointer_type,subtypep,claz_alien_alien_value_type).
+struct_opv(claz_alien_pointer_type,super_priority,[claz_alien_alien_value_type,claz_alien_system_area_pointer_type,claz_alien_type,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_alien_pointer_type,typeof,type_class).
+struct_opv(claz_alien_pointer_type,typeof,type_builtin_type).
+struct_opv(claz_alien_record_field,has_slot,slot(claz_t,"bits")).
+struct_opv(claz_alien_record_field,has_slot,slot(claz_t,"name")).
+struct_opv(claz_alien_record_field,has_slot,slot(claz_t,"offset")).
+struct_opv(claz_alien_record_field,has_slot,slot(claz_t,"type")).
+struct_opv(claz_alien_record_field,subtypep,claz_structure_c33_object).
+struct_opv(claz_alien_record_field,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_alien_record_field,typeof,type_class).
+struct_opv(claz_alien_record_field,typeof,type_builtin_type).
+struct_opv(claz_alien_record_type,has_slot,slot(claz_t,"class")).
+struct_opv(claz_alien_record_type,has_slot,slot(claz_t,"fields")).
+struct_opv(claz_alien_record_type,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_alien_record_type,has_slot,slot(claz_t,"name")).
+struct_opv(claz_alien_record_type,subtypep,claz_alien_mem_block_type).
+struct_opv(claz_alien_record_type,super_priority,[claz_alien_mem_block_type,claz_alien_alien_value_type,claz_alien_system_area_pointer_type,claz_alien_type,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_alien_record_type,typeof,type_class).
+struct_opv(claz_alien_record_type,typeof,type_builtin_type).
+struct_opv(claz_alien_single_float_type,has_slot,slot(claz_t,"bits")).
+struct_opv(claz_alien_single_float_type,has_slot,slot(claz_t,"class")).
+struct_opv(claz_alien_single_float_type,subtypep,claz_alien_float_type).
+struct_opv(claz_alien_single_float_type,super_priority,[claz_alien_float_type,claz_alien_type,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_alien_single_float_type,typeof,type_class).
+struct_opv(claz_alien_single_float_type,typeof,type_builtin_type).
+struct_opv(claz_alien_stack_exhausted,subtypep,claz_storage_condition).
+struct_opv(claz_alien_stack_exhausted,super_priority,[claz_storage_condition,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_alien_stack_exhausted,typeof,type_builtin_type).
+struct_opv(claz_alien_system_area_pointer_type,has_slot,slot(claz_t,"class")).
+struct_opv(claz_alien_system_area_pointer_type,subtypep,claz_alien_type).
+struct_opv(claz_alien_system_area_pointer_type,super_priority,[claz_alien_type,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_alien_system_area_pointer_type,typeof,type_class).
+struct_opv(claz_alien_system_area_pointer_type,typeof,type_builtin_type).
+struct_opv(claz_alien_type,has_slot,slot(claz_t,"alignment")).
+struct_opv(claz_alien_type,has_slot,slot(claz_t,"bits")).
+struct_opv(claz_alien_type,has_slot,slot(claz_t,"class")).
+struct_opv(claz_alien_type,subtypep,claz_structure_c33_object).
+struct_opv(claz_alien_type,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_alien_type,typeof,type_class).
+struct_opv(claz_alien_type,typeof,type_builtin_type).
+struct_opv(claz_alien_type_class,has_slot,slot(claz_t,"alien_rep")).
+struct_opv(claz_alien_type_class,has_slot,slot(claz_t,"arg_tn")).
+struct_opv(claz_alien_type_class,has_slot,slot(claz_t,"defstruct_name")).
+struct_opv(claz_alien_type_class,has_slot,slot(claz_t,"deport_alloc_gen")).
+struct_opv(claz_alien_type_class,has_slot,slot(claz_t,"deport_gen")).
+struct_opv(claz_alien_type_class,has_slot,slot(claz_t,"deport_pin_p")).
+struct_opv(claz_alien_type_class,has_slot,slot(claz_t,"deposit_gen")).
+struct_opv(claz_alien_type_class,has_slot,slot(claz_t,"extract_gen")).
+struct_opv(claz_alien_type_class,has_slot,slot(claz_t,"include")).
+struct_opv(claz_alien_type_class,has_slot,slot(claz_t,"lisp_rep")).
+struct_opv(claz_alien_type_class,has_slot,slot(claz_t,"name")).
+struct_opv(claz_alien_type_class,has_slot,slot(claz_t,"naturalize_gen")).
+struct_opv(claz_alien_type_class,has_slot,slot(claz_t,"result_tn")).
+struct_opv(claz_alien_type_class,has_slot,slot(claz_t,"subtypep")).
+struct_opv(claz_alien_type_class,has_slot,slot(claz_t,"type_c61")).
+struct_opv(claz_alien_type_class,has_slot,slot(claz_t,"unparse")).
+struct_opv(claz_alien_type_class,subtypep,claz_structure_object).
+struct_opv(claz_alien_type_class,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_alien_type_class,typeof,type_class).
+struct_opv(claz_alien_type_class,typeof,type_builtin_type).
+struct_opv(claz_alien_type_builtin_type,has_slot,slot(claz_t,"alien_type")).
+struct_opv(claz_alien_type_builtin_type,has_slot,slot(claz_t,"class_info")).
+struct_opv(claz_alien_type_builtin_type,subtypep,claz_ctype).
+struct_opv(claz_alien_type_builtin_type,super_priority,[claz_ctype,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_alien_type_builtin_type,typeof,type_class).
+struct_opv(claz_alien_type_builtin_type,typeof,type_builtin_type).
+struct_opv(claz_alien_value,has_slot,slot(claz_t,"sap")).
+struct_opv(claz_alien_value,has_slot,slot(claz_t,"type")).
+struct_opv(claz_alien_value,subtypep,claz_structure_object).
+struct_opv(claz_alien_value,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_alien_value,typeof,type_class).
+struct_opv(claz_alien_value,typeof,type_builtin_type).
+struct_opv(claz_alien_values_type,has_slot,slot(claz_t,"class")).
+struct_opv(claz_alien_values_type,has_slot,slot(claz_t,"values")).
+struct_opv(claz_alien_values_type,subtypep,claz_alien_type).
+struct_opv(claz_alien_values_type,super_priority,[claz_alien_type,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_alien_values_type,typeof,type_class).
+struct_opv(claz_alien_values_type,typeof,type_builtin_type).
+struct_opv(claz_alignment_note,has_slot,slot(claz_t,"bits")).
+struct_opv(claz_alignment_note,has_slot,slot(claz_t,"pattern")).
+struct_opv(claz_alignment_note,has_slot,slot(claz_t,"size")).
+struct_opv(claz_alignment_note,subtypep,claz_annotation).
+struct_opv(claz_alignment_note,super_priority,[claz_annotation,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_alignment_note,typeof,type_class).
+struct_opv(claz_alignment_note,typeof,type_builtin_type).
+struct_opv(claz_ambiguous_var_name,has_slot,slot(claz_t,"frame")).
+struct_opv(claz_ambiguous_var_name,has_slot,slot(claz_t,"name")).
+struct_opv(claz_ambiguous_var_name,subtypep,claz_debug_condition).
+struct_opv(claz_ambiguous_var_name,super_priority,[claz_debug_condition,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_ambiguous_var_name,typeof,type_class).
+struct_opv(claz_ambiguous_var_name,typeof,type_builtin_type).
+struct_opv(claz_annotation,has_slot,slot(claz_t,"index")).
+struct_opv(claz_annotation,has_slot,slot(claz_t,"posn")).
+struct_opv(claz_annotation,subtypep,claz_structure_c33_object).
+struct_opv(claz_annotation,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_annotation,typeof,type_class).
+struct_opv(claz_annotation,typeof,type_builtin_type).
+struct_opv(claz_anode,has_slot,slot(claz_t,"code")).
+struct_opv(claz_anode,has_slot,slot(claz_t,"seclass")).
+struct_opv(claz_anode,has_slot,slot(claz_t,"type")).
+struct_opv(claz_anode,subtypep,claz_structure_object).
+struct_opv(claz_anode,super_priority,[claz_structure_object,claz_t]).
+struct_opv(claz_anode,typeof,type_class).
+struct_opv(claz_anode,typeof,type_builtin_type).
+struct_opv(claz_ansi_stream,has_slot,slot(claz_t,"bin")).
+struct_opv(claz_ansi_stream,has_slot,slot(claz_t,"bout")).
+struct_opv(claz_ansi_stream,has_slot,slot(claz_t,"cin_buffer")).
+struct_opv(claz_ansi_stream,has_slot,slot(claz_t,"in")).
+struct_opv(claz_ansi_stream,has_slot,slot(claz_t,"in_buffer")).
+struct_opv(claz_ansi_stream,has_slot,slot(claz_t,"in_index")).
+struct_opv(claz_ansi_stream,has_slot,slot(claz_t,"input_char_pos")).
+struct_opv(claz_ansi_stream,has_slot,slot(claz_t,"misc")).
+struct_opv(claz_ansi_stream,has_slot,slot(claz_t,"n_bin")).
+struct_opv(claz_ansi_stream,has_slot,slot(claz_t,"out")).
+struct_opv(claz_ansi_stream,has_slot,slot(claz_t,"sout")).
+struct_opv(claz_ansi_stream,subtypep,claz_stream).
+struct_opv(claz_ansi_stream,subtypep,claz_structure_object).
+struct_opv(claz_ansi_stream,super_priority,[claz_stream,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_ansi_stream,typeof,type_class).
+struct_opv(claz_ansi_stream,typeof,type_builtin_type).
+struct_opv(claz_approximate_fun_type,has_slot,slot(claz_t,"keys")).
+struct_opv(claz_approximate_fun_type,has_slot,slot(claz_t,"max_args")).
+struct_opv(claz_approximate_fun_type,has_slot,slot(claz_t,"min_args")).
+struct_opv(claz_approximate_fun_type,has_slot,slot(claz_t,"types")).
+struct_opv(claz_approximate_fun_type,subtypep,claz_structure_object).
+struct_opv(claz_approximate_fun_type,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_approximate_fun_type,typeof,type_class).
+struct_opv(claz_approximate_fun_type,typeof,type_builtin_type).
+struct_opv(claz_approximate_key_info,has_slot,slot(claz_t,"allowp")).
+struct_opv(claz_approximate_key_info,has_slot,slot(claz_t,"name")).
+struct_opv(claz_approximate_key_info,has_slot,slot(claz_t,"position")).
+struct_opv(claz_approximate_key_info,has_slot,slot(claz_t,"types")).
+struct_opv(claz_approximate_key_info,subtypep,claz_structure_object).
+struct_opv(claz_approximate_key_info,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_approximate_key_info,typeof,type_class).
+struct_opv(claz_approximate_key_info,typeof,type_builtin_type).
+struct_opv(claz_arg,has_slot,slot(claz_t,"fields")).
+struct_opv(claz_arg,has_slot,slot(claz_t,"name")).
+struct_opv(claz_arg,has_slot,slot(claz_t,"position")).
+struct_opv(claz_arg,has_slot,slot(claz_t,"prefilter")).
+struct_opv(claz_arg,has_slot,slot(claz_t,"printer")).
+struct_opv(claz_arg,has_slot,slot(claz_t,"sign_extend_p")).
+struct_opv(claz_arg,has_slot,slot(claz_t,"use_label")).
+struct_opv(claz_arg,has_slot,slot(claz_t,"value")).
+struct_opv(claz_arg,subtypep,claz_structure_object).
+struct_opv(claz_arg,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_arg,typeof,type_class).
+struct_opv(claz_arg,typeof,type_builtin_type).
+struct_opv(claz_arg_count_error,has_slot,slot(claz_t,"args")).
+struct_opv(claz_arg_count_error,has_slot,slot(claz_t,"lambda_list")).
+struct_opv(claz_arg_count_error,has_slot,slot(claz_t,"maximum")).
+struct_opv(claz_arg_count_error,has_slot,slot(claz_t,"minimum")).
+struct_opv(claz_arg_count_error,subtypep,claz_defmacro_lambda_list_bind_error).
+struct_opv(claz_arg_count_error,super_priority,[claz_defmacro_lambda_list_bind_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_arg_count_error,typeof,type_class).
+struct_opv(claz_arg_count_error,typeof,type_builtin_type).
+struct_opv(claz_arg_count_program_error,subtypep,claz_arg_count_error).
+struct_opv(claz_arg_count_program_error,subtypep,claz_program_error).
+struct_opv(claz_arg_count_program_error,super_priority,[claz_arg_count_error,claz_defmacro_lambda_list_bind_error,claz_program_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_arg_count_program_error,typeof,type_builtin_type).
+struct_opv(claz_arg_form_kind,has_slot,slot(claz_t,"checker")).
+struct_opv(claz_arg_form_kind,has_slot,slot(claz_t,"names")).
+struct_opv(claz_arg_form_kind,has_slot,slot(claz_t,"producer")).
+struct_opv(claz_arg_form_kind,subtypep,claz_structure_object).
+struct_opv(claz_arg_form_kind,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_arg_form_kind,typeof,type_class).
+struct_opv(claz_arg_form_kind,typeof,type_builtin_type).
+struct_opv(claz_arg_info,has_slot,slot(claz_t,"arg_info_key_c47_rest_p")).
+struct_opv(claz_arg_info,has_slot,slot(claz_t,"arg_info_keys")).
+struct_opv(claz_arg_info,has_slot,slot(claz_t,"arg_info_lambda_list")).
+struct_opv(claz_arg_info,has_slot,slot(claz_t,"arg_info_metatypes")).
+struct_opv(claz_arg_info,has_slot,slot(claz_t,"arg_info_number_optional")).
+struct_opv(claz_arg_info,has_slot,slot(claz_t,"arg_info_precedence")).
+struct_opv(claz_arg_info,has_slot,slot(claz_t,"default")).
+struct_opv(claz_arg_info,has_slot,slot(claz_t,"gf_info_c_a_m_emf_std_p")).
+struct_opv(claz_arg_info,has_slot,slot(claz_t,"gf_info_fast_mf_p")).
+struct_opv(claz_arg_info,has_slot,slot(claz_t,"gf_info_simple_accessor_type")).
+struct_opv(claz_arg_info,has_slot,slot(claz_t,"gf_info_static_c_a_m_emf")).
+struct_opv(claz_arg_info,has_slot,slot(claz_t,"gf_precompute_dfun_and_emf_p")).
+struct_opv(claz_arg_info,has_slot,slot(claz_t,"key")).
+struct_opv(claz_arg_info,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_arg_info,has_slot,slot(claz_t,"specialp")).
+struct_opv(claz_arg_info,has_slot,slot(claz_t,"supplied_p")).
+struct_opv(claz_arg_info,has_slot,slot(claz_t,"supplied_used_p")).
+struct_opv(claz_arg_info,subtypep,claz_structure_c33_object).
+struct_opv(claz_arg_info,subtypep,claz_structure_object).
+struct_opv(claz_arg_info,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_arg_info,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_arg_info,typeof,type_class).
+struct_opv(claz_arg_info,typeof,type_builtin_type).
+struct_opv(claz_arg_state,has_slot,slot(claz_t,"register_args")).
+struct_opv(claz_arg_state,has_slot,slot(claz_t,"stack_frame_size")).
+struct_opv(claz_arg_state,has_slot,slot(claz_t,"xmm_args")).
+struct_opv(claz_arg_state,subtypep,claz_structure_object).
+struct_opv(claz_arg_state,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_arg_state,typeof,type_class).
+struct_opv(claz_arg_state,typeof,type_builtin_type).
+struct_opv(claz_args_type,has_slot,slot(claz_t,"allowp")).
+struct_opv(claz_args_type,has_slot,slot(claz_t,"keyp")).
+struct_opv(claz_args_type,has_slot,slot(claz_t,"keywords")).
+struct_opv(claz_args_type,has_slot,slot(claz_t,"optional")).
+struct_opv(claz_args_type,has_slot,slot(claz_t,"required")).
+struct_opv(claz_args_type,has_slot,slot(claz_t,"rest")).
+struct_opv(claz_args_type,subtypep,claz_ctype).
+struct_opv(claz_args_type,super_priority,[claz_ctype,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_args_type,typeof,type_class).
+struct_opv(claz_args_type,typeof,type_builtin_type).
+struct_opv(claz_argument_list_dotted,subtypep,claz_error).
+struct_opv(claz_argument_list_dotted,subtypep,claz_program_error).
+struct_opv(claz_argument_list_dotted,super_priority,[claz_program_error,claz_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_argument_list_dotted,typeof,type_builtin_type).
+struct_opv(claz_argument_list_processor,has_slot,slot(claz_array_of(claz_boolean),"specials")).
+struct_opv(claz_argument_list_processor,has_slot,slot(claz_array_of(claz_cla_keyword_param),"keyword_parameters")).
+struct_opv(claz_argument_list_processor,has_slot,slot(claz_array_of(claz_cla_param),"aux_vars")).
+struct_opv(claz_argument_list_processor,has_slot,slot(claz_array_of(claz_cla_param),"optional_parameters")).
+struct_opv(claz_argument_list_processor,has_slot,slot(claz_array_of(claz_cla_param),"positional_parameters")).
+struct_opv(claz_argument_list_processor,has_slot,slot(claz_array_of(claz_cla_param),"required_parameters")).
+struct_opv(claz_argument_list_processor,has_slot,slot(claz_array_of(claz_symbol),"variables")).
+struct_opv(claz_argument_list_processor,has_slot,slot(claz_boolean,"allow_other_keys")).
+struct_opv(claz_argument_list_processor,has_slot,slot(claz_boolean,"and_key")).
+struct_opv(claz_argument_list_processor,has_slot,slot(claz_boolean,"matcher_needs_env")).
+struct_opv(claz_argument_list_processor,has_slot,slot(claz_cla_argument_matcher,"matcher")).
+struct_opv(claz_argument_list_processor,has_slot,slot(claz_cla_param,"env_param")).
+struct_opv(claz_argument_list_processor,has_slot,slot(claz_cla_param,"rest_param")).
+struct_opv(claz_argument_list_processor,has_slot,slot(claz_integer,"arity")).
+struct_opv(claz_argument_list_processor,has_slot,slot(claz_integer,"max_args")).
+struct_opv(claz_argument_list_processor,has_slot,slot(claz_integer,"min_args")).
+struct_opv(claz_argument_list_processor,has_slot,slot(claz_operator,"function")).
+struct_opv(claz_argument_list_processor,has_slot,slot(claz_symbol,"env_var")).
+struct_opv(claz_argument_list_processor,has_slot,slot(claz_symbol,"rest_var")).
+struct_opv(claz_argument_list_processor,kw_ro,"matcher").
+struct_opv(claz_argument_list_processor,typeof,type_builtin_type).
+struct_opv(claz_arguments_out_of_domain_error,subtypep,claz_arithmetic_error).
+struct_opv(claz_arguments_out_of_domain_error,subtypep,claz_reference_condition).
+struct_opv(claz_arguments_out_of_domain_error,super_priority,[claz_arithmetic_error,claz_error,claz_serious_condition,claz_reference_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_arguments_out_of_domain_error,typeof,type_builtin_type).
+struct_opv(claz_arithmetic_error,has_slot,slot(claz_t,"operands")).
+struct_opv(claz_arithmetic_error,has_slot,slot(claz_t,"operation")).
+struct_opv(claz_arithmetic_error,subtypep,claz_error).
+struct_opv(claz_arithmetic_error,subtypep,claz_lisp_error).
+struct_opv(claz_arithmetic_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_arithmetic_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_arithmetic_error,typeof,type_class).
+struct_opv(claz_arithmetic_error,typeof,type_builtin_type).
+struct_opv(claz_array,subtypep,claz_object).
+struct_opv(claz_array,subtypep,claz_t).
+struct_opv(claz_array,super_priority,[claz_t]).
+struct_opv(claz_array,typeof,type_builtin_type).
+struct_opv(claz_array_initial_element_mismatch,subtypep,claz_reference_condition).
+struct_opv(claz_array_initial_element_mismatch,subtypep,claz_simple_warning).
+struct_opv(claz_array_initial_element_mismatch,super_priority,[claz_reference_condition,claz_simple_warning,claz_simple_condition,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_array_initial_element_mismatch,typeof,type_builtin_type).
+struct_opv(claz_array_of(_2760),typeof,type_builtin_type).
+struct_opv(claz_array_type,has_slot,slot(claz_t,"class_info")).
+struct_opv(claz_array_type,has_slot,slot(claz_t,"complexp")).
+struct_opv(claz_array_type,has_slot,slot(claz_t,"dimensions")).
+struct_opv(claz_array_type,has_slot,slot(claz_t,"element_type")).
+struct_opv(claz_array_type,has_slot,slot(claz_t,"specialized_element_type")).
+struct_opv(claz_array_type,subtypep,claz_ctype).
+struct_opv(claz_array_type,super_priority,[claz_ctype,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_array_type,typeof,type_class).
+struct_opv(claz_array_type,typeof,type_builtin_type).
+struct_opv(claz_asterisks_around_constant_variable_name,subtypep,claz_dubious_asterisks_around_variable_name).
+struct_opv(claz_asterisks_around_constant_variable_name,super_priority,[claz_dubious_asterisks_around_variable_name,claz_style_warning,claz_warning,claz_simple_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_asterisks_around_constant_variable_name,typeof,type_builtin_type).
+struct_opv(claz_asterisks_around_lexical_variable_name,subtypep,claz_dubious_asterisks_around_variable_name).
+struct_opv(claz_asterisks_around_lexical_variable_name,super_priority,[claz_dubious_asterisks_around_variable_name,claz_style_warning,claz_warning,claz_simple_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_asterisks_around_lexical_variable_name,typeof,type_builtin_type).
+struct_opv(claz_autoload,has_slot,slot(claz_string,"class_name")).
+struct_opv(claz_autoload,has_slot,slot(claz_string,"file_name")).
+struct_opv(claz_autoload,has_slot,slot(claz_symbol,"function_symbol")).
+struct_opv(claz_autoload,kw_ro,"class_name").
+struct_opv(claz_autoload,kw_ro,"file_name").
+struct_opv(claz_autoload,kw_ro,"function_symbol").
+struct_opv(claz_autoload,subtypep,claz_function).
+struct_opv(claz_autoload,typeof,type_builtin_type).
+struct_opv(claz_autoload_generalized_reference,has_slot,slot(claz_symbol,"indicator")).
+struct_opv(claz_autoload_generalized_reference,subtypep,claz_autoload).
+struct_opv(claz_autoload_generalized_reference,typeof,type_builtin_type).
+struct_opv(claz_autoload_macro,subtypep,claz_autoload).
+struct_opv(claz_autoload_macro,typeof,type_builtin_type).
+struct_opv(claz_back_patch,has_slot,slot(claz_t,"fun")).
+struct_opv(claz_back_patch,has_slot,slot(claz_t,"size")).
+struct_opv(claz_back_patch,subtypep,claz_annotation).
+struct_opv(claz_back_patch,super_priority,[claz_annotation,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_back_patch,typeof,type_class).
+struct_opv(claz_back_patch,typeof,type_builtin_type).
+struct_opv(claz_base_string,subtypep,claz_string).
+struct_opv(claz_base_string,super_priority,[claz_string,claz_vector,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_base_string,typeof,type_builtin_type).
+struct_opv(claz_basic_combination,has_slot,slot(claz_t,"args")).
+struct_opv(claz_basic_combination,has_slot,slot(claz_t,"fun")).
+struct_opv(claz_basic_combination,has_slot,slot(claz_t,"fun_info")).
+struct_opv(claz_basic_combination,has_slot,slot(claz_t,"info")).
+struct_opv(claz_basic_combination,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_basic_combination,has_slot,slot(claz_t,"step_info")).
+struct_opv(claz_basic_combination,has_slot,slot(claz_t,"type_validated_for_leaf")).
+struct_opv(claz_basic_combination,subtypep,claz_valued_node).
+struct_opv(claz_basic_combination,super_priority,[claz_valued_node,claz_node,claz_sset_element,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_basic_combination,typeof,type_class).
+struct_opv(claz_basic_combination,typeof,type_builtin_type).
+struct_opv(claz_basic_var,has_slot,slot(claz_t,"sets")).
+struct_opv(claz_basic_var,subtypep,claz_leaf).
+struct_opv(claz_basic_var,super_priority,[claz_leaf,claz_sset_element,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_basic_var,typeof,type_class).
+struct_opv(claz_basic_var,typeof,type_builtin_type).
+struct_opv(claz_basic_vector(_2760),has_slot,slot(claz_array_of(_2760),"elements")).
+struct_opv(claz_basic_vector(_2760),has_slot,slot(claz_integer,"capacity")).
+struct_opv(claz_basic_vector(claz_unsigned_byte16),subtypep,claz_vector).
+struct_opv(claz_basic_vector(claz_unsigned_byte16),typeof,type_builtin_type).
+struct_opv(claz_basic_vector(claz_unsigned_byte32),subtypep,claz_vector).
+struct_opv(claz_basic_vector(claz_unsigned_byte32),typeof,type_builtin_type).
+struct_opv(claz_basic_vector(claz_unsigned_byte8),subtypep,claz_vector).
+struct_opv(claz_basic_vector(claz_unsigned_byte8),typeof,type_builtin_type).
+struct_opv(claz_bignum,has_slot,slot(claz_prolog_big_integer,"value")).
+struct_opv(claz_bignum,kw_ro,"value").
+struct_opv(claz_bignum,subtypep,claz_integer).
+struct_opv(claz_bignum,subtypep,claz_lisp_integer).
+struct_opv(claz_bignum,super_priority,[claz_integer,claz_rational,claz_real,claz_number,claz_t]).
+struct_opv(claz_bignum,typeof,type_builtin_type).
+struct_opv(claz_bind,has_slot,slot(claz_t,"lambda")).
+struct_opv(claz_bind,subtypep,claz_node).
+struct_opv(claz_bind,super_priority,[claz_node,claz_sset_element,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_bind,typeof,type_class).
+struct_opv(claz_bind,typeof,type_builtin_type).
+struct_opv(claz_binding,has_slot,slot(claz_binding,"next")).
+struct_opv(claz_binding,has_slot,slot(claz_boolean,"specialp")).
+struct_opv(claz_binding,has_slot,slot(claz_environment,"env")).
+struct_opv(claz_binding,has_slot,slot(claz_object,"bound_symbol")).
+struct_opv(claz_binding,has_slot,slot(claz_object,"value")).
+struct_opv(claz_binding,kw_ro,"bound_symbol").
+struct_opv(claz_binding,kw_ro,"next").
+struct_opv(claz_binding,typeof,type_builtin_type).
+struct_opv(claz_binding_stack_exhausted,subtypep,claz_storage_condition).
+struct_opv(claz_binding_stack_exhausted,super_priority,[claz_storage_condition,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_binding_stack_exhausted,typeof,type_builtin_type).
+struct_opv(claz_bit_vector,has_slot,slot(claz_array_of(claz_long),"bits")).
+struct_opv(claz_bit_vector,has_slot,slot(claz_integer,"capacity")).
+struct_opv(claz_bit_vector,subtypep,claz_vector).
+struct_opv(claz_bit_vector,super_priority,[claz_vector,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_bit_vector,typeof,type_builtin_type).
+struct_opv(claz_bitmask,typeof,type_builtin_type).
+struct_opv(claz_block_annotation,has_slot,slot(claz_t,"block")).
+struct_opv(claz_block_annotation,has_slot,slot(claz_t,"next")).
+struct_opv(claz_block_annotation,has_slot,slot(claz_t,"prev")).
+struct_opv(claz_block_annotation,subtypep,claz_structure_c33_object).
+struct_opv(claz_block_annotation,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_block_annotation,typeof,type_class).
+struct_opv(claz_block_annotation,typeof,type_builtin_type).
+struct_opv(claz_block_end,has_slot,slot(claz_t,"suffix")).
+struct_opv(claz_block_end,subtypep,claz_queued_op).
+struct_opv(claz_block_end,super_priority,[claz_queued_op,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_block_end,typeof,type_class).
+struct_opv(claz_block_end,typeof,type_builtin_type).
+struct_opv(claz_block_start,has_slot,slot(claz_t,"block_end")).
+struct_opv(claz_block_start,has_slot,slot(claz_t,"prefix")).
+struct_opv(claz_block_start,has_slot,slot(claz_t,"suffix")).
+struct_opv(claz_block_start,subtypep,claz_section_start).
+struct_opv(claz_block_start,super_priority,[claz_section_start,claz_queued_op,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_block_start,typeof,type_class).
+struct_opv(claz_block_start,typeof,type_builtin_type).
+struct_opv(claz_bogus_debug_fun,has_slot,slot(claz_t,"name")).
+struct_opv(claz_bogus_debug_fun,subtypep,claz_debug_fun).
+struct_opv(claz_bogus_debug_fun,super_priority,[claz_debug_fun,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_bogus_debug_fun,typeof,type_class).
+struct_opv(claz_bogus_debug_fun,typeof,type_builtin_type).
+struct_opv(claz_boolean,typeof,type_builtin_type).
+struct_opv(claz_bootstrap_package_not_found,has_slot,slot(claz_t,"name")).
+struct_opv(claz_bootstrap_package_not_found,subtypep,claz_condition).
+struct_opv(claz_bootstrap_package_not_found,super_priority,[claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_bootstrap_package_not_found,typeof,type_class).
+struct_opv(claz_bootstrap_package_not_found,typeof,type_builtin_type).
+struct_opv(claz_bounding_indices_bad_error,has_slot,slot(claz_t,"object")).
+struct_opv(claz_bounding_indices_bad_error,subtypep,claz_error).
+struct_opv(claz_bounding_indices_bad_error,subtypep,claz_reference_condition).
+struct_opv(claz_bounding_indices_bad_error,super_priority,[claz_reference_condition,claz_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_bounding_indices_bad_error,typeof,type_class).
+struct_opv(claz_bounding_indices_bad_error,typeof,type_builtin_type).
+struct_opv(claz_breakpoint,has_slot,slot(claz_t,"cookie_fun")).
+struct_opv(claz_breakpoint,has_slot,slot(claz_t,"hook_fun")).
+struct_opv(claz_breakpoint,has_slot,slot(claz_t,"info")).
+struct_opv(claz_breakpoint,has_slot,slot(claz_t,"internal_data")).
+struct_opv(claz_breakpoint,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_breakpoint,has_slot,slot(claz_t,"start_helper")).
+struct_opv(claz_breakpoint,has_slot,slot(claz_t,"status")).
+struct_opv(claz_breakpoint,has_slot,slot(claz_t,"unknown_return_partner")).
+struct_opv(claz_breakpoint,has_slot,slot(claz_t,"what")).
+struct_opv(claz_breakpoint,subtypep,claz_structure_object).
+struct_opv(claz_breakpoint,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_breakpoint,typeof,type_class).
+struct_opv(claz_breakpoint,typeof,type_builtin_type).
+struct_opv(claz_breakpoint_data,has_slot,slot(claz_t,"breakpoints")).
+struct_opv(claz_breakpoint_data,has_slot,slot(claz_t,"component")).
+struct_opv(claz_breakpoint_data,has_slot,slot(claz_t,"instruction")).
+struct_opv(claz_breakpoint_data,has_slot,slot(claz_t,"offset")).
+struct_opv(claz_breakpoint_data,subtypep,claz_structure_object).
+struct_opv(claz_breakpoint_data,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_breakpoint_data,typeof,type_class).
+struct_opv(claz_breakpoint_data,typeof,type_builtin_type).
+struct_opv(claz_breakpoint_error,subtypep,claz_error).
+struct_opv(claz_breakpoint_error,subtypep,claz_system_condition).
+struct_opv(claz_breakpoint_error,super_priority,[claz_system_condition,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_breakpoint_error,typeof,type_builtin_type).
+struct_opv(claz_broadcast_stream,has_slot,slot(claz_array_of(claz_stream),"streams")).
+struct_opv(claz_broadcast_stream,has_slot,slot(claz_t,"bout")).
+struct_opv(claz_broadcast_stream,has_slot,slot(claz_t,"misc")).
+struct_opv(claz_broadcast_stream,has_slot,slot(claz_t,"out")).
+struct_opv(claz_broadcast_stream,has_slot,slot(claz_t,"sout")).
+struct_opv(claz_broadcast_stream,kw_ro,"streams").
+struct_opv(claz_broadcast_stream,subtypep,claz_ansi_stream).
+struct_opv(claz_broadcast_stream,subtypep,claz_stream).
+struct_opv(claz_broadcast_stream,super_priority,[claz_ansi_stream,claz_stream,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_broadcast_stream,super_priority,[claz_stream,claz_t]).
+struct_opv(claz_broadcast_stream,typeof,type_class).
+struct_opv(claz_broadcast_stream,typeof,type_builtin_type).
+struct_opv(claz_buffer,has_slot,slot(claz_t,"head")).
+struct_opv(claz_buffer,has_slot,slot(claz_t,"length")).
+struct_opv(claz_buffer,has_slot,slot(claz_t,"sap")).
+struct_opv(claz_buffer,has_slot,slot(claz_t,"tail")).
+struct_opv(claz_buffer,subtypep,claz_structure_object).
+struct_opv(claz_buffer,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_buffer,typeof,type_class).
+struct_opv(claz_buffer,typeof,type_builtin_type).
+struct_opv(claz_bug,subtypep,claz_simple_error).
+struct_opv(claz_bug,super_priority,[claz_simple_error,claz_simple_condition,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_bug,typeof,type_builtin_type).
+struct_opv(claz_built_in_class,has_slot,slot(claz_t,"prototype")).
+struct_opv(claz_built_in_class,subtypep,claz_class).
+struct_opv(claz_built_in_class,subtypep,claz_lisp_class).
+struct_opv(claz_built_in_class,subtypep,claz_system_class).
+struct_opv(claz_built_in_class,super_priority,[claz_class,claz_potential_class,claz_specializer,claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_built_in_class,super_priority,[claz_system_class,claz_pcl_class,claz_class,claz_dependent_update_mixin,claz_plist_mixin,claz_definition_source_mixin,claz_standard_specializer,claz_specializer,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_built_in_class,typeof,type_class).
+struct_opv(claz_built_in_class,typeof,type_builtin_type).
+struct_opv(claz_built_in_classoid,has_slot,slot(claz_t,"translation")).
+struct_opv(claz_built_in_classoid,subtypep,claz_classoid).
+struct_opv(claz_built_in_classoid,super_priority,[claz_classoid,claz_ctype,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_built_in_classoid,typeof,type_class).
+struct_opv(claz_built_in_classoid,typeof,type_builtin_type).
+struct_opv(claz_byte_array_input_stream,has_slot,slot(claz_prolog_byte_array_input_stream,"byte_array_input_stream")).
+struct_opv(claz_byte_array_input_stream,kw_ro,"byte_array_input_stream").
+struct_opv(claz_byte_array_input_stream,subtypep,claz_stream).
+struct_opv(claz_byte_array_input_stream,typeof,type_builtin_type).
+struct_opv(claz_byte_array_output_stream,has_slot,slot(claz_prolog_byte_array_output_stream,"byte_array_output_stream")).
+struct_opv(claz_byte_array_output_stream,kw_ro,"byte_array_output_stream").
+struct_opv(claz_byte_array_output_stream,subtypep,claz_stream).
+struct_opv(claz_byte_array_output_stream,typeof,type_builtin_type).
+struct_opv(claz_c_source_point,has_slot,slot(claz_t,"file")).
+struct_opv(claz_c_source_point,has_slot,slot(claz_t,"lineno1")).
+struct_opv(claz_c_source_point,has_slot,slot(claz_t,"lineno2")).
+struct_opv(claz_c_source_point,subtypep,claz_structure_object).
+struct_opv(claz_c_source_point,super_priority,[claz_structure_object,claz_t]).
+struct_opv(claz_c_source_point,typeof,type_class).
+struct_opv(claz_c_source_point,typeof,type_builtin_type).
+struct_opv(claz_c_string_decoding_error,subtypep,claz_character_decoding_error).
+struct_opv(claz_c_string_decoding_error,super_priority,[claz_character_decoding_error,claz_character_coding_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_c_string_decoding_error,typeof,type_builtin_type).
+struct_opv(claz_c_string_encoding_error,subtypep,claz_character_encoding_error).
+struct_opv(claz_c_string_encoding_error,super_priority,[claz_character_encoding_error,claz_character_coding_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_c_string_encoding_error,typeof,type_builtin_type).
+struct_opv(claz_cache,has_slot,slot(claz_t,"depth")).
+struct_opv(claz_cache,has_slot,slot(claz_t,"key_count")).
+struct_opv(claz_cache,has_slot,slot(claz_t,"limit")).
+struct_opv(claz_cache,has_slot,slot(claz_t,"line_size")).
+struct_opv(claz_cache,has_slot,slot(claz_t,"mask")).
+struct_opv(claz_cache,has_slot,slot(claz_t,"value")).
+struct_opv(claz_cache,has_slot,slot(claz_t,"vector")).
+struct_opv(claz_cache,subtypep,claz_structure_object).
+struct_opv(claz_cache,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_cache,typeof,type_class).
+struct_opv(claz_cache,typeof,type_builtin_type).
+struct_opv(claz_cached_fun,has_slot,slot(claz_t,"constraint")).
+struct_opv(claz_cached_fun,has_slot,slot(claz_t,"funstate")).
+struct_opv(claz_cached_fun,has_slot,slot(claz_t,"name")).
+struct_opv(claz_cached_fun,subtypep,claz_structure_object).
+struct_opv(claz_cached_fun,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_cached_fun,typeof,type_class).
+struct_opv(claz_cached_fun,typeof,type_builtin_type).
+struct_opv(claz_caching,subtypep,claz_dfun_info).
+struct_opv(claz_caching,super_priority,[claz_dfun_info,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_caching,typeof,type_builtin_type).
+struct_opv(claz_callback_info,has_slot,slot(claz_t,"function")).
+struct_opv(claz_callback_info,has_slot,slot(claz_t,"index")).
+struct_opv(claz_callback_info,has_slot,slot(claz_t,"specifier")).
+struct_opv(claz_callback_info,has_slot,slot(claz_t,"wrapper")).
+struct_opv(claz_callback_info,subtypep,claz_structure_object).
+struct_opv(claz_callback_info,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_callback_info,typeof,type_class).
+struct_opv(claz_callback_info,typeof,type_builtin_type).
+struct_opv(claz_capitalize_first_stream,has_slot,slot(claz_boolean,"virgin")).
+struct_opv(claz_capitalize_first_stream,subtypep,claz_case_frob_stream).
+struct_opv(claz_capitalize_first_stream,typeof,type_builtin_type).
+struct_opv(claz_capitalize_stream,has_slot,slot(claz_boolean,"in_word")).
+struct_opv(claz_capitalize_stream,subtypep,claz_case_frob_stream).
+struct_opv(claz_capitalize_stream,typeof,type_builtin_type).
+struct_opv(claz_case_failure,has_slot,slot(claz_t,"name")).
+struct_opv(claz_case_failure,has_slot,slot(claz_t,"possibilities")).
+struct_opv(claz_case_failure,subtypep,claz_error).
+struct_opv(claz_case_failure,super_priority,[claz_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_case_failure,typeof,type_class).
+struct_opv(claz_case_failure,typeof,type_builtin_type).
+struct_opv(claz_case_frob_stream,has_slot,slot(claz_stream,"target")).
+struct_opv(claz_case_frob_stream,has_slot,slot(claz_t,"misc")).
+struct_opv(claz_case_frob_stream,kw_ro,"target").
+struct_opv(claz_case_frob_stream,subtypep,claz_ansi_stream).
+struct_opv(claz_case_frob_stream,subtypep,claz_stream).
+struct_opv(claz_case_frob_stream,super_priority,[claz_ansi_stream,claz_stream,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_case_frob_stream,typeof,type_class).
+struct_opv(claz_case_frob_stream,typeof,type_builtin_type).
+struct_opv(claz_cast,has_slot,slot(claz_t,"asserted_type")).
+struct_opv(claz_cast,has_slot,slot(claz_t,"type_check")).
+struct_opv(claz_cast,has_slot,slot(claz_t,"type_to_check")).
+struct_opv(claz_cast,has_slot,slot(claz_t,"value")).
+struct_opv(claz_cast,has_slot,slot(claz_t,"vestigial_exit_entry_lexenv")).
+struct_opv(claz_cast,has_slot,slot(claz_t,"vestigial_exit_lexenv")).
+struct_opv(claz_cast,subtypep,claz_valued_node).
+struct_opv(claz_cast,super_priority,[claz_valued_node,claz_node,claz_sset_element,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_cast,typeof,type_class).
+struct_opv(claz_cast,typeof,type_builtin_type).
+struct_opv(claz_cblock,has_slot,slot(claz_t,"component")).
+struct_opv(claz_cblock,has_slot,slot(claz_t,"dominators")).
+struct_opv(claz_cblock,has_slot,slot(claz_t,"flag")).
+struct_opv(claz_cblock,has_slot,slot(claz_t,"flags")).
+struct_opv(claz_cblock,has_slot,slot(claz_t,"gen")).
+struct_opv(claz_cblock,has_slot,slot(claz_t,"in")).
+struct_opv(claz_cblock,has_slot,slot(claz_t,"info")).
+struct_opv(claz_cblock,has_slot,slot(claz_t,"kill")).
+struct_opv(claz_cblock,has_slot,slot(claz_t,"last")).
+struct_opv(claz_cblock,has_slot,slot(claz_t,"loop")).
+struct_opv(claz_cblock,has_slot,slot(claz_t,"loop_next")).
+struct_opv(claz_cblock,has_slot,slot(claz_t,"next")).
+struct_opv(claz_cblock,has_slot,slot(claz_t,"out")).
+struct_opv(claz_cblock,has_slot,slot(claz_t,"physenv_cache")).
+struct_opv(claz_cblock,has_slot,slot(claz_t,"pred")).
+struct_opv(claz_cblock,has_slot,slot(claz_t,"prev")).
+struct_opv(claz_cblock,has_slot,slot(claz_t,"start")).
+struct_opv(claz_cblock,has_slot,slot(claz_t,"succ")).
+struct_opv(claz_cblock,has_slot,slot(claz_t,"xrefs")).
+struct_opv(claz_cblock,subtypep,claz_sset_element).
+struct_opv(claz_cblock,super_priority,[claz_sset_element,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_cblock,typeof,type_class).
+struct_opv(claz_cblock,typeof,type_builtin_type).
+struct_opv(claz_cell_error,has_slot,slot(claz_t,"name")).
+struct_opv(claz_cell_error,subtypep,claz_error).
+struct_opv(claz_cell_error,subtypep,claz_lisp_error).
+struct_opv(claz_cell_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_cell_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_cell_error,typeof,type_class).
+struct_opv(claz_cell_error,typeof,type_builtin_type).
+struct_opv(claz_char_code,typeof,type_builtin_type).
+struct_opv(claz_char_hash_map(_2760),has_slot,slot(_2760,"null_value")).
+struct_opv(claz_char_hash_map(_2760),has_slot,slot(claz_array_of(_2760),"constants_by_char_code")).
+struct_opv(claz_char_hash_map(_2760),has_slot,slot(claz_hash_table(claz_prolog_character,_2760),"backing")).
+struct_opv(claz_char_hash_map(_2760),kw_ro,"backing").
+struct_opv(claz_char_hash_map(_2760),kw_ro,"constants_by_char_code").
+struct_opv(claz_char_hash_map(_2760),kw_ro,"null_value").
+struct_opv(claz_char_hash_map(_2760),typeof,type_builtin_type).
+struct_opv(claz_char_hash_map,typeof,type_builtin_type).
+struct_opv(claz_char_hash_map_1,has_slot,slot(claz_char_hash_map,"this_0")).
+struct_opv(claz_char_hash_map_1,has_slot,slot(claz_integer,"char_num")).
+struct_opv(claz_char_hash_map_1,has_slot,slot(claz_prolog_iterator(claz_prolog_character),"car_it")).
+struct_opv(claz_char_hash_map_1,kw_ro,"car_it").
+struct_opv(claz_char_hash_map_1,kw_ro,"this_0").
+struct_opv(claz_char_hash_map_1,typeof,type_builtin_type).
+struct_opv(claz_character,has_slot,slot(claz_char_code,"value")).
+struct_opv(claz_character,has_slot,slot(claz_string,"name")).
+struct_opv(claz_character,kw_ro,"value").
+struct_opv(claz_character,subtypep,claz_object).
+struct_opv(claz_character,subtypep,claz_t).
+struct_opv(claz_character,super_priority,[claz_t]).
+struct_opv(claz_character,typeof,type_builtin_type).
+struct_opv(claz_character_coding_error,has_slot,slot(claz_t,"external_format")).
+struct_opv(claz_character_coding_error,subtypep,claz_error).
+struct_opv(claz_character_coding_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_character_coding_error,typeof,type_class).
+struct_opv(claz_character_coding_error,typeof,type_builtin_type).
+struct_opv(claz_character_decoding_error,has_slot,slot(claz_t,"octets")).
+struct_opv(claz_character_decoding_error,subtypep,claz_character_coding_error).
+struct_opv(claz_character_decoding_error,super_priority,[claz_character_coding_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_character_decoding_error,typeof,type_class).
+struct_opv(claz_character_decoding_error,typeof,type_builtin_type).
+struct_opv(claz_character_decoding_error_in_comment,has_slot,slot(claz_t,"position")).
+struct_opv(claz_character_decoding_error_in_comment,has_slot,slot(claz_t,"stream")).
+struct_opv(claz_character_decoding_error_in_comment,subtypep,claz_style_warning).
+struct_opv(claz_character_decoding_error_in_comment,super_priority,[claz_style_warning,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_character_decoding_error_in_comment,typeof,type_class).
+struct_opv(claz_character_decoding_error_in_comment,typeof,type_builtin_type).
+struct_opv(claz_character_decoding_error_in_dispatch_macro_char_comment,has_slot,slot(claz_t,"disp_char")).
+struct_opv(claz_character_decoding_error_in_dispatch_macro_char_comment,has_slot,slot(claz_t,"sub_char")).
+struct_opv(claz_character_decoding_error_in_dispatch_macro_char_comment,subtypep,claz_character_decoding_error_in_comment).
+struct_opv(claz_character_decoding_error_in_dispatch_macro_char_comment,super_priority,[claz_character_decoding_error_in_comment,claz_style_warning,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_character_decoding_error_in_dispatch_macro_char_comment,typeof,type_class).
+struct_opv(claz_character_decoding_error_in_dispatch_macro_char_comment,typeof,type_builtin_type).
+struct_opv(claz_character_decoding_error_in_macro_char_comment,has_slot,slot(claz_t,"char")).
+struct_opv(claz_character_decoding_error_in_macro_char_comment,subtypep,claz_character_decoding_error_in_comment).
+struct_opv(claz_character_decoding_error_in_macro_char_comment,super_priority,[claz_character_decoding_error_in_comment,claz_style_warning,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_character_decoding_error_in_macro_char_comment,typeof,type_class).
+struct_opv(claz_character_decoding_error_in_macro_char_comment,typeof,type_builtin_type).
+struct_opv(claz_character_encoding_error,has_slot,slot(claz_t,"code")).
+struct_opv(claz_character_encoding_error,subtypep,claz_character_coding_error).
+struct_opv(claz_character_encoding_error,super_priority,[claz_character_coding_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_character_encoding_error,typeof,type_class).
+struct_opv(claz_character_encoding_error,typeof,type_builtin_type).
+struct_opv(claz_character_out_of_range,subtypep,claz_octet_decoding_error).
+struct_opv(claz_character_out_of_range,super_priority,[claz_octet_decoding_error,claz_character_decoding_error,claz_character_coding_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_character_out_of_range,typeof,type_builtin_type).
+struct_opv(claz_character_set_type,has_slot,slot(claz_t,"class_info")).
+struct_opv(claz_character_set_type,has_slot,slot(claz_t,"pairs")).
+struct_opv(claz_character_set_type,subtypep,claz_ctype).
+struct_opv(claz_character_set_type,super_priority,[claz_ctype,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_character_set_type,typeof,type_class).
+struct_opv(claz_character_set_type,typeof,type_builtin_type).
+struct_opv(claz_character_string,subtypep,claz_string).
+struct_opv(claz_character_string,super_priority,[claz_string,claz_vector,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_character_string,typeof,type_builtin_type).
+struct_opv(claz_charset_type_error,subtypep,claz_error).
+struct_opv(claz_charset_type_error,super_priority,[claz_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_charset_type_error,typeof,type_builtin_type).
+struct_opv(claz_checking,has_slot,slot(claz_t,"function")).
+struct_opv(claz_checking,subtypep,claz_dfun_info).
+struct_opv(claz_checking,super_priority,[claz_dfun_info,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_checking,typeof,type_class).
+struct_opv(claz_checking,typeof,type_builtin_type).
+struct_opv(claz_chooser,has_slot,slot(claz_t,"alignment")).
+struct_opv(claz_chooser,has_slot,slot(claz_t,"maybe_shrink")).
+struct_opv(claz_chooser,has_slot,slot(claz_t,"size")).
+struct_opv(claz_chooser,has_slot,slot(claz_t,"worst_case_fun")).
+struct_opv(claz_chooser,subtypep,claz_annotation).
+struct_opv(claz_chooser,super_priority,[claz_annotation,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_chooser,typeof,type_class).
+struct_opv(claz_chooser,typeof,type_builtin_type).
+struct_opv(claz_cif,has_slot,slot(claz_t,"alternative")).
+struct_opv(claz_cif,has_slot,slot(claz_t,"alternative_constraints")).
+struct_opv(claz_cif,has_slot,slot(claz_t,"consequent")).
+struct_opv(claz_cif,has_slot,slot(claz_t,"consequent_constraints")).
+struct_opv(claz_cif,has_slot,slot(claz_t,"test")).
+struct_opv(claz_cif,subtypep,claz_node).
+struct_opv(claz_cif,super_priority,[claz_node,claz_sset_element,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_cif,typeof,type_class).
+struct_opv(claz_cif,typeof,type_builtin_type).
+struct_opv(claz_circularity,has_slot,slot(claz_t,"enclosing_object")).
+struct_opv(claz_circularity,has_slot,slot(claz_t,"index")).
+struct_opv(claz_circularity,has_slot,slot(claz_t,"object")).
+struct_opv(claz_circularity,has_slot,slot(claz_t,"type")).
+struct_opv(claz_circularity,has_slot,slot(claz_t,"value")).
+struct_opv(claz_circularity,subtypep,claz_structure_object).
+struct_opv(claz_circularity,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_circularity,typeof,type_class).
+struct_opv(claz_circularity,typeof,type_builtin_type).
+struct_opv(claz_cla_arg_list,has_slot,slot(claz_environment,"env")).
+struct_opv(claz_cla_arg_list,has_slot,slot(claz_integer,"args_consumed")).
+struct_opv(claz_cla_arg_list,has_slot,slot(claz_integer,"len")).
+struct_opv(claz_cla_arg_list,has_slot,slot(claz_list,"args")).
+struct_opv(claz_cla_arg_list,kw_ro,"args").
+struct_opv(claz_cla_arg_list,kw_ro,"env").
+struct_opv(claz_cla_arg_list,kw_ro,"len").
+struct_opv(claz_cla_arg_list,typeof,type_builtin_type).
+struct_opv(claz_cla_argument_matcher,typeof,type_builtin_type).
+struct_opv(claz_cla_aux_param,has_slot,slot(claz_boolean,"special")).
+struct_opv(claz_cla_aux_param,has_slot,slot(claz_cla_init_form,"initform")).
+struct_opv(claz_cla_aux_param,has_slot,slot(claz_symbol,"var")).
+struct_opv(claz_cla_aux_param,typeof,type_builtin_type).
+struct_opv(claz_cla_constant_init_form,has_slot,slot(claz_object,"value")).
+struct_opv(claz_cla_constant_init_form,typeof,type_builtin_type).
+struct_opv(claz_cla_environment_param,has_slot,slot(claz_boolean,"special")).
+struct_opv(claz_cla_environment_param,has_slot,slot(claz_symbol,"var")).
+struct_opv(claz_cla_environment_param,typeof,type_builtin_type).
+struct_opv(claz_cla_fast_matcher,has_slot,slot(claz_argument_list_processor,"this_0")).
+struct_opv(claz_cla_fast_matcher,kw_ro,"this_0").
+struct_opv(claz_cla_fast_matcher,typeof,type_builtin_type).
+struct_opv(claz_cla_init_form,typeof,type_builtin_type).
+struct_opv(claz_cla_keyword_param,has_slot,slot(claz_symbol,"keyword")).
+struct_opv(claz_cla_keyword_param,typeof,type_builtin_type).
+struct_opv(claz_cla_non_constant_init_form,has_slot,slot(claz_object,"form")).
+struct_opv(claz_cla_non_constant_init_form,typeof,type_builtin_type).
+struct_opv(claz_cla_optional_param,has_slot,slot(claz_boolean,"special")).
+struct_opv(claz_cla_optional_param,has_slot,slot(claz_boolean,"supplied_special")).
+struct_opv(claz_cla_optional_param,has_slot,slot(claz_cla_init_form,"init_form")).
+struct_opv(claz_cla_optional_param,has_slot,slot(claz_symbol,"supplied_var")).
+struct_opv(claz_cla_optional_param,has_slot,slot(claz_symbol,"var")).
+struct_opv(claz_cla_optional_param,typeof,type_builtin_type).
+struct_opv(claz_cla_param,typeof,type_builtin_type).
+struct_opv(claz_cla_required_param,has_slot,slot(claz_boolean,"special")).
+struct_opv(claz_cla_required_param,has_slot,slot(claz_symbol,"var")).
+struct_opv(claz_cla_required_param,typeof,type_builtin_type).
+struct_opv(claz_cla_rest_param,has_slot,slot(claz_boolean,"special")).
+struct_opv(claz_cla_rest_param,has_slot,slot(claz_symbol,"var")).
+struct_opv(claz_cla_rest_param,typeof,type_builtin_type).
+struct_opv(claz_cla_slow_matcher,has_slot,slot(claz_argument_list_processor,"this_0")).
+struct_opv(claz_cla_slow_matcher,kw_ro,"this_0").
+struct_opv(claz_cla_slow_matcher,typeof,type_builtin_type).
+struct_opv(claz_clambda,has_slot,slot(claz_t,"allow_instrumenting")).
+struct_opv(claz_clambda,has_slot,slot(claz_t,"bind")).
+struct_opv(claz_clambda,has_slot,slot(claz_t,"call_lexenv")).
+struct_opv(claz_clambda,has_slot,slot(claz_t,"calls_or_closes")).
+struct_opv(claz_clambda,has_slot,slot(claz_t,"children")).
+struct_opv(claz_clambda,has_slot,slot(claz_t,"entries")).
+struct_opv(claz_clambda,has_slot,slot(claz_t,"home")).
+struct_opv(claz_clambda,has_slot,slot(claz_t,"lets")).
+struct_opv(claz_clambda,has_slot,slot(claz_t,"optional_dispatch")).
+struct_opv(claz_clambda,has_slot,slot(claz_t,"parent")).
+struct_opv(claz_clambda,has_slot,slot(claz_t,"physenv")).
+struct_opv(claz_clambda,has_slot,slot(claz_t,"return")).
+struct_opv(claz_clambda,has_slot,slot(claz_t,"system_lambda_p")).
+struct_opv(claz_clambda,has_slot,slot(claz_t,"tail_set")).
+struct_opv(claz_clambda,has_slot,slot(claz_t,"vars")).
+struct_opv(claz_clambda,subtypep,claz_functional).
+struct_opv(claz_clambda,super_priority,[claz_functional,claz_leaf,claz_sset_element,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_clambda,typeof,type_class).
+struct_opv(claz_clambda,typeof,type_builtin_type).
+struct_opv(claz_class,has_slot,slot(claz_t,"all_superclasses")).
+struct_opv(claz_class,has_slot,slot(claz_t,"class_eq_specializer")).
+struct_opv(claz_class,has_slot,slot(claz_t,"complex_c61")).
+struct_opv(claz_class,has_slot,slot(claz_t,"complex_intersection2")).
+struct_opv(claz_class,has_slot,slot(claz_t,"complex_subtypep_arg1")).
+struct_opv(claz_class,has_slot,slot(claz_t,"complex_subtypep_arg2")).
+struct_opv(claz_class,has_slot,slot(claz_t,"complex_union2")).
+struct_opv(claz_class,has_slot,slot(claz_t,"default_initargs")).
+struct_opv(claz_class,has_slot,slot(claz_t,"direct_default_initargs")).
+struct_opv(claz_class,has_slot,slot(claz_t,"direct_methods")).
+struct_opv(claz_class,has_slot,slot(claz_t,"direct_slots")).
+struct_opv(claz_class,has_slot,slot(claz_t,"direct_subclasses")).
+struct_opv(claz_class,has_slot,slot(claz_t,"direct_superclasses")).
+struct_opv(claz_class,has_slot,slot(claz_t,"documentation")).
+struct_opv(claz_class,has_slot,slot(claz_t,"enumerable_p")).
+struct_opv(claz_class,has_slot,slot(claz_t,"finalized_p")).
+struct_opv(claz_class,has_slot,slot(claz_t,"initialized")).
+struct_opv(claz_class,has_slot,slot(claz_t,"listeners")).
+struct_opv(claz_class,has_slot,slot(claz_t,"might_contain_other_types_p")).
+struct_opv(claz_class,has_slot,slot(claz_t,"name")).
+struct_opv(claz_class,has_slot,slot(claz_t,"negate")).
+struct_opv(claz_class,has_slot,slot(claz_t,"precedence_list")).
+struct_opv(claz_class,has_slot,slot(claz_t,"safe_p")).
+struct_opv(claz_class,has_slot,slot(claz_t,"simple_c61")).
+struct_opv(claz_class,has_slot,slot(claz_t,"simple_intersection2")).
+struct_opv(claz_class,has_slot,slot(claz_t,"simple_subtypep")).
+struct_opv(claz_class,has_slot,slot(claz_t,"simple_union2")).
+struct_opv(claz_class,has_slot,slot(claz_t,"singleton_p")).
+struct_opv(claz_class,has_slot,slot(claz_t,"slot_location_table")).
+struct_opv(claz_class,has_slot,slot(claz_t,"slots")).
+struct_opv(claz_class,has_slot,slot(claz_t,"unparse")).
+struct_opv(claz_class,subtypep,claz_definition_source_mixin).
+struct_opv(claz_class,subtypep,claz_dependent_update_mixin).
+struct_opv(claz_class,subtypep,claz_potential_class).
+struct_opv(claz_class,subtypep,claz_standard_specializer).
+struct_opv(claz_class,subtypep,claz_structure_c33_object).
+struct_opv(claz_class,super_priority,[claz_dependent_update_mixin,claz_plist_mixin,claz_definition_source_mixin,claz_standard_specializer,claz_specializer,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_class,super_priority,[claz_potential_class,claz_specializer,claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_class,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_class,typeof,type_class).
+struct_opv(claz_class,typeof,type_builtin_type).
+struct_opv(claz_class_eq_specializer,has_slot,slot(claz_t,"object")).
+struct_opv(claz_class_eq_specializer,subtypep,claz_exact_class_specializer).
+struct_opv(claz_class_eq_specializer,subtypep,claz_specializer_with_object).
+struct_opv(claz_class_eq_specializer,subtypep,claz_standard_specializer).
+struct_opv(claz_class_eq_specializer,super_priority,[claz_standard_specializer,claz_exact_class_specializer,claz_specializer_with_object,claz_specializer,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_class_eq_specializer,typeof,type_class).
+struct_opv(claz_class_eq_specializer,typeof,type_builtin_type).
+struct_opv(claz_class_precedence_description,has_slot,slot(claz_t,"cpd_after")).
+struct_opv(claz_class_precedence_description,has_slot,slot(claz_t,"cpd_class")).
+struct_opv(claz_class_precedence_description,has_slot,slot(claz_t,"cpd_count")).
+struct_opv(claz_class_precedence_description,has_slot,slot(claz_t,"cpd_supers")).
+struct_opv(claz_class_precedence_description,subtypep,claz_structure_object).
+struct_opv(claz_class_precedence_description,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_class_precedence_description,typeof,type_class).
+struct_opv(claz_class_precedence_description,typeof,type_builtin_type).
+struct_opv(claz_class_prototype_specializer,has_slot,slot(claz_t,"object")).
+struct_opv(claz_class_prototype_specializer,subtypep,claz_specializer_with_object).
+struct_opv(claz_class_prototype_specializer,subtypep,claz_standard_specializer).
+struct_opv(claz_class_prototype_specializer,super_priority,[claz_standard_specializer,claz_specializer_with_object,claz_specializer,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_class_prototype_specializer,typeof,type_class).
+struct_opv(claz_class_prototype_specializer,typeof,type_builtin_type).
+struct_opv(claz_classoid,has_slot,slot(claz_t,"class_info")).
+struct_opv(claz_classoid,has_slot,slot(claz_t,"direct_superclasses")).
+struct_opv(claz_classoid,has_slot,slot(claz_t,"layout")).
+struct_opv(claz_classoid,has_slot,slot(claz_t,"name")).
+struct_opv(claz_classoid,has_slot,slot(claz_t,"pcl_class")).
+struct_opv(claz_classoid,has_slot,slot(claz_t,"state")).
+struct_opv(claz_classoid,has_slot,slot(claz_t,"subclasses")).
+struct_opv(claz_classoid,subtypep,claz_ctype).
+struct_opv(claz_classoid,super_priority,[claz_ctype,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_classoid,typeof,type_class).
+struct_opv(claz_classoid,typeof,type_builtin_type).
+struct_opv(claz_classoid_cell,has_slot,slot(claz_t,"classoid")).
+struct_opv(claz_classoid_cell,has_slot,slot(claz_t,"name")).
+struct_opv(claz_classoid_cell,has_slot,slot(claz_t,"pcl_class")).
+struct_opv(claz_classoid_cell,subtypep,claz_structure_c33_object).
+struct_opv(claz_classoid_cell,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_classoid_cell,typeof,type_class).
+struct_opv(claz_classoid_cell,typeof,type_builtin_type).
+struct_opv(claz_cldolist,subtypep,claz_special_operator).
+struct_opv(claz_cldolist,typeof,type_builtin_type).
+struct_opv(claz_cldotimes,subtypep,claz_special_operator).
+struct_opv(claz_cldotimes,typeof,type_builtin_type).
+struct_opv(claz_cleanup,has_slot,slot(claz_t,"info")).
+struct_opv(claz_cleanup,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_cleanup,has_slot,slot(claz_t,"mess_up")).
+struct_opv(claz_cleanup,subtypep,claz_structure_c33_object).
+struct_opv(claz_cleanup,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_cleanup,typeof,type_class).
+struct_opv(claz_cleanup,typeof,type_builtin_type).
+struct_opv(claz_cloop,has_slot,slot(claz_t,"blocks")).
+struct_opv(claz_cloop,has_slot,slot(claz_t,"depth")).
+struct_opv(claz_cloop,has_slot,slot(claz_t,"exits")).
+struct_opv(claz_cloop,has_slot,slot(claz_t,"head")).
+struct_opv(claz_cloop,has_slot,slot(claz_t,"inferiors")).
+struct_opv(claz_cloop,has_slot,slot(claz_t,"info")).
+struct_opv(claz_cloop,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_cloop,has_slot,slot(claz_t,"superior")).
+struct_opv(claz_cloop,has_slot,slot(claz_t,"tail")).
+struct_opv(claz_cloop,subtypep,claz_structure_c33_object).
+struct_opv(claz_cloop,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_cloop,typeof,type_class).
+struct_opv(claz_cloop,typeof,type_builtin_type).
+struct_opv(claz_clos_warning,subtypep,claz_warning).
+struct_opv(claz_clos_warning,super_priority,[claz_warning,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_clos_warning,typeof,type_builtin_type).
+struct_opv(claz_closed_stream_error,subtypep,claz_stream_error).
+struct_opv(claz_closed_stream_error,super_priority,[claz_stream_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_closed_stream_error,typeof,type_builtin_type).
+struct_opv(claz_closure,has_slot,slot(claz_argument_list_processor,"arglist")).
+struct_opv(claz_closure,has_slot,slot(claz_array_of(claz_symbol),"free_specials")).
+struct_opv(claz_closure,has_slot,slot(claz_environment,"environment")).
+struct_opv(claz_closure,has_slot,slot(claz_object,"body")).
+struct_opv(claz_closure,has_slot,slot(claz_object,"execution_body")).
+struct_opv(claz_closure,kw_ro,"arglist").
+struct_opv(claz_closure,kw_ro,"body").
+struct_opv(claz_closure,kw_ro,"environment").
+struct_opv(claz_closure,kw_ro,"execution_body").
+struct_opv(claz_closure,kw_ro,"free_specials").
+struct_opv(claz_closure,subtypep,claz_function).
+struct_opv(claz_closure,typeof,type_builtin_type).
+struct_opv(claz_closure_binding,has_slot,slot(claz_object,"value")).
+struct_opv(claz_closure_binding,typeof,type_builtin_type).
+struct_opv(claz_cls_string,typeof,type_builtin_type).
+struct_opv(claz_clzip_directories,has_slot,slot(claz_j_zip_output_stream,"out")).
+struct_opv(claz_clzip_directories,typeof,type_builtin_type).
+struct_opv(claz_code_component,subtypep,claz_t).
+struct_opv(claz_code_component,super_priority,[claz_t]).
+struct_opv(claz_code_component,typeof,type_builtin_type).
+struct_opv(claz_code_deletion_note,subtypep,claz_simple_compiler_note).
+struct_opv(claz_code_deletion_note,super_priority,[claz_simple_compiler_note,claz_simple_condition,claz_compiler_note,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_code_deletion_note,typeof,type_builtin_type).
+struct_opv(claz_code_location,has_slot,slot(claz_t,"debug_block")).
+struct_opv(claz_code_location,has_slot,slot(claz_t,"debug_fun")).
+struct_opv(claz_code_location,has_slot,slot(claz_t,"form_number")).
+struct_opv(claz_code_location,has_slot,slot(claz_t,"tlf_offset")).
+struct_opv(claz_code_location,has_slot,slot(claz_t,"unknown_p")).
+struct_opv(claz_code_location,subtypep,claz_structure_object).
+struct_opv(claz_code_location,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_code_location,typeof,type_class).
+struct_opv(claz_code_location,typeof,type_builtin_type).
+struct_opv(claz_combination,subtypep,claz_basic_combination).
+struct_opv(claz_combination,super_priority,[claz_basic_combination,claz_valued_node,claz_node,claz_sset_element,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_combination,typeof,type_builtin_type).
+struct_opv(claz_comma,has_slot,slot(claz_t,"expr")).
+struct_opv(claz_comma,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_comma,subtypep,claz_structure_object).
+struct_opv(claz_comma,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_comma,typeof,type_class).
+struct_opv(claz_comma,typeof,type_builtin_type).
+struct_opv(claz_compiled_closure,has_slot,slot(claz_array_of(claz_closure_binding),"ctx")).
+struct_opv(claz_compiled_closure,subtypep,claz_closure).
+struct_opv(claz_compiled_closure,typeof,type_builtin_type).
+struct_opv(claz_compiled_code_location,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_compiled_code_location,has_slot,slot(claz_t,"live_set")).
+struct_opv(claz_compiled_code_location,has_slot,slot(claz_t,"pc")).
+struct_opv(claz_compiled_code_location,has_slot,slot(claz_t,"step_info")).
+struct_opv(claz_compiled_code_location,subtypep,claz_code_location).
+struct_opv(claz_compiled_code_location,super_priority,[claz_code_location,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_compiled_code_location,typeof,type_class).
+struct_opv(claz_compiled_code_location,typeof,type_builtin_type).
+struct_opv(claz_compiled_debug_block,has_slot,slot(claz_t,"code_locations")).
+struct_opv(claz_compiled_debug_block,subtypep,claz_debug_block).
+struct_opv(claz_compiled_debug_block,super_priority,[claz_debug_block,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_compiled_debug_block,typeof,type_class).
+struct_opv(claz_compiled_debug_block,typeof,type_builtin_type).
+struct_opv(claz_compiled_debug_fun,has_slot,slot(claz_t,"arguments")).
+struct_opv(claz_compiled_debug_fun,has_slot,slot(claz_t,"blocks")).
+struct_opv(claz_compiled_debug_fun,has_slot,slot(claz_t,"bsp_save")).
+struct_opv(claz_compiled_debug_fun,has_slot,slot(claz_t,"closure_save")).
+struct_opv(claz_compiled_debug_fun,has_slot,slot(claz_t,"compiler_debug_fun")).
+struct_opv(claz_compiled_debug_fun,has_slot,slot(claz_t,"component")).
+struct_opv(claz_compiled_debug_fun,has_slot,slot(claz_t,"elsewhere_pc")).
+struct_opv(claz_compiled_debug_fun,has_slot,slot(claz_t,"end_starter")).
+struct_opv(claz_compiled_debug_fun,has_slot,slot(claz_t,"form_number")).
+struct_opv(claz_compiled_debug_fun,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_compiled_debug_fun,has_slot,slot(claz_t,"name")).
+struct_opv(claz_compiled_debug_fun,has_slot,slot(claz_t,"returns")).
+struct_opv(claz_compiled_debug_fun,has_slot,slot(claz_t,"start_pc")).
+struct_opv(claz_compiled_debug_fun,has_slot,slot(claz_t,"tlf_number")).
+struct_opv(claz_compiled_debug_fun,has_slot,slot(claz_t,"vars")).
+struct_opv(claz_compiled_debug_fun,subtypep,claz_debug_fun).
+struct_opv(claz_compiled_debug_fun,super_priority,[claz_debug_fun,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_compiled_debug_fun,super_priority,[claz_debug_fun,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_compiled_debug_fun,typeof,type_class).
+struct_opv(claz_compiled_debug_fun,typeof,type_builtin_type).
+struct_opv(claz_compiled_debug_info,has_slot,slot(claz_t,"fun_map")).
+struct_opv(claz_compiled_debug_info,subtypep,claz_debug_info).
+struct_opv(claz_compiled_debug_info,super_priority,[claz_debug_info,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_compiled_debug_info,typeof,type_class).
+struct_opv(claz_compiled_debug_info,typeof,type_builtin_type).
+struct_opv(claz_compiled_debug_var,has_slot,slot(claz_t,"indirect_sc_offset")).
+struct_opv(claz_compiled_debug_var,has_slot,slot(claz_t,"info")).
+struct_opv(claz_compiled_debug_var,has_slot,slot(claz_t,"save_sc_offset")).
+struct_opv(claz_compiled_debug_var,has_slot,slot(claz_t,"sc_offset")).
+struct_opv(claz_compiled_debug_var,subtypep,claz_debug_var).
+struct_opv(claz_compiled_debug_var,super_priority,[claz_debug_var,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_compiled_debug_var,typeof,type_class).
+struct_opv(claz_compiled_debug_var,typeof,type_builtin_type).
+struct_opv(claz_compiled_frame,has_slot,slot(claz_t,"escaped")).
+struct_opv(claz_compiled_frame,subtypep,claz_frame).
+struct_opv(claz_compiled_frame,super_priority,[claz_frame,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_compiled_frame,typeof,type_class).
+struct_opv(claz_compiled_frame,typeof,type_builtin_type).
+struct_opv(claz_compiled_primitive,subtypep,claz_primitive).
+struct_opv(claz_compiled_primitive,typeof,type_builtin_type).
+struct_opv(claz_compiled_program_error,has_slot,slot(claz_t,"message")).
+struct_opv(claz_compiled_program_error,has_slot,slot(claz_t,"source")).
+struct_opv(claz_compiled_program_error,subtypep,claz_program_error).
+struct_opv(claz_compiled_program_error,super_priority,[claz_program_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_compiled_program_error,typeof,type_class).
+struct_opv(claz_compiled_program_error,typeof,type_builtin_type).
+struct_opv(claz_compiler_environment_too_complex_error,subtypep,claz_simple_error).
+struct_opv(claz_compiler_environment_too_complex_error,super_priority,[claz_simple_error,claz_simple_condition,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_compiler_environment_too_complex_error,typeof,type_builtin_type).
+struct_opv(claz_compiler_error,subtypep,claz_encapsulated_condition).
+struct_opv(claz_compiler_error,super_priority,[claz_encapsulated_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_compiler_error,typeof,type_builtin_type).
+struct_opv(claz_compiler_error_context,has_slot,slot(claz_t,"context")).
+struct_opv(claz_compiler_error_context,has_slot,slot(claz_t,"enclosing_source")).
+struct_opv(claz_compiler_error_context,has_slot,slot(claz_t,"file_name")).
+struct_opv(claz_compiler_error_context,has_slot,slot(claz_t,"file_position")).
+struct_opv(claz_compiler_error_context,has_slot,slot(claz_t,"lexenv")).
+struct_opv(claz_compiler_error_context,has_slot,slot(claz_t,"original_source")).
+struct_opv(claz_compiler_error_context,has_slot,slot(claz_t,"original_source_path")).
+struct_opv(claz_compiler_error_context,has_slot,slot(claz_t,"source")).
+struct_opv(claz_compiler_error_context,subtypep,claz_structure_object).
+struct_opv(claz_compiler_error_context,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_compiler_error_context,typeof,type_class).
+struct_opv(claz_compiler_error_context,typeof,type_builtin_type).
+struct_opv(claz_compiler_macro_application_missed_warning,has_slot,slot(claz_t,"count")).
+struct_opv(claz_compiler_macro_application_missed_warning,has_slot,slot(claz_t,"function")).
+struct_opv(claz_compiler_macro_application_missed_warning,subtypep,claz_style_warning).
+struct_opv(claz_compiler_macro_application_missed_warning,super_priority,[claz_style_warning,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_compiler_macro_application_missed_warning,typeof,type_class).
+struct_opv(claz_compiler_macro_application_missed_warning,typeof,type_builtin_type).
+struct_opv(claz_compiler_macro_keyword_problem,has_slot,slot(claz_t,"argument")).
+struct_opv(claz_compiler_macro_keyword_problem,subtypep,claz_condition).
+struct_opv(claz_compiler_macro_keyword_problem,super_priority,[claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_compiler_macro_keyword_problem,typeof,type_class).
+struct_opv(claz_compiler_macro_keyword_problem,typeof,type_builtin_type).
+struct_opv(claz_compiler_note,subtypep,claz_condition).
+struct_opv(claz_compiler_note,super_priority,[claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_compiler_note,typeof,type_builtin_type).
+struct_opv(claz_complex,has_slot,slot(claz_object,"imagpart")).
+struct_opv(claz_complex,has_slot,slot(claz_object,"realpart")).
+struct_opv(claz_complex,kw_ro,"imagpart").
+struct_opv(claz_complex,kw_ro,"realpart").
+struct_opv(claz_complex,subtypep,claz_number).
+struct_opv(claz_complex,subtypep,claz_object).
+struct_opv(claz_complex,super_priority,[claz_number,claz_t]).
+struct_opv(claz_complex,typeof,type_builtin_type).
+struct_opv(claz_complex_array(_2760),has_slot,slot(claz_array,"array")).
+struct_opv(claz_complex_array(_2760),has_slot,slot(claz_array_of(_2760),"data")).
+struct_opv(claz_complex_array(_2760),has_slot,slot(claz_array_of(claz_integer),"dimv")).
+struct_opv(claz_complex_array(_2760),has_slot,slot(claz_integer,"displacement")).
+struct_opv(claz_complex_array(_2760),has_slot,slot(claz_integer,"total_size")).
+struct_opv(claz_complex_array(_2760),kw_ro,"dimv").
+struct_opv(claz_complex_array(claz_unsigned_byte32),subtypep,claz_array).
+struct_opv(claz_complex_array(claz_unsigned_byte32),typeof,type_builtin_type).
+struct_opv(claz_complex_array(claz_unsigned_byte8),subtypep,claz_array).
+struct_opv(claz_complex_array(claz_unsigned_byte8),typeof,type_builtin_type).
+struct_opv(claz_complex_array,has_slot,slot(claz_array,"array")).
+struct_opv(claz_complex_array,has_slot,slot(claz_array_of(claz_integer),"dimv")).
+struct_opv(claz_complex_array,has_slot,slot(claz_integer,"displacement")).
+struct_opv(claz_complex_array,has_slot,slot(claz_integer,"total_size")).
+struct_opv(claz_complex_array,has_slot,slot(claz_list,"data")).
+struct_opv(claz_complex_array,has_slot,slot(claz_object,"element_type")).
+struct_opv(claz_complex_array,kw_ro,"dimv").
+struct_opv(claz_complex_array,kw_ro,"element_type").
+struct_opv(claz_complex_array,subtypep,claz_array).
+struct_opv(claz_complex_array,typeof,type_builtin_type).
+struct_opv(claz_complex_bit_vector,has_slot,slot(claz_array,"array")).
+struct_opv(claz_complex_bit_vector,has_slot,slot(claz_boolean,"is_displaced")).
+struct_opv(claz_complex_bit_vector,has_slot,slot(claz_integer,"displacement")).
+struct_opv(claz_complex_bit_vector,has_slot,slot(claz_integer,"fill_pointer")).
+struct_opv(claz_complex_bit_vector,subtypep,claz_bit_vector).
+struct_opv(claz_complex_bit_vector,typeof,type_builtin_type).
+struct_opv(claz_complex_double_float,subtypep,claz_complex).
+struct_opv(claz_complex_double_float,super_priority,[claz_complex,claz_number,claz_t]).
+struct_opv(claz_complex_double_float,typeof,type_builtin_type).
+struct_opv(claz_complex_single_float,subtypep,claz_complex).
+struct_opv(claz_complex_single_float,super_priority,[claz_complex,claz_number,claz_t]).
+struct_opv(claz_complex_single_float,typeof,type_builtin_type).
+struct_opv(claz_complex_string,has_slot,slot(claz_array,"array")).
+struct_opv(claz_complex_string,has_slot,slot(claz_array_of(claz_char_code),"chars")).
+struct_opv(claz_complex_string,has_slot,slot(claz_boolean,"is_displaced")).
+struct_opv(claz_complex_string,has_slot,slot(claz_integer,"capacity")).
+struct_opv(claz_complex_string,has_slot,slot(claz_integer,"displacement")).
+struct_opv(claz_complex_string,has_slot,slot(claz_integer,"fill_pointer")).
+struct_opv(claz_complex_string,subtypep,claz_string).
+struct_opv(claz_complex_string,typeof,type_builtin_type).
+struct_opv(claz_complex_vector(_2760),has_slot,slot(claz_array,"array")).
+struct_opv(claz_complex_vector(_2760),has_slot,slot(claz_array_of(_2760),"elements")).
+struct_opv(claz_complex_vector(_2760),has_slot,slot(claz_boolean,"is_displaced")).
+struct_opv(claz_complex_vector(_2760),has_slot,slot(claz_integer,"capacity")).
+struct_opv(claz_complex_vector(_2760),has_slot,slot(claz_integer,"displacement")).
+struct_opv(claz_complex_vector(_2760),has_slot,slot(claz_integer,"fill_pointer")).
+struct_opv(claz_complex_vector(claz_unsigned_byte32),subtypep,claz_vector).
+struct_opv(claz_complex_vector(claz_unsigned_byte32),typeof,type_builtin_type).
+struct_opv(claz_complex_vector(claz_unsigned_byte8),subtypep,claz_vector).
+struct_opv(claz_complex_vector(claz_unsigned_byte8),typeof,type_builtin_type).
+struct_opv(claz_complex_vector,has_slot,slot(claz_array,"array")).
+struct_opv(claz_complex_vector,has_slot,slot(claz_boolean,"is_displaced")).
+struct_opv(claz_complex_vector,has_slot,slot(claz_integer,"capacity")).
+struct_opv(claz_complex_vector,has_slot,slot(claz_integer,"displacement")).
+struct_opv(claz_complex_vector,has_slot,slot(claz_integer,"fill_pointer")).
+struct_opv(claz_complex_vector,has_slot,slot(claz_list,"elements")).
+struct_opv(claz_complex_vector,subtypep,claz_vector).
+struct_opv(claz_complex_vector,typeof,type_builtin_type).
+struct_opv(claz_component,has_slot,slot(claz_t,"delete_blocks")).
+struct_opv(claz_component,has_slot,slot(claz_t,"dx_lvars")).
+struct_opv(claz_component,has_slot,slot(claz_t,"failed_optimizations")).
+struct_opv(claz_component,has_slot,slot(claz_t,"head")).
+struct_opv(claz_component,has_slot,slot(claz_t,"info")).
+struct_opv(claz_component,has_slot,slot(claz_t,"inline_expansions")).
+struct_opv(claz_component,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_component,has_slot,slot(claz_t,"lambdas")).
+struct_opv(claz_component,has_slot,slot(claz_t,"last_block")).
+struct_opv(claz_component,has_slot,slot(claz_t,"name")).
+struct_opv(claz_component,has_slot,slot(claz_t,"new_functionals")).
+struct_opv(claz_component,has_slot,slot(claz_t,"nlx_info_generated_p")).
+struct_opv(claz_component,has_slot,slot(claz_t,"outer_loop")).
+struct_opv(claz_component,has_slot,slot(claz_t,"reanalyze")).
+struct_opv(claz_component,has_slot,slot(claz_t,"reanalyze_functionals")).
+struct_opv(claz_component,has_slot,slot(claz_t,"reoptimize")).
+struct_opv(claz_component,has_slot,slot(claz_t,"sset_number")).
+struct_opv(claz_component,has_slot,slot(claz_t,"tail")).
+struct_opv(claz_component,subtypep,claz_structure_c33_object).
+struct_opv(claz_component,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_component,typeof,type_class).
+struct_opv(claz_component,typeof,type_builtin_type).
+struct_opv(claz_compound_type,has_slot,slot(claz_t,"enumerable")).
+struct_opv(claz_compound_type,has_slot,slot(claz_t,"types")).
+struct_opv(claz_compound_type,subtypep,claz_ctype).
+struct_opv(claz_compound_type,super_priority,[claz_ctype,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_compound_type,typeof,type_class).
+struct_opv(claz_compound_type,typeof,type_builtin_type).
+struct_opv(claz_concatenated_stream,has_slot,slot(claz_object,"streams")).
+struct_opv(claz_concatenated_stream,has_slot,slot(claz_t,"bin")).
+struct_opv(claz_concatenated_stream,has_slot,slot(claz_t,"in")).
+struct_opv(claz_concatenated_stream,has_slot,slot(claz_t,"misc")).
+struct_opv(claz_concatenated_stream,has_slot,slot(claz_t,"n_bin")).
+struct_opv(claz_concatenated_stream,subtypep,claz_ansi_stream).
+struct_opv(claz_concatenated_stream,subtypep,claz_stream).
+struct_opv(claz_concatenated_stream,super_priority,[claz_ansi_stream,claz_stream,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_concatenated_stream,super_priority,[claz_stream,claz_t]).
+struct_opv(claz_concatenated_stream,typeof,type_class).
+struct_opv(claz_concatenated_stream,typeof,type_builtin_type).
+struct_opv(claz_condition,has_slot,slot(claz_string,"message")).
+struct_opv(claz_condition,subtypep,claz_slot_object).
+struct_opv(claz_condition,subtypep,claz_standard_object).
+struct_opv(claz_condition,super_priority,[claz_slot_object,claz_t]).
+struct_opv(claz_condition,super_priority,[claz_standard_object,claz_t]).
+struct_opv(claz_condition,typeof,type_builtin_type).
+struct_opv(claz_condition_class,subtypep,claz_slot_class).
+struct_opv(claz_condition_class,super_priority,[claz_slot_class,claz_pcl_class,claz_class,claz_dependent_update_mixin,claz_plist_mixin,claz_definition_source_mixin,claz_standard_specializer,claz_specializer,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_condition_class,typeof,type_builtin_type).
+struct_opv(claz_condition_classoid,has_slot,slot(claz_t,"class_slots")).
+struct_opv(claz_condition_classoid,has_slot,slot(claz_t,"cpl")).
+struct_opv(claz_condition_classoid,has_slot,slot(claz_t,"direct_default_initargs")).
+struct_opv(claz_condition_classoid,has_slot,slot(claz_t,"hairy_slots")).
+struct_opv(claz_condition_classoid,has_slot,slot(claz_t,"report")).
+struct_opv(claz_condition_classoid,has_slot,slot(claz_t,"slots")).
+struct_opv(claz_condition_classoid,subtypep,claz_classoid).
+struct_opv(claz_condition_classoid,super_priority,[claz_classoid,claz_ctype,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_condition_classoid,typeof,type_class).
+struct_opv(claz_condition_classoid,typeof,type_builtin_type).
+struct_opv(claz_condition_direct_slot_definition,subtypep,claz_condition_slot_definition).
+struct_opv(claz_condition_direct_slot_definition,subtypep,claz_direct_slot_definition).
+struct_opv(claz_condition_direct_slot_definition,super_priority,[claz_condition_slot_definition,claz_direct_slot_definition,claz_slot_definition,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_condition_direct_slot_definition,typeof,type_builtin_type).
+struct_opv(claz_condition_effective_slot_definition,subtypep,claz_condition_slot_definition).
+struct_opv(claz_condition_effective_slot_definition,subtypep,claz_effective_slot_definition).
+struct_opv(claz_condition_effective_slot_definition,super_priority,[claz_condition_slot_definition,claz_effective_slot_definition,claz_slot_definition,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_condition_effective_slot_definition,typeof,type_builtin_type).
+struct_opv(claz_condition_slot,has_slot,slot(claz_t,"allocation")).
+struct_opv(claz_condition_slot,has_slot,slot(claz_t,"cell")).
+struct_opv(claz_condition_slot,has_slot,slot(claz_t,"documentation")).
+struct_opv(claz_condition_slot,has_slot,slot(claz_t,"initargs")).
+struct_opv(claz_condition_slot,has_slot,slot(claz_t,"initform")).
+struct_opv(claz_condition_slot,has_slot,slot(claz_t,"initform_p")).
+struct_opv(claz_condition_slot,has_slot,slot(claz_t,"initfunction")).
+struct_opv(claz_condition_slot,has_slot,slot(claz_t,"name")).
+struct_opv(claz_condition_slot,has_slot,slot(claz_t,"readers")).
+struct_opv(claz_condition_slot,has_slot,slot(claz_t,"writers")).
+struct_opv(claz_condition_slot,subtypep,claz_structure_object).
+struct_opv(claz_condition_slot,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_condition_slot,typeof,type_class).
+struct_opv(claz_condition_slot,typeof,type_builtin_type).
+struct_opv(claz_condition_slot_definition,has_slot,slot(claz_t,"allocation")).
+struct_opv(claz_condition_slot_definition,has_slot,slot(claz_t,"allocation_class")).
+struct_opv(claz_condition_slot_definition,subtypep,claz_slot_definition).
+struct_opv(claz_condition_slot_definition,super_priority,[claz_slot_definition,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_condition_slot_definition,typeof,type_class).
+struct_opv(claz_condition_slot_definition,typeof,type_builtin_type).
+struct_opv(claz_cons,has_slot,slot(claz_object,"car")).
+struct_opv(claz_cons,has_slot,slot(claz_object,"cdr")).
+struct_opv(claz_cons,subtypep,claz_list).
+struct_opv(claz_cons,subtypep,claz_object).
+struct_opv(claz_cons,super_priority,[claz_list,claz_sequence,claz_t]).
+struct_opv(claz_cons,typeof,type_builtin_type).
+struct_opv(claz_cons_type,has_slot,slot(claz_t,"car_type")).
+struct_opv(claz_cons_type,has_slot,slot(claz_t,"cdr_type")).
+struct_opv(claz_cons_type,has_slot,slot(claz_t,"class_info")).
+struct_opv(claz_cons_type,subtypep,claz_ctype).
+struct_opv(claz_cons_type,super_priority,[claz_ctype,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_cons_type,typeof,type_class).
+struct_opv(claz_cons_type,typeof,type_builtin_type).
+struct_opv(claz_conset,has_slot,slot(claz_t,"max")).
+struct_opv(claz_conset,has_slot,slot(claz_t,"min")).
+struct_opv(claz_conset,has_slot,slot(claz_t,"vector")).
+struct_opv(claz_conset,subtypep,claz_structure_object).
+struct_opv(claz_conset,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_conset,typeof,type_class).
+struct_opv(claz_conset,typeof,type_builtin_type).
+struct_opv(claz_const,has_slot,slot(claz_t,"form")).
+struct_opv(claz_const,has_slot,slot(claz_t,"horizon")).
+struct_opv(claz_const,has_slot,slot(claz_t,"ltv_form")).
+struct_opv(claz_const,has_slot,slot(claz_t,"value")).
+struct_opv(claz_const,subtypep,claz_structure_object).
+struct_opv(claz_const,super_priority,[claz_structure_object,claz_t]).
+struct_opv(claz_const,typeof,type_class).
+struct_opv(claz_const,typeof,type_builtin_type).
+struct_opv(claz_constant,has_slot,slot(claz_t,"boxed_tn")).
+struct_opv(claz_constant,has_slot,slot(claz_t,"value")).
+struct_opv(claz_constant,subtypep,claz_leaf).
+struct_opv(claz_constant,super_priority,[claz_leaf,claz_sset_element,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_constant,typeof,type_class).
+struct_opv(claz_constant,typeof,type_builtin_type).
+struct_opv(claz_constant_fast_method_call,has_slot,slot(claz_t,"value")).
+struct_opv(claz_constant_fast_method_call,subtypep,claz_fast_method_call).
+struct_opv(claz_constant_fast_method_call,super_priority,[claz_fast_method_call,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_constant_fast_method_call,typeof,type_class).
+struct_opv(claz_constant_fast_method_call,typeof,type_builtin_type).
+struct_opv(claz_constant_method_call,has_slot,slot(claz_t,"value")).
+struct_opv(claz_constant_method_call,subtypep,claz_method_call).
+struct_opv(claz_constant_method_call,super_priority,[claz_method_call,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_constant_method_call,typeof,type_class).
+struct_opv(claz_constant_method_call,typeof,type_builtin_type).
+struct_opv(claz_constant_modified,has_slot,slot(claz_t,"fun_name")).
+struct_opv(claz_constant_modified,subtypep,claz_reference_condition).
+struct_opv(claz_constant_modified,subtypep,claz_warning).
+struct_opv(claz_constant_modified,super_priority,[claz_reference_condition,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_constant_modified,typeof,type_class).
+struct_opv(claz_constant_modified,typeof,type_builtin_type).
+struct_opv(claz_constant_type,has_slot,slot(claz_t,"class_info")).
+struct_opv(claz_constant_type,has_slot,slot(claz_t,"type")).
+struct_opv(claz_constant_type,subtypep,claz_ctype).
+struct_opv(claz_constant_type,super_priority,[claz_ctype,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_constant_type,typeof,type_class).
+struct_opv(claz_constant_type,typeof,type_builtin_type).
+struct_opv(claz_constant_value,subtypep,claz_dfun_info).
+struct_opv(claz_constant_value,super_priority,[claz_dfun_info,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_constant_value,typeof,type_builtin_type).
+struct_opv(claz_constraint,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_constraint,has_slot,slot(claz_t,"not_p")).
+struct_opv(claz_constraint,has_slot,slot(claz_t,"x")).
+struct_opv(claz_constraint,has_slot,slot(claz_t,"y")).
+struct_opv(claz_constraint,subtypep,claz_sset_element).
+struct_opv(claz_constraint,super_priority,[claz_sset_element,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_constraint,typeof,type_class).
+struct_opv(claz_constraint,typeof,type_builtin_type).
+struct_opv(claz_control_error,subtypep,claz_error).
+struct_opv(claz_control_error,subtypep,claz_lisp_error).
+struct_opv(claz_control_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_control_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_control_error,typeof,type_builtin_type).
+struct_opv(claz_control_stack_exhausted,subtypep,claz_storage_condition).
+struct_opv(claz_control_stack_exhausted,super_priority,[claz_storage_condition,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_control_stack_exhausted,typeof,type_builtin_type).
+struct_opv(claz_control_string_directive,has_slot,slot(claz_t,"atsign_p")).
+struct_opv(claz_control_string_directive,has_slot,slot(claz_t,"clause_chain")).
+struct_opv(claz_control_string_directive,has_slot,slot(claz_t,"colon_p")).
+struct_opv(claz_control_string_directive,has_slot,slot(claz_t,"cs_index")).
+struct_opv(claz_control_string_directive,has_slot,slot(claz_t,"data")).
+struct_opv(claz_control_string_directive,has_slot,slot(claz_t,"parm_list")).
+struct_opv(claz_control_string_directive,has_slot,slot(claz_t,"type")).
+struct_opv(claz_control_string_directive,has_slot,slot(claz_t,"v_or_c35_p")).
+struct_opv(claz_control_string_directive,subtypep,claz_structure_object).
+struct_opv(claz_control_string_directive,super_priority,[claz_structure_object,claz_t]).
+struct_opv(claz_control_string_directive,typeof,type_class).
+struct_opv(claz_control_string_directive,typeof,type_builtin_type).
+struct_opv(claz_control_transfer,subtypep,claz_prolog_runtime_exception).
+struct_opv(claz_control_transfer,typeof,type_builtin_type).
+struct_opv(claz_core_object,has_slot,slot(claz_t,"debug_info")).
+struct_opv(claz_core_object,has_slot,slot(claz_t,"entry_table")).
+struct_opv(claz_core_object,has_slot,slot(claz_t,"patch_table")).
+struct_opv(claz_core_object,subtypep,claz_structure_object).
+struct_opv(claz_core_object,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_core_object,typeof,type_class).
+struct_opv(claz_core_object,typeof,type_builtin_type).
+struct_opv(claz_counter,has_slot,slot(claz_t,"overflow")).
+struct_opv(claz_counter,has_slot,slot(claz_t,"word")).
+struct_opv(claz_counter,subtypep,claz_structure_object).
+struct_opv(claz_counter,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_counter,typeof,type_class).
+struct_opv(claz_counter,typeof,type_builtin_type).
+struct_opv(claz_cpl_protocol_violation,has_slot,slot(claz_t,"class")).
+struct_opv(claz_cpl_protocol_violation,has_slot,slot(claz_t,"cpl")).
+struct_opv(claz_cpl_protocol_violation,subtypep,claz_error).
+struct_opv(claz_cpl_protocol_violation,subtypep,claz_reference_condition).
+struct_opv(claz_cpl_protocol_violation,super_priority,[claz_reference_condition,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_cpl_protocol_violation,typeof,type_class).
+struct_opv(claz_cpl_protocol_violation,typeof,type_builtin_type).
+struct_opv(claz_creturn,has_slot,slot(claz_t,"lambda")).
+struct_opv(claz_creturn,has_slot,slot(claz_t,"result")).
+struct_opv(claz_creturn,has_slot,slot(claz_t,"result_type")).
+struct_opv(claz_creturn,subtypep,claz_node).
+struct_opv(claz_creturn,super_priority,[claz_node,claz_sset_element,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_creturn,typeof,type_class).
+struct_opv(claz_creturn,typeof,type_builtin_type).
+struct_opv(claz_cset,has_slot,slot(claz_t,"derived_type")).
+struct_opv(claz_cset,has_slot,slot(claz_t,"value")).
+struct_opv(claz_cset,has_slot,slot(claz_t,"var")).
+struct_opv(claz_cset,subtypep,claz_valued_node).
+struct_opv(claz_cset,super_priority,[claz_valued_node,claz_node,claz_sset_element,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_cset,typeof,type_class).
+struct_opv(claz_cset,typeof,type_builtin_type).
+struct_opv(claz_ctor,has_slot,slot(claz_t,"class")).
+struct_opv(claz_ctor,has_slot,slot(claz_t,"class_or_name")).
+struct_opv(claz_ctor,has_slot,slot(claz_t,"function_name")).
+struct_opv(claz_ctor,has_slot,slot(claz_t,"initargs")).
+struct_opv(claz_ctor,has_slot,slot(claz_t,"safe_p")).
+struct_opv(claz_ctor,has_slot,slot(claz_t,"state")).
+struct_opv(claz_ctor,subtypep,claz_function).
+struct_opv(claz_ctor,super_priority,[claz_t]).
+struct_opv(claz_ctor,typeof,type_class).
+struct_opv(claz_ctor,typeof,type_builtin_type).
+struct_opv(claz_ctran,has_slot,slot(claz_t,"block")).
+struct_opv(claz_ctran,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_ctran,has_slot,slot(claz_t,"next")).
+struct_opv(claz_ctran,has_slot,slot(claz_t,"use")).
+struct_opv(claz_ctran,subtypep,claz_structure_c33_object).
+struct_opv(claz_ctran,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_ctran,typeof,type_class).
+struct_opv(claz_ctran,typeof,type_builtin_type).
+struct_opv(claz_ctype,has_slot,slot(claz_t,"class_info")).
+struct_opv(claz_ctype,has_slot,slot(claz_t,"hash_value")).
+struct_opv(claz_ctype,subtypep,claz_structure_c33_object).
+struct_opv(claz_ctype,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_ctype,typeof,type_class).
+struct_opv(claz_ctype,typeof,type_builtin_type).
+struct_opv(claz_dead_beef_structure_object,subtypep,claz_structure_object).
+struct_opv(claz_dead_beef_structure_object,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_dead_beef_structure_object,typeof,type_builtin_type).
+struct_opv(claz_deadline_timeout,subtypep,claz_timeout).
+struct_opv(claz_deadline_timeout,super_priority,[claz_timeout,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_deadline_timeout,typeof,type_builtin_type).
+struct_opv(claz_debug_block,has_slot,slot(claz_t,"elsewhere_p")).
+struct_opv(claz_debug_block,subtypep,claz_structure_object).
+struct_opv(claz_debug_block,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_debug_block,typeof,type_class).
+struct_opv(claz_debug_block,typeof,type_builtin_type).
+struct_opv(claz_debug_condition,subtypep,claz_serious_condition).
+struct_opv(claz_debug_condition,super_priority,[claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_debug_condition,typeof,type_builtin_type).
+struct_opv(claz_debug_error,subtypep,claz_error).
+struct_opv(claz_debug_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_debug_error,typeof,type_builtin_type).
+struct_opv(claz_debug_fun,has_slot,slot(claz_t,"blocks")).
+struct_opv(claz_debug_fun,has_slot,slot(claz_t,"debug_vars")).
+struct_opv(claz_debug_fun,has_slot,slot(claz_t,"function")).
+struct_opv(claz_debug_fun,has_slot,slot(claz_t,"lambda_list")).
+struct_opv(claz_debug_fun,subtypep,claz_structure_c33_object).
+struct_opv(claz_debug_fun,subtypep,claz_structure_object).
+struct_opv(claz_debug_fun,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_debug_fun,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_debug_fun,typeof,type_class).
+struct_opv(claz_debug_fun,typeof,type_builtin_type).
+struct_opv(claz_debug_info,has_slot,slot(claz_t,"name")).
+struct_opv(claz_debug_info,has_slot,slot(claz_t,"source")).
+struct_opv(claz_debug_info,subtypep,claz_structure_c33_object).
+struct_opv(claz_debug_info,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_debug_info,typeof,type_class).
+struct_opv(claz_debug_info,typeof,type_builtin_type).
+struct_opv(claz_debug_name_marker,subtypep,claz_structure_c33_object).
+struct_opv(claz_debug_name_marker,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_debug_name_marker,typeof,type_builtin_type).
+struct_opv(claz_debug_source,has_slot,slot(claz_t,"compiled")).
+struct_opv(claz_debug_source,has_slot,slot(claz_t,"created")).
+struct_opv(claz_debug_source,has_slot,slot(claz_t,"form")).
+struct_opv(claz_debug_source,has_slot,slot(claz_t,"function")).
+struct_opv(claz_debug_source,has_slot,slot(claz_t,"namestring")).
+struct_opv(claz_debug_source,has_slot,slot(claz_t,"plist")).
+struct_opv(claz_debug_source,has_slot,slot(claz_t,"source_root")).
+struct_opv(claz_debug_source,has_slot,slot(claz_t,"start_positions")).
+struct_opv(claz_debug_source,subtypep,claz_structure_c33_object).
+struct_opv(claz_debug_source,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_debug_source,typeof,type_class).
+struct_opv(claz_debug_source,typeof,type_builtin_type).
+struct_opv(claz_debug_var,has_slot,slot(claz_t,"alive_p")).
+struct_opv(claz_debug_var,has_slot,slot(claz_t,"id")).
+struct_opv(claz_debug_var,has_slot,slot(claz_t,"symbol")).
+struct_opv(claz_debug_var,subtypep,claz_structure_object).
+struct_opv(claz_debug_var,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_debug_var,typeof,type_class).
+struct_opv(claz_debug_var,typeof,type_builtin_type).
+struct_opv(claz_declaration_type_conflict_error,subtypep,claz_reference_condition).
+struct_opv(claz_declaration_type_conflict_error,subtypep,claz_simple_error).
+struct_opv(claz_declaration_type_conflict_error,super_priority,[claz_reference_condition,claz_simple_error,claz_simple_condition,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_declaration_type_conflict_error,typeof,type_builtin_type).
+struct_opv(claz_decoding_reader,has_slot,slot(claz_prolog_byte_buffer,"bbuf")).
+struct_opv(claz_decoding_reader,has_slot,slot(claz_prolog_charset_decoder,"cd")).
+struct_opv(claz_decoding_reader,has_slot,slot(claz_prolog_charset_encoder,"ce")).
+struct_opv(claz_decoding_reader,has_slot,slot(claz_prolog_pushback_input_stream,"stream")).
+struct_opv(claz_decoding_reader,subtypep,claz_prolog_pushback_reader).
+struct_opv(claz_decoding_reader,typeof,type_builtin_type).
+struct_opv(claz_default_method_only,subtypep,claz_dfun_info).
+struct_opv(claz_default_method_only,super_priority,[claz_dfun_info,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_default_method_only,typeof,type_builtin_type).
+struct_opv(claz_defconstant_uneql,has_slot,slot(claz_t,"name")).
+struct_opv(claz_defconstant_uneql,has_slot,slot(claz_t,"new_value")).
+struct_opv(claz_defconstant_uneql,has_slot,slot(claz_t,"old_value")).
+struct_opv(claz_defconstant_uneql,subtypep,claz_error).
+struct_opv(claz_defconstant_uneql,subtypep,claz_reference_condition).
+struct_opv(claz_defconstant_uneql,super_priority,[claz_reference_condition,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_defconstant_uneql,typeof,type_class).
+struct_opv(claz_defconstant_uneql,typeof,type_builtin_type).
+struct_opv(claz_defined_fun,has_slot,slot(claz_t,"functionals")).
+struct_opv(claz_defined_fun,has_slot,slot(claz_t,"inline_expansion")).
+struct_opv(claz_defined_fun,has_slot,slot(claz_t,"inlinep")).
+struct_opv(claz_defined_fun,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_defined_fun,has_slot,slot(claz_t,"where_from")).
+struct_opv(claz_defined_fun,subtypep,claz_global_var).
+struct_opv(claz_defined_fun,super_priority,[claz_global_var,claz_basic_var,claz_leaf,claz_sset_element,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_defined_fun,typeof,type_class).
+struct_opv(claz_defined_fun,typeof,type_builtin_type).
+struct_opv(claz_definition_source_location,has_slot,slot(claz_t,"form_number")).
+struct_opv(claz_definition_source_location,has_slot,slot(claz_t,"namestring")).
+struct_opv(claz_definition_source_location,has_slot,slot(claz_t,"plist")).
+struct_opv(claz_definition_source_location,has_slot,slot(claz_t,"toplevel_form_number")).
+struct_opv(claz_definition_source_location,subtypep,claz_structure_c33_object).
+struct_opv(claz_definition_source_location,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_definition_source_location,typeof,type_class).
+struct_opv(claz_definition_source_location,typeof,type_builtin_type).
+struct_opv(claz_definition_source_mixin,has_slot,slot(claz_t,"source")).
+struct_opv(claz_definition_source_mixin,subtypep,claz_standard_object).
+struct_opv(claz_definition_source_mixin,super_priority,[claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_definition_source_mixin,typeof,type_class).
+struct_opv(claz_definition_source_mixin,typeof,type_builtin_type).
+struct_opv(claz_defmacro_lambda_list_bind_error,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_defmacro_lambda_list_bind_error,has_slot,slot(claz_t,"name")).
+struct_opv(claz_defmacro_lambda_list_bind_error,subtypep,claz_error).
+struct_opv(claz_defmacro_lambda_list_bind_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_defmacro_lambda_list_bind_error,typeof,type_class).
+struct_opv(claz_defmacro_lambda_list_bind_error,typeof,type_builtin_type).
+struct_opv(claz_defmacro_lambda_list_broken_key_list_error,has_slot,slot(claz_t,"info")).
+struct_opv(claz_defmacro_lambda_list_broken_key_list_error,has_slot,slot(claz_t,"problem")).
+struct_opv(claz_defmacro_lambda_list_broken_key_list_error,subtypep,claz_defmacro_lambda_list_bind_error).
+struct_opv(claz_defmacro_lambda_list_broken_key_list_error,super_priority,[claz_defmacro_lambda_list_bind_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_defmacro_lambda_list_broken_key_list_error,typeof,type_class).
+struct_opv(claz_defmacro_lambda_list_broken_key_list_error,typeof,type_builtin_type).
+struct_opv(claz_defstruct_description,has_slot,slot(claz_t,"alternate_metaclass")).
+struct_opv(claz_defstruct_description,has_slot,slot(claz_t,"conc_name")).
+struct_opv(claz_defstruct_description,has_slot,slot(claz_t,"constructors")).
+struct_opv(claz_defstruct_description,has_slot,slot(claz_t,"copier_name")).
+struct_opv(claz_defstruct_description,has_slot,slot(claz_t,"doc")).
+struct_opv(claz_defstruct_description,has_slot,slot(claz_t,"element_type")).
+struct_opv(claz_defstruct_description,has_slot,slot(claz_t,"include")).
+struct_opv(claz_defstruct_description,has_slot,slot(claz_t,"inherited_accessor_alist")).
+struct_opv(claz_defstruct_description,has_slot,slot(claz_t,"length")).
+struct_opv(claz_defstruct_description,has_slot,slot(claz_t,"name")).
+struct_opv(claz_defstruct_description,has_slot,slot(claz_t,"named")).
+struct_opv(claz_defstruct_description,has_slot,slot(claz_t,"null_lexenv_p")).
+struct_opv(claz_defstruct_description,has_slot,slot(claz_t,"offset")).
+struct_opv(claz_defstruct_description,has_slot,slot(claz_t,"predicate_name")).
+struct_opv(claz_defstruct_description,has_slot,slot(claz_t,"print_option")).
+struct_opv(claz_defstruct_description,has_slot,slot(claz_t,"printer_fname")).
+struct_opv(claz_defstruct_description,has_slot,slot(claz_t,"pure")).
+struct_opv(claz_defstruct_description,has_slot,slot(claz_t,"slots")).
+struct_opv(claz_defstruct_description,has_slot,slot(claz_t,"type")).
+struct_opv(claz_defstruct_description,subtypep,claz_structure_c33_object).
+struct_opv(claz_defstruct_description,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_defstruct_description,typeof,type_class).
+struct_opv(claz_defstruct_description,typeof,type_builtin_type).
+struct_opv(claz_defstruct_slot_description,has_slot,slot(claz_t,"accessor_name")).
+struct_opv(claz_defstruct_slot_description,has_slot,slot(claz_t,"default")).
+struct_opv(claz_defstruct_slot_description,has_slot,slot(claz_t,"index")).
+struct_opv(claz_defstruct_slot_description,has_slot,slot(claz_t,"name")).
+struct_opv(claz_defstruct_slot_description,has_slot,slot(claz_t,"raw_type")).
+struct_opv(claz_defstruct_slot_description,has_slot,slot(claz_t,"read_only")).
+struct_opv(claz_defstruct_slot_description,has_slot,slot(claz_t,"safe_p")).
+struct_opv(claz_defstruct_slot_description,has_slot,slot(claz_t,"type")).
+struct_opv(claz_defstruct_slot_description,subtypep,claz_structure_c33_object).
+struct_opv(claz_defstruct_slot_description,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_defstruct_slot_description,typeof,type_class).
+struct_opv(claz_defstruct_slot_description,typeof,type_builtin_type).
+struct_opv(claz_dependent_update_mixin,subtypep,claz_plist_mixin).
+struct_opv(claz_dependent_update_mixin,super_priority,[claz_plist_mixin,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_dependent_update_mixin,typeof,type_builtin_type).
+struct_opv(claz_deprecated_eval_when_situations,has_slot,slot(claz_t,"situations")).
+struct_opv(claz_deprecated_eval_when_situations,subtypep,claz_style_warning).
+struct_opv(claz_deprecated_eval_when_situations,super_priority,[claz_style_warning,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_deprecated_eval_when_situations,typeof,type_class).
+struct_opv(claz_deprecated_eval_when_situations,typeof,type_builtin_type).
+struct_opv(claz_deprecation_condition,has_slot,slot(claz_t,"name")).
+struct_opv(claz_deprecation_condition,has_slot,slot(claz_t,"namespace")).
+struct_opv(claz_deprecation_condition,has_slot,slot(claz_t,"replacements")).
+struct_opv(claz_deprecation_condition,has_slot,slot(claz_t,"runtime_error")).
+struct_opv(claz_deprecation_condition,has_slot,slot(claz_t,"software")).
+struct_opv(claz_deprecation_condition,has_slot,slot(claz_t,"version")).
+struct_opv(claz_deprecation_condition,subtypep,claz_reference_condition).
+struct_opv(claz_deprecation_condition,super_priority,[claz_reference_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_deprecation_condition,typeof,type_class).
+struct_opv(claz_deprecation_condition,typeof,type_builtin_type).
+struct_opv(claz_deprecation_error,subtypep,claz_deprecation_condition).
+struct_opv(claz_deprecation_error,subtypep,claz_error).
+struct_opv(claz_deprecation_error,super_priority,[claz_error,claz_serious_condition,claz_deprecation_condition,claz_reference_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_deprecation_error,typeof,type_builtin_type).
+struct_opv(claz_deprecation_info,has_slot,slot(claz_t,"replacements")).
+struct_opv(claz_deprecation_info,has_slot,slot(claz_t,"software")).
+struct_opv(claz_deprecation_info,has_slot,slot(claz_t,"state")).
+struct_opv(claz_deprecation_info,has_slot,slot(claz_t,"version")).
+struct_opv(claz_deprecation_info,subtypep,claz_structure_object).
+struct_opv(claz_deprecation_info,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_deprecation_info,typeof,type_class).
+struct_opv(claz_deprecation_info,typeof,type_builtin_type).
+struct_opv(claz_describe_stream,subtypep,claz_fill_stream).
+struct_opv(claz_describe_stream,super_priority,[claz_fill_stream,claz_fundamental_character_output_stream,claz_fundamental_output_stream,claz_fundamental_character_stream,claz_fundamental_stream,claz_stream,claz_standard_object,claz_t]).
+struct_opv(claz_describe_stream,typeof,type_builtin_type).
+struct_opv(claz_dfun_info,has_slot,slot(claz_t,"cache")).
+struct_opv(claz_dfun_info,subtypep,claz_structure_object).
+struct_opv(claz_dfun_info,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_dfun_info,typeof,type_class).
+struct_opv(claz_dfun_info,typeof,type_builtin_type).
+struct_opv(claz_direct_slot_definition,has_slot,slot(claz_t,"readers")).
+struct_opv(claz_direct_slot_definition,has_slot,slot(claz_t,"writers")).
+struct_opv(claz_direct_slot_definition,subtypep,claz_slot_definition).
+struct_opv(claz_direct_slot_definition,super_priority,[claz_slot_definition,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_direct_slot_definition,super_priority,[claz_slot_definition,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_direct_slot_definition,typeof,type_class).
+struct_opv(claz_direct_slot_definition,typeof,type_builtin_type).
+struct_opv(claz_disassem_state,has_slot,slot(claz_t,"addr_print_len")).
+struct_opv(claz_disassem_state,has_slot,slot(claz_t,"alignment")).
+struct_opv(claz_disassem_state,has_slot,slot(claz_t,"argument_column")).
+struct_opv(claz_disassem_state,has_slot,slot(claz_t,"byte_order")).
+struct_opv(claz_disassem_state,has_slot,slot(claz_t,"cur_labels")).
+struct_opv(claz_disassem_state,has_slot,slot(claz_t,"cur_offs")).
+struct_opv(claz_disassem_state,has_slot,slot(claz_t,"cur_offs_hooks")).
+struct_opv(claz_disassem_state,has_slot,slot(claz_t,"current_valid_locations")).
+struct_opv(claz_disassem_state,has_slot,slot(claz_t,"filtered_values")).
+struct_opv(claz_disassem_state,has_slot,slot(claz_t,"fun_hooks")).
+struct_opv(claz_disassem_state,has_slot,slot(claz_t,"inst_properties")).
+struct_opv(claz_disassem_state,has_slot,slot(claz_t,"label_hash")).
+struct_opv(claz_disassem_state,has_slot,slot(claz_t,"labels")).
+struct_opv(claz_disassem_state,has_slot,slot(claz_t,"next_offs")).
+struct_opv(claz_disassem_state,has_slot,slot(claz_t,"notes")).
+struct_opv(claz_disassem_state,has_slot,slot(claz_t,"output_state")).
+struct_opv(claz_disassem_state,has_slot,slot(claz_t,"properties")).
+struct_opv(claz_disassem_state,has_slot,slot(claz_t,"segment")).
+struct_opv(claz_disassem_state,has_slot,slot(claz_t,"segment_sap")).
+struct_opv(claz_disassem_state,subtypep,claz_structure_object).
+struct_opv(claz_disassem_state,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_disassem_state,typeof,type_class).
+struct_opv(claz_disassem_state,typeof,type_builtin_type).
+struct_opv(claz_dispatch,subtypep,claz_dfun_info).
+struct_opv(claz_dispatch,super_priority,[claz_dfun_info,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_dispatch,typeof,type_builtin_type).
+struct_opv(claz_dispatch_macro_function,subtypep,claz_function).
+struct_opv(claz_dispatch_macro_function,typeof,type_builtin_type).
+struct_opv(claz_division_by_zero,subtypep,claz_arithmetic_error).
+struct_opv(claz_division_by_zero,super_priority,[claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_division_by_zero,super_priority,[claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_division_by_zero,typeof,type_builtin_type).
+struct_opv(claz_double,typeof,type_builtin_type).
+struct_opv(claz_double_float,has_slot,slot(claz_double,"value")).
+struct_opv(claz_double_float,kw_ro,"value").
+struct_opv(claz_double_float,subtypep,claz_float).
+struct_opv(claz_double_float,subtypep,claz_object).
+struct_opv(claz_double_float,super_priority,[claz_float,claz_real,claz_number,claz_t]).
+struct_opv(claz_double_float,typeof,type_builtin_type).
+struct_opv(claz_downcase_stream,subtypep,claz_case_frob_stream).
+struct_opv(claz_downcase_stream,typeof,type_builtin_type).
+struct_opv(claz_dubious_asterisks_around_variable_name,subtypep,claz_simple_condition).
+struct_opv(claz_dubious_asterisks_around_variable_name,subtypep,claz_style_warning).
+struct_opv(claz_dubious_asterisks_around_variable_name,super_priority,[claz_style_warning,claz_warning,claz_simple_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_dubious_asterisks_around_variable_name,typeof,type_builtin_type).
+struct_opv(claz_duplicate_case_key_warning,has_slot,slot(claz_t,"case_kind")).
+struct_opv(claz_duplicate_case_key_warning,has_slot,slot(claz_t,"key")).
+struct_opv(claz_duplicate_case_key_warning,has_slot,slot(claz_t,"occurrences")).
+struct_opv(claz_duplicate_case_key_warning,subtypep,claz_style_warning).
+struct_opv(claz_duplicate_case_key_warning,super_priority,[claz_style_warning,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_duplicate_case_key_warning,typeof,type_class).
+struct_opv(claz_duplicate_case_key_warning,typeof,type_builtin_type).
+struct_opv(claz_duplicate_definition,has_slot,slot(claz_t,"name")).
+struct_opv(claz_duplicate_definition,subtypep,claz_reference_condition).
+struct_opv(claz_duplicate_definition,subtypep,claz_warning).
+struct_opv(claz_duplicate_definition,super_priority,[claz_reference_condition,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_duplicate_definition,typeof,type_class).
+struct_opv(claz_duplicate_definition,typeof,type_builtin_type).
+struct_opv(claz_ea,has_slot,slot(claz_t,"base")).
+struct_opv(claz_ea,has_slot,slot(claz_t,"disp")).
+struct_opv(claz_ea,has_slot,slot(claz_t,"index")).
+struct_opv(claz_ea,has_slot,slot(claz_t,"scale")).
+struct_opv(claz_ea,has_slot,slot(claz_t,"size")).
+struct_opv(claz_ea,subtypep,claz_structure_object).
+struct_opv(claz_ea,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_ea,typeof,type_class).
+struct_opv(claz_ea,typeof,type_builtin_type).
+struct_opv(claz_early_deprecation_warning,subtypep,claz_deprecation_condition).
+struct_opv(claz_early_deprecation_warning,subtypep,claz_style_warning).
+struct_opv(claz_early_deprecation_warning,super_priority,[claz_style_warning,claz_warning,claz_deprecation_condition,claz_reference_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_early_deprecation_warning,typeof,type_builtin_type).
+struct_opv(claz_echo_stream,has_slot,slot(claz_integer,"unread_char")).
+struct_opv(claz_echo_stream,has_slot,slot(claz_stream,"in")).
+struct_opv(claz_echo_stream,has_slot,slot(claz_stream,"out")).
+struct_opv(claz_echo_stream,has_slot,slot(claz_t,"bin")).
+struct_opv(claz_echo_stream,has_slot,slot(claz_t,"misc")).
+struct_opv(claz_echo_stream,has_slot,slot(claz_t,"n_bin")).
+struct_opv(claz_echo_stream,has_slot,slot(claz_t,"unread_stuff")).
+struct_opv(claz_echo_stream,kw_ro,"in").
+struct_opv(claz_echo_stream,kw_ro,"out").
+struct_opv(claz_echo_stream,subtypep,claz_stream).
+struct_opv(claz_echo_stream,subtypep,claz_two_way_stream).
+struct_opv(claz_echo_stream,super_priority,[claz_stream,claz_t]).
+struct_opv(claz_echo_stream,super_priority,[claz_two_way_stream,claz_ansi_stream,claz_stream,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_echo_stream,typeof,type_class).
+struct_opv(claz_echo_stream,typeof,type_builtin_type).
+struct_opv(claz_effective_slot_definition,has_slot,slot(claz_t,"accessor_flags")).
+struct_opv(claz_effective_slot_definition,has_slot,slot(claz_t,"efm_sbuc")).
+struct_opv(claz_effective_slot_definition,has_slot,slot(claz_t,"efm_smuc")).
+struct_opv(claz_effective_slot_definition,has_slot,slot(claz_t,"efm_ssvuc")).
+struct_opv(claz_effective_slot_definition,has_slot,slot(claz_t,"efm_svuc")).
+struct_opv(claz_effective_slot_definition,has_slot,slot(claz_t,"info")).
+struct_opv(claz_effective_slot_definition,has_slot,slot(claz_t,"location")).
+struct_opv(claz_effective_slot_definition,subtypep,claz_slot_definition).
+struct_opv(claz_effective_slot_definition,super_priority,[claz_slot_definition,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_effective_slot_definition,super_priority,[claz_slot_definition,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_effective_slot_definition,typeof,type_class).
+struct_opv(claz_effective_slot_definition,typeof,type_builtin_type).
+struct_opv(claz_emf_cache,has_slot,slot(claz_hash_table(claz_emf_cache_cache_entry,claz_object),"cache")).
+struct_opv(claz_emf_cache,has_slot,slot(claz_index_of(claz_emf_cache_eql_specialization),"eql_specializations")).
+struct_opv(claz_emf_cache,subtypep,claz_object).
+struct_opv(claz_emf_cache,typeof,type_builtin_type).
+struct_opv(claz_emf_cache_cache_entry,has_slot,slot(claz_list,"array")).
+struct_opv(claz_emf_cache_cache_entry,kw_ro,"array").
+struct_opv(claz_emf_cache_cache_entry,typeof,type_builtin_type).
+struct_opv(claz_emf_cache_eql_specialization,has_slot,slot(claz_object,"eql_to")).
+struct_opv(claz_emf_cache_eql_specialization,typeof,type_builtin_type).
+struct_opv(claz_encapsulated_condition,has_slot,slot(claz_t,"condition")).
+struct_opv(claz_encapsulated_condition,subtypep,claz_condition).
+struct_opv(claz_encapsulated_condition,super_priority,[claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_encapsulated_condition,typeof,type_class).
+struct_opv(claz_encapsulated_condition,typeof,type_builtin_type).
+struct_opv(claz_encapsulation_info,has_slot,slot(claz_t,"definition")).
+struct_opv(claz_encapsulation_info,has_slot,slot(claz_t,"type")).
+struct_opv(claz_encapsulation_info,subtypep,claz_structure_object).
+struct_opv(claz_encapsulation_info,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_encapsulation_info,typeof,type_class).
+struct_opv(claz_encapsulation_info,typeof,type_builtin_type).
+struct_opv(claz_end_of_file,subtypep,claz_stream_error).
+struct_opv(claz_end_of_file,super_priority,[claz_stream_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_end_of_file,super_priority,[claz_stream_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_end_of_file,typeof,type_builtin_type).
+struct_opv(claz_end_of_input_in_character,subtypep,claz_octet_decoding_error).
+struct_opv(claz_end_of_input_in_character,super_priority,[claz_octet_decoding_error,claz_character_decoding_error,claz_character_coding_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_end_of_input_in_character,typeof,type_builtin_type).
+struct_opv(claz_entry,has_slot,slot(claz_t,"cleanup")).
+struct_opv(claz_entry,has_slot,slot(claz_t,"exits")).
+struct_opv(claz_entry,subtypep,claz_node).
+struct_opv(claz_entry,super_priority,[claz_node,claz_sset_element,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_entry,typeof,type_class).
+struct_opv(claz_entry,typeof,type_builtin_type).
+struct_opv(claz_entry_info,has_slot,slot(claz_t,"arguments")).
+struct_opv(claz_entry_info,has_slot,slot(claz_t,"closure_tn")).
+struct_opv(claz_entry_info,has_slot,slot(claz_t,"info")).
+struct_opv(claz_entry_info,has_slot,slot(claz_t,"name")).
+struct_opv(claz_entry_info,has_slot,slot(claz_t,"offset")).
+struct_opv(claz_entry_info,has_slot,slot(claz_t,"type")).
+struct_opv(claz_entry_info,subtypep,claz_structure_object).
+struct_opv(claz_entry_info,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_entry_info,typeof,type_class).
+struct_opv(claz_entry_info,typeof,type_builtin_type).
+struct_opv(claz_env,has_slot,slot(claz_t,"blocks")).
+struct_opv(claz_env,has_slot,slot(claz_t,"declarations")).
+struct_opv(claz_env,has_slot,slot(claz_t,"expanders")).
+struct_opv(claz_env,has_slot,slot(claz_t,"funs")).
+struct_opv(claz_env,has_slot,slot(claz_t,"native_lexenv")).
+struct_opv(claz_env,has_slot,slot(claz_t,"parent")).
+struct_opv(claz_env,has_slot,slot(claz_t,"symbol_expansions")).
+struct_opv(claz_env,has_slot,slot(claz_t,"tags")).
+struct_opv(claz_env,has_slot,slot(claz_t,"vars")).
+struct_opv(claz_env,subtypep,claz_structure_object).
+struct_opv(claz_env,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_env,typeof,type_class).
+struct_opv(claz_env,typeof,type_builtin_type).
+struct_opv(claz_environment,has_slot,slot(claz_binding,"blocks")).
+struct_opv(claz_environment,has_slot,slot(claz_binding,"tags")).
+struct_opv(claz_environment,has_slot,slot(claz_binding,"vars")).
+struct_opv(claz_environment,has_slot,slot(claz_boolean,"inactive")).
+struct_opv(claz_environment,has_slot,slot(claz_function_binding,"last_function_binding")).
+struct_opv(claz_environment,subtypep,claz_object).
+struct_opv(claz_environment,typeof,type_builtin_type).
+struct_opv(claz_eql_specializer,has_slot,slot(claz_t,"direct_methods")).
+struct_opv(claz_eql_specializer,has_slot,slot(claz_t,"object")).
+struct_opv(claz_eql_specializer,has_slot,slot(claz_t,"singleton")).
+struct_opv(claz_eql_specializer,subtypep,claz_exact_class_specializer).
+struct_opv(claz_eql_specializer,subtypep,claz_specializer).
+struct_opv(claz_eql_specializer,subtypep,claz_specializer_with_object).
+struct_opv(claz_eql_specializer,subtypep,claz_standard_specializer).
+struct_opv(claz_eql_specializer,super_priority,[claz_specializer,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_eql_specializer,super_priority,[claz_standard_specializer,claz_exact_class_specializer,claz_specializer_with_object,claz_specializer,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_eql_specializer,typeof,type_class).
+struct_opv(claz_eql_specializer,typeof,type_builtin_type).
+struct_opv(claz_error,has_slot,slot(claz_t,"datum")).
+struct_opv(claz_error,has_slot,slot(claz_t,"expected_type")).
+struct_opv(claz_error,subtypep,claz_lisp_error).
+struct_opv(claz_error,subtypep,claz_serious_condition).
+struct_opv(claz_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_error,super_priority,[claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_error,super_priority,[claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_error,typeof,type_class).
+struct_opv(claz_error,typeof,type_builtin_type).
+struct_opv(claz_eval_error,subtypep,claz_encapsulated_condition).
+struct_opv(claz_eval_error,super_priority,[claz_encapsulated_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_eval_error,typeof,type_builtin_type).
+struct_opv(claz_event_info,has_slot,slot(claz_t,"action")).
+struct_opv(claz_event_info,has_slot,slot(claz_t,"count")).
+struct_opv(claz_event_info,has_slot,slot(claz_t,"description")).
+struct_opv(claz_event_info,has_slot,slot(claz_t,"level")).
+struct_opv(claz_event_info,has_slot,slot(claz_t,"name")).
+struct_opv(claz_event_info,has_slot,slot(claz_t,"var")).
+struct_opv(claz_event_info,subtypep,claz_structure_object).
+struct_opv(claz_event_info,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_event_info,typeof,type_class).
+struct_opv(claz_event_info,typeof,type_builtin_type).
+struct_opv(claz_exact_class_specializer,subtypep,claz_specializer).
+struct_opv(claz_exact_class_specializer,super_priority,[claz_specializer,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_exact_class_specializer,typeof,type_builtin_type).
+struct_opv(claz_exit,has_slot,slot(claz_t,"entry")).
+struct_opv(claz_exit,has_slot,slot(claz_t,"nlx_info")).
+struct_opv(claz_exit,has_slot,slot(claz_t,"value")).
+struct_opv(claz_exit,subtypep,claz_valued_node).
+struct_opv(claz_exit,super_priority,[claz_valued_node,claz_node,claz_sset_element,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_exit,typeof,type_class).
+struct_opv(claz_exit,typeof,type_builtin_type).
+struct_opv(claz_extension_failure,subtypep,claz_reference_condition).
+struct_opv(claz_extension_failure,subtypep,claz_simple_error).
+struct_opv(claz_extension_failure,super_priority,[claz_reference_condition,claz_simple_error,claz_simple_condition,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_extension_failure,typeof,type_builtin_type).
+struct_opv(claz_external_format,has_slot,slot(claz_t,"bytes_for_char_fun")).
+struct_opv(claz_external_format,has_slot,slot(claz_t,"default_replacement_character")).
+struct_opv(claz_external_format,has_slot,slot(claz_t,"names")).
+struct_opv(claz_external_format,has_slot,slot(claz_t,"octets_to_string_fun")).
+struct_opv(claz_external_format,has_slot,slot(claz_t,"read_c_string_fun")).
+struct_opv(claz_external_format,has_slot,slot(claz_t,"read_char_fun")).
+struct_opv(claz_external_format,has_slot,slot(claz_t,"read_n_chars_fun")).
+struct_opv(claz_external_format,has_slot,slot(claz_t,"resync_fun")).
+struct_opv(claz_external_format,has_slot,slot(claz_t,"string_to_octets_fun")).
+struct_opv(claz_external_format,has_slot,slot(claz_t,"write_c_string_fun")).
+struct_opv(claz_external_format,has_slot,slot(claz_t,"write_char_full_buffered_fun")).
+struct_opv(claz_external_format,has_slot,slot(claz_t,"write_char_line_buffered_fun")).
+struct_opv(claz_external_format,has_slot,slot(claz_t,"write_char_none_buffered_fun")).
+struct_opv(claz_external_format,has_slot,slot(claz_t,"write_n_bytes_fun")).
+struct_opv(claz_external_format,subtypep,claz_structure_object).
+struct_opv(claz_external_format,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_external_format,typeof,type_class).
+struct_opv(claz_external_format,typeof,type_builtin_type).
+struct_opv(claz_fasl_class_loader,has_slot,slot(claz_ffi_object,"boxed_this")).
+struct_opv(claz_fasl_class_loader,has_slot,slot(claz_string,"base_name")).
+struct_opv(claz_fasl_class_loader,kw_ro,"base_name").
+struct_opv(claz_fasl_class_loader,kw_ro,"boxed_this").
+struct_opv(claz_fasl_class_loader,subtypep,claz_ffi_class_loader).
+struct_opv(claz_fasl_class_loader,typeof,type_builtin_type).
+struct_opv(claz_fasl_header_missing,has_slot,slot(claz_t,"fhsss")).
+struct_opv(claz_fasl_header_missing,subtypep,claz_invalid_fasl).
+struct_opv(claz_fasl_header_missing,super_priority,[claz_invalid_fasl,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_fasl_header_missing,typeof,type_class).
+struct_opv(claz_fasl_header_missing,typeof,type_builtin_type).
+struct_opv(claz_fasl_input,has_slot,slot(claz_t,"deprecated_stuff")).
+struct_opv(claz_fasl_input,has_slot,slot(claz_t,"skip_until")).
+struct_opv(claz_fasl_input,has_slot,slot(claz_t,"stack")).
+struct_opv(claz_fasl_input,has_slot,slot(claz_t,"stream")).
+struct_opv(claz_fasl_input,has_slot,slot(claz_t,"table")).
+struct_opv(claz_fasl_input,subtypep,claz_structure_object).
+struct_opv(claz_fasl_input,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_fasl_input,typeof,type_class).
+struct_opv(claz_fasl_input,typeof,type_builtin_type).
+struct_opv(claz_fasl_output,has_slot,slot(claz_t,"circularity_table")).
+struct_opv(claz_fasl_output,has_slot,slot(claz_t,"debug_info")).
+struct_opv(claz_fasl_output,has_slot,slot(claz_t,"entry_table")).
+struct_opv(claz_fasl_output,has_slot,slot(claz_t,"eq_table")).
+struct_opv(claz_fasl_output,has_slot,slot(claz_t,"equal_table")).
+struct_opv(claz_fasl_output,has_slot,slot(claz_t,"packages")).
+struct_opv(claz_fasl_output,has_slot,slot(claz_t,"patch_table")).
+struct_opv(claz_fasl_output,has_slot,slot(claz_t,"stream")).
+struct_opv(claz_fasl_output,has_slot,slot(claz_t,"string_c61_table")).
+struct_opv(claz_fasl_output,has_slot,slot(claz_t,"table_free")).
+struct_opv(claz_fasl_output,has_slot,slot(claz_t,"valid_structures")).
+struct_opv(claz_fasl_output,subtypep,claz_structure_object).
+struct_opv(claz_fasl_output,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_fasl_output,typeof,type_class).
+struct_opv(claz_fasl_output,typeof,type_builtin_type).
+struct_opv(claz_fasl_readtable,subtypep,claz_readtable).
+struct_opv(claz_fasl_readtable,typeof,type_builtin_type).
+struct_opv(claz_fast_instance_boundp,has_slot,slot(claz_t,"index")).
+struct_opv(claz_fast_instance_boundp,subtypep,claz_structure_object).
+struct_opv(claz_fast_instance_boundp,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_fast_instance_boundp,typeof,type_class).
+struct_opv(claz_fast_instance_boundp,typeof,type_builtin_type).
+struct_opv(claz_fast_method_call,has_slot,slot(claz_t,"arg_info")).
+struct_opv(claz_fast_method_call,has_slot,slot(claz_t,"function")).
+struct_opv(claz_fast_method_call,has_slot,slot(claz_t,"next_method_call")).
+struct_opv(claz_fast_method_call,has_slot,slot(claz_t,"pv")).
+struct_opv(claz_fast_method_call,subtypep,claz_structure_object).
+struct_opv(claz_fast_method_call,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_fast_method_call,typeof,type_class).
+struct_opv(claz_fast_method_call,typeof,type_builtin_type).
+struct_opv(claz_fatal_compiler_error,subtypep,claz_encapsulated_condition).
+struct_opv(claz_fatal_compiler_error,super_priority,[claz_encapsulated_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_fatal_compiler_error,typeof,type_builtin_type).
+struct_opv(claz_fd_stream,has_slot,slot(claz_t,"bivalent_p")).
+struct_opv(claz_fd_stream,has_slot,slot(claz_t,"buffering")).
+struct_opv(claz_fd_stream,has_slot,slot(claz_t,"char_size")).
+struct_opv(claz_fd_stream,has_slot,slot(claz_t,"delete_original")).
+struct_opv(claz_fd_stream,has_slot,slot(claz_t,"dual_channel_p")).
+struct_opv(claz_fd_stream,has_slot,slot(claz_t,"element_size")).
+struct_opv(claz_fd_stream,has_slot,slot(claz_t,"element_type")).
+struct_opv(claz_fd_stream,has_slot,slot(claz_t,"eof_forced_p")).
+struct_opv(claz_fd_stream,has_slot,slot(claz_t,"external_format")).
+struct_opv(claz_fd_stream,has_slot,slot(claz_t,"fd")).
+struct_opv(claz_fd_stream,has_slot,slot(claz_t,"fd_type")).
+struct_opv(claz_fd_stream,has_slot,slot(claz_t,"file")).
+struct_opv(claz_fd_stream,has_slot,slot(claz_t,"handler")).
+struct_opv(claz_fd_stream,has_slot,slot(claz_t,"ibuf")).
+struct_opv(claz_fd_stream,has_slot,slot(claz_t,"instead")).
+struct_opv(claz_fd_stream,has_slot,slot(claz_t,"listen")).
+struct_opv(claz_fd_stream,has_slot,slot(claz_t,"misc")).
+struct_opv(claz_fd_stream,has_slot,slot(claz_t,"name")).
+struct_opv(claz_fd_stream,has_slot,slot(claz_t,"obuf")).
+struct_opv(claz_fd_stream,has_slot,slot(claz_t,"original")).
+struct_opv(claz_fd_stream,has_slot,slot(claz_t,"output_bytes")).
+struct_opv(claz_fd_stream,has_slot,slot(claz_t,"output_column")).
+struct_opv(claz_fd_stream,has_slot,slot(claz_t,"output_queue")).
+struct_opv(claz_fd_stream,has_slot,slot(claz_t,"pathname")).
+struct_opv(claz_fd_stream,has_slot,slot(claz_t,"serve_events")).
+struct_opv(claz_fd_stream,has_slot,slot(claz_t,"timeout")).
+struct_opv(claz_fd_stream,subtypep,claz_ansi_stream).
+struct_opv(claz_fd_stream,subtypep,claz_file_stream).
+struct_opv(claz_fd_stream,super_priority,[claz_file_stream,claz_ansi_stream,claz_stream,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_fd_stream,typeof,type_class).
+struct_opv(claz_fd_stream,typeof,type_builtin_type).
+struct_opv(claz_fdefn,subtypep,claz_t).
+struct_opv(claz_fdefn,super_priority,[claz_t]).
+struct_opv(claz_fdefn,typeof,type_builtin_type).
+struct_opv(claz_ffi_class_loader,subtypep,claz_prolog_url_class_loader).
+struct_opv(claz_ffi_class_loader,typeof,type_builtin_type).
+struct_opv(claz_ffi_class_loader_pf_get_default_classloader,has_slot,slot(claz_object,"default_class_loader")).
+struct_opv(claz_ffi_class_loader_pf_get_default_classloader,kw_ro,"default_class_loader").
+struct_opv(claz_ffi_class_loader_pf_get_default_classloader,typeof,type_builtin_type).
+struct_opv(claz_ffi_exception,has_slot,slot(claz_prolog_throwable,"throwable")).
+struct_opv(claz_ffi_exception,kw_ro,"throwable").
+struct_opv(claz_ffi_exception,subtypep,claz_lisp_error).
+struct_opv(claz_ffi_exception,typeof,type_builtin_type).
+struct_opv(claz_ffi_module,has_slot,slot(claz_t,"c_name")).
+struct_opv(claz_ffi_module,has_slot,slot(claz_t,"constant_table")).
+struct_opv(claz_ffi_module,has_slot,slot(claz_t,"fini")).
+struct_opv(claz_ffi_module,has_slot,slot(claz_t,"function_list")).
+struct_opv(claz_ffi_module,has_slot,slot(claz_t,"init_always")).
+struct_opv(claz_ffi_module,has_slot,slot(claz_t,"init_once")).
+struct_opv(claz_ffi_module,has_slot,slot(claz_t,"name")).
+struct_opv(claz_ffi_module,has_slot,slot(claz_t,"object_table")).
+struct_opv(claz_ffi_module,has_slot,slot(claz_t,"type_table")).
+struct_opv(claz_ffi_module,has_slot,slot(claz_t,"variable_list")).
+struct_opv(claz_ffi_module,subtypep,claz_structure_object).
+struct_opv(claz_ffi_module,super_priority,[claz_structure_object,claz_t]).
+struct_opv(claz_ffi_module,typeof,type_class).
+struct_opv(claz_ffi_module,typeof,type_builtin_type).
+struct_opv(claz_ffi_object,has_slot,slot(claz_prolog_class,"intended_class")).
+struct_opv(claz_ffi_object,has_slot,slot(claz_prolog_object,"obj")).
+struct_opv(claz_ffi_object,kw_ro,"intended_class").
+struct_opv(claz_ffi_object,kw_ro,"obj").
+struct_opv(claz_ffi_object,subtypep,claz_object).
+struct_opv(claz_ffi_object,typeof,type_builtin_type).
+struct_opv(claz_ffi_object_1,has_slot,slot(claz_ffi_object,"this_0")).
+struct_opv(claz_ffi_object_1,has_slot,slot(claz_list,"val_acc")).
+struct_opv(claz_ffi_object_1,kw_ro,"this_0").
+struct_opv(claz_ffi_object_1,kw_ro,"val_acc").
+struct_opv(claz_ffi_object_1,typeof,type_builtin_type).
+struct_opv(claz_ffi_object_2,has_slot,slot(claz_list,"val_acc")).
+struct_opv(claz_ffi_object_2,has_slot,slot(claz_object,"val_fn")).
+struct_opv(claz_ffi_object_2,kw_ro,"val_acc").
+struct_opv(claz_ffi_object_2,kw_ro,"val_fn").
+struct_opv(claz_ffi_object_2,typeof,type_builtin_type).
+struct_opv(claz_ffi_script_engine,has_slot,slot(claz_function,"compile_script")).
+struct_opv(claz_ffi_script_engine,has_slot,slot(claz_function,"eval_compiled_script")).
+struct_opv(claz_ffi_script_engine,has_slot,slot(claz_function,"eval_function")).
+struct_opv(claz_ffi_script_engine,has_slot,slot(claz_function,"eval_script")).
+struct_opv(claz_ffi_script_engine,has_slot,slot(claz_interpreter,"interpreter")).
+struct_opv(claz_ffi_script_engine,typeof,type_builtin_type).
+struct_opv(claz_ffi_script_engine_abobj_compiled_script,has_slot,slot(claz_ffi_script_engine,"this_0")).
+struct_opv(claz_ffi_script_engine_abobj_compiled_script,has_slot,slot(claz_object,"function")).
+struct_opv(claz_ffi_script_engine_abobj_compiled_script,kw_ro,"this_0").
+struct_opv(claz_ffi_script_engine_abobj_compiled_script,typeof,type_builtin_type).
+struct_opv(claz_ffi_stack_frame,has_slot,slot(claz_prolog_stack_trace_element,"ffi_frame")).
+struct_opv(claz_ffi_stack_frame,kw_ro,"ffi_frame").
+struct_opv(claz_ffi_stack_frame,subtypep,claz_stack_frame).
+struct_opv(claz_ffi_stack_frame,typeof,type_builtin_type).
+struct_opv(claz_fgen,has_slot,slot(claz_t,"generator")).
+struct_opv(claz_fgen,has_slot,slot(claz_t,"generator_lambda")).
+struct_opv(claz_fgen,has_slot,slot(claz_t,"gensyms")).
+struct_opv(claz_fgen,has_slot,slot(claz_t,"system")).
+struct_opv(claz_fgen,subtypep,claz_structure_object).
+struct_opv(claz_fgen,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_fgen,typeof,type_class).
+struct_opv(claz_fgen,typeof,type_builtin_type).
+struct_opv(claz_file_error,has_slot,slot(claz_t,"pathname")).
+struct_opv(claz_file_error,subtypep,claz_error).
+struct_opv(claz_file_error,subtypep,claz_lisp_error).
+struct_opv(claz_file_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_file_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_file_error,typeof,type_class).
+struct_opv(claz_file_error,typeof,type_builtin_type).
+struct_opv(claz_file_info,has_slot,slot(claz_t,"atime")).
+struct_opv(claz_file_info,has_slot,slot(claz_t,"attributes")).
+struct_opv(claz_file_info,has_slot,slot(claz_t,"ctime")).
+struct_opv(claz_file_info,has_slot,slot(claz_t,"external_format")).
+struct_opv(claz_file_info,has_slot,slot(claz_t,"forms")).
+struct_opv(claz_file_info,has_slot,slot(claz_t,"name")).
+struct_opv(claz_file_info,has_slot,slot(claz_t,"name_short")).
+struct_opv(claz_file_info,has_slot,slot(claz_t,"positions")).
+struct_opv(claz_file_info,has_slot,slot(claz_t,"size")).
+struct_opv(claz_file_info,has_slot,slot(claz_t,"source_root")).
+struct_opv(claz_file_info,has_slot,slot(claz_t,"style_warning_tracker")).
+struct_opv(claz_file_info,has_slot,slot(claz_t,"subforms")).
+struct_opv(claz_file_info,has_slot,slot(claz_t,"untruename")).
+struct_opv(claz_file_info,has_slot,slot(claz_t,"write_date")).
+struct_opv(claz_file_info,has_slot,slot(claz_t,"wtime")).
+struct_opv(claz_file_info,subtypep,claz_structure_object).
+struct_opv(claz_file_info,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_file_info,super_priority,[claz_structure_object,claz_t]).
+struct_opv(claz_file_info,typeof,type_class).
+struct_opv(claz_file_info,typeof,type_builtin_type).
+struct_opv(claz_file_stat,has_slot,slot(claz_t,"atime")).
+struct_opv(claz_file_stat,has_slot,slot(claz_t,"blksize")).
+struct_opv(claz_file_stat,has_slot,slot(claz_t,"blocks")).
+struct_opv(claz_file_stat,has_slot,slot(claz_t,"ctime")).
+struct_opv(claz_file_stat,has_slot,slot(claz_t,"dev")).
+struct_opv(claz_file_stat,has_slot,slot(claz_t,"file")).
+struct_opv(claz_file_stat,has_slot,slot(claz_t,"gid")).
+struct_opv(claz_file_stat,has_slot,slot(claz_t,"ino")).
+struct_opv(claz_file_stat,has_slot,slot(claz_t,"mode")).
+struct_opv(claz_file_stat,has_slot,slot(claz_t,"mtime")).
+struct_opv(claz_file_stat,has_slot,slot(claz_t,"nlink")).
+struct_opv(claz_file_stat,has_slot,slot(claz_t,"rdev")).
+struct_opv(claz_file_stat,has_slot,slot(claz_t,"size")).
+struct_opv(claz_file_stat,has_slot,slot(claz_t,"uid")).
+struct_opv(claz_file_stat,subtypep,claz_structure_object).
+struct_opv(claz_file_stat,super_priority,[claz_structure_object,claz_t]).
+struct_opv(claz_file_stat,typeof,type_class).
+struct_opv(claz_file_stat,typeof,type_builtin_type).
+struct_opv(claz_file_stream,has_slot,slot(claz_integer,"bytes_per_unit")).
+struct_opv(claz_file_stream,has_slot,slot(claz_pathname,"pathname")).
+struct_opv(claz_file_stream,has_slot,slot(claz_random_access_character_file,"racf")).
+struct_opv(claz_file_stream,kw_ro,"bytes_per_unit").
+struct_opv(claz_file_stream,kw_ro,"pathname").
+struct_opv(claz_file_stream,kw_ro,"racf").
+struct_opv(claz_file_stream,subtypep,claz_stream).
+struct_opv(claz_file_stream,super_priority,[claz_stream,claz_t]).
+struct_opv(claz_file_stream,typeof,type_builtin_type).
+struct_opv(claz_fill_pointer_output_stream,has_slot,slot(claz_complex_string,"string_buffer")).
+struct_opv(claz_fill_pointer_output_stream,has_slot,slot(claz_t,"misc")).
+struct_opv(claz_fill_pointer_output_stream,has_slot,slot(claz_t,"out")).
+struct_opv(claz_fill_pointer_output_stream,has_slot,slot(claz_t,"sout")).
+struct_opv(claz_fill_pointer_output_stream,has_slot,slot(claz_t,"string")).
+struct_opv(claz_fill_pointer_output_stream,subtypep,claz_ansi_stream).
+struct_opv(claz_fill_pointer_output_stream,subtypep,claz_stream).
+struct_opv(claz_fill_pointer_output_stream,subtypep,claz_string_stream).
+struct_opv(claz_fill_pointer_output_stream,super_priority,[claz_string_stream,claz_ansi_stream,claz_stream,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_fill_pointer_output_stream,typeof,type_class).
+struct_opv(claz_fill_pointer_output_stream,typeof,type_builtin_type).
+struct_opv(claz_fill_pointer_output_stream_writer,has_slot,slot(claz_fill_pointer_output_stream,"this_0")).
+struct_opv(claz_fill_pointer_output_stream_writer,kw_ro,"this_0").
+struct_opv(claz_fill_pointer_output_stream_writer,typeof,type_builtin_type).
+struct_opv(claz_fill_stream,has_slot,slot(claz_t,"buffer")).
+struct_opv(claz_fill_stream,has_slot,slot(claz_t,"current_indent")).
+struct_opv(claz_fill_stream,has_slot,slot(claz_t,"indent_var")).
+struct_opv(claz_fill_stream,has_slot,slot(claz_t,"inside_sexp")).
+struct_opv(claz_fill_stream,has_slot,slot(claz_t,"pending_indent")).
+struct_opv(claz_fill_stream,has_slot,slot(claz_t,"pending_space")).
+struct_opv(claz_fill_stream,has_slot,slot(claz_t,"sexp_indent")).
+struct_opv(claz_fill_stream,has_slot,slot(claz_t,"target_stream")).
+struct_opv(claz_fill_stream,subtypep,claz_fundamental_character_output_stream).
+struct_opv(claz_fill_stream,super_priority,[claz_fundamental_character_output_stream,claz_fundamental_output_stream,claz_fundamental_character_stream,claz_fundamental_stream,claz_stream,claz_standard_object,claz_t]).
+struct_opv(claz_fill_stream,typeof,type_class).
+struct_opv(claz_fill_stream,typeof,type_builtin_type).
+struct_opv(claz_filler,has_slot,slot(claz_t,"bytes")).
+struct_opv(claz_filler,subtypep,claz_annotation).
+struct_opv(claz_filler,super_priority,[claz_annotation,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_filler,typeof,type_class).
+struct_opv(claz_filler,typeof,type_builtin_type).
+struct_opv(claz_final_deprecation_warning,subtypep,claz_deprecation_condition).
+struct_opv(claz_final_deprecation_warning,subtypep,claz_warning).
+struct_opv(claz_final_deprecation_warning,super_priority,[claz_warning,claz_deprecation_condition,claz_reference_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_final_deprecation_warning,typeof,type_builtin_type).
+struct_opv(claz_finalizer_finalizing_weak_reference,has_slot,slot(claz_prolog_linked_list(claz_prolog_runnable),"finalizers")).
+struct_opv(claz_finalizer_finalizing_weak_reference,typeof,type_builtin_type).
+struct_opv(claz_find_method_length_mismatch,subtypep,claz_reference_condition).
+struct_opv(claz_find_method_length_mismatch,subtypep,claz_simple_error).
+struct_opv(claz_find_method_length_mismatch,super_priority,[claz_reference_condition,claz_simple_error,claz_simple_condition,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_find_method_length_mismatch,typeof,type_builtin_type).
+struct_opv(claz_finite_sb,has_slot,slot(claz_t,"always_live")).
+struct_opv(claz_finite_sb,has_slot,slot(claz_t,"always_live_count")).
+struct_opv(claz_finite_sb,has_slot,slot(claz_t,"conflicts")).
+struct_opv(claz_finite_sb,has_slot,slot(claz_t,"current_size")).
+struct_opv(claz_finite_sb,has_slot,slot(claz_t,"last_block_count")).
+struct_opv(claz_finite_sb,has_slot,slot(claz_t,"last_offset")).
+struct_opv(claz_finite_sb,has_slot,slot(claz_t,"live_tns")).
+struct_opv(claz_finite_sb,has_slot,slot(claz_t,"size_alignment")).
+struct_opv(claz_finite_sb,has_slot,slot(claz_t,"size_increment")).
+struct_opv(claz_finite_sb,subtypep,claz_sb).
+struct_opv(claz_finite_sb,super_priority,[claz_sb,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_finite_sb,typeof,type_class).
+struct_opv(claz_finite_sb,typeof,type_builtin_type).
+struct_opv(claz_fixnum,has_slot,slot(claz_integer,"value")).
+struct_opv(claz_fixnum,kw_ro,"value").
+struct_opv(claz_fixnum,subtypep,claz_integer).
+struct_opv(claz_fixnum,subtypep,claz_lisp_integer).
+struct_opv(claz_fixnum,super_priority,[claz_integer,claz_rational,claz_real,claz_number,claz_t]).
+struct_opv(claz_fixnum,typeof,type_builtin_type).
+struct_opv(claz_fixup,has_slot,slot(claz_t,"flavor")).
+struct_opv(claz_fixup,has_slot,slot(claz_t,"name")).
+struct_opv(claz_fixup,has_slot,slot(claz_t,"offset")).
+struct_opv(claz_fixup,subtypep,claz_structure_object).
+struct_opv(claz_fixup,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_fixup,typeof,type_class).
+struct_opv(claz_fixup,typeof,type_builtin_type).
+struct_opv(claz_fixup_note,has_slot,slot(claz_t,"fixup")).
+struct_opv(claz_fixup_note,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_fixup_note,has_slot,slot(claz_t,"position")).
+struct_opv(claz_fixup_note,subtypep,claz_structure_object).
+struct_opv(claz_fixup_note,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_fixup_note,typeof,type_class).
+struct_opv(claz_fixup_note,typeof,type_builtin_type).
+struct_opv(claz_float,subtypep,claz_real).
+struct_opv(claz_float,super_priority,[claz_real,claz_number,claz_t]).
+struct_opv(claz_float,typeof,type_builtin_type).
+struct_opv(claz_floating_point_exception,has_slot,slot(claz_t,"flags")).
+struct_opv(claz_floating_point_exception,subtypep,claz_arithmetic_error).
+struct_opv(claz_floating_point_exception,super_priority,[claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_floating_point_exception,typeof,type_class).
+struct_opv(claz_floating_point_exception,typeof,type_builtin_type).
+struct_opv(claz_floating_point_inexact,subtypep,claz_arithmetic_error).
+struct_opv(claz_floating_point_inexact,super_priority,[claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_floating_point_inexact,super_priority,[claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_floating_point_inexact,typeof,type_builtin_type).
+struct_opv(claz_floating_point_invalid_operation,subtypep,claz_arithmetic_error).
+struct_opv(claz_floating_point_invalid_operation,super_priority,[claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_floating_point_invalid_operation,super_priority,[claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_floating_point_invalid_operation,typeof,type_builtin_type).
+struct_opv(claz_floating_point_overflow,subtypep,claz_arithmetic_error).
+struct_opv(claz_floating_point_overflow,super_priority,[claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_floating_point_overflow,super_priority,[claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_floating_point_overflow,typeof,type_builtin_type).
+struct_opv(claz_floating_point_underflow,subtypep,claz_arithmetic_error).
+struct_opv(claz_floating_point_underflow,super_priority,[claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_floating_point_underflow,super_priority,[claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_floating_point_underflow,typeof,type_builtin_type).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"allow_other_keys_flag")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"blocks")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"blocks_offset")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"code")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"consts")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"consts_forms")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"consts_ltv_forms")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"consts_offset")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"denv")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"documentation")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"enclosing")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"far_assigned_vars")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"far_used_blocks")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"far_used_tagbodys")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"far_used_vars")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"gf_p")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"ignorable")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"ignore")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"keyword_flag")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"keyword_offset")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"keywords")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"lambda_list")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"name")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"opt_num")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"req_num")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"rest_flag")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"tagbodys")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"tagbodys_offset")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"tags")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"used")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"venvc")).
+struct_opv(claz_fnode,has_slot,slot(claz_t,"venvconst")).
+struct_opv(claz_fnode,subtypep,claz_structure_object).
+struct_opv(claz_fnode,super_priority,[claz_structure_object,claz_t]).
+struct_opv(claz_fnode,typeof,type_class).
+struct_opv(claz_fnode,typeof,type_builtin_type).
+struct_opv(claz_foreign_thread,subtypep,claz_thread).
+struct_opv(claz_foreign_thread,super_priority,[claz_thread,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_foreign_thread,typeof,type_builtin_type).
+struct_opv(claz_form_tracking_stream,has_slot,slot(claz_t,"form_start_byte_pos")).
+struct_opv(claz_form_tracking_stream,has_slot,slot(claz_t,"form_start_char_pos")).
+struct_opv(claz_form_tracking_stream,has_slot,slot(claz_t,"input_char_pos")).
+struct_opv(claz_form_tracking_stream,has_slot,slot(claz_t,"last_newline")).
+struct_opv(claz_form_tracking_stream,has_slot,slot(claz_t,"misc")).
+struct_opv(claz_form_tracking_stream,has_slot,slot(claz_t,"newlines")).
+struct_opv(claz_form_tracking_stream,has_slot,slot(claz_t,"observer")).
+struct_opv(claz_form_tracking_stream,subtypep,claz_fd_stream).
+struct_opv(claz_form_tracking_stream,super_priority,[claz_fd_stream,claz_file_stream,claz_ansi_stream,claz_stream,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_form_tracking_stream,typeof,type_class).
+struct_opv(claz_form_tracking_stream,typeof,type_builtin_type).
+struct_opv(claz_format_args_mismatch,subtypep,claz_reference_condition).
+struct_opv(claz_format_args_mismatch,super_priority,[claz_reference_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_format_args_mismatch,typeof,type_builtin_type).
+struct_opv(claz_format_directive,has_slot,slot(claz_t,"atsignp")).
+struct_opv(claz_format_directive,has_slot,slot(claz_t,"character")).
+struct_opv(claz_format_directive,has_slot,slot(claz_t,"colonp")).
+struct_opv(claz_format_directive,has_slot,slot(claz_t,"end")).
+struct_opv(claz_format_directive,has_slot,slot(claz_t,"params")).
+struct_opv(claz_format_directive,has_slot,slot(claz_t,"start")).
+struct_opv(claz_format_directive,has_slot,slot(claz_t,"string")).
+struct_opv(claz_format_directive,subtypep,claz_structure_object).
+struct_opv(claz_format_directive,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_format_directive,typeof,type_class).
+struct_opv(claz_format_directive,typeof,type_builtin_type).
+struct_opv(claz_format_error,has_slot,slot(claz_t,"args")).
+struct_opv(claz_format_error,has_slot,slot(claz_t,"complaint")).
+struct_opv(claz_format_error,has_slot,slot(claz_t,"control_string")).
+struct_opv(claz_format_error,has_slot,slot(claz_t,"offset")).
+struct_opv(claz_format_error,has_slot,slot(claz_t,"print_banner")).
+struct_opv(claz_format_error,has_slot,slot(claz_t,"second_relative")).
+struct_opv(claz_format_error,subtypep,claz_error).
+struct_opv(claz_format_error,subtypep,claz_reference_condition).
+struct_opv(claz_format_error,super_priority,[claz_error,claz_serious_condition,claz_reference_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_format_error,typeof,type_class).
+struct_opv(claz_format_error,typeof,type_builtin_type).
+struct_opv(claz_format_too_few_args_warning,subtypep,claz_format_args_mismatch).
+struct_opv(claz_format_too_few_args_warning,subtypep,claz_simple_warning).
+struct_opv(claz_format_too_few_args_warning,super_priority,[claz_format_args_mismatch,claz_reference_condition,claz_simple_warning,claz_simple_condition,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_format_too_few_args_warning,typeof,type_builtin_type).
+struct_opv(claz_format_too_many_args_warning,subtypep,claz_format_args_mismatch).
+struct_opv(claz_format_too_many_args_warning,subtypep,claz_simple_style_warning).
+struct_opv(claz_format_too_many_args_warning,super_priority,[claz_format_args_mismatch,claz_reference_condition,claz_simple_style_warning,claz_simple_condition,claz_style_warning,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_format_too_many_args_warning,typeof,type_builtin_type).
+struct_opv(claz_forward_referenced_class,subtypep,claz_pcl_class).
+struct_opv(claz_forward_referenced_class,subtypep,claz_super_class).
+struct_opv(claz_forward_referenced_class,super_priority,[claz_pcl_class,claz_class,claz_dependent_update_mixin,claz_plist_mixin,claz_definition_source_mixin,claz_standard_specializer,claz_specializer,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_forward_referenced_class,super_priority,[claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_forward_referenced_class,typeof,type_builtin_type).
+struct_opv(claz_frame,has_slot,slot(claz_t,"catches")).
+struct_opv(claz_frame,has_slot,slot(claz_t,"code_location")).
+struct_opv(claz_frame,has_slot,slot(claz_t,"debug_fun")).
+struct_opv(claz_frame,has_slot,slot(claz_t,"down")).
+struct_opv(claz_frame,has_slot,slot(claz_t,"number")).
+struct_opv(claz_frame,has_slot,slot(claz_t,"pointer")).
+struct_opv(claz_frame,has_slot,slot(claz_t,"up")).
+struct_opv(claz_frame,subtypep,claz_structure_object).
+struct_opv(claz_frame,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_frame,typeof,type_class).
+struct_opv(claz_frame,typeof,type_builtin_type).
+struct_opv(claz_frame_fun_mismatch,has_slot,slot(claz_t,"code_location")).
+struct_opv(claz_frame_fun_mismatch,has_slot,slot(claz_t,"form")).
+struct_opv(claz_frame_fun_mismatch,has_slot,slot(claz_t,"frame")).
+struct_opv(claz_frame_fun_mismatch,subtypep,claz_debug_error).
+struct_opv(claz_frame_fun_mismatch,super_priority,[claz_debug_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_frame_fun_mismatch,typeof,type_class).
+struct_opv(claz_frame_fun_mismatch,typeof,type_builtin_type).
+struct_opv(claz_ftype_proclamation_mismatch,subtypep,claz_proclamation_mismatch).
+struct_opv(claz_ftype_proclamation_mismatch,super_priority,[claz_proclamation_mismatch,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_ftype_proclamation_mismatch,typeof,type_builtin_type).
+struct_opv(claz_ftype_proclamation_mismatch_error,subtypep,claz_error).
+struct_opv(claz_ftype_proclamation_mismatch_error,subtypep,claz_ftype_proclamation_mismatch).
+struct_opv(claz_ftype_proclamation_mismatch_error,super_priority,[claz_error,claz_serious_condition,claz_ftype_proclamation_mismatch,claz_proclamation_mismatch,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_ftype_proclamation_mismatch_error,typeof,type_builtin_type).
+struct_opv(claz_ftype_proclamation_mismatch_warning,subtypep,claz_ftype_proclamation_mismatch).
+struct_opv(claz_ftype_proclamation_mismatch_warning,subtypep,claz_style_warning).
+struct_opv(claz_ftype_proclamation_mismatch_warning,super_priority,[claz_style_warning,claz_warning,claz_ftype_proclamation_mismatch,claz_proclamation_mismatch,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_ftype_proclamation_mismatch_warning,typeof,type_builtin_type).
+struct_opv(claz_fun_cache,has_slot,slot(claz_t,"labellers")).
+struct_opv(claz_fun_cache,has_slot,slot(claz_t,"prefilters")).
+struct_opv(claz_fun_cache,has_slot,slot(claz_t,"printers")).
+struct_opv(claz_fun_cache,has_slot,slot(claz_t,"serial_number")).
+struct_opv(claz_fun_cache,subtypep,claz_structure_object).
+struct_opv(claz_fun_cache,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_fun_cache,typeof,type_class).
+struct_opv(claz_fun_cache,typeof,type_builtin_type).
+struct_opv(claz_fun_end_cookie,has_slot,slot(claz_t,"bogus_lra")).
+struct_opv(claz_fun_end_cookie,has_slot,slot(claz_t,"debug_fun")).
+struct_opv(claz_fun_end_cookie,subtypep,claz_structure_object).
+struct_opv(claz_fun_end_cookie,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_fun_end_cookie,typeof,type_class).
+struct_opv(claz_fun_end_cookie,typeof,type_builtin_type).
+struct_opv(claz_fun_info,has_slot,slot(claz_t,"attributes")).
+struct_opv(claz_fun_info,has_slot,slot(claz_t,"constraint_propagate")).
+struct_opv(claz_fun_info,has_slot,slot(claz_t,"constraint_propagate_if")).
+struct_opv(claz_fun_info,has_slot,slot(claz_t,"derive_type")).
+struct_opv(claz_fun_info,has_slot,slot(claz_t,"destroyed_constant_args")).
+struct_opv(claz_fun_info,has_slot,slot(claz_t,"ir2_convert")).
+struct_opv(claz_fun_info,has_slot,slot(claz_t,"ltn_annotate")).
+struct_opv(claz_fun_info,has_slot,slot(claz_t,"optimizer")).
+struct_opv(claz_fun_info,has_slot,slot(claz_t,"predicate_type")).
+struct_opv(claz_fun_info,has_slot,slot(claz_t,"result_arg")).
+struct_opv(claz_fun_info,has_slot,slot(claz_t,"stack_allocate_result")).
+struct_opv(claz_fun_info,has_slot,slot(claz_t,"templates")).
+struct_opv(claz_fun_info,has_slot,slot(claz_t,"transforms")).
+struct_opv(claz_fun_info,subtypep,claz_structure_object).
+struct_opv(claz_fun_info,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_fun_info,typeof,type_class).
+struct_opv(claz_fun_info,typeof,type_builtin_type).
+struct_opv(claz_fun_type,has_slot,slot(claz_t,"class_info")).
+struct_opv(claz_fun_type,has_slot,slot(claz_t,"returns")).
+struct_opv(claz_fun_type,has_slot,slot(claz_t,"wild_args")).
+struct_opv(claz_fun_type,subtypep,claz_args_type).
+struct_opv(claz_fun_type,super_priority,[claz_args_type,claz_ctype,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_fun_type,typeof,type_class).
+struct_opv(claz_fun_type,typeof,type_builtin_type).
+struct_opv(claz_funcallable_standard_class,subtypep,claz_semi_standard_class).
+struct_opv(claz_funcallable_standard_class,subtypep,claz_standard_class).
+struct_opv(claz_funcallable_standard_class,subtypep,claz_std_class).
+struct_opv(claz_funcallable_standard_class,super_priority,[claz_semi_standard_class,claz_slotted_class,claz_class,claz_potential_class,claz_specializer,claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_funcallable_standard_class,super_priority,[claz_std_class,claz_slot_class,claz_pcl_class,claz_class,claz_dependent_update_mixin,claz_plist_mixin,claz_definition_source_mixin,claz_standard_specializer,claz_specializer,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_funcallable_standard_class,typeof,type_builtin_type).
+struct_opv(claz_funcallable_standard_object,has_slot,slot(claz_emf_cache,"cache")).
+struct_opv(claz_funcallable_standard_object,has_slot,slot(claz_integer,"call_count")).
+struct_opv(claz_funcallable_standard_object,has_slot,slot(claz_integer,"hot_count")).
+struct_opv(claz_funcallable_standard_object,has_slot,slot(claz_object,"function")).
+struct_opv(claz_funcallable_standard_object,has_slot,slot(claz_t,"name")).
+struct_opv(claz_funcallable_standard_object,subtypep,claz_function).
+struct_opv(claz_funcallable_standard_object,subtypep,claz_standard_object).
+struct_opv(claz_funcallable_standard_object,super_priority,[claz_function,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_funcallable_standard_object,super_priority,[claz_function,claz_standard_object,claz_t]).
+struct_opv(claz_funcallable_standard_object,typeof,type_class).
+struct_opv(claz_funcallable_standard_object,typeof,type_builtin_type).
+struct_opv(claz_function,has_slot,slot(claz_integer,"call_count")).
+struct_opv(claz_function,has_slot,slot(claz_integer,"hot_count")).
+struct_opv(claz_function,has_slot,slot(claz_list,"property_list")).
+struct_opv(claz_function,has_slot,slot(claz_object,"loaded_from")).
+struct_opv(claz_function,kw_ro,"loaded_from").
+struct_opv(claz_function,subtypep,claz_operator).
+struct_opv(claz_function,subtypep,claz_t).
+struct_opv(claz_function,super_priority,[claz_t]).
+struct_opv(claz_function,typeof,type_builtin_type).
+struct_opv(claz_function_binding,has_slot,slot(claz_function_binding,"next")).
+struct_opv(claz_function_binding,has_slot,slot(claz_object,"name")).
+struct_opv(claz_function_binding,has_slot,slot(claz_object,"value")).
+struct_opv(claz_function_binding,kw_ro,"next").
+struct_opv(claz_function_binding,typeof,type_builtin_type).
+struct_opv(claz_function_redefinition_warning,has_slot,slot(claz_t,"new_function")).
+struct_opv(claz_function_redefinition_warning,subtypep,claz_redefinition_warning).
+struct_opv(claz_function_redefinition_warning,super_priority,[claz_redefinition_warning,claz_style_warning,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_function_redefinition_warning,typeof,type_class).
+struct_opv(claz_function_redefinition_warning,typeof,type_builtin_type).
+struct_opv(claz_functional,has_slot,slot(claz_t,"allocator")).
+struct_opv(claz_functional,has_slot,slot(claz_t,"arg_documentation")).
+struct_opv(claz_functional,has_slot,slot(claz_t,"debug_name")).
+struct_opv(claz_functional,has_slot,slot(claz_t,"documentation")).
+struct_opv(claz_functional,has_slot,slot(claz_t,"entry_fun")).
+struct_opv(claz_functional,has_slot,slot(claz_t,"has_external_references_p")).
+struct_opv(claz_functional,has_slot,slot(claz_t,"inline_expanded")).
+struct_opv(claz_functional,has_slot,slot(claz_t,"inline_expansion")).
+struct_opv(claz_functional,has_slot,slot(claz_t,"inlinep")).
+struct_opv(claz_functional,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_functional,has_slot,slot(claz_t,"lexenv")).
+struct_opv(claz_functional,has_slot,slot(claz_t,"plist")).
+struct_opv(claz_functional,has_slot,slot(claz_t,"source_name")).
+struct_opv(claz_functional,has_slot,slot(claz_t,"type")).
+struct_opv(claz_functional,has_slot,slot(claz_t,"where_from")).
+struct_opv(claz_functional,has_slot,slot(claz_t,"xref")).
+struct_opv(claz_functional,subtypep,claz_leaf).
+struct_opv(claz_functional,super_priority,[claz_leaf,claz_sset_element,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_functional,typeof,type_class).
+struct_opv(claz_functional,typeof,type_builtin_type).
+struct_opv(claz_fundamental_binary_input_stream,subtypep,claz_fundamental_binary_stream).
+struct_opv(claz_fundamental_binary_input_stream,subtypep,claz_fundamental_input_stream).
+struct_opv(claz_fundamental_binary_input_stream,super_priority,[claz_fundamental_input_stream,claz_fundamental_binary_stream,claz_fundamental_stream,claz_standard_object,claz_slot_object,claz_stream,claz_t]).
+struct_opv(claz_fundamental_binary_input_stream,super_priority,[claz_fundamental_input_stream,claz_fundamental_binary_stream,claz_fundamental_stream,claz_stream,claz_standard_object,claz_t]).
+struct_opv(claz_fundamental_binary_input_stream,typeof,type_builtin_type).
+struct_opv(claz_fundamental_binary_output_stream,subtypep,claz_fundamental_binary_stream).
+struct_opv(claz_fundamental_binary_output_stream,subtypep,claz_fundamental_output_stream).
+struct_opv(claz_fundamental_binary_output_stream,super_priority,[claz_fundamental_output_stream,claz_fundamental_binary_stream,claz_fundamental_stream,claz_standard_object,claz_slot_object,claz_stream,claz_t]).
+struct_opv(claz_fundamental_binary_output_stream,super_priority,[claz_fundamental_output_stream,claz_fundamental_binary_stream,claz_fundamental_stream,claz_stream,claz_standard_object,claz_t]).
+struct_opv(claz_fundamental_binary_output_stream,typeof,type_builtin_type).
+struct_opv(claz_fundamental_binary_stream,subtypep,claz_fundamental_stream).
+struct_opv(claz_fundamental_binary_stream,super_priority,[claz_fundamental_stream,claz_standard_object,claz_slot_object,claz_stream,claz_t]).
+struct_opv(claz_fundamental_binary_stream,super_priority,[claz_fundamental_stream,claz_stream,claz_standard_object,claz_t]).
+struct_opv(claz_fundamental_binary_stream,typeof,type_builtin_type).
+struct_opv(claz_fundamental_character_input_stream,has_slot,slot(claz_t,"lastchar")).
+struct_opv(claz_fundamental_character_input_stream,subtypep,claz_fundamental_character_stream).
+struct_opv(claz_fundamental_character_input_stream,subtypep,claz_fundamental_input_stream).
+struct_opv(claz_fundamental_character_input_stream,super_priority,[claz_fundamental_input_stream,claz_fundamental_character_stream,claz_fundamental_stream,claz_standard_object,claz_slot_object,claz_stream,claz_t]).
+struct_opv(claz_fundamental_character_input_stream,super_priority,[claz_fundamental_input_stream,claz_fundamental_character_stream,claz_fundamental_stream,claz_stream,claz_standard_object,claz_t]).
+struct_opv(claz_fundamental_character_input_stream,typeof,type_class).
+struct_opv(claz_fundamental_character_input_stream,typeof,type_builtin_type).
+struct_opv(claz_fundamental_character_output_stream,subtypep,claz_fundamental_character_stream).
+struct_opv(claz_fundamental_character_output_stream,subtypep,claz_fundamental_output_stream).
+struct_opv(claz_fundamental_character_output_stream,super_priority,[claz_fundamental_output_stream,claz_fundamental_character_stream,claz_fundamental_stream,claz_standard_object,claz_slot_object,claz_stream,claz_t]).
+struct_opv(claz_fundamental_character_output_stream,super_priority,[claz_fundamental_output_stream,claz_fundamental_character_stream,claz_fundamental_stream,claz_stream,claz_standard_object,claz_t]).
+struct_opv(claz_fundamental_character_output_stream,typeof,type_builtin_type).
+struct_opv(claz_fundamental_character_stream,subtypep,claz_fundamental_stream).
+struct_opv(claz_fundamental_character_stream,super_priority,[claz_fundamental_stream,claz_standard_object,claz_slot_object,claz_stream,claz_t]).
+struct_opv(claz_fundamental_character_stream,super_priority,[claz_fundamental_stream,claz_stream,claz_standard_object,claz_t]).
+struct_opv(claz_fundamental_character_stream,typeof,type_builtin_type).
+struct_opv(claz_fundamental_input_stream,subtypep,claz_fundamental_stream).
+struct_opv(claz_fundamental_input_stream,super_priority,[claz_fundamental_stream,claz_standard_object,claz_slot_object,claz_stream,claz_t]).
+struct_opv(claz_fundamental_input_stream,super_priority,[claz_fundamental_stream,claz_stream,claz_standard_object,claz_t]).
+struct_opv(claz_fundamental_input_stream,typeof,type_builtin_type).
+struct_opv(claz_fundamental_output_stream,subtypep,claz_fundamental_stream).
+struct_opv(claz_fundamental_output_stream,super_priority,[claz_fundamental_stream,claz_standard_object,claz_slot_object,claz_stream,claz_t]).
+struct_opv(claz_fundamental_output_stream,super_priority,[claz_fundamental_stream,claz_stream,claz_standard_object,claz_t]).
+struct_opv(claz_fundamental_output_stream,typeof,type_builtin_type).
+struct_opv(claz_fundamental_stream,has_slot,slot(claz_t,"fasl")).
+struct_opv(claz_fundamental_stream,has_slot,slot(claz_t,"open")).
+struct_opv(claz_fundamental_stream,has_slot,slot(claz_t,"open_p")).
+struct_opv(claz_fundamental_stream,has_slot,slot(claz_t,"penl")).
+struct_opv(claz_fundamental_stream,subtypep,claz_standard_object).
+struct_opv(claz_fundamental_stream,subtypep,claz_stream).
+struct_opv(claz_fundamental_stream,super_priority,[claz_standard_object,claz_slot_object,claz_stream,claz_t]).
+struct_opv(claz_fundamental_stream,super_priority,[claz_stream,claz_standard_object,claz_t]).
+struct_opv(claz_fundamental_stream,typeof,type_class).
+struct_opv(claz_fundamental_stream,typeof,type_builtin_type).
+struct_opv(claz_funstate,has_slot,slot(claz_t,"arg_temps")).
+struct_opv(claz_funstate,has_slot,slot(claz_t,"args")).
+struct_opv(claz_funstate,subtypep,claz_structure_object).
+struct_opv(claz_funstate,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_funstate,typeof,type_class).
+struct_opv(claz_funstate,typeof,type_builtin_type).
+struct_opv(claz_generic_function,has_slot,slot(claz_t,"documentation")).
+struct_opv(claz_generic_function,has_slot,slot(claz_t,"encapsulations")).
+struct_opv(claz_generic_function,has_slot,slot(claz_t,"initial_methods")).
+struct_opv(claz_generic_function,has_slot,slot(claz_t,"listeners")).
+struct_opv(claz_generic_function,subtypep,claz_definition_source_mixin).
+struct_opv(claz_generic_function,subtypep,claz_dependent_update_mixin).
+struct_opv(claz_generic_function,subtypep,claz_funcallable_standard_object).
+struct_opv(claz_generic_function,subtypep,claz_metaobject).
+struct_opv(claz_generic_function,super_priority,[claz_dependent_update_mixin,claz_plist_mixin,claz_definition_source_mixin,claz_metaobject,claz_funcallable_standard_object,claz_function,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_generic_function,super_priority,[claz_metaobject,claz_funcallable_standard_object,claz_function,claz_standard_object,claz_t]).
+struct_opv(claz_generic_function,typeof,type_class).
+struct_opv(claz_generic_function,typeof,type_builtin_type).
+struct_opv(claz_generic_function_lambda_list_error,subtypep,claz_reference_condition).
+struct_opv(claz_generic_function_lambda_list_error,subtypep,claz_simple_program_error).
+struct_opv(claz_generic_function_lambda_list_error,super_priority,[claz_reference_condition,claz_simple_program_error,claz_simple_condition,claz_program_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_generic_function_lambda_list_error,typeof,type_builtin_type).
+struct_opv(claz_generic_stream_controller,subtypep,claz_standard_object).
+struct_opv(claz_generic_stream_controller,super_priority,[claz_standard_object,claz_t]).
+struct_opv(claz_generic_stream_controller,typeof,type_builtin_type).
+struct_opv(claz_gf_already_called_warning,subtypep,claz_clos_warning).
+struct_opv(claz_gf_already_called_warning,super_priority,[claz_clos_warning,claz_warning,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_gf_already_called_warning,typeof,type_builtin_type).
+struct_opv(claz_gf_replacing_method_warning,subtypep,claz_clos_warning).
+struct_opv(claz_gf_replacing_method_warning,super_priority,[claz_clos_warning,claz_warning,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_gf_replacing_method_warning,typeof,type_builtin_type).
+struct_opv(claz_global_boundp_method,subtypep,claz_accessor_method).
+struct_opv(claz_global_boundp_method,super_priority,[claz_accessor_method,claz_standard_method,claz_plist_mixin,claz_definition_source_mixin,claz_method,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_global_boundp_method,typeof,type_builtin_type).
+struct_opv(claz_global_conflicts,has_slot,slot(claz_t,"block")).
+struct_opv(claz_global_conflicts,has_slot,slot(claz_t,"conflicts")).
+struct_opv(claz_global_conflicts,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_global_conflicts,has_slot,slot(claz_t,"next_blockwise")).
+struct_opv(claz_global_conflicts,has_slot,slot(claz_t,"next_tnwise")).
+struct_opv(claz_global_conflicts,has_slot,slot(claz_t,"number")).
+struct_opv(claz_global_conflicts,has_slot,slot(claz_t,"tn")).
+struct_opv(claz_global_conflicts,subtypep,claz_structure_c33_object).
+struct_opv(claz_global_conflicts,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_global_conflicts,typeof,type_class).
+struct_opv(claz_global_conflicts,typeof,type_builtin_type).
+struct_opv(claz_global_reader_method,subtypep,claz_accessor_method).
+struct_opv(claz_global_reader_method,super_priority,[claz_accessor_method,claz_standard_method,claz_plist_mixin,claz_definition_source_mixin,claz_method,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_global_reader_method,typeof,type_builtin_type).
+struct_opv(claz_global_var,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_global_var,subtypep,claz_basic_var).
+struct_opv(claz_global_var,super_priority,[claz_basic_var,claz_leaf,claz_sset_element,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_global_var,typeof,type_class).
+struct_opv(claz_global_var,typeof,type_builtin_type).
+struct_opv(claz_global_writer_method,subtypep,claz_accessor_method).
+struct_opv(claz_global_writer_method,super_priority,[claz_accessor_method,claz_standard_method,claz_plist_mixin,claz_definition_source_mixin,claz_method,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_global_writer_method,typeof,type_builtin_type).
+struct_opv(claz_go,has_slot,slot(claz_object,"tag")).
+struct_opv(claz_go,has_slot,slot(claz_object,"tagbody")).
+struct_opv(claz_go,kw_ro,"tag").
+struct_opv(claz_go,kw_ro,"tagbody").
+struct_opv(claz_go,subtypep,claz_control_transfer).
+struct_opv(claz_go,typeof,type_builtin_type).
+struct_opv(claz_group_info,has_slot,slot(claz_t,"gid")).
+struct_opv(claz_group_info,has_slot,slot(claz_t,"members")).
+struct_opv(claz_group_info,has_slot,slot(claz_t,"name")).
+struct_opv(claz_group_info,subtypep,claz_structure_object).
+struct_opv(claz_group_info,super_priority,[claz_structure_object,claz_t]).
+struct_opv(claz_group_info,typeof,type_class).
+struct_opv(claz_group_info,typeof,type_builtin_type).
+struct_opv(claz_hairy_type,has_slot,slot(claz_t,"class_info")).
+struct_opv(claz_hairy_type,has_slot,slot(claz_t,"specifier")).
+struct_opv(claz_hairy_type,subtypep,claz_ctype).
+struct_opv(claz_hairy_type,super_priority,[claz_ctype,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_hairy_type,typeof,type_class).
+struct_opv(claz_hairy_type,typeof,type_builtin_type).
+struct_opv(claz_handler,has_slot,slot(claz_t,"active")).
+struct_opv(claz_handler,has_slot,slot(claz_t,"bogus")).
+struct_opv(claz_handler,has_slot,slot(claz_t,"descriptor")).
+struct_opv(claz_handler,has_slot,slot(claz_t,"direction")).
+struct_opv(claz_handler,has_slot,slot(claz_t,"function")).
+struct_opv(claz_handler,subtypep,claz_structure_object).
+struct_opv(claz_handler,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_handler,typeof,type_class).
+struct_opv(claz_handler,typeof,type_builtin_type).
+struct_opv(claz_hash_table(claz_emf_cache_cache_entry,claz_object),typeof,type_builtin_type).
+struct_opv(claz_hash_table(claz_object,claz_object),typeof,type_builtin_type).
+struct_opv(claz_hash_table(claz_prolog_character,_2762),typeof,type_builtin_type).
+struct_opv(claz_hash_table(claz_string,claz_ffi_object),typeof,type_builtin_type).
+struct_opv(claz_hash_table(claz_string,claz_package),typeof,type_builtin_type).
+struct_opv(claz_hash_table(claz_string,claz_symbol),typeof,type_builtin_type).
+struct_opv(claz_hash_table,has_slot,slot(claz_array_of(claz_hash_table_hash_entry),"buckets")).
+struct_opv(claz_hash_table,has_slot,slot(claz_hash_table_comparator,"comparator")).
+struct_opv(claz_hash_table,has_slot,slot(claz_integer,"count")).
+struct_opv(claz_hash_table,has_slot,slot(claz_integer,"rehash_size")).
+struct_opv(claz_hash_table,has_slot,slot(claz_integer,"threshold")).
+struct_opv(claz_hash_table,has_slot,slot(claz_j_reentrant_lock,"lock")).
+struct_opv(claz_hash_table,has_slot,slot(claz_number,"rehash_threshold")).
+struct_opv(claz_hash_table,has_slot,slot(claz_t,"cache")).
+struct_opv(claz_hash_table,has_slot,slot(claz_t,"hash_fun")).
+struct_opv(claz_hash_table,has_slot,slot(claz_t,"hash_vector")).
+struct_opv(claz_hash_table,has_slot,slot(claz_t,"index_vector")).
+struct_opv(claz_hash_table,has_slot,slot(claz_t,"needs_rehash_p")).
+struct_opv(claz_hash_table,has_slot,slot(claz_t,"next_free_kv")).
+struct_opv(claz_hash_table,has_slot,slot(claz_t,"next_vector")).
+struct_opv(claz_hash_table,has_slot,slot(claz_t,"next_weak_hash_table")).
+struct_opv(claz_hash_table,has_slot,slot(claz_t,"number_entries")).
+struct_opv(claz_hash_table,has_slot,slot(claz_t,"rehash_trigger")).
+struct_opv(claz_hash_table,has_slot,slot(claz_t,"synchronized_p")).
+struct_opv(claz_hash_table,has_slot,slot(claz_t,"table")).
+struct_opv(claz_hash_table,has_slot,slot(claz_t,"test")).
+struct_opv(claz_hash_table,has_slot,slot(claz_t,"test_fun")).
+struct_opv(claz_hash_table,has_slot,slot(claz_t,"weakness")).
+struct_opv(claz_hash_table,kw_ro,"comparator").
+struct_opv(claz_hash_table,kw_ro,"lock").
+struct_opv(claz_hash_table,kw_ro,"rehash_size").
+struct_opv(claz_hash_table,kw_ro,"rehash_threshold").
+struct_opv(claz_hash_table,subtypep,claz_object).
+struct_opv(claz_hash_table,subtypep,claz_structure_object).
+struct_opv(claz_hash_table,subtypep,claz_t).
+struct_opv(claz_hash_table,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_hash_table,super_priority,[claz_t]).
+struct_opv(claz_hash_table,typeof,type_class).
+struct_opv(claz_hash_table,typeof,type_builtin_type).
+struct_opv(claz_hash_table_comparator,typeof,type_builtin_type).
+struct_opv(claz_hash_table_hash_entry,has_slot,slot(claz_hash_table_hash_entry,"next")).
+struct_opv(claz_hash_table_hash_entry,has_slot,slot(claz_integer,"hash")).
+struct_opv(claz_hash_table_hash_entry,has_slot,slot(claz_object,"key")).
+struct_opv(claz_hash_table_hash_entry,has_slot,slot(claz_object,"value")).
+struct_opv(claz_hash_table_hash_entry,typeof,type_builtin_type).
+struct_opv(claz_heap_alien_info,has_slot,slot(claz_t,"alien_name")).
+struct_opv(claz_heap_alien_info,has_slot,slot(claz_t,"datap")).
+struct_opv(claz_heap_alien_info,has_slot,slot(claz_t,"type")).
+struct_opv(claz_heap_alien_info,subtypep,claz_structure_c33_object).
+struct_opv(claz_heap_alien_info,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_heap_alien_info,typeof,type_class).
+struct_opv(claz_heap_alien_info,typeof,type_builtin_type).
+struct_opv(claz_heap_exhausted_error,subtypep,claz_storage_condition).
+struct_opv(claz_heap_exhausted_error,super_priority,[claz_storage_condition,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_heap_exhausted_error,typeof,type_builtin_type).
+struct_opv(claz_host,has_slot,slot(claz_t,"customary_case")).
+struct_opv(claz_host,has_slot,slot(claz_t,"parse")).
+struct_opv(claz_host,has_slot,slot(claz_t,"parse_native")).
+struct_opv(claz_host,has_slot,slot(claz_t,"simplify_namestring")).
+struct_opv(claz_host,has_slot,slot(claz_t,"unparse")).
+struct_opv(claz_host,has_slot,slot(claz_t,"unparse_directory")).
+struct_opv(claz_host,has_slot,slot(claz_t,"unparse_directory_separator")).
+struct_opv(claz_host,has_slot,slot(claz_t,"unparse_enough")).
+struct_opv(claz_host,has_slot,slot(claz_t,"unparse_file")).
+struct_opv(claz_host,has_slot,slot(claz_t,"unparse_host")).
+struct_opv(claz_host,has_slot,slot(claz_t,"unparse_native")).
+struct_opv(claz_host,subtypep,claz_structure_object).
+struct_opv(claz_host,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_host,typeof,type_class).
+struct_opv(claz_host,typeof,type_builtin_type).
+struct_opv(claz_hostent,has_slot,slot(claz_t,"addr_list")).
+struct_opv(claz_hostent,has_slot,slot(claz_t,"addrtype")).
+struct_opv(claz_hostent,has_slot,slot(claz_t,"aliases")).
+struct_opv(claz_hostent,has_slot,slot(claz_t,"name")).
+struct_opv(claz_hostent,subtypep,claz_structure_object).
+struct_opv(claz_hostent,super_priority,[claz_structure_object,claz_t]).
+struct_opv(claz_hostent,typeof,type_class).
+struct_opv(claz_hostent,typeof,type_builtin_type).
+struct_opv(claz_html_stream_out,has_slot,slot(claz_t,"target_stream")).
+struct_opv(claz_html_stream_out,subtypep,claz_fundamental_character_output_stream).
+struct_opv(claz_html_stream_out,super_priority,[claz_fundamental_character_output_stream,claz_fundamental_output_stream,claz_fundamental_character_stream,claz_fundamental_stream,claz_stream,claz_standard_object,claz_t]).
+struct_opv(claz_html_stream_out,typeof,type_class).
+struct_opv(claz_html_stream_out,typeof,type_builtin_type).
+struct_opv(claz_huffman_node,has_slot,slot(claz_t,"key")).
+struct_opv(claz_huffman_node,has_slot,slot(claz_t,"weight")).
+struct_opv(claz_huffman_node,subtypep,claz_structure_object).
+struct_opv(claz_huffman_node,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_huffman_node,typeof,type_class).
+struct_opv(claz_huffman_node,typeof,type_builtin_type).
+struct_opv(claz_huffman_pair,has_slot,slot(claz_t,"left")).
+struct_opv(claz_huffman_pair,has_slot,slot(claz_t,"right")).
+struct_opv(claz_huffman_pair,subtypep,claz_huffman_node).
+struct_opv(claz_huffman_pair,super_priority,[claz_huffman_node,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_huffman_pair,typeof,type_class).
+struct_opv(claz_huffman_pair,typeof,type_builtin_type).
+struct_opv(claz_illegal_monitor_state,has_slot,slot(claz_string,"message")).
+struct_opv(claz_illegal_monitor_state,subtypep,claz_program_error).
+struct_opv(claz_illegal_monitor_state,typeof,type_builtin_type).
+struct_opv(claz_implicit_generic_function_warning,has_slot,slot(claz_t,"name")).
+struct_opv(claz_implicit_generic_function_warning,subtypep,claz_style_warning).
+struct_opv(claz_implicit_generic_function_warning,super_priority,[claz_style_warning,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_implicit_generic_function_warning,typeof,type_class).
+struct_opv(claz_implicit_generic_function_warning,typeof,type_builtin_type).
+struct_opv(claz_indentation,has_slot,slot(claz_t,"amount")).
+struct_opv(claz_indentation,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_indentation,subtypep,claz_queued_op).
+struct_opv(claz_indentation,super_priority,[claz_queued_op,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_indentation,typeof,type_class).
+struct_opv(claz_indentation,typeof,type_builtin_type).
+struct_opv(claz_index_of(claz_emf_cache_eql_specialization),typeof,type_builtin_type).
+struct_opv(claz_index_too_large_error,subtypep,claz_error).
+struct_opv(claz_index_too_large_error,super_priority,[claz_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_index_too_large_error,typeof,type_builtin_type).
+struct_opv(claz_info_hashtable,has_slot,slot(claz_t,"comparator")).
+struct_opv(claz_info_hashtable,has_slot,slot(claz_t,"count")).
+struct_opv(claz_info_hashtable,has_slot,slot(claz_t,"hash_function")).
+struct_opv(claz_info_hashtable,has_slot,slot(claz_t,"mutex")).
+struct_opv(claz_info_hashtable,has_slot,slot(claz_t,"storage")).
+struct_opv(claz_info_hashtable,subtypep,claz_structure_object).
+struct_opv(claz_info_hashtable,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_info_hashtable,typeof,type_class).
+struct_opv(claz_info_hashtable,typeof,type_builtin_type).
+struct_opv(claz_initarg_error,has_slot,slot(claz_t,"class")).
+struct_opv(claz_initarg_error,has_slot,slot(claz_t,"initargs")).
+struct_opv(claz_initarg_error,subtypep,claz_program_error).
+struct_opv(claz_initarg_error,subtypep,claz_reference_condition).
+struct_opv(claz_initarg_error,super_priority,[claz_reference_condition,claz_program_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_initarg_error,typeof,type_class).
+struct_opv(claz_initarg_error,typeof,type_builtin_type).
+struct_opv(claz_initial,subtypep,claz_dfun_info).
+struct_opv(claz_initial,super_priority,[claz_dfun_info,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_initial,typeof,type_builtin_type).
+struct_opv(claz_inlining_dependency_failure,subtypep,claz_simple_style_warning).
+struct_opv(claz_inlining_dependency_failure,super_priority,[claz_simple_style_warning,claz_simple_condition,claz_style_warning,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_inlining_dependency_failure,typeof,type_builtin_type).
+struct_opv(claz_input_character,has_slot,slot(claz_t,"bits")).
+struct_opv(claz_input_character,has_slot,slot(claz_t,"char")).
+struct_opv(claz_input_character,has_slot,slot(claz_t,"font")).
+struct_opv(claz_input_character,has_slot,slot(claz_t,"key")).
+struct_opv(claz_input_character,subtypep,claz_structure_object).
+struct_opv(claz_input_character,super_priority,[claz_structure_object,claz_t]).
+struct_opv(claz_input_character,typeof,type_class).
+struct_opv(claz_input_character,typeof,type_builtin_type).
+struct_opv(claz_input_error_in_compile_file,has_slot,slot(claz_t,"invoker")).
+struct_opv(claz_input_error_in_compile_file,has_slot,slot(claz_t,"line_c47_col")).
+struct_opv(claz_input_error_in_compile_file,has_slot,slot(claz_t,"position")).
+struct_opv(claz_input_error_in_compile_file,subtypep,claz_encapsulated_condition).
+struct_opv(claz_input_error_in_compile_file,subtypep,claz_reader_error).
+struct_opv(claz_input_error_in_compile_file,super_priority,[claz_reader_error,claz_parse_error,claz_stream_error,claz_error,claz_serious_condition,claz_encapsulated_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_input_error_in_compile_file,typeof,type_class).
+struct_opv(claz_input_error_in_compile_file,typeof,type_builtin_type).
+struct_opv(claz_input_error_in_load,subtypep,claz_input_error_in_compile_file).
+struct_opv(claz_input_error_in_load,super_priority,[claz_input_error_in_compile_file,claz_reader_error,claz_parse_error,claz_stream_error,claz_error,claz_serious_condition,claz_encapsulated_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_input_error_in_load,typeof,type_builtin_type).
+struct_opv(claz_inspection,has_slot,slot(claz_t,"blurb")).
+struct_opv(claz_inspection,has_slot,slot(claz_t,"id")).
+struct_opv(claz_inspection,has_slot,slot(claz_t,"nth_slot")).
+struct_opv(claz_inspection,has_slot,slot(claz_t,"num_slots")).
+struct_opv(claz_inspection,has_slot,slot(claz_t,"pos")).
+struct_opv(claz_inspection,has_slot,slot(claz_t,"self")).
+struct_opv(claz_inspection,has_slot,slot(claz_t,"set_slot")).
+struct_opv(claz_inspection,has_slot,slot(claz_t,"title")).
+struct_opv(claz_inspection,has_slot,slot(claz_t,"up")).
+struct_opv(claz_inspection,subtypep,claz_structure_object).
+struct_opv(claz_inspection,super_priority,[claz_structure_object,claz_t]).
+struct_opv(claz_inspection,typeof,type_class).
+struct_opv(claz_inspection,typeof,type_builtin_type).
+struct_opv(claz_inst_space,has_slot,slot(claz_t,"choices")).
+struct_opv(claz_inst_space,has_slot,slot(claz_t,"valid_mask")).
+struct_opv(claz_inst_space,subtypep,claz_structure_object).
+struct_opv(claz_inst_space,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_inst_space,typeof,type_class).
+struct_opv(claz_inst_space,typeof,type_builtin_type).
+struct_opv(claz_inst_space_choice,has_slot,slot(claz_t,"common_id")).
+struct_opv(claz_inst_space_choice,has_slot,slot(claz_t,"subspace")).
+struct_opv(claz_inst_space_choice,subtypep,claz_structure_object).
+struct_opv(claz_inst_space_choice,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_inst_space_choice,typeof,type_class).
+struct_opv(claz_inst_space_choice,typeof,type_builtin_type).
+struct_opv(claz_instance_structure_protocol_error,has_slot,slot(claz_t,"fun")).
+struct_opv(claz_instance_structure_protocol_error,has_slot,slot(claz_t,"slotd")).
+struct_opv(claz_instance_structure_protocol_error,subtypep,claz_error).
+struct_opv(claz_instance_structure_protocol_error,subtypep,claz_reference_condition).
+struct_opv(claz_instance_structure_protocol_error,super_priority,[claz_reference_condition,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_instance_structure_protocol_error,typeof,type_class).
+struct_opv(claz_instance_structure_protocol_error,typeof,type_builtin_type).
+struct_opv(claz_instruction,has_slot,slot(claz_t,"attributes")).
+struct_opv(claz_instruction,has_slot,slot(claz_t,"control")).
+struct_opv(claz_instruction,has_slot,slot(claz_t,"delay")).
+struct_opv(claz_instruction,has_slot,slot(claz_t,"depth")).
+struct_opv(claz_instruction,has_slot,slot(claz_t,"emitter")).
+struct_opv(claz_instruction,has_slot,slot(claz_t,"format_name")).
+struct_opv(claz_instruction,has_slot,slot(claz_t,"id")).
+struct_opv(claz_instruction,has_slot,slot(claz_t,"labeller")).
+struct_opv(claz_instruction,has_slot,slot(claz_t,"length")).
+struct_opv(claz_instruction,has_slot,slot(claz_t,"mask")).
+struct_opv(claz_instruction,has_slot,slot(claz_t,"name")).
+struct_opv(claz_instruction,has_slot,slot(claz_t,"prefilter")).
+struct_opv(claz_instruction,has_slot,slot(claz_t,"print_name")).
+struct_opv(claz_instruction,has_slot,slot(claz_t,"printer")).
+struct_opv(claz_instruction,has_slot,slot(claz_t,"read_dependencies")).
+struct_opv(claz_instruction,has_slot,slot(claz_t,"read_dependents")).
+struct_opv(claz_instruction,has_slot,slot(claz_t,"specializers")).
+struct_opv(claz_instruction,has_slot,slot(claz_t,"write_dependencies")).
+struct_opv(claz_instruction,has_slot,slot(claz_t,"write_dependents")).
+struct_opv(claz_instruction,subtypep,claz_sset_element).
+struct_opv(claz_instruction,subtypep,claz_structure_object).
+struct_opv(claz_instruction,super_priority,[claz_sset_element,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_instruction,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_instruction,typeof,type_class).
+struct_opv(claz_instruction,typeof,type_builtin_type).
+struct_opv(claz_instruction_format,has_slot,slot(claz_t,"args")).
+struct_opv(claz_instruction_format,has_slot,slot(claz_t,"default_printer")).
+struct_opv(claz_instruction_format,has_slot,slot(claz_t,"length")).
+struct_opv(claz_instruction_format,has_slot,slot(claz_t,"name")).
+struct_opv(claz_instruction_format,subtypep,claz_structure_object).
+struct_opv(claz_instruction_format,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_instruction_format,typeof,type_class).
+struct_opv(claz_instruction_format,typeof,type_builtin_type).
+struct_opv(claz_integer,subtypep,claz_rational).
+struct_opv(claz_integer,super_priority,[claz_rational,claz_real,claz_number,claz_t]).
+struct_opv(claz_integer,typeof,type_builtin_type).
+struct_opv(claz_integrity_error,subtypep,claz_prolog_error).
+struct_opv(claz_integrity_error,typeof,type_builtin_type).
+struct_opv(claz_interactive_interrupt,subtypep,claz_serious_condition).
+struct_opv(claz_interactive_interrupt,subtypep,claz_system_condition).
+struct_opv(claz_interactive_interrupt,super_priority,[claz_system_condition,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_interactive_interrupt,typeof,type_builtin_type).
+struct_opv(claz_interference_graph,has_slot,slot(claz_t,"precolored_vertices")).
+struct_opv(claz_interference_graph,has_slot,slot(claz_t,"tn_vertex")).
+struct_opv(claz_interference_graph,has_slot,slot(claz_t,"tn_vertex_mapping")).
+struct_opv(claz_interference_graph,has_slot,slot(claz_t,"vertices")).
+struct_opv(claz_interference_graph,subtypep,claz_structure_c33_object).
+struct_opv(claz_interference_graph,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_interference_graph,typeof,type_class).
+struct_opv(claz_interference_graph,typeof,type_builtin_type).
+struct_opv(claz_interpreted_function,has_slot,slot(claz_t,"body")).
+struct_opv(claz_interpreted_function,has_slot,slot(claz_t,"debug_lambda_list")).
+struct_opv(claz_interpreted_function,has_slot,slot(claz_t,"debug_name")).
+struct_opv(claz_interpreted_function,has_slot,slot(claz_t,"declarations")).
+struct_opv(claz_interpreted_function,has_slot,slot(claz_t,"documentation")).
+struct_opv(claz_interpreted_function,has_slot,slot(claz_t,"env")).
+struct_opv(claz_interpreted_function,has_slot,slot(claz_t,"lambda_list")).
+struct_opv(claz_interpreted_function,has_slot,slot(claz_t,"name")).
+struct_opv(claz_interpreted_function,has_slot,slot(claz_t,"source_location")).
+struct_opv(claz_interpreted_function,subtypep,claz_function).
+struct_opv(claz_interpreted_function,super_priority,[claz_t]).
+struct_opv(claz_interpreted_function,typeof,type_class).
+struct_opv(claz_interpreted_function,typeof,type_builtin_type).
+struct_opv(claz_interpreted_program_error,has_slot,slot(claz_t,"form")).
+struct_opv(claz_interpreted_program_error,subtypep,claz_encapsulated_condition).
+struct_opv(claz_interpreted_program_error,subtypep,claz_program_error).
+struct_opv(claz_interpreted_program_error,subtypep,claz_simple_condition).
+struct_opv(claz_interpreted_program_error,super_priority,[claz_program_error,claz_error,claz_serious_condition,claz_encapsulated_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_interpreted_program_error,super_priority,[claz_program_error,claz_error,claz_serious_condition,claz_simple_condition,claz_encapsulated_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_interpreted_program_error,typeof,type_class).
+struct_opv(claz_interpreted_program_error,typeof,type_builtin_type).
+struct_opv(claz_interpreter,has_slot,slot(claz_boolean,"jlisp")).
+struct_opv(claz_interpreter,has_slot,slot(claz_prolog_input_stream,"input_stream")).
+struct_opv(claz_interpreter,has_slot,slot(claz_prolog_output_stream,"output_stream")).
+struct_opv(claz_interpreter,kw_ro,"input_stream").
+struct_opv(claz_interpreter,kw_ro,"jlisp").
+struct_opv(claz_interpreter,kw_ro,"output_stream").
+struct_opv(claz_interpreter,typeof,type_builtin_type).
+struct_opv(claz_interpreter_environment_too_complex_error,subtypep,claz_simple_error).
+struct_opv(claz_interpreter_environment_too_complex_error,super_priority,[claz_simple_error,claz_simple_condition,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_interpreter_environment_too_complex_error,typeof,type_builtin_type).
+struct_opv(claz_interpreter_unhandled_condition,has_slot,slot(claz_object,"condition")).
+struct_opv(claz_interpreter_unhandled_condition,typeof,type_builtin_type).
+struct_opv(claz_interrupt_condition,subtypep,claz_serious_condition).
+struct_opv(claz_interrupt_condition,super_priority,[claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_interrupt_condition,typeof,type_builtin_type).
+struct_opv(claz_interrupt_thread_error,subtypep,claz_thread_error).
+struct_opv(claz_interrupt_thread_error,super_priority,[claz_thread_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_interrupt_thread_error,typeof,type_builtin_type).
+struct_opv(claz_intersection_type,has_slot,slot(claz_t,"class_info")).
+struct_opv(claz_intersection_type,subtypep,claz_compound_type).
+struct_opv(claz_intersection_type,super_priority,[claz_compound_type,claz_ctype,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_intersection_type,typeof,type_class).
+struct_opv(claz_intersection_type,typeof,type_builtin_type).
+struct_opv(claz_interval,has_slot,slot(claz_t,"high")).
+struct_opv(claz_interval,has_slot,slot(claz_t,"low")).
+struct_opv(claz_interval,subtypep,claz_structure_object).
+struct_opv(claz_interval,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_interval,typeof,type_class).
+struct_opv(claz_interval,typeof,type_builtin_type).
+struct_opv(claz_invalid_array_error,subtypep,claz_error).
+struct_opv(claz_invalid_array_error,subtypep,claz_reference_condition).
+struct_opv(claz_invalid_array_error,super_priority,[claz_reference_condition,claz_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_invalid_array_error,typeof,type_builtin_type).
+struct_opv(claz_invalid_array_index_error,has_slot,slot(claz_t,"array")).
+struct_opv(claz_invalid_array_index_error,has_slot,slot(claz_t,"axis")).
+struct_opv(claz_invalid_array_index_error,subtypep,claz_error).
+struct_opv(claz_invalid_array_index_error,super_priority,[claz_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_invalid_array_index_error,typeof,type_class).
+struct_opv(claz_invalid_array_index_error,typeof,type_builtin_type).
+struct_opv(claz_invalid_control_stack_pointer,subtypep,claz_debug_error).
+struct_opv(claz_invalid_control_stack_pointer,super_priority,[claz_debug_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_invalid_control_stack_pointer,typeof,type_builtin_type).
+struct_opv(claz_invalid_euc_jp_continuation_byte,subtypep,claz_octet_decoding_error).
+struct_opv(claz_invalid_euc_jp_continuation_byte,super_priority,[claz_octet_decoding_error,claz_character_decoding_error,claz_character_coding_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_invalid_euc_jp_continuation_byte,typeof,type_builtin_type).
+struct_opv(claz_invalid_euc_jp_starter_byte,subtypep,claz_octet_decoding_error).
+struct_opv(claz_invalid_euc_jp_starter_byte,super_priority,[claz_octet_decoding_error,claz_character_decoding_error,claz_character_coding_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_invalid_euc_jp_starter_byte,typeof,type_builtin_type).
+struct_opv(claz_invalid_fasl,has_slot,slot(claz_t,"expected")).
+struct_opv(claz_invalid_fasl,has_slot,slot(claz_t,"stream")).
+struct_opv(claz_invalid_fasl,subtypep,claz_error).
+struct_opv(claz_invalid_fasl,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_invalid_fasl,typeof,type_class).
+struct_opv(claz_invalid_fasl,typeof,type_builtin_type).
+struct_opv(claz_invalid_fasl_features,has_slot,slot(claz_t,"features")).
+struct_opv(claz_invalid_fasl_features,has_slot,slot(claz_t,"potential_features")).
+struct_opv(claz_invalid_fasl_features,subtypep,claz_invalid_fasl).
+struct_opv(claz_invalid_fasl_features,super_priority,[claz_invalid_fasl,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_invalid_fasl_features,typeof,type_class).
+struct_opv(claz_invalid_fasl_features,typeof,type_builtin_type).
+struct_opv(claz_invalid_fasl_header,has_slot,slot(claz_t,"byte")).
+struct_opv(claz_invalid_fasl_header,has_slot,slot(claz_t,"byte_nr")).
+struct_opv(claz_invalid_fasl_header,subtypep,claz_invalid_fasl).
+struct_opv(claz_invalid_fasl_header,super_priority,[claz_invalid_fasl,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_invalid_fasl_header,typeof,type_class).
+struct_opv(claz_invalid_fasl_header,typeof,type_builtin_type).
+struct_opv(claz_invalid_fasl_implementation,has_slot,slot(claz_t,"implementation")).
+struct_opv(claz_invalid_fasl_implementation,subtypep,claz_invalid_fasl).
+struct_opv(claz_invalid_fasl_implementation,super_priority,[claz_invalid_fasl,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_invalid_fasl_implementation,typeof,type_class).
+struct_opv(claz_invalid_fasl_implementation,typeof,type_builtin_type).
+struct_opv(claz_invalid_fasl_version,has_slot,slot(claz_t,"version")).
+struct_opv(claz_invalid_fasl_version,subtypep,claz_invalid_fasl).
+struct_opv(claz_invalid_fasl_version,super_priority,[claz_invalid_fasl,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_invalid_fasl_version,typeof,type_class).
+struct_opv(claz_invalid_fasl_version,typeof,type_builtin_type).
+struct_opv(claz_invalid_gbk_continuation_byte,subtypep,claz_octet_decoding_error).
+struct_opv(claz_invalid_gbk_continuation_byte,super_priority,[claz_octet_decoding_error,claz_character_decoding_error,claz_character_coding_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_invalid_gbk_continuation_byte,typeof,type_builtin_type).
+struct_opv(claz_invalid_gbk_starter_byte,subtypep,claz_octet_decoding_error).
+struct_opv(claz_invalid_gbk_starter_byte,super_priority,[claz_octet_decoding_error,claz_character_decoding_error,claz_character_coding_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_invalid_gbk_starter_byte,typeof,type_builtin_type).
+struct_opv(claz_invalid_method_initarg,has_slot,slot(claz_t,"method")).
+struct_opv(claz_invalid_method_initarg,subtypep,claz_simple_program_error).
+struct_opv(claz_invalid_method_initarg,super_priority,[claz_simple_program_error,claz_simple_condition,claz_program_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_invalid_method_initarg,typeof,type_class).
+struct_opv(claz_invalid_method_initarg,typeof,type_builtin_type).
+struct_opv(claz_invalid_shift_jis_continuation_byte,subtypep,claz_octet_decoding_error).
+struct_opv(claz_invalid_shift_jis_continuation_byte,super_priority,[claz_octet_decoding_error,claz_character_decoding_error,claz_character_coding_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_invalid_shift_jis_continuation_byte,typeof,type_builtin_type).
+struct_opv(claz_invalid_shift_jis_starter_byte,subtypep,claz_octet_decoding_error).
+struct_opv(claz_invalid_shift_jis_starter_byte,super_priority,[claz_octet_decoding_error,claz_character_decoding_error,claz_character_coding_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_invalid_shift_jis_starter_byte,typeof,type_builtin_type).
+struct_opv(claz_invalid_superclass,has_slot,slot(claz_t,"class")).
+struct_opv(claz_invalid_superclass,has_slot,slot(claz_t,"superclass")).
+struct_opv(claz_invalid_superclass,subtypep,claz_error).
+struct_opv(claz_invalid_superclass,subtypep,claz_reference_condition).
+struct_opv(claz_invalid_superclass,super_priority,[claz_reference_condition,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_invalid_superclass,typeof,type_class).
+struct_opv(claz_invalid_superclass,typeof,type_builtin_type).
+struct_opv(claz_invalid_utf8_continuation_byte,subtypep,claz_octet_decoding_error).
+struct_opv(claz_invalid_utf8_continuation_byte,super_priority,[claz_octet_decoding_error,claz_character_decoding_error,claz_character_coding_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_invalid_utf8_continuation_byte,typeof,type_builtin_type).
+struct_opv(claz_invalid_utf8_starter_byte,subtypep,claz_octet_decoding_error).
+struct_opv(claz_invalid_utf8_starter_byte,super_priority,[claz_octet_decoding_error,claz_character_decoding_error,claz_character_coding_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_invalid_utf8_starter_byte,typeof,type_builtin_type).
+struct_opv(claz_invalid_value,has_slot,slot(claz_t,"debug_var")).
+struct_opv(claz_invalid_value,has_slot,slot(claz_t,"frame")).
+struct_opv(claz_invalid_value,subtypep,claz_debug_condition).
+struct_opv(claz_invalid_value,super_priority,[claz_debug_condition,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_invalid_value,typeof,type_class).
+struct_opv(claz_invalid_value,typeof,type_builtin_type).
+struct_opv(claz_io_timeout,has_slot,slot(claz_t,"direction")).
+struct_opv(claz_io_timeout,subtypep,claz_stream_error).
+struct_opv(claz_io_timeout,subtypep,claz_timeout).
+struct_opv(claz_io_timeout,super_priority,[claz_stream_error,claz_error,claz_timeout,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_io_timeout,typeof,type_class).
+struct_opv(claz_io_timeout,typeof,type_builtin_type).
+struct_opv(claz_ir2_block,has_slot,slot(claz_t,"dropped_thru_to")).
+struct_opv(claz_ir2_block,has_slot,slot(claz_t,"end_stack")).
+struct_opv(claz_ir2_block,has_slot,slot(claz_t,"global_tns")).
+struct_opv(claz_ir2_block,has_slot,slot(claz_t,"label")).
+struct_opv(claz_ir2_block,has_slot,slot(claz_t,"last_vop")).
+struct_opv(claz_ir2_block,has_slot,slot(claz_t,"live_in")).
+struct_opv(claz_ir2_block,has_slot,slot(claz_t,"live_out")).
+struct_opv(claz_ir2_block,has_slot,slot(claz_t,"local_tn_count")).
+struct_opv(claz_ir2_block,has_slot,slot(claz_t,"local_tns")).
+struct_opv(claz_ir2_block,has_slot,slot(claz_t,"locations")).
+struct_opv(claz_ir2_block,has_slot,slot(claz_t,"number")).
+struct_opv(claz_ir2_block,has_slot,slot(claz_t,"popped")).
+struct_opv(claz_ir2_block,has_slot,slot(claz_t,"pushed")).
+struct_opv(claz_ir2_block,has_slot,slot(claz_t,"start_stack")).
+struct_opv(claz_ir2_block,has_slot,slot(claz_t,"start_vop")).
+struct_opv(claz_ir2_block,has_slot,slot(claz_t,"trampoline_label")).
+struct_opv(claz_ir2_block,has_slot,slot(claz_t,"written")).
+struct_opv(claz_ir2_block,subtypep,claz_block_annotation).
+struct_opv(claz_ir2_block,super_priority,[claz_block_annotation,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_ir2_block,typeof,type_class).
+struct_opv(claz_ir2_block,typeof,type_builtin_type).
+struct_opv(claz_ir2_component,has_slot,slot(claz_t,"alias_tns")).
+struct_opv(claz_ir2_component,has_slot,slot(claz_t,"component_tns")).
+struct_opv(claz_ir2_component,has_slot,slot(claz_t,"constant_tns")).
+struct_opv(claz_ir2_component,has_slot,slot(claz_t,"constants")).
+struct_opv(claz_ir2_component,has_slot,slot(claz_t,"entries")).
+struct_opv(claz_ir2_component,has_slot,slot(claz_t,"format")).
+struct_opv(claz_ir2_component,has_slot,slot(claz_t,"global_tn_counter")).
+struct_opv(claz_ir2_component,has_slot,slot(claz_t,"nfp")).
+struct_opv(claz_ir2_component,has_slot,slot(claz_t,"normal_tns")).
+struct_opv(claz_ir2_component,has_slot,slot(claz_t,"restricted_tns")).
+struct_opv(claz_ir2_component,has_slot,slot(claz_t,"specified_save_tns")).
+struct_opv(claz_ir2_component,has_slot,slot(claz_t,"spilled_tns")).
+struct_opv(claz_ir2_component,has_slot,slot(claz_t,"spilled_vops")).
+struct_opv(claz_ir2_component,has_slot,slot(claz_t,"values_receivers")).
+struct_opv(claz_ir2_component,has_slot,slot(claz_t,"wired_tns")).
+struct_opv(claz_ir2_component,subtypep,claz_structure_c33_object).
+struct_opv(claz_ir2_component,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_ir2_component,typeof,type_class).
+struct_opv(claz_ir2_component,typeof,type_builtin_type).
+struct_opv(claz_ir2_lvar,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_ir2_lvar,has_slot,slot(claz_t,"locs")).
+struct_opv(claz_ir2_lvar,has_slot,slot(claz_t,"primitive_type")).
+struct_opv(claz_ir2_lvar,has_slot,slot(claz_t,"stack_pointer")).
+struct_opv(claz_ir2_lvar,subtypep,claz_structure_object).
+struct_opv(claz_ir2_lvar,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_ir2_lvar,typeof,type_class).
+struct_opv(claz_ir2_lvar,typeof,type_builtin_type).
+struct_opv(claz_ir2_nlx_info,has_slot,slot(claz_t,"dynamic_state")).
+struct_opv(claz_ir2_nlx_info,has_slot,slot(claz_t,"home")).
+struct_opv(claz_ir2_nlx_info,has_slot,slot(claz_t,"save_sp")).
+struct_opv(claz_ir2_nlx_info,has_slot,slot(claz_t,"target")).
+struct_opv(claz_ir2_nlx_info,subtypep,claz_structure_object).
+struct_opv(claz_ir2_nlx_info,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_ir2_nlx_info,typeof,type_class).
+struct_opv(claz_ir2_nlx_info,typeof,type_builtin_type).
+struct_opv(claz_ir2_physenv,has_slot,slot(claz_t,"bsp_save_tn")).
+struct_opv(claz_ir2_physenv,has_slot,slot(claz_t,"closure")).
+struct_opv(claz_ir2_physenv,has_slot,slot(claz_t,"closure_save_tn")).
+struct_opv(claz_ir2_physenv,has_slot,slot(claz_t,"debug_live_tns")).
+struct_opv(claz_ir2_physenv,has_slot,slot(claz_t,"elsewhere_start")).
+struct_opv(claz_ir2_physenv,has_slot,slot(claz_t,"environment_start")).
+struct_opv(claz_ir2_physenv,has_slot,slot(claz_t,"live_tns")).
+struct_opv(claz_ir2_physenv,has_slot,slot(claz_t,"number_stack_p")).
+struct_opv(claz_ir2_physenv,has_slot,slot(claz_t,"old_fp")).
+struct_opv(claz_ir2_physenv,has_slot,slot(claz_t,"return_pc")).
+struct_opv(claz_ir2_physenv,has_slot,slot(claz_t,"return_pc_pass")).
+struct_opv(claz_ir2_physenv,subtypep,claz_structure_object).
+struct_opv(claz_ir2_physenv,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_ir2_physenv,typeof,type_class).
+struct_opv(claz_ir2_physenv,typeof,type_builtin_type).
+struct_opv(claz_j_reentrant_lock,typeof,type_builtin_type).
+struct_opv(claz_j_zip_file,typeof,type_builtin_type).
+struct_opv(claz_j_zip_output_stream,typeof,type_builtin_type).
+struct_opv(claz_jar_stream,has_slot,slot(claz_integer,"bytes_per_unit")).
+struct_opv(claz_jar_stream,has_slot,slot(claz_pathname,"pathname")).
+struct_opv(claz_jar_stream,has_slot,slot(claz_prolog_input_stream,"input")).
+struct_opv(claz_jar_stream,has_slot,slot(claz_prolog_reader,"reader")).
+struct_opv(claz_jar_stream,kw_ro,"bytes_per_unit").
+struct_opv(claz_jar_stream,kw_ro,"input").
+struct_opv(claz_jar_stream,kw_ro,"pathname").
+struct_opv(claz_jar_stream,kw_ro,"reader").
+struct_opv(claz_jar_stream,subtypep,claz_stream).
+struct_opv(claz_jar_stream,typeof,type_builtin_type).
+struct_opv(claz_join_thread_error,has_slot,slot(claz_t,"problem")).
+struct_opv(claz_join_thread_error,subtypep,claz_thread_error).
+struct_opv(claz_join_thread_error,super_priority,[claz_thread_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_join_thread_error,typeof,type_class).
+struct_opv(claz_join_thread_error,typeof,type_builtin_type).
+struct_opv(claz_key_info,has_slot,slot(claz_t,"name")).
+struct_opv(claz_key_info,has_slot,slot(claz_t,"type")).
+struct_opv(claz_key_info,subtypep,claz_structure_object).
+struct_opv(claz_key_info,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_key_info,typeof,type_class).
+struct_opv(claz_key_info,typeof,type_builtin_type).
+struct_opv(claz_keyword_error,subtypep,claz_error).
+struct_opv(claz_keyword_error,subtypep,claz_program_error).
+struct_opv(claz_keyword_error,super_priority,[claz_program_error,claz_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_keyword_error,typeof,type_builtin_type).
+struct_opv(claz_label,subtypep,claz_annotation).
+struct_opv(claz_label,super_priority,[claz_annotation,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_label,typeof,type_builtin_type).
+struct_opv(claz_lambda_list_unavailable,has_slot,slot(claz_t,"debug_fun")).
+struct_opv(claz_lambda_list_unavailable,subtypep,claz_debug_condition).
+struct_opv(claz_lambda_list_unavailable,super_priority,[claz_debug_condition,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_lambda_list_unavailable,typeof,type_class).
+struct_opv(claz_lambda_list_unavailable,typeof,type_builtin_type).
+struct_opv(claz_lambda_var,has_slot,slot(claz_t,"arg_info")).
+struct_opv(claz_lambda_var,has_slot,slot(claz_t,"constraints")).
+struct_opv(claz_lambda_var,has_slot,slot(claz_t,"ctype_constraints")).
+struct_opv(claz_lambda_var,has_slot,slot(claz_t,"eq_constraints")).
+struct_opv(claz_lambda_var,has_slot,slot(claz_t,"eql_var_constraints")).
+struct_opv(claz_lambda_var,has_slot,slot(claz_t,"flags")).
+struct_opv(claz_lambda_var,has_slot,slot(claz_t,"fop_value")).
+struct_opv(claz_lambda_var,has_slot,slot(claz_t,"home")).
+struct_opv(claz_lambda_var,has_slot,slot(claz_t,"inheritable_constraints")).
+struct_opv(claz_lambda_var,has_slot,slot(claz_t,"last_initial_type")).
+struct_opv(claz_lambda_var,has_slot,slot(claz_t,"private_constraints")).
+struct_opv(claz_lambda_var,has_slot,slot(claz_t,"specvar")).
+struct_opv(claz_lambda_var,subtypep,claz_basic_var).
+struct_opv(claz_lambda_var,super_priority,[claz_basic_var,claz_leaf,claz_sset_element,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_lambda_var,typeof,type_class).
+struct_opv(claz_lambda_var,typeof,type_builtin_type).
+struct_opv(claz_late_deprecation_warning,subtypep,claz_deprecation_condition).
+struct_opv(claz_late_deprecation_warning,subtypep,claz_warning).
+struct_opv(claz_late_deprecation_warning,super_priority,[claz_warning,claz_deprecation_condition,claz_reference_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_late_deprecation_warning,typeof,type_builtin_type).
+struct_opv(claz_layout,has_slot,slot(claz_boolean,"invalid")).
+struct_opv(claz_layout,has_slot,slot(claz_hash_table(claz_object,claz_object),"slot_table")).
+struct_opv(claz_layout,has_slot,slot(claz_list,"slot_names")).
+struct_opv(claz_layout,has_slot,slot(claz_object,"lisp_class")).
+struct_opv(claz_layout,has_slot,slot(claz_object,"shared_slots")).
+struct_opv(claz_layout,has_slot,slot(claz_t,"classoid")).
+struct_opv(claz_layout,has_slot,slot(claz_t,"clos_hash")).
+struct_opv(claz_layout,has_slot,slot(claz_t,"depthoid")).
+struct_opv(claz_layout,has_slot,slot(claz_t,"equalp_tests")).
+struct_opv(claz_layout,has_slot,slot(claz_t,"for_std_class_b")).
+struct_opv(claz_layout,has_slot,slot(claz_t,"info")).
+struct_opv(claz_layout,has_slot,slot(claz_t,"inherits")).
+struct_opv(claz_layout,has_slot,slot(claz_t,"length")).
+struct_opv(claz_layout,has_slot,slot(claz_t,"pure")).
+struct_opv(claz_layout,has_slot,slot(claz_t,"slot_list")).
+struct_opv(claz_layout,has_slot,slot(claz_t,"source_location")).
+struct_opv(claz_layout,has_slot,slot(claz_t,"untagged_bitmap")).
+struct_opv(claz_layout,kw_ro,"lisp_class").
+struct_opv(claz_layout,kw_ro,"shared_slots").
+struct_opv(claz_layout,kw_ro,"slot_names").
+struct_opv(claz_layout,kw_ro,"slot_table").
+struct_opv(claz_layout,subtypep,claz_object).
+struct_opv(claz_layout,subtypep,claz_structure_c33_object).
+struct_opv(claz_layout,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_layout,typeof,type_class).
+struct_opv(claz_layout,typeof,type_builtin_type).
+struct_opv(claz_layout_invalid,subtypep,claz_error).
+struct_opv(claz_layout_invalid,super_priority,[claz_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_layout_invalid,typeof,type_builtin_type).
+struct_opv(claz_leaf,has_slot,slot(claz_t,"defined_type")).
+struct_opv(claz_leaf,has_slot,slot(claz_t,"ever_used")).
+struct_opv(claz_leaf,has_slot,slot(claz_t,"extent")).
+struct_opv(claz_leaf,has_slot,slot(claz_t,"info")).
+struct_opv(claz_leaf,has_slot,slot(claz_t,"number")).
+struct_opv(claz_leaf,has_slot,slot(claz_t,"refs")).
+struct_opv(claz_leaf,has_slot,slot(claz_t,"source_name")).
+struct_opv(claz_leaf,has_slot,slot(claz_t,"type")).
+struct_opv(claz_leaf,has_slot,slot(claz_t,"where_from")).
+struct_opv(claz_leaf,subtypep,claz_sset_element).
+struct_opv(claz_leaf,super_priority,[claz_sset_element,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_leaf,typeof,type_class).
+struct_opv(claz_leaf,typeof,type_builtin_type).
+struct_opv(claz_lexenv,has_slot,slot(claz_t,"blocks")).
+struct_opv(claz_lexenv,has_slot,slot(claz_t,"cleanup")).
+struct_opv(claz_lexenv,has_slot,slot(claz_t,"disabled_package_locks")).
+struct_opv(claz_lexenv,has_slot,slot(claz_t,"funs")).
+struct_opv(claz_lexenv,has_slot,slot(claz_t,"handled_conditions")).
+struct_opv(claz_lexenv,has_slot,slot(claz_t,"lambda")).
+struct_opv(claz_lexenv,has_slot,slot(claz_t,"parent")).
+struct_opv(claz_lexenv,has_slot,slot(claz_t,"policy")).
+struct_opv(claz_lexenv,has_slot,slot(claz_t,"tags")).
+struct_opv(claz_lexenv,has_slot,slot(claz_t,"type_restrictions")).
+struct_opv(claz_lexenv,has_slot,slot(claz_t,"user_data")).
+struct_opv(claz_lexenv,has_slot,slot(claz_t,"vars")).
+struct_opv(claz_lexenv,subtypep,claz_abstract_lexenv).
+struct_opv(claz_lexenv,super_priority,[claz_abstract_lexenv,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_lexenv,typeof,type_class).
+struct_opv(claz_lexenv,typeof,type_builtin_type).
+struct_opv(claz_lexical_environment_too_complex,has_slot,slot(claz_t,"form")).
+struct_opv(claz_lexical_environment_too_complex,has_slot,slot(claz_t,"lexenv")).
+struct_opv(claz_lexical_environment_too_complex,subtypep,claz_style_warning).
+struct_opv(claz_lexical_environment_too_complex,super_priority,[claz_style_warning,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_lexical_environment_too_complex,typeof,type_class).
+struct_opv(claz_lexical_environment_too_complex,typeof,type_builtin_type).
+struct_opv(claz_lisp_class,has_slot,slot(claz_boolean,"finalized")).
+struct_opv(claz_lisp_class,has_slot,slot(claz_integer,"sxhash")).
+struct_opv(claz_lisp_class,has_slot,slot(claz_layout,"class_layout")).
+struct_opv(claz_lisp_class,has_slot,slot(claz_list,"class_precedence_list")).
+struct_opv(claz_lisp_class,has_slot,slot(claz_list,"direct_methods")).
+struct_opv(claz_lisp_class,has_slot,slot(claz_list,"direct_subclasses")).
+struct_opv(claz_lisp_class,has_slot,slot(claz_list,"direct_superclasses")).
+struct_opv(claz_lisp_class,has_slot,slot(claz_list,"documentation")).
+struct_opv(claz_lisp_class,has_slot,slot(claz_list,"property_list")).
+struct_opv(claz_lisp_class,has_slot,slot(claz_object,"name")).
+struct_opv(claz_lisp_class,kw_ro,"sxhash").
+struct_opv(claz_lisp_class,subtypep,claz_standard_object).
+struct_opv(claz_lisp_class,typeof,type_builtin_type).
+struct_opv(claz_lisp_error,subtypep,claz_serious_condition).
+struct_opv(claz_lisp_error,typeof,type_builtin_type).
+struct_opv(claz_lisp_integer,subtypep,claz_object).
+struct_opv(claz_lisp_integer,typeof,type_builtin_type).
+struct_opv(claz_lisp_stack_frame,has_slot,slot(claz_list,"args")).
+struct_opv(claz_lisp_stack_frame,has_slot,slot(claz_object,"operator")).
+struct_opv(claz_lisp_stack_frame,kw_ro,"args").
+struct_opv(claz_lisp_stack_frame,kw_ro,"operator").
+struct_opv(claz_lisp_stack_frame,subtypep,claz_stack_frame).
+struct_opv(claz_lisp_stack_frame,typeof,type_builtin_type).
+struct_opv(claz_lisp_thread,has_slot,slot(claz_array_of(claz_prolog_object),"stack")).
+struct_opv(claz_lisp_thread,has_slot,slot(claz_array_of(claz_special_binding),"specials")).
+struct_opv(claz_lisp_thread,has_slot,slot(claz_boolean,"destroyed")).
+struct_opv(claz_lisp_thread,has_slot,slot(claz_boolean,"thread_interrupted")).
+struct_opv(claz_lisp_thread,has_slot,slot(claz_integer,"stack_ptr")).
+struct_opv(claz_lisp_thread,has_slot,slot(claz_lisp_thread_stack_segment,"spare_stack_segment")).
+struct_opv(claz_lisp_thread,has_slot,slot(claz_lisp_thread_stack_segment,"top_stack_segment")).
+struct_opv(claz_lisp_thread,has_slot,slot(claz_list,"thread_values")).
+struct_opv(claz_lisp_thread,has_slot,slot(claz_object,"catch_tags")).
+struct_opv(claz_lisp_thread,has_slot,slot(claz_object,"name")).
+struct_opv(claz_lisp_thread,has_slot,slot(claz_object,"pending")).
+struct_opv(claz_lisp_thread,has_slot,slot(claz_object,"thread_value")).
+struct_opv(claz_lisp_thread,has_slot,slot(claz_prolog_thread,"ffi_thread")).
+struct_opv(claz_lisp_thread,has_slot,slot(claz_special_bindings_mark,"saved_specials")).
+struct_opv(claz_lisp_thread,has_slot,slot(claz_symbol,"wrapper")).
+struct_opv(claz_lisp_thread,kw_ro,"ffi_thread").
+struct_opv(claz_lisp_thread,kw_ro,"name").
+struct_opv(claz_lisp_thread,subtypep,claz_object).
+struct_opv(claz_lisp_thread,typeof,type_builtin_type).
+struct_opv(claz_lisp_thread_stack_marker,has_slot,slot(claz_integer,"num_args")).
+struct_opv(claz_lisp_thread_stack_marker,kw_ro,"num_args").
+struct_opv(claz_lisp_thread_stack_marker,typeof,type_builtin_type).
+struct_opv(claz_lisp_thread_stack_segment,has_slot,slot(claz_array_of(claz_prolog_object),"stack")).
+struct_opv(claz_lisp_thread_stack_segment,has_slot,slot(claz_integer,"stack_ptr")).
+struct_opv(claz_lisp_thread_stack_segment,has_slot,slot(claz_lisp_thread_stack_segment,"next")).
+struct_opv(claz_lisp_thread_stack_segment,kw_ro,"next").
+struct_opv(claz_lisp_thread_stack_segment,kw_ro,"stack").
+struct_opv(claz_lisp_thread_stack_segment,typeof,type_builtin_type).
+struct_opv(claz_list,subtypep,claz_sequence).
+struct_opv(claz_list,super_priority,[claz_sequence,claz_t]).
+struct_opv(claz_list,typeof,type_builtin_type).
+struct_opv(claz_local_alien_info,has_slot,slot(claz_t,"force_to_memory_p")).
+struct_opv(claz_local_alien_info,has_slot,slot(claz_t,"type")).
+struct_opv(claz_local_alien_info,subtypep,claz_structure_c33_object).
+struct_opv(claz_local_alien_info,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_local_alien_info,typeof,type_class).
+struct_opv(claz_local_alien_info,typeof,type_builtin_type).
+struct_opv(claz_local_argument_mismatch,subtypep,claz_reference_condition).
+struct_opv(claz_local_argument_mismatch,subtypep,claz_simple_warning).
+struct_opv(claz_local_argument_mismatch,super_priority,[claz_reference_condition,claz_simple_warning,claz_simple_condition,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_local_argument_mismatch,typeof,type_builtin_type).
+struct_opv(claz_locale_conv,has_slot,slot(claz_t,"currency_symbol")).
+struct_opv(claz_locale_conv,has_slot,slot(claz_t,"decimal_point")).
+struct_opv(claz_locale_conv,has_slot,slot(claz_t,"frac_digits")).
+struct_opv(claz_locale_conv,has_slot,slot(claz_t,"grouping")).
+struct_opv(claz_locale_conv,has_slot,slot(claz_t,"int_curr_symbol")).
+struct_opv(claz_locale_conv,has_slot,slot(claz_t,"int_frac_digits")).
+struct_opv(claz_locale_conv,has_slot,slot(claz_t,"int_n_cs_precedes")).
+struct_opv(claz_locale_conv,has_slot,slot(claz_t,"int_n_sep_by_space")).
+struct_opv(claz_locale_conv,has_slot,slot(claz_t,"int_n_sign_posn")).
+struct_opv(claz_locale_conv,has_slot,slot(claz_t,"int_p_cs_precedes")).
+struct_opv(claz_locale_conv,has_slot,slot(claz_t,"int_p_sep_by_space")).
+struct_opv(claz_locale_conv,has_slot,slot(claz_t,"int_p_sign_posn")).
+struct_opv(claz_locale_conv,has_slot,slot(claz_t,"mon_decimal_point")).
+struct_opv(claz_locale_conv,has_slot,slot(claz_t,"mon_grouping")).
+struct_opv(claz_locale_conv,has_slot,slot(claz_t,"mon_thousands_sep")).
+struct_opv(claz_locale_conv,has_slot,slot(claz_t,"n_cs_precedes")).
+struct_opv(claz_locale_conv,has_slot,slot(claz_t,"n_sep_by_space")).
+struct_opv(claz_locale_conv,has_slot,slot(claz_t,"n_sign_posn")).
+struct_opv(claz_locale_conv,has_slot,slot(claz_t,"negative_sign")).
+struct_opv(claz_locale_conv,has_slot,slot(claz_t,"p_cs_precedes")).
+struct_opv(claz_locale_conv,has_slot,slot(claz_t,"p_sep_by_space")).
+struct_opv(claz_locale_conv,has_slot,slot(claz_t,"p_sign_posn")).
+struct_opv(claz_locale_conv,has_slot,slot(claz_t,"positive_sign")).
+struct_opv(claz_locale_conv,has_slot,slot(claz_t,"thousands_sep")).
+struct_opv(claz_locale_conv,subtypep,claz_structure_object).
+struct_opv(claz_locale_conv,super_priority,[claz_structure_object,claz_t]).
+struct_opv(claz_locale_conv,typeof,type_class).
+struct_opv(claz_locale_conv,typeof,type_builtin_type).
+struct_opv(claz_location_group,has_slot,slot(claz_t,"locations")).
+struct_opv(claz_location_group,subtypep,claz_structure_object).
+struct_opv(claz_location_group,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_location_group,typeof,type_class).
+struct_opv(claz_location_group,typeof,type_builtin_type).
+struct_opv(claz_location_info,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_location_info,has_slot,slot(claz_t,"label")).
+struct_opv(claz_location_info,has_slot,slot(claz_t,"vop")).
+struct_opv(claz_location_info,subtypep,claz_structure_object).
+struct_opv(claz_location_info,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_location_info,typeof,type_class).
+struct_opv(claz_location_info,typeof,type_builtin_type).
+struct_opv(claz_logical_block,has_slot,slot(claz_t,"per_line_prefix_end")).
+struct_opv(claz_logical_block,has_slot,slot(claz_t,"prefix_length")).
+struct_opv(claz_logical_block,has_slot,slot(claz_t,"section_column")).
+struct_opv(claz_logical_block,has_slot,slot(claz_t,"section_start_line")).
+struct_opv(claz_logical_block,has_slot,slot(claz_t,"start_column")).
+struct_opv(claz_logical_block,has_slot,slot(claz_t,"suffix_length")).
+struct_opv(claz_logical_block,subtypep,claz_structure_object).
+struct_opv(claz_logical_block,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_logical_block,typeof,type_class).
+struct_opv(claz_logical_block,typeof,type_builtin_type).
+struct_opv(claz_logical_host,has_slot,slot(claz_t,"canon_transls")).
+struct_opv(claz_logical_host,has_slot,slot(claz_t,"customary_case")).
+struct_opv(claz_logical_host,has_slot,slot(claz_t,"name")).
+struct_opv(claz_logical_host,has_slot,slot(claz_t,"parse")).
+struct_opv(claz_logical_host,has_slot,slot(claz_t,"parse_native")).
+struct_opv(claz_logical_host,has_slot,slot(claz_t,"simplify_namestring")).
+struct_opv(claz_logical_host,has_slot,slot(claz_t,"translations")).
+struct_opv(claz_logical_host,has_slot,slot(claz_t,"unparse")).
+struct_opv(claz_logical_host,has_slot,slot(claz_t,"unparse_directory")).
+struct_opv(claz_logical_host,has_slot,slot(claz_t,"unparse_directory_separator")).
+struct_opv(claz_logical_host,has_slot,slot(claz_t,"unparse_enough")).
+struct_opv(claz_logical_host,has_slot,slot(claz_t,"unparse_file")).
+struct_opv(claz_logical_host,has_slot,slot(claz_t,"unparse_host")).
+struct_opv(claz_logical_host,has_slot,slot(claz_t,"unparse_native")).
+struct_opv(claz_logical_host,subtypep,claz_host).
+struct_opv(claz_logical_host,super_priority,[claz_host,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_logical_host,typeof,type_class).
+struct_opv(claz_logical_host,typeof,type_builtin_type).
+struct_opv(claz_logical_pathname,subtypep,claz_pathname).
+struct_opv(claz_logical_pathname,super_priority,[claz_pathname,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_logical_pathname,super_priority,[claz_pathname,claz_t]).
+struct_opv(claz_logical_pathname,typeof,type_builtin_type).
+struct_opv(claz_long,typeof,type_builtin_type).
+struct_opv(claz_long_method_combination,has_slot,slot(claz_t,"args_lambda_list")).
+struct_opv(claz_long_method_combination,has_slot,slot(claz_t,"function")).
+struct_opv(claz_long_method_combination,subtypep,claz_standard_method_combination).
+struct_opv(claz_long_method_combination,super_priority,[claz_standard_method_combination,claz_definition_source_mixin,claz_method_combination,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_long_method_combination,typeof,type_class).
+struct_opv(claz_long_method_combination,typeof,type_builtin_type).
+struct_opv(claz_long_method_combination_error,subtypep,claz_reference_condition).
+struct_opv(claz_long_method_combination_error,subtypep,claz_simple_error).
+struct_opv(claz_long_method_combination_error,super_priority,[claz_reference_condition,claz_simple_error,claz_simple_condition,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_long_method_combination_error,typeof,type_builtin_type).
+struct_opv(claz_loop_collector,has_slot,slot(claz_t,"class")).
+struct_opv(claz_loop_collector,has_slot,slot(claz_t,"data")).
+struct_opv(claz_loop_collector,has_slot,slot(claz_t,"dtype")).
+struct_opv(claz_loop_collector,has_slot,slot(claz_t,"history")).
+struct_opv(claz_loop_collector,has_slot,slot(claz_t,"name")).
+struct_opv(claz_loop_collector,has_slot,slot(claz_t,"specified_type")).
+struct_opv(claz_loop_collector,has_slot,slot(claz_t,"tempvars")).
+struct_opv(claz_loop_collector,subtypep,claz_structure_object).
+struct_opv(claz_loop_collector,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_loop_collector,typeof,type_class).
+struct_opv(claz_loop_collector,typeof,type_builtin_type).
+struct_opv(claz_loop_initialization,has_slot,slot(claz_t,"bindings")).
+struct_opv(claz_loop_initialization,has_slot,slot(claz_t,"declspecs")).
+struct_opv(claz_loop_initialization,has_slot,slot(claz_t,"depends_preceding")).
+struct_opv(claz_loop_initialization,has_slot,slot(claz_t,"endtest_forms")).
+struct_opv(claz_loop_initialization,has_slot,slot(claz_t,"everytime")).
+struct_opv(claz_loop_initialization,has_slot,slot(claz_t,"later_depend")).
+struct_opv(claz_loop_initialization,has_slot,slot(claz_t,"preamble")).
+struct_opv(claz_loop_initialization,has_slot,slot(claz_t,"requires_stepbefore")).
+struct_opv(claz_loop_initialization,has_slot,slot(claz_t,"specform")).
+struct_opv(claz_loop_initialization,subtypep,claz_structure_object).
+struct_opv(claz_loop_initialization,super_priority,[claz_structure_object,claz_t]).
+struct_opv(claz_loop_initialization,typeof,type_class).
+struct_opv(claz_loop_initialization,typeof,type_builtin_type).
+struct_opv(claz_loop_minimax,has_slot,slot(claz_t,"answer_variable")).
+struct_opv(claz_loop_minimax,has_slot,slot(claz_t,"flag_variable")).
+struct_opv(claz_loop_minimax,has_slot,slot(claz_t,"infinity_data")).
+struct_opv(claz_loop_minimax,has_slot,slot(claz_t,"operations")).
+struct_opv(claz_loop_minimax,has_slot,slot(claz_t,"temp_variable")).
+struct_opv(claz_loop_minimax,has_slot,slot(claz_t,"type")).
+struct_opv(claz_loop_minimax,subtypep,claz_structure_object).
+struct_opv(claz_loop_minimax,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_loop_minimax,typeof,type_class).
+struct_opv(claz_loop_minimax,typeof,type_builtin_type).
+struct_opv(claz_loop_path,has_slot,slot(claz_t,"function")).
+struct_opv(claz_loop_path,has_slot,slot(claz_t,"inclusive_permitted")).
+struct_opv(claz_loop_path,has_slot,slot(claz_t,"names")).
+struct_opv(claz_loop_path,has_slot,slot(claz_t,"preposition_groups")).
+struct_opv(claz_loop_path,has_slot,slot(claz_t,"user_data")).
+struct_opv(claz_loop_path,subtypep,claz_structure_object).
+struct_opv(claz_loop_path,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_loop_path,typeof,type_class).
+struct_opv(claz_loop_path,typeof,type_builtin_type).
+struct_opv(claz_loop_universe,has_slot,slot(claz_t,"for_keywords")).
+struct_opv(claz_loop_universe,has_slot,slot(claz_t,"iteration_keywords")).
+struct_opv(claz_loop_universe,has_slot,slot(claz_t,"keywords")).
+struct_opv(claz_loop_universe,has_slot,slot(claz_t,"path_keywords")).
+struct_opv(claz_loop_universe,has_slot,slot(claz_t,"type_keywords")).
+struct_opv(claz_loop_universe,has_slot,slot(claz_t,"type_symbols")).
+struct_opv(claz_loop_universe,subtypep,claz_structure_object).
+struct_opv(claz_loop_universe,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_loop_universe,typeof,type_class).
+struct_opv(claz_loop_universe,typeof,type_builtin_type).
+struct_opv(claz_lra,subtypep,claz_t).
+struct_opv(claz_lra,super_priority,[claz_t]).
+struct_opv(claz_lra,typeof,type_builtin_type).
+struct_opv(claz_lvar,has_slot,slot(claz_t,"derived_type")).
+struct_opv(claz_lvar,has_slot,slot(claz_t,"dest")).
+struct_opv(claz_lvar,has_slot,slot(claz_t,"dynamic_extent")).
+struct_opv(claz_lvar,has_slot,slot(claz_t,"externally_checkable_type")).
+struct_opv(claz_lvar,has_slot,slot(claz_t,"info")).
+struct_opv(claz_lvar,has_slot,slot(claz_t,"reoptimize")).
+struct_opv(claz_lvar,has_slot,slot(claz_t,"uses")).
+struct_opv(claz_lvar,subtypep,claz_structure_c33_object).
+struct_opv(claz_lvar,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_lvar,typeof,type_class).
+struct_opv(claz_lvar,typeof,type_builtin_type).
+struct_opv(claz_macro_object,has_slot,slot(claz_object,"expander")).
+struct_opv(claz_macro_object,has_slot,slot(claz_object,"name")).
+struct_opv(claz_macro_object,kw_ro,"expander").
+struct_opv(claz_macro_object,kw_ro,"name").
+struct_opv(claz_macro_object,subtypep,claz_function).
+struct_opv(claz_macro_object,typeof,type_builtin_type).
+struct_opv(claz_macroexpand_hook_type_error,subtypep,claz_error).
+struct_opv(claz_macroexpand_hook_type_error,super_priority,[claz_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_macroexpand_hook_type_error,typeof,type_builtin_type).
+struct_opv(claz_malformed_ascii,subtypep,claz_octet_decoding_error).
+struct_opv(claz_malformed_ascii,super_priority,[claz_octet_decoding_error,claz_character_decoding_error,claz_character_coding_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_malformed_ascii,typeof,type_builtin_type).
+struct_opv(claz_malformed_euc_jp,subtypep,claz_octet_decoding_error).
+struct_opv(claz_malformed_euc_jp,super_priority,[claz_octet_decoding_error,claz_character_decoding_error,claz_character_coding_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_malformed_euc_jp,typeof,type_builtin_type).
+struct_opv(claz_malformed_gbk,subtypep,claz_octet_decoding_error).
+struct_opv(claz_malformed_gbk,super_priority,[claz_octet_decoding_error,claz_character_decoding_error,claz_character_coding_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_malformed_gbk,typeof,type_builtin_type).
+struct_opv(claz_malformed_shift_jis,subtypep,claz_octet_decoding_error).
+struct_opv(claz_malformed_shift_jis,super_priority,[claz_octet_decoding_error,claz_character_decoding_error,claz_character_coding_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_malformed_shift_jis,typeof,type_builtin_type).
+struct_opv(claz_match,has_slot,slot(claz_t,"end")).
+struct_opv(claz_match,has_slot,slot(claz_t,"start")).
+struct_opv(claz_match,subtypep,claz_structure_object).
+struct_opv(claz_match,super_priority,[claz_structure_object,claz_t]).
+struct_opv(claz_match,typeof,type_class).
+struct_opv(claz_match,typeof,type_builtin_type).
+struct_opv(claz_member_type,has_slot,slot(claz_t,"class_info")).
+struct_opv(claz_member_type,has_slot,slot(claz_t,"fp_zeroes")).
+struct_opv(claz_member_type,has_slot,slot(claz_t,"xset")).
+struct_opv(claz_member_type,subtypep,claz_ctype).
+struct_opv(claz_member_type,super_priority,[claz_ctype,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_member_type,typeof,type_class).
+struct_opv(claz_member_type,typeof,type_builtin_type).
+struct_opv(claz_memory_class_loader,has_slot,slot(claz_ffi_object,"boxed_this")).
+struct_opv(claz_memory_class_loader,has_slot,slot(claz_hash_table(claz_string,claz_ffi_object),"hashtable")).
+struct_opv(claz_memory_class_loader,has_slot,slot(claz_string,"internal_name_prefix")).
+struct_opv(claz_memory_class_loader,kw_ro,"boxed_this").
+struct_opv(claz_memory_class_loader,kw_ro,"hashtable").
+struct_opv(claz_memory_class_loader,kw_ro,"internal_name_prefix").
+struct_opv(claz_memory_class_loader,subtypep,claz_ffi_class_loader).
+struct_opv(claz_memory_class_loader,typeof,type_builtin_type).
+struct_opv(claz_memory_fault_error,subtypep,claz_error).
+struct_opv(claz_memory_fault_error,subtypep,claz_system_condition).
+struct_opv(claz_memory_fault_error,super_priority,[claz_system_condition,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_memory_fault_error,typeof,type_builtin_type).
+struct_opv(claz_meta_info,has_slot,slot(claz_t,"category")).
+struct_opv(claz_meta_info,has_slot,slot(claz_t,"default")).
+struct_opv(claz_meta_info,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_meta_info,has_slot,slot(claz_t,"number")).
+struct_opv(claz_meta_info,has_slot,slot(claz_t,"type_checker")).
+struct_opv(claz_meta_info,has_slot,slot(claz_t,"type_spec")).
+struct_opv(claz_meta_info,has_slot,slot(claz_t,"validate_function")).
+struct_opv(claz_meta_info,subtypep,claz_structure_object).
+struct_opv(claz_meta_info,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_meta_info,typeof,type_class).
+struct_opv(claz_meta_info,typeof,type_builtin_type).
+struct_opv(claz_metaobject,subtypep,claz_standard_object).
+struct_opv(claz_metaobject,super_priority,[claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_metaobject,super_priority,[claz_standard_object,claz_t]).
+struct_opv(claz_metaobject,typeof,type_builtin_type).
+struct_opv(claz_metaobject_initialization_violation,subtypep,claz_reference_condition).
+struct_opv(claz_metaobject_initialization_violation,subtypep,claz_simple_error).
+struct_opv(claz_metaobject_initialization_violation,super_priority,[claz_reference_condition,claz_simple_error,claz_simple_condition,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_metaobject_initialization_violation,typeof,type_builtin_type).
+struct_opv(claz_method,has_slot,slot(claz_t,"from_defgeneric")).
+struct_opv(claz_method,subtypep,claz_metaobject).
+struct_opv(claz_method,subtypep,claz_standard_stablehash).
+struct_opv(claz_method,super_priority,[claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_method,super_priority,[claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_method,typeof,type_class).
+struct_opv(claz_method,typeof,type_builtin_type).
+struct_opv(claz_method_call,has_slot,slot(claz_t,"call_method_args")).
+struct_opv(claz_method_call,has_slot,slot(claz_t,"function")).
+struct_opv(claz_method_call,subtypep,claz_structure_object).
+struct_opv(claz_method_call,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_method_call,typeof,type_class).
+struct_opv(claz_method_call,typeof,type_builtin_type).
+struct_opv(claz_method_call_error,has_slot,slot(claz_t,"args")).
+struct_opv(claz_method_call_error,has_slot,slot(claz_t,"gf")).
+struct_opv(claz_method_call_error,has_slot,slot(claz_t,"method")).
+struct_opv(claz_method_call_error,subtypep,claz_simple_error).
+struct_opv(claz_method_call_error,super_priority,[claz_simple_error,claz_simple_condition,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_method_call_error,typeof,type_class).
+struct_opv(claz_method_call_error,typeof,type_builtin_type).
+struct_opv(claz_method_call_type_error,subtypep,claz_method_call_error).
+struct_opv(claz_method_call_type_error,subtypep,claz_simple_type_error).
+struct_opv(claz_method_call_type_error,super_priority,[claz_simple_type_error,claz_method_call_error,claz_simple_error,claz_simple_condition,claz_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_method_call_type_error,typeof,type_builtin_type).
+struct_opv(claz_method_combination,has_slot,slot(claz_t,"arguments_lambda_list")).
+struct_opv(claz_method_combination,has_slot,slot(claz_t,"call_next_method_allowed")).
+struct_opv(claz_method_combination,has_slot,slot(claz_t,"check_method_qualifiers")).
+struct_opv(claz_method_combination,has_slot,slot(claz_t,"check_options")).
+struct_opv(claz_method_combination,has_slot,slot(claz_t,"declarations")).
+struct_opv(claz_method_combination,has_slot,slot(claz_t,"documentation")).
+struct_opv(claz_method_combination,has_slot,slot(claz_t,"expander")).
+struct_opv(claz_method_combination,has_slot,slot(claz_t,"identity_with_one_argument")).
+struct_opv(claz_method_combination,has_slot,slot(claz_t,"long_expander")).
+struct_opv(claz_method_combination,has_slot,slot(claz_t,"name")).
+struct_opv(claz_method_combination,has_slot,slot(claz_t,"operator")).
+struct_opv(claz_method_combination,has_slot,slot(claz_t,"options")).
+struct_opv(claz_method_combination,has_slot,slot(claz_t,"qualifiers")).
+struct_opv(claz_method_combination,subtypep,claz_metaobject).
+struct_opv(claz_method_combination,super_priority,[claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_method_combination,super_priority,[claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_method_combination,typeof,type_class).
+struct_opv(claz_method_combination,typeof,type_builtin_type).
+struct_opv(claz_misdesigned_forward_referenced_class,subtypep,claz_forward_referenced_class).
+struct_opv(claz_misdesigned_forward_referenced_class,subtypep,claz_potential_class).
+struct_opv(claz_misdesigned_forward_referenced_class,super_priority,[claz_forward_referenced_class,claz_potential_class,claz_specializer,claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_misdesigned_forward_referenced_class,typeof,type_builtin_type).
+struct_opv(claz_missing_load_form,has_slot,slot(claz_t,"object")).
+struct_opv(claz_missing_load_form,subtypep,claz_error).
+struct_opv(claz_missing_load_form,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_missing_load_form,typeof,type_class).
+struct_opv(claz_missing_load_form,typeof,type_builtin_type).
+struct_opv(claz_modular_class,has_slot,slot(claz_t,"funs")).
+struct_opv(claz_modular_class,has_slot,slot(claz_t,"versions")).
+struct_opv(claz_modular_class,has_slot,slot(claz_t,"widths")).
+struct_opv(claz_modular_class,subtypep,claz_structure_object).
+struct_opv(claz_modular_class,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_modular_class,typeof,type_class).
+struct_opv(claz_modular_class,typeof,type_builtin_type).
+struct_opv(claz_modular_fun_info,has_slot,slot(claz_t,"lambda_list")).
+struct_opv(claz_modular_fun_info,has_slot,slot(claz_t,"name")).
+struct_opv(claz_modular_fun_info,has_slot,slot(claz_t,"prototype")).
+struct_opv(claz_modular_fun_info,has_slot,slot(claz_t,"signedp")).
+struct_opv(claz_modular_fun_info,has_slot,slot(claz_t,"width")).
+struct_opv(claz_modular_fun_info,subtypep,claz_structure_object).
+struct_opv(claz_modular_fun_info,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_modular_fun_info,typeof,type_class).
+struct_opv(claz_modular_fun_info,typeof,type_builtin_type).
+struct_opv(claz_mutex,has_slot,slot(claz_t,"name")).
+struct_opv(claz_mutex,has_slot,slot(claz_t,"owner")).
+struct_opv(claz_mutex,has_slot,slot(claz_t,"state")).
+struct_opv(claz_mutex,subtypep,claz_structure_c33_object).
+struct_opv(claz_mutex,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_mutex,typeof,type_class).
+struct_opv(claz_mutex,typeof,type_builtin_type).
+struct_opv(claz_mv_combination,subtypep,claz_basic_combination).
+struct_opv(claz_mv_combination,super_priority,[claz_basic_combination,claz_valued_node,claz_node,claz_sset_element,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_mv_combination,typeof,type_builtin_type).
+struct_opv(claz_n_n,subtypep,claz_accessor_dfun_info).
+struct_opv(claz_n_n,super_priority,[claz_accessor_dfun_info,claz_dfun_info,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_n_n,typeof,type_builtin_type).
+struct_opv(claz_name_conflict,has_slot,slot(claz_t,"datum")).
+struct_opv(claz_name_conflict,has_slot,slot(claz_t,"function")).
+struct_opv(claz_name_conflict,has_slot,slot(claz_t,"symbols")).
+struct_opv(claz_name_conflict,subtypep,claz_package_error).
+struct_opv(claz_name_conflict,subtypep,claz_reference_condition).
+struct_opv(claz_name_conflict,super_priority,[claz_reference_condition,claz_package_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_name_conflict,typeof,type_class).
+struct_opv(claz_name_conflict,typeof,type_builtin_type).
+struct_opv(claz_named_type,has_slot,slot(claz_t,"class_info")).
+struct_opv(claz_named_type,has_slot,slot(claz_t,"name")).
+struct_opv(claz_named_type,subtypep,claz_ctype).
+struct_opv(claz_named_type,super_priority,[claz_ctype,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_named_type,typeof,type_class).
+struct_opv(claz_named_type,typeof,type_builtin_type).
+struct_opv(claz_namestring_parse_error,has_slot,slot(claz_t,"args")).
+struct_opv(claz_namestring_parse_error,has_slot,slot(claz_t,"complaint")).
+struct_opv(claz_namestring_parse_error,has_slot,slot(claz_t,"namestring")).
+struct_opv(claz_namestring_parse_error,has_slot,slot(claz_t,"offset")).
+struct_opv(claz_namestring_parse_error,subtypep,claz_parse_error).
+struct_opv(claz_namestring_parse_error,super_priority,[claz_parse_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_namestring_parse_error,typeof,type_class).
+struct_opv(claz_namestring_parse_error,typeof,type_builtin_type).
+struct_opv(claz_negation_type,has_slot,slot(claz_t,"class_info")).
+struct_opv(claz_negation_type,has_slot,slot(claz_t,"type")).
+struct_opv(claz_negation_type,subtypep,claz_ctype).
+struct_opv(claz_negation_type,super_priority,[claz_ctype,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_negation_type,typeof,type_class).
+struct_opv(claz_negation_type,typeof,type_builtin_type).
+struct_opv(claz_new_value_specialization,has_slot,slot(claz_t,"method")).
+struct_opv(claz_new_value_specialization,subtypep,claz_error).
+struct_opv(claz_new_value_specialization,subtypep,claz_reference_condition).
+struct_opv(claz_new_value_specialization,super_priority,[claz_reference_condition,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_new_value_specialization,typeof,type_class).
+struct_opv(claz_new_value_specialization,typeof,type_builtin_type).
+struct_opv(claz_newline,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_newline,subtypep,claz_section_start).
+struct_opv(claz_newline,super_priority,[claz_section_start,claz_queued_op,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_newline,typeof,type_class).
+struct_opv(claz_newline,typeof,type_builtin_type).
+struct_opv(claz_nil,subtypep,claz_symbol).
+struct_opv(claz_nil,typeof,type_builtin_type).
+struct_opv(claz_nil_array_accessed_error,subtypep,claz_error).
+struct_opv(claz_nil_array_accessed_error,subtypep,claz_reference_condition).
+struct_opv(claz_nil_array_accessed_error,super_priority,[claz_reference_condition,claz_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_nil_array_accessed_error,typeof,type_builtin_type).
+struct_opv(claz_nil_vector,has_slot,slot(claz_integer,"capacity")).
+struct_opv(claz_nil_vector,subtypep,claz_string).
+struct_opv(claz_nil_vector,typeof,type_builtin_type).
+struct_opv(claz_nlx_info,has_slot,slot(claz_t,"block")).
+struct_opv(claz_nlx_info,has_slot,slot(claz_t,"cleanup")).
+struct_opv(claz_nlx_info,has_slot,slot(claz_t,"info")).
+struct_opv(claz_nlx_info,has_slot,slot(claz_t,"safe_p")).
+struct_opv(claz_nlx_info,has_slot,slot(claz_t,"target")).
+struct_opv(claz_nlx_info,subtypep,claz_structure_c33_object).
+struct_opv(claz_nlx_info,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_nlx_info,typeof,type_class).
+struct_opv(claz_nlx_info,typeof,type_builtin_type).
+struct_opv(claz_no_debug_blocks,has_slot,slot(claz_t,"debug_fun")).
+struct_opv(claz_no_debug_blocks,subtypep,claz_debug_condition).
+struct_opv(claz_no_debug_blocks,super_priority,[claz_debug_condition,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_no_debug_blocks,typeof,type_class).
+struct_opv(claz_no_debug_blocks,typeof,type_builtin_type).
+struct_opv(claz_no_debug_fun_returns,has_slot,slot(claz_t,"debug_fun")).
+struct_opv(claz_no_debug_fun_returns,subtypep,claz_debug_condition).
+struct_opv(claz_no_debug_fun_returns,super_priority,[claz_debug_condition,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_no_debug_fun_returns,typeof,type_class).
+struct_opv(claz_no_debug_fun_returns,typeof,type_builtin_type).
+struct_opv(claz_no_debug_vars,has_slot,slot(claz_t,"debug_fun")).
+struct_opv(claz_no_debug_vars,subtypep,claz_debug_condition).
+struct_opv(claz_no_debug_vars,super_priority,[claz_debug_condition,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_no_debug_vars,typeof,type_class).
+struct_opv(claz_no_debug_vars,typeof,type_builtin_type).
+struct_opv(claz_no_methods,subtypep,claz_dfun_info).
+struct_opv(claz_no_methods,super_priority,[claz_dfun_info,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_no_methods,typeof,type_builtin_type).
+struct_opv(claz_no_primary_method,has_slot,slot(claz_t,"args")).
+struct_opv(claz_no_primary_method,has_slot,slot(claz_t,"generic_function")).
+struct_opv(claz_no_primary_method,subtypep,claz_error).
+struct_opv(claz_no_primary_method,subtypep,claz_reference_condition).
+struct_opv(claz_no_primary_method,super_priority,[claz_reference_condition,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_no_primary_method,typeof,type_class).
+struct_opv(claz_no_primary_method,typeof,type_builtin_type).
+struct_opv(claz_node,has_slot,slot(claz_t,"lexenv")).
+struct_opv(claz_node,has_slot,slot(claz_t,"next")).
+struct_opv(claz_node,has_slot,slot(claz_t,"number")).
+struct_opv(claz_node,has_slot,slot(claz_t,"prev")).
+struct_opv(claz_node,has_slot,slot(claz_t,"reoptimize")).
+struct_opv(claz_node,has_slot,slot(claz_t,"source_path")).
+struct_opv(claz_node,has_slot,slot(claz_t,"tail_p")).
+struct_opv(claz_node,subtypep,claz_sset_element).
+struct_opv(claz_node,super_priority,[claz_sset_element,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_node,typeof,type_class).
+struct_opv(claz_node,typeof,type_builtin_type).
+struct_opv(claz_null,subtypep,claz_list).
+struct_opv(claz_null,subtypep,claz_symbol).
+struct_opv(claz_null,super_priority,[claz_symbol,claz_list,claz_sequence,claz_t]).
+struct_opv(claz_null,typeof,type_builtin_type).
+struct_opv(claz_number,subtypep,claz_t).
+struct_opv(claz_number,super_priority,[claz_t]).
+struct_opv(claz_number,typeof,type_builtin_type).
+struct_opv(claz_numeric_type,has_slot,slot(claz_t,"class")).
+struct_opv(claz_numeric_type,has_slot,slot(claz_t,"class_info")).
+struct_opv(claz_numeric_type,has_slot,slot(claz_t,"complexp")).
+struct_opv(claz_numeric_type,has_slot,slot(claz_t,"enumerable")).
+struct_opv(claz_numeric_type,has_slot,slot(claz_t,"format")).
+struct_opv(claz_numeric_type,has_slot,slot(claz_t,"high")).
+struct_opv(claz_numeric_type,has_slot,slot(claz_t,"low")).
+struct_opv(claz_numeric_type,subtypep,claz_ctype).
+struct_opv(claz_numeric_type,super_priority,[claz_ctype,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_numeric_type,typeof,type_class).
+struct_opv(claz_numeric_type,typeof,type_builtin_type).
+struct_opv(claz_object,typeof,type_builtin_type).
+struct_opv(claz_obsolete_structure,has_slot,slot(claz_t,"datum")).
+struct_opv(claz_obsolete_structure,subtypep,claz_error).
+struct_opv(claz_obsolete_structure,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_obsolete_structure,typeof,type_class).
+struct_opv(claz_obsolete_structure,typeof,type_builtin_type).
+struct_opv(claz_octet_decoding_error,has_slot,slot(claz_t,"array")).
+struct_opv(claz_octet_decoding_error,has_slot,slot(claz_t,"end")).
+struct_opv(claz_octet_decoding_error,has_slot,slot(claz_t,"external_format")).
+struct_opv(claz_octet_decoding_error,has_slot,slot(claz_t,"position")).
+struct_opv(claz_octet_decoding_error,has_slot,slot(claz_t,"start")).
+struct_opv(claz_octet_decoding_error,subtypep,claz_character_decoding_error).
+struct_opv(claz_octet_decoding_error,super_priority,[claz_character_decoding_error,claz_character_coding_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_octet_decoding_error,typeof,type_class).
+struct_opv(claz_octet_decoding_error,typeof,type_builtin_type).
+struct_opv(claz_octets_encoding_error,has_slot,slot(claz_t,"external_format")).
+struct_opv(claz_octets_encoding_error,has_slot,slot(claz_t,"position")).
+struct_opv(claz_octets_encoding_error,has_slot,slot(claz_t,"string")).
+struct_opv(claz_octets_encoding_error,subtypep,claz_character_encoding_error).
+struct_opv(claz_octets_encoding_error,super_priority,[claz_character_encoding_error,claz_character_coding_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_octets_encoding_error,typeof,type_class).
+struct_opv(claz_octets_encoding_error,typeof,type_builtin_type).
+struct_opv(claz_offs_hook,has_slot,slot(claz_t,"before_address")).
+struct_opv(claz_offs_hook,has_slot,slot(claz_t,"fun")).
+struct_opv(claz_offs_hook,has_slot,slot(claz_t,"offset")).
+struct_opv(claz_offs_hook,subtypep,claz_structure_object).
+struct_opv(claz_offs_hook,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_offs_hook,typeof,type_class).
+struct_opv(claz_offs_hook,typeof,type_builtin_type).
+struct_opv(claz_one_class,has_slot,slot(claz_t,"wrapper0")).
+struct_opv(claz_one_class,subtypep,claz_one_index_dfun_info).
+struct_opv(claz_one_class,super_priority,[claz_one_index_dfun_info,claz_accessor_dfun_info,claz_dfun_info,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_one_class,typeof,type_class).
+struct_opv(claz_one_class,typeof,type_builtin_type).
+struct_opv(claz_one_index,subtypep,claz_one_index_dfun_info).
+struct_opv(claz_one_index,super_priority,[claz_one_index_dfun_info,claz_accessor_dfun_info,claz_dfun_info,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_one_index,typeof,type_builtin_type).
+struct_opv(claz_one_index_dfun_info,has_slot,slot(claz_t,"index")).
+struct_opv(claz_one_index_dfun_info,subtypep,claz_accessor_dfun_info).
+struct_opv(claz_one_index_dfun_info,super_priority,[claz_accessor_dfun_info,claz_dfun_info,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_one_index_dfun_info,typeof,type_class).
+struct_opv(claz_one_index_dfun_info,typeof,type_builtin_type).
+struct_opv(claz_operand_parse,has_slot,slot(claz_t,"born")).
+struct_opv(claz_operand_parse,has_slot,slot(claz_t,"dies")).
+struct_opv(claz_operand_parse,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_operand_parse,has_slot,slot(claz_t,"load")).
+struct_opv(claz_operand_parse,has_slot,slot(claz_t,"load_tn")).
+struct_opv(claz_operand_parse,has_slot,slot(claz_t,"name")).
+struct_opv(claz_operand_parse,has_slot,slot(claz_t,"offset")).
+struct_opv(claz_operand_parse,has_slot,slot(claz_t,"sc")).
+struct_opv(claz_operand_parse,has_slot,slot(claz_t,"scs")).
+struct_opv(claz_operand_parse,has_slot,slot(claz_t,"target")).
+struct_opv(claz_operand_parse,has_slot,slot(claz_t,"temp")).
+struct_opv(claz_operand_parse,subtypep,claz_structure_c33_object).
+struct_opv(claz_operand_parse,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_operand_parse,typeof,type_class).
+struct_opv(claz_operand_parse,typeof,type_builtin_type).
+struct_opv(claz_operator,has_slot,slot(claz_object,"lambda_list")).
+struct_opv(claz_operator,has_slot,slot(claz_object,"lambda_name")).
+struct_opv(claz_operator,subtypep,claz_object).
+struct_opv(claz_operator,typeof,type_builtin_type).
+struct_opv(claz_optional_dispatch,has_slot,slot(claz_t,"allowp")).
+struct_opv(claz_optional_dispatch,has_slot,slot(claz_t,"arglist")).
+struct_opv(claz_optional_dispatch,has_slot,slot(claz_t,"entry_points")).
+struct_opv(claz_optional_dispatch,has_slot,slot(claz_t,"keyp")).
+struct_opv(claz_optional_dispatch,has_slot,slot(claz_t,"main_entry")).
+struct_opv(claz_optional_dispatch,has_slot,slot(claz_t,"max_args")).
+struct_opv(claz_optional_dispatch,has_slot,slot(claz_t,"min_args")).
+struct_opv(claz_optional_dispatch,has_slot,slot(claz_t,"more_entry")).
+struct_opv(claz_optional_dispatch,subtypep,claz_functional).
+struct_opv(claz_optional_dispatch,super_priority,[claz_functional,claz_leaf,claz_sset_element,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_optional_dispatch,typeof,type_class).
+struct_opv(claz_optional_dispatch,typeof,type_builtin_type).
+struct_opv(claz_ordered_set,has_slot,slot(claz_t,"members")).
+struct_opv(claz_ordered_set,subtypep,claz_sset).
+struct_opv(claz_ordered_set,super_priority,[claz_sset,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_ordered_set,typeof,type_class).
+struct_opv(claz_ordered_set,typeof,type_builtin_type).
+struct_opv(claz_os_error,subtypep,claz_error).
+struct_opv(claz_os_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_os_error,typeof,type_builtin_type).
+struct_opv(claz_overhead,has_slot,slot(claz_t,"call")).
+struct_opv(claz_overhead,has_slot,slot(claz_t,"internal")).
+struct_opv(claz_overhead,has_slot,slot(claz_t,"total")).
+struct_opv(claz_overhead,subtypep,claz_structure_object).
+struct_opv(claz_overhead,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_overhead,typeof,type_class).
+struct_opv(claz_overhead,typeof,type_builtin_type).
+struct_opv(claz_overlong_utf8_sequence,subtypep,claz_octet_decoding_error).
+struct_opv(claz_overlong_utf8_sequence,super_priority,[claz_octet_decoding_error,claz_character_decoding_error,claz_character_coding_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_overlong_utf8_sequence,typeof,type_builtin_type).
+struct_opv(claz_package,has_slot,slot(claz_cls_string,"name")).
+struct_opv(claz_package,has_slot,slot(claz_hash_table(claz_string,claz_package),"local_nicknames")).
+struct_opv(claz_package,has_slot,slot(claz_hash_table(claz_string,claz_symbol),"external_symbols")).
+struct_opv(claz_package,has_slot,slot(claz_hash_table(claz_string,claz_symbol),"internal_symbols")).
+struct_opv(claz_package,has_slot,slot(claz_hash_table(claz_string,claz_symbol),"shadowing_symbols")).
+struct_opv(claz_package,has_slot,slot(claz_list,"property_list")).
+struct_opv(claz_package,has_slot,slot(claz_prolog_array_list(claz_package),"use_list")).
+struct_opv(claz_package,has_slot,slot(claz_prolog_array_list(claz_package),"used_by_list")).
+struct_opv(claz_package,has_slot,slot(claz_prolog_array_list(claz_string),"nicknames")).
+struct_opv(claz_package,has_slot,slot(claz_t,"doc_string")).
+struct_opv(claz_package,has_slot,slot(claz_t,"implementation_packages")).
+struct_opv(claz_package,has_slot,slot(claz_t,"locally_nicknamed_by")).
+struct_opv(claz_package,has_slot,slot(claz_t,"lock")).
+struct_opv(claz_package,has_slot,slot(claz_t,"mru_table_index")).
+struct_opv(claz_package,has_slot,slot(claz_t,"source_location")).
+struct_opv(claz_package,has_slot,slot(claz_t,"tables")).
+struct_opv(claz_package,subtypep,claz_object).
+struct_opv(claz_package,subtypep,claz_structure_object).
+struct_opv(claz_package,subtypep,claz_t).
+struct_opv(claz_package,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_package,super_priority,[claz_t]).
+struct_opv(claz_package,typeof,type_class).
+struct_opv(claz_package,typeof,type_builtin_type).
+struct_opv(claz_package_at_variance,subtypep,claz_reference_condition).
+struct_opv(claz_package_at_variance,subtypep,claz_simple_warning).
+struct_opv(claz_package_at_variance,super_priority,[claz_reference_condition,claz_simple_warning,claz_simple_condition,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_package_at_variance,typeof,type_builtin_type).
+struct_opv(claz_package_at_variance_error,subtypep,claz_package_error).
+struct_opv(claz_package_at_variance_error,subtypep,claz_reference_condition).
+struct_opv(claz_package_at_variance_error,subtypep,claz_simple_condition).
+struct_opv(claz_package_at_variance_error,super_priority,[claz_reference_condition,claz_simple_condition,claz_package_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_package_at_variance_error,typeof,type_builtin_type).
+struct_opv(claz_package_error,has_slot,slot(claz_t,"package")).
+struct_opv(claz_package_error,subtypep,claz_error).
+struct_opv(claz_package_error,subtypep,claz_lisp_error).
+struct_opv(claz_package_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_package_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_package_error,typeof,type_class).
+struct_opv(claz_package_error,typeof,type_builtin_type).
+struct_opv(claz_package_hashtable,has_slot,slot(claz_t,"cells")).
+struct_opv(claz_package_hashtable,has_slot,slot(claz_t,"deleted")).
+struct_opv(claz_package_hashtable,has_slot,slot(claz_t,"free")).
+struct_opv(claz_package_hashtable,has_slot,slot(claz_t,"size")).
+struct_opv(claz_package_hashtable,subtypep,claz_structure_object).
+struct_opv(claz_package_hashtable,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_package_hashtable,typeof,type_class).
+struct_opv(claz_package_hashtable,typeof,type_builtin_type).
+struct_opv(claz_package_lock_violation,has_slot,slot(claz_t,"current_package")).
+struct_opv(claz_package_lock_violation,subtypep,claz_package_error).
+struct_opv(claz_package_lock_violation,subtypep,claz_reference_condition).
+struct_opv(claz_package_lock_violation,subtypep,claz_simple_condition).
+struct_opv(claz_package_lock_violation,super_priority,[claz_package_error,claz_error,claz_serious_condition,claz_reference_condition,claz_simple_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_package_lock_violation,typeof,type_class).
+struct_opv(claz_package_lock_violation,typeof,type_builtin_type).
+struct_opv(claz_package_locked_error,subtypep,claz_package_lock_violation).
+struct_opv(claz_package_locked_error,super_priority,[claz_package_lock_violation,claz_package_error,claz_error,claz_serious_condition,claz_reference_condition,claz_simple_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_package_locked_error,typeof,type_builtin_type).
+struct_opv(claz_parse_deprecated_type,has_slot,slot(claz_t,"specifier")).
+struct_opv(claz_parse_deprecated_type,subtypep,claz_condition).
+struct_opv(claz_parse_deprecated_type,super_priority,[claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_parse_deprecated_type,typeof,type_class).
+struct_opv(claz_parse_deprecated_type,typeof,type_builtin_type).
+struct_opv(claz_parse_error,subtypep,claz_error).
+struct_opv(claz_parse_error,subtypep,claz_lisp_error).
+struct_opv(claz_parse_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_parse_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_parse_error,typeof,type_builtin_type).
+struct_opv(claz_parse_unknown_type,has_slot,slot(claz_t,"specifier")).
+struct_opv(claz_parse_unknown_type,subtypep,claz_condition).
+struct_opv(claz_parse_unknown_type,super_priority,[claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_parse_unknown_type,typeof,type_class).
+struct_opv(claz_parse_unknown_type,typeof,type_builtin_type).
+struct_opv(claz_pathname,has_slot,slot(claz_object,"device")).
+struct_opv(claz_pathname,has_slot,slot(claz_object,"directory")).
+struct_opv(claz_pathname,has_slot,slot(claz_object,"host")).
+struct_opv(claz_pathname,has_slot,slot(claz_object,"name")).
+struct_opv(claz_pathname,has_slot,slot(claz_object,"type")).
+struct_opv(claz_pathname,has_slot,slot(claz_object,"version")).
+struct_opv(claz_pathname,has_slot,slot(claz_string,"namestring")).
+struct_opv(claz_pathname,subtypep,claz_object).
+struct_opv(claz_pathname,subtypep,claz_structure_object).
+struct_opv(claz_pathname,subtypep,claz_t).
+struct_opv(claz_pathname,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_pathname,super_priority,[claz_t]).
+struct_opv(claz_pathname,typeof,type_class).
+struct_opv(claz_pathname,typeof,type_builtin_type).
+struct_opv(claz_pattern,has_slot,slot(claz_t,"pieces")).
+struct_opv(claz_pattern,subtypep,claz_structure_c33_object).
+struct_opv(claz_pattern,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_pattern,typeof,type_class).
+struct_opv(claz_pattern,typeof,type_builtin_type).
+struct_opv(claz_pcl_class,has_slot,slot(claz_t,"can_precede_list")).
+struct_opv(claz_pcl_class,has_slot,slot(claz_t,"class_precedence_list")).
+struct_opv(claz_pcl_class,has_slot,slot(claz_t,"cpl_available_p")).
+struct_opv(claz_pcl_class,has_slot,slot(claz_t,"incompatible_superclass_list")).
+struct_opv(claz_pcl_class,has_slot,slot(claz_t,"prototype")).
+struct_opv(claz_pcl_class,has_slot,slot(claz_t,"wrapper")).
+struct_opv(claz_pcl_class,subtypep,claz_class).
+struct_opv(claz_pcl_class,super_priority,[claz_class,claz_dependent_update_mixin,claz_plist_mixin,claz_definition_source_mixin,claz_standard_specializer,claz_specializer,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_pcl_class,typeof,type_class).
+struct_opv(claz_pcl_class,typeof,type_builtin_type).
+struct_opv(claz_pf_method_function,has_slot,slot(claz_t,"fast_function")).
+struct_opv(claz_pf_method_function,has_slot,slot(claz_t,"name")).
+struct_opv(claz_pf_method_function,subtypep,claz_function).
+struct_opv(claz_pf_method_function,super_priority,[claz_t]).
+struct_opv(claz_pf_method_function,typeof,type_class).
+struct_opv(claz_pf_method_function,typeof,type_builtin_type).
+struct_opv(claz_physenv,has_slot,slot(claz_t,"closure")).
+struct_opv(claz_physenv,has_slot,slot(claz_t,"info")).
+struct_opv(claz_physenv,has_slot,slot(claz_t,"lambda")).
+struct_opv(claz_physenv,has_slot,slot(claz_t,"nlx_info")).
+struct_opv(claz_physenv,subtypep,claz_structure_c33_object).
+struct_opv(claz_physenv,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_physenv,typeof,type_class).
+struct_opv(claz_physenv,typeof,type_builtin_type).
+struct_opv(claz_plist_mixin,has_slot,slot(claz_t,"plist")).
+struct_opv(claz_plist_mixin,subtypep,claz_standard_object).
+struct_opv(claz_plist_mixin,super_priority,[claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_plist_mixin,typeof,type_class).
+struct_opv(claz_plist_mixin,typeof,type_builtin_type).
+struct_opv(claz_policy,has_slot,slot(claz_t,"dependent_qualities")).
+struct_opv(claz_policy,has_slot,slot(claz_t,"presence_bits")).
+struct_opv(claz_policy,has_slot,slot(claz_t,"primary_qualities")).
+struct_opv(claz_policy,subtypep,claz_structure_object).
+struct_opv(claz_policy,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_policy,typeof,type_class).
+struct_opv(claz_policy,typeof,type_builtin_type).
+struct_opv(claz_policy_dependent_quality,has_slot,slot(claz_t,"expression")).
+struct_opv(claz_policy_dependent_quality,has_slot,slot(claz_t,"getter")).
+struct_opv(claz_policy_dependent_quality,has_slot,slot(claz_t,"name")).
+struct_opv(claz_policy_dependent_quality,has_slot,slot(claz_t,"values_documentation")).
+struct_opv(claz_policy_dependent_quality,subtypep,claz_structure_object).
+struct_opv(claz_policy_dependent_quality,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_policy_dependent_quality,typeof,type_class).
+struct_opv(claz_policy_dependent_quality,typeof,type_builtin_type).
+struct_opv(claz_pollfds,has_slot,slot(claz_t,"fds")).
+struct_opv(claz_pollfds,has_slot,slot(claz_t,"list")).
+struct_opv(claz_pollfds,has_slot,slot(claz_t,"map")).
+struct_opv(claz_pollfds,has_slot,slot(claz_t,"n_fds")).
+struct_opv(claz_pollfds,subtypep,claz_structure_object).
+struct_opv(claz_pollfds,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_pollfds,typeof,type_class).
+struct_opv(claz_pollfds,typeof,type_builtin_type).
+struct_opv(claz_potential_class,subtypep,claz_specializer).
+struct_opv(claz_potential_class,subtypep,claz_super_class).
+struct_opv(claz_potential_class,super_priority,[claz_specializer,claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_potential_class,typeof,type_builtin_type).
+struct_opv(claz_pprint_dispatch_entry,has_slot,slot(claz_t,"fun")).
+struct_opv(claz_pprint_dispatch_entry,has_slot,slot(claz_t,"initial_p")).
+struct_opv(claz_pprint_dispatch_entry,has_slot,slot(claz_t,"priority")).
+struct_opv(claz_pprint_dispatch_entry,has_slot,slot(claz_t,"test_fn")).
+struct_opv(claz_pprint_dispatch_entry,has_slot,slot(claz_t,"type")).
+struct_opv(claz_pprint_dispatch_entry,subtypep,claz_structure_object).
+struct_opv(claz_pprint_dispatch_entry,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_pprint_dispatch_entry,typeof,type_class).
+struct_opv(claz_pprint_dispatch_entry,typeof,type_builtin_type).
+struct_opv(claz_pprint_dispatch_table,has_slot,slot(claz_t,"cons_entries")).
+struct_opv(claz_pprint_dispatch_table,has_slot,slot(claz_t,"entries")).
+struct_opv(claz_pprint_dispatch_table,subtypep,claz_structure_object).
+struct_opv(claz_pprint_dispatch_table,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_pprint_dispatch_table,typeof,type_class).
+struct_opv(claz_pprint_dispatch_table,typeof,type_builtin_type).
+struct_opv(claz_pretty_stream,has_slot,slot(claz_t,"blocks")).
+struct_opv(claz_pretty_stream,has_slot,slot(claz_t,"buffer")).
+struct_opv(claz_pretty_stream,has_slot,slot(claz_t,"buffer_fill_pointer")).
+struct_opv(claz_pretty_stream,has_slot,slot(claz_t,"buffer_offset")).
+struct_opv(claz_pretty_stream,has_slot,slot(claz_t,"buffer_start_column")).
+struct_opv(claz_pretty_stream,has_slot,slot(claz_t,"char_out_oneshot_hook")).
+struct_opv(claz_pretty_stream,has_slot,slot(claz_t,"line_length")).
+struct_opv(claz_pretty_stream,has_slot,slot(claz_t,"line_number")).
+struct_opv(claz_pretty_stream,has_slot,slot(claz_t,"pending_blocks")).
+struct_opv(claz_pretty_stream,has_slot,slot(claz_t,"prefix")).
+struct_opv(claz_pretty_stream,has_slot,slot(claz_t,"print_lines")).
+struct_opv(claz_pretty_stream,has_slot,slot(claz_t,"queue_head")).
+struct_opv(claz_pretty_stream,has_slot,slot(claz_t,"queue_tail")).
+struct_opv(claz_pretty_stream,has_slot,slot(claz_t,"suffix")).
+struct_opv(claz_pretty_stream,has_slot,slot(claz_t,"target")).
+struct_opv(claz_pretty_stream,subtypep,claz_ansi_stream).
+struct_opv(claz_pretty_stream,super_priority,[claz_ansi_stream,claz_stream,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_pretty_stream,typeof,type_class).
+struct_opv(claz_pretty_stream,typeof,type_builtin_type).
+struct_opv(claz_prim_object_slot,has_slot,slot(claz_t,"docs")).
+struct_opv(claz_prim_object_slot,has_slot,slot(claz_t,"name")).
+struct_opv(claz_prim_object_slot,has_slot,slot(claz_t,"offset")).
+struct_opv(claz_prim_object_slot,has_slot,slot(claz_t,"options")).
+struct_opv(claz_prim_object_slot,has_slot,slot(claz_t,"rest_p")).
+struct_opv(claz_prim_object_slot,has_slot,slot(claz_t,"special")).
+struct_opv(claz_prim_object_slot,subtypep,claz_structure_c33_object).
+struct_opv(claz_prim_object_slot,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_prim_object_slot,typeof,type_class).
+struct_opv(claz_prim_object_slot,typeof,type_builtin_type).
+struct_opv(claz_primitive,subtypep,claz_function).
+struct_opv(claz_primitive,typeof,type_builtin_type).
+struct_opv(claz_primitive_object,has_slot,slot(claz_t,"lowtag")).
+struct_opv(claz_primitive_object,has_slot,slot(claz_t,"name")).
+struct_opv(claz_primitive_object,has_slot,slot(claz_t,"options")).
+struct_opv(claz_primitive_object,has_slot,slot(claz_t,"size")).
+struct_opv(claz_primitive_object,has_slot,slot(claz_t,"slots")).
+struct_opv(claz_primitive_object,has_slot,slot(claz_t,"variable_length_p")).
+struct_opv(claz_primitive_object,has_slot,slot(claz_t,"widetag")).
+struct_opv(claz_primitive_object,subtypep,claz_structure_c33_object).
+struct_opv(claz_primitive_object,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_primitive_object,typeof,type_class).
+struct_opv(claz_primitive_object,typeof,type_builtin_type).
+struct_opv(claz_primitive_type,has_slot,slot(claz_t,"check")).
+struct_opv(claz_primitive_type,has_slot,slot(claz_t,"name")).
+struct_opv(claz_primitive_type,has_slot,slot(claz_t,"scs")).
+struct_opv(claz_primitive_type,has_slot,slot(claz_t,"specifier")).
+struct_opv(claz_primitive_type,subtypep,claz_structure_object).
+struct_opv(claz_primitive_type,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_primitive_type,typeof,type_class).
+struct_opv(claz_primitive_type,typeof,type_builtin_type).
+struct_opv(claz_primitives_pf_finalize,typeof,type_builtin_type).
+struct_opv(claz_primitives_pf_finalize_1,has_slot,slot(claz_object,"val_fun")).
+struct_opv(claz_primitives_pf_finalize_1,has_slot,slot(claz_primitives_pf_finalize,"this_0")).
+struct_opv(claz_primitives_pf_finalize_1,has_slot,slot(claz_prolog_thread,"thread")).
+struct_opv(claz_primitives_pf_finalize_1,kw_ro,"this_0").
+struct_opv(claz_primitives_pf_finalize_1,kw_ro,"val_fun").
+struct_opv(claz_primitives_pf_finalize_1,typeof,type_builtin_type).
+struct_opv(claz_print_not_readable,has_slot,slot(claz_t,"object")).
+struct_opv(claz_print_not_readable,subtypep,claz_error).
+struct_opv(claz_print_not_readable,subtypep,claz_lisp_error).
+struct_opv(claz_print_not_readable,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_print_not_readable,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_print_not_readable,typeof,type_class).
+struct_opv(claz_print_not_readable,typeof,type_builtin_type).
+struct_opv(claz_print_object_stream_specializer,subtypep,claz_reference_condition).
+struct_opv(claz_print_object_stream_specializer,subtypep,claz_simple_warning).
+struct_opv(claz_print_object_stream_specializer,super_priority,[claz_reference_condition,claz_simple_warning,claz_simple_condition,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_print_object_stream_specializer,typeof,type_builtin_type).
+struct_opv(claz_priority_queue,has_slot,slot(claz_t,"contents")).
+struct_opv(claz_priority_queue,has_slot,slot(claz_t,"keyfun")).
+struct_opv(claz_priority_queue,subtypep,claz_structure_object).
+struct_opv(claz_priority_queue,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_priority_queue,typeof,type_class).
+struct_opv(claz_priority_queue,typeof,type_builtin_type).
+struct_opv(claz_process,has_slot,slot(claz_t,"cookie")).
+struct_opv(claz_process,has_slot,slot(claz_t,"core_dumped")).
+struct_opv(claz_process,has_slot,slot(claz_t,"error")).
+struct_opv(claz_process,has_slot,slot(claz_t,"exit_code")).
+struct_opv(claz_process,has_slot,slot(claz_t,"input")).
+struct_opv(claz_process,has_slot,slot(claz_t,"output")).
+struct_opv(claz_process,has_slot,slot(claz_t,"pid")).
+struct_opv(claz_process,has_slot,slot(claz_t,"plist")).
+struct_opv(claz_process,has_slot,slot(claz_t,"pty")).
+struct_opv(claz_process,has_slot,slot(claz_t,"status")).
+struct_opv(claz_process,has_slot,slot(claz_t,"status_hook")).
+struct_opv(claz_process,subtypep,claz_structure_object).
+struct_opv(claz_process,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_process,typeof,type_class).
+struct_opv(claz_process,typeof,type_builtin_type).
+struct_opv(claz_processing_terminated,has_slot,slot(claz_integer,"status")).
+struct_opv(claz_processing_terminated,subtypep,claz_prolog_error).
+struct_opv(claz_processing_terminated,typeof,type_builtin_type).
+struct_opv(claz_proclamation_mismatch,has_slot,slot(claz_t,"description")).
+struct_opv(claz_proclamation_mismatch,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_proclamation_mismatch,has_slot,slot(claz_t,"name")).
+struct_opv(claz_proclamation_mismatch,has_slot,slot(claz_t,"new")).
+struct_opv(claz_proclamation_mismatch,has_slot,slot(claz_t,"old")).
+struct_opv(claz_proclamation_mismatch,subtypep,claz_condition).
+struct_opv(claz_proclamation_mismatch,super_priority,[claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_proclamation_mismatch,super_priority,[claz_proclamation_mismatch,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_proclamation_mismatch,typeof,type_class).
+struct_opv(claz_proclamation_mismatch,typeof,type_builtin_type).
+struct_opv(claz_proclamation_mismatch_warning,subtypep,claz_proclamation_mismatch).
+struct_opv(claz_proclamation_mismatch_warning,subtypep,claz_style_warning).
+struct_opv(claz_proclamation_mismatch_warning,super_priority,[claz_style_warning,claz_warning,claz_proclamation_mismatch,claz_proclamation_mismatch,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_proclamation_mismatch_warning,typeof,type_builtin_type).
+struct_opv(claz_profile_info,has_slot,slot(claz_t,"clear_stats_fun")).
+struct_opv(claz_profile_info,has_slot,slot(claz_t,"encapsulated_fun")).
+struct_opv(claz_profile_info,has_slot,slot(claz_t,"encapsulation_fun")).
+struct_opv(claz_profile_info,has_slot,slot(claz_t,"name")).
+struct_opv(claz_profile_info,has_slot,slot(claz_t,"read_stats_fun")).
+struct_opv(claz_profile_info,subtypep,claz_structure_object).
+struct_opv(claz_profile_info,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_profile_info,typeof,type_class).
+struct_opv(claz_profile_info,typeof,type_builtin_type).
+struct_opv(claz_profiler_1,typeof,type_builtin_type).
+struct_opv(claz_profiler_1_1,has_slot,slot(claz_lisp_thread,"val_thread")).
+struct_opv(claz_profiler_1_1,has_slot,slot(claz_profiler_1,"this_0")).
+struct_opv(claz_profiler_1_1,has_slot,slot(claz_prolog_thread,"thread")).
+struct_opv(claz_profiler_1_1,kw_ro,"this_0").
+struct_opv(claz_profiler_1_1,kw_ro,"val_thread").
+struct_opv(claz_profiler_1_1,typeof,type_builtin_type).
+struct_opv(claz_program_error,subtypep,claz_error).
+struct_opv(claz_program_error,subtypep,claz_lisp_error).
+struct_opv(claz_program_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_program_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_program_error,typeof,type_builtin_type).
+struct_opv(claz_prolog_array_list(claz_package),typeof,type_builtin_type).
+struct_opv(claz_prolog_array_list(claz_string),typeof,type_builtin_type).
+struct_opv(claz_prolog_big_integer,typeof,type_builtin_type).
+struct_opv(claz_prolog_buffered_reader,typeof,type_builtin_type).
+struct_opv(claz_prolog_byte_array_input_stream,typeof,type_builtin_type).
+struct_opv(claz_prolog_byte_array_output_stream,typeof,type_builtin_type).
+struct_opv(claz_prolog_byte_buffer,typeof,type_builtin_type).
+struct_opv(claz_prolog_char_buffer,typeof,type_builtin_type).
+struct_opv(claz_prolog_charset,typeof,type_builtin_type).
+struct_opv(claz_prolog_charset_decoder,typeof,type_builtin_type).
+struct_opv(claz_prolog_charset_encoder,typeof,type_builtin_type).
+struct_opv(claz_prolog_class,typeof,type_builtin_type).
+struct_opv(claz_prolog_error,typeof,type_builtin_type).
+struct_opv(claz_prolog_file_channel,typeof,type_builtin_type).
+struct_opv(claz_prolog_handler_entry,has_slot,slot(claz_function,"handler")).
+struct_opv(claz_prolog_handler_entry,has_slot,slot(claz_integer,"count")).
+struct_opv(claz_prolog_handler_entry,has_slot,slot(claz_object,"data")).
+struct_opv(claz_prolog_handler_entry,has_slot,slot(claz_prolog_map(claz_string,claz_prolog_handler_entry),"entry_table")).
+struct_opv(claz_prolog_handler_entry,has_slot,slot(claz_string,"event")).
+struct_opv(claz_prolog_handler_entry,typeof,type_builtin_type).
+struct_opv(claz_prolog_input_stream,typeof,type_builtin_type).
+struct_opv(claz_prolog_iterator(claz_prolog_character),typeof,type_builtin_type).
+struct_opv(claz_prolog_linked_list(claz_prolog_runnable),typeof,type_builtin_type).
+struct_opv(claz_prolog_malformed_input_exception,typeof,type_builtin_type).
+struct_opv(claz_prolog_map(claz_prolog_reference,claz_prolog_weak_hash_entry),typeof,type_builtin_type).
+struct_opv(claz_prolog_map(claz_string,claz_function),typeof,type_builtin_type).
+struct_opv(claz_prolog_map(claz_string,claz_prolog_handler_entry),typeof,type_builtin_type).
+struct_opv(claz_prolog_map,typeof,type_builtin_type).
+struct_opv(claz_prolog_object,typeof,type_builtin_type).
+struct_opv(claz_prolog_output_stream,typeof,type_builtin_type).
+struct_opv(claz_prolog_proxy_entry,has_slot,slot(claz_prolog_class,"iface")).
+struct_opv(claz_prolog_proxy_entry,has_slot,slot(claz_prolog_map,"lisp_defined_methods")).
+struct_opv(claz_prolog_proxy_entry,typeof,type_builtin_type).
+struct_opv(claz_prolog_proxy_lisp_handler,has_slot,slot(claz_prolog_map,"table")).
+struct_opv(claz_prolog_proxy_lisp_handler,typeof,type_builtin_type).
+struct_opv(claz_prolog_proxy_lisp_invocation_handler,has_slot,slot(claz_function,"function")).
+struct_opv(claz_prolog_proxy_lisp_invocation_handler,typeof,type_builtin_type).
+struct_opv(claz_prolog_pushback_input_stream,typeof,type_builtin_type).
+struct_opv(claz_prolog_pushback_reader,typeof,type_builtin_type).
+struct_opv(claz_prolog_random,typeof,type_builtin_type).
+struct_opv(claz_prolog_reader,typeof,type_builtin_type).
+struct_opv(claz_prolog_reference_queue(claz_object),typeof,type_builtin_type).
+struct_opv(claz_prolog_repl_console,has_slot,slot(claz_boolean,"disposed")).
+struct_opv(claz_prolog_repl_console,has_slot,slot(claz_object,"debugger_hook")).
+struct_opv(claz_prolog_repl_console,has_slot,slot(claz_prolog_reader,"reader")).
+struct_opv(claz_prolog_repl_console,has_slot,slot(claz_prolog_string_buffer,"input_buffer")).
+struct_opv(claz_prolog_repl_console,has_slot,slot(claz_prolog_thread,"repl_thread")).
+struct_opv(claz_prolog_repl_console,has_slot,slot(claz_prolog_writer,"writer")).
+struct_opv(claz_prolog_repl_console,kw_ro,"debugger_hook").
+struct_opv(claz_prolog_repl_console,kw_ro,"repl_thread").
+struct_opv(claz_prolog_repl_console,typeof,type_builtin_type).
+struct_opv(claz_prolog_runtime_exception,typeof,type_builtin_type).
+struct_opv(claz_prolog_socket,typeof,type_builtin_type).
+struct_opv(claz_prolog_stack_trace_element,typeof,type_builtin_type).
+struct_opv(claz_prolog_string_buffer,typeof,type_builtin_type).
+struct_opv(claz_prolog_string_reader,typeof,type_builtin_type).
+struct_opv(claz_prolog_string_writer,typeof,type_builtin_type).
+struct_opv(claz_prolog_thread,typeof,type_builtin_type).
+struct_opv(claz_prolog_throwable,typeof,type_builtin_type).
+struct_opv(claz_prolog_unmappable_character_exception,typeof,type_builtin_type).
+struct_opv(claz_prolog_url_class_loader,typeof,type_builtin_type).
+struct_opv(claz_prolog_weak_hash_entry,has_slot,slot(claz_integer,"hash")).
+struct_opv(claz_prolog_weak_hash_entry,has_slot,slot(claz_integer,"slot")).
+struct_opv(claz_prolog_weak_hash_entry,has_slot,slot(claz_object,"key")).
+struct_opv(claz_prolog_weak_hash_entry,has_slot,slot(claz_object,"value")).
+struct_opv(claz_prolog_weak_hash_entry,has_slot,slot(claz_prolog_weak_hash_entry,"next")).
+struct_opv(claz_prolog_weak_hash_entry,has_slot,slot(claz_weak_hash_table,"this_0")).
+struct_opv(claz_prolog_weak_hash_entry,kw_ro,"this_0").
+struct_opv(claz_prolog_weak_hash_entry,typeof,type_builtin_type).
+struct_opv(claz_prolog_weak_hash_entry_weak_key,has_slot,slot(claz_prolog_weak_reference(claz_object),"key")).
+struct_opv(claz_prolog_weak_hash_entry_weak_key,has_slot,slot(claz_weak_hash_table,"this_0")).
+struct_opv(claz_prolog_weak_hash_entry_weak_key,kw_ro,"this_0").
+struct_opv(claz_prolog_weak_hash_entry_weak_key,typeof,type_builtin_type).
+struct_opv(claz_prolog_weak_hash_entry_weak_key_and_value,has_slot,slot(claz_prolog_weak_reference(claz_object),"key")).
+struct_opv(claz_prolog_weak_hash_entry_weak_key_and_value,has_slot,slot(claz_prolog_weak_reference(claz_object),"value")).
+struct_opv(claz_prolog_weak_hash_entry_weak_key_and_value,has_slot,slot(claz_weak_hash_table,"this_0")).
+struct_opv(claz_prolog_weak_hash_entry_weak_key_and_value,kw_ro,"this_0").
+struct_opv(claz_prolog_weak_hash_entry_weak_key_and_value,typeof,type_builtin_type).
+struct_opv(claz_prolog_weak_hash_entry_weak_key_or_value,has_slot,slot(claz_weak_hash_table,"this_0")).
+struct_opv(claz_prolog_weak_hash_entry_weak_key_or_value,kw_ro,"this_0").
+struct_opv(claz_prolog_weak_hash_entry_weak_key_or_value,typeof,type_builtin_type).
+struct_opv(claz_prolog_weak_hash_entry_weak_value,has_slot,slot(claz_prolog_weak_reference(claz_object),"value")).
+struct_opv(claz_prolog_weak_hash_entry_weak_value,has_slot,slot(claz_weak_hash_table,"this_0")).
+struct_opv(claz_prolog_weak_hash_entry_weak_value,kw_ro,"this_0").
+struct_opv(claz_prolog_weak_hash_entry_weak_value,typeof,type_builtin_type).
+struct_opv(claz_prolog_weak_reference(claz_object),typeof,type_builtin_type).
+struct_opv(claz_prolog_writer,typeof,type_builtin_type).
+struct_opv(claz_protocol_unimplemented,subtypep,claz_error).
+struct_opv(claz_protocol_unimplemented,subtypep,claz_reference_condition).
+struct_opv(claz_protocol_unimplemented,super_priority,[claz_error,claz_error,claz_serious_condition,claz_reference_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_protocol_unimplemented,typeof,type_builtin_type).
+struct_opv(claz_pv_table,has_slot,slot(claz_t,"cache")).
+struct_opv(claz_pv_table,has_slot,slot(claz_t,"pv_size")).
+struct_opv(claz_pv_table,has_slot,slot(claz_t,"slot_name_lists")).
+struct_opv(claz_pv_table,subtypep,claz_structure_object).
+struct_opv(claz_pv_table,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_pv_table,typeof,type_class).
+struct_opv(claz_pv_table,typeof,type_builtin_type).
+struct_opv(claz_queued_op,has_slot,slot(claz_t,"posn")).
+struct_opv(claz_queued_op,subtypep,claz_structure_object).
+struct_opv(claz_queued_op,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_queued_op,typeof,type_class).
+struct_opv(claz_queued_op,typeof,type_builtin_type).
+struct_opv(claz_racf_malformed_input_exception,has_slot,slot(claz_char_code,"character")).
+struct_opv(claz_racf_malformed_input_exception,has_slot,slot(claz_integer,"position")).
+struct_opv(claz_racf_malformed_input_exception,has_slot,slot(claz_string,"charset_name")).
+struct_opv(claz_racf_malformed_input_exception,kw_ro,"character").
+struct_opv(claz_racf_malformed_input_exception,kw_ro,"charset_name").
+struct_opv(claz_racf_malformed_input_exception,kw_ro,"position").
+struct_opv(claz_racf_malformed_input_exception,subtypep,claz_prolog_malformed_input_exception).
+struct_opv(claz_racf_malformed_input_exception,typeof,type_builtin_type).
+struct_opv(claz_racf_unmappable_character_exception,has_slot,slot(claz_char_code,"character_value")).
+struct_opv(claz_racf_unmappable_character_exception,has_slot,slot(claz_integer,"position")).
+struct_opv(claz_racf_unmappable_character_exception,has_slot,slot(claz_string,"charset_name")).
+struct_opv(claz_racf_unmappable_character_exception,kw_ro,"character_value").
+struct_opv(claz_racf_unmappable_character_exception,kw_ro,"charset_name").
+struct_opv(claz_racf_unmappable_character_exception,kw_ro,"position").
+struct_opv(claz_racf_unmappable_character_exception,subtypep,claz_prolog_unmappable_character_exception).
+struct_opv(claz_racf_unmappable_character_exception,typeof,type_builtin_type).
+struct_opv(claz_random_access_character_file,has_slot,slot(claz_boolean,"bbuf_is_dirty")).
+struct_opv(claz_random_access_character_file,has_slot,slot(claz_boolean,"bbuf_is_readable")).
+struct_opv(claz_random_access_character_file,has_slot,slot(claz_long,"bbufpos")).
+struct_opv(claz_random_access_character_file,has_slot,slot(claz_prolog_byte_buffer,"bbuf")).
+struct_opv(claz_random_access_character_file,has_slot,slot(claz_prolog_byte_buffer,"short_byte_buf")).
+struct_opv(claz_random_access_character_file,has_slot,slot(claz_prolog_char_buffer,"single_char_buf")).
+struct_opv(claz_random_access_character_file,has_slot,slot(claz_prolog_charset,"cset")).
+struct_opv(claz_random_access_character_file,has_slot,slot(claz_prolog_charset_decoder,"cdec")).
+struct_opv(claz_random_access_character_file,has_slot,slot(claz_prolog_charset_encoder,"cenc")).
+struct_opv(claz_random_access_character_file,has_slot,slot(claz_prolog_file_channel,"fcn")).
+struct_opv(claz_random_access_character_file,has_slot,slot(claz_random_access_input_stream,"input_stream")).
+struct_opv(claz_random_access_character_file,has_slot,slot(claz_random_access_output_stream,"output_stream")).
+struct_opv(claz_random_access_character_file,has_slot,slot(claz_random_access_reader,"reader")).
+struct_opv(claz_random_access_character_file,has_slot,slot(claz_random_access_writer,"writer")).
+struct_opv(claz_random_access_character_file,typeof,type_builtin_type).
+struct_opv(claz_random_access_input_stream,has_slot,slot(claz_array_of(claz_unsigned_byte8),"read_buf")).
+struct_opv(claz_random_access_input_stream,has_slot,slot(claz_random_access_character_file,"this_0")).
+struct_opv(claz_random_access_input_stream,kw_ro,"this_0").
+struct_opv(claz_random_access_input_stream,typeof,type_builtin_type).
+struct_opv(claz_random_access_output_stream,has_slot,slot(claz_array_of(claz_unsigned_byte8),"write_buf")).
+struct_opv(claz_random_access_output_stream,has_slot,slot(claz_random_access_character_file,"this_0")).
+struct_opv(claz_random_access_output_stream,kw_ro,"this_0").
+struct_opv(claz_random_access_output_stream,typeof,type_builtin_type).
+struct_opv(claz_random_access_reader,has_slot,slot(claz_array_of(claz_char_code),"read_buf")).
+struct_opv(claz_random_access_reader,has_slot,slot(claz_random_access_character_file,"this_0")).
+struct_opv(claz_random_access_reader,kw_ro,"this_0").
+struct_opv(claz_random_access_reader,typeof,type_builtin_type).
+struct_opv(claz_random_access_writer,has_slot,slot(claz_random_access_character_file,"this_0")).
+struct_opv(claz_random_access_writer,kw_ro,"this_0").
+struct_opv(claz_random_access_writer,typeof,type_builtin_type).
+struct_opv(claz_random_class,subtypep,claz_t).
+struct_opv(claz_random_class,super_priority,[claz_t]).
+struct_opv(claz_random_class,typeof,type_builtin_type).
+struct_opv(claz_random_state,has_slot,slot(claz_prolog_random,"random")).
+struct_opv(claz_random_state,has_slot,slot(claz_t,"state")).
+struct_opv(claz_random_state,subtypep,claz_object).
+struct_opv(claz_random_state,subtypep,claz_structure_object).
+struct_opv(claz_random_state,subtypep,claz_t).
+struct_opv(claz_random_state,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_random_state,super_priority,[claz_t]).
+struct_opv(claz_random_state,typeof,type_class).
+struct_opv(claz_random_state,typeof,type_builtin_type).
+struct_opv(claz_ratio,has_slot,slot(claz_prolog_big_integer,"denominator")).
+struct_opv(claz_ratio,has_slot,slot(claz_prolog_big_integer,"numerator")).
+struct_opv(claz_ratio,subtypep,claz_object).
+struct_opv(claz_ratio,subtypep,claz_rational).
+struct_opv(claz_ratio,super_priority,[claz_rational,claz_real,claz_number,claz_t]).
+struct_opv(claz_ratio,typeof,type_builtin_type).
+struct_opv(claz_rational,subtypep,claz_real).
+struct_opv(claz_rational,super_priority,[claz_real,claz_number,claz_t]).
+struct_opv(claz_rational,typeof,type_builtin_type).
+struct_opv(claz_raw_slot_data,has_slot,slot(claz_t,"accessor_name")).
+struct_opv(claz_raw_slot_data,has_slot,slot(claz_t,"alignment")).
+struct_opv(claz_raw_slot_data,has_slot,slot(claz_t,"comparer")).
+struct_opv(claz_raw_slot_data,has_slot,slot(claz_t,"init_vop")).
+struct_opv(claz_raw_slot_data,has_slot,slot(claz_t,"n_words")).
+struct_opv(claz_raw_slot_data,has_slot,slot(claz_t,"raw_type")).
+struct_opv(claz_raw_slot_data,subtypep,claz_structure_object).
+struct_opv(claz_raw_slot_data,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_raw_slot_data,typeof,type_class).
+struct_opv(claz_raw_slot_data,typeof,type_builtin_type).
+struct_opv(claz_reader_eof_error,has_slot,slot(claz_t,"context")).
+struct_opv(claz_reader_eof_error,subtypep,claz_end_of_file).
+struct_opv(claz_reader_eof_error,super_priority,[claz_end_of_file,claz_stream_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_reader_eof_error,typeof,type_class).
+struct_opv(claz_reader_eof_error,typeof,type_builtin_type).
+struct_opv(claz_reader_error,subtypep,claz_parse_error).
+struct_opv(claz_reader_error,subtypep,claz_stream_error).
+struct_opv(claz_reader_error,super_priority,[claz_parse_error,claz_stream_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_reader_error,super_priority,[claz_parse_error,claz_stream_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_reader_error,typeof,type_builtin_type).
+struct_opv(claz_reader_impossible_number_error,has_slot,slot(claz_t,"error")).
+struct_opv(claz_reader_impossible_number_error,subtypep,claz_simple_reader_error).
+struct_opv(claz_reader_impossible_number_error,super_priority,[claz_simple_reader_error,claz_reader_error,claz_parse_error,claz_stream_error,claz_error,claz_serious_condition,claz_simple_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_reader_impossible_number_error,typeof,type_class).
+struct_opv(claz_reader_impossible_number_error,typeof,type_builtin_type).
+struct_opv(claz_reader_macro_function,subtypep,claz_function).
+struct_opv(claz_reader_macro_function,typeof,type_builtin_type).
+struct_opv(claz_readtable,has_slot,slot(claz_char_hash_map(claz_object),"reader_macro_functions")).
+struct_opv(claz_readtable,has_slot,slot(claz_char_hash_map(claz_prolog_byte),"syntax")).
+struct_opv(claz_readtable,has_slot,slot(claz_char_hash_map(claz_readtable_dispatch_table),"dispatch_tables")).
+struct_opv(claz_readtable,has_slot,slot(claz_object,"readtable_case")).
+struct_opv(claz_readtable,has_slot,slot(claz_t,"character_attribute_array")).
+struct_opv(claz_readtable,has_slot,slot(claz_t,"character_attribute_hash_table")).
+struct_opv(claz_readtable,has_slot,slot(claz_t,"character_macro_array")).
+struct_opv(claz_readtable,has_slot,slot(claz_t,"character_macro_hash_table")).
+struct_opv(claz_readtable,has_slot,slot(claz_t,"readtable_normalization")).
+struct_opv(claz_readtable,kw_ro,"dispatch_tables").
+struct_opv(claz_readtable,kw_ro,"reader_macro_functions").
+struct_opv(claz_readtable,kw_ro,"syntax").
+struct_opv(claz_readtable,subtypep,claz_object).
+struct_opv(claz_readtable,subtypep,claz_structure_object).
+struct_opv(claz_readtable,subtypep,claz_t).
+struct_opv(claz_readtable,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_readtable,super_priority,[claz_t]).
+struct_opv(claz_readtable,typeof,type_class).
+struct_opv(claz_readtable,typeof,type_builtin_type).
+struct_opv(claz_readtable_dispatch_table,has_slot,slot(claz_char_hash_map(claz_object),"functions")).
+struct_opv(claz_readtable_dispatch_table,kw_ro,"functions").
+struct_opv(claz_readtable_dispatch_table,typeof,type_builtin_type).
+struct_opv(claz_real,subtypep,claz_number).
+struct_opv(claz_real,super_priority,[claz_number,claz_t]).
+struct_opv(claz_real,typeof,type_builtin_type).
+struct_opv(claz_redefinition_warning,has_slot,slot(claz_t,"name")).
+struct_opv(claz_redefinition_warning,has_slot,slot(claz_t,"new_location")).
+struct_opv(claz_redefinition_warning,subtypep,claz_style_warning).
+struct_opv(claz_redefinition_warning,super_priority,[claz_style_warning,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_redefinition_warning,typeof,type_class).
+struct_opv(claz_redefinition_warning,typeof,type_builtin_type).
+struct_opv(claz_redefinition_with_defgeneric,subtypep,claz_redefinition_warning).
+struct_opv(claz_redefinition_with_defgeneric,super_priority,[claz_redefinition_warning,claz_style_warning,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_redefinition_with_defgeneric,typeof,type_builtin_type).
+struct_opv(claz_redefinition_with_defmacro,subtypep,claz_function_redefinition_warning).
+struct_opv(claz_redefinition_with_defmacro,super_priority,[claz_function_redefinition_warning,claz_redefinition_warning,claz_style_warning,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_redefinition_with_defmacro,typeof,type_builtin_type).
+struct_opv(claz_redefinition_with_defmethod,has_slot,slot(claz_t,"new_location")).
+struct_opv(claz_redefinition_with_defmethod,has_slot,slot(claz_t,"old_method")).
+struct_opv(claz_redefinition_with_defmethod,has_slot,slot(claz_t,"qualifiers")).
+struct_opv(claz_redefinition_with_defmethod,has_slot,slot(claz_t,"specializers")).
+struct_opv(claz_redefinition_with_defmethod,subtypep,claz_redefinition_warning).
+struct_opv(claz_redefinition_with_defmethod,super_priority,[claz_redefinition_warning,claz_style_warning,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_redefinition_with_defmethod,typeof,type_class).
+struct_opv(claz_redefinition_with_defmethod,typeof,type_builtin_type).
+struct_opv(claz_redefinition_with_deftransform,has_slot,slot(claz_t,"transform")).
+struct_opv(claz_redefinition_with_deftransform,subtypep,claz_redefinition_warning).
+struct_opv(claz_redefinition_with_deftransform,super_priority,[claz_redefinition_warning,claz_style_warning,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_redefinition_with_deftransform,typeof,type_class).
+struct_opv(claz_redefinition_with_deftransform,typeof,type_builtin_type).
+struct_opv(claz_redefinition_with_defun,subtypep,claz_function_redefinition_warning).
+struct_opv(claz_redefinition_with_defun,super_priority,[claz_function_redefinition_warning,claz_redefinition_warning,claz_style_warning,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_redefinition_with_defun,typeof,type_builtin_type).
+struct_opv(claz_ref,has_slot,slot(claz_t,"leaf")).
+struct_opv(claz_ref,has_slot,slot(claz_t,"reoptimize")).
+struct_opv(claz_ref,has_slot,slot(claz_t,"source_name")).
+struct_opv(claz_ref,subtypep,claz_valued_node).
+struct_opv(claz_ref,super_priority,[claz_valued_node,claz_node,claz_sset_element,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_ref,typeof,type_class).
+struct_opv(claz_ref,typeof,type_builtin_type).
+struct_opv(claz_reference_condition,has_slot,slot(claz_t,"references")).
+struct_opv(claz_reference_condition,subtypep,claz_condition).
+struct_opv(claz_reference_condition,super_priority,[claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_reference_condition,typeof,type_class).
+struct_opv(claz_reference_condition,typeof,type_builtin_type).
+struct_opv(claz_reg_spec,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_reg_spec,has_slot,slot(claz_t,"name")).
+struct_opv(claz_reg_spec,has_slot,slot(claz_t,"offset")).
+struct_opv(claz_reg_spec,has_slot,slot(claz_t,"scs")).
+struct_opv(claz_reg_spec,has_slot,slot(claz_t,"temp")).
+struct_opv(claz_reg_spec,subtypep,claz_structure_object).
+struct_opv(claz_reg_spec,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_reg_spec,typeof,type_class).
+struct_opv(claz_reg_spec,typeof,type_builtin_type).
+struct_opv(claz_restart,has_slot,slot(claz_t,"associated_conditions")).
+struct_opv(claz_restart,has_slot,slot(claz_t,"function")).
+struct_opv(claz_restart,has_slot,slot(claz_t,"interactive")).
+struct_opv(claz_restart,has_slot,slot(claz_t,"interactive_function")).
+struct_opv(claz_restart,has_slot,slot(claz_t,"invoke_function")).
+struct_opv(claz_restart,has_slot,slot(claz_t,"invoke_tag")).
+struct_opv(claz_restart,has_slot,slot(claz_t,"meaningfulp")).
+struct_opv(claz_restart,has_slot,slot(claz_t,"name")).
+struct_opv(claz_restart,has_slot,slot(claz_t,"report")).
+struct_opv(claz_restart,has_slot,slot(claz_t,"report_function")).
+struct_opv(claz_restart,has_slot,slot(claz_t,"test")).
+struct_opv(claz_restart,has_slot,slot(claz_t,"test_function")).
+struct_opv(claz_restart,subtypep,claz_structure_object).
+struct_opv(claz_restart,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_restart,super_priority,[claz_structure_object,claz_t]).
+struct_opv(claz_restart,typeof,type_class).
+struct_opv(claz_restart,typeof,type_builtin_type).
+struct_opv(claz_result_state,has_slot,slot(claz_t,"num_results")).
+struct_opv(claz_result_state,subtypep,claz_structure_object).
+struct_opv(claz_result_state,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_result_state,typeof,type_class).
+struct_opv(claz_result_state,typeof,type_builtin_type).
+struct_opv(claz_return,has_slot,slot(claz_object,"block")).
+struct_opv(claz_return,has_slot,slot(claz_object,"result")).
+struct_opv(claz_return,has_slot,slot(claz_object,"tag")).
+struct_opv(claz_return,kw_ro,"block").
+struct_opv(claz_return,kw_ro,"result").
+struct_opv(claz_return,kw_ro,"tag").
+struct_opv(claz_return,subtypep,claz_control_transfer).
+struct_opv(claz_return,typeof,type_builtin_type).
+struct_opv(claz_return_info,has_slot,slot(claz_t,"count")).
+struct_opv(claz_return_info,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_return_info,has_slot,slot(claz_t,"locations")).
+struct_opv(claz_return_info,has_slot,slot(claz_t,"types")).
+struct_opv(claz_return_info,subtypep,claz_structure_object).
+struct_opv(claz_return_info,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_return_info,typeof,type_class).
+struct_opv(claz_return_info,typeof,type_builtin_type).
+struct_opv(claz_rlimit,has_slot,slot(claz_t,"cur")).
+struct_opv(claz_rlimit,has_slot,slot(claz_t,"max")).
+struct_opv(claz_rlimit,subtypep,claz_structure_object).
+struct_opv(claz_rlimit,super_priority,[claz_structure_object,claz_t]).
+struct_opv(claz_rlimit,typeof,type_class).
+struct_opv(claz_rlimit,typeof,type_builtin_type).
+struct_opv(claz_room_info,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_room_info,has_slot,slot(claz_t,"name")).
+struct_opv(claz_room_info,subtypep,claz_structure_c33_object).
+struct_opv(claz_room_info,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_room_info,typeof,type_class).
+struct_opv(claz_room_info,typeof,type_builtin_type).
+struct_opv(claz_runtime_class,has_slot,slot(claz_prolog_map(claz_string,claz_function),"methods")).
+struct_opv(claz_runtime_class,typeof,type_builtin_type).
+struct_opv(claz_same_file_redefinition_warning,has_slot,slot(claz_t,"name")).
+struct_opv(claz_same_file_redefinition_warning,subtypep,claz_style_warning).
+struct_opv(claz_same_file_redefinition_warning,super_priority,[claz_style_warning,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_same_file_redefinition_warning,typeof,type_class).
+struct_opv(claz_same_file_redefinition_warning,typeof,type_builtin_type).
+struct_opv(claz_save_condition,subtypep,claz_reference_condition).
+struct_opv(claz_save_condition,super_priority,[claz_reference_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_save_condition,typeof,type_builtin_type).
+struct_opv(claz_save_error,subtypep,claz_error).
+struct_opv(claz_save_error,subtypep,claz_save_condition).
+struct_opv(claz_save_error,super_priority,[claz_error,claz_serious_condition,claz_save_condition,claz_reference_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_save_error,typeof,type_builtin_type).
+struct_opv(claz_save_with_multiple_threads_error,has_slot,slot(claz_t,"interactive_thread")).
+struct_opv(claz_save_with_multiple_threads_error,has_slot,slot(claz_t,"other_threads")).
+struct_opv(claz_save_with_multiple_threads_error,subtypep,claz_save_error).
+struct_opv(claz_save_with_multiple_threads_error,super_priority,[claz_save_error,claz_error,claz_serious_condition,claz_save_condition,claz_reference_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_save_with_multiple_threads_error,typeof,type_class).
+struct_opv(claz_save_with_multiple_threads_error,typeof,type_builtin_type).
+struct_opv(claz_sb,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_sb,has_slot,slot(claz_t,"name")).
+struct_opv(claz_sb,has_slot,slot(claz_t,"size")).
+struct_opv(claz_sb,subtypep,claz_structure_c33_object).
+struct_opv(claz_sb,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_sb,typeof,type_class).
+struct_opv(claz_sb,typeof,type_builtin_type).
+struct_opv(claz_sc,has_slot,slot(claz_t,"alignment")).
+struct_opv(claz_sc,has_slot,slot(claz_t,"alternate_scs")).
+struct_opv(claz_sc,has_slot,slot(claz_t,"constant_scs")).
+struct_opv(claz_sc,has_slot,slot(claz_t,"element_size")).
+struct_opv(claz_sc,has_slot,slot(claz_t,"load_costs")).
+struct_opv(claz_sc,has_slot,slot(claz_t,"locations")).
+struct_opv(claz_sc,has_slot,slot(claz_t,"move_arg_vops")).
+struct_opv(claz_sc,has_slot,slot(claz_t,"move_costs")).
+struct_opv(claz_sc,has_slot,slot(claz_t,"move_funs")).
+struct_opv(claz_sc,has_slot,slot(claz_t,"move_vops")).
+struct_opv(claz_sc,has_slot,slot(claz_t,"name")).
+struct_opv(claz_sc,has_slot,slot(claz_t,"number")).
+struct_opv(claz_sc,has_slot,slot(claz_t,"number_stack_p")).
+struct_opv(claz_sc,has_slot,slot(claz_t,"reserve_locations")).
+struct_opv(claz_sc,has_slot,slot(claz_t,"save_p")).
+struct_opv(claz_sc,has_slot,slot(claz_t,"sb")).
+struct_opv(claz_sc,subtypep,claz_structure_c33_object).
+struct_opv(claz_sc,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_sc,typeof,type_class).
+struct_opv(claz_sc,typeof,type_builtin_type).
+struct_opv(claz_section_start,has_slot,slot(claz_t,"depth")).
+struct_opv(claz_section_start,has_slot,slot(claz_t,"section_end")).
+struct_opv(claz_section_start,subtypep,claz_queued_op).
+struct_opv(claz_section_start,super_priority,[claz_queued_op,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_section_start,typeof,type_class).
+struct_opv(claz_section_start,typeof,type_builtin_type).
+struct_opv(claz_seekable_string_writer,has_slot,slot(claz_integer,"offset")).
+struct_opv(claz_seekable_string_writer,has_slot,slot(claz_prolog_string_buffer,"string_buffer")).
+struct_opv(claz_seekable_string_writer,kw_ro,"string_buffer").
+struct_opv(claz_seekable_string_writer,subtypep,claz_prolog_writer).
+struct_opv(claz_seekable_string_writer,typeof,type_builtin_type).
+struct_opv(claz_segment,has_slot,slot(claz_t,"alignment")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"annotations")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"branch_countdown")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"buffer")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"code")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"current_index")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"current_posn")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"delayed")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"emittable_insts_queue")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"emittable_insts_sset")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"final_index")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"final_posn")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"hooks")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"inst_hook")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"inst_number")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"last_annotation")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"length")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"opcodes_length")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"postits")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"queued_branches")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"readers")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"run_scheduler")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"sap_maker")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"storage_info")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"sync_posn")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"type")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"unboxed_data_range")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"virtual_location")).
+struct_opv(claz_segment,has_slot,slot(claz_t,"writers")).
+struct_opv(claz_segment,subtypep,claz_structure_object).
+struct_opv(claz_segment,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_segment,typeof,type_class).
+struct_opv(claz_segment,typeof,type_builtin_type).
+struct_opv(claz_semaphore,has_slot,slot(claz_t,"count")).
+struct_opv(claz_semaphore,has_slot,slot(claz_t,"mutex")).
+struct_opv(claz_semaphore,has_slot,slot(claz_t,"name")).
+struct_opv(claz_semaphore,has_slot,slot(claz_t,"queue")).
+struct_opv(claz_semaphore,has_slot,slot(claz_t,"waitcount")).
+struct_opv(claz_semaphore,subtypep,claz_structure_object).
+struct_opv(claz_semaphore,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_semaphore,typeof,type_class).
+struct_opv(claz_semaphore,typeof,type_builtin_type).
+struct_opv(claz_semaphore_notification,has_slot,slot(claz_t,"status")).
+struct_opv(claz_semaphore_notification,subtypep,claz_structure_object).
+struct_opv(claz_semaphore_notification,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_semaphore_notification,typeof,type_class).
+struct_opv(claz_semaphore_notification,typeof,type_builtin_type).
+struct_opv(claz_semi_standard_class,has_slot,slot(claz_t,"current_version")).
+struct_opv(claz_semi_standard_class,has_slot,slot(claz_t,"direct_instance_specializers")).
+struct_opv(claz_semi_standard_class,has_slot,slot(claz_t,"finalized_direct_subclasses")).
+struct_opv(claz_semi_standard_class,has_slot,slot(claz_t,"fixed_slot_locations")).
+struct_opv(claz_semi_standard_class,has_slot,slot(claz_t,"funcallablep")).
+struct_opv(claz_semi_standard_class,has_slot,slot(claz_t,"instantiated")).
+struct_opv(claz_semi_standard_class,has_slot,slot(claz_t,"prototype")).
+struct_opv(claz_semi_standard_class,subtypep,claz_slotted_class).
+struct_opv(claz_semi_standard_class,super_priority,[claz_slotted_class,claz_class,claz_potential_class,claz_specializer,claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_semi_standard_class,typeof,type_class).
+struct_opv(claz_semi_standard_class,typeof,type_builtin_type).
+struct_opv(claz_sequence,subtypep,claz_t).
+struct_opv(claz_sequence,super_priority,[claz_t]).
+struct_opv(claz_sequence,typeof,type_builtin_type).
+struct_opv(claz_serious_condition,subtypep,claz_condition).
+struct_opv(claz_serious_condition,super_priority,[claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_serious_condition,super_priority,[claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_serious_condition,typeof,type_builtin_type).
+struct_opv(claz_service,has_slot,slot(claz_t,"aliases")).
+struct_opv(claz_service,has_slot,slot(claz_t,"name")).
+struct_opv(claz_service,has_slot,slot(claz_t,"port")).
+struct_opv(claz_service,has_slot,slot(claz_t,"proto")).
+struct_opv(claz_service,subtypep,claz_structure_object).
+struct_opv(claz_service,super_priority,[claz_structure_object,claz_t]).
+struct_opv(claz_service,typeof,type_class).
+struct_opv(claz_service,typeof,type_builtin_type).
+struct_opv(claz_session,has_slot,slot(claz_t,"interactive_threads")).
+struct_opv(claz_session,has_slot,slot(claz_t,"interactive_threads_queue")).
+struct_opv(claz_session,has_slot,slot(claz_t,"lock")).
+struct_opv(claz_session,has_slot,slot(claz_t,"threads")).
+struct_opv(claz_session,subtypep,claz_structure_object).
+struct_opv(claz_session,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_session,typeof,type_class).
+struct_opv(claz_session,typeof,type_builtin_type).
+struct_opv(claz_shared_object,has_slot,slot(claz_t,"dont_save")).
+struct_opv(claz_shared_object,has_slot,slot(claz_t,"handle")).
+struct_opv(claz_shared_object,has_slot,slot(claz_t,"namestring")).
+struct_opv(claz_shared_object,has_slot,slot(claz_t,"pathname")).
+struct_opv(claz_shared_object,subtypep,claz_structure_object).
+struct_opv(claz_shared_object,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_shared_object,typeof,type_class).
+struct_opv(claz_shared_object,typeof,type_builtin_type).
+struct_opv(claz_shell_command,has_slot,slot(claz_integer,"exit_value")).
+struct_opv(claz_shell_command,has_slot,slot(claz_prolog_string_buffer,"output")).
+struct_opv(claz_shell_command,has_slot,slot(claz_prolog_thread,"thread")).
+struct_opv(claz_shell_command,has_slot,slot(claz_stream,"output_stream")).
+struct_opv(claz_shell_command,has_slot,slot(claz_string,"command")).
+struct_opv(claz_shell_command,has_slot,slot(claz_string,"directory")).
+struct_opv(claz_shell_command,kw_ro,"command").
+struct_opv(claz_shell_command,kw_ro,"directory").
+struct_opv(claz_shell_command,kw_ro,"output").
+struct_opv(claz_shell_command,kw_ro,"output_stream").
+struct_opv(claz_shell_command,typeof,type_builtin_type).
+struct_opv(claz_shell_command_reader_thread,has_slot,slot(claz_array_of(claz_char_code),"buf")).
+struct_opv(claz_shell_command_reader_thread,has_slot,slot(claz_boolean,"done")).
+struct_opv(claz_shell_command_reader_thread,has_slot,slot(claz_prolog_buffered_reader,"reader")).
+struct_opv(claz_shell_command_reader_thread,has_slot,slot(claz_prolog_input_stream,"input_stream")).
+struct_opv(claz_shell_command_reader_thread,has_slot,slot(claz_shell_command,"this_0")).
+struct_opv(claz_shell_command_reader_thread,kw_ro,"input_stream").
+struct_opv(claz_shell_command_reader_thread,kw_ro,"reader").
+struct_opv(claz_shell_command_reader_thread,kw_ro,"this_0").
+struct_opv(claz_shell_command_reader_thread,typeof,type_builtin_type).
+struct_opv(claz_short_method_combination,has_slot,slot(claz_t,"identity_with_one_argument")).
+struct_opv(claz_short_method_combination,has_slot,slot(claz_t,"operator")).
+struct_opv(claz_short_method_combination,subtypep,claz_standard_method_combination).
+struct_opv(claz_short_method_combination,super_priority,[claz_standard_method_combination,claz_definition_source_mixin,claz_method_combination,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_short_method_combination,typeof,type_class).
+struct_opv(claz_short_method_combination,typeof,type_builtin_type).
+struct_opv(claz_simd_pack,subtypep,claz_t).
+struct_opv(claz_simd_pack,super_priority,[claz_t]).
+struct_opv(claz_simd_pack,typeof,type_builtin_type).
+struct_opv(claz_simd_pack_type,has_slot,slot(claz_t,"class_info")).
+struct_opv(claz_simd_pack_type,has_slot,slot(claz_t,"element_type")).
+struct_opv(claz_simd_pack_type,subtypep,claz_ctype).
+struct_opv(claz_simd_pack_type,super_priority,[claz_ctype,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_simd_pack_type,typeof,type_class).
+struct_opv(claz_simd_pack_type,typeof,type_builtin_type).
+struct_opv(claz_simple_argument_list_dotted,subtypep,claz_argument_list_dotted).
+struct_opv(claz_simple_argument_list_dotted,subtypep,claz_simple_error).
+struct_opv(claz_simple_argument_list_dotted,super_priority,[claz_simple_error,claz_simple_condition,claz_argument_list_dotted,claz_program_error,claz_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_argument_list_dotted,typeof,type_builtin_type).
+struct_opv(claz_simple_arithmetic_error,subtypep,claz_arithmetic_error).
+struct_opv(claz_simple_arithmetic_error,subtypep,claz_simple_error).
+struct_opv(claz_simple_arithmetic_error,super_priority,[claz_simple_error,claz_simple_condition,claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_arithmetic_error,typeof,type_builtin_type).
+struct_opv(claz_simple_array(_2760),has_slot,slot(claz_array_of(_2760),"data")).
+struct_opv(claz_simple_array(claz_unsigned_byte16),has_slot,slot(claz_array_of(claz_integer),"data")).
+struct_opv(claz_simple_array(claz_unsigned_byte16),has_slot,slot(claz_array_of(claz_integer),"dimv")).
+struct_opv(claz_simple_array(claz_unsigned_byte16),has_slot,slot(claz_integer,"total_size")).
+struct_opv(claz_simple_array(claz_unsigned_byte16),kw_ro,"data").
+struct_opv(claz_simple_array(claz_unsigned_byte16),kw_ro,"dimv").
+struct_opv(claz_simple_array(claz_unsigned_byte16),kw_ro,"total_size").
+struct_opv(claz_simple_array(claz_unsigned_byte16),typeof,type_builtin_type).
+struct_opv(claz_simple_array(claz_unsigned_byte32),has_slot,slot(claz_array_of(claz_integer),"dimv")).
+struct_opv(claz_simple_array(claz_unsigned_byte32),has_slot,slot(claz_integer,"total_size")).
+struct_opv(claz_simple_array(claz_unsigned_byte32),has_slot,slot(claz_list,"data")).
+struct_opv(claz_simple_array(claz_unsigned_byte32),kw_ro,"data").
+struct_opv(claz_simple_array(claz_unsigned_byte32),kw_ro,"dimv").
+struct_opv(claz_simple_array(claz_unsigned_byte32),kw_ro,"total_size").
+struct_opv(claz_simple_array(claz_unsigned_byte32),subtypep,claz_array).
+struct_opv(claz_simple_array(claz_unsigned_byte32),typeof,type_builtin_type).
+struct_opv(claz_simple_array(claz_unsigned_byte8),subtypep,claz_array).
+struct_opv(claz_simple_array(claz_unsigned_byte8),typeof,type_builtin_type).
+struct_opv(claz_simple_array,subtypep,claz_array).
+struct_opv(claz_simple_array,super_priority,[claz_array,claz_t]).
+struct_opv(claz_simple_array,typeof,type_builtin_type).
+struct_opv(claz_simple_array_complex_double_float,subtypep,claz_simple_array).
+struct_opv(claz_simple_array_complex_double_float,subtypep,claz_vector).
+struct_opv(claz_simple_array_complex_double_float,super_priority,[claz_vector,claz_simple_array,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_simple_array_complex_double_float,typeof,type_builtin_type).
+struct_opv(claz_simple_array_complex_single_float,subtypep,claz_simple_array).
+struct_opv(claz_simple_array_complex_single_float,subtypep,claz_vector).
+struct_opv(claz_simple_array_complex_single_float,super_priority,[claz_vector,claz_simple_array,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_simple_array_complex_single_float,typeof,type_builtin_type).
+struct_opv(claz_simple_array_double_float,subtypep,claz_simple_array).
+struct_opv(claz_simple_array_double_float,subtypep,claz_vector).
+struct_opv(claz_simple_array_double_float,super_priority,[claz_vector,claz_simple_array,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_simple_array_double_float,typeof,type_builtin_type).
+struct_opv(claz_simple_array_fixnum,subtypep,claz_simple_array).
+struct_opv(claz_simple_array_fixnum,subtypep,claz_vector).
+struct_opv(claz_simple_array_fixnum,super_priority,[claz_vector,claz_simple_array,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_simple_array_fixnum,typeof,type_builtin_type).
+struct_opv(claz_simple_array_nil,subtypep,claz_simple_string).
+struct_opv(claz_simple_array_nil,subtypep,claz_vector_nil).
+struct_opv(claz_simple_array_nil,super_priority,[claz_vector_nil,claz_simple_string,claz_string,claz_vector,claz_simple_array,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_simple_array_nil,typeof,type_builtin_type).
+struct_opv(claz_simple_array_signed_byte_16,subtypep,claz_simple_array).
+struct_opv(claz_simple_array_signed_byte_16,subtypep,claz_vector).
+struct_opv(claz_simple_array_signed_byte_16,super_priority,[claz_vector,claz_simple_array,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_simple_array_signed_byte_16,typeof,type_builtin_type).
+struct_opv(claz_simple_array_signed_byte_32,subtypep,claz_simple_array).
+struct_opv(claz_simple_array_signed_byte_32,subtypep,claz_vector).
+struct_opv(claz_simple_array_signed_byte_32,super_priority,[claz_vector,claz_simple_array,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_simple_array_signed_byte_32,typeof,type_builtin_type).
+struct_opv(claz_simple_array_signed_byte_64,subtypep,claz_simple_array).
+struct_opv(claz_simple_array_signed_byte_64,subtypep,claz_vector).
+struct_opv(claz_simple_array_signed_byte_64,super_priority,[claz_vector,claz_simple_array,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_simple_array_signed_byte_64,typeof,type_builtin_type).
+struct_opv(claz_simple_array_signed_byte_8,subtypep,claz_simple_array).
+struct_opv(claz_simple_array_signed_byte_8,subtypep,claz_vector).
+struct_opv(claz_simple_array_signed_byte_8,super_priority,[claz_vector,claz_simple_array,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_simple_array_signed_byte_8,typeof,type_builtin_type).
+struct_opv(claz_simple_array_single_float,subtypep,claz_simple_array).
+struct_opv(claz_simple_array_single_float,subtypep,claz_vector).
+struct_opv(claz_simple_array_single_float,super_priority,[claz_vector,claz_simple_array,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_simple_array_single_float,typeof,type_builtin_type).
+struct_opv(claz_simple_array_t,has_slot,slot(claz_array_of(claz_integer),"dimv")).
+struct_opv(claz_simple_array_t,has_slot,slot(claz_integer,"total_size")).
+struct_opv(claz_simple_array_t,has_slot,slot(claz_list,"data")).
+struct_opv(claz_simple_array_t,has_slot,slot(claz_object,"element_type")).
+struct_opv(claz_simple_array_t,kw_ro,"data").
+struct_opv(claz_simple_array_t,kw_ro,"dimv").
+struct_opv(claz_simple_array_t,kw_ro,"element_type").
+struct_opv(claz_simple_array_t,kw_ro,"total_size").
+struct_opv(claz_simple_array_t,typeof,type_builtin_type).
+struct_opv(claz_simple_array_unsigned_byte_15,subtypep,claz_simple_array).
+struct_opv(claz_simple_array_unsigned_byte_15,subtypep,claz_vector).
+struct_opv(claz_simple_array_unsigned_byte_15,super_priority,[claz_vector,claz_simple_array,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_simple_array_unsigned_byte_15,typeof,type_builtin_type).
+struct_opv(claz_simple_array_unsigned_byte_16,subtypep,claz_simple_array).
+struct_opv(claz_simple_array_unsigned_byte_16,subtypep,claz_vector).
+struct_opv(claz_simple_array_unsigned_byte_16,super_priority,[claz_vector,claz_simple_array,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_simple_array_unsigned_byte_16,typeof,type_builtin_type).
+struct_opv(claz_simple_array_unsigned_byte_2,subtypep,claz_simple_array).
+struct_opv(claz_simple_array_unsigned_byte_2,subtypep,claz_vector).
+struct_opv(claz_simple_array_unsigned_byte_2,super_priority,[claz_vector,claz_simple_array,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_simple_array_unsigned_byte_2,typeof,type_builtin_type).
+struct_opv(claz_simple_array_unsigned_byte_31,subtypep,claz_simple_array).
+struct_opv(claz_simple_array_unsigned_byte_31,subtypep,claz_vector).
+struct_opv(claz_simple_array_unsigned_byte_31,super_priority,[claz_vector,claz_simple_array,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_simple_array_unsigned_byte_31,typeof,type_builtin_type).
+struct_opv(claz_simple_array_unsigned_byte_32,subtypep,claz_simple_array).
+struct_opv(claz_simple_array_unsigned_byte_32,subtypep,claz_vector).
+struct_opv(claz_simple_array_unsigned_byte_32,super_priority,[claz_vector,claz_simple_array,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_simple_array_unsigned_byte_32,typeof,type_builtin_type).
+struct_opv(claz_simple_array_unsigned_byte_4,subtypep,claz_simple_array).
+struct_opv(claz_simple_array_unsigned_byte_4,subtypep,claz_vector).
+struct_opv(claz_simple_array_unsigned_byte_4,super_priority,[claz_vector,claz_simple_array,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_simple_array_unsigned_byte_4,typeof,type_builtin_type).
+struct_opv(claz_simple_array_unsigned_byte_63,subtypep,claz_simple_array).
+struct_opv(claz_simple_array_unsigned_byte_63,subtypep,claz_vector).
+struct_opv(claz_simple_array_unsigned_byte_63,super_priority,[claz_vector,claz_simple_array,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_simple_array_unsigned_byte_63,typeof,type_builtin_type).
+struct_opv(claz_simple_array_unsigned_byte_64,subtypep,claz_simple_array).
+struct_opv(claz_simple_array_unsigned_byte_64,subtypep,claz_vector).
+struct_opv(claz_simple_array_unsigned_byte_64,super_priority,[claz_vector,claz_simple_array,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_simple_array_unsigned_byte_64,typeof,type_builtin_type).
+struct_opv(claz_simple_array_unsigned_byte_7,subtypep,claz_simple_array).
+struct_opv(claz_simple_array_unsigned_byte_7,subtypep,claz_vector).
+struct_opv(claz_simple_array_unsigned_byte_7,super_priority,[claz_vector,claz_simple_array,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_simple_array_unsigned_byte_7,typeof,type_builtin_type).
+struct_opv(claz_simple_array_unsigned_byte_8,subtypep,claz_simple_array).
+struct_opv(claz_simple_array_unsigned_byte_8,subtypep,claz_vector).
+struct_opv(claz_simple_array_unsigned_byte_8,super_priority,[claz_vector,claz_simple_array,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_simple_array_unsigned_byte_8,typeof,type_builtin_type).
+struct_opv(claz_simple_array_unsigned_fixnum,subtypep,claz_simple_array).
+struct_opv(claz_simple_array_unsigned_fixnum,subtypep,claz_vector).
+struct_opv(claz_simple_array_unsigned_fixnum,super_priority,[claz_vector,claz_simple_array,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_simple_array_unsigned_fixnum,typeof,type_builtin_type).
+struct_opv(claz_simple_base_string,subtypep,claz_base_string).
+struct_opv(claz_simple_base_string,subtypep,claz_simple_string).
+struct_opv(claz_simple_base_string,super_priority,[claz_base_string,claz_simple_string,claz_string,claz_vector,claz_simple_array,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_simple_base_string,typeof,type_builtin_type).
+struct_opv(claz_simple_bit_vector,subtypep,claz_bit_vector).
+struct_opv(claz_simple_bit_vector,subtypep,claz_simple_array).
+struct_opv(claz_simple_bit_vector,super_priority,[claz_bit_vector,claz_vector,claz_simple_array,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_simple_bit_vector,typeof,type_builtin_type).
+struct_opv(claz_simple_cell_error,subtypep,claz_cell_error).
+struct_opv(claz_simple_cell_error,subtypep,claz_simple_error).
+struct_opv(claz_simple_cell_error,super_priority,[claz_simple_error,claz_simple_condition,claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_cell_error,typeof,type_builtin_type).
+struct_opv(claz_simple_character_string,subtypep,claz_character_string).
+struct_opv(claz_simple_character_string,subtypep,claz_simple_string).
+struct_opv(claz_simple_character_string,super_priority,[claz_character_string,claz_simple_string,claz_string,claz_vector,claz_simple_array,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_simple_character_string,typeof,type_builtin_type).
+struct_opv(claz_simple_charset_type_error,subtypep,claz_charset_type_error).
+struct_opv(claz_simple_charset_type_error,subtypep,claz_simple_error).
+struct_opv(claz_simple_charset_type_error,super_priority,[claz_simple_error,claz_simple_condition,claz_charset_type_error,claz_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_charset_type_error,typeof,type_builtin_type).
+struct_opv(claz_simple_clos_warning,subtypep,claz_clos_warning).
+struct_opv(claz_simple_clos_warning,subtypep,claz_simple_condition).
+struct_opv(claz_simple_clos_warning,super_priority,[claz_simple_condition,claz_clos_warning,claz_warning,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_clos_warning,typeof,type_builtin_type).
+struct_opv(claz_simple_compiler_note,subtypep,claz_compiler_note).
+struct_opv(claz_simple_compiler_note,subtypep,claz_simple_condition).
+struct_opv(claz_simple_compiler_note,super_priority,[claz_simple_condition,claz_compiler_note,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_simple_compiler_note,typeof,type_builtin_type).
+struct_opv(claz_simple_condition,has_slot,slot(claz_t,"format_arguments")).
+struct_opv(claz_simple_condition,has_slot,slot(claz_t,"format_control")).
+struct_opv(claz_simple_condition,subtypep,claz_condition).
+struct_opv(claz_simple_condition,super_priority,[claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_simple_condition,super_priority,[claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_condition,typeof,type_class).
+struct_opv(claz_simple_condition,typeof,type_builtin_type).
+struct_opv(claz_simple_control_error,subtypep,claz_control_error).
+struct_opv(claz_simple_control_error,subtypep,claz_simple_condition).
+struct_opv(claz_simple_control_error,subtypep,claz_simple_error).
+struct_opv(claz_simple_control_error,super_priority,[claz_simple_condition,claz_control_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_simple_control_error,super_priority,[claz_simple_error,claz_simple_condition,claz_control_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_control_error,typeof,type_builtin_type).
+struct_opv(claz_simple_division_by_zero,subtypep,claz_division_by_zero).
+struct_opv(claz_simple_division_by_zero,subtypep,claz_simple_error).
+struct_opv(claz_simple_division_by_zero,super_priority,[claz_simple_error,claz_simple_condition,claz_division_by_zero,claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_division_by_zero,typeof,type_builtin_type).
+struct_opv(claz_simple_end_of_file,subtypep,claz_end_of_file).
+struct_opv(claz_simple_end_of_file,subtypep,claz_simple_error).
+struct_opv(claz_simple_end_of_file,super_priority,[claz_simple_error,claz_simple_condition,claz_end_of_file,claz_stream_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_end_of_file,typeof,type_builtin_type).
+struct_opv(claz_simple_error,subtypep,claz_error).
+struct_opv(claz_simple_error,subtypep,claz_lisp_error).
+struct_opv(claz_simple_error,subtypep,claz_simple_condition).
+struct_opv(claz_simple_error,super_priority,[claz_simple_condition,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_simple_error,super_priority,[claz_simple_condition,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_error,typeof,type_builtin_type).
+struct_opv(claz_simple_file_error,subtypep,claz_file_error).
+struct_opv(claz_simple_file_error,subtypep,claz_simple_condition).
+struct_opv(claz_simple_file_error,subtypep,claz_simple_error).
+struct_opv(claz_simple_file_error,super_priority,[claz_simple_condition,claz_file_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_simple_file_error,super_priority,[claz_simple_error,claz_simple_condition,claz_file_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_file_error,typeof,type_builtin_type).
+struct_opv(claz_simple_floating_point_overflow,subtypep,claz_floating_point_overflow).
+struct_opv(claz_simple_floating_point_overflow,subtypep,claz_simple_error).
+struct_opv(claz_simple_floating_point_overflow,super_priority,[claz_simple_error,claz_simple_condition,claz_floating_point_overflow,claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_floating_point_overflow,typeof,type_builtin_type).
+struct_opv(claz_simple_floating_point_underflow,subtypep,claz_floating_point_underflow).
+struct_opv(claz_simple_floating_point_underflow,subtypep,claz_simple_error).
+struct_opv(claz_simple_floating_point_underflow,super_priority,[claz_simple_error,claz_simple_condition,claz_floating_point_underflow,claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_floating_point_underflow,typeof,type_builtin_type).
+struct_opv(claz_simple_gf_already_called_warning,subtypep,claz_gf_already_called_warning).
+struct_opv(claz_simple_gf_already_called_warning,subtypep,claz_simple_condition).
+struct_opv(claz_simple_gf_already_called_warning,super_priority,[claz_simple_condition,claz_gf_already_called_warning,claz_clos_warning,claz_warning,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_gf_already_called_warning,typeof,type_builtin_type).
+struct_opv(claz_simple_gf_replacing_method_warning,subtypep,claz_gf_replacing_method_warning).
+struct_opv(claz_simple_gf_replacing_method_warning,subtypep,claz_simple_condition).
+struct_opv(claz_simple_gf_replacing_method_warning,super_priority,[claz_simple_condition,claz_gf_replacing_method_warning,claz_clos_warning,claz_warning,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_gf_replacing_method_warning,typeof,type_builtin_type).
+struct_opv(claz_simple_interrupt_condition,subtypep,claz_interrupt_condition).
+struct_opv(claz_simple_interrupt_condition,subtypep,claz_simple_condition).
+struct_opv(claz_simple_interrupt_condition,super_priority,[claz_simple_condition,claz_interrupt_condition,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_interrupt_condition,typeof,type_builtin_type).
+struct_opv(claz_simple_keyword_error,subtypep,claz_keyword_error).
+struct_opv(claz_simple_keyword_error,subtypep,claz_simple_error).
+struct_opv(claz_simple_keyword_error,super_priority,[claz_simple_error,claz_simple_condition,claz_keyword_error,claz_program_error,claz_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_keyword_error,typeof,type_builtin_type).
+struct_opv(claz_simple_missing_load_form,subtypep,claz_missing_load_form).
+struct_opv(claz_simple_missing_load_form,subtypep,claz_simple_error).
+struct_opv(claz_simple_missing_load_form,super_priority,[claz_simple_error,claz_simple_condition,claz_missing_load_form,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_missing_load_form,typeof,type_builtin_type).
+struct_opv(claz_simple_os_error,subtypep,claz_os_error).
+struct_opv(claz_simple_os_error,subtypep,claz_simple_error).
+struct_opv(claz_simple_os_error,super_priority,[claz_simple_error,claz_simple_condition,claz_os_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_os_error,typeof,type_builtin_type).
+struct_opv(claz_simple_package_error,subtypep,claz_package_error).
+struct_opv(claz_simple_package_error,subtypep,claz_simple_condition).
+struct_opv(claz_simple_package_error,subtypep,claz_simple_error).
+struct_opv(claz_simple_package_error,super_priority,[claz_simple_condition,claz_package_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_simple_package_error,super_priority,[claz_simple_error,claz_simple_condition,claz_package_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_package_error,typeof,type_builtin_type).
+struct_opv(claz_simple_parse_error,subtypep,claz_parse_error).
+struct_opv(claz_simple_parse_error,subtypep,claz_simple_condition).
+struct_opv(claz_simple_parse_error,subtypep,claz_simple_error).
+struct_opv(claz_simple_parse_error,super_priority,[claz_simple_condition,claz_parse_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_simple_parse_error,super_priority,[claz_simple_error,claz_simple_condition,claz_parse_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_parse_error,typeof,type_builtin_type).
+struct_opv(claz_simple_print_not_readable,subtypep,claz_print_not_readable).
+struct_opv(claz_simple_print_not_readable,subtypep,claz_simple_error).
+struct_opv(claz_simple_print_not_readable,super_priority,[claz_simple_error,claz_simple_condition,claz_print_not_readable,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_print_not_readable,typeof,type_builtin_type).
+struct_opv(claz_simple_program_error,subtypep,claz_program_error).
+struct_opv(claz_simple_program_error,subtypep,claz_simple_condition).
+struct_opv(claz_simple_program_error,subtypep,claz_simple_error).
+struct_opv(claz_simple_program_error,super_priority,[claz_simple_condition,claz_program_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_simple_program_error,super_priority,[claz_simple_error,claz_simple_condition,claz_program_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_program_error,typeof,type_builtin_type).
+struct_opv(claz_simple_reader_error,subtypep,claz_reader_error).
+struct_opv(claz_simple_reader_error,subtypep,claz_simple_condition).
+struct_opv(claz_simple_reader_error,subtypep,claz_simple_error).
+struct_opv(claz_simple_reader_error,super_priority,[claz_reader_error,claz_parse_error,claz_stream_error,claz_error,claz_serious_condition,claz_simple_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_simple_reader_error,super_priority,[claz_simple_error,claz_simple_condition,claz_reader_error,claz_parse_error,claz_stream_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_reader_error,typeof,type_builtin_type).
+struct_opv(claz_simple_reader_package_error,subtypep,claz_package_error).
+struct_opv(claz_simple_reader_package_error,subtypep,claz_simple_reader_error).
+struct_opv(claz_simple_reader_package_error,super_priority,[claz_simple_reader_error,claz_reader_error,claz_parse_error,claz_stream_error,claz_simple_condition,claz_package_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_simple_reader_package_error,typeof,type_builtin_type).
+struct_opv(claz_simple_reference_error,subtypep,claz_reference_condition).
+struct_opv(claz_simple_reference_error,subtypep,claz_simple_error).
+struct_opv(claz_simple_reference_error,super_priority,[claz_reference_condition,claz_simple_error,claz_simple_condition,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_simple_reference_error,typeof,type_builtin_type).
+struct_opv(claz_simple_reference_warning,subtypep,claz_reference_condition).
+struct_opv(claz_simple_reference_warning,subtypep,claz_simple_warning).
+struct_opv(claz_simple_reference_warning,super_priority,[claz_reference_condition,claz_simple_warning,claz_simple_condition,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_simple_reference_warning,typeof,type_builtin_type).
+struct_opv(claz_simple_serious_condition,subtypep,claz_serious_condition).
+struct_opv(claz_simple_serious_condition,subtypep,claz_simple_condition).
+struct_opv(claz_simple_serious_condition,super_priority,[claz_simple_condition,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_serious_condition,typeof,type_builtin_type).
+struct_opv(claz_simple_source_program_error,subtypep,claz_simple_error).
+struct_opv(claz_simple_source_program_error,subtypep,claz_source_program_error).
+struct_opv(claz_simple_source_program_error,super_priority,[claz_simple_error,claz_simple_condition,claz_source_program_error,claz_program_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_source_program_error,typeof,type_builtin_type).
+struct_opv(claz_simple_storage_condition,subtypep,claz_simple_condition).
+struct_opv(claz_simple_storage_condition,subtypep,claz_storage_condition).
+struct_opv(claz_simple_storage_condition,super_priority,[claz_simple_condition,claz_storage_condition,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_storage_condition,super_priority,[claz_storage_condition,claz_serious_condition,claz_simple_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_simple_storage_condition,typeof,type_builtin_type).
+struct_opv(claz_simple_stream_error,subtypep,claz_simple_condition).
+struct_opv(claz_simple_stream_error,subtypep,claz_simple_error).
+struct_opv(claz_simple_stream_error,subtypep,claz_stream_error).
+struct_opv(claz_simple_stream_error,super_priority,[claz_simple_condition,claz_stream_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_simple_stream_error,super_priority,[claz_simple_error,claz_simple_condition,claz_stream_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_stream_error,typeof,type_builtin_type).
+struct_opv(claz_simple_string,has_slot,slot(claz_array_of(claz_char_code),"chars")).
+struct_opv(claz_simple_string,has_slot,slot(claz_integer,"capacity")).
+struct_opv(claz_simple_string,subtypep,claz_simple_array).
+struct_opv(claz_simple_string,subtypep,claz_string).
+struct_opv(claz_simple_string,super_priority,[claz_string,claz_vector,claz_simple_array,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_simple_string,typeof,type_builtin_type).
+struct_opv(claz_simple_style_warning,subtypep,claz_simple_condition).
+struct_opv(claz_simple_style_warning,subtypep,claz_style_warning).
+struct_opv(claz_simple_style_warning,super_priority,[claz_simple_condition,claz_style_warning,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_simple_style_warning,super_priority,[claz_simple_condition,claz_style_warning,claz_warning,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_style_warning,typeof,type_builtin_type).
+struct_opv(claz_simple_thread_error,subtypep,claz_simple_condition).
+struct_opv(claz_simple_thread_error,subtypep,claz_thread_error).
+struct_opv(claz_simple_thread_error,super_priority,[claz_thread_error,claz_error,claz_serious_condition,claz_simple_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_simple_thread_error,typeof,type_builtin_type).
+struct_opv(claz_simple_type_error,subtypep,claz_error).
+struct_opv(claz_simple_type_error,subtypep,claz_simple_condition).
+struct_opv(claz_simple_type_error,super_priority,[claz_simple_condition,claz_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_simple_type_error,super_priority,[claz_simple_condition,claz_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_type_error,typeof,type_builtin_type).
+struct_opv(claz_simple_unbound_slot,subtypep,claz_simple_error).
+struct_opv(claz_simple_unbound_slot,subtypep,claz_unbound_slot).
+struct_opv(claz_simple_unbound_slot,super_priority,[claz_simple_error,claz_simple_condition,claz_unbound_slot,claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_unbound_slot,typeof,type_builtin_type).
+struct_opv(claz_simple_unbound_variable,subtypep,claz_simple_error).
+struct_opv(claz_simple_unbound_variable,subtypep,claz_unbound_variable).
+struct_opv(claz_simple_unbound_variable,super_priority,[claz_simple_error,claz_simple_condition,claz_unbound_variable,claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_unbound_variable,typeof,type_builtin_type).
+struct_opv(claz_simple_undefined_function,subtypep,claz_simple_error).
+struct_opv(claz_simple_undefined_function,subtypep,claz_undefined_function).
+struct_opv(claz_simple_undefined_function,super_priority,[claz_simple_error,claz_simple_condition,claz_undefined_function,claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_undefined_function,typeof,type_builtin_type).
+struct_opv(claz_simple_vector,has_slot,slot(claz_integer,"capacity")).
+struct_opv(claz_simple_vector,has_slot,slot(claz_list,"data")).
+struct_opv(claz_simple_vector,subtypep,claz_simple_array).
+struct_opv(claz_simple_vector,subtypep,claz_vector).
+struct_opv(claz_simple_vector,super_priority,[claz_vector,claz_simple_array,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_simple_vector,typeof,type_builtin_type).
+struct_opv(claz_simple_warning,subtypep,claz_simple_condition).
+struct_opv(claz_simple_warning,subtypep,claz_warning).
+struct_opv(claz_simple_warning,super_priority,[claz_simple_condition,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_simple_warning,super_priority,[claz_simple_condition,claz_warning,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_warning,typeof,type_builtin_type).
+struct_opv(claz_single_float,has_slot,slot(claz_float,"value")).
+struct_opv(claz_single_float,kw_ro,"value").
+struct_opv(claz_single_float,subtypep,claz_float).
+struct_opv(claz_single_float,subtypep,claz_object).
+struct_opv(claz_single_float,super_priority,[claz_float,claz_real,claz_number,claz_t]).
+struct_opv(claz_single_float,typeof,type_builtin_type).
+struct_opv(claz_slime_input_stream,has_slot,slot(claz_function,"f")).
+struct_opv(claz_slime_input_stream,has_slot,slot(claz_integer,"length")).
+struct_opv(claz_slime_input_stream,has_slot,slot(claz_stream,"ostream")).
+struct_opv(claz_slime_input_stream,has_slot,slot(claz_string,"s")).
+struct_opv(claz_slime_input_stream,kw_ro,"f").
+struct_opv(claz_slime_input_stream,kw_ro,"ostream").
+struct_opv(claz_slime_input_stream,subtypep,claz_stream).
+struct_opv(claz_slime_input_stream,typeof,type_builtin_type).
+struct_opv(claz_slime_output_stream,has_slot,slot(claz_function,"f")).
+struct_opv(claz_slime_output_stream,has_slot,slot(claz_prolog_string_writer,"string_writer")).
+struct_opv(claz_slime_output_stream,kw_ro,"f").
+struct_opv(claz_slime_output_stream,kw_ro,"string_writer").
+struct_opv(claz_slime_output_stream,subtypep,claz_stream).
+struct_opv(claz_slime_output_stream,typeof,type_builtin_type).
+struct_opv(claz_slot_class,has_slot,slot(claz_list,"default_initargs")).
+struct_opv(claz_slot_class,has_slot,slot(claz_list,"direct_default_initargs")).
+struct_opv(claz_slot_class,has_slot,slot(claz_list,"direct_slot_definitions")).
+struct_opv(claz_slot_class,has_slot,slot(claz_list,"slot_definitions")).
+struct_opv(claz_slot_class,has_slot,slot(claz_t,"direct_slots")).
+struct_opv(claz_slot_class,has_slot,slot(claz_t,"slots")).
+struct_opv(claz_slot_class,subtypep,claz_lisp_class).
+struct_opv(claz_slot_class,subtypep,claz_pcl_class).
+struct_opv(claz_slot_class,super_priority,[claz_pcl_class,claz_class,claz_dependent_update_mixin,claz_plist_mixin,claz_definition_source_mixin,claz_standard_specializer,claz_specializer,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_slot_class,typeof,type_class).
+struct_opv(claz_slot_class,typeof,type_builtin_type).
+struct_opv(claz_slot_definition,has_slot,slot(claz_t,"allocation")).
+struct_opv(claz_slot_definition,has_slot,slot(claz_t,"class")).
+struct_opv(claz_slot_definition,has_slot,slot(claz_t,"documentation")).
+struct_opv(claz_slot_definition,has_slot,slot(claz_t,"inheritable_doc")).
+struct_opv(claz_slot_definition,has_slot,slot(claz_t,"inheritable_initer")).
+struct_opv(claz_slot_definition,has_slot,slot(claz_t,"initargs")).
+struct_opv(claz_slot_definition,has_slot,slot(claz_t,"initform")).
+struct_opv(claz_slot_definition,has_slot,slot(claz_t,"initfunction")).
+struct_opv(claz_slot_definition,has_slot,slot(claz_t,"name")).
+struct_opv(claz_slot_definition,has_slot,slot(claz_t,"source")).
+struct_opv(claz_slot_definition,has_slot,slot(claz_t,"type")).
+struct_opv(claz_slot_definition,subtypep,claz_metaobject).
+struct_opv(claz_slot_definition,subtypep,claz_standard_object).
+struct_opv(claz_slot_definition,super_priority,[claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_slot_definition,super_priority,[claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_slot_definition,typeof,type_class).
+struct_opv(claz_slot_definition,typeof,type_builtin_type).
+struct_opv(claz_slot_definition_class,subtypep,claz_standard_class).
+struct_opv(claz_slot_definition_class,typeof,type_builtin_type).
+struct_opv(claz_slot_info,has_slot,slot(claz_t,"boundp")).
+struct_opv(claz_slot_info,has_slot,slot(claz_t,"reader")).
+struct_opv(claz_slot_info,has_slot,slot(claz_t,"typecheck")).
+struct_opv(claz_slot_info,has_slot,slot(claz_t,"writer")).
+struct_opv(claz_slot_info,subtypep,claz_structure_object).
+struct_opv(claz_slot_info,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_slot_info,typeof,type_class).
+struct_opv(claz_slot_info,typeof,type_builtin_type).
+struct_opv(claz_slot_object,subtypep,claz_t).
+struct_opv(claz_slot_object,super_priority,[claz_t]).
+struct_opv(claz_slot_object,typeof,type_builtin_type).
+struct_opv(claz_slotd_initialization_error,has_slot,slot(claz_t,"initarg")).
+struct_opv(claz_slotd_initialization_error,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_slotd_initialization_error,has_slot,slot(claz_t,"value")).
+struct_opv(claz_slotd_initialization_error,subtypep,claz_error).
+struct_opv(claz_slotd_initialization_error,subtypep,claz_reference_condition).
+struct_opv(claz_slotd_initialization_error,super_priority,[claz_reference_condition,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_slotd_initialization_error,typeof,type_class).
+struct_opv(claz_slotd_initialization_error,typeof,type_builtin_type).
+struct_opv(claz_slotd_initialization_type_error,has_slot,slot(claz_t,"value")).
+struct_opv(claz_slotd_initialization_type_error,subtypep,claz_error).
+struct_opv(claz_slotd_initialization_type_error,subtypep,claz_slotd_initialization_error).
+struct_opv(claz_slotd_initialization_type_error,super_priority,[claz_slotd_initialization_error,claz_reference_condition,claz_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_slotd_initialization_type_error,typeof,type_class).
+struct_opv(claz_slotd_initialization_type_error,typeof,type_builtin_type).
+struct_opv(claz_slotted_class,has_slot,slot(claz_t,"direct_accessors")).
+struct_opv(claz_slotted_class,has_slot,slot(claz_t,"generic_accessors")).
+struct_opv(claz_slotted_class,has_slot,slot(claz_t,"instance_size")).
+struct_opv(claz_slotted_class,has_slot,slot(claz_t,"subclass_of_stablehash_p")).
+struct_opv(claz_slotted_class,has_slot,slot(claz_t,"valid_initargs_from_slots")).
+struct_opv(claz_slotted_class,subtypep,claz_class).
+struct_opv(claz_slotted_class,super_priority,[claz_class,claz_potential_class,claz_specializer,claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_slotted_class,typeof,type_class).
+struct_opv(claz_slotted_class,typeof,type_builtin_type).
+struct_opv(claz_socket_stream,has_slot,slot(claz_prolog_socket,"socket")).
+struct_opv(claz_socket_stream,kw_ro,"socket").
+struct_opv(claz_socket_stream,subtypep,claz_two_way_stream).
+struct_opv(claz_socket_stream,typeof,type_builtin_type).
+struct_opv(claz_source_form_cache,has_slot,slot(claz_t,"debug_source")).
+struct_opv(claz_source_form_cache,has_slot,slot(claz_t,"last_form_retrieved")).
+struct_opv(claz_source_form_cache,has_slot,slot(claz_t,"last_location_retrieved")).
+struct_opv(claz_source_form_cache,has_slot,slot(claz_t,"toplevel_form_index")).
+struct_opv(claz_source_form_cache,subtypep,claz_structure_object).
+struct_opv(claz_source_form_cache,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_source_form_cache,typeof,type_class).
+struct_opv(claz_source_form_cache,typeof,type_builtin_type).
+struct_opv(claz_source_info,has_slot,slot(claz_t,"file_info")).
+struct_opv(claz_source_info,has_slot,slot(claz_t,"last_defn_source_loc")).
+struct_opv(claz_source_info,has_slot,slot(claz_t,"parent")).
+struct_opv(claz_source_info,has_slot,slot(claz_t,"start_real_time")).
+struct_opv(claz_source_info,has_slot,slot(claz_t,"start_time")).
+struct_opv(claz_source_info,has_slot,slot(claz_t,"stream")).
+struct_opv(claz_source_info,subtypep,claz_structure_object).
+struct_opv(claz_source_info,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_source_info,typeof,type_class).
+struct_opv(claz_source_info,typeof,type_builtin_type).
+struct_opv(claz_source_program_error,has_slot,slot(claz_t,"detail")).
+struct_opv(claz_source_program_error,has_slot,slot(claz_t,"form")).
+struct_opv(claz_source_program_error,subtypep,claz_program_error).
+struct_opv(claz_source_program_error,super_priority,[claz_program_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_source_program_error,typeof,type_class).
+struct_opv(claz_source_program_error,typeof,type_builtin_type).
+struct_opv(claz_special_binding,has_slot,slot(claz_integer,"idx")).
+struct_opv(claz_special_binding,has_slot,slot(claz_object,"value")).
+struct_opv(claz_special_binding,kw_ro,"idx").
+struct_opv(claz_special_binding,typeof,type_builtin_type).
+struct_opv(claz_special_bindings_mark,has_slot,slot(claz_integer,"idx")).
+struct_opv(claz_special_bindings_mark,has_slot,slot(claz_special_binding,"binding")).
+struct_opv(claz_special_bindings_mark,has_slot,slot(claz_special_bindings_mark,"next")).
+struct_opv(claz_special_bindings_mark,typeof,type_builtin_type).
+struct_opv(claz_special_form_function,subtypep,claz_undefined_function).
+struct_opv(claz_special_form_function,super_priority,[claz_undefined_function,claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_special_form_function,typeof,type_builtin_type).
+struct_opv(claz_special_operator,has_slot,slot(claz_integer,"call_count")).
+struct_opv(claz_special_operator,has_slot,slot(claz_integer,"hot_count")).
+struct_opv(claz_special_operator,subtypep,claz_operator).
+struct_opv(claz_special_operator,typeof,type_builtin_type).
+struct_opv(claz_specialized_array_element_type_properties,has_slot,slot(claz_t,"complex_typecode")).
+struct_opv(claz_specialized_array_element_type_properties,has_slot,slot(claz_t,"ctype")).
+struct_opv(claz_specialized_array_element_type_properties,has_slot,slot(claz_t,"fixnum_p")).
+struct_opv(claz_specialized_array_element_type_properties,has_slot,slot(claz_t,"importance")).
+struct_opv(claz_specialized_array_element_type_properties,has_slot,slot(claz_t,"initial_element_default")).
+struct_opv(claz_specialized_array_element_type_properties,has_slot,slot(claz_t,"n_bits")).
+struct_opv(claz_specialized_array_element_type_properties,has_slot,slot(claz_t,"n_pad_elements")).
+struct_opv(claz_specialized_array_element_type_properties,has_slot,slot(claz_t,"primitive_type_name")).
+struct_opv(claz_specialized_array_element_type_properties,has_slot,slot(claz_t,"specifier")).
+struct_opv(claz_specialized_array_element_type_properties,has_slot,slot(claz_t,"typecode")).
+struct_opv(claz_specialized_array_element_type_properties,subtypep,claz_structure_object).
+struct_opv(claz_specialized_array_element_type_properties,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_specialized_array_element_type_properties,typeof,type_class).
+struct_opv(claz_specialized_array_element_type_properties,typeof,type_builtin_type).
+struct_opv(claz_specialized_lambda_list_error,subtypep,claz_reference_condition).
+struct_opv(claz_specialized_lambda_list_error,subtypep,claz_simple_program_error).
+struct_opv(claz_specialized_lambda_list_error,super_priority,[claz_reference_condition,claz_simple_program_error,claz_simple_condition,claz_program_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_specialized_lambda_list_error,typeof,type_builtin_type).
+struct_opv(claz_specializer,has_slot,slot(claz_t,"direct_methods")).
+struct_opv(claz_specializer,has_slot,slot(claz_t,"type")).
+struct_opv(claz_specializer,subtypep,claz_metaobject).
+struct_opv(claz_specializer,subtypep,claz_standard_stablehash).
+struct_opv(claz_specializer,super_priority,[claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_specializer,super_priority,[claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_specializer,typeof,type_class).
+struct_opv(claz_specializer,typeof,type_builtin_type).
+struct_opv(claz_specializer_with_object,subtypep,claz_specializer).
+struct_opv(claz_specializer_with_object,super_priority,[claz_specializer,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_specializer_with_object,typeof,type_builtin_type).
+struct_opv(claz_sset,has_slot,slot(claz_t,"count")).
+struct_opv(claz_sset,has_slot,slot(claz_t,"free")).
+struct_opv(claz_sset,has_slot,slot(claz_t,"vector")).
+struct_opv(claz_sset,subtypep,claz_structure_object).
+struct_opv(claz_sset,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_sset,typeof,type_class).
+struct_opv(claz_sset,typeof,type_builtin_type).
+struct_opv(claz_sset_element,has_slot,slot(claz_t,"number")).
+struct_opv(claz_sset_element,subtypep,claz_structure_c33_object).
+struct_opv(claz_sset_element,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_sset_element,typeof,type_class).
+struct_opv(claz_sset_element,typeof,type_builtin_type).
+struct_opv(claz_stack_frame,has_slot,slot(claz_environment,"env")).
+struct_opv(claz_stack_frame,has_slot,slot(claz_stack_frame,"next")).
+struct_opv(claz_stack_frame,subtypep,claz_object).
+struct_opv(claz_stack_frame,typeof,type_builtin_type).
+struct_opv(claz_standard_accessor_method,has_slot,slot(claz_t,"slot_definition")).
+struct_opv(claz_standard_accessor_method,subtypep,claz_accessor_method).
+struct_opv(claz_standard_accessor_method,subtypep,claz_standard_method).
+struct_opv(claz_standard_accessor_method,super_priority,[claz_accessor_method,claz_standard_method,claz_plist_mixin,claz_definition_source_mixin,claz_method,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_standard_accessor_method,super_priority,[claz_standard_method,claz_method,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_standard_accessor_method,typeof,type_class).
+struct_opv(claz_standard_accessor_method,typeof,type_builtin_type).
+struct_opv(claz_standard_boundp_method,subtypep,claz_standard_accessor_method).
+struct_opv(claz_standard_boundp_method,super_priority,[claz_standard_accessor_method,claz_accessor_method,claz_standard_method,claz_plist_mixin,claz_definition_source_mixin,claz_method,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_standard_boundp_method,typeof,type_builtin_type).
+struct_opv(claz_standard_class,subtypep,claz_semi_standard_class).
+struct_opv(claz_standard_class,subtypep,claz_slot_class).
+struct_opv(claz_standard_class,subtypep,claz_std_class).
+struct_opv(claz_standard_class,super_priority,[claz_semi_standard_class,claz_slotted_class,claz_class,claz_potential_class,claz_specializer,claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_standard_class,super_priority,[claz_std_class,claz_slot_class,claz_pcl_class,claz_class,claz_dependent_update_mixin,claz_plist_mixin,claz_definition_source_mixin,claz_standard_specializer,claz_specializer,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_standard_class,typeof,type_builtin_type).
+struct_opv(claz_standard_classoid,subtypep,claz_classoid).
+struct_opv(claz_standard_classoid,super_priority,[claz_classoid,claz_ctype,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_standard_classoid,typeof,type_builtin_type).
+struct_opv(claz_standard_direct_slot_definition,subtypep,claz_direct_slot_definition).
+struct_opv(claz_standard_direct_slot_definition,subtypep,claz_standard_slot_definition).
+struct_opv(claz_standard_direct_slot_definition,super_priority,[claz_direct_slot_definition,claz_standard_slot_definition,claz_slot_definition,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_standard_direct_slot_definition,super_priority,[claz_standard_slot_definition,claz_direct_slot_definition,claz_slot_definition,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_standard_direct_slot_definition,typeof,type_builtin_type).
+struct_opv(claz_standard_effective_slot_definition,has_slot,slot(claz_t,"location")).
+struct_opv(claz_standard_effective_slot_definition,subtypep,claz_effective_slot_definition).
+struct_opv(claz_standard_effective_slot_definition,subtypep,claz_standard_slot_definition).
+struct_opv(claz_standard_effective_slot_definition,super_priority,[claz_effective_slot_definition,claz_standard_slot_definition,claz_slot_definition,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_standard_effective_slot_definition,super_priority,[claz_standard_slot_definition,claz_effective_slot_definition,claz_slot_definition,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_standard_effective_slot_definition,typeof,type_class).
+struct_opv(claz_standard_effective_slot_definition,typeof,type_builtin_type).
+struct_opv(claz_standard_funcallable_instance,has_slot,slot(claz_t,"clos_slots")).
+struct_opv(claz_standard_funcallable_instance,has_slot,slot(claz_t,"hash_code")).
+struct_opv(claz_standard_funcallable_instance,subtypep,claz_function).
+struct_opv(claz_standard_funcallable_instance,super_priority,[claz_t]).
+struct_opv(claz_standard_funcallable_instance,typeof,type_class).
+struct_opv(claz_standard_funcallable_instance,typeof,type_builtin_type).
+struct_opv(claz_standard_generic_function,has_slot,slot(claz_t,"arg_info")).
+struct_opv(claz_standard_generic_function,has_slot,slot(claz_t,"argorder")).
+struct_opv(claz_standard_generic_function,has_slot,slot(claz_t,"declarations")).
+struct_opv(claz_standard_generic_function,has_slot,slot(claz_t,"declspecs")).
+struct_opv(claz_standard_generic_function,has_slot,slot(claz_t,"default_method_class")).
+struct_opv(claz_standard_generic_function,has_slot,slot(claz_t,"dfun_state")).
+struct_opv(claz_standard_generic_function,has_slot,slot(claz_t,"documentation")).
+struct_opv(claz_standard_generic_function,has_slot,slot(claz_t,"effective_method_cache")).
+struct_opv(claz_standard_generic_function,has_slot,slot(claz_t,"info_needs_update")).
+struct_opv(claz_standard_generic_function,has_slot,slot(claz_t,"initialized")).
+struct_opv(claz_standard_generic_function,has_slot,slot(claz_t,"lambda_list")).
+struct_opv(claz_standard_generic_function,has_slot,slot(claz_t,"lock")).
+struct_opv(claz_standard_generic_function,has_slot,slot(claz_t,"method_class")).
+struct_opv(claz_standard_generic_function,has_slot,slot(claz_t,"method_combination")).
+struct_opv(claz_standard_generic_function,has_slot,slot(claz_t,"methods")).
+struct_opv(claz_standard_generic_function,has_slot,slot(claz_t,"name")).
+struct_opv(claz_standard_generic_function,has_slot,slot(claz_t,"signature")).
+struct_opv(claz_standard_generic_function,subtypep,claz_generic_function).
+struct_opv(claz_standard_generic_function,super_priority,[claz_generic_function,claz_dependent_update_mixin,claz_plist_mixin,claz_definition_source_mixin,claz_metaobject,claz_funcallable_standard_object,claz_function,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_standard_generic_function,super_priority,[claz_generic_function,claz_metaobject,claz_funcallable_standard_object,claz_function,claz_standard_object,claz_t]).
+struct_opv(claz_standard_generic_function,typeof,type_class).
+struct_opv(claz_standard_generic_function,typeof,type_builtin_type).
+struct_opv(claz_standard_method,has_slot,slot(claz_t,"documentation")).
+struct_opv(claz_standard_method,has_slot,slot(claz_t,"fast_function")).
+struct_opv(claz_standard_method,has_slot,slot(claz_t,"function")).
+struct_opv(claz_standard_method,has_slot,slot(claz_t,"generic_function")).
+struct_opv(claz_standard_method,has_slot,slot(claz_t,"gf")).
+struct_opv(claz_standard_method,has_slot,slot(claz_t,"lambda_list")).
+struct_opv(claz_standard_method,has_slot,slot(claz_t,"qualifiers")).
+struct_opv(claz_standard_method,has_slot,slot(claz_t,"signature")).
+struct_opv(claz_standard_method,has_slot,slot(claz_t,"simple_next_method_call")).
+struct_opv(claz_standard_method,has_slot,slot(claz_t,"specializers")).
+struct_opv(claz_standard_method,has_slot,slot(claz_t,"wants_next_method_p")).
+struct_opv(claz_standard_method,subtypep,claz_definition_source_mixin).
+struct_opv(claz_standard_method,subtypep,claz_method).
+struct_opv(claz_standard_method,subtypep,claz_plist_mixin).
+struct_opv(claz_standard_method,super_priority,[claz_method,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_standard_method,super_priority,[claz_plist_mixin,claz_definition_source_mixin,claz_method,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_standard_method,typeof,type_class).
+struct_opv(claz_standard_method,typeof,type_builtin_type).
+struct_opv(claz_standard_method_combination,has_slot,slot(claz_t,"options")).
+struct_opv(claz_standard_method_combination,has_slot,slot(claz_t,"type_name")).
+struct_opv(claz_standard_method_combination,subtypep,claz_definition_source_mixin).
+struct_opv(claz_standard_method_combination,subtypep,claz_method_combination).
+struct_opv(claz_standard_method_combination,super_priority,[claz_definition_source_mixin,claz_method_combination,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_standard_method_combination,typeof,type_class).
+struct_opv(claz_standard_method_combination,typeof,type_builtin_type).
+struct_opv(claz_standard_object,has_slot,slot(claz_layout,"layout")).
+struct_opv(claz_standard_object,has_slot,slot(claz_list,"slots")).
+struct_opv(claz_standard_object,subtypep,claz_object).
+struct_opv(claz_standard_object,subtypep,claz_slot_object).
+struct_opv(claz_standard_object,subtypep,claz_t).
+struct_opv(claz_standard_object,super_priority,[claz_slot_object,claz_t]).
+struct_opv(claz_standard_object,super_priority,[claz_t]).
+struct_opv(claz_standard_object,typeof,type_builtin_type).
+struct_opv(claz_standard_pprint_dispatch_table_modified_error,has_slot,slot(claz_t,"operation")).
+struct_opv(claz_standard_pprint_dispatch_table_modified_error,subtypep,claz_error).
+struct_opv(claz_standard_pprint_dispatch_table_modified_error,subtypep,claz_reference_condition).
+struct_opv(claz_standard_pprint_dispatch_table_modified_error,super_priority,[claz_reference_condition,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_standard_pprint_dispatch_table_modified_error,typeof,type_class).
+struct_opv(claz_standard_pprint_dispatch_table_modified_error,typeof,type_builtin_type).
+struct_opv(claz_standard_reader_method,subtypep,claz_standard_accessor_method).
+struct_opv(claz_standard_reader_method,super_priority,[claz_standard_accessor_method,claz_accessor_method,claz_standard_method,claz_plist_mixin,claz_definition_source_mixin,claz_method,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_standard_reader_method,super_priority,[claz_standard_accessor_method,claz_standard_method,claz_method,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_standard_reader_method,typeof,type_builtin_type).
+struct_opv(claz_standard_readtable_modified_error,has_slot,slot(claz_t,"operation")).
+struct_opv(claz_standard_readtable_modified_error,subtypep,claz_error).
+struct_opv(claz_standard_readtable_modified_error,subtypep,claz_reference_condition).
+struct_opv(claz_standard_readtable_modified_error,super_priority,[claz_reference_condition,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_standard_readtable_modified_error,typeof,type_class).
+struct_opv(claz_standard_readtable_modified_error,typeof,type_builtin_type).
+struct_opv(claz_standard_slot_definition,has_slot,slot(claz_t,"allocation")).
+struct_opv(claz_standard_slot_definition,has_slot,slot(claz_t,"allocation_class")).
+struct_opv(claz_standard_slot_definition,subtypep,claz_slot_definition).
+struct_opv(claz_standard_slot_definition,super_priority,[claz_slot_definition,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_standard_slot_definition,super_priority,[claz_slot_definition,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_standard_slot_definition,typeof,type_class).
+struct_opv(claz_standard_slot_definition,typeof,type_builtin_type).
+struct_opv(claz_standard_specializer,subtypep,claz_specializer).
+struct_opv(claz_standard_specializer,super_priority,[claz_specializer,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_standard_specializer,typeof,type_builtin_type).
+struct_opv(claz_standard_stablehash,has_slot,slot(claz_t,"hashcode")).
+struct_opv(claz_standard_stablehash,subtypep,claz_standard_object).
+struct_opv(claz_standard_stablehash,super_priority,[claz_standard_object,claz_t]).
+struct_opv(claz_standard_stablehash,typeof,type_class).
+struct_opv(claz_standard_stablehash,typeof,type_builtin_type).
+struct_opv(claz_standard_writer_method,subtypep,claz_standard_accessor_method).
+struct_opv(claz_standard_writer_method,super_priority,[claz_standard_accessor_method,claz_accessor_method,claz_standard_method,claz_plist_mixin,claz_definition_source_mixin,claz_method,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_standard_writer_method,super_priority,[claz_standard_accessor_method,claz_standard_method,claz_method,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_standard_writer_method,typeof,type_builtin_type).
+struct_opv(claz_stat_vfs,has_slot,slot(claz_t,"bavail")).
+struct_opv(claz_stat_vfs,has_slot,slot(claz_t,"bfree")).
+struct_opv(claz_stat_vfs,has_slot,slot(claz_t,"blocks")).
+struct_opv(claz_stat_vfs,has_slot,slot(claz_t,"bsize")).
+struct_opv(claz_stat_vfs,has_slot,slot(claz_t,"favail")).
+struct_opv(claz_stat_vfs,has_slot,slot(claz_t,"ffree")).
+struct_opv(claz_stat_vfs,has_slot,slot(claz_t,"file")).
+struct_opv(claz_stat_vfs,has_slot,slot(claz_t,"files")).
+struct_opv(claz_stat_vfs,has_slot,slot(claz_t,"flag")).
+struct_opv(claz_stat_vfs,has_slot,slot(claz_t,"frsize")).
+struct_opv(claz_stat_vfs,has_slot,slot(claz_t,"fs_type")).
+struct_opv(claz_stat_vfs,has_slot,slot(claz_t,"fsid")).
+struct_opv(claz_stat_vfs,has_slot,slot(claz_t,"namemax")).
+struct_opv(claz_stat_vfs,has_slot,slot(claz_t,"vol_name")).
+struct_opv(claz_stat_vfs,subtypep,claz_structure_object).
+struct_opv(claz_stat_vfs,super_priority,[claz_structure_object,claz_t]).
+struct_opv(claz_stat_vfs,typeof,type_class).
+struct_opv(claz_stat_vfs,typeof,type_builtin_type).
+struct_opv(claz_static_classoid,subtypep,claz_classoid).
+struct_opv(claz_static_classoid,super_priority,[claz_classoid,claz_ctype,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_static_classoid,typeof,type_builtin_type).
+struct_opv(claz_std_class,subtypep,claz_slot_class).
+struct_opv(claz_std_class,super_priority,[claz_slot_class,claz_pcl_class,claz_class,claz_dependent_update_mixin,claz_plist_mixin,claz_definition_source_mixin,claz_standard_specializer,claz_specializer,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_std_class,typeof,type_builtin_type).
+struct_opv(claz_step_condition,has_slot,slot(claz_t,"form")).
+struct_opv(claz_step_condition,subtypep,claz_condition).
+struct_opv(claz_step_condition,super_priority,[claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_step_condition,typeof,type_class).
+struct_opv(claz_step_condition,typeof,type_builtin_type).
+struct_opv(claz_step_finished_condition,subtypep,claz_step_condition).
+struct_opv(claz_step_finished_condition,super_priority,[claz_step_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_step_finished_condition,typeof,type_builtin_type).
+struct_opv(claz_step_form_condition,has_slot,slot(claz_t,"args")).
+struct_opv(claz_step_form_condition,subtypep,claz_step_condition).
+struct_opv(claz_step_form_condition,super_priority,[claz_step_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_step_form_condition,typeof,type_class).
+struct_opv(claz_step_form_condition,typeof,type_builtin_type).
+struct_opv(claz_step_result_condition,has_slot,slot(claz_t,"result")).
+struct_opv(claz_step_result_condition,subtypep,claz_step_condition).
+struct_opv(claz_step_result_condition,super_priority,[claz_step_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_step_result_condition,typeof,type_class).
+struct_opv(claz_step_result_condition,typeof,type_builtin_type).
+struct_opv(claz_step_values_condition,subtypep,claz_step_result_condition).
+struct_opv(claz_step_values_condition,super_priority,[claz_step_result_condition,claz_step_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_step_values_condition,typeof,type_builtin_type).
+struct_opv(claz_storage_condition,subtypep,claz_serious_condition).
+struct_opv(claz_storage_condition,super_priority,[claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_storage_condition,super_priority,[claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_storage_condition,typeof,type_builtin_type).
+struct_opv(claz_storage_info,has_slot,slot(claz_t,"debug_vars")).
+struct_opv(claz_storage_info,has_slot,slot(claz_t,"groups")).
+struct_opv(claz_storage_info,subtypep,claz_structure_object).
+struct_opv(claz_storage_info,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_storage_info,typeof,type_class).
+struct_opv(claz_storage_info,typeof,type_builtin_type).
+struct_opv(claz_stream,has_slot,slot(claz_boolean,"interactive")).
+struct_opv(claz_stream,has_slot,slot(claz_boolean,"is_binary_stream")).
+struct_opv(claz_stream,has_slot,slot(claz_boolean,"is_character_stream")).
+struct_opv(claz_stream,has_slot,slot(claz_boolean,"is_input_stream")).
+struct_opv(claz_stream,has_slot,slot(claz_boolean,"is_output_stream")).
+struct_opv(claz_stream,has_slot,slot(claz_boolean,"open")).
+struct_opv(claz_stream,has_slot,slot(claz_boolean,"past_end")).
+struct_opv(claz_stream,has_slot,slot(claz_char_code,"eol_char")).
+struct_opv(claz_stream,has_slot,slot(claz_char_code,"last_char")).
+struct_opv(claz_stream,has_slot,slot(claz_integer,"char_pos")).
+struct_opv(claz_stream,has_slot,slot(claz_integer,"line_number")).
+struct_opv(claz_stream,has_slot,slot(claz_integer,"offset")).
+struct_opv(claz_stream,has_slot,slot(claz_object,"element_type")).
+struct_opv(claz_stream,has_slot,slot(claz_object,"external_format")).
+struct_opv(claz_stream,has_slot,slot(claz_prolog_input_stream,"in")).
+struct_opv(claz_stream,has_slot,slot(claz_prolog_output_stream,"out")).
+struct_opv(claz_stream,has_slot,slot(claz_prolog_pushback_reader,"reader")).
+struct_opv(claz_stream,has_slot,slot(claz_prolog_writer,"writer")).
+struct_opv(claz_stream,has_slot,slot(claz_stream_eol_style,"eol_style")).
+struct_opv(claz_stream,has_slot,slot(claz_string,"encoding")).
+struct_opv(claz_stream,subtypep,claz_structure_object).
+struct_opv(claz_stream,subtypep,claz_t).
+struct_opv(claz_stream,super_priority,[claz_t]).
+struct_opv(claz_stream,typeof,type_builtin_type).
+struct_opv(claz_stream_decoding_error,subtypep,claz_character_decoding_error).
+struct_opv(claz_stream_decoding_error,subtypep,claz_stream_error).
+struct_opv(claz_stream_decoding_error,super_priority,[claz_stream_error,claz_character_decoding_error,claz_character_coding_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_stream_decoding_error,typeof,type_builtin_type).
+struct_opv(claz_stream_encoding_error,subtypep,claz_character_encoding_error).
+struct_opv(claz_stream_encoding_error,subtypep,claz_stream_error).
+struct_opv(claz_stream_encoding_error,super_priority,[claz_stream_error,claz_character_encoding_error,claz_character_coding_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_stream_encoding_error,typeof,type_builtin_type).
+struct_opv(claz_stream_eol_style,typeof,type_builtin_type).
+struct_opv(claz_stream_error,has_slot,slot(claz_prolog_throwable,"cause")).
+struct_opv(claz_stream_error,has_slot,slot(claz_t,"stream")).
+struct_opv(claz_stream_error,kw_ro,"cause").
+struct_opv(claz_stream_error,subtypep,claz_error).
+struct_opv(claz_stream_error,subtypep,claz_lisp_error).
+struct_opv(claz_stream_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_stream_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_stream_error,typeof,type_class).
+struct_opv(claz_stream_error,typeof,type_builtin_type).
+struct_opv(claz_string,subtypep,claz_vector).
+struct_opv(claz_string,super_priority,[claz_vector,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_string,typeof,type_builtin_type).
+struct_opv(claz_string_functions_string_indices_and_chars,has_slot,slot(claz_array_of(claz_char_code),"array1")).
+struct_opv(claz_string_functions_string_indices_and_chars,has_slot,slot(claz_array_of(claz_char_code),"array2")).
+struct_opv(claz_string_functions_string_indices_and_chars,has_slot,slot(claz_boolean,"convert_case")).
+struct_opv(claz_string_functions_string_indices_and_chars,has_slot,slot(claz_integer,"end1")).
+struct_opv(claz_string_functions_string_indices_and_chars,has_slot,slot(claz_integer,"end2")).
+struct_opv(claz_string_functions_string_indices_and_chars,has_slot,slot(claz_integer,"start1")).
+struct_opv(claz_string_functions_string_indices_and_chars,has_slot,slot(claz_integer,"start2")).
+struct_opv(claz_string_functions_string_indices_and_chars,has_slot,slot(claz_string,"string1")).
+struct_opv(claz_string_functions_string_indices_and_chars,typeof,type_builtin_type).
+struct_opv(claz_string_input_stream,has_slot,slot(claz_integer,"start")).
+struct_opv(claz_string_input_stream,has_slot,slot(claz_prolog_string_reader,"string_reader")).
+struct_opv(claz_string_input_stream,has_slot,slot(claz_string,"sub_string")).
+struct_opv(claz_string_input_stream,has_slot,slot(claz_t,"current")).
+struct_opv(claz_string_input_stream,has_slot,slot(claz_t,"end")).
+struct_opv(claz_string_input_stream,has_slot,slot(claz_t,"in")).
+struct_opv(claz_string_input_stream,has_slot,slot(claz_t,"misc")).
+struct_opv(claz_string_input_stream,has_slot,slot(claz_t,"string")).
+struct_opv(claz_string_input_stream,kw_ro,"start").
+struct_opv(claz_string_input_stream,kw_ro,"string_reader").
+struct_opv(claz_string_input_stream,kw_ro,"sub_string").
+struct_opv(claz_string_input_stream,subtypep,claz_ansi_stream).
+struct_opv(claz_string_input_stream,subtypep,claz_stream).
+struct_opv(claz_string_input_stream,subtypep,claz_string_stream).
+struct_opv(claz_string_input_stream,super_priority,[claz_string_stream,claz_ansi_stream,claz_stream,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_string_input_stream,typeof,type_class).
+struct_opv(claz_string_input_stream,typeof,type_builtin_type).
+struct_opv(claz_string_output_stream,has_slot,slot(claz_seekable_string_writer,"string_writer")).
+struct_opv(claz_string_output_stream,has_slot,slot(claz_t,"buffer")).
+struct_opv(claz_string_output_stream,has_slot,slot(claz_t,"element_type")).
+struct_opv(claz_string_output_stream,has_slot,slot(claz_t,"index")).
+struct_opv(claz_string_output_stream,has_slot,slot(claz_t,"index_cache")).
+struct_opv(claz_string_output_stream,has_slot,slot(claz_t,"misc")).
+struct_opv(claz_string_output_stream,has_slot,slot(claz_t,"next")).
+struct_opv(claz_string_output_stream,has_slot,slot(claz_t,"out")).
+struct_opv(claz_string_output_stream,has_slot,slot(claz_t,"pointer")).
+struct_opv(claz_string_output_stream,has_slot,slot(claz_t,"prev")).
+struct_opv(claz_string_output_stream,has_slot,slot(claz_t,"sout")).
+struct_opv(claz_string_output_stream,kw_ro,"string_writer").
+struct_opv(claz_string_output_stream,subtypep,claz_ansi_stream).
+struct_opv(claz_string_output_stream,subtypep,claz_stream).
+struct_opv(claz_string_output_stream,subtypep,claz_string_stream).
+struct_opv(claz_string_output_stream,super_priority,[claz_string_stream,claz_ansi_stream,claz_stream,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_string_output_stream,typeof,type_class).
+struct_opv(claz_string_output_stream,typeof,type_builtin_type).
+struct_opv(claz_string_stream,subtypep,claz_stream).
+struct_opv(claz_string_stream,super_priority,[claz_stream,claz_t]).
+struct_opv(claz_string_stream,typeof,type_builtin_type).
+struct_opv(claz_structure_c33_object,subtypep,claz_structure_object).
+struct_opv(claz_structure_c33_object,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_structure_c33_object,typeof,type_builtin_type).
+struct_opv(claz_structure_class,has_slot,slot(claz_t,"boa_constructors")).
+struct_opv(claz_structure_class,has_slot,slot(claz_t,"copier")).
+struct_opv(claz_structure_class,has_slot,slot(claz_t,"defstruct_constructor")).
+struct_opv(claz_structure_class,has_slot,slot(claz_t,"defstruct_form")).
+struct_opv(claz_structure_class,has_slot,slot(claz_t,"from_defclass_p")).
+struct_opv(claz_structure_class,has_slot,slot(claz_t,"kconstructor")).
+struct_opv(claz_structure_class,has_slot,slot(claz_t,"names")).
+struct_opv(claz_structure_class,has_slot,slot(claz_t,"predicate")).
+struct_opv(claz_structure_class,has_slot,slot(claz_t,"prototype")).
+struct_opv(claz_structure_class,subtypep,claz_slot_class).
+struct_opv(claz_structure_class,subtypep,claz_slotted_class).
+struct_opv(claz_structure_class,super_priority,[claz_slot_class,claz_pcl_class,claz_class,claz_dependent_update_mixin,claz_plist_mixin,claz_definition_source_mixin,claz_standard_specializer,claz_specializer,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_structure_class,super_priority,[claz_slotted_class,claz_class,claz_potential_class,claz_specializer,claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_structure_class,typeof,type_class).
+struct_opv(claz_structure_class,typeof,type_builtin_type).
+struct_opv(claz_structure_classoid,subtypep,claz_classoid).
+struct_opv(claz_structure_classoid,super_priority,[claz_classoid,claz_ctype,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_structure_classoid,typeof,type_builtin_type).
+struct_opv(claz_structure_direct_slot_definition,subtypep,claz_direct_slot_definition).
+struct_opv(claz_structure_direct_slot_definition,subtypep,claz_structure_slot_definition).
+struct_opv(claz_structure_direct_slot_definition,super_priority,[claz_direct_slot_definition,claz_slot_definition,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_structure_direct_slot_definition,super_priority,[claz_structure_slot_definition,claz_direct_slot_definition,claz_slot_definition,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_structure_direct_slot_definition,typeof,type_builtin_type).
+struct_opv(claz_structure_effective_slot_definition,has_slot,slot(claz_t,"efm_sbuc")).
+struct_opv(claz_structure_effective_slot_definition,has_slot,slot(claz_t,"efm_smuc")).
+struct_opv(claz_structure_effective_slot_definition,has_slot,slot(claz_t,"efm_ssvuc")).
+struct_opv(claz_structure_effective_slot_definition,has_slot,slot(claz_t,"efm_svuc")).
+struct_opv(claz_structure_effective_slot_definition,has_slot,slot(claz_t,"readonly")).
+struct_opv(claz_structure_effective_slot_definition,subtypep,claz_effective_slot_definition).
+struct_opv(claz_structure_effective_slot_definition,subtypep,claz_structure_slot_definition).
+struct_opv(claz_structure_effective_slot_definition,super_priority,[claz_effective_slot_definition,claz_slot_definition,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_structure_effective_slot_definition,super_priority,[claz_structure_slot_definition,claz_effective_slot_definition,claz_slot_definition,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_structure_effective_slot_definition,typeof,type_class).
+struct_opv(claz_structure_effective_slot_definition,typeof,type_builtin_type).
+struct_opv(claz_structure_initarg_not_keyword,subtypep,claz_reference_condition).
+struct_opv(claz_structure_initarg_not_keyword,subtypep,claz_simple_style_warning).
+struct_opv(claz_structure_initarg_not_keyword,super_priority,[claz_reference_condition,claz_simple_style_warning,claz_simple_condition,claz_style_warning,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_structure_initarg_not_keyword,typeof,type_builtin_type).
+struct_opv(claz_structure_object,has_slot,slot(claz_list,"slots")).
+struct_opv(claz_structure_object,has_slot,slot(claz_structure_class,"structure_class")).
+struct_opv(claz_structure_object,kw_ro,"slots").
+struct_opv(claz_structure_object,kw_ro,"structure_class").
+struct_opv(claz_structure_object,subtypep,claz_object).
+struct_opv(claz_structure_object,subtypep,claz_slot_object).
+struct_opv(claz_structure_object,subtypep,claz_t).
+struct_opv(claz_structure_object,super_priority,[claz_slot_object,claz_t]).
+struct_opv(claz_structure_object,super_priority,[claz_t]).
+struct_opv(claz_structure_object,typeof,type_builtin_type).
+struct_opv(claz_structure_slot_definition,has_slot,slot(claz_t,"defstruct_accessor_symbol")).
+struct_opv(claz_structure_slot_definition,has_slot,slot(claz_t,"internal_reader_function")).
+struct_opv(claz_structure_slot_definition,has_slot,slot(claz_t,"internal_writer_function")).
+struct_opv(claz_structure_slot_definition,subtypep,claz_slot_definition).
+struct_opv(claz_structure_slot_definition,super_priority,[claz_slot_definition,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_structure_slot_definition,typeof,type_class).
+struct_opv(claz_structure_slot_definition,typeof,type_builtin_type).
+struct_opv(claz_structure_stablehash,has_slot,slot(claz_t,"hashcode")).
+struct_opv(claz_structure_stablehash,subtypep,claz_structure_object).
+struct_opv(claz_structure_stablehash,super_priority,[claz_structure_object,claz_t]).
+struct_opv(claz_structure_stablehash,typeof,type_class).
+struct_opv(claz_structure_stablehash,typeof,type_builtin_type).
+struct_opv(claz_style_warning,subtypep,claz_reference_condition).
+struct_opv(claz_style_warning,subtypep,claz_simple_style_warning).
+struct_opv(claz_style_warning,subtypep,claz_warning).
+struct_opv(claz_style_warning,super_priority,[claz_reference_condition,claz_simple_style_warning,claz_simple_condition,claz_style_warning,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_style_warning,super_priority,[claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_style_warning,super_priority,[claz_warning,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_style_warning,typeof,type_builtin_type).
+struct_opv(claz_super_class,has_slot,slot(claz_t,"classname")).
+struct_opv(claz_super_class,has_slot,slot(claz_t,"direct_subclasses")).
+struct_opv(claz_super_class,subtypep,claz_metaobject).
+struct_opv(claz_super_class,subtypep,claz_standard_stablehash).
+struct_opv(claz_super_class,super_priority,[claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_super_class,typeof,type_class).
+struct_opv(claz_super_class,typeof,type_builtin_type).
+struct_opv(claz_symbol,has_slot,slot(claz_bitmask,"flags")).
+struct_opv(claz_symbol,has_slot,slot(claz_integer,"hash")).
+struct_opv(claz_symbol,has_slot,slot(claz_integer,"special_index")).
+struct_opv(claz_symbol,has_slot,slot(claz_list,"property_list")).
+struct_opv(claz_symbol,has_slot,slot(claz_object,"function")).
+struct_opv(claz_symbol,has_slot,slot(claz_object,"package")).
+struct_opv(claz_symbol,has_slot,slot(claz_object,"value")).
+struct_opv(claz_symbol,has_slot,slot(claz_simple_string,"name")).
+struct_opv(claz_symbol,kw_ro,"name").
+struct_opv(claz_symbol,subtypep,claz_object).
+struct_opv(claz_symbol,subtypep,claz_t).
+struct_opv(claz_symbol,super_priority,[claz_t]).
+struct_opv(claz_symbol,typeof,type_builtin_type).
+struct_opv(claz_symbol_macro,has_slot,slot(claz_object,"expansion")).
+struct_opv(claz_symbol_macro,subtypep,claz_object).
+struct_opv(claz_symbol_macro,typeof,type_builtin_type).
+struct_opv(claz_symbol_package_locked_error,has_slot,slot(claz_t,"symbol")).
+struct_opv(claz_symbol_package_locked_error,subtypep,claz_package_lock_violation).
+struct_opv(claz_symbol_package_locked_error,super_priority,[claz_package_lock_violation,claz_package_error,claz_error,claz_serious_condition,claz_reference_condition,claz_simple_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_symbol_package_locked_error,typeof,type_class).
+struct_opv(claz_symbol_package_locked_error,typeof,type_builtin_type).
+struct_opv(claz_symbol_value_in_thread_error,has_slot,slot(claz_t,"info")).
+struct_opv(claz_symbol_value_in_thread_error,subtypep,claz_cell_error).
+struct_opv(claz_symbol_value_in_thread_error,subtypep,claz_thread_error).
+struct_opv(claz_symbol_value_in_thread_error,super_priority,[claz_cell_error,claz_thread_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_symbol_value_in_thread_error,typeof,type_class).
+struct_opv(claz_symbol_value_in_thread_error,typeof,type_builtin_type).
+struct_opv(claz_synonym_stream,has_slot,slot(claz_symbol,"stream_name")).
+struct_opv(claz_synonym_stream,has_slot,slot(claz_t,"bin")).
+struct_opv(claz_synonym_stream,has_slot,slot(claz_t,"bout")).
+struct_opv(claz_synonym_stream,has_slot,slot(claz_t,"in")).
+struct_opv(claz_synonym_stream,has_slot,slot(claz_t,"misc")).
+struct_opv(claz_synonym_stream,has_slot,slot(claz_t,"n_bin")).
+struct_opv(claz_synonym_stream,has_slot,slot(claz_t,"out")).
+struct_opv(claz_synonym_stream,has_slot,slot(claz_t,"sout")).
+struct_opv(claz_synonym_stream,has_slot,slot(claz_t,"symbol")).
+struct_opv(claz_synonym_stream,kw_ro,"stream_name").
+struct_opv(claz_synonym_stream,subtypep,claz_ansi_stream).
+struct_opv(claz_synonym_stream,subtypep,claz_stream).
+struct_opv(claz_synonym_stream,super_priority,[claz_ansi_stream,claz_stream,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_synonym_stream,super_priority,[claz_stream,claz_t]).
+struct_opv(claz_synonym_stream,typeof,type_class).
+struct_opv(claz_synonym_stream,typeof,type_builtin_type).
+struct_opv(claz_system_area_pointer,subtypep,claz_t).
+struct_opv(claz_system_area_pointer,super_priority,[claz_t]).
+struct_opv(claz_system_area_pointer,typeof,type_builtin_type).
+struct_opv(claz_system_class,subtypep,claz_pcl_class).
+struct_opv(claz_system_class,super_priority,[claz_pcl_class,claz_class,claz_dependent_update_mixin,claz_plist_mixin,claz_definition_source_mixin,claz_standard_specializer,claz_specializer,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
+struct_opv(claz_system_class,typeof,type_builtin_type).
+struct_opv(claz_system_condition,has_slot,slot(claz_t,"address")).
+struct_opv(claz_system_condition,has_slot,slot(claz_t,"context")).
+struct_opv(claz_system_condition,subtypep,claz_condition).
+struct_opv(claz_system_condition,super_priority,[claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_system_condition,typeof,type_class).
+struct_opv(claz_system_condition,typeof,type_builtin_type).
+struct_opv(claz_t,super_priority,[]).
+struct_opv(claz_t,typeof,type_builtin_type).
+struct_opv(claz_tab,has_slot,slot(claz_t,"colinc")).
+struct_opv(claz_tab,has_slot,slot(claz_t,"colnum")).
+struct_opv(claz_tab,has_slot,slot(claz_t,"relativep")).
+struct_opv(claz_tab,has_slot,slot(claz_t,"sectionp")).
+struct_opv(claz_tab,subtypep,claz_queued_op).
+struct_opv(claz_tab,super_priority,[claz_queued_op,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_tab,typeof,type_class).
+struct_opv(claz_tab,typeof,type_builtin_type).
+struct_opv(claz_tail_set,has_slot,slot(claz_t,"funs")).
+struct_opv(claz_tail_set,has_slot,slot(claz_t,"info")).
+struct_opv(claz_tail_set,has_slot,slot(claz_t,"type")).
+struct_opv(claz_tail_set,subtypep,claz_structure_c33_object).
+struct_opv(claz_tail_set,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_tail_set,typeof,type_class).
+struct_opv(claz_tail_set,typeof,type_builtin_type).
+struct_opv(claz_template,has_slot,slot(claz_t,"arg_types")).
+struct_opv(claz_template,has_slot,slot(claz_t,"cost")).
+struct_opv(claz_template,has_slot,slot(claz_t,"guard")).
+struct_opv(claz_template,has_slot,slot(claz_t,"info_arg_count")).
+struct_opv(claz_template,has_slot,slot(claz_t,"ltn_policy")).
+struct_opv(claz_template,has_slot,slot(claz_t,"more_args_type")).
+struct_opv(claz_template,has_slot,slot(claz_t,"more_results_type")).
+struct_opv(claz_template,has_slot,slot(claz_t,"name")).
+struct_opv(claz_template,has_slot,slot(claz_t,"note")).
+struct_opv(claz_template,has_slot,slot(claz_t,"result_types")).
+struct_opv(claz_template,has_slot,slot(claz_t,"type")).
+struct_opv(claz_template,subtypep,claz_structure_c33_object).
+struct_opv(claz_template,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_template,typeof,type_class).
+struct_opv(claz_template,typeof,type_builtin_type).
+struct_opv(claz_thread,has_slot,slot(claz_t,"alive_p")).
+struct_opv(claz_thread,has_slot,slot(claz_t,"ephemeral_p")).
+struct_opv(claz_thread,has_slot,slot(claz_t,"interruptions")).
+struct_opv(claz_thread,has_slot,slot(claz_t,"interruptions_lock")).
+struct_opv(claz_thread,has_slot,slot(claz_t,"name")).
+struct_opv(claz_thread,has_slot,slot(claz_t,"os_thread")).
+struct_opv(claz_thread,has_slot,slot(claz_t,"result")).
+struct_opv(claz_thread,has_slot,slot(claz_t,"result_lock")).
+struct_opv(claz_thread,has_slot,slot(claz_t,"waiting_for")).
+struct_opv(claz_thread,subtypep,claz_structure_object).
+struct_opv(claz_thread,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_thread,typeof,type_class).
+struct_opv(claz_thread,typeof,type_builtin_type).
+struct_opv(claz_thread_deadlock,has_slot,slot(claz_t,"cycle")).
+struct_opv(claz_thread_deadlock,subtypep,claz_thread_error).
+struct_opv(claz_thread_deadlock,super_priority,[claz_thread_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_thread_deadlock,typeof,type_class).
+struct_opv(claz_thread_deadlock,typeof,type_builtin_type).
+struct_opv(claz_thread_destroyed,subtypep,claz_prolog_error).
+struct_opv(claz_thread_destroyed,typeof,type_builtin_type).
+struct_opv(claz_thread_error,has_slot,slot(claz_t,"thread")).
+struct_opv(claz_thread_error,subtypep,claz_error).
+struct_opv(claz_thread_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_thread_error,typeof,type_class).
+struct_opv(claz_thread_error,typeof,type_builtin_type).
+struct_opv(claz_throw,has_slot,slot(claz_list,"values")).
+struct_opv(claz_throw,has_slot,slot(claz_object,"result")).
+struct_opv(claz_throw,has_slot,slot(claz_object,"tag")).
+struct_opv(claz_throw,kw_ro,"result").
+struct_opv(claz_throw,kw_ro,"tag").
+struct_opv(claz_throw,kw_ro,"values").
+struct_opv(claz_throw,subtypep,claz_control_transfer).
+struct_opv(claz_throw,typeof,type_builtin_type).
+struct_opv(claz_time_info,has_slot,slot(claz_t,"calls")).
+struct_opv(claz_time_info,has_slot,slot(claz_t,"consing")).
+struct_opv(claz_time_info,has_slot,slot(claz_t,"gc_run_time")).
+struct_opv(claz_time_info,has_slot,slot(claz_t,"name")).
+struct_opv(claz_time_info,has_slot,slot(claz_t,"seconds")).
+struct_opv(claz_time_info,subtypep,claz_structure_object).
+struct_opv(claz_time_info,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_time_info,typeof,type_class).
+struct_opv(claz_time_info,typeof,type_builtin_type).
+struct_opv(claz_timeout,has_slot,slot(claz_t,"seconds")).
+struct_opv(claz_timeout,subtypep,claz_serious_condition).
+struct_opv(claz_timeout,super_priority,[claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_timeout,typeof,type_class).
+struct_opv(claz_timeout,typeof,type_builtin_type).
+struct_opv(claz_timer,has_slot,slot(claz_t,"cancel_function")).
+struct_opv(claz_timer,has_slot,slot(claz_t,"catch_up")).
+struct_opv(claz_timer,has_slot,slot(claz_t,"expire_time")).
+struct_opv(claz_timer,has_slot,slot(claz_t,"function")).
+struct_opv(claz_timer,has_slot,slot(claz_t,"interrupt_function")).
+struct_opv(claz_timer,has_slot,slot(claz_t,"name")).
+struct_opv(claz_timer,has_slot,slot(claz_t,"repeat_interval")).
+struct_opv(claz_timer,has_slot,slot(claz_t,"thread")).
+struct_opv(claz_timer,subtypep,claz_structure_object).
+struct_opv(claz_timer,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_timer,typeof,type_class).
+struct_opv(claz_timer,typeof,type_builtin_type).
+struct_opv(claz_tn,has_slot,slot(claz_t,"cost")).
+struct_opv(claz_tn,has_slot,slot(claz_t,"current_conflict")).
+struct_opv(claz_tn,has_slot,slot(claz_t,"global_conflicts")).
+struct_opv(claz_tn,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_tn,has_slot,slot(claz_t,"leaf")).
+struct_opv(claz_tn,has_slot,slot(claz_t,"local")).
+struct_opv(claz_tn,has_slot,slot(claz_t,"local_conflicts")).
+struct_opv(claz_tn,has_slot,slot(claz_t,"local_number")).
+struct_opv(claz_tn,has_slot,slot(claz_t,"loop_depth")).
+struct_opv(claz_tn,has_slot,slot(claz_t,"next")).
+struct_opv(claz_tn,has_slot,slot(claz_t,"next_xx")).
+struct_opv(claz_tn,has_slot,slot(claz_t,"offset")).
+struct_opv(claz_tn,has_slot,slot(claz_t,"physenv")).
+struct_opv(claz_tn,has_slot,slot(claz_t,"primitive_type")).
+struct_opv(claz_tn,has_slot,slot(claz_t,"reads")).
+struct_opv(claz_tn,has_slot,slot(claz_t,"save_tn")).
+struct_opv(claz_tn,has_slot,slot(claz_t,"sc")).
+struct_opv(claz_tn,has_slot,slot(claz_t,"writes")).
+struct_opv(claz_tn,subtypep,claz_sset_element).
+struct_opv(claz_tn,super_priority,[claz_sset_element,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_tn,typeof,type_class).
+struct_opv(claz_tn,typeof,type_builtin_type).
+struct_opv(claz_tn_ref,has_slot,slot(claz_t,"across")).
+struct_opv(claz_tn_ref,has_slot,slot(claz_t,"load_tn")).
+struct_opv(claz_tn_ref,has_slot,slot(claz_t,"next")).
+struct_opv(claz_tn_ref,has_slot,slot(claz_t,"next_ref")).
+struct_opv(claz_tn_ref,has_slot,slot(claz_t,"target")).
+struct_opv(claz_tn_ref,has_slot,slot(claz_t,"tn")).
+struct_opv(claz_tn_ref,has_slot,slot(claz_t,"vop")).
+struct_opv(claz_tn_ref,has_slot,slot(claz_t,"write_p")).
+struct_opv(claz_tn_ref,subtypep,claz_structure_c33_object).
+struct_opv(claz_tn_ref,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_tn_ref,typeof,type_class).
+struct_opv(claz_tn_ref,typeof,type_builtin_type).
+struct_opv(claz_token_buf,has_slot,slot(claz_t,"adjustable_string")).
+struct_opv(claz_token_buf,has_slot,slot(claz_t,"cursor")).
+struct_opv(claz_token_buf,has_slot,slot(claz_t,"escapes")).
+struct_opv(claz_token_buf,has_slot,slot(claz_t,"fill_ptr")).
+struct_opv(claz_token_buf,has_slot,slot(claz_t,"initial_string")).
+struct_opv(claz_token_buf,has_slot,slot(claz_t,"next")).
+struct_opv(claz_token_buf,has_slot,slot(claz_t,"only_base_chars")).
+struct_opv(claz_token_buf,has_slot,slot(claz_t,"string")).
+struct_opv(claz_token_buf,subtypep,claz_structure_object).
+struct_opv(claz_token_buf,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_token_buf,typeof,type_class).
+struct_opv(claz_token_buf,typeof,type_builtin_type).
+struct_opv(claz_trace_info,has_slot,slot(claz_t,"break")).
+struct_opv(claz_trace_info,has_slot,slot(claz_t,"break_after")).
+struct_opv(claz_trace_info,has_slot,slot(claz_t,"condition")).
+struct_opv(claz_trace_info,has_slot,slot(claz_t,"condition_after")).
+struct_opv(claz_trace_info,has_slot,slot(claz_t,"encapsulated")).
+struct_opv(claz_trace_info,has_slot,slot(claz_t,"end_breakpoint")).
+struct_opv(claz_trace_info,has_slot,slot(claz_t,"methods")).
+struct_opv(claz_trace_info,has_slot,slot(claz_t,"named")).
+struct_opv(claz_trace_info,has_slot,slot(claz_t,"print")).
+struct_opv(claz_trace_info,has_slot,slot(claz_t,"print_after")).
+struct_opv(claz_trace_info,has_slot,slot(claz_t,"start_breakpoint")).
+struct_opv(claz_trace_info,has_slot,slot(claz_t,"untraced")).
+struct_opv(claz_trace_info,has_slot,slot(claz_t,"what")).
+struct_opv(claz_trace_info,has_slot,slot(claz_t,"wherein")).
+struct_opv(claz_trace_info,subtypep,claz_structure_c33_object).
+struct_opv(claz_trace_info,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_trace_info,typeof,type_class).
+struct_opv(claz_trace_info,typeof,type_builtin_type).
+struct_opv(claz_transform,has_slot,slot(claz_t,"function")).
+struct_opv(claz_transform,has_slot,slot(claz_t,"important")).
+struct_opv(claz_transform,has_slot,slot(claz_t,"note")).
+struct_opv(claz_transform,has_slot,slot(claz_t,"type")).
+struct_opv(claz_transform,subtypep,claz_structure_object).
+struct_opv(claz_transform,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_transform,typeof,type_class).
+struct_opv(claz_transform,typeof,type_builtin_type).
+struct_opv(claz_two_class,has_slot,slot(claz_t,"wrapper1")).
+struct_opv(claz_two_class,subtypep,claz_one_class).
+struct_opv(claz_two_class,super_priority,[claz_one_class,claz_one_index_dfun_info,claz_accessor_dfun_info,claz_dfun_info,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_two_class,typeof,type_class).
+struct_opv(claz_two_class,typeof,type_builtin_type).
+struct_opv(claz_two_way_stream,has_slot,slot(claz_stream,"in")).
+struct_opv(claz_two_way_stream,has_slot,slot(claz_stream,"out")).
+struct_opv(claz_two_way_stream,has_slot,slot(claz_t,"bin")).
+struct_opv(claz_two_way_stream,has_slot,slot(claz_t,"bout")).
+struct_opv(claz_two_way_stream,has_slot,slot(claz_t,"input_stream")).
+struct_opv(claz_two_way_stream,has_slot,slot(claz_t,"misc")).
+struct_opv(claz_two_way_stream,has_slot,slot(claz_t,"n_bin")).
+struct_opv(claz_two_way_stream,has_slot,slot(claz_t,"output_stream")).
+struct_opv(claz_two_way_stream,has_slot,slot(claz_t,"sout")).
+struct_opv(claz_two_way_stream,kw_ro,"in").
+struct_opv(claz_two_way_stream,kw_ro,"out").
+struct_opv(claz_two_way_stream,subtypep,claz_ansi_stream).
+struct_opv(claz_two_way_stream,subtypep,claz_stream).
+struct_opv(claz_two_way_stream,super_priority,[claz_ansi_stream,claz_stream,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_two_way_stream,super_priority,[claz_stream,claz_t]).
+struct_opv(claz_two_way_stream,typeof,type_class).
+struct_opv(claz_two_way_stream,typeof,type_builtin_type).
+struct_opv(claz_uname,has_slot,slot(claz_t,"machine")).
+struct_opv(claz_uname,has_slot,slot(claz_t,"nodename")).
+struct_opv(claz_uname,has_slot,slot(claz_t,"release")).
+struct_opv(claz_uname,has_slot,slot(claz_t,"sysname")).
+struct_opv(claz_uname,has_slot,slot(claz_t,"version")).
+struct_opv(claz_uname,subtypep,claz_structure_object).
+struct_opv(claz_uname,super_priority,[claz_structure_object,claz_t]).
+struct_opv(claz_uname,typeof,type_class).
+struct_opv(claz_uname,typeof,type_builtin_type).
+struct_opv(claz_unbound_slot,has_slot,slot(claz_t,"instance")).
+struct_opv(claz_unbound_slot,subtypep,claz_cell_error).
+struct_opv(claz_unbound_slot,super_priority,[claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_unbound_slot,super_priority,[claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_unbound_slot,typeof,type_class).
+struct_opv(claz_unbound_slot,typeof,type_builtin_type).
+struct_opv(claz_unbound_variable,subtypep,claz_cell_error).
+struct_opv(claz_unbound_variable,super_priority,[claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_unbound_variable,super_priority,[claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_unbound_variable,typeof,type_builtin_type).
+struct_opv(claz_undefined_alien_error,subtypep,claz_cell_error).
+struct_opv(claz_undefined_alien_error,super_priority,[claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_undefined_alien_error,typeof,type_builtin_type).
+struct_opv(claz_undefined_alien_function_error,subtypep,claz_undefined_alien_error).
+struct_opv(claz_undefined_alien_function_error,super_priority,[claz_undefined_alien_error,claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_undefined_alien_function_error,typeof,type_builtin_type).
+struct_opv(claz_undefined_alien_style_warning,has_slot,slot(claz_t,"symbol")).
+struct_opv(claz_undefined_alien_style_warning,subtypep,claz_style_warning).
+struct_opv(claz_undefined_alien_style_warning,super_priority,[claz_style_warning,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_undefined_alien_style_warning,typeof,type_class).
+struct_opv(claz_undefined_alien_style_warning,typeof,type_builtin_type).
+struct_opv(claz_undefined_alien_variable_error,subtypep,claz_undefined_alien_error).
+struct_opv(claz_undefined_alien_variable_error,super_priority,[claz_undefined_alien_error,claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_undefined_alien_variable_error,typeof,type_builtin_type).
+struct_opv(claz_undefined_classoid,subtypep,claz_classoid).
+struct_opv(claz_undefined_classoid,super_priority,[claz_classoid,claz_ctype,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_undefined_classoid,typeof,type_builtin_type).
+struct_opv(claz_undefined_function,subtypep,claz_cell_error).
+struct_opv(claz_undefined_function,super_priority,[claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_undefined_function,super_priority,[claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_undefined_function,typeof,type_builtin_type).
+struct_opv(claz_undefined_package,has_slot,slot(claz_t,"error")).
+struct_opv(claz_undefined_package,subtypep,claz_structure_object).
+struct_opv(claz_undefined_package,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_undefined_package,typeof,type_class).
+struct_opv(claz_undefined_package,typeof,type_builtin_type).
+struct_opv(claz_undefined_warning,has_slot,slot(claz_t,"count")).
+struct_opv(claz_undefined_warning,has_slot,slot(claz_t,"kind")).
+struct_opv(claz_undefined_warning,has_slot,slot(claz_t,"name")).
+struct_opv(claz_undefined_warning,has_slot,slot(claz_t,"warnings")).
+struct_opv(claz_undefined_warning,subtypep,claz_structure_c33_object).
+struct_opv(claz_undefined_warning,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_undefined_warning,typeof,type_class).
+struct_opv(claz_undefined_warning,typeof,type_builtin_type).
+struct_opv(claz_unhandled_debug_condition,has_slot,slot(claz_t,"condition")).
+struct_opv(claz_unhandled_debug_condition,subtypep,claz_debug_error).
+struct_opv(claz_unhandled_debug_condition,super_priority,[claz_debug_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_unhandled_debug_condition,typeof,type_class).
+struct_opv(claz_unhandled_debug_condition,typeof,type_builtin_type).
+struct_opv(claz_union_type,has_slot,slot(claz_t,"class_info")).
+struct_opv(claz_union_type,subtypep,claz_compound_type).
+struct_opv(claz_union_type,super_priority,[claz_compound_type,claz_ctype,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_union_type,typeof,type_class).
+struct_opv(claz_union_type,typeof,type_builtin_type).
+struct_opv(claz_unix_host,has_slot,slot(claz_t,"customary_case")).
+struct_opv(claz_unix_host,has_slot,slot(claz_t,"parse")).
+struct_opv(claz_unix_host,has_slot,slot(claz_t,"parse_native")).
+struct_opv(claz_unix_host,has_slot,slot(claz_t,"simplify_namestring")).
+struct_opv(claz_unix_host,has_slot,slot(claz_t,"unparse")).
+struct_opv(claz_unix_host,has_slot,slot(claz_t,"unparse_directory")).
+struct_opv(claz_unix_host,has_slot,slot(claz_t,"unparse_directory_separator")).
+struct_opv(claz_unix_host,has_slot,slot(claz_t,"unparse_enough")).
+struct_opv(claz_unix_host,has_slot,slot(claz_t,"unparse_file")).
+struct_opv(claz_unix_host,has_slot,slot(claz_t,"unparse_host")).
+struct_opv(claz_unix_host,has_slot,slot(claz_t,"unparse_native")).
+struct_opv(claz_unix_host,subtypep,claz_host).
+struct_opv(claz_unix_host,super_priority,[claz_host,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_unix_host,typeof,type_class).
+struct_opv(claz_unix_host,typeof,type_builtin_type).
+struct_opv(claz_unknown_code_location,has_slot,slot(claz_t,"code_location")).
+struct_opv(claz_unknown_code_location,subtypep,claz_debug_error).
+struct_opv(claz_unknown_code_location,super_priority,[claz_debug_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_unknown_code_location,typeof,type_class).
+struct_opv(claz_unknown_code_location,typeof,type_builtin_type).
+struct_opv(claz_unknown_debug_var,has_slot,slot(claz_t,"debug_fun")).
+struct_opv(claz_unknown_debug_var,has_slot,slot(claz_t,"debug_var")).
+struct_opv(claz_unknown_debug_var,subtypep,claz_debug_error).
+struct_opv(claz_unknown_debug_var,super_priority,[claz_debug_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_unknown_debug_var,typeof,type_class).
+struct_opv(claz_unknown_debug_var,typeof,type_builtin_type).
+struct_opv(claz_unknown_type,subtypep,claz_hairy_type).
+struct_opv(claz_unknown_type,super_priority,[claz_hairy_type,claz_ctype,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_unknown_type,typeof,type_builtin_type).
+struct_opv(claz_unprintable_object,has_slot,slot(claz_t,"string")).
+struct_opv(claz_unprintable_object,subtypep,claz_structure_object).
+struct_opv(claz_unprintable_object,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_unprintable_object,typeof,type_class).
+struct_opv(claz_unprintable_object,typeof,type_builtin_type).
+struct_opv(claz_unset_funcallable_instance_function,subtypep,claz_reference_condition).
+struct_opv(claz_unset_funcallable_instance_function,subtypep,claz_simple_error).
+struct_opv(claz_unset_funcallable_instance_function,super_priority,[claz_reference_condition,claz_simple_error,claz_simple_condition,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_unset_funcallable_instance_function,typeof,type_builtin_type).
+struct_opv(claz_unsupported_operator,subtypep,claz_simple_error).
+struct_opv(claz_unsupported_operator,super_priority,[claz_simple_error,claz_simple_condition,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_unsupported_operator,typeof,type_builtin_type).
+struct_opv(claz_upcase_stream,subtypep,claz_case_frob_stream).
+struct_opv(claz_upcase_stream,typeof,type_builtin_type).
+struct_opv(claz_url_stream,has_slot,slot(claz_integer,"bytes_per_unit")).
+struct_opv(claz_url_stream,has_slot,slot(claz_pathname,"pathname")).
+struct_opv(claz_url_stream,has_slot,slot(claz_prolog_input_stream,"input")).
+struct_opv(claz_url_stream,has_slot,slot(claz_prolog_reader,"reader")).
+struct_opv(claz_url_stream,kw_ro,"bytes_per_unit").
+struct_opv(claz_url_stream,kw_ro,"input").
+struct_opv(claz_url_stream,kw_ro,"pathname").
+struct_opv(claz_url_stream,kw_ro,"reader").
+struct_opv(claz_url_stream,subtypep,claz_stream).
+struct_opv(claz_url_stream,typeof,type_builtin_type).
+struct_opv(claz_usage,has_slot,slot(claz_t,"blocks_input")).
+struct_opv(claz_usage,has_slot,slot(claz_t,"blocks_output")).
+struct_opv(claz_usage,has_slot,slot(claz_t,"context_switches_involuntary")).
+struct_opv(claz_usage,has_slot,slot(claz_t,"context_switches_voluntary")).
+struct_opv(claz_usage,has_slot,slot(claz_t,"data_memory")).
+struct_opv(claz_usage,has_slot,slot(claz_t,"major_page_faults")).
+struct_opv(claz_usage,has_slot,slot(claz_t,"max_rss")).
+struct_opv(claz_usage,has_slot,slot(claz_t,"messages_received")).
+struct_opv(claz_usage,has_slot,slot(claz_t,"messages_sent")).
+struct_opv(claz_usage,has_slot,slot(claz_t,"minor_page_faults")).
+struct_opv(claz_usage,has_slot,slot(claz_t,"num_swaps")).
+struct_opv(claz_usage,has_slot,slot(claz_t,"shared_memory")).
+struct_opv(claz_usage,has_slot,slot(claz_t,"signals")).
+struct_opv(claz_usage,has_slot,slot(claz_t,"stack_memory")).
+struct_opv(claz_usage,has_slot,slot(claz_t,"system_time")).
+struct_opv(claz_usage,has_slot,slot(claz_t,"user_time")).
+struct_opv(claz_usage,subtypep,claz_structure_object).
+struct_opv(claz_usage,super_priority,[claz_structure_object,claz_t]).
+struct_opv(claz_usage,typeof,type_class).
+struct_opv(claz_usage,typeof,type_builtin_type).
+struct_opv(claz_user_info,has_slot,slot(claz_t,"full_name")).
+struct_opv(claz_user_info,has_slot,slot(claz_t,"gid")).
+struct_opv(claz_user_info,has_slot,slot(claz_t,"home_dir")).
+struct_opv(claz_user_info,has_slot,slot(claz_t,"login_id")).
+struct_opv(claz_user_info,has_slot,slot(claz_t,"passwd")).
+struct_opv(claz_user_info,has_slot,slot(claz_t,"shell")).
+struct_opv(claz_user_info,has_slot,slot(claz_t,"uid")).
+struct_opv(claz_user_info,subtypep,claz_structure_object).
+struct_opv(claz_user_info,super_priority,[claz_structure_object,claz_t]).
+struct_opv(claz_user_info,typeof,type_class).
+struct_opv(claz_user_info,typeof,type_builtin_type).
+struct_opv(claz_utmpx,has_slot,slot(claz_t,"host")).
+struct_opv(claz_utmpx,has_slot,slot(claz_t,"id")).
+struct_opv(claz_utmpx,has_slot,slot(claz_t,"line")).
+struct_opv(claz_utmpx,has_slot,slot(claz_t,"pid")).
+struct_opv(claz_utmpx,has_slot,slot(claz_t,"tv")).
+struct_opv(claz_utmpx,has_slot,slot(claz_t,"type")).
+struct_opv(claz_utmpx,has_slot,slot(claz_t,"user")).
+struct_opv(claz_utmpx,subtypep,claz_structure_object).
+struct_opv(claz_utmpx,super_priority,[claz_structure_object,claz_t]).
+struct_opv(claz_utmpx,typeof,type_class).
+struct_opv(claz_utmpx,typeof,type_builtin_type).
+struct_opv(claz_valsrc,has_slot,slot(claz_t,"source")).
+struct_opv(claz_valsrc,has_slot,slot(claz_t,"value")).
+struct_opv(claz_valsrc,subtypep,claz_structure_object).
+struct_opv(claz_valsrc,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_valsrc,typeof,type_class).
+struct_opv(claz_valsrc,typeof,type_builtin_type).
+struct_opv(claz_valued_node,has_slot,slot(claz_t,"derived_type")).
+struct_opv(claz_valued_node,has_slot,slot(claz_t,"lvar")).
+struct_opv(claz_valued_node,subtypep,claz_node).
+struct_opv(claz_valued_node,super_priority,[claz_node,claz_sset_element,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_valued_node,typeof,type_class).
+struct_opv(claz_valued_node,typeof,type_builtin_type).
+struct_opv(claz_values_type,has_slot,slot(claz_t,"class_info")).
+struct_opv(claz_values_type,subtypep,claz_args_type).
+struct_opv(claz_values_type,super_priority,[claz_args_type,claz_ctype,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_values_type,typeof,type_class).
+struct_opv(claz_values_type,typeof,type_builtin_type).
+struct_opv(claz_var,has_slot,slot(claz_t,"assignedp")).
+struct_opv(claz_var,has_slot,slot(claz_t,"closurep")).
+struct_opv(claz_var,has_slot,slot(claz_t,"constant")).
+struct_opv(claz_var,has_slot,slot(claz_t,"constantp")).
+struct_opv(claz_var,has_slot,slot(claz_t,"fnode")).
+struct_opv(claz_var,has_slot,slot(claz_t,"for_value_usedp")).
+struct_opv(claz_var,has_slot,slot(claz_t,"modified_list")).
+struct_opv(claz_var,has_slot,slot(claz_t,"name")).
+struct_opv(claz_var,has_slot,slot(claz_t,"really_usedp")).
+struct_opv(claz_var,has_slot,slot(claz_t,"replaceable_list")).
+struct_opv(claz_var,has_slot,slot(claz_t,"specialp")).
+struct_opv(claz_var,has_slot,slot(claz_t,"stackz")).
+struct_opv(claz_var,has_slot,slot(claz_t,"usedp")).
+struct_opv(claz_var,has_slot,slot(claz_t,"venvc")).
+struct_opv(claz_var,subtypep,claz_structure_object).
+struct_opv(claz_var,super_priority,[claz_structure_object,claz_t]).
+struct_opv(claz_var,typeof,type_class).
+struct_opv(claz_var,typeof,type_builtin_type).
+struct_opv(claz_vector,subtypep,claz_array).
+struct_opv(claz_vector,subtypep,claz_sequence).
+struct_opv(claz_vector,super_priority,[claz_array,claz_sequence,claz_t]).
+struct_opv(claz_vector,typeof,type_builtin_type).
+struct_opv(claz_vector_nil,subtypep,claz_string).
+struct_opv(claz_vector_nil,super_priority,[claz_string,claz_vector,claz_array,claz_sequence,claz_t]).
+struct_opv(claz_vector_nil,typeof,type_builtin_type).
+struct_opv(claz_vertex,has_slot,slot(claz_t,"color")).
+struct_opv(claz_vertex,has_slot,slot(claz_t,"incidence")).
+struct_opv(claz_vertex,has_slot,slot(claz_t,"initial_domain")).
+struct_opv(claz_vertex,has_slot,slot(claz_t,"initial_domain_size")).
+struct_opv(claz_vertex,has_slot,slot(claz_t,"invisible")).
+struct_opv(claz_vertex,has_slot,slot(claz_t,"pack_type")).
+struct_opv(claz_vertex,has_slot,slot(claz_t,"spill_cost")).
+struct_opv(claz_vertex,has_slot,slot(claz_t,"tn")).
+struct_opv(claz_vertex,subtypep,claz_sset_element).
+struct_opv(claz_vertex,super_priority,[claz_sset_element,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_vertex,typeof,type_class).
+struct_opv(claz_vertex,typeof,type_builtin_type).
+struct_opv(claz_vop,has_slot,slot(claz_t,"args")).
+struct_opv(claz_vop,has_slot,slot(claz_t,"block")).
+struct_opv(claz_vop,has_slot,slot(claz_t,"codegen_info")).
+struct_opv(claz_vop,has_slot,slot(claz_t,"info")).
+struct_opv(claz_vop,has_slot,slot(claz_t,"next")).
+struct_opv(claz_vop,has_slot,slot(claz_t,"node")).
+struct_opv(claz_vop,has_slot,slot(claz_t,"prev")).
+struct_opv(claz_vop,has_slot,slot(claz_t,"refs")).
+struct_opv(claz_vop,has_slot,slot(claz_t,"results")).
+struct_opv(claz_vop,has_slot,slot(claz_t,"save_set")).
+struct_opv(claz_vop,has_slot,slot(claz_t,"temps")).
+struct_opv(claz_vop,subtypep,claz_structure_c33_object).
+struct_opv(claz_vop,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_vop,typeof,type_class).
+struct_opv(claz_vop,typeof,type_builtin_type).
+struct_opv(claz_vop_info,has_slot,slot(claz_t,"affected")).
+struct_opv(claz_vop_info,has_slot,slot(claz_t,"arg_costs")).
+struct_opv(claz_vop_info,has_slot,slot(claz_t,"arg_load_scs")).
+struct_opv(claz_vop_info,has_slot,slot(claz_t,"effects")).
+struct_opv(claz_vop_info,has_slot,slot(claz_t,"generator_function")).
+struct_opv(claz_vop_info,has_slot,slot(claz_t,"more_arg_costs")).
+struct_opv(claz_vop_info,has_slot,slot(claz_t,"more_result_costs")).
+struct_opv(claz_vop_info,has_slot,slot(claz_t,"move_args")).
+struct_opv(claz_vop_info,has_slot,slot(claz_t,"num_args")).
+struct_opv(claz_vop_info,has_slot,slot(claz_t,"num_results")).
+struct_opv(claz_vop_info,has_slot,slot(claz_t,"ref_ordering")).
+struct_opv(claz_vop_info,has_slot,slot(claz_t,"result_costs")).
+struct_opv(claz_vop_info,has_slot,slot(claz_t,"result_load_scs")).
+struct_opv(claz_vop_info,has_slot,slot(claz_t,"save_p")).
+struct_opv(claz_vop_info,has_slot,slot(claz_t,"targets")).
+struct_opv(claz_vop_info,has_slot,slot(claz_t,"temps")).
+struct_opv(claz_vop_info,has_slot,slot(claz_t,"variant")).
+struct_opv(claz_vop_info,subtypep,claz_template).
+struct_opv(claz_vop_info,super_priority,[claz_template,claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_vop_info,typeof,type_class).
+struct_opv(claz_vop_info,typeof,type_builtin_type).
+struct_opv(claz_vop_parse,has_slot,slot(claz_t,"affected")).
+struct_opv(claz_vop_parse,has_slot,slot(claz_t,"arg_types")).
+struct_opv(claz_vop_parse,has_slot,slot(claz_t,"args")).
+struct_opv(claz_vop_parse,has_slot,slot(claz_t,"body")).
+struct_opv(claz_vop_parse,has_slot,slot(claz_t,"conditional_p")).
+struct_opv(claz_vop_parse,has_slot,slot(claz_t,"cost")).
+struct_opv(claz_vop_parse,has_slot,slot(claz_t,"effects")).
+struct_opv(claz_vop_parse,has_slot,slot(claz_t,"guard")).
+struct_opv(claz_vop_parse,has_slot,slot(claz_t,"ignores")).
+struct_opv(claz_vop_parse,has_slot,slot(claz_t,"info_args")).
+struct_opv(claz_vop_parse,has_slot,slot(claz_t,"inherits")).
+struct_opv(claz_vop_parse,has_slot,slot(claz_t,"ltn_policy")).
+struct_opv(claz_vop_parse,has_slot,slot(claz_t,"more_args")).
+struct_opv(claz_vop_parse,has_slot,slot(claz_t,"more_results")).
+struct_opv(claz_vop_parse,has_slot,slot(claz_t,"move_args")).
+struct_opv(claz_vop_parse,has_slot,slot(claz_t,"name")).
+struct_opv(claz_vop_parse,has_slot,slot(claz_t,"node_var")).
+struct_opv(claz_vop_parse,has_slot,slot(claz_t,"note")).
+struct_opv(claz_vop_parse,has_slot,slot(claz_t,"operands")).
+struct_opv(claz_vop_parse,has_slot,slot(claz_t,"result_types")).
+struct_opv(claz_vop_parse,has_slot,slot(claz_t,"results")).
+struct_opv(claz_vop_parse,has_slot,slot(claz_t,"save_p")).
+struct_opv(claz_vop_parse,has_slot,slot(claz_t,"temps")).
+struct_opv(claz_vop_parse,has_slot,slot(claz_t,"translate")).
+struct_opv(claz_vop_parse,has_slot,slot(claz_t,"variant")).
+struct_opv(claz_vop_parse,has_slot,slot(claz_t,"variant_vars")).
+struct_opv(claz_vop_parse,has_slot,slot(claz_t,"vop_var")).
+struct_opv(claz_vop_parse,subtypep,claz_structure_c33_object).
+struct_opv(claz_vop_parse,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_vop_parse,typeof,type_class).
+struct_opv(claz_vop_parse,typeof,type_builtin_type).
+struct_opv(claz_waitqueue,has_slot,slot(claz_t,"name")).
+struct_opv(claz_waitqueue,has_slot,slot(claz_t,"token")).
+struct_opv(claz_waitqueue,subtypep,claz_structure_object).
+struct_opv(claz_waitqueue,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_waitqueue,typeof,type_class).
+struct_opv(claz_waitqueue,typeof,type_builtin_type).
+struct_opv(claz_warning,subtypep,claz_condition).
+struct_opv(claz_warning,subtypep,claz_reference_condition).
+struct_opv(claz_warning,subtypep,claz_simple_warning).
+struct_opv(claz_warning,super_priority,[claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_warning,super_priority,[claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_warning,super_priority,[claz_reference_condition,claz_simple_warning,claz_simple_condition,claz_warning,claz_condition,claz_slot_object,claz_t]).
+struct_opv(claz_warning,typeof,type_builtin_type).
+struct_opv(claz_weak_hash_table,has_slot,slot(claz_array_of(claz_prolog_weak_hash_entry),"buckets")).
+struct_opv(claz_weak_hash_table,has_slot,slot(claz_integer,"count")).
+struct_opv(claz_weak_hash_table,has_slot,slot(claz_integer,"threshold")).
+struct_opv(claz_weak_hash_table,has_slot,slot(claz_j_reentrant_lock,"lock")).
+struct_opv(claz_weak_hash_table,has_slot,slot(claz_object,"rehash_size")).
+struct_opv(claz_weak_hash_table,has_slot,slot(claz_object,"rehash_threshold")).
+struct_opv(claz_weak_hash_table,has_slot,slot(claz_object,"weakness")).
+struct_opv(claz_weak_hash_table,has_slot,slot(claz_prolog_map(claz_prolog_reference,claz_prolog_weak_hash_entry),"entry_lookup")).
+struct_opv(claz_weak_hash_table,has_slot,slot(claz_prolog_reference_queue(claz_object),"queue")).
+struct_opv(claz_weak_hash_table,has_slot,slot(claz_prolog_weak_hash_entry,"bucket_type")).
+struct_opv(claz_weak_hash_table,has_slot,slot(claz_weak_hash_table_comparator,"comparator")).
+struct_opv(claz_weak_hash_table,kw_ro,"comparator").
+struct_opv(claz_weak_hash_table,kw_ro,"lock").
+struct_opv(claz_weak_hash_table,kw_ro,"rehash_size").
+struct_opv(claz_weak_hash_table,kw_ro,"rehash_threshold").
+struct_opv(claz_weak_hash_table,kw_ro,"weakness").
+struct_opv(claz_weak_hash_table,subtypep,claz_object).
+struct_opv(claz_weak_hash_table,typeof,type_builtin_type).
+struct_opv(claz_weak_hash_table_comparator,typeof,type_builtin_type).
+struct_opv(claz_weak_pointer,subtypep,claz_t).
+struct_opv(claz_weak_pointer,super_priority,[claz_t]).
+struct_opv(claz_weak_pointer,typeof,type_builtin_type).
+struct_opv(claz_weak_reference,has_slot,slot(claz_prolog_weak_reference(claz_object),"ref")).
+struct_opv(claz_weak_reference,subtypep,claz_object).
+struct_opv(claz_weak_reference,typeof,type_builtin_type).
+struct_opv(claz_wrong_number_of_arguments_exception,has_slot,slot(claz_integer,"expected_max_args")).
+struct_opv(claz_wrong_number_of_arguments_exception,has_slot,slot(claz_integer,"expected_min_args")).
+struct_opv(claz_wrong_number_of_arguments_exception,has_slot,slot(claz_object,"actual_args")).
+struct_opv(claz_wrong_number_of_arguments_exception,has_slot,slot(claz_operator,"operator")).
+struct_opv(claz_wrong_number_of_arguments_exception,has_slot,slot(claz_string,"message")).
+struct_opv(claz_wrong_number_of_arguments_exception,subtypep,claz_program_error).
+struct_opv(claz_wrong_number_of_arguments_exception,typeof,type_builtin_type).
+struct_opv(claz_xset,has_slot,slot(claz_t,"data")).
+struct_opv(claz_xset,has_slot,slot(claz_t,"list_size")).
+struct_opv(claz_xset,subtypep,claz_structure_object).
+struct_opv(claz_xset,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
+struct_opv(claz_xset,typeof,type_class).
+struct_opv(claz_xset,typeof,type_builtin_type).
+struct_opv(claz_zero_rank_array,has_slot,slot(claz_boolean,"adjustable")).
+struct_opv(claz_zero_rank_array,has_slot,slot(claz_object,"data")).
+struct_opv(claz_zero_rank_array,has_slot,slot(claz_object,"element_type")).
+struct_opv(claz_zero_rank_array,kw_ro,"adjustable").
+struct_opv(claz_zero_rank_array,kw_ro,"element_type").
+struct_opv(claz_zero_rank_array,subtypep,claz_array).
+struct_opv(claz_zero_rank_array,typeof,type_builtin_type).
+struct_opv(claz_zip_cache_entry,has_slot,slot(claz_j_zip_file,"file")).
+struct_opv(claz_zip_cache_entry,has_slot,slot(claz_long,"last_modified")).
+struct_opv(claz_zip_cache_entry,typeof,type_builtin_type).

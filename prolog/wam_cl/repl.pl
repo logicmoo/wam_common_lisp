@@ -20,11 +20,11 @@
 
 :- dynamic 
 	user:named_lambda/2,
-        user:macro_lambda/4,
+        user:macro_lambda/5,
         user:function_lambda/4.
 :- multifile 
 	user:named_lambda/2,
-        user:macro_lambda/4,
+        user:macro_lambda/5,
         user:function_lambda/4.
 
 :- initialization((lisp,prolog),main).
@@ -239,7 +239,7 @@ eval_int(SExpression,Result):-
 eval(SExpression,Result):-eval_repl(SExpression,Result),!.
 eval(ExprS, Result):-
    as_sexp(ExprS,ExprS1),!,
-   reader_fix_symbols(ExprS1,Expression),
+   reader_intern_symbols(ExprS1,Expression),
    eval2(Expression, Result).
 
 eval2(Expression, Result):-
@@ -266,12 +266,7 @@ flush_all_output_safe:- forall(stream_property(S,mode(write)),notrace(catch(flus
 
 parse_sexpr_untyped_read(In, Expr):- 
   parse_sexpr_untyped(In,ExprS),!,
-  as_sexp(ExprS,ExprS1),!,reader_fix_symbols(ExprS1,Expr).
-
-reader_fix_symbols(ExprS1,ExprS1):- current_prolog_flag(no_symbol_fix,true),!.
-reader_fix_symbols(ExprS1,Expr):-
-  reading_package(Package),!,
-  reader_fix_symbols(Package,ExprS1,Expr),!.
+  as_sexp(ExprS,ExprS1),!,reader_intern_symbols(ExprS1,Expr).
 
 
 eval_repl(nil,  []):-!.
@@ -298,7 +293,7 @@ eval_repl_atom(make, O):- !, must_or_rtrace((make, cl_compile_file(pack('wam_com
 
 eval_repl_atom(show, t):- 
   listing([named_lambda/2,
-        user:macro_lambda/4,
+        user:macro_lambda/5,
         lisp_global_bindings/1]).
 
 :- fixup_exports.

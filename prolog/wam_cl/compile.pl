@@ -117,7 +117,7 @@ lisp_compile(Result,SExpression,Body):-
    lisp_compile(toplevel,Result,SExpression,Body).
 
 lisp_compile(Env,Result,Expression,Body):- 
-   must_or_rtrace(lisp_compile(ctx([]),Env,Result,Expression,Body)).
+   must_or_rtrace(lisp_compile(_AttVar,Env,Result,Expression,Body)).
 
 lisp_compile(Ctx,Env,Result,SExpression,Body):- 
    notrace(as_sexp(SExpression,Expression)),
@@ -141,8 +141,10 @@ must_compile_body(Ctx,Env,Result,Function, Body):-
   setarg(1,THE,Result).
 
 if_must_compile_body(Ctx,Env,Result,Function, Body):-
-  local_override(with_forms,lisp_grovel)-> Body= nop(lisp_groveling(Function,Result));
-  must_or_rtrace(compile_body(Ctx,Env,Result,Function, Body)).
+  ((fail,local_override(with_forms,lisp_grovel))
+   -> Body= nop(lisp_groveling(Function,Result))
+    ;
+    must_or_rtrace(compile_body(Ctx,Env,Result,Function, Body))).
 
 % PROG
 /*(defmacro prog (inits &rest forms)
@@ -264,17 +266,18 @@ compile_body(Ctx,_Env,Name,[defun,Name0,FormalParms|FunctionBody0], CompileBody)
     CompileBody = (% asserta((Head  :- (fail, <<==(FunctionHead , FunctionBody)))),
                    DocCode,
                    HeadDefCode,
-                   asserta(user:function_lambda(defun,Name, FormalParms, FunctionBody)),
+                   asserta(user:function_lambda(defun(Name0),Name, FormalParms, FunctionBody)),
                    FunctionAssert),!,
     make_compiled(Ctx,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode),
     (local_override(with_forms,lisp_grovel) -> FunctionAssert = true; FunctionAssert = asserta((Head  :- (!,  BodyCode)))).
 
-make_compiled(Ctx,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode):-
+make_compiled(Ctx,FunctionHead,FunctionBody,Head,HeadDefCode,(BodyCode,Result=CompiledResult)):-
     expand_function_head(Ctx,CallEnv,FunctionHead, Head, HeadEnv, Result,HeadDefCode,HeadCode),
     debug_var("RET",Result),debug_var("Env",CallEnv),
-    if_must_compile_body(Ctx,CallEnv,Result,[progn|FunctionBody],Body0),
+    if_must_compile_body(Ctx,CallEnv,CompiledResult,[progn|FunctionBody],Body0),
     body_cleanup(((CallEnv=HeadEnv,HeadCode,Body0)),BodyCode).
 
+same_symbol(OP1,OP2):- var(OP2),atom(OP1),!,prologcase_name(OP1,OP2).
 same_symbol(OP1,OP2):- 
    OP1==OP2 -> true;
   (atom(OP1),atom(OP2), 
@@ -284,21 +287,54 @@ same_symbol(OP1,OP2):-
      (OP1==N2 -> true ; N1==N2)))).
 
 % #+
-compile_body(Ctx,Env,Result,[OP,Flag,Form], Code):- same_symbol(OP,'#+'),!, symbol_value(Env,'*features*',List),
+compile_body(Ctx,Env,Result,[OP,Flag,Form], Code):- same_symbol(OP,'#+'),!, same_symbol('*features*',FEATURES), symbol_value(Env,FEATURES,List),
    (member(Flag,List) -> must_compile_body(Ctx,Env,Result,Form, Code) ; Code = true).
 % #-
-compile_body(Ctx,Env,Result,[OP,Flag,Form], Code):- same_symbol(OP,'#-'),!, symbol_value(Env,'*features*',List),
+compile_body(Ctx,Env,Result,[OP,Flag,Form], Code):- same_symbol(OP,'#-'),!, same_symbol('*features*',FEATURES), symbol_value(Env,FEATURES,List),
 ( \+ member(Flag,List) -> must_compile_body(Ctx,Env,Result,Form, Code) ; Code = true).  
 % EVAL-WHEN
 compile_body(Ctx,Env,Result,[OP,Flags|Forms], Code):-  same_symbol(OP,'eval-when'), !, 
  ((member(X,Flags),is_when(X) )
   -> must_compile_body(Ctx,Env,Result,[progn,Forms], Code) ; Code = true).
 % DEFMACRO
-compile_body(_Cx,_Ev,Name,[defmacro,Name,FormalParms|Body0], CompileBody):- !,
-      maybe_get_docs(function,Name,Body0,Body,DocCode),
-      CompileBody =(DocCode,retractall(user:macro_lambda(defmacro,Name,_,_)),
-	asserta(user:macro_lambda(defmacro,Name, FormalParms, [progn | Body]))).
+compile_body(Ctx,_Env,Name,[defmacro,Name0,FormalParmsB|FunctionBody0], CompileBody):- 
+    combine_setfs(Name0,Name1),
+    must(find_function_or_macro_name(Name1,_Len, Name)),
+    add_alphas(Ctx,Name),
+    must_or_rtrace(maybe_get_docs(function,Name,FunctionBody0,FunctionBodyB,DocCode)),
+    %reader_intern_symbols 
+    =([FormalParmsB,FunctionBodyB],[FormalParms,FunctionBody]),
+    FunctionHead=[Name|FormalParms],
+    CompileBody = (% asserta((Head  :- (fail, <<==(FunctionHead , FunctionBody)))),
+                   DocCode,
+                   HeadDefCode,
+                   retractall(user:macro_lambda(defmacro(Name0),Name,_,_,_)),
+                   asserta(user:macro_lambda(defmacro(Name0),Name, FormalParms, [progn | FunctionBody],Alphas)),
+                   nop(FunctionAssert)),!,
+    
+    make_compiled(Ctx,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode),
+    (local_override(with_forms,lisp_grovel) -> FunctionAssert = true; FunctionAssert = asserta((Head  :- (!,  BodyCode)))),
+    get_alphas(Ctx,Alphas),
+    wdmsg( :- lisp_compile( [defmacro,Name0, FormalParms, [progn | FunctionBody]])),
+    wdmsg(((Head  :- (!,  BodyCode)))),
+    wdmsg(alphas=Alphas),
+    nl,nl.
 
+get_value_or_default(Ctx,Name,Value,IfMissing):- oo_get_attr(Ctx,Name,Value)->true;Value=IfMissing.
+get_alphas(Ctx,Alphas):- get_value_or_default(Ctx,alphas,Alphas,[]).
+add_alphas(Ctx,Alpha):- atom(Alpha),!,get_value_or_default(Ctx,alphas,Alphas,[]),oo_put_attr(Ctx,alphas,[Alpha|Alphas]).
+add_alphas(_Ctx,Alphas):- \+ compound(Alphas),!.
+add_alphas(Ctx,Alphas):- Alphas=..[_|ARGS],maplist(add_alphas(Ctx),ARGS).
+/*
+compile_body(_Cx,OuterEnv,Name,[defmacro,Name0,FormalParms|Body0], CompileBody):- !,
+   combine_setfs(Name0,Name1),
+   must(find_function_or_macro_name(Name1,_Len, Name)),
+%      expand_function_head(Ctx,CallEnv,FunctionHead, Head, HeadEnv, Result,HeadDefCode,HeadCode),
+      maybe_get_docs(function,Name,Body0,Body,DocCode),
+      find_alphas(Ctx,OuterEnv,[defmacro,Name,FormalParms|Body],Alphas),
+      CompileBody =(DocCode,retractall(user:macro_lambda(defmacro,Name,_,_,_)),
+	asserta(user:macro_lambda(defmacro,Name, FormalParms, [progn | Body], Alphas))).
+*/
 
 % EVAL 
 compile_body(Ctx,Env,Result,['eval',Form1],(Body1,cl_eval(Result1,Result))):- !,
@@ -309,7 +345,7 @@ compile_body(Ctx,Env,Result,['eval',Form1],(Body1,cl_eval(Result1,Result))):- !,
 is_when(X):- dbmsg(warn(free_pass(is_when(X)))).
 
 combine_setfs(Name0,Name):-atom(Name0),Name0=Name.
-combine_setfs(Name0,Name):-atomic_list_concat(Name0,-,Name).
+combine_setfs(Name0,Name):-atomic_list_concat(['f_combined'|Name0],'__',Name).
 
 
 % DOLIST
@@ -429,7 +465,7 @@ compile_body(Ctx,Env,Result,[progv,VarsForm,ValuesForm|FormS],Code):- !,
 
 normalize_let([],[]).
 normalize_let([Decl|NewBindingsIn],[Norm|NewBindings]):-
-  must_or_rtrace(normalize_let1(Decl,Norm)),
+  must_or_rtrace(normalize_let1(Decl,Norm)),!,
   normalize_let(NewBindingsIn,NewBindings).
 
 
@@ -438,17 +474,17 @@ normalize_let1([Variable, Form],[bind, Variable, Form]).
 normalize_let1( Variable,[bind, Variable, []]).
 
 % LET
-compile_body(Ctx,Env,Result,['let', []| BodyForms], Body):- compile_body(Ctx,Env,Result,[progn| BodyForms], Body).
-compile_body(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body):-
-     must_or_rtrace(normalize_let(NewBindingsIn,NewBindings)),!,        
-	zip_with(Variables, ValueForms, [Variable, Form, [bind, Variable, Form]]^true, NewBindings),
+compile_body(Ctx,Env,Result,['let', []| BodyForms], Body):- !, compile_body(Ctx,Env,Result,[progn| BodyForms], Body).
+compile_body(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body):- !,
+     must_or_rtrace(normalize_let(NewBindingsIn,NewBindings)),!,       
+	zip_with(Variables, ValueForms, [Variable, Form, [bind, Variable, Form]]^true, NewBindings),      
 	expand_arguments(Ctx,Env,'funcall',1,ValueForms, ValueBody, Values),
-	zip_with(Variables, Values, [Var, Val, bv(Var, [Val|Unused])]^true,Bindings),
+       zip_with(Variables, Values, [Var, Val, bv(Var, [Val|Unused])]^true,Bindings),
 
-   must_or_rtrace((debug_var("_U",Unused),
+   nop((must_or_rtrace((debug_var("_U",Unused),
    debug_var("LETENV",BindingsEnvironment),
-   ignore((member(VarN,[Variable,Var]),atom(VarN),debug_var([VarN,'_Let'],Val))))), 
-
+   ignore((member(VarN,[Variable,Var]),atom(VarN),debug_var([VarN,'_Let'],Val))))))), 
+    add_alphas(Ctx,Variables),
 	must_compile_body(Ctx,BindingsEnvironment,Result,[progn|BodyForms], BodyFormsBody),
          Body = ( ValueBody,BindingsEnvironment=[Bindings|Env], BodyFormsBody ).
 

@@ -162,7 +162,7 @@ lisp_operator('define-variable-pattern').
 lisp_operator(u_define_caller_pattern).
 lisp_operator(f_u_define_caller_pattern).
 lisp_operator(S):-compiler_macro_left_right(S,_,_).
-lisp_operator(S):-user:macro_lambda(_Scope,S,_,_).
+lisp_operator(S):-user:macro_lambda(_Scope,S, _,_, _).
 lisp_operator(S):-is_special_op(S,P),currently_visible_package(P).
 %lisp_operator(S):-is_special_op(S,_P).
 
@@ -232,9 +232,10 @@ enforce_atomic(F):- (simple_atom_var(F)->true;(lisp_dumpST,break)).
 arginfo_incr(Prop,ArgInfo):- get_dict(Prop,ArgInfo,Old),New is Old +1, b_set_dict(Prop,ArgInfo,New).
 arginfo_set(Prop,ArgInfo,New):- nb_set_dict(Prop,ArgInfo,New).
 
+  
 
 enter_ordinary_args(ArgInfo,RestNKeysOut,RestNKeysIn,Required,FormalParms0,Params,Names,PVars,Code):-
-  maplist(un_c38,FormalParms0,FormalParms),
+  correct_formal_params(FormalParms0,FormalParms),
   ordinary_args(ArgInfo,RestNKeysOut,RestNKeysIn,Required,FormalParms,Params,Names,PVars,Code).
 
 
@@ -381,7 +382,7 @@ expand_function_head(Ctx,Env,FunctionName , Head, ZippedArgBindings, Result,Head
 
 
 
-function_head_params(_Ctx,Env,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,Names,PVars,Code):-!,
+function_head_params(Ctx,Env,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,Names,PVars,Code):-!,
    debug_var("RestNKeysIn",RestNKeysIn),debug_var("Env",Env),debug_var("RestNKeysOut",RestNKeysOut),
    debug_var("Code",Code),debug_var("ActualArgs",ActualArgs),
    ArgInfo = arginfo{req:0,all:0,opt:0,rest:0,key:0,aux:0,env:0,allow_other_keys:0,names:Names,complex:0},
@@ -389,6 +390,7 @@ function_head_params(_Ctx,Env,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,N
    maplist(debug_var,Names,PVars),
         freeze(Arg,debug_var(Arg,Val)),
 	zip_with(Names, PVars, [Arg, Val, bv(Arg, [Val|_])]^true, ZippedArgBindings),!,
+        add_alphas(Ctx,Names),
    % RestNKeysOut=RestNKeysIn,
    ((\+ get_dict(rest,ArgInfo,0); \+ get_dict(key,ArgInfo,0)) ->  
      (append(ActualArgsMaybe,RestNKeysIn,ActualArgs00),ActualArgs0=[ActualArgs00]) ; ActualArgs0 = ActualArgsMaybe),
@@ -448,17 +450,22 @@ make_bind_value([Var,_InitForm,IfPresent],Value,Env):-simple_atom_var(Var),make_
 
 must_or(Goal,Else):- Goal->true;Else.
 
-un_c38(Mode,ReMode):- atom(Mode),atom_concat('c38_',Sym,Mode),!,atom_concat('&',Sym,ReMode).
-un_c38(Mode,Mode).
+correct_formal_params(Mode,ReMode):-  correct_formal_params_c38(Mode,RMode1),
+  correct_formal_params_destructuring(RMode1,ReMode).
+correct_formal_params_c38(Mode,ReMode):- atom(Mode),atom_concat('c38_',Sym,Mode),!,atom_concat('&',Sym,ReMode).
+correct_formal_params_c38(Mode,Mode):- \+ compound(Mode),!.
+correct_formal_params_c38([F0|FormalParms0],[F|FormalParms]):- 
+  correct_formal_params_c38(F0,F),correct_formal_params_c38(FormalParms0,FormalParms).
+correct_formal_params_c38(Mode,Mode).
+
+correct_formal_params_destructuring([A, B|R],[A, B, '&rest',R]):- simple_atom_var(A),simple_atom_var(B),simple_atom_var(R),!.
+correct_formal_params_destructuring([A|R],[A,'&rest',R]):- simple_atom_var(A),simple_atom_var(R),!.
+correct_formal_params_destructuring(AA,AA).
 
 must_bind_parameters(Env,FormalParms0,Params,Code):- 
-  maplist(un_c38,FormalParms0,FormalParms),
+  correct_formal_params(FormalParms0,FormalParms),
   must_or_rtrace(bind_each_param(Env,FormalParms,Params,Code)).
 
-bind_each_param(Env, [A, B|R], Arguments,BindCode):- simple_atom_var(A),simple_atom_var(B),simple_atom_var(R),!,
-  bind_each_param(Env, [A, B, '&rest',R], Arguments,BindCode).
-bind_each_param(Env, [B|R], Arguments,BindCode):- simple_atom_var(B),simple_atom_var(R),!,
-  bind_each_param(Env, [B, '&rest',R], Arguments,BindCode).
 bind_each_param(Env, FormalParms, Arguments,BindCode):-
   % append_open_list(Env,bind),
   bind_parameters(Env, 'required', FormalParms, Arguments, BindCode),!.

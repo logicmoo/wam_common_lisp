@@ -7,6 +7,14 @@
  *
  * Douglas'' Notes:
  *
+ * Utils to add source debugging vars with almost almost pleasant atoms names 
+ *
+ * *PACKAGE* becomes xx_package_xx
+ * %MAKE-PACKAGE becomes pf_make_package
+ *
+ * @TODO:  List symbols that were named "FOO_123" might become "prefix_foo__123" (two underscores) vs one underscore 
+ * so that "FOO-123" will become 'prefix_foo_123'
+ *
  * (c) Douglas Miles, 2017
  *
  * The program is a *HUGE* common-lisp compiler/interpreter. It is written for YAP/SWI-Prolog (YAP 4x faster).
@@ -86,42 +94,9 @@ check_varname(UP):- name(UP,[C|_]),(char_type(C,digit)->throw(check_varname(UP))
 prologcase_name(String,ProposedName):- 
   string_lower(String,In),string_codes(In,Was),filter_var_chars(Was,CS),name(ProposedName,CS).
 
-symbol_case_name(String,Package,ProposedName):- 
-  package_symbol_prefix(Package,Prefix),!,
-  atom_concat_if_new(Prefix,String,CasePN),prologcase_name(CasePN,ProposedName),!.
-
-function_case_name(String,Package,ProposedName):- 
-  package_function_prefix(Package,Prefix),!,
-  atom_concat_if_new(Prefix,String,CasePN),prologcase_name(CasePN,ProposedName),!.
-
-package_function_prefix(A,B):- no_repeats(A,package_fprefix(A,B)).
-package_fprefix(pkg_cl,'cl_').
-package_fprefix(Pk,Pre):- Pk\==pkg_cl, package_symbol_prefix(Pk,Pre0),atom_concat('f_',Pre0,Pre).
-
-package_symbol_prefix(A,B):- no_repeats(A,package_prefix(A,B)).
-package_prefix(pkg_cl,'').
-package_prefix(pkg_kw,'kw_').
-package_prefix(pkg_sys,'sys_').
-package_prefix(pkg_user,'u_').
-package_prefix(pkg_ext,'ext_').
-package_prefix(PN,Pre):- nonvar(PN),package_nickname(Pk,PN),!,package_prefix(Pk,Pre).
-package_prefix(Pk,Pre):- is_lisp_package(Pk),atom_concat('pkg_',Package,Pk),atom_concat(Package,'_',Pre).
-
 
 atom_concat_if_new(Prefix,Atom,NewAtom):-
   (atom_concat(Prefix,_,Atom)-> NewAtom=Atom ; atom_concat(Prefix,Atom,NewAtom)).
-
-
-
-as_string_upper(C,SN):- compound(C),\+ is_list(C),functor(C,_P,A),arg(A,C,S),!, as_string_upper(S,SN).
-as_string_upper(S,U):- cl_string(S,D),string_upper(D,U).
-
-cl_string(SS,SS):- string(SS),!.
-cl_string(S,SN):- is_symbolp(S),cl_symbol_name(S,SN),!.
-% grabs ugly objects
-cl_string(S,SN):- atom_concat(':',S0,S),!,cl_string(S0,SN).
-cl_string(S,SN):- notrace(catch(text_to_string(S,SN),_,fail)),!.
-
 
 
 :- fixup_exports.

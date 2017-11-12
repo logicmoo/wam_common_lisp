@@ -17,6 +17,18 @@
 :- include('header.pro').
 
 
+
+cl_in_package(S,Package):- find_package_or_die(S,Package),
+   set_symbol_value('xx_package_xx',Package).
+
+cl_use_package(Package,R):- reading_package(CurrentPackage),
+                       cl_use_package(Package,CurrentPackage,R).
+
+cl_use_package(Package,CurrentPackage, t):- Package==CurrentPackage,!.
+cl_use_package(Package,CurrentPackage, R):- throw(implenent(cl_use_package(Package,CurrentPackage, R))).
+ 
+
+
 cl_find_package(S,Obj):- find_package(S,Package),!,must(as_package_object(Package,Obj)).
 cl_find_package(_,[]).
 
@@ -25,7 +37,7 @@ find_package(ugly(package,UP),Package):-!,find_package(UP,Package).
 find_package(S,S):- is_lisp_package(S),!.
 find_package(S,Package):- 
   as_string_upper(S,SN),
-  (package_name(Package,SN) ; package_nickname(Package,SN)).
+  (package_name(Package,SN) ; package_nickname(Package,SN)),!.
 
 find_package_or_die(X,Y):- find_package(X,Y) -> true ; throw(find_package_or_die(X,Y)).  
 
@@ -153,6 +165,30 @@ package_use_list(pkg_threads, pkg_cl).
 package_use_list(pkg_threads, pkg_ext).
 package_use_list(pkg_threads, pkg_sys).
 package_use_list(pkg_xp, pkg_cl).
+
+
+
+symbol_case_name(String,Package,ProposedName):- 
+  package_symbol_prefix(Package,Prefix),!,
+  atom_concat_if_new(Prefix,String,CasePN),prologcase_name(CasePN,ProposedName),!.
+
+function_case_name(String,Package,ProposedName):- 
+  package_function_prefix(Package,Prefix),!,
+  atom_concat_if_new(Prefix,String,CasePN),prologcase_name(CasePN,ProposedName),!.
+
+package_function_prefix(A,B):- no_repeats(A,package_fprefix(A,B)).
+package_fprefix(pkg_cl,'cl_').
+package_fprefix(Pk,Pre):- Pk\==pkg_cl, package_symbol_prefix(Pk,Pre0),atom_concat('f_',Pre0,Pre).
+
+package_symbol_prefix(A,B):- no_repeats(A,package_prefix(A,B)).
+package_prefix(pkg_cl,'').
+package_prefix(pkg_kw,'kw_').
+package_prefix(pkg_sys,'sys_').
+package_prefix(pkg_user,'u_').
+package_prefix(pkg_ext,'ext_').
+package_prefix(PN,Pre):- nonvar(PN),package_nickname(Pk,PN),!,package_prefix(Pk,Pre).
+package_prefix(Pk,Pre):- is_lisp_package(Pk),atom_concat('pkg_',Package,Pk),atom_concat(Package,'_',Pre).
+
 
 :- include('pi.pro').
 

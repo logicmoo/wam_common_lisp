@@ -20,13 +20,19 @@
 
 
 
-reader_fix_symbols(Package,SymbolName,Symbol):-
+% reader_intern_symbols(ExprS1,ExprS1):- current_prolog_flag(no_symbol_fix,true),!.
+reader_intern_symbols(ExprS1,Expr):-
+  reading_package(Package),!,
+  reader_intern_symbols(Package,ExprS1,Expr),!.
+
+
+reader_intern_symbols(Package,SymbolName,Symbol):-
    atom(SymbolName),atom_symbol(SymbolName,Package,Symbol),!.
-reader_fix_symbols(_Package,Some,Some):- \+ compound(Some),!.
-reader_fix_symbols(Package,[S|Some],[SR|SomeR]):- 
-  reader_fix_symbols(Package,S,SR),
-  reader_fix_symbols(Package,Some,SomeR).
-reader_fix_symbols(_Package,Some,Some).
+reader_intern_symbols(_Package,Some,Some):- \+ compound(Some),!.
+reader_intern_symbols(Package,[S|Some],[SR|SomeR]):- 
+  reader_intern_symbols(Package,S,SR),
+  reader_intern_symbols(Package,Some,SomeR).
+reader_intern_symbols(_Package,Some,Some).
 
 
 simple_atom_token(SymbolName):- atom_concat('$',_,SymbolName),upcase_atom(SymbolName,SymbolName).

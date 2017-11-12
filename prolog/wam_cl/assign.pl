@@ -108,8 +108,8 @@ push_values([V1|Push],V1):- must(nonvar(Push)),nb_setval('$mv_return',[V1|Push])
 
 
 
-bvof(E,L):-member(E,L).
-env_memb(E,L):-member(E,L).
+bvof(E,L):- nonvar(L),member(E,L).
+env_memb(E,L):- nonvar(L),member(E,L).
 env_memb(E,E).
 
 symbol_value_or(Env,Var,G,Value):-
@@ -117,7 +117,7 @@ symbol_value_or(Env,Var,G,Value):-
     -> extract_variable_value(Value0, Value, _)
       ; (symbol_value(Var,Value) -> true;  G).
 
-symbol_value(Var,Value):- symb:o_p_v(Var,value,Value).
+symbol_value(Var,Value):- get_opv(Var,value,Value).
 
 
 set_symbol_value(Env,Var,Result):-var(Result),!,symbol_value(Env,Var,Result).
@@ -125,7 +125,7 @@ set_symbol_value(Env,Var,Result):- !,
      ((	env_memb(Bindings, Env),bvof(bv(Var, Value0),Bindings))
       -> nb_setarg(1,Value0,Result)
       ;	( 
-        (symb:o_p_v(Var, value, _Old) 
+        (get_opv(Var, value, _Old) 
            -> update_opv(Var, value, Result) 
            ; set_symbol_value_last_chance(Env,Var,Result)))).
 
@@ -165,7 +165,7 @@ symbol_setter(Env,defparameter, Var, Result):-
    set_symbol_value(Env,Var,Result).
 
 symbol_setter(_Env,defvar, Var, Result):-   
-   (symb:o_p_v(Var, value, _) -> true ; asserta(symb:o_p_v(Var, value, Result))),
+   (get_opv(Var, value, _) -> true ; update_opv(Var, value, Result)),
    add_opv(Var,kw_deftype,defvar).
 
 symbol_setter(Env,setq, Var, Result):- !, set_symbol_value(Env,Var,Result).

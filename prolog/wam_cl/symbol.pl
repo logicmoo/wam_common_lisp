@@ -23,9 +23,9 @@ cl_symbol_value(Symbol,Value):- do_or_die(get_opv(Symbol,value,Value)),!.
 cl_symbol_function(Symbol,Function):- do_or_die(get_opv(Symbol,function,Function)),!.
 do_or_die(G):- G->true;throw(do_or_die(G)).
 
-is_constantp(Symbol):- get_opv(Symbol,kw_deftype,defconstant).
-is_constantp(Symbol):- get_opv(Symbol,package,pkg_kw).
-is_constantp(Object):- is_self_evaluationing_const(Object).
+is_constantp(Symbol):- get_opv(Symbol,kw_deftype,defconstant),!.
+is_constantp(Symbol):- get_opv(Symbol,package,pkg_kw),!.
+is_constantp(Object):- is_self_evaluationing_const(Object),!.
 
 
 
@@ -39,15 +39,16 @@ cl_gensym(Symbol):- cl_gensym("G",Symbol).
 cl_gensym(String,Symbol):- gensym(String,SymbolName),cl_make_symbol(SymbolName,Symbol).
 
 
-is_symbolp(Symbol):- get_opv(Symbol,typeof,symbol).
+is_symbolp(Symbol):- get_opv(Symbol,typeof,clz_symbol).
 
 is_keywordp(Symbol):- get_opv(Symbol,package,pkg_kw),!.
-is_keywordp(Symbol):- sanity((atom(Symbol),must(\+ atom_concat(':',_,Symbol)))),!,fail.
+%is_keywordp(Symbol):- atom(Symbol),sanity((must(\+ atom_concat(':',_,Symbol)))),!,fail.
 
 
 
-cl_find_symbol(String,Result):- reading_package(Package), cl_find_symbol(String,Package,Result).
-cl_find_symbol(String,Pack,Result):-  find_package_or_die(Pack,Package),package_find_symbol(String,Package,Symbol,IntExt),push_values([Symbol,IntExt],Result),!.
+cl_find_symbol(String,Result):- reading_package(Package)->cl_find_symbol(String,Package,Result).
+cl_find_symbol(String,Pack,Result):-  find_package_or_die(Pack,Package),
+  package_find_symbol(String,Package,Symbol,IntExt),push_values([Symbol,IntExt],Result),!.
 cl_find_symbol(_Var,_P,Result):- push_values([[],[]],Result).
 
 % @TODO Add symbol shadowing 
@@ -80,8 +81,8 @@ intern_symbol(String,Package,Symbol,IntExt):- package_find_symbol(String,Package
 intern_symbol(String,Package,Symbol,IntExt):-
    ignore(symbol_case_name(String,Package,Symbol)),
    create_symbol(String,Package,Symbol),
-   add_package_internal_symbol(Package,String,Symbol),   
-   must(package_find_symbol(String,Package,Symbol,IntExt)).
+   must((add_package_internal_symbol(Package,String,Symbol),   
+   package_find_symbol(String,Package,Symbol,IntExt))).
 
 
 cl_make_symbol(SymbolName,Symbol):- 
@@ -92,6 +93,7 @@ cl_make_symbol(SymbolName,Symbol):-
 create_symbol(String,Package,Symbol):-
    text_to_string(String,Name),
    add_opv(Symbol,typeof,symbol),
+   add_opv(Symbol,classof,clz_symbol),
    add_opv(Symbol,name,Name),
    add_opv(Symbol,package,Package),!.
 

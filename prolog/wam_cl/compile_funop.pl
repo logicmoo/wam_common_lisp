@@ -22,7 +22,8 @@
 
 % Use a previous DEFMACRO
 compile_funop(Cxt,Env,RResult,[Procedure|Arguments],CompileBodyCode):-
-  user:macro_lambda(_Scope,Procedure, FormalParams, LambdaExpression),!,
+  user:macro_lambda(_Scope,Procedure, FormalParams, LambdaExpression,_),!,
+
   must_or_rtrace(bind_parameters(NewEnv, FormalParams, Arguments,BindCode)),!,
   append(_,[],NewEnv),!,
   NextEnv = [NewEnv|Env],  

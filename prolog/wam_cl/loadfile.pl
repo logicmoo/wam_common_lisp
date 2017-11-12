@@ -20,14 +20,18 @@
 
 
 dd:- cl_grovel_file('../../t/daydreamer/dd.cl',_).
-dd1:- cl_compile_file('../../t/daydreamer/dd_compile.cl',_).
+dd1:- cl_compile_file('../../t/daydreamer/dd_compile.cl',keys([]),_).
 dd2:- cl_load('../../t/daydreamer/dd.cl',_).
 
 tdd:- cl_grovel_file('../../t/daydreamer/*.cl',_).
 tdd1:- cl_compile_file('../../t/daydreamer/*.cl',_).
 tdd2:- cl_load('../../t/daydreamer/*.cl',_).
 
-defpackage(_,_,_).
+cl_compile_file_mask(Mask,keys(Keys),TF):- 
+   with_each_file(do_compile_1file(Keys,TF),Mask).
+
+
+defpackage(A,B,C):- wdmsg(defpackage(A,B,C)).
 
 /*
 Function COMPILE-FILE
@@ -40,79 +44,164 @@ compile-file input-file &key output-file verbose print external-format
 Arguments and Values:
 
 input-file---a pathname designator. (Default fillers for unspecified components are taken from *default-pathname-defaults*.)
-
 output-file---a pathname designator. The default is implementation-defined.
-
 verbose---a generalized boolean. The default is the value of *compile-verbose*.
-
 print---a generalized boolean. The default is the value of *compile-print*.
-
 external-format---an external file format designator. The default is :default.
-
 output-truename---a pathname (the truename of the output file), or nil.
-
 warnings-p---a generalized boolean.
-
 failure-p---a generalized boolean.
 
 Description:
 
-compile-file transforms the contents of the file specified by input-file into implementation-dependent binary data which are placed in the file specified by output-file.
+compile-file transforms the contents of the file specified by input-file into implementation-dependent binary data 
+ which are placed in the file specified by output-file.
 
-The file to which input-file refers should be a source file. output-file can be used to specify an output pathname; the actual pathname of the compiled file to which compiled code will be output is computed as if by calling compile-file-pathname.
+The file to which input-file refers should be a source file. output-file can be used to specify an output pathname; 
+  the actual pathname of the compiled file to which compiled code will be output is computed 
+   as if by calling compile-file-pathname.
 
-If input-file or output-file is a logical pathname, it is translated into a physical pathname as if by calling translate-logical-pathname.
+If input-file or output-file is a logical pathname, it is translated into a physical pathname as if by calling 
+  translate-logical-pathname.
 
-If verbose is true, compile-file prints a message in the form of a comment (i.e., with a leading semicolon) to standard output indicating what file is being compiled and other useful information. If verbose is false, compile-file does not print this information.
+If verbose is true, compile-file prints a message in the form of a comment (i.e., with a leading semicolon) 
+     to standard output indicating what file is being compiled and other useful information.
+ If verbose is false, compile-file does not print this information.
 
-If print is true, information about top level forms in the file being compiled is printed to standard output. Exactly what is printed is implementation-dependent, but nevertheless some information is printed. If print is nil, no information is printed.
+If print is true, information about top level forms in the file being compiled is printed to standard output. 
+  Exactly what is printed is implementation-dependent, but nevertheless some information is printed. If print is nil, 
+  no information is printed.
 
-The external-format specifies the external file format to be used when opening the file; see the function open. compile-file and load must cooperate in such a way that the resulting compiled file can be loaded without specifying an external file format anew; see the function load.
+The external-format specifies the external file format to be used when opening the file; 
+ see the function open. compile-file and load must cooperate in such a way that the resulting compiled 
+ file can be loaded without specifying an external file format anew; see the function load.
 
 compile-file binds *readtable* and *package* to the values they held before processing the file.
 
 *compile-file-truename* is bound by compile-file to hold the truename of the pathname of the file being compiled.
 
-*compile-file-pathname* is bound by compile-file to hold a pathname denoted by the first argument to compile-file, merged against the defaults; that is, (pathname (merge-pathnames input-file)).
+*compile-file-pathname* is bound by compile-file to hold a pathname denoted by the first argument to compile-file, 
+  merged against the defaults; that is, (pathname (merge-pathnames input-file)).
 
-The compiled functions contained in the compiled file become available for use when the compiled file is loaded into Lisp. Any function definition that is processed by the compiler, including #'(lambda ...) forms and local function definitions made by flet, labels and defun forms, result in an object of type compiled-function.
+The compiled functions contained in the compiled file become available for use when the compiled file is loaded into Lisp. 
+  Any function definition that is processed by the compiler, including #'(lambda ...) forms and local function definitions 
+  made by flet, labels and defun forms, result in an object of type compiled-function.
 
-The primary value returned by compile-file, output-truename, is the truename of the output file, or nil if the file could not be created.
+The primary value returned by compile-file, output-truename, is the truename of the output file, 
+ or nil if the file could not be created.
 
-The secondary value, warnings-p, is false if no conditions of type error or warning were detected by the compiler, and true otherwise.
+The secondary value, warnings-p, is false if no conditions of type error or warning were detected by 
+  the compiler, and true otherwise.
 
-The tertiary value, failure-p, is false if no conditions of type error or warning (other than style-warning) were detected by the compiler, and true otherwise.
+The tertiary value, failure-p, is false if no conditions of type error or warning (other than style-warning) were 
+ detected by the compiler, and true otherwise.
 
 For general information about how files are processed by the file compiler, see Section 3.2.3 (File Compilation).
 
-Programs to be compiled by the file compiler must only contain externalizable objects; for details on such objects, see Section 3.2.4 (Literal Objects in Compiled Files). For information on how to extend the set of externalizable objects, see the function make-load-form and Section 3.2.4.4 (Additional Constraints on Externalizable Objects).
+Programs to be compiled by the file compiler must only contain externalizable objects; for details on such objects, 
+  see Section 3.2.4 (Literal Objects in Compiled Files). For information on how to extend the set of externalizable 
+  objects, see the function make-load-form and Section 3.2.4.4 (Additional Constraints on Externalizable Objects).
 
 Examples: None.
 
-Affected By:
-
-*error-output*, *standard-output*, *compile-verbose*, *compile-print*
-
-The computer's file system.
+Affected By:  *error-output*, *standard-output*, *compile-verbose*, *compile-print*
 
 Exceptional Situations:
 
-For information about errors detected during the compilation process, see Section 3.2.5 (Exceptional Situations in the Compiler).
+For information about errors detected during the compilation process, see Section 3.2.5
+  (Exceptional Situations in the Compiler).
 
 An error of type file-error might be signaled if (wild-pathname-p input-file) returns true.
 
-If either the attempt to open the source file for input or the attempt to open the compiled file for output fails, an error of type file-error is signaled.
+If either the attempt to open the source file for input or the attempt to open the compiled file for output fails,
+  an error of type file-error is signaled.
 
 See Also:
 
-compile, declare, eval-when, pathname, logical-pathname, Section 20.1 (File System Concepts), Section 19.1.2 (Pathnames as Filenames)
+compile, declare, eval-when, pathname, logical-pathname, 
+  Section 20.1 (File System Concepts), Section 19.1.2 (Pathnames as Filenames)
 
 Notes: None.
 */
-cl_compile_file(File,T):-
-  local_override(with_forms,lisp_grovel),!,format('~N; Grovel.. (COMPILE-FILE ~w)~n',[File]),cl_grovel_file(File,T),!.
-cl_compile_file(File,t):-
-  forall(between(1,2,N),with_each_file(with_each_form(do_file_pass(compile_file,N)),File)).
+casttype(O,O):- \+compound(O),!,fail.
+casttype(str(O),S):-!, casttype1(O,M),cl_string(M,S).
+casttype(sym(O),S):-!, casttype1(O,M),reader_intern_symbols(M,S).
+casttype(P,S):- P=..[F,M],!, casttype1(M,MM),must(get_opv(MM,F,S)).
+
+casttype1(O,O):- \+compound(O),!.
+casttype1(O,O):- is_list(O),!.
+casttype1(I,O):- casttype(I,O).
+
+
+
+locally_let([N=V|More],G):- casttype(V,Value),!,locally_let([N=Value|More],G).
+locally_let([N=V|More],G):- casttype(N,Symbol),!,locally_let([Symbol=V|More],G).
+locally_let([N=V|More],G):- 
+   locally($(N)=V,locally_let(More,G)).
+locally_let([],G):- call(G).
+
+cl_compile_file(File,R):-
+  cl_compile_file(File,keys([]),R).
+cl_compile_file(File,keys(Keys),R):-
+  do_compile_1file(Keys,R,File),
+  cl_truename(File,R).
+
+do_compile_1file(_Keys,R,File):-
+   ignore(R=t),
+   prolog_to_os_filename(File,OSFile),
+   atom_concat(OSFile,'.trans.pl',PLFile),
+   locally_let(
+     [sym('*compile-file-pathname*')=str(File),
+      sym('*compile-file-truename*')=str(OSFile),
+      sym('*output-file-pathname*')=str(PLFile),
+      sym('*package*')=value(sym('*package*'))],   
+        setup_call_cleanup(
+         open(PLFile,write,Stream),          
+            with_each_form(lisp_compile_to_prolog(Stream),File),
+          close(Stream))).
+
+lisp_compile_to_prolog(Stream,Expression):-    
+  as_sexp(Expression,SExpression),  
+  flush_all_output_safe,
+  dbmsg(:- lisp_compile_to_prolog(SExpression)),
+  reader_intern_symbols(SExpression,FExpression),
+  (SExpression==FExpression -> true ; dbmsg(:- lisp_compile(FExpression))),  
+  lisp_compile_to_prolog_pass1(Stream,FExpression),!.
+
+write_trans(P):- fmt9(P).
+
+lisp_compile_to_prolog_pass1(Stream,Expression):- 
+   debug_var('_Ignored',Result),
+   lisp_compile(Result,Expression,PrologCode),
+   write_trans(:- PrologCode),
+   must(lisp_compile_to_prolog_pass3(PrologCode)),!,
+   with_output_to(Stream,nop(call(PrologCode))).
+   
+
+lisp_compile_to_prolog_pass2(:- PrologCode):- !, lisp_compile_to_prolog_pass3(PrologCode).
+lisp_compile_to_prolog_pass2(_).
+
+lisp_compile_to_prolog_pass3((A,B)):-!, lisp_compile_to_prolog_pass3(A),lisp_compile_to_prolog_pass3(B).
+lisp_compile_to_prolog_pass3(asserta(PrologCode)):- !, lisp_compile_to_prolog_pass3(PrologCode).
+lisp_compile_to_prolog_pass3(assertz(PrologCode)):- !, lisp_compile_to_prolog_pass3(PrologCode).
+lisp_compile_to_prolog_pass3(assert(PrologCode)):- !, lisp_compile_to_prolog_pass3(PrologCode).
+
+% lisp_compile_to_prolog_pass3(PrologCode):- \+ compound(PrologCode),!.
+
+lisp_compile_to_prolog_pass3(cl_in_package(Into, Package)):-!, cl_in_package(Into, Package).
+lisp_compile_to_prolog_pass3(cl_use_package(Package, Load_Ret)):-!, cl_use_package(Package, Load_Ret).
+lisp_compile_to_prolog_pass3(cl_load(File, Load_Ret)):- !, cl_load(File, Load_Ret).
+lisp_compile_to_prolog_pass3(cl_compile_file(File, Load_Ret)):- !, cl_compile_file(File, Load_Ret).
+lisp_compile_to_prolog_pass3(cl_transl_file(File, Load_Ret)):- !, cl_transl_file(File, Load_Ret).
+
+lisp_compile_to_prolog_pass3(MP):- strip_module(MP,_,P),functor(P,F,_),arg(_,
+  v(doc_string,macro_lambda,function_lambda,arglist_info),F),!,
+  asserta(MP),
+  write_trans(MP).
+lisp_compile_to_prolog_pass3(MP):- write_trans(MP).
+   
+   %*compile-file-truename*
+
 
 cl_grovel_file(File,t):- format('~N; Grovel.. ~w~n',[File]),
    locally(local_override(with_forms,lisp_grovel),
@@ -121,24 +210,21 @@ cl_grovel_file(File,t):- format('~N; Grovel.. ~w~n',[File]),
 cl_load(File,T):-
   local_override(with_forms,lisp_grovel),!,format('~N; Grovel.. (LOAD ~w)~n',[File]),cl_grovel_file(File,T),!.
 cl_load(File,t):-
-  forall(member(N,[1,3]),with_each_file(with_each_form(do_file_pass(load,N)),File)).
+  cl_grovel_file(File,t),
+  with_each_file(with_each_form(lisp_reader_compiled_eval,File)).
 
-% pass 1 - defmacro, arginfos
-do_file_pass(_,1,Form):- lisp_grovel(Form).
-% pass 2 - :compile-toplevel - defconstant, defparameters, defuns
-do_file_pass(_,2,Form):- lisp_compile(Form).
-% pass 3 - :load-toplevel
-do_file_pass(_,3,Form):- lisp_compiled_eval(Form).
-% pass 4 - :execute
-do_file_pass(_,3,Form):- lisp_eval(Form).
 
+lisp_reader_compiled_eval(Forms):- reader_intern_symbols(Forms,FForms),lisp_compiled_eval(FForms).
 
 lisp_grovel_in_package(Form):-
-  reader_fix_symbols(Form,FForm),
-  lisp_grovel_in_package(FForm).
+  reader_intern_symbols(Form,FForm),
+  lisp_grovel(FForm).
 
 lisp_grovel([load,File|_]):- !, cl_grovel_file(File, _Load_Ret).
 lisp_grovel(['compile-file',File|_]):- !, cl_grovel_file(File, _Load_Ret).
+lisp_grovel(['in-package',Package|_]):- !, cl_in_package(Package, _Load_Ret).
+lisp_grovel(['use-package',Package|_]):- !, cl_use_package(Package, _Load_Ret).
+
 lisp_grovel(Form):- must(lisp_compile(Form,PrologCode)),!,
   must(grovel_prolog_code(PrologCode)),!.
 
@@ -154,8 +240,8 @@ grovel_prolog_code((A,B)):-!, grovel_prolog_code(A),grovel_prolog_code(B).
 grovel_prolog_code(MP):- strip_module(MP,_,P),functor(P,F,_),arg(_,
   v(doc_string,macro_lambda,function_lambda,arglist_info),F),!,asserta(MP).
 grovel_prolog_code(_).
-   
 
+cl_truename(In,O):- absolute_file_name(In,M),cl_string(M,O).
 
 with_flist(How,List):- must_maplist(with1file(How),List).
 
@@ -185,59 +271,37 @@ with_each_file(How,File):- stream_property(_,file_name(FD)),with_fstem(FD,File,F
 with_each_file(How,FDir):- exists_directory(FDir),!,with_directory(How,FDir),!.
 with_each_file(How,File):- working_directory(CD,CD),with_fstem(CD,File,Found),!,with1file(How,Found).
 
-
-f_u_file_trans(File,t):-
-   with_each_file(lisp_trans_file,File).
-
-lisp_trans_file(File):-
-   atom_concat(File,'.trans.pl',PLFile),
-   setup_call_cleanup(
-   open(PLFile,write,Stream),
-         with_each_form(lisp_transl(Stream),File),
-         close(Stream)).
+% with_each_file(How,File):- with_lisp_translation(File,lisp_compiled_eval).
 
 
-lisp_transl(Stream,Expression):-
-  as_sexp(Expression,SExpression),
-  writeln(Stream,'/* '),
-  portray_clause(Stream, (:- lisp_transl_e(SExpression))),
-  writeln(Stream,'*/ '),
-  lisp_transl_extra(SExpression),
-  with_output_to(Stream,lisp_transl_e(SExpression)),!.
+:- fixup_exports.
 
-write_trans(P):- fmt9(P).
-
-lisp_transl_extra([load,File|_]):- !, cl_transl_file(File, _Load_Ret).
-lisp_transl_extra(['compile-file',File|_]):- !, cl_transl_file(File, _Load_Ret).
-lisp_transl_extra(_).
+/*
 
 
-lisp_transl_e(Expression):- 
-   debug_var('_Ignored',Result),
-   reader_fix_symbols(Expression,FExpression),
-   lisp_compile(Result,FExpression,PrologCode),
-   must(transl_prolog_code(PrologCode)),!.
+*/
 
 
-transl_prolog_code(:- PrologCode):- !, transl_prolog_code_e(PrologCode).
-transl_prolog_code(PrologCode):- transl_prolog_code_e(PrologCode).
-  
 
 
-transl_prolog_code_e(PrologCode):- \+ compound(PrologCode),!.
-transl_prolog_code_e(cl_load(File, Load_Ret)):- !, cl_transl_file(File, Load_Ret).
-transl_prolog_code_e(cl_compile_file(File, Load_Ret)):- !, cl_transl_file(File, Load_Ret).
-transl_prolog_code_e(cl_transl_file(File, Load_Ret)):- !, cl_transl_file(File, Load_Ret).
-transl_prolog_code_e(asserta(PrologCode)):- !, transl_prolog_code_e(PrologCode).
-transl_prolog_code_e(assertz(PrologCode)):- !, transl_prolog_code_e(PrologCode).
-transl_prolog_code_e(assert(PrologCode)):- !, transl_prolog_code_e(PrologCode).
-transl_prolog_code_e((A,B)):-!, transl_prolog_code_e(A),transl_prolog_code_e(B).
-transl_prolog_code_e(MP):- strip_module(MP,_,P),functor(P,F,_),arg(_,
-  v(doc_string,macro_lambda,function_lambda,arglist_info),F),!,
-  asserta(MP),
-  write_trans(MP).
-transl_prolog_code_e(MP):- write_trans(MP).
-   
+
+
+
+
+
+
+
+
+
+               /*
+
+
+
+
+
+
+
+
 
 make_pass(1,
  [ 'xabcl/abcl-contrib.lisp',
@@ -426,8 +490,4 @@ make_pass(2,['xabcl/clos.lisp',
    'xabcl/autoloads-gen.lisp']).
 
 
-% with_each_file(How,File):- with_lisp_translation(File,lisp_compiled_eval).
-
-
-:- fixup_exports.
-
+*/

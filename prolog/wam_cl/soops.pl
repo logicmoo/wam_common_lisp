@@ -18,7 +18,7 @@
 
 
 new_cl_fixnum(X,R):-
-  create_struct(cl_fixnum,[X],R),!.
+  create_struct(clz_fixnum,[X],R),!.
 
 create_struct(Type,R):-create_struct(Type,[],R),!.
 create_struct(TypeARGS,R):- compound_name_arguments(TypeARGS,Type,ARGS), create_struct(Type,ARGS,R),!.
@@ -60,12 +60,12 @@ name_value_default(N-V,N-V).
 
 value_default(prolog_concurrent_hash_map(K,V),mut([],map(K,V))).
 value_default(prolog_hash_map(K,V),mut([],map(K,V))).
-value_default(cl_list,[]).
+value_default(claz_list,[]).
 value_default(integer,0).
-value_default(cl_object,mut([],cl_object)).
+value_default(claz_object,mut([],claz_object)).
 
-%value_default(cl_simple_string, @(null)).
-%value_default(cl_string, @(null)).
+%value_default(claz_simple_string, @(null)).
+%value_default(claz_string, @(null)).
 %value_default(prolog_array_list(_),[]).
 %value_default(array_of(_),[]).
 
@@ -99,9 +99,59 @@ cl_defstruct(NameKeyWords,_String,Slots,Defstruct_Ret):-
   % add doc for string
   cl_defstruct(NameKeyWords,Slots,Defstruct_Ret).
 
-cl_defstruct(NameKeyWords,_String,Slots,Defstruct_Ret):- wdmsg(cl_defstruct(NameKeyWords,Slots,Defstruct_Ret)).
+cl_defstruct(NameKeyWords,_String,Slots,Defstruct_Ret):- wdmsg(error_todo(cl_defstruct(NameKeyWords,Slots,Defstruct_Ret))).
 
-:- ensure_loaded(clstructs).
+
+:- dynamic((struct_opv/3)).
+
+:- include('ci.pro').
+
+cleanup_mop:- 
+  forall(struct_opv(X, subtypep, X),retract(struct_opv(X, subtypep, X))),
+  forall((struct_opv(X, has_slot, slot(NT,Name)),NT\==claz_t,
+     clause(struct_opv(X, has_slot, slot(Other,Name)),true,R),Other==claz_t),
+  erase(R)).
+
+save_mop:- cleanup_mop,tell('ci.pro'),P= struct_opv(_,_,_),
+   forall(P,format('~q.~n',[P])), told.
+
+:- style_check(-discontiguous).
+
+classof_to_typeof(claz_symbol,symbol).
+classof_to_typeof(claz_package,package).
+classof_to_typeof(claz_number,numer).
+
+:- multifile symp:o_p_v/3.
+:- dynamic symp:o_p_v/3.
+
+symp:o_p_v(Symbol,kw_deftype,defconstant):- symp:o_p_v(Symbol,package,pkg_kw).
+symp:o_p_v(Symbol,typeof,keyword):- symp:o_p_v(Symbol,package,pkg_kw).
+:- include('si.pro').
+symp:o_p_v(Symbol,typeof,Type):- symp:o_p_v(Symbol,classof,Class),
+  \+ clause(symp:o_p_v(Symbol,typeof,_AnyType),true),
+  classof_to_typeof(Class,Type).
+%:- include('si2.pro').
+
+
+f_u_get_opv(O,Result):- findall([P|V],get_opv(O,P,V),Result).
+f_u_get_opv(O,P,V):- get_opv(O,P,V).
+	
+add_opv_maybe(O,P,_):- symp:o_p_v(O,P,_),!.
+add_opv_maybe(O,P,V):- add_opv(O,P,V),!.
+
+add_opv_pred(MPred,O,P,V):- strip_module(MPred,M,Pred),Prop=.. [Pred,O,P,V], 
+   ( \+ M:Prop -> assert(M:Prop) ; true).
+
+add_opv(Symbol,value,SValue):- atom(SValue),
+ (atom_contains(SValue,'(');atom_contains(SValue,' ')),
+  (as_sexp(SValue,Value)->SValue\==Value),!,add_opv(Symbol,value,Value).
+
+add_opv(O,P,V):- ( \+ symp:o_p_v(O,P,_) -> assert(symp:o_p_v(O,P,V)) ; true).
+
+get_opv(O,_,_):- string(O),!,fail.
+get_opv(O,P,V):- no_repeats(O-P,symp:o_p_v(O,P,V)).
+
+update_opv(O,P,V):- ignore(retract(symp:o_p_v(O,P,_))),assert(symp:o_p_v(O,P,V)).
 
 
 /*

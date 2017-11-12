@@ -302,7 +302,7 @@ sym_arg_val_envd(Var,_InValue,Value,Environment):-
   (once((	(member(Bindings, Environment),
 			member(bv(Var, Value0), Bindings),
 			extract_variable_value(Value0, Value, _))
-		    ;	symp:symbol_info(Var, _Package, _, Value)
+		    ;	symbol_value(Var, Value)
 		    ;	(lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Var))))).
 
 fibd(A, K) :- !,

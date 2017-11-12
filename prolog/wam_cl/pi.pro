@@ -775,7 +775,7 @@ package_external_symbols(pkg_cl,"NAMESTRING",namestring).
 package_external_symbols(pkg_cl,"NBUTLAST",nbutlast).
 package_external_symbols(pkg_cl,"NCONC",nconc).
 package_external_symbols(pkg_cl,"NEXT-METHOD-P",next_method_p).
-package_external_symbols(pkg_cl,"NIL",nil).
+package_external_symbols(pkg_cl,"NIL",[]).
 package_external_symbols(pkg_cl,"NINTERSECTION",nintersection).
 package_external_symbols(pkg_cl,"NINTH",ninth).
 package_external_symbols(pkg_cl,"NO-APPLICABLE-METHOD",no_applicable_method).
