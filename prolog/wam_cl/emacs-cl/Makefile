@@ -1,20 +1,32 @@
-VERSION = 0.5
-CONTENT_DIR = emacs-cl-$(VERSION)
-CONTENT_TAR = $(CONTENT_DIR).tar
+# Copyright (C) 2003, 2004 Lars Brinkhoff.
 
-package: $(CONTENT_TAR)
+#EMACS = emacs19
+EMACS = emacs20
+#EMACS = emacs21
+#EMACS = xemacs20
+#EMACS = xemacs21
 
-$(CONTENT_TAR): $(CONTENT_DIR)
-	tar cf $@ $<
+EMACSEN = emacs20 emacs21 xemacs21 # ../emacs-19.34/src/emacs
 
-$(CONTENT_DIR): emacs-cl-pkg.el Makefile
-	rm -rf $(CONTENT_DIR)
-	mkdir $(CONTENT_DIR)
-	sed "s/VERSION/$(VERSION)/" < $< > $(CONTENT_DIR)/$<
-	cp README $(CONTENT_DIR)
-	cp COPYING $(CONTENT_DIR)
-	cp src/* $(CONTENT_DIR)
+all:
+	$(EMACS) -batch -l load-cl.el -f compile-cl
+
+#install:
+
+TESTFILES = -l load-cl.el -l batch.el -l tests.el
+
+check:
+	mv check.log previous.log 2> /dev/null
+	for e in $(EMACSEN); do						\
+		echo CHECKING $$e;					\
+		make clean > /dev/null;					\
+		echo Interpreting...;					\
+		$$e -batch $(TESTFILES) -f test-cl 2> /dev/null;	\
+		echo Compiling...;					\
+		make EMACS=$$e > /dev/null 2>&1;			\
+		$$e -batch $(TESTFILES) -f test-cl 2> /dev/null;	\
+	done | tee check.log
+	make clean
 
 clean:
-	$(MAKE) -C src clean
-	rm -rf $(CONTENT_DIR) $(CONTENT_TAR)
+	rm -f *.elc
