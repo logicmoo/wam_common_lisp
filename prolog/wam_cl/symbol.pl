@@ -17,14 +17,14 @@
 :- include('header.pro').
 
 
-cl_symbol_name(Symbol,Name):- get_o_p_v(Symbol,name,Name),!.
-cl_symbol_package(Symbol,Package):- get_o_p_v(Symbol,package,Package),!.
-cl_symbol_value(Symbol,Value):- do_or_die(get_o_p_v(Symbol,value,Value)),!.
-cl_symbol_function(Symbol,Function):- do_or_die(get_o_p_v(Symbol,function,Function)),!.
+cl_symbol_name(Symbol,Name):- get_opv(Symbol,name,Name),!.
+cl_symbol_package(Symbol,Package):- get_opv(Symbol,package,Package),!.
+cl_symbol_value(Symbol,Value):- do_or_die(get_opv(Symbol,value,Value)),!.
+cl_symbol_function(Symbol,Function):- do_or_die(get_opv(Symbol,function,Function)),!.
 do_or_die(G):- G->true;throw(do_or_die(G)).
 
-is_constantp(Symbol):- get_o_p_v(Symbol,kw_deftype,defconstant).
-is_constantp(Symbol):- get_o_p_v(Symbol,package,pkg_kw).
+is_constantp(Symbol):- get_opv(Symbol,kw_deftype,defconstant).
+is_constantp(Symbol):- get_opv(Symbol,package,pkg_kw).
 is_constantp(Object):- is_self_evaluationing_const(Object).
 
 
@@ -32,30 +32,36 @@ is_constantp(Object):- is_self_evaluationing_const(Object).
 cl_symbolp(S,R):-  t_or_nil(is_symbolp(S),R).
 cl_keywordp(S,R):-  t_or_nil(is_keywordp(S),R).
 cl_constantp(S,R):- t_or_nil(is_constantp(S),R).
-cl_boundp(Sym,R):- t_or_nil(get_o_p_v(Sym,value,_),R).
-cl_fboundp(Sym,R):- t_or_nil(get_o_p_v(Sym,function,_),R).
+cl_boundp(Sym,R):- t_or_nil(get_opv(Sym,value,_),R).
+cl_fboundp(Sym,R):- t_or_nil(get_opv(Sym,function,_),R).
 
 cl_gensym(Symbol):- cl_gensym("G",Symbol).
 cl_gensym(String,Symbol):- gensym(String,SymbolName),cl_make_symbol(SymbolName,Symbol).
 
 
-is_symbolp(Symbol):- get_o_p_v(Symbol,typeof,symbol).
-is_keywordp(Symbol):- get_o_p_v(Symbol,package,pkg_kw).
+is_symbolp(Symbol):- get_opv(Symbol,typeof,symbol).
+
+is_keywordp(Symbol):- get_opv(Symbol,package,pkg_kw),!.
+is_keywordp(Symbol):- sanity((atom(Symbol),must(\+ atom_concat(':',_,Symbol)))),!,fail.
+
 
 
 cl_find_symbol(String,Result):- reading_package(Package), cl_find_symbol(String,Package,Result).
-cl_find_symbol(String,Package,Result):-  package_find_symbol(String,Package,Symbol,IntExt),push_values([Symbol,IntExt],Result),!.
+cl_find_symbol(String,Pack,Result):-  find_package_or_die(Pack,Package),package_find_symbol(String,Package,Symbol,IntExt),push_values([Symbol,IntExt],Result),!.
 cl_find_symbol(_Var,_P,Result):- push_values([[],[]],Result).
 
+% @TODO Add symbol shadowing 
 cl_import(Symbol,Result):- reading_package(Package),cl_import(Symbol,Package,Result).
-cl_import(Symbol,Package,Result):- 
+cl_import(Symbol,Pack,Result):- 
+   find_package_or_die(Pack,Package),
    cl_symbol_name(Symbol,String),
    package_find_symbol(String,Package,_OldSymbol,IntExt),
    add_package_internal_symbol(Package,String,Symbol),
    push_values([Symbol,IntExt],Result),!.
 
 cl_export(Symbol,Result):- reading_package(Package),cl_export(Symbol,Package,Result).
-cl_export(Symbol,Package,Result):- 
+cl_export(Symbol,Pack,Result):-
+   find_package_or_die(Pack,Package),
    cl_symbol_name(Symbol,String),
    package_find_symbol(String,Package,_OldSymbol,IntExt),
    add_package_external_symbol(Package,String,Symbol),
@@ -64,7 +70,8 @@ cl_export(Symbol,Package,Result):-
 
 cl_intern(Symbol,Result):- reading_package(Package),cl_intern(Symbol,Package,Result).
 % cl_intern(Symbol,Package,Result):- \+ is_keywordp(Symbol),is_symbolp(Symbol),!,cl_intern_symbol(Symbol,Package,Result).
-cl_intern(Name,Package,Result):-
+cl_intern(Name,Pack,Result):-
+  find_package_or_die(Pack,Package),
   text_to_string(Name,String),
   intern_symbol(String,Package,Symbol,IntExt),
   push_values([Symbol,IntExt],Result),!.
@@ -84,9 +91,9 @@ cl_make_symbol(SymbolName,Symbol):-
 
 create_symbol(String,Package,Symbol):-
    text_to_string(String,Name),
-   add_o_p_v(Symbol,typeof,symbol),
-   add_o_p_v(Symbol,name,Name),
-   add_o_p_v(Symbol,package,Package),!.
+   add_opv(Symbol,typeof,symbol),
+   add_opv(Symbol,name,Name),
+   add_opv(Symbol,package,Package),!.
 
 create_keyword(Name,Symbol):- atom_concat(':',Make,Name),!,create_keyword(Make,Symbol).
 create_keyword(Name,Symbol):- string_upper(Name,String),string_lower(Name,Lower),
@@ -94,4 +101,46 @@ create_keyword(Name,Symbol):- string_upper(Name,String),string_lower(Name,Lower)
    create_symbol(String,pkg_kw,Symbol),
    add_package_external_symbol(pkg_kw,String,Symbol),!.
 
+
+
+
+
+
+
+
+
+
+print_symbol(Symbol):- 
+   writing_package(Package),
+   print_symbol_at(Symbol,Package),!.
+print_symbol(S):-write(S).
+ 
+print_symbol_at(Symbol,PrintP):- 
+  cl_symbol_package(Symbol,SPackage),!,
+  print_symbol_from(Symbol,PrintP,SPackage),!.
+
+print_symbol_from(Symbol,_PrintP,kw_pkg):- !, cl_symbol_name(Symbol,Name),write(':'),write(Name).
+print_symbol_from(Symbol,PrintP,SPackage):-
+  cl_symbol_name(Symbol,Name),
+  must(package_find_symbol(Name,SPackage,FoundSymbol,IntExt)),
+  must( Symbol\== FoundSymbol -> 
+    print_prefixed_symbol(Name,PrintP,SPackage,kw_internal);
+    print_prefixed_symbol(Name,PrintP,SPackage,IntExt)).
+
+print_package_or_hash([]):- write("#").
+print_package_or_hash(P):- package_name(P,S),write(S).
+print_package_or_hash(P):- write(P).
+
+print_prefixed_symbol(S,_WP,pkg_kw,_):- write(':'),write(S).
+print_prefixed_symbol(S,PrintP,SP,_):- SP==PrintP, !,write(S).
+print_prefixed_symbol(S,_P,SP,kw_internal):-!, print_package_or_hash(SP),write('::'),write(S).
+print_prefixed_symbol(S,PrintP,SP,kw_external):- package_use_list(PrintP,SP),!,write(S).
+print_prefixed_symbol(S,_P,SP,kw_external):- !, print_package_or_hash(SP),write(':'),write(S).
+print_prefixed_symbol(S,_,SP,_):- print_package_or_hash(SP),write('::'),write(S).
+
+
+
+
 :- fixup_exports.
+
+

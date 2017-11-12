@@ -31,6 +31,15 @@ prims:cl_exact.
 :- ensure_loaded((utils_writef)).
 :- ensure_loaded(library(lists)).
 
+:- use_module(library('dialect/sicstus/arrays')).
+% :- use_module(library('dialect/sicstus')).
+is_self_evaluationing_object(X):- var(X),!.
+is_self_evaluationing_object(X):- atomic(X),!,is_self_evaluationing_const(X).
+is_self_evaluationing_object(X):- (is_dict(X);is_array(X);is_rbtree(X)),!.
+
+is_self_evaluationing_const(X):- atomic(X),!,(number(X);is_keywordp(X);string(X);(blob(X,T),T\==text);X=t;X=[]),!.
+
+
 user:op_replacement(first,cl_car).
 cl_car(List, Result):- List==[]->Result=[];
 	once( (	List = [Result|_]

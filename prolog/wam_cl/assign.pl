@@ -126,7 +126,7 @@ set_symbol_value(Env,Var,Result):- !,
       -> nb_setarg(1,Value0,Result)
       ;	( 
         (symb:o_p_v(Var, value, _Old) 
-           -> asserta(symb:o_p_v(Var, value, Result)) 
+           -> update_opv(Var, value, Result) 
            ; set_symbol_value_last_chance(Env,Var,Result)))).
 
 set_symbol_value_last_chance(_Env,Var,Result):- nb_setval(Var,Result),!.
@@ -156,17 +156,17 @@ place_op(Env,setf, Var, [Result],  Result):- atom(Var),!,
 %TODO Make it a constantp
 symbol_setter(Env,defconstant, Var, Result):- 
    set_symbol_value(Env,Var,Result),
-   add_o_p_v(Var,kw_deftype,defconstant).
+   add_opv(Var,kw_deftype,defconstant).
 symbol_setter(Env,defconst, Var, Result):- 
   symbol_setter(Env,defconstant, Var, Result).
 
 symbol_setter(Env,defparameter, Var, Result):- 
-   add_o_p_v(Var,kw_deftype,defparameter),
+   add_opv(Var,kw_deftype,defparameter),
    set_symbol_value(Env,Var,Result).
 
 symbol_setter(_Env,defvar, Var, Result):-   
    (symb:o_p_v(Var, value, _) -> true ; asserta(symb:o_p_v(Var, value, Result))),
-   add_o_p_v(Var,kw_deftype,defvar).
+   add_opv(Var,kw_deftype,defvar).
 
 symbol_setter(Env,setq, Var, Result):- !, set_symbol_value(Env,Var,Result).
 

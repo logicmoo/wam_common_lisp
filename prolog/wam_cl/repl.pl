@@ -273,16 +273,6 @@ reader_fix_symbols(ExprS1,Expr):-
   reading_package(Package),!,
   reader_fix_symbols(Package,ExprS1,Expr),!.
 
-is_keyword_p(X):- atom(X),atom_concat(':',_,X).
-
-:- use_module(library('dialect/sicstus/arrays')).
-% :- use_module(library('dialect/sicstus')).
-is_self_evaluationing_object(X):- var(X),!.
-is_self_evaluationing_object(X):- atomic(X),!,is_self_evaluationing_const(X).
-is_self_evaluationing_object(X):- (is_dict(X);is_array(X);is_rbtree(X)),!.
-
-is_self_evaluationing_const(X):- atomic(X),!,(number(X);is_keyword_p(X);string(X);(blob(X,T),T\==text);X=t;X=[]),!.
-
 
 eval_repl(nil,  []):-!.
 eval_repl(Atom, R):- atom(Atom),atom_concat(_,'.',Atom),notrace(catch(read_term_from_atom(Atom,Term,[variable_names(Vs),syntax_errors(true)]),_,fail)),
