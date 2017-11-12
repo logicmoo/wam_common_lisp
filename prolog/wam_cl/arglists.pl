@@ -367,7 +367,7 @@ expand_function_head(Ctx,Env,[FunctionName | FormalParms],Head,ZippedArgBindings
    debug_var('ArgsIn',Arguments),
    debug_var('BinderCode',BindCode),
    HeadDefCode = (asserta(user:arglist_info(FunctionName,FormalParms,ActualArgs,ArgInfo))),
-   HeadCodeOut = (bind_parameters(Env,FormalParms,Arguments,BindCode),call(BindCode)),
+   HeadCodeOut = (must_bind_parameters(Env,FormalParms,Arguments,BindCode),call(BindCode)),
    Head =.. [FunctionName | HeadArgs])).
 
 % Creates a function Head and an argument unpacker using Code to unpack
@@ -451,11 +451,15 @@ must_or(Goal,Else):- Goal->true;Else.
 un_c38(Mode,ReMode):- atom(Mode),atom_concat('c38_',Sym,Mode),!,atom_concat('&',Sym,ReMode).
 un_c38(Mode,Mode).
 
-bind_parameters(Env, [A, B|R], Arguments,BindCode):- simple_atom_var(A),simple_atom_var(B),simple_atom_var(R),!,
-  bind_parameters(Env, [A, B, '&rest',R], Arguments,BindCode).
-bind_parameters(Env, [B|R], Arguments,BindCode):- simple_atom_var(B),simple_atom_var(R),!,
-  bind_parameters(Env, [B, '&rest',R], Arguments,BindCode).
-bind_parameters(Env, FormalParms, Arguments,BindCode):-
+must_bind_parameters(Env,FormalParms0,Params,Code):- 
+  maplist(un_c38,FormalParms0,FormalParms),
+  must_or_rtrace(bind_each_param(Env,FormalParms,Params,Code)).
+
+bind_each_param(Env, [A, B|R], Arguments,BindCode):- simple_atom_var(A),simple_atom_var(B),simple_atom_var(R),!,
+  bind_each_param(Env, [A, B, '&rest',R], Arguments,BindCode).
+bind_each_param(Env, [B|R], Arguments,BindCode):- simple_atom_var(B),simple_atom_var(R),!,
+  bind_each_param(Env, [B, '&rest',R], Arguments,BindCode).
+bind_each_param(Env, FormalParms, Arguments,BindCode):-
   % append_open_list(Env,bind),
   bind_parameters(Env, 'required', FormalParms, Arguments, BindCode),!.
 

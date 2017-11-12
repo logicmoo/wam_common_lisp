@@ -136,7 +136,9 @@ compile_forms(Ctx,Env,Result,FunctionBody,Code):-
 
 
 must_compile_body(Ctx,Env,Result,Function, Body):-
-  must_or_rtrace(compile_body(Ctx,Env,Result,Function, Body)).
+  quietly_must_or_rtrace(compile_body(Ctx,Env,Result,Function, Body)),
+  nb_current('$compiler_PreviousResult',THE),
+  setarg(1,THE,Result).
 
 if_must_compile_body(Ctx,Env,Result,Function, Body):-
   local_override(with_forms,lisp_grovel)-> Body= nop(lisp_groveling(Function,Result));
@@ -416,7 +418,7 @@ compile_body(Ctx,Env,Result,[lambda,LambdaArgs|LambdaBody], Body):-
 compile_body(Ctx,Env,Result,[progv,VarsForm,ValuesForm|FormS],Code):- !,
    must_compile_body(Ctx,Env,VarsRs,VarsForm,Body1),
    must_compile_body(Ctx,Env,ValuesRs,ValuesForm,Body2),
-   must_compile_progn(Ctx,Env,Result,FormS,[],BodyS),
+   must_compile_progn(Ctx,Env,Result,FormS,BodyS),
    Code = (Body1, Body2 , maplist(bind_dynamic_value(Env),VarsRs,ValuesRs), BodyS).
 
 normalize_let([],[]).
