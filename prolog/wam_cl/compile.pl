@@ -275,7 +275,13 @@ make_compiled(Ctx,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode):-
     if_must_compile_body(Ctx,CallEnv,Result,[progn|FunctionBody],Body0),
     body_cleanup(((CallEnv=HeadEnv,HeadCode,Body0)),BodyCode).
 
-same_symbol(OP1,OP2):- atom(OP1),atom(OP2), prologcase_name(OP1,N1),prologcase_name(OP2,N2),!, N1==N2.
+same_symbol(OP1,OP2):- 
+   OP1==OP2 -> true;
+  (atom(OP1),atom(OP2), 
+   prologcase_name(OP1,N1),
+   (OP2==N1 -> true ;
+   (prologcase_name(OP2,N2), 
+     (OP1==N2 -> true ; N1==N2)))).
 
 % #+
 compile_body(Ctx,Env,Result,[OP,Flag,Form], Code):- same_symbol(OP,'#+'),!, symbol_value(Env,'*features*',List),
