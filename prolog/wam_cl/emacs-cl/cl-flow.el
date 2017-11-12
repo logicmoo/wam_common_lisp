@@ -1,0 +1,748 @@
+;;;; -*- emacs-lisp -*-
+;;;
+;;; Copyright (C) 2003 Lars Brinkhoff.
+;;; This file implements operators in chapter 5, Data and Control Flow.
+
+(IN-PACKAGE "EMACS-CL")
+
+(define-storage-layout interp-fn (lambda-exp env name))
+
+(defvar *setf-definitions* (make-hash-table))
+
+(unless (fboundp 'functionp)
+  (defun functionp (object)
+    (or (subrp object)
+	(byte-code-function-p object)
+	(and (consp object)
+	     (eq (car object) 'lambda)))))
+
+(defun APPLY (fn &rest args)
+  (cond
+    ((COMPILED-FUNCTION-P fn)
+     (apply #'apply fn args))
+    ((INTERPRETED-FUNCTION-P fn)
+     (eval-lambda-form (append (list (interp-fn-lambda-exp fn))
+			       (butlast args)
+			       (car (last args)))
+		       (interp-fn-env fn)))
+    ((functionp fn)
+     (apply #'apply fn args))
+    ((or (symbolp fn) (consp fn))
+     (apply #'APPLY (FDEFINITION fn) args))
+    (t
+     (type-error fn '(OR FUNCTION SYMBOL CONS)))))
+
+(cl:defmacro DEFUN (name lambda-list &body forms)
+  (MULTIPLE-VALUE-BIND (body decls doc) (parse-body forms t)
+    `(EVAL-WHEN (,(kw COMPILE-TOPLEVEL) ,(kw LOAD-TOPLEVEL) ,(kw EXECUTE))
+      (set-fun (QUOTE ,name) (LAMBDA ,lambda-list
+			       ,@(when doc `(,doc))
+			       ,@(when decls `((DECLARE ,@decls)))
+			       (BLOCK ,name ,@body))))))
+
+(defun set-fun (name fn)
+  (setf (FDEFINITION name) fn)
+  (setf (function-name fn) name)
+  name)
+
+(defun setf-name-p (name)
+  (and (consp name)
+       (eq (car name) 'SETF)
+       (symbolp (cadr name))
+       (null (cddr name))))
+
+(defun not-function-name-error (name)
+  (type-error name '(OR SYMBOL (CONS (EQL SETF) (CONS SYMBOL NULL)))))
+
+(defun FDEFINITION (name)
+  (cond
+    ((symbolp name)
+     (unless (fboundp name)
+       (ERROR 'UNDEFINED-FUNCTION (kw NAME) name))
+     (if (or (SPECIAL-OPERATOR-P name) (MACRO-FUNCTION name))
+	 nil
+	 (SYMBOL-FUNCTION name)))
+    ((setf-name-p name)
+     (let ((fn (gethash (second name) *setf-definitions*)))
+       (if (null fn)
+	   (ERROR 'UNDEFINED-FUNCTION (kw NAME) name)
+	   fn)))
+    (t
+     (not-function-name-error name))))
+
+(defsetf FDEFINITION (name) (fn)
+  `(cond
+    ((symbolp ,name)
+     (setf (SYMBOL-FUNCTION ,name) ,fn))
+    ((setf-name-p ,name)
+     (puthash (second ,name) ,fn *setf-definitions*))
+    (t
+     (not-function-name-error ,name))))
+
+(defun FBOUNDP (name)
+  (cond
+    ((symbolp name)
+     (fboundp name))
+    ((setf-name-p name)
+     (not (null (gethash (second name) *setf-definitions*))))
+    (t
+     (not-function-name-error name))))
+    
+(defun FMAKUNBOUND (name)
+  (cond
+    ((symbolp name)
+     (fmakunbound name)
+     (remhash name *macro-functions*))
+    ((setf-name-p name)
+     (remhash (second name) *setf-definitions*))
+    (t
+     (not-function-name-error name)))
+  name)
+    
+;;; Special operators: FLET, LABELS, MACROLET
+
+(defun FUNCALL (fn &rest args)
+  (cond
+    ((COMPILED-FUNCTION-P fn)
+     (apply fn args))
+    ((INTERPRETED-FUNCTION-P fn)
+     (eval-lambda-form (cons (interp-fn-lambda-exp fn) args)
+		       (interp-fn-env fn)))
+    ((functionp fn)
+     (apply fn args))
+    (t
+     (APPLY (FDEFINITION fn) args))))
+
+;;; Special operator: FUNCTION
+
+(defun FUNCTION-LAMBDA-EXPRESSION (fn)
+  (cond
+    ((INTERPRETED-FUNCTION-P fn)	(cl:values (interp-fn-lambda-exp fn)
+						   T nil))
+    ((subrp fn)				(cl:values nil nil nil))
+    ((byte-code-function-p fn)		(cl:values nil nil nil))
+    ((FUNCTIONP fn)			(cl:values nil T nil))
+    (t					(error "type error"))))
+
+(defun FUNCTIONP (object)
+  (or (byte-code-function-p object)
+      (subrp object)
+      (INTERPRETED-FUNCTION-P object)))
+
+(defun COMPILED-FUNCTION-P (object)
+  (or (byte-code-function-p object)
+      (subrp object)))
+
+(defvar *constants* '(nil T PI))
+
+(defmacro* DEFCONSTANT (name initial-value &optional documentation)
+  `(eval-when (:compile-toplevel :load-toplevel :execute)
+     (defconst ,name ,initial-value
+       ,@(when documentation `(,documentation)))
+     (pushnew ',name *constants*)
+     ',name))
+
+(cl:defmacro DEFCONSTANT (name initial-value &optional documentation)
+  `(EVAL-WHEN (,(kw COMPILE-TOPLEVEL) ,(kw LOAD-TOPLEVEL) ,(kw EXECUTE))
+     (DEFVAR ,name ,initial-value)
+     (PUSHNEW (QUOTE ,name) *constants*)
+     (QUOTE ,name)))
+
+(DEFCONSTANT CALL-ARGUMENT-LIMIT 50)
+
+(DEFCONSTANT LAMBDA-LIST-KEYWORDS
+  '(&ALLOW-OTHER-KEYS &AUX &BODY &ENVIRONMENT &KEY &OPTIONAL &REST &WHOLE))
+
+(DEFCONSTANT LAMBDA-PARAMETERS-LIMIT 50)
+
+(defvar *specials* nil)
+
+(cl:defmacro DEFVAR (name &optional (initial-value nil valuep) documentation)
+  `(EVAL-WHEN (,(kw COMPILE-TOPLEVEL) ,(kw LOAD-TOPLEVEL) ,(kw EXECUTE))
+     (DECLAIM (SPECIAL ,name))
+     ,@(when valuep
+	 `((UNLESS (BOUNDP (QUOTE ,name))
+	     (SETQ ,name ,initial-value))))
+       (QUOTE ,name)))
+
+(cl:defmacro DEFPARAMETER (name initial-value &optional documentation)
+  `(EVAL-WHEN (,(kw COMPILE-TOPLEVEL) ,(kw LOAD-TOPLEVEL) ,(kw EXECUTE))
+     (SETQ ,name ,initial-value)
+     (QUOTE ,name)))
+
+(defun lambda-list-keyword-p (x)
+  (member x LAMBDA-LIST-KEYWORDS))
+
+(defun flatten (list)
+  (mappend (lambda (x) (if (consp x) (flatten x) (list x))) list))
+
+(defun destructure (lambda-list whole)
+  (if (null lambda-list)
+      nil
+      (let ((result nil)
+	    (current nil)
+	    (struct whole))
+	(setq current (pop lambda-list))
+	(when (eq current '&WHOLE)
+	  (push `(SETQ ,(pop lambda-list) ,whole) result)
+	  (setq current (pop lambda-list)))
+	(push `(WHEN (ATOM ,struct) (ERROR)) result)
+	(while (and current (not (lambda-list-keyword-p current)))
+	  (cond
+	    ((symbolp current)
+	     (push `(SETQ ,current (CAR ,struct)) result))
+	    ((consp current)
+	     (let ((subtree (gensym)))
+	       (push `(SETQ ,subtree (CAR ,struct)) result)
+	       (setq result (append (reverse (destructure current subtree))
+				    result)))))
+	  (push `(SETQ ,struct (CDR ,struct)) result)
+	  (setq current (pop lambda-list)))
+	(nreverse result))))
+
+(cl:defmacro DESTRUCTURING-BIND (lambda-list form &body body)
+  (with-gensyms (whole)
+    `(LET ,(remove-if #'lambda-list-keyword-p (flatten lambda-list))
+       (LET ((,whole ,form))
+	 ,@(destructure lambda-list whole))
+       ,@body)))
+
+;;; Special Operators: LET, LET*
+
+;;; Special Operator: PROGV
+
+;;; Special Operator: SETQ
+
+(cl:defmacro PSETQ (&rest forms)
+  (if (oddp (length forms))
+      (error "syntax error")
+      (do ((forms forms (cddr forms))
+	   (vars nil)
+	   (vals nil))
+	  ((null forms)
+	   (let ((temps (map-to-gensyms vars)))
+	     `(LET ,(MAPCAR #'LIST temps vals)
+	        (SETQ ,@(MAPCAN #'LIST vars temps)))))
+	(push (first forms) vars)
+	(push (second forms) vals))))
+
+;;; Special Operator: BLOCK
+
+;;; Special Operator: CATCH
+
+;;; Special Operator: GO
+
+;;; Special Operator: RETURN-FROM
+
+(cl:defmacro RETURN (&optional form)
+  `(RETURN-FROM nil ,form))
+
+;;; Special Operator: TAGBODY
+
+;;; Special Operator: THROW
+
+;;; Special Operator: UNWIND-PROTECT
+
+;;; Constant Variable: NIL
+
+(fset 'NOT (symbol-function 'not))
+
+(DEFCONSTANT T 'T)
+
+(fset 'EQ (symbol-function 'eq))
+
+(defun EQL (x y)
+  (or (eq x y)
+      (cond
+	((and (CHARACTERP x) (CHARACTERP y))
+	 (eq (CHAR-CODE x) (CHAR-CODE y)))
+	((and (floatp x) (floatp y))
+	 (equal x y))
+	((and (bignump x) (bignump y))
+	 (and (eq (length x) (length y))
+	      (every #'eq x y)))
+	((and (ratiop x) (ratiop y))
+	 (and (EQL (NUMERATOR x) (NUMERATOR y))
+	      (EQL (DENOMINATOR x) (DENOMINATOR y))))
+	((and (COMPLEXP x) (COMPLEXP y))
+	 (and (EQL (REALPART x) (REALPART y))
+	      (EQL (IMAGPART x) (IMAGPART y))))
+	(t
+	 nil))))
+
+(defun EQUAL (x y)
+  (or (EQL x y)
+      (cond
+	((and (consp x) (consp y))
+	 (and (EQUAL (car x) (car y))
+	      (EQUAL (cdr x) (cdr y))))
+	((and (STRINGP x) (STRINGP y))
+	 (and (eq (LENGTH x) (LENGTH y))
+	      (every #'eq x y)))
+	((and (BIT-VECTOR-P x) (BIT-VECTOR-P y))
+	 (and (eq (LENGTH x) (LENGTH y))
+	      (every #'eq x y)))
+	;; TODO: pathnames
+	(t
+	 nil))))
+
+(defun EQUALP (x y)
+  (or (EQUAL x y)
+      (cond
+	((and (CHARACTERP x) (CHARACTERP y))
+	 (CHAR-EQUAL x y))
+	((and (NUMBERP x) (NUMBERP y))
+	 (cl:= x y))
+	((and (consp x) (consp y))
+	 (and (EQUAL (car x) (car y))
+	      (EQUAL (cdr x) (cdr y))))
+	((and (ARRAYP x) (ARRAYP y))
+	 (and (equal (ARRAY-DIMENSIONS x) (ARRAY-DIMENSIONS y))
+	      ;; TODO
+	      'maybe))
+	;; TODO: structures and hash tables
+	(t
+	 nil))))
+
+(cl:defun IDENTITY (object)
+  object)
+
+(defun COMPLEMENT (fn)
+  (let ((env (augment-environment nil :variable '(fn))))
+    (setf (lexical-value 'fn env) fn)
+    (enclose '(LAMBDA (x) (NOT (FUNCALL fn x))) env
+	     (format "\"complement of %s\"" (PRIN1-TO-STRING fn)))))
+
+(defun CONSTANTLY (value)
+  (let ((env (augment-environment nil :variable '(value))))
+    (setf (lexical-value 'value env) value)
+    (enclose '(LAMBDA (&rest x) value) env
+	     (format "\"constantly %s\"" (PRIN1-TO-STRING value)))))
+
+(defun* EVERY (predicate &rest sequences)
+  (apply #'mapcar
+	 (lambda (&rest elts)
+	   (unless (APPLY predicate elts)
+	     (return-from EVERY nil)))
+	 sequences)
+  T)
+
+(defun* SOME (predicate &rest sequences)
+  (apply #'mapcar
+	 (lambda (&rest elts)
+	   (let ((val (APPLY predicate elts)))
+	     (when val
+	       (return-from SOME val))))
+	 sequences)
+  nil)
+
+(defun NOTEVERY (predicate &rest sequences)
+  (not (apply #'EVERY predicate sequences)))
+
+(defun NOTANY (predicate &rest sequences)
+  (not (apply #'SOME predicate sequences)))
+
+(cl:defmacro AND (&rest forms)
+  (if (null forms)
+      T
+      `(IF ,(first forms) (AND ,@(rest forms)))))
+
+(cl:defmacro COND (&rest clauses)
+  (if (null clauses)
+      nil
+      (let ((clause (first clauses)))
+	(case (length clause)
+	  (0	`(COND ,@(rest clauses)))
+	  (1	`(OR ,(first clause) (COND ,@(rest clauses))))
+	  (t	`(IF ,(first clause) (PROGN ,@(rest clause))
+				     (COND ,@(rest clauses))))))))
+
+;;; Special Operator: IF
+
+(cl:defmacro OR (&rest forms)
+  (cond
+    ((null forms)		nil)
+    ((null (rest forms))	(first forms))
+    (t				(with-gensyms (x)
+				  `(LET ((,x ,(first forms)))
+				    (IF ,x ,x (OR ,@(rest forms))))))))
+
+(cl:defmacro WHEN (condition &body body)
+  `(IF ,condition (PROGN ,@body)))
+
+(cl:defmacro UNLESS (condition &body body)
+  `(IF ,condition nil (PROGN ,@body)))
+
+(cl:defmacro CASE (form &rest clauses)
+  (let ((val (gensym))
+	(seen-otherwise nil))
+    `(LET ((,val ,form))
+       (COND
+	 ,@(mapcar (lambda (clause)
+		     (when seen-otherwise
+		       (error "syntax error"))
+		     (setq seen-otherwise
+			   (member (first clause) '(T OTHERWISE)))
+		     (cond
+		       (seen-otherwise
+			`(T ,@(rest clause)))
+		       ((atom (first clause))
+			`((EQL ,val ,(first clause))
+			  ,@(rest clause)))
+		       (t
+			`((MEMBER ,val (QUOTE ,(first clause)))
+			  ,@(rest clause)))))
+		   clauses)))))
+
+(cl:defmacro CCASE (place &rest clauses)
+  (with-gensyms (again)
+    `(RESTART-BIND ((STORE-VALUE (LAMBDA (object)
+				   (SETF ,place object)
+				   (GO ,again))))
+       (TAGBODY
+         ,again
+         (ECASE ,place ,@clauses)))))
+
+(cl:defmacro ECASE (form &rest clauses)
+  (with-gensyms (val)
+    `(LET ((,val ,form))
+       (CASE ,val
+	 ,@clauses
+	 (T (type-error ,val (QUOTE (MEMBER ,@(mappend
+					       (lambda (x)
+						 (ensure-list (first x)))
+					       clauses)))))))))
+
+(cl:defmacro TYPECASE (form &rest clauses)
+  (let ((val (gensym))
+	(seen-otherwise nil))
+    `(LET ((,val ,form))
+       (COND
+	 ,@(mapcar (lambda (clause)
+		     (when seen-otherwise
+		       (error "syntax error"))
+		     (setq seen-otherwise
+			   (member (first clause) '(T OTHERWISE)))
+		     `(,(if seen-otherwise
+			    T
+			    `(TYPEP ,val (QUOTE ,(first clause))))
+		       ,@(rest clause)))
+		   clauses)))))
+
+(cl:defmacro CTYPECASE (place &rest clauses)
+  (with-gensyms (again)
+    `(RESTART-BIND ((STORE-VALUE (LAMBDA (object)
+				   (SETF ,place object)
+				   (GO ,again))))
+       (TAGBODY
+         ,again
+         (ETYPECASE ,place ,@clauses)))))
+
+(cl:defmacro ETYPECASE (form &rest clauses)
+  (with-gensyms (val)
+    `(LET ((,val ,form))
+       (TYPECASE ,val
+	 ,@clauses
+	 (T (type-error ,val (QUOTE (OR ,@(mapcar #'first clauses)))))))))
+
+(defmacro* MULTIPLE-VALUE-BIND (vars form &body body)
+  (case (length vars)
+    (0	`(progn ,form ,@body))
+    (1	`(let ((,(first vars) ,form)) ,@body))
+    (t	(let ((n -1))
+	  `(let* ((,(first vars) ,form)
+		  ,@(mapcar (lambda (var) `(,var (nth ,(incf n) mvals)))
+			    (rest vars)))
+	     ,@body)))))
+
+(cl:defmacro MULTIPLE-VALUE-BIND (vars form &body body)
+  (case (length vars)
+    (0	`(PROGN ,form ,@body))
+    (1	`(LET ((,(first vars) ,form)) ,@body))
+    (t	`(MULTIPLE-VALUE-CALL (LAMBDA ,vars ,@body) ,form))))
+
+;;; MULTIPLE-VALUE-CALL is a special operator.
+
+(defmacro* MULTIPLE-VALUE-LIST (form)
+  (let ((val (gensym)))
+    `(let ((,val ,form))
+       (if (zerop nvals)
+	   nil
+	   (cons ,val mvals)))))
+
+(cl:defmacro MULTIPLE-VALUE-LIST (form)
+  `(MULTIPLE-VALUE-CALL (FUNCTION LIST) ,form))
+
+;;; MULTIPLE-VALUE-PROG1 is a special operator.
+
+(defmacro* MULTIPLE-VALUE-SETQ (vars form)
+  (if (null vars)
+      form
+      (let ((n -1))
+	`(setq ,(first vars) ,form
+	       ,@(mappend (lambda (var) `(,var (nth ,(incf n) mvals)))
+			  (rest vars))))))
+
+(cl:defmacro MULTIPLE-VALUE-SETQ (vars form)
+  (let ((vals (gensym))
+	(n -1))
+    `(let ((,vals (MULTIPLE-VALUE-LIST ,form)))
+       (SETQ ,@(mapcar (lambda (var) `(,var (nth ,(incf n) ,vals))) vars)))))
+
+(defun VALUES (&rest vals)
+  (VALUES-LIST vals))
+
+(defun VALUES-LIST (list)
+  (setq nvals (length list))
+  (setq mvals (cdr-safe list))
+  (car-safe list))
+
+(DEFCONSTANT MULTIPLE-VALUES-LIMIT 20)
+
+(defmacro* NTH-VALUE (n form)
+  (cond
+    ((eq n 0)		`(cl:values ,form))
+    ((integerp n)	`(progn ,form (cl:values (nth ,(1- n) mvals))))
+    (t			`(progn ,form (cl:values (nth (1- ,n) mvals))))))
+
+(cl:defmacro NTH-VALUE (n form)
+  `(MULTIPLE-VALUE-CALL (LAMBDA (&rest vals) (NTH ,n vals)) ,form))
+
+(defun expand-prog (let bindings body)
+  (MULTIPLE-VALUE-BIND (body decl) (parse-body body)
+    `(BLOCK nil
+       (,let ,bindings
+	 ,@decl
+	 (TAGBODY ,@body)))))
+
+(cl:defmacro PROG (bindings &body body)
+  (expand-prog 'LET bindings body))
+
+(cl:defmacro PROG* (bindings &body body)
+  (expand-prog 'LET* bindings body))
+
+(cl:defmacro PROG1 (form1 &rest forms)
+  (with-gensyms (val)
+    `(LET ((,val ,form1))
+       ,@forms
+       ,val)))
+
+(cl:defmacro PROG2 (form1 form2 &rest forms)
+  (with-gensyms (val)
+    `(PROGN
+       ,form1
+       (LET ((,val ,form2))
+	 ,@forms
+	 ,val))))
+
+;;; Special Operator: PROGN
+
+(cl:defmacro DEFINE-MODIFY-MACRO (name lambda-list fn &optional documentation)
+  (with-gensyms (place env temps values variables setter getter)
+    `(DEFMACRO ,name (,place ,@lambda-list &ENVIRONMENT ,env)
+       ,documentation
+       (MULTIPLE-VALUE-BIND (,temps ,values ,variables ,setter ,getter)
+	   (GET-SETF-EXPANSION ,place ,env)
+	 (BACKQUOTE
+	   (LET* ((COMMA-AT (MAPCAR (FUNCTION LIST) ,temps ,values))
+		  ((COMMA (FIRST ,variables))
+		   ;; TODO: only params from lambda-list
+		   (,fn (COMMA ,getter) ,@lambda-list)))
+	     (COMMA ,setter)))))))
+
+(defmacro* DEFSETF (access-fn &rest args)
+  (case (length args)
+    (0 (ERROR "Syntax error"))
+    (1 (short-form-defsetf access-fn (first args)))
+    (t (apply #'long-form-defsetf access-fn args))))
+
+(defun short-form-defsetf (access-fn update-fn)
+  `(DEFINE-SETF-EXPANDER ,access-fn (&rest args)
+     (let ((var (gensym))
+	   (temps (map-to-gensyms args)))
+       (cl:values temps
+		  args
+		  (list var)
+		  (append '(,update-fn) temps (list var))
+		  (list* ',access-fn temps)))))
+
+(defun* long-form-defsetf (access-fn lambda-list variables &body body)
+  (let ((args (remove-if (lambda (x) (memq x '(&optional &rest &key)))
+			 lambda-list)))
+    `(DEFINE-SETF-EXPANDER ,access-fn ,lambda-list
+       (let* ((var (gensym))
+	     (temps (map-to-gensyms ',args))
+	     (,(first variables) var))
+	 (cl:values temps
+		    (list ,@args)
+		    (list var)
+		    (apply (lambda ,lambda-list ,@body) temps)
+		    (cons ',access-fn temps))))))
+
+(cl:defmacro DEFSETF (access-fn &rest args)
+  (case (length args)
+    (0 (ERROR "Syntax error"))
+    (1 (cl-short-form-defsetf access-fn (first args)))
+    (t (apply #'cl-long-form-defsetf access-fn args))))
+
+(defun cl-short-form-defsetf (access-fn update-fn)
+  (with-gensyms (args var temps)
+    `(DEFINE-SETF-EXPANDER ,access-fn (&REST ,args)
+      (LET ((,var (GENSYM))
+	    (,temps (map-to-gensyms ,args)))
+	(VALUES ,temps
+		,args
+		(LIST ,var)
+		(BACKQUOTE (,update-fn (COMMA-AT ,temps) (COMMA ,var)))
+		(BACKQUOTE (,access-fn (COMMA-AT ,temps))))))))
+
+(defun* cl-long-form-defsetf (access-fn lambda-list variables &body body)
+  (let ((args (remove-if (lambda (x) (memq x LAMBDA-LIST-KEYWORDS))
+			 lambda-list)))
+    (with-gensyms (var temps)
+      `(DEFINE-SETF-EXPANDER ,access-fn ,lambda-list
+	(LET* ((,var (GENSYM))
+	       (,temps (map-to-gensyms (QUOTE ,args)))
+	       (,(first variables) ,var))
+	  (VALUES ,temps
+		  (LIST ,@args)
+		  (LIST ,var)
+		  (APPLY (LAMBDA ,lambda-list ,@body) ,temps)
+		  (BACKQUOTE (,access-fn (COMMA-AT ,temps)))))))))
+
+(defvar *setf-expanders* (make-hash-table))
+
+(defmacro* DEFINE-SETF-EXPANDER (access-fn lambda-list &body body)
+  (setq lambda-list (copy-list lambda-list))
+  (remf lambda-list '&environment)
+  `(eval-when (:compile-toplevel :load-toplevel :execute)
+     (setf (gethash ',access-fn *setf-expanders*)
+           (lambda ,lambda-list ,@body))
+     ',access-fn))
+
+(cl:defmacro DEFINE-SETF-EXPANDER (access-fn lambda-list &body body)
+  (setq lambda-list (copy-list lambda-list))
+  (remf lambda-list '&ENVIRONMENT)
+  `(EVAL-WHEN (,(kw COMPILE-TOPLEVEL) ,(kw LOAD-TOPLEVEL) ,(kw EXECUTE))
+     (puthash (QUOTE ,access-fn) (LAMBDA ,lambda-list ,@body) *setf-expanders*)
+     (QUOTE ,access-fn)))
+
+(DEFINE-SETF-EXPANDER VALUES (&rest forms)
+  (let ((temporaries nil)
+	(values nil)
+	(vars nil)
+	(setters nil)
+	(getters nil))
+    (dolist (form forms)
+      (MULTIPLE-VALUE-BIND (temps vals variables setter getter)
+	  (GET-SETF-EXPANSION form nil) ;TODO: env
+	(setq temporaries (append temps temporaries))
+	(setq values (append vals values))
+	(push (first variables) vars)
+	(push setter setters)
+	(push getter getters))
+    (cl:values temporaries
+	       values
+	       (nreverse vars)
+	       `(PROGN ,@(nreverse setters))
+	       `(VALUES ,@(nreverse getters))))))
+
+(DEFSETF FDEFINITION (name) (fn)
+  `(COND
+    ((SYMBOLP ,name)
+     (SETF (SYMBOL-FUNCTION ,name) ,fn))
+    ((setf-name-p ,name)
+     (puthash (SECOND ,name) ,fn *setf-definitions*))
+    (T
+     (not-function-name-error ,name))))
+
+(DEFSETF MACRO-FUNCTION (name &optional env) (fn)
+  `(IF (NULL ,env)
+       (puthash ,name ,fn *macro-functions*)
+       (set-local-macro ,name ,fn ,env)))
+
+(DEFINE-SETF-EXPANDER THE (type form)
+  (MULTIPLE-VALUE-BIND (temps values variables setter getter)
+      (GET-SETF-EXPANSION form nil) ;TODO: env
+    (with-gensyms (val)
+      (cl:values temps
+		 values
+		 (list val)
+		 `(LET ((,(first variables) (THE ,type ,val))) ,setter)
+		 getter))))
+
+(defun GET-SETF-EXPANSION (place &optional env)
+  (setq place (MACROEXPAND place))
+  (cond
+   ((consp place)
+    (let* ((name (first place))
+	   (fn (gethash (first place) *setf-expanders*)))
+      (if fn
+	  (APPLY fn (rest place))
+	  (let ((temps (map-to-gensyms (rest place)))
+		(var (gensym)))
+	    (cl:values temps
+		       (rest place)
+		       (list var)
+		       `(FUNCALL (FUNCTION (SETF ,name)) ,var ,@temps)
+		       `(,name ,@temps))))))
+   ((symbolp place)
+    (let ((var (gensym)))
+      (cl:values nil nil (list var) `(SETQ ,place ,var) place)))
+   (t
+    (error "error"))))
+
+(defmacro* SETF (place value &rest more &environment env)
+  (MULTIPLE-VALUE-BIND (temps values variables setter getter)
+      (GET-SETF-EXPANSION place env)
+    `(let* (,@(MAPCAR #'list temps values)
+	    (,(first variables) ,value))
+       ,setter
+       ,@(when more
+	   `((SETF ,@more))))))
+
+(cl:defmacro SETF (place value &rest more) ;TODO: &environment
+  (MULTIPLE-VALUE-BIND (temps values variables setter getter)
+      (GET-SETF-EXPANSION place env)
+    `(LET* ,(MAPCAR #'list temps values)
+       (MULTIPLE-VALUE-BIND ,variables ,value
+	 ,setter
+	 ,@(when more
+	    `((SETF ,@more)))))))
+
+(cl:defmacro PSETF (place value &rest more) ;TODO: &environment
+  (MULTIPLE-VALUE-BIND (temps values variables setter getter)
+      (GET-SETF-EXPANSION place env)
+    `(LET* ,(MAPCAR #'list temps values)
+       (MULTIPLE-VALUE-BIND ,variables ,value
+	 ,@(when more
+	     `((SETF ,@more)))
+	 ,setter
+	 nil))))
+
+(cl:defmacro SHIFTF (place x &rest more) ;TODO: &environment
+  (MULTIPLE-VALUE-BIND (temps values variables setter getter)
+      (GET-SETF-EXPANSION place env)
+    (with-gensyms (val)
+      `(LET* (,@(MAPCAR #'list temps values)
+	      (,val ,getter)
+	      (,(first variables) ,(if (null more) x `(SHIFTF ,x ,@more))))
+	 ,setter
+	 ,val))))
+
+(cl:defmacro ROTATEF (&rest places) ;TODO: &environment
+  (if (or (null places) (null (rest places)))
+      nil
+      (let ((place (first places))
+	    (places (rest places))
+	    (val (gensym)))
+      (MULTIPLE-VALUE-BIND (temps values variables setter getter)
+	  (GET-SETF-EXPANSION place env)
+	`(LET* (,@(MAPCAR #'list temps values)
+		(,val ,getter)
+		(,(first variables) (SHIFTF ,@places ,val)))
+	   ,setter
+	   nil)))))
+    
+;;; CONTROL-ERROR, PROGRAM-ERROR, and UNDEFINED-FUNCTION are defined
+;;; in cl-conditions.el.
