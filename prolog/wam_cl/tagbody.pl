@@ -309,22 +309,29 @@ end_of_file.
       (incf val 64)
      point-b
       (print "(incf val 08)")
-      (prolog-trace)
+      ;; (prolog-trace)
       (incf val 08)
       (print val))
     val)
 =>  15
+
+
  (defun f1 (flag)
    (let ((n 1))
      (tagbody 
        (setq n (f2 flag #'(lambda () (go out))))
       out
        (prin1 n))))
+
 =>  F1
+
+
  (defun f2 (flag escape)
    (if flag (funcall escape) 2))
+
 =>  F2
- (f1 nil)
+
+(f1 nil)
 >>  2
 =>  NIL
  (f1 t)
