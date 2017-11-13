@@ -68,7 +68,8 @@
 :- ensure_loaded(doc_strings).
 :- ensure_loaded(string).
 :- ensure_loaded(prims).
-:- ensure_loaded(block_tagbody).
+:- ensure_loaded(block).
+:- ensure_loaded(tagbody).
 :- ensure_loaded(readtables).
 :- ensure_loaded(symbol).
 :- ensure_loaded(package).

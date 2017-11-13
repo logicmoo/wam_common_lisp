@@ -680,3 +680,43 @@ Y =  (asserta((fifteen(_496):-fail, ([fifteen]<<==[[let, [val], [...|...]|...]])
 Z = fifteen,
 Q = 15.
 
+
+
+
+make_cont(G,Cont):-
+  	reset(((   
+          shift(mc(G))
+	     ->  G
+	     ;   true
+	     )), mc(G), Cont).
+
+reset_in_cond4(R):-
+  make_cont((format(atom(R), 'Hello ~w', [X]);format(atom(R), 'Bye ~w', [X])),Cont),
+   X = world,
+   call(Cont).
+
+loop_cont:-
+   make_cont(writeln([x=X,y=Y]),Cont1),
+   make_cont(once(number(Y)->X is Y+1;X=1),CalcX),
+   make_cont(once(number(X)->Y is X+1;Y=1),CalcY),
+   \+ \+ call(CalcY),
+   call(CalcX),
+   call(Cont1).
+
+
+local_test_1(SExpression):- 
+  as_sexp(SExpression,Expression),
+  dbmsg(lisp_compile(Expression)),
+  must_or_rtrace(lisp_compile(Result,Expression,Code)),
+  dbmsg(Code),
+  must_or_rtrace(call(Code)),
+  dbmsg(result(Result)).
+
+local_test_2(SExpression,Result):- 
+  as_sexp(SExpression,Expression),
+  dbmsg(lisp_compiled_eval(Expression)),
+  must_or_rtrace(lisp_compile(Expression,Code)),
+  dbmsg(Code),
+  nop((must_or_rtrace(call(Code)),dbmsg(result(Result)))).
+
+
