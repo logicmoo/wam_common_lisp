@@ -52,27 +52,11 @@ compile_prolog_call(Ctx,Env,ResultOut,[R|Resolve],Body,(Code,BodyResolved)):-
 
 
 
-/*
-TODO fix prolog_call
-
-tst:is_local_test(block2,[block,block2,[tagbody,setq(b,2),[go,tag2],setq(a,1),(tag1),
-                     prolog_call([a,b],plus(a,b,C)),prolog_call(writeln(C)),
-                     'return-from'(block2,c),(tag2),setq(a,4),[go,tag1]]],6).
-*/
-
 shared_lisp_compiler:plugin_expand_function_body(Ctx,Env,Result,InstrS,Code):- 
   compile_body_block(Ctx,Env,Result,InstrS,Code),!.
 
-
-compile_body_block(_Ctx,_Env,_Result,call(Body), call(Body) ):-!.
-compile_body_block(Ctx,Env,ResultOut,prolog_call(Body), call(BodyResolved) ):-
-   compile_prolog_call(Ctx,Env,[],ResultOut,Body,BodyResolved),!.
-compile_body_block(Ctx,Env,ResultOut,prolog_call(Resolve,Body), call(BodyResolved) ):-
-   compile_prolog_call(Ctx,Env,Resolve,ResultOut,Body,BodyResolved),!.
-
 compile_body_block(_Ctx,_Env,Result,exit( Tag), push_label(exit( Tag)) ):- debug_var("_GORES",Result).
 compile_body_block(_Ctx,_Env,Result,enter( Tag), push_label(enter( Tag)) ):- debug_var("_GORES",Result).
-
 compile_body_block(Ctx,Env,Result,[do,LoopVars,[EndTest|ResultForms]|TagBody], Code):- 
    loop_vars_to_let_n_step(LoopVars,LetVars,[],PSetQStepCode),
    gensym(dosym,Tag),

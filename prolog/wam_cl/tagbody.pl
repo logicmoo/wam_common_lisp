@@ -18,62 +18,91 @@
 
 :- include('header.pro').
 
-:- discontiguous(compile_body_h/5).
+:- discontiguous(compile_body_go_tagbody/5).
 
 shared_lisp_compiler:plugin_expand_function_body(Ctx,Env,Result,InstrS,Code):- 
-  compile_body_h(Ctx,Env,Result,InstrS,Code),!.
+  compile_body_go_tagbody(Ctx,Env,Result,InstrS,Code),!.
 
 
-
+push_label(_,_,_).
 % @IDEA we might use labels later 
-%compile_body_h(_Ctx,_Env,Result, nop(X),  nop(X)):- !, debug_var("_NopResult",Result).
-compile_body_h(_Ctx,_Env,Result,[label,ID, Tag], push_label(ID,Tag) ):- debug_var("_LABELRES",Result).
-%tagbody_go(Label,Env):- notrace(throw(tagbody_go(Label,Env))).
-tagbody_go(_TB,_Tag,Pred,Env):- call(Pred,Env).
+compile_body_go_tagbody(_Ctx,_Env,Result,[label,Label,ID|Rest], push_label(Label,ID,Rest) ):-!, debug_var("_LABELRES",Result).
+compile_body_go_tagbody(_Ctx,_Env,Result,[label,Label|Rest], push_label(Label,_,Rest) ):-!, debug_var("_LABELRES",Result).
 
 
-compute_new_proc(TB,Label,Pred):-atomic_list_concat([TB,Label],'_',Pred).
+tagbody_go(_TB,_Label,Pred,Env):- call(Pred,Env).
+% GO TAG
+compile_body_go_tagbody(_Ctx,Env,Result,[go,Label,TB,Pred],  Code ):- create_jump(TB,Label,Pred,Env,Code),!, debug_var("_GoThree",Result).
+compile_body_go_tagbody(_Ctx,Env,Result,[go,Label,TB|_],  Code ):- create_jump(TB,Label,_Pred,Env,Code),!, debug_var("_GoTwo",Result).
+compile_body_go_tagbody(_Ctx,Env,Result,[go,Label,TB], Code):- compute_new_address(TB,Label,Pred), debug_var("_GORES",Result),debug_var("GoEnv",Env),create_jump(TB,Label,Pred,Env,Code).
 
-push_label(_,_).
 
-compile_body_h(Ctx,Env,[],[tagbody| InstrS], Code):- 
-  gensym(tagbody_,TB),
-  compile_as_tagbody(Ctx,Env,TB,[TB|InstrS],Assertions),
-  maplist(add_context_code(Ctx),Assertions),
-  Code =.. [TB,Env].
+add_context_code(_Ctx,Assertion):-assert(user:Assertion),wdmsg(Assertion),!.
+% TAGBODY
+compile_body_go_tagbody(Ctx,Env,[],[tagbody| InstrS], Code):- 
+  gensym(addr_tagbody_,TB),gensym(addr_enter_,Label),
+  compile_tagbody(Ctx,Env,TB,[[go,Label],Label|InstrS],Clauses),
+  compute_new_address(TB,Label,Pred),
+  create_jump(TB,Label,Pred,Env,Code),
+  maplist(add_context_code(Ctx),Clauses).
 
-% tagbody_go(Label,Env)
-compile_body_h(_Ctx,Env,Result,[go,TB, Tag], tagbody_go(TB,Tag,Pred,Env) ):- compute_new_proc(TB,Label,Pred), debug_var("_GORES",Result),debug_var("GoEnv",Env).
-compile_body_h(_Ctx,_Env,PrevResult,[u_prolog_trace],trace).
-
-compile_as_tagbody(Ctx,Env,TB,InstrS,Assertions):-
+compile_tagbody(Ctx,Env,TB,InstrS,Clauses):-
  must_det_l((
-   externalize_go_points(Env,TB,InstrS,Gos),
-   get_tags(TB,Env,InstrS,Gos,Addrs),
-   check_missing_gos(Gos),   
-   compile_addrs(TB,Ctx,Env,Result,Addrs),
-   maplist(addresses_to_proceedures(TB),Addrs,Assertions).
+   get_go_points(TB,InstrS,Gos),
+   get_tags(TB,Env,InstrS,Gos,Addrs),  % check_missing_gos(Gos), wdmsg((get_tags(TB,Env,InstrS,Gos):-Addrs)),
+   compile_addrs(TB,Ctx,Env,_Result,Addrs),
+   % copy_term
+   =(Addrs,Addrs2),   
+   must_maplist(compile_addresses(TB),Addrs2,Clauses))).
+  % Code = call_addr_block(Env,CInstrS,Addrs2,Result))).
+
+
+create_jump(TB,Label,_UPred,Env,COUT):- compute_new_address(TB,Label,Pred),simplify_call(call(Pred,Env),COUT),!.
+create_jump(_TB,_Label,Pred,Env,COUT):- simplify_call(call(Pred,Env),COUT),!.
+create_jump(TB,Label,Pred,Env,call(Pred,Env)):- compute_new_address(TB,Label,Pred).
+
+simplify_call(call(Pred,Env),COUT):- atom(Pred),!, COUT=..[Pred,Env].
+simplify_call(COUT,COUT).
+
+compute_new_address(TB,Label,Pred):- must_or_rtrace(atomic_list_concat([TB,Label],'_',Pred)).
+
 
  /*
- addr(Pred,u_point_c,'$used',
-   Incf_Env, 
-    (place_op(Incf_Env, incf, u_val, [4], _2854), 
-    cl_print("(incf val 04)", _2866), 
-    tagbody_go(u_point_b, Incf_Env))).
+ ADDRESS TERM LOOK LIKE
 
-tagBodyId_66_u_point_c(Incf_Env) :-
-    (place_op(Incf_Env, incf, u_val, [4], _2854), 
-    cl_print("(incf val 04)", _2866), 
-    tagbody_go(u_point_b, Incf_Env))).
+%         addr(addr_tagbody_1_u_point_b,
+%              u_point_b,
+%              '$used',
+%              _32692,
+%
+%              [ [print, "(incf val 08)"],
+%                [u_prolog_trace],
+%                [incf, u_val, 8],
+%                [print, u_val],
+%                [go, u_point_a]
+%              ])
+
+ COMPILES TO
+
+ addr_tagbody_1_u_point_b(ENV) :-
+       cl_print("(incf val 08)", _Print_Ret10),
+       trace,
+       place_op(ENV, incf, u_val, [8], _Incf_Ret11),
+       symbol_value(ENV, u_val, U_Val_Res),
+       cl_print(U_Val_Res, U_Val_Res),
+       addr_tagbody_1_u_point_a(ENV).
 
  */
-addresses_to_proceedures(TB,Addr,Assert):-
- Addr = addr(Pred,Label,MaybeUsed,
-   Incf_Env, 
-    (place_op(Incf_Env, incf, u_val, [4], _2854), 
-    cl_print("(incf val 04)", _2866), 
-    tagbody_go(u_point_b, Incf_Env))).
+compile_addresses(_TB,Addr,(Head:-Body)):- 
+ Addr = addr(Pred,_Label,_MaybeUsed,Incf_Env,Code),
+ var(Incf_Env),( Env = Incf_Env),!,
+ Head=..[Pred,Env],
+ (Body = (Code)).
 
+compile_addresses(_TB,Addr,(Head:-Body)):-
+ Addr = addr(Pred,_Label,_MaybeUsed,Incf_Env,Code),
+ Head=..[Pred,Env],
+ (Body = (( Env = Incf_Env),Code)).
 
 
 
@@ -87,6 +116,7 @@ is_reflow('return',_,[]).
 is_reflow(OP,[Label|_],Label):- same_symbol('return-from',OP).
 is_reflow('throw',[Label|_],Label).
 
+
 is_label(Atom,Atom):- atomic(Atom),!,Atom\==[].
 is_label([OP|ARGS],Label):- is_label(OP,ARGS,Label).
 is_label(OPARGS,Label):- OPARGS=..[OP|ARGS],is_label(OP,ARGS,Label).
@@ -97,37 +127,40 @@ is_label('label',[Label|_],Label).
 is_branched([Op|_]):- fail,member(Op,[if,or,and,progn]).
 
 
-externalize_go_points(Env,TB,[FlowInst|InstrS],[addr(Pred,Label,'$used',Env,'$missing')|Addrs]):- 
+get_go_points(TB,[FlowInst|InstrS],[addr(Pred,Label,'$used','$missing','$missing')|Addrs]):- 
   is_reflow(FlowInst,Label),!,
-  compute_new_proc(TB,Label,Pred),
-  externalize_go_points(Env,TB,InstrS,Addrs).
-externalize_go_points(Env,TB,[],[]).
-externalize_go_points(Env,TB,[I|InstrS],Addrs):-% #branching call
-  is_branched(I),externalize_go_points(Env,TB,I,IAddrs),
-  externalize_go_points(Env,TB,InstrS,NAddrs),
+  compute_new_address(TB,Label,Pred),
+  get_go_points(TB,InstrS,Addrs).
+get_go_points(_TB,[],[]).
+get_go_points(TB,[I|InstrS],Addrs):-% #branching call
+  is_branched(I),get_go_points(TB,I,IAddrs),
+  get_go_points(TB,InstrS,NAddrs),
   append(IAddrs,NAddrs,Addrs).
-externalize_go_points(Env,TB,[_|InstrS],Addrs):-
-  externalize_go_points(Env,TB,InstrS,Addrs).
+get_go_points(TB,[_|InstrS],Addrs):-
+  get_go_points(TB,InstrS,Addrs).
 
 get_tags(TB,Env,[Label|InstrS],Gos,[GAddrs|Addrs]):- atomic(Label),
-  compute_new_proc(TB,Label,Pred),
-  member(GAddrs,Gos),GAddrs=addr(Pred,Label,_Used,_Env_,_Missing), !,
-   setarg(3,GAddrs,Env),
-   setarg(4,GAddrs,InstrS),
+  member(GAddrs,Gos),GAddrs=addr(_Pred,Label,_Used,_Env_,_Missing), !,
+   compute_new_address(TB,Label,Pred),
+   setarg(1,GAddrs,Pred),
+   setarg(4,GAddrs,Env),
+   setarg(5,GAddrs,InstrS),
   get_tags(TB,Env,InstrS,Gos,Addrs).
 get_tags(TB,Env,[Label|InstrS],Gos,[GAddrs|Addrs]):-
-  member(GAddrs,Gos),GAddrs=addr(Pred,Label,_Used,_Env_,_Missing),
-  compute_new_proc(TB,Label,Pred),
-   setarg(3,GAddrs,Env),
-   setarg(4,GAddrs,InstrS),
+  member(GAddrs,Gos),GAddrs=addr(_Pred,Label,_Used,_Env_,_Missing),
+   compute_new_address(TB,Label,Pred),
+   setarg(1,GAddrs,Pred),
+   setarg(4,GAddrs,Env),
+   setarg(5,GAddrs,InstrS),
   get_tags(TB,Env,InstrS,Gos,Addrs).
 get_tags(TB,Env,[TagInstr|InstrS],Gos,[GAddrs|Addrs]):- is_label(TagInstr,Label),
-   compute_new_proc(TB,Label,Pred),
-   GAddrs = addr(Pred,Label,'$unused','$env',InstrS),
-    setarg(3,GAddrs,Env),
-    setarg(4,GAddrs,InstrS),
+   GAddrs = addr(_Pred,Label,'$unused','$env',InstrS),
+    compute_new_address(TB,Label,Pred),
+    setarg(1,GAddrs,Pred),
+    setarg(4,GAddrs,Env),
+    setarg(5,GAddrs,InstrS),
   get_tags(TB,Env,InstrS,[GAddrs|Gos],Addrs).
-get_tags(TB,_Env,[],_,[]).
+get_tags(_TB,_Env,[],_,[]).
 get_tags(TB,Env,[I|InstrS],Gos,Addrs):- % #branching call
   is_branched(I),get_tags(TB,Env,I,Gos,IAddrs),
   get_tags(TB,Env,InstrS,Gos,NAddrs),
@@ -142,44 +175,33 @@ check_missing_gos(_).
 compile_addrs(TB,Ctx,Env,Result,[A|Addrs]):-
   compile_addr1(TB,Ctx,Env,Result,A),
   compile_addrs(TB,Ctx,Env,Result,Addrs).
-compile_addrs(TB,_Ctx,_Env,_Result,_).
+compile_addrs(_TB,_Ctx,_Env,_Result,_).
 
-compile_addr1(TB,Ctx,_Env,Result,A):- A= addr(Pred,_Tag,_Unused,_E,InstrS),   
-   must_or_rtrace(compile_tagbody_forms(TB,Ctx,NewEnv,Result,InstrS,Code)),
-   setarg(3,A,NewEnv),
-   setarg(4,A,Code),!.
+compile_addr1(TB,Ctx,_Env,Result,A):- A= addr(_Pred,Label,_Unused,_E,InstrS),   
+   must_or_rtrace(compile_tagbodys(TB,Ctx,NewEnv,Result,InstrS,Code)),
+   compute_new_address(TB,Label,Pred),
+   setarg(1,A,Pred),
+   setarg(4,A,NewEnv),
+   setarg(5,A,Code),!.
 compile_addr1(_TB,_Ctx,_Env,_Result,_):- !.
 
 
-
-
-compile_tagbody_forms(TB,Ctx,Env,Result,[enter(_)|InstrS],BInstrS):- !,compile_tagbody_forms(TB,Ctx,Env,Result,InstrS,BInstrS).
-compile_tagbody_forms(TB,Ctx,Env,Result,InstrS,BInstrS):-
+compile_tagbodys(TB,Ctx,Env,Result,[enter(_)|InstrS],BInstrS):- !,
+  compile_tagbodys(TB,Ctx,Env,Result,InstrS,BInstrS).
+compile_tagbodys(TB,Ctx,Env,Result,InstrS,BInstrS):-
    maplist(label_atoms(TB),InstrS,TInstrS),
    trim_tagbody(TInstrS,CInstrS),
    compile_forms(Ctx,Env,Result,CInstrS,BInstrS).
 
-%label_atoms(Instr,[label,Tag]):- is_label(Instr,Tag),!.
-label_atoms(TB,Tag,[label,Tag]):-atomic(Tag),!.
-label_atoms(TB,[go,Label],[go,TB,Label]):-atomic(Tag),!.
-label_atoms(TB,Instr,Instr).
+%label_atoms(Instr,[label,Label]):- is_label(Instr,Label),!.
+label_atoms(TB,Label,[label,Label,TB]):-atomic(Label),!.
+label_atoms(TB,[go,Label],[go,Label,TB]):-atomic(Label),!.
+label_atoms(_TB,Instr,Instr).
 
 trim_tagbody(InstrS,TInstrS):- append(Left,[R|_],InstrS),is_reflow(R,_),!,append(Left,[R],TInstrS).
 trim_tagbody(InstrS,InstrS).
 
 
-
-
-
-
-
-
-
-
-
-
-% asserta((fifteen(Val_Thru23):-!, []=[[]], LETENV=[[bv(val, [[]|_832])]], 
-%   call_addr_block(Env,(symbol_setq(val, 1, _1398), tagbody_go(Result,'point-a')), [addr(Pred,'point-c', '$used',  (push_label('point-c'), sym_arg_val_env(val, Val_In, Val_Thru, LETENV), incf(Val_Thru, 4, Incf_Ret), tagbody_go(Result,'point-b'))), addr(Pred,'point-a', '$used',  (push_label('point-a'), push_label('point-d-unused'), sym_arg_val_env(val, Val_In12, Val_Thru13, LETENV), incf(Val_Thru13, 2, Incf_Ret14), tagbody_go(Result,'point-c'))), addr(Pred,'point-d-unused', '$unused',  (push_label('point-d-unused'), sym_arg_val_env(val, Val_In17, Val_Thru18, LETENV), incf(Val_Thru18, 2, Incf_Ret19), tagbody_go(Result,'point-c'))), addr(Pred,'point-b', '$used', ['point-b', [incf, val, 8]])], _GORES15), sym_arg_val_env(val, Val_In22, Val_Thru23, LETENV)))
 
 tst:is_local_test(tagbody1,[tagbody,setq(b,2),[go,tag1],setq(a,1),(tag1),setq(a,4),print(plus(a,b))],[]).
 
@@ -261,9 +283,6 @@ tst:is_local_test(tagbody6,
    (tag1),setq(a,4),prolog_call([a,b],plus(a,b,C)),prolog_call(writeln(C)),
    (tag2),setq(a,4),[go,tag1]],
     []). % prints 6
-
-
-
 :- fixup_exports.
 
 end_of_file.
@@ -314,6 +333,3 @@ end_of_file.
 
 
 `
-
-
-
