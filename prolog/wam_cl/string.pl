@@ -14,7 +14,7 @@
  * The program is a *HUGE* common-lisp compiler/interpreter. It is written for YAP/SWI-Prolog (YAP 4x faster).
  *
  *******************************************************************/
-:- module(streams, []).
+:- module(string, []).
 
 :- set_module(class(library)).
 

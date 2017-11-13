@@ -1,2 +1,5 @@
 sbcl/
+*-old/
+*/
+*.trans.pl
 

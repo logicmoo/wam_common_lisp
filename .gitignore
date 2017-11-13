@@ -17,3 +17,7 @@ build
 *.nib
 *.swp
 *.o
+sbcl/
+*-old/
+*.trans.pl
+

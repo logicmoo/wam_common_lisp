@@ -66,7 +66,7 @@
 :- ensure_loaded(pnames).
 :- ensure_loaded(readtables).
 :- ensure_loaded(doc_strings).
-:- ensure_loaded(strings).
+:- ensure_loaded(string).
 :- ensure_loaded(prims).
 :- ensure_loaded(block_tagbody).
 :- ensure_loaded(readtables).
