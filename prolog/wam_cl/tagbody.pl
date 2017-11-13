@@ -240,7 +240,7 @@ tst:is_local_test(let_tagbody,
 
 
 tst:is_local_test(`
- (tagbody ))
+ (tagbody )
 `,[]).
 
 tst:is_local_test(`
@@ -252,7 +252,7 @@ tst:is_local_test(`
  (tagbody 1 (print "hi" ) (go 1))
 `,[]).
 
-
+% (compile (tagbody 1 (print "hi" ) (go 1)))
 
 tst:is_local_test(tagbody_let3,
  [let, [b],
@@ -338,5 +338,87 @@ end_of_file.
 >>  1
  ; =>  NIL
 
+
+
+
+
+
+
+
+
+USER> 
+ (let (val)
+    (tagbody
+      (setq val 1)
+      (go point-a)
+      (incf val 16)
+     point-c
+      (incf val 04)
+      (go point-b)
+      (incf val 32)
+     point-a
+     point-u ;; unused
+      (incf val 02)
+      (go point-c)
+      (incf val 64)
+     point-b
+      (incf val 08))
+    val))
+
+
+#|
+
+:- lisp_compile( pkg_user,
+                [ let,
+                  [u_val],
+
+                  [ tagbody,
+                    [setq, u_val, 1],
+                    [go, u_point_a],
+                    [incf, u_val, 16],
+                    u_point_c,
+                    [incf, u_val, 4],
+                    [go, u_point_b],
+                    [incf, u_val, 32],
+                    u_point_a,
+                    u_point_u,
+                    [incf, u_val, 2],
+                    [go, u_point_c],
+                    [incf, u_val, 64],
+                    u_point_b,
+                    [incf, u_val, 8]
+                  ],
+                  u_val
+                ]).
+
+
+ addr_tagbody_1_addr_enter_1(ENV) :-
+       symbol_setter(ENV, setq, u_val, 1),
+       addr_tagbody_1_u_point_a(ENV).
+
+ addr_tagbody_1_u_point_c(ENV) :-
+       place_op(ENV, incf, u_val, [4], _Incf_R),
+       addr_tagbody_1_u_point_b(ENV).
+
+ addr_tagbody_1_u_point_a(ENV) :-
+       push_label(u_point_u, addr_tagbody_1, []),
+       place_op(ENV, incf, u_val, [2], _Incf_R5),
+       addr_tagbody_1_u_point_c(ENV).
+
+ addr_tagbody_1_u_point_u(ENV) :-
+       place_op(ENV, incf, u_val, [2], _Incf_R8),
+       addr_tagbody_1_u_point_c(ENV).
+
+ addr_tagbody_1_u_point_b(ENV) :-
+       place_op(ENV, incf, u_val, [8], _Incf_R3).
+
+
+ :- TOPEnv=[[bv(u_val, [[]|_1330])]|toplevel],
+   addr_tagbody_1_addr_enter_1(TOPEnv),
+   symbol_value(TOPEnv, u_val, U_val_Get).
+
+|#
+15
+>
 
 `
