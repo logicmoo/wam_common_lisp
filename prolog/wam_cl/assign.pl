@@ -17,6 +17,18 @@
 :- include('header.pro').
 :- ensure_loaded((utils_for_swi)).
 
+rw_add(Ctx,Var,RW):- ensure_rw(Ctx,Var,Dict),arginfo_incr(RW,Dict).
+rw_get(Ctx,Var,RW,Value):- ensure_rw(Ctx,Var,Dict),get_dict(RW,Dict,Value).
+
+% actual var
+ensure_rw(_Ctx,Var,Dict):- var(Var),!, ( get_attr(Var,rwstate,Dict)-> true ; ( Dict = rw{name:_,r:0,w:0},put_attr(Var,rwstate,Dict))).
+% local symbol?
+ensure_rw(Ctx,Atom,Dict):- sanity(atom(Atom)),!,must(get_var_tracker(Ctx,Atom,Var)),!,ensure_rw(Ctx,Var,Dict).
+
+get_var_tracker(Ctx,Atom,Var):- nb_get_value(Ctx,Atom,Var)-> true ; put_var_tracker(Ctx,Atom,Var).
+put_var_tracker(Ctx,Atom,Var):- nb_set_value(Ctx,Atom,Var),
+    ( get_attr(Var,rwstate,_Dict)-> true ; ( Dict = rw{name:Atom,r:0,w:0},put_attr(Var,rwstate,Dict))).
+
 
 compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, Atom2| Rest], Body):- is_parallel_op(SetQ),!, 
    pairify([Var, ValueForm, Atom2| Rest],Atoms,Forms),
@@ -39,6 +51,7 @@ compile_assigns(Ctx,Env,Result,[Getf, Var| ValuesForms], Body):- is_place_op(Get
         list_to_conjuncts(ValuesBody,BodyS),
         debug_var([Getf,'_R'],Result),
         debug_var([Getf,'_Env'],Env),
+        (is_only_read_op(Getf)->rw_add(Ctx,Var,r);rw_add(Ctx,Var,w)),
         Body = (BodyS, place_op(Env,Getf, Var, ResultVs,Result)).
 
 compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, String], (Code,Body)):- 
@@ -48,28 +61,26 @@ compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, String], (Code,Body)):-
 
 
 compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm], Body):- is_symbol_setter(Env,SetQ),
-       % (EnvIn\==[]-> true ; break),
-	!,	
+        rw_add(Ctx,Var,w),
+        !,	
 	if_must_compile_body(Ctx,Env,ResultV,ValueForm, ValueBody),
         ((op_return_type(SetQ,RT),RT=name) ->  =(Var,Result) ; =(ResultV,Result)),
         Body = (ValueBody, symbol_setter(Env,SetQ, Var, ResultV)).
-        
-
-ensure_rw(V,Dict):- get_attr(V,rwstate,Dict)-> true ; (Dict = rw{r:0,w:0},put_attr(V,rwstate,Dict)).
 
 
-rw_add(V,RW):- ensure_rw(V,Dict),arginfo_incr(RW,Dict).
-rw_get(V,RW,Value):- ensure_rw(V,Dict),get_dict(RW,Dict,Value).
+% catches an internal error in this compiler 
+compile_symbol_getter(Ctx,Env,Result,Var, Body):- Var==mapcar,!, 
+  dbmsg(compile_symbol_getter(Ctx,Env,Result,Var, Body)), lisp_dumpST,break.
 
 
-compile_symbol_getter(Ctx,Env,Result,Var, Body):- Var==mapcar,!, dbmsg(compile_symbol_getter(Ctx,Env,Result,Var, Body)), lisp_dumpST,break.
-
-
-compile_symbol_getter(_Ctx,Env,Value, Var, Body):-  atom(Var),!,
+compile_symbol_getter(Ctx,Env,Value, Var, Body):-  atom(Var),!,
         debug_var([Var,'_Get'],Value),
+        rw_add(Ctx,Var,r),
         Body = symbol_value(Env, Var, Value).   
-        
+
+/*
 compile_symbol_getter(_Cx,Env,Value, Var,  Body):- % lisp_dumpST,break,
+   rw_add(Ctx,Var,r),
    debug_var([Var,'_Stack'],Value0),
    debug_var([Var,'_VAL'],Value),
 	!,
@@ -79,7 +90,7 @@ compile_symbol_getter(_Cx,Env,Value, Var,  Body):- % lisp_dumpST,break,
 			extract_variable_value(Value0, Value, _)
 		    ;	symbol_value(Var,Value)
 		    ;	throw(ErrNo, Var)	)	)).	
-
+*/
 
 
 
@@ -153,6 +164,9 @@ place_op(Env,decf, Var, [Value],  Result):- atom(Var),!,
 place_op(Env,setf, Var, [Result],  Result):- atom(Var),!,
   set_symbol_value(Env,Var, Result).
 
+place_op(Env,setf, Place, [Result],  Result):- is_list(Place),!,
+  set_place_value(Env,Place, Result).
+
 %TODO Make it a constantp
 symbol_setter(Env,defconstant, Var, Result):- 
    set_symbol_value(Env,Var,Result),
@@ -195,6 +209,7 @@ is_pair_op(psetq).
 is_pair_op(setf).
 is_pair_op(psetf).
 
+is_only_read_op(getf).
 
 is_place_op(setf).
 is_place_op(psetf).
@@ -212,7 +227,8 @@ pairify([],[],[]).
 pairify([Var, ValueForm | Rest],[Var | Atoms],[ValueForm | Forms]):-
    pairify(Rest,Atoms,Forms).
 
-set_with_prolog_var(_Cx,Env,SetQ,Var,Result,symbol_setter(Env,SetQ, Var, Result)).
+set_with_prolog_var(Ctx,Env,SetQ,Var,Result,symbol_setter(Env,SetQ, Var, Result)):-
+  rw_add(Ctx,Var,w).
 
 expand_ctx_env_forms(Ctx, Env,Forms,Body, Result):- 
    must_compile_body(Ctx,Env,Result,Forms, Body).

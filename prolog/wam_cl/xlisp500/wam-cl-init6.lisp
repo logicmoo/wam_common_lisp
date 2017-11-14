@@ -78,6 +78,7 @@
 	     (setf index (+ 1 index))
 	     (go start)))
 	new-sequence)))
+
 (defun elt (sequence index)
   (if (listp sequence)
       (nth index sequence)
@@ -86,6 +87,8 @@
   (if (listp sequence)
       (setf (nth index sequence) new-object)
       (setf (aref sequence index) new-object)))
+
+
 (defun make-sequence (result-type size &key initial-element)
   (let ((type-head (car (designator-list result-type))))
     (case type-head

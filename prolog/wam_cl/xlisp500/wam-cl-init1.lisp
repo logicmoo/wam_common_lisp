@@ -1278,8 +1278,10 @@
 (defun atom (object) (not (consp object)))
 (defun rplaca (cons object) (setf (car cons) object) cons)
 (defun rplacd (cons object) (setf (cdr cons) object) cons)
+
 (defun caar (x) (car (car x)))
 (defun (setf caar) (new-object x) (setf (car (car x)) new-object))
+
 (defun cadr (x) (car (cdr x)))
 (defun (setf cadr) (new-object x) (setf (car (cdr x)) new-object))
 (defun cdar (x) (cdr (car x)))
@@ -1305,8 +1307,10 @@
 (defun caaaar (x) (car (car (car (car x)))))
 (defun (setf caaaar) (new-object x) (setf (car (caaar x)) new-object))
 (defun caaadr (x) (car (car (car (cdr x)))))
+
 (defun (setf caaadr) (new-object x) (setf (car (caadr x)) new-object))
 (defun caadar (x) (car (car (cdr (car x)))))
+
 (defun (setf caadar) (new-object x) (setf (car (cadar x)) new-object))
 (defun caaddr (x) (car (car (cdr (cdr x)))))
 (defun (setf caaddr) (new-object x) (setf (car (caddr x)) new-object))

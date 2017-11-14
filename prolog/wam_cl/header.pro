@@ -60,28 +60,40 @@
 :- discontiguous(ssip_define/2).
 
 
-:- ensure_loaded(arglists).
-:- ensure_loaded(assign).
-:- ensure_loaded(backquote).
-:- ensure_loaded(pnames).
-:- ensure_loaded(readtables).
-:- ensure_loaded(doc_strings).
-:- ensure_loaded(string).
-:- ensure_loaded(prims).
-:- ensure_loaded(block).
-:- ensure_loaded(tagbody).
-:- ensure_loaded(readtables).
-:- ensure_loaded(symbol).
-:- ensure_loaded(package).
-:- ensure_loaded(compile).
-:- ensure_loaded(compile_funop).
-:- ensure_loaded(docs).
-:- ensure_loaded(loadfile).
-:- ensure_loaded(print).
-:- ensure_loaded(mizepro).
-:- ensure_loaded(print).
-:- ensure_loaded(repl).
-:- ensure_loaded(soops).
-:- ensure_loaded(streams).
-:- ensure_loaded(tests).
 
+:-ensure_loaded(arglists).
+:-ensure_loaded(assign).
+:-ensure_loaded(backquote).
+:-ensure_loaded(block).
+:-ensure_loaded(callp).
+:-ensure_loaded(compile).
+:-ensure_loaded(compile_funop).
+:-ensure_loaded(docs).
+:-ensure_loaded(env).
+:-ensure_loaded(interp).
+:-ensure_loaded(loadfile).
+:-ensure_loaded(mizepro).
+:-ensure_loaded(package).
+:-ensure_loaded(places).
+:-ensure_loaded(pnames).
+:-ensure_loaded(prims).
+:-ensure_loaded(print).
+:-ensure_loaded(readtables).
+:-ensure_loaded(repl).
+:-ensure_loaded(soops).
+:-ensure_loaded(sreader).
+:-ensure_loaded(streams).
+:-ensure_loaded(string).
+:-ensure_loaded(symbol).
+:-ensure_loaded(tagbody).
+:-ensure_loaded(tests).
+/*
+:-ensure_loaded(neil_smith).
+:-ensure_loaded(utils_for_swi).
+:-ensure_loaded(utils_higher_order).
+:-ensure_loaded(utils_list).
+:-ensure_loaded(utils_oset).
+:-ensure_loaded(utils_set).
+:-ensure_loaded(utils_shortest_paths).
+:-ensure_loaded(utils_writef).
+*/

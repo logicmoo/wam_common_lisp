@@ -62,7 +62,7 @@ eval3([defmacro, Name, FormalParms | Body0], _, Name):-
       maybe_get_docs(defun,Name,Body0,Body),
 	!,
         retractall(user:macro_lambda(_Scope,Name,_,_,_)),
-	asserta(user:macro_lambda(defmacro,Name, FormalParms, Body,AlphaRenames)),
+	asserta(user:macro_lambda(defmacro,Name, FormalParms, Body, [])),
 	!.
 eval3([defun, Name, FormalParms, Body0], _, Name):-
         maybe_get_docs(defun,Name,Body0,Body),
@@ -97,7 +97,7 @@ eval3([Procedure|Arguments], Bindings, Result):-  lisp_operator(Procedure),!,
   !.
 
 eval3([Procedure|Arguments], Bindings, Result):-
-  user:macro_lambda(_Scope,Procedure, FormalParams, LambdaExpression,AlphaRenames),
+  user:macro_lambda(_Scope,Procedure, FormalParams, LambdaExpression, []),
   bind_formal_parameters(FormalParams, Arguments, Bindings, NewBindings),
   eval(['eval*'|LambdaExpression], NewBindings, Result).
 
@@ -161,7 +161,7 @@ apply_f(_Binds,[closure, FormalParams, Body, Bindings0], ActualParams, Result):-
 	!.
 
 apply_f(_Binds,ProcedureName, ActualParams, Result):-
-	user:macro_lambda(_Scope,ProcedureName,FormalParams, LambdaExpression,AlphaRenames),!,
+	user:macro_lambda(_Scope,ProcedureName,FormalParams, LambdaExpression,[]),!,
 	bind_formal_parameters(FormalParams, ActualParams, Bindings),
         eval(LambdaExpression, Bindings, Result),
 	!.

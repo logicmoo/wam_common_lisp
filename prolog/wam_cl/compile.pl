@@ -72,6 +72,9 @@
 :- op(1200,  fx, <<== ).	% functional imperative definition
 
 
+env_toplevel(Env):- Env = toplevel.
+new_compile_ctx(Ctx):- list_to_rbtree([type-ctx],Ctx).
+
 % Connection to LPA's built-in error handler
 
 '?ERROR?'(Error, Form):-
@@ -114,10 +117,12 @@ lisp_compile(Expression,Body):-
    lisp_compile(Result,Expression,Body).
 
 lisp_compile(Result,SExpression,Body):- 
-   lisp_compile(toplevel,Result,SExpression,Body).
+   env_toplevel(Env),
+   lisp_compile(Env,Result,SExpression,Body).
 
 lisp_compile(Env,Result,Expression,Body):- 
-   must_or_rtrace(lisp_compile(_AttVar,Env,Result,Expression,Body)).
+   new_compile_ctx(Ctx),
+   must_or_rtrace(lisp_compile(Ctx,Env,Result,Expression,Body)).
 
 lisp_compile(Ctx,Env,Result,SExpression,Body):- 
    notrace(as_sexp(SExpression,Expression)),
@@ -137,8 +142,8 @@ compile_forms(Ctx,Env,Result,FunctionBody,Code):-
 
 must_compile_body(Ctx,Env,Result,Function, Body):-
   quietly_must_or_rtrace(compile_body(Ctx,Env,Result,Function, Body)),
-  nb_current('$compiler_PreviousResult',THE),
-  setarg(1,THE,Result).
+  % nb_current('$compiler_PreviousResult',THE),setarg(1,THE,Result),
+  !.
 
 if_must_compile_body(Ctx,Env,Result,Function, Body):-
   ((fail,local_override(with_forms,lisp_grovel))
@@ -258,23 +263,27 @@ compile_body(_Cx,Env,Result,['$BQ',Form], Code):-!,compile_bq(Env,Result,Form,Co
 compile_body(_Cx,Env,Result,['`',Form], Code):-!,compile_bq(Env,Result,Form,Code).
 
 % DEFUN
-compile_body(Ctx,_Env,Name,[defun,Name0,FormalParms|FunctionBody0], CompileBody):- 
-    combine_setfs(Name0,Name1),
-    must(find_function_or_macro_name(Name1,_Len, Name)),
-    must_or_rtrace(maybe_get_docs(function,Name,FunctionBody0,FunctionBody,DocCode)),
-    FunctionHead=[Name|FormalParms],
+compile_body(Ctx,Env,Symbol,[defun,Name,FormalParms|FunctionBody0], CompileBody):- 
+    combine_setfs(Name,Symbol),
+    must(find_function_or_macro_name(Symbol,_Len, Function)),
+    must_or_rtrace(maybe_get_docs(function,Function,FunctionBody0,FunctionBody,DocCode)),
+    FunctionHead=[Function|FormalParms],
+    debug_var('Setf-symbol-function',SetfR),
+    SETFUNCTION = place_op(Env,setf, [symbol_function,Symbol], [Function],  SetfR),
+    %compile_body(Ctx,Env,SetfR,[setf,[symbol_function,[quote,Symbol]],Function],SETFUNCTION),
     CompileBody = (% asserta((Head  :- (fail, <<==(FunctionHead , FunctionBody)))),
                    DocCode,
                    HeadDefCode,
-                   asserta(user:function_lambda(defun(Name0),Name, FormalParms, FunctionBody)),
-                   FunctionAssert),!,
+                   asserta(user:function_lambda(defun(Name),Function, FormalParms, FunctionBody)),
+                   FunctionAssert,
+                   SETFUNCTION),!,
     make_compiled(Ctx,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode),
     (local_override(with_forms,lisp_grovel) -> FunctionAssert = true; FunctionAssert = asserta((Head  :- (!,  BodyCode)))).
 
-make_compiled(Ctx,FunctionHead,FunctionBody,Head,HeadDefCode,(BodyCode,Result=CompiledResult)):-
+make_compiled(Ctx,FunctionHead,FunctionBody,Head,HeadDefCode,(BodyCode)):-
     expand_function_head(Ctx,CallEnv,FunctionHead, Head, HeadEnv, Result,HeadDefCode,HeadCode),
     debug_var("RET",Result),debug_var("Env",CallEnv),
-    if_must_compile_body(Ctx,CallEnv,CompiledResult,[progn|FunctionBody],Body0),
+    if_must_compile_body(Ctx,CallEnv,Result,[progn|FunctionBody],Body0),
     body_cleanup(((CallEnv=HeadEnv,HeadCode,Body0)),BodyCode).
 
 same_symbol(OP1,OP2):- var(OP2),atom(OP1),!,prologcase_name(OP1,OP2).
@@ -474,12 +483,14 @@ normalize_let1([Variable, Form],[bind, Variable, Form]).
 normalize_let1( Variable,[bind, Variable, []]).
 
 % LET
-compile_body(Ctx,Env,Result,['let', []| BodyForms], Body):- !, compile_body(Ctx,Env,Result,[progn| BodyForms], Body).
+compile_body(Ctx,Env,Result,[let, []| BodyForms], Body):- !, compile_body(Ctx,Env,Result,[progn| BodyForms], Body).
 compile_body(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body):- !,
      must_or_rtrace(normalize_let(NewBindingsIn,NewBindings)),!,       
 	zip_with(Variables, ValueForms, [Variable, Form, [bind, Variable, Form]]^true, NewBindings),      
 	expand_arguments(Ctx,Env,'funcall',1,ValueForms, ValueBody, Values),
-       zip_with(Variables, Values, [Var, Val, bv(Var, [Val|Unused])]^true,Bindings),
+        freeze(Var,debug_var('_Init',Var,Val)),
+        freeze(Var,put_var_tracker(Ctx,Var,Val)),
+        zip_with(Variables, Values, [Var, Val, bv(Var, [Val|Unused])]^true,Bindings),
 
    nop((must_or_rtrace((debug_var("_U",Unused),
    debug_var("LETENV",BindingsEnvironment),
@@ -549,7 +560,8 @@ compile_body(_Ctx,_Env,[],_, true):- local_override(with_forms,lisp_grovel),!.
 compile_body(Ctx,Env,Result,BodyForms, Body):- quietly_must_or_rtrace(compile_funop(Ctx,Env,Result,BodyForms, Body)),!.
 
 must_compile_progn(Ctx,Env,Result,Forms, Body):-
-   local_override('$compiler_PreviousResult',the(PreviousResult)),
+   % local_override('$compiler_PreviousResult',the(PreviousResult)),
+   PreviousResult = [],
    must_compile_progn(Ctx,Env,Result,Forms, PreviousResult,Body).
  
 must_compile_progn(Ctx,Env,Result,Forms, PreviousResult, Body):-

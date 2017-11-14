@@ -87,11 +87,13 @@
     ((0 1 2) nil)
     ((3 4) t)
     (t (error "not an array"))))
+
 (defun aref (array &rest subscripts)
   (row-major-aref array (apply #'array-row-major-index array subscripts)))
 (defun (setf aref) (new-element array &rest subscripts)
   (setf (row-major-aref array (apply #'array-row-major-index array subscripts))
 	new-element))
+
 (defun array-dimension (array axis-number)
   (nth axis-number (array-dimensions array)))
 (defun array-dimensions (array)
@@ -238,10 +240,12 @@
   (case (ldb '(2 . 0) (ival object))
     (2 (= (iref object 1) 3))
     (3 (member (jref object 1) '(20 116)))))
+
 (defun svref (simple-vector index)
   (aref simple-vector index))
 (defun (setf svref) (new-element simple-vector index)
   (setf (aref simple-vector index) new-element))
+
 (defun vector (&rest objects)
   (let ((vector (makei (length objects) 3))
 	(i 2))
