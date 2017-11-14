@@ -21,7 +21,7 @@
 :- discontiguous(compile_funop/5).
 
 % Use a previous DEFMACRO
-compile_funop(Cxt,Env,RResult,[Procedure|Arguments],CompileBodyCode):-
+compile_funop(Ctx,Env,RResult,[Procedure|Arguments],CompileBodyCode):- nonvar(Procedure),
   user:macro_lambda(_Scope,Procedure, FormalParams, LambdaExpression,_),!,
 
   must_or_rtrace(bind_parameters(NewEnv, FormalParams, Arguments,BindCode)),!,
@@ -29,13 +29,13 @@ compile_funop(Cxt,Env,RResult,[Procedure|Arguments],CompileBodyCode):-
   NextEnv = [NewEnv|Env],  
   call(BindCode),
   must_or_rtrace(expand_commas(NewEnv,CommaResult,LambdaExpression,CodeS)),
-  body_cleanup_keep_debug_vars(CodeS,Code),
+  body_cleanup_keep_debug_vars(Ctx,CodeS,Code),
   dbmsg(macro(macroResult(BindCode,Code,CommaResult))),
   (local_override(with_forms,lisp_grovel)-> (lisp_dumpST) ; true),
   call(Code),
-  must_compile_body(Cxt,NextEnv,CompileBody0Result,CommaResult, MCBR),
+  must_compile_body(Ctx,NextEnv,CompileBody0Result,CommaResult, MCBR),
   call(MCBR),
-  must_compile_body(Cxt,NextEnv,RResult,CompileBody0Result, CompileBody),
+  must_compile_body(Ctx,NextEnv,RResult,CompileBody0Result, CompileBody),
   CompileBodyCode = (CompileBody).
 
 
@@ -54,7 +54,7 @@ expand_arguments_maybe_macro(Ctx,CallEnv,FunctionName,0,FunctionArgs,ArgBody, Ar
   expand_arguments(Ctx,CallEnv,FunctionName,0,FunctionArgs,ArgBody, Args).
   
 
-compile_funop(Ctx,Env,Result,[Op | FunctionArgs], Body):- user:op_replacement(Op,Op2), !,
+compile_funop(Ctx,Env,Result,[Op | FunctionArgs], Body):- nonvar(Op),user:op_replacement(Op,Op2), !,
   must_compile_body(Ctx,Env,Result,[Op2 | FunctionArgs],Body).
 
 
@@ -65,10 +65,10 @@ compile_funop(Ctx,Env,Result,[FunctionName , A| FunctionArgs], Body):- is_list(F
   must_compile_body(Ctx,Env,Result,[funcall_list,FunctionName, A | FunctionArgs],Body).
 
 compile_funop(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):- \+ atom(FunctionName),!,
-  trace,must_compile_body(Ctx,Env,Result,[funcall_obj,FunctionName | FunctionArgs],Body).
+  dumpST,trace,must_compile_body(Ctx,Env,Result,[funcall_obj,FunctionName | FunctionArgs],Body).
 
 
-compile_funop(Ctx,CallEnv,Result,[FunctionName | FunctionArgs], Body):- 
+compile_funop(Ctx,CallEnv,Result,[FunctionName | FunctionArgs], Body):- nonvar(FunctionName),
       expand_arguments_maybe_macro(Ctx,CallEnv,FunctionName,0,FunctionArgs,ArgBody, Args),
       debug_var([FunctionName,'_Ret'],Result),      
       find_function_or_macro(FunctionName,Args,Result,ExpandedFunction),      

@@ -43,10 +43,11 @@ is_self_evaluationing_const(X):- atomic(X),!,(X==t;X==[];number(X);is_keywordp(X
 
 
 user:op_replacement(first,cl_car).
-cl_car(List, Result):- List==[]->Result=[];
-	once( (	List = [Result|_]
-	    ;	error(first_not_cons, ErrNo, _),
-		throw(ErrNo)	)).
+cl_car(List, Result):- 
+  (List = [Result|_] -> true;
+  (List==[] -> Result=[];
+  (	error(first_not_cons, ErrNo, _),
+		throw(ErrNo)))).
 
 user:op_replacement(rest,cl_cdr).
 cl_cdr(List, Result):- List==[]->Result=[];
@@ -100,7 +101,7 @@ cl_and(Bool1, Bool2, Result):-
 
 lisp_apply(FunctionObject, Arguments, Result):-
 		FunctionObject = [closure,FormalArgs, Body, Environment]
-	->	zip_with(FormalArgs, Arguments, [Arg, Val, bv(Arg, [Val|_])]^true, Bindings),
+	->	zip_with(FormalArgs, Arguments, [Arg, Val, bv(Arg,Val)]^true, Bindings),
 		apply(Body, [[Bindings|Environment], Result])
 	;	FunctionObject = [function,FunctionName], 
 		append(Arguments, [Result], ArgumentsResult),

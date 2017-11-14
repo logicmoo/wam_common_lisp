@@ -69,6 +69,7 @@
 :-ensure_loaded(compile).
 :-ensure_loaded(compile_funop).
 :-ensure_loaded(docs).
+:-ensure_loaded(hashtables).
 :-ensure_loaded(env).
 :-ensure_loaded(interp).
 :-ensure_loaded(loadfile).

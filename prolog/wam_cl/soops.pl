@@ -121,14 +121,14 @@ classof_to_typeof(claz_symbol,symbol).
 classof_to_typeof(claz_package,package).
 classof_to_typeof(claz_number,numer).
 
-:- multifile symp:o_p_v/3.
-:- dynamic symp:o_p_v/3.
+:- multifile soops:o_p_v/3.
+:- dynamic soops:o_p_v/3.
 
-symp:o_p_v(Symbol,kw_deftype,defconstant):- symp:o_p_v(Symbol,package,pkg_kw).
-symp:o_p_v(Symbol,typeof,keyword):- symp:o_p_v(Symbol,package,pkg_kw).
+soops:o_p_v(Symbol,kw_deftype,defconstant):- soops:o_p_v(Symbol,package,pkg_kw).
+soops:o_p_v(Symbol,typeof,keyword):- soops:o_p_v(Symbol,package,pkg_kw).
 :- include('si.pro').
-symp:o_p_v(Symbol,typeof,Type):- symp:o_p_v(Symbol,classof,Class),
-  \+ clause(symp:o_p_v(Symbol,typeof,_AnyType),true),
+soops:o_p_v(Symbol,typeof,Type):- soops:o_p_v(Symbol,classof,Class),
+  \+ clause(soops:o_p_v(Symbol,typeof,_AnyType),true),
   classof_to_typeof(Class,Type).
 %:- include('si2.pro').
 
@@ -136,7 +136,7 @@ symp:o_p_v(Symbol,typeof,Type):- symp:o_p_v(Symbol,classof,Class),
 f_u_get_opv(O,Result):- findall([P|V],get_opv(O,P,V),Result).
 f_u_get_opv(O,P,V):- get_opv(O,P,V).
 	
-add_opv_maybe(O,P,_):- symp:o_p_v(O,P,_),!.
+add_opv_maybe(O,P,_):- soops:o_p_v(O,P,_),!.
 add_opv_maybe(O,P,V):- add_opv(O,P,V),!.
 
 add_opv_pred(MPred,O,P,V):- strip_module(MPred,M,Pred),Prop=.. [Pred,O,P,V], 
@@ -146,12 +146,12 @@ add_opv(Symbol,value,SValue):- atom(SValue),
  (atom_contains(SValue,'(');atom_contains(SValue,' ')),
   (as_sexp(SValue,Value)->SValue\==Value),!,add_opv(Symbol,value,Value).
 
-add_opv(O,P,V):- ( \+ symp:o_p_v(O,P,_) -> assert(symp:o_p_v(O,P,V)) ; true).
+add_opv(O,P,V):- ( \+ soops:o_p_v(O,P,_) -> assert(soops:o_p_v(O,P,V)) ; true).
 
 get_opv(O,_,_):- string(O),!,fail.
-get_opv(O,P,V):- no_repeats(O-P,symp:o_p_v(O,P,V)).
+get_opv(O,P,V):- no_repeats(O-P,soops:o_p_v(O,P,V)).
 
-update_opv(O,P,V):- ignore(retract(symp:o_p_v(O,P,_))),assert(symp:o_p_v(O,P,V)).
+update_opv(O,P,V):- ignore(retract(soops:o_p_v(O,P,_))),assert(soops:o_p_v(O,P,V)).
 
 
 /*

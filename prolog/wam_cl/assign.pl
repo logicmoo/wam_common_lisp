@@ -17,17 +17,19 @@
 :- include('header.pro').
 :- ensure_loaded((utils_for_swi)).
 
-rw_add(Ctx,Var,RW):- ensure_rw(Ctx,Var,Dict),arginfo_incr(RW,Dict).
-rw_get(Ctx,Var,RW,Value):- ensure_rw(Ctx,Var,Dict),get_dict(RW,Dict,Value).
+% local symbol?
+rw_add(Ctx,Var,RW):-  get_var_tracker(Ctx,Var,Dict),arginfo_incr(RW,Dict).
 
 % actual var
-ensure_rw(_Ctx,Var,Dict):- var(Var),!, ( get_attr(Var,rwstate,Dict)-> true ; ( Dict = rw{name:_,r:0,w:0},put_attr(Var,rwstate,Dict))).
-% local symbol?
-ensure_rw(Ctx,Atom,Dict):- sanity(atom(Atom)),!,must(get_var_tracker(Ctx,Atom,Var)),!,ensure_rw(Ctx,Var,Dict).
+add_tracked_var(Ctx,Atom,Var):-
+   get_var_tracker(Ctx,Atom,Dict),
+   Vars=Dict.vars,
+   sort([Var|Vars],NewVars),
+   b_set_dict(vars,Dict,NewVars).
+  
+get_var_tracker(Ctx0,Atom,Dict):- get_attr(Ctx0,tracker,Ctx), must(sanity(atom(Atom))),oo_get_attr(Ctx,var_tracker(Atom),Dict),(is_dict(Dict)->true;(trace,oo_get_attr(Ctx,var_tracker(Atom),_SDict))).
+get_var_tracker(Ctx0,Atom,Dict):-  get_attr(Ctx0,tracker,Ctx),Dict=rw{name:Atom,r:0,w:0,vars:[]},oo_put_attr(Ctx,var_tracker(Atom),Dict),!.
 
-get_var_tracker(Ctx,Atom,Var):- nb_get_value(Ctx,Atom,Var)-> true ; put_var_tracker(Ctx,Atom,Var).
-put_var_tracker(Ctx,Atom,Var):- nb_set_value(Ctx,Atom,Var),
-    ( get_attr(Var,rwstate,_Dict)-> true ; ( Dict = rw{name:Atom,r:0,w:0},put_attr(Var,rwstate,Dict))).
 
 
 compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, Atom2| Rest], Body):- is_parallel_op(SetQ),!, 
@@ -73,28 +75,16 @@ compile_symbol_getter(Ctx,Env,Result,Var, Body):- Var==mapcar,!,
   dbmsg(compile_symbol_getter(Ctx,Env,Result,Var, Body)), lisp_dumpST,break.
 
 
-compile_symbol_getter(Ctx,Env,Value, Var, Body):-  atom(Var),!,
+compile_symbol_getter(Ctx,Env,Value, Var, Body):-  must(atom(Var)),!,
         debug_var([Var,'_Get'],Value),
-        rw_add(Ctx,Var,r),
+        add_tracked_var(Ctx,Var,Value),
+        rw_add(Ctx,Var,r),        
         Body = symbol_value(Env, Var, Value).   
 
-/*
-compile_symbol_getter(_Cx,Env,Value, Var,  Body):- % lisp_dumpST,break,
-   rw_add(Ctx,Var,r),
-   debug_var([Var,'_Stack'],Value0),
-   debug_var([Var,'_VAL'],Value),
-	!,
-	lisp_error_description(unbound_atom, ErrNo, _),
-	Body = (once((	env_memb(Bindings, Env),
-			bvof(bv(Var, Value0),Bindings),
-			extract_variable_value(Value0, Value, _)
-		    ;	symbol_value(Var,Value)
-		    ;	throw(ErrNo, Var)	)	)).	
-*/
 
 
 
-rwstate:attr_unify_hook(_,_).
+rwstate:attr_unify_hook(_,_):-fail.
 
 
 extract_variable_value([Val|Vals], FoundVal, Hole):-
@@ -119,22 +109,21 @@ push_values([V1|Push],V1):- must(nonvar(Push)),nb_setval('$mv_return',[V1|Push])
 
 
 
-bvof(E,L):- nonvar(L),member(E,L).
+bvof(E,E,L):- nonvar(L),member(E,L).
 env_memb(E,L):- nonvar(L),member(E,L).
 env_memb(E,E).
 
 symbol_value_or(Env,Var,G,Value):-
- (env_memb(Bindings, Env),bvof(bv(Var, Value0),Bindings)) 
-    -> extract_variable_value(Value0, Value, _)
-      ; (symbol_value(Var,Value) -> true;  G).
+ (env_memb(Bindings, Env),bvof(bv(Var, Value),_,Bindings)) 
+    -> true ; (symbol_value(Var,Value) -> true;  G).
 
 symbol_value(Var,Value):- get_opv(Var,value,Value).
 
 
 set_symbol_value(Env,Var,Result):-var(Result),!,symbol_value(Env,Var,Result).
 set_symbol_value(Env,Var,Result):- !,
-     ((	env_memb(Bindings, Env),bvof(bv(Var, Value0),Bindings))
-      -> nb_setarg(1,Value0,Result)
+     ((	env_memb(Bindings, Env),bvof(bv(Var,_),BV,Bindings))
+      -> nb_setarg(2,BV,Result)
       ;	( 
         (get_opv(Var, value, _Old) 
            -> update_opv(Var, value, Result) 

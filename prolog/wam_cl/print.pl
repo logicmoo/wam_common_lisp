@@ -24,6 +24,7 @@ sexpr1(X) --> {is_ftVar(X),(get_var_name(X,N)->format(atom(NN),'~w',[N]);format(
 sexpr1(Str)--> {string(Str)},!,[Str].
 sexpr1([function, Expression]) --> ['#'''], !, sexpr1(Expression).
 sexpr1([quote, Expression]) --> [''''], !, sexpr1(Expression).
+sexpr1(Dict) --> {is_dict(Dict,T),Dict=..[_,_|Rest]},!, ['#<'],sexpr1(T),lisplist(Rest,'>').
 sexpr1('ugly'(T,X)) --> ['#<'],sexpr1(T),sexpr1(X),['>'].
 sexpr1('$COMMA'(X)) --> [','],sexpr1(X).
 sexpr1(['$COMMA',X]) --> [','],sexpr1(X).
@@ -58,10 +59,11 @@ writeExpression(Expression):-
 	writeTokenL(TokenL).
 
 no_right_padding('(').
+no_right_padding(')').
 no_right_padding(X):-need_right_padding(X),!,fail.
 no_right_padding(Atom):- \+ atom(Atom),!,fail.
 no_right_padding(Atom):- \+ atom_length(Atom,1),!,fail.
-no_right_padding(Atom):- upcase_atom(Atom,Atom).
+% no_right_padding(Atom):- upcase_atom(Atom,Atom).
 need_right_padding('.').
 
 

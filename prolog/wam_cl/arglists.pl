@@ -275,7 +275,8 @@ ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,Mode,['&env'],Params,Names,PV
 ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,required,[F|FormalParms],[V|Params],[F|Names],[V|PVars],Code):- !,
   enforce_atomic(F),
   arginfo_incr(all,ArgInfo),arginfo_incr(req,ArgInfo),
-  rw_add(Ctx,V,w),
+  % ensure_var_tracker(Ctx,F,V),
+  rw_add(Ctx,F,w),
   ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,required,FormalParms,Params,Names,PVars,Code).
 
 
@@ -283,6 +284,7 @@ ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,required,[F|FormalParms],[V|P
 ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,optional,[ [F,InitForm,Supplied]|FormalParms],[V|Params],[F,Supplied|Names],[V,SuppliedV|PVars],PCode):- !,
    enforce_atomic(F),
    arginfo_incr(all,ArgInfo),arginfo_incr(opt,ArgInfo),
+   add_tracked_var(Ctx,F,V),
    ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,optional,FormalParms,Params,Names,PVars,Code),
    compile_init(F,V,[InitForm],Init),
    PCode = (arg_is_present(F,V,Supplied,SuppliedV),Init,Code).
@@ -334,10 +336,12 @@ ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,key,[F|FormalParms],Params,Na
 tfa:- tfa([ item,list,'&key',key,[test, [function, eql], testp],['test-not', [], notp]]).
 tfa(FormalParms):-
   dbmsg(:-tfa(FormalParms)),
-  function_head_params(_Ctx,_Env,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,Names,PVars,Code0),
+  debug_var('TFA_ENV',Env),
+  new_compile_ctx(Ctx),
+  function_head_params(Ctx,Env,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,Names,PVars,Code0),
   maplist(debug_var,Names,PVars),
   dbmsg(arginfo(ArgInfo,formal=FormalParms,params=ActualArgs,names=Names,vars=PVars,zab=ZippedArgBindings)),
-  body_cleanup(Code0,Code),
+  body_cleanup(Ctx,Code0,Code),
   dbmsg(:-Code),!.
 
 % compile_init(F,P,InitForm,Init)
@@ -387,10 +391,11 @@ function_head_params(Ctx,Env,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,Na
    debug_var("Code",Code),debug_var("ActualArgs",ActualArgs),
    ArgInfo = arginfo{req:0,all:0,opt:0,rest:0,key:0,aux:0,env:0,allow_other_keys:0,names:Names,complex:0},
    enter_ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,required,FormalParms,ActualArgsMaybe,Names,PVars,Code),
-   maplist(debug_var('_Param'),Names,PVars),
+   maplist(add_tracked_var(Ctx),Names,PVars),
+   maplist(debug_var('_Param'),Names,PVars),   
    freeze(Var,debug_var('_Thru',Var,Val)),
-   freeze(Var,put_var_tracker(Ctx,Var,Val)),
-	zip_with(Names, PVars, [Var, Val, bv(Var, [Val|_])]^true, ZippedArgBindings),!,
+   freeze(Var,add_tracked_var(Ctx,Var,Val)),
+	zip_with(Names, PVars, [Var, Val, bv(Var,Val)]^true, ZippedArgBindings),!,
         add_alphas(Ctx,Names),
    % RestNKeysOut=RestNKeysIn,
    ((\+ get_dict(rest,ArgInfo,0); \+ get_dict(key,ArgInfo,0)) ->  
@@ -405,7 +410,7 @@ bind_formal_arginfo(ArgInfo, Arguments, OldEnv, NewEnv,BindCode):-
 bind_formal_arginfo_with_rest(ArgInfo, Arguments, OldEnv, NewEnv, _BindCode):- 
       length(Left,ArgInfo.all),
       must(append(Left,Rest,Arguments)), % Checks arg underflow
-      append(OldEnv, bv(ArgInfo.rest,[Rest|_]),EnvMid),
+      append(OldEnv, bv(ArgInfo.rest,Rest),EnvMid),
       bind_formal_old(ArgInfo.names,Left,EnvMid,NewEnv).
 
 bind_formal_arginfo_no_rest(ArgInfo, Arguments, OldEnv, NewEnv, _BindCode):- 
@@ -418,7 +423,7 @@ bind_formal_old(_LeftOver, [], Env, Env, true).
 bind_formal_old([FormalParam|FormalParms], [ActualParam|ActualParams],
 		Bindings0, Bindings,BindCode):- 
 	bind_formal_old(FormalParms, ActualParams, 
-		[bv(FormalParam, [ActualParam|_])|Bindings0], Bindings,BindCode).
+		[bv(FormalParam,ActualParam)|Bindings0], Bindings,BindCode).
 
 
 
@@ -444,7 +449,7 @@ make_bind_value_missing( Var,Env,true):-simple_atom_var(Var),!,make_bind_value(V
 make_bind_value_missing([Var,InitForm],Env,Code):-!,simple_atom_var(Var),compile_init_form(Env,Value,InitForm,Code),make_bind_value(Var,Value,Env),!.
 make_bind_value_missing([Var,InitForm,IfPresent],Env,Code):-simple_atom_var(Var),make_bind_value(IfPresent,[],Env),make_bind_value_missing([Var,InitForm],Env,Code).
 
-make_bind_value(Var,Value,Env):-simple_atom_var(Var),!,debug_var([Var,'_In'],Value),append_open_list(Env,bv(Var,[Value|_])).
+make_bind_value(Var,Value,Env):-simple_atom_var(Var),!,debug_var([Var,'_In'],Value),append_open_list(Env,bv(Var,Value)).
 make_bind_value([Var,_InitForm],Value,Env):-simple_atom_var(Var),make_bind_value(Var,Value,Env).
 make_bind_value([Var,_InitForm,IfPresent],Value,Env):-simple_atom_var(Var),make_bind_value(IfPresent,t,Env),make_bind_value(Var,Value,Env).
 
