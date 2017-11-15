@@ -6,6 +6,10 @@
  *
  *
  * Douglas'' Notes:
+
+ * Need ot decide if BLOCK exits will use throw/1 or if they will be able to use tagbody GOs 
+   (which are implemented as calls to predicate closures )
+
  *
  * (c) Douglas Miles, 2017
  *
@@ -43,55 +47,46 @@ loop_1var_n_step([Variable, Form],[bind, Variable, Form],[]).
 loop_1var_n_step(Variable,[bind, Variable, []],[]).
 
 
-
-compile_prolog_call(_Ctx,Env,ResultOut,[],Body,BodyOut):-subst(Body,'$out',ResultOut,BodyMid),subst(BodyMid,'$env',Env,BodyOut).
-compile_prolog_call(Ctx,Env,ResultOut,[R|Resolve],Body,(Code,BodyResolved)):-
-  subst(Body,R,Result,BodyMid),
-  must_compile_body(Ctx,Env,Result,R,Code),
-  compile_prolog_call(Ctx,Env,ResultOut,Resolve,BodyMid,BodyResolved).
-
-
-
 shared_lisp_compiler:plugin_expand_function_body(Ctx,Env,Result,InstrS,Code):- 
   compile_body_block(Ctx,Env,Result,InstrS,Code),!.
 
-compile_body_block(_Ctx,_Env,Result,exit( Tag), push_label(exit( Tag)) ):- debug_var("_GORES",Result).
-compile_body_block(_Ctx,_Env,Result,enter( Tag), push_label(enter( Tag)) ):- debug_var("_GORES",Result).
+%compile_body_block(_Ctx,_Env,Result,exit( Tag), push_label(exit( Tag)) ):- debug_var("_GORES",Result).
+%compile_body_block(_Ctx,_Env,Result,enter( Tag), push_label(enter( Tag)) ):- debug_var("_GORES",Result).
 compile_body_block(Ctx,Env,Result,[do,LoopVars,[EndTest|ResultForms]|TagBody], Code):- 
    loop_vars_to_let_n_step(LoopVars,LetVars,[],PSetQStepCode),
-   gensym(dosym,Tag),
+   gensym(dosym,DoTag),
    must_compile_body(Ctx,Env,Result,
     [block,[],       
       [let,LetVars,
           [tagbody,
-            [label,Tag],
+            [label,DoTag],
             [if,
               EndTest,
-               ['return-from',[],[progn|ResultForms]],
+               [return_from,[],[progn|ResultForms]],
                [progn,[progn|TagBody],[psetq|PSetQStepCode]]
             ],
-            go(Tag)]
+            [go,DoTag]]
        ]
      ],  Code).
 
-compile_body_block(Ctx,Env,GoResult,['return-from',Tag,ValueForm], (ValueBody, goto(exit(Tag),ValueResult,Env)) ):- 
+compile_body_block(Ctx,Env,GoResult,[return_from,Tag,ValueForm], (ValueBody, goto(exit(Tag),ValueResult,Env)) ):- 
   compile_body(Ctx,Env,ValueResult,ValueForm, ValueBody),
   debug_var("_GORES",GoResult),
   debug_var("RetVal",ValueResult).
 
-compile_body_block(Ctx,Env,Result,['return',Value],Body):-!,compile_body_block(Ctx,Env,Result,['return-from',[],Value],Body).
+compile_body_block(Ctx,Env,Result,['return',Value],Body):-!,compile_body_block(Ctx,Env,Result,[return_from,[],Value],Body).
 compile_body_block(Ctx,Env,Result,return(Value), Body ):- !,compile_body_block(Ctx,Env,Result,[return, Value],Body).
 
-compile_body_block(Ctx,Env,Result,[block,Tag|InstrS], Code):- 
-  compile_block(Ctx,Env,Result,Tag,InstrS,Code),!.
+compile_body_block(Ctx,Env,Result,[block,BlockTag|InstrS], Code):- must(is_symbolp(BlockTag)), 
+  must_compile_block(Ctx,Env,Result,BlockTag,InstrS,Code),!.
 
 compile_block(Ctx,Env,Result,Tag,InstrS,Code):-
- append([[go,enter(Tag)],enter(Tag)|InstrS],[[go,exit(Tag)],exit(Tag)],WInstrS),
- compile_as_tagbody(Ctx,Env,Result,WInstrS,Code).
+ append([[go,[enter,Tag]],[label,[enter,Tag]]|InstrS],[[go,[exit,Tag]],[label,[exit,Tag]]],WInstrS),
+ must_compile_body(Ctx,Env,Result,WInstrS,Code),!.
 
 
 tst:is_local_test(block3,
-   [block,block3,setq(b,2),[go,tag1],setq(a,1),(tag1),setq(a,4),print(plus(a,b)),'return-from'(block3,plus(a,b))],6).
+   [block,block3,setq(b,2),[go,tag1],setq(a,1),(tag1),setq(a,4),print(plus(a,b)),return_from(block3,plus(a,b))],6).
 
 :- fixup_exports.
 

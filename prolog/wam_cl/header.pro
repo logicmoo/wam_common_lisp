@@ -19,12 +19,12 @@
 :- set_prolog_flag(verbose_load,full).
 :- set_prolog_flag(verbose,normal).
 :- set_prolog_flag(verbose_autoload,true).
-:- ensure_loaded(library(must_trace)).
-:- ensure_loaded(library(logicmoo_util_terms)).
-:- ensure_loaded(library(logicmoo_util_common)).
-%:- ensure_loaded(utils_list).
-:- ensure_loaded(utils_higher_order).
-:- ensure_loaded(library(dmsg)).
+:- use_module(library(must_trace)).
+:- use_module(library(logicmoo_util_terms)).
+:- use_module(library(logicmoo_util_common)).
+%:- use_module(utils_list).
+:- use_module(utils_higher_order).
+:- use_module(library(dmsg)).
 
 % :- require([colormsg1/1]).
 
@@ -61,40 +61,40 @@
 
 
 
-:-ensure_loaded(arglists).
-:-ensure_loaded(assign).
-:-ensure_loaded(backquote).
-:-ensure_loaded(block).
-:-ensure_loaded(callp).
-:-ensure_loaded(compile).
-:-ensure_loaded(compile_funop).
-:-ensure_loaded(docs).
-:-ensure_loaded(hashtables).
-:-ensure_loaded(env).
-:-ensure_loaded(interp).
-:-ensure_loaded(loadfile).
-:-ensure_loaded(mizepro).
-:-ensure_loaded(package).
-:-ensure_loaded(places).
-:-ensure_loaded(pnames).
-:-ensure_loaded(prims).
-:-ensure_loaded(print).
-:-ensure_loaded(readtables).
-:-ensure_loaded(repl).
-:-ensure_loaded(soops).
-:-ensure_loaded(sreader).
-:-ensure_loaded(streams).
-:-ensure_loaded(string).
-:-ensure_loaded(symbol).
-:-ensure_loaded(tagbody).
-:-ensure_loaded(tests).
+:-use_module(arglists).
+:-use_module(assign).
+:-use_module(backquote).
+:-use_module(block).
+:-use_module(callp).
+:-use_module(compile_funop).
+:-use_module(compile).
+:-use_module(docs).
+:-use_module(hashtables).
+:-use_module(env).
+:-use_module(interp).
+:-use_module(loadfile).
+:-use_module(mizepro).
+:-use_module(package).
+:-use_module(places).
+:-use_module(pnames).
+:-use_module(prims).
+:-use_module(print).
+:-use_module(readtables).
+:-use_module(repl).
+:-use_module(soops).
+:-use_module(sreader).
+:-use_module(streams).
+:-use_module(string).
+:-use_module(symbol).
+:-use_module(tagbody).
+:-use_module(tests).
 /*
-:-ensure_loaded(neil_smith).
-:-ensure_loaded(utils_for_swi).
-:-ensure_loaded(utils_higher_order).
-:-ensure_loaded(utils_list).
-:-ensure_loaded(utils_oset).
-:-ensure_loaded(utils_set).
-:-ensure_loaded(utils_shortest_paths).
-:-ensure_loaded(utils_writef).
+:-use_module(neil_smith).
+:-use_module(utils_for_swi).
+:-use_module(utils_higher_order).
+:-use_module(utils_list).
+:-use_module(utils_oset).
+:-use_module(utils_set).
+:-use_module(utils_shortest_paths).
+:-use_module(utils_writef).
 */

@@ -72,6 +72,7 @@
 :- op(1200,  fx, <<== ).	% functional imperative definition
 
 
+show_frame(X):-X,writeq(X),nl.
 env_toplevel(Env):- Env = toplevel.
 %new_compile_ctx(Ctx):- new_assoc(Ctx)put_attr(Ctx,type,ctx).
 new_compile_ctx(Ctx):- list_to_rbtree([type-ctx],Ctx0),put_attr(Ctx,tracker,Ctx0).
@@ -127,11 +128,11 @@ lisp_compile(Env,Result,Expression,Body):-
 
 lisp_compile(Ctx,Env,Result,SExpression,Body):-
    notrace(as_sexp(SExpression,Expression)),
-   quietly_must_or_rtrace(compile_forms(Ctx,Env,Result,[Expression],Body)).
+   must_or_rtrace(compile_forms(Ctx,Env,Result,[Expression],Body)).
 
 
 compile_forms(Ctx,Env,Result,FunctionBody,Code):-
-   must_compile_progn(Ctx,Env,Result,FunctionBody, Body),!,
+   must_compile_progn(Ctx,Env,Result,FunctionBody, [], Body),!,
    body_cleanup(Ctx,Body,Code).
 
 :- nop( debug_var('FirstForm',Var)),
@@ -142,11 +143,12 @@ compile_forms(Ctx,Env,Result,FunctionBody,Code):-
 
 
 must_compile_body(Ctx,Env,Result,Function, Body):-
-  quietly_must_or_rtrace(compile_body(Ctx,Env,Result,Function, Body)),
+  must_or_rtrace(compile_body(Ctx,Env,Result,Function, Body)),
   % nb_current('$compiler_PreviousResult',THE),setarg(1,THE,Result),
   !.
 
 if_must_compile_body(Ctx,Env,Result,Function, Body):-
+  show_frame(if_must_compile_body(Ctx,Env,Result,Function, Body)),
   ((fail,local_override(with_forms,lisp_grovel))
    -> Body= nop(lisp_groveling(Function,Result))
     ;
@@ -160,7 +162,7 @@ if_must_compile_body(Ctx,Env,Result,Function, Body):-
 */
 :- dynamic(compiler_macro_left_right/3).
 :- discontiguous(compiler_macro_left_right/3).
-compiler_macro_left_right(prog,[Vars|TagBody], [block,[],[let,Vars,[tagbody|TagBody]]]).
+compiler_macro_left_right(prog,[Vars|TagBody], [block,[],[let,Vars,[tagbody|TagBody]]]) :- trace.
 
 % (defmacro unless (test-form &rest forms) `(if (not ,test-form) (progn ,@forms)))
 compiler_macro_left_right(unless,[Test|IfFalse] , [if, Test, [], [progn|IfFalse]]).
@@ -183,7 +185,7 @@ compiler_macro_left_right(and,[Form1|Rest], [and,Form1,[and|Rest]]).
 compile_body(_Ctx,_Env,Result,Var, true):- is_ftVar(Var), !, Result = Var.
 compile_body(Ctx,Env,Result,Var, Code):- is_ftVar(Var), !, % NEVER SEEN
   debug_var("EVAL",Var),
-  compile_body(Ctx,Env,Result,[eval,Var], Code).
+  must_compile_body(Ctx,Env,Result,[eval,Var], Code).
 
 % Lazy Reader
 compile_body(Ctx,Env,Result, 's'(Str),  Body):-
@@ -195,10 +197,10 @@ compile_body(Ctx,Env,Result,InstrS,Code):-
   shared_lisp_compiler:plugin_expand_function_body(Ctx,Env,Result,InstrS,Code),!.
 
 % PROGN
-compile_body(Ctx,Env,Result,[progn|Forms], Body):- !, must_compile_progn(Ctx,Env,Result,Forms,Body).
+compile_body(Ctx,Env,Result,[progn|Forms], Body):- !, must_compile_progn(Ctx,Env,Result,Forms,[],Body).
 
 % SOURCE TRANSFORMATIONS
-compile_body(Ctx,Env,Result,[M|MACROLEFT], Code):-
+compile_body(Ctx,Env,Result,[M|MACROLEFT], Code):- atom(M),
   term_variables([M|MACROLEFT],VarsS),
   compiler_macro_left_right(M,MACROLEFT,MACRORIGHT),
   term_variables(MACRORIGHT,VarsE),
@@ -317,8 +319,9 @@ make_compiled(Ctx,FunctionHead,FunctionBody,Head,HeadDefCode,(BodyCode)):-
     body_cleanup(Ctx,((CallEnv=HeadEnv,HeadCode,Body0)),BodyCode).
 
 % same_symbol(OP1,OP2):-!, OP1=OP2.
-same_symbol(OP1,OP2):- var(OP2),atom(OP1),!,prologcase_name(OP1,OP2),!.
-same_symbol(OP2,OP1):- var(OP2),atom(OP1),!,prologcase_name(OP1,OP2),!.
+same_symbol(OP1,OP2):- var(OP1),var(OP2),trace_or_throw(same_symbol(OP1,OP2)).
+same_symbol(OP1,OP2):- var(OP2),atom(OP1),!,same_symbol(OP2,OP1).
+same_symbol(OP2,OP1):- var(OP2),atom(OP1),!,prologcase_name(OP1,OP3),!,freeze(OP2,((atom(OP2),same_symbol(OP2,OP3)))).
 same_symbol(OP1,OP2):-
   (atom(OP1),atom(OP2),(
    OP1==OP2 -> true;  
@@ -551,8 +554,10 @@ normalize_let1([bind, Variable, Form],[bind, Variable, Form]).
 normalize_let1([Variable, Form],[bind, Variable, Form]).
 normalize_let1( Variable,[bind, Variable, []]).
 
+compile_body(_Ctx,_Env,_Result,[OP|R], _Body):- var(OP),!,trace_or_throw(c_b([OP|R])).
+
 % LET
-compile_body(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body):- !,
+compile_body(Ctx,Env,Result,[OP, NewBindingsIn| BodyForms], Body):- must_or_rtrace(nonvar(OP)), OP=let, lisp_dumpST,!,
  must_or_rtrace(is_list(NewBindingsIn)),!,
  must_or_rtrace(compile_let(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body)).
 
@@ -572,9 +577,9 @@ compile_let(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body):- !,
          Body = ( ValueBody,BindingsEnvironment=[Bindings|Env], BodyFormsBody ).
 
 % LET*
-compile_body(Ctx,Env,Result,[OP, []| BodyForms], Body):- same_symbol(OP,'let*'), !, compile_body(Ctx,Env,Result,[progn| BodyForms], Body).
-compile_body(Ctx,Env,Result,[OP, [Binding1|NewBindings]| BodyForms], Body):-
-   must_compile_body(Ctx,Env,Result,['let', [Binding1],[progn, [OP, NewBindings| BodyForms]]], Body).
+compile_body(Ctx,Env,Result,[OP, []| BodyForms], Body):- same_symbol(OP,'let*'), !, must_compile_body(Ctx,Env,Result,[progn| BodyForms], Body).
+compile_body(Ctx,Env,Result,[OP, [Binding1|NewBindings]| BodyForms], Body):- same_symbol(OP,'let*'),
+   must_or_trace(compile_let(Ctx,Env,Result,['let', [Binding1],[progn, [OP, NewBindings| BodyForms]]], Body)).
 
 % VALUES (r1 . rest )
 compile_body(Ctx,Env,Result,['values',R1|EvalList], (ArgBody,Body)):-!,
@@ -623,34 +628,39 @@ zip_with([X|Xs], [Y|Ys], Pred, [Z|Zs]):-
 	zip_with(Xs, Ys, Pred, Zs).
 
 
+compile_body(Ctx,Env,Result,BodyForms, Body):- atom(BodyForms),!,
+   must_or_rtrace(compile_assigns(Ctx,Env,Result,BodyForms, Body)),!.
+
 % SETQ - PSET
 compile_body(Ctx,Env,Result,BodyForms, Body):- compile_assigns(Ctx,Env,Result,BodyForms, Body),!.
 
 % SOURCE GROVEL MODE
-compile_body(_Ctx,_Env,[],_, true):- local_override(with_forms,lisp_grovel),!.
+%compile_body(_Ctx,_Env,[],_, true):- local_override(with_forms,lisp_grovel),!.
 
-compile_body(Ctx,Env,Result,BodyForms, Body):- quietly_must_or_rtrace(compile_funop(Ctx,Env,Result,BodyForms, Body)),!.
+compile_body(Ctx,Env,Result,BodyForms, Body):- 
+  must_or_rtrace(compile_funop(Ctx,Env,Result,BodyForms, Body)),!.
 
-must_compile_progn(Ctx,Env,Result,Forms, Body):-
+/*must_compile_progn(Ctx,Env,Result,Forms, Body):-
    % local_override('$compiler_PreviousResult',the(PreviousResult)),
    PreviousResult = [],
    must_compile_progn(Ctx,Env,Result,Forms, PreviousResult,Body).
+*/
 
 must_compile_progn(Ctx,Env,Result,Forms, PreviousResult, Body):-
-   quietly_must_or_rtrace(compile_progn(Ctx,Env,Result,Forms, PreviousResult,Body)).
+   must_or_rtrace(compile_progn(Ctx,Env,Result,Forms, PreviousResult,Body)).
 
 compile_progn(_Cx,_Ev,Result,Var,_PreviousResult,cl_eval([progn|Var],Result)):- is_ftVar(Var),!.
 compile_progn(_Cx,_Ev,Result,[], PreviousResult,true):-!, PreviousResult = Result.
-compile_progn(Ctx,Env,Result,[Form | Forms], PreviousResult, Body):-  !,
-   locally(
-     local_override('$compiler_PreviousResult',the(PreviousResult)),
-	must_compile_body(Ctx,Env,FormResult, Form,FormBody)),
+compile_progn(Ctx,Env,Result,[Form | Forms], _PreviousResult, Body):-  !,
+   %locally(
+     %local_override('$compiler_PreviousResult',the(PreviousResult)),
+	must_compile_body(Ctx,Env,FormResult, Form,FormBody), %),
 	must_compile_progn(Ctx,Env,Result, Forms, FormResult, FormSBody),
         Body = (FormBody,FormSBody).
-compile_progn(Ctx,Env,Result, Form , PreviousResult, Body):-
-        locally(
-  local_override('$compiler_PreviousResult',the(PreviousResult)),
-	     must_compile_body(Ctx,Env,Result,Form, Body)).
+compile_progn(Ctx,Env,Result, Form , _PreviousResult, Body):-
+        % locally(
+  % local_override('$compiler_PreviousResult',the(PreviousResult)),
+	     must_compile_body(Ctx,Env,Result,Form, Body).
 
 
 :- set_prolog_flag(double_quotes,string).

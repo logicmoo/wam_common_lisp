@@ -161,7 +161,7 @@ lisp_operator('define-caller-pattern').
 lisp_operator('define-variable-pattern').
 lisp_operator(u_define_caller_pattern).
 lisp_operator(f_u_define_caller_pattern).
-lisp_operator(S):-compiler_macro_left_right(S,_,_).
+lisp_operator(S):- nonvar(S),compiler_macro_left_right(S,_,_).
 lisp_operator(S):-user:macro_lambda(_Scope,S, _,_, _).
 lisp_operator(S):-is_special_op(S,P),currently_visible_package(P).
 %lisp_operator(S):-is_special_op(S,_P).
@@ -347,7 +347,7 @@ tfa(FormalParms):-
 % compile_init(F,P,InitForm,Init)
 compile_init(Var,FinalResult,[InitForm],
   (set_symbol_value_if_missing('$env',Var,FinalResult,Code,Result))):- 
-    lisp_compile(Result,InitForm,Code).
+    lisp_compile(Result,InitForm,Code),!.
 compile_init(Var,FinalResult,[InitForm|_More],
   (set_symbol_value_if_missing('$env',Var,FinalResult,Code,Result))):- 
     lisp_dumpST,

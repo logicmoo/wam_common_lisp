@@ -113,7 +113,7 @@ is_reflow('cl_go',[Label|_],Label).
 is_reflow('tagbody_go',[Label|_],Label).
 is_reflow('gosub',[Label|_],Label).
 is_reflow('return',_,[]).
-is_reflow(OP,[Label|_],Label):- same_symbol('return-from',OP).
+is_reflow(OP,[Label|_],Label):- same_symbol(OP,'return-from').
 is_reflow('throw',[Label|_],Label).
 
 
