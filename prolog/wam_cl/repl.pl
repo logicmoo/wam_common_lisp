@@ -54,10 +54,10 @@ quietly_must_or_rtrace(G):-
   (catch(quietly(G),E,gripe_problem(uncaught(E),G)) 
    *-> true ; (gripe_problem(fail_must_or_rtrace_failed,G),!,fail)),!.
 
+must_or_rtrace((A,B)):-!,must_or_rtrace(A),must_or_rtrace(B).
 must_or_rtrace(G):- notrace(tracing),!,
    (catch((G),E,gripe_problem(uncaught(E),G)) 
     *-> true ; (gripe_problem(fail_must_or_rtrace_failed,G),!,fail)),!.
-
 must_or_rtrace(G):- quietly_must_or_rtrace(G).
 
 expand_pterm_to_sterm(VAR,VAR):- notrace(is_ftVar(VAR)),!.

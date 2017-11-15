@@ -280,8 +280,8 @@ is_def_at_least_two_args(labels).
 is_def_at_least_two_args(macrolet).
 is_def_at_least_two_args(symbol_macrolet).
 
-compile_body(_Ctx,_Env,Symbol,[Fun,Symbol,A2|AMORE],assert(P)):- is_def_at_least_two_args(Fun),!,P=..[Fun,Symbol,A2,AMORE].
-compile_body(_Ctx,_Env,Symbol,[Fun0,Symbol,A2|AMORE],assert(P)):- is_def_at_least_two_args(Fun),same_symbol(Fun,Fun0),!,P=..[Fun,Symbol,A2,AMORE].
+%compile_body(_Ctx,_Env,Symbol,[Fun,Symbol,A2|AMORE],assert(P)):- is_def_at_least_two_args(Fun),!,P=..[Fun,Symbol,A2,AMORE].
+%compile_body(_Ctx,_Env,Symbol,[Fun0,Symbol,A2|AMORE],assert(P)):- is_def_at_least_two_args(Fun),same_symbol(Fun,Fun0),!,P=..[Fun,Symbol,A2,AMORE].
 
 % handler-caserestart-casedestructuring-bind
 
@@ -289,7 +289,7 @@ compile_body(_Ctx,_Env,Symbol,[Fun0,Symbol,A2|AMORE],assert(P)):- is_def_at_leas
 % DEFUN
 compile_body(Ctx,Env,Symbol,[defun,Name,FormalParms|FunctionBody0], CompileBody):-
     combine_setfs(Name,Symbol),
-    must(find_function_or_macro_name(Symbol,_Len, Function)),
+    must_or_rtrace(find_function_or_macro_name(Symbol,_Len, Function)),
     must_or_rtrace(maybe_get_docs(function,Function,FunctionBody0,FunctionBody,DocCode)),
     FunctionHead=[Function|FormalParms],
     debug_var('Setf-symbol-function',SetfR),
@@ -316,14 +316,16 @@ make_compiled(Ctx,FunctionHead,FunctionBody,Head,HeadDefCode,(BodyCode)):-
     show_ctx_info(Ctx),
     body_cleanup(Ctx,((CallEnv=HeadEnv,HeadCode,Body0)),BodyCode).
 
-same_symbol(OP1,OP2):- var(OP2),atom(OP1),!,prologcase_name(OP1,OP2).
+% same_symbol(OP1,OP2):-!, OP1=OP2.
+same_symbol(OP1,OP2):- var(OP2),atom(OP1),!,prologcase_name(OP1,OP2),!.
+same_symbol(OP2,OP1):- var(OP2),atom(OP1),!,prologcase_name(OP1,OP2),!.
 same_symbol(OP1,OP2):-
-   OP1==OP2 -> true;
-  (atom(OP1),atom(OP2),
+  (atom(OP1),atom(OP2),(
+   OP1==OP2 -> true;  
    prologcase_name(OP1,N1),
    (OP2==N1 -> true ;
    (prologcase_name(OP2,N2),
-     (OP1==N2 -> true ; N1==N2)))).
+     (OP1==N2 -> true ; N1==N2))))).
 
 % #+
 compile_body(Ctx,Env,Result,[OP,Flag,Form], Code):- same_symbol(OP,'#+'),!, same_symbol('*features*',FEATURES), symbol_value(Env,FEATURES,List),
@@ -338,7 +340,7 @@ compile_body(Ctx,Env,Result,[OP,Flags|Forms], Code):-  same_symbol(OP,'eval-when
 % DEFMACRO
 compile_body(Ctx,_Env,Name,[defmacro,Name0,FormalParmsB|FunctionBody0], CompileBody):-
     combine_setfs(Name0,Name1),
-    must(find_function_or_macro_name(Name1,_Len, Name)),
+    must_or_rtrace(find_function_or_macro_name(Name1,_Len, Name)),
     add_alphas(Ctx,Name),
     must_or_rtrace(maybe_get_docs(function,Name,FunctionBody0,FunctionBodyB,DocCode)),
     %reader_intern_symbols
@@ -364,14 +366,14 @@ get_value_or_default(Ctx,Name,Value,IfMissing):- oo_get_attr(Ctx,Name,Value)->tr
 get_alphas(Ctx,Alphas):- get_attr(Ctx,tracker,Ctx0),get_alphas0(Ctx0,Alphas).
 get_alphas0(Ctx,Alphas):- get_value_or_default(Ctx,alphas,Alphas,[]).
 
-add_alphas(Ctx,Alphas):- get_attr(Ctx,tracker,Ctx0),add_alphas0(Ctx0,Alphas).
+add_alphas(Ctx,Alphas):- must_or_rtrace((get_attr(Ctx,tracker,Ctx0),add_alphas0(Ctx0,Alphas))).
 add_alphas0(Ctx,Alpha):- atom(Alpha),!,get_value_or_default(Ctx,alphas,Alphas,[]),oo_put_attr(Ctx,alphas,[Alpha|Alphas]).
 add_alphas0(_Ctx,Alphas):- \+ compound(Alphas),!.
 add_alphas0(Ctx,Alphas):- Alphas=..[_|ARGS],maplist(add_alphas0(Ctx),ARGS).
 /*
 compile_body(_Cx,OuterEnv,Name,[defmacro,Name0,FormalParms|Body0], CompileBody):- !,
    combine_setfs(Name0,Name1),
-   must(find_function_or_macro_name(Name1,_Len, Name)),
+   must_or_rtrace(find_function_or_macro_name(Name1,_Len, Name)),
 %      expand_function_head(Ctx,CallEnv,FunctionHead, Head, HeadEnv, Result,HeadDefCode,HeadCode),
       maybe_get_docs(function,Name,Body0,Body,DocCode),
       find_alphas(Ctx,OuterEnv,[defmacro,Name,FormalParms|Body],Alphas),
@@ -444,23 +446,42 @@ compile_body(Ctx,Env,Result,[if, Test, IfTrue, IfFalse], Body):-
 
 % COND
 compile_body(_Cx,_Ev,[],[cond ], true):- !.
-compile_body(_Cx,_Ev,[],[cond , []], true):- !.
-compile_body(Ctx,Env,Result,[cond, [Test|ResultForms] |Clauses], Body):-
-  must((
+
+compile_body(Ctx,Env,Result,[cond, List |Clauses], Body):- !,
+  must_or_rtrace((
+        [Test|ResultForms] = List,
         debug_var("CONDTEST",TestResult),
         debug_var("ResultFormsResult",ResultFormsResult),
         debug_var("ClausesResult",ClausesResult),
         debug_var("CondResult",Result))),
-	compile_test_body(Ctx,Env,TestResult,Test,TestBody,TestResultBody),
+   Result      = ClausesResult,
+   freeze(Result,var(Result)),
+   must_compile_body(Ctx,Env,TestResult,Test,TestBody),
+   must_compile_progn(Ctx,Env,ResultFormsResult,ResultForms, TestResult, ResultFormsBody),
+   must_compile_body(Ctx,Env,ClausesResult,[cond| Clauses],  ClausesBody),
+   Body = (	 
+                   ((TestBody, TestResult \==[]) -> ( ResultFormsBody,Result  = ResultFormsResult); ClausesBody)).
+   
+
+
+compile_body(Ctx,Env,Result,[cond, List |Clauses], Body):- !,
+  must_or_rtrace((
+        [Test|ResultForms] = List,
+        debug_var("CONDTEST",TestResult),
+        debug_var("ResultFormsResult",ResultFormsResult),
+        debug_var("ClausesResult",ClausesResult),
+        debug_var("CondResult",Result))),
+	must_compile_body(Ctx,Env,TestResult,Test,TestBody),
 	must_compile_progn(Ctx,Env,ResultFormsResult,ResultForms, TestResult, ResultFormsBody),
 	must_compile_body(Ctx,Env,ClausesResult,[cond| Clauses],  ClausesBody),
-	Body = (	TestBody,
-			( TestResultBody
-				->	ResultFormsBody,
-					Result      = ResultFormsResult
-				;	ClausesBody,
-					Result      = ClausesResult )	).
-                                                                      
+	Body = (	 
+			(( (TestBody, TestResult \==[])
+				->(	ResultFormsBody,
+					Result      = ResultFormsResult)
+				;	(ClausesBody,
+					Result      = ClausesResult )	))).
+
+
 
 % CONS inine
 compile_body(Ctx,Env,Result,[cons, IN1,IN2], Body):- \+ current_prolog_flag(lisp_inline,false),
@@ -531,25 +552,29 @@ normalize_let1([Variable, Form],[bind, Variable, Form]).
 normalize_let1( Variable,[bind, Variable, []]).
 
 % LET
-compile_body(Ctx,Env,Result,[let, []| BodyForms], Body):- !, compile_body(Ctx,Env,Result,[progn| BodyForms], Body).
 compile_body(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body):- !,
+ must_or_rtrace(is_list(NewBindingsIn)),!,
+ must_or_rtrace(compile_let(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body)).
+
+
+compile_let(Ctx,Env,Result,[let, []| BodyForms], Body):- !, must_compile_progn(Ctx,Env,Result, BodyForms, [], Body).
+compile_let(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body):- !,
      must_or_rtrace(normalize_let(NewBindingsIn,NewBindings)),!,
 	zip_with(Variables, ValueForms, [Variable, Form, [bind, Variable, Form]]^true, NewBindings),
-	expand_arguments(Ctx,Env,'funcall',1,ValueForms, ValueBody, Values),
-        freeze(Var,debug_var('_Init',Var,Val)),
-        freeze(Var,(var(Val),add_tracked_var(Ctx,Var,Val))),
+	must_or_rtrace(expand_arguments(Ctx,Env,'funcall',1,ValueForms, ValueBody, Values)),
+        freeze(Var,ignore((var(Val),debug_var('_Init',Var,Val)))),
+        freeze(Var,ignore(((var(Val),add_tracked_var(Ctx,Var,Val))))),
         zip_with(Variables, Values, [Var, Val, bv(Var,Val)]^true,Bindings),
-
-   debug_var("LETENV",BindingsEnvironment),
-   ignore((member(VarN,[Variable,Var]),atom(VarN),var(Val),debug_var([VarN,'_Let'],Val))),
-    add_alphas(Ctx,Variables),
-	must_compile_body(Ctx,BindingsEnvironment,Result,[progn|BodyForms], BodyFormsBody),
+        add_alphas(Ctx,Variables),
+        debug_var("LETENV",BindingsEnvironment),
+        ignore((member(VarN,[Variable,Var]),atom(VarN),var(Val),debug_var([VarN,'_Let'],Val))),        
+	must_compile_progn(Ctx,BindingsEnvironment,Result,BodyForms, [], BodyFormsBody),
          Body = ( ValueBody,BindingsEnvironment=[Bindings|Env], BodyFormsBody ).
 
 % LET*
 compile_body(Ctx,Env,Result,[OP, []| BodyForms], Body):- same_symbol(OP,'let*'), !, compile_body(Ctx,Env,Result,[progn| BodyForms], Body).
 compile_body(Ctx,Env,Result,[OP, [Binding1|NewBindings]| BodyForms], Body):-
-   compile_body(Ctx,Env,Result,['let', [Binding1],[progn, [OP, NewBindings| BodyForms]]], Body).
+   must_compile_body(Ctx,Env,Result,['let', [Binding1],[progn, [OP, NewBindings| BodyForms]]], Body).
 
 % VALUES (r1 . rest )
 compile_body(Ctx,Env,Result,['values',R1|EvalList], (ArgBody,Body)):-!,

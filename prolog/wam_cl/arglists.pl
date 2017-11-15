@@ -151,7 +151,7 @@ method-combination-lambda-list::= (wholevar var*
 currently_visible_package(P):- reading_package(Package),
   (P=Package;package_use_list(Package,P)).
 
-
+is_lisp_operator(G):- notrace(lisp_operator(G)).
 
 
 lisp_operator(defpackage).
@@ -393,8 +393,8 @@ function_head_params(Ctx,Env,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,Na
    enter_ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,required,FormalParms,ActualArgsMaybe,Names,PVars,Code),
    maplist(add_tracked_var(Ctx),Names,PVars),
    maplist(debug_var('_Param'),Names,PVars),   
-   freeze(Var,debug_var('_Thru',Var,Val)),
-   freeze(Var,add_tracked_var(Ctx,Var,Val)),
+   freeze(Var,ignore((((var(Val),debug_var('_Thru',Var,Val)))))),
+   freeze(Var,ignore((((var(Val),add_tracked_var(Ctx,Var,Val)))))),
 	zip_with(Names, PVars, [Var, Val, bv(Var,Val)]^true, ZippedArgBindings),!,
         add_alphas(Ctx,Names),
    % RestNKeysOut=RestNKeysIn,
@@ -428,20 +428,14 @@ bind_formal_old([FormalParam|FormalParms], [ActualParam|ActualParams],
 
 
 % The idea here is that FunctionName/ArgNum may need evaluated or may have its own special evaluator 
-expand_arguments(_Ctx,_Env,_FunctionName,_ArgNum,[], true, []).
-expand_arguments(_Ctx,_Env,FunctionName,_, Args, true, Args):- lisp_operator(FunctionName),!.
+expand_arguments(_Ctx,_Env,_FunctionName,_ArgNum,[], true, []):-!.
+expand_arguments(_Ctx,_Env,FunctionName,_, Args, true, ArgsO):- is_lisp_operator(FunctionName),!,Args=ArgsO.
 
-expand_arguments(Ctx,Env,FunctionName,ArgNum,[Arg|Args], Body, [Result|Results]):-
+expand_arguments(Ctx,Env,FunctionName,ArgNum,[Arg|Args], Body, [Result|Results]):-!,
        must_compile_body(Ctx,Env,Result,Arg, ArgBody),
        Body = (ArgBody, ArgsBody),
        ArgNum2 is ArgNum + 1,
        expand_arguments(Ctx,Env,FunctionName,ArgNum2,Args, ArgsBody, Results).
-
-
-find_hole([_Val|Vals], Hole):-
-      var(Vals) 
-       -> Hole = Vals 
-       ; find_hole(Vals, Hole).
 
 
 

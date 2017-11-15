@@ -27,6 +27,12 @@
 ;; not charge a fee for this document or for its distribution.
 
 
+
+(DEFUN cl:string (x )(COND ((STRINGP x )x )((SYMBOLP x )(symbol-name x ))(T (ERROR "type error" ))))
+(TAGBODY 1 (PRINT "hi" ))
+ (LET (val 1 )NIL )
+
+
 ;; 3.1. Review of defstruct
 
 (defstruct point

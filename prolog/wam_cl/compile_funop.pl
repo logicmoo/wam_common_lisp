@@ -49,7 +49,7 @@ op_replacement(>,greaterThan).
 */
 
 % Operator
-expand_arguments_maybe_macro(_Ctx,_CallEnv,FunctionName,_N,FunctionArgs,true, FunctionArgs):- lisp_operator(FunctionName),!.
+expand_arguments_maybe_macro(_Ctx,_CallEnv,FunctionName,_N,FunctionArgs,true, FunctionArgs):- is_lisp_operator(FunctionName),!.
 expand_arguments_maybe_macro(Ctx,CallEnv,FunctionName,0,FunctionArgs,ArgBody, Args):-
   expand_arguments(Ctx,CallEnv,FunctionName,0,FunctionArgs,ArgBody, Args).
   
