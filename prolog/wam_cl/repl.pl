@@ -47,7 +47,13 @@ gripe_problem0(Problem,G):-
      dbmsg((Problem:-G)),
      (rtrace(G)*->(notrace,break);(wdmsg(failed_rtrace(G)),notrace,break,!,fail)).
 
-  
+with_nat_term(G):-
+  \+ \+ ((
+  (term_attvars(G,Vs),
+    maplist(del_attr_rev2(freeze),Vs),
+    maplist(del_attr_rev2(tracker),Vs),
+   G))).
+
 quietly_must_or_rtrace(G):- 
   (catch(quietly(G),E,gripe_problem(uncaught(E),G)) 
    *-> true ; (gripe_problem(fail_must_or_rtrace_failed,G),!,fail)),!.
@@ -57,7 +63,7 @@ nonquietly_must_or_rtrace(G):-
 
 must_or_rtrace((A,B)):-!,must_or_rtrace(A),must_or_rtrace(B).
 must_or_rtrace(G):-
-  notrace(wdmsg(tracing_must_or_nc(G))),
+  notrace(with_nat_term(wdmsg(tracing(G)))),
    notrace(tracing),!,
    (catch((G),E,gripe_problem(uncaught(E),G)) 
     *-> true ; (gripe_problem(fail_must_or_rtrace_failed,G),!,fail)),!.

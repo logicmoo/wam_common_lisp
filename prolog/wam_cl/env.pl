@@ -18,6 +18,10 @@
 
 lisp_global_bindings(GlobalBindings):- must(nb_current('$toplevel_env',GlobalBindings)).
 
+current_env(Env):- env_toplevel(Env). 
+
+env_toplevel(Env):- Env = toplevel.
+
 % GlobalBindings
 :- fixup_exports.
 

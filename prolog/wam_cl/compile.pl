@@ -72,8 +72,6 @@
 :- op(1200,  fx, <<== ).	% functional imperative definition
 
 
-show_frame(X):-X,writeq(X),nl.
-env_toplevel(Env):- Env = toplevel.
 %new_compile_ctx(Ctx):- new_assoc(Ctx)put_attr(Ctx,type,ctx).
 new_compile_ctx(Ctx):- list_to_rbtree([type-ctx],Ctx0),put_attr(Ctx,tracker,Ctx0).
 
@@ -143,16 +141,18 @@ compile_forms(Ctx,Env,Result,FunctionBody,Code):-
 
 
 must_compile_body(Ctx,Env,Result,Function, Body):-
+  maybe_debug_var('_rCtx',Ctx),
+  maybe_debug_var('_rEnv',Env),
+  maybe_debug_var('_rResult',Result),
+  maybe_debug_var('_rForms',Function),
+  maybe_debug_var('_rBody',Body),
   must_or_rtrace(compile_body(Ctx,Env,Result,Function, Body)),
   % nb_current('$compiler_PreviousResult',THE),setarg(1,THE,Result),
   !.
 
+
 if_must_compile_body(Ctx,Env,Result,Function, Body):-
-  show_frame(if_must_compile_body(Ctx,Env,Result,Function, Body)),
-  ((fail,local_override(with_forms,lisp_grovel))
-   -> Body= nop(lisp_groveling(Function,Result))
-    ;
-    must_or_rtrace(compile_body(Ctx,Env,Result,Function, Body))).
+  must_or_rtrace(compile_body(Ctx,Env,Result,Function, Body)).
 
 % PROG
 /*(defmacro prog (inits &rest forms)
@@ -617,7 +617,9 @@ setq_values(Env,[Var|Vars],[Val|Values]):-
    set_symbol_value(Env,Var,Val),
    setq_values(Env,Vars,Values).
 
-
+set_symbol_value(Var,Val):-
+  current_env(Env),
+  set_symbol_value(Env,Var,Val).
 
 %   zip_with(Xs, Ys, Pred, Zs)
 %   is true if Pred(X, Y, Z) is true for all X, Y, Z.
@@ -647,6 +649,12 @@ compile_body(Ctx,Env,Result,BodyForms, Body):-
 */
 
 must_compile_progn(Ctx,Env,Result,Forms, PreviousResult, Body):-
+  maybe_debug_var('_rCtx',Ctx),
+  maybe_debug_var('_rEnv',Env),
+  maybe_debug_var('_rResult',Result),
+  maybe_debug_var('_rPrevRes',PreviousResult),
+  maybe_debug_var('_rForms',Forms),
+  maybe_debug_var('_rBody',Body),
    must_or_rtrace(compile_progn(Ctx,Env,Result,Forms, PreviousResult,Body)).
 
 compile_progn(_Cx,_Ev,Result,Var,_PreviousResult,cl_eval([progn|Var],Result)):- is_ftVar(Var),!.

@@ -49,16 +49,104 @@ reading_package(pkg_user).
 % TODO
 writing_package(Package):- reading_package(Package).
 
+package_find_symbol_or_missing(String,Package,OldSymbol,IntExt):- package_find_symbol(String,Package,OldSymbol,IntExt),!.
+package_find_symbol_or_missing(_String,_Package,_NoSymbol,'$missing').
 
-package_find_symbol(Name,_,Symbol,kw_external):- atom_concat(':',KWName,Name),!,atom_concat('kw_',KWName,SymbolCI),prologcase_name(SymbolCI,Symbol).
-package_find_symbol(Name,Package,Symbol,kw_external):- package_external_symbols(Package,Name,Symbol),!.
-package_find_symbol(Name,Package,Symbol,kw_internal):- package_internal_symbols(Package,Name,Symbol),!.
-package_find_symbol(Name,PW,Symbol,kw_inherited):-  package_use_list(PW,Package),package_external_symbols(Package,Name,Symbol).
+package_find_symbol(String,_,Symbol,kw_external):- atom_concat(':',KWName,String),!,atom_concat('kw_',KWName,SymbolCI),prologcase_name(SymbolCI,Symbol).
+package_find_symbol(String,Package,Symbol,kw_external):- package_external_symbols(Package,String,Symbol),!.
+package_find_symbol(String,Package,Symbol,kw_internal):- package_internal_symbols(Package,String,Symbol),!.
+package_find_symbol(String,PW,Symbol,kw_inherited):-  package_use_list(PW,Package),package_external_symbols(Package,String,Symbol).
 
-add_package_internal_symbol(Package,Name,Symbol):- Package==pkg_kw,!,add_package_external_symbol(Package,Name,Symbol).
-add_package_internal_symbol(Package,Name,Symbol):- assert_if_new(package_internal_symbols(Package,Name,Symbol)).
+% @TODO Add symbol shadowing 
+cl_import(Symbol,Result):- reading_package(Package),cl_import(Symbol,Package,Result).
+cl_import(List,Pack,t):- is_list(List),maplist([Symbol]>>cl_import(Symbol,Pack,_),List).
+cl_import(Symbol,Pack,t):- 
+   find_package_or_die(Pack,Package),
+   cl_symbol_name(Symbol,String),
+   package_find_symbol_or_missing(String,Package,OldSymbol,IntExt),!,
+   package_import_symbol_step2(Package,Symbol,String,OldSymbol,IntExt).
 
-add_package_external_symbol(Package,Name,Symbol):- assert_if_new(package_external_symbols(Package,Name,Symbol)).
+package_import_symbol_step2(Package,Symbol,String,_OldSymbol,'$missing'):-
+   assert_if_new(package:package_internal_symbols(Package,String,Symbol)).
+package_import_symbol_step2(_Package,Symbol,_String,OldSymbol,_IntExt):- Symbol == OldSymbol,!.
+package_import_symbol_step2(Package,Symbol,String,OldSymbol,kw_iherited):-
+   assert_if_new(package:package_shadowing_symbols(Package,OldSymbol)),
+   assert_if_new(package:package_internal_symbols(Package,String,Symbol)).
+package_import_symbol_step2(Package,Symbol,String,OldSymbol,kw_external):-
+   retract(package:package_external_symbols(Package,String,OldSymbol)),
+   assert_if_new(package:package_shadowing_symbols(Package,OldSymbol)),
+   assert_if_new(package:package_internal_symbols(Package,String,Symbol)).
+package_import_symbol_step2(Package,Symbol,String,OldSymbol,kw_internal):-
+   retract(package:package_internal_symbols(Package,String,OldSymbol)),
+   assert_if_new(package:package_shadowing_symbols(Package,OldSymbol)),
+   assert_if_new(package:package_internal_symbols(Package,String,Symbol)).
+
+
+
+cl_export(Symbol,Result):- reading_package(Package),cl_export(Symbol,Package,Result).
+cl_export(List,Pack,t):- is_list(List),maplist([Symbol]>>cl_export(Symbol,Pack,_),List).
+cl_export(Symbol,Pack,t):- 
+   find_package_or_die(Pack,Package),
+   cl_symbol_name(Symbol,String),
+   package_find_symbol_or_missing(String,Package,OldSymbol,IntExt),!,
+   package_export_symbol_step2(Package,Symbol,String,OldSymbol,IntExt).
+
+package_export_symbol_step2(Package,Symbol,String,_OldSymbol,'$missing'):-
+   assert_if_new(package:package_external_symbols(Package,String,Symbol)).
+package_export_symbol_step2(_Package,Symbol,_String,OldSymbol,kw_exported):- Symbol == OldSymbol,!.
+package_export_symbol_step2(Package,Symbol,String,OldSymbol,kw_inheritied):-
+   assert_if_new(package:package_shadowing_symbols(Package,OldSymbol)),
+   assert_if_new(package:package_external_symbols(Package,String,Symbol)).
+package_export_symbol_step2(Package,Symbol,String,OldSymbol,kw_external):-
+   retract(package:package_external_symbols(Package,String,OldSymbol)),
+   assert_if_new(package:package_shadowing_symbols(Package,OldSymbol)),
+   assert_if_new(package:package_external_symbols(Package,String,Symbol)).
+package_export_symbol_step2(Package,Symbol,String,OldSymbol,kw_internal):-
+   retract(package:package_internal_symbols(Package,String,OldSymbol)),
+   assert_if_new(package:package_shadowing_symbols(Package,OldSymbol)),
+   assert_if_new(package:package_external_symbols(Package,String,Symbol)).
+
+
+cl_unexport(Symbol,Result):- reading_package(Package),cl_unexport(Symbol,Package,Result).
+cl_unexport(List,Pack,t):- is_list(List),maplist([Symbol]>>cl_unexport(Symbol,Pack,_),List).
+cl_unexport(Symbol,Pack,t):- 
+   find_package_or_die(Pack,Package),
+   cl_symbol_name(Symbol,String),
+   package_find_symbol_or_missing(String,Package,OldSymbol,IntExt),!,
+   package_unexport_symbol_step2(Package,Symbol,String,OldSymbol,IntExt).
+
+package_unexport_symbol_step2(_Package,Symbol,_String,OldSymbol,kw_internal):- OldSymbol==Symbol.
+package_unexport_symbol_step2(_Package,_Symbol,_String,_OldSymbol,'$missing'):-!.
+package_unexport_symbol_step2(Package,Symbol,String,OldSymbol,_):-
+   retract(package:package_external_symbols(Package,String,OldSymbol)) -> 
+     assert_if_new(package:package_external_symbols(Package,String,Symbol));
+     true.
+
+
+cl_shadow(Symbol,Result):- reading_package(Package),cl_shadow(Symbol,Package,Result).
+cl_shadow(List,Pack,t):- is_list(List),maplist([Symbol]>>cl_shadow(Symbol,Pack,_),List).
+cl_shadow(Symbol,Pack,t):- 
+   find_package_or_die(Pack,Package),
+   cl_symbol_name(Symbol,String),
+   package_find_symbol_or_missing(String,Package,OldSymbol,IntExt),!,
+   package_shadow_symbol_step2(Package,String,OldSymbol,IntExt).
+
+
+package_shadow_symbol_step2(_Package,_String,_OldSymbol,kw_external).
+package_shadow_symbol_step2(_Package,_String,_OldSymbol,kw_internal).
+package_shadow_symbol_step2( Package,String,_OldSymbol,'$missing'):-
+   make_fresh_internal_symbol(Package,String,_Symbol).
+package_shadow_symbol_step2(Package,String,OldSymbol,kw_inherited):-
+   assert_if_new(package:package_shadowing_symbols(Package,OldSymbol)),
+   make_fresh_internal_symbol(Package,String,_Symbol).
+
+
+% caller is responsible for avoiding conflicts
+make_fresh_internal_symbol(pkg_kw,String,Symbol):- create_keyword(String,Symbol).
+make_fresh_internal_symbol(Package,String,Symbol):- 
+   ignore(symbol_case_name(String,Package,Symbol)),
+   create_symbol(String,Package,Symbol),
+   assert_if_new(package:package_internal_symbol(Package,String,Symbol)).
 
 
 is_lisp_package(P):- package_name(P,_). 
@@ -82,7 +170,7 @@ package_name(pkg_format,"FORMAT").
 package_name(pkg_gray,"GRAY").
 package_name(pkg_gstream,"GSTREAM").
 package_name(pkg_i18n,"I18N").
-package_name(pkg_keyword,"KEYWORD").
+package_name(pkg_kw,"KEYWORD").
 package_name(pkg_loop,"LOOP").
 package_name(pkg_os,"POSIX").
 package_name(pkg_precompiler,"PRECOMPILER").

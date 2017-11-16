@@ -32,6 +32,11 @@
 % debug_var(_A,_Var):-!.
 debug_var(X,Y):- notrace(catch(debug_var0(X,Y),_,fail)) -> true ; rtrace(debug_var0(X,Y)).
 
+maybe_debug_var(X,Y):-(maybe_debug_var0(X,Y)).
+maybe_debug_var0(_,Y):- nonvar(Y),!.
+maybe_debug_var0(X,_):- get_var_name(X,_),!.
+maybe_debug_var0(X,Y):- (catch(debug_var0(X,Y),_,fail)) -> true ; rtrace(debug_var0(X,Y)).
+
 debug_var(Sufix,X,Y):- notrace((flatten([X,Sufix],XS),debug_var(XS,Y))).
 
 p_n_atom(Cmpd,UP):- sub_term(Atom,Cmpd),nonvar(Atom),\+ number(Atom), Atom\==[], catch(p_n_atom0(Atom,UP),_,fail),!.
@@ -81,10 +86,12 @@ debug_var0(Atom,Var):- p_n_atom(Atom,UP),
   check_varname(UP),
   add_var_to_env_loco(UP,Var),!.
 
-add_var_to_env_loco(UP,Var):- \+ atom_concat('_',_,UP), var(Var),
-  get_var_name(Var,Name),atomic(Name),\+ atom_concat('_',_,Name),
-  
-  atom_concat(UP,Name,New),add_var_to_env(New,Var).
+
+add_var_to_env_loco(UP,Var):- var(Var), get_var_name(Var,Prev),atomic(Prev),
+  \+ atom_concat('_',_,UP), 
+  \+ atom_concat('_',_,Prev),  
+  atom_concat(UP,Prev,New),add_var_to_env(New,Var).
+
 add_var_to_env_loco(UP,Var):-add_var_to_env(UP,Var).
 
 check_varname(UP):- name(UP,[C|_]),(char_type(C,digit)->throw(check_varname(UP));true).

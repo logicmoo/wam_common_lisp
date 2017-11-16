@@ -1,14 +1,4 @@
 ;; $Id: examples.lisp,v 1.1 2003/10/21 17:30:56 nhabedi Exp $
-
-(in-package "CL-USER")
-
-
-(defun fib (n)
-  (if (> n 1)
-    (+ (fib (- n 1))
-       (fib (- n 2)))
-    1))
-
 ;;                          EXAMPLES.LISP
 ;;           Nick Levine, Ravenbrook Limited, 2003-08-14
 ;; 
@@ -26,6 +16,16 @@
 ;; distribute verbatim copies of this document provided that you do
 ;; not charge a fee for this document or for its distribution.
 
+
+
+(in-package "CL-USER")
+
+
+(defun fib (n)
+  (if (> n 1)
+    (+ (fib (- n 1))
+       (fib (- n 2)))
+    1))
 
 
 (DEFUN cl:string (x )(COND ((STRINGP x )x )((SYMBOLP x )(symbol-name x ))(T (ERROR "type error" ))))

@@ -1,4 +1,5 @@
 
+/*
 package_shadowing_symbols(pkg_os, 'defstruct').
 package_shadowing_symbols(pkg_readline, 'def-c-const').
 package_shadowing_symbols(pkg_readline, 'def-c-enum').
@@ -46,6 +47,7 @@ package_shadowing_symbols(pkg_sequence, 'subseq').
 package_shadowing_symbols(pkg_sequence, 'substitute').
 package_shadowing_symbols(pkg_sequence, 'substitute-if').
 package_shadowing_symbols(pkg_sequence, 'substitute-if-not').
+*/
 package_shadowing_symbols(pkg_sys, 'version').
 
 

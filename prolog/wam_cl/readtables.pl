@@ -53,16 +53,17 @@ atom_symbol_s("#",["",SymbolName],UPackage,_Symbol):- throw('@TODO *** - READ fr
 atom_symbol_s("#",[SymbolName],_UPackage,Symbol):- cl_make_symbol(SymbolName,Symbol).
 % SYMBOL
 atom_symbol_s(SymbolName,[],Package,Symbol):- intern_symbol(SymbolName,Package,Symbol,_).
+% PACKAGE::SYMBOL
+atom_symbol_s(PName,   ["", SymbolName],_UPackage,Symbol):- find_package_or_die(PName,Package),intern_symbol(SymbolName,Package,Symbol,_IntExt).
 % PACKAGE:SYMBOL
 atom_symbol_s(PName,   [SymbolName],_UPackage,Symbol):- find_package_or_die(PName,Package),atom_symbol_public(SymbolName,Package,Symbol).
-% PACKAGE::SYMBOL
-atom_symbol_s(PName,   [SymbolName],_UPackage,Symbol):- find_package_or_die(PName,Package),atom_symbol_exists(SymbolName,Package,Symbol).
 
-atom_symbol_exists(SymbolName,Package, Symbol):- package_find_symbol(SymbolName,Package,Symbol,_IntExt),!.
-atom_symbol_exists(SymbolName,Package,_Symbol):- throw('symbol_not_exists'(SymbolName,Package)).
-
-atom_symbol_public(SymbolName,Package, Symbol):- package_find_symbol(SymbolName,Package,Symbol,IntExt)-> IntExt\==kw_internal,!.
-atom_symbol_public(SymbolName,Package,_Symbol):- throw('symbol_not_exported'(SymbolName,Package)).
+% KEYWORD must already exist
+atom_symbol_public(SymbolName,Package, Symbol):- Package == pkg_kw,!, (package_find_symbol(SymbolName,Package,Symbol,_IntExt)->true;throw('symbol_not_exists'(SymbolName,Package))).
+% SYMBOL must exists AND be public
+atom_symbol_public(SymbolName,Package, Symbol):- package_find_symbol(SymbolName,Package,Symbol,IntExt), 
+   (IntExt\==kw_internal -> true ;throw('symbol_not_exported'(SymbolName,Package))).
+atom_symbol_public(SymbolName,Package,_Symbol):- throw('symbol_not_exists'(SymbolName,Package)).
 
 
 string_list_concat(StrS,Sep,String):- atomic_list_concat(L,Sep,String),atomics_to_strings(L,StrS).

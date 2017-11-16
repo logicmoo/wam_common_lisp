@@ -207,6 +207,10 @@ env_mize(_Ctx,_,C1,C1):-!.
 % inline_operation(_,_,_,C1,C1).
 inline_operation(_Never,_Ctx,_,C1,C1):- var(C1),!.
 inline_operation(_Never,_Ctx,_,Code,Out):- skip_optimize(Code),Out=Code.
+inline_operation(Never,Ctx,FF,(:-C1),(:-C2)):-   
+   inline_body(Never,Ctx,FF,C1,C2),C1\==C2,!.
+inline_operation(Never,Ctx,FF,(:-C1),(:-C2)):-   
+   inline_operation(Never,Ctx,FF,C1,C2).
 inline_operation(Never,Ctx,F,(C1,C2),CodeJoined):-!,
   inline_operation(Never,Ctx,F,C1,C1Better),
   inline_operation(Never,Ctx,F,C2,C2Better),
@@ -347,7 +351,7 @@ never_inline_fa(t_or_nil,_).
 lisp_compiler_option(_,false).
 
 maybe_inline(C1):- \+ never_inline(C1), 
-  predicate_property(C1,interpreted),lisp_compiler_option(inline,true),
+  predicate_property(C1,interpreted),% lisp_compiler_option(inline,true),
   % predicate_property(C1,static),
   %predicate_property(C1,number_of_clauses(1)).
   !.

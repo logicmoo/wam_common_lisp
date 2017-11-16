@@ -51,23 +51,6 @@ cl_find_symbol(String,Pack,Result):-  find_package_or_die(Pack,Package),
   package_find_symbol(String,Package,Symbol,IntExt),push_values([Symbol,IntExt],Result),!.
 cl_find_symbol(_Var,_P,Result):- push_values([[],[]],Result).
 
-% @TODO Add symbol shadowing 
-cl_import(Symbol,Result):- reading_package(Package),cl_import(Symbol,Package,Result).
-cl_import(Symbol,Pack,Result):- 
-   find_package_or_die(Pack,Package),
-   cl_symbol_name(Symbol,String),
-   package_find_symbol(String,Package,_OldSymbol,IntExt),
-   add_package_internal_symbol(Package,String,Symbol),
-   push_values([Symbol,IntExt],Result),!.
-
-cl_export(Symbol,Result):- reading_package(Package),cl_export(Symbol,Package,Result).
-cl_export(Symbol,Pack,Result):-
-   find_package_or_die(Pack,Package),
-   cl_symbol_name(Symbol,String),
-   package_find_symbol(String,Package,_OldSymbol,IntExt),
-   add_package_external_symbol(Package,String,Symbol),
-   push_values([Symbol,IntExt],Result),!.
-
 
 cl_intern(Symbol,Result):- reading_package(Package),cl_intern(Symbol,Package,Result).
 % cl_intern(Symbol,Package,Result):- \+ is_keywordp(Symbol),is_symbolp(Symbol),!,cl_intern_symbol(Symbol,Package,Result).
@@ -78,11 +61,9 @@ cl_intern(Name,Pack,Result):-
   push_values([Symbol,IntExt],Result),!.
 
 intern_symbol(String,Package,Symbol,IntExt):- package_find_symbol(String,Package,Symbol,IntExt),!.
-intern_symbol(String,Package,Symbol,IntExt):-
-   ignore(symbol_case_name(String,Package,Symbol)),
-   create_symbol(String,Package,Symbol),
-   must((add_package_internal_symbol(Package,String,Symbol),   
-   package_find_symbol(String,Package,Symbol,IntExt))).
+intern_symbol(String,Package,Symbol,IntExt):- 
+   make_fresh_internal_symbol(Package,String,Symbol),
+   must((package_find_symbol(String,Package,FoundSymbol,IntExt),FoundSymbol==Symbol)).
 
 
 cl_make_symbol(SymbolName,Symbol):- 
@@ -101,7 +82,7 @@ create_keyword(Name,Symbol):- atom_concat(':',Make,Name),!,create_keyword(Make,S
 create_keyword(Name,Symbol):- string_upper(Name,String),string_lower(Name,Lower),
    atom_concat('kw_',Lower,Symbol),
    create_symbol(String,pkg_kw,Symbol),
-   add_package_external_symbol(pkg_kw,String,Symbol),!.
+   assert_if_new(package:package_external_symbols(pkg_kw,String,Symbol)).
 
 
 
