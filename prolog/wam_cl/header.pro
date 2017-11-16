@@ -87,6 +87,7 @@
 :-use_module(string).
 :-use_module(symbol).
 :-use_module(tagbody).
+:-use_module(typeof).
 :-use_module(tests).
 /*
 :-use_module(neil_smith).

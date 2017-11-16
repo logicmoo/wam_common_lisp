@@ -17,8 +17,16 @@
 :- include('header.pro').
 :- ensure_loaded((utils_for_swi)).
 
-set_place_value(_Env,Place, Value):- update_opv(Place,placevalue,Value).
+set_place_value(Env,[Place,Obj], Value):-!, type_or_class_nameof(Obj,Type),set_place_value(Env,Obj,Type,Place,Value).
+set_place_value(Env, Obj, Value):-!, type_or_class_nameof(Obj,Type),set_place_value(Env,Obj,Type,value,Value).
 
+
+set_place_value(Env,Obj,Type,Place,Value):- 
+  atomic_list_concat(List,'_',Place),
+  set_place_value6(Env,Place,List,Type,Obj,Value).
+
+set_place_value6(_Env,_Place,[Type,Prop],Type,Obj, Value):- update_opv(Obj,Prop,Value),!.
+set_place_value6(_Env, Place,_List,      _Type,Obj, Value):- update_opv(Obj,Place,Value),!.
 
 /*
 

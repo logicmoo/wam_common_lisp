@@ -103,8 +103,8 @@ cl_defstruct(NameKeyWords,_String,Slots,Defstruct_Ret):- wdmsg(error_todo(cl_def
 
 
 :- dynamic((struct_opv/3)).
-
 :- include('ci.pro').
+
 
 cleanup_mop:- 
   forall(struct_opv(X, subtypep, X),retract(struct_opv(X, subtypep, X))),
@@ -117,19 +117,19 @@ save_mop:- cleanup_mop,tell('ci.pro'),P= struct_opv(_,_,_),
 
 :- style_check(-discontiguous).
 
-classof_to_typeof(claz_symbol,symbol).
-classof_to_typeof(claz_package,package).
-classof_to_typeof(claz_number,numer).
-
 :- multifile soops:o_p_v/3.
 :- dynamic soops:o_p_v/3.
+
+soop_to_typeof(claz_symbol,symbol).
+soop_to_typeof(claz_package,package).
+soop_to_typeof(claz_number,numer).
 
 soops:o_p_v(Symbol,kw_deftype,defconstant):- soops:o_p_v(Symbol,package,pkg_kw).
 soops:o_p_v(Symbol,typeof,keyword):- soops:o_p_v(Symbol,package,pkg_kw).
 :- include('si.pro').
 soops:o_p_v(Symbol,typeof,Type):- soops:o_p_v(Symbol,classof,Class),
   \+ clause(soops:o_p_v(Symbol,typeof,_AnyType),true),
-  classof_to_typeof(Class,Type).
+  soop_to_typeof(Class,Type).
 %:- include('si2.pro').
 
 

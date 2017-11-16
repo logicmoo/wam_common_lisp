@@ -38,7 +38,8 @@ reader_intern_symbols(_Package,Some,Some).
 simple_atom_token(SymbolName):- atom_concat('$',_,SymbolName),upcase_atom(SymbolName,SymbolName).
 simple_atom_token(SymbolName):- string_upper(SymbolName,UP),string_lower(SymbolName,DOWN),!,UP==DOWN.
 
-atom_symbol(SymbolName,_,Symbol):- simple_atom_token(SymbolName),!,SymbolName=Symbol.
+atom_symbol(SymbolName,_,Token):- simple_atom_token(SymbolName),!,SymbolName=Token.
+atom_symbol(SymbolName,_,Obj):- cl_type_of(SymbolName,X)->X\==t,SymbolName=Obj.
 atom_symbol(SymbolName,Package,Symbol):-
   string_upper(SymbolName,SymbolNameU), 
   string_list_concat([SymbolName1|SymbolNameS],":",SymbolNameU),

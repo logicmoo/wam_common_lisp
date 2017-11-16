@@ -74,8 +74,17 @@ expand_pterm_to_sterm('NIL',[]):-!.
 expand_pterm_to_sterm(nil,[]):-!.
 expand_pterm_to_sterm(VAR,VAR):- \+ compound(VAR),!.
 expand_pterm_to_sterm([X|L],[Y|Ls]):-!,expand_pterm_to_sterm(X,Y),expand_pterm_to_sterm(L,Ls),!.
-expand_pterm_to_sterm(X,[F|Y]):- compound_name_arguments(X,F,L),expand_pterm_to_sterm(L,Y),!.
+expand_pterm_to_sterm(X,STerm):- compound_name_arguments(X,F,L),expand_pterm_to_sterm(L,Y),!,maybe_sterm(F,Y,STerm).
 expand_pterm_to_sterm(X,X).
+maybe_sterm(F,Y,PTerm):- keep_as_compund(F),PTerm=..[F|Y].
+maybe_sterm(F,Y,[F|Y]).
+keep_as_compund(function).
+keep_as_compund(closure).
+keep_as_compund(prolog).
+keep_as_compund(ugly).
+keep_as_compund(v).
+keep_as_compund(obj).
+keep_as_compund(D):-atom_concat('$',_,D).
 
 str_to_expression(Str, Expression):- lisp_add_history(Str),parse_sexpr_untyped_read(string(Str), Expression),!.
 str_to_expression(Str, Expression):- with_input_from_string(Str,read_and_parse(Expression)),!.

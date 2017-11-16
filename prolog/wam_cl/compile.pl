@@ -299,8 +299,10 @@ compile_body(Ctx,Env,Symbol,[defun,Name,FormalParms|FunctionBody0], CompileBody)
     %compile_body(Ctx,Env,SetfR,[setf,[symbol_function,[quote,Symbol]],Function],SETFUNCTION),
     CompileBody = (DocCode,
    HeadDefCode,
-   asserta(user:function_lambda(defun(Name),Function, FormalParms, FunctionBody)),
+   asserta(user:function_lambda(defun(Name),Function, FormalParms, FunctionBody)),   
    FunctionAssert,
+   add_opv(Function,typeof,function),
+   add_opv(Function,classof,claz_compiled_function),
    SETFUNCTION),!,
     make_compiled(Ctx,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode),
     (local_override(with_forms,lisp_grovel) -> FunctionAssert = true; FunctionAssert = asserta((Head  :- (  BodyCode)))).
@@ -354,6 +356,8 @@ compile_body(Ctx,_Env,Name,[defmacro,Name0,FormalParmsB|FunctionBody0], CompileB
    HeadDefCode,
    retractall(user:macro_lambda(defmacro(Name0),Name,_,_,_)),
    asserta(user:macro_lambda(defmacro(Name0),Name, FormalParms, [progn | FunctionBody],Alphas)),
+   add_opv(Name,typeof,sys_macro),
+   add_opv(Name,classof,operator),
    nop(FunctionAssert)),!,
 
     make_compiled(Ctx,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode),
@@ -494,27 +498,28 @@ compile_body(Ctx,Env,Result,[cons, IN1,IN2], Body):- \+ current_prolog_flag(lisp
         Body = (ValueBody1,ValueBody2,Result=[MID1|MID2]).
 
 
+p_or_s([F|Args],F0,Args0):-!,F0=F,Args0=Args.
+p_or_s(POrSTerm,F,Args):- POrSTerm=..[F|Args].
 
 % (function (lambda ... ))
-compile_body(Ctx,Env,Result,[function, [lambda,LambdaArgs| LambdaBody]], Body):-
+compile_body(Ctx,Env,Result,POrSTerm, Body):- p_or_s(POrSTerm,function,[lambda,LambdaArgs| LambdaBody]),
 	!,
 
 	must_compile_body(Ctx,ClosureEnvironment,ClosureResult,[progn|LambdaBody],  ClosureBody),
         debug_var('LArgs',LambdaArgs),
         debug_var('LResult',ClosureResult),
         debug_var('LEnv',ClosureEnvironment),
-     Result = [closure,LambdaArgs,
+     Result = closure(LambdaArgs,
 			[ClosureEnvironment, ClosureResult]^ClosureBody,
-			Env],
+			Env),
 	Body = true.
 
 % (function ?? )
-compile_body(_Cx,_Ev,[function|Function], [function|Function], true):- !.
+compile_body(_Cx,_Ev,function(Function),POrSTerm, true):- p_or_s(POrSTerm,function,[Function]).
 
-% ((consure ...)..)
-compile_body(Ctx,Env,ClosureResult,[[closure,LambdaArgs,
-    [ClosureEnvironment, ClosureResult]^ClosureBody,
-			AltEnv]|ActualParams],Code):-
+% ((closure ...)..)
+compile_body(Ctx,Env,ClosureResult,[POrSTerm|ActualParams],Code):- 
+        p_or_s(POrSTerm,closure,[LambdaArgs,[ClosureEnvironment, ClosureResult]^ClosureBody,AltEnv]),
 	!,
 	bind_formal_parameters(LambdaArgs, ActualParams, [ClosureEnvironment,AltEnv], AltEnvBindings,BindCode),
         must_or_rtrace(call(BindCode)),
@@ -528,9 +533,9 @@ compile_body(Ctx,Env,Result,[lambda,LambdaArgs|LambdaBody], Body):-
         debug_var('LArgs',LambdaArgs),
         debug_var('LResult',ClosureResult),
         debug_var('LEnv',ClosureEnvironment),
-     Result = [closure,LambdaArgs,
+     Result = closure(LambdaArgs,
 			[ClosureEnvironment, ClosureResult]^ClosureBody,
-			Env],
+			Env),
 	Body = true.
 
 
