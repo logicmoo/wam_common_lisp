@@ -106,21 +106,20 @@ as_sexp1(Str,Expression):- as_sexp2(Str,Expression),!.
 as_sexp2(Str,Expression):- is_list(Str),!,maplist(expand_pterm_to_sterm,Str,Expression).
 as_sexp2(Str,Expression):- expand_pterm_to_sterm(Str,Expression),!.
 
-dbmsg(X):- both_outputs(dbmsg00(X)).
+dbmsg(X):- both_outputs(dbmsg0(X)).
 
-dbmsg00(X):- notrace((writeln('/*'), dbmsg0(X),writeln('*/'))).
-dbmsg0(Str):- string(Str),!,colormsg1(Str,[]).
-dbmsg0((Textbody:-Body)):-body==Textbody,colormsg1('==>'(body)),!,dbmsg0(Body).
-dbmsg0(Var):- var(Var),!,colormsg1(dbmsg_var(Var)).
-dbmsg0(:-((asserta(A),B))):- dbmsg0("~N:- asserta((~n"),dbmsg0(A),dbmsg0("~N)).~N"),dbmsg0(:- B).
-dbmsg0(((asserta(A),B))):- dbmsg0("~N asserta((~n"),dbmsg0(A),dbmsg0("~N)).~N"),dbmsg0(:- B).
-% dbmsg0((A,B)):-compound(A),compound(B),functor(A,F,N),functor(B,F,N),!,dbmsg0(A),dbmsg0(B).
-dbmsg0(asserta(A)):- dbmsg0("~Nasserta((~n"),dbmsg0(A),dbmsg0("~N)).~N").
-dbmsg0(:- asserta(A)):- dbmsg0("~N:- asserta((~n"),dbmsg0(A),dbmsg0("~N)).~N").
-dbmsg0(ABody):- ABody=..[A,Body],nonvar(Body), Body = (H :- B) , !, colormsg1((dbmsg(A,H) :- B)).
+in_comment(X):- notrace((write('/* '),(X),writeln(' */'))).
+
+
+dbmsg0(Str):- string(Str),!,in_comment(colormsg1(Str,[])).
+dbmsg0(Var):- var(Var),!,in_comment(colormsg1(dbmsg_var(Var))).
+dbmsg0(:-((asserta(A),B))):- !, dbmsg0(:-asserta(A)),dbmsg0(:- B).
+dbmsg0(:- asserta(A)):- colormsg1(A).
+dbmsg0(comment(S)):- in_comment(fmt9(S)).
+dbmsg0(N=V):- in_comment(fmt9(N=V)).
 dbmsg0(H :- Body):- !,colormsg1(H :- Body),!.
 dbmsg0(:- Body):- !,colormsg1(:- Body),!.
-dbmsg0(Body):- !,colormsg1(:- Body),!.
+dbmsg0(Body):- in_comment(colormsg1(:- Body)),!.
 % dbmsg(:- Body):- !, dmsg(:- Body).
 
 colormsg1(Msg,Args):- mesg_color(Msg,Ctrl),!,ansicall(Ctrl,format(Msg,Args)).

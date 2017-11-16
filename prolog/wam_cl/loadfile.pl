@@ -21,7 +21,10 @@
 cddd:- cd('/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/daydreamer/').
 
 dd:- cddd,cl_grovel_file('dd.cl',_).
-dd1:- cddd,cl_compile_file('dd_compile.cl',keys([]),_).
+
+dd1:- cddd,cl_load('dd_compile.cl',_),
+           cl_load('gate_compile.cl',_).
+
 dd2:- cddd,cl_load('dd.cl',_).
 
 tdd:- cl_grovel_file('../../t/daydreamer/*.cl',_).
@@ -32,7 +35,7 @@ cl_compile_file_mask(Mask,keys(Keys),TF):-
    with_each_file(do_compile_1file(Keys,TF),Mask).
 
 
-defpackage(A,B,C):- wdmsg(defpackage(A,B,C)).
+defpackage(A,B,C):- dbmsg(defpackage(A,B,C)).
 
 /*
 Function COMPILE-FILE
@@ -144,11 +147,12 @@ locally_let([],G):- call(G).
 cl_compile_file(File,R):-
   cl_compile_file(File,keys([]),R).
 cl_compile_file(File,keys(Keys),R):-
-  do_compile_1file(Keys,R,File),!,
+  do_compile_1file(Keys,File),!,
   cl_truename(File,R),!.
 
-do_compile_1file(_Keys,R,File):-
-   ignore(R=t),
+do_compile_1file(_Keys,File0):-
+   %ignore(R=t),
+   search_for(File0,File),
    prolog_to_os_filename(File,OSFile),
    atom_concat(OSFile,'.trans.pl',PLFile),
    locally_let(
@@ -158,25 +162,34 @@ do_compile_1file(_Keys,R,File):-
       sym('*package*')=value(sym('*package*'))],   
         setup_call_cleanup(
          open(PLFile,write,Stream),          
-            with_each_form(lisp_compile_to_prolog(Stream),File),
+            with_each_file(with_each_form(lisp_compile_to_prolog(Stream)),File),
           close(Stream))).
 
-lisp_compile_to_prolog(Stream,Expression):-    
+lisp_compile_to_prolog(Stream,Expression):- 
+  with_output_to(Stream,lisp_compile_to_prolog(Expression)),!.
+
+lisp_compile_to_prolog(COMMENTP):- is_comment(COMMENTP),!,write('/*'),write(COMMENTP),writeln('*/').
+lisp_compile_to_prolog(Expression):-    
   as_sexp(Expression,SExpression),  
+  nl,
+  writeln('/***********************/'),
   flush_all_output_safe,
   dbmsg(:- lisp_compile_to_prolog(SExpression)),
+  lisp_compile_to_prolog_pass1(SExpression),!.
+
+
+%write_trans(:-((A,B))):-!,write_trans(:-A),write_trans(:-B).
+%write_trans(:-asserta((A:-B))):- !, fmt9((A:-B)).
+write_trans(P):- dbmsg(P).
+
+lisp_compile_to_prolog_pass1(SExpression):- 
   reader_intern_symbols(SExpression,FExpression),
   (SExpression==FExpression -> true ; dbmsg(:- lisp_compile(FExpression))),  
-  lisp_compile_to_prolog_pass1(Stream,FExpression),!.
-
-write_trans(P):- fmt9(P).
-
-lisp_compile_to_prolog_pass1(Stream,Expression):- 
+   Expression = FExpression, 
    debug_var('_Ignored',Result),
    lisp_compile(Result,Expression,PrologCode),
-   write_trans(:- PrologCode),
-   must(lisp_compile_to_prolog_pass3(PrologCode)),!,
-   with_output_to(Stream,nop(call(PrologCode))).
+   write_trans(:-PrologCode),
+   must(lisp_compile_to_prolog_pass3(PrologCode)),!.
    
 
 lisp_compile_to_prolog_pass2(:- PrologCode):- !, lisp_compile_to_prolog_pass3(PrologCode).
@@ -191,10 +204,10 @@ lisp_compile_to_prolog_pass3(assert(PrologCode)):- !, lisp_compile_to_prolog_pas
 
 lisp_compile_to_prolog_pass3(cl_in_package(Into, Package)):-!, cl_in_package(Into, Package).
 lisp_compile_to_prolog_pass3(cl_use_package(Package, Load_Ret)):-!, cl_use_package(Package, Load_Ret).
-lisp_compile_to_prolog_pass3(cl_load(File, Load_Ret)):- !, cl_load(File, Load_Ret).
-lisp_compile_to_prolog_pass3(cl_compile_file(File, Load_Ret)):- !, cl_compile_file(File, Load_Ret).
-lisp_compile_to_prolog_pass3(cl_transl_file(File, Load_Ret)):- !, cl_transl_file(File, Load_Ret).
-
+lisp_compile_to_prolog_pass3(cl_load(File, Load_Ret)):- !, must_or_rtrace(cl_load(File, Load_Ret)).
+lisp_compile_to_prolog_pass3(cl_compile_file(File, Load_Ret)):- !, must_or_rtrace(cl_compile_file(File, Load_Ret)).
+lisp_compile_to_prolog_pass3(_).
+/*
 lisp_compile_to_prolog_pass3(MP):- strip_module(MP,_,P),functor(P,F,_),arg(_,
   v(doc_string,macro_lambda,function_lambda,arglist_info),F),!,
   asserta(MP),
@@ -202,14 +215,14 @@ lisp_compile_to_prolog_pass3(MP):- strip_module(MP,_,P),functor(P,F,_),arg(_,
 lisp_compile_to_prolog_pass3(MP):- write_trans(MP).
    
    %*compile-file-truename*
+*/
 
-
-cl_grovel_file(File,t):- format('~N; Grovel.. ~w~n',[File]),
+cl_grovel_file(File,t):- in_comment(format('~N; Grovel.. ~w~n',[File])),
    locally(local_override(with_forms,lisp_grovel),
     with_each_file(with_each_form(lisp_grovel_in_package),File)).
 
 cl_load(File,T):-
-  local_override(with_forms,lisp_grovel),!,format('~N; Grovel.. (LOAD ~w)~n',[File]),cl_grovel_file(File,T),!.
+  local_override(with_forms,lisp_grovel),!,in_comment(format('~N; Grovel.. (LOAD ~w)~n',[File])),cl_grovel_file(File,T),!.
 cl_load(File,t):-
   cl_grovel_file(File,t),
   with_each_file(with_each_form(lisp_reader_compiled_eval),File).
