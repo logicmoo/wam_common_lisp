@@ -25,7 +25,7 @@ sexpr1(Str)--> {string(Str)},!,[Str].
 sexpr1([function, Expression]) --> ['#'''], !, sexpr1(Expression).
 sexpr1([quote, Expression]) --> [''''], !, sexpr1(Expression).
 sexpr1(Dict) --> {is_dict(Dict,T),Dict=..[_,_|Rest]},!, ['#<'],sexpr1(T),lisplist(Rest,'>').
-sexpr1('ugly'(T,X)) --> ['#<'],sexpr1(T),sexpr1(X),['>'].
+sexpr1('$OBJ'(T,X)) --> ['#<'],sexpr1(T),sexpr1(X),['>'].
 sexpr1('$COMMA'(X)) --> [','],sexpr1(X).
 sexpr1(['$COMMA',X]) --> [','],sexpr1(X).
 sexpr1(['$BQ',X])--> ['`'],sexpr1(X).

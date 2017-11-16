@@ -426,6 +426,7 @@ sym_or_num(('1+')) --> `1+`,swhite,!.
 sym_or_num(('1-')) --> `1-`,swhite,!.
 sym_or_num(('#+')) --> `#+`,swhite,!.
 sym_or_num(('#-')) --> `#-`,swhite,!.
+sym_or_num(('-#+')) --> `-#+`,swhite,!.
 sym_or_num(E) --> rsymbol_maybe('',E),!.
 sym_or_num('#'(E)) --> [C],{name(E,[C])}.
 

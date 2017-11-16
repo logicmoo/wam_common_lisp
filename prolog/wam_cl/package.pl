@@ -25,7 +25,18 @@ cl_use_package(Package,R):- reading_package(CurrentPackage),
                        cl_use_package(Package,CurrentPackage,R).
 
 cl_use_package(Package,CurrentPackage, t):- Package==CurrentPackage,!.
-cl_use_package(Package,CurrentPackage, R):- throw(implenent(cl_use_package(Package,CurrentPackage, R))).
+cl_use_package(Package,CurrentPackage, R):- 
+  find_package(Package,Package0),
+  Package\==Package0,!,
+  cl_use_package(Package0,CurrentPackage, R).
+cl_use_package(Package,CurrentPackage, R):- 
+  find_package(CurrentPackage,CurrentPackage0),
+  CurrentPackage0\==CurrentPackage,!,
+  cl_use_package(Package,CurrentPackage0, R).
+cl_use_package(Package,CurrentPackage, t):- 
+   asserta_if_new(package_use_list(CurrentPackage,Package)),
+   dmsg(todo(check_for+package_symbolconflicts(package_use_list(CurrentPackage,Package)))).
+
  
 
 
@@ -33,7 +44,7 @@ cl_find_package(S,Obj):- find_package(S,Package),!,must(as_package_object(Packag
 cl_find_package(_,[]).
 
 
-find_package(ugly(package,UP),Package):-!,find_package(UP,Package).
+find_package('$OBJ'(package,UP),Package):-!,find_package(UP,Package).
 find_package(S,S):- is_lisp_package(S),!.
 find_package(S,Package):- 
   as_string_upper(S,SN),
@@ -41,7 +52,7 @@ find_package(S,Package):-
 
 find_package_or_die(X,Y):- find_package(X,Y) -> true ; throw(find_package_or_die(X,Y)).  
 
-as_package_object(Package,ugly(package,Package)).
+as_package_object(Package,'$OBJ'(package,Package)).
 
 
 reading_package(Package):- symbol_value('xx_package_xx',UP),find_package(UP,Package).

@@ -282,8 +282,8 @@ is_def_at_least_two_args(labels).
 is_def_at_least_two_args(macrolet).
 is_def_at_least_two_args(symbol_macrolet).
 
-%compile_body(_Ctx,_Env,Symbol,[Fun,Symbol,A2|AMORE],assert(P)):- is_def_at_least_two_args(Fun),!,P=..[Fun,Symbol,A2,AMORE].
-%compile_body(_Ctx,_Env,Symbol,[Fun0,Symbol,A2|AMORE],assert(P)):- is_def_at_least_two_args(Fun),same_symbol(Fun,Fun0),!,P=..[Fun,Symbol,A2,AMORE].
+compile_body(_Ctx,_Env,Symbol,[Fun,Symbol,A2|AMORE],assert(P)):- is_def_at_least_two_args(Fun),!,P=..[Fun,Symbol,A2,AMORE].
+compile_body(_Ctx,_Env,Symbol,[Fun0,Symbol,A2|AMORE],assert(P)):- is_def_at_least_two_args(Fun),same_symbol(Fun,Fun0),!,P=..[Fun,Symbol,A2,AMORE].
 
 % handler-caserestart-casedestructuring-bind
 
@@ -309,16 +309,19 @@ compile_body(Ctx,Env,Symbol,[defun,Name,FormalParms|FunctionBody0], CompileBody)
 
 
 show_ctx_info(Ctx):- term_attvars(Ctx,CtxVars),maplist(del_attr_rev2(freeze),CtxVars),show_ctx_info2(Ctx).
-show_ctx_info2(Ctx):- ignore((get_attr(Ctx,tracker,Ctx0),show_ctx_info3(Ctx0))).
-show_ctx_info3(Ctx):- is_rbtree(Ctx),!,forall(rb_in(Key, Value, Ctx),wdmsg(Key=Value)).
-show_ctx_info3(Ctx):- wdmsg(ctx=Ctx).
+show_ctx_info2(Ctx):- ignore((get_attr(Ctx,tracker,Ctx0),in_comment(show_ctx_info3(Ctx0)))).
+show_ctx_info3(Ctx):- is_rbtree(Ctx),!,forall(rb_in(Key, Value, Ctx),fmt9(Key=Value)).
+show_ctx_info3(Ctx):- fmt9(ctx=Ctx).
 
 make_compiled(Ctx,FunctionHead,FunctionBody,Head,HeadDefCode,(BodyCode)):-
-    expand_function_head(Ctx,CallEnv,FunctionHead, Head, HeadEnv, Result,HeadDefCode,HeadCode),
+    expand_function_head(Ctx,CallEnv,FunctionHead, Head, HeadEnv, HResult,HeadDefCode,HeadCode),
     debug_var("RET",Result),debug_var("Env",CallEnv),
     if_must_compile_body(Ctx,CallEnv,Result,[progn|FunctionBody],Body0),
     show_ctx_info(Ctx),
-    body_cleanup(Ctx,((CallEnv=HeadEnv,HeadCode,Body0)),BodyCode).
+    (((var(Result),HResult=Result))
+    -> body_cleanup(Ctx,((CallEnv=HeadEnv,HeadCode,Body0)),BodyCode)
+     ; body_cleanup(Ctx,((CallEnv=HeadEnv,HeadCode,Body0,HResult=Result)),BodyCode)).
+     
 
 % same_symbol(OP1,OP2):-!, OP1=OP2.
 same_symbol(OP1,OP2):- var(OP1),var(OP2),trace_or_throw(same_symbol(OP1,OP2)).
@@ -354,19 +357,16 @@ compile_body(Ctx,_Env,Name,[defmacro,Name0,FormalParmsB|FunctionBody0], CompileB
     CompileBody = (% asserta((Head  :- (fail, <<==(FunctionHead , FunctionBody)))),
    DocCode,
    HeadDefCode,
-   retractall(user:macro_lambda(defmacro(Name0),Name,_,_,_)),
    asserta(user:macro_lambda(defmacro(Name0),Name, FormalParms, [progn | FunctionBody],Alphas)),
+   FunctionAssert,
    add_opv(Name,typeof,sys_macro),
-   add_opv(Name,classof,operator),
-   nop(FunctionAssert)),!,
+   add_opv(Name,classof,operator)),!,
 
     make_compiled(Ctx,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode),
-    (local_override(with_forms,lisp_grovel) -> FunctionAssert = true; FunctionAssert = asserta((Head  :- (!,  BodyCode)))),
-    get_alphas(Ctx,Alphas),
-    wdmsg( :- lisp_compile( [defmacro,Name0, FormalParms, [progn | FunctionBody]])),
-    wdmsg(((Head  :- (!,  BodyCode)))),
-    wdmsg(alphas=Alphas),
-    nl,nl.
+   (local_override(with_forms,lisp_grovel) -> FunctionAssert = true; FunctionAssert = asserta((Head  :- ( BodyCode)))),
+    %wdmsg( :- lisp_compile( [defmacro,Name0, FormalParms, [progn | FunctionBody]])),
+    %wddmsg(((Head  :- (!,  BodyCode)))),    
+   get_alphas(Ctx,Alphas).
 
 get_value_or_default(Ctx,Name,Value,IfMissing):- oo_get_attr(Ctx,Name,Value)->true;Value=IfMissing.
 

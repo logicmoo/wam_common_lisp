@@ -82,6 +82,9 @@ keep_as_compund(function).
 keep_as_compund(closure).
 keep_as_compund(prolog).
 keep_as_compund(ugly).
+keep_as_compund('$OBJ').
+%keep_as_compund('$CHAR').
+%keep_as_compund('$PATHNAME').
 keep_as_compund(v).
 keep_as_compund(obj).
 keep_as_compund(D):-atom_concat('$',_,D).

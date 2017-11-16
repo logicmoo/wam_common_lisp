@@ -21,7 +21,7 @@
 cl_truename(In,Pathname):- search_for(In,O),as_pathanme(O,Pathname).
 
 
-as_pathanme(O,ugly(pathname,O)).
+as_pathanme(O,'$OBJ'(pathname,O)).
 
 % Uses Symbol value: *DEFAULT-PATHNAME-DEFAULTS*
 search_for(In,O):- cl_symbol_value(xx_default_pathname_defaults_xx,Str0),

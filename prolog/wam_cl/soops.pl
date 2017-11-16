@@ -99,7 +99,7 @@ cl_defstruct(NameKeyWords,_String,Slots,Defstruct_Ret):-
   % add doc for string
   cl_defstruct(NameKeyWords,Slots,Defstruct_Ret).
 
-cl_defstruct(NameKeyWords,_String,Slots,Defstruct_Ret):- wdmsg(error_todo(cl_defstruct(NameKeyWords,Slots,Defstruct_Ret))).
+cl_defstruct(NameKeyWords,_String,Slots,Defstruct_Ret):- dbmsg(error_todo(cl_defstruct(NameKeyWords,Slots,Defstruct_Ret))).
 
 
 :- dynamic((struct_opv/3)).
