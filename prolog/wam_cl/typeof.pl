@@ -34,7 +34,7 @@ type_i(Dict,Type):- is_dict(Dict,Type).
 type_i(Str,string):- string(Str).
 type_i(t,boolean).
 type_i(Obj,Type):- number(Obj),!,number_type_of(Obj,Type).
-type_i(char(_),character).
+type_i('$CHAR'(_),character).
 type_i(Obj,Type):- get_opv(Obj,typeof,Type).
 type_i(function(OP),Class):- get_opv(OP,function,Obj),!,cl_type_of(Obj,Class).
 
