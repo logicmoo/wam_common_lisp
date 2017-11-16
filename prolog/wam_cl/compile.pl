@@ -453,31 +453,32 @@ compile_body(Ctx,Env,Result,[if, Test, IfTrue, IfFalse], Body):-
 
 % COND
 compile_body(_Cx,_Ev,[],[cond ], true):- !.
-
-compile_body(Ctx,Env,Result,[cond, List |Clauses], Body):- !,
+compile_body(_Cx,_Ev,[],[cond ,[]], true):- !.
+compile_body(Ctx,Env,Result,[cond, List |Clauses], Body):- 
   must_or_rtrace((
         [Test|ResultForms] = List,
-        debug_var("CONDTEST",TestResult),
+        debug_var("CONDTESTA",TestResult),
         debug_var("ResultFormsResult",ResultFormsResult),
         debug_var("ClausesResult",ClausesResult),
-        debug_var("CondResult",Result))),
-   Result      = ClausesResult,
+        debug_var("CondAResult",Result))),
+   Result  = ClausesResult,
+   %Result  = ResultFormsResult,
    freeze(Result,var(Result)),
-   must_compile_body(Ctx,Env,TestResult,Test,TestBody),
+   must_compile_test_body(Ctx,Env,TestResult,Test,TestBody,TestResultBody),
    must_compile_progn(Ctx,Env,ResultFormsResult,ResultForms, TestResult, ResultFormsBody),
    must_compile_body(Ctx,Env,ClausesResult,[cond| Clauses],  ClausesBody),
    Body = (	 
-                   ((TestBody, TestResult \==[]) -> ( ResultFormsBody,Result  = ResultFormsResult); ClausesBody)).
+                   ((TestBody, TestResultBody) -> ( ResultFormsBody,Result  = ResultFormsResult); ClausesBody)),!.
    
 
 
 compile_body(Ctx,Env,Result,[cond, List |Clauses], Body):- !,
   must_or_rtrace((
         [Test|ResultForms] = List,
-        debug_var("CONDTEST",TestResult),
+        debug_var("CONDTESTB",TestResult),
         debug_var("ResultFormsResult",ResultFormsResult),
         debug_var("ClausesResult",ClausesResult),
-        debug_var("CondResult",Result))),
+        debug_var("CondBResult",Result))),
 	must_compile_body(Ctx,Env,TestResult,Test,TestBody),
 	must_compile_progn(Ctx,Env,ResultFormsResult,ResultForms, TestResult, ResultFormsBody),
 	must_compile_body(Ctx,Env,ClausesResult,[cond| Clauses],  ClausesBody),
@@ -562,7 +563,7 @@ normalize_let1( Variable,[bind, Variable, []]).
 compile_body(_Ctx,_Env,_Result,[OP|R], _Body):- var(OP),!,trace_or_throw(c_b([OP|R])).
 
 % LET
-compile_body(Ctx,Env,Result,[OP, NewBindingsIn| BodyForms], Body):- must_or_rtrace(nonvar(OP)), OP=let, lisp_dumpST,!,
+compile_body(Ctx,Env,Result,[OP, NewBindingsIn| BodyForms], Body):- (var(OP)-> throw(var(OP)) ; OP==let),!,
  must_or_rtrace(is_list(NewBindingsIn)),!,
  must_or_rtrace(compile_let(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body)).
 
@@ -584,7 +585,7 @@ compile_let(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body):- !,
 % LET*
 compile_body(Ctx,Env,Result,[OP, []| BodyForms], Body):- same_symbol(OP,'let*'), !, must_compile_body(Ctx,Env,Result,[progn| BodyForms], Body).
 compile_body(Ctx,Env,Result,[OP, [Binding1|NewBindings]| BodyForms], Body):- same_symbol(OP,'let*'),
-   must_or_trace(compile_let(Ctx,Env,Result,['let', [Binding1],[progn, [OP, NewBindings| BodyForms]]], Body)).
+   must_or_rtrace(compile_let(Ctx,Env,Result,['let', [Binding1],[progn, [OP, NewBindings| BodyForms]]], Body)).
 
 % VALUES (r1 . rest )
 compile_body(Ctx,Env,Result,['values',R1|EvalList], (ArgBody,Body)):-!,

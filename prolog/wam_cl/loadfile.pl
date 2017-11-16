@@ -18,10 +18,11 @@
 
 :- include('header.pro').
 
+cddd:- cd('/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/daydreamer/').
 
-dd:- cl_grovel_file('../../t/daydreamer/dd.cl',_).
-dd1:- cl_compile_file('../../t/daydreamer/dd_compile.cl',keys([]),_).
-dd2:- cl_load('../../t/daydreamer/dd.cl',_).
+dd:- cddd,cl_grovel_file('dd.cl',_).
+dd1:- cddd,cl_compile_file('dd_compile.cl',keys([]),_).
+dd2:- cddd,cl_load('dd.cl',_).
 
 tdd:- cl_grovel_file('../../t/daydreamer/*.cl',_).
 tdd1:- cl_compile_file('../../t/daydreamer/*.cl',_).
@@ -143,8 +144,8 @@ locally_let([],G):- call(G).
 cl_compile_file(File,R):-
   cl_compile_file(File,keys([]),R).
 cl_compile_file(File,keys(Keys),R):-
-  do_compile_1file(Keys,R,File),
-  cl_truename(File,R).
+  do_compile_1file(Keys,R,File),!,
+  cl_truename(File,R),!.
 
 do_compile_1file(_Keys,R,File):-
    ignore(R=t),
@@ -211,7 +212,7 @@ cl_load(File,T):-
   local_override(with_forms,lisp_grovel),!,format('~N; Grovel.. (LOAD ~w)~n',[File]),cl_grovel_file(File,T),!.
 cl_load(File,t):-
   cl_grovel_file(File,t),
-  with_each_file(with_each_form(lisp_reader_compiled_eval,File)).
+  with_each_file(with_each_form(lisp_reader_compiled_eval),File).
 
 
 lisp_reader_compiled_eval(Forms):- reader_intern_symbols(Forms,FForms),lisp_compiled_eval(FForms).
@@ -240,8 +241,7 @@ grovel_prolog_code((A,B)):-!, grovel_prolog_code(A),grovel_prolog_code(B).
 grovel_prolog_code(MP):- strip_module(MP,_,P),functor(P,F,_),arg(_,
   v(doc_string,macro_lambda,function_lambda,arglist_info),F),!,asserta(MP).
 grovel_prolog_code(_).
-
-cl_truename(In,O):- absolute_file_name(In,M),cl_string(M,O).
+ 
 
 with_flist(How,List):- must_maplist(with1file(How),List).
 
@@ -258,12 +258,10 @@ with_directory(How,FDir):- expand_directory_file_path(FDir,'*.cl',List),!,with_f
 with_directory(How,FDir):- expand_directory_file_path(FDir,'*.lisp',List),!,with_flist(How,List).
 with_directory(How,FDir):- expand_directory_file_path(FDir,'*.lsp',List),!,with_flist(How,List).
 
-with_fstem(F,File,Found):- 
-   absolute_file_name(File,Found,[relative_to(F),extensions(['','.cl','.lisp','.lsp','.el']),
-   access(read),file_errors(fail)]),exists_file(Found).
 
 with_each_file(How,File):- string(File),name(Atom,File),!,with_each_file(How,Atom).
-with_each_file(How,File):- compound(File),!,absolute_file_name(File,Abs),file_directory_name(Abs,Dir),exists_directory(Dir),!,with_each_file(How,Abs).
+with_each_file(How,File):- compound(File),!,absolute_file_name(File,Abs),file_directory_name(Abs,Dir),exists_directory(Dir),!,
+  with_each_file(How,Abs).
 with_each_file(How,File):- exists_file(File),!,with1file(How,File).
 with_each_file(How,FDir):- exists_directory(FDir),with_directory(How,FDir),!.
 with_each_file(How,Mask):- expand_file_name(Mask,List),List\==[Mask],!,with_flist(How,List).

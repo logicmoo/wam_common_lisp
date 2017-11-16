@@ -63,7 +63,7 @@ nonquietly_must_or_rtrace(G):-
 
 must_or_rtrace((A,B)):-!,must_or_rtrace(A),must_or_rtrace(B).
 must_or_rtrace(G):-
-  notrace(with_nat_term(wdmsg(tracing(G)))),
+   %notrace(with_nat_term(wdmsg(tracing(G)))),
    notrace(tracing),!,
    (catch((G),E,gripe_problem(uncaught(E),G)) 
     *-> true ; (gripe_problem(fail_must_or_rtrace_failed,G),!,fail)),!.

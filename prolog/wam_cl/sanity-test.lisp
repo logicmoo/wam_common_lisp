@@ -30,15 +30,14 @@
 
 (DEFUN cl:string (x )(COND ((STRINGP x )x )((SYMBOLP x )(symbol-name x ))(T (ERROR "type error" ))))
 (TAGBODY 1 (PRINT "hi" ))
- (LET (val 1 )NIL )
+ (LET ((val 1 ))NIL )
+ (LET ((val 1 ))val )
 
 
 ;; 3.1. Review of defstruct
 
 (defstruct point
-  x
-  y
-  z)
+  x y z)
 
 (defun distance-from-origin (point)
   (let* ((x (point-x point))

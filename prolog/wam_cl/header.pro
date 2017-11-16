@@ -76,6 +76,8 @@
 :-use_module(mizepro).
 :-use_module(package).
 :-use_module(places).
+:-use_module(pathname).
+:-use_module(funcall).
 :-use_module(pnames).
 :-use_module(prims).
 :-use_module(print).

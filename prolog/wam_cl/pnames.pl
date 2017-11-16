@@ -56,7 +56,7 @@ trim_95([X|L],[100,X|Y]):- char_type(X,digit), trim_96(L,Y).
 trim_95([X|L],[97,X|Y]):- \+ char_type(X,alpha), trim_96(L,Y).
 trim_95(X,Y):- trim_96(X,Y).
 
-%trim_96([95],[]).
+trim_96([95],[]).
 trim_96([],[]).
 trim_96([95,95|M],Y):- trim_96([95|M],Y).
 trim_96([X|M],[X|Y]):- trim_96(M,Y).

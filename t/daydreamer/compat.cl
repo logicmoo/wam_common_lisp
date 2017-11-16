@@ -65,7 +65,7 @@
 (defmacro string-posq (a b) `(position ,a ,b))
 (defmacro nth-elem (a b) `(nth ,b ,a))
 (defmacro newline (a) `(terpri ,a))
-(defmacro -1+ (a) `(+ -1 ,a))
+;(defmacro -1+ (a) `(+ -1 ,a))
 (defmacro fl+ (a b) `(+ ,a ,b))
 (defmacro fl- (a b) `(- ,a ,b))
 (defmacro fl* (a b) `(* ,a ,b))

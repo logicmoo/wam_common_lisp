@@ -44,10 +44,10 @@ skip_optimize(erase(_)).
 
 
 always_true(G):- \+ ground(G),fail.
-
-always_true(true).
 always_true(t\==[]).
 always_true([]\==t).
+
+is_always_true(true).
 
 
 opt_arg1(F,_):- atom_concat(assert,_,F).
@@ -136,7 +136,7 @@ mize_body(_Ctx,_,C1,C1):- \+ compound(C1),!.
 mize_body(Ctx,F, :-(C1), :-(C1Better)):-!,mize_body(Ctx,F,C1,C1Better).
 mize_body(Ctx,F,(C1,C2),CodeJoined):-!,mize_body(Ctx,F,C1,C1Better),mize_body(Ctx,F,C2,C2Better),conjoin_0(C1Better,C2Better,CodeJoined).
 %mize_body(Ctx,_,(C1 -> C2 ; _),C2Better):- mize_body(Ctx,->,C1,C1Better),always_true(C1Better),mize_body(Ctx,';',C2,C2Better),!.
-mize_body(_Ctx,_,(C1 -> C2 ; _),C2):- lisp_compiler_option(elim_always_trues,true), always_true(C1),!.
+mize_body(_Ctx,_,(C1 -> C2 ; _),C2):- lisp_compiler_option(safe(elim_always_trues),true), always_true(C1),!.
 mize_body(Ctx,_,(C1 -> C2 ; CodeC),(C1Better -> C2Better ; CodeCCBetter)):-!,mize_body(Ctx,->,C1,C1Better),mize_body(Ctx,';',C2,C2Better),mize_body(Ctx,';',CodeC,CodeCCBetter).
 mize_body(Ctx,_,(C2 ; CodeC),( C2Better ; CodeCCBetter)):-!,mize_body(Ctx,';',C2,C2Better),mize_body(Ctx,';',CodeC,CodeCCBetter).
 mize_body(Ctx,F,C1,CodeC):- mize_body1(Ctx,F,C1,C2),mize_body2(Ctx,F,C2,CodeC),!.
@@ -166,7 +166,8 @@ mize_body1(_Ctx,_,C1,C1):-!.
 mize_body2(_Ctx,_,C1,C1):- \+ compound(C1),!.
 mize_body2(_Ctx,_,t_or_nil(G, R),G):- R==t.
 mize_body2(_Ctx,_,t_or_nil(G, R),\+ G):- R==[].
-mize_body2(_Ctx,_,(t_or_nil(G, R),(R \==[] ->B;C)),(G->B;C)).
+mize_body2(_Ctx,_,(t_or_nil(G, R),(R \==[] ->B;C)),(G->B;C)):- var(R).
+mize_body2(_Ctx,_,(t_or_nil(G, R),(R \==[])),G):- var(R).
 
 mize_body2(_Ctx,_,(PARG,A=B), PARG):- lisp_compiler_option(elim_xvars,true),compound(PARG),functor(PARG,_,Ar),arg(Ar,PARG,PP),(A==PP;B==PP),!,A=B.
 mize_body2(_Ctx,_,G,true):- lisp_compiler_option(elim_always_trues,true), always_true(G).
@@ -303,7 +304,7 @@ maybe_inline(C1):- \+ never_inline(C1),
   predicate_property(C1,interpreted),
   predicate_property(C1,number_of_clauses(1)),
   \+ clause_has_cuts(C1),
-  %lisp_compiler_option(inline,true),
+  lisp_compiler_option(inline,true),
   !.
 
 clause_has_cuts(P):- clause(P,I),contains_var(!,I).
