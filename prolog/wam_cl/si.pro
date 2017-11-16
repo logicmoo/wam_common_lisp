@@ -10916,7 +10916,7 @@ o_p_v(custom_xx_prompt_start_xx,kw_deftype,defparameter).
 o_p_v(custom_xx_prompt_start_xx,name,"*PROMPT-START*").
 o_p_v(custom_xx_prompt_start_xx,package,pkg_custom).
 o_p_v(custom_xx_prompt_start_xx,classof,claz_symbol).
-o_p_v(custom_xx_prompt_start_xx,value,'').
+o_p_v(custom_xx_prompt_start_xx,value,"").
 o_p_v(custom_xx_prompt_step_xx,kw_deftype,defparameter).
 o_p_v(custom_xx_prompt_step_xx,name,"*PROMPT-STEP*").
 o_p_v(custom_xx_prompt_step_xx,package,pkg_custom).
@@ -61885,7 +61885,7 @@ o_p_v(xx_default_pathname_defaults_xx,kw_deftype,defparameter).
 o_p_v(xx_default_pathname_defaults_xx,name,"*DEFAULT-PATHNAME-DEFAULTS*").
 o_p_v(xx_default_pathname_defaults_xx,package,pkg_cl).
 o_p_v(xx_default_pathname_defaults_xx,classof,claz_symbol).
-o_p_v(xx_default_pathname_defaults_xx,value,'').
+o_p_v(xx_default_pathname_defaults_xx,value,"").
 o_p_v(xx_error_output_xx,kw_deftype,defparameter).
 o_p_v(xx_error_output_xx,name,"*ERROR-OUTPUT*").
 o_p_v(xx_error_output_xx,package,pkg_cl).

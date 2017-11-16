@@ -127,6 +127,8 @@ cl_equal(A,B,Ret):- t_or_nil( A=B , Ret).
 
 +(N1,N2,Ret):- Ret is (N1 + N2).
 -(N1,N2,Ret):- Ret is (N1 - N2).
+cl_c45(N1,N2,Ret):- Ret is (N1 - N2).
+f_u_(N1,N2,Ret):- Ret is (N1 - N2).
 *(N1,N2,Ret):- Ret is (N1 * N2).
 '/'(N1,N2,Ret):- Ret is (N1 / N2).
 

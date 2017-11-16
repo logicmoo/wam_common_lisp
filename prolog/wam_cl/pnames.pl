@@ -50,12 +50,13 @@ filter_var_chars(X,Y):- filter_var_chars_trim_95(X,Y).
 
 filter_var_chars_trim_95(X,Y):- filter_var_chars0(X,M),trim_95(M,Y),!.
 
+trim_95([X],[X]).
 trim_95([95|M],Y):-!, trim_95(M,Y).
 trim_95([X|L],[100,X|Y]):- char_type(X,digit), trim_96(L,Y).
 trim_95([X|L],[97,X|Y]):- \+ char_type(X,alpha), trim_96(L,Y).
 trim_95(X,Y):- trim_96(X,Y).
 
-trim_96([95],[]).
+%trim_96([95],[]).
 trim_96([],[]).
 trim_96([95,95|M],Y):- trim_96([95|M],Y).
 trim_96([X|M],[X|Y]):- trim_96(M,Y).
@@ -64,12 +65,17 @@ trim_96([X|M],[X|Y]):- trim_96(M,Y).
 
 filter_var_chars0([],[]).
 
+
+% WATN WHEN MAKING SYMBOLs...  `_` -> `__`
+
+%  `-` -> `c45`
+filter_var_chars0(`-`,`c45`):-!.
+%  `*` -> `_xx_`
+filter_var_chars0([42|T],[95,120,120,95|Rest]):-!,filter_var_chars0(T,Rest).
 %  `%` -> `_pf_`
 filter_var_chars0([37|T],[95,112, 102, 95| Rest]):-!,filter_var_chars0(T,Rest).
 %  `-` -> `_`
 filter_var_chars0([45|T],[95|Rest]):-!,filter_var_chars0(T,Rest).
-%  `*` -> `_xx_`
-filter_var_chars0([42|T],[95,120,120,95|Rest]):-!,filter_var_chars0(T,Rest).
 %  `:` -> `_`
 filter_var_chars0([42|T],[95,120,95|Rest]):-!,filter_var_chars0(T,Rest).
 filter_var_chars0([H|T],[H|Rest]):-  code_type(H, prolog_identifier_continue),!,filter_var_chars0(T,Rest).
