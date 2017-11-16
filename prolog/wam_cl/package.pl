@@ -142,11 +142,11 @@ package_shadow_symbol_step2(Package,String,OldSymbol,kw_inherited):-
 
 
 % caller is responsible for avoiding conflicts
-make_fresh_internal_symbol(pkg_kw,String,Symbol):- create_keyword(String,Symbol).
+make_fresh_internal_symbol(pkg_kw,String,Symbol):- !, create_keyword(String,Symbol).
 make_fresh_internal_symbol(Package,String,Symbol):- 
    ignore(symbol_case_name(String,Package,Symbol)),
    create_symbol(String,Package,Symbol),
-   assert_if_new(package:package_internal_symbol(Package,String,Symbol)).
+   assert_if_new(package:package_internal_symbols(Package,String,Symbol)).
 
 
 is_lisp_package(P):- package_name(P,_). 

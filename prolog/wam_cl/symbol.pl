@@ -63,7 +63,7 @@ cl_intern(Name,Pack,Result):-
 intern_symbol(String,Package,Symbol,IntExt):- package_find_symbol(String,Package,Symbol,IntExt),!.
 intern_symbol(String,Package,Symbol,IntExt):- 
    make_fresh_internal_symbol(Package,String,Symbol),
-   must((package_find_symbol(String,Package,FoundSymbol,IntExt),FoundSymbol==Symbol)).
+   must_or_rtrace((package_find_symbol(String,Package,FoundSymbol,IntExt),FoundSymbol==Symbol)).
 
 
 cl_make_symbol(SymbolName,Symbol):- 
