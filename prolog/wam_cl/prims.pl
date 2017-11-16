@@ -35,10 +35,8 @@ prims:cl_exact.
 % :- use_module(library('dialect/sicstus')).
 
 % Numbers, pathnames, and arrays are examples of self-evaluating objects.
-is_self_evaluationing_object(X):- var(X),!.
-is_self_evaluationing_object('$CHAR'(_)):-!.
 is_self_evaluationing_object(X):- atomic(X),!,is_self_evaluationing_const(X).
-
+is_self_evaluationing_object(X):- var(X),!.
 is_self_evaluationing_object(X):- (is_dict(X);is_array(X);is_rbtree(X)),!.
 
 is_self_evaluationing_const(X):- atomic(X),!,(X==t;X==[];number(X);is_keywordp(X);string(X);(blob(X,T),T\==text)),!.

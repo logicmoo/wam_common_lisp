@@ -37,7 +37,7 @@ compile_body_go_tagbody(_Ctx,Env,Result,[go,Label,TB|_],  Code ):- create_jump(T
 compile_body_go_tagbody(_Ctx,Env,Result,[go,Label,TB], Code):- compute_new_address(TB,Label,Pred), debug_var("_GORES",Result),debug_var("GoEnv",Env),create_jump(TB,Label,Pred,Env,Code).
 
 
-add_context_code(_Ctx,Assertion):-assert(user:Assertion),dbmsg(:-assert(Assertion)),!.
+add_context_code(_Ctx,Assertion):-assert(user:Assertion),wdmsg(Assertion),!.
 % TAGBODY
 compile_body_go_tagbody(Ctx,Env,[],[tagbody| InstrS], Code):- 
   gensym(addr_tagbody_,TB),gensym(addr_enter_,Label),
@@ -49,7 +49,7 @@ compile_body_go_tagbody(Ctx,Env,[],[tagbody| InstrS], Code):-
 compile_tagbody(Ctx,Env,TB,InstrS,Clauses):-
  must_det_l((
    get_go_points(TB,InstrS,Gos),
-   get_tags(TB,Env,InstrS,Gos,Addrs),  % check_missing_gos(Gos), 
+   get_tags(TB,Env,InstrS,Gos,Addrs),  % check_missing_gos(Gos), wdmsg((get_tags(TB,Env,InstrS,Gos):-Addrs)),
    compile_addrs(TB,Ctx,Env,_Result,Addrs),
    % copy_term
    =(Addrs,Addrs2),   

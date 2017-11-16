@@ -156,9 +156,8 @@ mize_body1(Ctx,_,symbol_value(_Env, Sym, Sym_Get),Was=Sym_Get):-
   lisp_compiler_option(safe(elim_symbolvalues_vars),true),
   
   get_var_tracker(Ctx,Sym,Dict),
-  Dict.w<2,
-  Dict.vars=[Was|_],
-  must(Was=Sym_Get).
+  Dict.w==1,Dict.vars=[Was|_],
+  Was=Sym_Get.
 
 mize_body1(_Ctx,_,C1,L=[R]):- C1 =@= (L=[R, []]). % lisp_compiler_option(elim_vars,true).
 %mize_body1(Ctx,_F,C1,C2):- compound_name_arguments(C1,F,C1Better),must_maplist(mize_body1(Ctx,F),C1Better,C2Better),C2=..[F|C2Better].

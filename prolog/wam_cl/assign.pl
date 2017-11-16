@@ -18,8 +18,7 @@
 :- ensure_loaded((utils_for_swi)).
 
 % local symbol?
-rw_add(Ctx,Var,RW):- atom(Var),!,  get_var_tracker(Ctx,Var,Dict),arginfo_incr(RW,Dict).
-rw_add(_Ctx,_Var,_RW).
+rw_add(Ctx,Var,RW):-  get_var_tracker(Ctx,Var,Dict),arginfo_incr(RW,Dict).
 
 % actual var
 add_tracked_var(Ctx,Atom,Var):-

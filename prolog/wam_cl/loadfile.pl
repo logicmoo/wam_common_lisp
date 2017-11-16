@@ -165,7 +165,7 @@ do_compile_1file(_Keys,File0):-
             with_each_file(with_each_form(lisp_compile_to_prolog(Stream)),File),
           close(Stream))).
 
-lisp_compile_to_prolog(Stream,Expression):- 
+lisp_compile_to_prolog(Stream,Expression):-    
   with_output_to(Stream,lisp_compile_to_prolog(Expression)),!.
 
 lisp_compile_to_prolog(COMMENTP):- is_comment(COMMENTP),!,write('/*'),write(COMMENTP),writeln('*/').
@@ -188,7 +188,7 @@ lisp_compile_to_prolog_pass1(SExpression):-
    Expression = FExpression, 
    debug_var('_Ignored',Result),
    lisp_compile(Result,Expression,PrologCode),
-   write_trans(:-PrologCode),
+   write_trans(:- PrologCode),
    must(lisp_compile_to_prolog_pass3(PrologCode)),!.
    
 
