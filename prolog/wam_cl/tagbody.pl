@@ -26,8 +26,10 @@ shared_lisp_compiler:plugin_expand_function_body(Ctx,Env,Result,InstrS,Code):-
 
 push_label(_,_,_).
 % @IDEA we might use labels later 
-compile_body_go_tagbody(_Ctx,_Env,Result,[label,Label,ID|Rest], push_label(Label,ID,Rest) ):-!, debug_var("_LABELRES",Result).
-compile_body_go_tagbody(_Ctx,_Env,Result,[label,Label|Rest], push_label(Label,_,Rest) ):-!, debug_var("_LABELRES",Result).
+compile_body_go_tagbody(_Ctx,_Env,Result,[label,Label,ID|Rest], PUSH ):-!, debug_var("_LABELRES",Result),
+  nop(PUSH = push_label(Label,ID,Rest)),PUSH=true.
+compile_body_go_tagbody(_Ctx,_Env,Result,[label,Label|Rest], PUSH ):-!, debug_var("_LABELRES",Result),
+  nop(PUSH = push_label(Label,_,Rest)),PUSH=true.
 
 
 tagbody_go(_TB,_Label,Pred,Env):- call(Pred,Env).
@@ -35,25 +37,28 @@ tagbody_go(_TB,_Label,Pred,Env):- call(Pred,Env).
 compile_body_go_tagbody(_Ctx,Env,Result,[go,Label,TB,Pred],  Code ):- create_jump(TB,Label,Pred,Env,Code),!, debug_var("_GoThree",Result).
 compile_body_go_tagbody(_Ctx,Env,Result,[go,Label,TB|_],  Code ):- create_jump(TB,Label,_Pred,Env,Code),!, debug_var("_GoTwo",Result).
 compile_body_go_tagbody(_Ctx,Env,Result,[go,Label,TB], Code):- compute_new_address(TB,Label,Pred), debug_var("_GORES",Result),debug_var("GoEnv",Env),create_jump(TB,Label,Pred,Env,Code).
+compile_body_go_tagbody(_Ctx,Env,Result,[go,Label], Code):- local_override(tagbody_scope,TB),compute_new_address(TB,Label,Pred), debug_var("_GORES",Result),debug_var("GoEnv",Env),create_jump(TB,Label,Pred,Env,Code).
 
 
-add_context_code(_Ctx,Assertion):-assert(user:Assertion),dbmsg(:-assert(Assertion)),!.
+add_context_code(_Ctx,Assertion):- user:asserta(Assertion),dbmsg(:-asserta(Assertion)),!.
 % TAGBODY
 compile_body_go_tagbody(Ctx,Env,[],[tagbody| InstrS], Code):- 
   gensym(addr_tagbody_,TB),gensym(addr_enter_,Label),
   compile_tagbody(Ctx,Env,TB,[[go,Label],Label|InstrS],Clauses),
   compute_new_address(TB,Label,Pred),
+  debug_var("TBEnv",Env),
   create_jump(TB,Label,Pred,Env,Code),
   maplist(add_context_code(Ctx),Clauses).
 
 compile_tagbody(Ctx,Env,TB,InstrS,Clauses):-
+ locally(local_override(tagbody_scope,TB),
  must_det_l((
    get_go_points(TB,InstrS,Gos),
    get_tags(TB,Env,InstrS,Gos,Addrs),  % check_missing_gos(Gos), 
    compile_addrs(TB,Ctx,Env,_Result,Addrs),
    % copy_term
    =(Addrs,Addrs2),   
-   must_maplist(compile_addresses(TB),Addrs2,Clauses))).
+   must_maplist(compile_addresses(TB),Addrs2,Clauses)))).
   % Code = call_addr_block(Env,CInstrS,Addrs2,Result))).
 
 
@@ -64,6 +69,7 @@ create_jump(TB,Label,Pred,Env,call(Pred,Env)):- compute_new_address(TB,Label,Pre
 simplify_call(call(Pred,Env),COUT):- atom(Pred),!, COUT=..[Pred,Env].
 simplify_call(COUT,COUT).
 
+compute_new_address(_, Label,Pred):- atom_concat('block_exit_',_,Label),!,Pred=Label.
 compute_new_address(TB,Label,Pred):- must_or_rtrace(atomic_list_concat([TB,Label],'_',Pred)).
 
 
@@ -193,9 +199,10 @@ compile_tagbodys(TB,Ctx,Env,Result,InstrS,BInstrS):-
    trim_tagbody(TInstrS,CInstrS),
    compile_forms(Ctx,Env,Result,CInstrS,BInstrS).
 
-%label_atoms(Instr,[label,Label]):- is_label(Instr,Label),!.
+label_atoms(Instr,[label,Label]):- is_label(Instr,Label),!.
 label_atoms(TB,Label,[label,Label,TB]):-atomic(Label),!.
-label_atoms(TB,[go,Label],[go,Label,TB]):-atomic(Label),!.
+%label_atoms(TB,[go,Label],[go,Label,TB]):-atomic(Label),!.
+% label_atoms(TB,[return_from|Label],[return_from|Label]):-!.
 label_atoms(_TB,Instr,Instr).
 
 trim_tagbody(InstrS,TInstrS):- append(Left,[R|_],InstrS),is_reflow(R,_),!,append(Left,[R],TInstrS).

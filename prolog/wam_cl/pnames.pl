@@ -106,8 +106,11 @@ check_varname(UP):- name(UP,[C|_]),(char_type(C,digit)->throw(check_varname(UP))
 
 % *PACKAGE* becomes xx_package_xx
 % %MAKE-PACKAGE becomes pf_make_package
-prologcase_name(String,Nonvar):-nonvar(Nonvar),!,prologcase_name(String,ProposedName),!,ProposedName==Nonvar.
-prologcase_name(String,ProposedName):- 
+
+prologcase_name(I,O):-notrace(prologcase_name0(I,O)).
+
+prologcase_name0(String,Nonvar):-nonvar(Nonvar),!,prologcase_name(String,ProposedName),!,ProposedName==Nonvar.
+prologcase_name0(String,ProposedName):- 
   string_lower(String,In),string_codes(In,Was),!,filter_var_chars(Was,CS),!,name(ProposedName,CS),!.
 
 

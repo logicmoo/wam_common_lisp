@@ -39,7 +39,7 @@ cl_gensym(Symbol):- cl_gensym("G",Symbol).
 cl_gensym(String,Symbol):- gensym(String,SymbolName),cl_make_symbol(SymbolName,Symbol).
 
 
-is_symbolp(Symbol):- get_opv(Symbol,typeof,clz_symbol).
+is_symbolp(Symbol):- get_opv(Symbol,classof,clz_symbol).
 
 is_keywordp(Symbol):- get_opv(Symbol,package,pkg_kw),!.
 %is_keywordp(Symbol):- atom(Symbol),sanity((must(\+ atom_concat(':',_,Symbol)))),!,fail.

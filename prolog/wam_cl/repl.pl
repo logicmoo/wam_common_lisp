@@ -257,13 +257,13 @@ eval_at_repl(Expression,Result):-
   env_current(Env),
   timel('COMPILER',always_catch(maybe_ltrace(lisp_compile(Env,Result,LExpression,Code)))),
   dbmsg(:-Code),  
-  timel('EXEC',always_catch(ignore(must_or_rtrace(maybe_ltrace(call(Code)))))),!.
+  timel('EXEC',always_catch(ignore(must_or_rtrace(maybe_ltrace(call(user:Code)))))),!.
 
 eval(Expression, Result):- env_current(Env), eval(Expression, Env, Result).
 
 eval(Expression, Env, Result):-
    always_catch(maybe_ltrace(lisp_compile(Env,Result,Expression,Code))), 
-   always_catch(ignore(must_or_rtrace(maybe_ltrace(call(Code))))),!.
+   always_catch(ignore(must_or_rtrace(maybe_ltrace(call(user:Code))))),!.
 
 
 /*:- if(exists_source(library(sexpr_reader))).
@@ -282,7 +282,7 @@ parse_sexpr_untyped_read(In, Expr):-
 
 eval_repl_hooks(nil,  []):-!.
 eval_repl_hooks(Atom, R):- atom(Atom),atom_concat(_,'.',Atom),notrace(catch(read_term_from_atom(Atom,Term,[variable_names(Vs),syntax_errors(true)]),_,fail)),
-  callable(Term),current_predicate(_,Term),b_setval('$variable_names',Vs),t_or_nil((call(Term)*->dmsg(Term);(dmsg(no(Term)),fail)),R).
+  callable(Term),current_predicate(_,Term),b_setval('$variable_names',Vs),t_or_nil((user:call(Term)*->dmsg(Term);(dmsg(no(Term)),fail)),R).
 eval_repl_hooks([quote, X], X):-!.
 eval_repl_hooks([debug,A], t):- debug(lisp(A)).
 eval_repl_hooks([nodebug,A], t):- nodebug(lisp(A)).

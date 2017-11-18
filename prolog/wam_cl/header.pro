@@ -61,43 +61,43 @@
 
 
 
-:-use_module(arglists).
-:-use_module(assign).
-:-use_module(backquote).
-:-use_module(block).
-:-use_module(callp).
-:-use_module(compile_funop).
-:-use_module(compile).
-:-use_module(docs).
-:-use_module(hashtables).
-:-use_module(env).
-:-use_module(interp).
-:-use_module(loadfile).
-:-use_module(mizepro).
-:-use_module(package).
-:-use_module(places).
-:-use_module(pathname).
-:-use_module(funcall).
-:-use_module(pnames).
-:-use_module(prims).
-:-use_module(print).
-:-use_module(readtables).
-:-use_module(repl).
-:-use_module(soops).
-:-use_module(sreader).
-:-use_module(streams).
-:-use_module(string).
-:-use_module(symbol).
-:-use_module(tagbody).
-:-use_module(typeof).
-:-use_module(tests).
+:- user:use_module(arglists).
+:- user:use_module(assign).
+:- user:use_module(backquote).
+:- user:use_module(block).
+:- user:use_module(callp).
+:- user:use_module(compile_funop).
+:- user:use_module(compile).
+:- user:use_module(docs).
+:- user:use_module(hashtables).
+:- user:use_module(env).
+:- user:use_module(interp).
+:- user:use_module(loadfile).
+:- user:use_module(mizepro).
+:- user:use_module(package).
+:- user:use_module(places).
+:- user:use_module(pathname).
+:- user:use_module(funcall).
+:- user:use_module(pnames).
+:- user:use_module(prims).
+:- user:use_module(print).
+:- user:use_module(readtables).
+:- user:use_module(repl).
+:- user:use_module(soops).
+:- user:use_module(sreader).
+:- user:use_module(streams).
+:- user:use_module(string).
+:- user:use_module(symbol).
+:- user:use_module(tagbody).
+:- user:use_module(typeof).
+:- user:use_module(tests).
 /*
-:-use_module(neil_smith).
-:-use_module(utils_for_swi).
-:-use_module(utils_higher_order).
-:-use_module(utils_list).
-:-use_module(utils_oset).
-:-use_module(utils_set).
-:-use_module(utils_shortest_paths).
-:-use_module(utils_writef).
+:- user:use_module(neil_smith).
+:- user:use_module(utils_for_swi).
+:- user:use_module(utils_higher_order).
+:- user:use_module(utils_list).
+:- user:use_module(utils_oset).
+:- user:use_module(utils_set).
+:- user:use_module(utils_shortest_paths).
+:- user:use_module(utils_writef).
 */

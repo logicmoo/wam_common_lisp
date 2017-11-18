@@ -180,6 +180,8 @@ get_opv(O,P,Value):- no_repeats(O-P,soops:o_p_v(O,P,Value)).
 
 update_opv(O,P,Value):- ignore(retract(soops:o_p_v(O,P,_))),assert(soops:o_p_v(O,P,Value)).
 
+set_opv(O,P,Value):- ignore(retract(soops:o_p_v(O,P,_))),assert(soops:o_p_v(O,P,Value)).
+
 :- dynamic(accessor_info/6).
 
 ensure_opv_type(Type):-accessor_info(Type,_,_,_,_,_),!.

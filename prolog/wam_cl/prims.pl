@@ -44,7 +44,7 @@ is_self_evaluationing_object(X):- (is_dict(X);is_array(X);is_rbtree(X)),!.
 
 is_self_evaluationing_const(X):- atomic(X),!,(X==t;X==[];number(X);is_keywordp(X);string(X);(blob(X,T),T\==text)),!.
 
-
+%:- dynamic(op_replacement/2).
 user:op_replacement(first,cl_car).
 cl_car(List, Result):- 
   (List = [Result|_] -> true;
@@ -68,6 +68,7 @@ cl_rplacd(Cons,Obj,Cons):- nb_setarg(2,Cons,Obj).
 cl_cons(Item,
  List, Result):-
 	Result = [Item|List].
+
 
 
 cl_list(List,List).
@@ -134,6 +135,14 @@ cl_c45(N1,N2,Ret):- Ret is (N1 - N2).
 f_u_(N1,N2,Ret):- Ret is (N1 - N2).
 *(N1,N2,Ret):- Ret is (N1 * N2).
 '/'(N1,N2,Ret):- Ret is (N1 / N2).
+
+/*
+op_replacement(+,plus).
+op_replacement(-,minus).
+op_replacement(*,mult).
+op_replacement(<,lessThan).
+op_replacement(>,greaterThan).
+*/
 
 <(N1,N2,Ret):- t_or_nil(<(N1,N2),Ret). 
 >(N1,N2,Ret):- t_or_nil(>(N1,N2),Ret). 

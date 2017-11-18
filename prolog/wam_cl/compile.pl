@@ -139,6 +139,18 @@ compile_forms(Ctx,Env,Result,FunctionBody,Code):-
 % compile_body(Ctx,Env,Result,Function, Body).
 % Expands a Lisp-like function body into its Prolog equivalent
 
+:- nb_setval('$labels_suffix','').
+suffix_by_context(Atom,SuffixAtom):- nb_current('$labels_suffix',Suffix),atom_concat(Atom,Suffix,SuffixAtom).
+suffixed_atom_concat(L,R,LRS):- atom_concat(L,R,LR),suffix_by_context(LR,LRS).
+push_labels_context(Atom):- suffix_by_context(Atom,SuffixAtom),b_setval('$labels_suffix',SuffixAtom).
+within_labels_context(Label,G):- nb_current('$labels_suffix',Suffix),
+   setup_call_cleanup(push_labels_context(Label),G,b_setval('$labels_suffix',Suffix)).
+gensym_in_labels(Stem,GenSym):- suffix_by_context(Stem,SuffixStem),gensym(SuffixStem,GenSym).
+  
+must_compile_closure_body(Ctx,Env,Result,Function, Body):-
+  must_compile_body(Ctx,Env,Result,Function, Body0),
+  body_cleanup_keep_debug_vars(Ctx,Body0,Body).
+
 
 must_compile_body(Ctx,Env,Result,Function, Body):-
   maybe_debug_var('_rCtx',Ctx),
@@ -282,8 +294,8 @@ is_def_at_least_two_args(labels).
 is_def_at_least_two_args(macrolet).
 is_def_at_least_two_args(symbol_macrolet).
 
-compile_body(_Ctx,_Env,Symbol,[Fun,Symbol,A2|AMORE],assert(P)):- is_def_at_least_two_args(Fun),!,P=..[Fun,Symbol,A2,AMORE].
-compile_body(_Ctx,_Env,Symbol,[Fun0,Symbol,A2|AMORE],assert(P)):- is_def_at_least_two_args(Fun),same_symbol(Fun,Fun0),!,P=..[Fun,Symbol,A2,AMORE].
+compile_body(_Ctx,_Env,Symbol,[Fun,Symbol,A2|AMORE],assert(P)):- notrace(is_def_at_least_two_args(Fun)),!,P=..[Fun,Symbol,A2,AMORE].
+compile_body(_Ctx,_Env,Symbol,[Fun0,Symbol,A2|AMORE],assert(P)):- notrace((is_def_at_least_two_args(Fun),same_symbol(Fun,Fun0))),!,P=..[Fun,Symbol,A2,AMORE].
 
 % handler-caserestart-casedestructuring-bind
 
@@ -305,7 +317,7 @@ compile_body(Ctx,Env,Symbol,[defun,Name,FormalParms|FunctionBody0], CompileBody)
    add_opv(Function,classof,claz_compiled_function),
    SETFUNCTION),!,
     make_compiled(Ctx,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode),
-    (local_override(with_forms,lisp_grovel) -> FunctionAssert = true; FunctionAssert = asserta((Head  :- (  BodyCode)))).
+    (local_override(with_forms,lisp_grovel) -> FunctionAssert = true; FunctionAssert = asserta((user:Head  :- (  BodyCode)))).
 
 
 show_ctx_info(Ctx):- term_attvars(Ctx,CtxVars),maplist(del_attr_rev2(freeze),CtxVars),show_ctx_info2(Ctx).
@@ -363,7 +375,7 @@ compile_body(Ctx,_Env,Name,[defmacro,Name0,FormalParmsB|FunctionBody0], CompileB
    add_opv(Name,classof,operator)),!,
 
     make_compiled(Ctx,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode),
-   (local_override(with_forms,lisp_grovel) -> FunctionAssert = true; FunctionAssert = asserta((Head  :- ( BodyCode)))),
+   (local_override(with_forms,lisp_grovel) -> FunctionAssert = true; FunctionAssert = asserta((user:Head  :- ( BodyCode)))),
     %wdmsg( :- lisp_compile( [defmacro,Name0, FormalParms, [progn | FunctionBody]])),
     %wddmsg(((Head  :- (!,  BodyCode)))),    
    get_alphas(Ctx,Alphas).
@@ -505,7 +517,7 @@ p_or_s(POrSTerm,F,Args):- POrSTerm=..[F|Args].
 % (function (lambda ... ))
 compile_body(Ctx,_Env,Result,POrSTerm, Body):- p_or_s(POrSTerm,function,[[lambda,LambdaArgs| LambdaBody]]),
       !,
-      must_compile_body(Ctx,ClosureEnvironment,ClosureResult,[progn|LambdaBody],  ClosureBody),
+      must_compile_closure_body(Ctx,ClosureEnvironment,ClosureResult,[progn|LambdaBody],  ClosureBody),
       debug_var('LArgs',LambdaArgs),
       debug_var('LResult',ClosureResult),
       debug_var('LEnv',ClosureEnvironment),
@@ -515,7 +527,7 @@ compile_body(Ctx,_Env,Result,POrSTerm, Body):- p_or_s(POrSTerm,function,[[lambda
 % (lambda ...)
 compile_body(Ctx,Env,Result,[lambda,LambdaArgs|LambdaBody], Body):-
 	!,
-	must_compile_body(Ctx,ClosureEnvironment,ClosureResult,[progn|LambdaBody],  ClosureBody),
+	must_compile_closure_body(Ctx,ClosureEnvironment,ClosureResult,[progn|LambdaBody],  ClosureBody),
    debug_var('LArgs',LambdaArgs),
    debug_var('LResult',ClosureResult),
    debug_var('ClosureEnvironment',ClosureEnvironment),
@@ -536,8 +548,8 @@ compile_body(_Ctx,_Env,Result,POrSTerm,Body):-
 
 % (compile ...)
 compile_body(Ctx,Env,Result,[compile|Forms], Body):- !,
-   must_compile_body(Ctx,CompileEnvironment,CompileResult,[progn|Forms],  Code),
-   body_cleanup_keep_debug_vars(Ctx,Code,CompileBody),
+   must_compile_closure_body(Ctx,CompileEnvironment,CompileResult,[progn|Forms],  CompileBody),
+   
    debug_var('LResult',CompileResult),
    debug_var('CompileEnvironment',CompileEnvironment),
    Result = closure([CompileEnvironment|Env],CompileResult,[],CompileBody),

@@ -65,6 +65,7 @@ compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, String], (Code,Body)):-
 
 compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm], Body):- is_symbol_setter(Env,SetQ),
         rw_add(Ctx,Var,w),
+        debug_var('Env',Env),
         !,	
 	if_must_compile_body(Ctx,Env,ResultV,ValueForm, ValueBody),
         ((op_return_type(SetQ,RT),RT=name) ->  =(Var,Result) ; =(ResultV,Result)),
@@ -79,7 +80,8 @@ compile_symbol_getter(Ctx,Env,Result,Var, Body):- Var==mapcar,!,
 compile_symbol_getter(Ctx,Env,Value, Var, Body):-  must(atom(Var)),!,
         debug_var([Var,'_Get'],Value),
         add_tracked_var(Ctx,Var,Value),
-        rw_add(Ctx,Var,r),        
+        rw_add(Ctx,Var,r),
+        debug_var('Env',Env),
         Body = symbol_value(Env, Var, Value).   
 
 
@@ -109,23 +111,19 @@ symbol_value_last_chance(_Env,Var,_Result):-
 push_values([V1|Push],V1):- must(nonvar(Push)),nb_setval('$mv_return',[V1|Push]).
 
 
-
-bvof(E,E,[L|IST]):-!,nonvar(L),member(E,[L|IST]).
-bvof(E,E,E).
-env_memb(E,E).
-env_memb(E,L):- nonvar(L),member(E,L).
+bvof(E,M,T):-E=T,!,M=T.
+bvof(E,M,[L|L2]):- ((nonvar(L),bvof(E,M,L))->true;(nonvar(L2),bvof(E,M,L2))).
 
 
 symbol_value_or(Env,Var,G,Value):-
- (env_memb(Bindings, Env),bvof(bv(Var, Value),_,Bindings)) 
-    -> true ; (symbol_value(Var,Value) -> true;  G).
+ (bvof(bv(Var, Value),_,Env) -> true ; (symbol_value(Var,Value) -> true;  G)).
 
 symbol_value(Var,Value):- get_opv(Var,value,Value).
 
 
 set_symbol_value(Env,Var,Result):-var(Result),!,symbol_value(Env,Var,Result).
 set_symbol_value(Env,Var,Result):- !,
-     ((	env_memb(Bindings, Env),bvof(bv(Var,_),BV,Bindings))
+     (bvof(bv(Var,_),BV,Env)
       -> nb_setarg(2,BV,Result)
       ;	( 
         (get_opv(Var, value, _Old) 
@@ -144,20 +142,6 @@ env_sym_arg_val(Env,Var,InValue,Value):-
 env_sym_arg_val(Env,Var,InValue,Value):- !,
   symbol_value_or(Env,Var,(nonvar(InValue),InValue=Value),Value)-> true;
     lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Var).
-
-place_op(Env,incf, Var, [Value],  Result):- atom(Var),!,
-  symbol_value(Env,Var, Old),
-  Result is Old+Value,
-  set_symbol_value(Env,Var, Result).
-place_op(Env,decf, Var, [Value],  Result):- atom(Var),!,
-  symbol_value(Env,Var, Old),
-  Result is Old-Value,
-  set_symbol_value(Env,Var, Result).
-place_op(Env,setf, Var, [Result],  Result):- atom(Var),!,
-  set_symbol_value(Env,Var, Result).
-
-place_op(Env,setf, Place, [Result],  Result):- is_list(Place),!,
-  set_place_value(Env,Place, Result).
 
 %TODO Make it a constantp
 symbol_setter(Env,defconstant, Var, Result):- 

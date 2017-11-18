@@ -127,6 +127,11 @@ conjoin_0(C1,C2,C1):- C2==true,!.
 conjoin_0(C1,C2,C2):- C1==true,!.
 conjoin_0(C1,C2,C1):- C2==!,!.
 conjoin_0(C1,C2,C2):- C1==!,!.
+%conjoin_0(C1,clean_escape(_),C1):- trace,!.
+conjoin_0(clean_escape(_),_,true):- trace,!.
+conjoin_0((clean_escape(_),_),_,true):- trace.
+conjoin_0((C1,clean_escape(_)),_,C1):- trace.
+conjoin_0(C1,(clean_escape(_),_),C1):- trace.
 conjoin_0((C1,C1Better),C2,(C1,AAB)):-!, conjoin(C1Better,C2,AAB).
 conjoin_0(C1,C2,(C1,C2)).
 
@@ -136,8 +141,9 @@ mize_body(_Ctx,_,C1,C1):- \+ compound(C1),!.
 mize_body(Ctx,F, :-(C1), :-(C1Better)):-!,mize_body(Ctx,F,C1,C1Better).
 mize_body(Ctx,F,(C1,C2),CodeJoined):-!,mize_body(Ctx,F,C1,C1Better),mize_body(Ctx,F,C2,C2Better),conjoin_0(C1Better,C2Better,CodeJoined).
 %mize_body(Ctx,_,(C1 -> C2 ; _),C2Better):- mize_body(Ctx,->,C1,C1Better),always_true(C1Better),mize_body(Ctx,';',C2,C2Better),!.
-mize_body(_Ctx,_,(C1 -> C2 ; _),C2):- lisp_compiler_option(safe(elim_always_trues),true), always_true(C1),!.
+mize_body(_Ctx,_,(C1 -> C2 ; _),C2):- fail, lisp_compiler_option(safe(elim_always_trues),true), always_true(C1),!.
 mize_body(Ctx,_,(C1 -> C2 ; CodeC),(C1Better -> C2Better ; CodeCCBetter)):-!,mize_body(Ctx,->,C1,C1Better),mize_body(Ctx,';',C2,C2Better),mize_body(Ctx,';',CodeC,CodeCCBetter).
+mize_body(Ctx,_,catch(C1,E, C2),catch(C1Better,E, C2Better)):-!,mize_body(Ctx,->,C1,C1Better),mize_body(Ctx,';',C2,C2Better).
 mize_body(Ctx,_,(C2 ; CodeC),( C2Better ; CodeCCBetter)):-!,mize_body(Ctx,';',C2,C2Better),mize_body(Ctx,';',CodeC,CodeCCBetter).
 mize_body(Ctx,F,C1,CodeC):- mize_body1(Ctx,F,C1,C2),mize_body2(Ctx,F,C2,CodeC),!.
 mize_body(Ctx,_F,C1,C2):- compound_name_arguments(C1,F,C1Better),must_maplist(mize_body(Ctx,F),C1Better,C2Better),C2=..[F|C2Better].
@@ -153,7 +159,7 @@ mize_body1(_Ctx,_,C1,C1):- \+ compound(C1),!.
 mize_body1(Ctx,F,(C1,C2),CodeJoined):-!,mize_body1(Ctx,F,C1,C1Better),mize_body1(Ctx,F,C2,C2Better),conjoin_0(C1Better,C2Better,CodeJoined).
 mize_body1(Ctx,F,C1,C2):- is_list(C1),must_maplist(mize_body1(Ctx,F),C1,C2).
 mize_body1(Ctx,_,symbol_value(_Env, Sym, Sym_Get),Was=Sym_Get):- 
-  lisp_compiler_option(safe(elim_symbolvalues_vars),true),
+  lisp_compiler_option(safe(elim_symbolvalues_vars),true), fail,
   get_var_tracker(Ctx,Sym,Dict),
   Dict.w<2,
   Dict.vars=[Was|_],

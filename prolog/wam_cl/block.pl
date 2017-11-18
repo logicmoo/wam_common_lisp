@@ -54,7 +54,7 @@ shared_lisp_compiler:plugin_expand_function_body(Ctx,Env,Result,InstrS,Code):-
 %compile_body_block(_Ctx,_Env,Result,enter( Tag), push_label(enter( Tag)) ):- debug_var("_GORES",Result).
 compile_body_block(Ctx,Env,Result,[do,LoopVars,[EndTest|ResultForms]|TagBody], Code):- 
    loop_vars_to_let_n_step(LoopVars,LetVars,[],PSetQStepCode),
-   gensym(dosym,DoTag),
+   gensym_in_labels(dosym,DoTag),
    must_compile_body(Ctx,Env,Result,
     [block,[],       
       [let,LetVars,
@@ -69,20 +69,68 @@ compile_body_block(Ctx,Env,Result,[do,LoopVars,[EndTest|ResultForms]|TagBody], C
        ]
      ],  Code).
 
-compile_body_block(Ctx,Env,GoResult,[return_from,Tag,ValueForm], (ValueBody, goto(exit(Tag),ValueResult,Env)) ):- 
-  compile_body(Ctx,Env,ValueResult,ValueForm, ValueBody),
-  debug_var("_GORES",GoResult),
-  debug_var("RetVal",ValueResult).
 
-compile_body_block(Ctx,Env,Result,['return',Value],Body):-!,compile_body_block(Ctx,Env,Result,[return_from,[],Value],Body).
-compile_body_block(Ctx,Env,Result,return(Value), Body ):- !,compile_body_block(Ctx,Env,Result,[return, Value],Body).
+compile_body_block(Ctx,Env,Result,RETURN_FROM,Body):- 
+  p_or_s(RETURN_FROM,'return',Value),!,
+  compile_body_block(Ctx,Env,Result,[return_from,[]|Value],Body).
+compile_body_block(Ctx,Env,GoResult,[return_from,Tag],Code):- !,
+   compile_body_block_in_tb(Ctx,Env,GoResult,[return_from,Tag,[]],Code).
 
-compile_body_block(Ctx,Env,Result,[block,BlockTag|InstrS], Code):- must(is_symbolp(BlockTag)), 
-  must_compile_block(Ctx,Env,Result,BlockTag,InstrS,Code),!.
+%@TODO make this work all the time uncommented
+%compile_body_block(Ctx,Env,Result,RETURN_FROM,Body):- 
+% compile_body_block_in_tb(Ctx,Env,Result,RETURN_FROM,Body).
 
-compile_block(Ctx,Env,Result,Tag,InstrS,Code):-
- append([[go,[enter,Tag]],[label,[enter,Tag]]|InstrS],[[go,[exit,Tag]],[label,[exit,Tag]]],WInstrS),
- must_compile_body(Ctx,Env,Result,WInstrS,Code),!.
+compile_body_block(Ctx,Env,Result,RETURN_FROM,Body):- 
+ compile_body_block_in_throw(Ctx,Env,Result,RETURN_FROM,Body).
+
+
+compile_body_block_in_throw(Ctx,Env,GoResult,[RETURN_FROM,Tag,ValueForm],(ValueFormCode, Code) ):- 
+   same_symbol(RETURN_FROM,'return-from'), 
+   debug_var('GoBlockResult',GoResult),
+   must_compile_body(Ctx,Env,ValueResult,ValueForm,ValueFormCode),
+   %suffixed_atom_concat(block_ret_,Tag,Var),
+   suffixed_atom_concat(block_exit_,Tag,ExitTag),
+  % compile_body(Ctx,Env,GoResult,[progn,[setq,Var,ValueResult],[go,ExitTag]], Code ).
+   debug_var('BlockExitEnv',Env),
+   Code = (throw(block_exit(ExitTag,ValueResult))).
+
+
+compile_body_block_in_throw(Ctx,Env,Result,[block,BlockTag|InstrS], 
+  catch((Code,ResultExit=Result),block_exit(ExitTag,Result),true)):-  must(is_symbolp(BlockTag)),
+   suffix_by_context(BlockTag,Tag),
+   gensym('_labels',Suffix),
+   must_or_rtrace(within_labels_context(Suffix,
+   ((%suffixed_atom_concat(block_ret_,Tag,Var),
+     suffixed_atom_concat(block_exit_,Tag,ExitTag), 
+      (must_compile_body(Ctx,Env,ResultExit,[progn|InstrS],Code)))))),!.
+
+
+
+
+compile_body_block_in_tb(Ctx,Env,GoResult,[RETURN_FROM,Tag,ValueForm],(ValueFormCode, Code) ):- 
+   same_symbol(RETURN_FROM,'return-from'), 
+   debug_var('GoBlockResult',GoResult),
+   must_compile_body(Ctx,Env,ValueResult,ValueForm,ValueFormCode),
+   suffixed_atom_concat(block_ret_,Tag,Var),
+   suffixed_atom_concat(block_exit_,Tag,ExitTag),
+  % compile_body(Ctx,Env,GoResult,[progn,[setq,Var,ValueResult],[go,ExitTag]], Code ).
+   debug_var('BlockExitEnv',Env),
+   Code = (set_symbol_value(Env,Var,ValueResult),call(ExitTag,Env),clean_escape(_)).
+
+
+compile_body_block_in_tb(Ctx,Env,Result,[block,BlockTag|InstrS], Code):- must(is_symbolp(BlockTag)),
+  suffix_by_context(BlockTag,Tag),
+  gensym('_labels',Suffix),
+  must_or_rtrace(within_labels_context(Suffix,
+  ((suffixed_atom_concat(block_ret_,Tag,Var),
+    suffixed_atom_concat(block_exit_,Tag,ExitTag), 
+    BLOCK = 
+      [let,[Var],[tagbody,[setq,Var,[progn|InstrS]],ExitTag],Var], 
+     (must_compile_body(Ctx,Env,Result,BLOCK,Code)))))),!.
+
+
+
+
 
 
 tst:is_local_test(block3,

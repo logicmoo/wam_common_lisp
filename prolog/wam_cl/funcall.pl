@@ -22,13 +22,13 @@ lisp_env_eval(_Pt1^Body, _Env, _Result):- !,
   call(Body).
 lisp_env_eval(Expression, Env, Result):-
   lisp_compile(Env,Result,Expression,Body),
-  call(Body).
+  user:call(Body).
 
 function(X,function(X)).
 closure(ClosureEnvironment,ClosureResult,FormalParams,ClosureBody,ActualParams,ClosureResult):-
   must_bind_parameters(ClosureEnvironment,FormalParams, ActualParams,_EnvOut,BinderCode),
-  must_or_rtrace(BinderCode),
-  must_or_rtrace(ClosureBody).
+  must_or_rtrace(user:BinderCode),
+  must_or_rtrace(user:ClosureBody).
 
 
 cl_funcall([function(F)|More],R):-!,cl_funcall([F|More],R).

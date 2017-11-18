@@ -39,14 +39,6 @@ compile_funop(Ctx,Env,RResult,[Procedure|Arguments],CompileBodyCode):- nonvar(Pr
   CompileBodyCode = (CompileBody).
 
 
-:- dynamic(op_replacement/2).
-/*
-op_replacement(+,plus).
-op_replacement(-,minus).
-op_replacement(*,mult).
-op_replacement(<,lessThan).
-op_replacement(>,greaterThan).
-*/
 
 % Operator
 expand_arguments_maybe_macro(_Ctx,_CallEnv,FunctionName,_N,FunctionArgs,true, FunctionArgs):- is_lisp_operator(FunctionName),!.

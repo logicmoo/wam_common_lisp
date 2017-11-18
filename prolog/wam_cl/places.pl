@@ -17,16 +17,39 @@
 :- include('header.pro').
 :- ensure_loaded((utils_for_swi)).
 
-set_place_value(Env,[Place,Obj], Value):-!, type_or_class_nameof(Obj,Type),set_place_value(Env,Obj,Type,Place,Value).
-set_place_value(Env, Obj, Value):-!, type_or_class_nameof(Obj,Type),set_place_value(Env,Obj,Type,value,Value).
+
+place_op(Env,setf, Place, [Result],  Result):- !,set_place_value(Env,Place, Result).
+
+place_op(Env,getf, Place, [Result],  Result):- !,get_place_value(Env,Place, Result).
+
+place_op(Env,incf, Var, [Value],  Result):- !,
+   get_place_value(Env,Var, Old),
+   Result is Old+Value,
+   set_place_value(Env,Var, Result).
+
+place_op(Env,decf, Var, [Value],  Result):- 
+   get_place_value(Env,Var, Old),
+   Result is Old-Value,
+   set_place_value(Env,Var, Result).
 
 
-set_place_value(Env,Obj,Type,Place,Value):- 
+
+get_place_value(Env, Obj, Value):- atom(Obj),!,symbol_value_or(Env,Obj,with_place_value(Env,get_opv,Obj, Value),Value).
+get_place_value(Env, Obj, Value):- with_place_value(Env,get_opv,Obj, Value).
+
+set_place_value(Env, Obj, Value):- atom(Obj),set_symbol_value(Env,Obj,Value).
+set_place_value(Env, Obj, Value):- with_place_value(Env,set_opv,Obj, Value).
+
+
+with_place_value(Env,OPR,[Place,Obj], Value):-!, type_or_class_nameof(Obj,Type),with_place_value(Env,OPR,Obj,Type,Place,Value).
+with_place_value(Env,OPR, Obj, Value):-!, type_or_class_nameof(Obj,Type),with_place_value(Env,OPR,Obj,Type,value,Value).
+
+with_place_value(Env,OPR,Obj,Type,Place,Value):- 
   atomic_list_concat(List,'_',Place),
-  set_place_value6(Env,Place,List,Type,Obj,Value).
+  with_place_value6(Env,OPR,Place,List,Type,Obj,Value).
 
-set_place_value6(_Env,_Place,[Type,Prop],Type,Obj, Value):- update_opv(Obj,Prop,Value),!.
-set_place_value6(_Env, Place,_List,      _Type,Obj, Value):- update_opv(Obj,Place,Value),!.
+with_place_value6(_Env,OPR,_Place,[Type,Prop],Type,Obj, Value):- call(OPR,Obj,Prop,Value),!.
+with_place_value6(_Env,OPR, Place,_List,      _Type,Obj, Value):- call(OPR,Obj,Place,Value),!.
 
 /*
 

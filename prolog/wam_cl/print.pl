@@ -48,8 +48,9 @@ lisplist(X,EQ) --> ['.'], sexpr1(X), [EQ].
 cl_format(Stream,Fmt,Args):-wdmsg(cl_format(Stream,Fmt,Args)).
 cl_format(Stream,Fmt,Arg1,Arg2):-wdmsg(cl_format(Stream,Fmt,Arg1,Arg2)).
 
-cl_print(X,X):-copy_term(X,Y),writeExpression(Y).
-
+cl_prin1(X,X):-copy_term(X,Y),writeExpression(Y),nl.
+cl_print(X,X):-cl_prin1(X,X),nl.
+cl_terpri(t):-nl.
 
 % writeExpression/1 displays a lisp expression
 
