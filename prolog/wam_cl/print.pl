@@ -20,9 +20,15 @@
 % Grammar rules for printing Lisp s-expressions.
 % Given a list of tokens, lisplist does all the nesting of lists
 
+trim_full_stop(SPClosure,TSPClosure):-atom_concat(SPClosureN,'\n',SPClosure),!,trim_full_stop(SPClosureN,TSPClosure).
+trim_full_stop(SPClosure,TSPClosure):-atom_concat(SPClosureN,' ',SPClosure),!,trim_full_stop(SPClosureN,TSPClosure).
+trim_full_stop(SPClosure,SPClosureN):-atom_concat(SPClosureN,'.',SPClosure).
+trim_full_stop(SPClosure,SPClosure).
+
 sexpr1(X) --> {is_ftVar(X),(get_var_name(X,N)->format(atom(NN),'~w',[N]);format(atom(NN),'~w',[X]))},!,[NN].
 sexpr1(Str)--> {string(Str)},!,[Str].
 sexpr1([function, Expression]) --> ['#'''], !, sexpr1(Expression).
+sexpr1(PClosure) --> {compound(PClosure),functor(PClosure,closure,_),with_output_to(atom(SPClosure),fmt9(PClosure)),trim_full_stop(SPClosure,TSPClosure)}, ['{',TSPClosure,'}.'], !.
 sexpr1([quote, Expression]) --> [''''], !, sexpr1(Expression).
 sexpr1(Dict) --> {is_dict(Dict,T),Dict=..[_,_|Rest]},!, ['#<'],sexpr1(T),lisplist(Rest,'>').
 sexpr1('$OBJ'(T,X)) --> ['#<'],sexpr1(T),sexpr1(X),['>'].

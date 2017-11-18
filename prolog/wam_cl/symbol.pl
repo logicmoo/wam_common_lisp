@@ -79,9 +79,11 @@ create_symbol(String,Package,Symbol):-
    add_opv(Symbol,package,Package),!.
 
 create_keyword(Name,Symbol):- atom_concat(':',Make,Name),!,create_keyword(Make,Symbol).
-create_keyword(Name,Symbol):- string_upper(Name,String),string_lower(Name,Lower),
+create_keyword(Name,Symbol):- string_upper(Name,String),
+   prologcase_name(String,Lower),
    atom_concat('kw_',Lower,Symbol),
    create_symbol(String,pkg_kw,Symbol),
+   update_opv(Symbol,typeof,keyword),
    assert_if_new(package:package_external_symbols(pkg_kw,String,Symbol)).
 
 

@@ -29,8 +29,8 @@
 
 :- initialization((lisp,prolog),main).
 
-:- meta_predicate(timel(:)).
-timel(M:X):- prolog_statistics:time(M:X).
+:- meta_predicate(timel(+,:)).
+timel(What,M:X):- write('% '),writeln(What),prolog_statistics:time(M:X).
 
 both_outputs(G):-
   notrace((current_output(O),stream_property(CO,alias(user_output)),
@@ -113,10 +113,12 @@ dbmsg(X):- both_outputs(dbmsg0(X)).
 in_comment(X):- notrace((write('/* '),(X),writeln(' */'))).
 
 
-dbmsg0(Str):- string(Str),!,in_comment(colormsg1(Str,[])).
 dbmsg0(Var):- var(Var),!,in_comment(colormsg1(dbmsg_var(Var))).
+dbmsg0(Str):- string(Str),!,in_comment(colormsg1(Str,[])).
+dbmsg0(:- asserta(A)):- !, colormsg1(A).
+dbmsg0(:- assert(A)):- !, colormsg1(A).
+dbmsg0(:-((B,asserta(A)))):- !, dbmsg0(:- B), dbmsg0(:-asserta(A)).
 dbmsg0(:-((asserta(A),B))):- !, dbmsg0(:-asserta(A)),dbmsg0(:- B).
-dbmsg0(:- asserta(A)):- colormsg1(A).
 dbmsg0(comment(S)):- in_comment(fmt9(S)).
 dbmsg0(N=V):- in_comment(fmt9(N=V)).
 dbmsg0(H :- Body):- !,colormsg1(H :- Body),!.
@@ -129,16 +131,14 @@ colormsg1(Msg):- mesg_color(Msg,Ctrl),!,ansicall(Ctrl,fmt90(Msg)).
 
 print_eval_string(Str):-
    str_to_expression(Str, Expression),
-   dmsg(print_eval_string(Expression)),
-   eval(Expression, Result),!,
+   dmsg(:- print_eval_string(Expression)),
+   eval_at_repl(Expression, Result),!,
    write_results(Result),
-   writeExpression(Expression),
    !.
 
 eval_string(Str):-
    str_to_expression(Str, Expression),
-   timel(eval(Expression, Result)),!,
-   writeExpression(Expression),
+   eval_at_repl(Expression, Result),!,
    write_results(Result),!.
 
 
@@ -178,7 +178,7 @@ __        ___    __  __        ____ _
 	prompt(Old, '> '),
 	prompts(Old1, Old2),
 	prompts('> ', '> '),
-	% tidy_database,
+	%tidy_database,
 	repeat,
         notrace,
    	catch(once(read_eval_print(Result)),_,notrace),
@@ -188,8 +188,8 @@ __        ___    __  __        ____ _
 
 
 tidy_database:-
-	retract(env_toplevel(_)),
-	asserta(env_toplevel([])),
+	nb_delete('$env_current'),
+        env_current(_Env),
 	retractall(lambda(_, _)).
 
 show_uncaught_or_fail((A,B)):-!,show_uncaught_or_fail(A),show_uncaught_or_fail(B).
@@ -200,7 +200,7 @@ read_eval_print(Result):-		% dodgy use of cuts to force a single evaluation
         show_uncaught_or_fail(read_no_parse(Expression)),!,
         show_uncaught_or_fail(lisp_add_history(Expression)),!,
         nb_linkval('$mv_return',[Result]),
-        show_uncaught_or_fail(eval(Expression,Result)),!,
+        show_uncaught_or_fail(eval_at_repl(Expression,Result)),!,
         show_uncaught_or_fail(write_results(Result)),!.
 	
 
@@ -246,32 +246,24 @@ lisp_add_history(Expression):-
         prolog:history(user_input, add(Store)).
 
 :- set_prolog_flag(lisp_no_compile,false).
-eval_compiled(SExpression,Result):-
-    locally(set_prolog_flag(lisp_compile,true),eval_int(SExpression,Result)).
 
 % basic EVAL statements for built-in procedures
-eval_int(Var,  R):- var(Var),!, R=Var.
-eval_int(SExpression,Result):- 
-  notrace(as_sexp(SExpression,Expression)),
-  must_or_rtrace(eval(Expression,Result)).
+eval_at_repl(Var,  R):- var(Var),!, R=Var.
+eval_at_repl(Expression, Result):- eval_repl_hooks(Expression,Result),!.
+eval_at_repl(Expression,Result):- 
+  notrace(as_sexp(Expression,SExpression)),
+  reader_intern_symbols(SExpression,LExpression),
+  dbmsg(:- lisp_compiled_eval(LExpression)),
+  env_current(Env),
+  timel('COMPILER',always_catch(maybe_ltrace(lisp_compile(Env,Result,LExpression,Code)))),
+  dbmsg(:-Code),  
+  timel('EXEC',always_catch(ignore(must_or_rtrace(maybe_ltrace(call(Code)))))),!.
 
-eval(SExpression,Result):-eval_repl(SExpression,Result),!.
-eval(ExprS, Result):-
-   as_sexp(ExprS,ExprS1),!,
-   reader_intern_symbols(ExprS1,Expression),
-   eval2(Expression, Result).
+eval(Expression, Result):- env_current(Env), eval(Expression, Env, Result).
 
-eval2(Expression, Result):-
-   \+ current_prolog_flag(lisp_interpret_only,true),
-   !,
-   dbmsg(lisp_compile(Expression)),
-   always_catch(maybe_ltrace(lisp_compile(Result,Expression,Code))),  % in compile.pl
-   dbmsg(Code),
+eval(Expression, Env, Result):-
+   always_catch(maybe_ltrace(lisp_compile(Env,Result,Expression,Code))), 
    always_catch(ignore(must_or_rtrace(maybe_ltrace(call(Code))))),!.
-eval2(Expression, Result):-
-   ensure_loaded(interp),
-   env_toplevel(Bindings),
-   eval(Expression, Bindings, Result). % in interp.pl
 
 
 /*:- if(exists_source(library(sexpr_reader))).
@@ -288,14 +280,14 @@ parse_sexpr_untyped_read(In, Expr):-
   as_sexp(ExprS,ExprS1),!,reader_intern_symbols(ExprS1,Expr).
 
 
-eval_repl(nil,  []):-!.
-eval_repl(Atom, R):- atom(Atom),atom_concat(_,'.',Atom),notrace(catch(read_term_from_atom(Atom,Term,[variable_names(Vs),syntax_errors(true)]),_,fail)),
+eval_repl_hooks(nil,  []):-!.
+eval_repl_hooks(Atom, R):- atom(Atom),atom_concat(_,'.',Atom),notrace(catch(read_term_from_atom(Atom,Term,[variable_names(Vs),syntax_errors(true)]),_,fail)),
   callable(Term),current_predicate(_,Term),b_setval('$variable_names',Vs),t_or_nil((call(Term)*->dmsg(Term);(dmsg(no(Term)),fail)),R).
-eval_repl([quote, X], X):-!.
-eval_repl([debug,A], t):- debug(lisp(A)).
-eval_repl([nodebug,A], t):- nodebug(lisp(A)).
-eval_repl([X], R):- eval_repl_atom( X, R),!.
-eval_repl( X , R):- eval_repl_atom( X, R),!.
+eval_repl_hooks([quote, X], X):-!.
+eval_repl_hooks([debug,A], t):- debug(lisp(A)).
+eval_repl_hooks([nodebug,A], t):- nodebug(lisp(A)).
+eval_repl_hooks([X], R):- eval_repl_atom( X, R),!.
+eval_repl_hooks( X , R):- eval_repl_atom( X, R),!.
 
 maybe_ltrace(G):- current_prolog_flag(lisp_trace,true)->rtrace(G);must_or_rtrace(G).
 
@@ -311,9 +303,9 @@ eval_repl_atom(nodebug, t):- nodebug(lisp(_)),nodebug,debugging.
 eval_repl_atom(make, O):- !, must_or_rtrace((make, cl_compile_file(pack('wam_commmon_lisp/prolog/wam_cl/xabcl'),O))).
 
 eval_repl_atom(show, t):- 
-  listing([named_lambda/2,
+  listing([user:named_lambda/2,
         user:macro_lambda/5,
-        env_toplevel/1]).
+        user:function_lambda/4]).
 
 :- fixup_exports.
 

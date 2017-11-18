@@ -503,49 +503,45 @@ p_or_s([F|Args],F0,Args0):-!,F0=F,Args0=Args.
 p_or_s(POrSTerm,F,Args):- POrSTerm=..[F|Args].
 
 % (function (lambda ... ))
-compile_body(Ctx,Env,Result,POrSTerm, Body):- p_or_s(POrSTerm,function,[lambda,LambdaArgs| LambdaBody]),
-	!,
-
-	must_compile_body(Ctx,ClosureEnvironment,ClosureResult,[progn|LambdaBody],  ClosureBody),
-        debug_var('LArgs',LambdaArgs),
-        debug_var('LResult',ClosureResult),
-        debug_var('LEnv',ClosureEnvironment),
-     Result = closure(LambdaArgs,
-			[ClosureEnvironment, ClosureResult]^ClosureBody,
-			Env),
-	Body = true.
-
-% (function ?? )
-compile_body(_Cx,_Ev,function(Function),POrSTerm, true):- p_or_s(POrSTerm,function,[Function]).
-
-% ((closure ...)..)
-compile_body(Ctx,Env,ClosureResult,[POrSTerm|ActualParams],Code):- 
-        p_or_s(POrSTerm,closure,[LambdaArgs,[ClosureEnvironment, ClosureResult]^ClosureBody,AltEnv]),
-	!,
-	bind_formal_parameters(LambdaArgs, ActualParams, [ClosureEnvironment,AltEnv], AltEnvBindings,BindCode),
-        must_or_rtrace(call(BindCode)),
-	must_compile_body(Ctx,[AltEnvBindings|Env],ClosureResult,ClosureBody, Code).
-	
+compile_body(Ctx,_Env,Result,POrSTerm, Body):- p_or_s(POrSTerm,function,[[lambda,LambdaArgs| LambdaBody]]),
+      !,
+      must_compile_body(Ctx,ClosureEnvironment,ClosureResult,[progn|LambdaBody],  ClosureBody),
+      debug_var('LArgs',LambdaArgs),
+      debug_var('LResult',ClosureResult),
+      debug_var('LEnv',ClosureEnvironment),
+   Result = closure(ClosureEnvironment,ClosureResult,LambdaArgs,ClosureBody),
+   Body = true.
 
 % (lambda ...)
-
-compile_body(Ctx,Env,Result,[compile|Forms], Body):- 
-        debug_var('CResult',CResult),
-        debug_var('LResult',ClosureResult),
-        debug_var('LEnv',ClosureEnvironment),
-    must_compile_progn(Ctx,Env,CResult,Forms, _PreviousResult, Body).
-    Result = 
-
 compile_body(Ctx,Env,Result,[lambda,LambdaArgs|LambdaBody], Body):-
 	!,
 	must_compile_body(Ctx,ClosureEnvironment,ClosureResult,[progn|LambdaBody],  ClosureBody),
    debug_var('LArgs',LambdaArgs),
    debug_var('LResult',ClosureResult),
-   debug_var('LEnv',ClosureEnvironment),
-     Result = closure(LambdaArgs,
-			[ClosureEnvironment, ClosureResult]^ClosureBody,
-			Env),
-	Body = true.
+   debug_var('ClosureEnvironment',ClosureEnvironment),
+   Body =
+     (Result = closure([ClosureEnvironment|Env],ClosureResult,LambdaArgs,ClosureBody)).
+   
+
+% (function ?? )
+compile_body(_Cx,_Ev,function(Function),POrSTerm, true):- p_or_s(POrSTerm,function,[Function]).
+
+% (closure ...)
+compile_body(_Ctx,_Env,Result,POrSTerm,Body):- 
+   p_or_s(POrSTerm,closure,[ClosureEnvironment,ClosureResult,LambdaArgs,ClosureBody]),
+   Body =
+     (Result = closure(ClosureEnvironment,ClosureResult,LambdaArgs,ClosureBody)).
+        
+	
+
+% (compile ...)
+compile_body(Ctx,Env,Result,[compile|Forms], Body):- !,
+   must_compile_body(Ctx,CompileEnvironment,CompileResult,[progn|Forms],  Code),
+   body_cleanup_keep_debug_vars(Ctx,Code,CompileBody),
+   debug_var('LResult',CompileResult),
+   debug_var('CompileEnvironment',CompileEnvironment),
+   Result = closure([CompileEnvironment|Env],CompileResult,[],CompileBody),
+   Body = true.
 
 
 

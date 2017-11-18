@@ -25,11 +25,11 @@ lisp_env_eval(Expression, Env, Result):-
   call(Body).
 
 function(X,function(X)).
-closure(FormalParams,[ClosureEnvironment, ClosureResult]^ClosureBody,ClosureEnvironment,ActualParams,ClosureResult):- 
-  trace,must_bind_parameters(ClosureEnvironment,FormalParams, ActualParams,_EnvOut,BinderCode),
+closure(ClosureEnvironment,ClosureResult,FormalParams,ClosureBody,ActualParams,ClosureResult):-
+  must_bind_parameters(ClosureEnvironment,FormalParams, ActualParams,_EnvOut,BinderCode),
   must_or_rtrace(BinderCode),
   must_or_rtrace(ClosureBody).
-  
+
 
 cl_funcall([function(F)|More],R):-!,cl_funcall([F|More],R).
 cl_funcall([ProcedureName|Args],Result):- env_current(Env),apply_c(Env,ProcedureName, Args, Result).
@@ -43,8 +43,8 @@ apply_c(EnvIn,[lambda, FormalParams, Body], ActualParams, Result):-
         must_or_rtrace(BinderCode),
 	lisp_env_eval(Body, EnvOut, Result),
 	!.
-apply_c(_EnvIn,closure( FormalParams, BodyCompiled, Bindings0), ActualParams, Result):-
-	closure( FormalParams, BodyCompiled, Bindings0, ActualParams, Result).
+apply_c(EnvIn,closure(ClosureEnvironment,ClosureResult,FormalParams,ClosureBody), ActualParams, Result):-
+	closure([ClosureEnvironment|EnvIn],ClosureResult,FormalParams,ClosureBody,ActualParams, Result).
     
 apply_c(EnvIn,ProcedureName, ActualParams, Result):-
 	user:macro_lambda(_Scope,ProcedureName,FormalParams, LambdaExpression,[]),!,
