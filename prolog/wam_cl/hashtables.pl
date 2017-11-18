@@ -18,8 +18,8 @@
 
 :- include('header.pro').
 
-cl_make_hash_table(X):- X=hashtable{equal_fn:cl_equal,key_values:[]}.
-
+cl_make_hash_table(X):- new_opv(claz_hash_table,X).
+  
 :- fixup_exports.
 
 end_of_file.

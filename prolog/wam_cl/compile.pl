@@ -528,12 +528,20 @@ compile_body(Ctx,Env,ClosureResult,[POrSTerm|ActualParams],Code):-
 	
 
 % (lambda ...)
+
+compile_body(Ctx,Env,Result,[compile|Forms], Body):- 
+        debug_var('CResult',CResult),
+        debug_var('LResult',ClosureResult),
+        debug_var('LEnv',ClosureEnvironment),
+    must_compile_progn(Ctx,Env,CResult,Forms, _PreviousResult, Body).
+    Result = 
+
 compile_body(Ctx,Env,Result,[lambda,LambdaArgs|LambdaBody], Body):-
 	!,
 	must_compile_body(Ctx,ClosureEnvironment,ClosureResult,[progn|LambdaBody],  ClosureBody),
-        debug_var('LArgs',LambdaArgs),
-        debug_var('LResult',ClosureResult),
-        debug_var('LEnv',ClosureEnvironment),
+   debug_var('LArgs',LambdaArgs),
+   debug_var('LResult',ClosureResult),
+   debug_var('LEnv',ClosureEnvironment),
      Result = closure(LambdaArgs,
 			[ClosureEnvironment, ClosureResult]^ClosureBody,
 			Env),
@@ -624,7 +632,7 @@ setq_values(Env,[Var|Vars],[Val|Values]):-
    setq_values(Env,Vars,Values).
 
 set_symbol_value(Var,Val):-
-  current_env(Env),
+  env_current(Env),
   set_symbol_value(Env,Var,Val).
 
 %   zip_with(Xs, Ys, Pred, Zs)

@@ -18,7 +18,8 @@
 :- ensure_loaded((utils_for_swi)).
 
 % local symbol?
-rw_add(Ctx,Var,RW):-  get_var_tracker(Ctx,Var,Dict),arginfo_incr(RW,Dict).
+rw_add(Ctx,Var,RW):- atom(Var),!,  get_var_tracker(Ctx,Var,Dict),arginfo_incr(RW,Dict).
+rw_add(_Ctx,_Var,_RW).
 
 % actual var
 add_tracked_var(Ctx,Atom,Var):-
@@ -110,8 +111,9 @@ push_values([V1|Push],V1):- must(nonvar(Push)),nb_setval('$mv_return',[V1|Push])
 
 
 bvof(E,E,L):- nonvar(L),member(E,L).
-env_memb(E,L):- nonvar(L),member(E,L).
 env_memb(E,E).
+env_memb(E,L):- nonvar(L),member(E,L).
+
 
 symbol_value_or(Env,Var,G,Value):-
  (env_memb(Bindings, Env),bvof(bv(Var, Value),_,Bindings)) 

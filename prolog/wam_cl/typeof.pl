@@ -16,27 +16,42 @@
 :- set_module(class(library)).
 :- include('header.pro').
 
-cl_type_of(O,T):- type_i(O,T),!.
-cl_type_of(O,T):- type_ges(O,T),!.
-cl_type_of(_Obj,t).
+cl_class_of(Obj,Class):- i_class(Obj,Class),!.
 
-cl_class_of(Obj,Class):- get_opv(Obj,classof,Class),!.
-cl_class_of(Obj,'$OBJ'(claz_builtin_class,Type)):- type_i(Obj,Type).
-cl_class_of(function(OP),Class):- get_opv(OP,function,Obj),!,cl_class_of(Obj,Class).
-cl_class_of(Obj,'$OBJ'(claz_class,Type)):- type_ges(Obj,Type).
-cl_class_of(_,'$OBJ'(claz_builtin_class,t)).
+i_class(Var,claz_locative):-var(Var).
+% compounds
+i_class(function(OP),Class):- get_opv(OP,function,Obj),cl_type_of(Obj,Class).
+i_class([_|_],claz_cons):-!.
+i_class('$OBJ'(Type,_Data),Type).
+i_class('$CHAR'(_),claz_character).
+% atomics
+i_class([],claz_null):-!.
+i_class(Str,clz_string):- string(Str).
+i_class(t,claz_symbol).
+i_class(Dict,Type):- is_dict(Dict,Type).
+i_class(Number,claz_integer):- integer(Number).
+i_class(Number,claz_float):- float(Number).
+i_class(Atom,Type):- atom(Atom),atomic_list_concat([Type,_Name],'_inst_',Atom).
+i_class(Obj,Type):- get_opv(Obj,classof,Type).
+i_class(function(_),clz_function).
 
-type_i(Var,sys_locative):-var(Var).
-type_i([],null):-!.
-type_i([_|_],cons):-!.
-type_i('$OBJ'(Type,_Data),Type).
-type_i(Dict,Type):- is_dict(Dict,Type).
-type_i(Str,string):- string(Str).
-type_i(t,boolean).
-type_i(Obj,Type):- number(Obj),!,number_type_of(Obj,Type).
-type_i('$CHAR'(_),character).
-type_i(Obj,Type):- get_opv(Obj,typeof,Type).
-type_i(function(OP),Class):- get_opv(OP,function,Obj),!,cl_type_of(Obj,Class).
+
+i_type(Var,sys_locative):-var(Var).
+i_type([],null):-!.
+i_type([_|_],cons):-!.
+i_type('$OBJ'(Type,_Data),Type).
+i_type(Dict,Type):- is_dict(Dict,Type).
+i_type(Str,string):- string(Str).
+i_type(t,boolean).
+i_type(Obj,Type):- number(Obj),!,number_type_of(Obj,Type).
+i_type('$CHAR'(_),character).
+i_type(Atom,Type):- atom(Atom),atomic_list_concat([Type,_Name],'_inst_',Atom).
+i_type(Obj,Type):- get_opv(Obj,typeof,Type).
+i_type(function(OP),Class):- get_opv(OP,function,Obj),cl_type_of(Obj,Class).
+
+type_ges(function(_),function).
+type_ges(Obj,Type):- compound(Obj),functor(Obj,Type,_).
+type_ges(Atom,Type):- atom(Atom),atomic_list_concat([Prefix|Rest],'_',Atom),prefix_to_typeof(Prefix,Rest,Atom,Type),!.
 
 
 type_or_class_nameof(Obj,Name):- cl_class_of(Obj,Type),type_named(Type,Name),atom(Name).
@@ -45,9 +60,12 @@ type_named('$OBJ'(_,Type),Type):- atom(Type),!.
 type_named(Type,Type):- atomic(Type).
 
 
-type_ges(function(_),function).
-type_ges(Obj,Type):- compound(Obj),functor(Obj,Type,_).
-type_ges(Atom,Type):- atom(Atom),atomic_list_concat([Prefix|Rest],'_',Atom),prefix_to_typeof(Prefix,Rest,Atom,Type),!.
+
+
+
+cl_type_of(O,T):- i_type(O,T),!.
+cl_type_of(O,T):- type_ges(O,T),!.
+cl_type_of(_Obj,t).
 
 
 

@@ -364,15 +364,15 @@ set_symbol_value_if_missing(Env, Var, In, _, Thru):- set_symbol_value(Env,Var,In
 simple_atom_var(Atom):- atom(Atom), Atom\=nil,Atom\=[], \+ arg(_, v('&optional', '&key', '&aux', '&rest', '&body', '&environment'),Atom).
 
 % Creates a function Head and an argument unpacker using Code to unpack
-expand_function_head(Ctx,Env,[FunctionName | FormalParms],Head,ZippedArgBindings, Result,HeadDefCode,HeadCodeOut):-
+expand_function_head(Ctx,EnvInOut,[FunctionName | FormalParms],Head,ZippedArgBindings, Result,HeadDefCode,HeadCodeOut):-
    member(Mode,FormalParms),arg(_, v('&optional', '&key', '&aux', '&rest', '&body', '&environment'),Mode),!,
-   must_det_l((function_head_params(Ctx,Env,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,_Names,_PVars,_HeadCode),
+   must_det_l((function_head_params(Ctx,EnvInOut,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,_Names,_PVars,_HeadCode),
    arginfo_incr(complex,ArgInfo),
    append([Arguments], [Result], HeadArgs),
    debug_var('ArgsIn',Arguments),
    debug_var('BinderCode',BindCode),
    HeadDefCode = (asserta(user:arglist_info(FunctionName,FormalParms,ActualArgs,ArgInfo))),
-   HeadCodeOut = (must_bind_parameters(Env,FormalParms,Arguments,BindCode),call(BindCode)),
+   HeadCodeOut = (must_bind_parameters(EnvInOut,FormalParms,Arguments,EnvInOut,BindCode),call(BindCode)),
    Head =.. [FunctionName | HeadArgs])).
 
 % Creates a function Head and an argument unpacker using Code to unpack
@@ -420,6 +420,7 @@ bind_formal_arginfo_no_rest(ArgInfo, Arguments, OldEnv, NewEnv, _BindCode):-
       
 % Expands the arguments 
 bind_formal_old(_LeftOver, [], Env, Env, true).
+bind_formal_old([], _, Env, Env, true).
 bind_formal_old([FormalParam|FormalParms], [ActualParam|ActualParams],
 		Bindings0, Bindings,BindCode):- 
 	bind_formal_old(FormalParms, ActualParams, 
@@ -462,9 +463,9 @@ correct_formal_params_destructuring([A, B|R],[A, B, '&rest',R]):- simple_atom_va
 correct_formal_params_destructuring([A|R],[A,'&rest',R]):- simple_atom_var(A),simple_atom_var(R),!.
 correct_formal_params_destructuring(AA,AA).
 
-must_bind_parameters(Env,FormalParms0,Params,Code):- 
+must_bind_parameters(EnvInOut,FormalParms0,Params,EnvInOut,Code):- 
   correct_formal_params(FormalParms0,FormalParms),
-  must_or_rtrace(bind_each_param(Env,FormalParms,Params,Code)).
+  must_or_rtrace(bind_each_param(EnvInOut,FormalParms,Params,Code)).
 
 bind_each_param(Env, FormalParms, Arguments,BindCode):-
   % append_open_list(Env,bind),
@@ -473,6 +474,7 @@ bind_each_param(Env, FormalParms, Arguments,BindCode):-
 
 append_open_list(Env,Value):- append(_,[Value|_],Env),!.
 append_open_list(EnvList,Value):- member(Env,EnvList),append(_,[Value|_],Env),!.
+append_open_list(ClosedList,Value):- ClosedList = [_Env|List], setarg(2,ClosedList,[Value|List]).
 
 bind_parameters(_Env,_Mode, [], _, true):-!.
 

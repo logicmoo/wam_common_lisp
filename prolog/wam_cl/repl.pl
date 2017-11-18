@@ -188,8 +188,8 @@ __        ___    __  __        ____ _
 
 
 tidy_database:-
-	retract(lisp_global_bindings(_)),
-	asserta(lisp_global_bindings([])),
+	retract(env_toplevel(_)),
+	asserta(env_toplevel([])),
 	retractall(lambda(_, _)).
 
 show_uncaught_or_fail((A,B)):-!,show_uncaught_or_fail(A),show_uncaught_or_fail(B).
@@ -270,7 +270,7 @@ eval2(Expression, Result):-
    always_catch(ignore(must_or_rtrace(maybe_ltrace(call(Code))))),!.
 eval2(Expression, Result):-
    ensure_loaded(interp),
-   lisp_global_bindings(Bindings),
+   env_toplevel(Bindings),
    eval(Expression, Bindings, Result). % in interp.pl
 
 
@@ -313,7 +313,7 @@ eval_repl_atom(make, O):- !, must_or_rtrace((make, cl_compile_file(pack('wam_com
 eval_repl_atom(show, t):- 
   listing([named_lambda/2,
         user:macro_lambda/5,
-        lisp_global_bindings/1]).
+        env_toplevel/1]).
 
 :- fixup_exports.
 

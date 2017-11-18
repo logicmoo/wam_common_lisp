@@ -24,13 +24,13 @@
 compile_funop(Ctx,Env,RResult,[Procedure|Arguments],CompileBodyCode):- nonvar(Procedure),
   user:macro_lambda(_Scope,Procedure, FormalParams, LambdaExpression,_),!,
 
-  must_or_rtrace(bind_parameters(NewEnv, FormalParams, Arguments,BindCode)),!,
+  must_bind_parameters(NewEnv, FormalParams, Arguments,BindCode),!,
   append(_,[],NewEnv),!,
   NextEnv = [NewEnv|Env],  
   call(BindCode),
   must_or_rtrace(expand_commas(NewEnv,CommaResult,LambdaExpression,CodeS)),
   body_cleanup_keep_debug_vars(Ctx,CodeS,Code),
-  dbmsg(macro(macroResult(BindCode,Code,CommaResult))),
+  dbmsg(comment(macroResult(BindCode,Code,CommaResult))),
   (local_override(with_forms,lisp_grovel)-> (lisp_dumpST) ; true),
   call(Code),
   must_compile_body(Ctx,NextEnv,CompileBody0Result,CommaResult, MCBR),
@@ -52,7 +52,7 @@ op_replacement(>,greaterThan).
 expand_arguments_maybe_macro(_Ctx,_CallEnv,FunctionName,_N,FunctionArgs,true, FunctionArgs):- is_lisp_operator(FunctionName),!.
 expand_arguments_maybe_macro(Ctx,CallEnv,FunctionName,0,FunctionArgs,ArgBody, Args):-
   expand_arguments(Ctx,CallEnv,FunctionName,0,FunctionArgs,ArgBody, Args).
-  
+
 
 compile_funop(Ctx,Env,Result,[Op | FunctionArgs], Body):- nonvar(Op),user:op_replacement(Op,Op2), !,
   must_compile_body(Ctx,Env,Result,[Op2 | FunctionArgs],Body).
@@ -62,7 +62,7 @@ compile_funop(Ctx,Env,Result,[FunctionName ], Body):- is_list(FunctionName),!,
   must_compile_body(Ctx,Env,Result,FunctionName,Body).
 
 compile_funop(Ctx,Env,Result,[FunctionName , A| FunctionArgs], Body):- is_list(FunctionName),!,
-  must_compile_body(Ctx,Env,Result,[funcall_list,FunctionName, A | FunctionArgs],Body).
+  must_compile_body(Ctx,Env,Result,[funcall,FunctionName, A | FunctionArgs],Body).
 
 compile_funop(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):- \+ atom(FunctionName),!,
   dumpST,trace,must_compile_body(Ctx,Env,Result,[funcall_obj,FunctionName | FunctionArgs],Body).
@@ -78,7 +78,7 @@ compile_funop(Ctx,CallEnv,Result,[FunctionName | FunctionArgs], Body):- nonvar(F
 % FUNCTION APPLY
 %compile_body(Ctx,Env,Result,['apply',Function|ARGS], Body):- atom(Function)
 % FUNCTION FUNCALL
-%compile_body(Ctx,Env,Result,['funcall',Function|ARGS], Body):- ...
+% compile_body(Ctx,Env,Result,['funcall',Function|ARGS], Body):- ...
 
 
 
@@ -104,6 +104,8 @@ find_function_or_macro_name(FunctionName,_Len, ProposedName):-
       function_case_name(FunctionName,Package,ProposedName)).
 
 
+align_args(_FunctionName,ProposedName,Args,Result,[Result,Args]):-
+    return_arg_is_first(ProposedName),!.
 
 align_args(_FunctionName,ProposedName,Args,Result,ArgsPlusResult):- 
    append(Args, [Result], ArgsPlusResult),
