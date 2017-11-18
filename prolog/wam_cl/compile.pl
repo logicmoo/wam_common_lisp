@@ -412,15 +412,6 @@ combine_setfs(Name0,Name):-atom(Name0),Name0=Name.
 combine_setfs(Name0,Name):-atomic_list_concat(['f_combined'|Name0],'__',Name).
 
 
-% DOLIST
-compile_body(Ctx,Env,Result,['dolist',[Var,List]|FormS], Code):- !,
-    must_compile_body(Ctx,Env,ResultL,List,ListBody),
-    must_compile_body(Ctx,Env,Result,[progn,FormS], Body),
-    Code = (ListBody,
-        forall(member(X,ResultL),
-      lexically_bind(Var,X,Body))).
-
-
 must_compile_test_body(Ctx,Env,TestResult,Test,TestBody,TestResultBody):-
   must_or_rtrace(compile_test_body(Ctx,Env,TestResult,Test,TestBody,TestResultBody)).
 
@@ -463,6 +454,38 @@ compile_body(Ctx,Env,Result,[if, Test, IfTrue, IfFalse], Body):-
 				;  	FalseBody,
 					Result      = FalseResult	) ).
 
+% DOLIST
+compile_body(Ctx,Env,Result,['dolist',[Var,List]|FormS], Code):- !,
+    must_compile_body(Ctx,Env,ResultL,List,ListBody),
+    must_compile_body(Ctx,Env2,Result,[progn,FormS], Body),
+    debug_var('BV',BV),debug_var('Env2',Env2),debug_var('Ele',X),debug_var('List',ResultL),
+    Code = (ListBody,
+      (( BV = bv(Var,X),Env2 = [BV|Env])),
+        forall(member(X,ResultL),
+          (nb_setarg(2,BV,X),
+            Body))).
+
+
+%   (case A ((x...) B C...)...)  -->
+%   (let ((@ A)) (cond ((memv @ '(x...)) B C...)...))
+compile_body(Ctx,Env,Result,[case,VarForm|Clauses], Body):-
+  compile_body(Ctx,Env,Key,VarForm,VarBody),
+   debug_var('Key',Key),
+   cases_to_conds(Key,Clauses,Conds),
+   wdmsg(cases:-Clauses),
+   wdmsg(conds:-Conds),
+   compile_body(Ctx,Env,Result,[cond|Conds], Body0),
+   Body = (VarBody,Body0).
+
+cases_to_conds(_,[],[]) :- !.
+cases_to_conds(_,[[otherwise,Tail]],  [[t,[progn,Tail]]]) :- !.
+cases_to_conds(V,[[Set|Tail]|Tail2], [[['sys_memq',V,[quote,Set]],[progn|Tail]]|X]) :- \+ atomic(Set),
+    cases_to_conds(V,Tail2,X).
+cases_to_conds(V,[[Item,Tail]|Tail2], [[['eq',V,[quote,Item]],[progn,Tail]]|X]) :-
+   cases_to_conds(V,Tail2,X).
+
+f_sys_memq(E,L,R):- t_or_nil((member(Q,L),Q==E),R).
+
 % COND
 compile_body(_Cx,_Ev,[],[cond ], true):- !.
 compile_body(_Cx,_Ev,[],[cond ,[]], true):- !.
@@ -479,10 +502,10 @@ compile_body(Ctx,Env,Result,[cond, List |Clauses], Body):-
    must_compile_test_body(Ctx,Env,TestResult,Test,TestBody,TestResultBody),
    must_compile_progn(Ctx,Env,ResultFormsResult,ResultForms, TestResult, ResultFormsBody),
    must_compile_body(Ctx,Env,ClausesResult,[cond| Clauses],  ClausesBody),
-   Body = (	 
-                   ((TestBody, TestResultBody) -> ( ResultFormsBody,Result  = ResultFormsResult); ClausesBody)),!.
+   Body = (((TestBody, TestResultBody) -> 
+      ( ResultFormsBody,Result  = ResultFormsResult); 
+      ( ClausesBody))),!.
    
-
 
 compile_body(Ctx,Env,Result,[cond, List |Clauses], Body):- !,
   must_or_rtrace((
@@ -677,7 +700,8 @@ must_compile_progn(Ctx,Env,Result,Forms, PreviousResult, Body):-
   maybe_debug_var('_rPrevRes',PreviousResult),
   maybe_debug_var('_rForms',Forms),
   maybe_debug_var('_rBody',Body),
-   must_or_rtrace(compile_progn(Ctx,Env,Result,Forms, PreviousResult,Body)).
+   must_or_rtrace(compile_progn(Ctx,Env,Result,Forms, PreviousResult,Body0)),
+   sanitize_true(Body0,Body).
 
 compile_progn(_Cx,_Ev,Result,Var,_PreviousResult,cl_eval([progn|Var],Result)):- is_ftVar(Var),!.
 compile_progn(_Cx,_Ev,Result,[], PreviousResult,true):-!, PreviousResult = Result.

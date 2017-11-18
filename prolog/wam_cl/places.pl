@@ -48,8 +48,10 @@ with_place_value(Env,OPR,Obj,Type,Place,Value):-
   atomic_list_concat(List,'_',Place),
   with_place_value6(Env,OPR,Place,List,Type,Obj,Value).
 
-with_place_value6(_Env,OPR,_Place,[Type,Prop],Type,Obj, Value):- call(OPR,Obj,Prop,Value),!.
-with_place_value6(_Env,OPR, Place,_List,      _Type,Obj, Value):- call(OPR,Obj,Place,Value),!.
+with_place_value6(_Env,OPR,_Place,[Type,Prop],Type,Obj, Value):- call_opv(OPR,Obj,Prop,Value),!.
+with_place_value6(_Env,OPR, Place,_List,      _Type,Obj, Value):- call_opv(OPR,Obj,Place,Value),!.
+
+call_opv(OPR,Obj,Place,Value):- call(OPR,Obj,Place,Value).
 
 /*
 

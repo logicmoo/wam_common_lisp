@@ -28,6 +28,8 @@ trim_full_stop(SPClosure,SPClosure).
 sexpr1(X) --> {is_ftVar(X),(get_var_name(X,N)->format(atom(NN),'~w',[N]);format(atom(NN),'~w',[X]))},!,[NN].
 sexpr1(Str)--> {string(Str)},!,[Str].
 sexpr1([function, Expression]) --> ['#'''], !, sexpr1(Expression).
+sexpr1(('$CHAR'(X))) --> {format(atom(NN),'#\\~w',[X])},!,[NN].
+sexpr1('$OBJ'('$CHAR',(X))) --> sexpr1(['$CHAR',X]).
 sexpr1(PClosure) --> {compound(PClosure),functor(PClosure,closure,_),with_output_to(atom(SPClosure),fmt9(PClosure)),trim_full_stop(SPClosure,TSPClosure)}, ['{',TSPClosure,'}.'], !.
 sexpr1([quote, Expression]) --> [''''], !, sexpr1(Expression).
 sexpr1(Dict) --> {is_dict(Dict,T),Dict=..[_,_|Rest]},!, ['#<'],sexpr1(T),lisplist(Rest,'>').
@@ -45,8 +47,9 @@ lisplist([X|Xs],EQ) --> sexpr1(X), !, lisplist(Xs,EQ).
 lisplist(X,EQ) --> ['.'], sexpr1(X), [EQ].
 
 
-cl_format(Stream,Fmt,Args):-wdmsg(cl_format(Stream,Fmt,Args)).
-cl_format(Stream,Fmt,Arg1,Arg2):-wdmsg(cl_format(Stream,Fmt,Arg1,Arg2)).
+cl_format(Stream,Fmt,Arg1,t):-wdmsg(cl_format(Stream,Fmt,Arg1,t)).
+cl_format(Stream,Fmt,Arg1,Arg2,t):-wdmsg(cl_format(Stream,Fmt,Arg1,Arg2,t)).
+cl_format(Stream,Fmt,Arg1,Arg2,Arg3,t):-wdmsg(cl_format(Stream,Fmt,Arg1,Arg2,Arg3,t)).
 
 cl_prin1(X,X):-copy_term(X,Y),writeExpression(Y),nl.
 cl_print(X,X):-cl_prin1(X,X),nl.

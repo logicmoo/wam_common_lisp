@@ -130,7 +130,8 @@ set_symbol_value(Env,Var,Result):- !,
            -> update_opv(Var, value, Result) 
            ; set_symbol_value_last_chance(Env,Var,Result)))).
 
-set_symbol_value_last_chance(_Env,Var,Result):- nb_setval(Var,Result),!.
+set_symbol_value_last_chance(_Env,Var,Result):- nb_current(Var,_)-> nb_setval(Var,Result),!.
+set_symbol_value_last_chance(_Env,Var,Result):- set_opv(Var, value, Result).
 set_symbol_value_last_chance(_Env,Var,_Result):- 
   lisp_error_description(atom_does_not_exist, ErrNo, _),throw(ErrNo, Var).
 
