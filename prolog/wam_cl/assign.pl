@@ -110,7 +110,8 @@ push_values([V1|Push],V1):- must(nonvar(Push)),nb_setval('$mv_return',[V1|Push])
 
 
 
-bvof(E,E,L):- nonvar(L),member(E,L).
+bvof(E,E,[L|IST]):-!,nonvar(L),member(E,[L|IST]).
+bvof(E,E,E).
 env_memb(E,E).
 env_memb(E,L):- nonvar(L),member(E,L).
 
