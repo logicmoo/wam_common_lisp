@@ -377,7 +377,7 @@ sexpr(['#'(quote),E])              --> `'`, !, swhite, sexpr(E).
 sexpr(['#'(backquote),E])         --> [96] , !, swhite, sexpr(E).
 sexpr(['$BQ-COMMA-ELIPSE',E]) --> `,@`, !, swhite, sexpr(E).
 sexpr('$COMMA'(E))            --> `,`, !, swhite, sexpr(E).
-sexpr('$OBJ'(brack_vector,V))                 --> `[`, sexpr_vector(V,`]`),!, swhite.
+sexpr('$OBJ'(claz_bracket_vector,V))                 --> `[`, sexpr_vector(V,`]`),!, swhite.
 sexpr('#'(A))              --> `|`, !, read_string_until(S,`|`), swhite,{maybe_notrace(atom_string(A,S))}.
 
 % maybe this is KIF
@@ -606,12 +606,12 @@ as_keyword(C,K):-atom_concat(':',_,C)->K=C;atom_concat(':',C,K).
 %
 to_untyped(S,S):- var(S),!.
 to_untyped([],[]):-!.
-to_untyped('#-'(C,O),'#-'(K,O)):- as_keyword(C,K),!.
-to_untyped('#+'(C,O),'#+'(K,O)):- as_keyword(C,K),!.
+to_untyped('#-'(C,I),'#-'(K,O)):- as_keyword(C,K),!,to_untyped(I,O),!.
+to_untyped('#+'(C,I),'#+'(K,O)):- as_keyword(C,K),!,to_untyped(I,O),!.
 to_untyped('?'(S),_):- S=='??',!.
 % to_untyped('?'(S),'$VAR'('_')):- S=='??',!.
 % to_untyped(VAR,NameU):-atom(VAR),atom_concat('#$',NameU,VAR),!.
-to_untyped(VAR,NameU):-atom(VAR),notrace(catch(atom_number(VAR,NameU),_,fail)),!.
+to_untyped(VAR,NameU):-atom(VAR),(atom_concat(N,'.',VAR)->true;N=VAR),notrace(catch(atom_number(N,NameU),_,fail)),!.
 %to_untyped(S,s(L)):- string(S),atom_contains(S,' '),atomic_list_concat(['(',S,')'],O),parse_sexpr_string(O,L),!.
 to_untyped(S,S):- string(S),!.
 to_untyped(S,S):- number(S),!.
@@ -624,7 +624,7 @@ to_untyped('#'(S),O):- !, (nonvar(S)->to_untyped(S,O) ; O='#'(S)).
 to_untyped('#\\'(S),C):-!,to_untyped('$CHAR'(S),C),!.
 to_untyped('$CHAR'(S),C):-to_char(S,C),!.
 to_untyped('$CHAR'(S),'$CHAR'(S)):-!.
-to_untyped('$STRING'(S),(S)):-!.
+% to_untyped('$STRING'(S),(S)):-!.
 to_untyped('$COMMA'(S),'$COMMA'(O)):-to_untyped(S,O),!.
 to_untyped('$OBJ'(S),'$OBJ'(O)):-to_untyped(S,O),!.
 to_untyped('$OBJ'(Ungly,S),'$OBJ'(Ungly,O)):-to_untyped(S,O),!.
@@ -633,6 +633,7 @@ to_untyped('$NUMBER'(S),O):-nonvar(S),to_number(S,O),to_untyped(S,O),!.
 to_untyped('$NUMBER'(S),'$NUMBER'(S)):-!. 
 % to_untyped([[]],[]):-!.
 to_untyped('$STR'(Expr),Forms):- (text_to_string_safe(Expr,Forms);to_untyped(Expr,Forms)),!.
+to_untyped('$STRING'(Expr),Forms):- (text_to_string_safe(Expr,Forms);to_untyped(Expr,Forms)),!.
 to_untyped(['#'(Backquote),Rest],Out):- Backquote == backquote, !,to_untyped(['#'('$BQ'),Rest],Out).
 to_untyped(['#'(S)|Rest],OOut):- nonvar(S), is_list(Rest),must_maplist(to_untyped,[S|Rest],[F|Mid]), 
           ((atom(F),t_l:s2p(F))-> Out=..[F|Mid];Out=[F|Mid]),
@@ -882,11 +883,12 @@ track_stream(In,G):- \+ is_stream(In),!,G.
 track_stream(In,G):- 
    b_setval('$lisp_translation_stream',In),
    catch(stream_position(In,Pos,Pos),_,true),
+   character_count(In,Chars),
    stream_property(In,encoding(Was)),
    (setup_call_catcher_cleanup(
-        set_stream(In,encoding(octet)),
+        nop(set_stream(In,encoding(octet))),
         (ignore(catch(line_count(In,Line),_,(Line = -1))),
-         b_setval('$lisp_translation_line',Line),
+         b_setval('$lisp_translation_line',Line-Chars),
            (maybe_notrace(G),!)),
         Catcher,
         true)->true;Catcher=fail),
@@ -894,11 +896,10 @@ track_stream(In,G):-
 
 track_stream_cleanup(Exit,In,Was,_Pos):- (Exit==exit ; Exit == (!)),!,
    set_stream(In,encoding(Was)).
-track_stream_cleanup(In,Was,Pos,Catcher):-
+track_stream_cleanup(Catcher,In,Was,Pos):-
    set_stream(In,encoding(Was)),
    ((nonvar(Pos),supports_seek(In))->stream_position(In,_Was,Pos);true),!,
    (compound(Catcher)-> (arg(1,Catcher,E),throw(E)) ; fail).
-
 
 
 

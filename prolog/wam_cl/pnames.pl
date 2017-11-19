@@ -93,12 +93,16 @@ debug_var0(Atom,Var):- p_n_atom(Atom,UP),
   add_var_to_env_loco(UP,Var),!.
 
 
-add_var_to_env_loco(UP,Var):- var(Var), get_var_name(Var,Prev),atomic(Prev),
-  \+ atom_concat('_',_,UP), 
-  \+ atom_concat('_',_,Prev),  
-  atom_concat(UP,Prev,New),add_var_to_env(New,Var).
-
+add_var_to_env_loco(UP,Var):- var(Var), get_var_name(Var,Prev),atomic(Prev),add_var_to_env_locovs_prev(UP,Prev,Var).
 add_var_to_env_loco(UP,Var):-add_var_to_env(UP,Var).
+
+add_var_to_env_locovs_prev(UP,Prev,_Var):- UP==Prev,!.
+add_var_to_env_locovs_prev(UP,_Prev,_Var):- atom_concat('_',_,UP),!.
+add_var_to_env_locovs_prev(UP,_Prev,_Var):- atom_concat(_,'_',UP),!.
+add_var_to_env_locovs_prev(UP,_Prev,Var):-add_var_to_env(UP,Var).
+add_var_to_env_locovs_prev(UP,Prev,Var):- atom_concat('_',_,Prev),!,add_var_to_env(UP,Var).
+add_var_to_env_locovs_prev(UP,Prev,Var):- atom_concat(UP,Prev,New),add_var_to_env(New,Var).
+add_var_to_env_locovs_prev(UP,_Prev,Var):- add_var_to_env(UP,Var).
 
 check_varname(UP):- name(UP,[C|_]),(char_type(C,digit)->throw(check_varname(UP));true).
                         

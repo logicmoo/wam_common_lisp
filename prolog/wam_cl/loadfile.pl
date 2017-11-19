@@ -160,11 +160,10 @@ lisp_compile_to_prolog(Expression):-
   nl,
   flush_all_output_safe,
   write('/*********** '),
-  ignore((nb_current('$lisp_translation_stream',In),stream_property(In,file_name(File)),
-  write(File))),
-  ignore((reading_package(Pkg),nb_current('$lisp_translation_line',Line-Chars),
-  write(Line-Chars))),
+  ignore((nb_current('$lisp_translation_stream',In),stream_property(In,file_name(File)),write(File))),
+  ignore((nb_current('$lisp_translation_line',LineChars),write(:),write(LineChars))),
   writeln(' **********************/'),
+  reading_package(Pkg),
   dbmsg(:- lisp_compile_to_prolog(Pkg,SExpression)),
   lisp_compile_to_prolog_pass1(SExpression),!.
 
@@ -177,7 +176,7 @@ write_trans(P):- dbmsg(P).
 lisp_compile_to_prolog_pass1(_Expression):- source_location(_,_),!.
 lisp_compile_to_prolog_pass1(SExpression):- 
   reader_intern_symbols(SExpression,FExpression),
-  (SExpression==FExpression -> true ; dbmsg(:- lisp_compile(FExpression))),  
+  %(SExpression==FExpression -> true ; dbmsg(:- lisp_compile(FExpression))),  
    Expression = FExpression, 
    debug_var('_Ignored',Result),
    lisp_compile(Result,Expression,PrologCode),
