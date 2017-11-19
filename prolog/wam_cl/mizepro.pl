@@ -301,10 +301,13 @@ never_inline(P):- predicate_property(P,number_of_clauses(N)),N==0.
 never_inline(P):- compound(P),functor(P,F,C1),never_inline_fa(F,C1).
 never_inline_fa(place_op,_).
 never_inline_fa(F,_):- atom_concat(_,' tabled',F).
+never_inline_fa(F,_):- atom_concat('cl_',_,F).
 never_inline_fa(start_tabling,_).
 never_inline_fa(symbol_value,_).
 never_inline_fa(set_symbol_value,_).
 never_inline_fa(get_opv,_).
+never_inline_fa(member,_).
+never_inline_fa(as_rest,_).
 never_inline_fa(t_or_nil,_).
 
 lisp_compiler_option(safe(_),true).
@@ -314,7 +317,7 @@ maybe_inline(C1):- \+ never_inline(C1),
   predicate_property(C1,interpreted),
   predicate_property(C1,number_of_clauses(1)),
   \+ clause_has_cuts(C1),
- % lisp_compiler_option(inline,true),
+  lisp_compiler_option(inline,true),
   !.
 
 clause_has_cuts(P):- clause(P,I),contains_var(!,I).

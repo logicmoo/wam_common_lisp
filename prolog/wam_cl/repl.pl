@@ -92,7 +92,7 @@ str_to_expression(Str, Expression):- lisp_add_history(Str),parse_sexpr_untyped_r
 str_to_expression(Str, Expression):- with_input_from_string(Str,read_and_parse(Expression)),!.
 
 remove_comments(IO,IO):- \+ compound(IO),!.
-remove_comments([I|II],O):- is_comment(I),!,remove_comments(II,O).
+remove_comments([I|II],O):- is_comment(I,_),!,remove_comments(II,O).
 remove_comments([I|II],[O|OO]):-remove_comments(I,O),!,remove_comments(II,OO).
 remove_comments(IO,IO).
 
@@ -308,12 +308,13 @@ eval_repl_atom(show, t):-
         user:function_lambda/4]).
 
 :- fixup_exports.
-
+:- cddd.
 % invoke_eval(['in-package', "SYSTEM"], In_package_Ret):
 %lisp_add_history("prolog.")
 :- initialization((lisp,prolog),main).
 %:- lisp_add_history("lisp.").
 
 :- set_prolog_flag(verbose_autoload,false).
+
 
 

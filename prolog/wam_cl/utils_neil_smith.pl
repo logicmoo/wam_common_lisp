@@ -2,18 +2,63 @@
  *
  * A Common Lisp compiler/interpretor, written in Prolog
  *
- * (lisp_library.pl)
- *
- * (c) Neil Smith, 2001
- *
  * This program provides some built-in functionality for the 
  * Lisp compiler.  It requires that the file lisp_compiler.pl has 
  * already been successfully compiled.
  *
  * Definitions in this file are given in the Lisp-like syntax 
  * read by this compiler.
+*  ..............................
+ *
+ *
+ * Neil''s Notes:
+ *
+ * (c) Neil Smith, 2001
+ *
+ * This program, and its associated support files, forms a compiler
+ * for a subset of the language LISP.  It supports a few simple
+ * built-in procedures, listed below.  It also supports both special
+ * and lexical variables, and higher-order functions and lexical
+ * closures.
+ *
+ * This compiler was written in LPA Prolog v3.6 under MS Windows.
+ * It should run under other Prologs without too much conversion needed,
+ * but note the required library modules.
+ *
+ *
+ * Special forms
+ *
+ * [] and nil are treated as special forms, evaluating to [], and treated as 'false'
+ * t is a special form, evaluating to t, and treated as 'true'
+ * if, cond
+ * progn (and implicit progn in defun and let bodies)
+ * quote
+ * let
+ * setq
+ * function
+ * lambda
+ * defvar, defparameter (both with and without initial values)
+ *
+ * Built-in procedures (defined in builtin_lisp_functions.pl)
+ *
+ * cons, first, rest, null
+ * eq, equalp
+ * plus, minus, times, divide
+ * lisp_not, or, and
+ * lisp_apply
+ *
+ * Other procedures are defined in lisp_library.pl
  *
  *******************************************************************/
+
+
+:- op(1200, xfx, <<== ).	% function definition
+:- op(1200,  fx, <<== ).	% functional imperative definition
+
+% :- ensure_loaded(builtin_lisp_functions). % Lisp primitives: this directives is at the end of the file
+% :- ensure_loaded(lisp_library).	% Functions defined in lisp: this directive is at the end of the file
+					% allowing them to be compiled correctly
+
 
 % The hook into the compiler
 

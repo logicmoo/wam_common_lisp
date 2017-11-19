@@ -23,6 +23,7 @@ env_toplevel(GlobalBindings):- must(nb_current('$env_toplevel',GlobalBindings)).
 env_current(Env):- nb_current('$env_current',Env),!.
 env_current(Env):- env_toplevel(Env),nb_linkval('$env_current',Env),!.
 
+reenter_lisp(Ctx,Env):- env_current(Env),new_compile_ctx(Ctx). 
 % GlobalBindings
 :- fixup_exports.
 

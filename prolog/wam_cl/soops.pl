@@ -171,7 +171,7 @@ add_opv_pred(MPred,O,P,Value):- strip_module(MPred,M,Pred),Prop=.. [Pred,O,P,Val
 
 add_opv(Symbol,value,SValue):- atom(SValue),
  (atom_contains(SValue,'(');atom_contains(SValue,' ')),
-  (as_sexp(SValue,Value)->SValue\==Value),!,add_opv(Symbol,value,Value).
+  (as_sexp(SValue,Value)->SValue\==Value),!,set_opv(Symbol,value,Value).
 
 add_opv(O,P,Value):- ( \+ soops:o_p_v(O,P,_) -> assert(soops:o_p_v(O,P,Value)) ; true).
 

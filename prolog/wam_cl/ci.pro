@@ -3601,13 +3601,13 @@ struct_opv(claz_parse_unknown_type,subtypep,claz_condition).
 struct_opv(claz_parse_unknown_type,super_priority,[claz_condition,claz_slot_object,claz_t]).
 struct_opv(claz_parse_unknown_type,typeof,type_class).
 struct_opv(claz_parse_unknown_type,typeof,claz_built_in_class).
+struct_opv(claz_pathname,has_slot,slot(claz_string,"namestring")).
 struct_opv(claz_pathname,has_slot,slot(claz_object,"device")).
 struct_opv(claz_pathname,has_slot,slot(claz_object,"directory")).
 struct_opv(claz_pathname,has_slot,slot(claz_object,"host")).
 struct_opv(claz_pathname,has_slot,slot(claz_object,"name")).
 struct_opv(claz_pathname,has_slot,slot(claz_object,"type")).
 struct_opv(claz_pathname,has_slot,slot(claz_object,"version")).
-struct_opv(claz_pathname,has_slot,slot(claz_string,"namestring")).
 struct_opv(claz_pathname,subtypep,claz_object).
 struct_opv(claz_pathname,subtypep,claz_structure_object).
 struct_opv(claz_pathname,subtypep,claz_t).

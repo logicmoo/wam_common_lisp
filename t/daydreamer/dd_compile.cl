@@ -14,9 +14,18 @@
 (load "gate_macros")
 (load "dd_macros")
 
+
+(compile-file "compat")
+(compile-file "loop")
+(compile-file "gate_macros")
+(compile-file "dd_macros")
+
+
 (compile-file "dd_cntrl")
 (compile-file "dd_epis")
-#-abcl (compile-file "dd_gen")
+;; #- :abcl (compile-file "dd_gen")
+;; #+ :wamcl 
+(compile-file "dd_gen")
 (compile-file "dd_mutation")
 (compile-file "dd_night")
 (compile-file "dd_reversal")

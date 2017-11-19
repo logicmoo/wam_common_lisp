@@ -32,6 +32,9 @@ reader_intern_symbols(_Package,Some,Some):- \+ compound(Some),!.
 reader_intern_symbols(Package,[S|Some],[SR|SomeR]):- 
   reader_intern_symbols(Package,S,SR),
   reader_intern_symbols(Package,Some,SomeR).
+reader_intern_symbols(Package,C1,C2):- 
+  compound_name_arguments(C1,F,C1O),
+  must_maplist(reader_intern_symbols(Package),C1O,C2O),C2=..[F|C2O].
 reader_intern_symbols(_Package,Some,Some).
 
 

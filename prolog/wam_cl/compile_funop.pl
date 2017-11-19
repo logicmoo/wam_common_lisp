@@ -23,15 +23,16 @@
 % Use a previous DEFMACRO
 compile_funop(Ctx,Env,RResult,[Procedure|Arguments],CompileBodyCode):- nonvar(Procedure),
   user:macro_lambda(_Scope,Procedure, FormalParams, LambdaExpression,_),!,
-
-  must_bind_parameters(NewEnv, FormalParams, Arguments,BindCode),!,
+  debug_var('EnvThru',EnvThru),debug_var('NewEnv',NewEnv),
+  debug_var('Env',Env),debug_var('NextEnv',NextEnv),debug_var('CommaResult',CommaResult),
+  must_bind_parameters(NewEnv, FormalParams, Arguments,EnvThru,BindCode),!,
   append(_,[],NewEnv),!,
   NextEnv = [NewEnv|Env],  
   call(BindCode),
   must_or_rtrace(expand_commas(NewEnv,CommaResult,LambdaExpression,CodeS)),
   body_cleanup_keep_debug_vars(Ctx,CodeS,Code),
   dbmsg(comment(macroResult(BindCode,Code,CommaResult))),
-  (local_override(with_forms,lisp_grovel)-> (lisp_dumpST) ; true),
+  % (local_override(with_forms,lisp_grovel)-> (lisp_dumpST) ; true),
   call(Code),
   must_compile_body(Ctx,NextEnv,CompileBody0Result,CommaResult, MCBR),
   call(MCBR),
@@ -63,7 +64,7 @@ compile_funop(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):- \+ atom(Func
 compile_funop(Ctx,CallEnv,Result,[FunctionName | FunctionArgs], Body):- nonvar(FunctionName),
       expand_arguments_maybe_macro(Ctx,CallEnv,FunctionName,0,FunctionArgs,ArgBody, Args),
       debug_var([FunctionName,'_Ret'],Result),      
-      find_function_or_macro(FunctionName,Args,Result,ExpandedFunction),      
+      find_function_or_macro(Ctx,CallEnv,FunctionName,Args,Result,ExpandedFunction),      
       Body = (ArgBody,ExpandedFunction).
 
 
@@ -79,17 +80,17 @@ uses_exact(FunctionName,ArgInfo):-  user:arglist_info(FunctionName,_,_,ArgInfo),
 uses_rest(FunctionName,ArgInfo):-  user:arglist_info(FunctionName,_,_,ArgInfo),!,ArgInfo.complex \==0 .
 % Non built-in function expands into an explicit function call
 
-find_function_or_macro(FunctionName,Args,Result,ExpandedFunction):-
+find_function_or_macro(Ctx,Env,FunctionName,Args,Result,ExpandedFunction):-
    length(Args,Len0),Len is Len0+1,
-   find_function_or_macro_name(FunctionName,Len, ProposedName),!,
+   find_function_or_macro_name(Ctx,Env,FunctionName,Len, ProposedName),!,
    align_args(FunctionName,ProposedName,Args,Result,ArgsPlusResult),
    ExpandedFunction =.. [ ProposedName | ArgsPlusResult].
    
-find_function_or_macro_name(FunctionName,_Len, ProposedName):- 
+find_function_or_macro_name(_Ctx,_Env,FunctionName,_Len, ProposedName):- 
   get_opv(FunctionName,function,ProposedName),!.
-find_function_or_macro_name(FunctionName,Len, ProposedName):-
+find_function_or_macro_name(_Ctx,_Env,FunctionName,Len, ProposedName):-
   some_function_or_macro(FunctionName,Len,['','cl_','pf_','sf_','mf_','f_'],ProposedName),!.
-find_function_or_macro_name(FunctionName,_Len, ProposedName):-
+find_function_or_macro_name(_Ctx,_Env,FunctionName,_Len, ProposedName):-
     maybe_symbol_package(FunctionName,Package),
     (cl_symbol_name(FunctionName,Name) ->
       function_case_name(Name,Package,ProposedName);

@@ -84,6 +84,21 @@ compile_body_block(Ctx,Env,Result,RETURN_FROM,Body):-
  compile_body_block_in_throw(Ctx,Env,Result,RETURN_FROM,Body).
 
 
+compile_body_block_in_throw(Ctx,Env,ValueResult,[RETURN_FROM,Tag,ValueForm],(ValueFormCode, Code) ):- 
+   same_symbol(RETURN_FROM,'return-from'), 
+   debug_var('RetResult',ValueResult),
+   must_compile_body(Ctx,Env,ValueResult,ValueForm,ValueFormCode),
+   %suffixed_atom_concat(block_ret_,Tag,Var),
+   %suffixed_atom_concat(block_exit_,Tag,ExitTag),
+  % compile_body(Ctx,Env,GoResult,[progn,[setq,Var,ValueResult],[go,ExitTag]], Code ).
+   debug_var('BlockExitEnv',Env),
+   Code = (throw(block_exit(Tag,ValueResult))).
+
+compile_body_block_in_throw(Ctx,Env,Result,[block,BlockTag|InstrS], 
+  catch((Code,ResultExit=Result),block_exit(BlockTag,Result),true)):-  % must(is_symbolp(BlockTag)),
+      (must_compile_body(Ctx,Env,ResultExit,[progn|InstrS],Code)).
+
+/*
 compile_body_block_in_throw(Ctx,Env,GoResult,[RETURN_FROM,Tag,ValueForm],(ValueFormCode, Code) ):- 
    same_symbol(RETURN_FROM,'return-from'), 
    debug_var('GoBlockResult',GoResult),
@@ -94,7 +109,6 @@ compile_body_block_in_throw(Ctx,Env,GoResult,[RETURN_FROM,Tag,ValueForm],(ValueF
    debug_var('BlockExitEnv',Env),
    Code = (throw(block_exit(ExitTag,ValueResult))).
 
-
 compile_body_block_in_throw(Ctx,Env,Result,[block,BlockTag|InstrS], 
   catch((Code,ResultExit=Result),block_exit(ExitTag,Result),true)):-  must(is_symbolp(BlockTag)),
    suffix_by_context(BlockTag,Tag),
@@ -103,7 +117,7 @@ compile_body_block_in_throw(Ctx,Env,Result,[block,BlockTag|InstrS],
    ((%suffixed_atom_concat(block_ret_,Tag,Var),
      suffixed_atom_concat(block_exit_,Tag,ExitTag), 
       (must_compile_body(Ctx,Env,ResultExit,[progn|InstrS],Code)))))),!.
-
+*/
 
 
 

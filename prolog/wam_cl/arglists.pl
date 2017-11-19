@@ -356,7 +356,6 @@ compile_init(Var,FinalResult,[InitForm|_More],
    
 % [name, 'package-designator', '&optional', [error, t]]
 
-:- dynamic(user:arglist_info/4).
 
 set_symbol_value_if_missing(Env, Var, In, G, Thru):- var(In),!,G,set_symbol_value(Env,Var,Thru).
 set_symbol_value_if_missing(Env, Var, In, _, Thru):- set_symbol_value(Env,Var,In),!,In=Thru.

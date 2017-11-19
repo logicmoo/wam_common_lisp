@@ -32,6 +32,22 @@ get_var_tracker(Ctx0,Atom,Dict):- get_attr(Ctx0,tracker,Ctx), must(sanity(atom(A
 get_var_tracker(Ctx0,Atom,Dict):-  get_attr(Ctx0,tracker,Ctx),Dict=rw{name:Atom,r:0,w:0,vars:[]},oo_put_attr(Ctx,var_tracker(Atom),Dict),!.
 
 
+locally_let([N=V|More],G):- castify(V,Value),!,locally_let([N=Value|More],G).
+locally_let([N=V|More],G):- castify(N,Symbol),!,locally_let([Symbol=V|More],G).
+locally_let([N=V|More],G):- 
+   locally($(N)=V,locally_let(More,G)).
+locally_let([],G):- call(G).
+
+castify(O,O):- \+compound(O),!,fail.
+castify(str(O),S):-!, castify1(O,M),cl_string(M,S).
+castify(sym(O),S):-!, castify1(O,M),reader_intern_symbols(M,S).
+castify(P,S):- P=..[F,M],!, castify1(M,MM),must(get_opv(MM,F,S)).
+
+castify1(O,O):- \+compound(O),!.
+castify1(O,O):- is_list(O),!.
+castify1(I,O):- castify(I,O).
+
+
 
 compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, Atom2| Rest], Body):- is_parallel_op(SetQ),!, 
    pairify([Var, ValueForm, Atom2| Rest],Atoms,Forms),
@@ -42,8 +58,8 @@ compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, Atom2| Rest], Body):- is_p
 
 
 compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, Atom2| Rest], Body):- is_pair_op(SetQ), 
-   if_must_compile_body(Ctx,Env,_ResultU,[SetQ, Var, ValueForm], Body1),
-   if_must_compile_body(Ctx,Env,Result,[SetQ, Atom2| Rest],  Body2),
+   must_compile_body(Ctx,Env,_ResultU,[SetQ, Var, ValueForm], Body1),
+   must_compile_body(Ctx,Env,Result,[SetQ, Atom2| Rest],  Body2),
    Body = (Body1 , Body2).
 
 compile_assigns(Ctx,Env,Result,[Defvar, Var], Body):- is_def_nil(Defvar),!,
@@ -67,7 +83,7 @@ compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm], Body):- is_symbol_setter(
         rw_add(Ctx,Var,w),
         debug_var('Env',Env),
         !,	
-	if_must_compile_body(Ctx,Env,ResultV,ValueForm, ValueBody),
+	must_compile_body(Ctx,Env,ResultV,ValueForm, ValueBody),
         ((op_return_type(SetQ,RT),RT=name) ->  =(Var,Result) ; =(ResultV,Result)),
         Body = (ValueBody, symbol_setter(Env,SetQ, Var, ResultV)).
 
@@ -147,17 +163,17 @@ env_sym_arg_val(Env,Var,InValue,Value):- !,
 %TODO Make it a constantp
 symbol_setter(Env,defconstant, Var, Result):- 
    set_symbol_value(Env,Var,Result),
-   add_opv(Var,kw_deftype,defconstant).
+   set_opv(Var,kw_deftype,defconstant).
 symbol_setter(Env,defconst, Var, Result):- 
   symbol_setter(Env,defconstant, Var, Result).
 
 symbol_setter(Env,defparameter, Var, Result):- 
-   add_opv(Var,kw_deftype,defparameter),
+   set_opv(Var,kw_deftype,defparameter),
    set_symbol_value(Env,Var,Result).
 
 symbol_setter(_Env,defvar, Var, Result):-   
    (get_opv(Var, value, _) -> true ; update_opv(Var, value, Result)),
-   add_opv(Var,kw_deftype,defvar).
+   set_opv(Var,kw_deftype,defvar).
 
 symbol_setter(Env,setq, Var, Result):- !, set_symbol_value(Env,Var,Result).
 
@@ -209,7 +225,7 @@ set_with_prolog_var(Ctx,Env,SetQ,Var,Result,symbol_setter(Env,SetQ, Var, Result)
 
 expand_ctx_env_forms(Ctx, Env,Forms,Body, Result):- 
    must_compile_body(Ctx,Env,Result,Forms, Body).
-
 :- fixup_exports.
+
 
 

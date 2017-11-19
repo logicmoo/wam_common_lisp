@@ -73,10 +73,10 @@ cl_make_symbol(SymbolName,Symbol):-
 
 create_symbol(String,Package,Symbol):-
    text_to_string(String,Name),
-   add_opv(Symbol,typeof,symbol),
-   add_opv(Symbol,classof,clz_symbol),
-   add_opv(Symbol,name,Name),
-   add_opv(Symbol,package,Package),!.
+   set_opv(Symbol,typeof,symbol),
+   set_opv(Symbol,classof,clz_symbol),
+   set_opv(Symbol,name,Name),
+   set_opv(Symbol,package,Package),!.
 
 create_keyword(Name,Symbol):- atom_concat(':',Make,Name),!,create_keyword(Make,Symbol).
 create_keyword(Name,Symbol):- string_upper(Name,String),

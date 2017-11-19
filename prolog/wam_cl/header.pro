@@ -50,6 +50,11 @@
 :- dynamic(user:op_replacement/2).
 :- discontiguous(user:op_replacement/2).
 
+:- dynamic(user:arglist_info/4).
+:- multifile(user:arglist_info/4).
+
+:- dynamic(user:function_lambda/4).
+:- multifile(user:function_lambda/4).
 
 %:- dynamic(compile_assigns/4).
 %:- multifile(compile_assigns/4).
@@ -59,45 +64,45 @@
 :- multifile(ssip_define/2).
 :- discontiguous(ssip_define/2).
 
-
-
-:- user:use_module(arglists).
-:- user:use_module(assign).
-:- user:use_module(backquote).
-:- user:use_module(block).
-:- user:use_module(callp).
-:- user:use_module(compile_funop).
-:- user:use_module(compile).
-:- user:use_module(docs).
-:- user:use_module(hashtables).
-:- user:use_module(env).
-:- user:use_module(interp).
-:- user:use_module(loadfile).
-:- user:use_module(mizepro).
-:- user:use_module(package).
-:- user:use_module(places).
-:- user:use_module(pathname).
-:- user:use_module(funcall).
-:- user:use_module(pnames).
-:- user:use_module(prims).
-:- user:use_module(print).
-:- user:use_module(readtables).
-:- user:use_module(repl).
-:- user:use_module(soops).
-:- user:use_module(sreader).
-:- user:use_module(streams).
-:- user:use_module(string).
-:- user:use_module(symbol).
-:- user:use_module(tagbody).
-:- user:use_module(typeof).
-:- user:use_module(tests).
+:- ensure_loaded('arglists.pl').
+:- ensure_loaded('assign.pl').
+:- ensure_loaded('backquote.pl').
+:- ensure_loaded('block.pl').
+:- ensure_loaded('body.pl').
+:- ensure_loaded('callp.pl').
+:- ensure_loaded('compile.pl').
+:- ensure_loaded('compile_funop.pl').
+:- ensure_loaded('conditions.pl').
+:- ensure_loaded('decls.pl').
+:- ensure_loaded('docs.pl').
+:- ensure_loaded('env.pl').
+:- ensure_loaded('funcall.pl').
+:- ensure_loaded('hashtables.pl').
+:- ensure_loaded('interp.pl').
+:- ensure_loaded('loadfile.pl').
+:- ensure_loaded('mizepro.pl').
+:- ensure_loaded('package.pl').
+:- ensure_loaded('pathname.pl').
+:- ensure_loaded('places.pl').
+:- ensure_loaded('pnames.pl').
+:- ensure_loaded('prims.pl').
+:- ensure_loaded('print.pl').
+:- ensure_loaded('readtables.pl').
+:- ensure_loaded('repl.pl').
+:- ensure_loaded('soops.pl').
+:- ensure_loaded('sreader.pl').
+:- ensure_loaded('streams.pl').
+:- ensure_loaded('string.pl').
+:- ensure_loaded('symbol.pl').
+:- ensure_loaded('tagbody.pl').
+:- ensure_loaded('tests.pl').
+:- ensure_loaded('typeof.pl').
 /*
-:- user:use_module(neil_smith).
-:- user:use_module(utils_for_swi).
-:- user:use_module(utils_higher_order).
-:- user:use_module(utils_list).
-:- user:use_module(utils_oset).
-:- user:use_module(utils_set).
-:- user:use_module(utils_shortest_paths).
-:- user:use_module(utils_writef).
+:- ensure_loaded('utils_for_swi.pl').
+:- ensure_loaded('utils_higher_order.pl').
+:- ensure_loaded('utils_list.pl').
+:- ensure_loaded('utils_oset.pl').
+:- ensure_loaded('utils_set.pl').
+:- ensure_loaded('utils_shortest_paths.pl').
+:- ensure_loaded('utils_writef.pl').
 */

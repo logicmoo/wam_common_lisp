@@ -38,6 +38,16 @@ cl_use_package(Package,CurrentPackage, t):-
    dmsg(todo(check_for+package_symbolconflicts(package_use_list(CurrentPackage,Package)))).
 
  
+cl_defpackage(Name,P1,P2,P3,R):- do_defpackage(Name,[P1,P2,P3],R).
+cl_defpackage(Name,P1,P2,R):- do_defpackage(Name,[P1,P2],R).
+cl_defpackage(Name,P1,R):- do_defpackage(Name,[P1],R).
+cl_defpackage(Name,R):- do_defpackage(Name,[],R).
+
+do_defpackage(Name,List,R):- atom_concat(pkg_,Name,Down),prologcase_name(Down,R),
+  asserta(package_name(R,Name)),add_props(R,List).
+add_props(R,[L|List]):- add_props(R,L), add_props(R,List).
+add_props(R,[Keyword|List]):- is_keywordp(Keyword),maplist(add_opv(R,Keyword),List).
+
 
 
 cl_find_package(S,Obj):- find_package(S,Package),!,must(as_package_object(Package,Obj)).

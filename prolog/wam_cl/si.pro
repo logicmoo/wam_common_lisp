@@ -58940,7 +58940,7 @@ o_p_v(sys_xx_compile_file_class_extension_xx,kw_deftype,defparameter).
 o_p_v(sys_xx_compile_file_class_extension_xx,name,"*COMPILE-FILE-CLASS-EXTENSION*").
 o_p_v(sys_xx_compile_file_class_extension_xx,package,pkg_sys).
 o_p_v(sys_xx_compile_file_class_extension_xx,classof,claz_symbol).
-o_p_v(sys_xx_compile_file_class_extension_xx,value,cls).
+o_p_v(sys_xx_compile_file_class_extension_xx,value,"tmp.pl").
 o_p_v(sys_xx_compile_file_directory_xx,kw_deftype,defparameter).
 o_p_v(sys_xx_compile_file_directory_xx,name,"*COMPILE-FILE-DIRECTORY*").
 o_p_v(sys_xx_compile_file_directory_xx,package,pkg_sys).
@@ -58970,7 +58970,7 @@ o_p_v(sys_xx_compile_file_type_xx,kw_deftype,defparameter).
 o_p_v(sys_xx_compile_file_type_xx,name,"*COMPILE-FILE-TYPE*").
 o_p_v(sys_xx_compile_file_type_xx,package,pkg_sys).
 o_p_v(sys_xx_compile_file_type_xx,classof,claz_symbol).
-o_p_v(sys_xx_compile_file_type_xx,value,abcl).
+o_p_v(sys_xx_compile_file_type_xx,value,"abcl").
 o_p_v(sys_xx_compile_file_zip_xx,kw_deftype,defparameter).
 o_p_v(sys_xx_compile_file_zip_xx,name,"*COMPILE-FILE-ZIP*").
 o_p_v(sys_xx_compile_file_zip_xx,package,pkg_sys).

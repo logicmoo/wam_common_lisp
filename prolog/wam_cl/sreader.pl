@@ -134,6 +134,7 @@ phrase_from_stream_part(Grammar, In) :- at_end_of_stream(In),!,phrase_from_strea
 
 phrase_from_stream_part(Grammar, In) :- phrase_from_stream_part_seekable(Grammar, In).
 
+
 phrase_from_stream_part_seekable(Grammar, In) :- 
     must(sanity(stream_property(In,reposition(true)))),!,
     % set_stream(In,buffer_size(16384)),!, % set_stream(In,buffer(full)),
@@ -394,12 +395,12 @@ sexpr('#\\'(C))                   --> `#\\`,rsymbol('',C), swhite.
 sexpr('$CHAR'(C))                 --> `#\\`,!,sym_or_num(C), swhite.
 sexpr('#-'(C,O)) --> `#-`,sexpr(C),swhite,sexpr(O),!.
 sexpr('#+'(C,O)) --> `#+`,sexpr(C),swhite,sexpr(O),!.
-sexpr('#P'(C)) --> `#P`,sexpr(C),swhite,!.
+sexpr('$OBJ'(claz_pathname,C)) --> `#P`,sexpr(C),swhite,!.
 sexpr('#S'(C)) --> `#S`,sexpr(C),swhite,!.
-sexpr('$OBJ'(bitvector,C)) --> `#*`,radix_digits(2,C),swhite,!.
+sexpr('$OBJ'(claz_bitvector,C)) --> `#*`,radix_digits(2,C),swhite,!.
 
-sexpr(['#'(function),E])                 --> `#\'`, sexpr(E), !. %, swhite.
-sexpr('$OBJ'(vector,V))                 --> `#(`, !, sexpr_vector(V,`)`),!, swhite,!.
+sexpr(function(E))                 --> `#\'`, sexpr(E), !. %, swhite.
+sexpr('$OBJ'(claz_vector,V))                 --> `#(`, !, sexpr_vector(V,`)`),!, swhite,!.
 
 sexpr(Number) --> `#`,integer(Radix),ci(`r`),!,radix_number(Radix,Number0),extend_radix(Radix,Number0,Number).
 sexpr('$ARRAY'(Dims,V)) --> `#`,integer(Dims),ci(`a`),!,sexpr(V).
@@ -418,12 +419,22 @@ sexpr(OBJ)--> ugly_sexpr(OBJ),!.
 
 sexpr(E)                      --> sym_or_num(E), swhite.
 
+sexpr(('+1-')) --> `+1-`,!,swhite.
+sexpr(('-1+')) --> `-1+`,!,swhite.
 
+sexpr(('#-')) --> `#-`,!,swhite.
+sexpr(('#+')) --> `#+`,!,swhite.
+
+sym_or_num(('-1-')) --> `-1-`,swhite,!.
+sym_or_num(('-1+')) --> `-1+`,swhite,!.
+sym_or_num(('+1+')) --> `+1-`,swhite,!.
 sym_or_num('$COMPLEX'(L)) --> `#C(`,!, swhite, sexpr_list(L), swhite.
 sym_or_num((E)) --> snumber(S),{number_string(E,S)}.
 %sym_or_num((E)) --> unsigned_number(S),{number_string(E,S)}.
 sym_or_num(('1+')) --> `1+`,swhite,!.
 sym_or_num(('1-')) --> `1-`,swhite,!.
+sym_or_num((E)) --> snumber(S),{number_string(E,S)}.
+%sym_or_num((E)) --> unsigned_number(S),{number_string(E,S)}.
 sym_or_num(('#+')) --> `#+`,swhite,!.
 sym_or_num(('#-')) --> `#-`,swhite,!.
 sym_or_num(('-#+')) --> `-#+`,swhite,!.
@@ -482,7 +493,7 @@ sexprs([H|T]) --> sexpr(H), !, sexprs(T).
 sexprs([]) --> [].
 
 
-:- export(sexpr_list//1).
+:- export('//'(sexpr_list,1)).
 
 sexpr_list([]) --> `)`, !.
 sexpr_list(_) --> `.`, [C], {\+ sym_char(C)}, !, {fail}.
@@ -587,7 +598,7 @@ to_unbackquote(I,O):-to_untyped(I,O).
 
 %atom_or_string(X):- (atom(X);string(X)),!.
 
-
+as_keyword(C,K):-atom_concat(':',_,C)->K=C;atom_concat(':',C,K).
 
 %% to_untyped( :TermVar, :TermName) is det.
 %
@@ -595,6 +606,8 @@ to_unbackquote(I,O):-to_untyped(I,O).
 %
 to_untyped(S,S):- var(S),!.
 to_untyped([],[]):-!.
+to_untyped('#-'(C,O),'#-'(K,O)):- as_keyword(C,K),!.
+to_untyped('#+'(C,O),'#+'(K,O)):- as_keyword(C,K),!.
 to_untyped('?'(S),_):- S=='??',!.
 % to_untyped('?'(S),'$VAR'('_')):- S=='??',!.
 % to_untyped(VAR,NameU):-atom(VAR),atom_concat('#$',NameU,VAR),!.
