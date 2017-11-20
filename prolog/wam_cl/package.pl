@@ -43,22 +43,26 @@ cl_defpackage(Name,P1,P2,R):- do_defpackage(Name,[P1,P2],R).
 cl_defpackage(Name,P1,R):- do_defpackage(Name,[P1],R).
 cl_defpackage(Name,R):- do_defpackage(Name,[],R).
 
-do_defpackage(Name,List,R):- atom_concat(pkg_,Name,Down),prologcase_name(Down,R),
-  asserta(package_name(R,Name)),add_props(R,List).
-add_props(R,[L|List]):- add_props(R,L), add_props(R,List).
-add_props(R,[Keyword|List]):- is_keywordp(Keyword),maplist(add_opv(R,Keyword),List).
 
-
+do_defpackage(AName,List,Package):-
+  atom_string(AName,Name),  
+  atom_concat(pkg_,Name,Down),prologcase_name(Down,Package),
+  asserta(package_name(Package,Name)),
+  init_slot_props(claz_package,2,Package,List), 
+  string_upper(Name,UName),
+  (Name==UName -> true ; add_kw_opv(Package,kw_nicknames,UName)),
+  instance_opv(Package,claz_package,[]).
 
 cl_find_package(S,Obj):- find_package(S,Package),!,must(as_package_object(Package,Obj)).
 cl_find_package(_,[]).
 
+cl_package_name(S,Name):- find_package(S,Package),get_opv(Package,name,Name).
 
 find_package('$OBJ'(package,UP),Package):-!,find_package(UP,Package).
 find_package(S,S):- is_lisp_package(S),!.
 find_package(S,Package):- 
   as_string_upper(S,SN),
-  (package_name(Package,SN) ; package_nickname(Package,SN)),!.
+  (package_name(Package,SN) ; package_nicknames(Package,SN)),!.
 
 find_package_or_die(X,Y):- find_package(X,Y) -> true ; throw(find_package_or_die(X,Y)).  
 
@@ -170,10 +174,11 @@ make_fresh_internal_symbol(Package,String,Symbol):-
    assert_if_new(package:package_internal_symbols(Package,String,Symbol)).
 
 
+
 is_lisp_package(P):- package_name(P,_). 
 
 :- dynamic package_name/2.
-:- dynamic package_nickname/2.
+:- dynamic package_nicknames/2.
 :- dynamic package_use_list/2.
 :- dynamic package_shadowing_symbols/2.
 :- dynamic package_external_symbols/3.
@@ -208,21 +213,25 @@ package_name(pkg_xp,"XP").
 package_name(pkg_java,"JAVA").
 package_name(pkg_jvm,"JVM").
 
-package_nickname(pkg_cl, "CL").
-package_nickname(pkg_cl, "LISP").
-package_nickname(pkg_cl, "EMACS-CL").
-package_nickname(pkg_user, "U").
-package_nickname(pkg_user, "USER").
-package_nickname(pkg_user, "CL-USER").
-package_nickname(pkg_user, "EMACS-CL-USER").
-package_nickname(pkg_tl, "TPL").
-package_nickname(pkg_ext, "EXT").
-package_nickname(pkg_os, "OS").
-package_nickname(pkg_clos, "MOP").
-package_nickname(pkg_precompiler, "PRE").
-package_nickname(pkg_profiler, "PROF").
-package_nickname(pkg_sys, "SYS").
+:- decl_mapped_opv(claz_package,[name=package_name]).
 
+package_nicknames(pkg_cl, "CL").
+package_nicknames(pkg_cl, "LISP").
+package_nicknames(pkg_cl, "EMACS-CL").
+package_nicknames(pkg_user, "U").
+package_nicknames(pkg_user, "USER").
+package_nicknames(pkg_user, "CL-USER").
+package_nicknames(pkg_user, "EMACS-CL-USER").
+package_nicknames(pkg_tl, "TPL").
+package_nicknames(pkg_ext, "EXT").
+package_nicknames(pkg_os, "OS").
+package_nicknames(pkg_clos, "MOP").
+package_nicknames(pkg_precompiler, "PRE").
+package_nicknames(pkg_profiler, "PROF").
+package_nicknames(pkg_sys, "SYS").
+package_nicknames(pkg_sys, "WAM-CL").
+
+:- decl_mapped_opv(claz_package,[nicknames=package_nicknames]).
 
 package_use_list(pkg_cl, pkg_clos).
 package_use_list(pkg_user, pkg_cl).
@@ -275,6 +284,8 @@ package_use_list(pkg_threads, pkg_ext).
 package_use_list(pkg_threads, pkg_sys).
 package_use_list(pkg_xp, pkg_cl).
 
+:- decl_mapped_opv(claz_package,[uses=package_use_list]).
+
 
 
 symbol_case_name(String,Package,ProposedName):- 
@@ -295,7 +306,7 @@ package_prefix(pkg_kw,'kw_').
 package_prefix(pkg_sys,'sys_').
 package_prefix(pkg_user,'u_').
 package_prefix(pkg_ext,'ext_').
-package_prefix(PN,Pre):- nonvar(PN),package_nickname(Pk,PN),!,package_prefix(Pk,Pre).
+package_prefix(PN,Pre):- nonvar(PN),package_nicknames(Pk,PN),!,package_prefix(Pk,Pre).
 package_prefix(Pk,Pre):- is_lisp_package(Pk),atom_concat('pkg_',Package,Pk),atom_concat(Package,'_',Pre).
 
 

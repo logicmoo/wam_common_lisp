@@ -25,10 +25,14 @@ reader_intern_symbols(ExprS1,Expr):-
   reading_package(Package),!,
   reader_intern_symbols(Package,ExprS1,Expr),!.
 
-
 reader_intern_symbols(Package,SymbolName,Symbol):-
    atom(SymbolName),atom_symbol(SymbolName,Package,Symbol),!.
 reader_intern_symbols(_Package,Some,Some):- \+ compound(Some),!.
+reader_intern_symbols(Package,ExprI,ExprO):- ExprI=..[F,C|Expr],F=='$OBJ',
+  find_kind(C,K),
+  must_maplist(reader_intern_symbols(Package),Expr,TT),ExprO=..[F,K|TT].
+reader_intern_symbols(Package,ExprI,ExprO):- ExprI=..[F|Expr],atom_concat('$',_,F),!,
+  must_maplist(reader_intern_symbols(Package),Expr,TT),ExprO=..[F|TT].
 reader_intern_symbols(Package,[S|Some],[SR|SomeR]):- 
   reader_intern_symbols(Package,S,SR),
   reader_intern_symbols(Package,Some,SomeR).
@@ -46,7 +50,7 @@ atom_symbol(SymbolName,_,Obj):- cl_type_of(SymbolName,X)->X\==t,SymbolName=Obj.
 atom_symbol(SymbolName,Package,Symbol):-
   string_upper(SymbolName,SymbolNameU), 
   string_list_concat([SymbolName1|SymbolNameS],":",SymbolNameU),
-  atom_symbol_s(SymbolName1,SymbolNameS,Package,Symbol),!.
+  must_or_rtrace(atom_symbol_s(SymbolName1,SymbolNameS,Package,Symbol)),!.
 
 
 % :KEYWORD

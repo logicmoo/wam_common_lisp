@@ -18,10 +18,12 @@
 
 :- include('header.pro').
 
+% (defparameter cl::*error-output* (make-synonym-stream 'wam-cl::*stderr* ))
+cl_make_synonym_stream(Name,Ret):-
+  create_struct(claz_synonym_stream,[symbol=Name],Ret).
+
+
 :- fixup_exports.
-
-
-
 end_of_file.
 
 

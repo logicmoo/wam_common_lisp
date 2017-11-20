@@ -396,7 +396,7 @@ sexpr('$CHAR'(C))                 --> `#\\`,!,sym_or_num(C), swhite.
 sexpr('#-'(C,O)) --> `#-`,sexpr(C),swhite,sexpr(O),!.
 sexpr('#+'(C,O)) --> `#+`,sexpr(C),swhite,sexpr(O),!.
 sexpr('$OBJ'(claz_pathname,C)) --> `#P`,sexpr(C),swhite,!.
-sexpr('#S'(C)) --> `#S`,sexpr(C),swhite,!.
+sexpr('$S'(C)) --> `#S`,sexpr(C),swhite,!.
 sexpr('$OBJ'(claz_bitvector,C)) --> `#*`,radix_digits(2,C),swhite,!.
 
 sexpr(function(E))                 --> `#\'`, sexpr(E), !. %, swhite.
@@ -631,6 +631,7 @@ to_untyped('$OBJ'(Ungly,S),'$OBJ'(Ungly,O)):-to_untyped(S,O),!.
 to_untyped('$OBJ'(Ungly,S),O):-to_untyped(S,SO),!,O=..[Ungly,SO].
 to_untyped('$NUMBER'(S),O):-nonvar(S),to_number(S,O),to_untyped(S,O),!.
 to_untyped('$NUMBER'(S),'$NUMBER'(S)):-!. 
+
 % to_untyped([[]],[]):-!.
 to_untyped('$STR'(Expr),Forms):- (text_to_string_safe(Expr,Forms);to_untyped(Expr,Forms)),!.
 to_untyped('$STRING'(Expr),Forms):- (text_to_string_safe(Expr,Forms);to_untyped(Expr,Forms)),!.
@@ -638,6 +639,8 @@ to_untyped(['#'(Backquote),Rest],Out):- Backquote == backquote, !,to_untyped(['#
 to_untyped(['#'(S)|Rest],OOut):- nonvar(S), is_list(Rest),must_maplist(to_untyped,[S|Rest],[F|Mid]), 
           ((atom(F),t_l:s2p(F))-> Out=..[F|Mid];Out=[F|Mid]),
           to_untyped(Out,OOut).
+to_untyped(ExprI,ExprO):- ExprI=..[F|Expr],atom_concat('$',_,F),must_maplist(to_untyped,Expr,TT),ExprO=..[F|TT].
+
 % to_untyped([H|T],Forms):-is_list([H|T]),must(text_to_string_safe([H|T],Forms);maplist(to_untyped,[H|T],Forms)).
 to_untyped([H|T],[HH|TT]):-!,must_det_l((to_untyped(H,HH),to_untyped(T,TT))).
 to_untyped(ExprI,ExprO):- must(ExprI=..Expr),

@@ -163,9 +163,10 @@ mize_body1(_Ctx,_,C1,C1):- \+ compound(C1),!.
 mize_body1(Ctx,F,(C1,C2),CodeJoined):-!,mize_body1(Ctx,F,C1,C1O),mize_body1(Ctx,F,C2,C2O),conjoin_0(C1O,C2O,CodeJoined).
 mize_body1(Ctx,F,C1,C2):- is_list(C1),must_maplist(mize_body1(Ctx,F),C1,C2).
 mize_body1(Ctx,_,symbol_value(_Env, Sym, Sym_Get),Was=Sym_Get):- 
-  lisp_compiler_option(safe(elim_symbolvalues_vars),true), fail,
+  % lisp_compiler_option(safe(elim_symbolvalues_vars),true), fail,
   get_var_tracker(Ctx,Sym,Dict),
-  Dict.w<2,
+  Dict.w==1,
+  Dict.r>0,
   Dict.vars=[Was|_],
   must(Was=Sym_Get).
 

@@ -167,7 +167,7 @@ lisp_operator(S):-is_special_op(S,P),currently_visible_package(P).
 %lisp_operator(S):-is_special_op(S,_P).
 
 
-is_special_op(S,P):- get_opv(S,kw_compile_as,operator),get_opv(S,package,P).
+is_special_op(S,P):- get_opv(S,kw_compile_as,kw_operator),get_opv(S,package,P).
 is_special_op('%%allocate-closures', pkg_sbc).
 is_special_op('%cleanup-fun', pkg_sbc).
 is_special_op('%escape-fun', pkg_sbc).

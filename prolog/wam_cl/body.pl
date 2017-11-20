@@ -100,6 +100,10 @@ compile_body(_Cx,_Ev,SelfEval,SelfEval,true):- notrace(is_self_evaluationing_obj
 
 % numbers
 compile_body(_Ctx,_Env,Value,Atom,true):- atom(Atom),atom_number_exta(Atom,Value),!.
+% string
+compile_body(_Ctx,_Env,Atom,'$STRING'(Atom),true).
+% #S
+compile_body(_Ctx,_Env,Result,'$S'([Type|Args]),create_struct([Type|Args],Result)).
 
 atom_number_exta(Atom,Value):- atom_number(Atom,Value).
 atom_number_exta(Atom,Value):- atom_concat('-.',R,Atom),atom_concat('-0.',R,NAtom),!,atom_number(NAtom,Value).

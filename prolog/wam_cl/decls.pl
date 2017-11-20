@@ -94,7 +94,7 @@ compile_macro(Ctx,CallEnv,Function,[Name0,FormalParms|FunctionBody0], CompileBod
    HeadDefCode,
    asserta(user:macro_lambda(defmacro(Name0),Function, FormalParms, [progn | FunctionBody],Alphas)),
    asserta((user:Head  :- BodyCode)),
-   set_opv(Symbol,kw_compile_as,operator),
+   set_opv(Symbol,kw_compile_as,kw_operator),
    set_opv(Symbol,function,Function),
    set_opv(Function,typeof,sys_macro),
    set_opv(Symbol,typeof,sys_macro),
@@ -124,7 +124,7 @@ compile_function(Ctx,Env,Function,[Name,FormalParms|FunctionBody0], CompileBody)
    asserta((user:Head  :-  BodyCode)),
    set_opv(Function,typeof,function),
    set_opv(Function,classof,claz_compiled_function),
-   set_opv(Symbol,kw_compile_as,function),
+   set_opv(Symbol,kw_compile_as,kw_function),
    set_opv(Symbol,function,Function),
    place_op(Env,setf, [symbol_function,Symbol], [Function],  SetfR)).
 

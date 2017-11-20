@@ -18,7 +18,7 @@
 
 env_toplevel(GlobalBindings):- must(nb_current('$env_toplevel',GlobalBindings)).
 
-:- nb_setval('$env_toplevel',[bv(tl,[])]).
+:- nb_linkval('$env_toplevel',[bv(tl,[])]).
 
 env_current(Env):- nb_current('$env_current',Env),!.
 env_current(Env):- env_toplevel(Env),nb_linkval('$env_current',Env),!.

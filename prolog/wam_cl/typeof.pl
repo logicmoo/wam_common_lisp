@@ -31,8 +31,8 @@ i_class(t,claz_symbol).
 i_class(Dict,Type):- is_dict(Dict,Type).
 i_class(Number,claz_integer):- integer(Number).
 i_class(Number,claz_float):- float(Number).
-i_class(Atom,Type):- atom(Atom),atomic_list_concat([Type,_Name],'_inst_',Atom).
-i_class(Obj,Type):- get_opv(Obj,classof,Type).
+i_class(Atom,Kind):- atom(Atom),atomic_list_concat([Type,_Name],'_znst_',Atom),atom_concat('claz_',Type,Kind).
+i_class(Obj,Type):- get_opv_i(Obj,classof,Type).
 i_class(function(_),clz_function).
 
 
@@ -45,8 +45,8 @@ i_type(Str,string):- string(Str).
 i_type(t,boolean).
 i_type(Obj,Type):- number(Obj),!,number_type_of(Obj,Type).
 i_type('$CHAR'(_),character).
-i_type(Atom,Type):- atom(Atom),atomic_list_concat([Type,_Name],'_inst_',Atom).
-i_type(Obj,Type):- get_opv(Obj,typeof,Type).
+i_type(Atom,Type):- atom(Atom),atomic_list_concat([Type,_Name],'_znst_',Atom).
+i_type(Obj,Type):- get_opv_i(Obj,typeof,Type).
 i_type(function(OP),Class):- get_opv(OP,function,Obj),cl_type_of(Obj,Class).
 
 type_ges(function(_),function).

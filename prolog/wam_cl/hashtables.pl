@@ -18,7 +18,7 @@
 
 :- include('header.pro').
 
-cl_make_hash_table(X):- new_opv(claz_hash_table,X).
+cl_make_hash_table(X):- create_struct(claz_hash_table,X).
   
 :- fixup_exports.
 

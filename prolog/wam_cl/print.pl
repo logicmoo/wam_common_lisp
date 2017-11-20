@@ -53,8 +53,10 @@ cl_format(Stream,Fmt,Arg1,Arg2,Arg3,t):-wdmsg(cl_format(Stream,Fmt,Arg1,Arg2,Arg
 cl_format(Stream,Fmt,Arg1,Arg2,Arg3,Arg4,t):-wdmsg(cl_format(Stream,Fmt,Arg1,Arg2,Arg3,Arg4,t)).
 
 cl_prin1(X,X):-copy_term(X,Y),writeExpression(Y),nl.
+cl_princ(X,X):-copy_term(X,Y),writeExpression(Y),nl.
 cl_print(X,X):-cl_prin1(X,X),nl.
 cl_terpri(t):-nl.
+cl_write_line(X,Y):-cl_princ(X,Y),nl.
 
 % writeExpression/1 displays a lisp expression
 
@@ -70,7 +72,7 @@ writeExpression(Expression):-
 	writeTokenL(TokenL).
 
 no_right_padding('(').
-no_right_padding(')').
+no_right_padding(')').            
 no_right_padding(X):-need_right_padding(X),!,fail.
 no_right_padding(Atom):- \+ atom(Atom),!,fail.
 no_right_padding(Atom):- \+ atom_length(Atom,1),!,fail.
@@ -92,7 +94,8 @@ writeTokenL([Token|TokenL]):- atomic(Token), \+ atom(Token),!,
    write(' '),
    writeTokenL(TokenL).
 writeTokenL([Token|TokenL]):-
-   atom(Token),write_atom_obj(Token),!,
+   atom(Token),
+   write_atom_obj(Token),!,
    write(' '),
    writeTokenL(TokenL).
 writeTokenL([Token|TokenL]):-
@@ -103,6 +106,9 @@ writeTokenL([Token|TokenL]):-
 
 
 write_atom_obj(Package):- package_name(Package,Name),!,write('#<PACKAGE '),write(Name),write('>').
+write_atom_obj(Atom):- atom(Atom),atomic_list_concat([Type,Named],'_znst_',Atom),
+   atomic_concat('claz_',Type,Kind),!,
+   write('#<'),write(Kind),write(' '),write(Named),write('>').
 write_atom_obj(Symbol):-  print_symbol(Symbol),!.
 
 

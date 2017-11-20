@@ -73,7 +73,7 @@ cl_make_symbol(SymbolName,Symbol):-
 
 create_symbol(String,Package,Symbol):-
    text_to_string(String,Name),
-   set_opv(Symbol,typeof,symbol),
+   must_or_rtrace(set_opv(Symbol,typeof,symbol)),
    set_opv(Symbol,classof,clz_symbol),
    set_opv(Symbol,name,Name),
    set_opv(Symbol,package,Package),!.
