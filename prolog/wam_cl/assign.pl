@@ -67,7 +67,7 @@ compile_assigns(Ctx,Env,Result,[Defvar, Var], Body):- is_def_nil(Defvar),!,
 
 compile_assigns(Ctx,Env,Result,[Getf, Var| ValuesForms], Body):- is_place_op(Getf),     
 	must_maplist(expand_ctx_env_forms(Ctx,Env),ValuesForms, ValuesBody,ResultVs),
-        list_to_conjuncts(ValuesBody,BodyS),
+        list_to_conjuncts([true|ValuesBody],BodyS),!,
         debug_var([Getf,'_R'],Result),
         debug_var([Getf,'_Env'],Env),
         (is_only_read_op(Getf)->rw_add(Ctx,Var,r);rw_add(Ctx,Var,w)),

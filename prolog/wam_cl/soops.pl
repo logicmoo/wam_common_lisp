@@ -212,8 +212,9 @@ get_opv(Obj,_,_):- string(Obj),!,fail.
 get_opv(Obj,Prop,Value):- no_repeats(Obj-Prop,get_opv_i(Obj,Prop,Value)).
 
 get_opv_i(quote, value, Value):- throw(get_opv_i(quote, value, Value)).
+get_opv_i(Obj,Prop,Value):- has_prop_value_getter(Obj,Prop,Getter),!,call(Getter,Obj,Prop,Value).
 get_opv_i(Obj,Prop,Value):- soops:o_p_v(Obj,Prop,Value).
-get_opv_i(Obj,Prop,Value):- Prop\==classof,Prop\==typeof,
+get_opv_i(Obj,Prop,Value):- Prop\==classof,Prop\==typeof,Prop\==value,
   get_obj_pred(Obj,Prop,Pred),
   call(Pred,Obj,Value).
 
@@ -268,10 +269,30 @@ delete_opvalues(Obj,Prop):-
    OPred=..[Pred,Obj,_],forall(clause(OPred,true,Ref),erase(Ref)))).
 
 
+:- dynamic(symbol_set_get/3).
+:- multifile(symbol_set_get/3).
+:- dynamic(has_prop_value_setter/3).
+:- multifile(has_prop_value_setter/3).
+:- dynamic(has_prop_value_getter/3).
+:- multifile(has_prop_value_getter/3).
 
+symbol_set_get(sys_xx_stdin_xx,claz_prolog_output_stream,set_input,current_input).
+
+has_prop_value_setter(Symbol,value,prolog_direct(Setter/1)):- symbol_set_get(Symbol,Setter,_Getter).
+has_prop_value_setter(sys_xx_stdout_xx,value,prolog_direct(set_output/1)).
+
+has_prop_value_getter(Symbol,value,prolog_direct(Getter/1)):- symbol_set_get(Symbol,_Setter,Getter).
+has_prop_value_getter(sys_xx_stdout_xx,value,prolog_direct(current_output/1)).
+%has_prop_value_setter(sys_xx_stderr_xx,value,prolog_direct(set_error/1)).
+%has_prop_value_getter(sys_xx_stderr_xx,value,prolog_direct(current_error/1)).
+
+prolog_direct(Pred/1,_Obj,_Prop,Value):- call(Pred,Value).
+prolog_direct(Pred/2,Obj,_Prop,Value):- call(Pred,Obj,Value).
+prolog_direct(Pred/3,Obj,Prop,Value):- call(Pred,Obj,Prop,Value).
    
 update_opv(Obj,Prop,Value):- set_opv(Obj,Prop,Value).
 
+set_opv(Obj,Prop,Value):- has_prop_value_setter(Obj,Prop,Setter),!,call(Setter,Obj,Prop,Value).
 set_opv(Obj,Prop,Value):- delete_opvalues(Obj,Prop),add_opv(Obj,Prop,Value).
 
 :- dynamic(is_obj_type/1).

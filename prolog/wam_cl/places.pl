@@ -17,17 +17,22 @@
 :- include('header.pro').
 :- ensure_loaded((utils_for_swi)).
 
+value_or([Value],Value,_):- !.
+value_or([],Value,Value).
 
+place_op(_Env,getf, Obj, Place,  Result):- 
+  value_or(Place,Prop,value),
+  get_opv(Obj,Prop, Result).
+
+place_op(_Env,setf, Obj, Place,  Result):-  value_or(Place,Prop,value),
+  update_opv(Obj,Prop, Result),!.
 place_op(Env,setf, Place, [Result],  Result):- !,set_place_value(Env,Place, Result).
 
-place_op(Env,getf, Place, [Result],  Result):- !,get_place_value(Env,Place, Result).
-
-place_op(Env,incf, Var, [Value],  Result):- !,
+place_op(Env,incf, Var, LV,  Result):- value_or(LV,Value,1),
    get_place_value(Env,Var, Old),
-   Result is Old+Value,
+   Result is Old+ Value,
    set_place_value(Env,Var, Result).
-
-place_op(Env,decf, Var, [Value],  Result):- 
+place_op(Env,decf, Var, LV,  Result):- value_or(LV,Value,1),
    get_place_value(Env,Var, Old),
    Result is Old-Value,
    set_place_value(Env,Var, Result).
