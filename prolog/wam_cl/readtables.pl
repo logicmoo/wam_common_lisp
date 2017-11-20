@@ -19,6 +19,8 @@
 :- include('header.pro').
 
 
+f_u_make_read_table(Out):-create_struct(read_table,Out).
+  
 
 % reader_intern_symbols(ExprS1,ExprS1):- current_prolog_flag(no_symbol_fix,true),!.
 reader_intern_symbols(ExprS1,Expr):-

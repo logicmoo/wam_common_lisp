@@ -50,8 +50,8 @@ do_defpackage(AName,List,Package):-
   asserta(package_name(Package,Name)),
   init_slot_props(claz_package,2,Package,List), 
   string_upper(Name,UName),
-  (Name==UName -> true ; add_kw_opv(Package,kw_nicknames,UName)),
-  instance_opv(Package,claz_package,[]).
+  (Name==UName -> true ; add_kw_opv(Package,kw_nicknames,UName)).
+  %instance_opv(Package,claz_package,[]).
 
 cl_find_package(S,Obj):- find_package(S,Package),!,must(as_package_object(Package,Obj)).
 cl_find_package(_,[]).

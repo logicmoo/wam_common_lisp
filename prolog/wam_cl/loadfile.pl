@@ -176,7 +176,7 @@ write_trans(P):- dbmsg(P).
 lisp_compile_to_prolog_pass1(_Expression):- source_location(_,_),!.
 lisp_compile_to_prolog_pass1(SExpression):- 
   reader_intern_symbols(SExpression,FExpression),
-  %(SExpression==FExpression -> true ; dbmsg(:- lisp_compile(FExpression))),  
+  
    Expression = FExpression, 
    debug_var('_Ignored',Result),
    lisp_compile(Result,Expression,PrologCode),

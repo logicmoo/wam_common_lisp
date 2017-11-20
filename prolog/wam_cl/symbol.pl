@@ -17,31 +17,30 @@
 :- include('header.pro').
 
 
-cl_symbol_name(Symbol,Name):- get_opv(Symbol,name,Name),!.
-cl_symbol_package(Symbol,Package):- get_opv(Symbol,package,Package),!.
-cl_symbol_value(Symbol,Value):- do_or_die(get_opv(Symbol,value,Value)),!.
+cl_symbol_name(Symbol,Name):- package_external_symbols(pkg_kw,Name,Symbol)->true;get_opv(Symbol,name,Name).
+cl_symbol_package(Symbol,Package):- is_keywordp(Symbol)->Package=pkg_kw;get_opv(Symbol,package,Package).
+cl_symbol_value(Symbol,Value):- is_keywordp(Symbol)->Symbol=Value;do_or_die(get_opv(Symbol,value,Value)).
 cl_symbol_function(Symbol,Function):- do_or_die(get_opv(Symbol,function,Function)),!.
 do_or_die(G):- G->true;throw(do_or_die(G)).
 
-is_constantp(Symbol):- get_opv(Symbol,kw_deftype,defconstant),!.
-is_constantp(Symbol):- get_opv(Symbol,package,pkg_kw),!.
-is_constantp(Object):- is_self_evaluationing_const(Object),!.
 
 
-
-cl_symbolp(S,R):-  t_or_nil(is_symbolp(S),R).
-cl_keywordp(S,R):-  t_or_nil(is_keywordp(S),R).
-cl_constantp(S,R):- t_or_nil(is_constantp(S),R).
-cl_boundp(Sym,R):- t_or_nil(get_opv(Sym,value,_),R).
-cl_fboundp(Sym,R):- t_or_nil(get_opv(Sym,function,_),R).
+cl_boundp(Symbol,TF):-  t_or_nil(is_boundp(Symbol),TF).
+cl_constantp(Symbol,TF):- t_or_nil(is_constantp(Symbol),TF).
+cl_fboundp(Symbol,TF):-  t_or_nil(is_fboundp(Symbol),TF).
+cl_keywordp(Symbol,TF):-  t_or_nil(is_keywordp(Symbol),TF).
+cl_symbolp(Symbol,TF):-  t_or_nil(is_symbolp(Symbol),TF).
 
 cl_gensym(Symbol):- cl_gensym("G",Symbol).
 cl_gensym(String,Symbol):- gensym(String,SymbolName),cl_make_symbol(SymbolName,Symbol).
 
 
-is_symbolp(Symbol):- get_opv(Symbol,classof,clz_symbol).
+is_boundp(Symbol):- is_keywordp(Symbol);get_opv(Symbol,value,_).
+is_constantp(Object):- is_self_evaluationing_const(Object);get_opv(Object,defined_as,defconstant).
+is_fboundp(Symbol):- get_opv(Symbol,function,_).
+is_keywordp(Symbol):- package_external_symbols(pkg_kw,_,Symbol).
+is_symbolp(Symbol):- is_keywordp(Symbol);get_opv(Symbol,classof,clz_symbol).
 
-is_keywordp(Symbol):- get_opv(Symbol,package,pkg_kw),!.
 %is_keywordp(Symbol):- atom(Symbol),sanity((must(\+ atom_concat(':',_,Symbol)))),!,fail.
 
 
@@ -71,9 +70,10 @@ cl_make_symbol(SymbolName,Symbol):-
    gensym(ProposedName,Symbol),
    create_symbol(SymbolName,[],Symbol).
 
+
+create_symbol(String,pkg_kw,Symbol):-!,create_keyword(String,Symbol).
 create_symbol(String,Package,Symbol):-
    text_to_string(String,Name),
-   must_or_rtrace(set_opv(Symbol,typeof,symbol)),
    set_opv(Symbol,classof,clz_symbol),
    set_opv(Symbol,name,Name),
    set_opv(Symbol,package,Package),!.
@@ -82,8 +82,6 @@ create_keyword(Name,Symbol):- atom_concat(':',Make,Name),!,create_keyword(Make,S
 create_keyword(Name,Symbol):- string_upper(Name,String),
    prologcase_name(String,Lower),
    atom_concat('kw_',Lower,Symbol),
-   create_symbol(String,pkg_kw,Symbol),
-   update_opv(Symbol,typeof,keyword),
    assert_if_new(package:package_external_symbols(pkg_kw,String,Symbol)).
 
 
@@ -98,7 +96,7 @@ create_keyword(Name,Symbol):- string_upper(Name,String),
 print_symbol(Symbol):- 
    writing_package(Package),
    print_symbol_at(Symbol,Package),!.
-print_symbol(S):-write(S).
+print_symbol(Symbol):-write(Symbol).
  
 print_symbol_at(Symbol,PrintP):- 
   cl_symbol_package(Symbol,SPackage),!,
@@ -113,15 +111,15 @@ print_symbol_from(Symbol,PrintP,SPackage):-
     print_prefixed_symbol(Name,PrintP,SPackage,IntExt)).
 
 print_package_or_hash([]):- write("#").
-print_package_or_hash(P):- package_name(P,S),write(S).
+print_package_or_hash(P):- package_name(P,Symbol),write(Symbol).
 print_package_or_hash(P):- write(P).
 
-print_prefixed_symbol(S,_WP,pkg_kw,_):- write(':'),write(S).
-print_prefixed_symbol(S,PrintP,SP,_):- SP==PrintP, !,write(S).
-print_prefixed_symbol(S,_P,SP,kw_internal):-!, print_package_or_hash(SP),write('::'),write(S).
-print_prefixed_symbol(S,PrintP,SP,kw_external):- package_use_list(PrintP,SP),!,write(S).
-print_prefixed_symbol(S,_P,SP,kw_external):- !, print_package_or_hash(SP),write(':'),write(S).
-print_prefixed_symbol(S,_,SP,_):- print_package_or_hash(SP),write('::'),write(S).
+print_prefixed_symbol(Symbol,_WP,pkg_kw,_):- write(':'),write(Symbol).
+print_prefixed_symbol(Symbol,PrintP,SP,_):- SP==PrintP, !,write(Symbol).
+print_prefixed_symbol(Symbol,_P,SP,kw_internal):-!, print_package_or_hash(SP),write('::'),write(Symbol).
+print_prefixed_symbol(Symbol,PrintP,SP,kw_external):- package_use_list(PrintP,SP),!,write(Symbol).
+print_prefixed_symbol(Symbol,_P,SP,kw_external):- !, print_package_or_hash(SP),write(':'),write(Symbol).
+print_prefixed_symbol(Symbol,_,SP,_):- print_package_or_hash(SP),write('::'),write(Symbol).
 
 
 

@@ -163,17 +163,17 @@ env_sym_arg_val(Env,Var,InValue,Value):- !,
 %TODO Make it a constantp
 symbol_setter(Env,defconstant, Var, Result):- 
    set_symbol_value(Env,Var,Result),
-   set_opv(Var,kw_deftype,defconstant).
+   set_opv(Var,declared_as,defconstant).
 symbol_setter(Env,defconst, Var, Result):- 
   symbol_setter(Env,defconstant, Var, Result).
 
 symbol_setter(Env,defparameter, Var, Result):- 
-   set_opv(Var,kw_deftype,defparameter),
+   set_opv(Var,declared_as,defparameter),
    set_symbol_value(Env,Var,Result).
 
 symbol_setter(_Env,defvar, Var, Result):-   
    (get_opv(Var, value, _) -> true ; update_opv(Var, value, Result)),
-   set_opv(Var,kw_deftype,defvar).
+   set_opv(Var,declared_as,defvar).
 
 symbol_setter(Env,setq, Var, Result):- !, set_symbol_value(Env,Var,Result).
 

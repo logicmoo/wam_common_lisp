@@ -29,15 +29,15 @@ lisp_compiled_eval(SExpression):-
 
 lisp_compiled_eval(SExpression,Result):-
   notrace(as_sexp(SExpression,Expression)),
-  dbmsg(lisp_compile(Expression)),
+  dbmsg(lisp_compiled_eval(Expression)),
   lisp_compile(Result,Expression,Code),
   dbmsg(Code),
   must_or_rtrace(call(Code)),!.
 
-lisp_compile(SExpression):- source_location(_,_),!,dbmsg((:-lisp_compile(SExpression))).
+%lisp_compile(SExpression):- source_location(_,_),!,dbmsg((:-lisp_compile(SExpression))).
 lisp_compile(SExpression):-
   notrace(as_sexp(SExpression,Expression)),
-  dbmsg(lisp_compiled_eval(Expression)),
+  dbmsg(lisp_compile(Expression)),
   lisp_compile(Expression,Code),!,
   dbmsg(Code).
 

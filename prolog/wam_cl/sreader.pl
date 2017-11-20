@@ -404,7 +404,7 @@ sexpr('$OBJ'(claz_vector,V))                 --> `#(`, !, sexpr_vector(V,`)`),!,
 
 sexpr(Number) --> `#`,integer(Radix),ci(`r`),!,radix_number(Radix,Number0),extend_radix(Radix,Number0,Number).
 sexpr('$ARRAY'(Dims,V)) --> `#`,integer(Dims),ci(`a`),!,sexpr(V).
-sexpr(V)                    --> `#.`, !,sexpr(C),{eval(C,V)}.
+sexpr(V)                    --> `#.`, !,sexpr(C),{reader_intern_symbols(C,M),lisp_compiled_eval(M,V)}.
 sexpr('#'(E))              --> `#:`, !, rsymbol('#:',E), swhite.
 
 sexpr(OBJ)--> ugly_sexpr(OBJ),!.
