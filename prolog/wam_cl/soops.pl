@@ -173,9 +173,11 @@ get_szlot(Prefix,Type,Key,SlotInfo):-
   atom_concat(Prefix,SlotInfo0,SlotInfo1),
   SlotInfo=..[SlotInfo1|Params].
    
-  
+cleanup_mop:-  
+ ignore((struct_opv(X,subtypep,claz_object),struct_opv(X,subtypep,Y),Y\==claz_object,retract(struct_opv(X,subtypep,claz_object)),fail)),
+ ignore((struct_opv(X,subtypep,claz_t),struct_opv(X,subtypep,Y),Y\==claz_t,retract(struct_opv(X,subtypep,claz_t)),fail)).
 
-save_mop:- cleanup_mop,tell('ci.pro'),
+save_mop:- cleanup_mop,tell('ci3.pro'),
  forall(member(Assert,[struct_opv(_,P,_),struct_opv(_,P,_,_),struct_opv(_,P,_,_,_)]),
    forall(soops:Assert,
       ignore((P\==slot1,P\==has_slots,format('~q.~n',[Assert]))))), told.
