@@ -88,18 +88,19 @@ compile_macro(Ctx,CallEnv,Function,[Name0,FormalParms|FunctionBody0], CompileBod
    must_or_rtrace(maybe_get_docs(function,Function,FunctionBody0,FunctionBody,DocCode)),
    %reader_intern_symbols
    FunctionHead=[Function|FormalParms],
-   debug_var('Setf-symbol-function',SetfR),
-   CompileBody = (% asserta((Head  :- (fail, <<==(FunctionHead , FunctionBody)))),
+   set_opv(Function,classof,claz_macro),
+   set_opv(Symbol,compile_as,kw_operator),
+   set_opv(Symbol,function,Function),
+   within_labels_context(Symbol, make_compiled(Ctx,CallEnv,Symbol,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode)),
+   get_alphas(Ctx,Alphas),
+ CompileBody = (
    DocCode,
    HeadDefCode,
    asserta(user:macro_lambda(defmacro(Name0),Function, FormalParms, [progn | FunctionBody],Alphas)),
    asserta((user:Head  :- BodyCode)),
-   set_opv(Symbol,compile_as,kw_operator),
-   set_opv(Symbol,function,Function),   
    set_opv(Function,classof,claz_macro),
-   place_op(CallEnv,setf, [symbol_function,Symbol], [Function],  SetfR)),!,
-   within_labels_context(Symbol, make_compiled(Ctx,CallEnv,Symbol,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode)),
-   get_alphas(Ctx,Alphas).
+   set_opv(Symbol,compile_as,kw_operator),
+   set_opv(Symbol,function,Function)).
 
 
 cl_defun(Name,FormalParms,FunctionBody,Result):-
@@ -113,7 +114,6 @@ compile_function(Ctx,Env,Function,[Name,FormalParms|FunctionBody0], CompileBody)
    must_or_rtrace(find_function_or_macro_name(Ctx,Env,Symbol,_Len, Function)),
    must_or_rtrace(maybe_get_docs(function,Function,FunctionBody0,FunctionBody,DocCode)),
    FunctionHead=[Function|FormalParms],
-   debug_var('Setf-symbol-function',SetfR),
    within_labels_context(Symbol, make_compiled(Ctx,Env,Symbol,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode)),
  CompileBody = (
    DocCode,
@@ -122,8 +122,7 @@ compile_function(Ctx,Env,Function,[Name,FormalParms|FunctionBody0], CompileBody)
    asserta((user:Head  :-  BodyCode)),
    set_opv(Function,classof,claz_compiled_function),
    set_opv(Symbol,compile_as,kw_function),
-   set_opv(Symbol,function,Function),
-   place_op(Env,setf, [symbol_function,Symbol], [Function],  SetfR)).
+   set_opv(Symbol,function,Function)).
 
 make_compiled(Ctx,_UnusedEnv,Symbol,FunctionHead,FunctionBody,Head,HeadDefCode,(BodyCode)):-
     expand_function_head(Ctx,CallEnv,FunctionHead, Head, HeadEnv, HResult,HeadDefCode,HeadCode),

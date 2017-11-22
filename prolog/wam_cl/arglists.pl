@@ -228,7 +228,7 @@ reserved_symbols(_Names,_PVars).
 as_rest(_,R,R).
 as_env(_,E,E).
 
-enforce_atomic(F):- (simple_atom_var(F)->true;(lisp_dumpST,break)).
+enforce_atomic(F):- (simple_atom_var(F)->true;(lisp_dump_break)).
 arginfo_incr(Prop,ArgInfo):- get_dict(Prop,ArgInfo,Old),New is Old +1, b_set_dict(Prop,ArgInfo,New).
 arginfo_set(Prop,ArgInfo,New):- nb_set_dict(Prop,ArgInfo,New).
 
@@ -350,8 +350,7 @@ compile_init(Var,FinalResult,[InitForm],
     lisp_compile(Result,InitForm,Code),!.
 compile_init(Var,FinalResult,[InitForm|_More],
   (set_symbol_value_if_missing('$env',Var,FinalResult,Code,Result))):- 
-    lisp_dumpST,
-    break,
+    lisp_dump_break,
     lisp_compile(Result,InitForm,Code).
    
 % [name, 'package-designator', '&optional', [error, t]]

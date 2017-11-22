@@ -26,14 +26,14 @@ i_class('$OBJ'(Type,_Data),Type).
 i_class('$CHAR'(_),claz_character).
 % atomics
 i_class([],claz_null):-!.
-i_class(Str,clz_string):- string(Str).
+i_class(Str,claz_string):- string(Str).
 i_class(t,claz_symbol).
 i_class(Dict,Type):- is_dict(Dict,Type).
 i_class(Number,claz_integer):- integer(Number).
 i_class(Number,claz_float):- float(Number).
 i_class(Atom,Kind):- atom(Atom),atomic_list_concat([Type,_Name],'_znst_',Atom),atom_concat('claz_',Type,Kind).
 i_class(Obj,Type):- get_opv_i(Obj,classof,Type).
-i_class(function(_),clz_function).
+i_class(function(_),claz_function).
 
 
 i_type(Var,sys_locative):-var(Var).
@@ -54,7 +54,7 @@ type_ges(Obj,Type):- compound(Obj),functor(Obj,Type,_).
 type_ges(Atom,Type):- atom(Atom),atomic_list_concat([Prefix|Rest],'_',Atom),prefix_to_typeof(Prefix,Rest,Atom,Type),!.
 
 
-type_or_class_nameof(Obj,Name):- cl_class_of(Obj,Type),type_named(Type,Name),atom(Name).
+type_or_class_nameof(Obj,Name):- quietly((cl_class_of(Obj,Type),type_named(Type,Name),atom(Name))).
 
 type_named('$OBJ'(_,Type),Type):- atom(Type),!.
 type_named(Type,Type):- atomic(Type).

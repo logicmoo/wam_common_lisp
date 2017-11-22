@@ -19,20 +19,23 @@
 
 value_or([Value],Value,_):- !.
 value_or([],Value,Value).
+                                  
+%place_op(Env,PlOP,[Place,Obj],[],Result):- place_op(Env,PlOP,Obj,[Place],Result).
 
-place_op(_Env,getf, Obj, Place,  Result):- 
-  value_or(Place,Prop,value),
-  get_opv(Obj,Prop, Result).
+%place_op(Env,PlOP,Obj,Value,Result):- var(Env),ensure_env(Env), \+ var(Env),!, place_op(Env,PlOP,Obj,Value,Result).
 
-place_op(_Env,setf, Obj, Place,  Result):-  value_or(Place,Prop,value),
-  update_opv(Obj,Prop, Result),!.
-place_op(Env,setf, Place, [Result],  Result):- !,set_place_value(Env,Place, Result).
+place_op(Env,getf, Obj,[Result],  Result):-
+   get_place_value(Env,Obj, Result),!.
 
-place_op(Env,incf, Var, LV,  Result):- value_or(LV,Value,1),
+place_op(Env,setf, Obj, [Result],  Result):- 
+   set_place_value(Env,Obj, Result),!.
+
+place_op(Env,incf, Var, LV,  Result):- value_or(LV,Value,1),!,
    get_place_value(Env,Var, Old),
    Result is Old+ Value,
    set_place_value(Env,Var, Result).
-place_op(Env,decf, Var, LV,  Result):- value_or(LV,Value,1),
+
+place_op(Env,decf, Var, LV,  Result):- value_or(LV,Value,1),!,
    get_place_value(Env,Var, Old),
    Result is Old-Value,
    set_place_value(Env,Var, Result).

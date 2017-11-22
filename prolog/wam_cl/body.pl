@@ -30,11 +30,11 @@ must_compile_closure_body(Ctx,Env,Result,Function, Body):-
 % Expands a Lisp-like function body into its Prolog equivalent
 
 must_compile_body(Ctx,Env,Result,Function, Body):-
-  maybe_debug_var('_rCtx',Ctx),
+  notrace((maybe_debug_var('_rCtx',Ctx),
   maybe_debug_var('_rEnv',Env),
   maybe_debug_var('_rResult',Result),
   maybe_debug_var('_rForms',Function),
-  maybe_debug_var('_rBody',Body),
+  maybe_debug_var('_rBody',Body))),
   must_or_rtrace(compile_body(Ctx,Env,Result,Function, Body)),
   % nb_current('$compiler_PreviousResult',THE),setarg(1,THE,Result),
   !.
@@ -157,17 +157,20 @@ compile_body(_Cx,Env,Result,['$BQ',Form], Code):-!,compile_bq(Env,Result,Form,Co
 compile_body(_Cx,Env,Result,['`',Form], Code):-!,compile_bq(Env,Result,Form,Code).
 
 % #+
-compile_body(Ctx,Env,Result,[OP,Flag,Form], Code):- same_symbol(OP,'#+'),!, symbol_value(xx_features_xx,FEATURES),
-   (member(Flag,FEATURES) -> must_compile_body(Ctx,Env,Result,Form, Code) ; Code = true).
+compile_body(Ctx,Env,Result,[OP,Flag,Form|MORE], Code):- same_symbol(OP,'#+'),!, 
+   must_or_rtrace(( symbol_value(xx_features_xx,FEATURES),
+          ( member(Flag,FEATURES) -> must_compile_body(Ctx,Env,Result,Form, Code) ; compile_body(Ctx,Env,Result,MORE, Code)))).
   
 % #-
-compile_body(Ctx,Env,Result,[OP,Flag,Form], Code):- same_symbol(OP,'#-'),!, symbol_value(xx_features_xx,FEATURES),
-   (\+ member(Flag,FEATURES) -> must_compile_body(Ctx,Env,Result,Form, Code) ; Code = true).
+compile_body(Ctx,Env,Result,[OP,Flag,Form|MORE], Code):- same_symbol(OP,'#-'),!,
+   must_or_rtrace(( symbol_value(xx_features_xx,FEATURES),
+          ( \+ member(Flag,FEATURES) -> must_compile_body(Ctx,Env,Result,Form, Code) ; 
+             compile_body(Ctx,Env,Result,MORE, Code)))).
 
 % EVAL-WHEN
 compile_body(Ctx,Env,Result,[OP,Flags|Forms], Code):-  same_symbol(OP,'eval-when'), !,
- ((member(X,Flags),is_when(X) )
-  -> must_compile_body(Ctx,Env,Result,[progn,Forms], Code) ; Code = true).
+ must_or_rtrace(((member(X,Flags),is_when(X) )
+  -> must_compile_body(Ctx,Env,Result,[progn,Forms], Code) ; Code = true)).
 
 
 compile_body(Ctx,Env,Result, Body, Code):- 
@@ -317,6 +320,7 @@ compile_body(Ctx,_Env,Result,POrSTerm, Body):- p_or_s(POrSTerm,function,[[lambda
       debug_var('LArgs',LambdaArgs),
       debug_var('LResult',ClosureResult),
       debug_var('LEnv',ClosureEnvironment),
+   debug_var('Function',Result),
    Result = closure(ClosureEnvironment,ClosureResult,LambdaArgs,ClosureBody),
    Body = true.
 
@@ -326,6 +330,7 @@ compile_body(Ctx,Env,Result,[lambda,LambdaArgs|LambdaBody], Body):-
 	must_compile_closure_body(Ctx,ClosureEnvironment,ClosureResult,[progn|LambdaBody],  ClosureBody),
    debug_var('LArgs',LambdaArgs),
    debug_var('LResult',ClosureResult),
+   debug_var('Lambda',Result),
    debug_var('ClosureEnvironment',ClosureEnvironment),
    Body =
      (Result = closure([ClosureEnvironment|Env],ClosureResult,LambdaArgs,ClosureBody)).
@@ -337,6 +342,8 @@ compile_body(_Cx,_Ev,function(Function),POrSTerm, true):- p_or_s(POrSTerm,functi
 % (closure ...)
 compile_body(_Ctx,_Env,Result,POrSTerm,Body):- 
    p_or_s(POrSTerm,closure,[ClosureEnvironment,ClosureResult,LambdaArgs,ClosureBody]),
+   debug_var('Closure',Result),
+   debug_var('ClosureResult',ClosureResult),
    Body =
      (Result = closure(ClosureEnvironment,ClosureResult,LambdaArgs,ClosureBody)).
         

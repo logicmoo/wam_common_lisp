@@ -65,8 +65,10 @@
 :- discontiguous(ssip_define/2).
 
 :- ensure_loaded('arglists.pl').
+:- ensure_loaded('array.pl').
 :- ensure_loaded('assign.pl').
 :- ensure_loaded('backquote.pl').
+:- ensure_loaded('reader_macros.pl').
 :- ensure_loaded('block.pl').
 :- ensure_loaded('body.pl').
 :- ensure_loaded('callp.pl').
@@ -97,6 +99,7 @@
 :- ensure_loaded('tagbody.pl').
 :- ensure_loaded('tests.pl').
 :- ensure_loaded('typeof.pl').
+
 /*
 :- ensure_loaded('utils_for_swi.pl').
 :- ensure_loaded('utils_higher_order.pl').

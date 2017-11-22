@@ -36,13 +36,19 @@ prims:cl_exact.
 
 % Numbers, pathnames, and arrays are examples of self-evaluating objects.
 is_self_evaluationing_object(X):- var(X),!.
+is_self_evaluationing_object(X):- atomic(X),!,is_self_evaluationing_const(X).
 is_self_evaluationing_object('$OBJ'(_,_)):-!.
 is_self_evaluationing_object('$CHAR'(_)):-!.
-is_self_evaluationing_object(X):- atomic(X),!,is_self_evaluationing_const(X).
 
 is_self_evaluationing_object(X):- (is_dict(X);is_array(X);is_rbtree(X)),!.
 
-is_self_evaluationing_const(X):- atomic(X),!,(X==t;X==[];number(X);is_keywordp(X);string(X);(blob(X,T),T\==text)),!.
+is_self_evaluationing_const(X):- atomic(X),is_self_evaluationing_const0(X),!.
+is_self_evaluationing_const0(X):- (X==t;X==[];number(X);is_keywordp(X);string(X);(blob(X,T),T\==text)),!.
+is_self_evaluationing_const0(X):- is_functionp(X).
+
+is_functionp(X):- \+ atom(X),!,fail.
+is_functionp(X):- atom_concat('f_',_,X),!.
+is_functionp(X):- atom_concat('cl_',_,X),!.
 
 %:- dynamic(op_replacement/2).
 user:op_replacement(first,cl_car).
@@ -69,7 +75,7 @@ cl_cons(Item,
  List, Result):-
 	Result = [Item|List].
 
-
+cl_append(A,B,R):- append(A,B,R),!.
 
 cl_list(List,List).
 

@@ -62,7 +62,7 @@ find_package('$OBJ'(package,UP),Package):-!,find_package(UP,Package).
 find_package(S,S):- is_lisp_package(S),!.
 find_package(S,Package):- 
   as_string_upper(S,SN),
-  (package_name(Package,SN) ; package_nicknames(Package,SN)),!.
+  (package_name(Package,SN) ; get_opv_i(Package,nicknames,SN)),!.
 
 find_package_or_die(X,Y):- find_package(X,Y) -> true ; throw(find_package_or_die(X,Y)).  
 

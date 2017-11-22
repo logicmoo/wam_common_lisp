@@ -280,8 +280,10 @@ inline_body(Never,Ctx,F,(C1,C2),CodeJoined):-!,inline_body(Never,Ctx,F,C1,C1O),i
 inline_body(_Never,_Ctx,_,C1,Out):- 
   maybe_inline(C1), 
   term_variables(C1,MustHaveAll),
+  copy_term(C1,Before),
   get_inlined(C1,Out),
   term_variables(Out,NewVars),
+  C1=@=Before,
   subset(MustHaveAll,NewVars).
 inline_body(_Never,_Ctx,_,C1,C1):- \+ compound(C1),!.
 inline_body(Never,Ctx,_F,C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(inline_body(Never,Ctx,F),C1O,C2O),C2=..[F|C2O].
@@ -299,7 +301,7 @@ never_inline(P):- \+ callable(P),!.
 never_inline(P):- predicate_property(P,foreign).
 never_inline(P):- predicate_property(P,imported_from(system)).
 never_inline(P):- predicate_property(P,number_of_clauses(N)),N==0.
-never_inline(P):- compound(P),functor(P,F,C1),never_inline_fa(F,C1).
+never_inline(P):- compound(P),functor(P,F,A),never_inline_fa(F,A).
 never_inline_fa(place_op,_).
 never_inline_fa(F,_):- atom_concat(_,' tabled',F).
 never_inline_fa(F,_):- atom_concat('cl_',_,F).
@@ -311,8 +313,22 @@ never_inline_fa(member,_).
 never_inline_fa(as_rest,_).
 never_inline_fa(t_or_nil,_).
 
+always_inline(P):- never_inline(P),!,fail.
+always_inline(P):- compound(P),functor(P,F,A),always_inline_fa(F,A).
+always_inline(P):- clause(P,B)->(B==true;B=t_or_nil(_,_)).
+
+always_inline_fa(F,1):- atom_concat('addr_tagbody_',M,F),atom_contains(M,'_addr_enter_').
+
+
 lisp_compiler_option(safe(_),true).
 lisp_compiler_option(_,false).
+
+maybe_inline(C1):- always_inline(C1),
+  predicate_property(C1,interpreted),
+  predicate_property(C1,number_of_clauses(1)),
+  \+ clause_has_cuts(C1),
+  lisp_compiler_option(safe(inline),true),
+  !.
 
 maybe_inline(C1):- \+ never_inline(C1), 
   predicate_property(C1,interpreted),
@@ -320,6 +336,7 @@ maybe_inline(C1):- \+ never_inline(C1),
   \+ clause_has_cuts(C1),
   lisp_compiler_option(inline,true),
   !.
+
 
 clause_has_cuts(P):- clause(P,I),contains_var(!,I).
 

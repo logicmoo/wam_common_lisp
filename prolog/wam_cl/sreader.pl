@@ -280,7 +280,7 @@ file_sexpr(C) --> comment_expr(C),!.
 
 file_sexpr(Expr) --> sexpr(Expr),!.
 
-% file_sexpr(Expr,H,T):- lisp_dumpST,break,rtrace(phrase(file_sexpr(Expr), H,T)).
+% file_sexpr(Expr,H,T):- lisp_dump_break,rtrace(phrase(file_sexpr(Expr), H,T)).
 /*
 file_sexpr(Expr) --> {fail},
    sexpr_lazy_list_character_count(Location,Stream),
@@ -346,7 +346,7 @@ mkvar_w([H|T], Base, W0, W) :-
 
 
 ci([])--> !, [].
-ci([X|Xs]) --> !, alpha_to_lower(X),ci(Xs).
+ci([U|Xs]) --> !,{to_lower(U,X)},alpha_to_lower(X),ci(Xs).
   
 
 implode_threse_vars([N='$VAR'(N)|Vars]):-!, implode_threse_vars(Vars).
@@ -393,8 +393,8 @@ sexpr(E)                      --> `#`,read_dispatch(E).
 
 sexpr('#\\'(C))                   --> `#\\`,rsymbol('',C), swhite.
 sexpr('$CHAR'(C))                 --> `#\\`,!,sym_or_num(C), swhite.
-sexpr('#-'(C,O)) --> `#-`,sexpr(C),swhite,sexpr(O),!.
-sexpr('#+'(C,O)) --> `#+`,sexpr(C),swhite,sexpr(O),!.
+sexpr(['#-',K,O]) --> `#-`,sexpr(C),swhite,sexpr(O),!,{as_keyword(C,K)}.
+sexpr(['#+',K,O]) --> `#+`,sexpr(C),swhite,sexpr(O),!,{as_keyword(C,K)}.
 sexpr('$OBJ'(claz_pathname,C)) --> `#P`,sexpr(C),swhite,!.
 sexpr('$S'(C)) --> `#S`,sexpr(C),swhite,!.
 sexpr('$OBJ'(claz_bitvector,C)) --> `#*`,radix_digits(2,C),swhite,!.
@@ -429,11 +429,10 @@ sym_or_num(('-1-')) --> `-1-`,swhite,!.
 sym_or_num(('-1+')) --> `-1+`,swhite,!.
 sym_or_num(('+1+')) --> `+1-`,swhite,!.
 sym_or_num('$COMPLEX'(L)) --> `#C(`,!, swhite, sexpr_list(L), swhite.
-sym_or_num((E)) --> snumber(S),{number_string(E,S)}.
 %sym_or_num((E)) --> unsigned_number(S),{number_string(E,S)}.
 sym_or_num(('1+')) --> `1+`,swhite,!.
 sym_or_num(('1-')) --> `1-`,swhite,!.
-sym_or_num((E)) --> snumber(S),{number_string(E,S)}.
+sym_or_num((E)) --> lnumber(E),swhite,!.
 %sym_or_num((E)) --> unsigned_number(S),{number_string(E,S)}.
 sym_or_num(('#+')) --> `#+`,swhite,!.
 sym_or_num(('#-')) --> `#-`,swhite,!.
@@ -541,19 +540,26 @@ sym_string([]) --> [].
 string_vector([First|Rest]) --> sexpr(First), !, string_vector(Rest).
 string_vector([]) --> [], !.
 
-snumber([45|N]) --> `-`, unsigned_number(N).
-snumber([43|N]) --> `+`, unsigned_number(N).
-snumber(N) --> `+`, unsigned_number(N).
+% . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-unsigned_number([X|N]) -->  cdigit(X),unsigned_number0(N).
+oneof_ci(OneOf,[C])--> {member(C,OneOf)},ci([C]). 
+dcg_and2(DCG1,DCG2,S,E) :- phrase(DCG1,S,E),phrase(DCG2,S,E).
 
-unsigned_number0([69|N]) --> `E`,snumber(N).
-unsigned_number0([101|N]) --> `e`,snumber(N).
-unsigned_number0([X|N]) --> cdigit(X), unsigned_number0(N).
-unsigned_number0([]) --> [].
+enumber(N)--> lnumber(L),{to_untyped(L,N)}.
 
-cdigit(C) --> [C], {C >= 48, C =<57}.
-cdigit(46) --> `.`.
+lnumber('$EXP'(N,T,E))-->snumber(N),oneof_ci(`EsfdL`,TC),dcg_basics:integer(E),!,{name(T,TC)}.
+lnumber(N) --> snumber(N).
+lnumber(N) --> dcg_basics:number(N).
+
+snumber(N)--> `-`,unumber(S),{N is -S}.
+snumber(N)--> `+`,unumber(N).
+snumber(N)--> unumber(N).
+
+unumber(N) --> dcg_and2((dcg_basics:integer(_),`.`,dcg_basics:digits(_)),dcg_basics:float(N)),!.
+unumber(N) --> `.`,dcg_basics:digits(S),{number_codes(N,[48,46|S])},!.
+unumber(N) --> dcg_basics:integer(N),`.`,!.
+unumber(N) --> dcg_basics:integer(N).
+
 
 % . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -630,7 +636,11 @@ to_untyped('$OBJ'(S),'$OBJ'(O)):-to_untyped(S,O),!.
 to_untyped('$OBJ'(Ungly,S),'$OBJ'(Ungly,O)):-to_untyped(S,O),!.
 to_untyped('$OBJ'(Ungly,S),O):-to_untyped(S,SO),!,O=..[Ungly,SO].
 to_untyped('$NUMBER'(S),O):-nonvar(S),to_number(S,O),to_untyped(S,O),!.
-to_untyped('$NUMBER'(S),'$NUMBER'(S)):-!. 
+to_untyped('$NUMBER'(S),'$NUMBER'(u,S)):-!.
+to_untyped('$EXP'(I,'E',E),N):- notrace(catch(N is 0.0 + ((I * 10^E)),_,fail)),!.
+to_untyped('$EXP'(I,'f',E),N):- notrace(catch(N is 0.0 + ((I * 10^E)),_,fail)),!.
+to_untyped('$EXP'(I,T,E),'$NUMBER'(N,T)):- notrace(catch(N is (I * 10^E),_,fail)),!.
+to_untyped('$EXP'(I,T,E),'$EXP'(I,T,E)):-!.
 
 % to_untyped([[]],[]):-!.
 to_untyped('$STR'(Expr),Forms):- (text_to_string_safe(Expr,Forms);to_untyped(Expr,Forms)),!.

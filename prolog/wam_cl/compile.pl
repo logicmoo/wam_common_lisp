@@ -46,7 +46,7 @@ lisp_compile(Expression,Body):-
    lisp_compile(Result,Expression,Body).
 
 lisp_compile(Result,SExpression,Body):-
-   env_toplevel(Env),
+   debug_var('TLEnv',Env),
    lisp_compile(Env,Result,SExpression,Body).
 
 lisp_compile(Env,Result,Expression,Body):-
@@ -82,17 +82,18 @@ show_ctx_info3(Ctx):- fmt9(ctx=Ctx).
      
 
 % same_symbol(OP1,OP2):-!, OP1=OP2.
-same_symbol(OP1,OP2):- var(OP1),var(OP2),trace_or_throw(same_symbol(OP1,OP2)).
-same_symbol(OP1,OP2):- var(OP2),atom(OP1),!,same_symbol(OP2,OP1).
-same_symbol(OP2,OP1):- var(OP2),atom(OP1),!,prologcase_name(OP1,OP3),!,freeze(OP2,((atom(OP2),same_symbol(OP2,OP3)))).
-same_symbol(OP1,OP2):-
+same_symbol(OP1,OP2):- notrace(same_symbol0(OP1,OP2)).
+same_symbol0(OP1,OP2):- var(OP1),var(OP2),trace_or_throw(same_symbol(OP1,OP2)).
+same_symbol0(OP1,OP2):- var(OP2),atom(OP1),!,same_symbol(OP2,OP1).
+same_symbol0(OP2,OP1):- var(OP2),atom(OP1),!,prologcase_name(OP1,OP3),!,freeze(OP2,((atom(OP2),same_symbol(OP2,OP3)))).
+same_symbol0(OP1,OP2):-
   (atom(OP1),atom(OP2),(
    OP1==OP2 -> true;  
    prologcase_name(OP1,N1),
    (OP2==N1 -> true ;
    (prologcase_name(OP2,N2),
      (OP1==N2 -> true ; N1==N2))))).
-
+:- '$hide'(same_symbol/2).
 
 
 
@@ -110,17 +111,18 @@ f_sys_memq(E,L,R):- t_or_nil((member(Q,L),Q==E),R).
 
 
 
-must_compile_progn(Ctx,Env,Result,Forms, PreviousResult, Body):-
-  maybe_debug_var('_rCtx',Ctx),
+must_compile_progn(Ctx,Env,Result,FormsIn, PreviousResult, Body):-
+  notrace((maybe_debug_var('_rCtx',Ctx),
   maybe_debug_var('_rEnv',Env),
   maybe_debug_var('_rResult',Result),
   maybe_debug_var('_rPrevRes',PreviousResult),
   maybe_debug_var('_rForms',Forms),
-  maybe_debug_var('_rBody',Body),
+  maybe_debug_var('_rBody',Body))),
+  resolve_reader_macros(FormsIn,Forms),!,
    must_or_rtrace(compile_progn(Ctx,Env,Result,Forms, PreviousResult,Body0)),
-   sanitize_true(Body0,Body).
+   notrace((sanitize_true(Body0,Body))).
 
-compile_progn(_Cx,_Ev,Result,Var,_PreviousResult,cl_eval([progn|Var],Result)):- is_ftVar(Var),!.
+compile_progn(_Cx,_Ev,Result,Var,_PreviousResult,Out):- notrace(is_ftVar(Var)),!,Out=cl_eval([progn|Var],Result).
 compile_progn(_Cx,_Ev,Result,[], PreviousResult,true):-!, PreviousResult = Result.
 compile_progn(Ctx,Env,Result,[Form | Forms], _PreviousResult, Body):-  !,
    %locally(

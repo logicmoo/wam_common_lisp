@@ -21,6 +21,6 @@ optimize(MFA):- writeln(optimize(MFA)).
 
 
 error_hook(X,Y):- writeln(error_hook(X,Y)),fail.
-throw(X,Y):- writeln(throw(X,Y)),throw(lpa_throw(X,Y)).
+throw(X,Y):- writeln(throw(X,Y)),lisp_dump_break,throw(lpa_throw(X,Y)).
 lwrupr(L,U):- var(L)-> downcase_atom(U,L); upcase_atom(L,U).
 

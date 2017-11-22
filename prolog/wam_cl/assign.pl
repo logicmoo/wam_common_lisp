@@ -90,7 +90,7 @@ compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm], Body):- is_symbol_setter(
 
 % catches an internal error in this compiler 
 compile_symbol_getter(Ctx,Env,Result,Var, Body):- Var==mapcar,!, 
-  dbmsg(compile_symbol_getter(Ctx,Env,Result,Var, Body)), lisp_dumpST,break.
+  dbmsg(compile_symbol_getter(Ctx,Env,Result,Var, Body)), lisp_dump_break.
 
 
 compile_symbol_getter(Ctx,Env,Value, Var, Body):-  must(atom(Var)),!,
@@ -115,30 +115,37 @@ extract_variable_value([Val|Vals], FoundVal, Hole):-
 
 bind_dynamic_value(Env,Var,Result):- set_symbol_value(Env,Var,Result).
 
+
+symbol_value(Var,Value):- env_current(Env), symbol_value(Env,Var,Value).
 symbol_value(Env,Var,Value):-
   symbol_value_or(Env,Var,
-    symbol_value_last_chance(Env,Var,Value),Value).
+    symbol_value_error(Env,Var,Value),Value).
 
-symbol_value_last_chance(_Env,Var,Result):- nb_current(Var,Result),!.
-symbol_value_last_chance(_Env,Var,_Result):- 
-  lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Var).
+symbol_value_or(Env,Var,G,Value):-
+ ensure_env(Env), 
+ (symbol_value0(Env,Var,Value) -> true ; G).
+
+symbol_value0(Env,Var,Value):-  bvof(bv(Var, Value),_,Env).
+symbol_value0(_Env,Var,_Value):- notrace((nonvar(Var),is_functionp(Var),wdmsg(is_functionp(Var)))),!,lisp_dump_break.
+symbol_value0(_Env,Var,Result):- get_opv(Var, value, Result),!.
+symbol_value0(_Env,Var,Result):- atom(Var),nb_current(Var,Result),!.
+symbol_value0(Env,[Place,Obj],Result):- place_op(Env,getf,[Place,Obj],[],Result).
+
+
+symbol_value_error(_Env,Var,_Result):- lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Var).
 
 
 push_values([V1|Push],V1):- must(nonvar(Push)),nb_setval('$mv_return',[V1|Push]).
 
-
+bvof(_,_,T):- notrace(((var(T);T==[tl]))),!,fail.
 bvof(E,M,T):-E=T,!,M=T.
 bvof(E,M,[L|L2]):- ((nonvar(L),bvof(E,M,L))->true;(nonvar(L2),bvof(E,M,L2))).
 
 
-symbol_value_or(Env,Var,G,Value):-
- (bvof(bv(Var, Value),_,Env) -> true ; (symbol_value(Var,Value) -> true;  G)).
-
-symbol_value(Var,Value):- get_opv(Var,value,Value).
-
 
 set_symbol_value(Env,Var,Result):-var(Result),!,symbol_value(Env,Var,Result).
-set_symbol_value(Env,Var,Result):- !,
+
+set_symbol_value(Env,Var,Result):- ensure_env(Env),!,
      (bvof(bv(Var,_),BV,Env)
       -> nb_setarg(2,BV,Result)
       ;	( 
@@ -147,9 +154,12 @@ set_symbol_value(Env,Var,Result):- !,
            ; set_symbol_value_last_chance(Env,Var,Result)))).
 
 set_symbol_value_last_chance(_Env,Var,Result):- nb_current(Var,_)-> nb_setval(Var,Result),!.
-set_symbol_value_last_chance(_Env,Var,Result):- set_opv(Var, value, Result).
+%set_symbol_value_last_chance(Env,Var,Result):- add_to_env(Env,Var,Result),!.
+set_symbol_value_last_chance(_Env,Var,Result):- set_opv(Var, value, Result),!.
 set_symbol_value_last_chance(_Env,Var,_Result):- 
   lisp_error_description(atom_does_not_exist, ErrNo, _),throw(ErrNo, Var).
+
+
 
 
 env_sym_arg_val(Env,Var,InValue,Value):-

@@ -32,7 +32,7 @@
 % debug_var(_A,_Var):-!.
 debug_var(X,Y):- notrace(catch(debug_var0(X,Y),_,fail)) -> true ; rtrace(debug_var0(X,Y)).
 
-maybe_debug_var(X,Y):-(maybe_debug_var0(X,Y)).
+maybe_debug_var(X,Y):- notrace(maybe_debug_var0(X,Y)).
 maybe_debug_var0(_,Y):- nonvar(Y),!.
 maybe_debug_var0(X,_):- get_var_name(X,_),!.
 maybe_debug_var0(X,Y):- (catch(debug_var0(X,Y),_,fail)) -> true ; rtrace(debug_var0(X,Y)).
