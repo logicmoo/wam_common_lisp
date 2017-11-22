@@ -110,6 +110,13 @@ value_default(claz_object,mut([],claz_object)).
 
 return_arg_is_first(cl_defstruct).
 
+
+cl_find_class(Name,Claz):-
+  cl_string(Name,StringC),
+  string_upper(StringC,NameS),
+  struct_opv(Claz,classname,NameS).
+  
+
 cl_defstruct(Kind,[[Name|KeyWords]|Slots]):- define_struct(Name,KeyWords,Slots,Kind).
 cl_defstruct(Kind,[Name|Slots]):- define_struct(Name,[],Slots,Kind).
   
@@ -218,10 +225,10 @@ add_opv_maybe(Obj,Prop,Value):- add_opv(Obj,Prop,Value),!.
 get_opv(Obj,_,_):- string(Obj),!,fail.
 get_opv(Obj,Prop,Value):- no_repeats(Obj-Prop,get_opv_i(Obj,Prop,Value)).
 
-get_opv_i(quote, value, Value):- throw(get_opv_i(quote, value, Value)).
-get_opv_i(Obj,Prop,Value):- has_prop_value_getter(Obj,Prop,Getter),!,call(Getter,Obj,Prop,Value).
+get_opv_i(Obj, value, Value):- Obj==quote, throw(get_opv_i(quote, value, Value)).
+get_opv_i(Obj,Prop,Value):- nonvar(Obj), has_prop_value_getter(Obj,Prop,Getter),!,call(Getter,Obj,Prop,Value).
 get_opv_i(Obj,Prop,Value):- soops:o_p_v(Obj,Prop,Value).
-get_opv_i(Obj,Prop,Value):- 
+get_opv_i(Obj,Prop,Value):- nonvar(Obj),
   notrace((Prop\==classof,Prop\==typeof,Prop\==value,Prop\==conc_name)),
   get_opv_ii(Obj,Prop,Value).
 

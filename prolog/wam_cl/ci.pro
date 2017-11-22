@@ -440,7 +440,7 @@ struct_opv(claz_argument_list_dotted,classname,"ARGUMENT-LIST-DOTTED").
 struct_opv(claz_argument_list_dotted,classof,claz_built_in_class).
 struct_opv(claz_argument_list_dotted,subtypep,claz_error).
 struct_opv(claz_argument_list_dotted,subtypep,claz_program_error).
-struct_opv(claz_argument_list_dotted,super_priority,[claz_program_error,claz_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_argument_list_dotted,super_priority,[claz_program_error,claz_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_argument_list_processor,classname,"ARGUMENT-LIST-PROCESSOR").
 struct_opv(claz_argument_list_processor,classof,claz_built_in_class).
 struct_opv(claz_argument_list_processor,name,"ALLOW-OTHER-KEYS",zlot_argument_list_processor_allow_other_keys).
@@ -515,7 +515,7 @@ struct_opv(claz_arithmetic_error,slot,operation,zlot_arithmetic_error_operation)
 struct_opv(claz_arithmetic_error,subtypep,claz_error).
 struct_opv(claz_arithmetic_error,subtypep,claz_lisp_error).
 struct_opv(claz_arithmetic_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_arithmetic_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_arithmetic_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_array,classname,"ARRAY").
 struct_opv(claz_array,classof,claz_built_in_class).
 struct_opv(claz_array,subtypep,claz_object).
@@ -802,7 +802,7 @@ struct_opv(claz_built_in_class,slot,prototype,zlot_built_in_class_prototype).
 struct_opv(claz_built_in_class,subtypep,claz_class).
 struct_opv(claz_built_in_class,subtypep,claz_lisp_class).
 struct_opv(claz_built_in_class,subtypep,claz_system_class).
-struct_opv(claz_built_in_class,super_priority,[claz_class,claz_potential_class,claz_specializer,claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_built_in_class,super_priority,[claz_class,claz_potential_class,claz_specializer,claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_built_in_class,super_priority,[claz_system_class,claz_pcl_class,claz_class,claz_dependent_update_mixin,claz_plist_mixin,claz_definition_source_mixin,claz_standard_specializer,claz_specializer,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
 struct_opv(claz_built_in_classoid,classname,"BUILT-IN-CLASSOID").
 struct_opv(claz_built_in_classoid,classof,claz_built_in_class).
@@ -982,7 +982,7 @@ struct_opv(claz_cell_error,slot,name,zlot_cell_error_name).
 struct_opv(claz_cell_error,subtypep,claz_error).
 struct_opv(claz_cell_error,subtypep,claz_lisp_error).
 struct_opv(claz_cell_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_cell_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_cell_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_char_code,classname,"CHAR-CODE").
 struct_opv(claz_char_code,classof,claz_built_in_class).
 struct_opv(claz_char_hash_map(_7612),classname,"CHAR-HASH-MAP").
@@ -1084,7 +1084,7 @@ struct_opv(claz_character_string,super_priority,[claz_string,claz_vector,claz_ar
 struct_opv(claz_charset_type_error,classname,"CHARSET-TYPE-ERROR").
 struct_opv(claz_charset_type_error,classof,claz_built_in_class).
 struct_opv(claz_charset_type_error,subtypep,claz_error).
-struct_opv(claz_charset_type_error,super_priority,[claz_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_charset_type_error,super_priority,[claz_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_checking,classname,"CHECKING").
 struct_opv(claz_checking,classof,claz_built_in_class).
 struct_opv(claz_checking,name,"FUNCTION",zlot_checking_function).
@@ -1337,7 +1337,7 @@ struct_opv(claz_class,subtypep,claz_potential_class).
 struct_opv(claz_class,subtypep,claz_standard_specializer).
 struct_opv(claz_class,subtypep,claz_structure_c33_object).
 struct_opv(claz_class,super_priority,[claz_dependent_update_mixin,claz_plist_mixin,claz_definition_source_mixin,claz_standard_specializer,claz_specializer,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
-struct_opv(claz_class,super_priority,[claz_potential_class,claz_specializer,claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_class,super_priority,[claz_potential_class,claz_specializer,claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_class,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
 struct_opv(claz_class_eq_specializer,classname,"CLASS-EQ-SPECIALIZER").
 struct_opv(claz_class_eq_specializer,classof,claz_built_in_class).
@@ -1435,7 +1435,7 @@ struct_opv(claz_cloop,super_priority,[claz_structure_c33_object,claz_structure_o
 struct_opv(claz_clos_warning,classname,"CLOS-WARNING").
 struct_opv(claz_clos_warning,classof,claz_built_in_class).
 struct_opv(claz_clos_warning,subtypep,claz_warning).
-struct_opv(claz_clos_warning,super_priority,[claz_warning,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_clos_warning,super_priority,[claz_warning,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_closed_stream_error,classname,"CLOSED-STREAM-ERROR").
 struct_opv(claz_closed_stream_error,classof,claz_built_in_class).
 struct_opv(claz_closed_stream_error,subtypep,claz_stream_error).
@@ -1869,7 +1869,7 @@ struct_opv(claz_condition,slot,message,zlot_condition_message).
 struct_opv(claz_condition,subtypep,claz_slot_object).
 struct_opv(claz_condition,subtypep,claz_standard_object).
 struct_opv(claz_condition,super_priority,[claz_slot_object,claz_t]).
-struct_opv(claz_condition,super_priority,[claz_standard_object,claz_t]).
+struct_opv(claz_condition,super_priority,[claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_condition_class,classname,"CONDITION-CLASS").
 struct_opv(claz_condition_class,classof,claz_built_in_class).
 struct_opv(claz_condition_class,subtypep,claz_slot_class).
@@ -2031,7 +2031,7 @@ struct_opv(claz_control_error,classof,claz_built_in_class).
 struct_opv(claz_control_error,subtypep,claz_error).
 struct_opv(claz_control_error,subtypep,claz_lisp_error).
 struct_opv(claz_control_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_control_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_control_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_control_stack_exhausted,classname,"CONTROL-STACK-EXHAUSTED").
 struct_opv(claz_control_stack_exhausted,classof,claz_built_in_class).
 struct_opv(claz_control_stack_exhausted,subtypep,claz_storage_condition).
@@ -2303,26 +2303,6 @@ struct_opv(claz_defmacro_lambda_list_broken_key_list_error,slot,info,zlot_defmac
 struct_opv(claz_defmacro_lambda_list_broken_key_list_error,slot,problem,zlot_defmacro_lambda_list_broken_key_list_error_problem).
 struct_opv(claz_defmacro_lambda_list_broken_key_list_error,subtypep,claz_defmacro_lambda_list_bind_error).
 struct_opv(claz_defmacro_lambda_list_broken_key_list_error,super_priority,[claz_defmacro_lambda_list_bind_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_defstruct_slot_description,classname,"DEFSTRUCT-SLOT-DESCRIPTION").
-struct_opv(claz_defstruct_slot_description,classof,claz_built_in_class).
-struct_opv(claz_defstruct_slot_description,name,"ACCESSOR-NAME",zlot_defstruct_slot_description_accessor_name).
-struct_opv(claz_defstruct_slot_description,name,"DEFAULT",zlot_defstruct_slot_description_default).
-struct_opv(claz_defstruct_slot_description,name,"INDEX",zlot_defstruct_slot_description_index).
-struct_opv(claz_defstruct_slot_description,name,"NAME",zlot_defstruct_slot_description_name).
-struct_opv(claz_defstruct_slot_description,name,"RAW-TYPE",zlot_defstruct_slot_description_raw_type).
-struct_opv(claz_defstruct_slot_description,name,"READ-ONLY",zlot_defstruct_slot_description_read_only).
-struct_opv(claz_defstruct_slot_description,name,"SAFE-P",zlot_defstruct_slot_description_safe_p).
-struct_opv(claz_defstruct_slot_description,name,"TYPE",zlot_defstruct_slot_description_type).
-struct_opv(claz_defstruct_slot_description,slot,accessor_name,zlot_defstruct_slot_description_accessor_name).
-struct_opv(claz_defstruct_slot_description,slot,default,zlot_defstruct_slot_description_default).
-struct_opv(claz_defstruct_slot_description,slot,index,zlot_defstruct_slot_description_index).
-struct_opv(claz_defstruct_slot_description,slot,name,zlot_defstruct_slot_description_name).
-struct_opv(claz_defstruct_slot_description,slot,raw_type,zlot_defstruct_slot_description_raw_type).
-struct_opv(claz_defstruct_slot_description,slot,read_only,zlot_defstruct_slot_description_read_only).
-struct_opv(claz_defstruct_slot_description,slot,safe_p,zlot_defstruct_slot_description_safe_p).
-struct_opv(claz_defstruct_slot_description,slot,type,zlot_defstruct_slot_description_type).
-struct_opv(claz_defstruct_slot_description,subtypep,claz_structure_c33_object).
-struct_opv(claz_defstruct_slot_description,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
 struct_opv(claz_dependent_update_mixin,classname,"DEPENDENT-UPDATE-MIXIN").
 struct_opv(claz_dependent_update_mixin,classof,claz_built_in_class).
 struct_opv(claz_dependent_update_mixin,subtypep,claz_plist_mixin).
@@ -2369,7 +2349,7 @@ struct_opv(claz_deprecation_info,super_priority,[claz_structure_object,claz_slot
 struct_opv(claz_describe_stream,classname,"DESCRIBE-STREAM").
 struct_opv(claz_describe_stream,classof,claz_built_in_class).
 struct_opv(claz_describe_stream,subtypep,claz_fill_stream).
-struct_opv(claz_describe_stream,super_priority,[claz_fill_stream,claz_fundamental_character_output_stream,claz_fundamental_output_stream,claz_fundamental_character_stream,claz_fundamental_stream,claz_stream,claz_standard_object,claz_t]).
+struct_opv(claz_describe_stream,super_priority,[claz_fill_stream,claz_fundamental_character_output_stream,claz_fundamental_output_stream,claz_fundamental_character_stream,claz_fundamental_stream,claz_stream,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_dfun_info,classname,"DFUN-INFO").
 struct_opv(claz_dfun_info,classof,claz_built_in_class).
 struct_opv(claz_dfun_info,name,"CACHE",zlot_dfun_info_cache).
@@ -2383,8 +2363,8 @@ struct_opv(claz_direct_slot_definition,name,"WRITERS",zlot_direct_slot_definitio
 struct_opv(claz_direct_slot_definition,slot,readers,zlot_direct_slot_definition_readers).
 struct_opv(claz_direct_slot_definition,slot,writers,zlot_direct_slot_definition_writers).
 struct_opv(claz_direct_slot_definition,subtypep,claz_slot_definition).
+struct_opv(claz_direct_slot_definition,super_priority,[claz_slot_definition,claz_metaobject,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_direct_slot_definition,super_priority,[claz_slot_definition,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
-struct_opv(claz_direct_slot_definition,super_priority,[claz_slot_definition,claz_metaobject,claz_standard_object,claz_t]).
 struct_opv(claz_disassem_state,classname,"DISASSEM-STATE").
 struct_opv(claz_disassem_state,classof,claz_built_in_class).
 struct_opv(claz_disassem_state,name,"ADDR-PRINT-LEN",zlot_disassem_state_addr_print_len).
@@ -2438,7 +2418,7 @@ struct_opv(claz_division_by_zero,classname,"DIVISION-BY-ZERO").
 struct_opv(claz_division_by_zero,classof,claz_built_in_class).
 struct_opv(claz_division_by_zero,subtypep,claz_arithmetic_error).
 struct_opv(claz_division_by_zero,super_priority,[claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_division_by_zero,super_priority,[claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_division_by_zero,super_priority,[claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_double,classname,"DOUBLE").
 struct_opv(claz_double,classof,claz_built_in_class).
 struct_opv(claz_double_float,classname,"DOUBLE-FLOAT").
@@ -2536,8 +2516,8 @@ struct_opv(claz_effective_slot_definition,slot,efm_svuc,zlot_effective_slot_defi
 struct_opv(claz_effective_slot_definition,slot,info,zlot_effective_slot_definition_info).
 struct_opv(claz_effective_slot_definition,slot,location,zlot_effective_slot_definition_location).
 struct_opv(claz_effective_slot_definition,subtypep,claz_slot_definition).
+struct_opv(claz_effective_slot_definition,super_priority,[claz_slot_definition,claz_metaobject,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_effective_slot_definition,super_priority,[claz_slot_definition,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
-struct_opv(claz_effective_slot_definition,super_priority,[claz_slot_definition,claz_metaobject,claz_standard_object,claz_t]).
 struct_opv(claz_emf_cache,classname,"EMF-CACHE").
 struct_opv(claz_emf_cache,classof,claz_built_in_class).
 struct_opv(claz_emf_cache,name,"CACHE",zlot_emf_cache_cache).
@@ -2576,7 +2556,7 @@ struct_opv(claz_end_of_file,classname,"END-OF-FILE").
 struct_opv(claz_end_of_file,classof,claz_built_in_class).
 struct_opv(claz_end_of_file,subtypep,claz_stream_error).
 struct_opv(claz_end_of_file,super_priority,[claz_stream_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_end_of_file,super_priority,[claz_stream_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_end_of_file,super_priority,[claz_stream_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_end_of_input_in_character,classname,"END-OF-INPUT-IN-CHARACTER").
 struct_opv(claz_end_of_input_in_character,classof,claz_built_in_class).
 struct_opv(claz_end_of_input_in_character,subtypep,claz_octet_decoding_error).
@@ -2657,7 +2637,7 @@ struct_opv(claz_eql_specializer,subtypep,claz_exact_class_specializer).
 struct_opv(claz_eql_specializer,subtypep,claz_specializer).
 struct_opv(claz_eql_specializer,subtypep,claz_specializer_with_object).
 struct_opv(claz_eql_specializer,subtypep,claz_standard_specializer).
-struct_opv(claz_eql_specializer,super_priority,[claz_specializer,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_eql_specializer,super_priority,[claz_specializer,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_eql_specializer,super_priority,[claz_standard_specializer,claz_exact_class_specializer,claz_specializer_with_object,claz_specializer,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
 struct_opv(claz_error,classname,"ERROR").
 struct_opv(claz_error,classof,claz_built_in_class).
@@ -2668,9 +2648,9 @@ struct_opv(claz_error,slot,expected_type,zlot_error_expected_type).
 struct_opv(claz_error,subtypep,claz_lisp_error).
 struct_opv(claz_error,subtypep,claz_serious_condition).
 struct_opv(claz_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_error,super_priority,[claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_error,super_priority,[claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_error,super_priority,[claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_eval_error,classname,"EVAL-ERROR").
 struct_opv(claz_eval_error,classof,claz_built_in_class).
 struct_opv(claz_eval_error,subtypep,claz_encapsulated_condition).
@@ -3008,7 +2988,7 @@ struct_opv(claz_file_error,slot,pathname,zlot_file_error_pathname).
 struct_opv(claz_file_error,subtypep,claz_error).
 struct_opv(claz_file_error,subtypep,claz_lisp_error).
 struct_opv(claz_file_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_file_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_file_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_file_info,classname,"FILE-INFO").
 struct_opv(claz_file_info,classof,claz_built_in_class).
 struct_opv(claz_file_info,name,"ATIME",zlot_file_info_atime).
@@ -3134,7 +3114,7 @@ struct_opv(claz_fill_stream,slot,pending_space,zlot_fill_stream_pending_space).
 struct_opv(claz_fill_stream,slot,sexp_indent,zlot_fill_stream_sexp_indent).
 struct_opv(claz_fill_stream,slot,target_stream,zlot_fill_stream_target_stream).
 struct_opv(claz_fill_stream,subtypep,claz_fundamental_character_output_stream).
-struct_opv(claz_fill_stream,super_priority,[claz_fundamental_character_output_stream,claz_fundamental_output_stream,claz_fundamental_character_stream,claz_fundamental_stream,claz_stream,claz_standard_object,claz_t]).
+struct_opv(claz_fill_stream,super_priority,[claz_fundamental_character_output_stream,claz_fundamental_output_stream,claz_fundamental_character_stream,claz_fundamental_stream,claz_stream,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_filler,classname,"FILLER").
 struct_opv(claz_filler,classof,claz_built_in_class).
 struct_opv(claz_filler,name,"BYTES",zlot_filler_bytes).
@@ -3221,22 +3201,22 @@ struct_opv(claz_floating_point_inexact,classname,"FLOATING-POINT-INEXACT").
 struct_opv(claz_floating_point_inexact,classof,claz_built_in_class).
 struct_opv(claz_floating_point_inexact,subtypep,claz_arithmetic_error).
 struct_opv(claz_floating_point_inexact,super_priority,[claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_floating_point_inexact,super_priority,[claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_floating_point_inexact,super_priority,[claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_floating_point_invalid_operation,classname,"FLOATING-POINT-INVALID-OPERATION").
 struct_opv(claz_floating_point_invalid_operation,classof,claz_built_in_class).
 struct_opv(claz_floating_point_invalid_operation,subtypep,claz_arithmetic_error).
 struct_opv(claz_floating_point_invalid_operation,super_priority,[claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_floating_point_invalid_operation,super_priority,[claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_floating_point_invalid_operation,super_priority,[claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_floating_point_overflow,classname,"FLOATING-POINT-OVERFLOW").
 struct_opv(claz_floating_point_overflow,classof,claz_built_in_class).
 struct_opv(claz_floating_point_overflow,subtypep,claz_arithmetic_error).
 struct_opv(claz_floating_point_overflow,super_priority,[claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_floating_point_overflow,super_priority,[claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_floating_point_overflow,super_priority,[claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_floating_point_underflow,classname,"FLOATING-POINT-UNDERFLOW").
 struct_opv(claz_floating_point_underflow,classof,claz_built_in_class).
 struct_opv(claz_floating_point_underflow,subtypep,claz_arithmetic_error).
 struct_opv(claz_floating_point_underflow,super_priority,[claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_floating_point_underflow,super_priority,[claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_floating_point_underflow,super_priority,[claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_fnode,classname,"FNODE").
 struct_opv(claz_fnode,classof,claz_built_in_class).
 struct_opv(claz_fnode,name,"ALLOW-OTHER-KEYS-FLAG",zlot_fnode_allow_other_keys_flag).
@@ -3381,7 +3361,7 @@ struct_opv(claz_forward_referenced_class,classof,claz_built_in_class).
 struct_opv(claz_forward_referenced_class,subtypep,claz_pcl_class).
 struct_opv(claz_forward_referenced_class,subtypep,claz_super_class).
 struct_opv(claz_forward_referenced_class,super_priority,[claz_pcl_class,claz_class,claz_dependent_update_mixin,claz_plist_mixin,claz_definition_source_mixin,claz_standard_specializer,claz_specializer,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
-struct_opv(claz_forward_referenced_class,super_priority,[claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_forward_referenced_class,super_priority,[claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_frame,classname,"FRAME").
 struct_opv(claz_frame,classof,claz_built_in_class).
 struct_opv(claz_frame,name,"CATCHES",zlot_frame_catches).
@@ -3489,7 +3469,7 @@ struct_opv(claz_funcallable_standard_class,classof,claz_built_in_class).
 struct_opv(claz_funcallable_standard_class,subtypep,claz_semi_standard_class).
 struct_opv(claz_funcallable_standard_class,subtypep,claz_standard_class).
 struct_opv(claz_funcallable_standard_class,subtypep,claz_std_class).
-struct_opv(claz_funcallable_standard_class,super_priority,[claz_semi_standard_class,claz_slotted_class,claz_class,claz_potential_class,claz_specializer,claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_funcallable_standard_class,super_priority,[claz_semi_standard_class,claz_slotted_class,claz_class,claz_potential_class,claz_specializer,claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_funcallable_standard_class,super_priority,[claz_std_class,claz_slot_class,claz_pcl_class,claz_class,claz_dependent_update_mixin,claz_plist_mixin,claz_definition_source_mixin,claz_standard_specializer,claz_specializer,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
 struct_opv(claz_funcallable_standard_object,classname,"FUNCALLABLE-STANDARD-OBJECT").
 struct_opv(claz_funcallable_standard_object,classof,claz_built_in_class).
@@ -3509,8 +3489,8 @@ struct_opv(claz_funcallable_standard_object,slot,hot_count,zlot_funcallable_stan
 struct_opv(claz_funcallable_standard_object,slot,name,zlot_funcallable_standard_object_name).
 struct_opv(claz_funcallable_standard_object,subtypep,claz_function).
 struct_opv(claz_funcallable_standard_object,subtypep,claz_standard_object).
+struct_opv(claz_funcallable_standard_object,super_priority,[claz_function,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_funcallable_standard_object,super_priority,[claz_function,claz_standard_object,claz_slot_object,claz_t]).
-struct_opv(claz_funcallable_standard_object,super_priority,[claz_function,claz_standard_object,claz_t]).
 struct_opv(claz_function,classname,"FUNCTION").
 struct_opv(claz_function,classof,claz_built_in_class).
 struct_opv(claz_function,name,"CALL-COUNT",zlot_function_call_count).
@@ -3588,18 +3568,18 @@ struct_opv(claz_fundamental_binary_input_stream,classof,claz_built_in_class).
 struct_opv(claz_fundamental_binary_input_stream,subtypep,claz_fundamental_binary_stream).
 struct_opv(claz_fundamental_binary_input_stream,subtypep,claz_fundamental_input_stream).
 struct_opv(claz_fundamental_binary_input_stream,super_priority,[claz_fundamental_input_stream,claz_fundamental_binary_stream,claz_fundamental_stream,claz_standard_object,claz_slot_object,claz_stream,claz_t]).
-struct_opv(claz_fundamental_binary_input_stream,super_priority,[claz_fundamental_input_stream,claz_fundamental_binary_stream,claz_fundamental_stream,claz_stream,claz_standard_object,claz_t]).
+struct_opv(claz_fundamental_binary_input_stream,super_priority,[claz_fundamental_input_stream,claz_fundamental_binary_stream,claz_fundamental_stream,claz_stream,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_fundamental_binary_output_stream,classname,"FUNDAMENTAL-BINARY-OUTPUT-STREAM").
 struct_opv(claz_fundamental_binary_output_stream,classof,claz_built_in_class).
 struct_opv(claz_fundamental_binary_output_stream,subtypep,claz_fundamental_binary_stream).
 struct_opv(claz_fundamental_binary_output_stream,subtypep,claz_fundamental_output_stream).
 struct_opv(claz_fundamental_binary_output_stream,super_priority,[claz_fundamental_output_stream,claz_fundamental_binary_stream,claz_fundamental_stream,claz_standard_object,claz_slot_object,claz_stream,claz_t]).
-struct_opv(claz_fundamental_binary_output_stream,super_priority,[claz_fundamental_output_stream,claz_fundamental_binary_stream,claz_fundamental_stream,claz_stream,claz_standard_object,claz_t]).
+struct_opv(claz_fundamental_binary_output_stream,super_priority,[claz_fundamental_output_stream,claz_fundamental_binary_stream,claz_fundamental_stream,claz_stream,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_fundamental_binary_stream,classname,"FUNDAMENTAL-BINARY-STREAM").
 struct_opv(claz_fundamental_binary_stream,classof,claz_built_in_class).
 struct_opv(claz_fundamental_binary_stream,subtypep,claz_fundamental_stream).
 struct_opv(claz_fundamental_binary_stream,super_priority,[claz_fundamental_stream,claz_standard_object,claz_slot_object,claz_stream,claz_t]).
-struct_opv(claz_fundamental_binary_stream,super_priority,[claz_fundamental_stream,claz_stream,claz_standard_object,claz_t]).
+struct_opv(claz_fundamental_binary_stream,super_priority,[claz_fundamental_stream,claz_stream,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_fundamental_character_input_stream,classname,"FUNDAMENTAL-CHARACTER-INPUT-STREAM").
 struct_opv(claz_fundamental_character_input_stream,classof,claz_built_in_class).
 struct_opv(claz_fundamental_character_input_stream,name,"LASTCHAR",zlot_fundamental_character_input_stream_lastchar).
@@ -3607,28 +3587,28 @@ struct_opv(claz_fundamental_character_input_stream,slot,lastchar,zlot_fundamenta
 struct_opv(claz_fundamental_character_input_stream,subtypep,claz_fundamental_character_stream).
 struct_opv(claz_fundamental_character_input_stream,subtypep,claz_fundamental_input_stream).
 struct_opv(claz_fundamental_character_input_stream,super_priority,[claz_fundamental_input_stream,claz_fundamental_character_stream,claz_fundamental_stream,claz_standard_object,claz_slot_object,claz_stream,claz_t]).
-struct_opv(claz_fundamental_character_input_stream,super_priority,[claz_fundamental_input_stream,claz_fundamental_character_stream,claz_fundamental_stream,claz_stream,claz_standard_object,claz_t]).
+struct_opv(claz_fundamental_character_input_stream,super_priority,[claz_fundamental_input_stream,claz_fundamental_character_stream,claz_fundamental_stream,claz_stream,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_fundamental_character_output_stream,classname,"FUNDAMENTAL-CHARACTER-OUTPUT-STREAM").
 struct_opv(claz_fundamental_character_output_stream,classof,claz_built_in_class).
 struct_opv(claz_fundamental_character_output_stream,subtypep,claz_fundamental_character_stream).
 struct_opv(claz_fundamental_character_output_stream,subtypep,claz_fundamental_output_stream).
 struct_opv(claz_fundamental_character_output_stream,super_priority,[claz_fundamental_output_stream,claz_fundamental_character_stream,claz_fundamental_stream,claz_standard_object,claz_slot_object,claz_stream,claz_t]).
-struct_opv(claz_fundamental_character_output_stream,super_priority,[claz_fundamental_output_stream,claz_fundamental_character_stream,claz_fundamental_stream,claz_stream,claz_standard_object,claz_t]).
+struct_opv(claz_fundamental_character_output_stream,super_priority,[claz_fundamental_output_stream,claz_fundamental_character_stream,claz_fundamental_stream,claz_stream,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_fundamental_character_stream,classname,"FUNDAMENTAL-CHARACTER-STREAM").
 struct_opv(claz_fundamental_character_stream,classof,claz_built_in_class).
 struct_opv(claz_fundamental_character_stream,subtypep,claz_fundamental_stream).
 struct_opv(claz_fundamental_character_stream,super_priority,[claz_fundamental_stream,claz_standard_object,claz_slot_object,claz_stream,claz_t]).
-struct_opv(claz_fundamental_character_stream,super_priority,[claz_fundamental_stream,claz_stream,claz_standard_object,claz_t]).
+struct_opv(claz_fundamental_character_stream,super_priority,[claz_fundamental_stream,claz_stream,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_fundamental_input_stream,classname,"FUNDAMENTAL-INPUT-STREAM").
 struct_opv(claz_fundamental_input_stream,classof,claz_built_in_class).
 struct_opv(claz_fundamental_input_stream,subtypep,claz_fundamental_stream).
 struct_opv(claz_fundamental_input_stream,super_priority,[claz_fundamental_stream,claz_standard_object,claz_slot_object,claz_stream,claz_t]).
-struct_opv(claz_fundamental_input_stream,super_priority,[claz_fundamental_stream,claz_stream,claz_standard_object,claz_t]).
+struct_opv(claz_fundamental_input_stream,super_priority,[claz_fundamental_stream,claz_stream,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_fundamental_output_stream,classname,"FUNDAMENTAL-OUTPUT-STREAM").
 struct_opv(claz_fundamental_output_stream,classof,claz_built_in_class).
 struct_opv(claz_fundamental_output_stream,subtypep,claz_fundamental_stream).
 struct_opv(claz_fundamental_output_stream,super_priority,[claz_fundamental_stream,claz_standard_object,claz_slot_object,claz_stream,claz_t]).
-struct_opv(claz_fundamental_output_stream,super_priority,[claz_fundamental_stream,claz_stream,claz_standard_object,claz_t]).
+struct_opv(claz_fundamental_output_stream,super_priority,[claz_fundamental_stream,claz_stream,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_fundamental_stream,classname,"FUNDAMENTAL-STREAM").
 struct_opv(claz_fundamental_stream,classof,claz_built_in_class).
 struct_opv(claz_fundamental_stream,name,"FASL",zlot_fundamental_stream_fasl).
@@ -3642,7 +3622,7 @@ struct_opv(claz_fundamental_stream,slot,penl,zlot_fundamental_stream_penl).
 struct_opv(claz_fundamental_stream,subtypep,claz_standard_object).
 struct_opv(claz_fundamental_stream,subtypep,claz_stream).
 struct_opv(claz_fundamental_stream,super_priority,[claz_standard_object,claz_slot_object,claz_stream,claz_t]).
-struct_opv(claz_fundamental_stream,super_priority,[claz_stream,claz_standard_object,claz_t]).
+struct_opv(claz_fundamental_stream,super_priority,[claz_stream,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_funstate,classname,"FUNSTATE").
 struct_opv(claz_funstate,classof,claz_built_in_class).
 struct_opv(claz_funstate,name,"ARG-TEMPS",zlot_funstate_arg_temps).
@@ -3666,7 +3646,7 @@ struct_opv(claz_generic_function,subtypep,claz_dependent_update_mixin).
 struct_opv(claz_generic_function,subtypep,claz_funcallable_standard_object).
 struct_opv(claz_generic_function,subtypep,claz_metaobject).
 struct_opv(claz_generic_function,super_priority,[claz_dependent_update_mixin,claz_plist_mixin,claz_definition_source_mixin,claz_metaobject,claz_funcallable_standard_object,claz_function,claz_standard_object,claz_slot_object,claz_t]).
-struct_opv(claz_generic_function,super_priority,[claz_metaobject,claz_funcallable_standard_object,claz_function,claz_standard_object,claz_t]).
+struct_opv(claz_generic_function,super_priority,[claz_metaobject,claz_funcallable_standard_object,claz_function,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_generic_function_lambda_list_error,classname,"GENERIC-FUNCTION-LAMBDA-LIST-ERROR").
 struct_opv(claz_generic_function_lambda_list_error,classof,claz_built_in_class).
 struct_opv(claz_generic_function_lambda_list_error,subtypep,claz_reference_condition).
@@ -3675,15 +3655,15 @@ struct_opv(claz_generic_function_lambda_list_error,super_priority,[claz_referenc
 struct_opv(claz_generic_stream_controller,classname,"GENERIC-STREAM-CONTROLLER").
 struct_opv(claz_generic_stream_controller,classof,claz_built_in_class).
 struct_opv(claz_generic_stream_controller,subtypep,claz_standard_object).
-struct_opv(claz_generic_stream_controller,super_priority,[claz_standard_object,claz_t]).
+struct_opv(claz_generic_stream_controller,super_priority,[claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_gf_already_called_warning,classname,"GF-ALREADY-CALLED-WARNING").
 struct_opv(claz_gf_already_called_warning,classof,claz_built_in_class).
 struct_opv(claz_gf_already_called_warning,subtypep,claz_clos_warning).
-struct_opv(claz_gf_already_called_warning,super_priority,[claz_clos_warning,claz_warning,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_gf_already_called_warning,super_priority,[claz_clos_warning,claz_warning,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_gf_replacing_method_warning,classname,"GF-REPLACING-METHOD-WARNING").
 struct_opv(claz_gf_replacing_method_warning,classof,claz_built_in_class).
 struct_opv(claz_gf_replacing_method_warning,subtypep,claz_clos_warning).
-struct_opv(claz_gf_replacing_method_warning,super_priority,[claz_clos_warning,claz_warning,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_gf_replacing_method_warning,super_priority,[claz_clos_warning,claz_warning,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_global_boundp_method,classname,"GLOBAL-BOUNDP-METHOD").
 struct_opv(claz_global_boundp_method,classof,claz_built_in_class).
 struct_opv(claz_global_boundp_method,subtypep,claz_accessor_method).
@@ -3763,17 +3743,17 @@ struct_opv(claz_handler,slot,direction,zlot_handler_direction).
 struct_opv(claz_handler,slot,function,zlot_handler_function).
 struct_opv(claz_handler,subtypep,claz_structure_object).
 struct_opv(claz_handler,super_priority,[claz_structure_object,claz_slot_object,claz_t]).
-struct_opv(claz_hash_table(claz_emf_cache_cache_entry,claz_object),classname,"HASH-TABLE").
+struct_opv(claz_hash_table(claz_emf_cache_cache_entry,claz_object),classname,"EMF-CACHE-ENTRY-OBJECT-HASH-TABLE").
 struct_opv(claz_hash_table(claz_emf_cache_cache_entry,claz_object),classof,claz_built_in_class).
-struct_opv(claz_hash_table(claz_object,claz_object),classname,"HASH-TABLE").
+struct_opv(claz_hash_table(claz_object,claz_object),classname,"OBJECT-OBJECT-HASH-TABLE").
 struct_opv(claz_hash_table(claz_object,claz_object),classof,claz_built_in_class).
-struct_opv(claz_hash_table(claz_prolog_character,_7614),classname,"HASH-TABLE").
+struct_opv(claz_hash_table(claz_prolog_character,_7614),classname,"CHARACTER-<GENERIC>-HASH-TABLE").
 struct_opv(claz_hash_table(claz_prolog_character,_7614),classof,claz_built_in_class).
-struct_opv(claz_hash_table(claz_string,claz_ffi_object),classname,"HASH-TABLE").
+struct_opv(claz_hash_table(claz_string,claz_ffi_object),classname,"STRING-FFI-OBJECT-HASH-TABLE").
 struct_opv(claz_hash_table(claz_string,claz_ffi_object),classof,claz_built_in_class).
-struct_opv(claz_hash_table(claz_string,claz_package),classname,"HASH-TABLE").
+struct_opv(claz_hash_table(claz_string,claz_package),classname,"STRING-PACKAGE-HASH-TABLE").
 struct_opv(claz_hash_table(claz_string,claz_package),classof,claz_built_in_class).
-struct_opv(claz_hash_table(claz_string,claz_symbol),classname,"HASH-TABLE").
+struct_opv(claz_hash_table(claz_string,claz_symbol),classname,"STRING-SYMBOL-HASH-TABLE").
 struct_opv(claz_hash_table(claz_string,claz_symbol),classof,claz_built_in_class).
 struct_opv(claz_hash_table(claz_t,claz_t),subtypep,claz_hash_table).
 struct_opv(claz_hash_table,classname,"HASH-TABLE").
@@ -3912,7 +3892,7 @@ struct_opv(claz_html_stream_out,classof,claz_built_in_class).
 struct_opv(claz_html_stream_out,name,"TARGET-STREAM",zlot_html_stream_out_target_stream).
 struct_opv(claz_html_stream_out,slot,target_stream,zlot_html_stream_out_target_stream).
 struct_opv(claz_html_stream_out,subtypep,claz_fundamental_character_output_stream).
-struct_opv(claz_html_stream_out,super_priority,[claz_fundamental_character_output_stream,claz_fundamental_output_stream,claz_fundamental_character_stream,claz_fundamental_stream,claz_stream,claz_standard_object,claz_t]).
+struct_opv(claz_html_stream_out,super_priority,[claz_fundamental_character_output_stream,claz_fundamental_output_stream,claz_fundamental_character_stream,claz_fundamental_stream,claz_stream,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_huffman_node,classname,"HUFFMAN-NODE").
 struct_opv(claz_huffman_node,classof,claz_built_in_class).
 struct_opv(claz_huffman_node,name,"KEY",zlot_huffman_node_key).
@@ -4197,7 +4177,7 @@ struct_opv(claz_interpreter_unhandled_condition,slot,condition,zlot_interpreter_
 struct_opv(claz_interrupt_condition,classname,"INTERRUPT-CONDITION").
 struct_opv(claz_interrupt_condition,classof,claz_built_in_class).
 struct_opv(claz_interrupt_condition,subtypep,claz_serious_condition).
-struct_opv(claz_interrupt_condition,super_priority,[claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_interrupt_condition,super_priority,[claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_interrupt_thread_error,classname,"INTERRUPT-THREAD-ERROR").
 struct_opv(claz_interrupt_thread_error,classof,claz_built_in_class).
 struct_opv(claz_interrupt_thread_error,subtypep,claz_thread_error).
@@ -4496,7 +4476,7 @@ struct_opv(claz_keyword_error,classname,"KEYWORD-ERROR").
 struct_opv(claz_keyword_error,classof,claz_built_in_class).
 struct_opv(claz_keyword_error,subtypep,claz_error).
 struct_opv(claz_keyword_error,subtypep,claz_program_error).
-struct_opv(claz_keyword_error,super_priority,[claz_program_error,claz_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_keyword_error,super_priority,[claz_program_error,claz_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_label,classname,"LABEL").
 struct_opv(claz_label,classof,claz_built_in_class).
 struct_opv(claz_label,subtypep,claz_annotation).
@@ -5121,8 +5101,8 @@ struct_opv(claz_meta_info,super_priority,[claz_structure_object,claz_slot_object
 struct_opv(claz_metaobject,classname,"METAOBJECT").
 struct_opv(claz_metaobject,classof,claz_built_in_class).
 struct_opv(claz_metaobject,subtypep,claz_standard_object).
+struct_opv(claz_metaobject,super_priority,[claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_metaobject,super_priority,[claz_standard_object,claz_slot_object,claz_t]).
-struct_opv(claz_metaobject,super_priority,[claz_standard_object,claz_t]).
 struct_opv(claz_metaobject_initialization_violation,classname,"METAOBJECT-INITIALIZATION-VIOLATION").
 struct_opv(claz_metaobject_initialization_violation,classof,claz_built_in_class).
 struct_opv(claz_metaobject_initialization_violation,subtypep,claz_reference_condition).
@@ -5135,7 +5115,7 @@ struct_opv(claz_method,slot,from_defgeneric,zlot_method_from_defgeneric).
 struct_opv(claz_method,subtypep,claz_metaobject).
 struct_opv(claz_method,subtypep,claz_standard_stablehash).
 struct_opv(claz_method,super_priority,[claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
-struct_opv(claz_method,super_priority,[claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_method,super_priority,[claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_method_call,classname,"METHOD-CALL").
 struct_opv(claz_method_call,classof,claz_built_in_class).
 struct_opv(claz_method_call,name,"CALL-METHOD-ARGS",zlot_method_call_call_method_args).
@@ -5153,12 +5133,12 @@ struct_opv(claz_method_call_error,slot,args,zlot_method_call_error_args).
 struct_opv(claz_method_call_error,slot,gf,zlot_method_call_error_gf).
 struct_opv(claz_method_call_error,slot,method,zlot_method_call_error_method).
 struct_opv(claz_method_call_error,subtypep,claz_simple_error).
-struct_opv(claz_method_call_error,super_priority,[claz_simple_error,claz_simple_condition,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_method_call_error,super_priority,[claz_simple_error,claz_simple_condition,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_method_call_type_error,classname,"METHOD-CALL-TYPE-ERROR").
 struct_opv(claz_method_call_type_error,classof,claz_built_in_class).
 struct_opv(claz_method_call_type_error,subtypep,claz_method_call_error).
 struct_opv(claz_method_call_type_error,subtypep,claz_simple_type_error).
-struct_opv(claz_method_call_type_error,super_priority,[claz_simple_type_error,claz_method_call_error,claz_simple_error,claz_simple_condition,claz_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_method_call_type_error,super_priority,[claz_simple_type_error,claz_method_call_error,claz_simple_error,claz_simple_condition,claz_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_method_combination,classname,"METHOD-COMBINATION").
 struct_opv(claz_method_combination,classof,claz_built_in_class).
 struct_opv(claz_method_combination,name,"ARGUMENTS-LAMBDA-LIST",zlot_method_combination_arguments_lambda_list).
@@ -5188,19 +5168,19 @@ struct_opv(claz_method_combination,slot,operator,zlot_method_combination_operato
 struct_opv(claz_method_combination,slot,options,zlot_method_combination_options).
 struct_opv(claz_method_combination,slot,qualifiers,zlot_method_combination_qualifiers).
 struct_opv(claz_method_combination,subtypep,claz_metaobject).
+struct_opv(claz_method_combination,super_priority,[claz_metaobject,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_method_combination,super_priority,[claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
-struct_opv(claz_method_combination,super_priority,[claz_metaobject,claz_standard_object,claz_t]).
 struct_opv(claz_misdesigned_forward_referenced_class,classname,"MISDESIGNED-FORWARD-REFERENCED-CLASS").
 struct_opv(claz_misdesigned_forward_referenced_class,classof,claz_built_in_class).
 struct_opv(claz_misdesigned_forward_referenced_class,subtypep,claz_forward_referenced_class).
 struct_opv(claz_misdesigned_forward_referenced_class,subtypep,claz_potential_class).
-struct_opv(claz_misdesigned_forward_referenced_class,super_priority,[claz_forward_referenced_class,claz_potential_class,claz_specializer,claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_misdesigned_forward_referenced_class,super_priority,[claz_forward_referenced_class,claz_potential_class,claz_specializer,claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_missing_load_form,classname,"MISSING-LOAD-FORM").
 struct_opv(claz_missing_load_form,classof,claz_built_in_class).
 struct_opv(claz_missing_load_form,name,"OBJECT",zlot_missing_load_form_object).
 struct_opv(claz_missing_load_form,slot,object,zlot_missing_load_form_object).
 struct_opv(claz_missing_load_form,subtypep,claz_error).
-struct_opv(claz_missing_load_form,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_missing_load_form,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_modular_class,classname,"MODULAR-CLASS").
 struct_opv(claz_modular_class,classof,claz_built_in_class).
 struct_opv(claz_modular_class,name,"FUNS",zlot_modular_class_funs).
@@ -5521,7 +5501,7 @@ struct_opv(claz_ordered_set,super_priority,[claz_sset,claz_structure_object,claz
 struct_opv(claz_os_error,classname,"OS-ERROR").
 struct_opv(claz_os_error,classof,claz_built_in_class).
 struct_opv(claz_os_error,subtypep,claz_error).
-struct_opv(claz_os_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_os_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_overhead,classname,"OVERHEAD").
 struct_opv(claz_overhead,classof,claz_built_in_class).
 struct_opv(claz_overhead,name,"CALL",zlot_overhead_call).
@@ -5606,7 +5586,7 @@ struct_opv(claz_package_error,slot,package,zlot_package_error_package).
 struct_opv(claz_package_error,subtypep,claz_error).
 struct_opv(claz_package_error,subtypep,claz_lisp_error).
 struct_opv(claz_package_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_package_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_package_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_package_hashtable,classname,"PACKAGE-HASHTABLE").
 struct_opv(claz_package_hashtable,classof,claz_built_in_class).
 struct_opv(claz_package_hashtable,name,"CELLS",zlot_package_hashtable_cells).
@@ -5642,7 +5622,7 @@ struct_opv(claz_parse_error,classof,claz_built_in_class).
 struct_opv(claz_parse_error,subtypep,claz_error).
 struct_opv(claz_parse_error,subtypep,claz_lisp_error).
 struct_opv(claz_parse_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_parse_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_parse_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_parse_unknown_type,classname,"PARSE-UNKNOWN-TYPE").
 struct_opv(claz_parse_unknown_type,classof,claz_built_in_class).
 struct_opv(claz_parse_unknown_type,name,"SPECIFIER",zlot_parse_unknown_type_specifier).
@@ -5763,7 +5743,7 @@ struct_opv(claz_potential_class,classname,"POTENTIAL-CLASS").
 struct_opv(claz_potential_class,classof,claz_built_in_class).
 struct_opv(claz_potential_class,subtypep,claz_specializer).
 struct_opv(claz_potential_class,subtypep,claz_super_class).
-struct_opv(claz_potential_class,super_priority,[claz_specializer,claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_potential_class,super_priority,[claz_specializer,claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_pprint_dispatch_entry,classname,"PPRINT-DISPATCH-ENTRY").
 struct_opv(claz_pprint_dispatch_entry,classof,claz_built_in_class).
 struct_opv(claz_pprint_dispatch_entry,name,"FUN",zlot_pprint_dispatch_entry_fun).
@@ -5891,7 +5871,7 @@ struct_opv(claz_print_not_readable,slot,object,zlot_print_not_readable_object).
 struct_opv(claz_print_not_readable,subtypep,claz_error).
 struct_opv(claz_print_not_readable,subtypep,claz_lisp_error).
 struct_opv(claz_print_not_readable,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_print_not_readable,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_print_not_readable,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_print_object_stream_specializer,classname,"PRINT-OBJECT-STREAM-SPECIALIZER").
 struct_opv(claz_print_object_stream_specializer,classof,claz_built_in_class).
 struct_opv(claz_print_object_stream_specializer,subtypep,claz_reference_condition).
@@ -5991,7 +5971,7 @@ struct_opv(claz_program_error,classof,claz_built_in_class).
 struct_opv(claz_program_error,subtypep,claz_error).
 struct_opv(claz_program_error,subtypep,claz_lisp_error).
 struct_opv(claz_program_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_program_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_program_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_prolog_array_list(claz_package),classname,"PROLOG-ARRAY-LIST").
 struct_opv(claz_prolog_array_list(claz_package),classof,claz_built_in_class).
 struct_opv(claz_prolog_array_list(claz_string),classname,"PROLOG-ARRAY-LIST").
@@ -6374,7 +6354,7 @@ struct_opv(claz_reader_error,classof,claz_built_in_class).
 struct_opv(claz_reader_error,subtypep,claz_parse_error).
 struct_opv(claz_reader_error,subtypep,claz_stream_error).
 struct_opv(claz_reader_error,super_priority,[claz_parse_error,claz_stream_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_reader_error,super_priority,[claz_parse_error,claz_stream_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_reader_error,super_priority,[claz_parse_error,claz_stream_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_reader_impossible_number_error,classname,"READER-IMPOSSIBLE-NUMBER-ERROR").
 struct_opv(claz_reader_impossible_number_error,classof,claz_built_in_class).
 struct_opv(claz_reader_impossible_number_error,name,"ERROR",zlot_reader_impossible_number_error_error).
@@ -6763,7 +6743,7 @@ struct_opv(claz_semi_standard_class,slot,funcallablep,zlot_semi_standard_class_f
 struct_opv(claz_semi_standard_class,slot,instantiated,zlot_semi_standard_class_instantiated).
 struct_opv(claz_semi_standard_class,slot,prototype,zlot_semi_standard_class_prototype).
 struct_opv(claz_semi_standard_class,subtypep,claz_slotted_class).
-struct_opv(claz_semi_standard_class,super_priority,[claz_slotted_class,claz_class,claz_potential_class,claz_specializer,claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_semi_standard_class,super_priority,[claz_slotted_class,claz_class,claz_potential_class,claz_specializer,claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_sequence,classname,"SEQUENCE").
 struct_opv(claz_sequence,classof,claz_built_in_class).
 struct_opv(claz_sequence,subtypep,claz_t).
@@ -6772,7 +6752,7 @@ struct_opv(claz_serious_condition,classname,"SERIOUS-CONDITION").
 struct_opv(claz_serious_condition,classof,claz_built_in_class).
 struct_opv(claz_serious_condition,subtypep,claz_condition).
 struct_opv(claz_serious_condition,super_priority,[claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_serious_condition,super_priority,[claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_serious_condition,super_priority,[claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_service,classname,"SERVICE").
 struct_opv(claz_service,classof,claz_built_in_class).
 struct_opv(claz_service,name,"ALIASES",zlot_service_aliases).
@@ -6877,12 +6857,12 @@ struct_opv(claz_simple_argument_list_dotted,classname,"SIMPLE-ARGUMENT-LIST-DOTT
 struct_opv(claz_simple_argument_list_dotted,classof,claz_built_in_class).
 struct_opv(claz_simple_argument_list_dotted,subtypep,claz_argument_list_dotted).
 struct_opv(claz_simple_argument_list_dotted,subtypep,claz_simple_error).
-struct_opv(claz_simple_argument_list_dotted,super_priority,[claz_simple_error,claz_simple_condition,claz_argument_list_dotted,claz_program_error,claz_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_argument_list_dotted,super_priority,[claz_simple_error,claz_simple_condition,claz_argument_list_dotted,claz_program_error,claz_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_arithmetic_error,classname,"SIMPLE-ARITHMETIC-ERROR").
 struct_opv(claz_simple_arithmetic_error,classof,claz_built_in_class).
 struct_opv(claz_simple_arithmetic_error,subtypep,claz_arithmetic_error).
 struct_opv(claz_simple_arithmetic_error,subtypep,claz_simple_error).
-struct_opv(claz_simple_arithmetic_error,super_priority,[claz_simple_error,claz_simple_condition,claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_arithmetic_error,super_priority,[claz_simple_error,claz_simple_condition,claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_array(_7612),name,"DATA",zlot_simple_array_data(_7612)).
 struct_opv(claz_simple_array(_7612),returns,claz_array_of(_7612),zlot_simple_array_data(_7612)).
 struct_opv(claz_simple_array(_7612),slot,data,zlot_simple_array_data(_7612)).
@@ -7055,7 +7035,7 @@ struct_opv(claz_simple_cell_error,classname,"SIMPLE-CELL-ERROR").
 struct_opv(claz_simple_cell_error,classof,claz_built_in_class).
 struct_opv(claz_simple_cell_error,subtypep,claz_cell_error).
 struct_opv(claz_simple_cell_error,subtypep,claz_simple_error).
-struct_opv(claz_simple_cell_error,super_priority,[claz_simple_error,claz_simple_condition,claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_cell_error,super_priority,[claz_simple_error,claz_simple_condition,claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_character_string,classname,"SIMPLE-CHARACTER-STRING").
 struct_opv(claz_simple_character_string,classof,claz_built_in_class).
 struct_opv(claz_simple_character_string,subtypep,claz_character_string).
@@ -7065,12 +7045,12 @@ struct_opv(claz_simple_charset_type_error,classname,"SIMPLE-CHARSET-TYPE-ERROR")
 struct_opv(claz_simple_charset_type_error,classof,claz_built_in_class).
 struct_opv(claz_simple_charset_type_error,subtypep,claz_charset_type_error).
 struct_opv(claz_simple_charset_type_error,subtypep,claz_simple_error).
-struct_opv(claz_simple_charset_type_error,super_priority,[claz_simple_error,claz_simple_condition,claz_charset_type_error,claz_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_charset_type_error,super_priority,[claz_simple_error,claz_simple_condition,claz_charset_type_error,claz_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_clos_warning,classname,"SIMPLE-CLOS-WARNING").
 struct_opv(claz_simple_clos_warning,classof,claz_built_in_class).
 struct_opv(claz_simple_clos_warning,subtypep,claz_clos_warning).
 struct_opv(claz_simple_clos_warning,subtypep,claz_simple_condition).
-struct_opv(claz_simple_clos_warning,super_priority,[claz_simple_condition,claz_clos_warning,claz_warning,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_clos_warning,super_priority,[claz_simple_condition,claz_clos_warning,claz_warning,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_compiler_note,classname,"SIMPLE-COMPILER-NOTE").
 struct_opv(claz_simple_compiler_note,classof,claz_built_in_class).
 struct_opv(claz_simple_compiler_note,subtypep,claz_compiler_note).
@@ -7084,111 +7064,111 @@ struct_opv(claz_simple_condition,slot,format_arguments,zlot_simple_condition_for
 struct_opv(claz_simple_condition,slot,format_control,zlot_simple_condition_format_control).
 struct_opv(claz_simple_condition,subtypep,claz_condition).
 struct_opv(claz_simple_condition,super_priority,[claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_simple_condition,super_priority,[claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_condition,super_priority,[claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_control_error,classname,"SIMPLE-CONTROL-ERROR").
 struct_opv(claz_simple_control_error,classof,claz_built_in_class).
 struct_opv(claz_simple_control_error,subtypep,claz_control_error).
 struct_opv(claz_simple_control_error,subtypep,claz_simple_condition).
 struct_opv(claz_simple_control_error,subtypep,claz_simple_error).
 struct_opv(claz_simple_control_error,super_priority,[claz_simple_condition,claz_control_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_simple_control_error,super_priority,[claz_simple_error,claz_simple_condition,claz_control_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_control_error,super_priority,[claz_simple_error,claz_simple_condition,claz_control_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_division_by_zero,classname,"SIMPLE-DIVISION-BY-ZERO").
 struct_opv(claz_simple_division_by_zero,classof,claz_built_in_class).
 struct_opv(claz_simple_division_by_zero,subtypep,claz_division_by_zero).
 struct_opv(claz_simple_division_by_zero,subtypep,claz_simple_error).
-struct_opv(claz_simple_division_by_zero,super_priority,[claz_simple_error,claz_simple_condition,claz_division_by_zero,claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_division_by_zero,super_priority,[claz_simple_error,claz_simple_condition,claz_division_by_zero,claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_end_of_file,classname,"SIMPLE-END-OF-FILE").
 struct_opv(claz_simple_end_of_file,classof,claz_built_in_class).
 struct_opv(claz_simple_end_of_file,subtypep,claz_end_of_file).
 struct_opv(claz_simple_end_of_file,subtypep,claz_simple_error).
-struct_opv(claz_simple_end_of_file,super_priority,[claz_simple_error,claz_simple_condition,claz_end_of_file,claz_stream_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_end_of_file,super_priority,[claz_simple_error,claz_simple_condition,claz_end_of_file,claz_stream_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_error,classname,"SIMPLE-ERROR").
 struct_opv(claz_simple_error,classof,claz_built_in_class).
 struct_opv(claz_simple_error,subtypep,claz_error).
 struct_opv(claz_simple_error,subtypep,claz_lisp_error).
 struct_opv(claz_simple_error,subtypep,claz_simple_condition).
 struct_opv(claz_simple_error,super_priority,[claz_simple_condition,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_simple_error,super_priority,[claz_simple_condition,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_error,super_priority,[claz_simple_condition,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_file_error,classname,"SIMPLE-FILE-ERROR").
 struct_opv(claz_simple_file_error,classof,claz_built_in_class).
 struct_opv(claz_simple_file_error,subtypep,claz_file_error).
 struct_opv(claz_simple_file_error,subtypep,claz_simple_condition).
 struct_opv(claz_simple_file_error,subtypep,claz_simple_error).
 struct_opv(claz_simple_file_error,super_priority,[claz_simple_condition,claz_file_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_simple_file_error,super_priority,[claz_simple_error,claz_simple_condition,claz_file_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_file_error,super_priority,[claz_simple_error,claz_simple_condition,claz_file_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_floating_point_overflow,classname,"SIMPLE-FLOATING-POINT-OVERFLOW").
 struct_opv(claz_simple_floating_point_overflow,classof,claz_built_in_class).
 struct_opv(claz_simple_floating_point_overflow,subtypep,claz_floating_point_overflow).
 struct_opv(claz_simple_floating_point_overflow,subtypep,claz_simple_error).
-struct_opv(claz_simple_floating_point_overflow,super_priority,[claz_simple_error,claz_simple_condition,claz_floating_point_overflow,claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_floating_point_overflow,super_priority,[claz_simple_error,claz_simple_condition,claz_floating_point_overflow,claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_floating_point_underflow,classname,"SIMPLE-FLOATING-POINT-UNDERFLOW").
 struct_opv(claz_simple_floating_point_underflow,classof,claz_built_in_class).
 struct_opv(claz_simple_floating_point_underflow,subtypep,claz_floating_point_underflow).
 struct_opv(claz_simple_floating_point_underflow,subtypep,claz_simple_error).
-struct_opv(claz_simple_floating_point_underflow,super_priority,[claz_simple_error,claz_simple_condition,claz_floating_point_underflow,claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_floating_point_underflow,super_priority,[claz_simple_error,claz_simple_condition,claz_floating_point_underflow,claz_arithmetic_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_gf_already_called_warning,classname,"SIMPLE-GF-ALREADY-CALLED-WARNING").
 struct_opv(claz_simple_gf_already_called_warning,classof,claz_built_in_class).
 struct_opv(claz_simple_gf_already_called_warning,subtypep,claz_gf_already_called_warning).
 struct_opv(claz_simple_gf_already_called_warning,subtypep,claz_simple_condition).
-struct_opv(claz_simple_gf_already_called_warning,super_priority,[claz_simple_condition,claz_gf_already_called_warning,claz_clos_warning,claz_warning,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_gf_already_called_warning,super_priority,[claz_simple_condition,claz_gf_already_called_warning,claz_clos_warning,claz_warning,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_gf_replacing_method_warning,classname,"SIMPLE-GF-REPLACING-METHOD-WARNING").
 struct_opv(claz_simple_gf_replacing_method_warning,classof,claz_built_in_class).
 struct_opv(claz_simple_gf_replacing_method_warning,subtypep,claz_gf_replacing_method_warning).
 struct_opv(claz_simple_gf_replacing_method_warning,subtypep,claz_simple_condition).
-struct_opv(claz_simple_gf_replacing_method_warning,super_priority,[claz_simple_condition,claz_gf_replacing_method_warning,claz_clos_warning,claz_warning,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_gf_replacing_method_warning,super_priority,[claz_simple_condition,claz_gf_replacing_method_warning,claz_clos_warning,claz_warning,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_interrupt_condition,classname,"SIMPLE-INTERRUPT-CONDITION").
 struct_opv(claz_simple_interrupt_condition,classof,claz_built_in_class).
 struct_opv(claz_simple_interrupt_condition,subtypep,claz_interrupt_condition).
 struct_opv(claz_simple_interrupt_condition,subtypep,claz_simple_condition).
-struct_opv(claz_simple_interrupt_condition,super_priority,[claz_simple_condition,claz_interrupt_condition,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_interrupt_condition,super_priority,[claz_simple_condition,claz_interrupt_condition,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_keyword_error,classname,"SIMPLE-KEYWORD-ERROR").
 struct_opv(claz_simple_keyword_error,classof,claz_built_in_class).
 struct_opv(claz_simple_keyword_error,subtypep,claz_keyword_error).
 struct_opv(claz_simple_keyword_error,subtypep,claz_simple_error).
-struct_opv(claz_simple_keyword_error,super_priority,[claz_simple_error,claz_simple_condition,claz_keyword_error,claz_program_error,claz_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_keyword_error,super_priority,[claz_simple_error,claz_simple_condition,claz_keyword_error,claz_program_error,claz_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_missing_load_form,classname,"SIMPLE-MISSING-LOAD-FORM").
 struct_opv(claz_simple_missing_load_form,classof,claz_built_in_class).
 struct_opv(claz_simple_missing_load_form,subtypep,claz_missing_load_form).
 struct_opv(claz_simple_missing_load_form,subtypep,claz_simple_error).
-struct_opv(claz_simple_missing_load_form,super_priority,[claz_simple_error,claz_simple_condition,claz_missing_load_form,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_missing_load_form,super_priority,[claz_simple_error,claz_simple_condition,claz_missing_load_form,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_os_error,classname,"SIMPLE-OS-ERROR").
 struct_opv(claz_simple_os_error,classof,claz_built_in_class).
 struct_opv(claz_simple_os_error,subtypep,claz_os_error).
 struct_opv(claz_simple_os_error,subtypep,claz_simple_error).
-struct_opv(claz_simple_os_error,super_priority,[claz_simple_error,claz_simple_condition,claz_os_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_os_error,super_priority,[claz_simple_error,claz_simple_condition,claz_os_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_package_error,classname,"SIMPLE-PACKAGE-ERROR").
 struct_opv(claz_simple_package_error,classof,claz_built_in_class).
 struct_opv(claz_simple_package_error,subtypep,claz_package_error).
 struct_opv(claz_simple_package_error,subtypep,claz_simple_condition).
 struct_opv(claz_simple_package_error,subtypep,claz_simple_error).
 struct_opv(claz_simple_package_error,super_priority,[claz_simple_condition,claz_package_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_simple_package_error,super_priority,[claz_simple_error,claz_simple_condition,claz_package_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_package_error,super_priority,[claz_simple_error,claz_simple_condition,claz_package_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_parse_error,classname,"SIMPLE-PARSE-ERROR").
 struct_opv(claz_simple_parse_error,classof,claz_built_in_class).
 struct_opv(claz_simple_parse_error,subtypep,claz_parse_error).
 struct_opv(claz_simple_parse_error,subtypep,claz_simple_condition).
 struct_opv(claz_simple_parse_error,subtypep,claz_simple_error).
 struct_opv(claz_simple_parse_error,super_priority,[claz_simple_condition,claz_parse_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_simple_parse_error,super_priority,[claz_simple_error,claz_simple_condition,claz_parse_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_parse_error,super_priority,[claz_simple_error,claz_simple_condition,claz_parse_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_print_not_readable,classname,"SIMPLE-PRINT-NOT-READABLE").
 struct_opv(claz_simple_print_not_readable,classof,claz_built_in_class).
 struct_opv(claz_simple_print_not_readable,subtypep,claz_print_not_readable).
 struct_opv(claz_simple_print_not_readable,subtypep,claz_simple_error).
-struct_opv(claz_simple_print_not_readable,super_priority,[claz_simple_error,claz_simple_condition,claz_print_not_readable,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_print_not_readable,super_priority,[claz_simple_error,claz_simple_condition,claz_print_not_readable,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_program_error,classname,"SIMPLE-PROGRAM-ERROR").
 struct_opv(claz_simple_program_error,classof,claz_built_in_class).
 struct_opv(claz_simple_program_error,subtypep,claz_program_error).
 struct_opv(claz_simple_program_error,subtypep,claz_simple_condition).
 struct_opv(claz_simple_program_error,subtypep,claz_simple_error).
 struct_opv(claz_simple_program_error,super_priority,[claz_simple_condition,claz_program_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_simple_program_error,super_priority,[claz_simple_error,claz_simple_condition,claz_program_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_program_error,super_priority,[claz_simple_error,claz_simple_condition,claz_program_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_reader_error,classname,"SIMPLE-READER-ERROR").
 struct_opv(claz_simple_reader_error,classof,claz_built_in_class).
 struct_opv(claz_simple_reader_error,subtypep,claz_reader_error).
 struct_opv(claz_simple_reader_error,subtypep,claz_simple_condition).
 struct_opv(claz_simple_reader_error,subtypep,claz_simple_error).
 struct_opv(claz_simple_reader_error,super_priority,[claz_reader_error,claz_parse_error,claz_stream_error,claz_error,claz_serious_condition,claz_simple_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_simple_reader_error,super_priority,[claz_simple_error,claz_simple_condition,claz_reader_error,claz_parse_error,claz_stream_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_reader_error,super_priority,[claz_simple_error,claz_simple_condition,claz_reader_error,claz_parse_error,claz_stream_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_reader_package_error,classname,"SIMPLE-READER-PACKAGE-ERROR").
 struct_opv(claz_simple_reader_package_error,classof,claz_built_in_class).
 struct_opv(claz_simple_reader_package_error,subtypep,claz_package_error).
@@ -7208,17 +7188,17 @@ struct_opv(claz_simple_serious_condition,classname,"SIMPLE-SERIOUS-CONDITION").
 struct_opv(claz_simple_serious_condition,classof,claz_built_in_class).
 struct_opv(claz_simple_serious_condition,subtypep,claz_serious_condition).
 struct_opv(claz_simple_serious_condition,subtypep,claz_simple_condition).
-struct_opv(claz_simple_serious_condition,super_priority,[claz_simple_condition,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_serious_condition,super_priority,[claz_simple_condition,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_source_program_error,classname,"SIMPLE-SOURCE-PROGRAM-ERROR").
 struct_opv(claz_simple_source_program_error,classof,claz_built_in_class).
 struct_opv(claz_simple_source_program_error,subtypep,claz_simple_error).
 struct_opv(claz_simple_source_program_error,subtypep,claz_source_program_error).
-struct_opv(claz_simple_source_program_error,super_priority,[claz_simple_error,claz_simple_condition,claz_source_program_error,claz_program_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_source_program_error,super_priority,[claz_simple_error,claz_simple_condition,claz_source_program_error,claz_program_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_storage_condition,classname,"SIMPLE-STORAGE-CONDITION").
 struct_opv(claz_simple_storage_condition,classof,claz_built_in_class).
 struct_opv(claz_simple_storage_condition,subtypep,claz_simple_condition).
 struct_opv(claz_simple_storage_condition,subtypep,claz_storage_condition).
-struct_opv(claz_simple_storage_condition,super_priority,[claz_simple_condition,claz_storage_condition,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_storage_condition,super_priority,[claz_simple_condition,claz_storage_condition,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_storage_condition,super_priority,[claz_storage_condition,claz_serious_condition,claz_simple_condition,claz_condition,claz_slot_object,claz_t]).
 struct_opv(claz_simple_stream_error,classname,"SIMPLE-STREAM-ERROR").
 struct_opv(claz_simple_stream_error,classof,claz_built_in_class).
@@ -7226,7 +7206,7 @@ struct_opv(claz_simple_stream_error,subtypep,claz_simple_condition).
 struct_opv(claz_simple_stream_error,subtypep,claz_simple_error).
 struct_opv(claz_simple_stream_error,subtypep,claz_stream_error).
 struct_opv(claz_simple_stream_error,super_priority,[claz_simple_condition,claz_stream_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_simple_stream_error,super_priority,[claz_simple_error,claz_simple_condition,claz_stream_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_stream_error,super_priority,[claz_simple_error,claz_simple_condition,claz_stream_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_string,classname,"SIMPLE-STRING").
 struct_opv(claz_simple_string,classof,claz_built_in_class).
 struct_opv(claz_simple_string,name,"CAPACITY",zlot_simple_string_capacity).
@@ -7243,7 +7223,7 @@ struct_opv(claz_simple_style_warning,classof,claz_built_in_class).
 struct_opv(claz_simple_style_warning,subtypep,claz_simple_condition).
 struct_opv(claz_simple_style_warning,subtypep,claz_style_warning).
 struct_opv(claz_simple_style_warning,super_priority,[claz_simple_condition,claz_style_warning,claz_warning,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_simple_style_warning,super_priority,[claz_simple_condition,claz_style_warning,claz_warning,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_style_warning,super_priority,[claz_simple_condition,claz_style_warning,claz_warning,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_thread_error,classname,"SIMPLE-THREAD-ERROR").
 struct_opv(claz_simple_thread_error,classof,claz_built_in_class).
 struct_opv(claz_simple_thread_error,subtypep,claz_simple_condition).
@@ -7254,22 +7234,22 @@ struct_opv(claz_simple_type_error,classof,claz_built_in_class).
 struct_opv(claz_simple_type_error,subtypep,claz_error).
 struct_opv(claz_simple_type_error,subtypep,claz_simple_condition).
 struct_opv(claz_simple_type_error,super_priority,[claz_simple_condition,claz_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_simple_type_error,super_priority,[claz_simple_condition,claz_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_type_error,super_priority,[claz_simple_condition,claz_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_unbound_slot,classname,"SIMPLE-UNBOUND-SLOT").
 struct_opv(claz_simple_unbound_slot,classof,claz_built_in_class).
 struct_opv(claz_simple_unbound_slot,subtypep,claz_simple_error).
 struct_opv(claz_simple_unbound_slot,subtypep,claz_unbound_slot).
-struct_opv(claz_simple_unbound_slot,super_priority,[claz_simple_error,claz_simple_condition,claz_unbound_slot,claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_unbound_slot,super_priority,[claz_simple_error,claz_simple_condition,claz_unbound_slot,claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_unbound_variable,classname,"SIMPLE-UNBOUND-VARIABLE").
 struct_opv(claz_simple_unbound_variable,classof,claz_built_in_class).
 struct_opv(claz_simple_unbound_variable,subtypep,claz_simple_error).
 struct_opv(claz_simple_unbound_variable,subtypep,claz_unbound_variable).
-struct_opv(claz_simple_unbound_variable,super_priority,[claz_simple_error,claz_simple_condition,claz_unbound_variable,claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_unbound_variable,super_priority,[claz_simple_error,claz_simple_condition,claz_unbound_variable,claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_undefined_function,classname,"SIMPLE-UNDEFINED-FUNCTION").
 struct_opv(claz_simple_undefined_function,classof,claz_built_in_class).
 struct_opv(claz_simple_undefined_function,subtypep,claz_simple_error).
 struct_opv(claz_simple_undefined_function,subtypep,claz_undefined_function).
-struct_opv(claz_simple_undefined_function,super_priority,[claz_simple_error,claz_simple_condition,claz_undefined_function,claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_undefined_function,super_priority,[claz_simple_error,claz_simple_condition,claz_undefined_function,claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_simple_vector,classname,"SIMPLE-VECTOR").
 struct_opv(claz_simple_vector,classof,claz_built_in_class).
 struct_opv(claz_simple_vector,name,"CAPACITY",zlot_simple_vector_capacity).
@@ -7286,7 +7266,7 @@ struct_opv(claz_simple_warning,classof,claz_built_in_class).
 struct_opv(claz_simple_warning,subtypep,claz_simple_condition).
 struct_opv(claz_simple_warning,subtypep,claz_warning).
 struct_opv(claz_simple_warning,super_priority,[claz_simple_condition,claz_warning,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_simple_warning,super_priority,[claz_simple_condition,claz_warning,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_simple_warning,super_priority,[claz_simple_condition,claz_warning,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_single_float,classname,"SINGLE-FLOAT").
 struct_opv(claz_single_float,classof,claz_built_in_class).
 struct_opv(claz_single_float,name,"VALUE",zlot_single_float_value).
@@ -7371,11 +7351,31 @@ struct_opv(claz_slot_definition,slot,source,zlot_slot_definition_source).
 struct_opv(claz_slot_definition,slot,type,zlot_slot_definition_type).
 struct_opv(claz_slot_definition,subtypep,claz_metaobject).
 struct_opv(claz_slot_definition,subtypep,claz_standard_object).
+struct_opv(claz_slot_definition,super_priority,[claz_metaobject,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_slot_definition,super_priority,[claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
-struct_opv(claz_slot_definition,super_priority,[claz_metaobject,claz_standard_object,claz_t]).
 struct_opv(claz_slot_definition_class,classname,"SLOT-DEFINITION-CLASS").
 struct_opv(claz_slot_definition_class,classof,claz_built_in_class).
 struct_opv(claz_slot_definition_class,subtypep,claz_standard_class).
+struct_opv(claz_slot_defstruct_description,classname,"DEFSTRUCT-SLOT-DESCRIPTION").
+struct_opv(claz_slot_defstruct_description,classof,claz_built_in_class).
+struct_opv(claz_slot_defstruct_description,name,"ACCESSOR-NAME",zlot_defstruct_slot_description_accessor_name).
+struct_opv(claz_slot_defstruct_description,name,"DEFAULT",zlot_defstruct_slot_description_default).
+struct_opv(claz_slot_defstruct_description,name,"INDEX",zlot_defstruct_slot_description_index).
+struct_opv(claz_slot_defstruct_description,name,"NAME",zlot_defstruct_slot_description_name).
+struct_opv(claz_slot_defstruct_description,name,"RAW-TYPE",zlot_defstruct_slot_description_raw_type).
+struct_opv(claz_slot_defstruct_description,name,"READ-ONLY",zlot_defstruct_slot_description_read_only).
+struct_opv(claz_slot_defstruct_description,name,"SAFE-P",zlot_defstruct_slot_description_safe_p).
+struct_opv(claz_slot_defstruct_description,name,"TYPE",zlot_defstruct_slot_description_type).
+struct_opv(claz_slot_defstruct_description,slot,accessor_name,zlot_defstruct_slot_description_accessor_name).
+struct_opv(claz_slot_defstruct_description,slot,default,zlot_defstruct_slot_description_default).
+struct_opv(claz_slot_defstruct_description,slot,index,zlot_defstruct_slot_description_index).
+struct_opv(claz_slot_defstruct_description,slot,name,zlot_defstruct_slot_description_name).
+struct_opv(claz_slot_defstruct_description,slot,raw_type,zlot_defstruct_slot_description_raw_type).
+struct_opv(claz_slot_defstruct_description,slot,read_only,zlot_defstruct_slot_description_read_only).
+struct_opv(claz_slot_defstruct_description,slot,safe_p,zlot_defstruct_slot_description_safe_p).
+struct_opv(claz_slot_defstruct_description,slot,type,zlot_defstruct_slot_description_type).
+struct_opv(claz_slot_defstruct_description,subtypep,claz_structure_c33_object).
+struct_opv(claz_slot_defstruct_description,super_priority,[claz_structure_c33_object,claz_structure_object,claz_slot_object,claz_t]).
 struct_opv(claz_slot_info,classname,"SLOT-INFO").
 struct_opv(claz_slot_info,classof,claz_built_in_class).
 struct_opv(claz_slot_info,name,"BOUNDP",zlot_slot_info_boundp).
@@ -7423,7 +7423,7 @@ struct_opv(claz_slotted_class,slot,instance_size,zlot_slotted_class_instance_siz
 struct_opv(claz_slotted_class,slot,subclass_of_stablehash_p,zlot_slotted_class_subclass_of_stablehash_p).
 struct_opv(claz_slotted_class,slot,valid_initargs_from_slots,zlot_slotted_class_valid_initargs_from_slots).
 struct_opv(claz_slotted_class,subtypep,claz_class).
-struct_opv(claz_slotted_class,super_priority,[claz_class,claz_potential_class,claz_specializer,claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_slotted_class,super_priority,[claz_class,claz_potential_class,claz_specializer,claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_socket_stream,classname,"SOCKET-STREAM").
 struct_opv(claz_socket_stream,classof,claz_built_in_class).
 struct_opv(claz_socket_stream,name,"SOCKET",zlot_socket_stream_socket).
@@ -7466,7 +7466,7 @@ struct_opv(claz_source_program_error,name,"FORM",zlot_source_program_error_form)
 struct_opv(claz_source_program_error,slot,detail,zlot_source_program_error_detail).
 struct_opv(claz_source_program_error,slot,form,zlot_source_program_error_form).
 struct_opv(claz_source_program_error,subtypep,claz_program_error).
-struct_opv(claz_source_program_error,super_priority,[claz_program_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_source_program_error,super_priority,[claz_program_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_special_binding,classname,"SPECIAL-BINDING").
 struct_opv(claz_special_binding,classof,claz_built_in_class).
 struct_opv(claz_special_binding,name,"IDX",zlot_special_binding_idx).
@@ -7538,7 +7538,7 @@ struct_opv(claz_specializer,slot,type,zlot_specializer_type).
 struct_opv(claz_specializer,subtypep,claz_metaobject).
 struct_opv(claz_specializer,subtypep,claz_standard_stablehash).
 struct_opv(claz_specializer,super_priority,[claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
-struct_opv(claz_specializer,super_priority,[claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_specializer,super_priority,[claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_specializer_with_object,classname,"SPECIALIZER-WITH-OBJECT").
 struct_opv(claz_specializer_with_object,classof,claz_built_in_class).
 struct_opv(claz_specializer_with_object,subtypep,claz_specializer).
@@ -7575,7 +7575,7 @@ struct_opv(claz_standard_accessor_method,slot,slot_definition,zlot_standard_acce
 struct_opv(claz_standard_accessor_method,subtypep,claz_accessor_method).
 struct_opv(claz_standard_accessor_method,subtypep,claz_standard_method).
 struct_opv(claz_standard_accessor_method,super_priority,[claz_accessor_method,claz_standard_method,claz_plist_mixin,claz_definition_source_mixin,claz_method,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
-struct_opv(claz_standard_accessor_method,super_priority,[claz_standard_method,claz_method,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_standard_accessor_method,super_priority,[claz_standard_method,claz_method,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_standard_boundp_method,classname,"STANDARD-BOUNDP-METHOD").
 struct_opv(claz_standard_boundp_method,classof,claz_built_in_class).
 struct_opv(claz_standard_boundp_method,subtypep,claz_standard_accessor_method).
@@ -7585,7 +7585,7 @@ struct_opv(claz_standard_class,classof,claz_built_in_class).
 struct_opv(claz_standard_class,subtypep,claz_semi_standard_class).
 struct_opv(claz_standard_class,subtypep,claz_slot_class).
 struct_opv(claz_standard_class,subtypep,claz_std_class).
-struct_opv(claz_standard_class,super_priority,[claz_semi_standard_class,claz_slotted_class,claz_class,claz_potential_class,claz_specializer,claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_standard_class,super_priority,[claz_semi_standard_class,claz_slotted_class,claz_class,claz_potential_class,claz_specializer,claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_standard_class,super_priority,[claz_std_class,claz_slot_class,claz_pcl_class,claz_class,claz_dependent_update_mixin,claz_plist_mixin,claz_definition_source_mixin,claz_standard_specializer,claz_specializer,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
 struct_opv(claz_standard_classoid,classname,"STANDARD-CLASSOID").
 struct_opv(claz_standard_classoid,classof,claz_built_in_class).
@@ -7595,7 +7595,7 @@ struct_opv(claz_standard_direct_slot_definition,classname,"STANDARD-DIRECT-SLOT-
 struct_opv(claz_standard_direct_slot_definition,classof,claz_built_in_class).
 struct_opv(claz_standard_direct_slot_definition,subtypep,claz_direct_slot_definition).
 struct_opv(claz_standard_direct_slot_definition,subtypep,claz_standard_slot_definition).
-struct_opv(claz_standard_direct_slot_definition,super_priority,[claz_direct_slot_definition,claz_standard_slot_definition,claz_slot_definition,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_standard_direct_slot_definition,super_priority,[claz_direct_slot_definition,claz_standard_slot_definition,claz_slot_definition,claz_metaobject,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_standard_direct_slot_definition,super_priority,[claz_standard_slot_definition,claz_direct_slot_definition,claz_slot_definition,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
 struct_opv(claz_standard_effective_slot_definition,classname,"STANDARD-EFFECTIVE-SLOT-DEFINITION").
 struct_opv(claz_standard_effective_slot_definition,classof,claz_built_in_class).
@@ -7603,7 +7603,7 @@ struct_opv(claz_standard_effective_slot_definition,name,"LOCATION",zlot_standard
 struct_opv(claz_standard_effective_slot_definition,slot,location,zlot_standard_effective_slot_definition_location).
 struct_opv(claz_standard_effective_slot_definition,subtypep,claz_effective_slot_definition).
 struct_opv(claz_standard_effective_slot_definition,subtypep,claz_standard_slot_definition).
-struct_opv(claz_standard_effective_slot_definition,super_priority,[claz_effective_slot_definition,claz_standard_slot_definition,claz_slot_definition,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_standard_effective_slot_definition,super_priority,[claz_effective_slot_definition,claz_standard_slot_definition,claz_slot_definition,claz_metaobject,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_standard_effective_slot_definition,super_priority,[claz_standard_slot_definition,claz_effective_slot_definition,claz_slot_definition,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
 struct_opv(claz_standard_funcallable_instance,classname,"STANDARD-FUNCALLABLE-INSTANCE").
 struct_opv(claz_standard_funcallable_instance,classof,claz_built_in_class).
@@ -7651,7 +7651,7 @@ struct_opv(claz_standard_generic_function,slot,name,zlot_standard_generic_functi
 struct_opv(claz_standard_generic_function,slot,signature,zlot_standard_generic_function_signature).
 struct_opv(claz_standard_generic_function,subtypep,claz_generic_function).
 struct_opv(claz_standard_generic_function,super_priority,[claz_generic_function,claz_dependent_update_mixin,claz_plist_mixin,claz_definition_source_mixin,claz_metaobject,claz_funcallable_standard_object,claz_function,claz_standard_object,claz_slot_object,claz_t]).
-struct_opv(claz_standard_generic_function,super_priority,[claz_generic_function,claz_metaobject,claz_funcallable_standard_object,claz_function,claz_standard_object,claz_t]).
+struct_opv(claz_standard_generic_function,super_priority,[claz_generic_function,claz_metaobject,claz_funcallable_standard_object,claz_function,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_standard_method,classname,"STANDARD-METHOD").
 struct_opv(claz_standard_method,classof,claz_built_in_class).
 struct_opv(claz_standard_method,name,"DOCUMENTATION",zlot_standard_method_documentation).
@@ -7679,7 +7679,7 @@ struct_opv(claz_standard_method,slot,wants_next_method_p,zlot_standard_method_wa
 struct_opv(claz_standard_method,subtypep,claz_definition_source_mixin).
 struct_opv(claz_standard_method,subtypep,claz_method).
 struct_opv(claz_standard_method,subtypep,claz_plist_mixin).
-struct_opv(claz_standard_method,super_priority,[claz_method,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_standard_method,super_priority,[claz_method,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_standard_method,super_priority,[claz_plist_mixin,claz_definition_source_mixin,claz_method,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
 struct_opv(claz_standard_method_combination,classname,"STANDARD-METHOD-COMBINATION").
 struct_opv(claz_standard_method_combination,classof,claz_built_in_class).
@@ -7714,7 +7714,7 @@ struct_opv(claz_standard_reader_method,classname,"STANDARD-READER-METHOD").
 struct_opv(claz_standard_reader_method,classof,claz_built_in_class).
 struct_opv(claz_standard_reader_method,subtypep,claz_standard_accessor_method).
 struct_opv(claz_standard_reader_method,super_priority,[claz_standard_accessor_method,claz_accessor_method,claz_standard_method,claz_plist_mixin,claz_definition_source_mixin,claz_method,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
-struct_opv(claz_standard_reader_method,super_priority,[claz_standard_accessor_method,claz_standard_method,claz_method,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_standard_reader_method,super_priority,[claz_standard_accessor_method,claz_standard_method,claz_method,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_standard_readtable_modified_error,classname,"STANDARD-READTABLE-MODIFIED-ERROR").
 struct_opv(claz_standard_readtable_modified_error,classof,claz_built_in_class).
 struct_opv(claz_standard_readtable_modified_error,name,"OPERATION",zlot_standard_readtable_modified_error_operation).
@@ -7729,8 +7729,8 @@ struct_opv(claz_standard_slot_definition,name,"ALLOCATION-CLASS",zlot_standard_s
 struct_opv(claz_standard_slot_definition,slot,allocation,zlot_standard_slot_definition_allocation).
 struct_opv(claz_standard_slot_definition,slot,allocation_class,zlot_standard_slot_definition_allocation_class).
 struct_opv(claz_standard_slot_definition,subtypep,claz_slot_definition).
+struct_opv(claz_standard_slot_definition,super_priority,[claz_slot_definition,claz_metaobject,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_standard_slot_definition,super_priority,[claz_slot_definition,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
-struct_opv(claz_standard_slot_definition,super_priority,[claz_slot_definition,claz_metaobject,claz_standard_object,claz_t]).
 struct_opv(claz_standard_specializer,classname,"STANDARD-SPECIALIZER").
 struct_opv(claz_standard_specializer,classof,claz_built_in_class).
 struct_opv(claz_standard_specializer,subtypep,claz_specializer).
@@ -7740,12 +7740,12 @@ struct_opv(claz_standard_stablehash,classof,claz_built_in_class).
 struct_opv(claz_standard_stablehash,name,"HASHCODE",zlot_standard_stablehash_hashcode).
 struct_opv(claz_standard_stablehash,slot,hashcode,zlot_standard_stablehash_hashcode).
 struct_opv(claz_standard_stablehash,subtypep,claz_standard_object).
-struct_opv(claz_standard_stablehash,super_priority,[claz_standard_object,claz_t]).
+struct_opv(claz_standard_stablehash,super_priority,[claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_standard_writer_method,classname,"STANDARD-WRITER-METHOD").
 struct_opv(claz_standard_writer_method,classof,claz_built_in_class).
 struct_opv(claz_standard_writer_method,subtypep,claz_standard_accessor_method).
 struct_opv(claz_standard_writer_method,super_priority,[claz_standard_accessor_method,claz_accessor_method,claz_standard_method,claz_plist_mixin,claz_definition_source_mixin,claz_method,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
-struct_opv(claz_standard_writer_method,super_priority,[claz_standard_accessor_method,claz_standard_method,claz_method,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_standard_writer_method,super_priority,[claz_standard_accessor_method,claz_standard_method,claz_method,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_stat_vfs,classname,"STAT-VFS").
 struct_opv(claz_stat_vfs,classof,claz_built_in_class).
 struct_opv(claz_stat_vfs,name,"BAVAIL",zlot_stat_vfs_bavail).
@@ -7816,7 +7816,7 @@ struct_opv(claz_storage_condition,classname,"STORAGE-CONDITION").
 struct_opv(claz_storage_condition,classof,claz_built_in_class).
 struct_opv(claz_storage_condition,subtypep,claz_serious_condition).
 struct_opv(claz_storage_condition,super_priority,[claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_storage_condition,super_priority,[claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_storage_condition,super_priority,[claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_storage_info,classname,"STORAGE-INFO").
 struct_opv(claz_storage_info,classof,claz_built_in_class).
 struct_opv(claz_storage_info,name,"DEBUG-VARS",zlot_storage_info_debug_vars).
@@ -7913,7 +7913,7 @@ struct_opv(claz_stream_error,slot,stream,zlot_stream_error_stream).
 struct_opv(claz_stream_error,subtypep,claz_error).
 struct_opv(claz_stream_error,subtypep,claz_lisp_error).
 struct_opv(claz_stream_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_stream_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_stream_error,super_priority,[claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_string,classname,"STRING").
 struct_opv(claz_string,classof,claz_built_in_class).
 struct_opv(claz_string,subtypep,claz_vector).
@@ -8033,7 +8033,7 @@ struct_opv(claz_structure_class,slot,prototype,zlot_structure_class_prototype).
 struct_opv(claz_structure_class,subtypep,claz_slot_class).
 struct_opv(claz_structure_class,subtypep,claz_slotted_class).
 struct_opv(claz_structure_class,super_priority,[claz_slot_class,claz_pcl_class,claz_class,claz_dependent_update_mixin,claz_plist_mixin,claz_definition_source_mixin,claz_standard_specializer,claz_specializer,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
-struct_opv(claz_structure_class,super_priority,[claz_slotted_class,claz_class,claz_potential_class,claz_specializer,claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_structure_class,super_priority,[claz_slotted_class,claz_class,claz_potential_class,claz_specializer,claz_super_class,claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_structure_classoid,classname,"STRUCTURE-CLASSOID").
 struct_opv(claz_structure_classoid,classof,claz_built_in_class).
 struct_opv(claz_structure_classoid,subtypep,claz_classoid).
@@ -8042,7 +8042,7 @@ struct_opv(claz_structure_direct_slot_definition,classname,"STRUCTURE-DIRECT-SLO
 struct_opv(claz_structure_direct_slot_definition,classof,claz_built_in_class).
 struct_opv(claz_structure_direct_slot_definition,subtypep,claz_direct_slot_definition).
 struct_opv(claz_structure_direct_slot_definition,subtypep,claz_structure_slot_definition).
-struct_opv(claz_structure_direct_slot_definition,super_priority,[claz_direct_slot_definition,claz_slot_definition,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_structure_direct_slot_definition,super_priority,[claz_direct_slot_definition,claz_slot_definition,claz_metaobject,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_structure_direct_slot_definition,super_priority,[claz_structure_slot_definition,claz_direct_slot_definition,claz_slot_definition,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
 struct_opv(claz_structure_effective_slot_definition,classname,"STRUCTURE-EFFECTIVE-SLOT-DEFINITION").
 struct_opv(claz_structure_effective_slot_definition,classof,claz_built_in_class).
@@ -8058,7 +8058,7 @@ struct_opv(claz_structure_effective_slot_definition,slot,efm_svuc,zlot_structure
 struct_opv(claz_structure_effective_slot_definition,slot,readonly,zlot_structure_effective_slot_definition_readonly).
 struct_opv(claz_structure_effective_slot_definition,subtypep,claz_effective_slot_definition).
 struct_opv(claz_structure_effective_slot_definition,subtypep,claz_structure_slot_definition).
-struct_opv(claz_structure_effective_slot_definition,super_priority,[claz_effective_slot_definition,claz_slot_definition,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_structure_effective_slot_definition,super_priority,[claz_effective_slot_definition,claz_slot_definition,claz_metaobject,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_structure_effective_slot_definition,super_priority,[claz_structure_slot_definition,claz_effective_slot_definition,claz_slot_definition,claz_metaobject,claz_standard_object,claz_slot_object,claz_t]).
 struct_opv(claz_structure_initarg_not_keyword,classname,"STRUCTURE-INITARG-NOT-KEYWORD").
 struct_opv(claz_structure_initarg_not_keyword,classof,claz_built_in_class).
@@ -8141,7 +8141,7 @@ struct_opv(claz_style_warning,subtypep,claz_simple_style_warning).
 struct_opv(claz_style_warning,subtypep,claz_warning).
 struct_opv(claz_style_warning,super_priority,[claz_reference_condition,claz_simple_style_warning,claz_simple_condition,claz_style_warning,claz_warning,claz_condition,claz_slot_object,claz_t]).
 struct_opv(claz_style_warning,super_priority,[claz_warning,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_style_warning,super_priority,[claz_warning,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_style_warning,super_priority,[claz_warning,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_super_class,classname,"SUPER-CLASS").
 struct_opv(claz_super_class,classof,claz_built_in_class).
 struct_opv(claz_super_class,name,"CLASSNAME",zlot_super_class_classname).
@@ -8150,7 +8150,7 @@ struct_opv(claz_super_class,slot,classname,zlot_super_class_classname).
 struct_opv(claz_super_class,slot,direct_subclasses,zlot_super_class_direct_subclasses).
 struct_opv(claz_super_class,subtypep,claz_metaobject).
 struct_opv(claz_super_class,subtypep,claz_standard_stablehash).
-struct_opv(claz_super_class,super_priority,[claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_t]).
+struct_opv(claz_super_class,super_priority,[claz_standard_stablehash,claz_metaobject,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_symbol,classname,"SYMBOL").
 struct_opv(claz_symbol,classof,claz_built_in_class).
 struct_opv(claz_symbol,name,"FLAGS",zlot_symbol_flags).
@@ -8550,12 +8550,12 @@ struct_opv(claz_unbound_slot,name,"INSTANCE",zlot_unbound_slot_instance).
 struct_opv(claz_unbound_slot,slot,instance,zlot_unbound_slot_instance).
 struct_opv(claz_unbound_slot,subtypep,claz_cell_error).
 struct_opv(claz_unbound_slot,super_priority,[claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_unbound_slot,super_priority,[claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_unbound_slot,super_priority,[claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_unbound_variable,classname,"UNBOUND-VARIABLE").
 struct_opv(claz_unbound_variable,classof,claz_built_in_class).
 struct_opv(claz_unbound_variable,subtypep,claz_cell_error).
 struct_opv(claz_unbound_variable,super_priority,[claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_unbound_variable,super_priority,[claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_unbound_variable,super_priority,[claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_undefined_alien_error,classname,"UNDEFINED-ALIEN-ERROR").
 struct_opv(claz_undefined_alien_error,classof,claz_built_in_class).
 struct_opv(claz_undefined_alien_error,subtypep,claz_cell_error).
@@ -8582,7 +8582,7 @@ struct_opv(claz_undefined_function,classname,"UNDEFINED-FUNCTION").
 struct_opv(claz_undefined_function,classof,claz_built_in_class).
 struct_opv(claz_undefined_function,subtypep,claz_cell_error).
 struct_opv(claz_undefined_function,super_priority,[claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_undefined_function,super_priority,[claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_undefined_function,super_priority,[claz_cell_error,claz_error,claz_serious_condition,claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_undefined_package,classname,"UNDEFINED-PACKAGE").
 struct_opv(claz_undefined_package,classof,claz_built_in_class).
 struct_opv(claz_undefined_package,name,"ERROR",zlot_undefined_package_error).
@@ -8985,7 +8985,7 @@ struct_opv(claz_warning,subtypep,claz_condition).
 struct_opv(claz_warning,subtypep,claz_reference_condition).
 struct_opv(claz_warning,subtypep,claz_simple_warning).
 struct_opv(claz_warning,super_priority,[claz_condition,claz_slot_object,claz_t]).
-struct_opv(claz_warning,super_priority,[claz_condition,claz_standard_object,claz_t]).
+struct_opv(claz_warning,super_priority,[claz_condition,claz_standard_object,claz_slot_object,claz_t /**/]).
 struct_opv(claz_warning,super_priority,[claz_reference_condition,claz_simple_warning,claz_simple_condition,claz_warning,claz_condition,claz_slot_object,claz_t]).
 struct_opv(claz_weak_hash_table,classname,"WEAK-HASH-TABLE").
 struct_opv(claz_weak_hash_table,classof,claz_built_in_class).
