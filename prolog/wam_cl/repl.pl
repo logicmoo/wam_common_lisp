@@ -138,6 +138,7 @@ __        ___    __  __        ____ _
 	prompts(Old1, Old2),
 	prompts('> ', '> '),
 	%tidy_database,
+        el_new(ENV),nb_setval('$env_toplevel',ENV),
 	repeat,
         catch(read_eval_print(Result),'$aborted',fail),
    	notrace(Result == end_of_file),!,

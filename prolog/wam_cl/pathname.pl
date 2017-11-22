@@ -44,7 +44,7 @@ search_for(In,O):- stream_property(_,file_name(FD)),with_fstem(FD,In,M),!,cl_str
 % Uses Symbol value: *SOURCE-FILE-TYPES*
 check_file_types(SearchTypes):- 
    cl_symbol_value(custom_xx_source_file_types_xx,FileTypes),
-   maplist(to_file_exts(),FileTypes,SearchTypes).
+   maplist(to_file_exts,FileTypes,SearchTypes).
 check_file_types(['.cl','.lisp','.lsp','.el']).
 
 to_file_exts(Str,Atom):-txt2a(Str,At),atom_concat('.',At,Atom).
