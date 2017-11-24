@@ -49,7 +49,7 @@ create_instance(Kind,Attrs,Obj):-
   new_named_opv(Kind,Name,Attrs,Obj).
 
 new_named_opv(SKind,Name,Attrs,Obj):- 
-  find_kind(SKind,Kind),
+  trace,find_kind(SKind,Kind),
   instance_prefix(Kind,Pre),!,
   cl_string(Name,SName),
   atomic_list_concat([Pre,SName],'_',PName),
@@ -286,8 +286,8 @@ get_szlot(Prefix,Type,Key,SlotInfo):-
   SlotInfo=..[SlotInfo1|Params].
    
 cleanup_mop:-  
- ignore((get_struct_opv(X,include,claz_object),get_struct_opv(X,include,Y),Y\==claz_object,show_call_trace(retract(soops:struct_opv(X,include,claz_object))),fail)),
- ignore((get_struct_opv(X,include,claz_t),get_struct_opv(X,include,Y),Y\==claz_t,show_call_trace(retract(soops:struct_opv(X,include,claz_t))),fail)).
+ ignore((get_struct_opv(X,include,claz_object),get_struct_opv(X,include,Y),Y\==claz_object,show_call_trace(retract(soops:struct_opv(X,defkw,include,claz_object))),fail)),
+ ignore((get_struct_opv(X,include,claz_t),get_struct_opv(X,include,Y),Y\==claz_t,show_call_trace(retract(soops:struct_opv(X,defkw,include,claz_t))),fail)).
 
 save_mop:- cleanup_mop,tell('ci3.pro'),
  forall(member(Assert,[get_struct_opv(_,P,_),get_struct_opv(_,P,_,_),get_struct_opv(_,P,_,_,_)]),
@@ -444,7 +444,7 @@ set_opv(Obj,Prop,Value):- delete_opvalues(Obj,Prop),add_opv(Obj,Prop,Value).
 ensure_opv_type_inited(Kind):- is_obj_type(Kind),!.
 ensure_opv_type_inited(Kind):- 
   asserta(is_obj_type(Kind)),!,
-  findall(Slot,soops:struct_opv(Kind,has_slot,Slot),Slots),add_opv_slots(Kind,1,Slots).
+  findall(Slot,soops:struct_opv(Kind,slot,Slot,_),Slots),add_opv_slots(Kind,1,Slots).
 
 add_opv_slots(Kind,N,[Slot|Slots]):- !, add_slot_def(N,Kind,Slot),N1 is N + 1,add_opv_slots(Kind,N1,Slots).
 add_opv_slots(_Type,_N,[]).
@@ -501,7 +501,7 @@ type_attribute_pred0(Kind,Prop,Pred):- nonvar(Prop),
 construct_opv(Obj,Kind):- get_opv(Obj,instance,Kind),!.
 construct_opv(Obj,Kind):-
   add_opv(Obj,instance,Kind),
-  forall(soops:struct_opv(Kind,include,Super),construct_opv(Obj,Super)).  
+  forall(soops:struct_opv(Kind,defkw,include,Super),construct_opv(Obj,Super)).  
 
 /*
 add_missing_opv(Obj,Kind,KV):- get_kv(KV,Key,Value), add_missing_opv(Obj,Kind,Key,Value). 

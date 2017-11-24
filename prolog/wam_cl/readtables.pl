@@ -31,9 +31,8 @@ reader_intern_symbols(Package,SymbolName,Symbol):-
    atom(SymbolName),atom_symbol(SymbolName,Package,Symbol),!.
 reader_intern_symbols(_Package,Some,Some):- \+ compound(Some),!.
 
-reader_intern_symbols(Package,ExprI,ExprO):- ExprI=..[F,C|Expr],F=='$OBJ',
-  reader_intern_symbols(Package,C,CC),
-  (atom(CC)->find_kind(CC,K);K=CC),
+reader_intern_symbols(Package,ExprI,ExprO):- ExprI=..[F,C|Expr],F=='$OBJ',  
+  ((find_kind(C,K),atom(K));reader_intern_symbols(Package,C,K)),
   must_maplist(reader_intern_symbols(Package),Expr,TT),ExprO=..[F,K|TT].
 reader_intern_symbols(Package,ExprI,ExprO):- ExprI=..[F|Expr],atom_concat('$',_,F),!,
   must_maplist(reader_intern_symbols(Package),Expr,TT),ExprO=..[F|TT].
