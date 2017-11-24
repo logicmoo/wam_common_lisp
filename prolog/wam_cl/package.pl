@@ -58,7 +58,7 @@ cl_find_package(_,[]).
 
 cl_package_name(S,Name):- find_package(S,Package),get_opv(Package,name,Name).
 
-find_package('$OBJ'(package,UP),Package):-!,find_package(UP,Package).
+find_package('$OBJ'(claz_package,UP),Package):-find_package(UP,Package).
 find_package(S,S):- is_lisp_package(S),!.
 find_package(S,Package):- 
   as_string_upper(S,SN),
@@ -66,7 +66,7 @@ find_package(S,Package):-
 
 find_package_or_die(X,Y):- find_package(X,Y) -> true ; throw(find_package_or_die(X,Y)).  
 
-as_package_object(Package,'$OBJ'(package,Package)).
+as_package_object(Package,'$OBJ'(claz_package,Package)).
 
 
 reading_package(Package):- symbol_value('xx_package_xx',UP),find_package(UP,Package).

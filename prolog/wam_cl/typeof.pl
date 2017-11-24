@@ -20,7 +20,7 @@ cl_class_of(Obj,Class):- i_class(Obj,Class),!.
 
 i_class(Var,claz_locative):-var(Var).
 % compounds
-i_class(function(OP),Class):- get_opv(OP,function,Obj),cl_type_of(Obj,Class).
+i_class(function(OP),Class):- get_opv(OP,function,Obj),cl_class_of(Obj,Class).
 i_class([_|_],claz_cons):-!.
 i_class('$OBJ'(Type,_Data),Type).
 i_class('$CHAR'(_),claz_character).
@@ -39,14 +39,15 @@ i_class(function(_),claz_function).
 i_type(Var,sys_locative):-var(Var).
 i_type([],null):-!.
 i_type([_|_],cons):-!.
-i_type('$OBJ'(Type,_Data),Type).
+i_type(Obj,Type):- get_opv_i(Obj,typeof,Type).
+i_type(Obj,Type):- get_opv_i(Obj,classof,Class),get_struct_opv(Class,type,Type).
 i_type(Dict,Type):- is_dict(Dict,Type).
 i_type(Str,string):- string(Str).
 i_type(t,boolean).
-i_type(Obj,Type):- number(Obj),!,number_type_of(Obj,Type).
 i_type('$CHAR'(_),character).
+i_type(Obj,Type):- number(Obj),!,number_type_of(Obj,Type).
+i_type('$OBJ'(Type,_Data),Type).
 i_type(Atom,Type):- atom(Atom),atomic_list_concat([Type,_Name],'_znst_',Atom).
-i_type(Obj,Type):- get_opv_i(Obj,typeof,Type).
 i_type(function(OP),Class):- get_opv(OP,function,Obj),cl_type_of(Obj,Class).
 
 type_ges(function(_),function).
@@ -58,7 +59,6 @@ type_or_class_nameof(Obj,Name):- quietly((cl_class_of(Obj,Type),type_named(Type,
 
 type_named('$OBJ'(_,Type),Type):- atom(Type),!.
 type_named(Type,Type):- atomic(Type).
-
 
 
 

@@ -123,6 +123,7 @@ lisp_call(Function, Result):-
 	apply(Function, [Result]).
 
 
+% negation can be over existence,  future possiblity or past existence, we say there exists some truth in which  
 
 
 t_or_nil(G,Ret):- G->Ret=t;Ret=[].
@@ -136,14 +137,14 @@ cl_eql(A,B,Ret):- t_or_nil( is_eql(A,B) , Ret).
 cl_equal(A,B,Ret):- t_or_nil( is_equal(A,B) , Ret).
 cl_equalp(A,B,Ret):- t_or_nil( is_equalp(A,B) , Ret).
 
-is_eql(X,Y):- X=:=Y.
+is_eql(X,Y):- cl_type_of(X,T),cl_type_of(Y,T), notrace(catch(X=:=Y,_,fail)).
 is_eq(X,Y):- X==Y.
-is_equal(X,Y):- X=@=Y.
-is_equalp(X,Y):- f_u_to_pvs(X,XX),f_u_to_pvs(Y,YY),XX=@=YY.
+is_equal(X,Y):- (X=@=Y->true;is_eql(X,Y)).
+is_equalp(X,Y):- is_equal(X,Y)->true;((f_u_to_pvs(X,XX),f_u_to_pvs(Y,YY), XX=@=YY)-> true ; ( \+ X\=Y)).
 
 f_u_to_pvs(X,[float|XX]):- notrace(catch(XX is (1.0 * X),_,fail)),!.
-f_u_to_pvs(X,XX):- findall([P|V],(get_opv(X,P,V);get_struct_opv(X,P,V)),List),List\==[],sort(List,XX).
-f_u_to_pvs(X,[str|XX]):-format(string(S),'~w',[X]),string_upper(S,XX).
+f_u_to_pvs(X,XX):- findall([P|V],(get_opv(X,P,V);get_struct_opv(X,P,V)),List),List\==[],sort(List,XX),!.
+f_u_to_pvs(X,[str|XX]):- format(string(S),'~w',[X]),string_upper(S,XX),!.
 
 
 

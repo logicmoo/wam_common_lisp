@@ -39,13 +39,13 @@ cl_aref(List,Index,RetVal):- cl_nthcdr(List,Index,RetVal).
 
 
 cl_make_array(Dims,RetVal):- e1_as_list(Dims,DimsL),
- create_struct(clz_array,[dims=DimsL],RetVal).
+ create_instance(clz_array,[dims=DimsL],RetVal).
 cl_make_array(Dims,Keys,RetVal):- e1_as_list(Dims,DimsL),
- create_struct(clz_array,[dims=DimsL|Keys],RetVal).
+ create_instance(clz_array,[dims=DimsL|Keys],RetVal).
 
 cl_vector(Elements,RetVal):-
  length(Elements,Size),
- create_struct(clz_vector,[dims=[Size],data=Elements],RetVal).
+ create_struct(clz_array,[dims=[Size],data=Elements],RetVal).
 
 cl_vectorp(Obj,RetVal):- t_or_nil(is_vectorp(Obj),RetVal).
 cl_arrayp(Obj,RetVal):- t_or_nil(is_arrayp(Obj),RetVal).
