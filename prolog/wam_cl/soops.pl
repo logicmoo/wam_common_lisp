@@ -30,6 +30,7 @@ create_struct1(_Type,Value,Value).
 on_x_rtrace(G):- catch(G,E,(dbmsg(E),rtrace(G),break)).
 atom_concat_or_rtrace(X,Y,Z):- on_x_rtrace(atom_concat(X,Y,Z)).
 
+find_kind(Name,Kind):- cl_find_class(Name,Kind),!.
 find_kind(Name,Kind):- atom(Name),atom_concat_or_rtrace('claz_',_,Name),!,Kind=Name.
 find_kind(Name,Kind):- cl_string(Name,SName),
   new_named_opv(claz_structure_class,SName,[],Kind),!.
@@ -119,7 +120,7 @@ value_default(claz_object,mut([],claz_object)).
 :- assert(user:return_arg_is_first(cl_make_instance)).
 
 
-
+cl_find_class(Name,Claz):- atom(Name),atom_concat('claz_',_,Name),Claz=Name.
 cl_find_class(Name,Claz):-
   cl_string(Name,StringC),
   string_upper(StringC,NameS),
