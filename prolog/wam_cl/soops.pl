@@ -30,11 +30,6 @@ create_struct1(_Type,Value,Value).
 on_x_rtrace(G):- catch(G,E,(dbmsg(E),rtrace(G),break)).
 atom_concat_or_rtrace(X,Y,Z):- on_x_rtrace(atom_concat(X,Y,Z)).
 
-find_kind(Name,Kind):- cl_find_class(Name,Kind),!.
-find_kind(Name,Kind):- atom(Name),atom_concat_or_rtrace('claz_',_,Name),!,Kind=Name.
-find_kind(Name,Kind):- cl_string(Name,SName),
-  new_named_opv(claz_structure_class,SName,[],Kind),!.
-
 cl_make_instance(Obj,[Name|Slots]):- must_or_rtrace(create_instance(Name,Slots,Obj)).
 
 create_struct(X,Y):-create_instance(X,Y).
@@ -49,7 +44,7 @@ create_instance(Kind,Attrs,Obj):-
   new_named_opv(Kind,Name,Attrs,Obj).
 
 new_named_opv(SKind,Name,Attrs,Obj):- 
-  trace,find_kind(SKind,Kind),
+  find_or_create_class(SKind,Kind),
   instance_prefix(Kind,Pre),!,
   cl_string(Name,SName),
   atomic_list_concat([Pre,SName],'_',PName),
@@ -120,11 +115,15 @@ value_default(claz_object,mut([],claz_object)).
 :- assert(user:return_arg_is_first(cl_make_instance)).
 
 
-cl_find_class(Name,Claz):- atom(Name),atom_concat('claz_',_,Name),Claz=Name.
+find_or_create_class(Name,Kind):- cl_find_class(Name,Kind),Kind\==[],!.
+find_or_create_class(Name,Kind):- cl_string(Name,SName),new_named_opv(claz_structure_class,SName,[],Kind),!.
+
+cl_find_class(Name,Claz):- atom(Name),atom_concat('claz_',_,Name),!,Claz=Name.
 cl_find_class(Name,Claz):-
   cl_string(Name,StringC),
   string_upper(StringC,NameS),
-  get_struct_opv(Claz,classname,NameS).
+  get_struct_opv(Claz,classname,NameS),!.
+cl_find_class(_,[]).
   
 cl_slot_value(Obj,Slot,Value):- get_opv(Obj,Slot,Value).
 
@@ -144,6 +143,9 @@ define_class(Name,KeyWords,SlotsIn,Kind):-
 define_struct(Name,KeyWords,SlotsIn,Kind):- 
   (var(Kind) -> ((cl_string(Name,SName), new_named_opv(claz_structure_class,SName,[],Kind)));true),
    define_kind(Name,KeyWords,SlotsIn,Kind).
+
+is_structure_class(T):- get_opv(T,classof,claz_structure_class).
+
 
 define_kind(Name,KeyWords,SlotsIn,Kind):- 
  must_or_rtrace((

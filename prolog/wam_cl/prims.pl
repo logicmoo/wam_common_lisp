@@ -147,7 +147,6 @@ f_u_to_pvs(X,XX):- findall([P|V],(get_opv(X,P,V);get_struct_opv(X,P,V)),List),Li
 f_u_to_pvs(X,[str|XX]):- format(string(S),'~w',[X]),string_upper(S,XX),!.
 
 
-
 cl_sqrt(X,Y):- \+ integer(X)-> Y is sqrt(X);
    (Y is sqrt(X)).
 
