@@ -47,7 +47,7 @@ check_file_types(SearchTypes):-
    maplist(to_file_exts,FileTypes,SearchTypes).
 check_file_types(['.cl','.lisp','.lsp','.el']).
 
-to_file_exts(Str,Atom):-txt2a(Str,At),atom_concat('.',At,Atom).
+to_file_exts(Str,Atom):-txt2a(Str,At),atom_concat_or_rtrace('.',At,Atom).
 txt2a(T,A):- text_to_string(T,S),atom_string(A,S),!.
 
 with_fstem(F0,File0,Found):-   

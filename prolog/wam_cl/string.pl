@@ -27,8 +27,8 @@ cl_stringp(A, R):- t_or_nil(string(A),R).
 cl_string(SS,SS):- string(SS),!.
 cl_string(S,SN):- is_symbolp(S),cl_symbol_name(S,SN),!.
 % grabs ugly objects
-cl_string(S,SN):- atom_concat(':',S0,S),!,cl_string(S0,SN).% TODO add a warjing that hte keyword was somehow misrepresented
-cl_string(S,SN):- atom_concat('kw_',S0,S),!,cl_string(S0,SN). % TODO add a warjing that hte keyword was somehow missing
+cl_string(S,SN):- atom_concat_or_rtrace(':',S0,S),!,cl_string(S0,SN).% TODO add a warjing that hte keyword was somehow misrepresented
+cl_string(S,SN):- atom_concat_or_rtrace('kw_',S0,S),!,cl_string(S0,SN). % TODO add a warjing that hte keyword was somehow missing
 cl_string(S,SN):- notrace(catch(text_to_string(S,SN),_,fail)),!.
 
    

@@ -32,7 +32,8 @@ reader_intern_symbols(Package,SymbolName,Symbol):-
 reader_intern_symbols(_Package,Some,Some):- \+ compound(Some),!.
 
 reader_intern_symbols(Package,ExprI,ExprO):- ExprI=..[F,C|Expr],F=='$OBJ',
-  find_kind(C,K),
+  reader_intern_symbols(Package,C,CC),
+  (atom(CC)->find_kind(CC,K);K=CC),
   must_maplist(reader_intern_symbols(Package),Expr,TT),ExprO=..[F,K|TT].
 reader_intern_symbols(Package,ExprI,ExprO):- ExprI=..[F|Expr],atom_concat('$',_,F),!,
   must_maplist(reader_intern_symbols(Package),Expr,TT),ExprO=..[F|TT].
@@ -47,7 +48,7 @@ reader_intern_symbols(Package,C1,C2):-
 reader_intern_symbols(_Package,Some,Some).
 
 
-simple_atom_token(SymbolName):- atom_concat('$',_,SymbolName),upcase_atom(SymbolName,SymbolName).
+simple_atom_token(SymbolName):- atom_concat_or_rtrace('$',_,SymbolName),upcase_atom(SymbolName,SymbolName).
 simple_atom_token(SymbolName):- string_upper(SymbolName,UP),string_lower(SymbolName,DOWN),!,UP==DOWN.
 
 atom_symbol(SymbolName,_,Token):- simple_atom_token(SymbolName),!,SymbolName=Token.

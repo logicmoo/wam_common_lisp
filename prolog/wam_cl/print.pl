@@ -20,9 +20,9 @@
 % Grammar rules for printing Lisp s-expressions.
 % Given a list of tokens, lisplist does all the nesting of lists
 
-trim_full_stop(SPClosure,TSPClosure):-atom_concat(SPClosureN,'\n',SPClosure),!,trim_full_stop(SPClosureN,TSPClosure).
-trim_full_stop(SPClosure,TSPClosure):-atom_concat(SPClosureN,' ',SPClosure),!,trim_full_stop(SPClosureN,TSPClosure).
-trim_full_stop(SPClosure,SPClosureN):-atom_concat(SPClosureN,'.',SPClosure).
+trim_full_stop(SPClosure,TSPClosure):-atom_concat_or_rtrace(SPClosureN,'\n',SPClosure),!,trim_full_stop(SPClosureN,TSPClosure).
+trim_full_stop(SPClosure,TSPClosure):-atom_concat_or_rtrace(SPClosureN,' ',SPClosure),!,trim_full_stop(SPClosureN,TSPClosure).
+trim_full_stop(SPClosure,SPClosureN):-atom_concat_or_rtrace(SPClosureN,'.',SPClosure).
 trim_full_stop(SPClosure,SPClosure).
 
 sexpr1(X) --> {is_ftVar(X),(get_var_name(X,N)->format(atom(NN),'~w',[N]);format(atom(NN),'~w',[X]))},!,[NN].

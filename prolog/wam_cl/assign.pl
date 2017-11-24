@@ -35,8 +35,14 @@ get_var_tracker(Ctx0,Atom,Dict):-  get_attr(Ctx0,tracker,Ctx),Dict=rw{name:Atom,
 locally_let([N=V|More],G):- castify(V,Value),!,locally_let([N=Value|More],G).
 locally_let([N=V|More],G):- castify(N,Symbol),!,locally_let([Symbol=V|More],G).
 locally_let([N=V|More],G):- 
-   locally($(N)=V,locally_let(More,G)).
+ symbol_value(N,Was),
+  setup_call_cleanup(
+     set_symbol_value(N,V),
+     once(locally($(N)=V,locally_let(More,G))),
+     set_symbol_value(N,Was)).
+   
 locally_let([],G):- call(G).
+locally_let(N=V,G):-!,locally_let([N=V],G).
 
 castify(O,O):- \+compound(O),!,fail.
 castify(str(O),S):-!, castify1(O,M),cl_string(M,S).
@@ -47,7 +53,8 @@ castify1(O,O):- \+compound(O),!.
 castify1(O,O):- is_list(O),!.
 castify1(I,O):- castify(I,O).
 
-
+extract_var_atom([_,RVar|_],RVar):-atomic(RVar).
+extract_var_atom(Var,Var).
 
 compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, Atom2| Rest], Body):- is_parallel_op(SetQ),!, 
    pairify([Var, ValueForm, Atom2| Rest],Atoms,Forms),
@@ -70,8 +77,10 @@ compile_assigns(Ctx,Env,Result,[Getf, Var| ValuesForms], Body):- is_place_op(Get
         list_to_conjuncts([true|ValuesBody],BodyS),!,
         debug_var([Getf,'_R'],Result),
         debug_var([Getf,'_Env'],Env),
-        (is_only_read_op(Getf)->rw_add(Ctx,Var,r);rw_add(Ctx,Var,w)),
-        Body = (BodyS, place_op(Env,Getf, Var, ResultVs,Result)).
+        extract_var_atom(Var,RVar),
+        compile_place(Ctx,Env,UsedVar,Var,Code),
+        (Var\==RVar -> rw_add(Ctx,RVar,r) ; (is_only_read_op(Getf)->rw_add(Ctx,RVar,r);rw_add(Ctx,RVar,w))),
+        Body = (BodyS,Code,place_op(Env,Getf, UsedVar, ResultVs,Result)).
 
 compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, String], (Code,Body)):- 
         string(String),is_def_maybe_docs(SetQ),
@@ -100,8 +109,18 @@ compile_symbol_getter(Ctx,Env,Value, Var, Body):-  must(atom(Var)),!,
         debug_var('Env',Env),
         Body = symbol_value(Env, Var, Value).   
 
+% compile_place(Ctx,Env,Result,Var,Code).
+compile_place(_Ctx,_Env,[value,Var],Var,true):- \+ is_list(Var),!.
+%compile_place(_Ctx,_Env,[Place,Var],[Place,Var],true):- atom(Var),!.
+compile_place(Ctx,Env,[Place|VarResult],[Place|VarEval],Code):- compile_each(Ctx,Env,VarResult,VarEval,Code).
+%compile_place(Ctx,Env,[Place,Var,Result],[Place,Var|Eval],Code):- compile_forms(Ctx,Env,Result,Eval,Code).
+%compile_place(_Ctx,_Env,Var,Var,true).
 
-
+compile_each(_Ctx,_Env,[],[],true).
+compile_each(Ctx,Env,[VarR|Result],[Var|Eval],Code):-
+  compile_body(Ctx,Env,VarR,Var,Code0),
+  compile_each(Ctx,Env,Result,Eval,Code1),
+  conjoin_0(Code0,Code1,Code).
 
 rwstate:attr_unify_hook(_,_):-fail.
 

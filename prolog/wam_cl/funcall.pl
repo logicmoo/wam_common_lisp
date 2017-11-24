@@ -30,6 +30,7 @@ closure(ClosureEnvironment,ClosureResult,FormalParams,ClosureBody,ActualParams,C
   must_or_rtrace(user:BinderCode),
   must_or_rtrace(user:ClosureBody).
 
+cl_eval(Form,Result):- lisp_compile(Result,Form,Body),call(Body).
 
 cl_funcall([function(F)|More],R):-!,cl_funcall([F|More],R).
 cl_funcall([ProcedureName|Args],Result):- env_current(Env),apply_c(Env,ProcedureName, Args, Result).
@@ -69,6 +70,6 @@ apply_c(EnvIn,X, _, R):- ignore(R=[]),
 	!.
 
 
-
 :- fixup_exports.
+
 

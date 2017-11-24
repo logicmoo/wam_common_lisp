@@ -50,7 +50,7 @@ always_true([]\==t).
 is_always_true(true).
 
 
-opt_arg1(F,_):- atom_concat(assert,_,F).
+opt_arg1(F,_):- atom_concat_or_rtrace(assert,_,F).
 opt_arg1(((:-)),1).
 
 %oper_mize(_Whole,_Ctx,_,Code,Code):-!.
@@ -123,9 +123,9 @@ maybe_optimize(_).
 
 del_attr_rev2(Name,Var):- del_attr(Var,Name).
 
-sanitize_true( C1,C2):- \+ compound(C1),!,C2=C1.
-sanitize_true((C1,C2),Joined):-!,sanitize_true(C1,C1O),sanitize_true(C2,C2O),conjoin_0(C1O,C2O,Joined).
-sanitize_true(C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(sanitize_true(),C1O,C2O),C2=..[F|C2O].
+sanitize_true(_, C1,C2):- \+ compound(C1),!,C2=C1.
+sanitize_true(Ctx,(C1,C2),Joined):-!,sanitize_true(Ctx,C1,C1O),sanitize_true(Ctx,C2,C2O),conjoin_0(C1O,C2O,Joined).
+sanitize_true(Ctx,C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(sanitize_true(Ctx),C1O,C2O),C2=..[F|C2O].
 
 conjoin_0(C1,C2,C1):- C2==true,!.
 conjoin_0(C1,C2,C2):- C1==true,!.
@@ -231,7 +231,7 @@ inline_operation(Never,Ctx,F,(C1,C2),CodeJoined):-!,
 
 inline_operation(_Never,_Ctx,_FF,(H:-C1),(H:-C1)):-  compound(C1), functor(C1,start_tabling,_),!.
 inline_operation(Never,Ctx,FF,(MH:-C1),(MH:-C2)):- 
-  strip_module(MH,_M,H),functor(H,F,A),atom_concat(_,' tabled',F),!,
+  strip_module(MH,_M,H),functor(H,F,A),atom_concat_or_rtrace(_,' tabled',F),!,
    inline_body([F/A|Never],Ctx,FF,C1,C2).
 
 
@@ -303,8 +303,8 @@ never_inline(P):- predicate_property(P,imported_from(system)).
 never_inline(P):- predicate_property(P,number_of_clauses(N)),N==0.
 never_inline(P):- compound(P),functor(P,F,A),never_inline_fa(F,A).
 never_inline_fa(place_op,_).
-never_inline_fa(F,_):- atom_concat(_,' tabled',F).
-never_inline_fa(F,_):- atom_concat('cl_',_,F).
+never_inline_fa(F,_):- atom_concat_or_rtrace(_,' tabled',F).
+never_inline_fa(F,_):- atom_concat_or_rtrace('cl_',_,F).
 never_inline_fa(start_tabling,_).
 never_inline_fa(symbol_value,_).
 never_inline_fa(set_symbol_value,_).
@@ -317,7 +317,7 @@ always_inline(P):- never_inline(P),!,fail.
 always_inline(P):- compound(P),functor(P,F,A),always_inline_fa(F,A).
 always_inline(P):- clause(P,B)->(B==true;B=t_or_nil(_,_)).
 
-always_inline_fa(F,1):- atom_concat('addr_tagbody_',M,F),atom_contains(M,'_addr_enter_').
+always_inline_fa(F,1):- atom_concat_or_rtrace('addr_tagbody_',M,F),atom_contains(M,'_addr_enter_').
 
 
 lisp_compiler_option(safe(_),true).

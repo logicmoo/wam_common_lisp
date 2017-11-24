@@ -67,8 +67,8 @@ compile_forms(Ctx,Env,Result,FunctionBody,Code):-
 
 
 :- nb_setval('$labels_suffix','').
-suffix_by_context(Atom,SuffixAtom):- nb_current('$labels_suffix',Suffix),atom_concat(Atom,Suffix,SuffixAtom).
-suffixed_atom_concat(L,R,LRS):- atom_concat(L,R,LR),suffix_by_context(LR,LRS).
+suffix_by_context(Atom,SuffixAtom):- nb_current('$labels_suffix',Suffix),atom_concat_or_rtrace(Atom,Suffix,SuffixAtom).
+suffixed_atom_concat(L,R,LRS):- atom_concat_or_rtrace(L,R,LR),suffix_by_context(LR,LRS).
 push_labels_context(Atom):- suffix_by_context(Atom,SuffixAtom),b_setval('$labels_suffix',SuffixAtom).
 within_labels_context(Label,G):- nb_current('$labels_suffix',Suffix),
    setup_call_cleanup(b_setval('$labels_suffix',Label),G,b_setval('$labels_suffix',Suffix)).
@@ -120,7 +120,7 @@ must_compile_progn(Ctx,Env,Result,FormsIn, PreviousResult, Body):-
   maybe_debug_var('_rBody',Body))),
   resolve_reader_macros(FormsIn,Forms),!,
    must_or_rtrace(compile_progn(Ctx,Env,Result,Forms, PreviousResult,Body0)),
-   notrace((sanitize_true(Body0,Body))).
+   notrace((sanitize_true(Ctx,Body0,Body))).
 
 compile_progn(_Cx,_Ev,Result,Var,_PreviousResult,Out):- notrace(is_ftVar(Var)),!,Out=cl_eval([progn|Var],Result).
 compile_progn(_Cx,_Ev,Result,[], PreviousResult,true):-!, PreviousResult = Result.

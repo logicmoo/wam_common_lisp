@@ -52,7 +52,7 @@ call_test_compiled(Name,Value):-
 compile_test(Name,Code,Return,Expected):-
    tst:is_local_test(Name,SExpression,Expected),
    as_sexp(SExpression,Expression),
-   dbmsg(lisp_compiled_eval(Expression)),
+   dbmsg(compile_test(Name,Code,Return,Expected)),
    must_or_rtrace(writeExpression(Expression)),
    lisp_compile(Return,Expression,Code),
    

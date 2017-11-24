@@ -47,8 +47,8 @@ is_self_evaluationing_const0(X):- (X==t;X==[];number(X);is_keywordp(X);string(X)
 is_self_evaluationing_const0(X):- is_functionp(X).
 
 is_functionp(X):- \+ atom(X),!,fail.
-is_functionp(X):- atom_concat('f_',_,X),!.
-is_functionp(X):- atom_concat('cl_',_,X),!.
+is_functionp(X):- atom_concat_or_rtrace('f_',_,X),!.
+is_functionp(X):- atom_concat_or_rtrace('cl_',_,X),!.
 
 %:- dynamic(op_replacement/2).
 user:op_replacement(first,cl_car).
@@ -131,15 +131,38 @@ cl_not(Obj,Ret):- t_or_nil(Obj == [] , Ret).
 cl_null(Obj,Ret):- t_or_nil(Obj == [] , Ret).
 
 =(N1,N2,Ret):- t_or_nil( (N1=N2),Ret). 
-cl_eq(A,B,Ret):- t_or_nil( A==B , Ret).
-cl_eql(A,B,Ret):- t_or_nil( A=@=B , Ret).
-cl_equal(A,B,Ret):- t_or_nil( A=B , Ret).
+cl_eq(A,B,Ret):- t_or_nil( is_eq(A,B) , Ret).
+cl_eql(A,B,Ret):- t_or_nil( is_eql(A,B) , Ret).
+cl_equal(A,B,Ret):- t_or_nil( is_equal(A,B) , Ret).
+cl_equalp(A,B,Ret):- t_or_nil( is_equalp(A,B) , Ret).
 
+is_eql(X,Y):- X=:=Y.
+is_eq(X,Y):- X==Y.
+is_equal(X,Y):- X=@=Y.
+is_equalp(X,Y):- f_u_to_pvs(X,XX),f_u_to_pvs(Y,YY),XX=@=YY.
+
+f_u_to_pvs(X,[float|XX]):- notrace(catch(XX is (1.0 * X),_,fail)),!.
+f_u_to_pvs(X,XX):- findall([P|V],(get_opv(X,P,V);get_struct_opv(X,P,V)),List),List\==[],sort(List,XX).
+f_u_to_pvs(X,[str|XX]):-format(string(S),'~w',[X]),string_upper(S,XX).
+
+
+
+cl_sqrt(X,Y):- \+ integer(X)-> Y is sqrt(X);
+   (Y is sqrt(X)).
+
+f_u_c43(N1,N2,Ret):- Ret is (N1 + N2).
 +(N1,N2,Ret):- Ret is (N1 + N2).
--(N1,N2,Ret):- Ret is (N1 - N2).
+
+f_u_c45(N1,N2,Ret):- Ret is (N1 + N2).
 cl_c45(N1,N2,Ret):- Ret is (N1 - N2).
+-(N1,N2,Ret):- Ret is (N1 - N2).
 f_u_(N1,N2,Ret):- Ret is (N1 - N2).
+
+
+f_u_c42(N1,N2,Ret):- Ret is (N1 + N2).
 *(N1,N2,Ret):- Ret is (N1 * N2).
+
+f_u_c47(N1,N2,Ret):- Ret is (N1 + N2).
 '/'(N1,N2,Ret):- Ret is (N1 / N2).
 
 /*

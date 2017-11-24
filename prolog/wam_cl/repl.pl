@@ -63,6 +63,7 @@ nonquietly_must_or_rtrace(G):-
    *-> true ; (gripe_problem(fail_must_or_rtrace_failed,G),!,fail)),!.
 
 must_or_rtrace((A,B)):-!,must_or_rtrace(A),must_or_rtrace(B).
+must_or_rtrace(notrace(G)):- !, quietly_must_or_rtrace(G).
 must_or_rtrace(G):- notrace(tracing),G. % nonquietly_must_or_rtrace(G).
 must_or_rtrace(G):- nonquietly_must_or_rtrace(G).
 

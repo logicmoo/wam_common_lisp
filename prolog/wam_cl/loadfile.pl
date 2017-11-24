@@ -138,12 +138,12 @@ do_compile_1file(_Keys,File0):-
    %ignore(R=t),
    search_for(File0,File),
    prolog_to_os_filename(File,OSFile),
-   atom_concat(OSFile,'.trans.pl',PLFile),
+   atom_concat_or_rtrace(OSFile,'.trans.pl',PLFile),
    locally_let(
-     [sym('*compile-file-pathname*')=str(File),
-      sym('*compile-file-truename*')=str(OSFile),
-      sym('*output-file-pathname*')=str(PLFile),
-      sym('*package*')=value(sym('*package*'))],   
+     [sym('sys::*compile-file-pathname*')=str(File),
+      sym('sys::*compile-file-truename*')=str(OSFile),
+      sym('sys::*output-file-pathname*')=str(PLFile),
+      sym('cl:*package*')=value(sym('*package*'))],   
         setup_call_cleanup(
          open(PLFile,write,Stream),          
             with_each_file(with_each_form(lisp_compile_to_prolog(Stream)),File),
@@ -152,10 +152,12 @@ do_compile_1file(_Keys,File0):-
 lisp_compile_to_prolog(Stream,Expression):- is_stream(Stream),!,  
   with_output_to(Stream,lisp_compile_to_prolog(Expression)),!.
 lisp_compile_to_prolog(Package,Expression):-  
-  locally_let(Package,lisp_compile_to_prolog(Expression)),!.
+  must_or_rtrace(locally_let(xx_package_xx=Package,
+    must_or_rtrace(lisp_compile_to_prolog(Expression)))),!.
 
 lisp_compile_to_prolog(COMMENTP):- is_comment(COMMENTP,String),!,write('/*'),write(String),writeln('*/').
-lisp_compile_to_prolog(Expression):-    
+lisp_compile_to_prolog(Expression):-   
+ must_or_rtrace((
   as_sexp(Expression,SExpression),  
   nl,
   flush_all_output_safe,
@@ -165,7 +167,7 @@ lisp_compile_to_prolog(Expression):-
   writeln(' **********************/'),
   reading_package(Pkg),
   dbmsg(:- lisp_compile_to_prolog(Pkg,SExpression)),
-  lisp_compile_to_prolog_pass1(SExpression),!.
+  lisp_compile_to_prolog_pass1(SExpression))),!.
 
 
 %write_trans(:-((A,B))):-!,write_trans(:-A),write_trans(:-B).
@@ -218,7 +220,7 @@ cl_grovel_file(File,t):- in_comment(format('~N; Grovel.. ~w~n',[File])),
 cl_load('$OBJ'(_Pathname,Loc),T):- string(Loc),!,cl_load(Loc,T).
 cl_load(File,T):-
   local_override(with_forms,lisp_grovel),!,in_comment(format('~N; Grovel.. (LOAD ~w)~n',[File])),cl_grovel_file(File,T),!.
-cl_load(File,t):- pl_compiled_filename(File,PL),!,dbmsg(ensure_loaded(PL)),!,ensure_loaded(PL).
+cl_load(File,t):- pl_compiled_filename(File,PL),!,in_comment(dbmsg(ensure_loaded(PL))),!,ensure_loaded(PL).
 cl_load(File,t):- 
   cl_grovel_file(File,t),
   with_each_file(with_each_form(lisp_reader_compiled_eval()),File).

@@ -46,7 +46,7 @@ cl_defpackage(Name,R):- do_defpackage(Name,[],R).
 
 do_defpackage(AName,List,Package):-
   atom_string(AName,Name),  
-  atom_concat(pkg_,Name,Down),prologcase_name(Down,Package),
+  atom_concat_or_rtrace(pkg_,Name,Down),prologcase_name(Down,Package),
   asserta(package_name(Package,Name)),
   init_slot_props(claz_package,2,Package,List), 
   string_upper(Name,UName),
@@ -74,10 +74,16 @@ reading_package(pkg_user).
 % TODO
 writing_package(Package):- reading_package(Package).
 
+
+package_unintern_symbol(Package,Symbol):- 
+  retractall(package:package_shadowing_symbols(Package,Symbol)),
+  retractall(package:package_internal_symbols(Package,Symbol)),
+  retractall(package:package_external_symbols(Package,Symbol)).
+
 package_find_symbol_or_missing(String,Package,OldSymbol,IntExt):- package_find_symbol(String,Package,OldSymbol,IntExt),!.
 package_find_symbol_or_missing(_String,_Package,_NoSymbol,'$missing').
 
-package_find_symbol(String,_,Symbol,kw_external):- atom_concat(':',KWName,String),!,atom_concat('kw_',KWName,SymbolCI),prologcase_name(SymbolCI,Symbol).
+package_find_symbol(String,_,Symbol,kw_external):- atom_concat_or_rtrace(':',KWName,String),!,atom_concat_or_rtrace('kw_',KWName,SymbolCI),prologcase_name(SymbolCI,Symbol).
 package_find_symbol(String,Package,Symbol,kw_external):- package_external_symbols(Package,String,Symbol),!.
 package_find_symbol(String,Package,Symbol,kw_internal):- package_internal_symbols(Package,String,Symbol),!.
 package_find_symbol(String,PW,Symbol,kw_inherited):-  package_use_list(PW,Package),package_external_symbols(Package,String,Symbol).
@@ -298,7 +304,7 @@ function_case_name(String,Package,ProposedName):-
 
 package_function_prefix(A,B):- no_repeats(A,package_fprefix(A,B)).
 package_fprefix(pkg_cl,'cl_').
-package_fprefix(Pk,Pre):- Pk\==pkg_cl, package_symbol_prefix(Pk,Pre0),atom_concat('f_',Pre0,Pre).
+package_fprefix(Pk,Pre):- Pk\==pkg_cl, package_symbol_prefix(Pk,Pre0),atom_concat_or_rtrace('f_',Pre0,Pre).
 
 package_symbol_prefix(A,B):- no_repeats(A,package_prefix(A,B)).
 package_prefix(pkg_cl,'').
@@ -307,7 +313,7 @@ package_prefix(pkg_sys,'sys_').
 package_prefix(pkg_user,'u_').
 package_prefix(pkg_ext,'ext_').
 package_prefix(PN,Pre):- nonvar(PN),package_nicknames(Pk,PN),!,package_prefix(Pk,Pre).
-package_prefix(Pk,Pre):- is_lisp_package(Pk),atom_concat('pkg_',Package,Pk),atom_concat(Package,'_',Pre).
+package_prefix(Pk,Pre):- is_lisp_package(Pk),atom_concat_or_rtrace('pkg_',Package,Pk),atom_concat_or_rtrace(Package,'_',Pre).
 
 
 :- include('pi.pro').

@@ -97,11 +97,11 @@ add_var_to_env_loco(UP,Var):- var(Var), get_var_name(Var,Prev),atomic(Prev),add_
 add_var_to_env_loco(UP,Var):-add_var_to_env(UP,Var).
 
 add_var_to_env_locovs_prev(UP,Prev,_Var):- UP==Prev,!.
-add_var_to_env_locovs_prev(UP,_Prev,_Var):- atom_concat('_',_,UP),!.
-add_var_to_env_locovs_prev(UP,_Prev,_Var):- atom_concat(_,'_',UP),!.
+add_var_to_env_locovs_prev(UP,_Prev,_Var):- atom_concat_or_rtrace('_',_,UP),!.
+add_var_to_env_locovs_prev(UP,_Prev,_Var):- atom_concat_or_rtrace(_,'_',UP),!.
 add_var_to_env_locovs_prev(UP,_Prev,Var):-add_var_to_env(UP,Var).
-add_var_to_env_locovs_prev(UP,Prev,Var):- atom_concat('_',_,Prev),!,add_var_to_env(UP,Var).
-add_var_to_env_locovs_prev(UP,Prev,Var):- atom_concat(UP,Prev,New),add_var_to_env(New,Var).
+add_var_to_env_locovs_prev(UP,Prev,Var):- atom_concat_or_rtrace('_',_,Prev),!,add_var_to_env(UP,Var).
+add_var_to_env_locovs_prev(UP,Prev,Var):- atom_concat_or_rtrace(UP,Prev,New),add_var_to_env(New,Var).
 add_var_to_env_locovs_prev(UP,_Prev,Var):- add_var_to_env(UP,Var).
 
 check_varname(UP):- name(UP,[C|_]),(char_type(C,digit)->throw(check_varname(UP));true).
@@ -119,7 +119,7 @@ prologcase_name0(String,ProposedName):-
 
 
 atom_concat_if_new(Prefix,Atom,NewAtom):-
-  (atom_concat(Prefix,_,Atom)-> NewAtom=Atom ; atom_concat(Prefix,Atom,NewAtom)).
+  (atom_concat_or_rtrace(Prefix,_,Atom)-> NewAtom=Atom ; atom_concat_or_rtrace(Prefix,Atom,NewAtom)).
 
 
 :- fixup_exports.

@@ -39,6 +39,31 @@ must_compile_body(Ctx,Env,Result,Function, Body):-
   % nb_current('$compiler_PreviousResult',THE),setarg(1,THE,Result),
   !.
 
+:- dynamic(compiler_macro_left_right/3).
+:- discontiguous(compiler_macro_left_right/3).
+/*
+
+(defmacro while (cond &rest forms)
+  (let ((start (gensym)))
+  `(tagbody ,start 
+     (when ,cond (progn ,@forms) (go ,start)))))
+       
+
+
+
+(let ((x 10)) (while (> (decf x) 1) (print x )))
+
+(LET ((x 10 ))(while (> (DECF x )1 )(PRINT x )(SETQ x (1- x ))))
+
+(LET ((x 10 ))(while (> (DECF x )1 )(PRINT x )(SETQ x (1- x ))))
+
+
+*/
+compiler_macro_left_right(u_while,[Cond|Forms], 
+  [tagbody,Start,[when,Cond,[progn|Forms],[go,Start]]]) :- gensym('while',Start).
+compiler_macro_left_right(while,[Cond|Forms], 
+  [tagbody,Start,[when,Cond,[progn|Forms],[go,Start]]]) :- gensym('while',Start).
+
 
 % PROG
 /*(defmacro prog (inits &rest forms)
@@ -46,16 +71,13 @@ must_compile_body(Ctx,Env,Result,Function, Body):-
     (let ,inits
       (tagbody ,@forms))))
 */
-:- dynamic(compiler_macro_left_right/3).
-:- discontiguous(compiler_macro_left_right/3).
-compiler_macro_left_right(prog,[Vars|TagBody], [block,[],[let,Vars,[tagbody|TagBody]]]) :- trace.
-
+compiler_macro_left_right(prog,[Vars|Forms], [block,[],[let,Vars,[tagbody|Forms]]]).
 % (defmacro unless (test-form &rest forms) `(if (not ,test-form) (progn ,@forms)))
 compiler_macro_left_right(unless,[Test|IfFalse] , [if, Test, [], [progn|IfFalse]]).
 % (defmacro when (test-form &rest forms) `(if ,test-form (progn ,@forms)))
 compiler_macro_left_right( when,[Test|IfTrue]  , [if, Test, [progn|IfTrue], []]).
 
-% IF/2
+% IF/1
 compiler_macro_left_right(if,[Test, IfTrue], [if, Test, IfTrue ,[]]).
 
 % AND
@@ -88,7 +110,8 @@ compile_body(Ctx,Env,Result,[progn|Forms], Body):- !, must_compile_progn(Ctx,Env
 % SOURCE TRANSFORMATIONS
 compile_body(Ctx,Env,Result,[M|MACROLEFT], Code):- atom(M),
   term_variables([M|MACROLEFT],VarsS),
-  compiler_macro_left_right(M,MACROLEFT,MACRORIGHT),
+  compiler_macro_left_right(MS,MACROLEFT,MACRORIGHT),
+  same_symbol(M,MS),
   term_variables(MACRORIGHT,VarsE),
   VarsE==VarsS,!,
   must_compile_body(Ctx,Env,Result,MACRORIGHT, Code).
@@ -105,9 +128,9 @@ compile_body(_Ctx,_Env,Atom,'$STRING'(Atom),true).
 % #S
 compile_body(_Ctx,_Env,Result,'$S'([Type|Args]),create_struct([Type|Args],Result)).
 
-atom_number_exta(Atom,Value):- atom_number(Atom,Value).
-atom_number_exta(Atom,Value):- atom_concat('-.',R,Atom),atom_concat('-0.',R,NAtom),!,atom_number(NAtom,Value).
-atom_number_exta(Atom,Value):- atom_concat('.',R,Atom),atom_concat('0.',R,NAtom),!,atom_number(NAtom,Value).
+atom_number_exta(Atom,Value):- on_x_rtrace(atom_number(Atom,Value)).
+atom_number_exta(Atom,Value):- atom_concat_or_rtrace('-.',R,Atom),atom_concat_or_rtrace('-0.',R,NAtom),!,atom_number(NAtom,Value).
+atom_number_exta(Atom,Value):- atom_concat_or_rtrace('.',R,Atom),atom_concat_or_rtrace('0.',R,NAtom),!,atom_number(NAtom,Value).
 
 
 % symbols
@@ -118,8 +141,8 @@ compile_body(Ctx,Env,Value,Atom, Body):- atom(Atom),!,
 compile_body(_Cx,_Ev,Item,[quote, Item],  true):- !.
 
 % COMMENTS
-is_comment([COMMENT,String|_],String):- atom(COMMENT),!,atom_concat('$COMMENT',_,COMMENT).
-is_comment(COMMENTP,String):- compound(COMMENTP),!,COMMENTP=..[COMMENT,String|_],!,atom_concat('$COMMENT',_,COMMENT).
+is_comment([COMMENT,String|_],String):- atom(COMMENT),!,atom_concat_or_rtrace('$COMMENT',_,COMMENT).
+is_comment(COMMENTP,String):- compound(COMMENTP),!,COMMENTP=..[COMMENT,String|_],!,atom_concat_or_rtrace('$COMMENT',_,COMMENT).
 
 compile_body(_Ctx,_Env,[],COMMENT,true):- is_comment(COMMENT,_),!.
 
@@ -127,17 +150,27 @@ compile_body(_Ctx,_Env,[],COMMENT,true):- is_comment(COMMENT,_),!.
 % OR
 compiler_macro_left_right(or,[], []).
 compiler_macro_left_right(or,[Form1], Form1).
-% OR-2 needs to use body compiler below
-% compiler_macro_left_right(or,[Form1,Form2,Form3|Rest], [or,Form1,[or,Form2,[or,Form3,[or|Rest]]]]).
+% OR-0
+compile_body(_Ctx,_Env,[],[or], true).
+% OR-1
+compile_body(Ctx,Env,Result,[or,Form], Body):- must_compile_body(Ctx,Env,Result,Form, Body).
 % OR-2+
-compile_body(Ctx,Env,Result,[or,Form1|Form2],Code):- !,
+compile_body(Ctx,Env,Result,[or,Form1|Form2],Code):- Form2\=[_],Form2\=[or|_], !, 
+  compile_body(Ctx,Env,Result,[or,Form1,[or|Form2]],Code).
+
+% OR-2 needs to use body compiler below
+compile_body(Ctx,Env,Result,[or,Form1,Form2],Code):- !,
    must_compile_body(Ctx,Env,Result1,Form1, Body1),
-   must_compile_body(Ctx,Env,Result2,[or|Form2], Body2),
+   must_compile_body(Ctx,Env,Result2,Form2, Body2),
    debug_var("FORM1_Res",Result1),
         Code = (	Body1,
 			( Result1 \== []
 				-> 	Result = Result1
 				;  	(Body2, Result = Result2))).
+
+% compiler_macro_left_right(or,[Form1,Form2,Form3|Rest], [or,Form1,[or,Form2,[or,Form3,[or|Rest]]]]).
+
+
 
 % PROG1
 compile_body(Ctx,Env,Result,[prog1,Form1|FormS],Code):- !,
@@ -453,6 +486,50 @@ zip_with([], [], _, []).
 zip_with([X|Xs], [Y|Ys], Pred, [Z|Zs]):-
 	lpa_apply(Pred, [X, Y, Z]),
 	zip_with(Xs, Ys, Pred, Zs).
+
+
+
+
+binop_identity(+,0).
+binop_identity(u_c43,0).
+binop_identity(-,0).
+binop_identity(*,1).
+binop_identity((/),1).
+
+% BinOP-0
+compiler_macro_left_right(BinOP,[], Identity):- binop_identity(BinOP,Identity).
+% BinOP-1
+compiler_macro_left_right(BinOP,[Form1], [BinOP,Identity,Form1]):- binop_identity(BinOP,Identity).
+% BinOP-3+
+compile_body(Ctx,Env,Result,[BinOP,Form1,Form2,Form3|FormS],Code):- binop_identity(BinOP,_Identity),
+  compile_body(Ctx,Env,Result1,[BinOP,Form1,Form2],Code1),
+  compile_body(Ctx,Env,Result,[BinOP,Result1,Form3|FormS],Code2),
+  Code = (Code1,Code2).
+
+
+% BinMacro-0
+compiler_macro_left_right(BinOP,[], Identity):- binary_macro(BinOP,Identity).
+% BinMacro-1
+compiler_macro_left_right(BinOP,[Form1], [BinOP,Identity,Form1]):- binary_macro(BinOP,Identity).
+% BinMacro-3+
+compile_body(Ctx,Env,Result,[BinOP,Form1|Form2],Code):- binary_macro(BinOP,_),
+  Form2\=[_],Form2\=[BinOP|_], !, 
+  compile_body(Ctx,Env,Result1,Form1,Code1),
+  compile_body(Ctx,Env,Result2,[BinOP|Form2],Code2),
+  compile_body(Ctx,Env,Result,[BinOP,Result1,Result2],Code3),
+  Code = (Code1,Code2,Code3).
+
+
+% EXT::XOR
+binary_macro(ext_xor,[]).
+compile_body(Ctx,Env,Result,[ext_xor,Form1,Form2],Code):-
+  compile_body(Ctx,Env,Result1,Form1,Code1),
+  compile_body(Ctx,Env,Result2,Form2,Code2),
+  Code3 = (((Result1 \==[]) -> (Result2 ==[]) ; (Result2 \==[])) -> Result=t;Result=[]),
+  Code = (Code1,Code2,Code3).
+
+
+
 
 
 compile_body(Ctx,Env,Result,BodyForms, Body):- atom(BodyForms),!,

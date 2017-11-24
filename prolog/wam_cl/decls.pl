@@ -80,27 +80,48 @@ cl_defmacro(Name,FormalParms,FunctionBody,Result):-
   call(Code).  
   
 
-compile_macro(Ctx,CallEnv,Function,[Name0,FormalParms|FunctionBody0], CompileBody):-
+compile_macro(Ctx,CallEnv,Macro,[Name0,FormalParms|FunctionBody0], CompileBody):-
    combine_setfs(Name0,Combined),
    suffix_by_context(Combined,Symbol),
-   must_or_rtrace(find_function_or_macro_name(Ctx,CallEnv,Symbol,_Len, Function)),
-   add_alphas(Ctx,Function),
-   must_or_rtrace(maybe_get_docs(function,Function,FunctionBody0,FunctionBody,DocCode)),
+   must_or_rtrace(find_function_or_macro_name(Ctx,CallEnv,Symbol,_Len, Macro)),
+   add_alphas(Ctx,Macro),
+   must_or_rtrace(maybe_get_docs(function,Macro,FunctionBody0,FunctionBody,DocCode)),
    %reader_intern_symbols
-   FunctionHead=[Function|FormalParms],
-   set_opv(Function,classof,claz_macro),
+   MacroHead=[Macro|FormalParms],
+   set_opv(Macro,classof,claz_macro),
    set_opv(Symbol,compile_as,kw_operator),
-   set_opv(Symbol,function,Function),
-   within_labels_context(Symbol, make_compiled(Ctx,CallEnv,Symbol,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode)),
-   get_alphas(Ctx,Alphas),
- CompileBody = (
+   set_opv(Symbol,function,Macro),
+    CompileBody = (
    DocCode,
    HeadDefCode,
-   asserta(user:macro_lambda(defmacro(Name0),Function, FormalParms, [progn | FunctionBody],Alphas)),
-   asserta((user:Head  :- BodyCode)),
-   set_opv(Function,classof,claz_macro),
+   asserta(user:macro_lambda(defmacro(Name0),Macro, FormalParms, [progn | FunctionBody],Alphas)),
+   asserta((user:RNewMacroHead  :- BodyCode)),
+   asserta((user:FunctionHead  :- (RNewMacroHead,cl_eval(MResult,FResult)))),
+   set_opv(Macro,classof,claz_macro),
    set_opv(Symbol,compile_as,kw_operator),
-   set_opv(Symbol,function,Function)).
+   set_opv(Symbol,function,Macro)),
+   within_labels_context(Symbol, make_mcompiled(Ctx,CallEnv,MResult,Symbol,MacroHead,FunctionBody,
+     NewMacroHead,HeadDefCode,BodyCode,Fun)),
+   NewMacroHead=..[M|ARGS],
+   atom_concat(M,'_mexpand1',MM),
+   RNewMacroHead=..[MM|ARGS],
+   get_alphas(Ctx,Alphas),
+   debug_var('FnResult',FResult),
+   subst(NewMacroHead,MResult,FResult,FunctionHead).
+
+
+make_mcompiled(Ctx,_UnusedEnv,CResult,Symbol,FunctionHead,FunctionBody,Head,HeadDefCode,(BodyCode),Fun):-
+    expand_function_head(Ctx,CallEnv,FunctionHead, Head, HeadEnv, CResult,HeadDefCode,HeadCode),
+    debug_var("CallEnv",CallEnv),debug_var('CResult',CResult),
+    debug_var('MResult',MResult),
+    compile_body(Ctx,CallEnv,MResult,[block,Symbol|FunctionBody],Body0),
+    show_ctx_info(Ctx),
+   ((fail,sub_term(Sub,Body0),compound(Sub),(Sub= (Body=Var)),var(Var),Var==MResult, is_list(Body))->
+     (lisp_compile(CResult,Body,BodyCode0),
+      subst(Body0,Sub,BodyCode0,BodyCode),Fun=t);
+    (((var(MResult),CResult=MResult))
+    -> sanitize_true(Ctx,((CallEnv=HeadEnv,HeadCode,Body0)),BodyCode)
+     ; (body_cleanup(Ctx,((CallEnv=HeadEnv,HeadCode,Body0,MResult=Result)),BodyCode)))).
 
 
 cl_defun(Name,FormalParms,FunctionBody,Result):-
@@ -114,24 +135,25 @@ compile_function(Ctx,Env,Function,[Name,FormalParms|FunctionBody0], CompileBody)
    must_or_rtrace(find_function_or_macro_name(Ctx,Env,Symbol,_Len, Function)),
    must_or_rtrace(maybe_get_docs(function,Function,FunctionBody0,FunctionBody,DocCode)),
    FunctionHead=[Function|FormalParms],
-   within_labels_context(Symbol, make_compiled(Ctx,Env,Symbol,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode)),
+   within_labels_context(Symbol, make_compiled(Ctx,Env,_MResult,Symbol,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode)),
  CompileBody = (
    DocCode,
    HeadDefCode,
    asserta(user:function_lambda(defun(Name),Function, FormalParms, FunctionBody)),   
-   asserta((user:Head  :-  BodyCode)),
+   asserta((user:Head  :- BodyCode)),
    set_opv(Function,classof,claz_compiled_function),
    set_opv(Symbol,compile_as,kw_function),
    set_opv(Symbol,function,Function)).
 
-make_compiled(Ctx,_UnusedEnv,Symbol,FunctionHead,FunctionBody,Head,HeadDefCode,(BodyCode)):-
-    expand_function_head(Ctx,CallEnv,FunctionHead, Head, HeadEnv, HResult,HeadDefCode,HeadCode),
-    debug_var("RET",Result),debug_var("CallEnv",CallEnv),debug_var('HResult',HResult),
+make_compiled(Ctx,_UnusedEnv,MResult,Symbol,FunctionHead,FunctionBody,Head,HeadDefCode,(BodyCode)):-
+    expand_function_head(Ctx,CallEnv,FunctionHead, Head, HeadEnv, MResult,HeadDefCode,HeadCode),
+    debug_var("RET",Result),debug_var("CallEnv",CallEnv),debug_var('MResult',MResult),
     compile_body(Ctx,CallEnv,Result,[block,Symbol|FunctionBody],Body0),
     show_ctx_info(Ctx),
-    (((var(Result),HResult=Result))
+    (((var(Result),MResult=Result))
     -> body_cleanup(Ctx,((CallEnv=HeadEnv,HeadCode,Body0)),BodyCode)
-     ; body_cleanup(Ctx,((CallEnv=HeadEnv,HeadCode,Body0,HResult=Result)),BodyCode)).
+     ; (body_cleanup(Ctx,((CallEnv=HeadEnv,HeadCode,Body0,MResult=Result)),BodyCode))).
+
 
 :- fixup_exports.
 

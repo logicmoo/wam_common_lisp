@@ -41,7 +41,7 @@ is_fboundp(Symbol):- get_opv(Symbol,function,_).
 is_keywordp(Symbol):- package_external_symbols(pkg_kw,_,Symbol).
 is_symbolp(Symbol):- is_keywordp(Symbol);get_opv(Symbol,classof,claz_symbol).
 
-%is_keywordp(Symbol):- atom(Symbol),sanity((must(\+ atom_concat(':',_,Symbol)))),!,fail.
+%is_keywordp(Symbol):- atom(Symbol),sanity((must(\+ atom_concat_or_rtrace(':',_,Symbol)))),!,fail.
 
 
 
@@ -59,9 +59,23 @@ cl_intern(Name,Pack,Result):-
   intern_symbol(String,Package,Symbol,IntExt),
   push_values([Symbol,IntExt],Result),!.
 
+
 intern_symbol(String,Package,Symbol,IntExt):- package_find_symbol(String,Package,Symbol,IntExt),!.
 intern_symbol(String,Package,Symbol,IntExt):- 
    make_fresh_internal_symbol(Package,String,Symbol),
+   must_or_rtrace((package_find_symbol(String,Package,FoundSymbol,IntExt),FoundSymbol==Symbol)).
+
+
+cl_unintern(Symbol,t):- 
+   cl_symbol_package(Symbol,Package),
+   (Package\==[]-> package_unintern_symbol(Package,Symbol) ; true),
+   set_opv(Symbol,package,[]).
+
+
+
+cl_unintern(String,Package,Symbol,IntExt):- package_find_symbol(String,Package,Symbol,IntExt),!.
+unintern_symbol(String,Package,Symbol,IntExt):- 
+   make_fresh_uninternal_symbol(Package,String,Symbol),
    must_or_rtrace((package_find_symbol(String,Package,FoundSymbol,IntExt),FoundSymbol==Symbol)).
 
 
@@ -78,10 +92,10 @@ create_symbol(String,Package,Symbol):-
    set_opv(Symbol,name,Name),
    set_opv(Symbol,package,Package),!.
 
-create_keyword(Name,Symbol):- atom_concat(':',Make,Name),!,create_keyword(Make,Symbol).
+create_keyword(Name,Symbol):- atom_concat_or_rtrace(':',Make,Name),!,create_keyword(Make,Symbol).
 create_keyword(Name,Symbol):- string_upper(Name,String),
    prologcase_name(String,Lower),
-   atom_concat('kw_',Lower,Symbol),
+   atom_concat_or_rtrace('kw_',Lower,Symbol),
    assert_if_new(package:package_external_symbols(pkg_kw,String,Symbol)).
 
 

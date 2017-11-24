@@ -221,6 +221,8 @@ is_special_op(tagbody, pkg_cl).
 is_special_op(the, pkg_cl).
 is_special_op(throw, pkg_cl).
 is_special_op(unless, pkg_cl).
+is_special_op(while, pkg_user).
+is_special_op(u_while, pkg_user).
 is_special_op(when, pkg_cl).
 
 
@@ -263,13 +265,13 @@ ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,_,['&body',F|FormalParms],Par
   PCode = (Code,(as_rest(F,V,RestNKeysOut))).
 
  
-% &env
-ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,Mode,['&env',F|FormalParms],Params,[F|Names],[V|PVars],(must(as_env(F,V,'$env')),Code)):- 
+% &environment
+ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,Mode,['&environment',F|FormalParms],Params,[F|Names],[V|PVars],(must(as_env(F,V,'$env')),Code)):- 
   arginfo_incr(env,ArgInfo),
   ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,Mode,FormalParms,Params,Names,PVars,Code).
-ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,Mode,['&env'],Params,Names,PVars,Code):-!,
+ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,Mode,['&environment'],Params,Names,PVars,Code):-!,
    arginfo_incr(env,ArgInfo),
-   ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,Mode,['&env',env],Params,Names,PVars,Code).
+   ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,Mode,['&environment',env],Params,Names,PVars,Code).
 
 % Parsing required(s)
 ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,required,[F|FormalParms],[V|Params],[F|Names],[V|PVars],Code):- !,

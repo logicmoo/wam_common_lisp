@@ -96,9 +96,12 @@ find_function_or_macro_name(_Ctx,_Env,FunctionName,_Len, ProposedName):-
       function_case_name(Name,Package,ProposedName);
       function_case_name(FunctionName,Package,ProposedName)).
 
+return_arg_is_first_p(P):- return_arg_is_first(P).
+return_arg_is_first_p(P):- atom_concat('f_',P,PP), return_arg_is_first(PP).
+return_arg_is_first_p(P):- atom_concat('f_',PP,P), return_arg_is_first(PP).
 
 align_args(_FunctionName,ProposedName,Args,Result,[Result,Args]):-
-    return_arg_is_first(ProposedName),!.
+    return_arg_is_first_p(ProposedName),!.
 
 align_args(_FunctionName,ProposedName,Args,Result,ArgsPlusResult):- 
    append(Args, [Result], ArgsPlusResult),
@@ -128,7 +131,7 @@ maybe_symbol_package(_Symbol,Package):- reading_package(Package).
 
 
 some_function_or_macro(FunctionName,Len,[Name|NameS],NewName):-
-   atom_concat(Name,FunctionName,ProposedPName),   
+   atom_concat_or_rtrace(Name,FunctionName,ProposedPName),   
    (((ProposedPName = ProposedName; prologcase_name(ProposedPName,ProposedName)),
     guess_functor(P,ProposedName,Len),current_predicate(_,P),\+ predicate_property(user:P,imported_from(system)))-> ProposedName=NewName;
    some_function_or_macro(FunctionName,Len,NameS,NewName)).

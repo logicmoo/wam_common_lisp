@@ -28,7 +28,8 @@
     1))
 
 
-(DEFUN cl:string (x )(COND ((STRINGP x )x )((SYMBOLP x )(symbol-name x ))(T (ERROR "type error" ))))
+(DEFUN cl:string_l (x )(COND ((STRINGP x )x )((SYMBOLP x )(symbol-name x ))(T (ERROR "type error" ))))
+
 (TAGBODY 1 (PRINT "hi" ))
  (LET ((val 1 ))NIL )
  (LET ((val 1 ))val )
@@ -50,6 +51,13 @@
         (- (point-y point))))
 
 (setf my-point (make-point :x 3 :y 4 :z 12))
+
+(setf my-point2 #S(POINT :X 3 :Y 4 :Z 12))
+
+
+
+
+(point-p my-point)
 
 (type-of my-point)
 

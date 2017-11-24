@@ -76,7 +76,7 @@ expand_pterm_to_sterm(VAR,VAR):- notrace(is_ftVar(VAR)),!.
 expand_pterm_to_sterm('NIL',[]):-!.
 expand_pterm_to_sterm(nil,[]):-!.
 expand_pterm_to_sterm(VAR,VAR):- \+ compound(VAR),!.
-expand_pterm_to_sterm(ExprI,ExprO):- ExprI=..[F|Expr],atom_concat('$',_,F),must_maplist(expand_pterm_to_sterm,Expr,TT),ExprO=..[F|TT].
+expand_pterm_to_sterm(ExprI,ExprO):- ExprI=..[F|Expr],atom_concat_or_rtrace('$',_,F),must_maplist(expand_pterm_to_sterm,Expr,TT),ExprO=..[F|TT].
 expand_pterm_to_sterm([X|L],[Y|Ls]):-!,expand_pterm_to_sterm(X,Y),expand_pterm_to_sterm(L,Ls),!.
 expand_pterm_to_sterm(X,STerm):- compound_name_arguments(X,F,L),expand_pterm_to_sterm(L,Y),!,maybe_sterm(F,Y,STerm).
 expand_pterm_to_sterm(X,X).
@@ -90,7 +90,7 @@ keep_as_compund('$OBJ').
 keep_as_compund('$CHAR').
 keep_as_compund(v).
 keep_as_compund(obj).
-keep_as_compund(D):-atom_concat('$',_,D).
+keep_as_compund(D):-atom_concat_or_rtrace('$',_,D).
 
 
 

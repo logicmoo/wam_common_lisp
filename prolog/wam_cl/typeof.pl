@@ -31,7 +31,7 @@ i_class(t,claz_symbol).
 i_class(Dict,Type):- is_dict(Dict,Type).
 i_class(Number,claz_integer):- integer(Number).
 i_class(Number,claz_float):- float(Number).
-i_class(Atom,Kind):- atom(Atom),atomic_list_concat([Type,_Name],'_znst_',Atom),atom_concat('claz_',Type,Kind).
+i_class(Atom,Kind):- atom(Atom),atomic_list_concat([Type,_Name],'_znst_',Atom),atom_concat_or_rtrace('claz_',Type,Kind).
 i_class(Obj,Type):- get_opv_i(Obj,classof,Type).
 i_class(function(_),claz_function).
 
