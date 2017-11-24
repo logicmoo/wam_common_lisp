@@ -497,9 +497,9 @@ binop_identity(*,1).
 binop_identity((/),1).
 
 % BinOP-0
-compiler_macro_left_right(BinOP,[], Identity):- binop_identity(BinOP,Identity).
+compiler_macro_left_right(BinOP,L, Identity):- binop_identity(BinOP,Identity),L==[].
 % BinOP-1
-compiler_macro_left_right(BinOP,[Form1], [BinOP,Identity,Form1]):- binop_identity(BinOP,Identity).
+compiler_macro_left_right(BinOP,[Form1|NoMore], [BinOP,Identity,Form1]):- NoMore==[], binop_identity(BinOP,Identity).
 % BinOP-3+
 compile_body(Ctx,Env,Result,[BinOP,Form1,Form2,Form3|FormS],Code):- binop_identity(BinOP,_Identity),
   compile_body(Ctx,Env,Result1,[BinOP,Form1,Form2],Code1),
@@ -508,9 +508,9 @@ compile_body(Ctx,Env,Result,[BinOP,Form1,Form2,Form3|FormS],Code):- binop_identi
 
 
 % BinMacro-0
-compiler_macro_left_right(BinOP,[], Identity):- binary_macro(BinOP,Identity).
+compiler_macro_left_right(BinOP,L, Identity):- binary_macro(BinOP,Identity),L==[].
 % BinMacro-1
-compiler_macro_left_right(BinOP,[Form1], [BinOP,Identity,Form1]):- binary_macro(BinOP,Identity).
+compiler_macro_left_right(BinOP,[Form1|NoMore], [BinOP,Identity,Form1]):- NoMore==[], binary_macro(BinOP,Identity).
 % BinMacro-3+
 compile_body(Ctx,Env,Result,[BinOP,Form1|Form2],Code):- binary_macro(BinOP,_),
   Form2\=[_],Form2\=[BinOP|_], !, 
@@ -520,6 +520,7 @@ compile_body(Ctx,Env,Result,[BinOP,Form1|Form2],Code):- binary_macro(BinOP,_),
   Code = (Code1,Code2,Code3).
 
 
+
 % EXT::XOR
 binary_macro(ext_xor,[]).
 compile_body(Ctx,Env,Result,[ext_xor,Form1,Form2],Code):-
@@ -527,7 +528,6 @@ compile_body(Ctx,Env,Result,[ext_xor,Form1,Form2],Code):-
   compile_body(Ctx,Env,Result2,Form2,Code2),
   Code3 = (((Result1 \==[]) -> (Result2 ==[]) ; (Result2 \==[])) -> Result=t;Result=[]),
   Code = (Code1,Code2,Code3).
-
 
 
 
