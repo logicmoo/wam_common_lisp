@@ -102,6 +102,10 @@ my-point
       point
     (sqrt (+ (* x x) (* y y) (* z z)))))
 
+
+(DISASSEMBLE #'distance-from-origin)
+
+
 (distance-from-origin my-point)
 
 ;; 3.3. classes are objects

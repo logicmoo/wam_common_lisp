@@ -100,6 +100,8 @@
 :- ensure_loaded('tagbody.pl').
 :- ensure_loaded('tests.pl').
 :- ensure_loaded('typeof.pl').
+:- ensure_loaded('disassemble.pl').
+
 
 /*
 :- ensure_loaded('utils_for_swi.pl').
