@@ -34,8 +34,11 @@ sexpr1(PClosure) --> {compound(PClosure),functor(PClosure,closure,_),with_output
 sexpr1([quote, Expression]) --> [''''], !, sexpr1(Expression).
 sexpr1(Dict) --> {is_dict(Dict,T),Dict=..[_,_|Rest]},!, ['#<'],sexpr1(T),lisplist(Rest,'>').
 sexpr1('$OBJ'(T,X)) --> {T==claz_vector},['#'],sexpr1(X).
-sexpr1('$OBJ'(T,X)) --> ['#S'],{is_structure_class(T),claz_to_symbol(T,TP)},sexpr1(TP),sexpr1(X),['>'].
-sexpr1('$OBJ'(T,X)) --> ['#<'],{claz_to_symbol(T,TP)},sexpr1(TP),sexpr1(X),['>'].
+sexpr1('$OBJ'(T,X)) --> {T==claz_pathname},['#P'],sexpr1(X).
+sexpr1('$S'(X)) --> ['#S'],sexpr1(X).
+sexpr1('$OBJ'(T,X)) --> ['#S'],{is_list(X),is_structure_class(T),claz_to_symbol(T,TP)},sexpr1(TP),sexpr1(X).
+sexpr1('$OBJ'(T,X)) --> ['#<'],{claz_to_symbol(T,TP)},!,sexpr1(TP),sexpr1(X),['>'].
+sexpr1('$OBJ'(T,X)) --> ['#<'],!,sexpr1(T),sexpr1(X),['>'].
 sexpr1('$COMMA'(X)) --> [','],sexpr1(X).
 sexpr1(['$COMMA',X]) --> [','],sexpr1(X).
 sexpr1(['$BQ',X])--> ['`'],sexpr1(X).
@@ -76,6 +79,8 @@ writeExpression(Expression):-
 no_right_padding('#').
 no_right_padding('@').
 no_right_padding('#<').
+no_right_padding('#P').
+no_right_padding('#S').
 no_right_padding(',').
 no_right_padding('(').
 no_right_padding(')').            

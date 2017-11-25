@@ -38,7 +38,7 @@ cl_gensym(String,Symbol):- gensym(String,SymbolName),cl_make_symbol(SymbolName,S
 is_boundp(Symbol):- is_keywordp(Symbol);get_opv(Symbol,value,_).
 is_constantp(Object):- is_self_evaluationing_const(Object);get_opv(Object,defined_as,defconstant).
 is_fboundp(Symbol):- get_opv(Symbol,function,_).
-is_keywordp(Symbol):- package_external_symbols(pkg_kw,_,Symbol).
+is_keywordp(Symbol):- package:package_external_symbols(pkg_kw,_,Symbol).
 is_symbolp(Symbol):- is_keywordp(Symbol);get_opv(Symbol,classof,claz_symbol).
 
 %is_keywordp(Symbol):- atom(Symbol),sanity((must(\+ atom_concat_or_rtrace(':',_,Symbol)))),!,fail.

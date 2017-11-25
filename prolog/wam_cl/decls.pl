@@ -107,6 +107,7 @@ compile_macro(Ctx,CallEnv,Macro,[Name0,FormalParms|FunctionBody0], CompileBody):
    RNewMacroHead=..[MM|ARGS],
    get_alphas(Ctx,Alphas),
    debug_var('FnResult',FResult),
+   debug_var('Fun',Fun),
    subst(NewMacroHead,MResult,FResult,FunctionHead).
 
 
@@ -121,7 +122,7 @@ make_mcompiled(Ctx,_UnusedEnv,CResult,Symbol,FunctionHead,FunctionBody,Head,Head
       subst(Body0,Sub,BodyCode0,BodyCode),Fun=t);
     (((var(MResult),CResult=MResult))
     -> sanitize_true(Ctx,((CallEnv=HeadEnv,HeadCode,Body0)),BodyCode)
-     ; (body_cleanup(Ctx,((CallEnv=HeadEnv,HeadCode,Body0,MResult=Result)),BodyCode)))).
+     ; (body_cleanup(Ctx,((CallEnv=HeadEnv,HeadCode,Body0,MResult=CResult)),BodyCode)))).
 
 
 cl_defun(Name,FormalParms,FunctionBody,Result):-

@@ -384,19 +384,17 @@ sexpr('#'(A))              --> `|`, !, read_string_until(S,`|`), swhite,{maybe_n
 sexpr('?'(E))              --> `?`, sexpr_dcgPeek(([C],{sym_char(C)})),!, rsymbol('?',E), swhite.
 % @TODO if KIF sexpr('#'(E))              --> `&%`, !, rsymbol('#$',E), swhite.
 
-sexpr('$STRING'(""))             --> `""`,!, swhite.
-sexpr('$STRING'(Txt))                 --> `"`, !, sexpr_string(S), swhite,{text_to_string_safe(S,Txt)}.
+sexpr('$STRING'(S))             --> s_string(S).
 
 /******** BEGIN HASH ************/
-
-sexpr(E)                      --> `#`,read_dispatch(E).
+sexpr(E)                      --> `#`,read_dispatch(E),!.
 
 sexpr('#\\'(C))                   --> `#\\`,rsymbol('',C), swhite.
 sexpr('$CHAR'(C))                 --> `#\\`,!,sym_or_num(C), swhite.
 sexpr(['#-',K,O]) --> `#-`,sexpr(C),swhite,sexpr(O),!,{as_keyword(C,K)}.
 sexpr(['#+',K,O]) --> `#+`,sexpr(C),swhite,sexpr(O),!,{as_keyword(C,K)}.
-sexpr('$OBJ'(claz_pathname,C)) --> `#P`,sexpr(C),swhite,!.
-sexpr('$S'(C)) --> `#S`,sexpr(C),swhite,!.
+sexpr('$OBJ'(claz_pathname,C)) --> `#`,ci(`p`),s_string(C).
+sexpr('$S'(C)) -->                  `#`, ci(`s`),sexpr(C),swhite,!.
 sexpr('$OBJ'(claz_bitvector,C)) --> `#*`,radix_digits(2,C),swhite,!.
 
 sexpr(function(E))                 --> `#\'`, sexpr(E), !. %, swhite.
@@ -446,6 +444,9 @@ sblank --> [C], {nonvar(C),charvar(C),!,bx(C =< 32)},!, swhite.
 
 sblank_lines --> {eoln(C)},[C],!.
 sblank_lines --> [C], {charvar(C),!,bx(C =< 32)}, sblank_lines.
+
+s_string((""))             --> `""`,!, swhite.
+s_string((Txt))                 --> `"`, !, sexpr_string(S), swhite,{text_to_string_safe(S,Txt)}.
 
 
 swhite --> sblank,!.
