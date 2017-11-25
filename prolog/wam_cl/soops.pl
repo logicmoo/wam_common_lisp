@@ -119,6 +119,7 @@ value_default(claz_object,mut([],claz_object)).
 
 :- assert(user:return_arg_is_first(cl_defstruct)).
 :- assert(user:return_arg_is_first(cl_make_instance)).
+:- assert(user:return_arg_is_first(cl_defclass)).
 
 
 find_or_create_class(Name,Kind):- find_class(Name,Kind),Kind\==[],!.
@@ -145,9 +146,7 @@ cl_defstruct(Kind,[[Name,KeyWords]|Slots]):- !, must_or_rtrace(define_struct(Nam
 cl_defstruct(Kind,[[Name|KeyWords]|Slots]):- !, must_or_rtrace(define_struct(Name,KeyWords,Slots,Kind)).
 cl_defstruct(Kind,[Name|Slots]):- must_or_rtrace(define_struct(Name,[],Slots,Kind)).
 
-cl_defclass(Kind,[[Name,KeyWords]|Slots]):- !, must_or_rtrace(define_class(Name,KeyWords,Slots,Kind)).
-cl_defclass(Kind,[[Name|KeyWords]|Slots]):- !, must_or_rtrace(define_class(Name,KeyWords,Slots,Kind)).
-cl_defclass(Kind,[Name|Slots]):- must_or_rtrace(define_class(Name,[],Slots,Kind)).
+cl_defclass(Kind,[Name,Supers,Slots]):- !, must_or_rtrace(define_class(Name,[[kw_include|Supers]],Slots,Kind)).
 
 
 define_class(Name,KeyWords,SlotsIn,Kind):- 

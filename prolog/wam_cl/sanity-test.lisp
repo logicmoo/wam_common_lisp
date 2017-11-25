@@ -112,7 +112,7 @@ my-point
 
 (class-of my-point)
 
-#-(or cormanlisp CLISP WAM-CL)
+;; #-(or cormanlisp CLISP WAM-CL)
 (typep my-point (class-of my-point))
 
 (class-of (class-of my-point))

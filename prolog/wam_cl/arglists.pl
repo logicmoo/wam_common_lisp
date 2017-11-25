@@ -224,7 +224,8 @@ is_special_op(unless, pkg_cl).
 is_special_op(while, pkg_user).
 is_special_op(u_while, pkg_user).
 is_special_op(when, pkg_cl).
-
+is_special_op(defclass, pkg_cl).
+is_special_op(defstruct, pkg_cl).
 
 reserved_symbols(_Names,_PVars).
 as_rest(_,R,R).

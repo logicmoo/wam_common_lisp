@@ -427,7 +427,8 @@ compile_body(_Ctx,_Env,Result,POrSTerm,Body):-
    Body =
      (Result = closure(ClosureEnvironment,ClosureResult,LambdaArgs,ClosureBody)).
         
-	
+
+
 
 % (compile ...)
 compile_body(Ctx,Env,Result,[compile|Forms], Body):- !,
@@ -459,9 +460,20 @@ normalize_let1( Variable,[bind, Variable, []]).
 
 compile_body(_Ctx,_Env,_Result,[OP|R], _Body):- var(OP),!,trace_or_throw(c_b([OP|R])).
 
+
+compile_body(Ctx,Env,Result,[with_slots,Slots,Obj|Progn],Body):- 
+ must_or_rtrace(is_list(Slots)),!,
+ slot_object_lets(Obj,Slots,Lets),
+ compile_body(Ctx,Env,Result,[let,Lets|Progn],Body).
+
+% slot_object_lets(Obj,Slots,Lets)
+slot_object_lets(_Obj,[],[]).
+slot_object_lets(Obj,[S|Slots],[[S,['slot_value',Obj,[quote,S]]]|Lets]):-
+  slot_object_lets(Obj,Slots,Lets).
+
 % LET
 compile_body(Ctx,Env,Result,[OP, NewBindingsIn| BodyForms], Body):- (var(OP)-> throw(var(OP)) ; OP==let),!,
- must_or_rtrace(is_list(NewBindingsIn)),!,
+   must_or_rtrace(is_list(NewBindingsIn)),!,
  must_or_rtrace(compile_let(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body)).
 
 
@@ -533,7 +545,6 @@ zip_with([], [], _, []).
 zip_with([X|Xs], [Y|Ys], Pred, [Z|Zs]):-
 	lpa_apply(Pred, [X, Y, Z]),
 	zip_with(Xs, Ys, Pred, Zs).
-
 
 
 
