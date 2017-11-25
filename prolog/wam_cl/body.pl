@@ -39,6 +39,25 @@ must_compile_body(Ctx,Env,Result,Function, Body):-
   % nb_current('$compiler_PreviousResult',THE),setarg(1,THE,Result),
   !.
 
+make_holder('$hldr'([])).
+nb_set_last_tail(HT,Last):- HT=[_|T], ((compound(T),functor(T,_,2)) -> nb_set_last_tail(T,Last);  nb_setarg(2,HT,Last)).
+nb_holder_append(Obj,Value):- is_list(Obj),!,nb_set_last_tail(Obj,[Value]). 
+nb_holder_append(Obj,Value):- functor(Obj,_,A),arg(A,Obj,E),
+  (E==[] -> nb_setarg(A,Obj,[Value]) ;
+   (is_list(E)-> nb_set_last_tail(E,[Value]) ; nb_setarg(A,Obj,[E,Value]))).
+nb_holder_setval(Obj,Value):- is_list(Obj),!,nb_setarg(1,Obj,Value),nb_setarg(2,Obj,[]).
+nb_holder_setval(Obj,Value):- functor(Obj,_,A),nb_setarg(A,Obj,Value).
+nb_holder_value(Obj,Value):- is_list(Obj),!,([Value]=Obj->true;Value=Obj).
+nb_holder_value(Obj,Value):- functor(Obj,_,A),arg(A,Obj,Value). 
+
+make_restartable_block(Place,CodeWithPlace,LispCode):-
+     gensym(restartable_block,GenBlock),gensym(restartable_loop,GenLoop),
+     LispCode = [ block, GenBlock,
+                    [ tagbody,GenLoop,
+                      [ restart_bind,[[ store_value,[ lambda,[u_object],[setf, Place, u_object],[go, GenLoop]]]],
+                        [ return_from,GenBlock,[progn|CodeWithPlace] ]]]].
+
+
 :- dynamic(compiler_macro_left_right/3).
 :- discontiguous(compiler_macro_left_right/3).
 /*
@@ -275,24 +294,52 @@ compile_body(Ctx,Env,Result,['dolist',[Var,List]|FormS], Code):- !,
 
 %   (case A ((x...) B C...)...)  -->
 %   (let ((@ A)) (cond ((memv @ '(x...)) B C...)...))
-compile_body(Ctx,Env,Result,[case,VarForm|Clauses], Body):-
+compile_body(Ctx,Env,Result,[CASE,VarForm|Clauses], Body):-  member(CASE,[case,ecase,ccase]),
   compile_body(Ctx,Env,Key,VarForm,VarBody),
    debug_var('Key',Key),
-   cases_to_conds(Key,Clauses,Conds),
-   wdmsg(cases:-Clauses),
-   wdmsg(conds:-Conds),
-   compile_body(Ctx,Env,Result,[cond|Conds], Body0),
+   make_holder(SOf),    
+   cases_to_conds(SOf,Key,Clauses,Conds),
+   nb_holder_value(SOf,Values),
+   (CASE\==case -> (Values==t -> true ; nb_set_last_tail(Conds,[[t,['type_error',Key,[quote,[member|Values]]]]])) ; true),
+   wdmsg(CASE:-Clauses),wdmsg(conds:-Conds),
+   (CASE==ccase -> (make_restartable_block(Key,[cond|Conds],LispCode),compile_body(Ctx,Env,Result,LispCode, Body0)) ;
+     compile_body(Ctx,Env,Result,[cond|Conds], Body0)),
    Body = (VarBody,Body0).
 
-cases_to_conds(_,[],[]) :- !.
-cases_to_conds(_,[[otherwise,Tail]],  [[t,[progn,Tail]]]) :- !.
-cases_to_conds(V,[[One|Tail]|Tail2], [[['eq',V,[quote,Realy1]],[progn|Tail]]|X]) :- is_list(One),One=[Realy1],
-    cases_to_conds(V,Tail2,X).
-cases_to_conds(V,[[Set|Tail]|Tail2], [[['sys_memq',V,[quote,Set]],[progn|Tail]]|X]) :- \+ atomic(Set),
-    cases_to_conds(V,Tail2,X).
-cases_to_conds(V,[[Item,Tail]|Tail2], [[['eq',V,[quote,Item]],[progn,Tail]]|X]) :-
-   cases_to_conds(V,Tail2,X).
+cases_to_conds(_SOf,_,[],[]) :- !.
+cases_to_conds(SOf,_,[[otherwise|Tail]],  [[t,[progn|Tail]]]):- nb_holder_setval(SOf,t).
+cases_to_conds(SOf,_,[[t|Tail]],  [[t,[progn|Tail]]]):- nb_holder_setval(SOf,t).
+cases_to_conds(SOf,V,[[One|Tail]|Tail2], [[['eq',V,[quote,Realy1]],[progn|Tail]]|X]) :- is_list(One),One=[Realy1],nb_holder_append(SOf,Realy1),
+    cases_to_conds(SOf,V,Tail2,X).
+cases_to_conds(SOf,V,[[Set|Tail]|Tail2], [[['sys_memq',V,[quote,Set]],[progn|Tail]]|X]) :- \+ atomic(Set),nb_holder_append(SOf,[or|Set]),
+    cases_to_conds(SOf,V,Tail2,X).
+cases_to_conds(SOf,V,[[Item|Tail]|Tail2], [[['eq',V,[quote,Item]],[progn|Tail]]|X]) :- nb_holder_append(SOf,Item),
+   cases_to_conds(SOf,V,Tail2,X).
 
+% Macro TYPECASE, CTYPECASE, ETYPECASE
+%   (typecase A ((x...) B C...)...)  -->
+%   (let ((@ A)) (cond ((memv @ '(x...)) B C...)...))
+compile_body(Ctx,Env,Result,[CASE,VarForm|Clauses], Body):-  member(CASE,[typecase,etypecase,ctypecase]),
+  compile_body(Ctx,Env,Key,VarForm,VarBody),
+   debug_var('Key',Key),
+   make_holder(SOf),    
+   typecases_to_conds(SOf,Key,Clauses,Conds),
+   nb_holder_value(SOf,Values),
+   (CASE\==typecase -> (Values==t -> true ; nb_set_last_tail(Conds,[[t,['type_error',Key,[quote,[or|Values]]]]])) ; true),
+   wdmsg(CASE:-Clauses),wdmsg(conds:-Conds),
+   (CASE==ctypecase -> (make_restartable_block(Key,[cond|Conds],LispCode),compile_body(Ctx,Env,Result,LispCode, Body0)) ;
+     compile_body(Ctx,Env,Result,[cond|Conds], Body0)),
+   Body = (VarBody,Body0).
+
+typecases_to_conds(_SOf,_,[],[]) :- !.
+typecases_to_conds(SOf,_,[[otherwise|Tail]],  [[t,[progn|Tail]]]):- nb_holder_setval(SOf,t).
+typecases_to_conds(SOf,_,[[t|Tail]],  [[t,[progn|Tail]]]):- nb_holder_setval(SOf,t).
+typecases_to_conds(SOf,V,[[One|Tail]|Tail2], [[['typep',V,[quote,Realy1]],[progn|Tail]]|X]) :- is_list(One),One=[Realy1],nb_holder_append(SOf,Realy1),
+    typecases_to_conds(SOf,V,Tail2,X).
+typecases_to_conds(SOf,V,[[Set|Tail]|Tail2], [[['typep',V,[quote,[or|Set]]],[progn|Tail]]|X]) :- \+ atomic(Set),nb_holder_append(SOf,[or|Set]),
+    typecases_to_conds(SOf,V,Tail2,X).
+typecases_to_conds(SOf,V,[[Item|Tail]|Tail2], [[['typep',V,[quote,Item]],[progn|Tail]]|X]) :- nb_holder_append(SOf,Item),
+   typecases_to_conds(SOf,V,Tail2,X).
 
 
 % COND

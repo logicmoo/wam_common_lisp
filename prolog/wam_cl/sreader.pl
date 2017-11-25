@@ -603,8 +603,10 @@ to_unbackquote(I,O):-to_untyped(I,O).
 
 
 %atom_or_string(X):- (atom(X);string(X)),!.
-
-as_keyword(C,K):-atom_concat_or_rtrace(':',_,C)->K=C;atom_concat_or_rtrace(':',C,K).
+as_keyword(C,K):- atom(C),!,(atom_concat_or_rtrace(':',_,C)->K=C;atom_concat_or_rtrace(':',C,K)),!.
+as_keyword(C,C):- \+compound(C),!.
+as_keyword([A|B],[AK|BK]):- as_keyword(A,AK),as_keyword(B,BK),!.
+as_keyword(C,C).
 
 %% to_untyped( :TermVar, :TermName) is det.
 %

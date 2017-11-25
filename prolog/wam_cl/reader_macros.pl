@@ -43,15 +43,22 @@ resolve_inlines([A,[OP,Flag,Form]|MORE], Code):- same_symbol(OP,'#-'),!,
 % #+
 resolve_inlines([OP,Flag,Form], Code):- same_symbol(OP,'#+'),!, 
    must_or_rtrace(( symbol_value(xx_features_xx,FEATURES),
-                    (  member(Flag,FEATURES) -> resolve_inlines(Form, Code) ; resolve_inlines('$COMMENT'(flag_removed(+Flag,Form)), Code)))).
+                    (  feature_member(Flag,FEATURES) -> resolve_inlines(Form, Code) ; resolve_inlines('$COMMENT'(flag_removed(+Flag,Form)), Code)))).
 % #-
 resolve_inlines([OP,Flag,Form], Code):- same_symbol(OP,'#-'),!, 
    must_or_rtrace(( symbol_value(xx_features_xx,FEATURES),
-                    (  \+ member(Flag,FEATURES) -> resolve_inlines(Form, Code) ; resolve_inlines('$COMMENT'(flag_removed(+Flag,Form)), Code)))).
+                    (  \+ feature_member(Flag,FEATURES) -> resolve_inlines(Form, Code) ; resolve_inlines('$COMMENT'(flag_removed(+Flag,Form)), Code)))).
 
 resolve_inlines([I|II],O):- is_comment(I,_),!,resolve_inlines(II,O).
 resolve_inlines([I|II],[O|OO]):-resolve_inlines(I,O),!,resolve_inlines(II,OO).
 resolve_inlines(IO,IO).
+
+
+
+feature_member(Flag,Features):- memberchk(Flag,Features).
+feature_member([kw_or|X],Features):- member(E,X), feature_member(E,Features).
+feature_member([kw_and|X],Features):- \+ ( member(E,X), \+ feature_member(E,Features)).
+
 
 as_sexp(I,O):- as_sexp1(I,M),resolve_reader_macros(M,M2),remove_comments(M2,O).
 
