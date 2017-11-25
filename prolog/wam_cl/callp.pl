@@ -15,7 +15,7 @@
  * Lisp compiler.  It requires that the file lisp_compiler.pl has 
  * already been successfully compiled.
  *
- * The program is a *HUGE* common-lisp compiler/interpreter. It is written for YAP/SWI-Prolog (YAP 4x faster).
+ * The program is a *HUGE* common-lisp compiler/interpreter. It is written for YAP/SWI-Prolog .
  *
  *******************************************************************/
 :- module(callp,[]).

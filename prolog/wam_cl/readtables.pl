@@ -9,7 +9,7 @@
  *
  * (c) Douglas Miles, 2017
  *
- * The program is a *HUGE* common-lisp compiler/interpreter. It is written for YAP/SWI-Prolog (YAP 4x faster).
+ * The program is a *HUGE* common-lisp compiler/interpreter. It is written for YAP/SWI-Prolog .
  *
  *******************************************************************/
 :- module(readtables, []).
@@ -32,7 +32,7 @@ reader_intern_symbols(Package,SymbolName,Symbol):-
 reader_intern_symbols(_Package,Some,Some):- \+ compound(Some),!.
 
 reader_intern_symbols(Package,ExprI,ExprO):- ExprI=..[F,C|Expr],F=='$OBJ',  
-  ((find_kind(C,K),atom(K));reader_intern_symbols(Package,C,K)),
+  ((find_or_create_class(C,K),atom(K));reader_intern_symbols(Package,C,K)),
   must_maplist(reader_intern_symbols(Package),Expr,TT),ExprO=..[F,K|TT].
 reader_intern_symbols(Package,ExprI,ExprO):- ExprI=..[F|Expr],atom_concat('$',_,F),!,
   must_maplist(reader_intern_symbols(Package),Expr,TT),ExprO=..[F|TT].

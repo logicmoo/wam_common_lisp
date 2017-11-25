@@ -9,7 +9,7 @@
  *
  * (c) Douglas Miles, 2017
  *
- * The program is a *HUGE* common-lisp compiler/interpreter. It is written for YAP/SWI-Prolog (YAP 4x faster).
+ * The program is a *HUGE* common-lisp compiler/interpreter. It is written for YAP/SWI-Prolog .
  *
  *******************************************************************/
 :- module(soops, []).
@@ -43,8 +43,10 @@ create_instance(Kind,Attrs,Obj):-
   gensym('znst_',Name),  
   new_named_opv(Kind,Name,Attrs,Obj).
 
+true_or_die(Goal):-functor(Goal,_,A),arg(A,Goal,Ret),must_or_rtrace((Goal,Ret\==[])).
+
 new_named_opv(SKind,Name,Attrs,Obj):- 
-  find_or_create_class(SKind,Kind),
+  must_or_rtrace((find_class(SKind,Kind),
   instance_prefix(Kind,Pre),!,
   cl_string(Name,SName),
   atomic_list_concat([Pre,SName],'_',PName),
@@ -53,7 +55,7 @@ new_named_opv(SKind,Name,Attrs,Obj):-
   add_opv(Obj,classof,Kind),
   ensure_opv_type_inited(Kind),
   construct_opv(Obj,Kind),
-  init_slot_props(Kind,1,Obj,Attrs).
+  init_slot_props(Kind,1,Obj,Attrs))).
   %maplist(add_missing_opv(Obj,Kind),Attrs).
 
 
@@ -115,14 +117,18 @@ value_default(claz_object,mut([],claz_object)).
 :- assert(user:return_arg_is_first(cl_make_instance)).
 
 
-find_or_create_class(Name,Kind):- cl_find_class(Name,Kind),Kind\==[],!.
-find_or_create_class(Name,Kind):- cl_string(Name,SName),new_named_opv(claz_structure_class,SName,[],Kind),!.
+find_or_create_class(Name,Kind):- find_class(Name,Kind),Kind\==[],!.
+find_or_create_class(Name,Kind):- 
+   cl_string(Name,SName),
+   new_named_opv(claz_structure_class,SName,[],Kind),!.
 
-cl_find_class(Name,Claz):- atom(Name),atom_concat('claz_',_,Name),!,Claz=Name.
-cl_find_class(Name,Claz):-
-  cl_string(Name,StringC),
-  string_upper(StringC,NameS),
-  get_struct_opv(Claz,classname,NameS),!.
+find_class(Name,Claz):- atom(Name),atom_concat('claz_',_,Name),!,Claz=Name.
+find_class(Name,Claz):-
+  cl_string(Name,StringC)->string_upper(StringC,NameS),
+  get_struct_opv(Claz,classname,NameS).
+
+
+cl_find_class(Name,Claz):- must_or_rtrace(is_symbolp(Name)),once((find_class(Name,Claz),claz_to_symbol(Claz,Symbol),Name==Symbol)).
 cl_find_class(_,[]).
   
 cl_slot_value(Obj,Slot,Value):- get_opv(Obj,Slot,Value).
@@ -379,11 +385,13 @@ instance_prefix0(claz_keyword, kw_).
 
 instance_prefix1(Kind, Prefix):- claz_to_symbol(Kind, Prefix).
 
-claz_to_symbol(claz_symbol,symbol).
-claz_to_symbol(claz_package,package).
-claz_to_symbol(claz_number,number).
-claz_to_symbol(Class,Symbol):-atom(Class),atom_concat_or_rtrace('claz_',Symbol,Class).
-claz_to_symbol(Class,Symbol):-Class=Symbol.
+claz_to_symbol(C,S):- claz_to_symbol0(C,S).
+claz_to_symbol(C,S):- get_struct_opv(C,symbolname,S).
+claz_to_symbol0(claz_symbol,symbol).
+claz_to_symbol0(claz_package,package).
+claz_to_symbol0(claz_number,number).
+claz_to_symbol0(Class,Symbol):-atom(Class),atom_concat_or_rtrace('claz_',Symbol,Class).
+claz_to_symbol0(Class,Symbol):-Class=Symbol.
 
 
 

@@ -17,7 +17,7 @@
  *
  * (c) Douglas Miles, 2017
  *
- * The program is a *HUGE* common-lisp compiler/interpreter. It is written for YAP/SWI-Prolog (YAP 4x faster).
+ * The program is a *HUGE* common-lisp compiler/interpreter. It is written for YAP/SWI-Prolog .
  *
  *******************************************************************/
 :- module(pnames, []).
