@@ -37,7 +37,7 @@ tst:is_local_test(do(0.1),
  
 loop_vars_to_let_n_step([],[],InOut,InOut).
 loop_vars_to_let_n_step([Decl|LoopVars],[Norm|LetVars],In,Out):-
-  must_or_rtrace(loop_1var_n_step(Decl,Norm,More)),
+  always(loop_1var_n_step(Decl,Norm,More)),
   append(In,More,Mid),
   loop_vars_to_let_n_step(LoopVars,LetVars,Mid,Out).
 
@@ -113,7 +113,7 @@ compile_body_block_in_throw(Ctx,Env,Result,[block,BlockTag|InstrS],
   catch((Code,ResultExit=Result),block_exit(ExitTag,Result),true)):-  must(is_symbolp(BlockTag)),
    suffix_by_context(BlockTag,Tag),
    gensym('_labels',Suffix),
-   must_or_rtrace(within_labels_context(Suffix,
+   always(within_labels_context(Suffix,
    ((%suffixed_atom_concat(block_ret_,Tag,Var),
      suffixed_atom_concat(block_exit_,Tag,ExitTag), 
       (must_compile_body(Ctx,Env,ResultExit,[progn|InstrS],Code)))))),!.
@@ -129,13 +129,13 @@ compile_body_block_in_tb(Ctx,Env,GoResult,[RETURN_FROM,Tag,ValueForm],(ValueForm
    suffixed_atom_concat(block_exit_,Tag,ExitTag),
   % compile_body(Ctx,Env,GoResult,[progn,[setq,Var,ValueResult],[go,ExitTag]], Code ).
    debug_var('BlockExitEnv',Env),
-   Code = (set_symbol_value(Env,Var,ValueResult),must_or_rtrace(ExitTag,Env),clean_escape(_)).
+   Code = (set_symbol_value(Env,Var,ValueResult),always(ExitTag,Env),clean_escape(_)).
 
 
 compile_body_block_in_tb(Ctx,Env,Result,[block,BlockTag|InstrS], Code):- must(is_symbolp(BlockTag)),
   suffix_by_context(BlockTag,Tag),
   gensym('_labels',Suffix),
-  must_or_rtrace(within_labels_context(Suffix,
+  always(within_labels_context(Suffix,
   ((suffixed_atom_concat(block_ret_,Tag,Var),
     suffixed_atom_concat(block_exit_,Tag,ExitTag), 
     BLOCK = 

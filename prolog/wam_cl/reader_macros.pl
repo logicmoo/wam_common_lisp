@@ -32,21 +32,21 @@ resolve_inlines(IO,IO):- \+ compound(IO),!.
 /*
 % #+
 resolve_inlines([A,[OP,Flag,Form]|MORE], Code):- same_symbol(OP,'#+'),!, 
-   must_or_rtrace(( symbol_value(xx_features_xx,FEATURES),
+   always(( symbol_value(xx_features_xx,FEATURES),
                     (  member(Flag,FEATURES) -> resolve_inlines([A,Form|MORE], Code) ; resolve_inlines([A,'$COMMENT'(flag_removed(+Flag,Form))|MORE], Code)))).
 % #-
 resolve_inlines([A,[OP,Flag,Form]|MORE], Code):- same_symbol(OP,'#-'),!, 
-   must_or_rtrace(( symbol_value(xx_features_xx,FEATURES),
+   always(( symbol_value(xx_features_xx,FEATURES),
                     ( \+ member(Flag,FEATURES) -> resolve_inlines([A,Form|MORE], Code) ; resolve_inlines([A,'$COMMENT'(flag_removed(-Flag,Form))|MORE], Code)))).
 
 */
 % #+
 resolve_inlines([OP,Flag,Form], Code):- same_symbol(OP,'#+'),!, 
-   must_or_rtrace(( symbol_value(xx_features_xx,FEATURES),
+   always(( symbol_value(xx_features_xx,FEATURES),
                     (  feature_member(Flag,FEATURES) -> resolve_inlines(Form, Code) ; resolve_inlines('$COMMENT'(flag_removed(+Flag,Form)), Code)))).
 % #-
 resolve_inlines([OP,Flag,Form], Code):- same_symbol(OP,'#-'),!, 
-   must_or_rtrace(( symbol_value(xx_features_xx,FEATURES),
+   always(( symbol_value(xx_features_xx,FEATURES),
                     (  \+ feature_member(Flag,FEATURES) -> resolve_inlines(Form, Code) ; resolve_inlines('$COMMENT'(flag_removed(+Flag,Form)), Code)))).
 
 resolve_inlines([I|II],O):- is_comment(I,_),!,resolve_inlines(II,O).
@@ -67,7 +67,7 @@ as_sexp1(NIL,NIL):-NIL==[],!.
 as_sexp1(Stream,Expression):- is_stream(Stream),!,must(parse_sexpr_untyped(Stream,SExpression)),!,as_sexp2(SExpression,Expression).
 as_sexp1(s(Str),Expression):- !, must(parse_sexpr_untyped(string(Str),SExpression)),!,as_sexp2(SExpression,Expression).
 as_sexp1(Str,Expression):- notrace(catch(text_to_string(Str,String),_,fail)),!, 
-    must_or_rtrace(parse_sexpr_untyped(string(String),SExpression)),!,as_sexp2(SExpression,Expression).
+    always(parse_sexpr_untyped(string(String),SExpression)),!,as_sexp2(SExpression,Expression).
 as_sexp1(Str,Expression):- as_sexp2(Str,Expression),!.
 
 as_sexp2(Str,Expression):- is_list(Str),!,maplist(expand_pterm_to_sterm,Str,Expression).

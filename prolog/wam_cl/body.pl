@@ -35,7 +35,7 @@ must_compile_body(Ctx,Env,Result,Function, Body):-
   maybe_debug_var('_rResult',Result),
   maybe_debug_var('_rForms',Function),
   maybe_debug_var('_rBody',Body))),
-  must_or_rtrace(compile_body(Ctx,Env,Result,Function, Body)),
+  always(compile_body(Ctx,Env,Result,Function, Body)),
   % nb_current('$compiler_PreviousResult',THE),setarg(1,THE,Result),
   !.
 
@@ -154,7 +154,7 @@ atom_number_exta(Atom,Value):- atom_concat_or_rtrace('.',R,Atom),atom_concat_or_
 
 % symbols
 compile_body(Ctx,Env,Value,Atom, Body):- atom(Atom),!,
-  must_or_rtrace(compile_symbol_getter(Ctx,Env,Value, Atom, Body)).
+  always(compile_symbol_getter(Ctx,Env,Value, Atom, Body)).
 
 % QUOTE
 compile_body(_Cx,_Ev,Item,[quote, Item],  true):- !.
@@ -210,18 +210,18 @@ compile_body(_Cx,Env,Result,['`',Form], Code):-!,compile_bq(Env,Result,Form,Code
 
 % #+
 compile_body(Ctx,Env,Result,[OP,Flag,Form|MORE], Code):- same_symbol(OP,'#+'),!, 
-   must_or_rtrace(( symbol_value(xx_features_xx,FEATURES),
+   always(( symbol_value(xx_features_xx,FEATURES),
           ( member(Flag,FEATURES) -> must_compile_body(Ctx,Env,Result,Form, Code) ; compile_body(Ctx,Env,Result,MORE, Code)))).
   
 % #-
 compile_body(Ctx,Env,Result,[OP,Flag,Form|MORE], Code):- same_symbol(OP,'#-'),!,
-   must_or_rtrace(( symbol_value(xx_features_xx,FEATURES),
+   always(( symbol_value(xx_features_xx,FEATURES),
           ( \+ member(Flag,FEATURES) -> must_compile_body(Ctx,Env,Result,Form, Code) ; 
              compile_body(Ctx,Env,Result,MORE, Code)))).
 
 % EVAL-WHEN
 compile_body(Ctx,Env,Result,[OP,Flags|Forms], Code):-  same_symbol(OP,'eval-when'), !,
- must_or_rtrace(((member(X,Flags),is_when(X) )
+ always(((member(X,Flags),is_when(X) )
   -> must_compile_body(Ctx,Env,Result,[progn,Forms], Code) ; Code = true)).
 
 
@@ -239,7 +239,7 @@ is_when(X):- dbmsg(warn(free_pass(is_when(X)))).
 
 
 must_compile_test_body(Ctx,Env,TestResult,Test,TestBody,TestResultBody):-
-  must_or_rtrace(compile_test_body(Ctx,Env,TestResult,Test,TestBody,TestResultBody)).
+  always(compile_test_body(Ctx,Env,TestResult,Test,TestBody,TestResultBody)).
 
 % IF (null ...)
 compile_test_body(Ctx,Env,TestResult,[null,Test],TestBody,TestResultBody):-
@@ -346,7 +346,7 @@ typecases_to_conds(SOf,V,[[Item|Tail]|Tail2], [[['typep',V,[quote,Item]],[progn|
 compile_body(_Cx,_Ev,[],[cond ], true):- !.
 compile_body(_Cx,_Ev,[],[cond ,[]], true):- !.
 compile_body(Ctx,Env,Result,[cond, List |Clauses], Body):- 
-  must_or_rtrace((
+  always((
         [Test|ResultForms] = List,
         debug_var("CONDTESTA",TestResult),
         debug_var("ResultFormsResult",ResultFormsResult),
@@ -364,7 +364,7 @@ compile_body(Ctx,Env,Result,[cond, List |Clauses], Body):-
    
 
 compile_body(Ctx,Env,Result,[cond, List |Clauses], Body):- !,
-  must_or_rtrace((
+  always((
         [Test|ResultForms] = List,
         debug_var("CONDTESTB",TestResult),
         debug_var("ResultFormsResult",ResultFormsResult),
@@ -450,7 +450,7 @@ compile_body(Ctx,Env,Result,[progv,VarsForm,ValuesForm|FormS],Code):- !,
 
 normalize_let([],[]).
 normalize_let([Decl|NewBindingsIn],[Norm|NewBindings]):-
-  must_or_rtrace(normalize_let1(Decl,Norm)),!,
+  always(normalize_let1(Decl,Norm)),!,
   normalize_let(NewBindingsIn,NewBindings).
 
 
@@ -462,7 +462,7 @@ compile_body(_Ctx,_Env,_Result,[OP|R], _Body):- var(OP),!,trace_or_throw(c_b([OP
 
 
 compile_body(Ctx,Env,Result,[with_slots,Slots,Obj|Progn],Body):- 
- must_or_rtrace(is_list(Slots)),!,
+ always(is_list(Slots)),!,
  slot_object_lets(Obj,Slots,Lets),
  compile_body(Ctx,Env,Result,[let,Lets|Progn],Body).
 
@@ -473,15 +473,15 @@ slot_object_lets(Obj,[S|Slots],[[S,['slot_value',Obj,[quote,S]]]|Lets]):-
 
 % LET
 compile_body(Ctx,Env,Result,[OP, NewBindingsIn| BodyForms], Body):- (var(OP)-> throw(var(OP)) ; OP==let),!,
-   must_or_rtrace(is_list(NewBindingsIn)),!,
- must_or_rtrace(compile_let(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body)).
+   always(is_list(NewBindingsIn)),!,
+ always(compile_let(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body)).
 
 
 compile_let(Ctx,Env,Result,[let, []| BodyForms], Body):- !, compile_forms(Ctx,Env,Result, BodyForms, Body).
 compile_let(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body):- !,
-     must_or_rtrace(normalize_let(NewBindingsIn,NewBindings)),!,
+     always(normalize_let(NewBindingsIn,NewBindings)),!,
 	zip_with(Variables, ValueForms, [Variable, Form, [bind, Variable, Form]]^true, NewBindings),
-	must_or_rtrace(expand_arguments(Ctx,Env,'funcall',1,ValueForms, ValueBody, Values)),
+	always(expand_arguments(Ctx,Env,'funcall',1,ValueForms, ValueBody, Values)),
         freeze(Var,ignore((var(Val),debug_var('_Init',Var,Val)))),
         freeze(Var,ignore(((var(Val),add_tracked_var(Ctx,Var,Val))))),
         zip_with(Variables, Values, [Var, Val, bv(Var,Val)]^true,Bindings),
@@ -494,7 +494,7 @@ compile_let(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body):- !,
 % LET*
 compile_body(Ctx,Env,Result,[OP, []| BodyForms], Body):- same_symbol(OP,'let*'), !, must_compile_body(Ctx,Env,Result,[progn| BodyForms], Body).
 compile_body(Ctx,Env,Result,[OP, [Binding1|NewBindings]| BodyForms], Body):- same_symbol(OP,'let*'),
-   must_or_rtrace(compile_let(Ctx,Env,Result,['let', [Binding1],[progn, [OP, NewBindings| BodyForms]]], Body)).
+   always(compile_let(Ctx,Env,Result,['let', [Binding1],[progn, [OP, NewBindings| BodyForms]]], Body)).
 
 % VALUES (r1 . rest )
 compile_body(Ctx,Env,Result,['values',R1|EvalList], (ArgBody,Body)):-!,
@@ -591,12 +591,12 @@ compile_body(Ctx,Env,Result,[ext_xor,Form1,Form2],Code):-
 
 
 compile_body(Ctx,Env,Result,BodyForms, Body):- atom(BodyForms),!,
-   must_or_rtrace(compile_assigns(Ctx,Env,Result,BodyForms, Body)),!.
+   always(compile_assigns(Ctx,Env,Result,BodyForms, Body)),!.
 
 % SETQ - PSET
 compile_body(Ctx,Env,Result,BodyForms, Body):- compile_assigns(Ctx,Env,Result,BodyForms, Body),!.
 
-compile_body(Ctx,Env,Result,BodyForms, Body):- must_or_rtrace(compile_funop(Ctx,Env,Result,BodyForms, Body)),!.
+compile_body(Ctx,Env,Result,BodyForms, Body):- always(compile_funop(Ctx,Env,Result,BodyForms, Body)),!.
 
 
 :- fixup_exports.

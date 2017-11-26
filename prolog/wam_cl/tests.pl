@@ -40,7 +40,7 @@ tst:is_local_test(_,H,V):-
   clause(tst:is_local_test(H,V),true,_).
 
 call_test_compiled(Name,Value):- 
-  must_or_rtrace(compile_test(Name,Code,Return,Expected)),
+  always(compile_test(Name,Code,Return,Expected)),
   debug_var('Return',Return),
   debug_var('Expected',Expected),
   debug_var('OutValue',OutValue),
@@ -53,7 +53,7 @@ compile_test(Name,Code,Return,Expected):-
    tst:is_local_test(Name,SExpression,Expected),
    as_sexp(SExpression,Expression),
    dbmsg(compile_test(Name,Code,Return,Expected)),
-   must_or_rtrace(writeExpression(Expression)),
+   always(writeExpression(Expression)),
    lisp_compile(Return,Expression,Code),
    
    term_attvars(Code,AttVars),maplist(del_attr_rev2(vn),AttVars).
@@ -148,7 +148,7 @@ run666(Program, Values) :-
 
 see_and_do(Pred2, I,O):-
   dmsg(seeingFormala(I)),
-  must_or_rtrace(call(Pred2,I,O)),
+  always(call(Pred2,I,O)),
   dmsg(result(O)).
 
 :- set_prolog_flag(double_quotes,string).

@@ -40,7 +40,7 @@ i_type(Var,sys_locative):-var(Var).
 i_type([],null):-!.
 i_type([_|_],cons):-!.
 i_type(Obj,Type):- get_opv_i(Obj,typeof,Type).
-i_type(Obj,Type):- get_opv_i(Obj,classof,Class),get_struct_opv(Class,type,Type).
+i_type(Obj,Type):- get_opv_i(Obj,classof,Class),claz_to_symbol(Class,Type).
 i_type(Dict,Type):- is_dict(Dict,Type).
 i_type(Str,string):- string(Str).
 i_type(t,boolean).
@@ -61,7 +61,11 @@ type_named('$OBJ'(_,Type),Type):- atom(Type),!.
 type_named(Type,Type):- atomic(Type).
 
 
+cl_typep(Obj,Type,Result):- t_or_nil(is_typep(Obj,Type),Result).
 
+is_subtypep(SubType,Type):- find_class(SubType,SubClass),find_class(Type,Class),is_subclass(SubClass,Class).
+is_subclass(SubClass,Class):- get_struct_opv(SubClass,instance,Class);get_struct_opv(SubClass,super_priority,Classes),memberchk(Class,Classes).
+is_typep(Obj,Type):- i_type(Obj,SubType),is_subtypep(SubType,Type),!.
 
 cl_type_of(O,T):- i_type(O,T),!.
 cl_type_of(O,T):- type_ges(O,T),!.

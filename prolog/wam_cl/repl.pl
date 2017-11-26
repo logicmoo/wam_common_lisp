@@ -29,65 +29,6 @@
 
 :- initialization((lisp,prolog),main).
 
-:- meta_predicate(timel(+,:)).
-timel(What,M:X):- notrace(( write('% '),writeln(What))),prolog_statistics:time(M:X).
-
-both_outputs(G):-
-  notrace((current_output(O),stream_property(CO,alias(user_output)),
-  (CO\==O -> with_output_to(CO,G) ; true),G)).
-
-lisp_dump_break:- lisp_dumpST,break.
-lisp_dumpST:- both_outputs(dumpST).
-
-always_catch(G):- G. %  catch(catch(G,'$aborted',notrace),_,notrace).
-
-gripe_problem(Problem,G):- always_catch(gripe_problem0(Problem,G)).
-gripe_problem0(Problem,G):-
-     notrace(( 
-     wdmsg((Problem:-G)),lisp_dumpST,
-     dbmsg((Problem:-G)))),
-     (rtrace(G)*->(notrace,break);(wdmsg(failed_rtrace(G)),notrace,break,!,fail)).
-
-with_nat_term(G):-
-  \+ \+ ((
-  (term_attvars(G,Vs),
-    maplist(del_attr_rev2(freeze),Vs),
-    maplist(del_attr_rev2(tracker),Vs),
-   G))).
-
-quietly_must_or_rtrace(G):- 
-  (catch(quietly(G),E,gripe_problem(uncaught(E),G)) 
-   *-> true ; (gripe_problem(fail_must_or_rtrace_failed,G),!,fail)),!.
-nonquietly_must_or_rtrace(G):- 
-  (catch((G),E,gripe_problem(uncaught(E),G)) 
-   *-> true ; (gripe_problem(fail_must_or_rtrace_failed,G),!,fail)),!.
-
-must_or_rtrace((A,B)):-!,must_or_rtrace(A),must_or_rtrace(B).
-must_or_rtrace(notrace(G)):- !, quietly_must_or_rtrace(G).
-must_or_rtrace(G):- notrace(tracing),G. % nonquietly_must_or_rtrace(G).
-must_or_rtrace(G):- nonquietly_must_or_rtrace(G).
-
-
-dbmsg(X):- both_outputs(dbmsg0(X)).
-
-in_comment(X):- notrace((write('/* '),(X),writeln(' */'))).
-
-
-dbmsg0(Var):- var(Var),!,in_comment(colormsg1(dbmsg_var(Var))).
-dbmsg0(Str):- string(Str),!,in_comment(colormsg1(Str,[])).
-dbmsg0(:- asserta(A)):- !, colormsg1(A).
-dbmsg0(:- assert(A)):- !, colormsg1(A).
-dbmsg0(:-((B,asserta(A)))):- !, dbmsg0(:- B), dbmsg0(:-asserta(A)).
-dbmsg0(:-((asserta(A),B))):- !, dbmsg0(:-asserta(A)),dbmsg0(:- B).
-dbmsg0(comment(S)):- in_comment(fmt9(S)).
-dbmsg0(N=V):- in_comment(fmt9(N=V)).
-dbmsg0(H :- Body):- !,colormsg1(H :- Body),!.
-dbmsg0(:- Body):- !,colormsg1(:- Body),!.
-dbmsg0(Body):- in_comment(colormsg1(:- Body)),!.
-% dbmsg(:- Body):- !, dmsg(:- Body).
-
-colormsg1(Msg,Args):- mesg_color(Msg,Ctrl),!,ansicall(Ctrl,format(Msg,Args)).
-colormsg1(Msg):- mesg_color(Msg,Ctrl),!,ansicall(Ctrl,fmt90(Msg)).
 
 print_eval_string(Str):-
    str_to_expression(Str, Expression),
@@ -219,7 +160,7 @@ eval_at_repl(Expression,Result):-
   timel('COMPILER',always_catch(maybe_ltrace(lisp_compile(Env,Result,LExpression,Code)))),
   notrace(dbmsg(:-Code)),
   (notrace(tracing)-> Code ; 
-   timel('EXEC',always_catch(ignore(must_or_rtrace(maybe_ltrace(call(user:Code))))))),!.
+   timel('EXEC',always_catch(ignore(always(maybe_ltrace(call(user:Code))))))),!.
 
 eval_at_repl_tracing(Expression,Result):-
   quietly(as_sexp(Expression,SExpression)),
@@ -249,7 +190,7 @@ eval(Expression, Result):- env_current(Env), eval(Expression, Env, Result).
 
 eval(Expression, Env, Result):-
    always_catch(maybe_ltrace(lisp_compile(Env,Result,Expression,Code))), 
-   always_catch(ignore(must_or_rtrace(maybe_ltrace(call(user:Code))))),!.
+   always_catch(ignore(always(maybe_ltrace(call(user:Code))))),!.
 
 
 /*:- if(exists_source(library(sexpr_reader))).
@@ -276,7 +217,7 @@ eval_repl_hooks([UC|A], R):- atom(UC),downcase_atom(UC,DC),DC\==UC,!,eval_repl_h
 eval_repl_hooks([X], R):-!, eval_repl_atom( X, R),!.
 eval_repl_hooks( X , R):- eval_repl_atom( X, R),!.
 
-maybe_ltrace(G):- current_prolog_flag(lisp_trace,true)->rtrace(G);must_or_rtrace(G).
+maybe_ltrace(G):- current_prolog_flag(lisp_trace,true)->rtrace(G);always(G).
 
 eval_repl_atom(V,_):-var(V),!,fail.
 eval_repl_atom(end_of_file, end_of_file):-!.
@@ -288,7 +229,7 @@ eval_repl_atom(noltrace, t):- set_prolog_flag(lisp_trace,false),nodebug(lisp(tra
 eval_repl_atom(debug, t):- debug(lisp(_)),debug,debugging.
 eval_repl_atom(nodebug, t):- nodebug(lisp(_)),nodebug,debugging.
 
-eval_repl_atom(make, O):- !, must_or_rtrace((make, cl_compile_file_mask(pack('wam_commmon_lisp/prolog/wam_cl/lisp/'),keys([]),O))).
+eval_repl_atom(make, O):- !, always((make, cl_compile_file_mask(pack('wam_commmon_lisp/prolog/wam_cl/lisp/'),keys([]),O))).
 
 eval_repl_atom(UC, R):- atom(UC),downcase_atom(UC,DC),DC\==UC,eval_repl_atom(DC, R).
 

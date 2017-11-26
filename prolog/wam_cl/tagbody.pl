@@ -70,7 +70,7 @@ simplify_call(call(Pred,Env),COUT):- atom(Pred),!, COUT=..[Pred,Env].
 simplify_call(COUT,COUT).
 
 compute_new_address(_, Label,Pred):- atom_concat('block_exit_',_,Label),!,Pred=Label.
-compute_new_address(TB,Label,Pred):- must_or_rtrace(atomic_list_concat([TB,Label],'_',Pred)).
+compute_new_address(TB,Label,Pred):- always(atomic_list_concat([TB,Label],'_',Pred)).
 
 
  /*
@@ -184,7 +184,7 @@ compile_addrs(TB,Ctx,Env,Result,[A|Addrs]):-
 compile_addrs(_TB,_Ctx,_Env,_Result,_).
 
 compile_addr1(TB,Ctx,_Env,Result,A):- A= addr(_Pred,Label,_Unused,_E,InstrS),   
-   must_or_rtrace(compile_tagbodys(TB,Ctx,NewEnv,Result,InstrS,Code)),
+   always(compile_tagbodys(TB,Ctx,NewEnv,Result,InstrS,Code)),
    compute_new_address(TB,Label,Pred),
    setarg(1,A,Pred),
    setarg(4,A,NewEnv),

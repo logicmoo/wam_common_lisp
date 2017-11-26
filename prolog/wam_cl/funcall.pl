@@ -19,18 +19,18 @@
 :- include('header.pro').
 
 lisp_env_eval(_Pt1^Body, _Env, _Result):- !,
-  must_or_rtrace(Body).
+  always(Body).
 lisp_env_eval(Expression, Env, Result):-
   lisp_compile(Env,Result,Expression,Body),
-  user:must_or_rtrace(Body).
+  user:always(Body).
 
 function(X,function(X)).
 closure(ClosureEnvironment,ClosureResult,FormalParams,ClosureBody,ActualParams,ClosureResult):-
   must_bind_parameters(ClosureEnvironment,FormalParams, ActualParams,_EnvOut,BinderCode),
-  must_or_rtrace(user:BinderCode),
-  must_or_rtrace(user:ClosureBody).
+  always(user:BinderCode),
+  always(user:ClosureBody).
 
-cl_eval(Form,Result):- lisp_compile(Result,Form,Body),must_or_rtrace(Body).
+cl_eval(Form,Result):- lisp_compile(Result,Form,Body),always(Body).
 
 cl_funcall([function(F)|More],R):-!,cl_funcall([F|More],R).
 cl_funcall([ProcedureName|Args],Result):- env_current(Env),apply_c(Env,ProcedureName, Args, Result).
@@ -41,7 +41,7 @@ apply_c(_EnvIns,function, [A],[function,A]).
 apply_c(EnvIn,[lambda, FormalParams, Body], ActualParams, Result):-
 	!,
 	must_bind_parameters(EnvIn,FormalParams, ActualParams,EnvOut,BinderCode),!,
-        must_or_rtrace(BinderCode),
+        always(BinderCode),
 	lisp_env_eval(Body, EnvOut, Result),
 	!.
 apply_c(EnvIn,closure(ClosureEnvironment,ClosureResult,FormalParams,ClosureBody), ActualParams, Result):-
@@ -50,7 +50,7 @@ apply_c(EnvIn,closure(ClosureEnvironment,ClosureResult,FormalParams,ClosureBody)
 apply_c(EnvIn,ProcedureName, ActualParams, Result):-
 	user:macro_lambda(_Scope,ProcedureName,FormalParams, LambdaExpression,[]),!,
 	must_bind_parameters(EnvIn,FormalParams, ActualParams, Env,BinderCode),
-        must_or_rtrace(BinderCode),
+        always(BinderCode),
         lisp_env_eval(LambdaExpression, Env, Result),
 	!.
 apply_c(Env,ProcedureName, Args, Result):-

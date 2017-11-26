@@ -85,7 +85,7 @@ oper_mize(_Whole,Ctx,FF,PAB,PABO):- PAB=..[F,C1|Rest],functor(PAB,F,A),opt_arg1(
     oper_mize(C1,Ctx,FF,C1,C2),PABO=..[F,C2|Rest].
 
 oper_mize(_Whole,Ctx,FF,(H:-C1),(H:-C2)):- nonvar(H),!,functor(H,F,A), body_mize([F/A],(H:-C1),Ctx,FF,C1,C2).
-oper_mize(Whole,Ctx,F,must_or_rtrace(C1),must_or_rtrace(C2)):-!,oper_mize(Whole,Ctx,F,(C1),(C2)).
+oper_mize(Whole,Ctx,F,always(C1),always(C2)):-!,oper_mize(Whole,Ctx,F,(C1),(C2)).
 oper_mize(Whole,Ctx,F,call(C1),call(C2)):-!,oper_mize(Whole,Ctx,F,(C1),(C2)).
 oper_mize(Whole,Ctx,F,C1,C2):- body_mize([],Whole,Ctx,F,C1,C2).
 
@@ -241,7 +241,7 @@ inline_operation(Never,Ctx,FF,(asserta(MH:-C1)),Wrapper):-
    functor(H,F,A),
    %tabling:rename_term(H,HH),  
    %wdmsg(Wrapper),
-   %must_or_rtrace(ensure_tabled(M,H)),
+   %always(ensure_tabled(M,H)),
    inline_body([F/A|Never],Ctx,FF,C1,C2),
    Wrapper = asserta(MH :- C2).
 
@@ -263,8 +263,8 @@ ensure_tabled(M,H):-
   (multifile('$table_mode'/3)),
   (multifile('$table_update'/4)),
   
-  must_or_rtrace(prolog:'$flushed_predicate'(M:'$tabled'(_))),
-  (must_or_rtrace(prolog:call(M:'$tabled'(H))))).
+  always(prolog:'$flushed_predicate'(M:'$tabled'(_))),
+  (always(prolog:call(M:'$tabled'(H))))).
  
 do_conjs(F,C1,Rest,Conjs):-var(C1),!,Conjs=..[F,C1|Rest].
 do_conjs(_F,unwrapped(C2),_Rest,C2):-!.
@@ -319,10 +319,6 @@ always_inline(P):- compound(P),functor(P,F,A),always_inline_fa(F,A).
 always_inline(P):- clause(P,B)->(B==true;B=t_or_nil(_,_)).
 
 always_inline_fa(F,1):- atom_concat_or_rtrace('addr_tagbody_',M,F),atom_contains(M,'_addr_enter_').
-
-
-lisp_compiler_option(safe(_),true).
-lisp_compiler_option(_,false).
 
 maybe_inline(C1):- always_inline(C1),
   predicate_property(C1,interpreted),

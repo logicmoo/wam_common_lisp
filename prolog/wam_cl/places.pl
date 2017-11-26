@@ -53,13 +53,15 @@ with_place_value(Env,OPR,[Place,Obj], Value):-!, type_or_class_nameof(Obj,Type),
 with_place_value(Env,OPR, Obj, Value):-!, type_or_class_nameof(Obj,Type),with_place_value(Env,OPR,Obj,Type,value,Value).
 
 with_place_value(Env,OPR,Obj,Type,Place,Value):- 
-  atomic_list_concat(List,'_',Place),
+  always(atomic_list_concat(List,'_',Place)),
   with_place_value6(Env,OPR,Place,List,Type,Obj,Value).
 
 with_place_value6(_Env,OPR,_Place,[Type,Prop],Type,Obj, Value):- call_opv(OPR,Obj,Prop,Value),!.
 with_place_value6(_Env,OPR, Place,_List,      _Type,Obj, Value):- call_opv(OPR,Obj,Place,Value),!.
 
-call_opv(OPR,Obj,Place,Value):- call(OPR,Obj,Place,Value).
+call_opv(OPR,[slot_value,Obj,Place],value,Value):- !, call(OPR,Obj,Place,Value).
+call_opv(OPR,[Place,Obj],value,Value):- !, call(OPR,Obj,Place,Value).
+call_opv(OPR,Obj,Place,Value):- !, call(OPR,Obj,Place,Value).
 
 /*
 

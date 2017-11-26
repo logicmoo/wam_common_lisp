@@ -32,7 +32,7 @@ lisp_compiled_eval(SExpression,Result):-
   dbmsg(lisp_compiled_eval(Expression)),
   lisp_compile(Result,Expression,Code),
   dbmsg(Code),
-  must_or_rtrace((Code)),!.
+  always((Code)),!.
 
 %lisp_compile(SExpression):- source_location(_,_),!,dbmsg((:-lisp_compile(SExpression))).
 lisp_compile(SExpression):-
@@ -51,11 +51,11 @@ lisp_compile(Result,SExpression,Body):-
 
 lisp_compile(Env,Result,Expression,Body):-
    new_compile_ctx(Ctx),
-   must_or_rtrace(lisp_compile(Ctx,Env,Result,Expression,Body)).
+   always(lisp_compile(Ctx,Env,Result,Expression,Body)).
 
 lisp_compile(Ctx,Env,Result,SExpression,Body):-
    notrace(as_sexp(SExpression,Expression)),
-   must_or_rtrace(compile_forms(Ctx,Env,Result,[Expression],Body)).
+   always(compile_forms(Ctx,Env,Result,[Expression],Body)).
 
 
 compile_forms(Ctx,Env,Result,FunctionBody,Code):-
@@ -102,7 +102,7 @@ get_value_or_default(Ctx,Name,Value,IfMissing):- oo_get_attr(Ctx,Name,Value)->tr
 get_alphas(Ctx,Alphas):- get_attr(Ctx,tracker,Ctx0),get_alphas0(Ctx0,Alphas).
 get_alphas0(Ctx,Alphas):- get_value_or_default(Ctx,alphas,Alphas,[]).
 
-add_alphas(Ctx,Alphas):- must_or_rtrace((get_attr(Ctx,tracker,Ctx0),add_alphas0(Ctx0,Alphas))).
+add_alphas(Ctx,Alphas):- always((get_attr(Ctx,tracker,Ctx0),add_alphas0(Ctx0,Alphas))).
 add_alphas0(Ctx,Alpha):- atom(Alpha),!,get_value_or_default(Ctx,alphas,Alphas,[]),oo_put_attr(Ctx,alphas,[Alpha|Alphas]).
 add_alphas0(_Ctx,Alphas):- \+ compound(Alphas),!.
 add_alphas0(Ctx,Alphas):- Alphas=..[_|ARGS],maplist(add_alphas0(Ctx),ARGS).
@@ -119,7 +119,7 @@ must_compile_progn(Ctx,Env,Result,FormsIn, PreviousResult, Body):-
   maybe_debug_var('_rForms',Forms),
   maybe_debug_var('_rBody',Body))),
   resolve_reader_macros(FormsIn,Forms),!,
-   must_or_rtrace(compile_progn(Ctx,Env,Result,Forms, PreviousResult,Body0)),
+   always(compile_progn(Ctx,Env,Result,Forms, PreviousResult,Body0)),
    notrace((sanitize_true(Ctx,Body0,Body))).
 
 compile_progn(_Cx,_Ev,Result,Var,_PreviousResult,Out):- notrace(is_ftVar(Var)),!,Out=cl_eval([progn|Var],Result).

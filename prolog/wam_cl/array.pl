@@ -21,7 +21,7 @@
 e1_as_list(List,List):- is_list(List),!.
 e1_as_list(H,[H]):-!.
 
-cl_array_dimensions(Obj,RetVal):- get_opv(Obj,dims,RetVal).
+cl_array_dimensions(Obj,RetVal):- always(get_opv(Obj,dims,RetVal)).
 cl_array_dimension(Obj,Axis,RetVal):- get_opv(Obj,dims,List),nth0(Axis,List,RetVal).
 
 cl_nth(Axis,List,RetVal):- nth0(Axis,List,RetVal).

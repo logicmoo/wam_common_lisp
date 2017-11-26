@@ -87,7 +87,7 @@ finish_lisp_translation_cached(M,File,Temp,WithPart1):-
    M:load_files([Temp],[qcompile(auto)]),
    forall(M:lisp_trans(Part2,BaseName:Line),
    once((b_setval('$lisp_translation_line',Line),
-         must_or_rtrace(M:call(WithPart1,Part2))))).
+         always(M:call(WithPart1,Part2))))).
   
 maybe_cache_lisp_translation(File,Temp,_):- \+ file_needs_rebuilt(Temp,File),!.
 maybe_cache_lisp_translation(File,Temp,WithPart2):- 
@@ -103,7 +103,7 @@ maybe_cache_lisp_translation(File,Temp,WithPart2):-
   
 
 write_trans(Outs,File,WithPart2,Lisp):-
-   must_or_rtrace((call(WithPart2,Lisp,Part),
+   always((call(WithPart2,Lisp,Part),
    b_getval('$lisp_translation_line',Line),
    format(Outs,'~N~q.~n',[lisp_trans(Part,File:Line)]))),!.
 
@@ -313,7 +313,7 @@ read_dispatch_error(Form,In,Out):- lisp_dumpST,trace_or_throw((read_dispatch_err
 :- use_module(library(dcg/basics)).
 % #x Hex
 sread_dyn:plugin_read_dispatch_char([DispatCH],Form,In,Out):-
-  member(DispatCH,`Xx`),!,must_or_rtrace(phrase(dcg_basics:xinteger(Form), In, Out)),!.
+  member(DispatCH,`Xx`),!,always(phrase(dcg_basics:xinteger(Form), In, Out)),!.
 
 % #B Binary
 sread_dyn:plugin_read_dispatch_char([DispatCH],Form,In,Out):-

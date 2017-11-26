@@ -63,20 +63,21 @@ cl_intern(Name,Pack,Result):-
 intern_symbol(String,Package,Symbol,IntExt):- package_find_symbol(String,Package,Symbol,IntExt),!.
 intern_symbol(String,Package,Symbol,IntExt):- 
    make_fresh_internal_symbol(Package,String,Symbol),
-   must_or_rtrace((package_find_symbol(String,Package,FoundSymbol,IntExt),FoundSymbol==Symbol)).
+   always((package_find_symbol(String,Package,FoundSymbol,IntExt),FoundSymbol==Symbol)).
 
 
 cl_unintern(Symbol,t):- 
    cl_symbol_package(Symbol,Package),
    (Package\==[]-> package_unintern_symbol(Package,Symbol) ; true),
-   set_opv(Symbol,package,[]).
+   set_opv(Symbol,package,[]),
+   delete_obj(Symbol).
 
 
 
 cl_unintern(String,Package,Symbol,IntExt):- package_find_symbol(String,Package,Symbol,IntExt),!.
 unintern_symbol(String,Package,Symbol,IntExt):- 
    make_fresh_uninternal_symbol(Package,String,Symbol),
-   must_or_rtrace((package_find_symbol(String,Package,FoundSymbol,IntExt),FoundSymbol==Symbol)).
+   always((package_find_symbol(String,Package,FoundSymbol,IntExt),FoundSymbol==Symbol)).
 
 
 cl_make_symbol(SymbolName,Symbol):- 

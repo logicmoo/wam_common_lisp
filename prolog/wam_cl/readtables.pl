@@ -60,7 +60,7 @@ atom_symbol(SymbolName,_,Obj):- cl_type_of(SymbolName,X)->X\==t,SymbolName=Obj.
 atom_symbol(SymbolName,Package,Symbol):-
   string_upper(SymbolName,SymbolNameU), 
   string_list_concat([SymbolName1|SymbolNameS],":",SymbolNameU),
-  must_or_rtrace(atom_symbol_s(SymbolName1,SymbolNameS,Package,Symbol)),!.
+  always(atom_symbol_s(SymbolName1,SymbolNameS,Package,Symbol)),!.
 
 
 % :KEYWORD

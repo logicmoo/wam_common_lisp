@@ -252,7 +252,7 @@ ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,_,['&optional'|FormalParms],P
   ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,optional,FormalParms,Params,Names,PVars,Code).
 
 ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,_,['&key'|FormalParms],Params,Names,PVars,Code):- !,
-  must_or_rtrace(ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,key,FormalParms,Params,Names,PVars,Code)).
+  always(ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,key,FormalParms,Params,Names,PVars,Code)).
 
 % &body and &rest
 ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,_,['&rest',F|FormalParms],Params,[F|Names],[V|PVars],PCode):- !, 
@@ -373,7 +373,7 @@ expand_function_head(Ctx,EnvInOut,[FunctionName | FormalParms],Head,ZippedArgBin
    debug_var('ArgsIn',Arguments),
    debug_var('BinderCode',BindCode),
    HeadDefCode = (asserta(user:arglist_info(FunctionName,FormalParms,ActualArgs,ArgInfo))),
-   HeadCodeOut = (must_bind_parameters(EnvInOut,FormalParms,Arguments,EnvInOut,BindCode),must_or_rtrace(BindCode)),
+   HeadCodeOut = (must_bind_parameters(EnvInOut,FormalParms,Arguments,EnvInOut,BindCode),always(BindCode)),
    Head =.. [FunctionName | HeadArgs])).
 
 % Creates a function Head and an argument unpacker using Code to unpack
@@ -466,7 +466,7 @@ correct_formal_params_destructuring(AA,AA).
 
 must_bind_parameters(EnvInOut,FormalParms0,Params,EnvInOut,Code):- 
   correct_formal_params(FormalParms0,FormalParms),
-  must_or_rtrace(bind_each_param(EnvInOut,FormalParms,Params,Code)).
+  always(bind_each_param(EnvInOut,FormalParms,Params,Code)).
 
 bind_each_param(Env, FormalParms, Arguments,BindCode):-
   % append_open_list(Env,bind),

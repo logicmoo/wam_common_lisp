@@ -157,12 +157,12 @@ do_compile_1file(_Keys,File0):-
 lisp_compile_to_prolog(Stream,Expression):- is_stream(Stream),!,  
   with_output_to(Stream,lisp_compile_to_prolog(Expression)),!.
 lisp_compile_to_prolog(Package,Expression):-  
-  must_or_rtrace(locally_let(xx_package_xx=Package,
-    must_or_rtrace(lisp_compile_to_prolog(Expression)))),!.
+  always(locally_let(xx_package_xx=Package,
+    always(lisp_compile_to_prolog(Expression)))),!.
 
 lisp_compile_to_prolog(COMMENTP):- is_comment(COMMENTP,String),!,write('/*'),write(String),writeln('*/').
 lisp_compile_to_prolog(Expression):-   
- must_or_rtrace((
+ always((
   as_sexp(Expression,SExpression),  
   nl,
   flush_all_output_safe,
@@ -203,8 +203,8 @@ lisp_compile_to_prolog_pass3(assert(PrologCode)):- !, lisp_compile_to_prolog_pas
 
 lisp_compile_to_prolog_pass3(cl_in_package(Into, Package)):-!, cl_in_package(Into, Package).
 lisp_compile_to_prolog_pass3(cl_use_package(Package, Load_Ret)):-!, cl_use_package(Package, Load_Ret).
-lisp_compile_to_prolog_pass3(cl_load(File, Load_Ret)):- !, must_or_rtrace(cl_load(File, Load_Ret)).
-lisp_compile_to_prolog_pass3(cl_compile_file(File, Load_Ret)):- !, must_or_rtrace(cl_compile_file(File, Load_Ret)).
+lisp_compile_to_prolog_pass3(cl_load(File, Load_Ret)):- !, always(cl_load(File, Load_Ret)).
+lisp_compile_to_prolog_pass3(cl_compile_file(File, Load_Ret)):- !, always(cl_compile_file(File, Load_Ret)).
 lisp_compile_to_prolog_pass3(_).
 /*
 lisp_compile_to_prolog_pass3(MP):- strip_module(MP,_,P),functor(P,F,_),arg(_,
@@ -261,7 +261,7 @@ grovel_prolog_code(_).
 
 with_flist(How,List):- must_maplist(with1file(How),List).
 
-with1file(How,File):- must_or_rtrace(call(How,File)).
+with1file(How,File):- always(call(How,File)).
 
 with_each_form(How,File):- local_override(with_forms,What),What\==How,!,with_each_form(What,File).
 with_each_form(How,File):-

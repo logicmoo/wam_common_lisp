@@ -64,6 +64,7 @@
 :- multifile(ssip_define/2).
 :- discontiguous(ssip_define/2).
 
+:- ensure_loaded('8ball.pl').
 :- ensure_loaded('evil_workarounds.pl').
 :- ensure_loaded('arglists.pl').
 :- ensure_loaded('array.pl').

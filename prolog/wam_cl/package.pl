@@ -16,6 +16,11 @@
 :- set_module(class(library)).
 :- include('header.pro').
 
+:- multifile(xlisting_config:xlisting_always/1).
+:- dynamic(xlisting_config:xlisting_always/1).
+
+xlisting_config:xlisting_always(G):- G=package:_, current_predicate(_,G),predicate_property(G,dynamic),
+  \+ predicate_property(G,imported_from(_)).
 
 
 cl_in_package(S,Package):- find_package_or_die(S,Package),
@@ -77,8 +82,8 @@ writing_package(Package):- reading_package(Package).
 
 package_unintern_symbol(Package,Symbol):- 
   retractall(package:package_shadowing_symbols(Package,Symbol)),
-  retractall(package:package_internal_symbols(Package,Symbol)),
-  retractall(package:package_external_symbols(Package,Symbol)).
+  retractall(package:package_internal_symbols(Package,_,Symbol)),
+  retractall(package:package_external_symbols(Package,_,Symbol)).
 
 package_find_symbol_or_missing(String,Package,OldSymbol,IntExt):- package_find_symbol(String,Package,OldSymbol,IntExt),!.
 package_find_symbol_or_missing(_String,_Package,_NoSymbol,'$missing').

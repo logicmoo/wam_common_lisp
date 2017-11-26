@@ -77,15 +77,15 @@ combine_setfs(Name0,Name):-atomic_list_concat(['f_combined'|Name0],'__',Name).
 cl_defmacro(Name,FormalParms,FunctionBody,Result):-
   reenter_lisp(Ctx,Env),
   compile_decls(Ctx,Env,Result,[defmacro,Name,FormalParms|FunctionBody],Code),
-  must_or_rtrace(Code).  
+  always(Code).  
   
 
 compile_macro(Ctx,CallEnv,Macro,[Name0,FormalParms|FunctionBody0], CompileBody):-
    combine_setfs(Name0,Combined),
    suffix_by_context(Combined,Symbol),
-   must_or_rtrace(find_function_or_macro_name(Ctx,CallEnv,Symbol,_Len, Macro)),
+   always(find_function_or_macro_name(Ctx,CallEnv,Symbol,_Len, Macro)),
    add_alphas(Ctx,Macro),
-   must_or_rtrace(maybe_get_docs(function,Macro,FunctionBody0,FunctionBody,DocCode)),
+   always(maybe_get_docs(function,Macro,FunctionBody0,FunctionBody,DocCode)),
    %reader_intern_symbols
    MacroHead=[Macro|FormalParms],
    set_opv(Macro,classof,claz_macro),
@@ -128,13 +128,13 @@ make_mcompiled(Ctx,_UnusedEnv,CResult,Symbol,FunctionHead,FunctionBody,Head,Head
 cl_defun(Name,FormalParms,FunctionBody,Result):-
   reenter_lisp(Ctx,Env),
   compile_decls(Ctx,Env,Result,[defun,Name,FormalParms|FunctionBody],Code),
-  must_or_rtrace(Code).
+  always(Code).
 
 compile_function(Ctx,Env,Function,[Name,FormalParms|FunctionBody0], CompileBody):-
    combine_setfs(Name,Combined),
    suffix_by_context(Combined,Symbol),
-   must_or_rtrace(find_function_or_macro_name(Ctx,Env,Symbol,_Len, Function)),
-   must_or_rtrace(maybe_get_docs(function,Function,FunctionBody0,FunctionBody,DocCode)),
+   always(find_function_or_macro_name(Ctx,Env,Symbol,_Len, Function)),
+   always(maybe_get_docs(function,Function,FunctionBody0,FunctionBody,DocCode)),
    FunctionHead=[Function|FormalParms],
    within_labels_context(Symbol, make_compiled(Ctx,Env,_MResult,Symbol,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode)),
  CompileBody = (

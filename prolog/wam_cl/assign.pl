@@ -41,7 +41,7 @@ locally_let([N=V|More],G):-
      once(locally($(N)=V,locally_let(More,G))),
      set_symbol_value(N,Was)).
    
-locally_let([],G):- must_or_rtrace(G).
+locally_let([],G):- always(G).
 locally_let(N=V,G):-!,locally_let([N=V],G).
 
 castify(O,O):- \+compound(O),!,fail.
