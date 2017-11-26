@@ -210,10 +210,10 @@ lisp_add_history(Expression):-
 % basic EVAL statements for built-in procedures
 eval_at_repl(Var,  R):- notrace(var(Var)),!, R=Var.
 eval_at_repl(Expression, Result):- quietly(eval_repl_hooks(Expression,Result)),!.
-eval_at_repl(Expression,Result):- notrace(tracing), !, eval_at_repl_tracing(Expression,Result).
+eval_at_repl(Expression,Result):- notrace(tracing), !, trace,eval_at_repl_tracing(Expression,Result).
 eval_at_repl(Expression,Result):-
   notrace(as_sexp(Expression,SExpression)),
-  quietly(reader_intern_symbols(SExpression,LExpression)),
+  (reader_intern_symbols(SExpression,LExpression)),
   notrace(dbmsg(:- lisp_compiled_eval(LExpression))),
   notrace(debug_var('ReplEnv',Env)),
   timel('COMPILER',always_catch(maybe_ltrace(lisp_compile(Env,Result,LExpression,Code)))),
@@ -223,7 +223,8 @@ eval_at_repl(Expression,Result):-
 
 eval_at_repl_tracing(Expression,Result):-
   quietly(as_sexp(Expression,SExpression)),
-  quietly(reader_intern_symbols(SExpression,LExpression)),
+  (reader_intern_symbols(SExpression,LExpression)),
+  writeq((reader_intern_symbols(SExpression,LExpression))),nl,
   notrace(debug_var('ReplEnv',Env)),
   notrace(cls),
    notrace((writeln(==================================================================))),
@@ -269,7 +270,6 @@ eval_repl_hooks(V,_):-var(V),!,fail.
 eval_repl_hooks(nil,  []):-!.
 eval_repl_hooks(Atom, R):- atom(Atom),atom_concat(_,'.',Atom),notrace(catch(read_term_from_atom(Atom,Term,[variable_names(Vs),syntax_errors(true)]),_,fail)),
   callable(Term),current_predicate(_,Term),b_setval('$variable_names',Vs),t_or_nil((user:call(Term)*->dmsg(Term);(dmsg(no(Term)),fail)),R).
-eval_repl_hooks([quote, X], X):-!.
 eval_repl_hooks([debug,A], t):- !,debug(lisp(A)).
 eval_repl_hooks([nodebug,A], t):- !, nodebug(lisp(A)).
 eval_repl_hooks([UC|A], R):- atom(UC),downcase_atom(UC,DC),DC\==UC,!,eval_repl_hooks([DC|A], R).

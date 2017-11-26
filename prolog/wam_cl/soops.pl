@@ -282,7 +282,7 @@ get_struct_opv(Obj, KW, String):-
   call((soops:struct_opv(Obj , Key, String, defkw ))).
 get_struct_opv(Obj, KW, Value,Info):-
   un_kw1(KW,Key),
-  call((soops:struct_opv(Obj, Key, UValue,Info))).
+  call((soops:struct_opv(Obj, Key, Value,Info))).
 
 
 %:- discontiguous soops:struct_opv/3.

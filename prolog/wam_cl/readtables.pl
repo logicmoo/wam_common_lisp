@@ -27,9 +27,14 @@ reader_intern_symbols(ExprS1,Expr):-
   reading_package(Package),!,
   reader_intern_symbols(Package,ExprS1,Expr),!.
 
+reader_intern_symbols(_,Var,Var):- (var(Var);Var==[]),!.
 reader_intern_symbols(Package,SymbolName,Symbol):-
    atom(SymbolName),atom_symbol(SymbolName,Package,Symbol),!.
 reader_intern_symbols(_Package,Some,Some):- \+ compound(Some),!.
+
+% #<unbound>
+reader_intern_symbols(_,'$OBJ'([unbound]),'$OBJ'(unbound,[])):-!.
+reader_intern_symbols(Package,'$OBJ'(Expr),'$OBJ'(ExprO)):-!,reader_intern_symbols(Package,(Expr),(ExprO)).
 
 reader_intern_symbols(Package,ExprI,ExprO):- ExprI=..[F,C|Expr],F=='$OBJ',  
   ((find_or_create_class(C,K),atom(K));reader_intern_symbols(Package,C,K)),
