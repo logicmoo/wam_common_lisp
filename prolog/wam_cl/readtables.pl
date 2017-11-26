@@ -73,8 +73,32 @@ atom_symbol_s("#",[SymbolName],_UPackage,Symbol):- cl_make_symbol(SymbolName,Sym
 atom_symbol_s(SymbolName,[],Package,Symbol):- intern_symbol(SymbolName,Package,Symbol,_).
 % PACKAGE::SYMBOL
 atom_symbol_s(PName,   ["", SymbolName],_UPackage,Symbol):- find_package_or_die(PName,Package),intern_symbol(SymbolName,Package,Symbol,_IntExt).
-% PACKAGE:SYMBOL
+% PACKAGE:SYMBOL will be made public
+atom_symbol_s(PName,   [SymbolName],_UPackage,Symbol):- find_package_or_die(PName,Package),atom_symbol_make_public(SymbolName,Package,Symbol),!.
+% PACKAGE:SYMBOL must exists AND be public
 atom_symbol_s(PName,   [SymbolName],_UPackage,Symbol):- find_package_or_die(PName,Package),atom_symbol_public(SymbolName,Package,Symbol).
+
+
+
+% KEYWORD already exist or get created
+atom_symbol_make_public(SymbolName,Package, Symbol):- Package == pkg_kw,!, 
+  (package_find_symbol(SymbolName,Package,Symbol,_IntExt)->true;create_keyword(SymbolName,Symbol)).
+% SYMBOL if exists will become public
+atom_symbol_make_public(SymbolName,Package, Symbol):- package_find_symbol(SymbolName,Package,Symbol,IntExt), 
+   (IntExt\==kw_internal -> true ; cl_export(Symbol,Package,_)).
+
+% SYMBOL was found on used-by-list
+atom_symbol_make_public(SymbolName,Package,Symbol):- 
+   get_opv_i(Users,uses,Package),
+   package_find_symbol(SymbolName,Users,Symbol,_IntExt),
+   show_call_trace(cl_import(Symbol,Package,_)),
+   % should we move the home package?
+   show_call_trace(cl_export(Symbol,Package,_)),!.
+% SYMBOL if not exists will become public
+atom_symbol_make_public(SymbolName,Package,Symbol):- true,
+   intern_symbol(SymbolName,Package,Symbol,_),cl_export(Symbol,Package,_).
+
+
 
 % KEYWORD must already exist
 atom_symbol_public(SymbolName,Package, Symbol):- Package == pkg_kw,!, (package_find_symbol(SymbolName,Package,Symbol,_IntExt)->true;throw('symbol_not_exists'(SymbolName,Package))).

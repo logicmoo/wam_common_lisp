@@ -5082,6 +5082,9 @@ o_p_v(clos_defmethod,compile_as,kw_operator).
 o_p_v(clos_defmethod,function,f_clos_defmethod).
 o_p_v(clos_defmethod,name,"DEFMETHOD").
 o_p_v(clos_defmethod,package,pkg_clos).
+o_p_v(clos_defmethod_without_generic_function, classof, claz_symbol).
+o_p_v(clos_defmethod_without_generic_function, name, "DEFMETHOD-WITHOUT-GENERIC-FUNCTION").
+o_p_v(clos_defmethod_without_generic_function, package, pkg_clos).
 o_p_v(clos_defstruct_remove_print_object_method,classof,claz_symbol).
 o_p_v(clos_defstruct_remove_print_object_method,compile_as,kw_function).
 o_p_v(clos_defstruct_remove_print_object_method,function,f_clos_defstruct_remove_print_object_method).
@@ -5222,6 +5225,9 @@ o_p_v(clos_dummy_f,package,pkg_clos).
 o_p_v(clos_duplicates,classof,claz_symbol).
 o_p_v(clos_duplicates,name,"DUPLICATES").
 o_p_v(clos_duplicates,package,pkg_clos).
+o_p_v(clos_dwg_name, classof, claz_symbol).
+o_p_v(clos_dwg_name, name, "DWG-NAME").
+o_p_v(clos_dwg_name, package, pkg_clos).
 o_p_v(clos_effective_method_code_bricks,classof,claz_symbol).
 o_p_v(clos_effective_method_code_bricks,compile_as,kw_function).
 o_p_v(clos_effective_method_code_bricks,function,f_clos_effective_method_code_bricks).
@@ -5981,6 +5987,9 @@ o_p_v(clos_initial_make_instance,compile_as,kw_function).
 o_p_v(clos_initial_make_instance,function,f_clos_initial_make_instance).
 o_p_v(clos_initial_make_instance,name,"INITIAL-MAKE-INSTANCE").
 o_p_v(clos_initial_make_instance,package,pkg_clos).
+o_p_v(clos_initial_methods, classof, claz_symbol).
+o_p_v(clos_initial_methods, name, "INITIAL-METHODS").
+o_p_v(clos_initial_methods, package, pkg_clos).
 o_p_v(clos_initial_reinitialize_instance,classof,claz_symbol).
 o_p_v(clos_initial_reinitialize_instance,compile_as,kw_function).
 o_p_v(clos_initial_reinitialize_instance,function,f_clos_initial_reinitialize_instance).
@@ -10375,6 +10384,288 @@ o_p_v(d1_c45,package,pkg_cl).
 o_p_v(debug,classof,claz_symbol).
 o_p_v(debug,name,"DEBUG").
 o_p_v(debug,package,pkg_cl).
+o_p_v(debug_alive_p, classof, claz_symbol).
+o_p_v(debug_alive_p, name, "ALIVE-P").
+o_p_v(debug_alive_p, package, pkg_debug).
+o_p_v(debug_ambiguous_var_name, classof, claz_symbol).
+o_p_v(debug_ambiguous_var_name, name, "AMBIGUOUS-VAR-NAME").
+o_p_v(debug_ambiguous_var_name, package, pkg_debug).
+o_p_v(debug_ambiguous_var_name_frame, classof, claz_symbol).
+o_p_v(debug_ambiguous_var_name_frame, name, "AMBIGUOUS-VAR-NAME-FRAME").
+o_p_v(debug_ambiguous_var_name_frame, package, pkg_debug).
+o_p_v(debug_ambiguous_var_name_name, classof, claz_symbol).
+o_p_v(debug_ambiguous_var_name_name, name, "AMBIGUOUS-VAR-NAME-NAME").
+o_p_v(debug_ambiguous_var_name_name, package, pkg_debug).
+o_p_v(debug_blocks, classof, claz_symbol).
+o_p_v(debug_blocks, name, "BLOCKS").
+o_p_v(debug_blocks, package, pkg_debug).
+o_p_v(debug_bogus_debug_fun, classof, claz_symbol).
+o_p_v(debug_bogus_debug_fun, name, "BOGUS-DEBUG-FUN").
+o_p_v(debug_bogus_debug_fun, package, pkg_debug).
+o_p_v(debug_break_after, classof, claz_symbol).
+o_p_v(debug_break_after, name, "BREAK-AFTER").
+o_p_v(debug_break_after, package, pkg_debug).
+o_p_v(debug_breakpoint, classof, claz_symbol).
+o_p_v(debug_breakpoint, name, "BREAKPOINT").
+o_p_v(debug_breakpoint, package, pkg_debug).
+o_p_v(debug_breakpoint_data, classof, claz_symbol).
+o_p_v(debug_breakpoint_data, name, "BREAKPOINT-DATA").
+o_p_v(debug_breakpoint_data, package, pkg_debug).
+o_p_v(debug_breakpoints, classof, claz_symbol).
+o_p_v(debug_breakpoints, name, "BREAKPOINTS").
+o_p_v(debug_breakpoints, package, pkg_debug).
+o_p_v(debug_code_location, classof, claz_symbol).
+o_p_v(debug_code_location, name, "CODE-LOCATION").
+o_p_v(debug_code_location, package, pkg_debug).
+o_p_v(debug_code_locations, classof, claz_symbol).
+o_p_v(debug_code_locations, name, "CODE-LOCATIONS").
+o_p_v(debug_code_locations, package, pkg_debug).
+o_p_v(debug_compiled_code_location, classof, claz_symbol).
+o_p_v(debug_compiled_code_location, name, "COMPILED-CODE-LOCATION").
+o_p_v(debug_compiled_code_location, package, pkg_debug).
+o_p_v(debug_compiled_debug_block, classof, claz_symbol).
+o_p_v(debug_compiled_debug_block, name, "COMPILED-DEBUG-BLOCK").
+o_p_v(debug_compiled_debug_block, package, pkg_debug).
+o_p_v(debug_compiled_debug_fun, classof, claz_symbol).
+o_p_v(debug_compiled_debug_fun, name, "COMPILED-DEBUG-FUN").
+o_p_v(debug_compiled_debug_fun, package, pkg_debug).
+o_p_v(debug_compiled_debug_var, classof, claz_symbol).
+o_p_v(debug_compiled_debug_var, name, "COMPILED-DEBUG-VAR").
+o_p_v(debug_compiled_debug_var, package, pkg_debug).
+o_p_v(debug_compiled_frame, classof, claz_symbol).
+o_p_v(debug_compiled_frame, name, "COMPILED-FRAME").
+o_p_v(debug_compiled_frame, package, pkg_debug).
+o_p_v(debug_compiler_debug_fun, classof, claz_symbol).
+o_p_v(debug_compiler_debug_fun, name, "COMPILER-DEBUG-FUN").
+o_p_v(debug_compiler_debug_fun, package, pkg_debug).
+o_p_v(debug_component, classof, claz_symbol).
+o_p_v(debug_component, name, "COMPONENT").
+o_p_v(debug_component, package, pkg_debug).
+o_p_v(debug_condition_after, classof, claz_symbol).
+o_p_v(debug_condition_after, name, "CONDITION-AFTER").
+o_p_v(debug_condition_after, package, pkg_debug).
+o_p_v(debug_cookie_fun, classof, claz_symbol).
+o_p_v(debug_cookie_fun, name, "COOKIE-FUN").
+o_p_v(debug_cookie_fun, package, pkg_debug).
+o_p_v(debug_debug_block, classof, claz_symbol).
+o_p_v(debug_debug_block, name, "DEBUG-BLOCK").
+o_p_v(debug_debug_block, package, pkg_debug).
+o_p_v(debug_debug_condition, classof, claz_symbol).
+o_p_v(debug_debug_condition, name, "DEBUG-CONDITION").
+o_p_v(debug_debug_condition, package, pkg_debug).
+o_p_v(debug_debug_error, classof, claz_symbol).
+o_p_v(debug_debug_error, name, "DEBUG-ERROR").
+o_p_v(debug_debug_error, package, pkg_debug).
+o_p_v(debug_debug_fun, classof, claz_symbol).
+o_p_v(debug_debug_fun, name, "DEBUG-FUN").
+o_p_v(debug_debug_fun, package, pkg_debug).
+o_p_v(debug_debug_var, classof, claz_symbol).
+o_p_v(debug_debug_var, name, "DEBUG-VAR").
+o_p_v(debug_debug_var, package, pkg_debug).
+o_p_v(debug_elsewhere_p, classof, claz_symbol).
+o_p_v(debug_elsewhere_p, name, "ELSEWHERE-P").
+o_p_v(debug_elsewhere_p, package, pkg_debug).
+o_p_v(debug_encapsulated, classof, claz_symbol).
+o_p_v(debug_encapsulated, name, "ENCAPSULATED").
+o_p_v(debug_encapsulated, package, pkg_debug).
+o_p_v(debug_end_breakpoint, classof, claz_symbol).
+o_p_v(debug_end_breakpoint, name, "END-BREAKPOINT").
+o_p_v(debug_end_breakpoint, package, pkg_debug).
+o_p_v(debug_end_starter, classof, claz_symbol).
+o_p_v(debug_end_starter, name, "END-STARTER").
+o_p_v(debug_end_starter, package, pkg_debug).
+o_p_v(debug_escaped, classof, claz_symbol).
+o_p_v(debug_escaped, name, "ESCAPED").
+o_p_v(debug_escaped, package, pkg_debug).
+o_p_v(debug_frame, classof, claz_symbol).
+o_p_v(debug_frame, name, "FRAME").
+o_p_v(debug_frame, package, pkg_debug).
+o_p_v(debug_frame_fun_mismatch, classof, claz_symbol).
+o_p_v(debug_frame_fun_mismatch, name, "FRAME-FUN-MISMATCH").
+o_p_v(debug_frame_fun_mismatch, package, pkg_debug).
+o_p_v(debug_frame_fun_mismatch_code_location, classof, claz_symbol).
+o_p_v(debug_frame_fun_mismatch_code_location, name, "FRAME-FUN-MISMATCH-CODE-LOCATION").
+o_p_v(debug_frame_fun_mismatch_code_location, package, pkg_debug).
+o_p_v(debug_frame_fun_mismatch_form, classof, claz_symbol).
+o_p_v(debug_frame_fun_mismatch_form, name, "FRAME-FUN-MISMATCH-FORM").
+o_p_v(debug_frame_fun_mismatch_form, package, pkg_debug).
+o_p_v(debug_frame_fun_mismatch_frame, classof, claz_symbol).
+o_p_v(debug_frame_fun_mismatch_frame, name, "FRAME-FUN-MISMATCH-FRAME").
+o_p_v(debug_frame_fun_mismatch_frame, package, pkg_debug).
+o_p_v(debug_hook_fun, classof, claz_symbol).
+o_p_v(debug_hook_fun, name, "HOOK-FUN").
+o_p_v(debug_hook_fun, package, pkg_debug).
+o_p_v(debug_id, classof, claz_symbol).
+o_p_v(debug_id, name, "ID").
+o_p_v(debug_id, package, pkg_debug).
+o_p_v(debug_indirect_sc_offset, classof, claz_symbol).
+o_p_v(debug_indirect_sc_offset, name, "INDIRECT-SC-OFFSET").
+o_p_v(debug_indirect_sc_offset, package, pkg_debug).
+o_p_v(debug_instruction, classof, claz_symbol).
+o_p_v(debug_instruction, name, "INSTRUCTION").
+o_p_v(debug_instruction, package, pkg_debug).
+o_p_v(debug_internal_data, classof, claz_symbol).
+o_p_v(debug_internal_data, name, "INTERNAL-DATA").
+o_p_v(debug_internal_data, package, pkg_debug).
+o_p_v(debug_invalid_control_stack_pointer, classof, claz_symbol).
+o_p_v(debug_invalid_control_stack_pointer, name, "INVALID-CONTROL-STACK-POINTER").
+o_p_v(debug_invalid_control_stack_pointer, package, pkg_debug).
+o_p_v(debug_invalid_value, classof, claz_symbol).
+o_p_v(debug_invalid_value, name, "INVALID-VALUE").
+o_p_v(debug_invalid_value, package, pkg_debug).
+o_p_v(debug_invalid_value_debug_var, classof, claz_symbol).
+o_p_v(debug_invalid_value_debug_var, name, "INVALID-VALUE-DEBUG-VAR").
+o_p_v(debug_invalid_value_debug_var, package, pkg_debug).
+o_p_v(debug_invalid_value_frame, classof, claz_symbol).
+o_p_v(debug_invalid_value_frame, name, "INVALID-VALUE-FRAME").
+o_p_v(debug_invalid_value_frame, package, pkg_debug).
+o_p_v(debug_kind, classof, claz_symbol).
+o_p_v(debug_kind, name, "KIND").
+o_p_v(debug_kind, package, pkg_debug).
+o_p_v(debug_lambda_list_unavailable, classof, claz_symbol).
+o_p_v(debug_lambda_list_unavailable, name, "LAMBDA-LIST-UNAVAILABLE").
+o_p_v(debug_lambda_list_unavailable, package, pkg_debug).
+o_p_v(debug_lambda_list_unavailable_debug_fun, classof, claz_symbol).
+o_p_v(debug_lambda_list_unavailable_debug_fun, name, "LAMBDA-LIST-UNAVAILABLE-DEBUG-FUN").
+o_p_v(debug_lambda_list_unavailable_debug_fun, package, pkg_debug).
+o_p_v(debug_methods, classof, claz_symbol).
+o_p_v(debug_methods, name, "METHODS").
+o_p_v(debug_methods, package, pkg_debug).
+o_p_v(debug_name, classof, claz_symbol).
+o_p_v(debug_name, name, "NAME").
+o_p_v(debug_name, package, pkg_debug).
+o_p_v(debug_named, classof, claz_symbol).
+o_p_v(debug_named, name, "NAMED").
+o_p_v(debug_named, package, pkg_debug).
+o_p_v(debug_no_debug_blocks, classof, claz_symbol).
+o_p_v(debug_no_debug_blocks, name, "NO-DEBUG-BLOCKS").
+o_p_v(debug_no_debug_blocks, package, pkg_debug).
+o_p_v(debug_no_debug_blocks_debug_fun, classof, claz_symbol).
+o_p_v(debug_no_debug_blocks_debug_fun, name, "NO-DEBUG-BLOCKS-DEBUG-FUN").
+o_p_v(debug_no_debug_blocks_debug_fun, package, pkg_debug).
+o_p_v(debug_no_debug_fun_returns, classof, claz_symbol).
+o_p_v(debug_no_debug_fun_returns, name, "NO-DEBUG-FUN-RETURNS").
+o_p_v(debug_no_debug_fun_returns, package, pkg_debug).
+o_p_v(debug_no_debug_fun_returns_debug_fun, classof, claz_symbol).
+o_p_v(debug_no_debug_fun_returns_debug_fun, name, "NO-DEBUG-FUN-RETURNS-DEBUG-FUN").
+o_p_v(debug_no_debug_fun_returns_debug_fun, package, pkg_debug).
+o_p_v(debug_no_debug_vars, classof, claz_symbol).
+o_p_v(debug_no_debug_vars, name, "NO-DEBUG-VARS").
+o_p_v(debug_no_debug_vars, package, pkg_debug).
+o_p_v(debug_no_debug_vars_debug_fun, classof, claz_symbol).
+o_p_v(debug_no_debug_vars_debug_fun, name, "NO-DEBUG-VARS-DEBUG-FUN").
+o_p_v(debug_no_debug_vars_debug_fun, package, pkg_debug).
+o_p_v(debug_offset, classof, claz_symbol).
+o_p_v(debug_offset, name, "OFFSET").
+o_p_v(debug_offset, package, pkg_debug).
+o_p_v(debug_pc, classof, claz_symbol).
+o_p_v(debug_pc, name, "PC").
+o_p_v(debug_pc, package, pkg_debug).
+o_p_v(debug_pf_catches, classof, claz_symbol).
+o_p_v(debug_pf_catches, name, "%CATCHES").
+o_p_v(debug_pf_catches, package, pkg_debug).
+o_p_v(debug_pf_debug_block, classof, claz_symbol).
+o_p_v(debug_pf_debug_block, name, "%DEBUG-BLOCK").
+o_p_v(debug_pf_debug_block, package, pkg_debug).
+o_p_v(debug_pf_debug_vars, classof, claz_symbol).
+o_p_v(debug_pf_debug_vars, name, "%DEBUG-VARS").
+o_p_v(debug_pf_debug_vars, package, pkg_debug).
+o_p_v(debug_pf_down, classof, claz_symbol).
+o_p_v(debug_pf_down, name, "%DOWN").
+o_p_v(debug_pf_down, package, pkg_debug).
+o_p_v(debug_pf_form_number, classof, claz_symbol).
+o_p_v(debug_pf_form_number, name, "%FORM-NUMBER").
+o_p_v(debug_pf_form_number, package, pkg_debug).
+o_p_v(debug_pf_function, classof, claz_symbol).
+o_p_v(debug_pf_function, name, "%FUNCTION").
+o_p_v(debug_pf_function, package, pkg_debug).
+o_p_v(debug_pf_info, classof, claz_symbol).
+o_p_v(debug_pf_info, name, "%INFO").
+o_p_v(debug_pf_info, package, pkg_debug).
+o_p_v(debug_pf_lambda_list, classof, claz_symbol).
+o_p_v(debug_pf_lambda_list, name, "%LAMBDA-LIST").
+o_p_v(debug_pf_lambda_list, package, pkg_debug).
+o_p_v(debug_pf_live_set, classof, claz_symbol).
+o_p_v(debug_pf_live_set, name, "%LIVE-SET").
+o_p_v(debug_pf_live_set, package, pkg_debug).
+o_p_v(debug_pf_name, classof, claz_symbol).
+o_p_v(debug_pf_name, name, "%NAME").
+o_p_v(debug_pf_name, package, pkg_debug).
+o_p_v(debug_pf_tlf_offset, classof, claz_symbol).
+o_p_v(debug_pf_tlf_offset, name, "%TLF-OFFSET").
+o_p_v(debug_pf_tlf_offset, package, pkg_debug).
+o_p_v(debug_pf_unknown_p, classof, claz_symbol).
+o_p_v(debug_pf_unknown_p, name, "%UNKNOWN-P").
+o_p_v(debug_pf_unknown_p, package, pkg_debug).
+o_p_v(debug_pointer, classof, claz_symbol).
+o_p_v(debug_pointer, name, "POINTER").
+o_p_v(debug_pointer, package, pkg_debug).
+o_p_v(debug_print_after, classof, claz_symbol).
+o_p_v(debug_print_after, name, "PRINT-AFTER").
+o_p_v(debug_print_after, package, pkg_debug).
+o_p_v(debug_required_arg, classof, claz_symbol).
+o_p_v(debug_required_arg, name, "REQUIRED-ARG").
+o_p_v(debug_required_arg, package, pkg_debug).
+o_p_v(debug_save_sc_offset, classof, claz_symbol).
+o_p_v(debug_save_sc_offset, name, "SAVE-SC-OFFSET").
+o_p_v(debug_save_sc_offset, package, pkg_debug).
+o_p_v(debug_sc_offset, classof, claz_symbol).
+o_p_v(debug_sc_offset, name, "SC-OFFSET").
+o_p_v(debug_sc_offset, package, pkg_debug).
+o_p_v(debug_start_breakpoint, classof, claz_symbol).
+o_p_v(debug_start_breakpoint, name, "START-BREAKPOINT").
+o_p_v(debug_start_breakpoint, package, pkg_debug).
+o_p_v(debug_start_helper, classof, claz_symbol).
+o_p_v(debug_start_helper, name, "START-HELPER").
+o_p_v(debug_start_helper, package, pkg_debug).
+o_p_v(debug_status, classof, claz_symbol).
+o_p_v(debug_status, name, "STATUS").
+o_p_v(debug_status, package, pkg_debug).
+o_p_v(debug_step_info, classof, claz_symbol).
+o_p_v(debug_step_info, name, "STEP-INFO").
+o_p_v(debug_step_info, package, pkg_debug).
+o_p_v(debug_trace_info, classof, claz_symbol).
+o_p_v(debug_trace_info, name, "TRACE-INFO").
+o_p_v(debug_trace_info, package, pkg_debug).
+o_p_v(debug_unhandled_debug_condition, classof, claz_symbol).
+o_p_v(debug_unhandled_debug_condition, name, "UNHANDLED-DEBUG-CONDITION").
+o_p_v(debug_unhandled_debug_condition, package, pkg_debug).
+o_p_v(debug_unhandled_debug_condition_condition, classof, claz_symbol).
+o_p_v(debug_unhandled_debug_condition_condition, name, "UNHANDLED-DEBUG-CONDITION-CONDITION").
+o_p_v(debug_unhandled_debug_condition_condition, package, pkg_debug).
+o_p_v(debug_unknown_code_location, classof, claz_symbol).
+o_p_v(debug_unknown_code_location, name, "UNKNOWN-CODE-LOCATION").
+o_p_v(debug_unknown_code_location, package, pkg_debug).
+o_p_v(debug_unknown_code_location_code_location, classof, claz_symbol).
+o_p_v(debug_unknown_code_location_code_location, name, "UNKNOWN-CODE-LOCATION-CODE-LOCATION").
+o_p_v(debug_unknown_code_location_code_location, package, pkg_debug).
+o_p_v(debug_unknown_debug_var, classof, claz_symbol).
+o_p_v(debug_unknown_debug_var, name, "UNKNOWN-DEBUG-VAR").
+o_p_v(debug_unknown_debug_var, package, pkg_debug).
+o_p_v(debug_unknown_debug_var_debug_fun, classof, claz_symbol).
+o_p_v(debug_unknown_debug_var_debug_fun, name, "UNKNOWN-DEBUG-VAR-DEBUG-FUN").
+o_p_v(debug_unknown_debug_var_debug_fun, package, pkg_debug).
+o_p_v(debug_unknown_debug_var_debug_var, classof, claz_symbol).
+o_p_v(debug_unknown_debug_var_debug_var, name, "UNKNOWN-DEBUG-VAR-DEBUG-VAR").
+o_p_v(debug_unknown_debug_var_debug_var, package, pkg_debug).
+o_p_v(debug_unknown_return_partner, classof, claz_symbol).
+o_p_v(debug_unknown_return_partner, name, "UNKNOWN-RETURN-PARTNER").
+o_p_v(debug_unknown_return_partner, package, pkg_debug).
+o_p_v(debug_untraced, classof, claz_symbol).
+o_p_v(debug_untraced, name, "UNTRACED").
+o_p_v(debug_untraced, package, pkg_debug).
+o_p_v(debug_up, classof, claz_symbol).
+o_p_v(debug_up, name, "UP").
+o_p_v(debug_up, package, pkg_debug).
+o_p_v(debug_what, classof, claz_symbol).
+o_p_v(debug_what, name, "WHAT").
+o_p_v(debug_what, package, pkg_debug).
+o_p_v(debug_wherein, classof, claz_symbol).
+o_p_v(debug_wherein, name, "WHEREIN").
+o_p_v(debug_wherein, package, pkg_debug).
+o_p_v(debug_xx_trace_encapsulate_default_xx, classof, claz_symbol).
+o_p_v(debug_xx_trace_encapsulate_default_xx, name, "*TRACE-ENCAPSULATE-DEFAULT*").
+o_p_v(debug_xx_trace_encapsulate_default_xx, package, pkg_debug).
 o_p_v(decf,classof,claz_symbol).
 o_p_v(decf,compile_as,kw_operator).
 o_p_v(decf,function,cl_decf).
@@ -11031,6 +11322,9 @@ o_p_v(ext_clhs,compile_as,kw_function).
 o_p_v(ext_clhs,function,f_ext_clhs).
 o_p_v(ext_clhs,name,"CLHS").
 o_p_v(ext_clhs,package,pkg_ext).
+o_p_v(ext_code_deletion_note, classof, claz_symbol).
+o_p_v(ext_code_deletion_note, name, "CODE-DELETION-NOTE").
+o_p_v(ext_code_deletion_note, package, pkg_ext).
 o_p_v(ext_collect,classof,claz_symbol).
 o_p_v(ext_collect,compile_as,kw_function).
 o_p_v(ext_collect,function,f_ext_collect).
@@ -11078,6 +11372,9 @@ o_p_v(ext_compiler_let,compile_as,kw_operator).
 o_p_v(ext_compiler_let,function,f_ext_compiler_let).
 o_p_v(ext_compiler_let,name,"COMPILER-LET").
 o_p_v(ext_compiler_let,package,pkg_ext).
+o_p_v(ext_compiler_note, classof, claz_symbol).
+o_p_v(ext_compiler_note, name, "COMPILER-NOTE").
+o_p_v(ext_compiler_note, package, pkg_ext).
 o_p_v(ext_constant_inline,classof,claz_symbol).
 o_p_v(ext_constant_inline,name,"CONSTANT-INLINE").
 o_p_v(ext_constant_inline,package,pkg_ext).
@@ -11107,6 +11404,18 @@ o_p_v(ext_default_directory,compile_as,kw_function).
 o_p_v(ext_default_directory,function,f_ext_default_directory).
 o_p_v(ext_default_directory,name,"DEFAULT-DIRECTORY").
 o_p_v(ext_default_directory,package,pkg_ext).
+o_p_v(ext_defconstant_uneql, classof, claz_symbol).
+o_p_v(ext_defconstant_uneql, name, "DEFCONSTANT-UNEQL").
+o_p_v(ext_defconstant_uneql, package, pkg_ext).
+o_p_v(ext_defconstant_uneql_name, classof, claz_symbol).
+o_p_v(ext_defconstant_uneql_name, name, "DEFCONSTANT-UNEQL-NAME").
+o_p_v(ext_defconstant_uneql_name, package, pkg_ext).
+o_p_v(ext_defconstant_uneql_new_value, classof, claz_symbol).
+o_p_v(ext_defconstant_uneql_new_value, name, "DEFCONSTANT-UNEQL-NEW-VALUE").
+o_p_v(ext_defconstant_uneql_new_value, package, pkg_ext).
+o_p_v(ext_defconstant_uneql_old_value, classof, claz_symbol).
+o_p_v(ext_defconstant_uneql_old_value, name, "DEFCONSTANT-UNEQL-OLD-VALUE").
+o_p_v(ext_defconstant_uneql_old_value, package, pkg_ext).
 o_p_v(ext_define_hash_table_test,classof,claz_symbol).
 o_p_v(ext_define_hash_table_test,compile_as,kw_operator).
 o_p_v(ext_define_hash_table_test,function,f_ext_define_hash_table_test).
@@ -11130,6 +11439,30 @@ o_p_v(ext_delete_directory,compile_as,kw_function).
 o_p_v(ext_delete_directory,function,f_ext_delete_directory).
 o_p_v(ext_delete_directory,name,"DELETE-DIRECTORY").
 o_p_v(ext_delete_directory,package,pkg_ext).
+o_p_v(ext_deprecation_condition, classof, claz_symbol).
+o_p_v(ext_deprecation_condition, name, "DEPRECATION-CONDITION").
+o_p_v(ext_deprecation_condition, package, pkg_ext).
+o_p_v(ext_deprecation_condition_name, classof, claz_symbol).
+o_p_v(ext_deprecation_condition_name, name, "DEPRECATION-CONDITION-NAME").
+o_p_v(ext_deprecation_condition_name, package, pkg_ext).
+o_p_v(ext_deprecation_condition_namespace, classof, claz_symbol).
+o_p_v(ext_deprecation_condition_namespace, name, "DEPRECATION-CONDITION-NAMESPACE").
+o_p_v(ext_deprecation_condition_namespace, package, pkg_ext).
+o_p_v(ext_deprecation_condition_replacements, classof, claz_symbol).
+o_p_v(ext_deprecation_condition_replacements, name, "DEPRECATION-CONDITION-REPLACEMENTS").
+o_p_v(ext_deprecation_condition_replacements, package, pkg_ext).
+o_p_v(ext_deprecation_condition_runtime_error, classof, claz_symbol).
+o_p_v(ext_deprecation_condition_runtime_error, name, "DEPRECATION-CONDITION-RUNTIME-ERROR").
+o_p_v(ext_deprecation_condition_runtime_error, package, pkg_ext).
+o_p_v(ext_deprecation_condition_software, classof, claz_symbol).
+o_p_v(ext_deprecation_condition_software, name, "DEPRECATION-CONDITION-SOFTWARE").
+o_p_v(ext_deprecation_condition_software, package, pkg_ext).
+o_p_v(ext_deprecation_condition_version, classof, claz_symbol).
+o_p_v(ext_deprecation_condition_version, name, "DEPRECATION-CONDITION-VERSION").
+o_p_v(ext_deprecation_condition_version, package, pkg_ext).
+o_p_v(ext_deprecation_error, classof, claz_symbol).
+o_p_v(ext_deprecation_error, name, "DEPRECATION-ERROR").
+o_p_v(ext_deprecation_error, package, pkg_ext).
 o_p_v(ext_designator,classof,claz_symbol).
 o_p_v(ext_designator,name,"DESIGNATOR").
 o_p_v(ext_designator,package,pkg_ext).
@@ -11200,6 +11533,9 @@ o_p_v(ext_dump_java_stack,compile_as,kw_function).
 o_p_v(ext_dump_java_stack,function,f_ext_dump_java_stack).
 o_p_v(ext_dump_java_stack,name,"DUMP-JAVA-STACK").
 o_p_v(ext_dump_java_stack,package,pkg_ext).
+o_p_v(ext_early_deprecation_warning, classof, claz_symbol).
+o_p_v(ext_early_deprecation_warning, name, "EARLY-DEPRECATION-WARNING").
+o_p_v(ext_early_deprecation_warning, package, pkg_ext).
 o_p_v(ext_edit_file,classof,claz_symbol).
 o_p_v(ext_edit_file,compile_as,kw_function).
 o_p_v(ext_edit_file,function,f_ext_edit_file).
@@ -11271,6 +11607,9 @@ o_p_v(ext_expand_form,compile_as,kw_function).
 o_p_v(ext_expand_form,function,f_ext_expand_form).
 o_p_v(ext_expand_form,name,"EXPAND-FORM").
 o_p_v(ext_expand_form,package,pkg_ext).
+o_p_v(ext_expected, classof, claz_symbol).
+o_p_v(ext_expected, name, "EXPECTED").
+o_p_v(ext_expected, package, pkg_ext).
 o_p_v(ext_exquo,classof,claz_symbol).
 o_p_v(ext_exquo,compile_as,kw_function).
 o_p_v(ext_exquo,function,f_ext_exquo).
@@ -11315,6 +11654,9 @@ o_p_v(ext_file_directory_p,package,pkg_ext).
 o_p_v(ext_fill_stream,classof,claz_symbol).
 o_p_v(ext_fill_stream,name,"FILL-STREAM").
 o_p_v(ext_fill_stream,package,pkg_ext).
+o_p_v(ext_final_deprecation_warning, classof, claz_symbol).
+o_p_v(ext_final_deprecation_warning, name, "FINAL-DEPRECATION-WARNING").
+o_p_v(ext_final_deprecation_warning, package, pkg_ext).
 o_p_v(ext_finalize,classof,claz_symbol).
 o_p_v(ext_finalize,compile_as,kw_function).
 o_p_v(ext_finalize,function,f_ext_finalize).
@@ -11420,6 +11762,12 @@ o_p_v(ext_http_proxy_1,package,pkg_ext).
 o_p_v(ext_http_proxy_2,classof,claz_symbol).
 o_p_v(ext_http_proxy_2,name,"HTTP-PROXY-2").
 o_p_v(ext_http_proxy_2,package,pkg_ext).
+o_p_v(ext_implicit_generic_function_name, classof, claz_symbol).
+o_p_v(ext_implicit_generic_function_name, name, "IMPLICIT-GENERIC-FUNCTION-NAME").
+o_p_v(ext_implicit_generic_function_name, package, pkg_ext).
+o_p_v(ext_implicit_generic_function_warning, classof, claz_symbol).
+o_p_v(ext_implicit_generic_function_warning, name, "IMPLICIT-GENERIC-FUNCTION-WARNING").
+o_p_v(ext_implicit_generic_function_warning, package, pkg_ext).
 o_p_v(ext_init_gui,classof,claz_symbol).
 o_p_v(ext_init_gui,compile_as,kw_function).
 o_p_v(ext_init_gui,function,f_ext_init_gui).
@@ -11435,9 +11783,18 @@ o_p_v(ext_interrupt_lisp,compile_as,kw_function).
 o_p_v(ext_interrupt_lisp,function,f_ext_interrupt_lisp).
 o_p_v(ext_interrupt_lisp,name,"INTERRUPT-LISP").
 o_p_v(ext_interrupt_lisp,package,pkg_ext).
+o_p_v(ext_invalid_fasl, classof, claz_symbol).
+o_p_v(ext_invalid_fasl, name, "INVALID-FASL").
+o_p_v(ext_invalid_fasl, package, pkg_ext).
+o_p_v(ext_invalid_fasl_stream, classof, claz_symbol).
+o_p_v(ext_invalid_fasl_stream, name, "INVALID-FASL-STREAM").
+o_p_v(ext_invalid_fasl_stream, package, pkg_ext).
 o_p_v(ext_jar_pathname,classof,claz_symbol).
 o_p_v(ext_jar_pathname,name,"JAR-PATHNAME").
 o_p_v(ext_jar_pathname,package,pkg_ext).
+o_p_v(ext_late_deprecation_warning, classof, claz_symbol).
+o_p_v(ext_late_deprecation_warning, name, "LATE-DEPRECATION-WARNING").
+o_p_v(ext_late_deprecation_warning, package, pkg_ext).
 o_p_v(ext_launch,classof,claz_symbol).
 o_p_v(ext_launch,compile_as,kw_function).
 o_p_v(ext_launch,function,f_ext_launch).
@@ -11681,6 +12038,18 @@ o_p_v(ext_n_value,package,pkg_ext).
 o_p_v(ext_name,classof,claz_symbol).
 o_p_v(ext_name,name,"NAME").
 o_p_v(ext_name,package,pkg_ext).
+o_p_v(ext_name_conflict, classof, claz_symbol).
+o_p_v(ext_name_conflict, name, "NAME-CONFLICT").
+o_p_v(ext_name_conflict, package, pkg_ext).
+o_p_v(ext_name_conflict_datum, classof, claz_symbol).
+o_p_v(ext_name_conflict_datum, name, "NAME-CONFLICT-DATUM").
+o_p_v(ext_name_conflict_datum, package, pkg_ext).
+o_p_v(ext_name_conflict_function, classof, claz_symbol).
+o_p_v(ext_name_conflict_function, name, "NAME-CONFLICT-FUNCTION").
+o_p_v(ext_name_conflict_function, package, pkg_ext).
+o_p_v(ext_name_conflict_symbols, classof, claz_symbol).
+o_p_v(ext_name_conflict_symbols, name, "NAME-CONFLICT-SYMBOLS").
+o_p_v(ext_name_conflict_symbols, package, pkg_ext).
 o_p_v(ext_names,classof,claz_symbol).
 o_p_v(ext_names,name,"NAMES").
 o_p_v(ext_names,package,pkg_ext).
@@ -11805,6 +12174,15 @@ o_p_v(ext_package_lock,compile_as,kw_function).
 o_p_v(ext_package_lock,function,f_ext_package_lock).
 o_p_v(ext_package_lock,name,"PACKAGE-LOCK").
 o_p_v(ext_package_lock,package,pkg_ext).
+o_p_v(ext_package_lock_violation, classof, claz_symbol).
+o_p_v(ext_package_lock_violation, name, "PACKAGE-LOCK-VIOLATION").
+o_p_v(ext_package_lock_violation, package, pkg_ext).
+o_p_v(ext_package_locked_error, classof, claz_symbol).
+o_p_v(ext_package_locked_error, name, "PACKAGE-LOCKED-ERROR").
+o_p_v(ext_package_locked_error, package, pkg_ext).
+o_p_v(ext_package_locked_error_symbol, classof, claz_symbol).
+o_p_v(ext_package_locked_error_symbol, name, "PACKAGE-LOCKED-ERROR-SYMBOL").
+o_p_v(ext_package_locked_error_symbol, package, pkg_ext).
 o_p_v(ext_package_shortest_name,classof,claz_symbol).
 o_p_v(ext_package_shortest_name,compile_as,kw_function).
 o_p_v(ext_package_shortest_name,function,f_ext_package_shortest_name).
@@ -12060,6 +12438,9 @@ o_p_v(ext_show_stack,compile_as,kw_function).
 o_p_v(ext_show_stack,function,f_ext_show_stack).
 o_p_v(ext_show_stack,name,"SHOW-STACK").
 o_p_v(ext_show_stack,package,pkg_ext).
+o_p_v(ext_simd_pack, classof, claz_symbol).
+o_p_v(ext_simd_pack, name, "SIMD-PACK").
+o_p_v(ext_simd_pack, package, pkg_ext).
 o_p_v(ext_simple_16bit_vector,classof,claz_symbol).
 o_p_v(ext_simple_16bit_vector,name,"SIMPLE-16BIT-VECTOR").
 o_p_v(ext_simple_16bit_vector,package,pkg_ext).
@@ -12210,11 +12591,32 @@ o_p_v(ext_stablehash_equal,compile_as,kw_function).
 o_p_v(ext_stablehash_equal,function,f_ext_stablehash_equal).
 o_p_v(ext_stablehash_equal,name,"STABLEHASH-EQUAL").
 o_p_v(ext_stablehash_equal,package,pkg_ext).
+o_p_v(ext_step_condition, classof, claz_symbol).
+o_p_v(ext_step_condition, name, "STEP-CONDITION").
+o_p_v(ext_step_condition, package, pkg_ext).
+o_p_v(ext_step_condition_args, classof, claz_symbol).
+o_p_v(ext_step_condition_args, name, "STEP-CONDITION-ARGS").
+o_p_v(ext_step_condition_args, package, pkg_ext).
+o_p_v(ext_step_condition_form, classof, claz_symbol).
+o_p_v(ext_step_condition_form, name, "STEP-CONDITION-FORM").
+o_p_v(ext_step_condition_form, package, pkg_ext).
+o_p_v(ext_step_condition_result, classof, claz_symbol).
+o_p_v(ext_step_condition_result, name, "STEP-CONDITION-RESULT").
+o_p_v(ext_step_condition_result, package, pkg_ext).
+o_p_v(ext_step_finished_condition, classof, claz_symbol).
+o_p_v(ext_step_finished_condition, name, "STEP-FINISHED-CONDITION").
+o_p_v(ext_step_finished_condition, package, pkg_ext).
+o_p_v(ext_step_form_condition, classof, claz_symbol).
+o_p_v(ext_step_form_condition, name, "STEP-FORM-CONDITION").
+o_p_v(ext_step_form_condition, package, pkg_ext).
 o_p_v(ext_step_level,classof,claz_symbol).
 o_p_v(ext_step_level,compile_as,kw_function).
 o_p_v(ext_step_level,function,f_ext_step_level).
 o_p_v(ext_step_level,name,"STEP-LEVEL").
 o_p_v(ext_step_level,package,pkg_ext).
+o_p_v(ext_step_values_condition, classof, claz_symbol).
+o_p_v(ext_step_values_condition, name, "STEP-VALUES-CONDITION").
+o_p_v(ext_step_values_condition, package, pkg_ext).
 o_p_v(ext_string_char,classof,claz_symbol).
 o_p_v(ext_string_char,name,"STRING-CHAR").
 o_p_v(ext_string_char,package,pkg_ext).
@@ -12301,6 +12703,9 @@ o_p_v(ext_symbol_macro_expand,compile_as,kw_function).
 o_p_v(ext_symbol_macro_expand,function,f_ext_symbol_macro_expand).
 o_p_v(ext_symbol_macro_expand,name,"SYMBOL-MACRO-EXPAND").
 o_p_v(ext_symbol_macro_expand,package,pkg_ext).
+o_p_v(ext_symbol_package_locked_error, classof, claz_symbol).
+o_p_v(ext_symbol_package_locked_error, name, "SYMBOL-PACKAGE-LOCKED-ERROR").
+o_p_v(ext_symbol_package_locked_error, package, pkg_ext).
 o_p_v(ext_system_function,classof,claz_symbol).
 o_p_v(ext_system_function,name,"SYSTEM-FUNCTION").
 o_p_v(ext_system_function,package,pkg_ext).
@@ -12309,6 +12714,12 @@ o_p_v(ext_the_environment,compile_as,kw_operator).
 o_p_v(ext_the_environment,function,f_ext_the_environment).
 o_p_v(ext_the_environment,name,"THE-ENVIRONMENT").
 o_p_v(ext_the_environment,package,pkg_ext).
+o_p_v(ext_timeout, classof, claz_symbol).
+o_p_v(ext_timeout, name, "TIMEOUT").
+o_p_v(ext_timeout, package, pkg_ext).
+o_p_v(ext_timer, classof, claz_symbol).
+o_p_v(ext_timer, name, "TIMER").
+o_p_v(ext_timer, package, pkg_ext).
 o_p_v(ext_times,classof,claz_symbol).
 o_p_v(ext_times,compile_as,kw_operator).
 o_p_v(ext_times,function,f_ext_times).
@@ -12593,6 +13004,9 @@ o_p_v(ext_without_package_lock,compile_as,kw_operator).
 o_p_v(ext_without_package_lock,function,f_ext_without_package_lock).
 o_p_v(ext_without_package_lock,name,"WITHOUT-PACKAGE-LOCK").
 o_p_v(ext_without_package_lock,package,pkg_ext).
+o_p_v(ext_word, classof, claz_symbol).
+o_p_v(ext_word, name, "WORD").
+o_p_v(ext_word, package, pkg_ext).
 o_p_v(ext_write_byte_sequence,classof,claz_symbol).
 o_p_v(ext_write_byte_sequence,compile_as,kw_function).
 o_p_v(ext_write_byte_sequence,function,f_ext_write_byte_sequence).
@@ -18008,6 +18422,75 @@ o_p_v(fdefinition,compile_as,kw_function).
 o_p_v(fdefinition,function,cl_fdefinition).
 o_p_v(fdefinition,name,"FDEFINITION").
 o_p_v(fdefinition,package,pkg_cl).
+o_p_v(ffi_alien, classof, claz_symbol).
+o_p_v(ffi_alien, name, "ALIEN").
+o_p_v(ffi_alien, package, pkg_ffi).
+o_p_v(ffi_alien_alien_value_type, classof, claz_symbol).
+o_p_v(ffi_alien_alien_value_type, name, "ALIEN-ALIEN-VALUE-TYPE").
+o_p_v(ffi_alien_alien_value_type, package, pkg_ffi).
+o_p_v(ffi_alien_array_type, classof, claz_symbol).
+o_p_v(ffi_alien_array_type, name, "ALIEN-ARRAY-TYPE").
+o_p_v(ffi_alien_array_type, package, pkg_ffi).
+o_p_v(ffi_alien_boolean_type, classof, claz_symbol).
+o_p_v(ffi_alien_boolean_type, name, "ALIEN-BOOLEAN-TYPE").
+o_p_v(ffi_alien_boolean_type, package, pkg_ffi).
+o_p_v(ffi_alien_c_string_type, classof, claz_symbol).
+o_p_v(ffi_alien_c_string_type, name, "ALIEN-C-STRING-TYPE").
+o_p_v(ffi_alien_c_string_type, package, pkg_ffi).
+o_p_v(ffi_alien_double_float_type, classof, claz_symbol).
+o_p_v(ffi_alien_double_float_type, name, "ALIEN-DOUBLE-FLOAT-TYPE").
+o_p_v(ffi_alien_double_float_type, package, pkg_ffi).
+o_p_v(ffi_alien_enum_type, classof, claz_symbol).
+o_p_v(ffi_alien_enum_type, name, "ALIEN-ENUM-TYPE").
+o_p_v(ffi_alien_enum_type, package, pkg_ffi).
+o_p_v(ffi_alien_float_type, classof, claz_symbol).
+o_p_v(ffi_alien_float_type, name, "ALIEN-FLOAT-TYPE").
+o_p_v(ffi_alien_float_type, package, pkg_ffi).
+o_p_v(ffi_alien_fun_type, classof, claz_symbol).
+o_p_v(ffi_alien_fun_type, name, "ALIEN-FUN-TYPE").
+o_p_v(ffi_alien_fun_type, package, pkg_ffi).
+o_p_v(ffi_alien_integer_type, classof, claz_symbol).
+o_p_v(ffi_alien_integer_type, name, "ALIEN-INTEGER-TYPE").
+o_p_v(ffi_alien_integer_type, package, pkg_ffi).
+o_p_v(ffi_alien_mem_block_type, classof, claz_symbol).
+o_p_v(ffi_alien_mem_block_type, name, "ALIEN-MEM-BLOCK-TYPE").
+o_p_v(ffi_alien_mem_block_type, package, pkg_ffi).
+o_p_v(ffi_alien_name, classof, claz_symbol).
+o_p_v(ffi_alien_name, name, "ALIEN-NAME").
+o_p_v(ffi_alien_name, package, pkg_ffi).
+o_p_v(ffi_alien_pointer_type, classof, claz_symbol).
+o_p_v(ffi_alien_pointer_type, name, "ALIEN-POINTER-TYPE").
+o_p_v(ffi_alien_pointer_type, package, pkg_ffi).
+o_p_v(ffi_alien_record_field, classof, claz_symbol).
+o_p_v(ffi_alien_record_field, name, "ALIEN-RECORD-FIELD").
+o_p_v(ffi_alien_record_field, package, pkg_ffi).
+o_p_v(ffi_alien_record_type, classof, claz_symbol).
+o_p_v(ffi_alien_record_type, name, "ALIEN-RECORD-TYPE").
+o_p_v(ffi_alien_record_type, package, pkg_ffi).
+o_p_v(ffi_alien_rep, classof, claz_symbol).
+o_p_v(ffi_alien_rep, name, "ALIEN-REP").
+o_p_v(ffi_alien_rep, package, pkg_ffi).
+o_p_v(ffi_alien_single_float_type, classof, claz_symbol).
+o_p_v(ffi_alien_single_float_type, name, "ALIEN-SINGLE-FLOAT-TYPE").
+o_p_v(ffi_alien_single_float_type, package, pkg_ffi).
+o_p_v(ffi_alien_system_area_pointer_type, classof, claz_symbol).
+o_p_v(ffi_alien_system_area_pointer_type, name, "ALIEN-SYSTEM-AREA-POINTER-TYPE").
+o_p_v(ffi_alien_system_area_pointer_type, package, pkg_ffi).
+o_p_v(ffi_alien_type, classof, claz_symbol).
+o_p_v(ffi_alien_type, name, "ALIEN-TYPE").
+o_p_v(ffi_alien_type, package, pkg_ffi).
+o_p_v(ffi_alien_type_class, classof, claz_symbol).
+o_p_v(ffi_alien_type_class, name, "ALIEN-TYPE-CLASS").
+o_p_v(ffi_alien_type_class, package, pkg_ffi).
+o_p_v(ffi_alien_value, classof, claz_symbol).
+o_p_v(ffi_alien_value, name, "ALIEN-VALUE").
+o_p_v(ffi_alien_value, package, pkg_ffi).
+o_p_v(ffi_alien_values_type, classof, claz_symbol).
+o_p_v(ffi_alien_values_type, name, "ALIEN-VALUES-TYPE").
+o_p_v(ffi_alien_values_type, package, pkg_ffi).
+o_p_v(ffi_alignment, classof, claz_symbol).
+o_p_v(ffi_alignment, name, "ALIGNMENT").
+o_p_v(ffi_alignment, package, pkg_ffi).
 o_p_v(ffi_alist,classof,claz_symbol).
 o_p_v(ffi_alist,name,"ALIST").
 o_p_v(ffi_alist,package,pkg_ffi).
@@ -18024,6 +18507,12 @@ o_p_v(ffi_allocate_shallow,compile_as,kw_operator).
 o_p_v(ffi_allocate_shallow,function,f_ffi_allocate_shallow).
 o_p_v(ffi_allocate_shallow,name,"ALLOCATE-SHALLOW").
 o_p_v(ffi_allocate_shallow,package,pkg_ffi).
+o_p_v(ffi_arg_tn, classof, claz_symbol).
+o_p_v(ffi_arg_tn, name, "ARG-TN").
+o_p_v(ffi_arg_tn, package, pkg_ffi).
+o_p_v(ffi_arg_types, classof, claz_symbol).
+o_p_v(ffi_arg_types, name, "ARG-TYPES").
+o_p_v(ffi_arg_types, package, pkg_ffi).
 o_p_v(ffi_arg_vector,classof,claz_symbol).
 o_p_v(ffi_arg_vector,name,"ARG-VECTOR").
 o_p_v(ffi_arg_vector,package,pkg_ffi).
@@ -18042,6 +18531,9 @@ o_p_v(ffi_args,package,pkg_ffi).
 o_p_v(ffi_argtype,classof,claz_symbol).
 o_p_v(ffi_argtype,name,"ARGTYPE").
 o_p_v(ffi_argtype,package,pkg_ffi).
+o_p_v(ffi_bits, classof, claz_symbol).
+o_p_v(ffi_bits, name, "BITS").
+o_p_v(ffi_bits, package, pkg_ffi).
 o_p_v(ffi_bitsizeof,classof,claz_symbol).
 o_p_v(ffi_bitsizeof,compile_as,kw_operator).
 o_p_v(ffi_bitsizeof,function,f_ffi_bitsizeof).
@@ -18191,6 +18683,12 @@ o_p_v(ffi_call_with_foreign_string,compile_as,kw_function).
 o_p_v(ffi_call_with_foreign_string,function,f_ffi_call_with_foreign_string).
 o_p_v(ffi_call_with_foreign_string,name,"CALL-WITH-FOREIGN-STRING").
 o_p_v(ffi_call_with_foreign_string,package,pkg_ffi).
+o_p_v(ffi_callback_info, classof, claz_symbol).
+o_p_v(ffi_callback_info, name, "CALLBACK-INFO").
+o_p_v(ffi_callback_info, package, pkg_ffi).
+o_p_v(ffi_calling_convention, classof, claz_symbol).
+o_p_v(ffi_calling_convention, name, "CALLING-CONVENTION").
+o_p_v(ffi_calling_convention, package, pkg_ffi).
 o_p_v(ffi_cast,classof,claz_symbol).
 o_p_v(ffi_cast,compile_as,kw_operator).
 o_p_v(ffi_cast,function,f_ffi_cast).
@@ -18213,6 +18711,9 @@ o_p_v(ffi_close_foreign_library,package,pkg_ffi).
 o_p_v(ffi_constant_table,classof,claz_symbol).
 o_p_v(ffi_constant_table,name,"CONSTANT-TABLE").
 o_p_v(ffi_constant_table,package,pkg_ffi).
+o_p_v(ffi_convention, classof, claz_symbol).
+o_p_v(ffi_convention, name, "CONVENTION").
+o_p_v(ffi_convention, package, pkg_ffi).
 o_p_v(ffi_convert_from_foreign,classof,claz_symbol).
 o_p_v(ffi_convert_from_foreign,compile_as,kw_function).
 o_p_v(ffi_convert_from_foreign,function,f_ffi_convert_from_foreign).
@@ -18241,6 +18742,9 @@ o_p_v(ffi_ctype_type,compile_as,kw_function).
 o_p_v(ffi_ctype_type,function,f_ffi_ctype_type).
 o_p_v(ffi_ctype_type,name,"CTYPE-TYPE").
 o_p_v(ffi_ctype_type,package,pkg_ffi).
+o_p_v(ffi_datap, classof, claz_symbol).
+o_p_v(ffi_datap, name, "DATAP").
+o_p_v(ffi_datap, package, pkg_ffi).
 o_p_v(ffi_def_c_call_in,classof,claz_symbol).
 o_p_v(ffi_def_c_call_in,compile_as,kw_operator).
 o_p_v(ffi_def_c_call_in,function,f_ffi_def_c_call_in).
@@ -18314,6 +18818,9 @@ o_p_v(ffi_default_type_table,package,pkg_ffi).
 o_p_v(ffi_defined_p,classof,claz_symbol).
 o_p_v(ffi_defined_p,name,"DEFINED-P").
 o_p_v(ffi_defined_p,package,pkg_ffi).
+o_p_v(ffi_defstruct_name, classof, claz_symbol).
+o_p_v(ffi_defstruct_name, name, "DEFSTRUCT-NAME").
+o_p_v(ffi_defstruct_name, package, pkg_ffi).
 o_p_v(ffi_deparse_c_type,classof,claz_symbol).
 o_p_v(ffi_deparse_c_type,compile_as,kw_function).
 o_p_v(ffi_deparse_c_type,function,f_ffi_deparse_c_type).
@@ -18328,6 +18835,18 @@ o_p_v(ffi_deparse_c_type_deparse_slot,package,pkg_ffi).
 o_p_v(ffi_deparse_c_type_new_type,classof,claz_symbol).
 o_p_v(ffi_deparse_c_type_new_type,name,"DEPARSE-C-TYPE-NEW-TYPE").
 o_p_v(ffi_deparse_c_type_new_type,package,pkg_ffi).
+o_p_v(ffi_deport_alloc_gen, classof, claz_symbol).
+o_p_v(ffi_deport_alloc_gen, name, "DEPORT-ALLOC-GEN").
+o_p_v(ffi_deport_alloc_gen, package, pkg_ffi).
+o_p_v(ffi_deport_gen, classof, claz_symbol).
+o_p_v(ffi_deport_gen, name, "DEPORT-GEN").
+o_p_v(ffi_deport_gen, package, pkg_ffi).
+o_p_v(ffi_deport_pin_p, classof, claz_symbol).
+o_p_v(ffi_deport_pin_p, name, "DEPORT-PIN-P").
+o_p_v(ffi_deport_pin_p, package, pkg_ffi).
+o_p_v(ffi_deposit_gen, classof, claz_symbol).
+o_p_v(ffi_deposit_gen, name, "DEPOSIT-GEN").
+o_p_v(ffi_deposit_gen, package, pkg_ffi).
 o_p_v(ffi_deref,classof,claz_symbol).
 o_p_v(ffi_deref,compile_as,kw_operator).
 o_p_v(ffi_deref,function,f_ffi_deref).
@@ -18336,16 +18855,25 @@ o_p_v(ffi_deref,package,pkg_ffi).
 o_p_v(ffi_dim,classof,claz_symbol).
 o_p_v(ffi_dim,name,"DIM").
 o_p_v(ffi_dim,package,pkg_ffi).
+o_p_v(ffi_dimensions, classof, claz_symbol).
+o_p_v(ffi_dimensions, name, "DIMENSIONS").
+o_p_v(ffi_dimensions, package, pkg_ffi).
 o_p_v(ffi_do_c_lines,classof,claz_symbol).
 o_p_v(ffi_do_c_lines,compile_as,kw_function).
 o_p_v(ffi_do_c_lines,function,f_ffi_do_c_lines).
 o_p_v(ffi_do_c_lines,name,"DO-C-LINES").
 o_p_v(ffi_do_c_lines,package,pkg_ffi).
+o_p_v(ffi_dont_save, classof, claz_symbol).
+o_p_v(ffi_dont_save, name, "DONT-SAVE").
+o_p_v(ffi_dont_save, package, pkg_ffi).
 o_p_v(ffi_element,classof,claz_symbol).
 o_p_v(ffi_element,compile_as,kw_operator).
 o_p_v(ffi_element,function,f_ffi_element).
 o_p_v(ffi_element,name,"ELEMENT").
 o_p_v(ffi_element,package,pkg_ffi).
+o_p_v(ffi_element_type, classof, claz_symbol).
+o_p_v(ffi_element_type, name, "ELEMENT-TYPE").
+o_p_v(ffi_element_type, package, pkg_ffi).
 o_p_v(ffi_end,classof,claz_symbol).
 o_p_v(ffi_end,name,"END").
 o_p_v(ffi_end,package,pkg_ffi).
@@ -18386,6 +18914,12 @@ o_p_v(ffi_exec_with_foreign_string,compile_as,kw_function).
 o_p_v(ffi_exec_with_foreign_string,function,f_ffi_exec_with_foreign_string).
 o_p_v(ffi_exec_with_foreign_string,name,"EXEC-WITH-FOREIGN-STRING").
 o_p_v(ffi_exec_with_foreign_string,package,pkg_ffi).
+o_p_v(ffi_external_format, classof, claz_symbol).
+o_p_v(ffi_external_format, name, "EXTERNAL-FORMAT").
+o_p_v(ffi_external_format, package, pkg_ffi).
+o_p_v(ffi_extract_gen, classof, claz_symbol).
+o_p_v(ffi_extract_gen, name, "EXTRACT-GEN").
+o_p_v(ffi_extract_gen, package, pkg_ffi).
 o_p_v(ffi_f_name,classof,claz_symbol).
 o_p_v(ffi_f_name,name,"F-NAME").
 o_p_v(ffi_f_name,package,pkg_ffi).
@@ -18493,6 +19027,9 @@ o_p_v(ffi_ffi_module_variable_list,package,pkg_ffi).
 o_p_v(ffi_ffi_type,classof,claz_symbol).
 o_p_v(ffi_ffi_type,name,"FFI-TYPE").
 o_p_v(ffi_ffi_type,package,pkg_ffi).
+o_p_v(ffi_fields, classof, claz_symbol).
+o_p_v(ffi_fields, name, "FIELDS").
+o_p_v(ffi_fields, package, pkg_ffi).
 o_p_v(ffi_file,classof,claz_symbol).
 o_p_v(ffi_file,name,"FILE").
 o_p_v(ffi_file,package,pkg_ffi).
@@ -18525,6 +19062,9 @@ o_p_v(ffi_flag_to_language,package,pkg_ffi).
 o_p_v(ffi_flags,classof,claz_symbol).
 o_p_v(ffi_flags,name,"FLAGS").
 o_p_v(ffi_flags,package,pkg_ffi).
+o_p_v(ffi_force_to_memory_p, classof, claz_symbol).
+o_p_v(ffi_force_to_memory_p, name, "FORCE-TO-MEMORY-P").
+o_p_v(ffi_force_to_memory_p, package, pkg_ffi).
 o_p_v(ffi_foreign_address,classof,claz_symbol).
 o_p_v(ffi_foreign_address,compile_as,kw_function).
 o_p_v(ffi_foreign_address,function,f_ffi_foreign_address).
@@ -18605,6 +19145,12 @@ o_p_v(ffi_form_type,package,pkg_ffi).
 o_p_v(ffi_format_string,classof,claz_symbol).
 o_p_v(ffi_format_string,name,"FORMAT-STRING").
 o_p_v(ffi_format_string,package,pkg_ffi).
+o_p_v(ffi_from, classof, claz_symbol).
+o_p_v(ffi_from, name, "FROM").
+o_p_v(ffi_from, package, pkg_ffi).
+o_p_v(ffi_fun, classof, claz_symbol).
+o_p_v(ffi_fun, name, "FUN").
+o_p_v(ffi_fun, package, pkg_ffi).
 o_p_v(ffi_function_list,classof,claz_symbol).
 o_p_v(ffi_function_list,name,"FUNCTION-LIST").
 o_p_v(ffi_function_list,package,pkg_ffi).
@@ -18629,6 +19175,15 @@ o_p_v(ffi_get_assoc,package,pkg_ffi).
 o_p_v(ffi_guard,classof,claz_symbol).
 o_p_v(ffi_guard,name,"GUARD").
 o_p_v(ffi_guard,package,pkg_ffi).
+o_p_v(ffi_handle, classof, claz_symbol).
+o_p_v(ffi_handle, name, "HANDLE").
+o_p_v(ffi_handle, package, pkg_ffi).
+o_p_v(ffi_heap_alien_info, classof, claz_symbol).
+o_p_v(ffi_heap_alien_info, name, "HEAP-ALIEN-INFO").
+o_p_v(ffi_heap_alien_info, package, pkg_ffi).
+o_p_v(ffi_include, classof, claz_symbol).
+o_p_v(ffi_include, name, "INCLUDE").
+o_p_v(ffi_include, package, pkg_ffi).
 o_p_v(ffi_index,classof,claz_symbol).
 o_p_v(ffi_index,name,"INDEX").
 o_p_v(ffi_index,package,pkg_ffi).
@@ -18668,6 +19223,9 @@ o_p_v(ffi_key,package,pkg_ffi).
 o_p_v(ffi_keywords,classof,claz_symbol).
 o_p_v(ffi_keywords,name,"KEYWORDS").
 o_p_v(ffi_keywords,package,pkg_ffi).
+o_p_v(ffi_kind, classof, claz_symbol).
+o_p_v(ffi_kind, name, "KIND").
+o_p_v(ffi_kind, package, pkg_ffi).
 o_p_v(ffi_lang,classof,claz_symbol).
 o_p_v(ffi_lang,name,"LANG").
 o_p_v(ffi_lang,package,pkg_ffi).
@@ -18685,9 +19243,15 @@ o_p_v(ffi_library,package,pkg_ffi).
 o_p_v(ffi_lisp_name,classof,claz_symbol).
 o_p_v(ffi_lisp_name,name,"LISP-NAME").
 o_p_v(ffi_lisp_name,package,pkg_ffi).
+o_p_v(ffi_lisp_rep, classof, claz_symbol).
+o_p_v(ffi_lisp_rep, name, "LISP-REP").
+o_p_v(ffi_lisp_rep, package, pkg_ffi).
 o_p_v(ffi_lispobj,classof,claz_symbol).
 o_p_v(ffi_lispobj,name,"LISPOBJ").
 o_p_v(ffi_lispobj,package,pkg_ffi).
+o_p_v(ffi_local_alien_info, classof, claz_symbol).
+o_p_v(ffi_local_alien_info, name, "LOCAL-ALIEN-INFO").
+o_p_v(ffi_local_alien_info, package, pkg_ffi).
 o_p_v(ffi_long,classof,claz_symbol).
 o_p_v(ffi_long,name,"LONG").
 o_p_v(ffi_long,package,pkg_ffi).
@@ -18701,6 +19265,9 @@ o_p_v(ffi_maximize_integer_type,compile_as,kw_function).
 o_p_v(ffi_maximize_integer_type,function,f_ffi_maximize_integer_type).
 o_p_v(ffi_maximize_integer_type,name,"MAXIMIZE-INTEGER-TYPE").
 o_p_v(ffi_maximize_integer_type,package,pkg_ffi).
+o_p_v(ffi_mem_block, classof, claz_symbol).
+o_p_v(ffi_mem_block, name, "MEM-BLOCK").
+o_p_v(ffi_mem_block, package, pkg_ffi).
 o_p_v(ffi_memory_as,classof,claz_symbol).
 o_p_v(ffi_memory_as,compile_as,kw_function).
 o_p_v(ffi_memory_as,function,f_ffi_memory_as).
@@ -18715,11 +19282,17 @@ o_p_v(ffi_name_c43_options,package,pkg_ffi).
 o_p_v(ffi_name_option,classof,claz_symbol).
 o_p_v(ffi_name_option,name,"NAME-OPTION").
 o_p_v(ffi_name_option,package,pkg_ffi).
+o_p_v(ffi_naturalize_gen, classof, claz_symbol).
+o_p_v(ffi_naturalize_gen, name, "NATURALIZE-GEN").
+o_p_v(ffi_naturalize_gen, package, pkg_ffi).
 o_p_v(ffi_new_object,classof,claz_symbol).
 o_p_v(ffi_new_object,compile_as,kw_function).
 o_p_v(ffi_new_object,function,f_ffi_new_object).
 o_p_v(ffi_new_object,name,"NEW-OBJECT").
 o_p_v(ffi_new_object,package,pkg_ffi).
+o_p_v(ffi_not_null, classof, claz_symbol).
+o_p_v(ffi_not_null, name, "NOT-NULL").
+o_p_v(ffi_not_null, package, pkg_ffi).
 o_p_v(ffi_note_c_call_in,classof,claz_symbol).
 o_p_v(ffi_note_c_call_in,compile_as,kw_function).
 o_p_v(ffi_note_c_call_in,function,f_ffi_note_c_call_in).
@@ -18891,6 +19464,9 @@ o_p_v(ffi_pf_slot,package,pkg_ffi).
 o_p_v(ffi_place,classof,claz_symbol).
 o_p_v(ffi_place,name,"PLACE").
 o_p_v(ffi_place,package,pkg_ffi).
+o_p_v(ffi_pointer, classof, claz_symbol).
+o_p_v(ffi_pointer, name, "POINTER").
+o_p_v(ffi_pointer, package, pkg_ffi).
 o_p_v(ffi_prepare_c_typedecl,classof,claz_symbol).
 o_p_v(ffi_prepare_c_typedecl,compile_as,kw_function).
 o_p_v(ffi_prepare_c_typedecl,function,f_ffi_prepare_c_typedecl).
@@ -18916,18 +19492,30 @@ o_p_v(ffi_read_only_p,package,pkg_ffi).
 o_p_v(ffi_reconsed_form,classof,claz_symbol).
 o_p_v(ffi_reconsed_form,name,"RECONSED-FORM").
 o_p_v(ffi_reconsed_form,package,pkg_ffi).
+o_p_v(ffi_record, classof, claz_symbol).
+o_p_v(ffi_record, name, "RECORD").
+o_p_v(ffi_record, package, pkg_ffi).
 o_p_v(ffi_reserved_list,classof,claz_symbol).
 o_p_v(ffi_reserved_list,name,"RESERVED-LIST").
 o_p_v(ffi_reserved_list,package,pkg_ffi).
 o_p_v(ffi_reserved_table,classof,claz_symbol).
 o_p_v(ffi_reserved_table,name,"RESERVED-TABLE").
 o_p_v(ffi_reserved_table,package,pkg_ffi).
+o_p_v(ffi_result_tn, classof, claz_symbol).
+o_p_v(ffi_result_tn, name, "RESULT-TN").
+o_p_v(ffi_result_tn, package, pkg_ffi).
+o_p_v(ffi_result_type, classof, claz_symbol).
+o_p_v(ffi_result_type, name, "RESULT-TYPE").
+o_p_v(ffi_result_type, package, pkg_ffi).
 o_p_v(ffi_retaddr,classof,claz_symbol).
 o_p_v(ffi_retaddr,name,"RETADDR").
 o_p_v(ffi_retaddr,package,pkg_ffi).
 o_p_v(ffi_rettype,classof,claz_symbol).
 o_p_v(ffi_rettype,name,"RETTYPE").
 o_p_v(ffi_rettype,package,pkg_ffi).
+o_p_v(ffi_root, classof, claz_symbol).
+o_p_v(ffi_root, name, "ROOT").
+o_p_v(ffi_root, package, pkg_ffi).
 o_p_v(ffi_set_foreign_pointer,classof,claz_symbol).
 o_p_v(ffi_set_foreign_pointer,compile_as,kw_function).
 o_p_v(ffi_set_foreign_pointer,function,f_ffi_set_foreign_pointer).
@@ -18943,9 +19531,15 @@ o_p_v(ffi_set_validp,compile_as,kw_function).
 o_p_v(ffi_set_validp,function,f_ffi_set_validp).
 o_p_v(ffi_set_validp,name,"SET-VALIDP").
 o_p_v(ffi_set_validp,package,pkg_ffi).
+o_p_v(ffi_shared_object, classof, claz_symbol).
+o_p_v(ffi_shared_object, name, "SHARED-OBJECT").
+o_p_v(ffi_shared_object, package, pkg_ffi).
 o_p_v(ffi_short,classof,claz_symbol).
 o_p_v(ffi_short,name,"SHORT").
 o_p_v(ffi_short,package,pkg_ffi).
+o_p_v(ffi_signed, classof, claz_symbol).
+o_p_v(ffi_signed, name, "SIGNED").
+o_p_v(ffi_signed, package, pkg_ffi).
 o_p_v(ffi_sint16,classof,claz_symbol).
 o_p_v(ffi_sint16,name,"SINT16").
 o_p_v(ffi_sint16,package,pkg_ffi).
@@ -18980,6 +19574,9 @@ o_p_v(ffi_slots,package,pkg_ffi).
 o_p_v(ffi_slottype,classof,claz_symbol).
 o_p_v(ffi_slottype,name,"SLOTTYPE").
 o_p_v(ffi_slottype,package,pkg_ffi).
+o_p_v(ffi_specifier, classof, claz_symbol).
+o_p_v(ffi_specifier, name, "SPECIFIER").
+o_p_v(ffi_specifier, package, pkg_ffi).
 o_p_v(ffi_split_c_fun_arglist,classof,claz_symbol).
 o_p_v(ffi_split_c_fun_arglist,compile_as,kw_function).
 o_p_v(ffi_split_c_fun_arglist,function,f_ffi_split_c_fun_arglist).
@@ -18991,9 +19588,15 @@ o_p_v(ffi_ssize_t,package,pkg_ffi).
 o_p_v(ffi_start,classof,claz_symbol).
 o_p_v(ffi_start,name,"START").
 o_p_v(ffi_start,package,pkg_ffi).
+o_p_v(ffi_stub, classof, claz_symbol).
+o_p_v(ffi_stub, name, "STUB").
+o_p_v(ffi_stub, package, pkg_ffi).
 o_p_v(ffi_thunk,classof,claz_symbol).
 o_p_v(ffi_thunk,name,"THUNK").
 o_p_v(ffi_thunk,package,pkg_ffi).
+o_p_v(ffi_to, classof, claz_symbol).
+o_p_v(ffi_to, name, "TO").
+o_p_v(ffi_to, package, pkg_ffi).
 o_p_v(ffi_to_c_name,classof,claz_symbol).
 o_p_v(ffi_to_c_name,compile_as,kw_function).
 o_p_v(ffi_to_c_name,function,f_ffi_to_c_name).
@@ -19029,6 +19632,9 @@ o_p_v(ffi_to_module_name,package,pkg_ffi).
 o_p_v(ffi_to_module_name_1,classof,claz_symbol).
 o_p_v(ffi_to_module_name_1,name,"TO-MODULE-NAME-1").
 o_p_v(ffi_to_module_name_1,package,pkg_ffi).
+o_p_v(ffi_type_c61, classof, claz_symbol).
+o_p_v(ffi_type_c61, name, "TYPE=").
+o_p_v(ffi_type_c61, package, pkg_ffi).
 o_p_v(ffi_type_table,classof,claz_symbol).
 o_p_v(ffi_type_table,name,"TYPE-TABLE").
 o_p_v(ffi_type_table,package,pkg_ffi).
@@ -19061,6 +19667,12 @@ o_p_v(ffi_uint8,package,pkg_ffi).
 o_p_v(ffi_ulong,classof,claz_symbol).
 o_p_v(ffi_ulong,name,"ULONG").
 o_p_v(ffi_ulong,package,pkg_ffi).
+o_p_v(ffi_undefined_alien_error, classof, claz_symbol).
+o_p_v(ffi_undefined_alien_error, name, "UNDEFINED-ALIEN-ERROR").
+o_p_v(ffi_undefined_alien_error, package, pkg_ffi).
+o_p_v(ffi_unparse, classof, claz_symbol).
+o_p_v(ffi_unparse, name, "UNPARSE").
+o_p_v(ffi_unparse, package, pkg_ffi).
 o_p_v(ffi_unsigned_foreign_address,classof,claz_symbol).
 o_p_v(ffi_unsigned_foreign_address,compile_as,kw_function).
 o_p_v(ffi_unsigned_foreign_address,function,f_ffi_unsigned_foreign_address).
@@ -19125,6 +19737,9 @@ o_p_v(ffi_with_name_c47_options,compile_as,kw_operator).
 o_p_v(ffi_with_name_c47_options,function,f_ffi_with_name_c47_options).
 o_p_v(ffi_with_name_c47_options,name,"WITH-NAME/OPTIONS").
 o_p_v(ffi_with_name_c47_options,package,pkg_ffi).
+o_p_v(ffi_wrapper, classof, claz_symbol).
+o_p_v(ffi_wrapper, name, "WRAPPER").
+o_p_v(ffi_wrapper, package, pkg_ffi).
 o_p_v(ffi_write_memory_as,classof,claz_symbol).
 o_p_v(ffi_write_memory_as,compile_as,kw_function).
 o_p_v(ffi_write_memory_as,function,f_ffi_write_memory_as).
@@ -26263,6 +26878,9 @@ o_p_v(most_positive_single_float,declared_as,defconstant).
 o_p_v(most_positive_single_float,name,"MOST-POSITIVE-SINGLE-FLOAT").
 o_p_v(most_positive_single_float,package,pkg_cl).
 o_p_v(most_positive_single_float,value,3.4028235e+38).
+o_p_v(mu1, classof, claz_symbol).
+o_p_v(mu1, name, "MU").
+o_p_v(mu1, package, []).
 o_p_v(muffle_warning,classof,claz_symbol).
 o_p_v(muffle_warning,compile_as,kw_function).
 o_p_v(muffle_warning,function,cl_muffle_warning).
@@ -26507,6 +27125,282 @@ o_p_v(or,compile_as,kw_operator).
 o_p_v(or,function,cl_or).
 o_p_v(or,name,"OR").
 o_p_v(or,package,pkg_cl).
+o_p_v(os_cc, classof, claz_symbol).
+o_p_v(os_cc, name, "CC").
+o_p_v(os_cc, package, pkg_os).
+o_p_v(os_cflag, classof, claz_symbol).
+o_p_v(os_cflag, name, "CFLAG").
+o_p_v(os_cflag, package, pkg_os).
+o_p_v(os_cycle, classof, claz_symbol).
+o_p_v(os_cycle, name, "CYCLE").
+o_p_v(os_cycle, package, pkg_os).
+o_p_v(os_flock, classof, claz_symbol).
+o_p_v(os_flock, name, "FLOCK").
+o_p_v(os_flock, package, pkg_os).
+o_p_v(os_flock_len, classof, claz_symbol).
+o_p_v(os_flock_len, name, "FLOCK-LEN").
+o_p_v(os_flock_len, package, pkg_os).
+o_p_v(os_flock_pid, classof, claz_symbol).
+o_p_v(os_flock_pid, name, "FLOCK-PID").
+o_p_v(os_flock_pid, package, pkg_os).
+o_p_v(os_flock_start, classof, claz_symbol).
+o_p_v(os_flock_start, name, "FLOCK-START").
+o_p_v(os_flock_start, package, pkg_os).
+o_p_v(os_flock_type, classof, claz_symbol).
+o_p_v(os_flock_type, name, "FLOCK-TYPE").
+o_p_v(os_flock_type, package, pkg_os).
+o_p_v(os_flock_whence, classof, claz_symbol).
+o_p_v(os_flock_whence, name, "FLOCK-WHENCE").
+o_p_v(os_flock_whence, package, pkg_os).
+o_p_v(os_foreign_thread, classof, claz_symbol).
+o_p_v(os_foreign_thread, name, "FOREIGN-THREAD").
+o_p_v(os_foreign_thread, package, pkg_os).
+o_p_v(os_gecos, classof, claz_symbol).
+o_p_v(os_gecos, name, "GECOS").
+o_p_v(os_gecos, package, pkg_os).
+o_p_v(os_group, classof, claz_symbol).
+o_p_v(os_group, name, "GROUP").
+o_p_v(os_group, package, pkg_os).
+o_p_v(os_group_gid, classof, claz_symbol).
+o_p_v(os_group_gid, name, "GROUP-GID").
+o_p_v(os_group_gid, package, pkg_os).
+o_p_v(os_group_name, classof, claz_symbol).
+o_p_v(os_group_name, name, "GROUP-NAME").
+o_p_v(os_group_name, package, pkg_os).
+o_p_v(os_group_passwd, classof, claz_symbol).
+o_p_v(os_group_passwd, name, "GROUP-PASSWD").
+o_p_v(os_group_passwd, package, pkg_os).
+o_p_v(os_iflag, classof, claz_symbol).
+o_p_v(os_iflag, name, "IFLAG").
+o_p_v(os_iflag, package, pkg_os).
+o_p_v(os_interactive_threads, classof, claz_symbol).
+o_p_v(os_interactive_threads, name, "INTERACTIVE-THREADS").
+o_p_v(os_interactive_threads, package, pkg_os).
+o_p_v(os_interactive_threads_queue, classof, claz_symbol).
+o_p_v(os_interactive_threads_queue, name, "INTERACTIVE-THREADS-QUEUE").
+o_p_v(os_interactive_threads_queue, package, pkg_os).
+o_p_v(os_interrupt_thread_error, classof, claz_symbol).
+o_p_v(os_interrupt_thread_error, name, "INTERRUPT-THREAD-ERROR").
+o_p_v(os_interrupt_thread_error, package, pkg_os).
+o_p_v(os_interruptions, classof, claz_symbol).
+o_p_v(os_interruptions, name, "INTERRUPTIONS").
+o_p_v(os_interruptions, package, pkg_os).
+o_p_v(os_interruptions_lock, classof, claz_symbol).
+o_p_v(os_interruptions_lock, name, "INTERRUPTIONS-LOCK").
+o_p_v(os_interruptions_lock, package, pkg_os).
+o_p_v(os_join_thread_error, classof, claz_symbol).
+o_p_v(os_join_thread_error, name, "JOIN-THREAD-ERROR").
+o_p_v(os_join_thread_error, package, pkg_os).
+o_p_v(os_join_thread_problem, classof, claz_symbol).
+o_p_v(os_join_thread_problem, name, "JOIN-THREAD-PROBLEM").
+o_p_v(os_join_thread_problem, package, pkg_os).
+o_p_v(os_len, classof, claz_symbol).
+o_p_v(os_len, name, "LEN").
+o_p_v(os_len, package, pkg_os).
+o_p_v(os_lflag, classof, claz_symbol).
+o_p_v(os_lflag, name, "LFLAG").
+o_p_v(os_lflag, package, pkg_os).
+o_p_v(os_lock, classof, claz_symbol).
+o_p_v(os_lock, name, "LOCK").
+o_p_v(os_lock, package, pkg_os).
+o_p_v(os_make_mutex, classof, claz_symbol).
+o_p_v(os_make_mutex, name, "MAKE-MUTEX").
+o_p_v(os_make_mutex, package, pkg_os).
+o_p_v(os_make_waitqueue, classof, claz_symbol).
+o_p_v(os_make_waitqueue, name, "MAKE-WAITQUEUE").
+o_p_v(os_make_waitqueue, package, pkg_os).
+o_p_v(os_oflag, classof, claz_symbol).
+o_p_v(os_oflag, name, "OFLAG").
+o_p_v(os_oflag, package, pkg_os).
+o_p_v(os_os_thread, classof, claz_symbol).
+o_p_v(os_os_thread, name, "OS-THREAD").
+o_p_v(os_os_thread, package, pkg_os).
+o_p_v(os_passwd_dir, classof, claz_symbol).
+o_p_v(os_passwd_dir, name, "PASSWD-DIR").
+o_p_v(os_passwd_dir, package, pkg_os).
+o_p_v(os_passwd_gecos, classof, claz_symbol).
+o_p_v(os_passwd_gecos, name, "PASSWD-GECOS").
+o_p_v(os_passwd_gecos, package, pkg_os).
+o_p_v(os_passwd_gid, classof, claz_symbol).
+o_p_v(os_passwd_gid, name, "PASSWD-GID").
+o_p_v(os_passwd_gid, package, pkg_os).
+o_p_v(os_passwd_name, classof, claz_symbol).
+o_p_v(os_passwd_name, name, "PASSWD-NAME").
+o_p_v(os_passwd_name, package, pkg_os).
+o_p_v(os_passwd_passwd, classof, claz_symbol).
+o_p_v(os_passwd_passwd, name, "PASSWD-PASSWD").
+o_p_v(os_passwd_passwd, package, pkg_os).
+o_p_v(os_passwd_shell, classof, claz_symbol).
+o_p_v(os_passwd_shell, name, "PASSWD-SHELL").
+o_p_v(os_passwd_shell, package, pkg_os).
+o_p_v(os_passwd_uid, classof, claz_symbol).
+o_p_v(os_passwd_uid, name, "PASSWD-UID").
+o_p_v(os_passwd_uid, package, pkg_os).
+o_p_v(os_pf_alive_p, classof, claz_symbol).
+o_p_v(os_pf_alive_p, name, "%ALIVE-P").
+o_p_v(os_pf_alive_p, package, pkg_os).
+o_p_v(os_pf_count, classof, claz_symbol).
+o_p_v(os_pf_count, name, "%COUNT").
+o_p_v(os_pf_count, package, pkg_os).
+o_p_v(os_pf_ephemeral_p, classof, claz_symbol).
+o_p_v(os_pf_ephemeral_p, name, "%EPHEMERAL-P").
+o_p_v(os_pf_ephemeral_p, package, pkg_os).
+o_p_v(os_pf_owner, classof, claz_symbol).
+o_p_v(os_pf_owner, name, "%OWNER").
+o_p_v(os_pf_owner, package, pkg_os).
+o_p_v(os_pf_status, classof, claz_symbol).
+o_p_v(os_pf_status, name, "%STATUS").
+o_p_v(os_pf_status, package, pkg_os).
+o_p_v(os_problem, classof, claz_symbol).
+o_p_v(os_problem, name, "PROBLEM").
+o_p_v(os_problem, package, pkg_os).
+o_p_v(os_queue, classof, claz_symbol).
+o_p_v(os_queue, name, "QUEUE").
+o_p_v(os_queue, package, pkg_os).
+o_p_v(os_result, classof, claz_symbol).
+o_p_v(os_result, name, "RESULT").
+o_p_v(os_result, package, pkg_os).
+o_p_v(os_result_lock, classof, claz_symbol).
+o_p_v(os_result_lock, name, "RESULT-LOCK").
+o_p_v(os_result_lock, package, pkg_os).
+o_p_v(os_sec, classof, claz_symbol).
+o_p_v(os_sec, name, "SEC").
+o_p_v(os_sec, package, pkg_os).
+o_p_v(os_semaphore, classof, claz_symbol).
+o_p_v(os_semaphore, name, "SEMAPHORE").
+o_p_v(os_semaphore, package, pkg_os).
+o_p_v(os_semaphore_notification, classof, claz_symbol).
+o_p_v(os_semaphore_notification, name, "SEMAPHORE-NOTIFICATION").
+o_p_v(os_semaphore_notification, package, pkg_os).
+o_p_v(os_session, classof, claz_symbol).
+o_p_v(os_session, name, "SESSION").
+o_p_v(os_session, package, pkg_os).
+o_p_v(os_simple_thread_error, classof, claz_symbol).
+o_p_v(os_simple_thread_error, name, "SIMPLE-THREAD-ERROR").
+o_p_v(os_simple_thread_error, package, pkg_os).
+o_p_v(os_start, classof, claz_symbol).
+o_p_v(os_start, name, "START").
+o_p_v(os_start, package, pkg_os).
+o_p_v(os_stat, classof, claz_symbol).
+o_p_v(os_stat, name, "STAT").
+o_p_v(os_stat, package, pkg_os).
+o_p_v(os_stat_atime, classof, claz_symbol).
+o_p_v(os_stat_atime, name, "STAT-ATIME").
+o_p_v(os_stat_atime, package, pkg_os).
+o_p_v(os_stat_ctime, classof, claz_symbol).
+o_p_v(os_stat_ctime, name, "STAT-CTIME").
+o_p_v(os_stat_ctime, package, pkg_os).
+o_p_v(os_stat_dev, classof, claz_symbol).
+o_p_v(os_stat_dev, name, "STAT-DEV").
+o_p_v(os_stat_dev, package, pkg_os).
+o_p_v(os_stat_gid, classof, claz_symbol).
+o_p_v(os_stat_gid, name, "STAT-GID").
+o_p_v(os_stat_gid, package, pkg_os).
+o_p_v(os_stat_ino, classof, claz_symbol).
+o_p_v(os_stat_ino, name, "STAT-INO").
+o_p_v(os_stat_ino, package, pkg_os).
+o_p_v(os_stat_mode, classof, claz_symbol).
+o_p_v(os_stat_mode, name, "STAT-MODE").
+o_p_v(os_stat_mode, package, pkg_os).
+o_p_v(os_stat_mtime, classof, claz_symbol).
+o_p_v(os_stat_mtime, name, "STAT-MTIME").
+o_p_v(os_stat_mtime, package, pkg_os).
+o_p_v(os_stat_nlink, classof, claz_symbol).
+o_p_v(os_stat_nlink, name, "STAT-NLINK").
+o_p_v(os_stat_nlink, package, pkg_os).
+o_p_v(os_stat_rdev, classof, claz_symbol).
+o_p_v(os_stat_rdev, name, "STAT-RDEV").
+o_p_v(os_stat_rdev, package, pkg_os).
+o_p_v(os_stat_size, classof, claz_symbol).
+o_p_v(os_stat_size, name, "STAT-SIZE").
+o_p_v(os_stat_size, package, pkg_os).
+o_p_v(os_stat_uid, classof, claz_symbol).
+o_p_v(os_stat_uid, name, "STAT-UID").
+o_p_v(os_stat_uid, package, pkg_os).
+o_p_v(os_state, classof, claz_symbol).
+o_p_v(os_state, name, "STATE").
+o_p_v(os_state, package, pkg_os).
+o_p_v(os_symbol_value_in_thread_error, classof, claz_symbol).
+o_p_v(os_symbol_value_in_thread_error, name, "SYMBOL-VALUE-IN-THREAD-ERROR").
+o_p_v(os_symbol_value_in_thread_error, package, pkg_os).
+o_p_v(os_symbol_value_in_thread_error_info, classof, claz_symbol).
+o_p_v(os_symbol_value_in_thread_error_info, name, "SYMBOL-VALUE-IN-THREAD-ERROR-INFO").
+o_p_v(os_symbol_value_in_thread_error_info, package, pkg_os).
+o_p_v(os_syscall_errno, classof, claz_symbol).
+o_p_v(os_syscall_errno, name, "SYSCALL-ERRNO").
+o_p_v(os_syscall_errno, package, pkg_os).
+o_p_v(os_syscall_error, classof, claz_symbol).
+o_p_v(os_syscall_error, name, "SYSCALL-ERROR").
+o_p_v(os_syscall_error, package, pkg_os).
+o_p_v(os_syscall_name, classof, claz_symbol).
+o_p_v(os_syscall_name, name, "SYSCALL-NAME").
+o_p_v(os_syscall_name, package, pkg_os).
+o_p_v(os_termios, classof, claz_symbol).
+o_p_v(os_termios, name, "TERMIOS").
+o_p_v(os_termios, package, pkg_os).
+o_p_v(os_termios_cc, classof, claz_symbol).
+o_p_v(os_termios_cc, name, "TERMIOS-CC").
+o_p_v(os_termios_cc, package, pkg_os).
+o_p_v(os_termios_cflag, classof, claz_symbol).
+o_p_v(os_termios_cflag, name, "TERMIOS-CFLAG").
+o_p_v(os_termios_cflag, package, pkg_os).
+o_p_v(os_termios_iflag, classof, claz_symbol).
+o_p_v(os_termios_iflag, name, "TERMIOS-IFLAG").
+o_p_v(os_termios_iflag, package, pkg_os).
+o_p_v(os_termios_lflag, classof, claz_symbol).
+o_p_v(os_termios_lflag, name, "TERMIOS-LFLAG").
+o_p_v(os_termios_lflag, package, pkg_os).
+o_p_v(os_termios_oflag, classof, claz_symbol).
+o_p_v(os_termios_oflag, name, "TERMIOS-OFLAG").
+o_p_v(os_termios_oflag, package, pkg_os).
+o_p_v(os_thread, classof, claz_symbol).
+o_p_v(os_thread, name, "THREAD").
+o_p_v(os_thread, package, pkg_os).
+o_p_v(os_thread_deadlock, classof, claz_symbol).
+o_p_v(os_thread_deadlock, name, "THREAD-DEADLOCK").
+o_p_v(os_thread_deadlock, package, pkg_os).
+o_p_v(os_thread_deadlock_cycle, classof, claz_symbol).
+o_p_v(os_thread_deadlock_cycle, name, "THREAD-DEADLOCK-CYCLE").
+o_p_v(os_thread_deadlock_cycle, package, pkg_os).
+o_p_v(os_thread_error, classof, claz_symbol).
+o_p_v(os_thread_error, name, "THREAD-ERROR").
+o_p_v(os_thread_error, package, pkg_os).
+o_p_v(os_thread_error_thread, classof, claz_symbol).
+o_p_v(os_thread_error_thread, name, "THREAD-ERROR-THREAD").
+o_p_v(os_thread_error_thread, package, pkg_os).
+o_p_v(os_thread_name, classof, claz_symbol).
+o_p_v(os_thread_name, name, "THREAD-NAME").
+o_p_v(os_thread_name, package, pkg_os).
+o_p_v(os_threads, classof, claz_symbol).
+o_p_v(os_threads, name, "THREADS").
+o_p_v(os_threads, package, pkg_os).
+o_p_v(os_timeval, classof, claz_symbol).
+o_p_v(os_timeval, name, "TIMEVAL").
+o_p_v(os_timeval, package, pkg_os).
+o_p_v(os_timeval_sec, classof, claz_symbol).
+o_p_v(os_timeval_sec, name, "TIMEVAL-SEC").
+o_p_v(os_timeval_sec, package, pkg_os).
+o_p_v(os_timeval_usec, classof, claz_symbol).
+o_p_v(os_timeval_usec, name, "TIMEVAL-USEC").
+o_p_v(os_timeval_usec, package, pkg_os).
+o_p_v(os_token, classof, claz_symbol).
+o_p_v(os_token, name, "TOKEN").
+o_p_v(os_token, package, pkg_os).
+o_p_v(os_usec, classof, claz_symbol).
+o_p_v(os_usec, name, "USEC").
+o_p_v(os_usec, package, pkg_os).
+o_p_v(os_waitcount, classof, claz_symbol).
+o_p_v(os_waitcount, name, "WAITCOUNT").
+o_p_v(os_waitcount, package, pkg_os).
+o_p_v(os_waiting_for, classof, claz_symbol).
+o_p_v(os_waiting_for, name, "WAITING-FOR").
+o_p_v(os_waiting_for, package, pkg_os).
+o_p_v(os_waitqueue, classof, claz_symbol).
+o_p_v(os_waitqueue, name, "WAITQUEUE").
+o_p_v(os_waitqueue, package, pkg_os).
+o_p_v(os_whence, classof, claz_symbol).
+o_p_v(os_whence, name, "WHENCE").
+o_p_v(os_whence, package, pkg_os).
 o_p_v(otherwise,classof,claz_symbol).
 o_p_v(otherwise,name,"OTHERWISE").
 o_p_v(otherwise,package,pkg_cl).
@@ -30848,6 +31742,225 @@ o_p_v(slot_value,package,pkg_cl).
 o_p_v(so_acceptconn,classof,claz_symbol).
 o_p_v(so_acceptconn,name,"SO-ACCEPTCONN").
 o_p_v(so_acceptconn,package,pkg_cl).
+o_p_v(socket_address_family_not_supported, classof, claz_symbol).
+o_p_v(socket_address_family_not_supported, name, "ADDRESS-FAMILY-NOT-SUPPORTED").
+o_p_v(socket_address_family_not_supported, package, pkg_socket).
+o_p_v(socket_address_in_use_error, classof, claz_symbol).
+o_p_v(socket_address_in_use_error, name, "ADDRESS-IN-USE-ERROR").
+o_p_v(socket_address_in_use_error, package, pkg_socket).
+o_p_v(socket_address_type, classof, claz_symbol).
+o_p_v(socket_address_type, name, "ADDRESS-TYPE").
+o_p_v(socket_address_type, package, pkg_socket).
+o_p_v(socket_addresses, classof, claz_symbol).
+o_p_v(socket_addresses, name, "ADDRESSES").
+o_p_v(socket_addresses, package, pkg_socket).
+o_p_v(socket_af_inet, classof, claz_symbol).
+o_p_v(socket_af_inet, name, "AF-INET").
+o_p_v(socket_af_inet, package, pkg_socket).
+o_p_v(socket_af_inet6, classof, claz_symbol).
+o_p_v(socket_af_inet6, name, "AF-INET6").
+o_p_v(socket_af_inet6, package, pkg_socket).
+o_p_v(socket_af_local, classof, claz_symbol).
+o_p_v(socket_af_local, name, "AF-LOCAL").
+o_p_v(socket_af_local, package, pkg_socket).
+o_p_v(socket_aliases, classof, claz_symbol).
+o_p_v(socket_aliases, name, "ALIASES").
+o_p_v(socket_aliases, package, pkg_socket).
+o_p_v(socket_bad_file_descriptor_error, classof, claz_symbol).
+o_p_v(socket_bad_file_descriptor_error, name, "BAD-FILE-DESCRIPTOR-ERROR").
+o_p_v(socket_bad_file_descriptor_error, package, pkg_socket).
+o_p_v(socket_connection_refused_error, classof, claz_symbol).
+o_p_v(socket_connection_refused_error, name, "CONNECTION-REFUSED-ERROR").
+o_p_v(socket_connection_refused_error, package, pkg_socket).
+o_p_v(socket_eaddrinuse, classof, claz_symbol).
+o_p_v(socket_eaddrinuse, name, "EADDRINUSE").
+o_p_v(socket_eaddrinuse, package, pkg_socket).
+o_p_v(socket_eafnosupport, classof, claz_symbol).
+o_p_v(socket_eafnosupport, name, "EAFNOSUPPORT").
+o_p_v(socket_eafnosupport, package, pkg_socket).
+o_p_v(socket_eai_again, classof, claz_symbol).
+o_p_v(socket_eai_again, name, "EAI-AGAIN").
+o_p_v(socket_eai_again, package, pkg_socket).
+o_p_v(socket_eai_fail, classof, claz_symbol).
+o_p_v(socket_eai_fail, name, "EAI-FAIL").
+o_p_v(socket_eai_fail, package, pkg_socket).
+o_p_v(socket_eai_noname, classof, claz_symbol).
+o_p_v(socket_eai_noname, name, "EAI-NONAME").
+o_p_v(socket_eai_noname, package, pkg_socket).
+o_p_v(socket_ebadf, classof, claz_symbol).
+o_p_v(socket_ebadf, name, "EBADF").
+o_p_v(socket_ebadf, package, pkg_socket).
+o_p_v(socket_econnrefused, classof, claz_symbol).
+o_p_v(socket_econnrefused, name, "ECONNREFUSED").
+o_p_v(socket_econnrefused, package, pkg_socket).
+o_p_v(socket_eintr, classof, claz_symbol).
+o_p_v(socket_eintr, name, "EINTR").
+o_p_v(socket_eintr, package, pkg_socket).
+o_p_v(socket_einval, classof, claz_symbol).
+o_p_v(socket_einval, name, "EINVAL").
+o_p_v(socket_einval, package, pkg_socket).
+o_p_v(socket_enetunreach, classof, claz_symbol).
+o_p_v(socket_enetunreach, name, "ENETUNREACH").
+o_p_v(socket_enetunreach, package, pkg_socket).
+o_p_v(socket_enobufs, classof, claz_symbol).
+o_p_v(socket_enobufs, name, "ENOBUFS").
+o_p_v(socket_enobufs, package, pkg_socket).
+o_p_v(socket_enomem, classof, claz_symbol).
+o_p_v(socket_enomem, name, "ENOMEM").
+o_p_v(socket_enomem, package, pkg_socket).
+o_p_v(socket_enotconn, classof, claz_symbol).
+o_p_v(socket_enotconn, name, "ENOTCONN").
+o_p_v(socket_enotconn, package, pkg_socket).
+o_p_v(socket_eopnotsupp, classof, claz_symbol).
+o_p_v(socket_eopnotsupp, name, "EOPNOTSUPP").
+o_p_v(socket_eopnotsupp, package, pkg_socket).
+o_p_v(socket_eperm, classof, claz_symbol).
+o_p_v(socket_eperm, name, "EPERM").
+o_p_v(socket_eperm, package, pkg_socket).
+o_p_v(socket_eprotonosupport, classof, claz_symbol).
+o_p_v(socket_eprotonosupport, name, "EPROTONOSUPPORT").
+o_p_v(socket_eprotonosupport, package, pkg_socket).
+o_p_v(socket_errno, classof, claz_symbol).
+o_p_v(socket_errno, name, "ERRNO").
+o_p_v(socket_errno, package, pkg_socket).
+o_p_v(socket_errno_symbol, classof, claz_symbol).
+o_p_v(socket_errno_symbol, name, "ERRNO-SYMBOL").
+o_p_v(socket_errno_symbol, package, pkg_socket).
+o_p_v(socket_error_code, classof, claz_symbol).
+o_p_v(socket_error_code, name, "ERROR-CODE").
+o_p_v(socket_error_code, package, pkg_socket).
+o_p_v(socket_error_code_symbol, classof, claz_symbol).
+o_p_v(socket_error_code_symbol, name, "ERROR-CODE-SYMBOL").
+o_p_v(socket_error_code_symbol, package, pkg_socket).
+o_p_v(socket_esocktnosupport, classof, claz_symbol).
+o_p_v(socket_esocktnosupport, name, "ESOCKTNOSUPPORT").
+o_p_v(socket_esocktnosupport, package, pkg_socket).
+o_p_v(socket_etimedout, classof, claz_symbol).
+o_p_v(socket_etimedout, name, "ETIMEDOUT").
+o_p_v(socket_etimedout, package, pkg_socket).
+o_p_v(socket_family, classof, claz_symbol).
+o_p_v(socket_family, name, "FAMILY").
+o_p_v(socket_family, package, pkg_socket).
+o_p_v(socket_file_descriptor, classof, claz_symbol).
+o_p_v(socket_file_descriptor, name, "FILE-DESCRIPTOR").
+o_p_v(socket_file_descriptor, package, pkg_socket).
+o_p_v(socket_host_ent, classof, claz_symbol).
+o_p_v(socket_host_ent, name, "HOST-ENT").
+o_p_v(socket_host_ent, package, pkg_socket).
+o_p_v(socket_host_ent_address_type, classof, claz_symbol).
+o_p_v(socket_host_ent_address_type, name, "HOST-ENT-ADDRESS-TYPE").
+o_p_v(socket_host_ent_address_type, package, pkg_socket).
+o_p_v(socket_host_ent_addresses, classof, claz_symbol).
+o_p_v(socket_host_ent_addresses, name, "HOST-ENT-ADDRESSES").
+o_p_v(socket_host_ent_addresses, package, pkg_socket).
+o_p_v(socket_host_ent_aliases, classof, claz_symbol).
+o_p_v(socket_host_ent_aliases, name, "HOST-ENT-ALIASES").
+o_p_v(socket_host_ent_aliases, package, pkg_socket).
+o_p_v(socket_host_ent_name, classof, claz_symbol).
+o_p_v(socket_host_ent_name, name, "HOST-ENT-NAME").
+o_p_v(socket_host_ent_name, package, pkg_socket).
+o_p_v(socket_host_not_found, classof, claz_symbol).
+o_p_v(socket_host_not_found, name, "HOST-NOT-FOUND").
+o_p_v(socket_host_not_found, package, pkg_socket).
+o_p_v(socket_host_not_found_error, classof, claz_symbol).
+o_p_v(socket_host_not_found_error, name, "HOST-NOT-FOUND-ERROR").
+o_p_v(socket_host_not_found_error, package, pkg_socket).
+o_p_v(socket_inet6_socket, classof, claz_symbol).
+o_p_v(socket_inet6_socket, name, "INET6-SOCKET").
+o_p_v(socket_inet6_socket, package, pkg_socket).
+o_p_v(socket_inet_socket, classof, claz_symbol).
+o_p_v(socket_inet_socket, name, "INET-SOCKET").
+o_p_v(socket_inet_socket, package, pkg_socket).
+o_p_v(socket_interrupted_error, classof, claz_symbol).
+o_p_v(socket_interrupted_error, name, "INTERRUPTED-ERROR").
+o_p_v(socket_interrupted_error, package, pkg_socket).
+o_p_v(socket_invalid_argument_error, classof, claz_symbol).
+o_p_v(socket_invalid_argument_error, name, "INVALID-ARGUMENT-ERROR").
+o_p_v(socket_invalid_argument_error, package, pkg_socket).
+o_p_v(socket_local_abstract_socket, classof, claz_symbol).
+o_p_v(socket_local_abstract_socket, name, "LOCAL-ABSTRACT-SOCKET").
+o_p_v(socket_local_abstract_socket, package, pkg_socket).
+o_p_v(socket_local_socket, classof, claz_symbol).
+o_p_v(socket_local_socket, name, "LOCAL-SOCKET").
+o_p_v(socket_local_socket, package, pkg_socket).
+o_p_v(socket_name, classof, claz_symbol).
+o_p_v(socket_name, name, "NAME").
+o_p_v(socket_name, package, pkg_socket).
+o_p_v(socket_name_service_error, classof, claz_symbol).
+o_p_v(socket_name_service_error, name, "NAME-SERVICE-ERROR").
+o_p_v(socket_name_service_error, package, pkg_socket).
+o_p_v(socket_name_service_error_errno, classof, claz_symbol).
+o_p_v(socket_name_service_error_errno, name, "NAME-SERVICE-ERROR-ERRNO").
+o_p_v(socket_name_service_error_errno, package, pkg_socket).
+o_p_v(socket_name_service_error_errno_symbol, classof, claz_symbol).
+o_p_v(socket_name_service_error_errno_symbol, name, "NAME-SERVICE-ERROR-ERRNO-SYMBOL").
+o_p_v(socket_name_service_error_errno_symbol, package, pkg_socket).
+o_p_v(socket_name_service_error_error_code, classof, claz_symbol).
+o_p_v(socket_name_service_error_error_code, name, "NAME-SERVICE-ERROR-ERROR-CODE").
+o_p_v(socket_name_service_error_error_code, package, pkg_socket).
+o_p_v(socket_name_service_error_error_code_symbol, classof, claz_symbol).
+o_p_v(socket_name_service_error_error_code_symbol, name, "NAME-SERVICE-ERROR-ERROR-CODE-SYMBOL").
+o_p_v(socket_name_service_error_error_code_symbol, package, pkg_socket).
+o_p_v(socket_name_service_error_symbol, classof, claz_symbol).
+o_p_v(socket_name_service_error_symbol, name, "NAME-SERVICE-ERROR-SYMBOL").
+o_p_v(socket_name_service_error_symbol, package, pkg_socket).
+o_p_v(socket_name_service_error_syscall, classof, claz_symbol).
+o_p_v(socket_name_service_error_syscall, name, "NAME-SERVICE-ERROR-SYSCALL").
+o_p_v(socket_name_service_error_syscall, package, pkg_socket).
+o_p_v(socket_netdb_internal, classof, claz_symbol).
+o_p_v(socket_netdb_internal, name, "NETDB-INTERNAL").
+o_p_v(socket_netdb_internal, package, pkg_socket).
+o_p_v(socket_netdb_internal_error, classof, claz_symbol).
+o_p_v(socket_netdb_internal_error, name, "NETDB-INTERNAL-ERROR").
+o_p_v(socket_netdb_internal_error, package, pkg_socket).
+o_p_v(socket_netdb_success, classof, claz_symbol).
+o_p_v(socket_netdb_success, name, "NETDB-SUCCESS").
+o_p_v(socket_netdb_success, package, pkg_socket).
+o_p_v(socket_netdb_success_error, classof, claz_symbol).
+o_p_v(socket_netdb_success_error, name, "NETDB-SUCCESS-ERROR").
+o_p_v(socket_netdb_success_error, package, pkg_socket).
+o_p_v(socket_network_unreachable_error, classof, claz_symbol).
+o_p_v(socket_network_unreachable_error, name, "NETWORK-UNREACHABLE-ERROR").
+o_p_v(socket_network_unreachable_error, package, pkg_socket).
+o_p_v(socket_no_address, classof, claz_symbol).
+o_p_v(socket_no_address, name, "NO-ADDRESS").
+o_p_v(socket_no_address, package, pkg_socket).
+o_p_v(socket_no_address_error, classof, claz_symbol).
+o_p_v(socket_no_address_error, name, "NO-ADDRESS-ERROR").
+o_p_v(socket_no_address_error, package, pkg_socket).
+o_p_v(socket_no_buffers_error, classof, claz_symbol).
+o_p_v(socket_no_buffers_error, name, "NO-BUFFERS-ERROR").
+o_p_v(socket_no_buffers_error, package, pkg_socket).
+o_p_v(socket_no_recovery, classof, claz_symbol).
+o_p_v(socket_no_recovery, name, "NO-RECOVERY").
+o_p_v(socket_no_recovery, package, pkg_socket).
+o_p_v(socket_no_recovery_error, classof, claz_symbol).
+o_p_v(socket_no_recovery_error, name, "NO-RECOVERY-ERROR").
+o_p_v(socket_no_recovery_error, package, pkg_socket).
+o_p_v(socket_not_connected_error, classof, claz_symbol).
+o_p_v(socket_not_connected_error, name, "NOT-CONNECTED-ERROR").
+o_p_v(socket_not_connected_error, package, pkg_socket).
+o_p_v(socket_operation_not_permitted_error, classof, claz_symbol).
+o_p_v(socket_operation_not_permitted_error, name, "OPERATION-NOT-PERMITTED-ERROR").
+o_p_v(socket_operation_not_permitted_error, package, pkg_socket).
+o_p_v(socket_operation_not_supported_error, classof, claz_symbol).
+o_p_v(socket_operation_not_supported_error, name, "OPERATION-NOT-SUPPORTED-ERROR").
+o_p_v(socket_operation_not_supported_error, package, pkg_socket).
+o_p_v(socket_operation_timeout_error, classof, claz_symbol).
+o_p_v(socket_operation_timeout_error, name, "OPERATION-TIMEOUT-ERROR").
+o_p_v(socket_operation_timeout_error, package, pkg_socket).
+o_p_v(socket_out_of_memory_error, classof, claz_symbol).
+o_p_v(socket_out_of_memory_error, name, "OUT-OF-MEMORY-ERROR").
+o_p_v(socket_out_of_memory_error, package, pkg_socket).
+o_p_v(socket_protocol, classof, claz_symbol).
+o_p_v(socket_protocol, name, "PROTOCOL").
+o_p_v(socket_protocol, package, pkg_socket).
+o_p_v(socket_protocol_not_supported_error, classof, claz_symbol).
+o_p_v(socket_protocol_not_supported_error, name, "PROTOCOL-NOT-SUPPORTED-ERROR").
+o_p_v(socket_protocol_not_supported_error, package, pkg_socket).
+o_p_v(socket_socket, classof, claz_symbol).
+o_p_v(socket_socket, name, "SOCKET").
+o_p_v(socket_socket, package, pkg_socket).
 o_p_v(socket_socket_accept,classof,claz_symbol).
 o_p_v(socket_socket_accept,compile_as,kw_function).
 o_p_v(socket_socket_accept,function,f_socket_socket_accept).
@@ -30858,11 +31971,32 @@ o_p_v(socket_socket_connect,compile_as,kw_function).
 o_p_v(socket_socket_connect,function,f_socket_socket_connect).
 o_p_v(socket_socket_connect,name,"SOCKET-CONNECT").
 o_p_v(socket_socket_connect,package,pkg_socket).
+o_p_v(socket_socket_error, classof, claz_symbol).
+o_p_v(socket_socket_error, name, "SOCKET-ERROR").
+o_p_v(socket_socket_error, package, pkg_socket).
+o_p_v(socket_socket_error_errno, classof, claz_symbol).
+o_p_v(socket_socket_error_errno, name, "SOCKET-ERROR-ERRNO").
+o_p_v(socket_socket_error_errno, package, pkg_socket).
+o_p_v(socket_socket_error_symbol, classof, claz_symbol).
+o_p_v(socket_socket_error_symbol, name, "SOCKET-ERROR-SYMBOL").
+o_p_v(socket_socket_error_symbol, package, pkg_socket).
+o_p_v(socket_socket_error_syscall, classof, claz_symbol).
+o_p_v(socket_socket_error_syscall, name, "SOCKET-ERROR-SYSCALL").
+o_p_v(socket_socket_error_syscall, package, pkg_socket).
+o_p_v(socket_socket_family, classof, claz_symbol).
+o_p_v(socket_socket_family, name, "SOCKET-FAMILY").
+o_p_v(socket_socket_family, package, pkg_socket).
+o_p_v(socket_socket_file_descriptor, classof, claz_symbol).
+o_p_v(socket_socket_file_descriptor, name, "SOCKET-FILE-DESCRIPTOR").
+o_p_v(socket_socket_file_descriptor, package, pkg_socket).
 o_p_v(socket_socket_options,classof,claz_symbol).
 o_p_v(socket_socket_options,compile_as,kw_function).
 o_p_v(socket_socket_options,function,f_socket_socket_options).
 o_p_v(socket_socket_options,name,"SOCKET-OPTIONS").
 o_p_v(socket_socket_options,package,pkg_socket).
+o_p_v(socket_socket_protocol, classof, claz_symbol).
+o_p_v(socket_socket_protocol, name, "SOCKET-PROTOCOL").
+o_p_v(socket_socket_protocol, package, pkg_socket).
 o_p_v(socket_socket_server,classof,claz_symbol).
 o_p_v(socket_socket_server,compile_as,kw_function).
 o_p_v(socket_socket_server,function,f_socket_socket_server).
@@ -30918,6 +32052,12 @@ o_p_v(socket_socket_stream_shutdown,compile_as,kw_function).
 o_p_v(socket_socket_stream_shutdown,function,f_socket_socket_stream_shutdown).
 o_p_v(socket_socket_stream_shutdown,name,"SOCKET-STREAM-SHUTDOWN").
 o_p_v(socket_socket_stream_shutdown,package,pkg_socket).
+o_p_v(socket_socket_type, classof, claz_symbol).
+o_p_v(socket_socket_type, name, "SOCKET-TYPE").
+o_p_v(socket_socket_type, package, pkg_socket).
+o_p_v(socket_socket_type_not_supported_error, classof, claz_symbol).
+o_p_v(socket_socket_type_not_supported_error, name, "SOCKET-TYPE-NOT-SUPPORTED-ERROR").
+o_p_v(socket_socket_type_not_supported_error, package, pkg_socket).
 o_p_v(socket_socket_wait,classof,claz_symbol).
 o_p_v(socket_socket_wait,compile_as,kw_function).
 o_p_v(socket_socket_wait,function,f_socket_socket_wait).
@@ -30928,6 +32068,21 @@ o_p_v(socket_stream_handles,compile_as,kw_function).
 o_p_v(socket_stream_handles,function,f_socket_stream_handles).
 o_p_v(socket_stream_handles,name,"STREAM-HANDLES").
 o_p_v(socket_stream_handles,package,pkg_socket).
+o_p_v(socket_syscall, classof, claz_symbol).
+o_p_v(socket_syscall, name, "SYSCALL").
+o_p_v(socket_syscall, package, pkg_socket).
+o_p_v(socket_try_again, classof, claz_symbol).
+o_p_v(socket_try_again, name, "TRY-AGAIN").
+o_p_v(socket_try_again, package, pkg_socket).
+o_p_v(socket_try_again_error, classof, claz_symbol).
+o_p_v(socket_try_again_error, name, "TRY-AGAIN-ERROR").
+o_p_v(socket_try_again_error, package, pkg_socket).
+o_p_v(socket_unknown_protocol, classof, claz_symbol).
+o_p_v(socket_unknown_protocol, name, "UNKNOWN-PROTOCOL").
+o_p_v(socket_unknown_protocol, package, pkg_socket).
+o_p_v(socket_unknown_protocol_name, classof, claz_symbol).
+o_p_v(socket_unknown_protocol_name, name, "UNKNOWN-PROTOCOL-NAME").
+o_p_v(socket_unknown_protocol_name, package, pkg_socket).
 o_p_v(software_type,classof,claz_symbol).
 o_p_v(software_type,compile_as,kw_function).
 o_p_v(software_type,function,cl_software_type).
@@ -31346,6 +32501,9 @@ o_p_v(synonym_stream_znst_9,symbol,xx_terminal_io_xx).
 o_p_v(sys_a,classof,claz_symbol).
 o_p_v(sys_a,name,"A").
 o_p_v(sys_a,package,pkg_sys).
+o_p_v(sys_abort_failure, classof, claz_symbol).
+o_p_v(sys_abort_failure, name, "ABORT-FAILURE").
+o_p_v(sys_abort_failure, package, pkg_sys).
 o_p_v(sys_abort_to_top,classof,claz_symbol).
 o_p_v(sys_abort_to_top,name,"ABORT-TO-TOP").
 o_p_v(sys_abort_to_top,package,pkg_sys).
@@ -31357,6 +32515,9 @@ o_p_v(sys_abortonerror,package,pkg_sys).
 o_p_v(sys_above,classof,claz_symbol).
 o_p_v(sys_above,name,"ABOVE").
 o_p_v(sys_above,package,pkg_sys).
+o_p_v(sys_abstract_lexenv, classof, claz_symbol).
+o_p_v(sys_abstract_lexenv, name, "ABSTRACT-LEXENV").
+o_p_v(sys_abstract_lexenv, package, pkg_sys).
 o_p_v(sys_access_fn,classof,claz_symbol).
 o_p_v(sys_access_fn,name,"ACCESS-FN").
 o_p_v(sys_access_fn,package,pkg_sys).
@@ -31376,6 +32537,24 @@ o_p_v(sys_access_in_stack,package,pkg_sys).
 o_p_v(sys_accessfn,classof,claz_symbol).
 o_p_v(sys_accessfn,name,"ACCESSFN").
 o_p_v(sys_accessfn,package,pkg_sys).
+o_p_v(sys_accessor_dfuninfo, classof, claz_symbol).
+o_p_v(sys_accessor_dfuninfo, name, "ACCESSOR-DFUNINFO").
+o_p_v(sys_accessor_dfuninfo, package, pkg_sys).
+o_p_v(sys_accessor_flags, classof, claz_symbol).
+o_p_v(sys_accessor_flags, name, "ACCESSOR-FLAGS").
+o_p_v(sys_accessor_flags, package, pkg_sys).
+o_p_v(sys_accessor_method, classof, claz_symbol).
+o_p_v(sys_accessor_method, name, "ACCESSOR-METHOD").
+o_p_v(sys_accessor_method, package, pkg_sys).
+o_p_v(sys_accessor_method_slot_name, classof, claz_symbol).
+o_p_v(sys_accessor_method_slot_name, name, "ACCESSOR-METHOD-SLOT-NAME").
+o_p_v(sys_accessor_method_slot_name, package, pkg_sys).
+o_p_v(sys_accessor_name, classof, claz_symbol).
+o_p_v(sys_accessor_name, name, "ACCESSOR-NAME").
+o_p_v(sys_accessor_name, package, pkg_sys).
+o_p_v(sys_accessor_type, classof, claz_symbol).
+o_p_v(sys_accessor_type, name, "ACCESSOR-TYPE").
+o_p_v(sys_accessor_type, package, pkg_sys).
 o_p_v(sys_accufuncsym,classof,claz_symbol).
 o_p_v(sys_accufuncsym,name,"ACCUFUNCSYM").
 o_p_v(sys_accufuncsym,package,pkg_sys).
@@ -31385,6 +32564,9 @@ o_p_v(sys_accumulate,package,pkg_sys).
 o_p_v(sys_across,classof,claz_symbol).
 o_p_v(sys_across,name,"ACROSS").
 o_p_v(sys_across,package,pkg_sys).
+o_p_v(sys_active, classof, claz_symbol).
+o_p_v(sys_active, name, "ACTIVE").
+o_p_v(sys_active, package, pkg_sys).
 o_p_v(sys_actual_package,classof,claz_symbol).
 o_p_v(sys_actual_package,name,"ACTUAL-PACKAGE").
 o_p_v(sys_actual_package,package,pkg_sys).
@@ -31421,6 +32603,15 @@ o_p_v(sys_address_of,package,pkg_sys).
 o_p_v(sys_adjustable,classof,claz_symbol).
 o_p_v(sys_adjustable,name,"ADJUSTABLE").
 o_p_v(sys_adjustable,package,pkg_sys).
+o_p_v(sys_adjustable_string, classof, claz_symbol).
+o_p_v(sys_adjustable_string, name, "ADJUSTABLE-STRING").
+o_p_v(sys_adjustable_string, package, pkg_sys).
+o_p_v(sys_alien_stack_exhausted, classof, claz_symbol).
+o_p_v(sys_alien_stack_exhausted, name, "ALIEN-STACK-EXHAUSTED").
+o_p_v(sys_alien_stack_exhausted, package, pkg_sys).
+o_p_v(sys_alien_type_type, classof, claz_symbol).
+o_p_v(sys_alien_type_type, name, "ALIEN-TYPE-TYPE").
+o_p_v(sys_alien_type_type, package, pkg_sys).
 o_p_v(sys_all,classof,claz_symbol).
 o_p_v(sys_all,name,"ALL").
 o_p_v(sys_all,package,pkg_sys).
@@ -31445,6 +32636,12 @@ o_p_v(sys_allow_other_keys_flag,package,pkg_sys).
 o_p_v(sys_allow_p,classof,claz_symbol).
 o_p_v(sys_allow_p,name,"ALLOW-P").
 o_p_v(sys_allow_p,package,pkg_sys).
+o_p_v(sys_allowp, classof, claz_symbol).
+o_p_v(sys_allowp, name, "ALLOWP").
+o_p_v(sys_allowp, package, pkg_sys).
+o_p_v(sys_alternate_metaclass, classof, claz_symbol).
+o_p_v(sys_alternate_metaclass, name, "ALTERNATE-METACLASS").
+o_p_v(sys_alternate_metaclass, package, pkg_sys).
 o_p_v(sys_always,classof,claz_symbol).
 o_p_v(sys_always,name,"ALWAYS").
 o_p_v(sys_always,package,pkg_sys).
@@ -31586,6 +32783,15 @@ o_p_v(sys_ansi_pathname_reader,compile_as,kw_function).
 o_p_v(sys_ansi_pathname_reader,function,f_sys_ansi_pathname_reader).
 o_p_v(sys_ansi_pathname_reader,name,"ANSI-PATHNAME-READER").
 o_p_v(sys_ansi_pathname_reader,package,pkg_sys).
+o_p_v(sys_ansi_stream, classof, claz_symbol).
+o_p_v(sys_ansi_stream, name, "ANSI-STREAM").
+o_p_v(sys_ansi_stream, package, pkg_sys).
+o_p_v(sys_ansi_stream_cin_buffer, classof, claz_symbol).
+o_p_v(sys_ansi_stream_cin_buffer, name, "ANSI-STREAM-CIN-BUFFER").
+o_p_v(sys_ansi_stream_cin_buffer, package, pkg_sys).
+o_p_v(sys_ansi_stream_in_buffer, classof, claz_symbol).
+o_p_v(sys_ansi_stream_in_buffer, name, "ANSI-STREAM-IN-BUFFER").
+o_p_v(sys_ansi_stream_in_buffer, package, pkg_sys).
 o_p_v(sys_anything,classof,claz_symbol).
 o_p_v(sys_anything,name,"ANYTHING").
 o_p_v(sys_anything,package,pkg_sys).
@@ -31635,6 +32841,42 @@ o_p_v(sys_arg_count_error,compile_as,kw_function).
 o_p_v(sys_arg_count_error,function,f_sys_arg_count_error).
 o_p_v(sys_arg_count_error,name,"ARG-COUNT-ERROR").
 o_p_v(sys_arg_count_error,package,pkg_sys).
+o_p_v(sys_arg_count_error_args, classof, claz_symbol).
+o_p_v(sys_arg_count_error_args, name, "ARG-COUNT-ERROR-ARGS").
+o_p_v(sys_arg_count_error_args, package, pkg_sys).
+o_p_v(sys_arg_count_error_lambda_list, classof, claz_symbol).
+o_p_v(sys_arg_count_error_lambda_list, name, "ARG-COUNT-ERROR-LAMBDA-LIST").
+o_p_v(sys_arg_count_error_lambda_list, package, pkg_sys).
+o_p_v(sys_arg_count_error_maximum, classof, claz_symbol).
+o_p_v(sys_arg_count_error_maximum, name, "ARG-COUNT-ERROR-MAXIMUM").
+o_p_v(sys_arg_count_error_maximum, package, pkg_sys).
+o_p_v(sys_arg_count_error_minimum, classof, claz_symbol).
+o_p_v(sys_arg_count_error_minimum, name, "ARG-COUNT-ERROR-MINIMUM").
+o_p_v(sys_arg_count_error_minimum, package, pkg_sys).
+o_p_v(sys_arg_count_program_error, classof, claz_symbol).
+o_p_v(sys_arg_count_program_error, name, "ARG-COUNT-PROGRAM-ERROR").
+o_p_v(sys_arg_count_program_error, package, pkg_sys).
+o_p_v(sys_arg_info, classof, claz_symbol).
+o_p_v(sys_arg_info, name, "ARG-INFO").
+o_p_v(sys_arg_info, package, pkg_sys).
+o_p_v(sys_arg_info_key_c47_rest_p, classof, claz_symbol).
+o_p_v(sys_arg_info_key_c47_rest_p, name, "ARG-INFO-KEY/REST-P").
+o_p_v(sys_arg_info_key_c47_rest_p, package, pkg_sys).
+o_p_v(sys_arg_info_keys, classof, claz_symbol).
+o_p_v(sys_arg_info_keys, name, "ARG-INFO-KEYS").
+o_p_v(sys_arg_info_keys, package, pkg_sys).
+o_p_v(sys_arg_info_lambda_list, classof, claz_symbol).
+o_p_v(sys_arg_info_lambda_list, name, "ARG-INFO-LAMBDA-LIST").
+o_p_v(sys_arg_info_lambda_list, package, pkg_sys).
+o_p_v(sys_arg_info_metatypes, classof, claz_symbol).
+o_p_v(sys_arg_info_metatypes, name, "ARG-INFO-METATYPES").
+o_p_v(sys_arg_info_metatypes, package, pkg_sys).
+o_p_v(sys_arg_info_number_optional, classof, claz_symbol).
+o_p_v(sys_arg_info_number_optional, name, "ARG-INFO-NUMBER-OPTIONAL").
+o_p_v(sys_arg_info_number_optional, package, pkg_sys).
+o_p_v(sys_arg_info_precedence, classof, claz_symbol).
+o_p_v(sys_arg_info_precedence, name, "ARG-INFO-PRECEDENCE").
+o_p_v(sys_arg_info_precedence, package, pkg_sys).
 o_p_v(sys_arg_list,classof,claz_symbol).
 o_p_v(sys_arg_list,name,"ARG-LIST").
 o_p_v(sys_arg_list,package,pkg_sys).
@@ -31650,6 +32892,15 @@ o_p_v(sys_args1,package,pkg_sys).
 o_p_v(sys_args2,classof,claz_symbol).
 o_p_v(sys_args2,name,"ARGS2").
 o_p_v(sys_args2,package,pkg_sys).
+o_p_v(sys_args_lambda_list, classof, claz_symbol).
+o_p_v(sys_args_lambda_list, name, "ARGS-LAMBDA-LIST").
+o_p_v(sys_args_lambda_list, package, pkg_sys).
+o_p_v(sys_args_type, classof, claz_symbol).
+o_p_v(sys_args_type, name, "ARGS-TYPE").
+o_p_v(sys_args_type, package, pkg_sys).
+o_p_v(sys_argument, classof, claz_symbol).
+o_p_v(sys_argument, name, "ARGUMENT").
+o_p_v(sys_argument, package, pkg_sys).
 o_p_v(sys_argument_list_dotted,classof,claz_symbol).
 o_p_v(sys_argument_list_dotted,name,"ARGUMENT-LIST-DOTTED").
 o_p_v(sys_argument_list_dotted,package,pkg_sys).
@@ -31659,9 +32910,15 @@ o_p_v(sys_argument_precedence_order,package,pkg_sys).
 o_p_v(sys_arguments,classof,claz_symbol).
 o_p_v(sys_arguments,name,"ARGUMENTS").
 o_p_v(sys_arguments,package,pkg_sys).
+o_p_v(sys_arguments_out_of_domain_error, classof, claz_symbol).
+o_p_v(sys_arguments_out_of_domain_error, name, "ARGUMENTS-OUT-OF-DOMAIN-ERROR").
+o_p_v(sys_arguments_out_of_domain_error, package, pkg_sys).
 o_p_v(sys_argvars,classof,claz_symbol).
 o_p_v(sys_argvars,name,"ARGVARS").
 o_p_v(sys_argvars,package,pkg_sys).
+o_p_v(sys_array_initial_element_mismatch, classof, claz_symbol).
+o_p_v(sys_array_initial_element_mismatch, name, "ARRAY-INITIAL-ELEMENT-MISMATCH").
+o_p_v(sys_array_initial_element_mismatch, package, pkg_sys).
 o_p_v(sys_array_readably_printable_p,classof,claz_symbol).
 o_p_v(sys_array_readably_printable_p,compile_as,kw_function).
 o_p_v(sys_array_readably_printable_p,function,f_sys_array_readably_printable_p).
@@ -31672,6 +32929,9 @@ o_p_v(sys_array_reader,compile_as,kw_function).
 o_p_v(sys_array_reader,function,f_sys_array_reader).
 o_p_v(sys_array_reader,name,"ARRAY-READER").
 o_p_v(sys_array_reader,package,pkg_sys).
+o_p_v(sys_array_type, classof, claz_symbol).
+o_p_v(sys_array_type, name, "ARRAY-TYPE").
+o_p_v(sys_array_type, package, pkg_sys).
 o_p_v(sys_as,classof,claz_symbol).
 o_p_v(sys_as,name,"AS").
 o_p_v(sys_as,package,pkg_sys).
@@ -31747,6 +33007,15 @@ o_p_v(sys_assoc_guts,compile_as,kw_function).
 o_p_v(sys_assoc_guts,function,f_sys_assoc_guts).
 o_p_v(sys_assoc_guts,name,"ASSOC-GUTS").
 o_p_v(sys_assoc_guts,package,pkg_sys).
+o_p_v(sys_associated_conditions, classof, claz_symbol).
+o_p_v(sys_associated_conditions, name, "ASSOCIATED-CONDITIONS").
+o_p_v(sys_associated_conditions, package, pkg_sys).
+o_p_v(sys_asterisks_around_constant_variable_name, classof, claz_symbol).
+o_p_v(sys_asterisks_around_constant_variable_name, name, "ASTERISKS-AROUND-CONSTANT-VARIABLE-NAME").
+o_p_v(sys_asterisks_around_constant_variable_name, package, pkg_sys).
+o_p_v(sys_asterisks_around_lexical_variable_name, classof, claz_symbol).
+o_p_v(sys_asterisks_around_lexical_variable_name, name, "ASTERISKS-AROUND-LEXICAL-VARIABLE-NAME").
+o_p_v(sys_asterisks_around_lexical_variable_name, package, pkg_sys).
 o_p_v(sys_atomic_type_specifiers,classof,claz_symbol).
 o_p_v(sys_atomic_type_specifiers,name,"ATOMIC-TYPE-SPECIFIERS").
 o_p_v(sys_atomic_type_specifiers,package,pkg_sys).
@@ -31756,6 +33025,9 @@ o_p_v(sys_atsign,package,pkg_sys).
 o_p_v(sys_atsign_p,classof,claz_symbol).
 o_p_v(sys_atsign_p,name,"ATSIGN-P").
 o_p_v(sys_atsign_p,package,pkg_sys).
+o_p_v(sys_attribute_table, classof, claz_symbol).
+o_p_v(sys_attribute_table, name, "ATTRIBUTE-TABLE").
+o_p_v(sys_attribute_table, package, pkg_sys).
 o_p_v(sys_augment_load_path,classof,claz_symbol).
 o_p_v(sys_augment_load_path,compile_as,kw_function).
 o_p_v(sys_augment_load_path,function,f_sys_augment_load_path).
@@ -31779,6 +33051,9 @@ o_p_v(sys_aver,compile_as,kw_function).
 o_p_v(sys_aver,function,f_sys_aver).
 o_p_v(sys_aver,name,"AVER").
 o_p_v(sys_aver,package,pkg_sys).
+o_p_v(sys_axis, classof, claz_symbol).
+o_p_v(sys_axis, name, "AXIS").
+o_p_v(sys_axis, package, pkg_sys).
 o_p_v(sys_b,classof,claz_symbol).
 o_p_v(sys_b,name,"B").
 o_p_v(sys_b,package,pkg_sys).
@@ -31911,6 +33186,9 @@ o_p_v(sys_benv_search,compile_as,kw_function).
 o_p_v(sys_benv_search,function,f_sys_benv_search).
 o_p_v(sys_benv_search,name,"BENV-SEARCH").
 o_p_v(sys_benv_search,package,pkg_sys).
+o_p_v(sys_bin, classof, claz_symbol).
+o_p_v(sys_bin, name, "BIN").
+o_p_v(sys_bin, package, pkg_sys).
 o_p_v(sys_binary_reader,classof,claz_symbol).
 o_p_v(sys_binary_reader,compile_as,kw_function).
 o_p_v(sys_binary_reader,function,f_sys_binary_reader).
@@ -31960,6 +33238,9 @@ o_p_v(sys_bind_rest_vars,package,pkg_sys).
 o_p_v(sys_binding,classof,claz_symbol).
 o_p_v(sys_binding,name,"BINDING").
 o_p_v(sys_binding,package,pkg_sys).
+o_p_v(sys_binding_stack_exhausted, classof, claz_symbol).
+o_p_v(sys_binding_stack_exhausted, name, "BINDING-STACK-EXHAUSTED").
+o_p_v(sys_binding_stack_exhausted, package, pkg_sys).
 o_p_v(sys_bindings,classof,claz_symbol).
 o_p_v(sys_bindings,name,"BINDINGS").
 o_p_v(sys_bindings,package,pkg_sys).
@@ -31985,6 +33266,9 @@ o_p_v(sys_bit_vector_reader,package,pkg_sys).
 o_p_v(sys_bits,classof,claz_symbol).
 o_p_v(sys_bits,name,"BITS").
 o_p_v(sys_bits,package,pkg_sys).
+o_p_v(sys_bivalent_p, classof, claz_symbol).
+o_p_v(sys_bivalent_p, name, "BIVALENT-P").
+o_p_v(sys_bivalent_p, package, pkg_sys).
 o_p_v(sys_bl,classof,claz_symbol).
 o_p_v(sys_bl,name,"BL").
 o_p_v(sys_bl,package,pkg_sys).
@@ -32050,6 +33334,9 @@ o_p_v(sys_body,package,pkg_sys).
 o_p_v(sys_body_form,classof,claz_symbol).
 o_p_v(sys_body_form,name,"BODY-FORM").
 o_p_v(sys_body_form,package,pkg_sys).
+o_p_v(sys_bogus, classof, claz_symbol).
+o_p_v(sys_bogus, name, "BOGUS").
+o_p_v(sys_bogus, package, pkg_sys).
 o_p_v(sys_bogus_sublist_error,classof,claz_symbol).
 o_p_v(sys_bogus_sublist_error,compile_as,kw_function).
 o_p_v(sys_bogus_sublist_error,function,f_sys_bogus_sublist_error).
@@ -32060,11 +33347,26 @@ o_p_v(sys_boot_classloader,compile_as,kw_function).
 o_p_v(sys_boot_classloader,function,f_sys_boot_classloader).
 o_p_v(sys_boot_classloader,name,"BOOT-CLASSLOADER").
 o_p_v(sys_boot_classloader,package,pkg_sys).
+o_p_v(sys_bootstrap_package_name, classof, claz_symbol).
+o_p_v(sys_bootstrap_package_name, name, "BOOTSTRAP-PACKAGE-NAME").
+o_p_v(sys_bootstrap_package_name, package, pkg_sys).
+o_p_v(sys_bootstrap_package_not_found, classof, claz_symbol).
+o_p_v(sys_bootstrap_package_not_found, name, "BOOTSTRAP-PACKAGE-NOT-FOUND").
+o_p_v(sys_bootstrap_package_not_found, package, pkg_sys).
 o_p_v(sys_bound_to_var_p,classof,claz_symbol).
 o_p_v(sys_bound_to_var_p,compile_as,kw_function).
 o_p_v(sys_bound_to_var_p,function,f_sys_bound_to_var_p).
 o_p_v(sys_bound_to_var_p,name,"BOUND-TO-VAR-P").
 o_p_v(sys_bound_to_var_p,package,pkg_sys).
+o_p_v(sys_bounding_indices_bad_error, classof, claz_symbol).
+o_p_v(sys_bounding_indices_bad_error, name, "BOUNDING-INDICES-BAD-ERROR").
+o_p_v(sys_bounding_indices_bad_error, package, pkg_sys).
+o_p_v(sys_bounding_indices_bad_object, classof, claz_symbol).
+o_p_v(sys_bounding_indices_bad_object, name, "BOUNDING-INDICES-BAD-OBJECT").
+o_p_v(sys_bounding_indices_bad_object, package, pkg_sys).
+o_p_v(sys_bout, classof, claz_symbol).
+o_p_v(sys_bout, name, "BOUT").
+o_p_v(sys_bout, package, pkg_sys).
 o_p_v(sys_bq_append,classof,claz_symbol).
 o_p_v(sys_bq_append,compile_as,kw_function).
 o_p_v(sys_bq_append,function,f_sys_bq_append).
@@ -32158,6 +33460,21 @@ o_p_v(sys_break_loop_2_2,package,pkg_sys).
 o_p_v(sys_break_loop_2_3,classof,claz_symbol).
 o_p_v(sys_break_loop_2_3,name,"BREAK-LOOP-2-3").
 o_p_v(sys_break_loop_2_3,package,pkg_sys).
+o_p_v(sys_breakpoint_error, classof, claz_symbol).
+o_p_v(sys_breakpoint_error, name, "BREAKPOINT-ERROR").
+o_p_v(sys_breakpoint_error, package, pkg_sys).
+o_p_v(sys_broadcast_bout, classof, claz_symbol).
+o_p_v(sys_broadcast_bout, name, "BROADCAST-BOUT").
+o_p_v(sys_broadcast_bout, package, pkg_sys).
+o_p_v(sys_broadcast_misc, classof, claz_symbol).
+o_p_v(sys_broadcast_misc, name, "BROADCAST-MISC").
+o_p_v(sys_broadcast_misc, package, pkg_sys).
+o_p_v(sys_broadcast_out, classof, claz_symbol).
+o_p_v(sys_broadcast_out, name, "BROADCAST-OUT").
+o_p_v(sys_broadcast_out, package, pkg_sys).
+o_p_v(sys_broadcast_sout, classof, claz_symbol).
+o_p_v(sys_broadcast_sout, name, "BROADCAST-SOUT").
+o_p_v(sys_broadcast_sout, package, pkg_sys).
 o_p_v(sys_broadcast_stream_p,classof,claz_symbol).
 o_p_v(sys_broadcast_stream_p,compile_as,kw_function).
 o_p_v(sys_broadcast_stream_p,function,f_sys_broadcast_stream_p).
@@ -32177,6 +33494,15 @@ o_p_v(sys_buffered_input_stream_index,compile_as,kw_function).
 o_p_v(sys_buffered_input_stream_index,function,f_sys_buffered_input_stream_index).
 o_p_v(sys_buffered_input_stream_index,name,"BUFFERED-INPUT-STREAM-INDEX").
 o_p_v(sys_buffered_input_stream_index,package,pkg_sys).
+o_p_v(sys_buffering, classof, claz_symbol).
+o_p_v(sys_buffering, name, "BUFFERING").
+o_p_v(sys_buffering, package, pkg_sys).
+o_p_v(sys_bug, classof, claz_symbol).
+o_p_v(sys_bug, name, "BUG").
+o_p_v(sys_bug, package, pkg_sys).
+o_p_v(sys_built_in_classoid, classof, claz_symbol).
+o_p_v(sys_built_in_classoid, name, "BUILT-IN-CLASSOID").
+o_p_v(sys_built_in_classoid, package, pkg_sys).
 o_p_v(sys_built_in_function_p,classof,claz_symbol).
 o_p_v(sys_built_in_function_p,compile_as,kw_function).
 o_p_v(sys_built_in_function_p,function,f_sys_built_in_function_p).
@@ -32218,6 +33544,9 @@ o_p_v(sys_bytep,compile_as,kw_function).
 o_p_v(sys_bytep,function,f_sys_bytep).
 o_p_v(sys_bytep,name,"BYTEP").
 o_p_v(sys_bytep,package,pkg_sys).
+o_p_v(sys_bytes_for_char_fun, classof, claz_symbol).
+o_p_v(sys_bytes_for_char_fun, name, "BYTES-FOR-CHAR-FUN").
+o_p_v(sys_bytes_for_char_fun, package, pkg_sys).
 o_p_v(sys_bytespec,classof,claz_symbol).
 o_p_v(sys_bytespec,name,"BYTESPEC").
 o_p_v(sys_bytespec,package,pkg_sys).
@@ -32965,11 +34294,20 @@ o_p_v(sys_c40_setf_c32_weak_pointer_value_c41,compile_as,kw_function).
 o_p_v(sys_c40_setf_c32_weak_pointer_value_c41,function,f_sys_c40_setf_c32_weak_pointer_value_c41).
 o_p_v(sys_c40_setf_c32_weak_pointer_value_c41,name,"(SETF WEAK-POINTER-VALUE)").
 o_p_v(sys_c40_setf_c32_weak_pointer_value_c41,package,pkg_sys).
+o_p_v(sys_c43_ansi_stream_in_buffer_length_c43, classof, claz_symbol).
+o_p_v(sys_c43_ansi_stream_in_buffer_length_c43, name, "+ANSI-STREAM-IN-BUFFER-LENGTH+").
+o_p_v(sys_c43_ansi_stream_in_buffer_length_c43, package, pkg_sys).
+o_p_v(sys_c43_char_attr_constituent_c43, classof, claz_symbol).
+o_p_v(sys_c43_char_attr_constituent_c43, name, "+CHAR-ATTR-CONSTITUENT+").
+o_p_v(sys_c43_char_attr_constituent_c43, package, pkg_sys).
 o_p_v(sys_c43_cl_package_c43,classof,claz_symbol).
 o_p_v(sys_c43_cl_package_c43,declared_as,defconstant).
 o_p_v(sys_c43_cl_package_c43,name,"+CL-PACKAGE+").
 o_p_v(sys_c43_cl_package_c43,package,pkg_sys).
 o_p_v(sys_c43_cl_package_c43,value,'$OBJ'(package,"COMMON-LISP")).
+o_p_v(sys_c43_ctype_hash_mask_c43, classof, claz_symbol).
+o_p_v(sys_c43_ctype_hash_mask_c43, name, "+CTYPE-HASH-MASK+").
+o_p_v(sys_c43_ctype_hash_mask_c43, package, pkg_sys).
 o_p_v(sys_c43_false_type_c43,classof,claz_symbol).
 o_p_v(sys_c43_false_type_c43,name,"+FALSE-TYPE+").
 o_p_v(sys_c43_false_type_c43,package,pkg_sys).
@@ -33821,6 +35159,12 @@ o_p_v(sys_c_star,package,pkg_sys).
 o_p_v(sys_c_star_1,classof,claz_symbol).
 o_p_v(sys_c_star_1,name,"C-STAR-1").
 o_p_v(sys_c_star_1,package,pkg_sys).
+o_p_v(sys_c_string_decoding_error, classof, claz_symbol).
+o_p_v(sys_c_string_decoding_error, name, "C-STRING-DECODING-ERROR").
+o_p_v(sys_c_string_decoding_error, package, pkg_sys).
+o_p_v(sys_c_string_encoding_error, classof, claz_symbol).
+o_p_v(sys_c_string_encoding_error, name, "C-STRING-ENCODING-ERROR").
+o_p_v(sys_c_string_encoding_error, package, pkg_sys).
 o_p_v(sys_c_style_warn,classof,claz_symbol).
 o_p_v(sys_c_style_warn,compile_as,kw_function).
 o_p_v(sys_c_style_warn,function,f_sys_c_style_warn).
@@ -34013,6 +35357,9 @@ o_p_v(sys_call_count,compile_as,kw_function).
 o_p_v(sys_call_count,function,f_sys_call_count).
 o_p_v(sys_call_count,name,"CALL-COUNT").
 o_p_v(sys_call_count,package,pkg_sys).
+o_p_v(sys_call_method_args, classof, claz_symbol).
+o_p_v(sys_call_method_args, name, "CALL-METHOD-ARGS").
+o_p_v(sys_call_method_args, package, pkg_sys).
 o_p_v(sys_call_registers_limit,classof,claz_symbol).
 o_p_v(sys_call_registers_limit,declared_as,defconstant).
 o_p_v(sys_call_registers_limit,name,"CALL-REGISTERS-LIMIT").
@@ -34097,6 +35444,15 @@ o_p_v(sys_callsr_c38_push,package,pkg_sys).
 o_p_v(sys_callsr_c38_store,classof,claz_symbol).
 o_p_v(sys_callsr_c38_store,name,"CALLSR&STORE").
 o_p_v(sys_callsr_c38_store,package,pkg_sys).
+o_p_v(sys_can_precede_list, classof, claz_symbol).
+o_p_v(sys_can_precede_list, name, "CAN-PRECEDE-LIST").
+o_p_v(sys_can_precede_list, package, pkg_sys).
+o_p_v(sys_cancel_function, classof, claz_symbol).
+o_p_v(sys_cancel_function, name, "CANCEL-FUNCTION").
+o_p_v(sys_cancel_function, package, pkg_sys).
+o_p_v(sys_canon_transls, classof, claz_symbol).
+o_p_v(sys_canon_transls, name, "CANON-TRANSLS").
+o_p_v(sys_canon_transls, package, pkg_sys).
 o_p_v(sys_canonical_host,classof,claz_symbol).
 o_p_v(sys_canonical_host,name,"CANONICAL-HOST").
 o_p_v(sys_canonical_host,package,pkg_sys).
@@ -34129,6 +35485,9 @@ o_p_v(sys_canonicalized_types_equal_p,package,pkg_sys).
 o_p_v(sys_car_c38_push,classof,claz_symbol).
 o_p_v(sys_car_c38_push,name,"CAR&PUSH").
 o_p_v(sys_car_c38_push,package,pkg_sys).
+o_p_v(sys_car_type, classof, claz_symbol).
+o_p_v(sys_car_type, name, "CAR-TYPE").
+o_p_v(sys_car_type, package, pkg_sys).
 o_p_v(sys_case_body,classof,claz_symbol).
 o_p_v(sys_case_body,compile_as,kw_function).
 o_p_v(sys_case_body,function,f_sys_case_body).
@@ -34160,12 +35519,33 @@ o_p_v(sys_case_expand,package,pkg_sys).
 o_p_v(sys_case_expected_type,classof,claz_symbol).
 o_p_v(sys_case_expected_type,name,"CASE-EXPECTED-TYPE").
 o_p_v(sys_case_expected_type,package,pkg_sys).
+o_p_v(sys_case_failure, classof, claz_symbol).
+o_p_v(sys_case_failure, name, "CASE-FAILURE").
+o_p_v(sys_case_failure, package, pkg_sys).
+o_p_v(sys_case_failure_name, classof, claz_symbol).
+o_p_v(sys_case_failure_name, name, "CASE-FAILURE-NAME").
+o_p_v(sys_case_failure_name, package, pkg_sys).
+o_p_v(sys_case_failure_possibilities, classof, claz_symbol).
+o_p_v(sys_case_failure_possibilities, name, "CASE-FAILURE-POSSIBILITIES").
+o_p_v(sys_case_failure_possibilities, package, pkg_sys).
+o_p_v(sys_case_frob_misc, classof, claz_symbol).
+o_p_v(sys_case_frob_misc, name, "CASE-FROB-MISC").
+o_p_v(sys_case_frob_misc, package, pkg_sys).
 o_p_v(sys_case_frob_stream,classof,claz_symbol).
 o_p_v(sys_case_frob_stream,name,"CASE-FROB-STREAM").
 o_p_v(sys_case_frob_stream,package,pkg_sys).
+o_p_v(sys_case_kind, classof, claz_symbol).
+o_p_v(sys_case_kind, name, "CASE-KIND").
+o_p_v(sys_case_kind, package, pkg_sys).
 o_p_v(sys_case_list,classof,claz_symbol).
 o_p_v(sys_case_list,name,"CASE-LIST").
 o_p_v(sys_case_list,package,pkg_sys).
+o_p_v(sys_case_warning_case_kind, classof, claz_symbol).
+o_p_v(sys_case_warning_case_kind, name, "CASE-WARNING-CASE-KIND").
+o_p_v(sys_case_warning_case_kind, package, pkg_sys).
+o_p_v(sys_case_warning_key, classof, claz_symbol).
+o_p_v(sys_case_warning_key, name, "CASE-WARNING-KEY").
+o_p_v(sys_case_warning_key, package, pkg_sys).
 o_p_v(sys_cases,classof,claz_symbol).
 o_p_v(sys_cases,name,"CASES").
 o_p_v(sys_cases,package,pkg_sys).
@@ -34180,6 +35560,9 @@ o_p_v(sys_catch_close,package,pkg_sys).
 o_p_v(sys_catch_open,classof,claz_symbol).
 o_p_v(sys_catch_open,name,"CATCH-OPEN").
 o_p_v(sys_catch_open,package,pkg_sys).
+o_p_v(sys_catch_up, classof, claz_symbol).
+o_p_v(sys_catch_up, name, "CATCH-UP").
+o_p_v(sys_catch_up, package, pkg_sys).
 o_p_v(sys_cause,classof,claz_symbol).
 o_p_v(sys_cause,name,"CAUSE").
 o_p_v(sys_cause,package,pkg_sys).
@@ -34197,6 +35580,15 @@ o_p_v(sys_cclosure_call_code_producer_2,package,pkg_sys).
 o_p_v(sys_cdr_c38_push,classof,claz_symbol).
 o_p_v(sys_cdr_c38_push,name,"CDR&PUSH").
 o_p_v(sys_cdr_c38_push,package,pkg_sys).
+o_p_v(sys_cdr_type, classof, claz_symbol).
+o_p_v(sys_cdr_type, name, "CDR-TYPE").
+o_p_v(sys_cdr_type, package, pkg_sys).
+o_p_v(sys_cell, classof, claz_symbol).
+o_p_v(sys_cell, name, "CELL").
+o_p_v(sys_cell, package, pkg_sys).
+o_p_v(sys_cells, classof, claz_symbol).
+o_p_v(sys_cells, name, "CELLS").
+o_p_v(sys_cells, package, pkg_sys).
 o_p_v(sys_cerror_of_type,classof,claz_symbol).
 o_p_v(sys_cerror_of_type,compile_as,kw_function).
 o_p_v(sys_cerror_of_type,function,f_sys_cerror_of_type).
@@ -34223,9 +35615,72 @@ o_p_v(sys_char_reader,compile_as,kw_function).
 o_p_v(sys_char_reader,function,f_sys_char_reader).
 o_p_v(sys_char_reader,name,"CHAR-READER").
 o_p_v(sys_char_reader,package,pkg_sys).
+o_p_v(sys_char_size, classof, claz_symbol).
+o_p_v(sys_char_size, name, "CHAR-SIZE").
+o_p_v(sys_char_size, package, pkg_sys).
+o_p_v(sys_character_attribute_array, classof, claz_symbol).
+o_p_v(sys_character_attribute_array, name, "CHARACTER-ATTRIBUTE-ARRAY").
+o_p_v(sys_character_attribute_array, package, pkg_sys).
+o_p_v(sys_character_attribute_hash_table, classof, claz_symbol).
+o_p_v(sys_character_attribute_hash_table, name, "CHARACTER-ATTRIBUTE-HASH-TABLE").
+o_p_v(sys_character_attribute_hash_table, package, pkg_sys).
+o_p_v(sys_character_coding_error, classof, claz_symbol).
+o_p_v(sys_character_coding_error, name, "CHARACTER-CODING-ERROR").
+o_p_v(sys_character_coding_error, package, pkg_sys).
+o_p_v(sys_character_coding_error_external_format, classof, claz_symbol).
+o_p_v(sys_character_coding_error_external_format, name, "CHARACTER-CODING-ERROR-EXTERNAL-FORMAT").
+o_p_v(sys_character_coding_error_external_format, package, pkg_sys).
+o_p_v(sys_character_decoding_error, classof, claz_symbol).
+o_p_v(sys_character_decoding_error, name, "CHARACTER-DECODING-ERROR").
+o_p_v(sys_character_decoding_error, package, pkg_sys).
+o_p_v(sys_character_decoding_error_in_comment, classof, claz_symbol).
+o_p_v(sys_character_decoding_error_in_comment, name, "CHARACTER-DECODING-ERROR-IN-COMMENT").
+o_p_v(sys_character_decoding_error_in_comment, package, pkg_sys).
+o_p_v(sys_character_decoding_error_in_dispatch_macro_char_comment, classof, claz_symbol).
+o_p_v(sys_character_decoding_error_in_dispatch_macro_char_comment, name, "CHARACTER-DECODING-ERROR-IN-DISPATCH-MACRO-CHAR-COMMENT").
+o_p_v(sys_character_decoding_error_in_dispatch_macro_char_comment, package, pkg_sys).
+o_p_v(sys_character_decoding_error_in_macro_char_comment, classof, claz_symbol).
+o_p_v(sys_character_decoding_error_in_macro_char_comment, name, "CHARACTER-DECODING-ERROR-IN-MACRO-CHAR-COMMENT").
+o_p_v(sys_character_decoding_error_in_macro_char_comment, package, pkg_sys).
+o_p_v(sys_character_decoding_error_in_macro_char_comment_char, classof, claz_symbol).
+o_p_v(sys_character_decoding_error_in_macro_char_comment_char, name, "CHARACTER-DECODING-ERROR-IN-MACRO-CHAR-COMMENT-CHAR").
+o_p_v(sys_character_decoding_error_in_macro_char_comment_char, package, pkg_sys).
+o_p_v(sys_character_decoding_error_in_macro_char_comment_disp_char, classof, claz_symbol).
+o_p_v(sys_character_decoding_error_in_macro_char_comment_disp_char, name, "CHARACTER-DECODING-ERROR-IN-MACRO-CHAR-COMMENT-DISP-CHAR").
+o_p_v(sys_character_decoding_error_in_macro_char_comment_disp_char, package, pkg_sys).
+o_p_v(sys_character_decoding_error_in_macro_char_comment_sub_char, classof, claz_symbol).
+o_p_v(sys_character_decoding_error_in_macro_char_comment_sub_char, name, "CHARACTER-DECODING-ERROR-IN-MACRO-CHAR-COMMENT-SUB-CHAR").
+o_p_v(sys_character_decoding_error_in_macro_char_comment_sub_char, package, pkg_sys).
+o_p_v(sys_character_decoding_error_octets, classof, claz_symbol).
+o_p_v(sys_character_decoding_error_octets, name, "CHARACTER-DECODING-ERROR-OCTETS").
+o_p_v(sys_character_decoding_error_octets, package, pkg_sys).
+o_p_v(sys_character_encoding_error, classof, claz_symbol).
+o_p_v(sys_character_encoding_error, name, "CHARACTER-ENCODING-ERROR").
+o_p_v(sys_character_encoding_error, package, pkg_sys).
+o_p_v(sys_character_encoding_error_code, classof, claz_symbol).
+o_p_v(sys_character_encoding_error_code, name, "CHARACTER-ENCODING-ERROR-CODE").
+o_p_v(sys_character_encoding_error_code, package, pkg_sys).
 o_p_v(sys_character_intervals,classof,claz_symbol).
 o_p_v(sys_character_intervals,name,"CHARACTER-INTERVALS").
 o_p_v(sys_character_intervals,package,pkg_sys).
+o_p_v(sys_character_macro_array, classof, claz_symbol).
+o_p_v(sys_character_macro_array, name, "CHARACTER-MACRO-ARRAY").
+o_p_v(sys_character_macro_array, package, pkg_sys).
+o_p_v(sys_character_macro_hash_table, classof, claz_symbol).
+o_p_v(sys_character_macro_hash_table, name, "CHARACTER-MACRO-HASH-TABLE").
+o_p_v(sys_character_macro_hash_table, package, pkg_sys).
+o_p_v(sys_character_out_of_range, classof, claz_symbol).
+o_p_v(sys_character_out_of_range, name, "CHARACTER-OUT-OF-RANGE").
+o_p_v(sys_character_out_of_range, package, pkg_sys).
+o_p_v(sys_character_set, classof, claz_symbol).
+o_p_v(sys_character_set, name, "CHARACTER-SET").
+o_p_v(sys_character_set, package, pkg_sys).
+o_p_v(sys_character_set_type, classof, claz_symbol).
+o_p_v(sys_character_set_type, name, "CHARACTER-SET-TYPE").
+o_p_v(sys_character_set_type, package, pkg_sys).
+o_p_v(sys_character_string, classof, claz_symbol).
+o_p_v(sys_character_string, name, "CHARACTER-STRING").
+o_p_v(sys_character_string, package, pkg_sys).
 o_p_v(sys_charset_range,classof,claz_symbol).
 o_p_v(sys_charset_range,compile_as,kw_function).
 o_p_v(sys_charset_range,function,f_sys_charset_range).
@@ -34445,6 +35900,9 @@ o_p_v(sys_choose_disassembler,compile_as,kw_function).
 o_p_v(sys_choose_disassembler,function,f_sys_choose_disassembler).
 o_p_v(sys_choose_disassembler,name,"CHOOSE-DISASSEMBLER").
 o_p_v(sys_choose_disassembler,package,pkg_sys).
+o_p_v(sys_cin_buffer, classof, claz_symbol).
+o_p_v(sys_cin_buffer, name, "CIN-BUFFER").
+o_p_v(sys_cin_buffer, package, pkg_sys).
 o_p_v(sys_circle_subst,classof,claz_symbol).
 o_p_v(sys_circle_subst,compile_as,kw_function).
 o_p_v(sys_circle_subst,function,f_sys_circle_subst).
@@ -34455,11 +35913,47 @@ o_p_v(sys_class_bytes,compile_as,kw_function).
 o_p_v(sys_class_bytes,function,f_sys_class_bytes).
 o_p_v(sys_class_bytes,name,"CLASS-BYTES").
 o_p_v(sys_class_bytes,package,pkg_sys).
+o_p_v(sys_class_can_precede_list, classof, claz_symbol).
+o_p_v(sys_class_can_precede_list, name, "CLASS-CAN-PRECEDE-LIST").
+o_p_v(sys_class_can_precede_list, package, pkg_sys).
+o_p_v(sys_class_defstruct_constructor, classof, claz_symbol).
+o_p_v(sys_class_defstruct_constructor, name, "CLASS-DEFSTRUCT-CONSTRUCTOR").
+o_p_v(sys_class_defstruct_constructor, package, pkg_sys).
+o_p_v(sys_class_defstruct_form, classof, claz_symbol).
+o_p_v(sys_class_defstruct_form, name, "CLASS-DEFSTRUCT-FORM").
+o_p_v(sys_class_defstruct_form, package, pkg_sys).
+o_p_v(sys_class_eq_specializer, classof, claz_symbol).
+o_p_v(sys_class_eq_specializer, name, "CLASS-EQ-SPECIALIZER").
+o_p_v(sys_class_eq_specializer, package, pkg_sys).
+o_p_v(sys_class_incompatible_superclass_list, classof, claz_symbol).
+o_p_v(sys_class_incompatible_superclass_list, name, "CLASS-INCOMPATIBLE-SUPERCLASS-LIST").
+o_p_v(sys_class_incompatible_superclass_list, package, pkg_sys).
+o_p_v(sys_class_info, classof, claz_symbol).
+o_p_v(sys_class_info, name, "CLASS-INFO").
+o_p_v(sys_class_info, package, pkg_sys).
+o_p_v(sys_class_precedence_description, classof, claz_symbol).
+o_p_v(sys_class_precedence_description, name, "CLASS-PRECEDENCE-DESCRIPTION").
+o_p_v(sys_class_precedence_description, package, pkg_sys).
+o_p_v(sys_class_prototype_specializer, classof, claz_symbol).
+o_p_v(sys_class_prototype_specializer, name, "CLASS-PROTOTYPE-SPECIALIZER").
+o_p_v(sys_class_prototype_specializer, package, pkg_sys).
 o_p_v(sys_class_resource_path,classof,claz_symbol).
 o_p_v(sys_class_resource_path,compile_as,kw_function).
 o_p_v(sys_class_resource_path,function,f_sys_class_resource_path).
 o_p_v(sys_class_resource_path,name,"CLASS-RESOURCE-PATH").
 o_p_v(sys_class_resource_path,package,pkg_sys).
+o_p_v(sys_class_slots, classof, claz_symbol).
+o_p_v(sys_class_slots, name, "CLASS-SLOTS").
+o_p_v(sys_class_slots, package, pkg_sys).
+o_p_v(sys_class_wrapper, classof, claz_symbol).
+o_p_v(sys_class_wrapper, name, "CLASS-WRAPPER").
+o_p_v(sys_class_wrapper, package, pkg_sys).
+o_p_v(sys_classoid, classof, claz_symbol).
+o_p_v(sys_classoid, name, "CLASSOID").
+o_p_v(sys_classoid, package, pkg_sys).
+o_p_v(sys_classoid_cell, classof, claz_symbol).
+o_p_v(sys_classoid_cell, name, "CLASSOID-CELL").
+o_p_v(sys_classoid_cell, package, pkg_sys).
 o_p_v(sys_clause_chain,classof,claz_symbol).
 o_p_v(sys_clause_chain,name,"CLAUSE-CHAIN").
 o_p_v(sys_clause_chain,package,pkg_sys).
@@ -34490,6 +35984,15 @@ o_p_v(sys_clos_class,compile_as,kw_function).
 o_p_v(sys_clos_class,function,f_sys_clos_class).
 o_p_v(sys_clos_class,name,"CLOS-CLASS").
 o_p_v(sys_clos_class,package,pkg_sys).
+o_p_v(sys_clos_hash, classof, claz_symbol).
+o_p_v(sys_clos_hash, name, "CLOS-HASH").
+o_p_v(sys_clos_hash, package, pkg_sys).
+o_p_v(sys_clos_slots, classof, claz_symbol).
+o_p_v(sys_clos_slots, name, "CLOS-SLOTS").
+o_p_v(sys_clos_slots, package, pkg_sys).
+o_p_v(sys_closed_stream_error, classof, claz_symbol).
+o_p_v(sys_closed_stream_error, name, "CLOSED-STREAM-ERROR").
+o_p_v(sys_closed_stream_error, package, pkg_sys).
 o_p_v(sys_closure,classof,claz_symbol).
 o_p_v(sys_closure,name,"CLOSURE").
 o_p_v(sys_closure,package,pkg_sys).
@@ -34576,6 +36079,9 @@ o_p_v(sys_code_address_of,compile_as,kw_function).
 o_p_v(sys_code_address_of,function,f_sys_code_address_of).
 o_p_v(sys_code_address_of,name,"CODE-ADDRESS-OF").
 o_p_v(sys_code_address_of,package,pkg_sys).
+o_p_v(sys_code_component, classof, claz_symbol).
+o_p_v(sys_code_component, name, "CODE-COMPONENT").
+o_p_v(sys_code_component, package, pkg_sys).
 o_p_v(sys_code_part,classof,claz_symbol).
 o_p_v(sys_code_part,name,"CODE-PART").
 o_p_v(sys_code_part,package,pkg_sys).
@@ -34849,11 +36355,17 @@ o_p_v(sys_compile_warnings_p,compile_as,kw_function).
 o_p_v(sys_compile_warnings_p,function,f_sys_compile_warnings_p).
 o_p_v(sys_compile_warnings_p,name,"COMPILE-WARNINGS-P").
 o_p_v(sys_compile_warnings_p,package,pkg_sys).
+o_p_v(sys_compiled_debug_fun, classof, claz_symbol).
+o_p_v(sys_compiled_debug_fun, name, "COMPILED-DEBUG-FUN").
+o_p_v(sys_compiled_debug_fun, package, pkg_sys).
 o_p_v(sys_compiled_lisp_function_p,classof,claz_symbol).
 o_p_v(sys_compiled_lisp_function_p,compile_as,kw_function).
 o_p_v(sys_compiled_lisp_function_p,function,f_sys_compiled_lisp_function_p).
 o_p_v(sys_compiled_lisp_function_p,name,"COMPILED-LISP-FUNCTION-P").
 o_p_v(sys_compiled_lisp_function_p,package,pkg_sys).
+o_p_v(sys_compiled_program_error, classof, claz_symbol).
+o_p_v(sys_compiled_program_error, name, "COMPILED-PROGRAM-ERROR").
+o_p_v(sys_compiled_program_error, package, pkg_sys).
 o_p_v(sys_compiled_with_errors,classof,claz_symbol).
 o_p_v(sys_compiled_with_errors,compile_as,kw_function).
 o_p_v(sys_compiled_with_errors,function,f_sys_compiled_with_errors).
@@ -34864,11 +36376,20 @@ o_p_v(sys_compiler_defstruct,compile_as,kw_function).
 o_p_v(sys_compiler_defstruct,function,f_sys_compiler_defstruct).
 o_p_v(sys_compiler_defstruct,name,"COMPILER-DEFSTRUCT").
 o_p_v(sys_compiler_defstruct,package,pkg_sys).
+o_p_v(sys_compiler_environment_too_complex_error, classof, claz_symbol).
+o_p_v(sys_compiler_environment_too_complex_error, name, "COMPILER-ENVIRONMENT-TOO-COMPLEX-ERROR").
+o_p_v(sys_compiler_environment_too_complex_error, package, pkg_sys).
 o_p_v(sys_compiler_error,classof,claz_symbol).
 o_p_v(sys_compiler_error,compile_as,kw_function).
 o_p_v(sys_compiler_error,function,f_sys_compiler_error).
 o_p_v(sys_compiler_error,name,"COMPILER-ERROR").
 o_p_v(sys_compiler_error,package,pkg_sys).
+o_p_v(sys_compiler_macro_keyword_argument, classof, claz_symbol).
+o_p_v(sys_compiler_macro_keyword_argument, name, "COMPILER-MACRO-KEYWORD-ARGUMENT").
+o_p_v(sys_compiler_macro_keyword_argument, package, pkg_sys).
+o_p_v(sys_compiler_macro_keyword_problem, classof, claz_symbol).
+o_p_v(sys_compiler_macro_keyword_problem, name, "COMPILER-MACRO-KEYWORD-PROBLEM").
+o_p_v(sys_compiler_macro_keyword_problem, package, pkg_sys).
 o_p_v(sys_compiler_macroexpand,classof,claz_symbol).
 o_p_v(sys_compiler_macroexpand,compile_as,kw_function).
 o_p_v(sys_compiler_macroexpand,function,f_sys_compiler_macroexpand).
@@ -34899,6 +36420,9 @@ o_p_v(sys_compiler_warn,compile_as,kw_function).
 o_p_v(sys_compiler_warn,function,f_sys_compiler_warn).
 o_p_v(sys_compiler_warn,name,"COMPILER-WARN").
 o_p_v(sys_compiler_warn,package,pkg_sys).
+o_p_v(sys_complaint, classof, claz_symbol).
+o_p_v(sys_complaint, name, "COMPLAINT").
+o_p_v(sys_complaint, package, pkg_sys).
 o_p_v(sys_completion,classof,claz_symbol).
 o_p_v(sys_completion,compile_as,kw_function).
 o_p_v(sys_completion,function,f_sys_completion).
@@ -34916,11 +36440,32 @@ o_p_v(sys_completion_3,package,pkg_sys).
 o_p_v(sys_completion_4,classof,claz_symbol).
 o_p_v(sys_completion_4,name,"COMPLETION-4").
 o_p_v(sys_completion_4,package,pkg_sys).
+o_p_v(sys_complex_c61, classof, claz_symbol).
+o_p_v(sys_complex_c61, name, "COMPLEX-=").
+o_p_v(sys_complex_c61, package, pkg_sys).
+o_p_v(sys_complex_double_float, classof, claz_symbol).
+o_p_v(sys_complex_double_float, name, "COMPLEX-DOUBLE-FLOAT").
+o_p_v(sys_complex_double_float, package, pkg_sys).
+o_p_v(sys_complex_intersection2, classof, claz_symbol).
+o_p_v(sys_complex_intersection2, name, "COMPLEX-INTERSECTION2").
+o_p_v(sys_complex_intersection2, package, pkg_sys).
 o_p_v(sys_complex_reader,classof,claz_symbol).
 o_p_v(sys_complex_reader,compile_as,kw_function).
 o_p_v(sys_complex_reader,function,f_sys_complex_reader).
 o_p_v(sys_complex_reader,name,"COMPLEX-READER").
 o_p_v(sys_complex_reader,package,pkg_sys).
+o_p_v(sys_complex_single_float, classof, claz_symbol).
+o_p_v(sys_complex_single_float, name, "COMPLEX-SINGLE-FLOAT").
+o_p_v(sys_complex_single_float, package, pkg_sys).
+o_p_v(sys_complex_subtypep_arg1, classof, claz_symbol).
+o_p_v(sys_complex_subtypep_arg1, name, "COMPLEX-SUBTYPEP-ARG1").
+o_p_v(sys_complex_subtypep_arg1, package, pkg_sys).
+o_p_v(sys_complex_subtypep_arg2, classof, claz_symbol).
+o_p_v(sys_complex_subtypep_arg2, name, "COMPLEX-SUBTYPEP-ARG2").
+o_p_v(sys_complex_subtypep_arg2, package, pkg_sys).
+o_p_v(sys_complex_union2, classof, claz_symbol).
+o_p_v(sys_complex_union2, name, "COMPLEX-UNION2").
+o_p_v(sys_complex_union2, package, pkg_sys).
 o_p_v(sys_component,classof,claz_symbol).
 o_p_v(sys_component,name,"COMPONENT").
 o_p_v(sys_component,package,pkg_sys).
@@ -34939,6 +36484,9 @@ o_p_v(sys_compound_object_p,compile_as,kw_function).
 o_p_v(sys_compound_object_p,function,f_sys_compound_object_p).
 o_p_v(sys_compound_object_p,name,"COMPOUND-OBJECT-P").
 o_p_v(sys_compound_object_p,package,pkg_sys).
+o_p_v(sys_compound_type, classof, claz_symbol).
+o_p_v(sys_compound_type, name, "COMPOUND-TYPE").
+o_p_v(sys_compound_type, package, pkg_sys).
 o_p_v(sys_compute_classfile,classof,claz_symbol).
 o_p_v(sys_compute_classfile,compile_as,kw_function).
 o_p_v(sys_compute_classfile,function,f_sys_compute_classfile).
@@ -34967,9 +36515,27 @@ o_p_v(sys_concatenated_stream_p,compile_as,kw_function).
 o_p_v(sys_concatenated_stream_p,function,f_sys_concatenated_stream_p).
 o_p_v(sys_concatenated_stream_p,name,"CONCATENATED-STREAM-P").
 o_p_v(sys_concatenated_stream_p,package,pkg_sys).
+o_p_v(sys_condition_class, classof, claz_symbol).
+o_p_v(sys_condition_class, name, "CONDITION-CLASS").
+o_p_v(sys_condition_class, package, pkg_sys).
+o_p_v(sys_condition_classoid, classof, claz_symbol).
+o_p_v(sys_condition_classoid, name, "CONDITION-CLASSOID").
+o_p_v(sys_condition_classoid, package, pkg_sys).
+o_p_v(sys_condition_direct_slot_definition, classof, claz_symbol).
+o_p_v(sys_condition_direct_slot_definition, name, "CONDITION-DIRECT-SLOT-DEFINITION").
+o_p_v(sys_condition_direct_slot_definition, package, pkg_sys).
+o_p_v(sys_condition_effective_slot_definition, classof, claz_symbol).
+o_p_v(sys_condition_effective_slot_definition, name, "CONDITION-EFFECTIVE-SLOT-DEFINITION").
+o_p_v(sys_condition_effective_slot_definition, package, pkg_sys).
 o_p_v(sys_condition_form,classof,claz_symbol).
 o_p_v(sys_condition_form,name,"CONDITION-FORM").
 o_p_v(sys_condition_form,package,pkg_sys).
+o_p_v(sys_condition_slot, classof, claz_symbol).
+o_p_v(sys_condition_slot, name, "CONDITION-SLOT").
+o_p_v(sys_condition_slot, package, pkg_sys).
+o_p_v(sys_condition_slot_definition, classof, claz_symbol).
+o_p_v(sys_condition_slot_definition, name, "CONDITION-SLOT-DEFINITION").
+o_p_v(sys_condition_slot_definition, package, pkg_sys).
 o_p_v(sys_cons_c38_push,classof,claz_symbol).
 o_p_v(sys_cons_c38_push,name,"CONS&PUSH").
 o_p_v(sys_cons_c38_push,package,pkg_sys).
@@ -34983,6 +36549,9 @@ o_p_v(sys_cons_cdr,compile_as,kw_function).
 o_p_v(sys_cons_cdr,function,f_sys_cons_cdr).
 o_p_v(sys_cons_cdr,name,"CONS-CDR").
 o_p_v(sys_cons_cdr,package,pkg_sys).
+o_p_v(sys_cons_type, classof, claz_symbol).
+o_p_v(sys_cons_type, name, "CONS-TYPE").
+o_p_v(sys_cons_type, package, pkg_sys).
 o_p_v(sys_cons_xx_fenv_xx,classof,claz_symbol).
 o_p_v(sys_cons_xx_fenv_xx,compile_as,kw_function).
 o_p_v(sys_cons_xx_fenv_xx,function,f_sys_cons_xx_fenv_xx).
@@ -35067,6 +36636,12 @@ o_p_v(sys_constant_initfunction_p,package,pkg_sys).
 o_p_v(sys_constant_inlinable,classof,claz_symbol).
 o_p_v(sys_constant_inlinable,name,"CONSTANT-INLINABLE").
 o_p_v(sys_constant_inlinable,package,pkg_sys).
+o_p_v(sys_constant_modified, classof, claz_symbol).
+o_p_v(sys_constant_modified, name, "CONSTANT-MODIFIED").
+o_p_v(sys_constant_modified, package, pkg_sys).
+o_p_v(sys_constant_modified_fun_name, classof, claz_symbol).
+o_p_v(sys_constant_modified_fun_name, name, "CONSTANT-MODIFIED-FUN-NAME").
+o_p_v(sys_constant_modified_fun_name, package, pkg_sys).
 o_p_v(sys_constant_type_p,classof,claz_symbol).
 o_p_v(sys_constant_type_p,compile_as,kw_function).
 o_p_v(sys_constant_type_p,function,f_sys_constant_type_p).
@@ -35103,6 +36678,9 @@ o_p_v(sys_constvalue_index,package,pkg_sys).
 o_p_v(sys_consvar,classof,claz_symbol).
 o_p_v(sys_consvar,name,"CONSVAR").
 o_p_v(sys_consvar,package,pkg_sys).
+o_p_v(sys_contents, classof, claz_symbol).
+o_p_v(sys_contents, name, "CONTENTS").
+o_p_v(sys_contents, package, pkg_sys).
 o_p_v(sys_context,classof,claz_symbol).
 o_p_v(sys_context,name,"CONTEXT").
 o_p_v(sys_context,package,pkg_sys).
@@ -35117,6 +36695,9 @@ o_p_v(sys_contrib_jar_p,package,pkg_sys).
 o_p_v(sys_control,classof,claz_symbol).
 o_p_v(sys_control,name,"CONTROL").
 o_p_v(sys_control,package,pkg_sys).
+o_p_v(sys_control_stack_exhausted, classof, claz_symbol).
+o_p_v(sys_control_stack_exhausted, name, "CONTROL-STACK-EXHAUSTED").
+o_p_v(sys_control_stack_exhausted, package, pkg_sys).
 o_p_v(sys_control_string,classof,claz_symbol).
 o_p_v(sys_control_string,name,"CONTROL-STRING").
 o_p_v(sys_control_string,package,pkg_sys).
@@ -35134,9 +36715,15 @@ o_p_v(sys_convert_toplevel_form,compile_as,kw_function).
 o_p_v(sys_convert_toplevel_form,function,f_sys_convert_toplevel_form).
 o_p_v(sys_convert_toplevel_form,name,"CONVERT-TOPLEVEL-FORM").
 o_p_v(sys_convert_toplevel_form,package,pkg_sys).
+o_p_v(sys_cookie, classof, claz_symbol).
+o_p_v(sys_cookie, name, "COOKIE").
+o_p_v(sys_cookie, package, pkg_sys).
 o_p_v(sys_copier,classof,claz_symbol).
 o_p_v(sys_copier,name,"COPIER").
 o_p_v(sys_copier,package,pkg_sys).
+o_p_v(sys_copier_name, classof, claz_symbol).
+o_p_v(sys_copier_name, name, "COPIER-NAME").
+o_p_v(sys_copier_name, package, pkg_sys).
 o_p_v(sys_copy_c60_structure_effective_slot_definition_c62,classof,claz_symbol).
 o_p_v(sys_copy_c60_structure_effective_slot_definition_c62,compile_as,kw_function).
 o_p_v(sys_copy_c60_structure_effective_slot_definition_c62,function,f_sys_copy_c60_structure_effective_slot_definition_c62).
@@ -35199,6 +36786,9 @@ o_p_v(sys_copy_tracer,compile_as,kw_function).
 o_p_v(sys_copy_tracer,function,f_sys_copy_tracer).
 o_p_v(sys_copy_tracer,name,"COPY-TRACER").
 o_p_v(sys_copy_tracer,package,pkg_sys).
+o_p_v(sys_core_dumped, classof, claz_symbol).
+o_p_v(sys_core_dumped, name, "CORE-DUMPED").
+o_p_v(sys_core_dumped, package, pkg_sys).
 o_p_v(sys_correctable_error,classof,claz_symbol).
 o_p_v(sys_correctable_error,compile_as,kw_function).
 o_p_v(sys_correctable_error,function,f_sys_correctable_error).
@@ -35225,6 +36815,33 @@ o_p_v(sys_countform,package,pkg_sys).
 o_p_v(sys_counting,classof,claz_symbol).
 o_p_v(sys_counting,name,"COUNTING").
 o_p_v(sys_counting,package,pkg_sys).
+o_p_v(sys_cpd_after, classof, claz_symbol).
+o_p_v(sys_cpd_after, name, "CPD-AFTER").
+o_p_v(sys_cpd_after, package, pkg_sys).
+o_p_v(sys_cpd_class, classof, claz_symbol).
+o_p_v(sys_cpd_class, name, "CPD-CLASS").
+o_p_v(sys_cpd_class, package, pkg_sys).
+o_p_v(sys_cpd_count, classof, claz_symbol).
+o_p_v(sys_cpd_count, name, "CPD-COUNT").
+o_p_v(sys_cpd_count, package, pkg_sys).
+o_p_v(sys_cpd_supers, classof, claz_symbol).
+o_p_v(sys_cpd_supers, name, "CPD-SUPERS").
+o_p_v(sys_cpd_supers, package, pkg_sys).
+o_p_v(sys_cpl, classof, claz_symbol).
+o_p_v(sys_cpl, name, "CPL").
+o_p_v(sys_cpl, package, pkg_sys).
+o_p_v(sys_cpl_available_p, classof, claz_symbol).
+o_p_v(sys_cpl_available_p, name, "CPL-AVAILABLE-P").
+o_p_v(sys_cpl_available_p, package, pkg_sys).
+o_p_v(sys_cpl_protocol_violation, classof, claz_symbol).
+o_p_v(sys_cpl_protocol_violation, name, "CPL-PROTOCOL-VIOLATION").
+o_p_v(sys_cpl_protocol_violation, package, pkg_sys).
+o_p_v(sys_cpl_protocol_violation_class, classof, claz_symbol).
+o_p_v(sys_cpl_protocol_violation_class, name, "CPL-PROTOCOL-VIOLATION-CLASS").
+o_p_v(sys_cpl_protocol_violation_class, package, pkg_sys).
+o_p_v(sys_cpl_protocol_violation_cpl, classof, claz_symbol).
+o_p_v(sys_cpl_protocol_violation_cpl, name, "CPL-PROTOCOL-VIOLATION-CPL").
+o_p_v(sys_cpl_protocol_violation_cpl, package, pkg_sys).
 o_p_v(sys_crash,classof,claz_symbol).
 o_p_v(sys_crash,compile_as,kw_function).
 o_p_v(sys_crash,function,f_sys_crash).
@@ -35368,6 +36985,15 @@ o_p_v(sys_current_language,compile_as,kw_function).
 o_p_v(sys_current_language,function,f_sys_current_language).
 o_p_v(sys_current_language,name,"CURRENT-LANGUAGE").
 o_p_v(sys_current_language,package,pkg_sys).
+o_p_v(sys_current_package, classof, claz_symbol).
+o_p_v(sys_current_package, name, "CURRENT-PACKAGE").
+o_p_v(sys_current_package, package, pkg_sys).
+o_p_v(sys_cursor, classof, claz_symbol).
+o_p_v(sys_cursor, name, "CURSOR").
+o_p_v(sys_cursor, package, pkg_sys).
+o_p_v(sys_customary_case, classof, claz_symbol).
+o_p_v(sys_customary_case, name, "CUSTOMARY-CASE").
+o_p_v(sys_customary_case, package, pkg_sys).
 o_p_v(sys_d,classof,claz_symbol).
 o_p_v(sys_d,name,"D").
 o_p_v(sys_d,package,pkg_sys).
@@ -35462,6 +37088,12 @@ o_p_v(sys_dd_type,compile_as,kw_function).
 o_p_v(sys_dd_type,function,f_sys_dd_type).
 o_p_v(sys_dd_type,name,"DD-TYPE").
 o_p_v(sys_dd_type,package,pkg_sys).
+o_p_v(sys_dead_beef_structure_object, classof, claz_symbol).
+o_p_v(sys_dead_beef_structure_object, name, "DEAD-BEEF-STRUCTURE-OBJECT").
+o_p_v(sys_dead_beef_structure_object, package, pkg_sys).
+o_p_v(sys_deadline_timeout, classof, claz_symbol).
+o_p_v(sys_deadline_timeout, name, "DEADLINE-TIMEOUT").
+o_p_v(sys_deadline_timeout, package, pkg_sys).
 o_p_v(sys_debug_backtrace,classof,claz_symbol).
 o_p_v(sys_debug_backtrace,compile_as,kw_function).
 o_p_v(sys_debug_backtrace,function,f_sys_debug_backtrace).
@@ -35497,6 +37129,9 @@ o_p_v(sys_debug_inspect_error,compile_as,kw_function).
 o_p_v(sys_debug_inspect_error,function,f_sys_debug_inspect_error).
 o_p_v(sys_debug_inspect_error,name,"DEBUG-INSPECT-ERROR").
 o_p_v(sys_debug_inspect_error,package,pkg_sys).
+o_p_v(sys_debug_lambda_list, classof, claz_symbol).
+o_p_v(sys_debug_lambda_list, name, "DEBUG-LAMBDA-LIST").
+o_p_v(sys_debug_lambda_list, package, pkg_sys).
 o_p_v(sys_debug_loop,classof,claz_symbol).
 o_p_v(sys_debug_loop,compile_as,kw_function).
 o_p_v(sys_debug_loop,function,f_sys_debug_loop).
@@ -35507,6 +37142,9 @@ o_p_v(sys_debug_mode,compile_as,kw_function).
 o_p_v(sys_debug_mode,function,f_sys_debug_mode).
 o_p_v(sys_debug_mode,name,"DEBUG-MODE").
 o_p_v(sys_debug_mode,package,pkg_sys).
+o_p_v(sys_debug_name, classof, claz_symbol).
+o_p_v(sys_debug_name, name, "DEBUG-NAME").
+o_p_v(sys_debug_name, package, pkg_sys).
 o_p_v(sys_debug_print_error,classof,claz_symbol).
 o_p_v(sys_debug_print_error,compile_as,kw_function).
 o_p_v(sys_debug_print_error,function,f_sys_debug_print_error).
@@ -35583,6 +37221,9 @@ o_p_v(sys_declaration_error,package,pkg_sys).
 o_p_v(sys_declaration_specifier,classof,claz_symbol).
 o_p_v(sys_declaration_specifier,name,"DECLARATION-SPECIFIER").
 o_p_v(sys_declaration_specifier,package,pkg_sys).
+o_p_v(sys_declaration_type_conflict_error, classof, claz_symbol).
+o_p_v(sys_declaration_type_conflict_error, name, "DECLARATION-TYPE-CONFLICT-ERROR").
+o_p_v(sys_declaration_type_conflict_error, package, pkg_sys).
 o_p_v(sys_declarations,classof,claz_symbol).
 o_p_v(sys_declarations,name,"DECLARATIONS").
 o_p_v(sys_declarations,package,pkg_sys).
@@ -35622,6 +37263,12 @@ o_p_v(sys_decode_float_decimal,compile_as,kw_function).
 o_p_v(sys_decode_float_decimal,function,f_sys_decode_float_decimal).
 o_p_v(sys_decode_float_decimal,name,"DECODE-FLOAT-DECIMAL").
 o_p_v(sys_decode_float_decimal,package,pkg_sys).
+o_p_v(sys_decoding_error_in_comment_position, classof, claz_symbol).
+o_p_v(sys_decoding_error_in_comment_position, name, "DECODING-ERROR-IN-COMMENT-POSITION").
+o_p_v(sys_decoding_error_in_comment_position, package, pkg_sys).
+o_p_v(sys_decoding_error_in_comment_stream, classof, claz_symbol).
+o_p_v(sys_decoding_error_in_comment_stream, name, "DECODING-ERROR-IN-COMMENT-STREAM").
+o_p_v(sys_decoding_error_in_comment_stream, package, pkg_sys).
 o_p_v(sys_def,classof,claz_symbol).
 o_p_v(sys_def,name,"DEF").
 o_p_v(sys_def,package,pkg_sys).
@@ -35704,6 +37351,9 @@ o_p_v(sys_default_lineno1,package,pkg_sys).
 o_p_v(sys_default_lineno2,classof,claz_symbol).
 o_p_v(sys_default_lineno2,name,"DEFAULT-LINENO2").
 o_p_v(sys_default_lineno2,package,pkg_sys).
+o_p_v(sys_default_method_only, classof, claz_symbol).
+o_p_v(sys_default_method_only, name, "DEFAULT-METHOD-ONLY").
+o_p_v(sys_default_method_only, package, pkg_sys).
 o_p_v(sys_default_pathname,classof,claz_symbol).
 o_p_v(sys_default_pathname,name,"DEFAULT-PATHNAME").
 o_p_v(sys_default_pathname,package,pkg_sys).
@@ -35712,6 +37362,9 @@ o_p_v(sys_default_print_dispatch_function,compile_as,kw_function).
 o_p_v(sys_default_print_dispatch_function,function,f_sys_default_print_dispatch_function).
 o_p_v(sys_default_print_dispatch_function,name,"DEFAULT-PRINT-DISPATCH-FUNCTION").
 o_p_v(sys_default_print_dispatch_function,package,pkg_sys).
+o_p_v(sys_default_replacement_character, classof, claz_symbol).
+o_p_v(sys_default_replacement_character, name, "DEFAULT-REPLACEMENT-CHARACTER").
+o_p_v(sys_default_replacement_character, package, pkg_sys).
 o_p_v(sys_default_restart_interactive,classof,claz_symbol).
 o_p_v(sys_default_restart_interactive,compile_as,kw_function).
 o_p_v(sys_default_restart_interactive,function,f_sys_default_restart_interactive).
@@ -35807,6 +37460,12 @@ o_p_v(sys_defining_p,package,pkg_sys).
 o_p_v(sys_definition,classof,claz_symbol).
 o_p_v(sys_definition,name,"DEFINITION").
 o_p_v(sys_definition,package,pkg_sys).
+o_p_v(sys_definition_source, classof, claz_symbol).
+o_p_v(sys_definition_source, name, "DEFINITION-SOURCE").
+o_p_v(sys_definition_source, package, pkg_sys).
+o_p_v(sys_definition_source_mixin, classof, claz_symbol).
+o_p_v(sys_definition_source_mixin, name, "DEFINITION-SOURCE-MIXIN").
+o_p_v(sys_definition_source_mixin, package, pkg_sys).
 o_p_v(sys_definternational_default,classof,claz_symbol).
 o_p_v(sys_definternational_default,compile_as,kw_function).
 o_p_v(sys_definternational_default,function,f_sys_definternational_default).
@@ -35828,14 +37487,35 @@ o_p_v(sys_defmacro_error,compile_as,kw_function).
 o_p_v(sys_defmacro_error,function,f_sys_defmacro_error).
 o_p_v(sys_defmacro_error,name,"DEFMACRO-ERROR").
 o_p_v(sys_defmacro_error,package,pkg_sys).
+o_p_v(sys_defmacro_lambda_list_bind_error, classof, claz_symbol).
+o_p_v(sys_defmacro_lambda_list_bind_error, name, "DEFMACRO-LAMBDA-LIST-BIND-ERROR").
+o_p_v(sys_defmacro_lambda_list_bind_error, package, pkg_sys).
+o_p_v(sys_defmacro_lambda_list_bind_error_kind, classof, claz_symbol).
+o_p_v(sys_defmacro_lambda_list_bind_error_kind, name, "DEFMACRO-LAMBDA-LIST-BIND-ERROR-KIND").
+o_p_v(sys_defmacro_lambda_list_bind_error_kind, package, pkg_sys).
+o_p_v(sys_defmacro_lambda_list_bind_error_name, classof, claz_symbol).
+o_p_v(sys_defmacro_lambda_list_bind_error_name, name, "DEFMACRO-LAMBDA-LIST-BIND-ERROR-NAME").
+o_p_v(sys_defmacro_lambda_list_bind_error_name, package, pkg_sys).
 o_p_v(sys_defmacro_lambda_list_broken_key_list_error,classof,claz_symbol).
 o_p_v(sys_defmacro_lambda_list_broken_key_list_error,name,"DEFMACRO-LAMBDA-LIST-BROKEN-KEY-LIST-ERROR").
 o_p_v(sys_defmacro_lambda_list_broken_key_list_error,package,pkg_sys).
+o_p_v(sys_defmacro_lambda_list_broken_key_list_error_info, classof, claz_symbol).
+o_p_v(sys_defmacro_lambda_list_broken_key_list_error_info, name, "DEFMACRO-LAMBDA-LIST-BROKEN-KEY-LIST-ERROR-INFO").
+o_p_v(sys_defmacro_lambda_list_broken_key_list_error_info, package, pkg_sys).
+o_p_v(sys_defmacro_lambda_list_broken_key_list_error_problem, classof, claz_symbol).
+o_p_v(sys_defmacro_lambda_list_broken_key_list_error_problem, name, "DEFMACRO-LAMBDA-LIST-BROKEN-KEY-LIST-ERROR-PROBLEM").
+o_p_v(sys_defmacro_lambda_list_broken_key_list_error_problem, package, pkg_sys).
 o_p_v(sys_defmacro_special,classof,claz_symbol).
 o_p_v(sys_defmacro_special,compile_as,kw_operator).
 o_p_v(sys_defmacro_special,function,f_sys_defmacro_special).
 o_p_v(sys_defmacro_special,name,"DEFMACRO-SPECIAL").
 o_p_v(sys_defmacro_special,package,pkg_sys).
+o_p_v(sys_defstruct_accessor_symbol, classof, claz_symbol).
+o_p_v(sys_defstruct_accessor_symbol, name, "DEFSTRUCT-ACCESSOR-SYMBOL").
+o_p_v(sys_defstruct_accessor_symbol, package, pkg_sys).
+o_p_v(sys_defstruct_constructor, classof, claz_symbol).
+o_p_v(sys_defstruct_constructor, name, "DEFSTRUCT-CONSTRUCTOR").
+o_p_v(sys_defstruct_constructor, package, pkg_sys).
 o_p_v(sys_defstruct_default_constructor,classof,claz_symbol).
 o_p_v(sys_defstruct_default_constructor,compile_as,kw_function).
 o_p_v(sys_defstruct_default_constructor,function,f_sys_defstruct_default_constructor).
@@ -35844,6 +37524,9 @@ o_p_v(sys_defstruct_default_constructor,package,pkg_sys).
 o_p_v(sys_defstruct_description,classof,claz_symbol).
 o_p_v(sys_defstruct_description,name,"DEFSTRUCT-DESCRIPTION").
 o_p_v(sys_defstruct_description,package,pkg_sys).
+o_p_v(sys_defstruct_form, classof, claz_symbol).
+o_p_v(sys_defstruct_form, name, "DEFSTRUCT-FORM").
+o_p_v(sys_defstruct_form, package, pkg_sys).
 o_p_v(sys_defstruct_reader,classof,claz_symbol).
 o_p_v(sys_defstruct_reader,name,"DEFSTRUCT-READER").
 o_p_v(sys_defstruct_reader,package,pkg_sys).
@@ -35872,6 +37555,12 @@ o_p_v(sys_delete_eql,compile_as,kw_function).
 o_p_v(sys_delete_eql,function,f_sys_delete_eql).
 o_p_v(sys_delete_eql,name,"DELETE-EQL").
 o_p_v(sys_delete_eql,package,pkg_sys).
+o_p_v(sys_delete_original, classof, claz_symbol).
+o_p_v(sys_delete_original, name, "DELETE-ORIGINAL").
+o_p_v(sys_delete_original, package, pkg_sys).
+o_p_v(sys_deleted, classof, claz_symbol).
+o_p_v(sys_deleted, name, "DELETED").
+o_p_v(sys_deleted, package, pkg_sys).
 o_p_v(sys_delta,classof,claz_symbol).
 o_p_v(sys_delta,name,"DELTA").
 o_p_v(sys_delta,package,pkg_sys).
@@ -35883,6 +37572,9 @@ o_p_v(sys_delta4,package,pkg_sys).
 o_p_v(sys_denv,classof,claz_symbol).
 o_p_v(sys_denv,name,"DENV").
 o_p_v(sys_denv,package,pkg_sys).
+o_p_v(sys_dependent_update_mixin, classof, claz_symbol).
+o_p_v(sys_dependent_update_mixin, name, "DEPENDENT-UPDATE-MIXIN").
+o_p_v(sys_dependent_update_mixin, package, pkg_sys).
 o_p_v(sys_depends_preceding,classof,claz_symbol).
 o_p_v(sys_depends_preceding,name,"DEPENDS-PRECEDING").
 o_p_v(sys_depends_preceding,package,pkg_sys).
@@ -35894,6 +37586,21 @@ o_p_v(sys_deprecate,package,pkg_sys).
 o_p_v(sys_deprecated,classof,claz_symbol).
 o_p_v(sys_deprecated,name,"DEPRECATED").
 o_p_v(sys_deprecated,package,pkg_sys).
+o_p_v(sys_deprecated_eval_when_situations, classof, claz_symbol).
+o_p_v(sys_deprecated_eval_when_situations, name, "DEPRECATED-EVAL-WHEN-SITUATIONS").
+o_p_v(sys_deprecated_eval_when_situations, package, pkg_sys).
+o_p_v(sys_deprecated_eval_when_situations_situations, classof, claz_symbol).
+o_p_v(sys_deprecated_eval_when_situations_situations, name, "DEPRECATED-EVAL-WHEN-SITUATIONS-SITUATIONS").
+o_p_v(sys_deprecated_eval_when_situations_situations, package, pkg_sys).
+o_p_v(sys_deprecation_info, classof, claz_symbol).
+o_p_v(sys_deprecation_info, name, "DEPRECATION-INFO").
+o_p_v(sys_deprecation_info, package, pkg_sys).
+o_p_v(sys_deprecation_state, classof, claz_symbol).
+o_p_v(sys_deprecation_state, name, "DEPRECATION-STATE").
+o_p_v(sys_deprecation_state, package, pkg_sys).
+o_p_v(sys_depthoid, classof, claz_symbol).
+o_p_v(sys_depthoid, name, "DEPTHOID").
+o_p_v(sys_depthoid, package, pkg_sys).
 o_p_v(sys_describe1,classof,claz_symbol).
 o_p_v(sys_describe1,compile_as,kw_function).
 o_p_v(sys_describe1,function,f_sys_describe1).
@@ -35945,6 +37652,12 @@ o_p_v(sys_describe_slotted_object_2,package,pkg_sys).
 o_p_v(sys_describe_stream,classof,claz_symbol).
 o_p_v(sys_describe_stream,name,"DESCRIBE-STREAM").
 o_p_v(sys_describe_stream,package,pkg_sys).
+o_p_v(sys_description, classof, claz_symbol).
+o_p_v(sys_description, name, "DESCRIPTION").
+o_p_v(sys_description, package, pkg_sys).
+o_p_v(sys_descriptor, classof, claz_symbol).
+o_p_v(sys_descriptor, name, "DESCRIPTOR").
+o_p_v(sys_descriptor, package, pkg_sys).
 o_p_v(sys_designated_package_name,classof,claz_symbol).
 o_p_v(sys_designated_package_name,compile_as,kw_function).
 o_p_v(sys_designated_package_name,function,f_sys_designated_package_name).
@@ -35990,6 +37703,9 @@ o_p_v(sys_devalue_form,compile_as,kw_function).
 o_p_v(sys_devalue_form,function,f_sys_devalue_form).
 o_p_v(sys_devalue_form,name,"DEVALUE-FORM").
 o_p_v(sys_devalue_form,package,pkg_sys).
+o_p_v(sys_device, classof, claz_symbol).
+o_p_v(sys_device, name, "DEVICE").
+o_p_v(sys_device, package, pkg_sys).
 o_p_v(sys_df_check_cons,classof,claz_symbol).
 o_p_v(sys_df_check_cons,compile_as,kw_function).
 o_p_v(sys_df_check_cons,function,f_sys_df_check_cons).
@@ -36020,6 +37736,12 @@ o_p_v(sys_df_register_circularity,compile_as,kw_function).
 o_p_v(sys_df_register_circularity,function,f_sys_df_register_circularity).
 o_p_v(sys_df_register_circularity,name,"DF-REGISTER-CIRCULARITY").
 o_p_v(sys_df_register_circularity,package,pkg_sys).
+o_p_v(sys_dfun_info, classof, claz_symbol).
+o_p_v(sys_dfun_info, name, "DFUN-INFO").
+o_p_v(sys_dfun_info, package, pkg_sys).
+o_p_v(sys_dfun_state, classof, claz_symbol).
+o_p_v(sys_dfun_state, name, "DFUN-STATE").
+o_p_v(sys_dfun_state, package, pkg_sys).
 o_p_v(sys_diag,classof,claz_symbol).
 o_p_v(sys_diag,compile_as,kw_function).
 o_p_v(sys_diag,function,f_sys_diag).
@@ -36075,6 +37797,9 @@ o_p_v(sys_direct_subclasses,package,pkg_sys).
 o_p_v(sys_direct_superclasses,classof,claz_symbol).
 o_p_v(sys_direct_superclasses,name,"DIRECT-SUPERCLASSES").
 o_p_v(sys_direct_superclasses,package,pkg_sys).
+o_p_v(sys_direction, classof, claz_symbol).
+o_p_v(sys_direction, name, "DIRECTION").
+o_p_v(sys_direction, package, pkg_sys).
 o_p_v(sys_directory_match_components,classof,claz_symbol).
 o_p_v(sys_directory_match_components,compile_as,kw_function).
 o_p_v(sys_directory_match_components,function,f_sys_directory_match_components).
@@ -36093,6 +37818,9 @@ o_p_v(sys_disable_zip_cache,compile_as,kw_function).
 o_p_v(sys_disable_zip_cache,function,f_sys_disable_zip_cache).
 o_p_v(sys_disable_zip_cache,name,"DISABLE-ZIP-CACHE").
 o_p_v(sys_disable_zip_cache,package,pkg_sys).
+o_p_v(sys_disabled_package_locks, classof, claz_symbol).
+o_p_v(sys_disabled_package_locks, name, "DISABLED-PACKAGE-LOCKS").
+o_p_v(sys_disabled_package_locks, package, pkg_sys).
 o_p_v(sys_disassemble_bytes,classof,claz_symbol).
 o_p_v(sys_disassemble_bytes,compile_as,kw_function).
 o_p_v(sys_disassemble_bytes,function,f_sys_disassemble_bytes).
@@ -36173,6 +37901,12 @@ o_p_v(sys_disassemble_machine_code_7,package,pkg_sys).
 o_p_v(sys_disassemble_machine_code_8,classof,claz_symbol).
 o_p_v(sys_disassemble_machine_code_8,name,"DISASSEMBLE-MACHINE-CODE-8").
 o_p_v(sys_disassemble_machine_code_8,package,pkg_sys).
+o_p_v(sys_disp_char, classof, claz_symbol).
+o_p_v(sys_disp_char, name, "DISP-CHAR").
+o_p_v(sys_disp_char, package, pkg_sys).
+o_p_v(sys_dispatch, classof, claz_symbol).
+o_p_v(sys_dispatch, name, "DISPATCH").
+o_p_v(sys_dispatch, package, pkg_sys).
 o_p_v(sys_dispatch_reader,classof,claz_symbol).
 o_p_v(sys_dispatch_reader,compile_as,kw_function).
 o_p_v(sys_dispatch_reader,function,f_sys_dispatch_reader).
@@ -36485,6 +38219,12 @@ o_p_v(sys_dsd_type,compile_as,kw_function).
 o_p_v(sys_dsd_type,function,f_sys_dsd_type).
 o_p_v(sys_dsd_type,name,"DSD-TYPE").
 o_p_v(sys_dsd_type,package,pkg_sys).
+o_p_v(sys_dual_channel_p, classof, claz_symbol).
+o_p_v(sys_dual_channel_p, name, "DUAL-CHANNEL-P").
+o_p_v(sys_dual_channel_p, package, pkg_sys).
+o_p_v(sys_dubious_asterisks_around_variable_name, classof, claz_symbol).
+o_p_v(sys_dubious_asterisks_around_variable_name, name, "DUBIOUS-ASTERISKS-AROUND-VARIABLE-NAME").
+o_p_v(sys_dubious_asterisks_around_variable_name, package, pkg_sys).
 o_p_v(sys_dummies,classof,claz_symbol).
 o_p_v(sys_dummies,name,"DUMMIES").
 o_p_v(sys_dummies,package,pkg_sys).
@@ -36528,6 +38268,18 @@ o_p_v(sys_dump_vector,compile_as,kw_function).
 o_p_v(sys_dump_vector,function,f_sys_dump_vector).
 o_p_v(sys_dump_vector,name,"DUMP-VECTOR").
 o_p_v(sys_dump_vector,package,pkg_sys).
+o_p_v(sys_duplicate_case_key_warning, classof, claz_symbol).
+o_p_v(sys_duplicate_case_key_warning, name, "DUPLICATE-CASE-KEY-WARNING").
+o_p_v(sys_duplicate_case_key_warning, package, pkg_sys).
+o_p_v(sys_duplicate_case_key_warning_occurrences, classof, claz_symbol).
+o_p_v(sys_duplicate_case_key_warning_occurrences, name, "DUPLICATE-CASE-KEY-WARNING-OCCURRENCES").
+o_p_v(sys_duplicate_case_key_warning_occurrences, package, pkg_sys).
+o_p_v(sys_duplicate_definition, classof, claz_symbol).
+o_p_v(sys_duplicate_definition, name, "DUPLICATE-DEFINITION").
+o_p_v(sys_duplicate_definition, package, pkg_sys).
+o_p_v(sys_duplicate_definition_name, classof, claz_symbol).
+o_p_v(sys_duplicate_definition_name, name, "DUPLICATE-DEFINITION-NAME").
+o_p_v(sys_duplicate_definition_name, package, pkg_sys).
 o_p_v(sys_dynamic_keys,classof,claz_symbol).
 o_p_v(sys_dynamic_keys,name,"DYNAMIC-KEYS").
 o_p_v(sys_dynamic_keys,package,pkg_sys).
@@ -36547,6 +38299,9 @@ o_p_v(sys_echo_stream_p,package,pkg_sys).
 o_p_v(sys_element,classof,claz_symbol).
 o_p_v(sys_element,name,"ELEMENT").
 o_p_v(sys_element,package,pkg_sys).
+o_p_v(sys_element_size, classof, claz_symbol).
+o_p_v(sys_element_size, name, "ELEMENT-SIZE").
+o_p_v(sys_element_size, package, pkg_sys).
 o_p_v(sys_element_type,classof,claz_symbol).
 o_p_v(sys_element_type,name,"ELEMENT-TYPE").
 o_p_v(sys_element_type,package,pkg_sys).
@@ -36576,6 +38331,15 @@ o_p_v(sys_empty_tree_p,compile_as,kw_function).
 o_p_v(sys_empty_tree_p,function,f_sys_empty_tree_p).
 o_p_v(sys_empty_tree_p,name,"EMPTY-TREE-P").
 o_p_v(sys_empty_tree_p,package,pkg_sys).
+o_p_v(sys_encapsulated_condition, classof, claz_symbol).
+o_p_v(sys_encapsulated_condition, name, "ENCAPSULATED-CONDITION").
+o_p_v(sys_encapsulated_condition, package, pkg_sys).
+o_p_v(sys_encapsulation_info, classof, claz_symbol).
+o_p_v(sys_encapsulation_info, name, "ENCAPSULATION-INFO").
+o_p_v(sys_encapsulation_info, package, pkg_sys).
+o_p_v(sys_encapsulations, classof, claz_symbol).
+o_p_v(sys_encapsulations, name, "ENCAPSULATIONS").
+o_p_v(sys_encapsulations, package, pkg_sys).
 o_p_v(sys_enclosing,classof,claz_symbol).
 o_p_v(sys_enclosing,name,"ENCLOSING").
 o_p_v(sys_enclosing,package,pkg_sys).
@@ -36607,6 +38371,9 @@ o_p_v(sys_end_b,package,pkg_sys).
 o_p_v(sys_end_loop,classof,claz_symbol).
 o_p_v(sys_end_loop,name,"END-LOOP").
 o_p_v(sys_end_loop,package,pkg_sys).
+o_p_v(sys_end_of_input_in_character, classof, claz_symbol).
+o_p_v(sys_end_of_input_in_character, name, "END-OF-INPUT-IN-CHARACTER").
+o_p_v(sys_end_of_input_in_character, package, pkg_sys).
 o_p_v(sys_end_test_form,classof,claz_symbol).
 o_p_v(sys_end_test_form,name,"END-TEST-FORM").
 o_p_v(sys_end_test_form,package,pkg_sys).
@@ -36666,6 +38433,12 @@ o_p_v(sys_ensure_rank,compile_as,kw_operator).
 o_p_v(sys_ensure_rank,function,f_sys_ensure_rank).
 o_p_v(sys_ensure_rank,name,"ENSURE-RANK").
 o_p_v(sys_ensure_rank,package,pkg_sys).
+o_p_v(sys_enumerable, classof, claz_symbol).
+o_p_v(sys_enumerable, name, "ENUMERABLE").
+o_p_v(sys_enumerable, package, pkg_sys).
+o_p_v(sys_enumerable_p, classof, claz_symbol).
+o_p_v(sys_enumerable_p, name, "ENUMERABLE-P").
+o_p_v(sys_enumerable_p, package, pkg_sys).
 o_p_v(sys_env,classof,claz_symbol).
 o_p_v(sys_env,compile_as,kw_function).
 o_p_v(sys_env,function,f_sys_env).
@@ -36710,6 +38483,9 @@ o_p_v(sys_environment_variables,compile_as,kw_function).
 o_p_v(sys_environment_variables,function,f_sys_environment_variables).
 o_p_v(sys_environment_variables,name,"ENVIRONMENT-VARIABLES").
 o_p_v(sys_environment_variables,package,pkg_sys).
+o_p_v(sys_eof_forced_p, classof, claz_symbol).
+o_p_v(sys_eof_forced_p, name, "EOF-FORCED-P").
+o_p_v(sys_eof_forced_p, package, pkg_sys).
 o_p_v(sys_eql_c61_eq,classof,claz_symbol).
 o_p_v(sys_eql_c61_eq,compile_as,kw_function).
 o_p_v(sys_eql_c61_eq,function,f_sys_eql_c61_eq).
@@ -36730,6 +38506,9 @@ o_p_v(sys_equal_components_p,compile_as,kw_function).
 o_p_v(sys_equal_components_p,function,f_sys_equal_components_p).
 o_p_v(sys_equal_components_p,name,"EQUAL-COMPONENTS-P").
 o_p_v(sys_equal_components_p,package,pkg_sys).
+o_p_v(sys_equalp_tests, classof, claz_symbol).
+o_p_v(sys_equalp_tests, name, "EQUALP-TESTS").
+o_p_v(sys_equalp_tests, package, pkg_sys).
 o_p_v(sys_error_args,classof,claz_symbol).
 o_p_v(sys_error_args,name,"ERROR-ARGS").
 o_p_v(sys_error_args,package,pkg_sys).
@@ -36752,6 +38531,9 @@ o_p_v(sys_error_of_type,package,pkg_sys).
 o_p_v(sys_error_when_failed_p,classof,claz_symbol).
 o_p_v(sys_error_when_failed_p,name,"ERROR-WHEN-FAILED-P").
 o_p_v(sys_error_when_failed_p,package,pkg_sys).
+o_p_v(sys_escapes, classof, claz_symbol).
+o_p_v(sys_escapes, name, "ESCAPES").
+o_p_v(sys_escapes, package, pkg_sys).
 o_p_v(sys_etypecase_failed,classof,claz_symbol).
 o_p_v(sys_etypecase_failed,compile_as,kw_function).
 o_p_v(sys_etypecase_failed,function,f_sys_etypecase_failed).
@@ -36762,6 +38544,9 @@ o_p_v(sys_eval_at,compile_as,kw_function).
 o_p_v(sys_eval_at,function,f_sys_eval_at).
 o_p_v(sys_eval_at,name,"EVAL-AT").
 o_p_v(sys_eval_at,package,pkg_sys).
+o_p_v(sys_eval_error, classof, claz_symbol).
+o_p_v(sys_eval_error, name, "EVAL-ERROR").
+o_p_v(sys_eval_error, package, pkg_sys).
 o_p_v(sys_eval_frame_p,classof,claz_symbol).
 o_p_v(sys_eval_frame_p,compile_as,kw_function).
 o_p_v(sys_eval_frame_p,function,f_sys_eval_frame_p).
@@ -36806,6 +38591,9 @@ o_p_v(sys_eval_when_compile,package,pkg_sys).
 o_p_v(sys_everytime,classof,claz_symbol).
 o_p_v(sys_everytime,name,"EVERYTIME").
 o_p_v(sys_everytime,package,pkg_sys).
+o_p_v(sys_exact_class_specializer, classof, claz_symbol).
+o_p_v(sys_exact_class_specializer, name, "EXACT-CLASS-SPECIALIZER").
+o_p_v(sys_exact_class_specializer, package, pkg_sys).
 o_p_v(sys_exec_with_keyboard,classof,claz_symbol).
 o_p_v(sys_exec_with_keyboard,compile_as,kw_function).
 o_p_v(sys_exec_with_keyboard,function,f_sys_exec_with_keyboard).
@@ -36970,18 +38758,27 @@ o_p_v(sys_expandable_backq_expression_p,package,pkg_sys).
 o_p_v(sys_expander,classof,claz_symbol).
 o_p_v(sys_expander,name,"EXPANDER").
 o_p_v(sys_expander,package,pkg_sys).
+o_p_v(sys_expanders, classof, claz_symbol).
+o_p_v(sys_expanders, name, "EXPANDERS").
+o_p_v(sys_expanders, package, pkg_sys).
 o_p_v(sys_expansion,classof,claz_symbol).
 o_p_v(sys_expansion,name,"EXPANSION").
 o_p_v(sys_expansion,package,pkg_sys).
 o_p_v(sys_expected_type,classof,claz_symbol).
 o_p_v(sys_expected_type,name,"EXPECTED-TYPE").
 o_p_v(sys_expected_type,package,pkg_sys).
+o_p_v(sys_expire_time, classof, claz_symbol).
+o_p_v(sys_expire_time, name, "EXPIRE-TIME").
+o_p_v(sys_expire_time, package, pkg_sys).
 o_p_v(sys_expression,classof,claz_symbol).
 o_p_v(sys_expression,name,"EXPRESSION").
 o_p_v(sys_expression,package,pkg_sys).
 o_p_v(sys_exps,classof,claz_symbol).
 o_p_v(sys_exps,name,"EXPS").
 o_p_v(sys_exps,package,pkg_sys).
+o_p_v(sys_extension_failure, classof, claz_symbol).
+o_p_v(sys_extension_failure, name, "EXTENSION-FAILURE").
+o_p_v(sys_extension_failure, package, pkg_sys).
 o_p_v(sys_external_format,classof,claz_symbol).
 o_p_v(sys_external_format,name,"EXTERNAL-FORMAT").
 o_p_v(sys_external_format,package,pkg_sys).
@@ -37125,6 +38922,9 @@ o_p_v(sys_fasl_sharp_x,package,pkg_sys).
 o_p_v(sys_fast_function,classof,claz_symbol).
 o_p_v(sys_fast_function,name,"FAST-FUNCTION").
 o_p_v(sys_fast_function,package,pkg_sys).
+o_p_v(sys_fast_instance_boundp, classof, claz_symbol).
+o_p_v(sys_fast_instance_boundp, name, "FAST-INSTANCE-BOUNDP").
+o_p_v(sys_fast_instance_boundp, package, pkg_sys).
 o_p_v(sys_fasthash_stable_p,classof,claz_symbol).
 o_p_v(sys_fasthash_stable_p,compile_as,kw_function).
 o_p_v(sys_fasthash_stable_p,function,f_sys_fasthash_stable_p).
@@ -37143,11 +38943,26 @@ o_p_v(sys_fconst_index,compile_as,kw_function).
 o_p_v(sys_fconst_index,function,f_sys_fconst_index).
 o_p_v(sys_fconst_index,name,"FCONST-INDEX").
 o_p_v(sys_fconst_index,package,pkg_sys).
+o_p_v(sys_fd, classof, claz_symbol).
+o_p_v(sys_fd, name, "FD").
+o_p_v(sys_fd, package, pkg_sys).
+o_p_v(sys_fd_stream, classof, claz_symbol).
+o_p_v(sys_fd_stream, name, "FD-STREAM").
+o_p_v(sys_fd_stream, package, pkg_sys).
+o_p_v(sys_fd_stream_misc_routine, classof, claz_symbol).
+o_p_v(sys_fd_stream_misc_routine, name, "FD-STREAM-MISC-ROUTINE").
+o_p_v(sys_fd_stream_misc_routine, package, pkg_sys).
+o_p_v(sys_fd_type, classof, claz_symbol).
+o_p_v(sys_fd_type, name, "FD-TYPE").
+o_p_v(sys_fd_type, package, pkg_sys).
 o_p_v(sys_fdefinition_block_name,classof,claz_symbol).
 o_p_v(sys_fdefinition_block_name,compile_as,kw_function).
 o_p_v(sys_fdefinition_block_name,function,f_sys_fdefinition_block_name).
 o_p_v(sys_fdefinition_block_name,name,"FDEFINITION-BLOCK-NAME").
 o_p_v(sys_fdefinition_block_name,package,pkg_sys).
+o_p_v(sys_fdefn, classof, claz_symbol).
+o_p_v(sys_fdefn, name, "FDEFN").
+o_p_v(sys_fdefn, package, pkg_sys).
 o_p_v(sys_fdescr_signature,classof,claz_symbol).
 o_p_v(sys_fdescr_signature,compile_as,kw_function).
 o_p_v(sys_fdescr_signature,function,f_sys_fdescr_signature).
@@ -37156,6 +38971,9 @@ o_p_v(sys_fdescr_signature,package,pkg_sys).
 o_p_v(sys_fdigits,classof,claz_symbol).
 o_p_v(sys_fdigits,name,"FDIGITS").
 o_p_v(sys_fdigits,package,pkg_sys).
+o_p_v(sys_fds, classof, claz_symbol).
+o_p_v(sys_fds, name, "FDS").
+o_p_v(sys_fds, package, pkg_sys).
 o_p_v(sys_feature_reader,classof,claz_symbol).
 o_p_v(sys_feature_reader,compile_as,kw_function).
 o_p_v(sys_feature_reader,function,f_sys_feature_reader).
@@ -37182,6 +39000,21 @@ o_p_v(sys_file_stream_p,compile_as,kw_function).
 o_p_v(sys_file_stream_p,function,f_sys_file_stream_p).
 o_p_v(sys_file_stream_p,name,"FILE-STREAM-P").
 o_p_v(sys_file_stream_p,package,pkg_sys).
+o_p_v(sys_fill_pointer_misc, classof, claz_symbol).
+o_p_v(sys_fill_pointer_misc, name, "FILL-POINTER-MISC").
+o_p_v(sys_fill_pointer_misc, package, pkg_sys).
+o_p_v(sys_fill_pointer_ouch, classof, claz_symbol).
+o_p_v(sys_fill_pointer_ouch, name, "FILL-POINTER-OUCH").
+o_p_v(sys_fill_pointer_ouch, package, pkg_sys).
+o_p_v(sys_fill_pointer_output_stream, classof, claz_symbol).
+o_p_v(sys_fill_pointer_output_stream, name, "FILL-POINTER-OUTPUT-STREAM").
+o_p_v(sys_fill_pointer_output_stream, package, pkg_sys).
+o_p_v(sys_fill_pointer_sout, classof, claz_symbol).
+o_p_v(sys_fill_pointer_sout, name, "FILL-POINTER-SOUT").
+o_p_v(sys_fill_pointer_sout, package, pkg_sys).
+o_p_v(sys_fill_ptr, classof, claz_symbol).
+o_p_v(sys_fill_ptr, name, "FILL-PTR").
+o_p_v(sys_fill_ptr, package, pkg_sys).
 o_p_v(sys_fill_stream_flush_buffer,classof,claz_symbol).
 o_p_v(sys_fill_stream_flush_buffer,compile_as,kw_function).
 o_p_v(sys_fill_stream_flush_buffer,function,f_sys_fill_stream_flush_buffer).
@@ -37348,6 +39181,9 @@ o_p_v(sys_find_jar,compile_as,kw_function).
 o_p_v(sys_find_jar,function,f_sys_find_jar).
 o_p_v(sys_find_jar,name,"FIND-JAR").
 o_p_v(sys_find_jar,package,pkg_sys).
+o_p_v(sys_find_method_length_mismatch, classof, claz_symbol).
+o_p_v(sys_find_method_length_mismatch, name, "FIND-METHOD-LENGTH-MISMATCH").
+o_p_v(sys_find_method_length_mismatch, package, pkg_sys).
 o_p_v(sys_find_name_for_implementation_title,classof,claz_symbol).
 o_p_v(sys_find_name_for_implementation_title,compile_as,kw_function).
 o_p_v(sys_find_name_for_implementation_title,function,f_sys_find_name_for_implementation_title).
@@ -37422,11 +39258,17 @@ o_p_v(sys_fixnump,package,pkg_sys).
 o_p_v(sys_flag,classof,claz_symbol).
 o_p_v(sys_flag,name,"FLAG").
 o_p_v(sys_flag,package,pkg_sys).
+o_p_v(sys_flags, classof, claz_symbol).
+o_p_v(sys_flags, name, "FLAGS").
+o_p_v(sys_flags, package, pkg_sys).
 o_p_v(sys_float_denormalized_p,classof,claz_symbol).
 o_p_v(sys_float_denormalized_p,compile_as,kw_function).
 o_p_v(sys_float_denormalized_p,function,f_sys_float_denormalized_p).
 o_p_v(sys_float_denormalized_p,name,"FLOAT-DENORMALIZED-P").
 o_p_v(sys_float_denormalized_p,package,pkg_sys).
+o_p_v(sys_float_format, classof, claz_symbol).
+o_p_v(sys_float_format, name, "FLOAT-FORMAT").
+o_p_v(sys_float_format, package, pkg_sys).
 o_p_v(sys_float_infinity_p,classof,claz_symbol).
 o_p_v(sys_float_infinity_p,compile_as,kw_function).
 o_p_v(sys_float_infinity_p,function,f_sys_float_infinity_p).
@@ -37457,6 +39299,12 @@ o_p_v(sys_float_underflow_mode,compile_as,kw_function).
 o_p_v(sys_float_underflow_mode,function,f_sys_float_underflow_mode).
 o_p_v(sys_float_underflow_mode,name,"FLOAT-UNDERFLOW-MODE").
 o_p_v(sys_float_underflow_mode,package,pkg_sys).
+o_p_v(sys_floating_point_exception, classof, claz_symbol).
+o_p_v(sys_floating_point_exception, name, "FLOATING-POINT-EXCEPTION").
+o_p_v(sys_floating_point_exception, package, pkg_sys).
+o_p_v(sys_floating_point_exception_traps, classof, claz_symbol).
+o_p_v(sys_floating_point_exception_traps, name, "FLOATING-POINT-EXCEPTION-TRAPS").
+o_p_v(sys_floating_point_exception_traps, package, pkg_sys).
 o_p_v(sys_flonum_to_string,classof,claz_symbol).
 o_p_v(sys_flonum_to_string,compile_as,kw_function).
 o_p_v(sys_flonum_to_string,function,f_sys_flonum_to_string).
@@ -37687,11 +39535,23 @@ o_p_v(sys_form_feed_char_code,declared_as,defconstant).
 o_p_v(sys_form_feed_char_code,name,"FORM-FEED-CHAR-CODE").
 o_p_v(sys_form_feed_char_code,package,pkg_sys).
 o_p_v(sys_form_feed_char_code,value,12).
+o_p_v(sys_form_start_byte_pos, classof, claz_symbol).
+o_p_v(sys_form_start_byte_pos, name, "FORM-START-BYTE-POS").
+o_p_v(sys_form_start_byte_pos, package, pkg_sys).
+o_p_v(sys_form_start_char_pos, classof, claz_symbol).
+o_p_v(sys_form_start_char_pos, name, "FORM-START-CHAR-POS").
+o_p_v(sys_form_start_char_pos, package, pkg_sys).
+o_p_v(sys_form_tracking_stream, classof, claz_symbol).
+o_p_v(sys_form_tracking_stream, name, "FORM-TRACKING-STREAM").
+o_p_v(sys_form_tracking_stream, package, pkg_sys).
 o_p_v(sys_format_apply,classof,claz_symbol).
 o_p_v(sys_format_apply,compile_as,kw_function).
 o_p_v(sys_format_apply,function,f_sys_format_apply).
 o_p_v(sys_format_apply,name,"FORMAT-APPLY").
 o_p_v(sys_format_apply,package,pkg_sys).
+o_p_v(sys_format_args_mismatch, classof, claz_symbol).
+o_p_v(sys_format_args_mismatch, name, "FORMAT-ARGS-MISMATCH").
+o_p_v(sys_format_args_mismatch, package, pkg_sys).
 o_p_v(sys_format_arguments,classof,claz_symbol).
 o_p_v(sys_format_arguments,name,"FORMAT-ARGUMENTS").
 o_p_v(sys_format_arguments,package,pkg_sys).
@@ -38017,6 +39877,12 @@ o_p_v(sys_format_tilde,compile_as,kw_function).
 o_p_v(sys_format_tilde,function,f_sys_format_tilde).
 o_p_v(sys_format_tilde,name,"FORMAT-TILDE").
 o_p_v(sys_format_tilde,package,pkg_sys).
+o_p_v(sys_format_too_few_args_warning, classof, claz_symbol).
+o_p_v(sys_format_too_few_args_warning, name, "FORMAT-TOO-FEW-ARGS-WARNING").
+o_p_v(sys_format_too_few_args_warning, package, pkg_sys).
+o_p_v(sys_format_too_many_args_warning, classof, claz_symbol).
+o_p_v(sys_format_too_many_args_warning, name, "FORMAT-TOO-MANY-ARGS-WARNING").
+o_p_v(sys_format_too_many_args_warning, package, pkg_sys).
 o_p_v(sys_format_up_and_out,classof,claz_symbol).
 o_p_v(sys_format_up_and_out,compile_as,kw_function).
 o_p_v(sys_format_up_and_out,function,f_sys_format_up_and_out).
@@ -38219,6 +40085,9 @@ o_p_v(sys_forward_referenced_class,package,pkg_sys).
 o_p_v(sys_found,classof,claz_symbol).
 o_p_v(sys_found,name,"FOUND").
 o_p_v(sys_found,package,pkg_sys).
+o_p_v(sys_fp_zeroes, classof, claz_symbol).
+o_p_v(sys_fp_zeroes, name, "FP-ZEROES").
+o_p_v(sys_fp_zeroes, package, pkg_sys).
 o_p_v(sys_frame_down,classof,claz_symbol).
 o_p_v(sys_frame_down,compile_as,kw_function).
 o_p_v(sys_frame_down,function,f_sys_frame_down).
@@ -38265,12 +40134,18 @@ o_p_v(sys_frame_up_down,compile_as,kw_function).
 o_p_v(sys_frame_up_down,function,f_sys_frame_up_down).
 o_p_v(sys_frame_up_down,name,"FRAME-UP-DOWN").
 o_p_v(sys_frame_up_down,package,pkg_sys).
+o_p_v(sys_free, classof, claz_symbol).
+o_p_v(sys_free, name, "FREE").
+o_p_v(sys_free, package, pkg_sys).
 o_p_v(sys_frob,classof,claz_symbol).
 o_p_v(sys_frob,name,"FROB").
 o_p_v(sys_frob,package,pkg_sys).
 o_p_v(sys_from,classof,claz_symbol).
 o_p_v(sys_from,name,"FROM").
 o_p_v(sys_from,package,pkg_sys).
+o_p_v(sys_from_defclass_p, classof, claz_symbol).
+o_p_v(sys_from_defclass_p, name, "FROM-DEFCLASS-P").
+o_p_v(sys_from_defclass_p, package, pkg_sys).
 o_p_v(sys_from_end,classof,claz_symbol).
 o_p_v(sys_from_end,name,"FROM-END").
 o_p_v(sys_from_end,package,pkg_sys).
@@ -38290,6 +40165,15 @@ o_p_v(sys_fset,compile_as,kw_function).
 o_p_v(sys_fset,function,f_sys_fset).
 o_p_v(sys_fset,name,"FSET").
 o_p_v(sys_fset,package,pkg_sys).
+o_p_v(sys_ftype_proclamation_mismatch, classof, claz_symbol).
+o_p_v(sys_ftype_proclamation_mismatch, name, "FTYPE-PROCLAMATION-MISMATCH").
+o_p_v(sys_ftype_proclamation_mismatch, package, pkg_sys).
+o_p_v(sys_ftype_proclamation_mismatch_error, classof, claz_symbol).
+o_p_v(sys_ftype_proclamation_mismatch_error, name, "FTYPE-PROCLAMATION-MISMATCH-ERROR").
+o_p_v(sys_ftype_proclamation_mismatch_error, package, pkg_sys).
+o_p_v(sys_ftype_proclamation_mismatch_warning, classof, claz_symbol).
+o_p_v(sys_ftype_proclamation_mismatch_warning, name, "FTYPE-PROCLAMATION-MISMATCH-WARNING").
+o_p_v(sys_ftype_proclamation_mismatch_warning, package, pkg_sys).
 o_p_v(sys_ftype_result_type,classof,claz_symbol).
 o_p_v(sys_ftype_result_type,compile_as,kw_function).
 o_p_v(sys_ftype_result_type,function,f_sys_ftype_result_type).
@@ -38301,6 +40185,9 @@ o_p_v(sys_fun,package,pkg_sys).
 o_p_v(sys_fun_name,classof,claz_symbol).
 o_p_v(sys_fun_name,name,"FUN-NAME").
 o_p_v(sys_fun_name,package,pkg_sys).
+o_p_v(sys_fun_type, classof, claz_symbol).
+o_p_v(sys_fun_type, name, "FUN-TYPE").
+o_p_v(sys_fun_type, package, pkg_sys).
 o_p_v(sys_funcall_c38_push,classof,claz_symbol).
 o_p_v(sys_funcall_c38_push,name,"FUNCALL&PUSH").
 o_p_v(sys_funcall_c38_push,package,pkg_sys).
@@ -38312,6 +40199,9 @@ o_p_v(sys_funcall_key,compile_as,kw_function).
 o_p_v(sys_funcall_key,function,f_sys_funcall_key).
 o_p_v(sys_funcall_key,name,"FUNCALL-KEY").
 o_p_v(sys_funcall_key,package,pkg_sys).
+o_p_v(sys_funcallable_structure, classof, claz_symbol).
+o_p_v(sys_funcallable_structure, name, "FUNCALLABLE-STRUCTURE").
+o_p_v(sys_funcallable_structure, package, pkg_sys).
 o_p_v(sys_funcallp,classof,claz_symbol).
 o_p_v(sys_funcallp,name,"FUNCALLP").
 o_p_v(sys_funcallp,package,pkg_sys).
@@ -38394,6 +40284,12 @@ o_p_v(sys_function_reader,compile_as,kw_function).
 o_p_v(sys_function_reader,function,f_sys_function_reader).
 o_p_v(sys_function_reader,name,"FUNCTION-READER").
 o_p_v(sys_function_reader,package,pkg_sys).
+o_p_v(sys_function_redefinition_warning, classof, claz_symbol).
+o_p_v(sys_function_redefinition_warning, name, "FUNCTION-REDEFINITION-WARNING").
+o_p_v(sys_function_redefinition_warning, package, pkg_sys).
+o_p_v(sys_function_redefinition_warning_new_function, classof, claz_symbol).
+o_p_v(sys_function_redefinition_warning_new_function, name, "FUNCTION-REDEFINITION-WARNING-NEW-FUNCTION").
+o_p_v(sys_function_redefinition_warning_new_function, package, pkg_sys).
 o_p_v(sys_function_result_type,classof,claz_symbol).
 o_p_v(sys_function_result_type,compile_as,kw_function).
 o_p_v(sys_function_result_type,function,f_sys_function_result_type).
@@ -38475,6 +40371,15 @@ o_p_v(sys_generic_function_effective_method_function,compile_as,kw_function).
 o_p_v(sys_generic_function_effective_method_function,function,f_sys_generic_function_effective_method_function).
 o_p_v(sys_generic_function_effective_method_function,name,"GENERIC-FUNCTION-EFFECTIVE-METHOD-FUNCTION").
 o_p_v(sys_generic_function_effective_method_function,package,pkg_sys).
+o_p_v(sys_generic_function_encapsulations, classof, claz_symbol).
+o_p_v(sys_generic_function_encapsulations, name, "GENERIC-FUNCTION-ENCAPSULATIONS").
+o_p_v(sys_generic_function_encapsulations, package, pkg_sys).
+o_p_v(sys_generic_function_initial_methods, classof, claz_symbol).
+o_p_v(sys_generic_function_initial_methods, name, "GENERIC-FUNCTION-INITIAL-METHODS").
+o_p_v(sys_generic_function_initial_methods, package, pkg_sys).
+o_p_v(sys_generic_function_lambda_list_error, classof, claz_symbol).
+o_p_v(sys_generic_function_lambda_list_error, name, "GENERIC-FUNCTION-LAMBDA-LIST-ERROR").
+o_p_v(sys_generic_function_lambda_list_error, package, pkg_sys).
 o_p_v(sys_gensym_list,classof,claz_symbol).
 o_p_v(sys_gensym_list,compile_as,kw_function).
 o_p_v(sys_gensym_list,function,f_sys_gensym_list).
@@ -38638,12 +40543,42 @@ o_p_v(sys_getvalue_c38_push,package,pkg_sys).
 o_p_v(sys_gf,classof,claz_symbol).
 o_p_v(sys_gf,name,"GF").
 o_p_v(sys_gf,package,pkg_sys).
+o_p_v(sys_gf_arg_info, classof, claz_symbol).
+o_p_v(sys_gf_arg_info, name, "GF-ARG-INFO").
+o_p_v(sys_gf_arg_info, package, pkg_sys).
+o_p_v(sys_gf_dfun_state, classof, claz_symbol).
+o_p_v(sys_gf_dfun_state, name, "GF-DFUN-STATE").
+o_p_v(sys_gf_dfun_state, package, pkg_sys).
+o_p_v(sys_gf_info_c_a_m_emf_std_p, classof, claz_symbol).
+o_p_v(sys_gf_info_c_a_m_emf_std_p, name, "GF-INFO-C-A-M-EMF-STD-P").
+o_p_v(sys_gf_info_c_a_m_emf_std_p, package, pkg_sys).
+o_p_v(sys_gf_info_fast_mf_p, classof, claz_symbol).
+o_p_v(sys_gf_info_fast_mf_p, name, "GF-INFO-FAST-MF-P").
+o_p_v(sys_gf_info_fast_mf_p, package, pkg_sys).
+o_p_v(sys_gf_info_needs_update, classof, claz_symbol).
+o_p_v(sys_gf_info_needs_update, name, "GF-INFO-NEEDS-UPDATE").
+o_p_v(sys_gf_info_needs_update, package, pkg_sys).
+o_p_v(sys_gf_info_simple_accessor_type, classof, claz_symbol).
+o_p_v(sys_gf_info_simple_accessor_type, name, "GF-INFO-SIMPLE-ACCESSOR-TYPE").
+o_p_v(sys_gf_info_simple_accessor_type, package, pkg_sys).
+o_p_v(sys_gf_info_static_c_a_m_emf, classof, claz_symbol).
+o_p_v(sys_gf_info_static_c_a_m_emf, name, "GF-INFO-STATIC-C-A-M-EMF").
+o_p_v(sys_gf_info_static_c_a_m_emf, package, pkg_sys).
+o_p_v(sys_gf_lock, classof, claz_symbol).
+o_p_v(sys_gf_lock, name, "GF-LOCK").
+o_p_v(sys_gf_lock, package, pkg_sys).
 o_p_v(sys_gf_p,classof,claz_symbol).
 o_p_v(sys_gf_p,name,"GF-P").
 o_p_v(sys_gf_p,package,pkg_sys).
+o_p_v(sys_gf_precompute_dfun_and_emf_p, classof, claz_symbol).
+o_p_v(sys_gf_precompute_dfun_and_emf_p, name, "GF-PRECOMPUTE-DFUN-AND-EMF-P").
+o_p_v(sys_gf_precompute_dfun_and_emf_p, package, pkg_sys).
 o_p_v(sys_global,classof,claz_symbol).
 o_p_v(sys_global,name,"GLOBAL").
 o_p_v(sys_global,package,pkg_sys).
+o_p_v(sys_global_boundp_method, classof, claz_symbol).
+o_p_v(sys_global_boundp_method, name, "GLOBAL-BOUNDP-METHOD").
+o_p_v(sys_global_boundp_method, package, pkg_sys).
 o_p_v(sys_global_handler,classof,claz_symbol).
 o_p_v(sys_global_handler,compile_as,kw_function).
 o_p_v(sys_global_handler,function,f_sys_global_handler).
@@ -38666,6 +40601,9 @@ o_p_v(sys_global_in_fenv_p,compile_as,kw_function).
 o_p_v(sys_global_in_fenv_p,function,f_sys_global_in_fenv_p).
 o_p_v(sys_global_in_fenv_p,name,"GLOBAL-IN-FENV-P").
 o_p_v(sys_global_in_fenv_p,package,pkg_sys).
+o_p_v(sys_global_reader_method, classof, claz_symbol).
+o_p_v(sys_global_reader_method, name, "GLOBAL-READER-METHOD").
+o_p_v(sys_global_reader_method, package, pkg_sys).
 o_p_v(sys_global_symbol_macro_definition,classof,claz_symbol).
 o_p_v(sys_global_symbol_macro_definition,compile_as,kw_function).
 o_p_v(sys_global_symbol_macro_definition,function,f_sys_global_symbol_macro_definition).
@@ -38676,6 +40614,9 @@ o_p_v(sys_global_symbol_macro_p,compile_as,kw_function).
 o_p_v(sys_global_symbol_macro_p,function,f_sys_global_symbol_macro_p).
 o_p_v(sys_global_symbol_macro_p,name,"GLOBAL-SYMBOL-MACRO-P").
 o_p_v(sys_global_symbol_macro_p,package,pkg_sys).
+o_p_v(sys_global_writer_method, classof, claz_symbol).
+o_p_v(sys_global_writer_method, name, "GLOBAL-WRITER-METHOD").
+o_p_v(sys_global_writer_method, package, pkg_sys).
 o_p_v(sys_gnuval,classof,claz_symbol).
 o_p_v(sys_gnuval,name,"GNUVAL").
 o_p_v(sys_gnuval,package,pkg_sys).
@@ -38695,6 +40636,15 @@ o_p_v(sys_grovel_java_definitions_in_file,compile_as,kw_function).
 o_p_v(sys_grovel_java_definitions_in_file,function,f_sys_grovel_java_definitions_in_file).
 o_p_v(sys_grovel_java_definitions_in_file,name,"GROVEL-JAVA-DEFINITIONS-IN-FILE").
 o_p_v(sys_grovel_java_definitions_in_file,package,pkg_sys).
+o_p_v(sys_hairy, classof, claz_symbol).
+o_p_v(sys_hairy, name, "HAIRY").
+o_p_v(sys_hairy, package, pkg_sys).
+o_p_v(sys_hairy_slots, classof, claz_symbol).
+o_p_v(sys_hairy_slots, name, "HAIRY-SLOTS").
+o_p_v(sys_hairy_slots, package, pkg_sys).
+o_p_v(sys_hairy_type, classof, claz_symbol).
+o_p_v(sys_hairy_type, name, "HAIRY-TYPE").
+o_p_v(sys_hairy_type, package, pkg_sys).
 o_p_v(sys_handle,classof,claz_symbol).
 o_p_v(sys_handle,name,"HANDLE").
 o_p_v(sys_handle,package,pkg_sys).
@@ -38703,6 +40653,9 @@ o_p_v(sys_handle_circularity,compile_as,kw_function).
 o_p_v(sys_handle_circularity,function,f_sys_handle_circularity).
 o_p_v(sys_handle_circularity,name,"HANDLE-CIRCULARITY").
 o_p_v(sys_handle_circularity,package,pkg_sys).
+o_p_v(sys_handled_conditions, classof, claz_symbol).
+o_p_v(sys_handled_conditions, name, "HANDLED-CONDITIONS").
+o_p_v(sys_handled_conditions, package, pkg_sys).
 o_p_v(sys_handler,classof,claz_symbol).
 o_p_v(sys_handler,name,"HANDLER").
 o_p_v(sys_handler,package,pkg_sys).
@@ -38718,6 +40671,9 @@ o_p_v(sys_handler_open,package,pkg_sys).
 o_p_v(sys_hash,classof,claz_symbol).
 o_p_v(sys_hash,name,"HASH").
 o_p_v(sys_hash,package,pkg_sys).
+o_p_v(sys_hash_code, classof, claz_symbol).
+o_p_v(sys_hash_code, name, "HASH-CODE").
+o_p_v(sys_hash_code, package, pkg_sys).
 o_p_v(sys_hash_key,classof,claz_symbol).
 o_p_v(sys_hash_key,name,"HASH-KEY").
 o_p_v(sys_hash_key,package,pkg_sys).
@@ -38761,6 +40717,9 @@ o_p_v(sys_hashtable,package,pkg_sys).
 o_p_v(sys_head,classof,claz_symbol).
 o_p_v(sys_head,name,"HEAD").
 o_p_v(sys_head,package,pkg_sys).
+o_p_v(sys_heap_exhausted_error, classof, claz_symbol).
+o_p_v(sys_heap_exhausted_error, name, "HEAP-EXHAUSTED-ERROR").
+o_p_v(sys_heap_exhausted_error, package, pkg_sys).
 o_p_v(sys_heap_statistics,classof,claz_symbol).
 o_p_v(sys_heap_statistics,compile_as,kw_function).
 o_p_v(sys_heap_statistics,function,f_sys_heap_statistics).
@@ -38786,6 +40745,15 @@ o_p_v(sys_hexadecimal_reader,compile_as,kw_function).
 o_p_v(sys_hexadecimal_reader,function,f_sys_hexadecimal_reader).
 o_p_v(sys_hexadecimal_reader,name,"HEXADECIMAL-READER").
 o_p_v(sys_hexadecimal_reader,package,pkg_sys).
+o_p_v(sys_hierarchical_intersection2, classof, claz_symbol).
+o_p_v(sys_hierarchical_intersection2, name, "HIERARCHICAL-INTERSECTION2").
+o_p_v(sys_hierarchical_intersection2, package, pkg_sys).
+o_p_v(sys_hierarchical_union2, classof, claz_symbol).
+o_p_v(sys_hierarchical_union2, name, "HIERARCHICAL-UNION2").
+o_p_v(sys_hierarchical_union2, package, pkg_sys).
+o_p_v(sys_high, classof, claz_symbol).
+o_p_v(sys_high, name, "HIGH").
+o_p_v(sys_high, package, pkg_sys).
 o_p_v(sys_hook,classof,claz_symbol).
 o_p_v(sys_hook,name,"HOOK").
 o_p_v(sys_hook,package,pkg_sys).
@@ -38942,6 +40910,12 @@ o_p_v(sys_http_error_8,package,pkg_sys).
 o_p_v(sys_http_error_9,classof,claz_symbol).
 o_p_v(sys_http_error_9,name,"HTTP-ERROR-9").
 o_p_v(sys_http_error_9,package,pkg_sys).
+o_p_v(sys_huffman_node, classof, claz_symbol).
+o_p_v(sys_huffman_node, name, "HUFFMAN-NODE").
+o_p_v(sys_huffman_node, package, pkg_sys).
+o_p_v(sys_huffman_pair, classof, claz_symbol).
+o_p_v(sys_huffman_pair, name, "HUFFMAN-PAIR").
+o_p_v(sys_huffman_pair, package, pkg_sys).
 o_p_v(sys_i,classof,claz_symbol).
 o_p_v(sys_i,name,"I").
 o_p_v(sys_i,package,pkg_sys).
@@ -38951,6 +40925,9 @@ o_p_v(sys_i1,package,pkg_sys).
 o_p_v(sys_i2,classof,claz_symbol).
 o_p_v(sys_i2,name,"I2").
 o_p_v(sys_i2,package,pkg_sys).
+o_p_v(sys_ibuf, classof, claz_symbol).
+o_p_v(sys_ibuf, name, "IBUF").
+o_p_v(sys_ibuf, package, pkg_sys).
 o_p_v(sys_id,classof,claz_symbol).
 o_p_v(sys_id,name,"ID").
 o_p_v(sys_id,package,pkg_sys).
@@ -38965,6 +40942,9 @@ o_p_v(sys_identity_hash_code,compile_as,kw_function).
 o_p_v(sys_identity_hash_code,function,f_sys_identity_hash_code).
 o_p_v(sys_identity_hash_code,name,"IDENTITY-HASH-CODE").
 o_p_v(sys_identity_hash_code,package,pkg_sys).
+o_p_v(sys_identity_with_one_argument, classof, claz_symbol).
+o_p_v(sys_identity_with_one_argument, name, "IDENTITY-WITH-ONE-ARGUMENT").
+o_p_v(sys_identity_with_one_argument, package, pkg_sys).
 o_p_v(sys_if_list_delete,classof,claz_symbol).
 o_p_v(sys_if_list_delete,compile_as,kw_function).
 o_p_v(sys_if_list_delete,function,f_sys_if_list_delete).
@@ -39064,6 +41044,18 @@ o_p_v(sys_ignore_check,package,pkg_sys).
 o_p_v(sys_ignored,classof,claz_symbol).
 o_p_v(sys_ignored,name,"IGNORED").
 o_p_v(sys_ignored,package,pkg_sys).
+o_p_v(sys_ill_bin, classof, claz_symbol).
+o_p_v(sys_ill_bin, name, "ILL-BIN").
+o_p_v(sys_ill_bin, package, pkg_sys).
+o_p_v(sys_ill_bout, classof, claz_symbol).
+o_p_v(sys_ill_bout, name, "ILL-BOUT").
+o_p_v(sys_ill_bout, package, pkg_sys).
+o_p_v(sys_ill_in, classof, claz_symbol).
+o_p_v(sys_ill_in, name, "ILL-IN").
+o_p_v(sys_ill_in, package, pkg_sys).
+o_p_v(sys_ill_out, classof, claz_symbol).
+o_p_v(sys_ill_out, name, "ILL-OUT").
+o_p_v(sys_ill_out, package, pkg_sys).
 o_p_v(sys_illegal_args,classof,claz_symbol).
 o_p_v(sys_illegal_args,name,"ILLEGAL-ARGS").
 o_p_v(sys_illegal_args,package,pkg_sys).
@@ -39086,6 +41078,9 @@ o_p_v(sys_imports,package,pkg_sys).
 o_p_v(sys_in,classof,claz_symbol).
 o_p_v(sys_in,name,"IN").
 o_p_v(sys_in,package,pkg_sys).
+o_p_v(sys_in_buffer, classof, claz_symbol).
+o_p_v(sys_in_buffer, name, "IN-BUFFER").
+o_p_v(sys_in_buffer, package, pkg_sys).
 o_p_v(sys_in_defun,classof,claz_symbol).
 o_p_v(sys_in_defun,name,"IN-DEFUN").
 o_p_v(sys_in_defun,package,pkg_sys).
@@ -39094,6 +41089,9 @@ o_p_v(sys_in_defun_p,compile_as,kw_function).
 o_p_v(sys_in_defun_p,function,f_sys_in_defun_p).
 o_p_v(sys_in_defun_p,name,"IN-DEFUN-P").
 o_p_v(sys_in_defun_p,package,pkg_sys).
+o_p_v(sys_in_index, classof, claz_symbol).
+o_p_v(sys_in_index, name, "IN-INDEX").
+o_p_v(sys_in_index, package, pkg_sys).
 o_p_v(sys_in_interval_p,classof,claz_symbol).
 o_p_v(sys_in_interval_p,compile_as,kw_function).
 o_p_v(sys_in_interval_p,function,f_sys_in_interval_p).
@@ -39110,6 +41108,9 @@ o_p_v(sys_include,package,pkg_sys).
 o_p_v(sys_include_skip,classof,claz_symbol).
 o_p_v(sys_include_skip,name,"INCLUDE-SKIP").
 o_p_v(sys_include_skip,package,pkg_sys).
+o_p_v(sys_incompatible_superclass_list, classof, claz_symbol).
+o_p_v(sys_incompatible_superclass_list, name, "INCOMPATIBLE-SUPERCLASS-LIST").
+o_p_v(sys_incompatible_superclass_list, package, pkg_sys).
 o_p_v(sys_incrementer,classof,claz_symbol).
 o_p_v(sys_incrementer,name,"INCREMENTER").
 o_p_v(sys_incrementer,package,pkg_sys).
@@ -39132,15 +41133,33 @@ o_p_v(sys_indent_var,package,pkg_sys).
 o_p_v(sys_index,classof,claz_symbol).
 o_p_v(sys_index,name,"INDEX").
 o_p_v(sys_index,package,pkg_sys).
+o_p_v(sys_index_cache, classof, claz_symbol).
+o_p_v(sys_index_cache, name, "INDEX-CACHE").
+o_p_v(sys_index_cache, package, pkg_sys).
+o_p_v(sys_index_or_minus_1, classof, claz_symbol).
+o_p_v(sys_index_or_minus_1, name, "INDEX-OR-MINUS-1").
+o_p_v(sys_index_or_minus_1, package, pkg_sys).
+o_p_v(sys_index_too_large_error, classof, claz_symbol).
+o_p_v(sys_index_too_large_error, name, "INDEX-TOO-LARGE-ERROR").
+o_p_v(sys_index_too_large_error, package, pkg_sys).
 o_p_v(sys_indicator,classof,claz_symbol).
 o_p_v(sys_indicator,name,"INDICATOR").
 o_p_v(sys_indicator,package,pkg_sys).
 o_p_v(sys_info,classof,claz_symbol).
 o_p_v(sys_info,name,"INFO").
 o_p_v(sys_info,package,pkg_sys).
+o_p_v(sys_info_needs_update, classof, claz_symbol).
+o_p_v(sys_info_needs_update, name, "INFO-NEEDS-UPDATE").
+o_p_v(sys_info_needs_update, package, pkg_sys).
+o_p_v(sys_inherited_accessor_alist, classof, claz_symbol).
+o_p_v(sys_inherited_accessor_alist, name, "INHERITED-ACCESSOR-ALIST").
+o_p_v(sys_inherited_accessor_alist, package, pkg_sys).
 o_p_v(sys_inherited_accessors,classof,claz_symbol).
 o_p_v(sys_inherited_accessors,name,"INHERITED-ACCESSORS").
 o_p_v(sys_inherited_accessors,package,pkg_sys).
+o_p_v(sys_inherits, classof, claz_symbol).
+o_p_v(sys_inherits, name, "INHERITS").
+o_p_v(sys_inherits, package, pkg_sys).
 o_p_v(sys_init_fasl,classof,claz_symbol).
 o_p_v(sys_init_fasl,compile_as,kw_function).
 o_p_v(sys_init_fasl,function,f_sys_init_fasl).
@@ -39149,12 +41168,30 @@ o_p_v(sys_init_fasl,package,pkg_sys).
 o_p_v(sys_init_form,classof,claz_symbol).
 o_p_v(sys_init_form,name,"INIT-FORM").
 o_p_v(sys_init_form,package,pkg_sys).
+o_p_v(sys_init_random_state, classof, claz_symbol).
+o_p_v(sys_init_random_state, name, "INIT-RANDOM-STATE").
+o_p_v(sys_init_random_state, package, pkg_sys).
+o_p_v(sys_initarg, classof, claz_symbol).
+o_p_v(sys_initarg, name, "INITARG").
+o_p_v(sys_initarg, package, pkg_sys).
+o_p_v(sys_initarg_error, classof, claz_symbol).
+o_p_v(sys_initarg_error, name, "INITARG-ERROR").
+o_p_v(sys_initarg_error, package, pkg_sys).
+o_p_v(sys_initarg_error_class, classof, claz_symbol).
+o_p_v(sys_initarg_error_class, name, "INITARG-ERROR-CLASS").
+o_p_v(sys_initarg_error_class, package, pkg_sys).
+o_p_v(sys_initarg_error_initargs, classof, claz_symbol).
+o_p_v(sys_initarg_error_initargs, name, "INITARG-ERROR-INITARGS").
+o_p_v(sys_initarg_error_initargs, package, pkg_sys).
 o_p_v(sys_initargs,classof,claz_symbol).
 o_p_v(sys_initargs,name,"INITARGS").
 o_p_v(sys_initargs,package,pkg_sys).
 o_p_v(sys_initform,classof,claz_symbol).
 o_p_v(sys_initform,name,"INITFORM").
 o_p_v(sys_initform,package,pkg_sys).
+o_p_v(sys_initform_p, classof, claz_symbol).
+o_p_v(sys_initform_p, name, "INITFORM-P").
+o_p_v(sys_initform_p, package, pkg_sys).
 o_p_v(sys_initfunction,classof,claz_symbol).
 o_p_v(sys_initfunction,name,"INITFUNCTION").
 o_p_v(sys_initfunction,package,pkg_sys).
@@ -39181,6 +41218,9 @@ o_p_v(sys_initial_methods,package,pkg_sys).
 o_p_v(sys_initial_offset,classof,claz_symbol).
 o_p_v(sys_initial_offset,name,"INITIAL-OFFSET").
 o_p_v(sys_initial_offset,package,pkg_sys).
+o_p_v(sys_initial_string, classof, claz_symbol).
+o_p_v(sys_initial_string, name, "INITIAL-STRING").
+o_p_v(sys_initial_string, package, pkg_sys).
 o_p_v(sys_initial_value,classof,claz_symbol).
 o_p_v(sys_initial_value,name,"INITIAL-VALUE").
 o_p_v(sys_initial_value,package,pkg_sys).
@@ -39233,6 +41273,12 @@ o_p_v(sys_inline_p,package,pkg_sys).
 o_p_v(sys_inlining,classof,claz_symbol).
 o_p_v(sys_inlining,name,"INLINING").
 o_p_v(sys_inlining,package,pkg_sys).
+o_p_v(sys_input, classof, claz_symbol).
+o_p_v(sys_input, name, "INPUT").
+o_p_v(sys_input, package, pkg_sys).
+o_p_v(sys_input_char_pos, classof, claz_symbol).
+o_p_v(sys_input_char_pos, name, "INPUT-CHAR-POS").
+o_p_v(sys_input_char_pos, package, pkg_sys).
 o_p_v(sys_input_character,classof,claz_symbol).
 o_p_v(sys_input_character,name,"INPUT-CHARACTER").
 o_p_v(sys_input_character,package,pkg_sys).
@@ -39261,6 +41307,9 @@ o_p_v(sys_input_character_p,compile_as,kw_function).
 o_p_v(sys_input_character_p,function,f_sys_input_character_p).
 o_p_v(sys_input_character_p,name,"INPUT-CHARACTER-P").
 o_p_v(sys_input_character_p,package,pkg_sys).
+o_p_v(sys_input_stream, classof, claz_symbol).
+o_p_v(sys_input_stream, name, "INPUT-STREAM").
+o_p_v(sys_input_stream, package, pkg_sys).
 o_p_v(sys_insert_combined_laps,classof,claz_symbol).
 o_p_v(sys_insert_combined_laps,compile_as,kw_function).
 o_p_v(sys_insert_combined_laps,function,f_sys_insert_combined_laps).
@@ -39406,6 +41455,18 @@ o_p_v(sys_install_toplevel_handler,package,pkg_sys).
 o_p_v(sys_instance,classof,claz_symbol).
 o_p_v(sys_instance,name,"INSTANCE").
 o_p_v(sys_instance,package,pkg_sys).
+o_p_v(sys_instance_structure_protocol_error, classof, claz_symbol).
+o_p_v(sys_instance_structure_protocol_error, name, "INSTANCE-STRUCTURE-PROTOCOL-ERROR").
+o_p_v(sys_instance_structure_protocol_error, package, pkg_sys).
+o_p_v(sys_instance_structure_protocol_error_fun, classof, claz_symbol).
+o_p_v(sys_instance_structure_protocol_error_fun, name, "INSTANCE-STRUCTURE-PROTOCOL-ERROR-FUN").
+o_p_v(sys_instance_structure_protocol_error_fun, package, pkg_sys).
+o_p_v(sys_instance_structure_protocol_error_slotd, classof, claz_symbol).
+o_p_v(sys_instance_structure_protocol_error_slotd, name, "INSTANCE-STRUCTURE-PROTOCOL-ERROR-SLOTD").
+o_p_v(sys_instance_structure_protocol_error_slotd, package, pkg_sys).
+o_p_v(sys_instead, classof, claz_symbol).
+o_p_v(sys_instead, name, "INSTEAD").
+o_p_v(sys_instead, package, pkg_sys).
 o_p_v(sys_instruction,classof,claz_symbol).
 o_p_v(sys_instruction,name,"INSTRUCTION").
 o_p_v(sys_instruction,package,pkg_sys).
@@ -39459,11 +41520,17 @@ o_p_v(sys_interactive_eval,package,pkg_sys).
 o_p_v(sys_interactive_function,classof,claz_symbol).
 o_p_v(sys_interactive_function,name,"INTERACTIVE-FUNCTION").
 o_p_v(sys_interactive_function,package,pkg_sys).
+o_p_v(sys_interactive_interrupt, classof, claz_symbol).
+o_p_v(sys_interactive_interrupt, name, "INTERACTIVE-INTERRUPT").
+o_p_v(sys_interactive_interrupt, package, pkg_sys).
 o_p_v(sys_interactive_restart_arguments,classof,claz_symbol).
 o_p_v(sys_interactive_restart_arguments,compile_as,kw_function).
 o_p_v(sys_interactive_restart_arguments,function,f_sys_interactive_restart_arguments).
 o_p_v(sys_interactive_restart_arguments,name,"INTERACTIVE-RESTART-ARGUMENTS").
 o_p_v(sys_interactive_restart_arguments,package,pkg_sys).
+o_p_v(sys_interactive_thread, classof, claz_symbol).
+o_p_v(sys_interactive_thread, name, "INTERACTIVE-THREAD").
+o_p_v(sys_interactive_thread, package, pkg_sys).
 o_p_v(sys_intern_export,classof,claz_symbol).
 o_p_v(sys_intern_export,compile_as,kw_function).
 o_p_v(sys_intern_export,function,f_sys_intern_export).
@@ -39479,6 +41546,9 @@ o_p_v(sys_internal_debug,compile_as,kw_function).
 o_p_v(sys_internal_debug,function,f_sys_internal_debug).
 o_p_v(sys_internal_debug,name,"INTERNAL-DEBUG").
 o_p_v(sys_internal_debug,package,pkg_sys).
+o_p_v(sys_internal_reader_function, classof, claz_symbol).
+o_p_v(sys_internal_reader_function, name, "INTERNAL-READER-FUNCTION").
+o_p_v(sys_internal_reader_function, package, pkg_sys).
 o_p_v(sys_internal_symbol,classof,claz_symbol).
 o_p_v(sys_internal_symbol,name,"INTERNAL-SYMBOL").
 o_p_v(sys_internal_symbol,package,pkg_sys).
@@ -39494,9 +41564,24 @@ o_p_v(sys_internal_weak_hashed_alist,package,pkg_sys).
 o_p_v(sys_internal_weak_list,classof,claz_symbol).
 o_p_v(sys_internal_weak_list,name,"INTERNAL-WEAK-LIST").
 o_p_v(sys_internal_weak_list,package,pkg_sys).
+o_p_v(sys_internal_writer_function, classof, claz_symbol).
+o_p_v(sys_internal_writer_function, name, "INTERNAL-WRITER-FUNCTION").
+o_p_v(sys_internal_writer_function, package, pkg_sys).
+o_p_v(sys_interpreted_program_error, classof, claz_symbol).
+o_p_v(sys_interpreted_program_error, name, "INTERPRETED-PROGRAM-ERROR").
+o_p_v(sys_interpreted_program_error, package, pkg_sys).
+o_p_v(sys_interpreter_environment_too_complex_error, classof, claz_symbol).
+o_p_v(sys_interpreter_environment_too_complex_error, name, "INTERPRETER-ENVIRONMENT-TOO-COMPLEX-ERROR").
+o_p_v(sys_interpreter_environment_too_complex_error, package, pkg_sys).
 o_p_v(sys_interrupt_condition,classof,claz_symbol).
 o_p_v(sys_interrupt_condition,name,"INTERRUPT-CONDITION").
 o_p_v(sys_interrupt_condition,package,pkg_sys).
+o_p_v(sys_interrupt_function, classof, claz_symbol).
+o_p_v(sys_interrupt_function, name, "INTERRUPT-FUNCTION").
+o_p_v(sys_interrupt_function, package, pkg_sys).
+o_p_v(sys_intersection_type, classof, claz_symbol).
+o_p_v(sys_intersection_type, name, "INTERSECTION-TYPE").
+o_p_v(sys_intersection_type, package, pkg_sys).
 o_p_v(sys_interval,classof,claz_symbol).
 o_p_v(sys_interval,name,"INTERVAL").
 o_p_v(sys_interval,package,pkg_sys).
@@ -39577,6 +41662,63 @@ o_p_v(sys_intervals_union,package,pkg_sys).
 o_p_v(sys_into,classof,claz_symbol).
 o_p_v(sys_into,name,"INTO").
 o_p_v(sys_into,package,pkg_sys).
+o_p_v(sys_invalid, classof, claz_symbol).
+o_p_v(sys_invalid, name, "INVALID").
+o_p_v(sys_invalid, package, pkg_sys).
+o_p_v(sys_invalid_array_error, classof, claz_symbol).
+o_p_v(sys_invalid_array_error, name, "INVALID-ARRAY-ERROR").
+o_p_v(sys_invalid_array_error, package, pkg_sys).
+o_p_v(sys_invalid_array_index_error, classof, claz_symbol).
+o_p_v(sys_invalid_array_index_error, name, "INVALID-ARRAY-INDEX-ERROR").
+o_p_v(sys_invalid_array_index_error, package, pkg_sys).
+o_p_v(sys_invalid_array_index_error_array, classof, claz_symbol).
+o_p_v(sys_invalid_array_index_error_array, name, "INVALID-ARRAY-INDEX-ERROR-ARRAY").
+o_p_v(sys_invalid_array_index_error_array, package, pkg_sys).
+o_p_v(sys_invalid_array_index_error_axis, classof, claz_symbol).
+o_p_v(sys_invalid_array_index_error_axis, name, "INVALID-ARRAY-INDEX-ERROR-AXIS").
+o_p_v(sys_invalid_array_index_error_axis, package, pkg_sys).
+o_p_v(sys_invalid_euc_jp_continuation_byte, classof, claz_symbol).
+o_p_v(sys_invalid_euc_jp_continuation_byte, name, "INVALID-EUC-JP-CONTINUATION-BYTE").
+o_p_v(sys_invalid_euc_jp_continuation_byte, package, pkg_sys).
+o_p_v(sys_invalid_euc_jp_starter_byte, classof, claz_symbol).
+o_p_v(sys_invalid_euc_jp_starter_byte, name, "INVALID-EUC-JP-STARTER-BYTE").
+o_p_v(sys_invalid_euc_jp_starter_byte, package, pkg_sys).
+o_p_v(sys_invalid_fasl_expected, classof, claz_symbol).
+o_p_v(sys_invalid_fasl_expected, name, "INVALID-FASL-EXPECTED").
+o_p_v(sys_invalid_fasl_expected, package, pkg_sys).
+o_p_v(sys_invalid_gbk_continuation_byte, classof, claz_symbol).
+o_p_v(sys_invalid_gbk_continuation_byte, name, "INVALID-GBK-CONTINUATION-BYTE").
+o_p_v(sys_invalid_gbk_continuation_byte, package, pkg_sys).
+o_p_v(sys_invalid_gbk_starter_byte, classof, claz_symbol).
+o_p_v(sys_invalid_gbk_starter_byte, name, "INVALID-GBK-STARTER-BYTE").
+o_p_v(sys_invalid_gbk_starter_byte, package, pkg_sys).
+o_p_v(sys_invalid_method_initarg, classof, claz_symbol).
+o_p_v(sys_invalid_method_initarg, name, "INVALID-METHOD-INITARG").
+o_p_v(sys_invalid_method_initarg, package, pkg_sys).
+o_p_v(sys_invalid_method_initarg_method, classof, claz_symbol).
+o_p_v(sys_invalid_method_initarg_method, name, "INVALID-METHOD-INITARG-METHOD").
+o_p_v(sys_invalid_method_initarg_method, package, pkg_sys).
+o_p_v(sys_invalid_shift_jis_continuation_byte, classof, claz_symbol).
+o_p_v(sys_invalid_shift_jis_continuation_byte, name, "INVALID-SHIFT_JIS-CONTINUATION-BYTE").
+o_p_v(sys_invalid_shift_jis_continuation_byte, package, pkg_sys).
+o_p_v(sys_invalid_shift_jis_starter_byte, classof, claz_symbol).
+o_p_v(sys_invalid_shift_jis_starter_byte, name, "INVALID-SHIFT_JIS-STARTER-BYTE").
+o_p_v(sys_invalid_shift_jis_starter_byte, package, pkg_sys).
+o_p_v(sys_invalid_superclass, classof, claz_symbol).
+o_p_v(sys_invalid_superclass, name, "INVALID-SUPERCLASS").
+o_p_v(sys_invalid_superclass, package, pkg_sys).
+o_p_v(sys_invalid_superclass_class, classof, claz_symbol).
+o_p_v(sys_invalid_superclass_class, name, "INVALID-SUPERCLASS-CLASS").
+o_p_v(sys_invalid_superclass_class, package, pkg_sys).
+o_p_v(sys_invalid_superclass_superclass, classof, claz_symbol).
+o_p_v(sys_invalid_superclass_superclass, name, "INVALID-SUPERCLASS-SUPERCLASS").
+o_p_v(sys_invalid_superclass_superclass, package, pkg_sys).
+o_p_v(sys_invalid_utf8_continuation_byte, classof, claz_symbol).
+o_p_v(sys_invalid_utf8_continuation_byte, name, "INVALID-UTF8-CONTINUATION-BYTE").
+o_p_v(sys_invalid_utf8_continuation_byte, package, pkg_sys).
+o_p_v(sys_invalid_utf8_starter_byte, classof, claz_symbol).
+o_p_v(sys_invalid_utf8_starter_byte, name, "INVALID-UTF8-STARTER-BYTE").
+o_p_v(sys_invalid_utf8_starter_byte, package, pkg_sys).
 o_p_v(sys_inverse,classof,claz_symbol).
 o_p_v(sys_inverse,name,"INVERSE").
 o_p_v(sys_inverse,package,pkg_sys).
@@ -39601,6 +41743,12 @@ o_p_v(sys_invoke_restart_condition_if_exists,package,pkg_sys).
 o_p_v(sys_invoke_tag,classof,claz_symbol).
 o_p_v(sys_invoke_tag,name,"INVOKE-TAG").
 o_p_v(sys_invoke_tag,package,pkg_sys).
+o_p_v(sys_io_timeout, classof, claz_symbol).
+o_p_v(sys_io_timeout, name, "IO-TIMEOUT").
+o_p_v(sys_io_timeout, package, pkg_sys).
+o_p_v(sys_io_timeout_direction, classof, claz_symbol).
+o_p_v(sys_io_timeout_direction, name, "IO-TIMEOUT-DIRECTION").
+o_p_v(sys_io_timeout_direction, package, pkg_sys).
 o_p_v(sys_istep,classof,claz_symbol).
 o_p_v(sys_istep,compile_as,kw_function).
 o_p_v(sys_istep,function,f_sys_istep).
@@ -39729,6 +41877,9 @@ o_p_v(sys_keep_alive,package,pkg_sys).
 o_p_v(sys_key,classof,claz_symbol).
 o_p_v(sys_key,name,"KEY").
 o_p_v(sys_key,package,pkg_sys).
+o_p_v(sys_key_info, classof, claz_symbol).
+o_p_v(sys_key_info, name, "KEY-INFO").
+o_p_v(sys_key_info, package, pkg_sys).
 o_p_v(sys_key_list,classof,claz_symbol).
 o_p_v(sys_key_list,name,"KEY-LIST").
 o_p_v(sys_key_list,package,pkg_sys).
@@ -39738,9 +41889,15 @@ o_p_v(sys_keyclauselist,package,pkg_sys).
 o_p_v(sys_keyform,classof,claz_symbol).
 o_p_v(sys_keyform,name,"KEYFORM").
 o_p_v(sys_keyform,package,pkg_sys).
+o_p_v(sys_keyfun, classof, claz_symbol).
+o_p_v(sys_keyfun, name, "KEYFUN").
+o_p_v(sys_keyfun, package, pkg_sys).
 o_p_v(sys_keylist,classof,claz_symbol).
 o_p_v(sys_keylist,name,"KEYLIST").
 o_p_v(sys_keylist,package,pkg_sys).
+o_p_v(sys_keyp, classof, claz_symbol).
+o_p_v(sys_keyp, name, "KEYP").
+o_p_v(sys_keyp, package, pkg_sys).
 o_p_v(sys_keyplace,classof,claz_symbol).
 o_p_v(sys_keyplace,name,"KEYPLACE").
 o_p_v(sys_keyplace,package,pkg_sys).
@@ -39887,6 +42044,9 @@ o_p_v(sys_last_cons_of,compile_as,kw_function).
 o_p_v(sys_last_cons_of,function,f_sys_last_cons_of).
 o_p_v(sys_last_cons_of,name,"LAST-CONS-OF").
 o_p_v(sys_last_cons_of,package,pkg_sys).
+o_p_v(sys_last_newline, classof, claz_symbol).
+o_p_v(sys_last_newline, name, "LAST-NEWLINE").
+o_p_v(sys_last_newline, package, pkg_sys).
 o_p_v(sys_later_depend,classof,claz_symbol).
 o_p_v(sys_later_depend,name,"LATER-DEPEND").
 o_p_v(sys_later_depend,package,pkg_sys).
@@ -39903,6 +42063,15 @@ o_p_v(sys_layout_class,compile_as,kw_function).
 o_p_v(sys_layout_class,function,f_sys_layout_class).
 o_p_v(sys_layout_class,name,"LAYOUT-CLASS").
 o_p_v(sys_layout_class,package,pkg_sys).
+o_p_v(sys_layout_clos_hash, classof, claz_symbol).
+o_p_v(sys_layout_clos_hash, name, "LAYOUT-CLOS-HASH").
+o_p_v(sys_layout_clos_hash, package, pkg_sys).
+o_p_v(sys_layout_depthoid, classof, claz_symbol).
+o_p_v(sys_layout_depthoid, name, "LAYOUT-DEPTHOID").
+o_p_v(sys_layout_depthoid, package, pkg_sys).
+o_p_v(sys_layout_invalid, classof, claz_symbol).
+o_p_v(sys_layout_invalid, name, "LAYOUT-INVALID").
+o_p_v(sys_layout_invalid, package, pkg_sys).
 o_p_v(sys_layout_length,classof,claz_symbol).
 o_p_v(sys_layout_length,compile_as,kw_function).
 o_p_v(sys_layout_length,function,f_sys_layout_length).
@@ -39940,6 +42109,18 @@ o_p_v(sys_lenv,package,pkg_sys).
 o_p_v(sys_let_list,classof,claz_symbol).
 o_p_v(sys_let_list,name,"LET-LIST").
 o_p_v(sys_let_list,package,pkg_sys).
+o_p_v(sys_lexenv, classof, claz_symbol).
+o_p_v(sys_lexenv, name, "LEXENV").
+o_p_v(sys_lexenv, package, pkg_sys).
+o_p_v(sys_lexical_environment_too_complex, classof, claz_symbol).
+o_p_v(sys_lexical_environment_too_complex, name, "LEXICAL-ENVIRONMENT-TOO-COMPLEX").
+o_p_v(sys_lexical_environment_too_complex, package, pkg_sys).
+o_p_v(sys_lexical_environment_too_complex_form, classof, claz_symbol).
+o_p_v(sys_lexical_environment_too_complex_form, name, "LEXICAL-ENVIRONMENT-TOO-COMPLEX-FORM").
+o_p_v(sys_lexical_environment_too_complex_form, package, pkg_sys).
+o_p_v(sys_lexical_environment_too_complex_lexenv, classof, claz_symbol).
+o_p_v(sys_lexical_environment_too_complex_lexenv, name, "LEXICAL-ENVIRONMENT-TOO-COMPLEX-LEXENV").
+o_p_v(sys_lexical_environment_too_complex_lexenv, package, pkg_sys).
 o_p_v(sys_li,classof,claz_symbol).
 o_p_v(sys_li,name,"LI").
 o_p_v(sys_li,package,pkg_sys).
@@ -40244,6 +42425,9 @@ o_p_v(sys_list_set_elt,compile_as,kw_function).
 o_p_v(sys_list_set_elt,function,f_sys_list_set_elt).
 o_p_v(sys_list_set_elt,name,"LIST-SET-ELT").
 o_p_v(sys_list_set_elt,package,pkg_sys).
+o_p_v(sys_list_size, classof, claz_symbol).
+o_p_v(sys_list_size, name, "LIST-SIZE").
+o_p_v(sys_list_size, package, pkg_sys).
 o_p_v(sys_list_statistics,classof,claz_symbol).
 o_p_v(sys_list_statistics,compile_as,kw_function).
 o_p_v(sys_list_statistics,function,f_sys_list_statistics).
@@ -40391,6 +42575,9 @@ o_p_v(sys_loadv,package,pkg_sys).
 o_p_v(sys_loadv_c38_push,classof,claz_symbol).
 o_p_v(sys_loadv_c38_push,name,"LOADV&PUSH").
 o_p_v(sys_loadv_c38_push,package,pkg_sys).
+o_p_v(sys_local_argument_mismatch, classof, claz_symbol).
+o_p_v(sys_local_argument_mismatch, name, "LOCAL-ARGUMENT-MISMATCH").
+o_p_v(sys_local_argument_mismatch, package, pkg_sys).
 o_p_v(sys_local_function_name_p,classof,claz_symbol).
 o_p_v(sys_local_function_name_p,compile_as,kw_function).
 o_p_v(sys_local_function_name_p,function,f_sys_local_function_name_p).
@@ -40418,6 +42605,9 @@ o_p_v(sys_locater_test_not,package,pkg_sys).
 o_p_v(sys_location,classof,claz_symbol).
 o_p_v(sys_location,name,"LOCATION").
 o_p_v(sys_location,package,pkg_sys).
+o_p_v(sys_location_kind, classof, claz_symbol).
+o_p_v(sys_location_kind, name, "LOCATION-KIND").
+o_p_v(sys_location_kind, package, pkg_sys).
 o_p_v(sys_log10,classof,claz_symbol).
 o_p_v(sys_log10,compile_as,kw_function).
 o_p_v(sys_log10,function,f_sys_log10).
@@ -40428,6 +42618,12 @@ o_p_v(sys_log2,compile_as,kw_function).
 o_p_v(sys_log2,function,f_sys_log2).
 o_p_v(sys_log2,name,"LOG2").
 o_p_v(sys_log2,package,pkg_sys).
+o_p_v(sys_logical_host, classof, claz_symbol).
+o_p_v(sys_logical_host, name, "LOGICAL-HOST").
+o_p_v(sys_logical_host, package, pkg_sys).
+o_p_v(sys_logical_host_name, classof, claz_symbol).
+o_p_v(sys_logical_host_name, name, "LOGICAL-HOST-NAME").
+o_p_v(sys_logical_host_name, package, pkg_sys).
 o_p_v(sys_logical_host_p,classof,claz_symbol).
 o_p_v(sys_logical_host_p,compile_as,kw_function).
 o_p_v(sys_logical_host_p,function,f_sys_logical_host_p).
@@ -40443,6 +42639,18 @@ o_p_v(sys_long_float_p,compile_as,kw_function).
 o_p_v(sys_long_float_p,function,f_sys_long_float_p).
 o_p_v(sys_long_float_p,name,"LONG-FLOAT-P").
 o_p_v(sys_long_float_p,package,pkg_sys).
+o_p_v(sys_long_method_combination, classof, claz_symbol).
+o_p_v(sys_long_method_combination, name, "LONG-METHOD-COMBINATION").
+o_p_v(sys_long_method_combination, package, pkg_sys).
+o_p_v(sys_long_method_combination_args_lambda_list, classof, claz_symbol).
+o_p_v(sys_long_method_combination_args_lambda_list, name, "LONG-METHOD-COMBINATION-ARGS-LAMBDA-LIST").
+o_p_v(sys_long_method_combination_args_lambda_list, package, pkg_sys).
+o_p_v(sys_long_method_combination_error, classof, claz_symbol).
+o_p_v(sys_long_method_combination_error, name, "LONG-METHOD-COMBINATION-ERROR").
+o_p_v(sys_long_method_combination_error, package, pkg_sys).
+o_p_v(sys_long_method_combination_function, classof, claz_symbol).
+o_p_v(sys_long_method_combination_function, name, "LONG-METHOD-COMBINATION-FUNCTION").
+o_p_v(sys_long_method_combination_function, package, pkg_sys).
 o_p_v(sys_lookup_keyword,classof,claz_symbol).
 o_p_v(sys_lookup_keyword,compile_as,kw_function).
 o_p_v(sys_lookup_keyword,function,f_sys_lookup_keyword).
@@ -40482,6 +42690,9 @@ o_p_v(sys_loose_constant_eql,package,pkg_sys).
 o_p_v(sys_losers,classof,claz_symbol).
 o_p_v(sys_losers,name,"LOSERS").
 o_p_v(sys_losers,package,pkg_sys).
+o_p_v(sys_low, classof, claz_symbol).
+o_p_v(sys_low, name, "LOW").
+o_p_v(sys_low, package, pkg_sys).
 o_p_v(sys_lpar_reader,classof,claz_symbol).
 o_p_v(sys_lpar_reader,compile_as,kw_function).
 o_p_v(sys_lpar_reader,function,f_sys_lpar_reader).
@@ -40537,6 +42748,9 @@ o_p_v(sys_macroexpand_form,compile_as,kw_function).
 o_p_v(sys_macroexpand_form,function,f_sys_macroexpand_form).
 o_p_v(sys_macroexpand_form,name,"MACROEXPAND-FORM").
 o_p_v(sys_macroexpand_form,package,pkg_sys).
+o_p_v(sys_macroexpand_hook_type_error, classof, claz_symbol).
+o_p_v(sys_macroexpand_hook_type_error, name, "MACROEXPAND-HOOK-TYPE-ERROR").
+o_p_v(sys_macroexpand_hook_type_error, package, pkg_sys).
 o_p_v(sys_macroexpand_macro,classof,claz_symbol).
 o_p_v(sys_macroexpand_macro,name,"MACROEXPAND-MACRO").
 o_p_v(sys_macroexpand_macro,package,pkg_sys).
@@ -40581,6 +42795,9 @@ o_p_v(sys_make_apply_form,compile_as,kw_function).
 o_p_v(sys_make_apply_form,function,f_sys_make_apply_form).
 o_p_v(sys_make_apply_form,name,"MAKE-APPLY-FORM").
 o_p_v(sys_make_apply_form,package,pkg_sys).
+o_p_v(sys_make_arg_info, classof, claz_symbol).
+o_p_v(sys_make_arg_info, name, "MAKE-ARG-INFO").
+o_p_v(sys_make_arg_info, package, pkg_sys).
 o_p_v(sys_make_bit_vector,classof,claz_symbol).
 o_p_v(sys_make_bit_vector,compile_as,kw_function).
 o_p_v(sys_make_bit_vector,function,f_sys_make_bit_vector).
@@ -40952,6 +43169,18 @@ o_p_v(sys_make_vector_writer,compile_as,kw_function).
 o_p_v(sys_make_vector_writer,function,f_sys_make_vector_writer).
 o_p_v(sys_make_vector_writer,name,"MAKE-VECTOR-WRITER").
 o_p_v(sys_make_vector_writer,package,pkg_sys).
+o_p_v(sys_malformed_ascii, classof, claz_symbol).
+o_p_v(sys_malformed_ascii, name, "MALFORMED-ASCII").
+o_p_v(sys_malformed_ascii, package, pkg_sys).
+o_p_v(sys_malformed_euc_jp, classof, claz_symbol).
+o_p_v(sys_malformed_euc_jp, name, "MALFORMED-EUC-JP").
+o_p_v(sys_malformed_euc_jp, package, pkg_sys).
+o_p_v(sys_malformed_gbk, classof, claz_symbol).
+o_p_v(sys_malformed_gbk, name, "MALFORMED-GBK").
+o_p_v(sys_malformed_gbk, package, pkg_sys).
+o_p_v(sys_malformed_shift_jis, classof, claz_symbol).
+o_p_v(sys_malformed_shift_jis, name, "MALFORMED-SHIFT_JIS").
+o_p_v(sys_malformed_shift_jis, package, pkg_sys).
 o_p_v(sys_map1,classof,claz_symbol).
 o_p_v(sys_map1,compile_as,kw_function).
 o_p_v(sys_map1,function,f_sys_map1).
@@ -41042,9 +43271,15 @@ o_p_v(sys_mecase,compile_as,kw_operator).
 o_p_v(sys_mecase,function,f_sys_mecase).
 o_p_v(sys_mecase,name,"MECASE").
 o_p_v(sys_mecase,package,pkg_sys).
+o_p_v(sys_member_type, classof, claz_symbol).
+o_p_v(sys_member_type, name, "MEMBER-TYPE").
+o_p_v(sys_member_type, package, pkg_sys).
 o_p_v(sys_memory,classof,claz_symbol).
 o_p_v(sys_memory,name,"MEMORY").
 o_p_v(sys_memory,package,pkg_sys).
+o_p_v(sys_memory_fault_error, classof, claz_symbol).
+o_p_v(sys_memory_fault_error, name, "MEMORY-FAULT-ERROR").
+o_p_v(sys_memory_fault_error, package, pkg_sys).
 o_p_v(sys_memq,classof,claz_symbol).
 o_p_v(sys_memq,compile_as,kw_function).
 o_p_v(sys_memq,function,f_sys_memq).
@@ -41083,15 +43318,33 @@ o_p_v(sys_merge_vectors_body,compile_as,kw_function).
 o_p_v(sys_merge_vectors_body,function,f_sys_merge_vectors_body).
 o_p_v(sys_merge_vectors_body,name,"MERGE-VECTORS-BODY").
 o_p_v(sys_merge_vectors_body,package,pkg_sys).
+o_p_v(sys_message, classof, claz_symbol).
+o_p_v(sys_message, name, "MESSAGE").
+o_p_v(sys_message, package, pkg_sys).
 o_p_v(sys_meta,classof,claz_symbol).
 o_p_v(sys_meta,name,"META").
 o_p_v(sys_meta,package,pkg_sys).
+o_p_v(sys_metaobject_initialization_violation, classof, claz_symbol).
+o_p_v(sys_metaobject_initialization_violation, name, "METAOBJECT-INITIALIZATION-VIOLATION").
+o_p_v(sys_metaobject_initialization_violation, package, pkg_sys).
+o_p_v(sys_method_call, classof, claz_symbol).
+o_p_v(sys_method_call, name, "METHOD-CALL").
+o_p_v(sys_method_call, package, pkg_sys).
 o_p_v(sys_method_class,classof,claz_symbol).
 o_p_v(sys_method_class,name,"METHOD-CLASS").
 o_p_v(sys_method_class,package,pkg_sys).
+o_p_v(sys_method_combination_options, classof, claz_symbol).
+o_p_v(sys_method_combination_options, name, "METHOD-COMBINATION-OPTIONS").
+o_p_v(sys_method_combination_options, package, pkg_sys).
+o_p_v(sys_method_combination_type_name, classof, claz_symbol).
+o_p_v(sys_method_combination_type_name, name, "METHOD-COMBINATION-TYPE-NAME").
+o_p_v(sys_method_combination_type_name, package, pkg_sys).
 o_p_v(sys_methods,classof,claz_symbol).
 o_p_v(sys_methods,name,"METHODS").
 o_p_v(sys_methods,package,pkg_sys).
+o_p_v(sys_might_contain_other_types_p, classof, claz_symbol).
+o_p_v(sys_might_contain_other_types_p, name, "MIGHT-CONTAIN-OTHER-TYPES-P").
+o_p_v(sys_might_contain_other_types_p, package, pkg_sys).
 o_p_v(sys_min_if,classof,claz_symbol).
 o_p_v(sys_min_if,compile_as,kw_function).
 o_p_v(sys_min_if,function,f_sys_min_if).
@@ -41106,11 +43359,17 @@ o_p_v(sys_minimizing,package,pkg_sys).
 o_p_v(sys_minimum,classof,claz_symbol).
 o_p_v(sys_minimum,name,"MINIMUM").
 o_p_v(sys_minimum,package,pkg_sys).
+o_p_v(sys_misc, classof, claz_symbol).
+o_p_v(sys_misc, name, "MISC").
+o_p_v(sys_misc, package, pkg_sys).
 o_p_v(sys_misc_encoding,classof,claz_symbol).
 o_p_v(sys_misc_encoding,compile_as,kw_function).
 o_p_v(sys_misc_encoding,function,f_sys_misc_encoding).
 o_p_v(sys_misc_encoding,name,"MISC-ENCODING").
 o_p_v(sys_misc_encoding,package,pkg_sys).
+o_p_v(sys_missing_arg, classof, claz_symbol).
+o_p_v(sys_missing_arg, name, "MISSING-ARG").
+o_p_v(sys_missing_arg, package, pkg_sys).
 o_p_v(sys_mk_anode,classof,claz_symbol).
 o_p_v(sys_mk_anode,compile_as,kw_function).
 o_p_v(sys_mk_anode,function,f_sys_mk_anode).
@@ -41213,6 +43472,9 @@ o_p_v(sys_munge_restart_case_expression,compile_as,kw_function).
 o_p_v(sys_munge_restart_case_expression,function,f_sys_munge_restart_case_expression).
 o_p_v(sys_munge_restart_case_expression,name,"MUNGE-RESTART-CASE-EXPRESSION").
 o_p_v(sys_munge_restart_case_expression,package,pkg_sys).
+o_p_v(sys_must_supply_this, classof, claz_symbol).
+o_p_v(sys_must_supply_this, name, "MUST-SUPPLY-THIS").
+o_p_v(sys_must_supply_this, package, pkg_sys).
 o_p_v(sys_mv_to_list,classof,claz_symbol).
 o_p_v(sys_mv_to_list,name,"MV-TO-LIST").
 o_p_v(sys_mv_to_list,package,pkg_sys).
@@ -41228,6 +43490,12 @@ o_p_v(sys_mvcallp,package,pkg_sys).
 o_p_v(sys_n,classof,claz_symbol).
 o_p_v(sys_n,name,"N").
 o_p_v(sys_n,package,pkg_sys).
+o_p_v(sys_n_bin, classof, claz_symbol).
+o_p_v(sys_n_bin, name, "N-BIN").
+o_p_v(sys_n_bin, package, pkg_sys).
+o_p_v(sys_n_fds, classof, claz_symbol).
+o_p_v(sys_n_fds, name, "N-FDS").
+o_p_v(sys_n_fds, package, pkg_sys).
 o_p_v(sys_n_new,classof,claz_symbol).
 o_p_v(sys_n_new,name,"N-NEW").
 o_p_v(sys_n_new,package,pkg_sys).
@@ -41266,9 +43534,33 @@ o_p_v(sys_named_let,compile_as,kw_function).
 o_p_v(sys_named_let,function,f_sys_named_let).
 o_p_v(sys_named_let,name,"NAMED-LET").
 o_p_v(sys_named_let,package,pkg_sys).
+o_p_v(sys_named_type, classof, claz_symbol).
+o_p_v(sys_named_type, name, "NAMED-TYPE").
+o_p_v(sys_named_type, package, pkg_sys).
 o_p_v(sys_names,classof,claz_symbol).
 o_p_v(sys_names,name,"NAMES").
 o_p_v(sys_names,package,pkg_sys).
+o_p_v(sys_namespace, classof, claz_symbol).
+o_p_v(sys_namespace, name, "NAMESPACE").
+o_p_v(sys_namespace, package, pkg_sys).
+o_p_v(sys_namestring_parse_error, classof, claz_symbol).
+o_p_v(sys_namestring_parse_error, name, "NAMESTRING-PARSE-ERROR").
+o_p_v(sys_namestring_parse_error, package, pkg_sys).
+o_p_v(sys_namestring_parse_error_args, classof, claz_symbol).
+o_p_v(sys_namestring_parse_error_args, name, "NAMESTRING-PARSE-ERROR-ARGS").
+o_p_v(sys_namestring_parse_error_args, package, pkg_sys).
+o_p_v(sys_namestring_parse_error_complaint, classof, claz_symbol).
+o_p_v(sys_namestring_parse_error_complaint, name, "NAMESTRING-PARSE-ERROR-COMPLAINT").
+o_p_v(sys_namestring_parse_error_complaint, package, pkg_sys).
+o_p_v(sys_namestring_parse_error_namestring, classof, claz_symbol).
+o_p_v(sys_namestring_parse_error_namestring, name, "NAMESTRING-PARSE-ERROR-NAMESTRING").
+o_p_v(sys_namestring_parse_error_namestring, package, pkg_sys).
+o_p_v(sys_namestring_parse_error_offset, classof, claz_symbol).
+o_p_v(sys_namestring_parse_error_offset, name, "NAMESTRING-PARSE-ERROR-OFFSET").
+o_p_v(sys_namestring_parse_error_offset, package, pkg_sys).
+o_p_v(sys_native_lexenv, classof, claz_symbol).
+o_p_v(sys_native_lexenv, name, "NATIVE-LEXENV").
+o_p_v(sys_native_lexenv, package, pkg_sys).
 o_p_v(sys_nb,classof,claz_symbol).
 o_p_v(sys_nb,name,"NB").
 o_p_v(sys_nb,package,pkg_sys).
@@ -41284,6 +43576,15 @@ o_p_v(sys_nc,package,pkg_sys).
 o_p_v(sys_nconcing,classof,claz_symbol).
 o_p_v(sys_nconcing,name,"NCONCING").
 o_p_v(sys_nconcing,package,pkg_sys).
+o_p_v(sys_negate, classof, claz_symbol).
+o_p_v(sys_negate, name, "NEGATE").
+o_p_v(sys_negate, package, pkg_sys).
+o_p_v(sys_negation, classof, claz_symbol).
+o_p_v(sys_negation, name, "NEGATION").
+o_p_v(sys_negation, package, pkg_sys).
+o_p_v(sys_negation_type, classof, claz_symbol).
+o_p_v(sys_negation_type, name, "NEGATION-TYPE").
+o_p_v(sys_negation_type, package, pkg_sys).
 o_p_v(sys_never,classof,claz_symbol).
 o_p_v(sys_never,name,"NEVER").
 o_p_v(sys_never,package,pkg_sys).
@@ -41310,6 +43611,9 @@ o_p_v(sys_new_function,package,pkg_sys).
 o_p_v(sys_new_index,classof,claz_symbol).
 o_p_v(sys_new_index,name,"NEW-INDEX").
 o_p_v(sys_new_index,package,pkg_sys).
+o_p_v(sys_new_location, classof, claz_symbol).
+o_p_v(sys_new_location, name, "NEW-LOCATION").
+o_p_v(sys_new_location, package, pkg_sys).
 o_p_v(sys_new_value,classof,claz_symbol).
 o_p_v(sys_new_value,name,"NEW-VALUE").
 o_p_v(sys_new_value,package,pkg_sys).
@@ -41319,12 +43623,18 @@ o_p_v(sys_new_var,package,pkg_sys).
 o_p_v(sys_newbyte,classof,claz_symbol).
 o_p_v(sys_newbyte,name,"NEWBYTE").
 o_p_v(sys_newbyte,package,pkg_sys).
+o_p_v(sys_newlines, classof, claz_symbol).
+o_p_v(sys_newlines, name, "NEWLINES").
+o_p_v(sys_newlines, package, pkg_sys).
 o_p_v(sys_newval,classof,claz_symbol).
 o_p_v(sys_newval,name,"NEWVAL").
 o_p_v(sys_newval,package,pkg_sys).
 o_p_v(sys_newvals,classof,claz_symbol).
 o_p_v(sys_newvals,name,"NEWVALS").
 o_p_v(sys_newvals,package,pkg_sys).
+o_p_v(sys_next, classof, claz_symbol).
+o_p_v(sys_next, name, "NEXT").
+o_p_v(sys_next, package, pkg_sys).
 o_p_v(sys_next_arg,classof,claz_symbol).
 o_p_v(sys_next_arg,compile_as,kw_function).
 o_p_v(sys_next_arg,function,f_sys_next_arg).
@@ -41341,6 +43651,9 @@ o_p_v(sys_nhl,package,pkg_sys).
 o_p_v(sys_nicknames,classof,claz_symbol).
 o_p_v(sys_nicknames,name,"NICKNAMES").
 o_p_v(sys_nicknames,package,pkg_sys).
+o_p_v(sys_nil_array_accessed_error, classof, claz_symbol).
+o_p_v(sys_nil_array_accessed_error, name, "NIL-ARRAY-ACCESSED-ERROR").
+o_p_v(sys_nil_array_accessed_error, package, pkg_sys).
 o_p_v(sys_nil_c38_push,classof,claz_symbol).
 o_p_v(sys_nil_c38_push,name,"NIL&PUSH").
 o_p_v(sys_nil_c38_push,package,pkg_sys).
@@ -41389,6 +43702,18 @@ o_p_v(sys_no_hang,package,pkg_sys).
 o_p_v(sys_no_keys,classof,claz_symbol).
 o_p_v(sys_no_keys,name,"NO-KEYS").
 o_p_v(sys_no_keys,package,pkg_sys).
+o_p_v(sys_no_op_placeholder, classof, claz_symbol).
+o_p_v(sys_no_op_placeholder, name, "NO-OP-PLACEHOLDER").
+o_p_v(sys_no_op_placeholder, package, pkg_sys).
+o_p_v(sys_no_primary_method, classof, claz_symbol).
+o_p_v(sys_no_primary_method, name, "NO-PRIMARY-METHOD").
+o_p_v(sys_no_primary_method, package, pkg_sys).
+o_p_v(sys_no_primary_method_args, classof, claz_symbol).
+o_p_v(sys_no_primary_method_args, name, "NO-PRIMARY-METHOD-ARGS").
+o_p_v(sys_no_primary_method_args, package, pkg_sys).
+o_p_v(sys_no_primary_method_generic_function, classof, claz_symbol).
+o_p_v(sys_no_primary_method_generic_function, name, "NO-PRIMARY-METHOD-GENERIC-FUNCTION").
+o_p_v(sys_no_primary_method_generic_function, package, pkg_sys).
 o_p_v(sys_node,classof,claz_symbol).
 o_p_v(sys_node,name,"NODE").
 o_p_v(sys_node,package,pkg_sys).
@@ -41534,6 +43859,9 @@ o_p_v(sys_nstring_capitalize1,package,pkg_sys).
 o_p_v(sys_nth_slot,classof,claz_symbol).
 o_p_v(sys_nth_slot,name,"NTH-SLOT").
 o_p_v(sys_nth_slot,package,pkg_sys).
+o_p_v(sys_null_lexenv_p, classof, claz_symbol).
+o_p_v(sys_null_lexenv_p, name, "NULL-LEXENV-P").
+o_p_v(sys_null_lexenv_p, package, pkg_sys).
 o_p_v(sys_num_operand_length,classof,claz_symbol).
 o_p_v(sys_num_operand_length,compile_as,kw_function).
 o_p_v(sys_num_operand_length,function,f_sys_num_operand_length).
@@ -41548,6 +43876,9 @@ o_p_v(sys_num_store_vars,package,pkg_sys).
 o_p_v(sys_number_zapped,classof,claz_symbol).
 o_p_v(sys_number_zapped,name,"NUMBER-ZAPPED").
 o_p_v(sys_number_zapped,package,pkg_sys).
+o_p_v(sys_numeric_type, classof, claz_symbol).
+o_p_v(sys_numeric_type, name, "NUMERIC-TYPE").
+o_p_v(sys_numeric_type, package, pkg_sys).
 o_p_v(sys_nv_to_stack,classof,claz_symbol).
 o_p_v(sys_nv_to_stack,name,"NV-TO-STACK").
 o_p_v(sys_nv_to_stack,package,pkg_sys).
@@ -41578,6 +43909,24 @@ o_p_v(sys_obj_length,package,pkg_sys).
 o_p_v(sys_object,classof,claz_symbol).
 o_p_v(sys_object,name,"OBJECT").
 o_p_v(sys_object,package,pkg_sys).
+o_p_v(sys_object_plist, classof, claz_symbol).
+o_p_v(sys_object_plist, name, "OBJECT-PLIST").
+o_p_v(sys_object_plist, package, pkg_sys).
+o_p_v(sys_observer, classof, claz_symbol).
+o_p_v(sys_observer, name, "OBSERVER").
+o_p_v(sys_observer, package, pkg_sys).
+o_p_v(sys_obsolete_structure, classof, claz_symbol).
+o_p_v(sys_obsolete_structure, name, "OBSOLETE-STRUCTURE").
+o_p_v(sys_obsolete_structure, package, pkg_sys).
+o_p_v(sys_obsolete_structure_datum, classof, claz_symbol).
+o_p_v(sys_obsolete_structure_datum, name, "OBSOLETE-STRUCTURE-DATUM").
+o_p_v(sys_obsolete_structure_datum, package, pkg_sys).
+o_p_v(sys_obuf, classof, claz_symbol).
+o_p_v(sys_obuf, name, "OBUF").
+o_p_v(sys_obuf, package, pkg_sys).
+o_p_v(sys_occurrences, classof, claz_symbol).
+o_p_v(sys_occurrences, name, "OCCURRENCES").
+o_p_v(sys_occurrences, package, pkg_sys).
 o_p_v(sys_occurs_in_p,classof,claz_symbol).
 o_p_v(sys_occurs_in_p,compile_as,kw_function).
 o_p_v(sys_occurs_in_p,function,f_sys_occurs_in_p).
@@ -41588,15 +43937,57 @@ o_p_v(sys_octal_reader,compile_as,kw_function).
 o_p_v(sys_octal_reader,function,f_sys_octal_reader).
 o_p_v(sys_octal_reader,name,"OCTAL-READER").
 o_p_v(sys_octal_reader,package,pkg_sys).
+o_p_v(sys_octet_decoding_bad_byte_position, classof, claz_symbol).
+o_p_v(sys_octet_decoding_bad_byte_position, name, "OCTET-DECODING-BAD-BYTE-POSITION").
+o_p_v(sys_octet_decoding_bad_byte_position, package, pkg_sys).
+o_p_v(sys_octet_decoding_error, classof, claz_symbol).
+o_p_v(sys_octet_decoding_error, name, "OCTET-DECODING-ERROR").
+o_p_v(sys_octet_decoding_error, package, pkg_sys).
+o_p_v(sys_octet_decoding_error_array, classof, claz_symbol).
+o_p_v(sys_octet_decoding_error_array, name, "OCTET-DECODING-ERROR-ARRAY").
+o_p_v(sys_octet_decoding_error_array, package, pkg_sys).
+o_p_v(sys_octet_decoding_error_end, classof, claz_symbol).
+o_p_v(sys_octet_decoding_error_end, name, "OCTET-DECODING-ERROR-END").
+o_p_v(sys_octet_decoding_error_end, package, pkg_sys).
+o_p_v(sys_octet_decoding_error_external_format, classof, claz_symbol).
+o_p_v(sys_octet_decoding_error_external_format, name, "OCTET-DECODING-ERROR-EXTERNAL-FORMAT").
+o_p_v(sys_octet_decoding_error_external_format, package, pkg_sys).
+o_p_v(sys_octet_decoding_error_start, classof, claz_symbol).
+o_p_v(sys_octet_decoding_error_start, name, "OCTET-DECODING-ERROR-START").
+o_p_v(sys_octet_decoding_error_start, package, pkg_sys).
+o_p_v(sys_octets, classof, claz_symbol).
+o_p_v(sys_octets, name, "OCTETS").
+o_p_v(sys_octets, package, pkg_sys).
+o_p_v(sys_octets_encoding_error, classof, claz_symbol).
+o_p_v(sys_octets_encoding_error, name, "OCTETS-ENCODING-ERROR").
+o_p_v(sys_octets_encoding_error, package, pkg_sys).
+o_p_v(sys_octets_encoding_error_external_format, classof, claz_symbol).
+o_p_v(sys_octets_encoding_error_external_format, name, "OCTETS-ENCODING-ERROR-EXTERNAL-FORMAT").
+o_p_v(sys_octets_encoding_error_external_format, package, pkg_sys).
+o_p_v(sys_octets_encoding_error_position, classof, claz_symbol).
+o_p_v(sys_octets_encoding_error_position, name, "OCTETS-ENCODING-ERROR-POSITION").
+o_p_v(sys_octets_encoding_error_position, package, pkg_sys).
+o_p_v(sys_octets_encoding_error_string, classof, claz_symbol).
+o_p_v(sys_octets_encoding_error_string, name, "OCTETS-ENCODING-ERROR-STRING").
+o_p_v(sys_octets_encoding_error_string, package, pkg_sys).
+o_p_v(sys_octets_to_string_fun, classof, claz_symbol).
+o_p_v(sys_octets_to_string_fun, name, "OCTETS-TO-STRING-FUN").
+o_p_v(sys_octets_to_string_fun, package, pkg_sys).
 o_p_v(sys_of,classof,claz_symbol).
 o_p_v(sys_of,name,"OF").
 o_p_v(sys_of,package,pkg_sys).
 o_p_v(sys_of_type,classof,claz_symbol).
 o_p_v(sys_of_type,name,"OF-TYPE").
 o_p_v(sys_of_type,package,pkg_sys).
+o_p_v(sys_offset, classof, claz_symbol).
+o_p_v(sys_offset, name, "OFFSET").
+o_p_v(sys_offset, package, pkg_sys).
 o_p_v(sys_old,classof,claz_symbol).
 o_p_v(sys_old,name,"OLD").
 o_p_v(sys_old,package,pkg_sys).
+o_p_v(sys_old_method, classof, claz_symbol).
+o_p_v(sys_old_method, name, "OLD-METHOD").
+o_p_v(sys_old_method, package, pkg_sys).
 o_p_v(sys_old_new_alist,classof,claz_symbol).
 o_p_v(sys_old_new_alist,name,"OLD-NEW-ALIST").
 o_p_v(sys_old_new_alist,package,pkg_sys).
@@ -41619,6 +44010,9 @@ o_p_v(sys_one_value_ops,declared_as,defconstant).
 o_p_v(sys_one_value_ops,name,"ONE-VALUE-OPS").
 o_p_v(sys_one_value_ops,package,pkg_sys).
 o_p_v(sys_one_value_ops,value,['#S',['HASH-TABLE','TEST','STABLEHASH-EQ','WARN-IF-NEEDS-REHASH-AFTER-GC','T',['LIST*'|'T'],['LIST'|'T'],['SVSET'|'T'],['SVREF'|'T'],['SYMBOL-FUNCTION'|'T'],['CONSP'|'T'],['ATOM'|'T'],['CONS'|'T'],['CDR'|'T'],['CAR'|'T'],['EQ'|'T'],['NOT'|'T'],['TAGBODY-CLOSE-NIL'|'T'],['MV-TO-LIST'|'T'],['VALUES1'|'T'],['BOUNDP'|'T'],['COPY-CLOSURE'|'T'],['VENV'|'T'],['POP'|'T'],['SETVALUE'|'T'],['GETVALUE'|'T'],['STOREIC'|'T'],['STOREV'|'T'],['STOREC'|'T'],['STOREI'|'T'],['STORE'|'T'],['LOADIC'|'T'],['LOADV'|'T'],['LOADC'|'T'],['LOADI'|'T'],['LOAD'|'T'],['CONST'|'T'],['T'|'T'],[[]|'T']]]).
+o_p_v(sys_only_base_chars, classof, claz_symbol).
+o_p_v(sys_only_base_chars, name, "ONLY-BASE-CHARS").
+o_p_v(sys_only_base_chars, package, pkg_sys).
 o_p_v(sys_op,classof,claz_symbol).
 o_p_v(sys_op,name,"OP").
 o_p_v(sys_op,package,pkg_sys).
@@ -41656,6 +44050,9 @@ o_p_v(sys_operands,package,pkg_sys).
 o_p_v(sys_operation,classof,claz_symbol).
 o_p_v(sys_operation,name,"OPERATION").
 o_p_v(sys_operation,package,pkg_sys).
+o_p_v(sys_operator, classof, claz_symbol).
+o_p_v(sys_operator, name, "OPERATOR").
+o_p_v(sys_operator, package, pkg_sys).
 o_p_v(sys_opt,classof,claz_symbol).
 o_p_v(sys_opt,name,"OPT").
 o_p_v(sys_opt,package,pkg_sys).
@@ -41713,6 +44110,9 @@ o_p_v(sys_optimized_wrap_multiple_value_bind,package,pkg_sys).
 o_p_v(sys_option,classof,claz_symbol).
 o_p_v(sys_option,name,"OPTION").
 o_p_v(sys_option,package,pkg_sys).
+o_p_v(sys_optional, classof, claz_symbol).
+o_p_v(sys_optional, name, "OPTIONAL").
+o_p_v(sys_optional, package, pkg_sys).
 o_p_v(sys_optional_args,classof,claz_symbol).
 o_p_v(sys_optional_args,name,"OPTIONAL-ARGS").
 o_p_v(sys_optional_args,package,pkg_sys).
@@ -41742,6 +44142,9 @@ o_p_v(sys_orig_fundef,package,pkg_sys).
 o_p_v(sys_orig_stream,classof,claz_symbol).
 o_p_v(sys_orig_stream,name,"ORIG-STREAM").
 o_p_v(sys_orig_stream,package,pkg_sys).
+o_p_v(sys_original, classof, claz_symbol).
+o_p_v(sys_original, name, "ORIGINAL").
+o_p_v(sys_original, package, pkg_sys).
 o_p_v(sys_original_arglists,classof,claz_symbol).
 o_p_v(sys_original_arglists,name,"ORIGINAL-ARGLISTS").
 o_p_v(sys_original_arglists,package,pkg_sys).
@@ -41757,6 +44160,9 @@ o_p_v(sys_other_keywords_p,package,pkg_sys).
 o_p_v(sys_other_language,classof,claz_symbol).
 o_p_v(sys_other_language,name,"OTHER-LANGUAGE").
 o_p_v(sys_other_language,package,pkg_sys).
+o_p_v(sys_other_threads, classof, claz_symbol).
+o_p_v(sys_other_threads, name, "OTHER-THREADS").
+o_p_v(sys_other_threads, package, pkg_sys).
 o_p_v(sys_out,classof,claz_symbol).
 o_p_v(sys_out,name,"OUT").
 o_p_v(sys_out,package,pkg_sys).
@@ -41768,6 +44174,15 @@ o_p_v(sys_out_synonym_of,package,pkg_sys).
 o_p_v(sys_outer_loop,classof,claz_symbol).
 o_p_v(sys_outer_loop,name,"OUTER-LOOP").
 o_p_v(sys_outer_loop,package,pkg_sys).
+o_p_v(sys_output, classof, claz_symbol).
+o_p_v(sys_output, name, "OUTPUT").
+o_p_v(sys_output, package, pkg_sys).
+o_p_v(sys_output_bytes, classof, claz_symbol).
+o_p_v(sys_output_bytes, name, "OUTPUT-BYTES").
+o_p_v(sys_output_bytes, package, pkg_sys).
+o_p_v(sys_output_column, classof, claz_symbol).
+o_p_v(sys_output_column, name, "OUTPUT-COLUMN").
+o_p_v(sys_output_column, package, pkg_sys).
 o_p_v(sys_output_form,classof,claz_symbol).
 o_p_v(sys_output_form,compile_as,kw_function).
 o_p_v(sys_output_form,function,f_sys_output_form).
@@ -41788,6 +44203,9 @@ o_p_v(sys_output_object,compile_as,kw_function).
 o_p_v(sys_output_object,function,f_sys_output_object).
 o_p_v(sys_output_object,name,"OUTPUT-OBJECT").
 o_p_v(sys_output_object,package,pkg_sys).
+o_p_v(sys_output_queue, classof, claz_symbol).
+o_p_v(sys_output_queue, name, "OUTPUT-QUEUE").
+o_p_v(sys_output_queue, package, pkg_sys).
 o_p_v(sys_output_stream,classof,claz_symbol).
 o_p_v(sys_output_stream,name,"OUTPUT-STREAM").
 o_p_v(sys_output_stream,package,pkg_sys).
@@ -41812,12 +44230,21 @@ o_p_v(sys_over,package,pkg_sys).
 o_p_v(sys_over_this_level,classof,claz_symbol).
 o_p_v(sys_over_this_level,name,"OVER-THIS-LEVEL").
 o_p_v(sys_over_this_level,package,pkg_sys).
+o_p_v(sys_overlong_utf8_sequence, classof, claz_symbol).
+o_p_v(sys_overlong_utf8_sequence, name, "OVERLONG-UTF8-SEQUENCE").
+o_p_v(sys_overlong_utf8_sequence, package, pkg_sys).
 o_p_v(sys_override,classof,claz_symbol).
 o_p_v(sys_override,name,"OVERRIDE").
 o_p_v(sys_override,package,pkg_sys).
 o_p_v(sys_pack_list,classof,claz_symbol).
 o_p_v(sys_pack_list,name,"PACK-LIST").
 o_p_v(sys_pack_list,package,pkg_sys).
+o_p_v(sys_package_at_variance, classof, claz_symbol).
+o_p_v(sys_package_at_variance, name, "PACKAGE-AT-VARIANCE").
+o_p_v(sys_package_at_variance, package, pkg_sys).
+o_p_v(sys_package_at_variance_error, classof, claz_symbol).
+o_p_v(sys_package_at_variance_error, name, "PACKAGE-AT-VARIANCE-ERROR").
+o_p_v(sys_package_at_variance_error, package, pkg_sys).
 o_p_v(sys_package_designator,classof,claz_symbol).
 o_p_v(sys_package_designator,name,"PACKAGE-DESIGNATOR").
 o_p_v(sys_package_designator,package,pkg_sys).
@@ -41831,6 +44258,9 @@ o_p_v(sys_package_external_symbols,compile_as,kw_function).
 o_p_v(sys_package_external_symbols,function,f_sys_package_external_symbols).
 o_p_v(sys_package_external_symbols,name,"PACKAGE-EXTERNAL-SYMBOLS").
 o_p_v(sys_package_external_symbols,package,pkg_sys).
+o_p_v(sys_package_hashtable, classof, claz_symbol).
+o_p_v(sys_package_hashtable, name, "PACKAGE-HASHTABLE").
+o_p_v(sys_package_hashtable, package, pkg_sys).
 o_p_v(sys_package_inherited_symbols,classof,claz_symbol).
 o_p_v(sys_package_inherited_symbols,compile_as,kw_function).
 o_p_v(sys_package_inherited_symbols,function,f_sys_package_inherited_symbols).
@@ -41859,6 +44289,9 @@ o_p_v(sys_package_iterator_function,package,pkg_sys).
 o_p_v(sys_package_iterator_function_1,classof,claz_symbol).
 o_p_v(sys_package_iterator_function_1,name,"PACKAGE-ITERATOR-FUNCTION-1").
 o_p_v(sys_package_iterator_function_1,package,pkg_sys).
+o_p_v(sys_package_lock_violation_in_package, classof, claz_symbol).
+o_p_v(sys_package_lock_violation_in_package, name, "PACKAGE-LOCK-VIOLATION-IN-PACKAGE").
+o_p_v(sys_package_lock_violation_in_package, package, pkg_sys).
 o_p_v(sys_package_supplied_p,classof,claz_symbol).
 o_p_v(sys_package_supplied_p,name,"PACKAGE-SUPPLIED-P").
 o_p_v(sys_package_supplied_p,package,pkg_sys).
@@ -41881,6 +44314,12 @@ o_p_v(sys_packages_from_combos,package,pkg_sys).
 o_p_v(sys_packname,classof,claz_symbol).
 o_p_v(sys_packname,name,"PACKNAME").
 o_p_v(sys_packname,package,pkg_sys).
+o_p_v(sys_pairs, classof, claz_symbol).
+o_p_v(sys_pairs, name, "PAIRS").
+o_p_v(sys_pairs, package, pkg_sys).
+o_p_v(sys_parent, classof, claz_symbol).
+o_p_v(sys_parent, name, "PARENT").
+o_p_v(sys_parent, package, pkg_sys).
 o_p_v(sys_parent_lang,classof,claz_symbol).
 o_p_v(sys_parent_lang,name,"PARENT-LANG").
 o_p_v(sys_parent_lang,package,pkg_sys).
@@ -41893,6 +44332,9 @@ o_p_v(sys_parenthesize_keys,package,pkg_sys).
 o_p_v(sys_parm_list,classof,claz_symbol).
 o_p_v(sys_parm_list,name,"PARM-LIST").
 o_p_v(sys_parm_list,package,pkg_sys).
+o_p_v(sys_parse, classof, claz_symbol).
+o_p_v(sys_parse, name, "PARSE").
+o_p_v(sys_parse, package, pkg_sys).
 o_p_v(sys_parse_1_option,classof,claz_symbol).
 o_p_v(sys_parse_1_option,compile_as,kw_function).
 o_p_v(sys_parse_1_option,function,f_sys_parse_1_option).
@@ -41913,6 +44355,12 @@ o_p_v(sys_parse_defmacro_lambda_list,compile_as,kw_function).
 o_p_v(sys_parse_defmacro_lambda_list,function,f_sys_parse_defmacro_lambda_list).
 o_p_v(sys_parse_defmacro_lambda_list,name,"PARSE-DEFMACRO-LAMBDA-LIST").
 o_p_v(sys_parse_defmacro_lambda_list,package,pkg_sys).
+o_p_v(sys_parse_deprecated_type, classof, claz_symbol).
+o_p_v(sys_parse_deprecated_type, name, "PARSE-DEPRECATED-TYPE").
+o_p_v(sys_parse_deprecated_type, package, pkg_sys).
+o_p_v(sys_parse_deprecated_type_specifier, classof, claz_symbol).
+o_p_v(sys_parse_deprecated_type_specifier, name, "PARSE-DEPRECATED-TYPE-SPECIFIER").
+o_p_v(sys_parse_deprecated_type_specifier, package, pkg_sys).
 o_p_v(sys_parse_integer_error,classof,claz_symbol).
 o_p_v(sys_parse_integer_error,compile_as,kw_function).
 o_p_v(sys_parse_integer_error,function,f_sys_parse_integer_error).
@@ -41933,16 +44381,34 @@ o_p_v(sys_parse_lambda_list_like_thing,compile_as,kw_function).
 o_p_v(sys_parse_lambda_list_like_thing,function,f_sys_parse_lambda_list_like_thing).
 o_p_v(sys_parse_lambda_list_like_thing,name,"PARSE-LAMBDA-LIST-LIKE-THING").
 o_p_v(sys_parse_lambda_list_like_thing,package,pkg_sys).
+o_p_v(sys_parse_logical_namestring, classof, claz_symbol).
+o_p_v(sys_parse_logical_namestring, name, "PARSE-LOGICAL-NAMESTRING").
+o_p_v(sys_parse_logical_namestring, package, pkg_sys).
 o_p_v(sys_parse_name_and_options,classof,claz_symbol).
 o_p_v(sys_parse_name_and_options,compile_as,kw_function).
 o_p_v(sys_parse_name_and_options,function,f_sys_parse_name_and_options).
 o_p_v(sys_parse_name_and_options,name,"PARSE-NAME-AND-OPTIONS").
 o_p_v(sys_parse_name_and_options,package,pkg_sys).
+o_p_v(sys_parse_native, classof, claz_symbol).
+o_p_v(sys_parse_native, name, "PARSE-NATIVE").
+o_p_v(sys_parse_native, package, pkg_sys).
+o_p_v(sys_parse_native_unix_namestring, classof, claz_symbol).
+o_p_v(sys_parse_native_unix_namestring, name, "PARSE-NATIVE-UNIX-NAMESTRING").
+o_p_v(sys_parse_native_unix_namestring, package, pkg_sys).
 o_p_v(sys_parse_optimize_quality,classof,claz_symbol).
 o_p_v(sys_parse_optimize_quality,compile_as,kw_function).
 o_p_v(sys_parse_optimize_quality,function,f_sys_parse_optimize_quality).
 o_p_v(sys_parse_optimize_quality,name,"PARSE-OPTIMIZE-QUALITY").
 o_p_v(sys_parse_optimize_quality,package,pkg_sys).
+o_p_v(sys_parse_unix_namestring, classof, claz_symbol).
+o_p_v(sys_parse_unix_namestring, name, "PARSE-UNIX-NAMESTRING").
+o_p_v(sys_parse_unix_namestring, package, pkg_sys).
+o_p_v(sys_parse_unknown_type, classof, claz_symbol).
+o_p_v(sys_parse_unknown_type, name, "PARSE-UNKNOWN-TYPE").
+o_p_v(sys_parse_unknown_type, package, pkg_sys).
+o_p_v(sys_parse_unknown_type_specifier, classof, claz_symbol).
+o_p_v(sys_parse_unknown_type_specifier, name, "PARSE-UNKNOWN-TYPE-SPECIFIER").
+o_p_v(sys_parse_unknown_type_specifier, package, pkg_sys).
 o_p_v(sys_pass2,classof,claz_symbol).
 o_p_v(sys_pass2,compile_as,kw_function).
 o_p_v(sys_pass2,function,f_sys_pass2).
@@ -41964,6 +44430,9 @@ o_p_v(sys_pathname_as_file,compile_as,kw_function).
 o_p_v(sys_pathname_as_file,function,f_sys_pathname_as_file).
 o_p_v(sys_pathname_as_file,name,"PATHNAME-AS-FILE").
 o_p_v(sys_pathname_as_file,package,pkg_sys).
+o_p_v(sys_pathname_component_tokens, classof, claz_symbol).
+o_p_v(sys_pathname_component_tokens, name, "PATHNAME-COMPONENT-TOKENS").
+o_p_v(sys_pathname_component_tokens, package, pkg_sys).
 o_p_v(sys_pathname_directory_p,classof,claz_symbol).
 o_p_v(sys_pathname_directory_p,compile_as,kw_function).
 o_p_v(sys_pathname_directory_p,function,f_sys_pathname_directory_p).
@@ -41980,6 +44449,12 @@ o_p_v(sys_pathnames,package,pkg_sys).
 o_p_v(sys_pathspec,classof,claz_symbol).
 o_p_v(sys_pathspec,name,"PATHSPEC").
 o_p_v(sys_pathspec,package,pkg_sys).
+o_p_v(sys_pattern, classof, claz_symbol).
+o_p_v(sys_pattern, name, "PATTERN").
+o_p_v(sys_pattern, package, pkg_sys).
+o_p_v(sys_pcl_class, classof, claz_symbol).
+o_p_v(sys_pcl_class, name, "PCL-CLASS").
+o_p_v(sys_pcl_class, package, pkg_sys).
 o_p_v(sys_pending_indent,classof,claz_symbol).
 o_p_v(sys_pending_indent,name,"PENDING-INDENT").
 o_p_v(sys_pending_indent,package,pkg_sys).
@@ -42025,6 +44500,9 @@ o_p_v(sys_pf_circlep,compile_as,kw_function).
 o_p_v(sys_pf_circlep,function,f_sys_pf_circlep).
 o_p_v(sys_pf_circlep,name,"%CIRCLEP").
 o_p_v(sys_pf_circlep,package,pkg_sys).
+o_p_v(sys_pf_class, classof, claz_symbol).
+o_p_v(sys_pf_class, name, "%CLASS").
+o_p_v(sys_pf_class, package, pkg_sys).
 o_p_v(sys_pf_class_default_initargs,classof,claz_symbol).
 o_p_v(sys_pf_class_default_initargs,compile_as,kw_function).
 o_p_v(sys_pf_class_default_initargs,function,f_sys_pf_class_default_initargs).
@@ -42227,6 +44705,9 @@ o_p_v(sys_pf_exit,compile_as,kw_function).
 o_p_v(sys_pf_exit,function,f_sys_pf_exit).
 o_p_v(sys_pf_exit,name,"%EXIT").
 o_p_v(sys_pf_exit,package,pkg_sys).
+o_p_v(sys_pf_exit_code, classof, claz_symbol).
+o_p_v(sys_pf_exit_code, name, "%EXIT-CODE").
+o_p_v(sys_pf_exit_code, package, pkg_sys).
 o_p_v(sys_pf_expand,classof,claz_symbol).
 o_p_v(sys_pf_expand,name,"%EXPAND").
 o_p_v(sys_pf_expand,package,pkg_sys).
@@ -42388,6 +44869,9 @@ o_p_v(sys_pf_float_bits,compile_as,kw_function).
 o_p_v(sys_pf_float_bits,function,f_sys_pf_float_bits).
 o_p_v(sys_pf_float_bits,name,"%FLOAT-BITS").
 o_p_v(sys_pf_float_bits,package,pkg_sys).
+o_p_v(sys_pf_for_std_class_b, classof, claz_symbol).
+o_p_v(sys_pf_for_std_class_b, name, "%FOR-STD-CLASS-B").
+o_p_v(sys_pf_for_std_class_b, package, pkg_sys).
 o_p_v(sys_pf_force_output,classof,claz_symbol).
 o_p_v(sys_pf_force_output,compile_as,kw_function).
 o_p_v(sys_pf_force_output,function,f_sys_pf_force_output).
@@ -42490,6 +44974,9 @@ o_p_v(sys_pf_local_set,compile_as,kw_function).
 o_p_v(sys_pf_local_set,function,f_sys_pf_local_set).
 o_p_v(sys_pf_local_set,name,"%LOCAL-SET").
 o_p_v(sys_pf_local_set,package,pkg_sys).
+o_p_v(sys_pf_lock, classof, claz_symbol).
+o_p_v(sys_pf_lock, name, "%LOCK").
+o_p_v(sys_pf_lock, package, pkg_sys).
 o_p_v(sys_pf_make_array,classof,claz_symbol).
 o_p_v(sys_pf_make_array,compile_as,kw_function).
 o_p_v(sys_pf_make_array,function,f_sys_pf_make_array).
@@ -42613,6 +45100,9 @@ o_p_v(sys_pf_member,package,pkg_sys).
 o_p_v(sys_pf_method_combination,classof,claz_symbol).
 o_p_v(sys_pf_method_combination,name,"%METHOD-COMBINATION").
 o_p_v(sys_pf_method_combination,package,pkg_sys).
+o_p_v(sys_pf_method_function, classof, claz_symbol).
+o_p_v(sys_pf_method_function, name, "%METHOD-FUNCTION").
+o_p_v(sys_pf_method_function, package, pkg_sys).
 o_p_v(sys_pf_min_args,classof,claz_symbol).
 o_p_v(sys_pf_min_args,name,"%MIN-ARGS").
 o_p_v(sys_pf_min_args,package,pkg_sys).
@@ -42694,6 +45184,9 @@ o_p_v(sys_pf_pf_time,compile_as,kw_function).
 o_p_v(sys_pf_pf_time,function,f_sys_pf_pf_time).
 o_p_v(sys_pf_pf_time,name,"%%TIME").
 o_p_v(sys_pf_pf_time,package,pkg_sys).
+o_p_v(sys_pf_policy, classof, claz_symbol).
+o_p_v(sys_pf_policy, name, "%POLICY").
+o_p_v(sys_pf_policy, package, pkg_sys).
 o_p_v(sys_pf_pprint_logical_block,classof,claz_symbol).
 o_p_v(sys_pf_pprint_logical_block,compile_as,kw_function).
 o_p_v(sys_pf_pprint_logical_block,function,f_sys_pf_pprint_logical_block).
@@ -42802,6 +45295,12 @@ o_p_v(sys_pf_reader_error,compile_as,kw_function).
 o_p_v(sys_pf_reader_error,function,f_sys_pf_reader_error).
 o_p_v(sys_pf_reader_error,name,"%READER-ERROR").
 o_p_v(sys_pf_reader_error,package,pkg_sys).
+o_p_v(sys_pf_readtable_case, classof, claz_symbol).
+o_p_v(sys_pf_readtable_case, name, "%READTABLE-CASE").
+o_p_v(sys_pf_readtable_case, package, pkg_sys).
+o_p_v(sys_pf_readtable_normalization, classof, claz_symbol).
+o_p_v(sys_pf_readtable_normalization, name, "%READTABLE-NORMALIZATION").
+o_p_v(sys_pf_readtable_normalization, package, pkg_sys).
 o_p_v(sys_pf_record_length,classof,claz_symbol).
 o_p_v(sys_pf_record_length,compile_as,kw_function).
 o_p_v(sys_pf_record_length,function,f_sys_pf_record_length).
@@ -43264,6 +45763,9 @@ o_p_v(sys_pf_sleep,package,pkg_sys).
 o_p_v(sys_pf_slot_definition,classof,claz_symbol).
 o_p_v(sys_pf_slot_definition,name,"%SLOT-DEFINITION").
 o_p_v(sys_pf_slot_definition,package,pkg_sys).
+o_p_v(sys_pf_slot_definition_documentation, classof, claz_symbol).
+o_p_v(sys_pf_slot_definition_documentation, name, "%SLOT-DEFINITION-DOCUMENTATION").
+o_p_v(sys_pf_slot_definition_documentation, package, pkg_sys).
 o_p_v(sys_pf_socket_accept,classof,claz_symbol).
 o_p_v(sys_pf_socket_accept,compile_as,kw_function).
 o_p_v(sys_pf_socket_accept,function,f_sys_pf_socket_accept).
@@ -43314,6 +45816,9 @@ o_p_v(sys_pf_standard_char_p,package,pkg_sys).
 o_p_v(sys_pf_start,classof,claz_symbol).
 o_p_v(sys_pf_start,name,"%START").
 o_p_v(sys_pf_start,package,pkg_sys).
+o_p_v(sys_pf_status, classof, claz_symbol).
+o_p_v(sys_pf_status, name, "%STATUS").
+o_p_v(sys_pf_status, package, pkg_sys).
 o_p_v(sys_pf_std_allocate_instance,classof,claz_symbol).
 o_p_v(sys_pf_std_allocate_instance,compile_as,kw_function).
 o_p_v(sys_pf_std_allocate_instance,function,f_sys_pf_std_allocate_instance).
@@ -43543,6 +46048,9 @@ o_p_v(sys_pick_result_array,compile_as,kw_function).
 o_p_v(sys_pick_result_array,function,f_sys_pick_result_array).
 o_p_v(sys_pick_result_array,name,"PICK-RESULT-ARRAY").
 o_p_v(sys_pick_result_array,package,pkg_sys).
+o_p_v(sys_pid, classof, claz_symbol).
+o_p_v(sys_pid, name, "PID").
+o_p_v(sys_pid, package, pkg_sys).
 o_p_v(sys_pieces,classof,claz_symbol).
 o_p_v(sys_pieces,name,"PIECES").
 o_p_v(sys_pieces,package,pkg_sys).
@@ -43561,6 +46069,18 @@ o_p_v(sys_places,package,pkg_sys).
 o_p_v(sys_plist,classof,claz_symbol).
 o_p_v(sys_plist,name,"PLIST").
 o_p_v(sys_plist,package,pkg_sys).
+o_p_v(sys_plist_mixin, classof, claz_symbol).
+o_p_v(sys_plist_mixin, name, "PLIST-MIXIN").
+o_p_v(sys_plist_mixin, package, pkg_sys).
+o_p_v(sys_pointer, classof, claz_symbol).
+o_p_v(sys_pointer, name, "POINTER").
+o_p_v(sys_pointer, package, pkg_sys).
+o_p_v(sys_policy, classof, claz_symbol).
+o_p_v(sys_policy, name, "POLICY").
+o_p_v(sys_policy, package, pkg_sys).
+o_p_v(sys_pollfds, classof, claz_symbol).
+o_p_v(sys_pollfds, name, "POLLFDS").
+o_p_v(sys_pollfds, package, pkg_sys).
 o_p_v(sys_pop_c38_store,classof,claz_symbol).
 o_p_v(sys_pop_c38_store,name,"POP&STORE").
 o_p_v(sys_pop_c38_store,package,pkg_sys).
@@ -43572,6 +46092,9 @@ o_p_v(sys_populate_zip_fasl,package,pkg_sys).
 o_p_v(sys_pos,classof,claz_symbol).
 o_p_v(sys_pos,name,"POS").
 o_p_v(sys_pos,package,pkg_sys).
+o_p_v(sys_possibilities, classof, claz_symbol).
+o_p_v(sys_possibilities, name, "POSSIBILITIES").
+o_p_v(sys_possibilities, package, pkg_sys).
 o_p_v(sys_post,classof,claz_symbol).
 o_p_v(sys_post,name,"POST").
 o_p_v(sys_post,package,pkg_sys).
@@ -43655,6 +46178,9 @@ o_p_v(sys_predicate_for_type,compile_as,kw_function).
 o_p_v(sys_predicate_for_type,function,f_sys_predicate_for_type).
 o_p_v(sys_predicate_for_type,name,"PREDICATE-FOR-TYPE").
 o_p_v(sys_predicate_for_type,package,pkg_sys).
+o_p_v(sys_predicate_name, classof, claz_symbol).
+o_p_v(sys_predicate_name, name, "PREDICATE-NAME").
+o_p_v(sys_predicate_name, package, pkg_sys).
 o_p_v(sys_prefix,classof,claz_symbol).
 o_p_v(sys_prefix,name,"PREFIX").
 o_p_v(sys_prefix,package,pkg_sys).
@@ -43685,6 +46211,9 @@ o_p_v(sys_pretty_print_condition,compile_as,kw_function).
 o_p_v(sys_pretty_print_condition,function,f_sys_pretty_print_condition).
 o_p_v(sys_pretty_print_condition,name,"PRETTY-PRINT-CONDITION").
 o_p_v(sys_pretty_print_condition,package,pkg_sys).
+o_p_v(sys_prev, classof, claz_symbol).
+o_p_v(sys_prev, name, "PREV").
+o_p_v(sys_prev, package, pkg_sys).
 o_p_v(sys_previous,classof,claz_symbol).
 o_p_v(sys_previous,name,"PREVIOUS").
 o_p_v(sys_previous,package,pkg_sys).
@@ -43727,6 +46256,12 @@ o_p_v(sys_print_lines_with_prefix,compile_as,kw_function).
 o_p_v(sys_print_lines_with_prefix,function,f_sys_print_lines_with_prefix).
 o_p_v(sys_print_lines_with_prefix,name,"PRINT-LINES-WITH-PREFIX").
 o_p_v(sys_print_lines_with_prefix,package,pkg_sys).
+o_p_v(sys_print_object_stream_specializer, classof, claz_symbol).
+o_p_v(sys_print_object_stream_specializer, name, "PRINT-OBJECT-STREAM-SPECIALIZER").
+o_p_v(sys_print_object_stream_specializer, package, pkg_sys).
+o_p_v(sys_print_option, classof, claz_symbol).
+o_p_v(sys_print_option, name, "PRINT-OPTION").
+o_p_v(sys_print_option, package, pkg_sys).
 o_p_v(sys_print_reference,classof,claz_symbol).
 o_p_v(sys_print_reference,compile_as,kw_function).
 o_p_v(sys_print_reference,function,f_sys_print_reference).
@@ -43742,6 +46277,12 @@ o_p_v(sys_print_structure,compile_as,kw_function).
 o_p_v(sys_print_structure,function,f_sys_print_structure).
 o_p_v(sys_print_structure,name,"PRINT-STRUCTURE").
 o_p_v(sys_print_structure,package,pkg_sys).
+o_p_v(sys_printer_fname, classof, claz_symbol).
+o_p_v(sys_printer_fname, name, "PRINTER-FNAME").
+o_p_v(sys_printer_fname, package, pkg_sys).
+o_p_v(sys_priority_queue, classof, claz_symbol).
+o_p_v(sys_priority_queue, name, "PRIORITY-QUEUE").
+o_p_v(sys_priority_queue, package, pkg_sys).
 o_p_v(sys_problem,classof,claz_symbol).
 o_p_v(sys_problem,name,"PROBLEM").
 o_p_v(sys_problem,package,pkg_sys).
@@ -43948,6 +46489,33 @@ o_p_v(sys_proclaimed_type,compile_as,kw_function).
 o_p_v(sys_proclaimed_type,function,f_sys_proclaimed_type).
 o_p_v(sys_proclaimed_type,name,"PROCLAIMED-TYPE").
 o_p_v(sys_proclaimed_type,package,pkg_sys).
+o_p_v(sys_proclamation_mismatch, classof, claz_symbol).
+o_p_v(sys_proclamation_mismatch, name, "PROCLAMATION-MISMATCH").
+o_p_v(sys_proclamation_mismatch, package, pkg_sys).
+o_p_v(sys_proclamation_mismatch_description, classof, claz_symbol).
+o_p_v(sys_proclamation_mismatch_description, name, "PROCLAMATION-MISMATCH-DESCRIPTION").
+o_p_v(sys_proclamation_mismatch_description, package, pkg_sys).
+o_p_v(sys_proclamation_mismatch_kind, classof, claz_symbol).
+o_p_v(sys_proclamation_mismatch_kind, name, "PROCLAMATION-MISMATCH-KIND").
+o_p_v(sys_proclamation_mismatch_kind, package, pkg_sys).
+o_p_v(sys_proclamation_mismatch_name, classof, claz_symbol).
+o_p_v(sys_proclamation_mismatch_name, name, "PROCLAMATION-MISMATCH-NAME").
+o_p_v(sys_proclamation_mismatch_name, package, pkg_sys).
+o_p_v(sys_proclamation_mismatch_new, classof, claz_symbol).
+o_p_v(sys_proclamation_mismatch_new, name, "PROCLAMATION-MISMATCH-NEW").
+o_p_v(sys_proclamation_mismatch_new, package, pkg_sys).
+o_p_v(sys_proclamation_mismatch_old, classof, claz_symbol).
+o_p_v(sys_proclamation_mismatch_old, name, "PROCLAMATION-MISMATCH-OLD").
+o_p_v(sys_proclamation_mismatch_old, package, pkg_sys).
+o_p_v(sys_program_error_form, classof, claz_symbol).
+o_p_v(sys_program_error_form, name, "PROGRAM-ERROR-FORM").
+o_p_v(sys_program_error_form, package, pkg_sys).
+o_p_v(sys_program_error_message, classof, claz_symbol).
+o_p_v(sys_program_error_message, name, "PROGRAM-ERROR-MESSAGE").
+o_p_v(sys_program_error_message, package, pkg_sys).
+o_p_v(sys_program_error_source, classof, claz_symbol).
+o_p_v(sys_program_error_source, name, "PROGRAM-ERROR-SOURCE").
+o_p_v(sys_program_error_source, package, pkg_sys).
 o_p_v(sys_program_name,classof,claz_symbol).
 o_p_v(sys_program_name,compile_as,kw_function).
 o_p_v(sys_program_name,function,f_sys_program_name).
@@ -44061,6 +46629,9 @@ o_p_v(sys_properly_named_class_p,compile_as,kw_function).
 o_p_v(sys_properly_named_class_p,function,f_sys_properly_named_class_p).
 o_p_v(sys_properly_named_class_p,name,"PROPERLY-NAMED-CLASS-P").
 o_p_v(sys_properly_named_class_p,package,pkg_sys).
+o_p_v(sys_prototype, classof, claz_symbol).
+o_p_v(sys_prototype, name, "PROTOTYPE").
+o_p_v(sys_prototype, package, pkg_sys).
 o_p_v(sys_proxy_p,classof,claz_symbol).
 o_p_v(sys_proxy_p,name,"PROXY-P").
 o_p_v(sys_proxy_p,package,pkg_sys).
@@ -44078,11 +46649,17 @@ o_p_v(sys_psxhash,package,pkg_sys).
 o_p_v(sys_ptemp,classof,claz_symbol).
 o_p_v(sys_ptemp,name,"PTEMP").
 o_p_v(sys_ptemp,package,pkg_sys).
+o_p_v(sys_pty, classof, claz_symbol).
+o_p_v(sys_pty, name, "PTY").
+o_p_v(sys_pty, package, pkg_sys).
 o_p_v(sys_punt_print_if_too_long,classof,claz_symbol).
 o_p_v(sys_punt_print_if_too_long,compile_as,kw_function).
 o_p_v(sys_punt_print_if_too_long,function,f_sys_punt_print_if_too_long).
 o_p_v(sys_punt_print_if_too_long,name,"PUNT-PRINT-IF-TOO-LONG").
 o_p_v(sys_punt_print_if_too_long,package,pkg_sys).
+o_p_v(sys_pure, classof, claz_symbol).
+o_p_v(sys_pure, name, "PURE").
+o_p_v(sys_pure, package, pkg_sys).
 o_p_v(sys_push_let_binding,classof,claz_symbol).
 o_p_v(sys_push_let_binding,compile_as,kw_function).
 o_p_v(sys_push_let_binding,function,f_sys_push_let_binding).
@@ -44137,6 +46714,9 @@ o_p_v(sys_puthash,package,pkg_sys).
 o_p_v(sys_qualifiers,classof,claz_symbol).
 o_p_v(sys_qualifiers,name,"QUALIFIERS").
 o_p_v(sys_qualifiers,package,pkg_sys).
+o_p_v(sys_quasi_random_address_based_hash, classof, claz_symbol).
+o_p_v(sys_quasi_random_address_based_hash, name, "QUASI-RANDOM-ADDRESS-BASED-HASH").
+o_p_v(sys_quasi_random_address_based_hash, package, pkg_sys).
 o_p_v(sys_query_function,classof,claz_symbol).
 o_p_v(sys_query_function,compile_as,kw_function).
 o_p_v(sys_query_function,function,f_sys_query_function).
@@ -44182,6 +46762,12 @@ o_p_v(sys_radix_reader,compile_as,kw_function).
 o_p_v(sys_radix_reader,function,f_sys_radix_reader).
 o_p_v(sys_radix_reader,name,"RADIX-READER").
 o_p_v(sys_radix_reader,package,pkg_sys).
+o_p_v(sys_random_class, classof, claz_symbol).
+o_p_v(sys_random_class, name, "RANDOM-CLASS").
+o_p_v(sys_random_class, package, pkg_sys).
+o_p_v(sys_random_layout_clos_hash, classof, claz_symbol).
+o_p_v(sys_random_layout_clos_hash, name, "RANDOM-LAYOUT-CLOS-HASH").
+o_p_v(sys_random_layout_clos_hash, package, pkg_sys).
 o_p_v(sys_random_posfixnum,classof,claz_symbol).
 o_p_v(sys_random_posfixnum,compile_as,kw_function).
 o_p_v(sys_random_posfixnum,function,f_sys_random_posfixnum).
@@ -44193,6 +46779,9 @@ o_p_v(sys_rank,package,pkg_sys).
 o_p_v(sys_raw,classof,claz_symbol).
 o_p_v(sys_raw,name,"RAW").
 o_p_v(sys_raw,package,pkg_sys).
+o_p_v(sys_raw_type, classof, claz_symbol).
+o_p_v(sys_raw_type, name, "RAW-TYPE").
+o_p_v(sys_raw_type, package, pkg_sys).
 o_p_v(sys_read_8_bits,classof,claz_symbol).
 o_p_v(sys_read_8_bits,compile_as,kw_function).
 o_p_v(sys_read_8_bits,function,f_sys_read_8_bits).
@@ -44203,6 +46792,12 @@ o_p_v(sys_read_byte_array_from_stream,compile_as,kw_function).
 o_p_v(sys_read_byte_array_from_stream,function,f_sys_read_byte_array_from_stream).
 o_p_v(sys_read_byte_array_from_stream,name,"READ-BYTE-ARRAY-FROM-STREAM").
 o_p_v(sys_read_byte_array_from_stream,package,pkg_sys).
+o_p_v(sys_read_c_string_fun, classof, claz_symbol).
+o_p_v(sys_read_c_string_fun, name, "READ-C-STRING-FUN").
+o_p_v(sys_read_c_string_fun, package, pkg_sys).
+o_p_v(sys_read_char_fun, classof, claz_symbol).
+o_p_v(sys_read_char_fun, name, "READ-CHAR-FUN").
+o_p_v(sys_read_char_fun, package, pkg_sys).
 o_p_v(sys_read_comment,classof,claz_symbol).
 o_p_v(sys_read_comment,compile_as,kw_function).
 o_p_v(sys_read_comment,function,f_sys_read_comment).
@@ -44256,6 +46851,9 @@ o_p_v(sys_read_n_bytes,compile_as,kw_function).
 o_p_v(sys_read_n_bytes,function,f_sys_read_n_bytes).
 o_p_v(sys_read_n_bytes,name,"READ-N-BYTES").
 o_p_v(sys_read_n_bytes,package,pkg_sys).
+o_p_v(sys_read_n_chars_fun, classof, claz_symbol).
+o_p_v(sys_read_n_chars_fun, name, "READ-N-CHARS-FUN").
+o_p_v(sys_read_n_chars_fun, package, pkg_sys).
 o_p_v(sys_read_only,classof,claz_symbol).
 o_p_v(sys_read_only,name,"READ-ONLY").
 o_p_v(sys_read_only,package,pkg_sys).
@@ -44282,6 +46880,18 @@ o_p_v(sys_read_vector_unsigned_byte_8,package,pkg_sys).
 o_p_v(sys_reader,classof,claz_symbol).
 o_p_v(sys_reader,name,"READER").
 o_p_v(sys_reader,package,pkg_sys).
+o_p_v(sys_reader_eof_error, classof, claz_symbol).
+o_p_v(sys_reader_eof_error, name, "READER-EOF-ERROR").
+o_p_v(sys_reader_eof_error, package, pkg_sys).
+o_p_v(sys_reader_eof_error_context, classof, claz_symbol).
+o_p_v(sys_reader_eof_error_context, name, "READER-EOF-ERROR-CONTEXT").
+o_p_v(sys_reader_eof_error_context, package, pkg_sys).
+o_p_v(sys_reader_impossible_number_error, classof, claz_symbol).
+o_p_v(sys_reader_impossible_number_error, name, "READER-IMPOSSIBLE-NUMBER-ERROR").
+o_p_v(sys_reader_impossible_number_error, package, pkg_sys).
+o_p_v(sys_reader_impossible_number_error_error, classof, claz_symbol).
+o_p_v(sys_reader_impossible_number_error_error, name, "READER-IMPOSSIBLE-NUMBER-ERROR-ERROR").
+o_p_v(sys_reader_impossible_number_error_error, package, pkg_sys).
 o_p_v(sys_readers,classof,claz_symbol).
 o_p_v(sys_readers,name,"READERS").
 o_p_v(sys_readers,package,pkg_sys).
@@ -44316,6 +46926,45 @@ o_p_v(sys_record_source_information_for_type,compile_as,kw_function).
 o_p_v(sys_record_source_information_for_type,function,f_sys_record_source_information_for_type).
 o_p_v(sys_record_source_information_for_type,name,"RECORD-SOURCE-INFORMATION-FOR-TYPE").
 o_p_v(sys_record_source_information_for_type,package,pkg_sys).
+o_p_v(sys_redefinition_warning, classof, claz_symbol).
+o_p_v(sys_redefinition_warning, name, "REDEFINITION-WARNING").
+o_p_v(sys_redefinition_warning, package, pkg_sys).
+o_p_v(sys_redefinition_warning_name, classof, claz_symbol).
+o_p_v(sys_redefinition_warning_name, name, "REDEFINITION-WARNING-NAME").
+o_p_v(sys_redefinition_warning_name, package, pkg_sys).
+o_p_v(sys_redefinition_warning_new_location, classof, claz_symbol).
+o_p_v(sys_redefinition_warning_new_location, name, "REDEFINITION-WARNING-NEW-LOCATION").
+o_p_v(sys_redefinition_warning_new_location, package, pkg_sys).
+o_p_v(sys_redefinition_with_defgeneric, classof, claz_symbol).
+o_p_v(sys_redefinition_with_defgeneric, name, "REDEFINITION-WITH-DEFGENERIC").
+o_p_v(sys_redefinition_with_defgeneric, package, pkg_sys).
+o_p_v(sys_redefinition_with_defmacro, classof, claz_symbol).
+o_p_v(sys_redefinition_with_defmacro, name, "REDEFINITION-WITH-DEFMACRO").
+o_p_v(sys_redefinition_with_defmacro, package, pkg_sys).
+o_p_v(sys_redefinition_with_defmethod, classof, claz_symbol).
+o_p_v(sys_redefinition_with_defmethod, name, "REDEFINITION-WITH-DEFMETHOD").
+o_p_v(sys_redefinition_with_defmethod, package, pkg_sys).
+o_p_v(sys_redefinition_with_defmethod_new_location, classof, claz_symbol).
+o_p_v(sys_redefinition_with_defmethod_new_location, name, "REDEFINITION-WITH-DEFMETHOD-NEW-LOCATION").
+o_p_v(sys_redefinition_with_defmethod_new_location, package, pkg_sys).
+o_p_v(sys_redefinition_with_defmethod_old_method, classof, claz_symbol).
+o_p_v(sys_redefinition_with_defmethod_old_method, name, "REDEFINITION-WITH-DEFMETHOD-OLD-METHOD").
+o_p_v(sys_redefinition_with_defmethod_old_method, package, pkg_sys).
+o_p_v(sys_redefinition_with_defmethod_qualifiers, classof, claz_symbol).
+o_p_v(sys_redefinition_with_defmethod_qualifiers, name, "REDEFINITION-WITH-DEFMETHOD-QUALIFIERS").
+o_p_v(sys_redefinition_with_defmethod_qualifiers, package, pkg_sys).
+o_p_v(sys_redefinition_with_defmethod_specializers, classof, claz_symbol).
+o_p_v(sys_redefinition_with_defmethod_specializers, name, "REDEFINITION-WITH-DEFMETHOD-SPECIALIZERS").
+o_p_v(sys_redefinition_with_defmethod_specializers, package, pkg_sys).
+o_p_v(sys_redefinition_with_deftransform, classof, claz_symbol).
+o_p_v(sys_redefinition_with_deftransform, name, "REDEFINITION-WITH-DEFTRANSFORM").
+o_p_v(sys_redefinition_with_deftransform, package, pkg_sys).
+o_p_v(sys_redefinition_with_deftransform_transform, classof, claz_symbol).
+o_p_v(sys_redefinition_with_deftransform_transform, name, "REDEFINITION-WITH-DEFTRANSFORM-TRANSFORM").
+o_p_v(sys_redefinition_with_deftransform_transform, package, pkg_sys).
+o_p_v(sys_redefinition_with_defun, classof, claz_symbol).
+o_p_v(sys_redefinition_with_defun, name, "REDEFINITION-WITH-DEFUN").
+o_p_v(sys_redefinition_with_defun, package, pkg_sys).
 o_p_v(sys_redo_eval_frame,classof,claz_symbol).
 o_p_v(sys_redo_eval_frame,compile_as,kw_function).
 o_p_v(sys_redo_eval_frame,function,f_sys_redo_eval_frame).
@@ -44324,6 +46973,15 @@ o_p_v(sys_redo_eval_frame,package,pkg_sys).
 o_p_v(sys_ref,classof,claz_symbol).
 o_p_v(sys_ref,name,"REF").
 o_p_v(sys_ref,package,pkg_sys).
+o_p_v(sys_reference_condition, classof, claz_symbol).
+o_p_v(sys_reference_condition, name, "REFERENCE-CONDITION").
+o_p_v(sys_reference_condition, package, pkg_sys).
+o_p_v(sys_reference_condition_references, classof, claz_symbol).
+o_p_v(sys_reference_condition_references, name, "REFERENCE-CONDITION-REFERENCES").
+o_p_v(sys_reference_condition_references, package, pkg_sys).
+o_p_v(sys_references, classof, claz_symbol).
+o_p_v(sys_references, name, "REFERENCES").
+o_p_v(sys_references, package, pkg_sys).
 o_p_v(sys_rehash_size,classof,claz_symbol).
 o_p_v(sys_rehash_size,name,"REHASH-SIZE").
 o_p_v(sys_rehash_size,package,pkg_sys).
@@ -44363,9 +47021,15 @@ o_p_v(sys_remove_zip_cache_entry,package,pkg_sys).
 o_p_v(sys_repeat,classof,claz_symbol).
 o_p_v(sys_repeat,name,"REPEAT").
 o_p_v(sys_repeat,package,pkg_sys).
+o_p_v(sys_repeat_interval, classof, claz_symbol).
+o_p_v(sys_repeat_interval, name, "REPEAT-INTERVAL").
+o_p_v(sys_repeat_interval, package, pkg_sys).
 o_p_v(sys_replaceable_list,classof,claz_symbol).
 o_p_v(sys_replaceable_list,name,"REPLACEABLE-LIST").
 o_p_v(sys_replaceable_list,package,pkg_sys).
+o_p_v(sys_replacements, classof, claz_symbol).
+o_p_v(sys_replacements, name, "REPLACEMENTS").
+o_p_v(sys_replacements, package, pkg_sys).
 o_p_v(sys_report,classof,claz_symbol).
 o_p_v(sys_report,name,"REPORT").
 o_p_v(sys_report,package,pkg_sys).
@@ -44416,6 +47080,9 @@ o_p_v(sys_require_type,compile_as,kw_function).
 o_p_v(sys_require_type,function,f_sys_require_type).
 o_p_v(sys_require_type,name,"REQUIRE-TYPE").
 o_p_v(sys_require_type,package,pkg_sys).
+o_p_v(sys_required, classof, claz_symbol).
+o_p_v(sys_required, name, "REQUIRED").
+o_p_v(sys_required, package, pkg_sys).
 o_p_v(sys_required_args,classof,claz_symbol).
 o_p_v(sys_required_args,name,"REQUIRED-ARGS").
 o_p_v(sys_required_args,package,pkg_sys).
@@ -44521,6 +47188,9 @@ o_p_v(sys_resultform,package,pkg_sys).
 o_p_v(sys_results,classof,claz_symbol).
 o_p_v(sys_results,name,"RESULTS").
 o_p_v(sys_results,package,pkg_sys).
+o_p_v(sys_resync_fun, classof, claz_symbol).
+o_p_v(sys_resync_fun, name, "RESYNC-FUN").
+o_p_v(sys_resync_fun, package, pkg_sys).
 o_p_v(sys_ret,classof,claz_symbol).
 o_p_v(sys_ret,name,"RET").
 o_p_v(sys_ret,package,pkg_sys).
@@ -44578,6 +47248,9 @@ o_p_v(sys_return_type,package,pkg_sys).
 o_p_v(sys_return_value,classof,claz_symbol).
 o_p_v(sys_return_value,name,"RETURN-VALUE").
 o_p_v(sys_return_value,package,pkg_sys).
+o_p_v(sys_returns, classof, claz_symbol).
+o_p_v(sys_returns, name, "RETURNS").
+o_p_v(sys_returns, package, pkg_sys).
 o_p_v(sys_revadd,classof,claz_symbol).
 o_p_v(sys_revadd,compile_as,kw_operator).
 o_p_v(sys_revadd,function,f_sys_revadd).
@@ -44625,6 +47298,9 @@ o_p_v(sys_run_program,compile_as,kw_function).
 o_p_v(sys_run_program,function,f_sys_run_program).
 o_p_v(sys_run_program,name,"RUN-PROGRAM").
 o_p_v(sys_run_program,package,pkg_sys).
+o_p_v(sys_runtime_error, classof, claz_symbol).
+o_p_v(sys_runtime_error, name, "RUNTIME-ERROR").
+o_p_v(sys_runtime_error, package, pkg_sys).
 o_p_v(sys_s,classof,claz_symbol).
 o_p_v(sys_s,name,"S").
 o_p_v(sys_s,package,pkg_sys).
@@ -44633,6 +47309,9 @@ o_p_v(sys_safe_length,compile_as,kw_function).
 o_p_v(sys_safe_length,function,f_sys_safe_length).
 o_p_v(sys_safe_length,name,"SAFE-LENGTH").
 o_p_v(sys_safe_length,package,pkg_sys).
+o_p_v(sys_safe_p, classof, claz_symbol).
+o_p_v(sys_safe_p, name, "SAFE-P").
+o_p_v(sys_safe_p, package, pkg_sys).
 o_p_v(sys_safe_typep,classof,claz_symbol).
 o_p_v(sys_safe_typep,compile_as,kw_function).
 o_p_v(sys_safe_typep,function,f_sys_safe_typep).
@@ -44663,21 +47342,45 @@ o_p_v(sys_same_env_as,compile_as,kw_function).
 o_p_v(sys_same_env_as,function,f_sys_same_env_as).
 o_p_v(sys_same_env_as,name,"SAME-ENV-AS").
 o_p_v(sys_same_env_as,package,pkg_sys).
+o_p_v(sys_same_file_redefinition_warning, classof, claz_symbol).
+o_p_v(sys_same_file_redefinition_warning, name, "SAME-FILE-REDEFINITION-WARNING").
+o_p_v(sys_same_file_redefinition_warning, package, pkg_sys).
 o_p_v(sys_sanitize_class_name,classof,claz_symbol).
 o_p_v(sys_sanitize_class_name,compile_as,kw_function).
 o_p_v(sys_sanitize_class_name,function,f_sys_sanitize_class_name).
 o_p_v(sys_sanitize_class_name,name,"SANITIZE-CLASS-NAME").
 o_p_v(sys_sanitize_class_name,package,pkg_sys).
+o_p_v(sys_sap, classof, claz_symbol).
+o_p_v(sys_sap, name, "SAP").
+o_p_v(sys_sap, package, pkg_sys).
 o_p_v(sys_satisfies_the_test,classof,claz_symbol).
 o_p_v(sys_satisfies_the_test,compile_as,kw_function).
 o_p_v(sys_satisfies_the_test,function,f_sys_satisfies_the_test).
 o_p_v(sys_satisfies_the_test,name,"SATISFIES-THE-TEST").
 o_p_v(sys_satisfies_the_test,package,pkg_sys).
+o_p_v(sys_save_condition, classof, claz_symbol).
+o_p_v(sys_save_condition, name, "SAVE-CONDITION").
+o_p_v(sys_save_condition, package, pkg_sys).
+o_p_v(sys_save_error, classof, claz_symbol).
+o_p_v(sys_save_error, name, "SAVE-ERROR").
+o_p_v(sys_save_error, package, pkg_sys).
+o_p_v(sys_save_with_multiple_threads_error, classof, claz_symbol).
+o_p_v(sys_save_with_multiple_threads_error, name, "SAVE-WITH-MULTIPLE-THREADS-ERROR").
+o_p_v(sys_save_with_multiple_threads_error, package, pkg_sys).
+o_p_v(sys_save_with_multiple_threads_error_interactive_threads, classof, claz_symbol).
+o_p_v(sys_save_with_multiple_threads_error_interactive_threads, name, "SAVE-WITH-MULTIPLE-THREADS-ERROR-INTERACTIVE-THREADS").
+o_p_v(sys_save_with_multiple_threads_error_interactive_threads, package, pkg_sys).
+o_p_v(sys_save_with_multiple_threads_error_other_threads, classof, claz_symbol).
+o_p_v(sys_save_with_multiple_threads_error_other_threads, name, "SAVE-WITH-MULTIPLE-THREADS-ERROR-OTHER-THREADS").
+o_p_v(sys_save_with_multiple_threads_error_other_threads, package, pkg_sys).
 o_p_v(sys_savemem,classof,claz_symbol).
 o_p_v(sys_savemem,compile_as,kw_function).
 o_p_v(sys_savemem,function,f_sys_savemem).
 o_p_v(sys_savemem,name,"SAVEMEM").
 o_p_v(sys_savemem,package,pkg_sys).
+o_p_v(sys_sc_offset, classof, claz_symbol).
+o_p_v(sys_sc_offset, name, "SC-OFFSET").
+o_p_v(sys_sc_offset, package, pkg_sys).
 o_p_v(sys_scale,classof,claz_symbol).
 o_p_v(sys_scale,name,"SCALE").
 o_p_v(sys_scale,package,pkg_sys).
@@ -44761,6 +47464,9 @@ o_p_v(sys_seclasses_commute_disjoint_p,package,pkg_sys).
 o_p_v(sys_second_form,classof,claz_symbol).
 o_p_v(sys_second_form,name,"SECOND-FORM").
 o_p_v(sys_second_form,package,pkg_sys).
+o_p_v(sys_seconds, classof, claz_symbol).
+o_p_v(sys_seconds, name, "SECONDS").
+o_p_v(sys_seconds, package, pkg_sys).
 o_p_v(sys_seen,classof,claz_symbol).
 o_p_v(sys_seen,name,"SEEN").
 o_p_v(sys_seen,package,pkg_sys).
@@ -44806,6 +47512,9 @@ o_p_v(sys_sequencep,package,pkg_sys).
 o_p_v(sys_sequences,classof,claz_symbol).
 o_p_v(sys_sequences,name,"SEQUENCES").
 o_p_v(sys_sequences,package,pkg_sys).
+o_p_v(sys_serve_events, classof, claz_symbol).
+o_p_v(sys_serve_events, name, "SERVE-EVENTS").
+o_p_v(sys_serve_events, package, pkg_sys).
 o_p_v(sys_set_ansi,classof,claz_symbol).
 o_p_v(sys_set_ansi,compile_as,kw_function).
 o_p_v(sys_set_ansi,function,f_sys_set_ansi).
@@ -45312,11 +48021,20 @@ o_p_v(sys_short_code_opsize,declared_as,defconstant).
 o_p_v(sys_short_code_opsize,name,"SHORT-CODE-OPSIZE").
 o_p_v(sys_short_code_opsize,package,pkg_sys).
 o_p_v(sys_short_code_opsize,value,'$OBJ'(claz_vector,[15,25,21,30,8])).
+o_p_v(sys_short_combination_identity_with_one_argument, classof, claz_symbol).
+o_p_v(sys_short_combination_identity_with_one_argument, name, "SHORT-COMBINATION-IDENTITY-WITH-ONE-ARGUMENT").
+o_p_v(sys_short_combination_identity_with_one_argument, package, pkg_sys).
+o_p_v(sys_short_combination_operator, classof, claz_symbol).
+o_p_v(sys_short_combination_operator, name, "SHORT-COMBINATION-OPERATOR").
+o_p_v(sys_short_combination_operator, package, pkg_sys).
 o_p_v(sys_short_float_p,classof,claz_symbol).
 o_p_v(sys_short_float_p,compile_as,kw_function).
 o_p_v(sys_short_float_p,function,f_sys_short_float_p).
 o_p_v(sys_short_float_p,name,"SHORT-FLOAT-P").
 o_p_v(sys_short_float_p,package,pkg_sys).
+o_p_v(sys_short_method_combination, classof, claz_symbol).
+o_p_v(sys_short_method_combination, name, "SHORT-METHOD-COMBINATION").
+o_p_v(sys_short_method_combination, package, pkg_sys).
 o_p_v(sys_show_local_symbols,classof,claz_symbol).
 o_p_v(sys_show_local_symbols,compile_as,kw_function).
 o_p_v(sys_show_local_symbols,function,f_sys_show_local_symbols).
@@ -45380,17 +48098,83 @@ o_p_v(sys_signed_operand_length,compile_as,kw_function).
 o_p_v(sys_signed_operand_length,function,f_sys_signed_operand_length).
 o_p_v(sys_signed_operand_length,name,"SIGNED-OPERAND-LENGTH").
 o_p_v(sys_signed_operand_length,package,pkg_sys).
+o_p_v(sys_simd_pack_type, classof, claz_symbol).
+o_p_v(sys_simd_pack_type, name, "SIMD-PACK-TYPE").
+o_p_v(sys_simd_pack_type, package, pkg_sys).
 o_p_v(sys_simple_argument_list_dotted,classof,claz_symbol).
 o_p_v(sys_simple_argument_list_dotted,name,"SIMPLE-ARGUMENT-LIST-DOTTED").
 o_p_v(sys_simple_argument_list_dotted,package,pkg_sys).
 o_p_v(sys_simple_arithmetic_error,classof,claz_symbol).
 o_p_v(sys_simple_arithmetic_error,name,"SIMPLE-ARITHMETIC-ERROR").
 o_p_v(sys_simple_arithmetic_error,package,pkg_sys).
+o_p_v(sys_simple_array_complex_double_float, classof, claz_symbol).
+o_p_v(sys_simple_array_complex_double_float, name, "SIMPLE-ARRAY-COMPLEX-DOUBLE-FLOAT").
+o_p_v(sys_simple_array_complex_double_float, package, pkg_sys).
+o_p_v(sys_simple_array_complex_single_float, classof, claz_symbol).
+o_p_v(sys_simple_array_complex_single_float, name, "SIMPLE-ARRAY-COMPLEX-SINGLE-FLOAT").
+o_p_v(sys_simple_array_complex_single_float, package, pkg_sys).
+o_p_v(sys_simple_array_double_float, classof, claz_symbol).
+o_p_v(sys_simple_array_double_float, name, "SIMPLE-ARRAY-DOUBLE-FLOAT").
+o_p_v(sys_simple_array_double_float, package, pkg_sys).
+o_p_v(sys_simple_array_fixnum, classof, claz_symbol).
+o_p_v(sys_simple_array_fixnum, name, "SIMPLE-ARRAY-FIXNUM").
+o_p_v(sys_simple_array_fixnum, package, pkg_sys).
+o_p_v(sys_simple_array_nil, classof, claz_symbol).
+o_p_v(sys_simple_array_nil, name, "SIMPLE-ARRAY-NIL").
+o_p_v(sys_simple_array_nil, package, pkg_sys).
 o_p_v(sys_simple_array_p,classof,claz_symbol).
 o_p_v(sys_simple_array_p,compile_as,kw_function).
 o_p_v(sys_simple_array_p,function,f_sys_simple_array_p).
 o_p_v(sys_simple_array_p,name,"SIMPLE-ARRAY-P").
 o_p_v(sys_simple_array_p,package,pkg_sys).
+o_p_v(sys_simple_array_signed_byte_16, classof, claz_symbol).
+o_p_v(sys_simple_array_signed_byte_16, name, "SIMPLE-ARRAY-SIGNED-BYTE-16").
+o_p_v(sys_simple_array_signed_byte_16, package, pkg_sys).
+o_p_v(sys_simple_array_signed_byte_32, classof, claz_symbol).
+o_p_v(sys_simple_array_signed_byte_32, name, "SIMPLE-ARRAY-SIGNED-BYTE-32").
+o_p_v(sys_simple_array_signed_byte_32, package, pkg_sys).
+o_p_v(sys_simple_array_signed_byte_64, classof, claz_symbol).
+o_p_v(sys_simple_array_signed_byte_64, name, "SIMPLE-ARRAY-SIGNED-BYTE-64").
+o_p_v(sys_simple_array_signed_byte_64, package, pkg_sys).
+o_p_v(sys_simple_array_signed_byte_8, classof, claz_symbol).
+o_p_v(sys_simple_array_signed_byte_8, name, "SIMPLE-ARRAY-SIGNED-BYTE-8").
+o_p_v(sys_simple_array_signed_byte_8, package, pkg_sys).
+o_p_v(sys_simple_array_single_float, classof, claz_symbol).
+o_p_v(sys_simple_array_single_float, name, "SIMPLE-ARRAY-SINGLE-FLOAT").
+o_p_v(sys_simple_array_single_float, package, pkg_sys).
+o_p_v(sys_simple_array_unsigned_byte_15, classof, claz_symbol).
+o_p_v(sys_simple_array_unsigned_byte_15, name, "SIMPLE-ARRAY-UNSIGNED-BYTE-15").
+o_p_v(sys_simple_array_unsigned_byte_15, package, pkg_sys).
+o_p_v(sys_simple_array_unsigned_byte_16, classof, claz_symbol).
+o_p_v(sys_simple_array_unsigned_byte_16, name, "SIMPLE-ARRAY-UNSIGNED-BYTE-16").
+o_p_v(sys_simple_array_unsigned_byte_16, package, pkg_sys).
+o_p_v(sys_simple_array_unsigned_byte_2, classof, claz_symbol).
+o_p_v(sys_simple_array_unsigned_byte_2, name, "SIMPLE-ARRAY-UNSIGNED-BYTE-2").
+o_p_v(sys_simple_array_unsigned_byte_2, package, pkg_sys).
+o_p_v(sys_simple_array_unsigned_byte_31, classof, claz_symbol).
+o_p_v(sys_simple_array_unsigned_byte_31, name, "SIMPLE-ARRAY-UNSIGNED-BYTE-31").
+o_p_v(sys_simple_array_unsigned_byte_31, package, pkg_sys).
+o_p_v(sys_simple_array_unsigned_byte_32, classof, claz_symbol).
+o_p_v(sys_simple_array_unsigned_byte_32, name, "SIMPLE-ARRAY-UNSIGNED-BYTE-32").
+o_p_v(sys_simple_array_unsigned_byte_32, package, pkg_sys).
+o_p_v(sys_simple_array_unsigned_byte_4, classof, claz_symbol).
+o_p_v(sys_simple_array_unsigned_byte_4, name, "SIMPLE-ARRAY-UNSIGNED-BYTE-4").
+o_p_v(sys_simple_array_unsigned_byte_4, package, pkg_sys).
+o_p_v(sys_simple_array_unsigned_byte_63, classof, claz_symbol).
+o_p_v(sys_simple_array_unsigned_byte_63, name, "SIMPLE-ARRAY-UNSIGNED-BYTE-63").
+o_p_v(sys_simple_array_unsigned_byte_63, package, pkg_sys).
+o_p_v(sys_simple_array_unsigned_byte_64, classof, claz_symbol).
+o_p_v(sys_simple_array_unsigned_byte_64, name, "SIMPLE-ARRAY-UNSIGNED-BYTE-64").
+o_p_v(sys_simple_array_unsigned_byte_64, package, pkg_sys).
+o_p_v(sys_simple_array_unsigned_byte_7, classof, claz_symbol).
+o_p_v(sys_simple_array_unsigned_byte_7, name, "SIMPLE-ARRAY-UNSIGNED-BYTE-7").
+o_p_v(sys_simple_array_unsigned_byte_7, package, pkg_sys).
+o_p_v(sys_simple_array_unsigned_byte_8, classof, claz_symbol).
+o_p_v(sys_simple_array_unsigned_byte_8, name, "SIMPLE-ARRAY-UNSIGNED-BYTE-8").
+o_p_v(sys_simple_array_unsigned_byte_8, package, pkg_sys).
+o_p_v(sys_simple_array_unsigned_fixnum, classof, claz_symbol).
+o_p_v(sys_simple_array_unsigned_fixnum, name, "SIMPLE-ARRAY-UNSIGNED-FIXNUM").
+o_p_v(sys_simple_array_unsigned_fixnum, package, pkg_sys).
 o_p_v(sys_simple_assert_failed,classof,claz_symbol).
 o_p_v(sys_simple_assert_failed,compile_as,kw_function).
 o_p_v(sys_simple_assert_failed,function,f_sys_simple_assert_failed).
@@ -45410,9 +48194,18 @@ o_p_v(sys_simple_assignment_p,package,pkg_sys).
 o_p_v(sys_simple_bit_array,classof,claz_symbol).
 o_p_v(sys_simple_bit_array,name,"SIMPLE-BIT-ARRAY").
 o_p_v(sys_simple_bit_array,package,pkg_sys).
+o_p_v(sys_simple_c61, classof, claz_symbol).
+o_p_v(sys_simple_c61, name, "SIMPLE-=").
+o_p_v(sys_simple_c61, package, pkg_sys).
 o_p_v(sys_simple_cell_error,classof,claz_symbol).
 o_p_v(sys_simple_cell_error,name,"SIMPLE-CELL-ERROR").
 o_p_v(sys_simple_cell_error,package,pkg_sys).
+o_p_v(sys_simple_character_string, classof, claz_symbol).
+o_p_v(sys_simple_character_string, name, "SIMPLE-CHARACTER-STRING").
+o_p_v(sys_simple_character_string, package, pkg_sys).
+o_p_v(sys_simple_compiler_note, classof, claz_symbol).
+o_p_v(sys_simple_compiler_note, name, "SIMPLE-COMPILER-NOTE").
+o_p_v(sys_simple_compiler_note, package, pkg_sys).
 o_p_v(sys_simple_control_error,classof,claz_symbol).
 o_p_v(sys_simple_control_error,name,"SIMPLE-CONTROL-ERROR").
 o_p_v(sys_simple_control_error,package,pkg_sys).
@@ -45449,6 +48242,9 @@ o_p_v(sys_simple_function_form_p,package,pkg_sys).
 o_p_v(sys_simple_interrupt_condition,classof,claz_symbol).
 o_p_v(sys_simple_interrupt_condition,name,"SIMPLE-INTERRUPT-CONDITION").
 o_p_v(sys_simple_interrupt_condition,package,pkg_sys).
+o_p_v(sys_simple_intersection2, classof, claz_symbol).
+o_p_v(sys_simple_intersection2, name, "SIMPLE-INTERSECTION2").
+o_p_v(sys_simple_intersection2, package, pkg_sys).
 o_p_v(sys_simple_keyword_error,classof,claz_symbol).
 o_p_v(sys_simple_keyword_error,name,"SIMPLE-KEYWORD-ERROR").
 o_p_v(sys_simple_keyword_error,package,pkg_sys).
@@ -45457,6 +48253,12 @@ o_p_v(sys_simple_list_remove_duplicates,compile_as,kw_function).
 o_p_v(sys_simple_list_remove_duplicates,function,f_sys_simple_list_remove_duplicates).
 o_p_v(sys_simple_list_remove_duplicates,name,"SIMPLE-LIST-REMOVE-DUPLICATES").
 o_p_v(sys_simple_list_remove_duplicates,package,pkg_sys).
+o_p_v(sys_simple_next_method_call, classof, claz_symbol).
+o_p_v(sys_simple_next_method_call, name, "SIMPLE-NEXT-METHOD-CALL").
+o_p_v(sys_simple_next_method_call, package, pkg_sys).
+o_p_v(sys_simple_next_method_call_p, classof, claz_symbol).
+o_p_v(sys_simple_next_method_call_p, name, "SIMPLE-NEXT-METHOD-CALL-P").
+o_p_v(sys_simple_next_method_call_p, package, pkg_sys).
 o_p_v(sys_simple_occurrence_in_basic_block_p,classof,claz_symbol).
 o_p_v(sys_simple_occurrence_in_basic_block_p,compile_as,kw_function).
 o_p_v(sys_simple_occurrence_in_basic_block_p,function,f_sys_simple_occurrence_in_basic_block_p).
@@ -45483,6 +48285,15 @@ o_p_v(sys_simple_program_error,package,pkg_sys).
 o_p_v(sys_simple_reader_error,classof,claz_symbol).
 o_p_v(sys_simple_reader_error,name,"SIMPLE-READER-ERROR").
 o_p_v(sys_simple_reader_error,package,pkg_sys).
+o_p_v(sys_simple_reader_package_error, classof, claz_symbol).
+o_p_v(sys_simple_reader_package_error, name, "SIMPLE-READER-PACKAGE-ERROR").
+o_p_v(sys_simple_reader_package_error, package, pkg_sys).
+o_p_v(sys_simple_reference_error, classof, claz_symbol).
+o_p_v(sys_simple_reference_error, name, "SIMPLE-REFERENCE-ERROR").
+o_p_v(sys_simple_reference_error, package, pkg_sys).
+o_p_v(sys_simple_reference_warning, classof, claz_symbol).
+o_p_v(sys_simple_reference_warning, name, "SIMPLE-REFERENCE-WARNING").
+o_p_v(sys_simple_reference_warning, package, pkg_sys).
 o_p_v(sys_simple_search,classof,claz_symbol).
 o_p_v(sys_simple_search,compile_as,kw_function).
 o_p_v(sys_simple_search,function,f_sys_simple_search).
@@ -45532,6 +48343,9 @@ o_p_v(sys_simple_unbound_variable,package,pkg_sys).
 o_p_v(sys_simple_undefined_function,classof,claz_symbol).
 o_p_v(sys_simple_undefined_function,name,"SIMPLE-UNDEFINED-FUNCTION").
 o_p_v(sys_simple_undefined_function,package,pkg_sys).
+o_p_v(sys_simple_union2, classof, claz_symbol).
+o_p_v(sys_simple_union2, name, "SIMPLE-UNION2").
+o_p_v(sys_simple_union2, package, pkg_sys).
 o_p_v(sys_simple_use_p,classof,claz_symbol).
 o_p_v(sys_simple_use_p,compile_as,kw_function).
 o_p_v(sys_simple_use_p,function,f_sys_simple_use_p).
@@ -45595,6 +48409,9 @@ o_p_v(sys_simplify_and_structure_object,compile_as,kw_function).
 o_p_v(sys_simplify_and_structure_object,function,f_sys_simplify_and_structure_object).
 o_p_v(sys_simplify_and_structure_object,name,"SIMPLIFY-AND-STRUCTURE-OBJECT").
 o_p_v(sys_simplify_and_structure_object,package,pkg_sys).
+o_p_v(sys_simplify_namestring, classof, claz_symbol).
+o_p_v(sys_simplify_namestring, name, "SIMPLIFY-NAMESTRING").
+o_p_v(sys_simplify_namestring, package, pkg_sys).
 o_p_v(sys_simplify_or_array,classof,claz_symbol).
 o_p_v(sys_simplify_or_array,compile_as,kw_function).
 o_p_v(sys_simplify_or_array,function,f_sys_simplify_or_array).
@@ -45640,6 +48457,9 @@ o_p_v(sys_simplify_or_structure_object,compile_as,kw_function).
 o_p_v(sys_simplify_or_structure_object,function,f_sys_simplify_or_structure_object).
 o_p_v(sys_simplify_or_structure_object,name,"SIMPLIFY-OR-STRUCTURE-OBJECT").
 o_p_v(sys_simplify_or_structure_object,package,pkg_sys).
+o_p_v(sys_simplify_unix_namestring, classof, claz_symbol).
+o_p_v(sys_simplify_unix_namestring, name, "SIMPLIFY-UNIX-NAMESTRING").
+o_p_v(sys_simplify_unix_namestring, package, pkg_sys).
 o_p_v(sys_simply_error,classof,claz_symbol).
 o_p_v(sys_simply_error,name,"SIMPLY-ERROR").
 o_p_v(sys_simply_error,package,pkg_sys).
@@ -45656,9 +48476,15 @@ o_p_v(sys_single_float_p,compile_as,kw_function).
 o_p_v(sys_single_float_p,function,f_sys_single_float_p).
 o_p_v(sys_single_float_p,name,"SINGLE-FLOAT-P").
 o_p_v(sys_single_float_p,package,pkg_sys).
+o_p_v(sys_singleton_p, classof, claz_symbol).
+o_p_v(sys_singleton_p, name, "SINGLETON-P").
+o_p_v(sys_singleton_p, package, pkg_sys).
 o_p_v(sys_situation,classof,claz_symbol).
 o_p_v(sys_situation,name,"SITUATION").
 o_p_v(sys_situation,package,pkg_sys).
+o_p_v(sys_situations, classof, claz_symbol).
+o_p_v(sys_situations, name, "SITUATIONS").
+o_p_v(sys_situations, package, pkg_sys).
 o_p_v(sys_size,classof,claz_symbol).
 o_p_v(sys_size,name,"SIZE").
 o_p_v(sys_size,package,pkg_sys).
@@ -45685,12 +48511,66 @@ o_p_v(sys_skipsp,package,pkg_sys).
 o_p_v(sys_slot,classof,claz_symbol).
 o_p_v(sys_slot,name,"SLOT").
 o_p_v(sys_slot,package,pkg_sys).
+o_p_v(sys_slot_class, classof, claz_symbol).
+o_p_v(sys_slot_class, name, "SLOT-CLASS").
+o_p_v(sys_slot_class, package, pkg_sys).
 o_p_v(sys_slot_definition,classof,claz_symbol).
 o_p_v(sys_slot_definition,name,"SLOT-DEFINITION").
 o_p_v(sys_slot_definition,package,pkg_sys).
+o_p_v(sys_slot_definition_allocation_class, classof, claz_symbol).
+o_p_v(sys_slot_definition_allocation_class, name, "SLOT-DEFINITION-ALLOCATION-CLASS").
+o_p_v(sys_slot_definition_allocation_class, package, pkg_sys).
+o_p_v(sys_slot_definition_class, classof, claz_symbol).
+o_p_v(sys_slot_definition_class, name, "SLOT-DEFINITION-CLASS").
+o_p_v(sys_slot_definition_class, package, pkg_sys).
+o_p_v(sys_slot_definition_defstruct_accessor_symbol, classof, claz_symbol).
+o_p_v(sys_slot_definition_defstruct_accessor_symbol, name, "SLOT-DEFINITION-DEFSTRUCT-ACCESSOR-SYMBOL").
+o_p_v(sys_slot_definition_defstruct_accessor_symbol, package, pkg_sys).
+o_p_v(sys_slot_definition_info, classof, claz_symbol).
+o_p_v(sys_slot_definition_info, name, "SLOT-DEFINITION-INFO").
+o_p_v(sys_slot_definition_info, package, pkg_sys).
+o_p_v(sys_slot_definition_internal_reader_function, classof, claz_symbol).
+o_p_v(sys_slot_definition_internal_reader_function, name, "SLOT-DEFINITION-INTERNAL-READER-FUNCTION").
+o_p_v(sys_slot_definition_internal_reader_function, package, pkg_sys).
+o_p_v(sys_slot_definition_internal_writer_function, classof, claz_symbol).
+o_p_v(sys_slot_definition_internal_writer_function, name, "SLOT-DEFINITION-INTERNAL-WRITER-FUNCTION").
+o_p_v(sys_slot_definition_internal_writer_function, package, pkg_sys).
+o_p_v(sys_slot_info, classof, claz_symbol).
+o_p_v(sys_slot_info, name, "SLOT-INFO").
+o_p_v(sys_slot_info, package, pkg_sys).
+o_p_v(sys_slot_list, classof, claz_symbol).
+o_p_v(sys_slot_list, name, "SLOT-LIST").
+o_p_v(sys_slot_list, package, pkg_sys).
+o_p_v(sys_slot_name, classof, claz_symbol).
+o_p_v(sys_slot_name, name, "SLOT-NAME").
+o_p_v(sys_slot_name, package, pkg_sys).
+o_p_v(sys_slot_object, classof, claz_symbol).
+o_p_v(sys_slot_object, name, "SLOT-OBJECT").
+o_p_v(sys_slot_object, package, pkg_sys).
 o_p_v(sys_slot_specs,classof,claz_symbol).
 o_p_v(sys_slot_specs,name,"SLOT-SPECS").
 o_p_v(sys_slot_specs,package,pkg_sys).
+o_p_v(sys_slot_table, classof, claz_symbol).
+o_p_v(sys_slot_table, name, "SLOT-TABLE").
+o_p_v(sys_slot_table, package, pkg_sys).
+o_p_v(sys_slotd, classof, claz_symbol).
+o_p_v(sys_slotd, name, "SLOTD").
+o_p_v(sys_slotd, package, pkg_sys).
+o_p_v(sys_slotd_initialization_error, classof, claz_symbol).
+o_p_v(sys_slotd_initialization_error, name, "SLOTD-INITIALIZATION-ERROR").
+o_p_v(sys_slotd_initialization_error, package, pkg_sys).
+o_p_v(sys_slotd_initialization_error_initarg, classof, claz_symbol).
+o_p_v(sys_slotd_initialization_error_initarg, name, "SLOTD-INITIALIZATION-ERROR-INITARG").
+o_p_v(sys_slotd_initialization_error_initarg, package, pkg_sys).
+o_p_v(sys_slotd_initialization_error_kind, classof, claz_symbol).
+o_p_v(sys_slotd_initialization_error_kind, name, "SLOTD-INITIALIZATION-ERROR-KIND").
+o_p_v(sys_slotd_initialization_error_kind, package, pkg_sys).
+o_p_v(sys_slotd_initialization_error_value, classof, claz_symbol).
+o_p_v(sys_slotd_initialization_error_value, name, "SLOTD-INITIALIZATION-ERROR-VALUE").
+o_p_v(sys_slotd_initialization_error_value, package, pkg_sys).
+o_p_v(sys_slotd_initialization_type_error, classof, claz_symbol).
+o_p_v(sys_slotd_initialization_type_error, name, "SLOTD-INITIALIZATION-TYPE-ERROR").
+o_p_v(sys_slotd_initialization_type_error, package, pkg_sys).
 o_p_v(sys_slotlist,classof,claz_symbol).
 o_p_v(sys_slotlist,name,"SLOTLIST").
 o_p_v(sys_slotlist,package,pkg_sys).
@@ -45700,6 +48580,9 @@ o_p_v(sys_slots,package,pkg_sys).
 o_p_v(sys_socket_stream,classof,claz_symbol).
 o_p_v(sys_socket_stream,name,"SOCKET-STREAM").
 o_p_v(sys_socket_stream,package,pkg_sys).
+o_p_v(sys_software, classof, claz_symbol).
+o_p_v(sys_software, name, "SOFTWARE").
+o_p_v(sys_software, package, pkg_sys).
 o_p_v(sys_sort_list,classof,claz_symbol).
 o_p_v(sys_sort_list,compile_as,kw_function).
 o_p_v(sys_sort_list,function,f_sys_sort_list).
@@ -45708,6 +48591,9 @@ o_p_v(sys_sort_list,package,pkg_sys).
 o_p_v(sys_source,classof,claz_symbol).
 o_p_v(sys_source,name,"SOURCE").
 o_p_v(sys_source,package,pkg_sys).
+o_p_v(sys_source_location, classof, claz_symbol).
+o_p_v(sys_source_location, name, "SOURCE-LOCATION").
+o_p_v(sys_source_location, package, pkg_sys).
 o_p_v(sys_source_position,classof,claz_symbol).
 o_p_v(sys_source_position,name,"SOURCE-POSITION").
 o_p_v(sys_source_position,package,pkg_sys).
@@ -45716,6 +48602,9 @@ o_p_v(sys_source_transform,compile_as,kw_function).
 o_p_v(sys_source_transform,function,f_sys_source_transform).
 o_p_v(sys_source_transform,name,"SOURCE-TRANSFORM").
 o_p_v(sys_source_transform,package,pkg_sys).
+o_p_v(sys_sout, classof, claz_symbol).
+o_p_v(sys_sout, name, "SOUT").
+o_p_v(sys_sout, package, pkg_sys).
 o_p_v(sys_sp_depth,classof,claz_symbol).
 o_p_v(sys_sp_depth,compile_as,kw_function).
 o_p_v(sys_sp_depth,function,f_sys_sp_depth).
@@ -45765,6 +48654,15 @@ o_p_v(sys_specdecl,value,['$OBJ',['SPECIAL','REFERENCE']]).
 o_p_v(sys_specform,classof,claz_symbol).
 o_p_v(sys_specform,name,"SPECFORM").
 o_p_v(sys_specform,package,pkg_sys).
+o_p_v(sys_special_form_function, classof, claz_symbol).
+o_p_v(sys_special_form_function, name, "SPECIAL-FORM-FUNCTION").
+o_p_v(sys_special_form_function, package, pkg_sys).
+o_p_v(sys_specialized_element_type, classof, claz_symbol).
+o_p_v(sys_specialized_element_type, name, "SPECIALIZED-ELEMENT-TYPE").
+o_p_v(sys_specialized_element_type, package, pkg_sys).
+o_p_v(sys_specialized_lambda_list_error, classof, claz_symbol).
+o_p_v(sys_specialized_lambda_list_error, name, "SPECIALIZED-LAMBDA-LIST-ERROR").
+o_p_v(sys_specialized_lambda_list_error, package, pkg_sys).
 o_p_v(sys_specialized_lambda_list_to_ordinary,classof,claz_symbol).
 o_p_v(sys_specialized_lambda_list_to_ordinary,compile_as,kw_function).
 o_p_v(sys_specialized_lambda_list_to_ordinary,function,f_sys_specialized_lambda_list_to_ordinary).
@@ -45773,12 +48671,27 @@ o_p_v(sys_specialized_lambda_list_to_ordinary,package,pkg_sys).
 o_p_v(sys_specialized_lambda_list_to_ordinary_1,classof,claz_symbol).
 o_p_v(sys_specialized_lambda_list_to_ordinary_1,name,"SPECIALIZED-LAMBDA-LIST-TO-ORDINARY-1").
 o_p_v(sys_specialized_lambda_list_to_ordinary_1,package,pkg_sys).
+o_p_v(sys_specializer_class, classof, claz_symbol).
+o_p_v(sys_specializer_class, name, "SPECIALIZER-CLASS").
+o_p_v(sys_specializer_class, package, pkg_sys).
+o_p_v(sys_specializer_object, classof, claz_symbol).
+o_p_v(sys_specializer_object, name, "SPECIALIZER-OBJECT").
+o_p_v(sys_specializer_object, package, pkg_sys).
+o_p_v(sys_specializer_type, classof, claz_symbol).
+o_p_v(sys_specializer_type, name, "SPECIALIZER-TYPE").
+o_p_v(sys_specializer_type, package, pkg_sys).
+o_p_v(sys_specializer_with_object, classof, claz_symbol).
+o_p_v(sys_specializer_with_object, name, "SPECIALIZER-WITH-OBJECT").
+o_p_v(sys_specializer_with_object, package, pkg_sys).
 o_p_v(sys_specializers,classof,claz_symbol).
 o_p_v(sys_specializers,name,"SPECIALIZERS").
 o_p_v(sys_specializers,package,pkg_sys).
 o_p_v(sys_specialp,classof,claz_symbol).
 o_p_v(sys_specialp,name,"SPECIALP").
 o_p_v(sys_specialp,package,pkg_sys).
+o_p_v(sys_specifier, classof, claz_symbol).
+o_p_v(sys_specifier, name, "SPECIFIER").
+o_p_v(sys_specifier, package, pkg_sys).
 o_p_v(sys_specs,classof,claz_symbol).
 o_p_v(sys_specs,name,"SPECS").
 o_p_v(sys_specs,package,pkg_sys).
@@ -45823,16 +48736,43 @@ o_p_v(sys_stackz_fun,compile_as,kw_function).
 o_p_v(sys_stackz_fun,function,f_sys_stackz_fun).
 o_p_v(sys_stackz_fun,name,"STACKZ-FUN").
 o_p_v(sys_stackz_fun,package,pkg_sys).
+o_p_v(sys_standard_boundp_method, classof, claz_symbol).
+o_p_v(sys_standard_boundp_method, name, "STANDARD-BOUNDP-METHOD").
+o_p_v(sys_standard_boundp_method, package, pkg_sys).
+o_p_v(sys_standard_classoid, classof, claz_symbol).
+o_p_v(sys_standard_classoid, name, "STANDARD-CLASSOID").
+o_p_v(sys_standard_classoid, package, pkg_sys).
+o_p_v(sys_standard_funcallable_instance, classof, claz_symbol).
+o_p_v(sys_standard_funcallable_instance, name, "STANDARD-FUNCALLABLE-INSTANCE").
+o_p_v(sys_standard_funcallable_instance, package, pkg_sys).
 o_p_v(sys_standard_instance_access,classof,claz_symbol).
 o_p_v(sys_standard_instance_access,compile_as,kw_function).
 o_p_v(sys_standard_instance_access,function,f_sys_standard_instance_access).
 o_p_v(sys_standard_instance_access,name,"STANDARD-INSTANCE-ACCESS").
 o_p_v(sys_standard_instance_access,package,pkg_sys).
+o_p_v(sys_standard_method_combination, classof, claz_symbol).
+o_p_v(sys_standard_method_combination, name, "STANDARD-METHOD-COMBINATION").
+o_p_v(sys_standard_method_combination, package, pkg_sys).
 o_p_v(sys_standard_object_p,classof,claz_symbol).
 o_p_v(sys_standard_object_p,compile_as,kw_function).
 o_p_v(sys_standard_object_p,function,f_sys_standard_object_p).
 o_p_v(sys_standard_object_p,name,"STANDARD-OBJECT-P").
 o_p_v(sys_standard_object_p,package,pkg_sys).
+o_p_v(sys_standard_pprint_dispatch_table_modified_error, classof, claz_symbol).
+o_p_v(sys_standard_pprint_dispatch_table_modified_error, name, "STANDARD-PPRINT-DISPATCH-TABLE-MODIFIED-ERROR").
+o_p_v(sys_standard_pprint_dispatch_table_modified_error, package, pkg_sys).
+o_p_v(sys_standard_pprint_dispatch_table_modified_operation, classof, claz_symbol).
+o_p_v(sys_standard_pprint_dispatch_table_modified_operation, name, "STANDARD-PPRINT-DISPATCH-TABLE-MODIFIED-OPERATION").
+o_p_v(sys_standard_pprint_dispatch_table_modified_operation, package, pkg_sys).
+o_p_v(sys_standard_readtable_modified_error, classof, claz_symbol).
+o_p_v(sys_standard_readtable_modified_error, name, "STANDARD-READTABLE-MODIFIED-ERROR").
+o_p_v(sys_standard_readtable_modified_error, package, pkg_sys).
+o_p_v(sys_standard_readtable_modified_operation, classof, claz_symbol).
+o_p_v(sys_standard_readtable_modified_operation, name, "STANDARD-READTABLE-MODIFIED-OPERATION").
+o_p_v(sys_standard_readtable_modified_operation, package, pkg_sys).
+o_p_v(sys_standard_specializer, classof, claz_symbol).
+o_p_v(sys_standard_specializer, name, "STANDARD-SPECIALIZER").
+o_p_v(sys_standard_specializer, package, pkg_sys).
 o_p_v(sys_start,classof,claz_symbol).
 o_p_v(sys_start,name,"START").
 o_p_v(sys_start,package,pkg_sys).
@@ -45859,12 +48799,24 @@ o_p_v(sys_start_message,package,pkg_sys).
 o_p_v(sys_start_message_1,classof,claz_symbol).
 o_p_v(sys_start_message_1,name,"START-MESSAGE-1").
 o_p_v(sys_start_message_1,package,pkg_sys).
+o_p_v(sys_state, classof, claz_symbol).
+o_p_v(sys_state, name, "STATE").
+o_p_v(sys_state, package, pkg_sys).
 o_p_v(sys_statements,classof,claz_symbol).
 o_p_v(sys_statements,name,"STATEMENTS").
 o_p_v(sys_statements,package,pkg_sys).
+o_p_v(sys_static_classoid, classof, claz_symbol).
+o_p_v(sys_static_classoid, name, "STATIC-CLASSOID").
+o_p_v(sys_static_classoid, package, pkg_sys).
 o_p_v(sys_static_keys,classof,claz_symbol).
 o_p_v(sys_static_keys,name,"STATIC-KEYS").
 o_p_v(sys_static_keys,package,pkg_sys).
+o_p_v(sys_status_hook, classof, claz_symbol).
+o_p_v(sys_status_hook, name, "STATUS-HOOK").
+o_p_v(sys_status_hook, package, pkg_sys).
+o_p_v(sys_std_class, classof, claz_symbol).
+o_p_v(sys_std_class, name, "STD-CLASS").
+o_p_v(sys_std_class, package, pkg_sys).
 o_p_v(sys_std_instance_class,classof,claz_symbol).
 o_p_v(sys_std_instance_class,compile_as,kw_function).
 o_p_v(sys_std_instance_class,function,f_sys_std_instance_class).
@@ -45905,6 +48857,9 @@ o_p_v(sys_step_hook_fn_1_3,package,pkg_sys).
 o_p_v(sys_step_if,classof,claz_symbol).
 o_p_v(sys_step_if,name,"STEP-IF").
 o_p_v(sys_step_if,package,pkg_sys).
+o_p_v(sys_step_result_condition, classof, claz_symbol).
+o_p_v(sys_step_result_condition, name, "STEP-RESULT-CONDITION").
+o_p_v(sys_step_result_condition, package, pkg_sys).
 o_p_v(sys_step_values,classof,claz_symbol).
 o_p_v(sys_step_values,compile_as,kw_function).
 o_p_v(sys_step_values,function,f_sys_step_values).
@@ -45962,11 +48917,17 @@ o_p_v(sys_stream_charpos,compile_as,kw_function).
 o_p_v(sys_stream_charpos,function,f_sys_stream_charpos).
 o_p_v(sys_stream_charpos,name,"STREAM-CHARPOS").
 o_p_v(sys_stream_charpos,package,pkg_sys).
+o_p_v(sys_stream_decoding_error, classof, claz_symbol).
+o_p_v(sys_stream_decoding_error, name, "STREAM-DECODING-ERROR").
+o_p_v(sys_stream_decoding_error, package, pkg_sys).
 o_p_v(sys_stream_element_type_eq,classof,claz_symbol).
 o_p_v(sys_stream_element_type_eq,compile_as,kw_function).
 o_p_v(sys_stream_element_type_eq,function,f_sys_stream_element_type_eq).
 o_p_v(sys_stream_element_type_eq,name,"STREAM-ELEMENT-TYPE-EQ").
 o_p_v(sys_stream_element_type_eq,package,pkg_sys).
+o_p_v(sys_stream_encoding_error, classof, claz_symbol).
+o_p_v(sys_stream_encoding_error, name, "STREAM-ENCODING-ERROR").
+o_p_v(sys_stream_encoding_error, package, pkg_sys).
 o_p_v(sys_stream_end_s_expression,classof,claz_symbol).
 o_p_v(sys_stream_end_s_expression,compile_as,kw_function).
 o_p_v(sys_stream_end_s_expression,function,f_sys_stream_end_s_expression).
@@ -46030,6 +48991,9 @@ o_p_v(sys_stream_tab,package,pkg_sys).
 o_p_v(sys_stream_var,classof,claz_symbol).
 o_p_v(sys_stream_var,name,"STREAM-VAR").
 o_p_v(sys_stream_var,package,pkg_sys).
+o_p_v(sys_streams, classof, claz_symbol).
+o_p_v(sys_streams, name, "STREAMS").
+o_p_v(sys_streams, package, pkg_sys).
 o_p_v(sys_string1,classof,claz_symbol).
 o_p_v(sys_string1,name,"STRING1").
 o_p_v(sys_string1,package,pkg_sys).
@@ -46051,6 +49015,12 @@ o_p_v(sys_string_dimension_limit,declared_as,defconstant).
 o_p_v(sys_string_dimension_limit,name,"STRING-DIMENSION-LIMIT").
 o_p_v(sys_string_dimension_limit,package,pkg_sys).
 o_p_v(sys_string_dimension_limit,value,67108864).
+o_p_v(sys_string_in_misc, classof, claz_symbol).
+o_p_v(sys_string_in_misc, name, "STRING-IN-MISC").
+o_p_v(sys_string_in_misc, package, pkg_sys).
+o_p_v(sys_string_inch, classof, claz_symbol).
+o_p_v(sys_string_inch, name, "STRING-INCH").
+o_p_v(sys_string_inch, package, pkg_sys).
 o_p_v(sys_string_info,classof,claz_symbol).
 o_p_v(sys_string_info,compile_as,kw_function).
 o_p_v(sys_string_info,function,f_sys_string_info).
@@ -46064,6 +49034,12 @@ o_p_v(sys_string_input_stream_index,compile_as,kw_function).
 o_p_v(sys_string_input_stream_index,function,f_sys_string_input_stream_index).
 o_p_v(sys_string_input_stream_index,name,"STRING-INPUT-STREAM-INDEX").
 o_p_v(sys_string_input_stream_index,package,pkg_sys).
+o_p_v(sys_string_ouch, classof, claz_symbol).
+o_p_v(sys_string_ouch, name, "STRING-OUCH").
+o_p_v(sys_string_ouch, package, pkg_sys).
+o_p_v(sys_string_out_misc, classof, claz_symbol).
+o_p_v(sys_string_out_misc, name, "STRING-OUT-MISC").
+o_p_v(sys_string_out_misc, package, pkg_sys).
 o_p_v(sys_string_output_stream,classof,claz_symbol).
 o_p_v(sys_string_output_stream,name,"STRING-OUTPUT-STREAM").
 o_p_v(sys_string_output_stream,package,pkg_sys).
@@ -46072,6 +49048,9 @@ o_p_v(sys_string_reader,compile_as,kw_function).
 o_p_v(sys_string_reader,function,f_sys_string_reader).
 o_p_v(sys_string_reader,name,"STRING-READER").
 o_p_v(sys_string_reader,package,pkg_sys).
+o_p_v(sys_string_sout, classof, claz_symbol).
+o_p_v(sys_string_sout, name, "STRING-SOUT").
+o_p_v(sys_string_sout, package, pkg_sys).
 o_p_v(sys_string_stream_p,classof,claz_symbol).
 o_p_v(sys_string_stream_p,compile_as,kw_function).
 o_p_v(sys_string_stream_p,function,f_sys_string_stream_p).
@@ -46082,6 +49061,12 @@ o_p_v(sys_string_stream_string,compile_as,kw_function).
 o_p_v(sys_string_stream_string,function,f_sys_string_stream_string).
 o_p_v(sys_string_stream_string,name,"STRING-STREAM-STRING").
 o_p_v(sys_string_stream_string,package,pkg_sys).
+o_p_v(sys_string_to_octets_fun, classof, claz_symbol).
+o_p_v(sys_string_to_octets_fun, name, "STRING-TO-OCTETS-FUN").
+o_p_v(sys_string_to_octets_fun, package, pkg_sys).
+o_p_v(sys_string_with_fill_pointer, classof, claz_symbol).
+o_p_v(sys_string_with_fill_pointer, name, "STRING-WITH-FILL-POINTER").
+o_p_v(sys_string_with_fill_pointer, package, pkg_sys).
 o_p_v(sys_stringify_names,classof,claz_symbol).
 o_p_v(sys_stringify_names,compile_as,kw_function).
 o_p_v(sys_stringify_names,function,f_sys_stringify_names).
@@ -46095,9 +49080,24 @@ o_p_v(sys_strip_funcall_form,package,pkg_sys).
 o_p_v(sys_struct,classof,claz_symbol).
 o_p_v(sys_struct,name,"STRUCT").
 o_p_v(sys_struct,package,pkg_sys).
+o_p_v(sys_structure_c33_object, classof, claz_symbol).
+o_p_v(sys_structure_c33_object, name, "STRUCTURE!OBJECT").
+o_p_v(sys_structure_c33_object, package, pkg_sys).
+o_p_v(sys_structure_classoid, classof, claz_symbol).
+o_p_v(sys_structure_classoid, name, "STRUCTURE-CLASSOID").
+o_p_v(sys_structure_classoid, package, pkg_sys).
 o_p_v(sys_structure_definition,classof,claz_symbol).
 o_p_v(sys_structure_definition,name,"STRUCTURE-DEFINITION").
 o_p_v(sys_structure_definition,package,pkg_sys).
+o_p_v(sys_structure_direct_slot_definition, classof, claz_symbol).
+o_p_v(sys_structure_direct_slot_definition, name, "STRUCTURE-DIRECT-SLOT-DEFINITION").
+o_p_v(sys_structure_direct_slot_definition, package, pkg_sys).
+o_p_v(sys_structure_effective_slot_definition, classof, claz_symbol).
+o_p_v(sys_structure_effective_slot_definition, name, "STRUCTURE-EFFECTIVE-SLOT-DEFINITION").
+o_p_v(sys_structure_effective_slot_definition, package, pkg_sys).
+o_p_v(sys_structure_initarg_not_keyword, classof, claz_symbol).
+o_p_v(sys_structure_initarg_not_keyword, name, "STRUCTURE-INITARG-NOT-KEYWORD").
+o_p_v(sys_structure_initarg_not_keyword, package, pkg_sys).
 o_p_v(sys_structure_instance_size,classof,claz_symbol).
 o_p_v(sys_structure_instance_size,compile_as,kw_function).
 o_p_v(sys_structure_instance_size,function,f_sys_structure_instance_size).
@@ -46131,6 +49131,9 @@ o_p_v(sys_structure_set,compile_as,kw_function).
 o_p_v(sys_structure_set,function,f_sys_structure_set).
 o_p_v(sys_structure_set,name,"STRUCTURE-SET").
 o_p_v(sys_structure_set,package,pkg_sys).
+o_p_v(sys_structure_slot_definition, classof, claz_symbol).
+o_p_v(sys_structure_slot_definition, name, "STRUCTURE-SLOT-DEFINITION").
+o_p_v(sys_structure_slot_definition, package, pkg_sys).
 o_p_v(sys_structure_type,classof,claz_symbol).
 o_p_v(sys_structure_type,name,"STRUCTURE-TYPE").
 o_p_v(sys_structure_type,package,pkg_sys).
@@ -46145,6 +49148,9 @@ o_p_v(sys_strv,package,pkg_sys).
 o_p_v(sys_sub_anodes,classof,claz_symbol).
 o_p_v(sys_sub_anodes,name,"SUB-ANODES").
 o_p_v(sys_sub_anodes,package,pkg_sys).
+o_p_v(sys_sub_char, classof, claz_symbol).
+o_p_v(sys_sub_char, name, "SUB-CHAR").
+o_p_v(sys_sub_char, package, pkg_sys).
 o_p_v(sys_sub_directory,classof,claz_symbol).
 o_p_v(sys_sub_directory,compile_as,kw_function).
 o_p_v(sys_sub_directory,function,f_sys_sub_directory).
@@ -46158,6 +49164,9 @@ o_p_v(sys_sub_interval_p,package,pkg_sys).
 o_p_v(sys_subchar,classof,claz_symbol).
 o_p_v(sys_subchar,name,"SUBCHAR").
 o_p_v(sys_subchar,package,pkg_sys).
+o_p_v(sys_subclasses, classof, claz_symbol).
+o_p_v(sys_subclasses, name, "SUBCLASSES").
+o_p_v(sys_subclasses, package, pkg_sys).
 o_p_v(sys_subclassp,classof,claz_symbol).
 o_p_v(sys_subclassp,compile_as,kw_function).
 o_p_v(sys_subclassp,function,f_sys_subclassp).
@@ -46370,6 +49379,9 @@ o_p_v(sys_sym,package,pkg_sys).
 o_p_v(sys_symb,classof,claz_symbol).
 o_p_v(sys_symb,name,"SYMB").
 o_p_v(sys_symb,package,pkg_sys).
+o_p_v(sys_symbol_expansions, classof, claz_symbol).
+o_p_v(sys_symbol_expansions, name, "SYMBOL-EXPANSIONS").
+o_p_v(sys_symbol_expansions, package, pkg_sys).
 o_p_v(sys_symbol_macro,classof,claz_symbol).
 o_p_v(sys_symbol_macro,name,"SYMBOL-MACRO").
 o_p_v(sys_symbol_macro,package,pkg_sys).
@@ -46414,6 +49426,27 @@ o_p_v(sys_symbolmacro,package,pkg_sys).
 o_p_v(sys_symbols,classof,claz_symbol).
 o_p_v(sys_symbols,name,"SYMBOLS").
 o_p_v(sys_symbols,package,pkg_sys).
+o_p_v(sys_synonym_bin, classof, claz_symbol).
+o_p_v(sys_synonym_bin, name, "SYNONYM-BIN").
+o_p_v(sys_synonym_bin, package, pkg_sys).
+o_p_v(sys_synonym_bout, classof, claz_symbol).
+o_p_v(sys_synonym_bout, name, "SYNONYM-BOUT").
+o_p_v(sys_synonym_bout, package, pkg_sys).
+o_p_v(sys_synonym_in, classof, claz_symbol).
+o_p_v(sys_synonym_in, name, "SYNONYM-IN").
+o_p_v(sys_synonym_in, package, pkg_sys).
+o_p_v(sys_synonym_misc, classof, claz_symbol).
+o_p_v(sys_synonym_misc, name, "SYNONYM-MISC").
+o_p_v(sys_synonym_misc, package, pkg_sys).
+o_p_v(sys_synonym_n_bin, classof, claz_symbol).
+o_p_v(sys_synonym_n_bin, name, "SYNONYM-N-BIN").
+o_p_v(sys_synonym_n_bin, package, pkg_sys).
+o_p_v(sys_synonym_out, classof, claz_symbol).
+o_p_v(sys_synonym_out, name, "SYNONYM-OUT").
+o_p_v(sys_synonym_out, package, pkg_sys).
+o_p_v(sys_synonym_sout, classof, claz_symbol).
+o_p_v(sys_synonym_sout, name, "SYNONYM-SOUT").
+o_p_v(sys_synonym_sout, package, pkg_sys).
 o_p_v(sys_synonym_stream_p,classof,claz_symbol).
 o_p_v(sys_synonym_stream_p,compile_as,kw_function).
 o_p_v(sys_synonym_stream_p,function,f_sys_synonym_stream_p).
@@ -46424,6 +49457,21 @@ o_p_v(sys_syntax_error_reader,compile_as,kw_function).
 o_p_v(sys_syntax_error_reader,function,f_sys_syntax_error_reader).
 o_p_v(sys_syntax_error_reader,name,"SYNTAX-ERROR-READER").
 o_p_v(sys_syntax_error_reader,package,pkg_sys).
+o_p_v(sys_system_area_pointer, classof, claz_symbol).
+o_p_v(sys_system_area_pointer, name, "SYSTEM-AREA-POINTER").
+o_p_v(sys_system_area_pointer, package, pkg_sys).
+o_p_v(sys_system_class, classof, claz_symbol).
+o_p_v(sys_system_class, name, "SYSTEM-CLASS").
+o_p_v(sys_system_class, package, pkg_sys).
+o_p_v(sys_system_condition, classof, claz_symbol).
+o_p_v(sys_system_condition, name, "SYSTEM-CONDITION").
+o_p_v(sys_system_condition, package, pkg_sys).
+o_p_v(sys_system_condition_address, classof, claz_symbol).
+o_p_v(sys_system_condition_address, name, "SYSTEM-CONDITION-ADDRESS").
+o_p_v(sys_system_condition_address, package, pkg_sys).
+o_p_v(sys_system_condition_context, classof, claz_symbol).
+o_p_v(sys_system_condition_context, name, "SYSTEM-CONDITION-CONTEXT").
+o_p_v(sys_system_condition_context, package, pkg_sys).
 o_p_v(sys_system_internal,classof,claz_symbol).
 o_p_v(sys_system_internal,name,"SYSTEM-INTERNAL").
 o_p_v(sys_system_internal,package,pkg_sys).
@@ -46509,6 +49557,9 @@ o_p_v(sys_tail,package,pkg_sys).
 o_p_v(sys_take_car,classof,claz_symbol).
 o_p_v(sys_take_car,name,"TAKE-CAR").
 o_p_v(sys_take_car,package,pkg_sys).
+o_p_v(sys_target, classof, claz_symbol).
+o_p_v(sys_target, name, "TARGET").
+o_p_v(sys_target, package, pkg_sys).
 o_p_v(sys_target_stream,classof,claz_symbol).
 o_p_v(sys_target_stream,name,"TARGET-STREAM").
 o_p_v(sys_target_stream,package,pkg_sys).
@@ -46599,6 +49650,12 @@ o_p_v(sys_things,package,pkg_sys).
 o_p_v(sys_this_element,classof,claz_symbol).
 o_p_v(sys_this_element,name,"THIS-ELEMENT").
 o_p_v(sys_this_element,package,pkg_sys).
+o_p_v(sys_thread, classof, claz_symbol).
+o_p_v(sys_thread, name, "THREAD").
+o_p_v(sys_thread, package, pkg_sys).
+o_p_v(sys_timeout_seconds, classof, claz_symbol).
+o_p_v(sys_timeout_seconds, name, "TIMEOUT-SECONDS").
+o_p_v(sys_timeout_seconds, package, pkg_sys).
 o_p_v(sys_title,classof,claz_symbol).
 o_p_v(sys_title,name,"TITLE").
 o_p_v(sys_title,package,pkg_sys).
@@ -46613,6 +49670,9 @@ o_p_v(sys_to_file,package,pkg_sys).
 o_p_v(sys_to_wildcard,classof,claz_symbol).
 o_p_v(sys_to_wildcard,name,"TO-WILDCARD").
 o_p_v(sys_to_wildcard,package,pkg_sys).
+o_p_v(sys_token_buf, classof, claz_symbol).
+o_p_v(sys_token_buf, name, "TOKEN-BUF").
+o_p_v(sys_token_buf, package, pkg_sys).
 o_p_v(sys_top_level,classof,claz_symbol).
 o_p_v(sys_top_level,name,"TOP-LEVEL").
 o_p_v(sys_top_level,package,pkg_sys).
@@ -46755,6 +49815,9 @@ o_p_v(sys_tracer_symb,package,pkg_sys).
 o_p_v(sys_tracing_definition,classof,claz_symbol).
 o_p_v(sys_tracing_definition,name,"TRACING-DEFINITION").
 o_p_v(sys_tracing_definition,package,pkg_sys).
+o_p_v(sys_tracking_stream_misc, classof, claz_symbol).
+o_p_v(sys_tracking_stream_misc, name, "TRACKING-STREAM-MISC").
+o_p_v(sys_tracking_stream_misc, package, pkg_sys).
 o_p_v(sys_trampoline,classof,claz_symbol).
 o_p_v(sys_trampoline,name,"TRAMPOLINE").
 o_p_v(sys_trampoline,package,pkg_sys).
@@ -46791,6 +49854,9 @@ o_p_v(sys_translate_jar_device,compile_as,kw_function).
 o_p_v(sys_translate_jar_device,function,f_sys_translate_jar_device).
 o_p_v(sys_translate_jar_device,name,"TRANSLATE-JAR-DEVICE").
 o_p_v(sys_translate_jar_device,package,pkg_sys).
+o_p_v(sys_translation, classof, claz_symbol).
+o_p_v(sys_translation, name, "TRANSLATION").
+o_p_v(sys_translation, package, pkg_sys).
 o_p_v(sys_translations,classof,claz_symbol).
 o_p_v(sys_translations,name,"TRANSLATIONS").
 o_p_v(sys_translations,package,pkg_sys).
@@ -46846,6 +49912,27 @@ o_p_v(sys_two_arg_lcm,compile_as,kw_function).
 o_p_v(sys_two_arg_lcm,function,f_sys_two_arg_lcm).
 o_p_v(sys_two_arg_lcm,name,"TWO-ARG-LCM").
 o_p_v(sys_two_arg_lcm,package,pkg_sys).
+o_p_v(sys_two_way_bin, classof, claz_symbol).
+o_p_v(sys_two_way_bin, name, "TWO-WAY-BIN").
+o_p_v(sys_two_way_bin, package, pkg_sys).
+o_p_v(sys_two_way_bout, classof, claz_symbol).
+o_p_v(sys_two_way_bout, name, "TWO-WAY-BOUT").
+o_p_v(sys_two_way_bout, package, pkg_sys).
+o_p_v(sys_two_way_in, classof, claz_symbol).
+o_p_v(sys_two_way_in, name, "TWO-WAY-IN").
+o_p_v(sys_two_way_in, package, pkg_sys).
+o_p_v(sys_two_way_misc, classof, claz_symbol).
+o_p_v(sys_two_way_misc, name, "TWO-WAY-MISC").
+o_p_v(sys_two_way_misc, package, pkg_sys).
+o_p_v(sys_two_way_n_bin, classof, claz_symbol).
+o_p_v(sys_two_way_n_bin, name, "TWO-WAY-N-BIN").
+o_p_v(sys_two_way_n_bin, package, pkg_sys).
+o_p_v(sys_two_way_out, classof, claz_symbol).
+o_p_v(sys_two_way_out, name, "TWO-WAY-OUT").
+o_p_v(sys_two_way_out, package, pkg_sys).
+o_p_v(sys_two_way_sout, classof, claz_symbol).
+o_p_v(sys_two_way_sout, name, "TWO-WAY-SOUT").
+o_p_v(sys_two_way_sout, package, pkg_sys).
 o_p_v(sys_two_way_stream_p,classof,claz_symbol).
 o_p_v(sys_two_way_stream_p,compile_as,kw_function).
 o_p_v(sys_two_way_stream_p,function,f_sys_two_way_stream_p).
@@ -46870,6 +49957,12 @@ o_p_v(sys_type_category,compile_as,kw_function).
 o_p_v(sys_type_category,function,f_sys_type_category).
 o_p_v(sys_type_category,name,"TYPE-CATEGORY").
 o_p_v(sys_type_category,package,pkg_sys).
+o_p_v(sys_type_class, classof, claz_symbol).
+o_p_v(sys_type_class, name, "TYPE-CLASS").
+o_p_v(sys_type_class, package, pkg_sys).
+o_p_v(sys_type_class_or_lose, classof, claz_symbol).
+o_p_v(sys_type_class_or_lose, name, "TYPE-CLASS-OR-LOSE").
+o_p_v(sys_type_class_or_lose, package, pkg_sys).
 o_p_v(sys_type_error_string,classof,claz_symbol).
 o_p_v(sys_type_error_string,compile_as,kw_function).
 o_p_v(sys_type_error_string,function,f_sys_type_error_string).
@@ -46964,16 +50057,34 @@ o_p_v(sys_type_list_unsigned_byte,package,pkg_sys).
 o_p_v(sys_type_list_vector,classof,claz_symbol).
 o_p_v(sys_type_list_vector,name,"TYPE-LIST-VECTOR").
 o_p_v(sys_type_list_vector,package,pkg_sys).
+o_p_v(sys_type_name, classof, claz_symbol).
+o_p_v(sys_type_name, name, "TYPE-NAME").
+o_p_v(sys_type_name, package, pkg_sys).
 o_p_v(sys_type_of_sequence,classof,claz_symbol).
 o_p_v(sys_type_of_sequence,compile_as,kw_function).
 o_p_v(sys_type_of_sequence,function,f_sys_type_of_sequence).
 o_p_v(sys_type_of_sequence,name,"TYPE-OF-SEQUENCE").
 o_p_v(sys_type_of_sequence,package,pkg_sys).
+o_p_v(sys_type_proclamation_mismatch, classof, claz_symbol).
+o_p_v(sys_type_proclamation_mismatch, name, "TYPE-PROCLAMATION-MISMATCH").
+o_p_v(sys_type_proclamation_mismatch, package, pkg_sys).
+o_p_v(sys_type_proclamation_mismatch_warning, classof, claz_symbol).
+o_p_v(sys_type_proclamation_mismatch_warning, name, "TYPE-PROCLAMATION-MISMATCH-WARNING").
+o_p_v(sys_type_proclamation_mismatch_warning, package, pkg_sys).
+o_p_v(sys_type_restrictions, classof, claz_symbol).
+o_p_v(sys_type_restrictions, name, "TYPE-RESTRICTIONS").
+o_p_v(sys_type_restrictions, package, pkg_sys).
+o_p_v(sys_type_specifier, classof, claz_symbol).
+o_p_v(sys_type_specifier, name, "TYPE-SPECIFIER").
+o_p_v(sys_type_specifier, package, pkg_sys).
 o_p_v(sys_type_specifier_atom,classof,claz_symbol).
 o_p_v(sys_type_specifier_atom,compile_as,kw_function).
 o_p_v(sys_type_specifier_atom,function,f_sys_type_specifier_atom).
 o_p_v(sys_type_specifier_atom,name,"TYPE-SPECIFIER-ATOM").
 o_p_v(sys_type_specifier_atom,package,pkg_sys).
+o_p_v(sys_type_style_warning, classof, claz_symbol).
+o_p_v(sys_type_style_warning, name, "TYPE-STYLE-WARNING").
+o_p_v(sys_type_style_warning, package, pkg_sys).
 o_p_v(sys_type_symbol,classof,claz_symbol).
 o_p_v(sys_type_symbol,name,"TYPE-SYMBOL").
 o_p_v(sys_type_symbol,package,pkg_sys).
@@ -47019,6 +50130,9 @@ o_p_v(sys_type_symbol_simple_base_string,package,pkg_sys).
 o_p_v(sys_type_symbol_t,classof,claz_symbol).
 o_p_v(sys_type_symbol_t,name,"TYPE-SYMBOL-T").
 o_p_v(sys_type_symbol_t,package,pkg_sys).
+o_p_v(sys_type_warning, classof, claz_symbol).
+o_p_v(sys_type_warning, name, "TYPE-WARNING").
+o_p_v(sys_type_warning, package, pkg_sys).
 o_p_v(sys_typecase_error_string,classof,claz_symbol).
 o_p_v(sys_typecase_error_string,compile_as,kw_function).
 o_p_v(sys_typecase_error_string,function,f_sys_typecase_error_string).
@@ -47030,6 +50144,9 @@ o_p_v(sys_typecase_errorstring,package,pkg_sys).
 o_p_v(sys_typecase_expected_type,classof,claz_symbol).
 o_p_v(sys_typecase_expected_type,name,"TYPECASE-EXPECTED-TYPE").
 o_p_v(sys_typecase_expected_type,package,pkg_sys).
+o_p_v(sys_typecheck, classof, claz_symbol).
+o_p_v(sys_typecheck, name, "TYPECHECK").
+o_p_v(sys_typecheck, package, pkg_sys).
 o_p_v(sys_typeclauselist,classof,claz_symbol).
 o_p_v(sys_typeclauselist,name,"TYPECLAUSELIST").
 o_p_v(sys_typeclauselist,package,pkg_sys).
@@ -47061,6 +50178,15 @@ o_p_v(sys_unbind1,package,pkg_sys).
 o_p_v(sys_unbound_c62_nil,classof,claz_symbol).
 o_p_v(sys_unbound_c62_nil,name,"UNBOUND->NIL").
 o_p_v(sys_unbound_c62_nil,package,pkg_sys).
+o_p_v(sys_undefined_alien_style_warning, classof, claz_symbol).
+o_p_v(sys_undefined_alien_style_warning, name, "UNDEFINED-ALIEN-STYLE-WARNING").
+o_p_v(sys_undefined_alien_style_warning, package, pkg_sys).
+o_p_v(sys_undefined_alien_symbol, classof, claz_symbol).
+o_p_v(sys_undefined_alien_symbol, name, "UNDEFINED-ALIEN-SYMBOL").
+o_p_v(sys_undefined_alien_symbol, package, pkg_sys).
+o_p_v(sys_undefined_classoid, classof, claz_symbol).
+o_p_v(sys_undefined_classoid, name, "UNDEFINED-CLASSOID").
+o_p_v(sys_undefined_classoid, package, pkg_sys).
 o_p_v(sys_undefined_function_called,classof,claz_symbol).
 o_p_v(sys_undefined_function_called,compile_as,kw_function).
 o_p_v(sys_undefined_function_called,function,f_sys_undefined_function_called).
@@ -47090,6 +50216,9 @@ o_p_v(sys_uninterned_reader,compile_as,kw_function).
 o_p_v(sys_uninterned_reader,function,f_sys_uninterned_reader).
 o_p_v(sys_uninterned_reader,name,"UNINTERNED-READER").
 o_p_v(sys_uninterned_reader,package,pkg_sys).
+o_p_v(sys_union_type, classof, claz_symbol).
+o_p_v(sys_union_type, name, "UNION-TYPE").
+o_p_v(sys_union_type, package, pkg_sys).
 o_p_v(sys_uniquely_identified_by_print_p,classof,claz_symbol).
 o_p_v(sys_uniquely_identified_by_print_p,compile_as,kw_function).
 o_p_v(sys_uniquely_identified_by_print_p,function,f_sys_uniquely_identified_by_print_p).
@@ -47100,9 +50229,15 @@ o_p_v(sys_unix_executable_reader,compile_as,kw_function).
 o_p_v(sys_unix_executable_reader,function,f_sys_unix_executable_reader).
 o_p_v(sys_unix_executable_reader,name,"UNIX-EXECUTABLE-READER").
 o_p_v(sys_unix_executable_reader,package,pkg_sys).
+o_p_v(sys_unix_host, classof, claz_symbol).
+o_p_v(sys_unix_host, name, "UNIX-HOST").
+o_p_v(sys_unix_host, package, pkg_sys).
 o_p_v(sys_unknown,classof,claz_symbol).
 o_p_v(sys_unknown,name,"UNKNOWN").
 o_p_v(sys_unknown,package,pkg_sys).
+o_p_v(sys_unknown_type, classof, claz_symbol).
+o_p_v(sys_unknown_type, name, "UNKNOWN-TYPE").
+o_p_v(sys_unknown_type, package, pkg_sys).
 o_p_v(sys_unlist,classof,claz_symbol).
 o_p_v(sys_unlist,name,"UNLIST").
 o_p_v(sys_unlist,package,pkg_sys).
@@ -47114,9 +50249,75 @@ o_p_v(sys_unmodify_unused_var,compile_as,kw_function).
 o_p_v(sys_unmodify_unused_var,function,f_sys_unmodify_unused_var).
 o_p_v(sys_unmodify_unused_var,name,"UNMODIFY-UNUSED-VAR").
 o_p_v(sys_unmodify_unused_var,package,pkg_sys).
+o_p_v(sys_unparse, classof, claz_symbol).
+o_p_v(sys_unparse, name, "UNPARSE").
+o_p_v(sys_unparse, package, pkg_sys).
+o_p_v(sys_unparse_directory, classof, claz_symbol).
+o_p_v(sys_unparse_directory, name, "UNPARSE-DIRECTORY").
+o_p_v(sys_unparse_directory, package, pkg_sys).
+o_p_v(sys_unparse_directory_separator, classof, claz_symbol).
+o_p_v(sys_unparse_directory_separator, name, "UNPARSE-DIRECTORY-SEPARATOR").
+o_p_v(sys_unparse_directory_separator, package, pkg_sys).
+o_p_v(sys_unparse_enough, classof, claz_symbol).
+o_p_v(sys_unparse_enough, name, "UNPARSE-ENOUGH").
+o_p_v(sys_unparse_enough, package, pkg_sys).
+o_p_v(sys_unparse_enough_namestring, classof, claz_symbol).
+o_p_v(sys_unparse_enough_namestring, name, "UNPARSE-ENOUGH-NAMESTRING").
+o_p_v(sys_unparse_enough_namestring, package, pkg_sys).
+o_p_v(sys_unparse_file, classof, claz_symbol).
+o_p_v(sys_unparse_file, name, "UNPARSE-FILE").
+o_p_v(sys_unparse_file, package, pkg_sys).
+o_p_v(sys_unparse_host, classof, claz_symbol).
+o_p_v(sys_unparse_host, name, "UNPARSE-HOST").
+o_p_v(sys_unparse_host, package, pkg_sys).
+o_p_v(sys_unparse_logical_directory, classof, claz_symbol).
+o_p_v(sys_unparse_logical_directory, name, "UNPARSE-LOGICAL-DIRECTORY").
+o_p_v(sys_unparse_logical_directory, package, pkg_sys).
+o_p_v(sys_unparse_logical_file, classof, claz_symbol).
+o_p_v(sys_unparse_logical_file, name, "UNPARSE-LOGICAL-FILE").
+o_p_v(sys_unparse_logical_file, package, pkg_sys).
+o_p_v(sys_unparse_logical_namestring, classof, claz_symbol).
+o_p_v(sys_unparse_logical_namestring, name, "UNPARSE-LOGICAL-NAMESTRING").
+o_p_v(sys_unparse_logical_namestring, package, pkg_sys).
+o_p_v(sys_unparse_native, classof, claz_symbol).
+o_p_v(sys_unparse_native, name, "UNPARSE-NATIVE").
+o_p_v(sys_unparse_native, package, pkg_sys).
+o_p_v(sys_unparse_native_unix_namestring, classof, claz_symbol).
+o_p_v(sys_unparse_native_unix_namestring, name, "UNPARSE-NATIVE-UNIX-NAMESTRING").
+o_p_v(sys_unparse_native_unix_namestring, package, pkg_sys).
+o_p_v(sys_unparse_unix_directory, classof, claz_symbol).
+o_p_v(sys_unparse_unix_directory, name, "UNPARSE-UNIX-DIRECTORY").
+o_p_v(sys_unparse_unix_directory, package, pkg_sys).
+o_p_v(sys_unparse_unix_enough, classof, claz_symbol).
+o_p_v(sys_unparse_unix_enough, name, "UNPARSE-UNIX-ENOUGH").
+o_p_v(sys_unparse_unix_enough, package, pkg_sys).
+o_p_v(sys_unparse_unix_file, classof, claz_symbol).
+o_p_v(sys_unparse_unix_file, name, "UNPARSE-UNIX-FILE").
+o_p_v(sys_unparse_unix_file, package, pkg_sys).
+o_p_v(sys_unparse_unix_host, classof, claz_symbol).
+o_p_v(sys_unparse_unix_host, name, "UNPARSE-UNIX-HOST").
+o_p_v(sys_unparse_unix_host, package, pkg_sys).
+o_p_v(sys_unparse_unix_namestring, classof, claz_symbol).
+o_p_v(sys_unparse_unix_namestring, name, "UNPARSE-UNIX-NAMESTRING").
+o_p_v(sys_unparse_unix_namestring, package, pkg_sys).
+o_p_v(sys_unprintable_object, classof, claz_symbol).
+o_p_v(sys_unprintable_object, name, "UNPRINTABLE-OBJECT").
+o_p_v(sys_unprintable_object, package, pkg_sys).
 o_p_v(sys_unquote,classof,claz_symbol).
 o_p_v(sys_unquote,name,"UNQUOTE").
 o_p_v(sys_unquote,package,pkg_sys).
+o_p_v(sys_unread_stuff, classof, claz_symbol).
+o_p_v(sys_unread_stuff, name, "UNREAD-STUFF").
+o_p_v(sys_unread_stuff, package, pkg_sys).
+o_p_v(sys_unset_funcallable_instance_function, classof, claz_symbol).
+o_p_v(sys_unset_funcallable_instance_function, name, "UNSET-FUNCALLABLE-INSTANCE-FUNCTION").
+o_p_v(sys_unset_funcallable_instance_function, package, pkg_sys).
+o_p_v(sys_unsupported_operator, classof, claz_symbol).
+o_p_v(sys_unsupported_operator, name, "UNSUPPORTED-OPERATOR").
+o_p_v(sys_unsupported_operator, package, pkg_sys).
+o_p_v(sys_untagged_bitmap, classof, claz_symbol).
+o_p_v(sys_untagged_bitmap, name, "UNTAGGED-BITMAP").
+o_p_v(sys_untagged_bitmap, package, pkg_sys).
 o_p_v(sys_until,classof,claz_symbol).
 o_p_v(sys_until,name,"UNTIL").
 o_p_v(sys_until,package,pkg_sys).
@@ -47229,6 +50430,9 @@ o_p_v(sys_used_far,package,pkg_sys).
 o_p_v(sys_usedp,classof,claz_symbol).
 o_p_v(sys_usedp,name,"USEDP").
 o_p_v(sys_usedp,package,pkg_sys).
+o_p_v(sys_user_data, classof, claz_symbol).
+o_p_v(sys_user_data, name, "USER-DATA").
+o_p_v(sys_user_data, package, pkg_sys).
 o_p_v(sys_uses,classof,claz_symbol).
 o_p_v(sys_uses,name,"USES").
 o_p_v(sys_uses,package,pkg_sys).
@@ -47315,6 +50519,9 @@ o_p_v(sys_values0,package,pkg_sys).
 o_p_v(sys_values1,classof,claz_symbol).
 o_p_v(sys_values1,name,"VALUES1").
 o_p_v(sys_values1,package,pkg_sys).
+o_p_v(sys_values_type, classof, claz_symbol).
+o_p_v(sys_values_type, name, "VALUES-TYPE").
+o_p_v(sys_values_type, package, pkg_sys).
 o_p_v(sys_valuevar,classof,claz_symbol).
 o_p_v(sys_valuevar,name,"VALUEVAR").
 o_p_v(sys_valuevar,package,pkg_sys).
@@ -47523,6 +50730,9 @@ o_p_v(sys_vector_locater_macro,compile_as,kw_function).
 o_p_v(sys_vector_locater_macro,function,f_sys_vector_locater_type_macro).
 o_p_v(sys_vector_locater_macro,name,"VECTOR-LOCATER-MACRO").
 o_p_v(sys_vector_locater_macro,package,pkg_sys).
+o_p_v(sys_vector_nil, classof, claz_symbol).
+o_p_v(sys_vector_nil, name, "VECTOR-NIL").
+o_p_v(sys_vector_nil, package, pkg_sys).
 o_p_v(sys_vector_position,classof,claz_symbol).
 o_p_v(sys_vector_position,compile_as,kw_function).
 o_p_v(sys_vector_position,function,f_sys_vector_position).
@@ -47635,6 +50845,9 @@ o_p_v(sys_warn_of_type_3,package,pkg_sys).
 o_p_v(sys_weakness,classof,claz_symbol).
 o_p_v(sys_weakness,name,"WEAKNESS").
 o_p_v(sys_weakness,package,pkg_sys).
+o_p_v(sys_weight, classof, claz_symbol).
+o_p_v(sys_weight, name, "WEIGHT").
+o_p_v(sys_weight, package, pkg_sys).
 o_p_v(sys_while,classof,claz_symbol).
 o_p_v(sys_while,name,"WHILE").
 o_p_v(sys_while,package,pkg_sys).
@@ -47658,6 +50871,9 @@ o_p_v(sys_width,package,pkg_sys).
 o_p_v(sys_wild,classof,claz_symbol).
 o_p_v(sys_wild,name,"WILD").
 o_p_v(sys_wild,package,pkg_sys).
+o_p_v(sys_wild_args, classof, claz_symbol).
+o_p_v(sys_wild_args, name, "WILD-ARGS").
+o_p_v(sys_wild_args, package, pkg_sys).
 o_p_v(sys_wild_inferiors_p,classof,claz_symbol).
 o_p_v(sys_wild_inferiors_p,compile_as,kw_function).
 o_p_v(sys_wild_inferiors_p,function,f_sys_wild_inferiors_p).
@@ -47749,6 +50965,9 @@ o_p_v(sys_wrap_user_commands,package,pkg_sys).
 o_p_v(sys_wrap_user_commands_1,classof,claz_symbol).
 o_p_v(sys_wrap_user_commands_1,name,"WRAP-USER-COMMANDS-1").
 o_p_v(sys_wrap_user_commands_1,package,pkg_sys).
+o_p_v(sys_wrapper, classof, claz_symbol).
+o_p_v(sys_wrapper, name, "WRAPPER").
+o_p_v(sys_wrapper, package, pkg_sys).
 o_p_v(sys_write_8_bits,classof,claz_symbol).
 o_p_v(sys_write_8_bits,compile_as,kw_function).
 o_p_v(sys_write_8_bits,function,f_sys_write_8_bits).
@@ -47759,6 +50978,18 @@ o_p_v(sys_write_autoloader,compile_as,kw_function).
 o_p_v(sys_write_autoloader,function,f_sys_write_autoloader).
 o_p_v(sys_write_autoloader,name,"WRITE-AUTOLOADER").
 o_p_v(sys_write_autoloader,package,pkg_sys).
+o_p_v(sys_write_c_string_fun, classof, claz_symbol).
+o_p_v(sys_write_c_string_fun, name, "WRITE-C-STRING-FUN").
+o_p_v(sys_write_c_string_fun, package, pkg_sys).
+o_p_v(sys_write_char_full_buffered_fun, classof, claz_symbol).
+o_p_v(sys_write_char_full_buffered_fun, name, "WRITE-CHAR-FULL-BUFFERED-FUN").
+o_p_v(sys_write_char_full_buffered_fun, package, pkg_sys).
+o_p_v(sys_write_char_line_buffered_fun, classof, claz_symbol).
+o_p_v(sys_write_char_line_buffered_fun, name, "WRITE-CHAR-LINE-BUFFERED-FUN").
+o_p_v(sys_write_char_line_buffered_fun, package, pkg_sys).
+o_p_v(sys_write_char_none_buffered_fun, classof, claz_symbol).
+o_p_v(sys_write_char_none_buffered_fun, name, "WRITE-CHAR-NONE-BUFFERED-FUN").
+o_p_v(sys_write_char_none_buffered_fun, package, pkg_sys).
 o_p_v(sys_write_fasl_prologue,classof,claz_symbol).
 o_p_v(sys_write_fasl_prologue,compile_as,kw_function).
 o_p_v(sys_write_fasl_prologue,function,f_sys_write_fasl_prologue).
@@ -47774,6 +51005,9 @@ o_p_v(sys_write_n_bytes,compile_as,kw_function).
 o_p_v(sys_write_n_bytes,function,f_sys_write_n_bytes).
 o_p_v(sys_write_n_bytes,name,"WRITE-N-BYTES").
 o_p_v(sys_write_n_bytes,package,pkg_sys).
+o_p_v(sys_write_n_bytes_fun, classof, claz_symbol).
+o_p_v(sys_write_n_bytes_fun, name, "WRITE-N-BYTES-FUN").
+o_p_v(sys_write_n_bytes_fun, package, pkg_sys).
 o_p_v(sys_write_package_filesets,classof,claz_symbol).
 o_p_v(sys_write_package_filesets,compile_as,kw_function).
 o_p_v(sys_write_package_filesets,function,f_sys_write_package_filesets).
@@ -47799,6 +51033,9 @@ o_p_v(sys_write_vector_unsigned_byte_8,compile_as,kw_function).
 o_p_v(sys_write_vector_unsigned_byte_8,function,f_sys_write_vector_unsigned_byte_8).
 o_p_v(sys_write_vector_unsigned_byte_8,name,"WRITE-VECTOR-UNSIGNED-BYTE-8").
 o_p_v(sys_write_vector_unsigned_byte_8,package,pkg_sys).
+o_p_v(sys_writer, classof, claz_symbol).
+o_p_v(sys_writer, name, "WRITER").
+o_p_v(sys_writer, package, pkg_sys).
 o_p_v(sys_writers,classof,claz_symbol).
 o_p_v(sys_writers,name,"WRITERS").
 o_p_v(sys_writers,package,pkg_sys).
@@ -47808,6 +51045,9 @@ o_p_v(sys_x,package,pkg_sys).
 o_p_v(sys_x11_socket_stream,classof,claz_symbol).
 o_p_v(sys_x11_socket_stream,name,"X11-SOCKET-STREAM").
 o_p_v(sys_x11_socket_stream,package,pkg_sys).
+o_p_v(sys_xset, classof, claz_symbol).
+o_p_v(sys_xset, name, "XSET").
+o_p_v(sys_xset, package, pkg_sys).
 o_p_v(sys_xstring,classof,claz_symbol).
 o_p_v(sys_xstring,name,"XSTRING").
 o_p_v(sys_xstring,package,pkg_sys).
@@ -48033,6 +51273,9 @@ o_p_v(sys_xx_coutput_stream_xx,declared_as,defparameter).
 o_p_v(sys_xx_coutput_stream_xx,name,"*COUTPUT-STREAM*").
 o_p_v(sys_xx_coutput_stream_xx,package,pkg_sys).
 o_p_v(sys_xx_coutput_stream_xx,value,[]).
+o_p_v(sys_xx_ctype_hash_state_xx, classof, claz_symbol).
+o_p_v(sys_xx_ctype_hash_state_xx, name, "*CTYPE-HASH-STATE*").
+o_p_v(sys_xx_ctype_hash_state_xx, package, pkg_sys).
 o_p_v(sys_xx_current_error_depth_xx,classof,claz_symbol).
 o_p_v(sys_xx_current_error_depth_xx,declared_as,defparameter).
 o_p_v(sys_xx_current_error_depth_xx,name,"*CURRENT-ERROR-DEPTH*").
@@ -48208,6 +51451,9 @@ o_p_v(sys_xx_describe_done_xx,package,pkg_sys).
 o_p_v(sys_xx_describe_nesting_xx,classof,claz_symbol).
 o_p_v(sys_xx_describe_nesting_xx,name,"*DESCRIBE-NESTING*").
 o_p_v(sys_xx_describe_nesting_xx,package,pkg_sys).
+o_p_v(sys_xx_disabled_package_locks_xx, classof, claz_symbol).
+o_p_v(sys_xx_disabled_package_locks_xx, name, "*DISABLED-PACKAGE-LOCKS*").
+o_p_v(sys_xx_disabled_package_locks_xx, package, pkg_sys).
 o_p_v(sys_xx_disassemble_use_live_process_xx,classof,claz_symbol).
 o_p_v(sys_xx_disassemble_use_live_process_xx,declared_as,defparameter).
 o_p_v(sys_xx_disassemble_use_live_process_xx,name,"*DISASSEMBLE-USE-LIVE-PROCESS*").
@@ -48360,6 +51606,9 @@ o_p_v(sys_xx_gc_statistics_xx,value,-1).
 o_p_v(sys_xx_genv_xx,classof,claz_symbol).
 o_p_v(sys_xx_genv_xx,name,"*GENV*").
 o_p_v(sys_xx_genv_xx,package,pkg_sys).
+o_p_v(sys_xx_handled_conditions_xx, classof, claz_symbol).
+o_p_v(sys_xx_handled_conditions_xx, name, "*HANDLED-CONDITIONS*").
+o_p_v(sys_xx_handled_conditions_xx, package, pkg_sys).
 o_p_v(sys_xx_handler_clusters_xx,classof,claz_symbol).
 o_p_v(sys_xx_handler_clusters_xx,declared_as,defparameter).
 o_p_v(sys_xx_handler_clusters_xx,name,"*HANDLER-CLUSTERS*").
@@ -48846,6 +52095,9 @@ o_p_v(sys_xx_step_watch_xx,declared_as,defparameter).
 o_p_v(sys_xx_step_watch_xx,name,"*STEP-WATCH*").
 o_p_v(sys_xx_step_watch_xx,package,pkg_sys).
 o_p_v(sys_xx_step_watch_xx,value,[]).
+o_p_v(sys_xx_string_output_stream_buffer_initial_size_xx, classof, claz_symbol).
+o_p_v(sys_xx_string_output_stream_buffer_initial_size_xx, name, "*STRING-OUTPUT-STREAM-BUFFER-INITIAL-SIZE*").
+o_p_v(sys_xx_string_output_stream_buffer_initial_size_xx, package, pkg_sys).
 o_p_v(sys_xx_style_warning_count_xx,classof,claz_symbol).
 o_p_v(sys_xx_style_warning_count_xx,name,"*STYLE-WARNING-COUNT*").
 o_p_v(sys_xx_style_warning_count_xx,package,pkg_sys).
@@ -48956,6 +52208,9 @@ o_p_v(sys_xx_warning_count_xx,package,pkg_sys).
 o_p_v(sys_xx_whole_xx,classof,claz_symbol).
 o_p_v(sys_xx_whole_xx,name,"*WHOLE*").
 o_p_v(sys_xx_whole_xx,package,pkg_sys).
+o_p_v(sys_xx_wild_type_xx, classof, claz_symbol).
+o_p_v(sys_xx_wild_type_xx, name, "*WILD-TYPE*").
+o_p_v(sys_xx_wild_type_xx, package, pkg_sys).
 o_p_v(sys_y,classof,claz_symbol).
 o_p_v(sys_y,name,"Y").
 o_p_v(sys_y,package,pkg_sys).
@@ -48968,6 +52223,9 @@ o_p_v(sys_yes,package,pkg_sys).
 o_p_v(sys_yes_or_no,classof,claz_symbol).
 o_p_v(sys_yes_or_no,name,"YES-OR-NO").
 o_p_v(sys_yes_or_no,package,pkg_sys).
+o_p_v(sys_z, classof, claz_symbol).
+o_p_v(sys_z, name, "Z").
+o_p_v(sys_z, package, pkg_sys).
 o_p_v(sys_zip,classof,claz_symbol).
 o_p_v(sys_zip,compile_as,kw_function).
 o_p_v(sys_zip,function,f_sys_zip).
@@ -49578,9 +52836,18 @@ o_p_v(typep,compile_as,kw_function).
 o_p_v(typep,function,cl_typep).
 o_p_v(typep,name,"TYPEP").
 o_p_v(typep,package,pkg_cl).
+o_p_v(u_a, classof, claz_symbol).
+o_p_v(u_a, name, "A").
+o_p_v(u_a, package, pkg_user).
+o_p_v(u_d, classof, claz_symbol).
+o_p_v(u_d, name, "D").
+o_p_v(u_d, package, pkg_user).
 o_p_v(u_doc,classof,claz_symbol).
 o_p_v(u_doc,name,"DOC").
 o_p_v(u_doc,package,pkg_user).
+o_p_v(u_input_stream, classof, claz_symbol).
+o_p_v(u_input_stream, name, "INPUT-STREAM").
+o_p_v(u_input_stream, package, pkg_user).
 o_p_v(u_item,classof,claz_symbol).
 o_p_v(u_item,name,"ITEM").
 o_p_v(u_item,package,pkg_user).
@@ -49593,6 +52860,9 @@ o_p_v(u_nn,package,pkg_user).
 o_p_v(u_notp,classof,claz_symbol).
 o_p_v(u_notp,name,"NOTP").
 o_p_v(u_notp,package,pkg_user).
+o_p_v(u_output_stream, classof, claz_symbol).
+o_p_v(u_output_stream, name, "OUTPUT-STREAM").
+o_p_v(u_output_stream, package, pkg_user).
 o_p_v(u_p,classof,claz_symbol).
 o_p_v(u_p,name,"P").
 o_p_v(u_p,package,pkg_user).
@@ -49607,6 +52877,9 @@ o_p_v(u_psyminfo,package,pkg_user).
 o_p_v(u_quicklisp_init,classof,claz_symbol).
 o_p_v(u_quicklisp_init,name,"QUICKLISP-INIT").
 o_p_v(u_quicklisp_init,package,pkg_user).
+o_p_v(u_s, classof, claz_symbol).
+o_p_v(u_s, name, "S").
+o_p_v(u_s, package, pkg_user).
 o_p_v(u_sf,classof,claz_symbol).
 o_p_v(u_sf,name,"SF").
 o_p_v(u_sf,package,pkg_user).

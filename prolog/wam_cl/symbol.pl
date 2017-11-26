@@ -124,10 +124,12 @@ print_symbol_from(Symbol,PrintP,SPackage):-
     print_prefixed_symbol(Name,PrintP,SPackage,kw_internal);
     print_prefixed_symbol(Name,PrintP,SPackage,IntExt)).
 
+print_package_or_hash(Var):- !,writeq(Var).
 print_package_or_hash([]):- !,write("#").
-print_package_or_hash(P):- package_name(P,Symbol),shorter_name(Symbol,Short),write(Short).
+print_package_or_hash(P):- package_name(P,Symbol),shorter_name(Symbol,Short),!,write(Short).
 print_package_or_hash(P):- write(P).
 
+shorter_name(PN,NN):- package_nicknames(PN,NN).
 shorter_name("SYSTEM","SYS").
 shorter_name("COMMON-LISP","CL").
 shorter_name("COMMON-LISP-USER","U").

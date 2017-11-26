@@ -20,6 +20,11 @@
 
 cddd:- cd('/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/daydreamer/').
 
+
+lci :- with_lisp_translation(file('ci2.pro'),print_term).
+print_term(COMMENTP):- is_comment(COMMENTP,_),!.
+print_term([_|N]):- P=..[struct_opv_new|N],reader_intern_symbols(P,PI), format('~N~q.~n',[PI]).
+
 dd:- cddd,cl_grovel_file('dd.cl',_).
 
 dd1:- cddd,cl_load('dd_compile.cl',_),

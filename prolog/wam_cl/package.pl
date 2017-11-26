@@ -193,6 +193,7 @@ is_lisp_package(P):- package_name(P,_).
 package_name(pkg_cl,"COMMON-LISP").
 package_name(pkg_user,"COMMON-LISP-USER").
 package_name(pkg_tl,"TOP-LEVEL").
+package_name(pkg_debug,"DEBUG").
 package_name(pkg_charset,"CHARSET").
 package_name(pkg_clos,"CLOS").
 package_name(pkg_custom,"CUSTOM").
@@ -315,6 +316,14 @@ package_prefix(pkg_ext,'ext_').
 package_prefix(PN,Pre):- nonvar(PN),package_nicknames(Pk,PN),!,package_prefix(Pk,Pre).
 package_prefix(Pk,Pre):- is_lisp_package(Pk),atom_concat_or_rtrace('pkg_',Package,Pk),atom_concat_or_rtrace(Package,'_',Pre).
 
+
+save_pi:- tell('pi2.pro'),
+   forall(member(Assert,[
+     package_shadowing_symbols(_,_),
+     package_external_symbols(_,_,_),
+     package_internal_symbols(_,_,_)]),
+   forall(clause(package:Assert,true),
+      ignore((format('~q.~n',[Assert]))))), told.
 
 :- include('pi.pro').
 
