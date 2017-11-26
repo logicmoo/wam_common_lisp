@@ -32,7 +32,7 @@ lisp_compiled_eval(SExpression,Result):-
   dbmsg(lisp_compiled_eval(Expression)),
   lisp_compile(Result,Expression,Code),
   dbmsg(Code),
-  must_or_rtrace(call(Code)),!.
+  must_or_rtrace((Code)),!.
 
 %lisp_compile(SExpression):- source_location(_,_),!,dbmsg((:-lisp_compile(SExpression))).
 lisp_compile(SExpression):-

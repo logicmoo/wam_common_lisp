@@ -256,7 +256,7 @@ grovel_prolog_code(_).
 
 with_flist(How,List):- must_maplist(with1file(How),List).
 
-with1file(How,File):- call(How,File).
+with1file(How,File):- must_or_rtrace(call(How,File)).
 
 with_each_form(How,File):- local_override(with_forms,What),What\==How,!,with_each_form(What,File).
 with_each_form(How,File):-

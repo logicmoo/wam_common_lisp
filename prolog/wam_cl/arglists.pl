@@ -373,7 +373,7 @@ expand_function_head(Ctx,EnvInOut,[FunctionName | FormalParms],Head,ZippedArgBin
    debug_var('ArgsIn',Arguments),
    debug_var('BinderCode',BindCode),
    HeadDefCode = (asserta(user:arglist_info(FunctionName,FormalParms,ActualArgs,ArgInfo))),
-   HeadCodeOut = (must_bind_parameters(EnvInOut,FormalParms,Arguments,EnvInOut,BindCode),call(BindCode)),
+   HeadCodeOut = (must_bind_parameters(EnvInOut,FormalParms,Arguments,EnvInOut,BindCode),must_or_rtrace(BindCode)),
    Head =.. [FunctionName | HeadArgs])).
 
 % Creates a function Head and an argument unpacker using Code to unpack

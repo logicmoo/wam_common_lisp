@@ -170,7 +170,7 @@ define_kind(Name,KeyWords,SlotsIn,Kind):-
   assert_struct_opv(Kind,readerpackage,Package),
   % add doc for string
   maybe_get_docs('class',Name,SlotsIn,Slots,Code),
-  call(Code),
+  must_or_rtrace(Code),
   set_opv(Kind,sname,SName),
   add_opv_keywords(Kind,KeyWords),
   struct_offset(Kind,Offset),
@@ -242,7 +242,7 @@ maybe_add_function(FnName,ArgList,LispBody,R):-
    (is_fboundp(Symbol)->R=Symbol;
      (R=Result,as_sexp(LispBody,SLispBody),
        reader_intern_symbols(pkg_user,[defun,FnName,ArgList,[progn,SLispBody]],LispInterned),
-         lisp_compile(Result,LispInterned,PrologCode),call(PrologCode))).
+         lisp_compile(Result,LispInterned,PrologCode),must_or_rtrace(PrologCode))).
 
 
 struct_opv_else(Kind,Key,Value,Else):-
@@ -270,22 +270,18 @@ assert_struct_kw(Kind, Key, Value):-
   ignore(( \+ is_keywordp(Key) , dmsg(warn(assert_struct_kw(Kind, Key, Value))))),
   assert_struct_opv(Kind, Key, Value).
 
-un_kw1(X,X).
-
-assert_struct_opv(Obj, KW, String):-
+assert_struct_opv(Obj, KW, Value):-
   un_kw1(KW,Key),
-  show_call_trace(assertz_new(soops:struct_opv(Obj, defkw, Key, String))).
+  show_call_trace(assertz_new(soops:struct_opv(Obj, Key, Value,defkw))).
 assert_struct_opv(Obj, KW, Value,Info):-
-  un_kw1(KW,Key),
-  (KW==Key-> un_kw1(Value,UValue); Value=UValue),
-  show_call_trace(assertz_new(soops:struct_opv(Obj, Key, UValue,Info))).
+  un_kw1(KW,Key),  
+  show_call_trace(assertz_new(soops:struct_opv(Obj, Key, Value,Info))).
 
 get_struct_opv(Obj, KW, String):-
   un_kw1(KW,Key),
-  call((soops:struct_opv(Obj , defkw, Key, String))).
+  call((soops:struct_opv(Obj , Key, String, defkw ))).
 get_struct_opv(Obj, KW, Value,Info):-
   un_kw1(KW,Key),
-  (KW==Key-> un_kw1(Value,UValue); Value=UValue),
   call((soops:struct_opv(Obj, Key, UValue,Info))).
 
 
@@ -342,14 +338,15 @@ soops:o_p_v(Symbol,typeof,Kind):- soops:o_p_v(Symbol,classof,Class),
          [['#S',['LOGICAL-PATHNAME','HOST','SYS','DEVICE','UNSPECIFIC','DIRECTORY',['ABSOLUTE'],'NAME','WILD','TYPE',[],'VERSION',[]]],'\/ *']]]]).
 */
 
-un_kw(Prop,Prop):- var(Prop),!.
-un_kw(X,X):-!.
-un_kw([],[]):-!.
-un_kw(Key,Prop):- \+ atomic(Key),!,lisp_dump_break,Key=Prop.
-un_kw(Key,Prop):- atom_concat_or_rtrace(':',Prop,Key),!.
-%un_kw(Key,Prop):- atom_concat_or_rtrace('kw_',Prop,Key),!.
-un_kw(Key,Prop):- \+ atomic_list_concat([_,_|_],'_',Key),!,Prop=Key.
-un_kw(Key,Prop):- cl_string(Key,Str),downcase_atom(Str,Prop),!.
+un_kw1(Prop,Prop):- var(Prop),!.
+un_kw1([],[]):-!.
+un_kw1(Key,Prop):- \+ atomic(Key),!,lisp_dump_break,Key=Prop.
+un_kw1(Key,Prop):- atom_concat_or_rtrace(':',Prop,Key),!.
+%un_k1w(Key,Prop):- atom_concat_or_rtrace('kw_',Prop,Key),!.
+un_kw1(Key,Prop):- \+ atomic_list_concat([_,_|_],'_',Key),!,Prop=Key.
+un_kw1(Key,Prop):- cl_string(Key,Str),downcase_atom(Str,Prop),!.
+un_kw1(Prop,Prop).
+
 un_kw(Prop,Prop).
 
 add_kw_opv(Obj,Key,V):- un_kw(Key,Prop),add_opv(Obj,Prop,V).
@@ -404,15 +401,18 @@ instance_prefix1(Kind, Prefix):- claz_to_symbol(Kind, Prefix).
 
 cl_class_name(C,S):- claz_to_symbol(C,S).
 
-claz_to_symbol(C,S):- get_struct_opv(C,symbolname,S).
-claz_to_symbol(C,S):- get_struct_opv(C,name,S).
-claz_to_symbol(C,S):- get_struct_opv(C,type,S).
 claz_to_symbol(C,S):- claz_to_symbol0(C,S),!.
-claz_to_symbol0(claz_symbol,symbol).
-claz_to_symbol0(claz_package,package).
-claz_to_symbol0(claz_number,number).
-claz_to_symbol0(Class,Symbol):-atom(Class),atom_concat_or_rtrace('claz_',Symbol,Class).
-claz_to_symbol0(Class,Symbol):-Class=Symbol.
+
+claz_to_symbol0(C,S):- get_struct_opv(C,symbolname,S).
+claz_to_symbol0(C,S):- get_struct_opv(C,name,S), \+ string(S).
+claz_to_symbol0(C,S):- get_struct_opv(C,type,S).
+claz_to_symbol0(C,S):- claz_to_symbol1(C,S),!.
+
+claz_to_symbol1(claz_symbol,symbol).
+claz_to_symbol1(claz_package,package).
+claz_to_symbol1(claz_number,number).
+claz_to_symbol1(Class,Symbol):-atom(Class),atom_concat_or_rtrace('claz_',Symbol,Class).
+claz_to_symbol1(Class,Symbol):-Class=Symbol.
 
 
 

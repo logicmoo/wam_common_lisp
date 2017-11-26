@@ -129,7 +129,7 @@ compile_body_block_in_tb(Ctx,Env,GoResult,[RETURN_FROM,Tag,ValueForm],(ValueForm
    suffixed_atom_concat(block_exit_,Tag,ExitTag),
   % compile_body(Ctx,Env,GoResult,[progn,[setq,Var,ValueResult],[go,ExitTag]], Code ).
    debug_var('BlockExitEnv',Env),
-   Code = (set_symbol_value(Env,Var,ValueResult),call(ExitTag,Env),clean_escape(_)).
+   Code = (set_symbol_value(Env,Var,ValueResult),must_or_rtrace(ExitTag,Env),clean_escape(_)).
 
 
 compile_body_block_in_tb(Ctx,Env,Result,[block,BlockTag|InstrS], Code):- must(is_symbolp(BlockTag)),

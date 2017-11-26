@@ -77,7 +77,7 @@ combine_setfs(Name0,Name):-atomic_list_concat(['f_combined'|Name0],'__',Name).
 cl_defmacro(Name,FormalParms,FunctionBody,Result):-
   reenter_lisp(Ctx,Env),
   compile_decls(Ctx,Env,Result,[defmacro,Name,FormalParms|FunctionBody],Code),
-  call(Code).  
+  must_or_rtrace(Code).  
   
 
 compile_macro(Ctx,CallEnv,Macro,[Name0,FormalParms|FunctionBody0], CompileBody):-
@@ -128,7 +128,7 @@ make_mcompiled(Ctx,_UnusedEnv,CResult,Symbol,FunctionHead,FunctionBody,Head,Head
 cl_defun(Name,FormalParms,FunctionBody,Result):-
   reenter_lisp(Ctx,Env),
   compile_decls(Ctx,Env,Result,[defun,Name,FormalParms|FunctionBody],Code),
-  call(Code).
+  must_or_rtrace(Code).
 
 compile_function(Ctx,Env,Function,[Name,FormalParms|FunctionBody0], CompileBody):-
    combine_setfs(Name,Combined),

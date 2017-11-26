@@ -85,6 +85,7 @@ oper_mize(_Whole,Ctx,FF,PAB,PABO):- PAB=..[F,C1|Rest],functor(PAB,F,A),opt_arg1(
     oper_mize(C1,Ctx,FF,C1,C2),PABO=..[F,C2|Rest].
 
 oper_mize(_Whole,Ctx,FF,(H:-C1),(H:-C2)):- nonvar(H),!,functor(H,F,A), body_mize([F/A],(H:-C1),Ctx,FF,C1,C2).
+oper_mize(Whole,Ctx,F,must_or_rtrace(C1),must_or_rtrace(C2)):-!,oper_mize(Whole,Ctx,F,(C1),(C2)).
 oper_mize(Whole,Ctx,F,call(C1),call(C2)):-!,oper_mize(Whole,Ctx,F,(C1),(C2)).
 oper_mize(Whole,Ctx,F,C1,C2):- body_mize([],Whole,Ctx,F,C1,C2).
 

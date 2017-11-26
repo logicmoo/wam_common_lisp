@@ -19,10 +19,10 @@
 :- include('header.pro').
 
 lisp_env_eval(_Pt1^Body, _Env, _Result):- !,
-  call(Body).
+  must_or_rtrace(Body).
 lisp_env_eval(Expression, Env, Result):-
   lisp_compile(Env,Result,Expression,Body),
-  user:call(Body).
+  user:must_or_rtrace(Body).
 
 function(X,function(X)).
 closure(ClosureEnvironment,ClosureResult,FormalParams,ClosureBody,ActualParams,ClosureResult):-
@@ -30,7 +30,7 @@ closure(ClosureEnvironment,ClosureResult,FormalParams,ClosureBody,ActualParams,C
   must_or_rtrace(user:BinderCode),
   must_or_rtrace(user:ClosureBody).
 
-cl_eval(Form,Result):- lisp_compile(Result,Form,Body),call(Body).
+cl_eval(Form,Result):- lisp_compile(Result,Form,Body),must_or_rtrace(Body).
 
 cl_funcall([function(F)|More],R):-!,cl_funcall([F|More],R).
 cl_funcall([ProcedureName|Args],Result):- env_current(Env),apply_c(Env,ProcedureName, Args, Result).

@@ -148,7 +148,7 @@ run666(Program, Values) :-
 
 see_and_do(Pred2, I,O):-
   dmsg(seeingFormala(I)),
-  call(Pred2,I,O),
+  must_or_rtrace(call(Pred2,I,O)),
   dmsg(result(O)).
 
 :- set_prolog_flag(double_quotes,string).

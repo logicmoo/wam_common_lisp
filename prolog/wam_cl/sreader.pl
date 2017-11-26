@@ -87,7 +87,7 @@ finish_lisp_translation_cached(M,File,Temp,WithPart1):-
    M:load_files([Temp],[qcompile(auto)]),
    forall(M:lisp_trans(Part2,BaseName:Line),
    once((b_setval('$lisp_translation_line',Line),
-         M:call(WithPart1,Part2)))).
+         must_or_rtrace(M:call(WithPart1,Part2))))).
   
 maybe_cache_lisp_translation(File,Temp,_):- \+ file_needs_rebuilt(Temp,File),!.
 maybe_cache_lisp_translation(File,Temp,WithPart2):- 
@@ -103,7 +103,7 @@ maybe_cache_lisp_translation(File,Temp,WithPart2):-
   
 
 write_trans(Outs,File,WithPart2,Lisp):-
-   must_det((call(WithPart2,Lisp,Part),
+   must_or_rtrace((call(WithPart2,Lisp,Part),
    b_getval('$lisp_translation_line',Line),
    format(Outs,'~N~q.~n',[lisp_trans(Part,File:Line)]))),!.
 

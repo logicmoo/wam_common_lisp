@@ -116,7 +116,7 @@ lisp_apply(FunctionObject, Arguments, Result):-
 	;	FunctionObject = [function,FunctionName], 
 		append(Arguments, [Result], ArgumentsResult),
 		Function =.. [FunctionName|ArgumentsResult],
-		call(Function).
+		must_or_rtrace(Function).
 
 
 lisp_call(Function, Result):-
