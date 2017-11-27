@@ -55,11 +55,9 @@ lisplist([],EQ) --> [EQ], !.
 lisplist([X|Xs],EQ) --> sexpr1(X), !, lisplist(Xs,EQ).
 lisplist(X,EQ) --> ['.'], sexpr1(X), [EQ].
 
-cl_format(Stream,Fmt,t):-wdmsg(cl_format(Stream,Fmt,t)).
-cl_format(Stream,Fmt,Arg1,t):-wdmsg(cl_format(Stream,Fmt,Arg1,t)).
-cl_format(Stream,Fmt,Arg1,Arg2,t):-wdmsg(cl_format(Stream,Fmt,Arg1,Arg2,t)).
-cl_format(Stream,Fmt,Arg1,Arg2,Arg3,t):-wdmsg(cl_format(Stream,Fmt,Arg1,Arg2,Arg3,t)).
-cl_format(Stream,Fmt,Arg1,Arg2,Arg3,Arg4,t):-wdmsg(cl_format(Stream,Fmt,Arg1,Arg2,Arg3,Arg4,t)).
+wl:declared(cl_format,lambda(['&rest',r])).
+cl_format([Stream,Fmt],t):-wdmsg(cl_format(Stream,Fmt,t)).
+cl_format([Stream,Fmt|ArgS],t):-wdmsg(cl_format(Stream,Fmt,ArgS,t)).
 
 cl_prin1(X,X):-copy_term(X,Y),writeExpression(Y),nl.
 cl_princ(X,X):-copy_term(X,Y),writeExpression(Y),nl.

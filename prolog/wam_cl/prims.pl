@@ -79,6 +79,9 @@ cl_cons(Item,
 
 cl_append(A,B,R):- append(A,B,R),!.
 
+wl:declared(cl_error,lambda(['&rest',r])).
+cl_error(Args,Res):- cl_format([t|Args],Res),throw(cl_error(Args,Res)).
+
 wl:declared(cl_list,lambda(['&rest',r])).
 wl:declared(cl_list,inline(list)).
 wl:declared(cl_list,uses_rest).

@@ -65,7 +65,7 @@ oper_mize(_Whole,_Ctx,_F,(C1,C2),U_x_Param=CondResult):-
    var(S1),
    S1==S2,!.
 
-
+                                    
 
 oper_mize(_Whole,Ctx,F,(C1,C2),Joined):-!,
    oper_mize(C1,Ctx,F,C1,C1O),    
@@ -158,24 +158,30 @@ mize_body(_Ctx,_,C1,C1):-!.
 
 ifthenelse(A->B;C):-nonvar(A),nonvar(B),nonvar(C).
 
-
 mize_body1(_Ctx,_F,(A=B),true):- A==B,!.
 mize_body1(_Ctx,_,C1,C1):- \+ compound(C1),!.
 mize_body1(Ctx,F,(C1,C2),CodeJoined):-!,mize_body1(Ctx,F,C1,C1O),mize_body1(Ctx,F,C2,C2O),conjoin_0(C1O,C2O,CodeJoined).
 mize_body1(Ctx,F,C1,C2):- is_list(C1),must_maplist(mize_body1(Ctx,F),C1,C2).
-mize_body1(Ctx,_,symbol_value(_Env, Sym, Sym_Get),Was=Sym_Get):- 
-  % lisp_compiler_option(safe(elim_symbolvalues_vars),true), fail,
+mize_body1(Ctx,_,symbol_value(_Env, Sym, Sym_Get),true):- 
+  % lisp_compiler_option(safe(elim_symbolvalues_vars),true), 
+  
   get_var_tracker(Ctx,Sym,Dict),
   Dict.w==1,
+  Dict.p==1,
+  % Dict.u<2,
   Dict.r>0,
-  Dict.vars=[Was|_],
+  rw_add(Ctx,Sym,u),
+  Dict.vars=[Was|_],!,
   must(Was=Sym_Get).
+
+
 
 mize_body1(_Ctx,_,C1,L=[R]):- C1 =@= (L=[R, []]). % lisp_compiler_option(elim_vars,true).
 %mize_body1(Ctx,_F,C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(mize_body1(Ctx,F),C1O,C2O),C2=..[F|C2O].
 mize_body1(_Ctx,_,C1,C1):-!.
 
 mize_body2(_Ctx,_,C1,C1):- \+ compound(C1),!.
+mize_body2(_,_,(ITE,R=V),ITE):- var(R),var(V),ifthenelse(ITE),R=V.
 mize_body2(_Ctx,_,t_or_nil(G, R),G):- R==t.
 mize_body2(_Ctx,_,t_or_nil(G, R),\+ G):- R==[].
 mize_body2(_Ctx,_,(t_or_nil(G, R),(R \==[] ->B;C)),(G->B;C)):- var(R).

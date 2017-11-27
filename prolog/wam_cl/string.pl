@@ -21,8 +21,8 @@
 as_string_upper(C,SN):- compound(C),\+ is_list(C),functor(C,_P,A),arg(A,C,S),!, as_string_upper(S,SN).
 as_string_upper(S,U):- cl_string(S,D),string_upper(D,U).
 
-
-cl_stringp(A, R):- t_or_nil(string(A),R).
+is_stringp(X):- string(X).
+cl_stringp(A, R):- t_or_nil(is_stringp(A),R).
 
 cl_string(SS,SS):- string(SS),!.
 cl_string(S,SN):- is_symbolp(S),cl_symbol_name(S,SN),!.

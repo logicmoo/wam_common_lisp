@@ -24,34 +24,42 @@ value_or([],Value,Value).
 
 %place_op(Env,PlOP,Obj,Value,Result):- var(Env),ensure_env(Env), \+ var(Env),!, place_op(Env,PlOP,Obj,Value,Result).
 
-place_op(Env,getf, Obj,[Result],  Result):-
-   get_place_value(Env,Obj, Result),!.
+to_place([value,Obj],Obj,value):-!.
+to_place([slot_value,Obj,Place],Obj,Place):-!.
+to_place([Place,Obj],Obj,Place):-!.
+to_place([Place,Obj|Args],Obj,[Place|Args]):-!.
+to_place([Obj],Obj,value):-!.
+to_place(Obj,Obj,value).
 
-place_op(Env,setf, Obj, [Result],  Result):- 
-   set_place_value(Env,Obj, Result),!.
+place_op(Env, Oper, Obj, Value,  Result):-
+  always(to_place(Obj,RObj,Place)),!,
+    always(place_op(Env, Oper, RObj, Place, Value,  Result)).
 
-place_op(Env,incf, Var, LV,  Result):- value_or(LV,Value,1),!,
-   get_place_value(Env,Var, Old),
+
+place_op(Env,getf,Obj,Place,[Value],Value):-!,get_place_value(Env, Obj, Place, Value).
+place_op(Env,setf,Obj,Place, [Value], Value):-!,set_place_value(Env, Obj, Place, Value).
+
+place_op(Env,incf, Obj, Place, LV,  Result):- value_or(LV,Value,1),!,
+   get_place_value(Env, Obj, Place, Old),
    Result is Old+ Value,
-   set_place_value(Env,Var, Result).
+   set_place_value(Env, Obj, Place, Result).
 
-place_op(Env,decf, Var, LV,  Result):- value_or(LV,Value,1),!,
-   get_place_value(Env,Var, Old),
-   Result is Old-Value,
-   set_place_value(Env,Var, Result).
-
-
-
-get_place_value(Env, Obj, Value):- atom(Obj),!,symbol_value_or(Env,Obj,with_place_value(Env,get_opv,Obj, Value),Value).
-get_place_value(Env, Obj, Value):- with_place_value(Env,get_opv,Obj, Value).
-
-set_place_value(Env, Obj, Value):- atom(Obj),set_symbol_value(Env,Obj,Value).
-set_place_value(Env, Obj, Value):- with_place_value(Env,set_opv,Obj, Value).
+place_op(Env,decf, Obj, Place, LV,  Result):- value_or(LV,Value,1),!,
+   get_place_value(Env, Obj, Place, Old),
+   Result is Old+ Value,
+   set_place_value(Env, Obj, Place, Result).
 
 
-with_place_value(Env,OPR,[Place,Obj], Value):-!, type_or_class_nameof(Obj,Type),with_place_value(Env,OPR,Obj,Type,Place,Value).
-with_place_value(Env,OPR, Obj, Value):-!, type_or_class_nameof(Obj,Type),with_place_value(Env,OPR,Obj,Type,value,Value).
+ 
+get_place_value(Env, Obj, value, Value):- atom(Obj),!,get_symbol_value(Env,Obj,Value).
+get_place_value(_Env, Obj, Place, Value):- get_opv(Obj, Place, Value).
 
+set_place_value(Env, Obj, value, Value):- atom(Obj),!,set_symbol_value(Env,Obj,Value).
+set_place_value(_Env, Obj, Place, Value):- set_opv(Obj, Place, Value).
+
+
+%with_place_value(Env,OPR,Obj,Place, Value):-!, type_or_class_nameof(Obj,Type),with_place_value(Env,OPR,Obj,Type,Place,Value).
+/*
 with_place_value(Env,OPR,Obj,Type,Place,Value):- 
   always(atomic_list_concat(List,'_',Place)),
   with_place_value6(Env,OPR,Place,List,Type,Obj,Value).
@@ -62,7 +70,7 @@ with_place_value6(_Env,OPR, Place,_List,      _Type,Obj, Value):- call_opv(OPR,O
 call_opv(OPR,[slot_value,Obj,Place],value,Value):- !, call(OPR,Obj,Place,Value).
 call_opv(OPR,[Place,Obj],value,Value):- !, call(OPR,Obj,Place,Value).
 call_opv(OPR,Obj,Place,Value):- !, call(OPR,Obj,Place,Value).
-
+*/
 /*
 
 The effect of

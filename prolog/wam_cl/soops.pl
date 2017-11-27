@@ -282,17 +282,17 @@ assert_struct_kw(Kind, Key, Value):-
   assert_struct_opv(Kind, Key, Value).
 
 assert_struct_opv(Obj, KW, Value):-
-  un_kw1(KW,Key),
+  un_kw(KW,Key),
   show_call_trace(assertz_new(soops:struct_opv(Obj, Key, Value))).
 assert_struct_opv(Obj, KW, Value,Info):-
-  un_kw1(KW,Key),  
+  un_kw(KW,Key),  
   show_call_trace(assertz_new(soops:struct_opv(Obj, Key, Value,Info))).
 
 get_struct_opv(Obj, KW, String):-
-  un_kw1(KW,Key),
+  un_kw(KW,Key),
   call((soops:struct_opv(Obj , Key, String ))).
 get_struct_opv(Obj, KW, Value,Info):-
-  un_kw1(KW,Key),
+  un_kw(KW,Key),
   call((soops:struct_opv(Obj, Key, Value,Info))).
 
 
@@ -306,7 +306,7 @@ get_szlot(Prefix,Type,Key,SlotInfo):-
   Type=..[Kind|Params],
   claz_to_symbol(Kind,Symbol),
   cl_string(Symbol,ClassName),
-  un_kw1(Key,UKey),  
+  un_kw(Key,UKey),  
   atomic_list_concat([ClassName,UKey],'_',SlotInfo0),
   atom_concat_or_rtrace(Prefix,SlotInfo0,SlotInfo1),
   prologcase_name(SlotInfo1,SlotInfo2),
@@ -349,17 +349,18 @@ soops:o_p_v(Symbol,typeof,Kind):- soops:o_p_v(Symbol,classof,Class),
          [['#S',['LOGICAL-PATHNAME','HOST','SYS','DEVICE','UNSPECIFIC','DIRECTORY',['RELATIVE'],'NAME','WILD','TYPE',[],'VERSION',[]]],*],
          [['#S',['LOGICAL-PATHNAME','HOST','SYS','DEVICE','UNSPECIFIC','DIRECTORY',['ABSOLUTE'],'NAME','WILD','TYPE',[],'VERSION',[]]],'\/ *']]]]).
 */
+%un_kw(Prop,Prop).
+un_kw(Key,Prop):- notrace(un_kw1(Key,Prop)).
+
 
 un_kw1(Prop,Prop):- var(Prop),!.
-un_kw1([],[]):-!.
 un_kw1(Key,Prop):- \+ atomic(Key),!,lisp_dump_break,Key=Prop.
-un_kw1(Key,Prop):- atom_concat_or_rtrace(':',Prop,Key),!.
-%un_k1w(Key,Prop):- atom_concat_or_rtrace('kw_',Prop,Key),!.
+un_kw1([],[]):-!.
 un_kw1(Key,Prop):- \+ atomic_list_concat([_,_|_],'_',Key),!,Prop=Key.
-un_kw1(Key,Prop):- cl_string(Key,Str),downcase_atom(Str,Prop),!.
+un_kw1(Key,Prop):- Prop\==name,cl_string(Key,Str),downcase_atom(Str,Prop),!.
+un_kw1(Key,Prop):- atom_concat_or_rtrace('kw_',Prop,Key),!.
+un_kw1(Key,Prop):- atom_concat_or_rtrace(':',Prop,Key),!.
 un_kw1(Prop,Prop).
-
-un_kw(Prop,Prop).
 
 add_kw_opv(Obj,Key,V):- un_kw(Key,Prop),add_opv(Obj,Prop,V).
 
@@ -372,11 +373,14 @@ add_opv_maybe(Obj,Prop,Value):- add_opv(Obj,Prop,Value),!.
 get_opv(Obj,_,_):- string(Obj),!,fail.
 get_opv(Obj,Prop,Value):- no_repeats(Obj-Prop,get_opv_i(Obj,Prop,Value)).
 
-get_opv_i(Obj, value, Value):- Obj==quote, throw(get_opv_i(quote, value, Value)).
-get_opv_i(Obj,Prop,Value):- nonvar(Obj), has_prop_value_getter(Obj,Prop,Getter),!,call(Getter,Obj,Prop,Value).
-get_opv_i(Obj,Prop,Value):- soops:o_p_v(Obj,Prop,Value).
-get_opv_i(Obj,Prop,Value):- get_struct_opv(Obj,Prop,Value).
-get_opv_i(Obj,Prop,Value):- nonvar(Obj),nonvar(Prop),
+get_opv_i(Obj,Key,Value):- un_kw(Key,Prop),get_opv_ki(Obj,Prop,Value).
+
+get_opv_ki(Obj, value, Value):- Obj==quote, throw(get_opv_i(quote, value, Value)).
+get_opv_ki(Obj,Prop,Value):- soops:o_p_v(Obj,Prop,Value).
+get_opv_ki(Obj,Prop,Value):- nonvar(Obj), has_prop_value_getter(Obj,Prop,Getter),call(Getter,Obj,Prop,Value).
+get_opv_ki(Obj,Prop,Value):- soops:struct_opv(Obj,Prop,Value).
+
+get_opv_ki(Obj,Prop,Value):- nonvar(Obj),nonvar(Prop),
   notrace((Prop\==classof,Prop\==typeof,Prop\==value,Prop\==conc_name)),
   get_opv_ii(Obj,Prop,Value).
 
@@ -389,7 +393,7 @@ get_opv_ii(Obj,Prop,Value):- get_obj_prefix(Obj,Prefix),atom_concat_or_rtrace(Pr
 
 get_obj_prefix(Obj,Prefix):- quietly(((type_or_class_nameof(Obj,Class),!,type_prop_prefix(Class,Prefix)))).
 
-type_prop_prefix(Class,Prefix):- get_opv(Class,conc_name,Prefix),trace,!.
+type_prop_prefix(Class,Prefix):- get_opv(Class,conc_name,Prefix),!.
 type_prop_prefix(Class,Prefix):- claz_to_symbol(Class,Prefix),!.
 
 get_o_kind(Obj,Kind):- get_opv_i(Obj,classof,Class),!,claz_to_symbol(Class,Kind).
@@ -442,11 +446,14 @@ add_opv_new(Obj,Prop,V):-
    get_obj_pred(Obj,Prop,Pred),
    modulize(call(Pred,Obj,V),OPred),predicate_property(OPred,dynamic),
    assert_if_new(OPred),!.
-add_opv_new(Obj,Prop,Value):-
+
+add_opv_new(Obj,Key,Value):-
  always(\+ is_list(Obj)),
+ un_kw(Key,Prop),
  show_call_trace(assert_if_new(soops:o_p_v(Obj,Prop,Value))).
-delete_opvalues(Obj,Prop):- 
-   always(\+ is_list(Obj)),
+delete_opvalues(Obj,Key):- 
+ always(\+ is_list(Obj)),
+ un_kw(Key,Prop),
    ignore(forall(retract(soops:o_p_v(Obj,Prop,_)),true)),
    ignore((
      get_obj_prefix(Obj,Kind),
@@ -525,15 +532,21 @@ add_slot_def_props(N,Kind,Key,MoreInfo):-
    (assert_struct_opv(Kind,keyword,KW,SlotInfo)),
    ignore((nonvar(N),(assert_struct_opv(Kind,ordinal,N,SlotInfo)))),
    ignore((kind_attribute_pred(Kind,Key,Pred),(assert_struct_opv(Kind,accessor_predicate,Pred,SlotInfo)))),
-   add_slot_more_info(Kind,SlotInfo,MoreInfo))).
+   add_slot_more_info(KW,Kind,SlotInfo,MoreInfo))).
 
-add_slot_more_info(_Kind,_SlotInfo,[]):-!.
-add_slot_more_info(Kind,SlotInfo,[KW,Value|MoreInfo]):- \+ is_list(KW),
-   assert_struct_opv(Kind,KW,Value,SlotInfo),
-   add_slot_more_info(Kind,SlotInfo,MoreInfo).
-add_slot_more_info(Kind,SlotInfo,[[KW,Value]|MoreInfo]):- \+ is_list(KW),
-   assert_struct_opv(Kind,KW,Value,SlotInfo),
-   add_slot_more_info(Kind,SlotInfo,MoreInfo).
+add_slot_more_info(_SlotKW,_Kind,_SlotInfo,[]):-!.
+add_slot_more_info(SlotKW,Kind,SlotInfo,[KW,Value|MoreInfo]):- \+ is_list(KW),
+   assert_struct_opv4(SlotKW,Kind,KW,Value,SlotInfo),
+   add_slot_more_info(SlotKW,Kind,SlotInfo,MoreInfo).
+add_slot_more_info(SlotKW,Kind,SlotInfo,[[KW,Value]|MoreInfo]):- \+ is_list(KW),
+   assert_struct_opv4(SlotKW,Kind,KW,Value,SlotInfo),
+   add_slot_more_info(SlotKW,Kind,SlotInfo,MoreInfo).
+
+assert_struct_opv4(SlotKW,Kind,KW,Value,SlotInfo):-
+  un_kw(KW,Prop),
+  un_kw(SlotKW,SlotName),
+  (Prop == accessor -> (maybe_add_function(Value,[obj],['slot-value',obj,[quote,SlotName]],_Added)) ; true),
+  assert_struct_opv(Kind,Prop,Value,SlotInfo).
 
 prop_to_name(X,S):-string(X),!,X=S.
 prop_to_name(Prop,Upper):- compound(Prop),!,functor(Prop,F,_),prop_to_name(F,Upper).
@@ -632,7 +645,7 @@ visit_struct_opv_old_slot(Kind,SlotInfo,[KW,Value]):-
 
 visit_struct_opv_old(Symbol,Key,Order):-
   old_claz_to_new_claz(Symbol,Kind),
-  symbol_to_claz(Symbol,Kind),un_kw1(Key,UNK),
+  symbol_to_claz(Symbol,Kind),un_kw(Key,UNK),
   visit_struct_opv_old(Symbol,Kind,UNK,Order).
   
 
@@ -659,7 +672,7 @@ visit_struct_opv_old(_Symbol,Kind,typeof,Super):-
 
 visit_struct_opv_new(_Kind,kw_package_name,_Package).
 visit_struct_opv_new(Symbol,Key,Order):-
-  symbol_to_claz(Symbol,Kind),un_kw1(Key,UNK),
+  symbol_to_claz(Symbol,Kind),un_kw(Key,UNK),
   visit_struct_opv_new(Symbol,Kind,UNK,Order).
   
 

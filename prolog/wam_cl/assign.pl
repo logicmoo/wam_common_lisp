@@ -29,7 +29,7 @@ add_tracked_var(Ctx,Atom,Var):-
    b_set_dict(vars,Dict,NewVars).
   
 get_var_tracker(Ctx0,Atom,Dict):- get_attr(Ctx0,tracker,Ctx), must(sanity(atom(Atom))),oo_get_attr(Ctx,var_tracker(Atom),Dict),(is_dict(Dict)->true;(trace,oo_get_attr(Ctx,var_tracker(Atom),_SDict))).
-get_var_tracker(Ctx0,Atom,Dict):-  get_attr(Ctx0,tracker,Ctx),Dict=rw{name:Atom,r:0,w:0,vars:[]},oo_put_attr(Ctx,var_tracker(Atom),Dict),!.
+get_var_tracker(Ctx0,Atom,Dict):-  get_attr(Ctx0,tracker,Ctx),Dict=rw{name:Atom,r:0,w:0,p:0,ret:0,u:0,vars:[]},oo_put_attr(Ctx,var_tracker(Atom),Dict),!.
 
 
 locally_let([N=V|More],G):- castify(V,Value),!,locally_let([N=Value|More],G).
@@ -134,6 +134,7 @@ extract_variable_value([Val|Vals], FoundVal, Hole):-
 
 bind_dynamic_value(Env,Var,Result):- set_symbol_value(Env,Var,Result).
 
+get_symbol_value(Env,Obj,Value):- symbol_value(Env,Obj,Value).
 
 symbol_value(Var,Value):- env_current(Env), symbol_value(Env,Var,Value).
 symbol_value(Env,Var,Value):-

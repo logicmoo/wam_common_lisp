@@ -242,6 +242,12 @@ must_compile_test_body(Ctx,Env,TestResult,Test,TestBody,TestResultBody):-
   always(compile_test_body(Ctx,Env,TestResult,Test,TestBody,TestResultBody)).
 
 % IF (null ...)
+compile_test_body(Ctx,Env,unused,[stringp,Test],TestBody,is_stringp(TestResult)):-
+   debug_var("StringPArg",TestResult),
+   must_compile_body(Ctx,Env,TestResult,Test,  TestBody),!.
+compile_test_body(Ctx,Env,unused,[symbolp,Test],TestBody,is_symbolp(TestResult)):-
+   debug_var("StringPArg",TestResult),
+   must_compile_body(Ctx,Env,TestResult,Test,  TestBody),!.
 compile_test_body(Ctx,Env,TestResult,[null,Test],TestBody,TestResultBody):-
    debug_var("TestNullResult",TestResult),
    must_compile_body(Ctx,Env,TestResult,Test,  TestBody),
@@ -262,6 +268,23 @@ compile_test_body(Ctx,Env,TestResult,Test,TestBody,TestResultBody):-
 
 
 
+compile_body(Ctx,Env,Result,[if, Test, IfTrue, IfFalse], Body):-
+	!,
+   debug_var("IFTEST",TestResult),
+   compile_test_body(Ctx,Env,TestResult,Test,TestBody,TestResultBody),
+   must_compile_body(Ctx,Env,TrueResult,IfTrue, TrueBody),
+   must_compile_body(Ctx,Env,FalseResult,IfFalse, FalseBody),
+   debug_var("TrueResult",TrueResult),
+   debug_var("ElseResult",FalseResult),
+
+        Body = (	TestBody,
+			( TestResultBody
+				->     ( TrueBody,
+					Result      = TrueResult)
+				;  	(FalseBody,
+					Result      = FalseResult)	) ).
+
+
 % IF-3
 compile_body(Ctx,Env,Result,[if, Test, IfTrue, IfFalse], Body):-
 	!,
@@ -275,10 +298,10 @@ compile_body(Ctx,Env,Result,[if, Test, IfTrue, IfFalse], Body):-
 
         Body = (	TestBody,
 			( TestResultBody
-				-> 	TrueBody,
-					Result      = TrueResult
-				;  	FalseBody,
-					Result      = FalseResult	) ).
+				->     ( TrueBody,
+					Result      = TrueResult)
+				;  	(FalseBody,
+					Result      = FalseResult)	) ).
 
 % DOLIST
 compile_body(Ctx,Env,Result,['dolist',[Var,List]|FormS], Code):- !,
@@ -343,43 +366,12 @@ typecases_to_conds(SOf,V,[[Item|Tail]|Tail2], [[['typep',V,[quote,Item]],[progn|
 
 
 % COND
-compile_body(_Cx,_Ev,[],[cond ], true):- !.
-compile_body(_Cx,_Ev,[],[cond ,[]], true):- !.
-compile_body(Ctx,Env,Result,[cond, List |Clauses], Body):- 
-  always((
-        [Test|ResultForms] = List,
-        debug_var("CONDTESTA",TestResult),
-        debug_var("ResultFormsResult",ResultFormsResult),
-        debug_var("ClausesResult",ClausesResult),
-        debug_var("CondAResult",Result))),
-   Result  = ClausesResult,
-   %Result  = ResultFormsResult,
-   freeze(Result,var(Result)),
-   must_compile_test_body(Ctx,Env,TestResult,Test,TestBody,TestResultBody),
-   must_compile_progn(Ctx,Env,ResultFormsResult,ResultForms, TestResult, ResultFormsBody),
-   must_compile_body(Ctx,Env,ClausesResult,[cond| Clauses],  ClausesBody),
-   Body = (((TestBody, TestResultBody) -> 
-      ( ResultFormsBody,Result  = ResultFormsResult); 
-      ( ClausesBody))),!.
-   
-
-compile_body(Ctx,Env,Result,[cond, List |Clauses], Body):- !,
-  always((
-        [Test|ResultForms] = List,
-        debug_var("CONDTESTB",TestResult),
-        debug_var("ResultFormsResult",ResultFormsResult),
-        debug_var("ClausesResult",ClausesResult),
-        debug_var("CondBResult",Result))),
-	must_compile_body(Ctx,Env,TestResult,Test,TestBody),
-	must_compile_progn(Ctx,Env,ResultFormsResult,ResultForms, TestResult, ResultFormsBody),
-	must_compile_body(Ctx,Env,ClausesResult,[cond| Clauses],  ClausesBody),
-	Body = (	 
-			(( (TestBody, TestResult \==[])
-				->(	ResultFormsBody,
-					Result      = ResultFormsResult)
-				;	(ClausesBody,
-					Result      = ClausesResult )	))).
-
+compile_body(_Cx,_Ev,Result,[cond ], Result=[]):- !.
+compile_body(_Cx,_Ev,Result,[cond,[] ], Result=[]):- !.
+compile_body(Ctx,Env,Result,[cond, [t|Progn]|_], (Body)):-   
+  must_compile_progn(Ctx,Env,Result, Progn,[], Body).
+compile_body(Ctx,Env,Result,[cond, [Test|ResultForms] |Clauses], Body):- 
+  compile_body(Ctx,Env,Result,[if,Test,[progn|ResultForms],[cond |Clauses]], Body).
 
 
 % CONS inine

@@ -76,6 +76,62 @@ f_u_accum(A, G) :-
 
 (write-line "PASSED")
 
+(defun fifteen ()
+  (let (val)
+    (tagbody
+      (setq val 1)
+      (go point-a)
+      (incf val 16)
+     point-c
+      (incf val 04)
+      (go point-b)
+      (incf val 32)
+     point-a
+     point-u ;; unused
+      (incf val 02)
+      (go point-c)
+      (incf val 64)
+     point-b
+      (incf val 08))
+    val))
+
+(disassemble #'fifteen)
+
+#|
+
+/* this first one should get deleted since its inlined away in f_u_fifteen */
+
+addr_tagbody_1_addr_enter_1(Env10) :-
+        symbol_setter(Env10, setq, u_val, 1),
+        addr_tagbody_1_u_point_a(Env10).
+addr_tagbody_1_u_point_c(Incf_Env) :-
+        place_op(Incf_Env, incf, [value, u_val], [4], Incf_R),
+        addr_tagbody_1_u_point_b(Incf_Env).
+addr_tagbody_1_u_point_a(Incf_Env19) :-
+        place_op(Incf_Env19, incf, [value, u_val], [2], Incf_R18),
+        addr_tagbody_1_u_point_c(Incf_Env19).
+addr_tagbody_1_u_point_u(Incf_Env23) :-
+        place_op(Incf_Env23, incf, [value, u_val], [2], Incf_R22),
+        addr_tagbody_1_u_point_c(Incf_Env23).
+addr_tagbody_1_u_point_b(Incf_Env27) :-
+        place_op(Incf_Env27, incf, [value, u_val], [8], _GORES15).
+
+f_u_fifteen(MResult) :-
+        Env=[],
+        catch(( TBEnv=[[bv(u_val, [])]|Env],
+                symbol_setter(TBEnv, setq, u_val, 1),
+                addr_tagbody_1_u_point_a(TBEnv),
+                symbol_value(TBEnv, u_val, U_val_Get),
+                U_val_Get=MResult
+              ),
+              block_exit(u_fifteen, MResult),
+              true).
+
+|#
+
+(is eq 15 (fifteen))
+
+
 (defun fib (n)
   (if (> n 1)
     (+ (fib (- n 1))

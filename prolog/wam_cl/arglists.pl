@@ -278,8 +278,9 @@ ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,Mode,['&environment'],Params,
 ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,required,[F|FormalParms],[V|Params],[F|Names],[V|PVars],Code):- !,
   enforce_atomic(F),
   arginfo_incr(all,ArgInfo),arginfo_incr(req,ArgInfo),
-  % ensure_var_tracker(Ctx,F,V),
+  % ensure_var_tracker(Ctx,F,V),                               
   rw_add(Ctx,F,w),
+  rw_add(Ctx,F,p),
   ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,required,FormalParms,Params,Names,PVars,Code).
 
 

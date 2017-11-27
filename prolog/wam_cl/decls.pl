@@ -110,17 +110,22 @@ compile_macro(Ctx,CallEnv,Macro,[Name0,FormalParms|FunctionBody0], CompileBody):
    debug_var('Fun',Fun),
    subst(NewMacroHead,MResult,FResult,FunctionHead).
 
+varuse:attr_unify_hook(_,Other):- var(Other).
 
 make_mcompiled(Ctx,_UnusedEnv,CResult,Symbol,FunctionHead,FunctionBody,Head,HeadDefCode,(BodyCode),Fun):-
     expand_function_head(Ctx,CallEnv,FunctionHead, Head, HeadEnv, CResult,HeadDefCode,HeadCode),
     debug_var("CallEnv",CallEnv),debug_var('CResult',CResult),
-    debug_var('MResult',MResult),
+   debug_var('MResult',MResult),
     compile_body(Ctx,CallEnv,MResult,[block,Symbol|FunctionBody],Body0),
     show_ctx_info(Ctx),
+    %gensym(retval,R),
+    %add_tracked_var(Ctx,R,MResult),
+    %put_attr(MResult,varuse,retval),
+    %rw_add(Ctx,R,ret),
    ((fail,sub_term(Sub,Body0),compound(Sub),(Sub= (Body=Var)),var(Var),Var==MResult, is_list(Body))->
      (lisp_compile(CResult,Body,BodyCode0),
       subst(Body0,Sub,BodyCode0,BodyCode),Fun=t);
-    (((var(MResult),CResult=MResult))
+    (((var(MResult)))
     -> sanitize_true(Ctx,((CallEnv=HeadEnv,HeadCode,Body0)),BodyCode)
      ; (body_cleanup(Ctx,((CallEnv=HeadEnv,HeadCode,Body0,MResult=CResult)),BodyCode)))).
 
@@ -136,7 +141,7 @@ compile_function(Ctx,Env,Function,[Name,FormalParms|FunctionBody0], CompileBody)
    always(find_function_or_macro_name(Ctx,Env,Symbol,_Len, Function)),
    always(maybe_get_docs(function,Function,FunctionBody0,FunctionBody,DocCode)),
    FunctionHead=[Function|FormalParms],
-   within_labels_context(Symbol, make_compiled(Ctx,Env,_MResult,Symbol,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode)),
+   within_labels_context(Symbol, make_compiled(Ctx,Env,MResult,Symbol,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode)),
  CompileBody = (
    DocCode,
    HeadDefCode,
@@ -144,14 +149,17 @@ compile_function(Ctx,Env,Function,[Name,FormalParms|FunctionBody0], CompileBody)
    asserta((user:Head  :- BodyCode)),
    set_opv(Function,classof,claz_compiled_function),
    set_opv(Symbol,compile_as,kw_function),
-   set_opv(Symbol,function,Function)).
+   set_opv(Symbol,function,Function)),
+   debug_var('MResult',MResult).
 
 make_compiled(Ctx,_UnusedEnv,MResult,Symbol,FunctionHead,FunctionBody,Head,HeadDefCode,(BodyCode)):-
     expand_function_head(Ctx,CallEnv,FunctionHead, Head, HeadEnv, MResult,HeadDefCode,HeadCode),
     debug_var("RET",Result),debug_var("CallEnv",CallEnv),debug_var('MResult',MResult),
+    %put_attr(MResult,varuse,retval),
+    MResult=Result,
     compile_body(Ctx,CallEnv,Result,[block,Symbol|FunctionBody],Body0),
     show_ctx_info(Ctx),
-    (((var(Result),MResult=Result))
+    (((var(Result)))
     -> body_cleanup(Ctx,((CallEnv=HeadEnv,HeadCode,Body0)),BodyCode)
      ; (body_cleanup(Ctx,((CallEnv=HeadEnv,HeadCode,Body0,MResult=Result)),BodyCode))).
 
