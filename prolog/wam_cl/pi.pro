@@ -340,7 +340,7 @@ package_external_symbols(pkg_cl,"*TRACE-OUTPUT*",xx_trace_output_xx).
 package_external_symbols(pkg_cl,"+",c43).
 package_external_symbols(pkg_cl,"++",c43_c43).
 package_external_symbols(pkg_cl,"+++",c43_c43_c43).
-package_external_symbols(pkg_cl,"-",'').
+package_external_symbols(pkg_cl,"-",c45).
 package_external_symbols(pkg_cl,"/",c47).
 package_external_symbols(pkg_cl,"//",c47_c47).
 package_external_symbols(pkg_cl,"///",c47_c47_c47).
@@ -2129,7 +2129,7 @@ package_external_symbols(pkg_jvm,"*RESIGNAL-COMPILER-WARNINGS*",jvm_xx_resignal_
 package_external_symbols(pkg_jvm,"COMPILE-DEFUN",jvm_compile_defun).
 package_external_symbols(pkg_jvm,"DERIVE-COMPILER-TYPE",jvm_derive_compiler_type).
 package_external_symbols(pkg_jvm,"WITH-INLINE-CODE",jvm_with_inline_code).
-package_external_symbols(pkg_kw,"",kw).
+% package_external_symbols(pkg_kw,"",kw).
 package_external_symbols(pkg_kw,"%COUNT",kw_pf_count).
 package_external_symbols(pkg_kw,"%DOCUMENTATION",kw_pf_documentation).
 package_external_symbols(pkg_kw,"%POLICY",kw_pf_policy).

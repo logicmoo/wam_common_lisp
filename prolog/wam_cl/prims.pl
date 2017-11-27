@@ -71,12 +71,17 @@ cl_rplaca(Cons,Obj,Cons):- nb_setarg(1,Cons,Obj).
 user:op_replacement(setcdr,cl_rplacd).
 cl_rplacd(Cons,Obj,Cons):- nb_setarg(2,Cons,Obj).
 
+
+wl:declared(cl_cons,inline(cons)).
 cl_cons(Item,
  List, Result):-
 	Result = [Item|List].
 
 cl_append(A,B,R):- append(A,B,R),!.
 
+wl:declared(cl_list,lambda(['&rest',r])).
+wl:declared(cl_list,inline(list)).
+wl:declared(cl_list,uses_rest).
 cl_list(List,List).
 
 cl_plus(Num1, Num2, Result):-Result is Num1 + Num2.

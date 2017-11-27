@@ -17,9 +17,10 @@
 
 cl_disassemble(function(Symbol), Code):- !, cl_disassemble((Symbol), Code).
 cl_disassemble(Obj, Code):- get_opv(Obj,function,Obj2),!,cl_disassemble(Obj2, Code).
+cl_disassemble(Function, Code):- string(Function),downcase_atom(Function,DC),!,cl_disassemble(DC, Code).
 cl_disassemble(Function, Code):- 
   writeln('#| DISASSEMBLY FOR':Function),
-  user:listing(Function),
+  find_listings(Function),
   findall('$OBJ'(claz_prolog,(P:-B)),
    (current_predicate(W:Function/Arity),
   % listing(W:Function/Arity),
@@ -27,6 +28,7 @@ cl_disassemble(Function, Code):-
    Code),
   writeln('|#').
 
+find_listings(F):- user:listing(F).
 
 :- fixup_exports.
 

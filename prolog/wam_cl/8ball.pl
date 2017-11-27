@@ -93,7 +93,8 @@ colormsg1(Msg):- mesg_color(Msg,Ctrl),!,ansicall(Ctrl,fmt90(Msg)).
 lisp_compiler_option(speed,N):- current_prolog_flag(runtime_speed,N).
 lisp_compiler_option(safety,N):- current_prolog_flag(runtime_safety,N).
 lisp_compiler_option(safe(_),true).
-lisp_compiler_option(_,false).
+lisp_compiler_option(safe(_),true):- lisp_compiler_option(safety,N),N<2.
+lisp_compiler_option(_,2).
 
 system:goal_expansion(always(G),G) :- lisp_compiler_option(speed,0).
 system:goal_expansion(certainly(G),G) :- lisp_compiler_option(safety,0).

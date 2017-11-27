@@ -83,16 +83,41 @@ show_ctx_info3(Ctx):- fmt9(ctx=Ctx).
 
 % same_symbol(OP1,OP2):-!, OP1=OP2.
 same_symbol(OP1,OP2):- notrace(same_symbol0(OP1,OP2)).
+
+%prologcase_name_or_string(S,N):-prologcase_name(S,N).
+
 same_symbol0(OP1,OP2):- var(OP1),var(OP2),trace_or_throw(same_symbol(OP1,OP2)).
-same_symbol0(OP1,OP2):- var(OP2),atom(OP1),!,same_symbol(OP2,OP1).
-same_symbol0(OP2,OP1):- var(OP2),atom(OP1),!,prologcase_name(OP1,OP3),!,freeze(OP2,((atom(OP2),same_symbol(OP2,OP3)))).
-same_symbol0(OP1,OP2):-
-  (atom(OP1),atom(OP2),(
-   OP1==OP2 -> true;  
-   prologcase_name(OP1,N1),
-   (OP2==N1 -> true ;
-   (prologcase_name(OP2,N2),
-     (OP1==N2 -> true ; N1==N2))))).
+same_symbol0(OP1,OP2):- var(OP1),!,same_symbol0(OP2,OP1).
+same_symbol0(OP1,OP2):- var(OP2),!,freeze(OP2,((nonvar(OP2),same_symbol(OP1,OP2)))).
+
+same_symbol0(OP1,OP2):- string(OP1),cl_string(OP2,N2),!,OP1==N2.
+same_symbol0(OP1,OP2):- string(OP2),!,same_symbol0(OP2,OP1).
+
+same_symbol0(OP1,OP2):- atom(OP1),atom(OP2),!, same_reduced_atoms(OP1,OP2),!.
+same_symbol0(P,OP2):- compound(P),!,arg(1,P,OP1),same_symbol0(OP1,OP2).
+same_symbol0(OP1,P):- compound(P),!,arg(1,P,OP2),same_symbol0(OP1,OP2).
+
+same_reduced_atoms(X,X).
+same_reduced_atoms(X,Y):- reduce_atom(X,XX),X\==XX,!,same_reduced_atoms(XX,Y).
+same_reduced_atoms(Y,X):- reduce_atom(X,XX),X\==XX,!,same_reduced_atoms(Y,XX).
+
+reduce_atom(X,XX):- reduce_atom0(X,XX),XX\==''.
+reduce_atom0(X,XX):- downcase_atom(X,XX)->X\==XX.
+%reduce_atom(X,XX):- atom_concat('%',XX,X).
+%reduce_atom(X,XX):- atom_concat('$',XX,X).
+reduce_atom0(X,XX):- prologcase_name(X,XX)->X\==XX.
+reduce_atom0(X,XX):- atom_concat(':',XX,X).
+reduce_atom0(X,XX):- atom_concat('cl_',XX,X).
+reduce_atom0(X,XX):- atom_concat('f_',XX,X).
+/*
+reduce_atom(X,XX):- atom_concat('u_',XX,X).
+reduce_atom(X,XX):- atom_concat('kw_',XX,X).
+reduce_atom(X,XX):- atom_concat('sys_',XX,X).
+reduce_atom(X,XX):- atom_concat('ext_',XX,X).
+reduce_atom(X,XX):- atom_concat(XX,'_mexpand1',X).
+*/
+
+
 :- '$hide'(same_symbol/2).
 
 

@@ -29,6 +29,7 @@
        (if (not (,eqf ,a ,b))
          (progn
            (format t "FAILED: when matching ~a and ~a~%" ,a ,b)
+	   (prolog-inline "trace")
            '(quit 1))
          (format t "OK: ~a is ~a to ~a~%" ',expected ',eqf ',actual)))))
 
@@ -44,12 +45,28 @@
 (is eq 10 (if t 10 20))
 
 (is eq t (stringp "abc"))
+
+;;  "FAILED: when matching ~a and ~a~%", ['$CHAR'(b), '$CHAR'(c)], "bc", t).
 (is equal (subseq "abc" 1) "bc")
 
 (is eq 1 (if t 1 2))
 (is eq 2 (if nil 1 2))
 
 (defun accum (r) (if (= 0 r) (list 0) (cons r (accum (- r 1)))))
+
+(disassemble #'accum)
+#| DISASSEMBLY FOR:f_u_accum
+:- dynamic f_u_accum/2.
+
+f_u_accum(A, G) :-
+	(   0=:=A
+	->  G=[0]
+	;   C is A - 1,
+	    f_u_accum(C, D),
+	    G=[A|D]
+	).
+
+|#
 (is equal (list 4 3 2 1 0) (accum 4))
 
 (defmacro defwrap (name) `(defun ,name () 1))
@@ -65,12 +82,18 @@
        (fib (- n 2)))
     1))
 
+(is eql 89 (fib 10))
 
-(DEFUN string_l (x )(COND ((STRINGP x )x )((SYMBOLP x )(symbol-name x ))(T (ERROR "type error" ))))
+(is eq 'string_l (DEFUN string_l (x )(COND ((STRINGP x )x )((SYMBOLP x )(symbol-name x ))(T (ERROR "type error" )))))
 
-(TAGBODY 1 (PRINT "hi" ))
- (LET ((val 1 ))NIL )
- (LET ((val 1 ))val )
+(is eq () (TAGBODY 1 (PRINT "hi" )))
+
+(is eq () (TAGBODY a (PRINT "hi" )))
+
+(is eq () (LET ((val 1 ))NIL ))
+(is eq () (LET ((val 1 )) ))
+
+(is eql 1 (LET ((val 1 ))val ))
 
 
 ;; 3.1. Review of defstruct

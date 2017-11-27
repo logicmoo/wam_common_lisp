@@ -50,6 +50,10 @@
 :- dynamic(user:op_replacement/2).
 :- discontiguous(user:op_replacement/2).
 
+:- multifile(wl:declared/2).
+:- dynamic(wl:declared/2).
+:- discontiguous(wl:declared/2).
+
 :- dynamic(user:arglist_info/4).
 :- multifile(user:arglist_info/4).
 

@@ -88,10 +88,10 @@ package_unintern_symbol(Package,Symbol):-
 package_find_symbol_or_missing(String,Package,OldSymbol,IntExt):- package_find_symbol(String,Package,OldSymbol,IntExt),!.
 package_find_symbol_or_missing(_String,_Package,_NoSymbol,'$missing').
 
-package_find_symbol(String,_,Symbol,kw_external):- atom_concat_or_rtrace(':',KWName,String),!,atom_concat_or_rtrace('kw_',KWName,SymbolCI),prologcase_name(SymbolCI,Symbol).
+%package_find_symbol(String,_,Symbol,kw_external):- atom_concat_or_rtrace(':',KWName,String),!,atom_concat_or_rtrace('kw_',KWName,SymbolCI),prologcase_name(SymbolCI,Symbol).
 package_find_symbol(String,Package,Symbol,kw_external):- package_external_symbols(Package,String,Symbol),!.
 package_find_symbol(String,Package,Symbol,kw_internal):- package_internal_symbols(Package,String,Symbol),!.
-package_find_symbol(String,PW,Symbol,kw_inherited):-  package_use_list(PW,Package),package_external_symbols(Package,String,Symbol).
+package_find_symbol(String,PW,Symbol,kw_inherited):-  package_use_list(PW,Package),package_external_symbols(Package,String,Symbol),!.
 
 % @TODO Add symbol shadowing 
 cl_import(Symbol,Result):- reading_package(Package),cl_import(Symbol,Package,Result).

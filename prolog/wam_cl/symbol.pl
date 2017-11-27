@@ -110,14 +110,14 @@ create_keyword(Name,Symbol):- string_upper(Name,String),
 
 print_symbol(Symbol):- 
    writing_package(Package),
-   print_symbol_at(Symbol,Package),!.
+   ((print_symbol_at(Symbol,Package))),!.
 print_symbol(Symbol):-write(Symbol).
  
 print_symbol_at(Symbol,PrintP):- 
   cl_symbol_package(Symbol,SPackage),!,
   print_symbol_from(Symbol,PrintP,SPackage),!.
 
-print_symbol_from(Symbol,_PrintP,kw_pkg):- !, cl_symbol_name(Symbol,Name),write(':'),write(Name).
+print_symbol_from(Symbol,_PrintP,Pkg):- Pkg == kw_pkg, !, cl_symbol_name(Symbol,Name),write(':'),write(Name).
 print_symbol_from(Symbol,PrintP,SPackage):-
   cl_symbol_name(Symbol,Name),
   must(package_find_symbol(Name,SPackage,FoundSymbol,IntExt)),
@@ -125,12 +125,14 @@ print_symbol_from(Symbol,PrintP,SPackage):-
     print_prefixed_symbol(Name,PrintP,SPackage,kw_internal);
     print_prefixed_symbol(Name,PrintP,SPackage,IntExt)).
 
-print_package_or_hash(Var):- !,writeq(Var).
+print_package_or_hash(Var):- var(Var),!,writeq(Var).
 print_package_or_hash([]):- !,write("#").
 print_package_or_hash(P):- package_name(P,Symbol),shorter_name(Symbol,Short),!,write(Short).
-print_package_or_hash(P):- write(P).
+print_package_or_hash(P):- package_name(P,N),!,write(N).
+print_package_or_hash(P):- trace,writeq(failed_print_package_or_hash(P)).
 
-shorter_name(PN,NN):- package_nicknames(PN,NN).
+
+shorter_name(PN,NN):- package_nicknames(PN,NN),atom_length(PN,B),atom_length(NN,A),A<B.
 shorter_name("SYSTEM","SYS").
 shorter_name("COMMON-LISP","CL").
 shorter_name("COMMON-LISP-USER","U").

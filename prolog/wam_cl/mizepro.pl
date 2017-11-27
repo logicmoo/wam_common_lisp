@@ -316,9 +316,10 @@ never_inline_fa(t_or_nil,_).
 
 always_inline(P):- never_inline(P),!,fail.
 always_inline(P):- compound(P),functor(P,F,A),always_inline_fa(F,A).
-always_inline(P):- clause(P,B)->(B==true;B=t_or_nil(_,_)).
+%always_inline(P):- clause(P,B)->(B==true;B=t_or_nil(_,_)).
 
 always_inline_fa(F,1):- atom_concat_or_rtrace('addr_tagbody_',M,F),atom_contains(M,'_addr_enter_').
+always_inline_fa(F,_):- atom_concat_or_rtrace(_,'expand1',F).
 
 maybe_inline(C1):- always_inline(C1),
   predicate_property(C1,interpreted),

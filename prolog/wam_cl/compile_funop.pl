@@ -23,9 +23,9 @@
 % Use a previous DEFMACRO
 
 compile_funop(Ctx,Env,Result,LispCode,CompileBody):-
-  macroexpand_1_or_fail(LispCode,CompileBody0Result),
-  must_compile_body(Ctx,NextEnv,RResult,CompileBody0Result, CompileBody),
-  CompileBodyCode = (CompileBody).
+  fail, macroexpand_1_or_fail(LispCode,CompileBody0Result),
+  must_compile_body(Ctx,Env,Result,CompileBody0Result, CompileBody).
+
 
 macroexpand_1_or_fail([Procedure|Arguments],CompileBody0Result):- nonvar(Procedure),
    user:macro_lambda(defmacro(Procedure),_FProcedure, FormalParams, LambdaExpression,_),!,
@@ -82,7 +82,9 @@ compile_funop(Ctx,CallEnv,Result,[FunctionName | FunctionArgs], Body):- nonvar(F
 
 
 uses_exact(FunctionName,ArgInfo):-  user:arglist_info(FunctionName,_,_,ArgInfo),!,ArgInfo.complex ==0 .
-uses_rest(FunctionName,ArgInfo):-  user:arglist_info(FunctionName,_,_,ArgInfo),!,ArgInfo.complex \==0 .
+
+uses_rest(FunctionName):-  user:arglist_info(FunctionName,_,_,ArgInfo),!,ArgInfo.complex \==0 .
+uses_rest(FunctionName):- same_symbol(FunctionName,F),wl:declared(F,lambda(['&rest',_])).
 % Non built-in function expands into an explicit function call
 
 find_function_or_macro(Ctx,Env,FunctionName,Args,Result,ExpandedFunction):-
@@ -108,19 +110,19 @@ return_arg_is_first_p(P):- atom_concat('f_',PP,P), return_arg_is_first(PP).
 align_args(_FunctionName,ProposedName,Args,Result,[Result,Args]):-
     return_arg_is_first_p(ProposedName),!.
 
-align_args(_FunctionName,ProposedName,Args,Result,ArgsPlusResult):- 
-   append(Args, [Result], ArgsPlusResult),
-   length(ArgsPlusResult,Len),
-   functor(G,ProposedName,Len),
-   current_predicate(_,G),!.
+align_args(FunctionName,ProposedName,Args,Result,ArgsPlusResult):- 
+   (uses_rest(FunctionName);uses_rest(ProposedName)),
+   append([Args], [Result], ArgsPlusResult).
 
 align_args(FunctionName,ProposedName,Args,Result,ArgsPlusResult):- 
    (uses_exact(FunctionName,_ArgInfo);uses_exact(ProposedName,_ArgInfo)),
    append(Args, [Result], ArgsPlusResult).
 
-align_args(FunctionName,ProposedName,Args,Result,ArgsPlusResult):- 
-   (uses_rest(FunctionName,_ArgInfo);uses_rest(ProposedName,_ArgInfo)),
-   append([Args], [Result], ArgsPlusResult).
+align_args(_FunctionName,ProposedName,Args,Result,ArgsPlusResult):- 
+   append(Args, [Result], ArgsPlusResult),
+   length(ArgsPlusResult,Len),
+   functor(G,ProposedName,Len),
+   current_predicate(_,G),!.
 
 align_args(_FunctionName,ProposedName,[Arg],Result,[Arg,Result]):- functor(G,ProposedName,2),current_predicate(_,G),!.
 

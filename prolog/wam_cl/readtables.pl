@@ -74,7 +74,7 @@ atom_symbol_s(SymbolName,[],Package,Symbol):- intern_symbol(SymbolName,Package,S
 % PACKAGE::SYMBOL
 atom_symbol_s(PName,   ["", SymbolName],_UPackage,Symbol):- find_package_or_die(PName,Package),intern_symbol(SymbolName,Package,Symbol,_IntExt).
 % PACKAGE:SYMBOL will be made public
-atom_symbol_s(PName,   [SymbolName],_UPackage,Symbol):- find_package_or_die(PName,Package),atom_symbol_make_public(SymbolName,Package,Symbol),!.
+atom_symbol_s(PName,   [SymbolName],_UPackage,Symbol):- fail, find_package_or_die(PName,Package),atom_symbol_make_public(SymbolName,Package,Symbol),!.
 % PACKAGE:SYMBOL must exists AND be public
 atom_symbol_s(PName,   [SymbolName],_UPackage,Symbol):- find_package_or_die(PName,Package),atom_symbol_public(SymbolName,Package,Symbol).
 

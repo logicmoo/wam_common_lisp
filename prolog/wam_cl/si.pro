@@ -1,10 +1,10 @@
-o_p_v(-,classof,claz_symbol).
-o_p_v(-,compile_as,kw_function).
-o_p_v(-,declared_as,defparameter).
-o_p_v(-,function,cl_c45).
-o_p_v(-,name,"-").
-o_p_v(-,package,pkg_cl).
-o_p_v(-,value,[]).
+o_p_v(c45,classof,claz_symbol).
+o_p_v(c45,compile_as,kw_function).
+o_p_v(c45,declared_as,defparameter).
+o_p_v(c45,function,cl_c45).
+o_p_v(c45,name,"-").
+o_p_v(c45,package,pkg_cl).
+o_p_v(c45,value,[]).
 o_p_v([],classof,claz_symbol).
 o_p_v([],declared_as,defconstant).
 o_p_v([],name,"NIL").
