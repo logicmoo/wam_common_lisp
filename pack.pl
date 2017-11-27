@@ -7,9 +7,11 @@ packager( 'TeamSPoon/LogicMoo', 'https://github.com/TeamSPoon/' ).
 maintainer( 'TeamSPoon', 'https://github.com/TeamSPoon/' ).
 home( 'https://github.com/TeamSPoon/wam_common_lisp' ).
 download( 'https://github.com/TeamSPoon/wam_common_lisp/release/*.zip' ).
-requires(s_expression).
+requires(loop_check).
 requires(predicate_streams).
+requires(no_repeats).
 requires(dictoo).
 requires(must_trace).
+requires(logicmoo_utils).
 autoload(false).
 

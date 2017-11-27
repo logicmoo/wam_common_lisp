@@ -68,7 +68,7 @@ oper_mize(_Whole,_Ctx,_F,(C1,C2),U_x_Param=CondResult):-
 
 
 oper_mize(_Whole,Ctx,F,(C1,C2),Joined):-!,
-   oper_mize(C1,Ctx,F,C1,C1O),
+   oper_mize(C1,Ctx,F,C1,C1O),    
    oper_mize(C2,Ctx,F,C2,C2O),
    conjoin_0(C1O,C2O,Joined).
 oper_mize(_Whole,Ctx,F,[C1|C2],Joined):-!,
