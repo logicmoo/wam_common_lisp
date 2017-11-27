@@ -35,9 +35,10 @@ sexpr1([quote, Expression]) --> [''''], !, sexpr1(Expression).
 sexpr1(Dict) --> {is_dict(Dict,T),Dict=..[_,_|Rest]},!, ['#<'],sexpr1(T),lisplist(Rest,'>').
 sexpr1('$OBJ'([T,X])) --> sexpr1('$OBJ'(T,X)).
 sexpr1('$OBJ'([T|X])) --> sexpr1('$OBJ'(T,X)).
+sexpr1('$OBJ'(T,X)) --> {T==claz_prolog,with_output_to(atom(SPClosure),fmt9(X)),trim_full_stop(SPClosure,TSPClosure)}, 
+  ['{',TSPClosure,'}.'], !.
 sexpr1('$OBJ'(T,X)) --> {T==claz_vector},['#'],sexpr1(X).
 sexpr1('$OBJ'(T,X)) --> {T==claz_pathname},['#P'],sexpr1(X).
-sexpr1('$OBJ'(T,X)) --> {T==claz_package},sexpr1(X).
 sexpr1('$S'(X)) --> ['#S'],sexpr1(X).
 sexpr1('$OBJ'(T,X)) --> ['#S'],{is_list(X),is_structure_class(T),claz_to_symbol(T,TP)},sexpr1(TP),sexpr1(X).
 sexpr1('$OBJ'(T,X)) --> ['#<'],{claz_to_symbol(T,TP)},!,sexpr1(TP),sexpr1(X),['>'].
@@ -96,6 +97,7 @@ need_right_padding('.').
 
 writeTokenL([]).
 
+writeTokenL(['{',Code,'}.'|TokenL]):- write({Code}),write('.'), writeTokenL(TokenL).
 writeTokenL(['(', ')'|TokenL]):- !,
 	write('NIL '),
 	writeTokenL(TokenL).

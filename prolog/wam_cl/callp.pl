@@ -46,16 +46,34 @@ compile_prolog_subst_call(Ctx,Env,ResultOut,[R|Resolve],Body,(Code,BodyResolved)
   compile_prolog_subst_call(Ctx,Env,ResultOut,Resolve,BodyMid,BodyResolved).
 
 
+expand_prolog(_Ctx,Env,Term0,Term):-subst(Term0,'$env',Env,Term).
+
+read_prolog_from_lisp('$OBJ'(claz_prolog,Term),Term):-!.
+read_prolog_from_lisp(Call,Term):- cl_string(Call,Str),read_term_from_atom(Str,Term,[]).
+
 % (prolog-trace)
 compile_prolog_call(_Ctx,_Env,_Result,[u_prolog_trace], trace).
 
 %compile_body_h(_Ctx,_Env,Result, nop(X),  nop(X)):- !, debug_var("_NopResult",Result).
-compile_prolog_call(_Ctx,_Env,_Result,call(Body), call(Body) ):-!.
-compile_prolog_call(Ctx,Env,ResultOut,prolog_call(Body), call(BodyResolved) ):-
-   compile_prolog_call(Ctx,Env,[],ResultOut,Body,BodyResolved),!.
-compile_prolog_call(Ctx,Env,ResultOut,prolog_call(Resolve,Body), call(BodyResolved) ):-
-   compile_prolog_call(Ctx,Env,Resolve,ResultOut,Body,BodyResolved),!.
+compile_prolog_call(Ctx,Env,Body,call(Body0), Body ):-!,
+  expand_prolog(Ctx,Env,Body,Body0).
 
+% (prolog-call "ls.")
+compile_prolog_call(Ctx,Env,Result,[u_prolog_call,Call], (Term->Result=t;Result=[]) ):-
+   read_prolog_from_lisp(Call,Term0),
+   expand_prolog(Ctx,Env,Term0,Term).   
+
+% (prolog-call "X=1" "X")
+compile_prolog_call(Ctx,Env,Result,[u_prolog_call,Call,ResultL], (Term->true;Result=[]) ):-
+   cl_string(Call,Str),cl_string(ResultL,Str2),
+   atomic_list_concat(['((',Str,')):-((',Str2,'))'],Read),
+   read_term_from_atom(Read,(Term0:-Result0),[]),
+   expand_prolog(Ctx,Env,Term0:-Result0,Term:-Result).
+
+% (prolog-inline "trace" )
+compile_prolog_call(Ctx,Env,'$OBJ'(claz_prolog,Term),[u_prolog_inline,Call], Term ):-
+   read_prolog_from_lisp(Call,Term0),
+   expand_prolog(Ctx,Env,Term0,Term).
 
 :- fixup_exports.
 

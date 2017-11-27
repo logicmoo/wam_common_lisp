@@ -146,6 +146,14 @@ f_u_to_pvs(X,[float|XX]):- notrace(catch(XX is (1.0 * X),_,fail)),!.
 f_u_to_pvs(X,XX):- findall([P|V],(get_opv(X,P,V);get_struct_opv(X,P,V)),List),List\==[],sort(List,XX),!.
 f_u_to_pvs(X,[str|XX]):- format(string(S),'~w',[X]),string_upper(S,XX),!.
 
+make_character('$CHAR'(Int),'$CHAR'(Int)):-!.
+make_character(Int,'$CHAR'(Int)).
+
+f_ext_quit(ExitCode,Ret):- trace,t_or_nil(halt(ExitCode),Ret).
+
+as_list(Str,List):-string(Str),atom_chars(Str,Chars),maplist(make_character,Chars,List).
+
+cl_subseq(Seq,Offset,Result):- as_list(Seq,List), length(Left,Offset),append(Left,Result,List).
 
 cl_sqrt(X,Y):- \+ integer(X)-> Y is sqrt(X);
    (Y is sqrt(X)).

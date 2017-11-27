@@ -32,7 +32,7 @@ cl_keywordp(Symbol,TF):-  t_or_nil(is_keywordp(Symbol),TF).
 cl_symbolp(Symbol,TF):-  t_or_nil(is_symbolp(Symbol),TF).
 
 cl_gensym(Symbol):- cl_gensym("G",Symbol).
-cl_gensym(String,Symbol):- gensym(String,SymbolName),cl_make_symbol(SymbolName,Symbol).
+cl_gensym(Name,Symbol):- cl_string(Name,String), gensym(String,SymbolName),cl_make_symbol(SymbolName,Symbol).
 
 
 is_boundp(Symbol):- is_keywordp(Symbol);get_opv(Symbol,value,_).

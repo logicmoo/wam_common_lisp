@@ -21,24 +21,29 @@
 :- discontiguous(compile_funop/5).
 
 % Use a previous DEFMACRO
-compile_funop(Ctx,Env,RResult,[Procedure|Arguments],CompileBodyCode):- nonvar(Procedure),
-  user:macro_lambda(_Scope,Procedure, FormalParams, LambdaExpression,_),!,
-  debug_var('EnvThru',EnvThru),debug_var('NewEnv',NewEnv),
-  debug_var('Env',Env),debug_var('NextEnv',NextEnv),debug_var('CommaResult',CommaResult),
-  must_bind_parameters(NewEnv, FormalParams, Arguments,EnvThru,BindCode),!,
-  append(_,[],NewEnv),!,
-  NextEnv = [NewEnv|Env],  
-  always(BindCode),
-  always(expand_commas(NewEnv,CommaResult,LambdaExpression,CodeS)),
-  body_cleanup_keep_debug_vars(Ctx,CodeS,Code),
-  dbmsg(comment(macroResult(BindCode,Code,CommaResult))),
-  % (local_override(with_forms,lisp_grovel)-> (lisp_dumpST) ; true),
-  always(Code),
-  must_compile_body(Ctx,NextEnv,CompileBody0Result,CommaResult, MCBR),
-  always(MCBR),
+
+compile_funop(Ctx,Env,Result,LispCode,CompileBody):-
+  macroexpand_1_or_fail(LispCode,CompileBody0Result),
   must_compile_body(Ctx,NextEnv,RResult,CompileBody0Result, CompileBody),
   CompileBodyCode = (CompileBody).
 
+macroexpand_1_or_fail([Procedure|Arguments],CompileBody0Result):- nonvar(Procedure),
+   user:macro_lambda(defmacro(Procedure),_FProcedure, FormalParams, LambdaExpression,_),!,
+   always((debug_var('EnvThru',EnvThru),debug_var('NewEnv',NewEnv),
+   debug_var('Env',Env),debug_var('NextEnv',NextEnv),debug_var('CommaResult',CommaResult),
+   must_bind_parameters(NewEnv, FormalParams, Arguments,EnvThru,BindCode),!,
+   append(_,[],NewEnv),!,
+   NextEnv = [NewEnv|Env],  
+   always(BindCode),
+   always(expand_commas(NewEnv,CommaResult,LambdaExpression,CodeS)),
+   body_cleanup_keep_debug_vars(Ctx,CodeS,Code),
+   % (local_override(with_forms,lisp_grovel)-> (lisp_dumpST) ; true),
+   always(Code),
+   must_compile_body(Ctx,NextEnv,CompileBody0Result,CommaResult, MCBR),
+   always(MCBR),
+   dbmsg(comment(macroResult(BindCode,Code,CommaResult,CompileBody0Result))))),!.
+
+cl_macroexpand_1(LispCode,Result):- macroexpand_1_or_fail(LispCode,Result)->true;Result=LispCode.
 
 
 % Operator
