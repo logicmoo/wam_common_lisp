@@ -263,9 +263,10 @@ my-point
 
 (setf my-daft-point (make-instance 'daft-point :x 19))
 
+
 (list (daft-x my-daft-point)
       (daft-y my-daft-point)
-      (daft-z my-daft-point))
+      (progn (prolog-trace) (daft-z my-daft-point)))
 
 (let ((temp (make-instance 'daft-point)))
   (setf (daft-y temp) 999

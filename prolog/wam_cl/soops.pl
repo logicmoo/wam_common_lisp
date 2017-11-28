@@ -65,12 +65,22 @@ new_unnamed_opv(SKind,Name,Attrs,Obj):-
   atomic_list_concat([Pre,Name],'_',PName),
   prologcase_name(PName,Obj),
   cl_string(Name,SName),set_opv(Obj,sname,SName),
-  add_opv(Obj,classof,Kind),
-  ensure_opv_type_inited(Kind),
+  add_opv_i(Obj,classof,Kind),
+  ensure_opv_type_inited(Kind),  
   construct_opv(Obj,Kind),
-  init_slot_props(Kind,1,Obj,Attrs))).
+  init_slot_props(Kind,1,Obj,Attrs),
+  call_init_slot_props(Kind,Obj))).
   %maplist(add_missing_opv(Obj,Kind),Attrs).
 
+call_init_slot_props(Kind,Obj):-
+  forall(get_struct_opv(Kind,slot,Name,SlotInfo),
+    init_struct_opv(Kind,Obj,Name,SlotInfo)).
+
+init_struct_opv(Kind,Obj,Name,SlotInfo):-
+   when_must(get_struct_opv(Kind,initarg,From,SlotInfo) , ignore((get_opv(Obj,From,Value),set_opv(Obj,Name,Value)))),
+   when_must(get_struct_opv(Kind,initform,Value,SlotInfo) , (cl_eval(Value,Result),set_opv(Obj,Name,Result))),!.
+
+when_must(True,Then):- True->always(Then);true.
 
 init_slot_props(_,_,_,[]).
 init_slot_props(Kind,Ord,Obj,[Key,Value|Props]):- is_keywordp(Key),
@@ -171,24 +181,19 @@ is_structure_class(T):- get_opv(T,classof,claz_structure_class);get_opv(T,classo
 define_kind(Name,KeyWords,SlotsIn,Kind):- 
  always((
   assert_struct_opv(Kind,symbolname,Name),
-  %assert_struct_opv(Kind,name,Name),
-  assert_struct_opv(Kind,type,Name),
-  cl_symbol_package(Name,Package),
-  cl_string(Name,SName),
-  assert_struct_opv(Kind,readerpackage,Package),
+  assert_struct_opv(Kind,type,Name),  
   % add doc for string
   maybe_get_docs('class',Name,SlotsIn,Slots,Code),
-  always(Code),
-  set_opv(Kind,sname,SName),
-  add_opv_keywords(Kind,KeyWords),
-  struct_offset(Kind,Offset),
+  always(Code),  
+  add_class_keywords(Kind,KeyWords),
+  get_struct_offset(Kind,Offset),
   NOffset is Offset +1,
-  add_opv_slots(Kind,NOffset,Slots),
-  %assert_struct_opv(Kind,classname,SName),
+  add_class_slots(Kind,NOffset,Slots),
+  
   generate_missing_struct_functions(Kind))).
 
-struct_offset(Kind,W):- get_struct_opv(Kind,initial_offset,W).
-struct_offset(_,0).
+get_struct_offset(Kind,W):- get_struct_opv(Kind,initial_offset,W).
+get_struct_offset(_,0).
 
 generate_missing_struct_functions(Kind):-
   always(( get_struct_opv(Kind,symbolname,Name),
@@ -228,7 +233,7 @@ maybe_add_get_function(Kind,ConcatName,Keyword,ZLOT):-
   create_keyword(Name,KW),
   atom_concat_or_rtrace(ConcatName,Name,Getter),
   maybe_add_function(Getter,[obj],['slot-value',obj,[quote,KW]],Added),
-  ( Added\==[]-> assert_struct_opv(Kind,kw_accessor,Added,ZLOT) ; true ))).
+  ( Added\==[]-> assert_struct_opv4(Kind,kw_accessor,Added,ZLOT) ; true ))).
 
 maybe_add_set_function(Kind,_ConcName,_Keyword,ZLOT):- get_struct_opv(Kind,setter_fn,_Getter,ZLOT),!.
 maybe_add_set_function(Kind,ConcatName,Keyword,ZLOT):-   
@@ -238,7 +243,7 @@ maybe_add_set_function(Kind,ConcatName,Keyword,ZLOT):-
   atom_concat_or_rtrace(ConcatName,Name,Getter),
   atomic_list_concat(['SETF',Getter],'-',Setter),
   maybe_add_function(Setter,[obj,val],['setf',[Keyword,obj],val],Added),
-  ( Added\==[]-> assert_struct_opv(Kind,setter_fn,Added,ZLOT) ; true ))).
+  ( Added\==[]-> assert_struct_opv4(Kind,setter_fn,Added,ZLOT) ; true ))).
 
 
   
@@ -263,19 +268,19 @@ struct_opv_else(Kind,Key,Value,Else):-
 
 
 
-add_opv_keywords(_Struct,[]):-!.
-add_opv_keywords(Kind,[[Key,Value]|KeyWords]):- !,
+add_class_keywords(_Struct,[]):-!.
+add_class_keywords(Kind,[[Key,Value]|KeyWords]):- !,
    assert_struct_kw(Kind, Key, Value),
-   add_opv_keywords(Kind,KeyWords).
-add_opv_keywords(Kind,[[Key|Value]|KeyWords]):- !, 
+   add_class_keywords(Kind,KeyWords).
+add_class_keywords(Kind,[[Key|Value]|KeyWords]):- !, 
    assert_struct_kw(Kind, Key, Value),
-   add_opv_keywords(Kind,KeyWords).
-add_opv_keywords(Kind,[Key|KeyWords]):-  Key = kw_named,
+   add_class_keywords(Kind,KeyWords).
+add_class_keywords(Kind,[Key|KeyWords]):-  Key = kw_named,
    assert_struct_kw(Kind, Key, t),
-   add_opv_keywords(Kind,KeyWords).
-add_opv_keywords(Kind,[Key,Value|KeyWords]):-    
+   add_class_keywords(Kind,KeyWords).
+add_class_keywords(Kind,[Key,Value|KeyWords]):-    
    assert_struct_kw(Kind, Key, Value),
-   add_opv_keywords(Kind,KeyWords).
+   add_class_keywords(Kind,KeyWords).
 
 assert_struct_kw(Kind, Key, Value):- 
   ignore(( \+ is_keywordp(Key) , dmsg(warn(assert_struct_kw(Kind, Key, Value))))),
@@ -284,7 +289,7 @@ assert_struct_kw(Kind, Key, Value):-
 assert_struct_opv(Obj, KW, Value):-
   un_kw(KW,Key),
   show_call_trace(assertz_new(soops:struct_opv(Obj, Key, Value))).
-assert_struct_opv(Obj, KW, Value,Info):-
+assert_struct_opv4(Obj, KW, Value,Info):-
   un_kw(KW,Key),  
   show_call_trace(assertz_new(soops:struct_opv(Obj, Key, Value,Info))).
 
@@ -362,13 +367,13 @@ un_kw1(Key,Prop):- atom_concat_or_rtrace('kw_',Prop,Key),!.
 un_kw1(Key,Prop):- atom_concat_or_rtrace(':',Prop,Key),!.
 un_kw1(Prop,Prop).
 
-add_kw_opv(Obj,Key,V):- un_kw(Key,Prop),add_opv(Obj,Prop,V).
+add_kw_opv(Obj,Key,V):- un_kw(Key,Prop),add_opv_i(Obj,Prop,V).
 
 f_u_get_opv(Obj,Result):- findall([Prop|Value],get_opv(Obj,Prop,Value),Result).
 f_u_get_opv(Obj,Prop,Value):- get_opv(Obj,Prop,Value).
 	
 add_opv_maybe(Obj,Prop,_):- get_opv_i(Obj,Prop,_),!.
-add_opv_maybe(Obj,Prop,Value):- add_opv(Obj,Prop,Value),!.
+add_opv_maybe(Obj,Prop,Value):- add_opv_i(Obj,Prop,Value),!.
 
 get_opv(Obj,_,_):- string(Obj),!,fail.
 get_opv(Obj,Prop,Value):- no_repeats(Obj-Prop,get_opv_i(Obj,Prop,Value)).
@@ -387,7 +392,7 @@ get_opv_ki(Obj,Prop,Value):- nonvar(Obj),nonvar(Prop),
 get_opv_ii(Obj,Prop,Value):-
   get_obj_pred(Obj,Prop,Pred),
   call(Pred,Obj,Value).
-get_opv_ii(Obj,Prop,Value):- get_obj_prefix(Obj,Prefix),atom_concat_or_rtrace(Prefix,DashKey,Prop),atom_concat_or_rtrace('_',Key,DashKey),!,
+get_opv_ii(Obj,Prop,Value):- fail, get_obj_prefix(Obj,Prefix),atom_concat_or_rtrace(Prefix,DashKey,Prop),atom_concat_or_rtrace('_',Key,DashKey),!,
   get_opv_i(Obj,Key,Value).
   
 
@@ -431,12 +436,12 @@ claz_to_symbol1(Class,Symbol):-atom(Class),atom_concat_or_rtrace('claz_',Symbol,
 claz_to_symbol1(Class,Symbol):-Class=Symbol.
 
 
+add_opv(Obj,Prop,Value):- add_opv_i(Obj,Prop,Value).
 
-
-add_opv(Symbol,value,SValue):- atom(SValue),
+add_opv_i(Symbol,value,SValue):- atom(SValue),
  (atom_contains(SValue,'(');atom_contains(SValue,' ')),
   (as_sexp(SValue,Value)->SValue\==Value),!,set_opv(Symbol,value,Value).
-add_opv(Obj,Prop,Value):-  add_opv_new(Obj,Prop,Value).
+add_opv_i(Obj,Prop,Value):-  add_opv_new(Obj,Prop,Value).
 
 
 % add_opv_pred(MPred,Obj,Key,Value):- strip_module(MPred,M,Pred),Assertion=.. [Pred,Obj,Key,Value], ( \+ M:Assertion -> assert(M:Assertion) ; true).
@@ -501,20 +506,19 @@ prolog_direct(Pred/3,Obj,Prop,Value):- call(Pred,Obj,Prop,Value).
    
 update_opv(Obj,Prop,Value):- set_opv(Obj,Prop,Value).
 
-set_opv(Obj,Prop,Value):- has_prop_value_setter(Obj,Prop,Setter),!,call(Setter,Obj,Prop,Value).
-set_opv(Obj,Prop,Value):- delete_opvalues(Obj,Prop),add_opv(Obj,Prop,Value).
+set_opv(Obj,Prop,Value):- set_opv_i(Obj,Prop,Value).
+set_opv_i(Obj,Prop,Value):- has_prop_value_setter(Obj,Prop,Setter),!,call(Setter,Obj,Prop,Value).
+set_opv_i(Obj,Prop,Value):- delete_opvalues(Obj,Prop),add_opv_i(Obj,Prop,Value).
 
 :- dynamic(is_obj_type/1).
 
 ensure_opv_type_inited(Kind):- is_obj_type(Kind),!.
 ensure_opv_type_inited(Kind):- 
   asserta(is_obj_type(Kind)),!,
-  findall(Slot,soops:struct_opv(Kind,slot,Slot,_),Slots),add_opv_slots(Kind,1,Slots).
+  findall(Slot,soops:struct_opv(Kind,slot,Slot,_),Slots),add_class_slots(Kind,1,Slots).
 
-add_opv_slots(Kind,N,[Slot|Slots]):- !, always(add_slot_def(N,Kind,Slot)),N1 is N + 1,add_opv_slots(Kind,N1,Slots).
-add_opv_slots(_Type,_N,[]).
-
-add_slot_def(Kind,SLOT):- add_slot_def(_,Kind,SLOT).
+add_class_slots(Kind,N,[Slot|Slots]):- !, always(add_slot_def(N,Kind,Slot)),N1 is N + 1,add_class_slots(Kind,N1,Slots).
+add_class_slots(_Type,_N,[]).
 
 is_oddp(N):- 1 is N div 2.
 
@@ -527,26 +531,27 @@ add_slot_def(N,Kind,[Prop|Keys]):-
 
 add_slot_def_props(N,Kind,Key,MoreInfo):-
    always((get_szlot('zlot_',Kind,Key,SlotInfo),
-   (assert_struct_opv(Kind,slot,Key,SlotInfo)), 
-   cl_string(Key,Name),create_keyword(Name,KW),
-   (assert_struct_opv(Kind,keyword,KW,SlotInfo)),
-   ignore((nonvar(N),(assert_struct_opv(Kind,ordinal,N,SlotInfo)))),
-   ignore((kind_attribute_pred(Kind,Key,Pred),(assert_struct_opv(Kind,accessor_predicate,Pred,SlotInfo)))),
-   add_slot_more_info(KW,Kind,SlotInfo,MoreInfo))).
+   assert_struct_opv4(Kind,slot,Key,SlotInfo), 
+   cl_string(Key,SName),create_keyword(SName,KW),assert_struct_opv4(Kind,keyword,KW,SlotInfo),
+   %claz_to_symbol(Kind,ClassSymbol),cl_symbol_package(ClassSymbol,Package),trace,intern_symbol(SName,Package,Name,_),
+   %assert_struct_opv4(Kind,name,Name,SlotInfo),
+   ignore((nonvar(N),(assert_struct_opv4(Kind,ordinal,N,SlotInfo)))),
+   ignore((kind_attribute_pred(Kind,Key,Pred),assert_struct_opv4(Kind,accessor_predicate,Pred,SlotInfo))),
+   add_slot_more_info(Key,Kind,SlotInfo,MoreInfo))).
 
 add_slot_more_info(_SlotKW,_Kind,_SlotInfo,[]):-!.
-add_slot_more_info(SlotKW,Kind,SlotInfo,[KW,Value|MoreInfo]):- \+ is_list(KW),
-   assert_struct_opv4(SlotKW,Kind,KW,Value,SlotInfo),
-   add_slot_more_info(SlotKW,Kind,SlotInfo,MoreInfo).
-add_slot_more_info(SlotKW,Kind,SlotInfo,[[KW,Value]|MoreInfo]):- \+ is_list(KW),
-   assert_struct_opv4(SlotKW,Kind,KW,Value,SlotInfo),
-   add_slot_more_info(SlotKW,Kind,SlotInfo,MoreInfo).
+add_slot_more_info(SlotName,Kind,SlotInfo,[KW,Value|MoreInfo]):- \+ is_list(KW),
+   assert_slot_prop(SlotName,Kind,KW,Value,SlotInfo),
+   add_slot_more_info(SlotName,Kind,SlotInfo,MoreInfo).
+add_slot_more_info(SlotName,Kind,SlotInfo,[[KW,Value]|MoreInfo]):- \+ is_list(KW),
+   assert_slot_prop(SlotName,Kind,KW,Value,SlotInfo),
+   add_slot_more_info(SlotName,Kind,SlotInfo,MoreInfo).
 
-assert_struct_opv4(SlotKW,Kind,KW,Value,SlotInfo):-
-  un_kw(KW,Prop),
-  un_kw(SlotKW,SlotName),
-  (Prop == accessor -> (maybe_add_function(Value,[obj],['slot-value',obj,[quote,SlotName]],_Added)) ; true),
-  assert_struct_opv(Kind,Prop,Value,SlotInfo).
+assert_slot_prop(SlotName,Kind,KW,Value,SlotInfo):-
+  un_kw(KW,Prop),!,
+  (Prop == accessor -> (assert_struct_opv4(Kind,name,SlotName,SlotInfo),
+    show_call_trace(maybe_add_function(Value,[obj],['slot-value',obj,[quote,SlotName]],_Added))) ; true),
+  assert_struct_opv4(Kind,Prop,Value,SlotInfo).
 
 prop_to_name(X,S):-string(X),!,X=S.
 prop_to_name(Prop,Upper):- compound(Prop),!,functor(Prop,F,_),prop_to_name(F,Upper).
@@ -578,231 +583,9 @@ type_attribute_pred0(Kind,Prop,Pred):- nonvar(Prop),
 
 construct_opv(Obj,Kind):- get_opv(Obj,instance,Kind),!.
 construct_opv(Obj,Kind):-
-  add_opv(Obj,instance,Kind),
+  add_opv_i(Obj,instance,Kind),
   forall(soops:struct_opv(Kind,include,Super),construct_opv(Obj,Super)).  
 
-
-symbol_to_claz(Symbol,Kind):- 
-%  symbol_to_claz(Symbol,Kind)
-  atom_concat_or_rtrace('claz_',Symbol,Kind),
-  assert_struct_opv(Kind,symbolname,Symbol).
-
- % claz_number,claz_stream,claz_sequence,claz_condition,claz_clos_metaobject,claz_function
-%:- include('ci2.pro').
-/*
-use_ci2_never:- % forall(clause(struct_opv_new(X,Y,Z),true),once(visit_struct_opv_new(X,Y,Z))),
-  forall(clause(struct_opv(X,Y,Z,A),true),visit_struct_opv_old(X,Y,Z,A)),
-   tell('ci5.pro'),
-   forall(member(Assert,[struct_opv(_,_,_),struct_opv(_,_,_,_)]),
-     forall(clause(soops:Assert,true),
-        ignore((P\==slot1,P\==has_slots,format('~q.~n',[Assert]))))), told.
-
-
-visit_struct_opv_old(_,ordinal,_,_):-!.
-visit_struct_opv_old(Symbol,X,Y,Z):-
-  old_claz_to_new_claz(Symbol,Kind),
-  Symbol\==Kind,!,
-  visit_struct_opv_old(Kind,X,Y,Z).
-visit_struct_opv_old(X,defkw,Z,A):-!, visit_struct_opv_old(X,Z,A).
-visit_struct_opv_old(X,Y,Symbol,Z):-
-  old_claz_to_new_claz(Symbol,Kind),
-  Symbol\==Kind,!,
-  visit_struct_opv_old(X,Y,Kind,Z).
-visit_struct_opv_old(X,Y,Z,A):- assert_struct_opv(X,Y,Z,A).
-
-
-:- dynamic old2new_missed/1.
-:- dynamic foo:old2new/2.
-old_claz_to_new_claz(Old,Kind):- (var(Old);Old==[]),!,Kind=Old.
-old_claz_to_new_claz([O|Old],[K|Kind]):- !, old_claz_to_new_claz(O,K),old_claz_to_new_claz(Old,Kind).
-old_claz_to_new_claz(Old,Kind):- compound(Old),Old=..OARGS,!,old_claz_to_new_claz(OARGS,KARGS),!,Kind=..KARGS,!.  
-old_claz_to_new_claz(Old,Kind):- compound(Old),Old=..[O|ARGS],!,old_claz_to_new_claz(O,K),!,Kind=..[K|ARGS],!.  
-old_claz_to_new_claz(Old,Kind):- \+ atom(Old),!,Kind=Old.
-old_claz_to_new_claz(Old,Kind):- \+ atom_concat('claz_',_,Old),!,Kind=Old.
-old_claz_to_new_claz(Old,Old):- old2new_missed(Old),!.  
-old_claz_to_new_claz(Old,Kind):- foo:old2new(Old,Kind),!.
-old_claz_to_new_claz(Old,Kind):-
-  struct_opv(Old,defkw,namestring,String),
-  find_new_class(String,Kind),  
-  show_call_trace(asserta(foo:old2new(Old,Kind))),!.
-old_claz_to_new_claz(Old,Old):- asserta(old2new_missed(Old)).
-
-
-find_new_class(String,Kind):- 
-  struct_opv(Kind, symbolname, Sym),cl_string(Sym,Name),String=Name,!.
-
-
-visit_struct_opv_old(_Kind,classname,_Package).
-visit_struct_opv_old(X,Y,Symbol):-
-  old_claz_to_new_claz(Symbol,Kind),
-  Symbol\==Kind,!,
-  visit_struct_opv_old(X,Y,Kind).
-visit_struct_opv_old(X,Y,Z):- assert_struct_opv(X,Y,Z).
-*/
-/*
-visit_struct_opv_old_slot(Kind,SlotInfo,[KW,Value]):-   
-   assert_struct_opv(Kind,KW,Value,SlotInfo).
-
-visit_struct_opv_old(Symbol,Key,Order):-
-  old_claz_to_new_claz(Symbol,Kind),
-  symbol_to_claz(Symbol,Kind),un_kw(Key,UNK),
-  visit_struct_opv_old(Symbol,Kind,UNK,Order).
-  
-
-visit_struct_opv_old(_Symbol,Kind,precedance,Order):- 
-   maplist(symbol_to_claz,Order,ClazOrder), 
-   assert_struct_opv(Kind,super_priority,ClazOrder).
-
-visit_struct_opv_old(Symbol,Kind,slot,[[kw_name,Name]|Keys]):-
- once(member([kw_readers,[R1|_]],Keys)-> atom_concat_or_rtrace('zlot_',R1,SlotInfo) ;get_szlot('zlot_',Symbol,Name,SlotInfo)),
- assert_struct_opv(Kind,slot,Name,SlotInfo),
- cl_string(Name,String),create_keyword(String,KWN),
- assert_struct_opv(Kind,keyword,KWN,SlotInfo),
- assert_struct_opv(Kind,slot,Name,SlotInfo),
- maplist(visit_struct_opv_old_slot(Kind,SlotInfo),Keys),!.
-
-visit_struct_opv_old(_Symbol,Kind,superclass,Super):- 
-   symbol_to_claz(Super,SuperClazz),
-  assert_struct_opv(Kind,include,SuperClazz).
-
-visit_struct_opv_old(_Symbol,Kind,typeof,Super):- 
-  symbol_to_claz(Super,SuperClazz),
-  assert_struct_opv(Kind,classof,SuperClazz).
-*/           /*
-
-visit_struct_opv_new(_Kind,kw_package_name,_Package).
-visit_struct_opv_new(Symbol,Key,Order):-
-  symbol_to_claz(Symbol,Kind),un_kw(Key,UNK),
-  visit_struct_opv_new(Symbol,Kind,UNK,Order).
-  
-
-visit_struct_opv_new(_Symbol,Kind,precedance,Order):- 
-   maplist(symbol_to_claz,Order,ClazOrder), 
-   assert_struct_opv(Kind,super_priority,ClazOrder).
-
-visit_struct_opv_new(Symbol,Kind,slot,[[kw_name,Name]|Keys]):-
- once(member([kw_readers,[R1|_]],Keys)-> atom_concat_or_rtrace('zlot_',R1,SlotInfo) ;get_szlot('zlot_',Symbol,Name,SlotInfo)),
- assert_struct_opv(Kind,slot,Name,SlotInfo),
- cl_string(Name,String),create_keyword(String,KWN),
- assert_struct_opv(Kind,keyword,KWN,SlotInfo),
- assert_struct_opv(Kind,slot,Name,SlotInfo),
- maplist(visit_struct_opv_new_slot(Kind,SlotInfo),Keys),!.
-
-visit_struct_opv_new(_Symbol,Kind,superclass,Super):- 
-   symbol_to_claz(Super,SuperClazz),
-  assert_struct_opv(Kind,include,SuperClazz).
-
-visit_struct_opv_new(_Symbol,Kind,typeof,Super):- 
-  symbol_to_claz(Super,SuperClazz),
-  assert_struct_opv(Kind,classof,SuperClazz).
-visit_struct_opv_new(_,X,Y,Z):- assert_struct_opv(X,Y,Z).
-
-visit_struct_opv_new_slot(Kind,SlotInfo,[KW,Value]):-   
-   assert_struct_opv(Kind,KW,Value,SlotInfo).*/
-/*
-add_missing_opv(Obj,Kind,KV):- get_kv(KV,Key,Value), add_missing_opv(Obj,Kind,Key,Value). 
-
-add_missing_opv(Obj,Kind,Key,Value):- 
-  get_szlot(Kind,Key,SlotInfo),
-  soops:struct_opv(SlotInfo,returnType,DataType),
-  create_instance(DataType,Value,VObj),!,
-  update_opv(Obj,Key,VObj).
-add_missing_opv(Obj,Kind,Key,Value):- 
-  cl_type_of(Value,DataType),
-  atom_string(Key,SKey),string_lower(SKey,Prop),
-  add_slot_def(Kind,slot(DataType,Prop)),
-  update_opv(Obj,Key,Value).
-*/  
-
-
-/*
-
-  // Packages.
-  public static final Package PACKAGE_CL =
-    Packages.createPackage("COMMON-LISP", 2048); // EH 10-10-2010: Actual number = 1014
-  public static final Package PACKAGE_CL_USER =
-    Packages.createPackage("COMMON-LISP-USER", 1024);
-  public static final Package PACKAGE_KEYWORD =
-    Packages.createPackage("KEYWORD", 1024);
-  public static final Package PACKAGE_SYS =
-    Packages.createPackage("SYSTEM", 2048); // EH 10-10-2010: Actual number = 1216
-  public static final Package PACKAGE_MOP =
-    Packages.createPackage("MOP", 512); // EH 10-10-2010: Actual number = 277
-  public static final Package PACKAGE_TPL =
-    Packages.createPackage("TOP-LEVEL", 128); // EH 10-10-2010: Actual number = 6
-  public static final Package PACKAGE_EXT =
-    Packages.createPackage("EXTENSIONS", 256); // EH 10-10-2010: Actual number = 131
-  public static final Package PACKAGE_JVM =
-    Packages.createPackage("JVM", 2048); // EH 10-10-2010: Actual number = 1518
-  public static final Package PACKAGE_LOOP =
-    Packages.createPackage("LOOP", 512); // EH 10-10-2010: Actual number = 305
-  public static final Package PACKAGE_PROF =
-    Packages.createPackage("PROFILER");
-  public static final Package PACKAGE_JAVA =
-    Packages.createPackage("JAVA");
-  public static final Package PACKAGE_LISP =
-    Packages.createPackage("LISP");
-  public static final Package PACKAGE_THREADS =
-    Packages.createPackage("THREADS");
-  public static final Package PACKAGE_FORMAT =
-    Packages.createPackage("FORMAT");
-  public static final Package PACKAGE_XP =
-    Packages.createPackage("XP");
-  public static final Package PACKAGE_PRECOMPILER =
-    Packages.createPackage("PRECOMPILER");
-  public static final Package PACKAGE_SEQUENCE =
-    Packages.createPackage("SEQUENCE", 128); // EH 10-10-2010: Actual number 62
-
-
-  @DocString(name="nil")
-  public static final Symbol NIL = Nil.NIL;
-
-  // We need NIL before we can call usePackage().
-  static
-  {
-    PACKAGE_CL.addNickname("CL");
-    PACKAGE_CL_USER.addNickname("CL-USER");
-    PACKAGE_CL_USER.usePackage(PACKAGE_CL);
-    PACKAGE_CL_USER.usePackage(PACKAGE_EXT);
-    PACKAGE_CL_USER.usePackage(PACKAGE_JAVA);
-    PACKAGE_SYS.addNickname("SYS");
-    PACKAGE_SYS.usePackage(PACKAGE_CL);
-    PACKAGE_SYS.usePackage(PACKAGE_EXT);
-    PACKAGE_MOP.usePackage(PACKAGE_CL);
-    PACKAGE_MOP.usePackage(PACKAGE_EXT);
-    PACKAGE_MOP.usePackage(PACKAGE_SYS);
-    PACKAGE_TPL.addNickname("TPL");
-    PACKAGE_TPL.usePackage(PACKAGE_CL);
-    PACKAGE_TPL.usePackage(PACKAGE_EXT);
-    PACKAGE_EXT.addNickname("EXT");
-    PACKAGE_EXT.usePackage(PACKAGE_CL);
-    PACKAGE_EXT.usePackage(PACKAGE_THREADS);
-    PACKAGE_JVM.usePackage(PACKAGE_CL);
-    PACKAGE_JVM.usePackage(PACKAGE_EXT);
-    PACKAGE_JVM.usePackage(PACKAGE_SYS);
-    PACKAGE_LOOP.usePackage(PACKAGE_CL);
-    PACKAGE_PROF.addNickname("PROF");
-    PACKAGE_PROF.usePackage(PACKAGE_CL);
-    PACKAGE_PROF.usePackage(PACKAGE_EXT);
-    PACKAGE_JAVA.usePackage(PACKAGE_CL);
-    PACKAGE_JAVA.usePackage(PACKAGE_EXT);
-    PACKAGE_LISP.usePackage(PACKAGE_CL);
-    PACKAGE_LISP.usePackage(PACKAGE_EXT);
-    PACKAGE_LISP.usePackage(PACKAGE_SYS);
-    PACKAGE_THREADS.usePackage(PACKAGE_CL);
-    PACKAGE_THREADS.usePackage(PACKAGE_EXT);
-    PACKAGE_THREADS.usePackage(PACKAGE_SYS);
-    PACKAGE_FORMAT.usePackage(PACKAGE_CL);
-    PACKAGE_FORMAT.usePackage(PACKAGE_EXT);
-    PACKAGE_XP.usePackage(PACKAGE_CL);
-    PACKAGE_PRECOMPILER.addNickname("PRE");
-    PACKAGE_PRECOMPILER.usePackage(PACKAGE_CL);
-    PACKAGE_PRECOMPILER.usePackage(PACKAGE_EXT);
-    PACKAGE_PRECOMPILER.usePackage(PACKAGE_SYS);
-    PACKAGE_SEQUENCE.usePackage(PACKAGE_CL);
-  }
-
-*/
 
 :- fixup_exports.
 
