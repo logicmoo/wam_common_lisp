@@ -17,6 +17,22 @@
 :- include('header.pro').
 
 
+wl:type_checked(P):- current_predicate(_,mth:P), \+ predicate_property(mth:P,imported_from(_)),
+   P=..[_|List],maplist( =(number),List).
+
+wl:coercion(In, number, Out):- is_numberp(In),to_prolog_number(In,Out).
+
+to_prolog_number('$RATIO'(X,Y),Z):- !, to_prolog_number(X,XX),to_prolog_number(Y,YY),Z is XX/YY.
+to_prolog_number('$COMPLEX'(X,Y),Z):- !, to_prolog_number(Y,YY), 0 is YY,to_prolog_number(X,Z).
+to_prolog_number('$NUMBER'(_,Y),Z):- !, to_prolog_number(Y,Z).
+to_prolog_number('$EXP'(I,_,E),N):- !, notrace(catch(N is (I * 10^E),_,fail)),!.
+to_prolog_number(X,Y):- Y is X,!.
+
+is_numberp('$RATIO'(_,_)).
+is_numberp('$COMPLEX'(_,_)).
+is_numberp('$NUMBER'(_,_)).
+is_numberp('$EXP'(_,_,_)).
+
 cl_sqrt(X,Y):- \+ integer(X)-> (Y is sqrt(X)) ; (IY is sqrt(X), RY is floor(IY),(RY=:=IY -> Y=RY ; Y=IY)).
 
 %cl_floor(X,Y):- Y is floor(X).

@@ -679,8 +679,9 @@ to_untyped('$EXP'(I,'f',E),N):- notrace(catch(N is 0.0 + ((I * 10^E)),_,fail)),!
 to_untyped('$EXP'(I,T,E),'$NUMBER'(T,N)):- notrace(catch(N is (I * 10^E),_,fail)),!.
 to_untyped('$EXP'(I,T,E),'$EXP'(I,T,E)):-!.
 
-to_untyped([S|Rest],OOut):- atom(S),nonvar(S), is_list(Rest),must_maplist(to_untyped,[S|Rest],[F|Mid]), 
-          ((atom(F),t_l:s2p(F))-> Out=..[F|Mid];Out=[F|Mid]),
+to_untyped([F|Rest],OOut):- atom(F),
+       is_list(Rest),must_maplist(to_untyped,Rest,Mid), 
+          (t_l:s2p(F)-> (Out=..[F|Mid];Out=[F|Mid])),
           to_untyped(Out,OOut).
 to_untyped(ExprI,ExprO):- ExprI=..[F|Expr],atom_concat_or_rtrace('$',_,F),must_maplist(to_untyped,Expr,TT),ExprO=..[F|TT].
 
