@@ -22,16 +22,17 @@ wl:type_checked(P):- current_predicate(_,mth:P), \+ predicate_property(mth:P,imp
 
 wl:coercion(In, number, Out):- is_numberp(In),to_prolog_number(In,Out).
 
+to_prolog_number('$NUMBER'(_,Y),Z):- !, to_prolog_number(Y,Z).
 to_prolog_number('$RATIO'(X,Y),Z):- !, to_prolog_number(X,XX),to_prolog_number(Y,YY),Z is XX/YY.
 to_prolog_number('$COMPLEX'(X,Y),Z):- !, to_prolog_number(Y,YY), 0 is YY,to_prolog_number(X,Z).
-to_prolog_number('$NUMBER'(_,Y),Z):- !, to_prolog_number(Y,Z).
 to_prolog_number('$EXP'(I,_,E),N):- !, notrace(catch(N is (I * 10^E),_,fail)),!.
 to_prolog_number(X,Y):- Y is X,!.
 
+is_numberp('$NUMBER'(_,_)).
 is_numberp('$RATIO'(_,_)).
 is_numberp('$COMPLEX'(_,_)).
-is_numberp('$NUMBER'(_,_)).
 is_numberp('$EXP'(_,_,_)).
+is_numberp(P):- number(P).
 
 cl_sqrt(X,Y):- \+ integer(X)-> (Y is sqrt(X)) ; (IY is sqrt(X), RY is floor(IY),(RY=:=IY -> Y=RY ; Y=IY)).
 
@@ -61,10 +62,9 @@ f_u_c47(N1,N2,Ret):- Ret is (N1 + N2).
 '1+'(N,Ret):- Ret is N + 1.
 '1-'(N,Ret):- Ret is N - 1.
 
-
-
 f_c61(N1,N2,Ret):- t_or_nil( (N1=:=N2),Ret). 
 =(N1,N2,Ret):- t_or_nil( (N1=:=N2),Ret).
+
 cl_plus(Num1, Num2, Result):-Result is Num1 + Num2.
 
 cl_minus(Num1, Num2, Result):-

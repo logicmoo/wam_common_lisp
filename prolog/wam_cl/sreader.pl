@@ -392,7 +392,7 @@ sexpr((Txt))                 --> `#|`, lazy_list_location(file(_,_,I,CP)),
   {assert(t_l:s_reader_info('$COMMENT'(Txt,I,CP)))},
   sexpr((Txt)).
 */
-sexpr(['\''(E)])              --> `'`, !, swhite, sexpr(E).
+sexpr('\''(E))              --> `'`, !, swhite, sexpr(E).
 sexpr('$BQ'(E))         --> [96] , !, swhite, sexpr(E).
 sexpr('$BQ-COMMA-ELIPSE'(E)) --> `,@`, !, swhite, sexpr(E).
 sexpr('$COMMA'(E))            --> `,`, !, swhite, sexpr(E).
@@ -645,6 +645,9 @@ missed_untyped(G):- G, trace_or_throw(missed_untyped(G)).
 %
 to_untyped(S,S):- var(S),!.
 to_untyped([],[]):-!.
+
+to_untyped('\''(I),quote(O)):-!,to_untyped(I,O),!.
+
 to_untyped('#-'(C,I),'#-'(K,O)):- as_keyword(C,K),!,to_untyped(I,O),!.
 to_untyped('#+'(C,I),'#+'(K,O)):- as_keyword(C,K),!,to_untyped(I,O),!.
 to_untyped('$STRING'(Expr),LispO):- !, text_to_string_safe(Expr,Text),!,to_lisp_string(Text,LispO).

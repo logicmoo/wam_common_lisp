@@ -192,6 +192,9 @@ struct_opv(claz_character,super_priority,[claz_t]).
 struct_opv(claz_character,symbolname,character).
 struct_opv(claz_character,type,char_code,zlot_character_value).
 struct_opv(claz_character,type,string,zlot_character_name).
+struct_opv(claz_base_character,symbolname,claz_base_character).
+struct_opv(claz_base_character,include,claz_character).
+struct_opv(claz_base_character,super_priority,[claz_character,claz_t]).
 struct_opv(claz_class,classof,claz_built_in_class).
 struct_opv(claz_class,classof,claz_standard_class).
 struct_opv(claz_class,include,claz_dependent_update_mixin).
@@ -2412,7 +2415,7 @@ struct_opv(claz_ffi_alien_c_string_type,slot,ffi_external_format,zlot_alien_c_st
 struct_opv(claz_ffi_alien_c_string_type,slot,ffi_not_null,zlot_alien_c_string_type_not_null).
 struct_opv(claz_ffi_alien_c_string_type,super_priority,[claz_ffi_alien_pointer_type,claz_ffi_alien_alien_value_type,claz_ffi_alien_system_area_pointer_type,claz_ffi_alien_type,claz_sys_structure_c33_object,claz_structure_object,claz_sys_slot_object,claz_t]).
 struct_opv(claz_ffi_alien_c_string_type,symbolname,ffi_alien_c_string_type).
-struct_opv(claz_ffi_alien_c_string_type,type,[member,character,base_char],zlot_alien_c_string_type_element_type).
+struct_opv(claz_ffi_alien_c_string_type,type,[member,character,claz_base_character],zlot_alien_c_string_type_element_type).
 struct_opv(claz_ffi_alien_c_string_type,type,boolean,zlot_alien_c_string_type_not_null).
 struct_opv(claz_ffi_alien_c_string_type,type,keyword,zlot_alien_c_string_type_external_format).
 struct_opv(claz_ffi_alien_c_string_type,type,symbol,zlot_alien_c_string_type_class).
@@ -7789,7 +7792,7 @@ struct_opv(claz_sys_fd_stream,initform,-1,zlot_fd_stream_fd).
 struct_opv(claz_sys_fd_stream,initform,1,zlot_fd_stream_char_size).
 struct_opv(claz_sys_fd_stream,initform,1,zlot_fd_stream_element_size).
 struct_opv(claz_sys_fd_stream,initform,[make_array,0,kw_element_type,[quote,character],kw_adjustable,t,kw_fill_pointer,t],zlot_fd_stream_instead).
-struct_opv(claz_sys_fd_stream,initform,[quote,base_char],zlot_fd_stream_element_type).
+struct_opv(claz_sys_fd_stream,initform,[quote,claz_base_character],zlot_fd_stream_element_type).
 struct_opv(claz_sys_fd_stream,initform,function(sys_fd_stream_misc_routine),zlot_fd_stream_misc).
 struct_opv(claz_sys_fd_stream,initform,function(sys_ill_out),zlot_fd_stream_output_bytes).
 struct_opv(claz_sys_fd_stream,initform,kw_full,zlot_fd_stream_buffering).

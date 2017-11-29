@@ -139,18 +139,20 @@ compile_body(Ctx,Env,Result,[M|MACROLEFT], Code):- atom(M),
 % SELF EVALUATING OBJECTS
 compile_body(_Cx,_Ev, [],[],true):- !.
 compile_body(_Cx,_Ev, [],nil,true):- !.
+
+compile_body(_Ctx,_Env,Result,'$S'([Type|Args]),create_struct([Type|Args],Result)).
+
 compile_body(_Cx,_Ev,SelfEval,SelfEval,true):- notrace(is_self_evaluating_object(SelfEval)),!.
 
 % numbers
-compile_body(_Ctx,_Env,Value,Atom,true):- atom(Atom),atom_number_exta(Atom,Value),!.
+%compile_body(_Ctx,_Env,Value,Atom,true):- atom(Atom),atom_number_exta(Atom,Value),!.
 % string
-compile_body(_Ctx,_Env,Atom,'$STRING'(Atom),true).
+%compile_body(_Ctx,_Env,Atom,'$STRING'(Atom),true).
 % #S
-compile_body(_Ctx,_Env,Result,'$S'([Type|Args]),create_struct([Type|Args],Result)).
 
-atom_number_exta(Atom,Value):- on_x_rtrace(atom_number(Atom,Value)).
-atom_number_exta(Atom,Value):- atom_concat_or_rtrace('-.',R,Atom),atom_concat_or_rtrace('-0.',R,NAtom),!,atom_number(NAtom,Value).
-atom_number_exta(Atom,Value):- atom_concat_or_rtrace('.',R,Atom),atom_concat_or_rtrace('0.',R,NAtom),!,atom_number(NAtom,Value).
+%atom_number_exta(Atom,Value):- on_x_rtrace(atom_number(Atom,Value)).
+%atom_number_exta(Atom,Value):- atom_concat_or_rtrace('-.',R,Atom),atom_concat_or_rtrace('-0.',R,NAtom),!,atom_number(NAtom,Value).
+%atom_number_exta(Atom,Value):- atom_concat_or_rtrace('.',R,Atom),atom_concat_or_rtrace('0.',R,NAtom),!,atom_number(NAtom,Value).
 
 
 % symbols
