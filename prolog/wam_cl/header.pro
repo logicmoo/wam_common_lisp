@@ -46,19 +46,28 @@
 :- multifile(shared_lisp_compiler:plugin_expand_function_body/5).
 :- discontiguous(shared_lisp_compiler:plugin_expand_function_body/5).
 
-:- multifile(user:op_replacement/2).
-:- dynamic(user:op_replacement/2).
-:- discontiguous(user:op_replacement/2).
+:- multifile(wl:op_replacement/2).
+:- dynamic(wl:op_replacement/2).
+:- discontiguous(wl:op_replacement/2).
 
 :- multifile(wl:declared/2).
 :- dynamic(wl:declared/2).
 :- discontiguous(wl:declared/2).
 
-:- dynamic(user:arglist_info/4).
-:- multifile(user:arglist_info/4).
+:- multifile(wl:type_checked/1).
+:- dynamic(wl:type_checked/1).
+:- discontiguous(wl:type_checked/1).
 
-:- dynamic(user:function_lambda/4).
-:- multifile(user:function_lambda/4).
+
+:- multifile(wl:coercion/3).
+:- dynamic(wl:coercion/3).
+:- discontiguous(wl:coercion/3).
+
+:- dynamic(wl:arglist_info/4).
+:- multifile(wl:arglist_info/4).
+
+:- dynamic(wl:function_lambda/4).
+:- multifile(wl:function_lambda/4).
 
 %:- dynamic(compile_assigns/4).
 %:- multifile(compile_assigns/4).
@@ -69,6 +78,7 @@
 :- discontiguous(ssip_define/2).
 
 :- ensure_loaded('8ball.pl').
+:- ensure_loaded('typecheck.pl').
 :- ensure_loaded('evil_workarounds.pl').
 :- ensure_loaded('arglists.pl').
 :- ensure_loaded('array.pl').
@@ -105,6 +115,7 @@
 :- ensure_loaded('tagbody.pl').
 :- ensure_loaded('tests.pl').
 :- ensure_loaded('typeof.pl').
+:- ensure_loaded('math.pl').
 :- ensure_loaded('disassemble.pl').
 
 

@@ -18,7 +18,7 @@
 
 body_cleanup(Ctx,CodeIn,CodeOut):- quietly(body_cleanup_keep_debug_vars(Ctx,CodeIn,CodeOut)).
 
-body_cleanup_keep_debug_vars(Ctx,CodeIn,CodeOut):- 
+body_cleanup_keep_debug_vars(Ctx,CodeIn,CodeOutNow):- 
  must_det_l(( 
    term_attvars(CodeIn,AttVars),maplist(del_attr_rev2(freeze),AttVars),
    inline_operation([],Ctx,',',CodeIn,Code0),
@@ -26,7 +26,8 @@ body_cleanup_keep_debug_vars(Ctx,CodeIn,CodeOut):-
    body_cleanup_keep_debug_vars1(Ctx,Code2,Code3),
                   env_mize(Ctx,',',Code3,Code4),
                   inline_operation([],Ctx,',',Code4,Code5),
-   body_cleanup_keep_debug_vars1(Ctx,Code5,CodeOut))).
+   body_cleanup_keep_debug_vars1(Ctx,Code5,CodeOut))),
+  add_type_checks(Ctx,CodeOut,CodeOutNow).
 
 
 body_cleanup_keep_debug_vars1(Ctx,Code0,CodeOut):-
@@ -126,22 +127,27 @@ del_attr_rev2(Name,Var):- del_attr(Var,Name).
 
 sanitize_true(_, C1,C2):- \+ compound(C1),!,C2=C1.
 sanitize_true(Ctx,(C1,C2),Joined):-!,sanitize_true(Ctx,C1,C1O),sanitize_true(Ctx,C2,C2O),conjoin_0(C1O,C2O,Joined).
+sanitize_true(Ctx,(C1 -> C2 ; CodeC),(C1O -> C2O ; CodeCCO)):-!,sanitize_true(Ctx,C1,C1O),sanitize_true(Ctx,C2,C2O),sanitize_true(Ctx,CodeC,CodeCCO).
 sanitize_true(Ctx,C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(sanitize_true(Ctx),C1O,C2O),C2=..[F|C2O].
 
-conjoin_0(C1,C2,C1):- C2==true,!.
-conjoin_0(C1,C2,C2):- C1==true,!.
-conjoin_0(C1,C2,C1):- C2==!,!.
-conjoin_0(C1,C2,C2):- C1==!,!.
+conjoin_0(C1,C2,C3):- C2==true,!,visit_lit(C1,C3).
+conjoin_0(C1,C2,C3):- C1==true,!,visit_lit(C2,C3).
+conjoin_0(C1,C2,C3):- C2==!,visit_lit(C1,C3).
+conjoin_0(C1,C2,C3):- C1==!,visit_lit(C2,C3).
 %conjoin_0(C1,clean_escape(_),C1):- trace,!.
+conjoin_0(C1,C2,(C1,C3)):- var(C1),!,sanitize_true(C2,C3).
+conjoin_0(C1,C2,(C3,C2)):- var(C2),!,sanitize_true(C1,C3).
 conjoin_0(clean_escape(_),_,true):- trace,!.
 conjoin_0((clean_escape(_),_),_,true):- trace.
-conjoin_0((C1,clean_escape(_)),_,C1):- trace.
-conjoin_0(C1,(clean_escape(_),_),C1):- trace.
+conjoin_0((C1,clean_escape(_)),_,C3):- trace,visit_lit(C1,C3).
+conjoin_0(C1,(clean_escape(_),_),C3):- trace,visit_lit(C1,C3).
 conjoin_0(symbol_value(ReplEnv, Var, Value),symbol_value(ReplEnv, Var, Value),
            symbol_value(ReplEnv, Var, Value)).
-conjoin_0((C1,C1O),C2,(C1,AAB)):-!, conjoin(C1O,C2,AAB).
-conjoin_0(C1,C2,(C1,C2)).
+conjoin_0((C1,C1O),C2,(C1,AAB)):-!, 
+  conjoin_0(C1O,C2,AAB).
+conjoin_0(C1,C2,(C11,C21)):- !,visit_lit(C1,C11),!,visit_lit(C2,C21).
 
+visit_lit(C1,C1).
 
 
 mize_body(_Ctx,_,C1,C1):- \+ compound(C1),!.

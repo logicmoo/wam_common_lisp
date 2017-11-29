@@ -373,7 +373,7 @@ expand_function_head(Ctx,EnvInOut,[FunctionName | FormalParms],Head,ZippedArgBin
    append([Arguments], [Result], HeadArgs),
    debug_var('ArgsIn',Arguments),
    debug_var('BinderCode',BindCode),
-   HeadDefCode = (asserta(user:arglist_info(FunctionName,FormalParms,ActualArgs,ArgInfo))),
+   HeadDefCode = (asserta(wl:arglist_info(FunctionName,FormalParms,ActualArgs,ArgInfo))),
    HeadCodeOut = (must_bind_parameters(EnvInOut,FormalParms,Arguments,EnvInOut,BindCode),always(BindCode)),
    Head =.. [FunctionName | HeadArgs])).
 
@@ -381,7 +381,7 @@ expand_function_head(Ctx,EnvInOut,[FunctionName | FormalParms],Head,ZippedArgBin
 expand_function_head(Ctx,Env,[FunctionName | FormalParms],Head,ZippedArgBindings, Result,HeadDefCode,HeadCode):-!,
        function_head_params(Ctx,Env,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,_Names,_PVars,HeadCode),
        append(ActualArgs, [Result], HeadArgs),
-       HeadDefCode = (asserta(user:arglist_info(FunctionName,FormalParms,ActualArgs,ArgInfo))),
+       HeadDefCode = (asserta(wl:arglist_info(FunctionName,FormalParms,ActualArgs,ArgInfo))),
        Head =.. [FunctionName | HeadArgs].
 expand_function_head(Ctx,Env,FunctionName , Head, ZippedArgBindings, Result,HeadDefCode,HeadCode):-
     expand_function_head(Ctx,Env,[FunctionName], Head, ZippedArgBindings, Result,HeadDefCode,HeadCode).

@@ -35,12 +35,13 @@ prims:cl_exact.
 % :- use_module(library('dialect/sicstus')).
 
 % Numbers, pathnames, and arrays are examples of self-evaluating objects.
-is_self_evaluationing_object(X):- var(X),!.
-is_self_evaluationing_object(X):- atomic(X),!,is_self_evaluationing_const(X).
-is_self_evaluationing_object('$OBJ'(_,_)):-!.
-is_self_evaluationing_object('$CHAR'(_)):-!.
+is_self_evaluating_object(X):- var(X),!.
+is_self_evaluating_object(X):- atomic(X),!,is_self_evaluationing_const(X).
+is_self_evaluating_object('$OBJ'(_,_)):-!.
+is_self_evaluating_object('$CHAR'(_)):-!.
+is_self_evaluating_object(P):-functor(P,F,_),atom_concat_or_rtrace('$',_,F),!.
 
-is_self_evaluationing_object(X):- (is_dict(X);is_array(X);is_rbtree(X)),!.
+is_self_evaluating_object(X):- (is_dict(X);is_array(X);is_rbtree(X)),!.
 
 is_self_evaluationing_const(X):- atomic(X),is_self_evaluationing_const0(X),!.
 is_self_evaluationing_const0(X):- (X==t;X==[];number(X);is_keywordp(X);string(X);(blob(X,T),T\==text)),!.
@@ -51,24 +52,24 @@ is_functionp(X):- atom_concat_or_rtrace('f_',_,X),!.
 is_functionp(X):- atom_concat_or_rtrace('cl_',_,X),!.
 
 %:- dynamic(op_replacement/2).
-user:op_replacement(first,cl_car).
+wl:op_replacement(first,cl_car).
 cl_car(List, Result):- 
   (List = [Result|_] -> true;
   (List==[] -> Result=[];
   (	error(first_not_cons, ErrNo, _),
 		throw(ErrNo)))).
 
-user:op_replacement(rest,cl_cdr).
+wl:op_replacement(rest,cl_cdr).
 cl_cdr(List, Result):- List==[]->Result=[];
 	once( (	List = [_|Result]
 	    ;	error(rest_not_cons, ErrNo, _),
 		throw(ErrNo)	)).
 
 
-user:op_replacement(setcar,cl_rplaca).
+wl:op_replacement(setcar,cl_rplaca).
 cl_rplaca(Cons,Obj,Cons):- nb_setarg(1,Cons,Obj).
 
-user:op_replacement(setcdr,cl_rplacd).
+wl:op_replacement(setcdr,cl_rplacd).
 cl_rplacd(Cons,Obj,Cons):- nb_setarg(2,Cons,Obj).
 
 
@@ -86,15 +87,6 @@ wl:declared(cl_list,lambda(['&rest',r])).
 wl:declared(cl_list,inline(list)).
 wl:declared(cl_list,uses_rest).
 cl_list(List,List).
-
-cl_plus(Num1, Num2, Result):-Result is Num1 + Num2.
-
-cl_minus(Num1, Num2, Result):-
-	Result is Num1 - Num2.
-cl_times(Num1, Num2, Result):-
-	Result is Num1 * Num2.
-cl_divide(Num1, Num2, Result):-
-	Result is Num1 / Num2.
 
 
 cl_lisp_not(Boolean, Result):-
@@ -141,9 +133,6 @@ t_or_nil(G,Ret):- G->Ret=t;Ret=[].
 cl_not(Obj,Ret):- t_or_nil(Obj == [] , Ret).
 cl_null(Obj,Ret):- t_or_nil(Obj == [] , Ret).
 
-f_c61(N1,N2,Ret):- t_or_nil( (N1=:=N2),Ret). 
-=(N1,N2,Ret):- t_or_nil( (N1=:=N2),Ret).
-
 cl_eq(A,B,Ret):- t_or_nil( is_eq(A,B) , Ret).
 cl_eql(A,B,Ret):- t_or_nil( is_eql(A,B) , Ret).
 cl_equal(A,B,Ret):- t_or_nil( is_equal(A,B) , Ret).
@@ -160,34 +149,10 @@ f_u_to_pvs(X,[float|XX]):- notrace(catch(XX is (1.0 * X),_,fail)),!.
 f_u_to_pvs(X,XX):- findall([P|V],(get_opv(X,P,V);get_struct_opv(X,P,V)),List),List\==[],sort(List,XX),!.
 f_u_to_pvs(X,[str|XX]):- format(string(S),'~w',[X]),string_upper(S,XX),!.
 
-make_character('$CHAR'(Int),'$CHAR'(Int)):-!.
-make_character(Int,'$CHAR'(Int)).
+
 
 f_ext_quit(ExitCode,Ret):- trace,t_or_nil(halt(ExitCode),Ret).
 
-as_list(Str,List):-string(Str),atom_chars(Str,Chars),maplist(make_character,Chars,List).
-
-cl_subseq(Seq,Offset,Result):- as_list(Seq,List), length(Left,Offset),append(Left,Result,List).
-
-cl_sqrt(X,Y):- \+ integer(X)-> (Y is sqrt(X)) ; (IY is sqrt(X), RY is floor(IY),(RY=:=IY -> Y=RY ; Y=IY)).
-
-f_u_c43(N1,N2,Ret):- Ret is (N1 + N2).
-+(N1,N2,Ret):- Ret is (N1 + N2).
-
-f_u_c45(N1,N2,Ret):- Ret is (N1 + N2).
--(N1,N2,Ret):- Ret is (N1 - N2).
-
-f_u_c42(N1,N2,Ret):- Ret is (N1 + N2).
-*(N1,N2,Ret):- Ret is (N1 * N2).
-
-f_u_c47(N1,N2,Ret):- Ret is (N1 + N2).
-'/'(N1,N2,Ret):- Ret is (N1 / N2).
-
-<(N1,N2,Ret):- t_or_nil(<(N1,N2),Ret). 
->(N1,N2,Ret):- t_or_nil(>(N1,N2),Ret). 
-
-'1+'(N,Ret):- Ret is N + 1.
-'1-'(N,Ret):- Ret is N - 1.
 
 is_special_var_c(_,_):-!,fail.
 sym_arg_val_envc(N,A,B,_) :- is_special_var_c(N,B) -> true ; A = B.

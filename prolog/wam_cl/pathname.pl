@@ -37,9 +37,9 @@ pl_compiled_filename(File,PL):- symbol_value(sys_xx_compile_file_type_xx,Ext),
 
 % Uses Symbol value: *DEFAULT-PATHNAME-DEFAULTS*
 search_for(In,O):- cl_symbol_value(xx_default_pathname_defaults_xx,Str0),
-   (Str0 == "" -> Str="." ; Str=Str0), with_fstem(Str,In,M),!,cl_string(M,O).
-search_for(In,O):- with_fstem('.',In,M),!,cl_string(M,O).
-search_for(In,O):- stream_property(_,file_name(FD)),with_fstem(FD,In,M),!,cl_string(M,O).
+   (Str0 == "" -> Str="." ; Str=Str0), with_fstem(Str,In,M),!,to_prolog_string(M,O).
+search_for(In,O):- with_fstem('.',In,M),!,to_prolog_string(M,O).
+search_for(In,O):- stream_property(_,file_name(FD)),with_fstem(FD,In,M),!,to_prolog_string(M,O).
 
 % Uses Symbol value: *SOURCE-FILE-TYPES*
 check_file_types(SearchTypes):- 

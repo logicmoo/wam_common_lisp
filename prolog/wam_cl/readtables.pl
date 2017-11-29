@@ -38,6 +38,7 @@ reader_intern_symbols(_,'$OBJ'(Function,F),function(F)):- Function==function,!.
 % #<unbound>
 reader_intern_symbols(_,'$OBJ'([unbound]),'$OBJ'(unbound,[])):-!.
 reader_intern_symbols(Package,'$OBJ'(Expr),'$OBJ'(ExprO)):-!,reader_intern_symbols(Package,(Expr),(ExprO)).
+reader_intern_symbols(_Package,'$NUMBER'(X,Y),'$NUMBER'(X,Y)):-!.
 
 reader_intern_symbols(Package,ExprI,ExprO):- ExprI=..[F,C|Expr],F=='$OBJ',  
   ((find_or_create_class(C,K),atom(K));reader_intern_symbols(Package,C,K)),

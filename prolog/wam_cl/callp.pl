@@ -49,7 +49,7 @@ compile_prolog_subst_call(Ctx,Env,ResultOut,[R|Resolve],Body,(Code,BodyResolved)
 expand_prolog(_Ctx,Env,Term0,Term):-subst(Term0,'$env',Env,Term).
 
 read_prolog_from_lisp('$OBJ'(claz_prolog,Term),Term):-!.
-read_prolog_from_lisp(Call,Term):- cl_string(Call,Str),read_term_from_atom(Str,Term,[]).
+read_prolog_from_lisp(Call,Term):- to_prolog_string(Call,Str),read_term_from_atom(Str,Term,[]).
 
 % (prolog-trace)
 compile_prolog_call(_Ctx,_Env,_Result,[u_prolog_trace], trace).
@@ -65,7 +65,7 @@ compile_prolog_call(Ctx,Env,Result,[u_prolog_call,Call], (Term->Result=t;Result=
 
 % (prolog-call "X=1" "X")
 compile_prolog_call(Ctx,Env,Result,[u_prolog_call,Call,ResultL], (Term->true;Result=[]) ):-
-   cl_string(Call,Str),cl_string(ResultL,Str2),
+   to_prolog_string(Call,Str),to_prolog_string(ResultL,Str2),
    atomic_list_concat(['((',Str,')):-((',Str2,'))'],Read),
    read_term_from_atom(Read,(Term0:-Result0),[]),
    expand_prolog(Ctx,Env,Term0:-Result0,Term:-Result).

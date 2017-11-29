@@ -16,13 +16,13 @@
 :- set_module(class(library)).
 :- include('header.pro').
 
-
-cl_symbol_name(Symbol,Name):- package_external_symbols(pkg_kw,Name,Symbol)->true;get_opv(Symbol,name,Name).
+wl:type_checked(cl_symbol_name(symbol,string)).
+cl_symbol_name(Symbol,Name):- pl_symbol_name(Symbol,Name).
+pl_symbol_name(Symbol,Name):- package_external_symbols(pkg_kw,Name,Symbol)->true;get_opv(Symbol,name,Name).
 cl_symbol_package(Symbol,Package):- is_keywordp(Symbol)->Package=pkg_kw;get_opv(Symbol,package,Package).
 cl_symbol_value(Symbol,Value):- is_keywordp(Symbol)->Symbol=Value;do_or_die(get_opv(Symbol,value,Value)).
 cl_symbol_function(Symbol,Function):- do_or_die(get_opv(Symbol,function,Function)),!.
 do_or_die(G):- G->true;throw(do_or_die(G)).
-
 
 
 cl_boundp(Symbol,TF):-  t_or_nil(is_boundp(Symbol),TF).
@@ -32,7 +32,7 @@ cl_keywordp(Symbol,TF):-  t_or_nil(is_keywordp(Symbol),TF).
 cl_symbolp(Symbol,TF):-  t_or_nil(is_symbolp(Symbol),TF).
 
 cl_gensym(Symbol):- cl_gensym("G",Symbol).
-cl_gensym(Name,Symbol):- cl_string(Name,String), gensym(String,SymbolName),cl_make_symbol(SymbolName,Symbol).
+cl_gensym(Name,Symbol):- to_prolog_string(Name,String), gensym(String,SymbolName),cl_make_symbol(SymbolName,Symbol).
 
 
 is_boundp(Symbol):- is_keywordp(Symbol);get_opv(Symbol,value,_).

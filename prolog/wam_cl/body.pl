@@ -139,7 +139,7 @@ compile_body(Ctx,Env,Result,[M|MACROLEFT], Code):- atom(M),
 % SELF EVALUATING OBJECTS
 compile_body(_Cx,_Ev, [],[],true):- !.
 compile_body(_Cx,_Ev, [],nil,true):- !.
-compile_body(_Cx,_Ev,SelfEval,SelfEval,true):- notrace(is_self_evaluationing_object(SelfEval)),!.
+compile_body(_Cx,_Ev,SelfEval,SelfEval,true):- notrace(is_self_evaluating_object(SelfEval)),!.
 
 % numbers
 compile_body(_Ctx,_Env,Value,Atom,true):- atom(Atom),atom_number_exta(Atom,Value),!.

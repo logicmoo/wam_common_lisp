@@ -55,7 +55,20 @@ is_arrayp(Obj):- get_opv(Obj,classof,clz_array).
 
 cl_adjustable_array_p(Obj,RetVal):-
   t_or_nil(get_opv(Obj,adjustable,t),RetVal).
-  
+
+% wl:type_checked(cl_subseq(sequence(T,E),number,sequence(T,E))).
+cl_subseq(Seq,Offset,Result):- 
+  wl:coercion(Seq, sequence(T,E), Mid),
+  pl_subseq(Mid,Offset,MOut),
+  wl:coercion(MOut, sequence(T,E),Result).
+
+pl_subseq([], _Skip, []).
+pl_subseq([Head|Tail], Skip, [Head|Cmpl]) :- Skip<1,!,
+	pl_subseq(Tail, Skip, Cmpl).
+pl_subseq([_|Tail], Skip, Cmpl) :- Skip2 is Skip-1,
+	pl_subseq(Tail, Skip2, Cmpl).
+
+
 :- fixup_exports.
 
 

@@ -55,7 +55,7 @@ expand_commas(_,Result,Form,true):- \+ compound(Form),!,Result=Form.
 expand_commas(Env,Result,['$COMMA',Form],Code):- ec_lisp_eval(Env,Result,Form,Code).
 expand_commas(Env,Result,'$COMMA'(Form),Code):- ec_lisp_eval(Env,Result,Form,Code).
 expand_commas(Env,[quote,Result],['$BQ',Form],Code):- expand_commas(Env,Result,Form,Code).
-expand_commas(_,SelfEval,SelfEval,true):- notrace(is_self_evaluationing_object(SelfEval)),!.
+expand_commas(_,SelfEval,SelfEval,true):- notrace(is_self_evaluating_object(SelfEval)),!.
 expand_commas(Env,[R|Result],[F,['$BQ-COMMA-ELIPSE',Form]],Code):- Form\=['$COMMA',_], 
   expand_commas(Env,R,F,Code1),
   lisp_compile(Env,Result,Form,Code2),
@@ -80,7 +80,7 @@ compile_bq(_,Result,Form,true):- \+ compound(Form),!,Result=Form.
 compile_bq(Env,Result,['$COMMA',Form],Code):- lisp_compile(Env,Result,Form,Code).
 compile_bq(Env,Result,'$COMMA'(Form),Code):- lisp_compile(Env,Result,Form,Code).
 compile_bq(Env,[quote,Result],['$BQ',Form],Code):- compile_bq(Env,Result,Form,Code).
-compile_bq(_,SelfEval,SelfEval,true):- notrace(is_self_evaluationing_object(SelfEval)),!.
+compile_bq(_,SelfEval,SelfEval,true):- notrace(is_self_evaluating_object(SelfEval)),!.
 compile_bq(Env,[R|Result],[F,['$BQ-COMMA-ELIPSE',Form]],Code):- Form\=['$COMMA',_], Form\='$COMMA'(_), 
   compile_bq(Env,R,F,Code1),
   lisp_compile(Env,Result,Form,Code2),

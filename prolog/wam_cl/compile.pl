@@ -90,7 +90,7 @@ same_symbol0(OP1,OP2):- var(OP1),var(OP2),trace_or_throw(same_symbol(OP1,OP2)).
 same_symbol0(OP1,OP2):- var(OP1),!,same_symbol0(OP2,OP1).
 same_symbol0(OP1,OP2):- var(OP2),!,freeze(OP2,((nonvar(OP2),same_symbol(OP1,OP2)))).
 
-same_symbol0(OP1,OP2):- string(OP1),cl_string(OP2,N2),!,OP1==N2.
+same_symbol0(OP1,OP2):- string(OP1),to_prolog_string(OP2,N2),!,OP1==N2.
 same_symbol0(OP1,OP2):- string(OP2),!,same_symbol0(OP2,OP1).
 
 same_symbol0(OP1,OP2):- atom(OP1),atom(OP2),!, same_reduced_atoms(OP1,OP2),!.

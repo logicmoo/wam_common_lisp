@@ -52,7 +52,7 @@ expand_arguments_maybe_macro(Ctx,CallEnv,FunctionName,0,FunctionArgs,ArgBody, Ar
   expand_arguments(Ctx,CallEnv,FunctionName,0,FunctionArgs,ArgBody, Args).
 
 
-compile_funop(Ctx,Env,Result,[Op | FunctionArgs], Body):- nonvar(Op),user:op_replacement(Op,Op2), !,
+compile_funop(Ctx,Env,Result,[Op | FunctionArgs], Body):- nonvar(Op),wl:op_replacement(Op,Op2), !,
   must_compile_body(Ctx,Env,Result,[Op2 | FunctionArgs],Body).
 
 
@@ -81,9 +81,9 @@ compile_funop(Ctx,CallEnv,Result,[FunctionName | FunctionArgs], Body):- nonvar(F
 
 
 
-uses_exact(FunctionName,ArgInfo):-  user:arglist_info(FunctionName,_,_,ArgInfo),!,ArgInfo.complex ==0 .
+uses_exact(FunctionName,ArgInfo):-  wl:arglist_info(FunctionName,_,_,ArgInfo),!,ArgInfo.complex ==0 .
 
-uses_rest(FunctionName):-  user:arglist_info(FunctionName,_,_,ArgInfo),!,ArgInfo.complex \==0 .
+uses_rest(FunctionName):-  wl:arglist_info(FunctionName,_,_,ArgInfo),!,ArgInfo.complex \==0 .
 uses_rest(FunctionName):- same_symbol(FunctionName,F),wl:declared(F,lambda(['&rest',_])).
 % Non built-in function expands into an explicit function call
 

@@ -17,6 +17,8 @@
 :- set_module(class(library)).
 
 
+show_call_trace(G):- G *-> wdmsg(G); (wdmsg(warn(failed(show_call_trace(G)))),fail).
+
 on_x_rtrace(G):- catch(G,E,(dbmsg(E),rtrace(G),break)).
 atom_concat_or_rtrace(X,Y,Z):- on_x_rtrace(atom_concat(X,Y,Z)).
 lisp_dump_break:- lisp_dumpST,break.

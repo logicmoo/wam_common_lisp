@@ -35,8 +35,6 @@ new_cl_fixnum(Init,Obj):-
   create_instance(claz_fixnum,[Init],Obj),!.
 
 
-show_call_trace(G):- G *-> wdmsg(G); (wdmsg(warn(failed(show_call_trace(G)))),fail).
-
 create_struct1(Kind,[Value],Value):- data_record(Kind,[_]),!.
 create_struct1(Kind,ARGS,Obj):-create_instance(Kind,ARGS,Obj),!.
 create_struct1(_Type,Value,Value).
@@ -64,7 +62,7 @@ new_unnamed_opv(SKind,Name,Attrs,Obj):-
   instance_prefix(Kind,Pre),!,  
   atomic_list_concat([Pre,Name],'_',PName),
   prologcase_name(PName,Obj),
-  cl_string(Name,SName),set_opv(Obj,sname,SName),
+  to_prolog_string(Name,SName),set_opv(Obj,sname,SName),
   add_opv_i(Obj,classof,Kind),
   ensure_opv_type_inited(Kind),  
   construct_opv(Obj,Kind),
@@ -143,7 +141,7 @@ value_default(claz_object,mut([],claz_object)).
 
 find_or_create_class(Name,Kind):- find_class(Name,Kind),Kind\==[],!.
 find_or_create_class(Name,Kind):- 
-   %cl_string(Name,SName),
+   %to_prolog_string(Name,SName),
    new_named_opv(claz_structure_object,Name,[],Kind),!.
 
 find_class(Name,Claz):- atom(Name),atom_concat_or_rtrace('claz_',_,Name),!,Claz=Name.
@@ -151,7 +149,7 @@ find_class(Name,Claz):-
   get_struct_opv(Claz,symbolname,Name),!.
 %find_class(Name,Claz):- get_struct_opv(Claz,name,Name),!.
 find_class(Name,Claz):-
-  cl_string(Name,StringC)->string_upper(StringC,NameS),
+  to_prolog_string(Name,StringC)->string_upper(StringC,NameS),
   get_struct_opv(Claz,namestring,NameS).
 
 
@@ -208,7 +206,7 @@ get_struct_offset(_,0).
 
 generate_missing_struct_functions(Kind):-
   always(( get_struct_opv(Kind,symbolname,Name),
-  cl_string(Name,SName),
+  to_prolog_string(Name,SName),
  % define keyword defaults now
  make_default_constructor(Kind),
  maybe_add_kw_function(Kind,SName,"-P",kw_predicate, [obj],( eq('class-of'(obj),quote(Kind)))),
@@ -219,7 +217,7 @@ generate_missing_struct_functions(Kind):-
 
 make_default_constructor(Kind):- 
  always((
- get_struct_opv(Kind,symbolname,Name),cl_string(Name,SName),
+ get_struct_opv(Kind,symbolname,Name),to_prolog_string(Name,SName),
  atom_concat_or_rtrace("MAKE-",SName,FnName),
  reader_intern_symbols(FnName,Symbol),
  find_function_or_macro_name(_,_,Symbol,3,Function),
@@ -240,7 +238,7 @@ maybe_add_get_set_functions(Kind,ConcatName,Keyword,ZLOT):-
 maybe_add_get_function(Kind,_ConcName,_Keyword,ZLOT):- get_struct_opv(Kind,kw_accessor,_Getter,ZLOT),!.
 maybe_add_get_function(Kind,ConcatName,Keyword,ZLOT):- 
   always((get_struct_opv(Kind,slot,Keyword,ZLOT),
-  cl_string(Keyword,Name),
+  to_prolog_string(Keyword,Name),
   create_keyword(Name,KW),
   atom_concat_or_rtrace(ConcatName,Name,Getter),
   maybe_add_function(Getter,[obj],['slot-value',obj,[quote,KW]],Added),
@@ -250,7 +248,7 @@ maybe_add_set_function(Kind,_ConcName,_Keyword,ZLOT):- get_struct_opv(Kind,sette
 maybe_add_set_function(Kind,ConcatName,Keyword,ZLOT):-   
   always((
   get_struct_opv(Kind,slot,Keyword,ZLOT),
-  cl_string(Keyword,Name),
+  to_prolog_string(Keyword,Name),
   atom_concat_or_rtrace(ConcatName,Name,Getter),
   atomic_list_concat(['SETF',Getter],'-',Setter),
   maybe_add_function(Setter,[obj,val],['setf',[Keyword,obj],val],Added),
@@ -321,7 +319,7 @@ get_struct_opv(Obj, KW, Value,Info):-
 get_szlot(Prefix,Type,Key,SlotInfo):-
   Type=..[Kind|Params],
   claz_to_symbol(Kind,Symbol),
-  cl_string(Symbol,ClassName),
+  to_prolog_string(Symbol,ClassName),
   un_kw(Key,UKey),  
   atomic_list_concat([ClassName,UKey],'_',SlotInfo0),
   atom_concat_or_rtrace(Prefix,SlotInfo0,SlotInfo1),
@@ -373,7 +371,7 @@ un_kw1(Prop,Prop):- var(Prop),!.
 un_kw1(Key,Prop):- \+ atomic(Key),!,lisp_dump_break,Key=Prop.
 un_kw1([],[]):-!.
 un_kw1(Key,Prop):- \+ atomic_list_concat([_,_|_],'_',Key),!,Prop=Key.
-un_kw1(Key,Prop):- Prop\==name,cl_string(Key,Str),downcase_atom(Str,Prop),!.
+un_kw1(Key,Prop):- Prop\==name,to_prolog_string(Key,Str),downcase_atom(Str,Prop),!.
 un_kw1(Key,Prop):- atom_concat_or_rtrace('kw_',Prop,Key),!.
 un_kw1(Key,Prop):- atom_concat_or_rtrace(':',Prop,Key),!.
 un_kw1(Prop,Prop).
@@ -545,7 +543,7 @@ add_slot_def(_DefType,N,Kind,[Prop|Keys]):- add_slot_def_props(N,Kind,Prop,Keys)
 add_slot_def_props(N,Kind,Key,MoreInfo):-
    always((get_szlot('zlot_',Kind,Key,SlotInfo),
    assert_struct_opv4(Kind,slot,Key,SlotInfo), 
-   cl_string(Key,SName),create_keyword(SName,KW),assert_struct_opv4(Kind,keyword,KW,SlotInfo),
+   to_prolog_string(Key,SName),create_keyword(SName,KW),assert_struct_opv4(Kind,keyword,KW,SlotInfo),
    %claz_to_symbol(Kind,ClassSymbol),cl_symbol_package(ClassSymbol,Package),trace,intern_symbol(SName,Package,Name,_),
    %assert_struct_opv4(Kind,name,Name,SlotInfo),
    ignore((nonvar(N),(assert_struct_opv4(Kind,ordinal,N,SlotInfo)))),
@@ -568,7 +566,7 @@ assert_slot_prop(SlotName,Kind,KW,Value,SlotInfo):-
 
 prop_to_name(X,S):-string(X),!,X=S.
 prop_to_name(Prop,Upper):- compound(Prop),!,functor(Prop,F,_),prop_to_name(F,Upper).
-prop_to_name(Prop,Upper):- cl_string(Prop,Upper),!.
+prop_to_name(Prop,Upper):- to_prolog_string(Prop,Upper),!.
 prop_to_name(Prop,Upper):- claz_to_symbol(Prop,Key),
  atomic_list_concat(List,'_',Key),atomic_list_concat(List,'-',Lower),string_upper(Lower,Upper).
 

@@ -3557,7 +3557,7 @@ package_external_symbols(pkg_kw,"W3M",kw_w3m).
 package_external_symbols(pkg_kw,"W3M-XTERM",kw_w3m_xterm).
 package_external_symbols(pkg_kw,"WAIT",kw_wait).
 package_external_symbols(pkg_kw,"WAITCOUNT",kw_waitcount).
-package_external_symbols(pkg_kw,"WAM-ARMEDBEAR",kw_wam_armedbear
+package_external_symbols(pkg_kw,"WAM-ARMEDBEAR",kw_wam_armedbear).
 package_external_symbols(pkg_kw,"WAM-CL",kw_wam_cl).
 package_external_symbols(pkg_kw,"WARN-IF-NEEDS-REHASH-AFTER-GC",kw_warn_if_needs_rehash_after_gc).
 package_external_symbols(pkg_kw,"WARNING",kw_warning).

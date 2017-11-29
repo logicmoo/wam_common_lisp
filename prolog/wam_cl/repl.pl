@@ -247,6 +247,9 @@ lw:- cl_load("wam-cl-params",_).
 %:- lisp_add_history("lisp.").
 
 :- set_prolog_flag(verbose_autoload,false).
+
+:- ignore((((((clause(arithmetic:eval(P,_,_),_),nonvar(P)),(functor(P,F,A),show_call_trace(define_cl_math(F,A)))))),fail)).
+
 :- fixup_exports.
 
 
