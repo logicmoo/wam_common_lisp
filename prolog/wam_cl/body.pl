@@ -29,13 +29,14 @@ must_compile_closure_body(Ctx,Env,Result,Function, Body):-
 % compile_body(Ctx,Env,Result,Function, Body).
 % Expands a Lisp-like function body into its Prolog equivalent
 
-must_compile_body(Ctx,Env,Result,Function, Body):-
+must_compile_body(Ctx,Env,Result,LispCode, Body):-
   notrace((maybe_debug_var('_rCtx',Ctx),
   maybe_debug_var('_rEnv',Env),
   maybe_debug_var('_rResult',Result),
-  maybe_debug_var('_rForms',Function),
+  maybe_debug_var('_LispCode',LispCode),
   maybe_debug_var('_rBody',Body))),
-  always(compile_body(Ctx,Env,Result,Function, Body)),
+  resolve_reader_macros(LispCode,Forms),!,
+  always(compile_body(Ctx,Env,Result,Forms, Body)),
   % nb_current('$compiler_PreviousResult',THE),setarg(1,THE,Result),
   !.
 
@@ -408,17 +409,24 @@ compile_body(Ctx,Env,Result,[lambda,LambdaArgs|LambdaBody], Body):-
      (Result = closure([ClosureEnvironment|Env],ClosureResult,LambdaArgs,ClosureBody)).
    
 
-% (function ?? )
+% (function .)
 compile_body(_Cx,_Ev,function(Function),POrSTerm, true):- p_or_s(POrSTerm,function,[Function]).
+% ((function .) ...)
+compile_body(Ctx,Env,Result,[POrSTerm|ARGS],Body):- p_or_s(POrSTerm,function,[Function]),
+  compile_body(Ctx,Env,Result,[Function|ARGS],Body).
+
 
 % (closure ...)
 compile_body(_Ctx,_Env,Result,POrSTerm,Body):- 
    p_or_s(POrSTerm,closure,[ClosureEnvironment,ClosureResult,LambdaArgs,ClosureBody]),
-   debug_var('Closure',Result),
-   debug_var('ClosureResult',ClosureResult),
-   Body =
-     (Result = closure(ClosureEnvironment,ClosureResult,LambdaArgs,ClosureBody)).
-        
+   debug_var('Closure',Result),debug_var('ClosureResult',ClosureResult),
+   Body = (Result = closure(ClosureEnvironment,ClosureResult,LambdaArgs,ClosureBody)).
+% ((closure ...) ...)
+compile_body(_Ctx,_Env,Result,[POrSTerm|ARGS],Body):- 
+   p_or_s(POrSTerm,closure,[ClosureEnvironment,ClosureResult,LambdaArgs,ClosureBody]),
+    ClosureResult = Result,debug_var('ClosureEnv',ClosureEnvironment),debug_var('ClosureResult',Result),
+   Body = closure(ClosureEnvironment,ClosureResult,LambdaArgs,ClosureBody,ARGS,Result).
+
 
 
 

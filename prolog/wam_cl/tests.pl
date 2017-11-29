@@ -59,84 +59,189 @@ compile_test(Name,Code,Return,Expected):-
    term_attvars(Code,AttVars),maplist(del_attr_rev2(vn),AttVars).
 
 
+
+
+:- use_module(library(tabling)).
+:- table fibt/2.
+fibt(0, 1) :- !.
+fibt(1, 1) :- !.
+fibt(N, F) :-
+        N > 1,
+        N1 is N-1,
+        N2 is N-2,
+        fibt(N1, F1),
+        fibt(N2, F2),
+        F is F1+F2.
+
+fibp(0, 1) :- !.
+fibp(1, 1) :- !.
+fibp(N, F) :-
+        N > 1,
+        N1 is N-1,
+        N2 is N-2,
+        fibp(N1, F1),
+        fibp(N2, F2),
+        F is F1+F2.
+% SBCL 
+% * (time (fib 38))
+% 1.264000 seconds of total run time (1.264000 user, 0.000000 system)
+% YAP
+% ?- time(fibp(38,O)).
+% 4.924 CPU in 4.953 seconds ( 99% CPU)
+% SWI
+% ?- timel(fibp(38,O)).
+% 252,983,942 inferences, 19.712 CPU in 19.949 seconds (99% CPU, 12833899 Lips)
+% CLISP
+% (time (fib 38))
+% Run time: 53.0 sec.
+% BProlog
+% ?- time(fibp(38,O)).
+% CPU time 75.764 seconds.
+
+fibp2(N, F) :-
+        N =< 1 
+        -> F = 1 
+        ;
+        N1 is N-1,
+        N2 is N-2,
+        fibp2(N1, F1),
+        fibp2(N2, F2),
+        F is F1+F2.
+% SBCL 
+% * (time (fib 38))
+% 1.264000 seconds of total run time (1.264000 user, 0.000000 system)
+% YAP
+% ?- time(fibp2(38,O)).
+% 3.124 CPU in 3.148 seconds ( 99% CPU)
+% SWI
+% ?- timel(fibp2(38,O)).
+% 442,721,899 inferences, 24.558 CPU in 24.826 seconds (99% CPU, 18027611 Lips)
+% CLISP
+% (time (fib 38))
+% 53.0 sec.
+
+
+/*
+ 
+NOTES:
+ 
+* WAM-CL currently produces code 6 times slower than the handwritten code
+ 
+* Handwritten Prolog is 2-3 slower than SBCL
+ 
+* If WAM-CL becomes fast as handwritten code,
+** it will be 17 times faster than CLISP
+** it will be 6 times faster than ECL
+ 
+ 
+ 
+ 
+(defun fib (n)
+  (if (> n 1)
+    (+ (fib (- n 1))
+       (fib (- n 2)))
+    1))
+ 
+*/
+
+% WAM-CL 
+fibc(A, K) :- !,
+        B=[[bv(n, [A|_])]],
+        sym_arg_val_envc(n, A, C, B),
+        >(C, 1, D),
+        (   D\=[]
+        ->  sym_arg_val_envc(n, A, Obj, B),
+            -(Obj, 1, F),
+            fibc(F, I),
+            sym_arg_val_envc(n, A, G, B),
+            -(G, 2, H),
+            fibc(H, J),
+            +(I, J, L),
+            K=L
+        ;   K=1
+        ).
+fibc(_, _) :- '<<=='(fibc(n),if(n>1, fibc(n-1)+fibc(n-2), 1)).
+
+
+% HANDWRITTEN
+
+fibp3(N, F) :-
+        N =< 1 
+        -> F = 1 
+        ;
+        N1 is N-1,
+        N2 is N-2,
+        fibp3(N1, F1),
+        fibp3(N2, F2),
+        F is F1+F2.
+
+
+
+
+
+% SBCL 1.3.1
+% * (time (fib 38))
+% 1.264000 seconds of total run time (1.264000 user, 0.000000 system)
+
+% YAP-Prolog (Hand written)
+% ?- time(fibp2(38,O)).
+% 3.124 CPU in 3.148 seconds ( 99% CPU)
+
+% YAP-Lisp (WAM-CL)
+% ?- time(fibc(38,O)).
+% 20.184 CPU in 20.340 seconds ( 99% CPU)
+
+% SWI-Prolog (Hand written)
+% ?- timel(fibp3(38,O)).
+% 24.558 CPU in 24.826 seconds (99% CPU, 18027611 Lips)
+
+% ECL 15.3.7
+% > (time (fib 38))
+% run time  : 25.516 secs (real time : 26.290 secs)
+
+% CLISP 2.49
+% (time (fib 38))
+% 53.0 sec.
+
+% SWI-Lisp (WAM-CL)
+% ?- time(fibc(38,O)).
+% 113.043 CPU in 114.324 seconds (99% CPU, 15665558 Lips)
+
+
+sym_arg_val_envd(Var,_InValue,Value,Environment):- 
+  (once((	(member(Bindings, Environment),
+			member(bv(Var, Value0), Bindings),
+			extract_variable_value(Value0, Value, _))
+		    ;	symbol_value(Var, Value)
+		    ;	(lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Var))))).
+
+fibd(A, K) :- !,
+        B=[[bv(n, [A|_])]],
+        sym_arg_val_envd(n, A, C, B),
+        >(C, 1, D),
+        (   D\=[]
+        ->  sym_arg_val_envd(n, A, Obj, B),
+            -(Obj, 1, F),
+            fibd(F, I),
+            sym_arg_val_envd(n, A, G, B),
+            -(G, 2, H),
+            fibd(H, J),
+            +(I, J, L),
+            K=L
+        ;   K=1
+        ).
+fibd(_, _) :- '<<=='(fibd(n),if(n>1, fibd(n-1)+fibd(n-2), 1)).
+% YAP
+% ?- time(fibd(38,O)).
+% 41.608 CPU in 42.418 seconds ( 98% CPU)
+
+
+
 :- fixup_exports.
 
 
 
 end_of_file.
-
-/*******************************************************************
- *
- * A Common Lisp compiler/interpretor, written in Prolog
- *
- * (tests.pl)
- *
- * (c) Neil Smith, 2001
- *
- * A few sample function definitions, mainly used by me as simple 
- * test cases for the compiler.  I'm sure you can come up with 
- * something better...
- *
- *******************************************************************/
-
-
-simple(x) <<== x.
-
-
-lisp_append_2(l1, l2) <<==
-	cond(  [[null(l1), l2], 
-		[t,	cons( first(l1),
-			      lisp_append_2(rest(l1),
-			                    l2))]]).
- 
-
-lisp_error(x) <<== setq(y, 5).
-
-%:- rtrace.
-lisp_let() <<==
-	let([bind(x, 3), bind(y, 5)], 
-		      progn(x,y)).
-
-lisp_let1() <<==
-	let([bind(x, 3), bind(y, 5)], 
-			x, 		% implicit progn here
-			y).
-
-
-% maps 'first' over a list of lists
-mapfirst(l) <<==
-	mapcar(function(first), l).
-
-
-<<== defvar(fred, 13).
-
-<<== defvar(george).
-
-
-reset_george(val) <<==
-	setq(george, val).
-
-
-make_adder(x) <<==
-	function(lambda([y], plus(x, y))).
-
-
-scale_list(xs, scale) <<==
-	let([bind(fred, function(lambda([num], times(scale, num))))], mapcar(fred, xs)).
-
-
-make_summer(total) <<== 
-	function(lambda([n],
-		setq(total, plus(total, n)))).
-
-
-sum_with_map(xs) <<==
-	let([bind(running_total, 0)],
-		let([bind(summer, function(lambda([n], setq(running_total, 
-							plus(running_total, n)))))],
-		 mapcar(summer, xs),
-		  running_total )).
-
 
  
 parsing(Program, Forms0):- sformat(S,'(\n~s\n)\n',[Program]),str_to_expression(S,Forms0).

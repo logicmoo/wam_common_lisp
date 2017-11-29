@@ -32,6 +32,9 @@ reader_intern_symbols(Package,SymbolName,Symbol):-
    atom(SymbolName),atom_symbol(SymbolName,Package,Symbol),!.
 reader_intern_symbols(_Package,Some,Some):- \+ compound(Some),!.
 
+reader_intern_symbols(P,I,O):- resolve_reader_macros(I,M)->I\==M,!,reader_intern_symbols(P,M,O).
+
+reader_intern_symbols(_,'$OBJ'(Function,F),function(F)):- Function==function,!.
 % #<unbound>
 reader_intern_symbols(_,'$OBJ'([unbound]),'$OBJ'(unbound,[])):-!.
 reader_intern_symbols(Package,'$OBJ'(Expr),'$OBJ'(ExprO)):-!,reader_intern_symbols(Package,(Expr),(ExprO)).

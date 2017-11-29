@@ -137,6 +137,8 @@ conjoin_0(clean_escape(_),_,true):- trace,!.
 conjoin_0((clean_escape(_),_),_,true):- trace.
 conjoin_0((C1,clean_escape(_)),_,C1):- trace.
 conjoin_0(C1,(clean_escape(_),_),C1):- trace.
+conjoin_0(symbol_value(ReplEnv, Var, Value),symbol_value(ReplEnv, Var, Value),
+           symbol_value(ReplEnv, Var, Value)).
 conjoin_0((C1,C1O),C2,(C1,AAB)):-!, conjoin(C1O,C2,AAB).
 conjoin_0(C1,C2,(C1,C2)).
 
@@ -181,6 +183,7 @@ mize_body1(_Ctx,_,C1,L=[R]):- C1 =@= (L=[R, []]). % lisp_compiler_option(elim_va
 mize_body1(_Ctx,_,C1,C1):-!.
 
 mize_body2(_Ctx,_,C1,C1):- \+ compound(C1),!.
+
 mize_body2(_,_,(ITE,R=V),ITE):- var(R),var(V),ifthenelse(ITE),R=V.
 mize_body2(_Ctx,_,t_or_nil(G, R),G):- R==t.
 mize_body2(_Ctx,_,t_or_nil(G, R),\+ G):- R==[].

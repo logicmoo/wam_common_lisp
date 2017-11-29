@@ -160,25 +160,36 @@ cl_find_class(_,[]).
   
 cl_slot_value(Obj,Slot,Value):- always(get_opv(Obj,Slot,Value)).
 
-cl_defstruct(Kind,[[Name,KeyWords]|Slots]):- !, always(define_struct(Name,KeyWords,Slots,Kind)).
-cl_defstruct(Kind,[[Name|KeyWords]|Slots]):- !, always(define_struct(Name,KeyWords,Slots,Kind)).
-cl_defstruct(Kind,[Name|Slots]):- always(define_struct(Name,[],Slots,Kind)).
+cl_defstruct(Name,[[Name,KeyWords]|Slots]):- !, always(define_struct(Name,KeyWords,Slots,_Kind)).
+cl_defstruct(Name,[[Name|KeyWords]|Slots]):- !, always(define_struct(Name,KeyWords,Slots,_Kind)).
+cl_defstruct(Name,[Name|Slots]):- always(define_struct(Name,[],Slots,_Kind)).
 
-cl_defclass(Kind,[Name,Supers,Slots]):- !, always(define_class(Name,[[kw_include|Supers]],Slots,Kind)).
+cl_defclass(Kind,[Name,Supers,Slots|KwInfo]):- !, always(define_class(Name,[[kw_include|Supers]|KwInfo],Slots,Kind)).
 
 
 define_class(Name,KeyWords,SlotsIn,Kind):- 
   (var(Kind) -> (( new_named_opv(claz_standard_class,Name,[],Kind)));true),
-   define_kind(Name,KeyWords,SlotsIn,Kind).
+   define_kind(defclass,Name,KeyWords,SlotsIn,Kind),
+   ensure_prototype(Kind).
+
+
+% @TODO Store INITIALIZE-INSTANCE, REINITIALIZE-INSTANCE, and SHARED-INITIALIZE  Hooks
+ensure_prototype(Kind):- get_struct_opv(Kind,prototype,_),!.
+ensure_prototype(Kind):- make_proto_instance(Kind,Instance),assert_struct_opv(Kind,prototype,Instance) .
+
+make_proto_instance(Kind,Obj):-
+  new_unnamed_opv(Kind,prototypical,[],Obj).
+  
+
 
 define_struct(Name,KeyWords,SlotsIn,Kind):- 
   (var(Kind) -> (( new_named_opv(claz_structure_object,Name,[],Kind)));true),
-   define_kind(Name,KeyWords,SlotsIn,Kind).
+   define_kind(defstruct,Name,KeyWords,SlotsIn,Kind).
 
 is_structure_class(T):- get_opv(T,classof,claz_structure_class);get_opv(T,classof,claz_structure_object).
 
 
-define_kind(Name,KeyWords,SlotsIn,Kind):- 
+define_kind(DefType,Name,KeyWords,SlotsIn,Kind):- 
  always((
   assert_struct_opv(Kind,symbolname,Name),
   assert_struct_opv(Kind,type,Name),  
@@ -188,7 +199,7 @@ define_kind(Name,KeyWords,SlotsIn,Kind):-
   add_class_keywords(Kind,KeyWords),
   get_struct_offset(Kind,Offset),
   NOffset is Offset +1,
-  add_class_slots(Kind,NOffset,Slots),
+  add_class_slots(DefType,Kind,NOffset,Slots),
   
   generate_missing_struct_functions(Kind))).
 
@@ -515,19 +526,21 @@ set_opv_i(Obj,Prop,Value):- delete_opvalues(Obj,Prop),add_opv_i(Obj,Prop,Value).
 ensure_opv_type_inited(Kind):- is_obj_type(Kind),!.
 ensure_opv_type_inited(Kind):- 
   asserta(is_obj_type(Kind)),!,
-  findall(Slot,soops:struct_opv(Kind,slot,Slot,_),Slots),add_class_slots(Kind,1,Slots).
+  get_deftype(Kind,DefType),
+  findall(Slot,soops:struct_opv(Kind,slot,Slot,_),Slots),add_class_slots(DefType,Kind,1,Slots).
 
-add_class_slots(Kind,N,[Slot|Slots]):- !, always(add_slot_def(N,Kind,Slot)),N1 is N + 1,add_class_slots(Kind,N1,Slots).
-add_class_slots(_Type,_N,[]).
+get_deftype(Kind,DefType):- (is_structure_class(Kind) -> DefType=defstruct; DefType=defclass).
+
+add_class_slots(DefType,Kind,N,[Slot|Slots]):- !, always(add_slot_def(DefType,N,Kind,Slot)),N1 is N + 1,add_class_slots(DefType,Kind,N1,Slots).
+add_class_slots(_DefType,_Type,_N,[]).
 
 is_oddp(N):- 1 is N div 2.
 
-add_slot_def(N,Kind,Prop):- atom(Prop),!,
-   add_slot_def_props(N,Kind,Prop,[]).
-add_slot_def(N,Kind,[Prop,Default|Keys]):- length(Keys,Len), \+ is_oddp(Len),!,
+add_slot_def(_DefType,N,Kind,Prop):- atom(Prop),!,add_slot_def_props(N,Kind,Prop,[]).
+add_slot_def(defclass,N,Kind,[Prop|Keys]):- !,add_slot_def_props(N,Kind,Prop,Keys).
+add_slot_def(defsturct,N,Kind,[Prop,Default|Keys]):- length(Keys,Len), \+ is_oddp(Len),!,
    add_slot_def_props(N,Kind,Prop,[kw_initform,Default|Keys]).
-add_slot_def(N,Kind,[Prop|Keys]):- 
-   add_slot_def_props(N,Kind,Prop,Keys).
+add_slot_def(_DefType,N,Kind,[Prop|Keys]):- add_slot_def_props(N,Kind,Prop,Keys).
 
 add_slot_def_props(N,Kind,Key,MoreInfo):-
    always((get_szlot('zlot_',Kind,Key,SlotInfo),

@@ -20,7 +20,10 @@
 
 (in-package "CL-USER")
 
-(prolog-call "cls.")
+#+WAM-CL (prolog-call "cls.")
+
+(defun mapcar-visualize (func l) (if (null l) () (cons (apply func (list (first l))) (mapcar func (rest l)))))
+
 
 ;; Test macro
 (defmacro is (eqf expected actual)
@@ -29,8 +32,8 @@
        (if (not (,eqf ,a ,b))
          (progn
            (format t "FAILED: when matching ~a and ~a~%" ,a ,b)
-	   (prolog-inline "trace")
-           '(quit 1))
+	   #+WAM-CL (prolog-inline "trace")
+           #+WAM-CL '(quit 1)  #+CLISP (quit 1))
          (format t "OK: ~a is ~a to ~a~%" ',expected ',eqf ',actual)))))
 
 (write-line "Running smoke test!")
@@ -154,9 +157,10 @@ f_u_fifteen(MResult) :-
 
 ;; 3.1. Review of defstruct
 
-(defstruct point x y z)
+(progn #+WAM-CL (prolog-inline "nop(trace)")(is eq 'point (defstruct point x y z)))
+;; (defstruct point x y z)
 
-(defstruct point4d x y z t)
+(is eq 'point4d (defstruct point4d x y z t))
 
 (defun distance-from-origin (point)
   (let* ((x (point-x point))
@@ -168,19 +172,18 @@ f_u_fifteen(MResult) :-
   (setf (point-y point)
         (- (point-y point))))
 
-(setf my-point (make-point :x 3 :y 4 :z 12))
-(setf my-point2 (make-point :x 3 :y 4 :z 12))
+(list (setf my-point (make-point :x 3 :y 4 :z 12)) (setf my-point2 (make-point :x 3 :y 4 :z 12)))
 (setf my-point3 #S(POINT :X 3 :Y 4 :Z 12))
 (setf my-point4d (make-point4d :x 3 :y 4 :z 12 :t 1))
 
 
+(is eq t (point-p my-point))
 
-(point-p my-point)
+(is eq 'point (type-of my-point))
 
-(type-of my-point)
+#+WAM-CL (prolog-call "break")
 
-
-(progn (print (distance-from-origin my-point)))
+(is eql 13 (progn (print (distance-from-origin my-point))))
 
 (reflect-in-y-axis my-point)
 
@@ -266,7 +269,7 @@ my-point
 
 (list (daft-x my-daft-point)
       (daft-y my-daft-point)
-      (progn (prolog-trace) (daft-z my-daft-point)))
+      (progn #+WAM-CL (prolog-trace) (daft-z my-daft-point)))
 
 (let ((temp (make-instance 'daft-point)))
   (setf (daft-y temp) 999

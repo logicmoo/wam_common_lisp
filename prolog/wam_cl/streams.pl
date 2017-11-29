@@ -52,7 +52,7 @@ stream_first(stream) <<==
 	first(stream).
 
 stream_rest(stream) <<==
-	lisp_apply(second(stream), []).
+	cl_apply(second(stream), []).
 
 stream_cons(a, b) <<==
 	list_2( a, b).

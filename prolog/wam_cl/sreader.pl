@@ -634,6 +634,8 @@ to_untyped('#\\'(S),C):-!,to_untyped('$CHAR'(S),C),!.
 to_untyped('$CHAR'(S),C):-to_char(S,C),!.
 to_untyped('$CHAR'(S),'$CHAR'(S)):-!.
 % to_untyped('$STRING'(S),(S)):-!.
+to_untyped('$OBJ'([FUN, F]),O):- atom(FUN),!,to_untyped('$OBJ'(FUN, F),O).
+to_untyped('$OBJ'([FUN| F]),O):- atom(FUN),!,to_untyped('$OBJ'(FUN, F),O).
 to_untyped('$COMMA'(S),'$COMMA'(O)):-to_untyped(S,O),!.
 to_untyped('$OBJ'(S),'$OBJ'(O)):-to_untyped(S,O),!.
 to_untyped('$OBJ'(Ungly,S),'$OBJ'(Ungly,O)):-to_untyped(S,O),!.

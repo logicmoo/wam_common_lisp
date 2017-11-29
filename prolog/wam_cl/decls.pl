@@ -91,15 +91,6 @@ compile_macro(Ctx,CallEnv,Macro,[Name0,FormalParms|FunctionBody0], CompileBody):
    set_opv(Macro,classof,claz_macro),
    set_opv(Symbol,compile_as,kw_operator),
    set_opv(Symbol,function,Macro),
-    CompileBody = (
-   DocCode,
-   HeadDefCode,
-   asserta(user:macro_lambda(defmacro(Name0),Macro, FormalParms, [progn | FunctionBody],Alphas)),
-   asserta((user:FunctionHead  :- (BodyCode,cl_eval(MResult,FResult)))),
-   nop((user:RNewMacroHead  :- BodyCode)),
-   set_opv(Macro,classof,claz_macro),
-   set_opv(Symbol,compile_as,kw_operator),
-   set_opv(Symbol,function,Macro)),
    within_labels_context(Symbol, make_mcompiled(Ctx,CallEnv,MResult,Symbol,MacroHead,FunctionBody,
      NewMacroHead,HeadDefCode,BodyCode,Fun)),
    NewMacroHead=..[M|ARGS],
@@ -108,14 +99,24 @@ compile_macro(Ctx,CallEnv,Macro,[Name0,FormalParms|FunctionBody0], CompileBody):
    get_alphas(Ctx,Alphas),
    debug_var('FnResult',FResult),
    debug_var('Fun',Fun),
-   subst(NewMacroHead,MResult,FResult,FunctionHead).
+   subst(NewMacroHead,MResult,FResult,FunctionHead),
+
+ CompileBody = (
+   DocCode,
+   HeadDefCode,
+   asserta(user:macro_lambda(defmacro(Name0),Macro, FormalParms, [progn | FunctionBody],Alphas)),
+   asserta((user:FunctionHead  :- (BodyCode, 
+       cl_eval(MResult,FResult)))),
+   nop((user:RNewMacroHead  :- BodyCode)),
+   set_opv(Macro,classof,claz_macro),
+   set_opv(Symbol,compile_as,kw_operator),
+   set_opv(Symbol,function,Macro)).
 
 varuse:attr_unify_hook(_,Other):- var(Other).
 
 make_mcompiled(Ctx,_UnusedEnv,CResult,Symbol,FunctionHead,FunctionBody,Head,HeadDefCode,(BodyCode),Fun):-
     expand_function_head(Ctx,CallEnv,FunctionHead, Head, HeadEnv, CResult,HeadDefCode,HeadCode),
-    debug_var("CallEnv",CallEnv),debug_var('CResult',CResult),
-   debug_var('MResult',MResult),
+    debug_var("CallEnv",CallEnv),debug_var('CResult',CResult),debug_var('MResult',MResult),
     compile_body(Ctx,CallEnv,MResult,[block,Symbol|FunctionBody],Body0),
     show_ctx_info(Ctx),
     %gensym(retval,R),
@@ -126,7 +127,7 @@ make_mcompiled(Ctx,_UnusedEnv,CResult,Symbol,FunctionHead,FunctionBody,Head,Head
      (lisp_compile(CResult,Body,BodyCode0),
       subst(Body0,Sub,BodyCode0,BodyCode),Fun=t);
     (((var(MResult)))
-    -> sanitize_true(Ctx,((CallEnv=HeadEnv,HeadCode,Body0)),BodyCode)
+    -> (MResult=CResult,sanitize_true(Ctx,((CallEnv=HeadEnv,HeadCode,Body0)),BodyCode))
      ; (body_cleanup(Ctx,((CallEnv=HeadEnv,HeadCode,Body0,MResult=CResult)),BodyCode)))).
 
 

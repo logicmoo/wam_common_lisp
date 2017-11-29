@@ -3557,6 +3557,8 @@ package_external_symbols(pkg_kw,"W3M",kw_w3m).
 package_external_symbols(pkg_kw,"W3M-XTERM",kw_w3m_xterm).
 package_external_symbols(pkg_kw,"WAIT",kw_wait).
 package_external_symbols(pkg_kw,"WAITCOUNT",kw_waitcount).
+package_external_symbols(pkg_kw,"WAM-ARMEDBEAR",kw_wam_armedbear
+package_external_symbols(pkg_kw,"WAM-CL",kw_wam_cl).
 package_external_symbols(pkg_kw,"WARN-IF-NEEDS-REHASH-AFTER-GC",kw_warn_if_needs_rehash_after_gc).
 package_external_symbols(pkg_kw,"WARNING",kw_warning).
 package_external_symbols(pkg_kw,"WARNINGS",kw_warnings).
@@ -4506,7 +4508,6 @@ package_external_symbols(pkg_threads,"WITH-MUTEX",threads_with_mutex).
 package_external_symbols(pkg_threads,"WITH-THREAD-LOCK",threads_with_thread_lock).
 package_external_symbols(pkg_threads,"YIELD",threads_yield).
 package_external_symbols(pkg_xp,"*PRINT-SHARED*",xp_xx_print_shared_xx).
-
 
 package_internal_symbols(pkg_cl,"%CLASS-NAME",pf_class_name).
 package_internal_symbols(pkg_cl,"%END",pf_end).
