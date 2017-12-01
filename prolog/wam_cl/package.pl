@@ -63,6 +63,7 @@ cl_find_package(_,[]).
 
 cl_package_name(S,Name):- find_package(S,Package),get_opv(Package,name,Name).
 
+find_package(Obj,Res):- to_prolog_string_if_needed(Obj,F),!,find_package(F,Res).
 find_package('$OBJ'(claz_package,UP),Package):-find_package(UP,Package).
 find_package(S,S):- is_lisp_package(S),!.
 find_package(S,Package):- 

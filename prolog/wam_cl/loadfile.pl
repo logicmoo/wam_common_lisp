@@ -182,13 +182,14 @@ write_trans(P):- dbmsg(P).
 % lisp_compile_to_prolog/1 already interned the important stuff
 lisp_compile_to_prolog_pass1(_Expression):- source_location(_,_),!.
 lisp_compile_to_prolog_pass1(SExpression):- 
-  reader_intern_symbols(SExpression,FExpression),
+ always((
+   reader_intern_symbols(SExpression,FExpression),
   
    Expression = FExpression, 
    debug_var('_Ignored',Result),
    lisp_compile(Result,Expression,PrologCode),
    write_trans(:- PrologCode),
-   must(lisp_compile_to_prolog_pass3(PrologCode)),!.
+   must(lisp_compile_to_prolog_pass3(PrologCode)))),!.
    
 
 lisp_compile_to_prolog_pass2(:- PrologCode):- !, lisp_compile_to_prolog_pass3(PrologCode).
@@ -222,6 +223,7 @@ cl_grovel_file(File,t):- in_comment(format('~N; Grovel.. ~w~n',[File])),
    locally(local_override(with_forms,lisp_grovel),
     with_each_file(with_each_form(lisp_grovel_in_package),File)).
 
+cl_load(L,T):- to_prolog_string_if_needed(L,Loc),!,cl_load(Loc,T).
 cl_load('$OBJ'(_Pathname,Loc),T):- string(Loc),!,cl_load(Loc,T).
 cl_load(File,T):-
   local_override(with_forms,lisp_grovel),!,in_comment(format('~N; Grovel.. (LOAD ~w)~n',[File])),cl_grovel_file(File,T),!.
@@ -234,16 +236,16 @@ cl_load(File,t):-
 lisp_reader_compiled_eval(Forms):- reader_intern_symbols(Forms,FForms),lisp_compiled_eval(FForms).
 
 lisp_grovel_in_package(Form):-
-  reader_intern_symbols(Form,FForm),
-  lisp_grovel(FForm).
+  always((reader_intern_symbols(Form,FForm),
+  lisp_grovel(FForm))).
 
 lisp_grovel([load,File|_]):- !, cl_grovel_file(File, _Load_Ret).
 lisp_grovel(['compile-file',File|_]):- !, cl_grovel_file(File, _Load_Ret).
 lisp_grovel(['in-package',Package|_]):- !, cl_in_package(Package, _Load_Ret).
 lisp_grovel(['use-package',Package|_]):- !, cl_use_package(Package, _Load_Ret).
 
-lisp_grovel(Form):- must(lisp_compile(Form,PrologCode)),!,
-  must(grovel_prolog_code(PrologCode)),!.
+lisp_grovel(Form):- always(lisp_compile(Form,PrologCode)),!,
+  always(grovel_prolog_code(PrologCode)),!.
 
 grovel_prolog_code(PrologCode):- \+ compound(PrologCode),!.
 grovel_prolog_code(:- PrologCode):- grovel_prolog_code(PrologCode).

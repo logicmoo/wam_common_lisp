@@ -18,6 +18,9 @@
 
 :- use_module(sreader).
 
+resolve_reader_macros(I,O):- remove_comments(I,M),resolve_inlines(M,M2),remove_comments(M2,O).
+
+
 str_to_expression(Str, Expression):- lisp_add_history(Str),parse_sexpr_untyped_read(string(Str), Expression),!.
 str_to_expression(Str, Expression):- with_input_from_string(Str,read_and_parse(Expression)),!.
 
@@ -26,38 +29,32 @@ remove_comments([I|II],O):- is_comment(I,_),!,remove_comments(II,O).
 remove_comments([I|II],[O|OO]):-remove_comments(I,O),!,remove_comments(II,OO).
 remove_comments(IO,IO).
 
-resolve_reader_macros(I,O):- remove_comments(I,M),resolve_inlines(M,M2),remove_comments(M2,O).
+
+feature_member(Flag0,Features):- reader_intern_symbols(pkg_kw,Flag0,Flag),!,feature_member0(Flag,Features).
+feature_member0(Flag,Features):- memberchk(Flag,Features).
+feature_member0([kw_or|X],Features):- member(E,X), feature_member0(E,Features).
+feature_member0([kw_and|X],Features):- \+ ( member(E,X), \+ feature_member0(E,Features)).
+
+
+% #+
+resolve_1inline([OP,Flag,Form], Code):- nonvar(OP), same_symbol(OP,'#+'),nonvar(Flag),!, 
+   always(( symbol_value(xx_features_xx,FEATURES),
+     (feature_member(Flag,FEATURES) -> Code = Form ; Code = '$COMMENT'(flag_removed(+Flag,Form))))).
+   
+% #-
+resolve_1inline([OP,Flag,Form], Code):- nonvar(OP), same_symbol(OP,'#-'),nonvar(Flag),!,
+   always(( symbol_value(xx_features_xx,FEATURES),
+     (\+ feature_member(Flag,FEATURES) -> Code = Form ; Code = '$COMMENT'(flag_removed(+Flag,Form))))).
+
 
 resolve_inlines(IO,IO):- \+ compound(IO),!.
-/*
-% #+
-resolve_inlines([A,[OP,Flag,Form]|MORE], Code):- same_symbol(OP,'#+'),!, 
-   always(( symbol_value(xx_features_xx,FEATURES),
-                    (  member(Flag,FEATURES) -> resolve_inlines([A,Form|MORE], Code) ; resolve_inlines([A,'$COMMENT'(flag_removed(+Flag,Form))|MORE], Code)))).
-% #-
-resolve_inlines([A,[OP,Flag,Form]|MORE], Code):- same_symbol(OP,'#-'),!, 
-   always(( symbol_value(xx_features_xx,FEATURES),
-                    ( \+ member(Flag,FEATURES) -> resolve_inlines([A,Form|MORE], Code) ; resolve_inlines([A,'$COMMENT'(flag_removed(-Flag,Form))|MORE], Code)))).
-
-*/
-% #+
-resolve_inlines([OP,Flag,Form], Code):- same_symbol(OP,'#+'),!, 
-   always(( symbol_value(xx_features_xx,FEATURES),
-                    (  feature_member(Flag,FEATURES) -> resolve_inlines(Form, Code) ; resolve_inlines('$COMMENT'(flag_removed(+Flag,Form)), Code)))).
-% #-
-resolve_inlines([OP,Flag,Form], Code):- same_symbol(OP,'#-'),!, 
-   always(( symbol_value(xx_features_xx,FEATURES),
-                    (  \+ feature_member(Flag,FEATURES) -> resolve_inlines(Form, Code) ; resolve_inlines('$COMMENT'(flag_removed(+Flag,Form)), Code)))).
-
 resolve_inlines([I|II],O):- is_comment(I,_),!,resolve_inlines(II,O).
+resolve_inlines([A,B,C],OO):- resolve_1inline([A,B,C],O),!,resolve_inlines(O,OO).
+resolve_inlines([L,A,B,C|II],OO):- resolve_1inline([A,B,C],O),!,resolve_inlines([L,O|II],OO).
+resolve_inlines([[A,B,C]|II],[O|OO]):- resolve_1inline([A,B,C],O),!,resolve_inlines(II,OO).
+resolve_inlines([A,B,C|II],OO):- resolve_1inline([A,B,C],O),!,resolve_inlines([O|II],OO).
 resolve_inlines([I|II],[O|OO]):-resolve_inlines(I,O),!,resolve_inlines(II,OO).
 resolve_inlines(IO,IO).
-
-
-
-feature_member(Flag,Features):- memberchk(Flag,Features).
-feature_member([kw_or|X],Features):- member(E,X), feature_member(E,Features).
-feature_member([kw_and|X],Features):- \+ ( member(E,X), \+ feature_member(E,Features)).
 
 
 as_sexp(I,O):- as_sexp1(I,M),resolve_reader_macros(M,M2),remove_comments(M2,O).
@@ -72,7 +69,7 @@ as_sexp1(Str,Expression):- as_sexp2(Str,Expression),!.
 
 as_sexp2(Str,Expression):- is_list(Str),!,maplist(expand_pterm_to_sterm,Str,Expression).
 as_sexp2(Str,Expression):- expand_pterm_to_sterm(Str,Expression),!.
-
+                                                  
 
 
 

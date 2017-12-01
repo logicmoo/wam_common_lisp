@@ -565,7 +565,7 @@ assert_slot_prop(SlotName,Kind,KW,Value,SlotInfo):-
   assert_struct_opv4(Kind,Prop,Value,SlotInfo).
 
 prop_to_name(X,S):-string(X),!,X=S.
-prop_to_name(Prop,Upper):- compound(Prop),!,functor(Prop,F,_),prop_to_name(F,Upper).
+prop_to_name(Prop,Upper):- to_prolog_string_if_needed(Prop,F),!,prop_to_name(F,Upper).
 prop_to_name(Prop,Upper):- to_prolog_string(Prop,Upper),!.
 prop_to_name(Prop,Upper):- claz_to_symbol(Prop,Key),
  atomic_list_concat(List,'_',Key),atomic_list_concat(List,'-',Lower),string_upper(Lower,Upper).

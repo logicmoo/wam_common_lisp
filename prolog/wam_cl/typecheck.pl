@@ -45,7 +45,13 @@ compound_starts_with(More,_):- \+ compound(More),!,fail.
 compound_starts_with(A,A):-!.
 compound_starts_with((A,_),B):- compound(A),A=B.
 
+skip_type_checks(asserta(_)).
+skip_type_checks(assertz(_)).
+skip_type_checks(assert(_)).
+
 add_type_checks(_Ctx,Some,Some):- \+ compound(Some),!.
+add_type_checks(_Ctx,Some,Some):- skip_type_checks(Some),!.
+add_type_checks(Ctx,(A:B),(A:BB)):-!, add_type_checks(Ctx,B,BB).
 add_type_checks(_,(P,More),Agenda):- \+ compound_starts_with(More,coerce_to(_,_,_)),wl:do_correctly(P,AT),P=..[_|L],make_correctly(P,AT,1,L,Agenda),!.
 add_type_checks(_,P,Agenda):- wl:do_correctly(P,AT),P=..[_|L],make_correctly(P,AT,1,L,Agenda),!.
 %add_type_checks(_,P,correctly(P,AT)):- wl:do_correctly(P,AT).

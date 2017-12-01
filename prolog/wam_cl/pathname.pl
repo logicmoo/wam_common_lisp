@@ -28,9 +28,12 @@ make_pathanme(Pathname,'$OBJ'(claz_pathname,Pathname)).
 */
 % *COMPILE-FILE-CLASS-EXTENSION*  sys_xx_compile_file_class_extension_xx
 % *COMPILE-FILE-TYPE*    sys_xx_compile_file_type_xx
-pl_compiled_filename(Obj,PL):-compound(Obj),arg(2,Obj,From),string(From),
+
+% (LOAD "sanity-test")
+pl_compiled_filename(Obj,PL):- to_prolog_string(Obj,M),pl_compiled_filename0(M,PL).
+pl_compiled_filename0(Obj,PL):- compound(Obj),arg(2,Obj,From),string(From),
    search_for(From,File),pl_compiled_filename(File,PL),!.
-pl_compiled_filename(File,PL):- symbol_value(sys_xx_compile_file_type_xx,Ext),
+pl_compiled_filename0(File,PL):- symbol_value(sys_xx_compile_file_type_xx,Ext),
    search_for(File,Found),atomic_list_concat([Found,Ext],'.',PL),exists_file(PL),!.
 
 
@@ -47,8 +50,8 @@ check_file_types(SearchTypes):-
    maplist(to_file_exts,FileTypes,SearchTypes).
 check_file_types(['.cl','.lisp','.lsp','.el']).
 
-to_file_exts(Str,Atom):-txt2a(Str,At),atom_concat_or_rtrace('.',At,Atom).
-txt2a(T,A):- text_to_string(T,S),atom_string(A,S),!.
+to_file_exts(Str,Atom):- txt2a(Str,At),atom_concat_or_rtrace('.',At,Atom).
+txt2a(TXT,A):- always((to_prolog_string(TXT,T),text_to_string(T,S),atom_string(A,S))),!.
 
 with_fstem(F0,File0,Found):-   
    check_file_types(SearchTypes),

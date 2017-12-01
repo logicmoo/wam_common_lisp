@@ -93,13 +93,13 @@ compile_macro(Ctx,CallEnv,Macro,[Name0,FormalParms|FunctionBody0], CompileBody):
    set_opv(Symbol,function,Macro),
    within_labels_context(Symbol, make_mcompiled(Ctx,CallEnv,MResult,Symbol,MacroHead,FunctionBody,
      NewMacroHead,HeadDefCode,BodyCode,Fun)),
-   NewMacroHead=..[M|ARGS],
-   atom_concat(M,'_mexpand1',MM),
-   RNewMacroHead=..[MM|ARGS],
+   %NewMacroHead=..[M|ARGS],RNewMacroHead=..[MM|ARGS], atom_concat(M,'_mexpand1',MM),   
    get_alphas(Ctx,Alphas),
    debug_var('FnResult',FResult),
    debug_var('Fun',Fun),
    subst(NewMacroHead,MResult,FResult,FunctionHead),
+
+ 
 
  CompileBody = (
    DocCode,
@@ -107,7 +107,7 @@ compile_macro(Ctx,CallEnv,Macro,[Name0,FormalParms|FunctionBody0], CompileBody):
    asserta(user:macro_lambda(defmacro(Name0),Macro, FormalParms, [progn | FunctionBody],Alphas)),
    asserta((user:FunctionHead  :- (BodyCode, 
        cl_eval(MResult,FResult)))),
-   nop((user:RNewMacroHead  :- BodyCode)),
+   % nop((user:RNewMacroHead  :- BodyCode)),
    set_opv(Macro,classof,claz_macro),
    set_opv(Symbol,compile_as,kw_operator),
    set_opv(Symbol,function,Macro)).

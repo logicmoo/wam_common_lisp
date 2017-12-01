@@ -30,7 +30,13 @@ reader_intern_symbols(ExprS1,Expr):-
 reader_intern_symbols(_,Var,Var):- (var(Var);Var==[]),!.
 reader_intern_symbols(Package,SymbolName,Symbol):-
    atom(SymbolName),atom_symbol(SymbolName,Package,Symbol),!.
+
+
 reader_intern_symbols(_Package,Some,Some):- \+ compound(Some),!.
+reader_intern_symbols(_,I,I):- is_comment(I,_),!.
+reader_intern_symbols(_Package,'$NUMBER'(X,Y),'$NUMBER'(X,Y)):-!.
+reader_intern_symbols(_Package,'$COMPLEX'(X,Y),'$COMPLEX'(X,Y)):-!.
+reader_intern_symbols(_Package,'$CHAR'(X),'$CHAR'(X)):-!.
 
 reader_intern_symbols(P,I,O):- resolve_reader_macros(I,M)->I\==M,!,reader_intern_symbols(P,M,O).
 
@@ -39,9 +45,6 @@ reader_intern_symbols(_,'$OBJ'([Unbound]),'$OBJ'(unbound,[])):- Unbound = unboun
 % #'symbol
 reader_intern_symbols(_,'$OBJ'(Function,F),function(F)):- Function==function,!.
 reader_intern_symbols(Package,'$OBJ'(Expr),'$OBJ'(ExprO)):-!,reader_intern_symbols(Package,(Expr),(ExprO)).
-reader_intern_symbols(_Package,'$NUMBER'(X,Y),'$NUMBER'(X,Y)):-!.
-reader_intern_symbols(_Package,'$COMPLEX'(X,Y),'$COMPLEX'(X,Y)):-!.
-reader_intern_symbols(_Package,'$CHAR'(X),'$CHAR'(X)):-!.
 
 reader_intern_symbols(Package,ExprI,ExprO):- ExprI=..[F,C,D|Expr],F=='$ARRAY',  
   ((find_or_create_class(D,K),atom(K));reader_intern_symbols(Package,C,K)),

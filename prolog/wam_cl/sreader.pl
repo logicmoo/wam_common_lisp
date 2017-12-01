@@ -392,10 +392,10 @@ sexpr((Txt))                 --> `#|`, lazy_list_location(file(_,_,I,CP)),
   {assert(t_l:s_reader_info('$COMMENT'(Txt,I,CP)))},
   sexpr((Txt)).
 */
-sexpr('\''(E))              --> `'`, !, swhite, sexpr(E).
-sexpr('$BQ'(E))         --> [96] , !, swhite, sexpr(E).
+sexpr([quote,E])              --> `'`, !, swhite, sexpr(E).
+sexpr(['$BQ',E])         --> [96] , !, swhite, sexpr(E).
 sexpr('$BQ-COMMA-ELIPSE'(E)) --> `,@`, !, swhite, sexpr(E).
-sexpr('$COMMA'(E))            --> `,`, !, swhite, sexpr(E).
+sexpr(['$COMMA',E])            --> `,`, !, swhite, sexpr(E).
 sexpr('$OBJ'(claz_bracket_vector,V))                 --> `[`, sexpr_vector(V,`]`),!, swhite.
 sexpr(/*#*/(A))              --> `|`, !, read_string_until(S,`|`), swhite,{maybe_notrace(atom_string(A,S))}.
 
@@ -699,9 +699,11 @@ to_number(S,N):- text_to_string_safe(S,Str),number_string(N,Str),!.
 
 is_characterp(O):- nonvar(O),O='$CHAR'(_).
 make_character(S,'$CHAR'(S)):- var(S),!.
-make_character(S,C):- atom(S),name(S,[N]),!,make_character(N,C).
-make_character(N,'$CHAR'(S)):- integer(N),(char_type(N,alnum)->name(S,[N]);S=N),!.
 make_character('$CHAR'(S),C):- !, make_character(S,C).
+make_character(S,'$CHAR'(Char)):- number(S), S < 4096,char_code(Char,S).
+make_character(S,'$CHAR'(S)):- atom(S),name(S,[_]),!.
+make_character(S,'$CHAR'(S)):- atom(S),char_code(S,_),!.
+make_character(N,'$CHAR'(S)):- integer(N),(char_type(N,alnum)->name(S,[N]);S=N),!.
 make_character(N,C):- text_to_string_safe(N,Str),char_code_from_name(Str,Code),make_character(Code,C),!.
 make_character(C,'$CHAR'(C)).
 

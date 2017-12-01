@@ -58,9 +58,9 @@ cl_adjustable_array_p(Obj,RetVal):-
 
 % wl:type_checked(cl_subseq(sequence(T,E),number,sequence(T,E))).
 cl_subseq(Seq,Offset,Result):- 
-  wl:coercion(Seq, sequence(T,E), Mid),
-  pl_subseq(Mid,Offset,MOut),
-  wl:coercion(MOut, sequence(T,E),Result).
+  always(coerce_to(Seq, sequence(Was,Info), Mid)),
+  always(pl_subseq(Mid,Offset,MOut)),
+  always(coerce_to(MOut, object(Was,Info),Result)).
 
 pl_subseq([], _Skip, []).
 pl_subseq([Head|Tail], Skip, [Head|Cmpl]) :- Skip<1,!,
