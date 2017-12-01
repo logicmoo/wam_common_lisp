@@ -76,6 +76,7 @@ in_comment(X):- notrace((write('/* '),(X),writeln(' */'))).
 
 
 dbmsg0(Var):- var(Var),!,in_comment(colormsg1(dbmsg_var(Var))).
+dbmsg0(StringL):- to_prolog_string_if_needed(StringL,String),!,dbmsg0(String).
 dbmsg0(Str):- string(Str),!,in_comment(colormsg1(Str,[])).
 dbmsg0(:- asserta(A)):- !, colormsg1(A).
 dbmsg0(:- assert(A)):- !, colormsg1(A).

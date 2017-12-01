@@ -141,6 +141,9 @@ lisp_add_history(Expression):- atom(Expression),!,
         prolog:history(user_input, add(Expression)).
 lisp_add_history(Expression):- string(Expression),!,
         prolog:history(user_input, add(Expression)).
+lisp_add_history(Expression):- is_stringp(Expression),!,
+       to_prolog_string(Expression,ExpressionS),
+        prolog:history(user_input, add(ExpressionS)).
 lisp_add_history(Expression):-
         with_output_to(string(S),writeExpression(Expression)),
         (string_upper(S,S)->string_lower(S,Store);Store=S),

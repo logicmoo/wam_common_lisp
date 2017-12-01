@@ -56,7 +56,7 @@ call_proc(Pred1,O):- call(Pred1,O),with_rest_info(Pred1).
 
 with_rest_info(Pred1):- forall(retract(t_l:s_reader_info(O2)),must_det(call(Pred1,O2))).
 
-parse_sexpr_untyped(I,O):- parse_sexpr(I,M),to_untyped(M,O),!.
+parse_sexpr_untyped(I,O):- parse_sexpr(I,M),quietly(to_untyped(M,O)),!.
 
 read_pending_whitespace(In):- repeat, peek_char(In,Code),
    (( \+ char_type(Code,space), \+ char_type(Code,white))-> ! ; (get_char(In,_),fail)).
@@ -650,8 +650,9 @@ to_untyped('\''(I),quote(O)):-!,to_untyped(I,O),!.
 
 to_untyped('#-'(C,I),'#-'(K,O)):- as_keyword(C,K),!,to_untyped(I,O),!.
 to_untyped('#+'(C,I),'#+'(K,O)):- as_keyword(C,K),!,to_untyped(I,O),!.
-to_untyped('$STRING'(Expr),LispO):- !, text_to_string_safe(Expr,Text),!,to_lisp_string(Text,LispO).
-to_untyped(Text,LispO):- is_stringp(Text),!,to_lisp_string(Text,LispO).
+to_untyped('$STRING'(Expr),LispO):- !, text_to_string_safe(Expr,Text),!,notrace(to_lisp_string(Text,LispO)).
+to_untyped(Text,LispO):- string(Text),LispO=Text,!.
+%to_untyped(Text,LispO):- is_stringp(Text),!,to_lisp_string(Text,LispO).
 to_untyped(S,S):- missed_untyped(string(S)).
 to_untyped('$CHAR'(S),C):- make_character(S,C),!.
 to_untyped('#\\'(S),C):-!,to_untyped('$CHAR'(S),C),!.
@@ -698,14 +699,15 @@ to_number(S,S):-number(S),!.
 to_number(S,N):- text_to_string_safe(S,Str),number_string(N,Str),!.
 
 is_characterp(O):- nonvar(O),O='$CHAR'(_).
-make_character(S,'$CHAR'(S)):- var(S),!.
-make_character('$CHAR'(S),C):- !, make_character(S,C).
-make_character(S,'$CHAR'(Char)):- number(S), S < 4096,char_code(Char,S).
-make_character(S,'$CHAR'(S)):- atom(S),name(S,[_]),!.
-make_character(S,'$CHAR'(S)):- atom(S),char_code(S,_),!.
-make_character(N,'$CHAR'(S)):- integer(N),(char_type(N,alnum)->name(S,[N]);S=N),!.
-make_character(N,C):- text_to_string_safe(N,Str),char_code_from_name(Str,Code),make_character(Code,C),!.
-make_character(C,'$CHAR'(C)).
+make_character(I,O):-notrace(make_character0(I,O)).
+make_character0(S,'$CHAR'(S)):- var(S),!.
+make_character0('$CHAR'(S),C):- !, make_character0(S,C).
+make_character0(S,'$CHAR'(Char)):- number(S), S < 4096,char_code(Char,S).
+make_character0(S,'$CHAR'(S)):- atom(S),name(S,[_]),!.
+make_character0(S,'$CHAR'(S)):- atom(S),char_code(S,_),!.
+make_character0(N,'$CHAR'(S)):- integer(N),(char_type(N,alnum)->name(S,[N]);S=N),!.
+make_character0(N,C):- text_to_string_safe(N,Str),char_code_from_name(Str,Code),make_character0(Code,C),!.
+make_character0(C,'$CHAR'(C)).
 
 char_code_from_name(Str,Code):-find_from_name(Str,Code),!.
 char_code_from_name(Str,Code):-text_upper(Str,StrU),find_from_name2(StrU,Code).
@@ -915,7 +917,7 @@ lisp_read_from_stream(Input,Forms):-
 %
 lisp_read(Input,Forms):- 
     lisp_read_typed(Input, Forms0),!,
-    must(to_untyped(Forms0,Forms)).
+    quietly(must(to_untyped(Forms0,Forms))).
 
 
 
@@ -1285,7 +1287,7 @@ input_to_forms_debug(String,Decoder):-input_to_forms(String,Wff,Vs),
 %
 input_to_forms(Codes,FormsOut,Vars):- 
   b_setval('$variable_names',[])-> 
-  input_to_forms0(Codes,FormsOut,Vars) ->
+  quietly(input_to_forms0(Codes,FormsOut,Vars)) ->
   nop(set_variable_names_safe(Vars)).
   
 is_variable_names_safe(Vars):- var(Vars),!.

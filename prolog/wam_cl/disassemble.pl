@@ -17,6 +17,7 @@
 
 cl_disassemble(function(Symbol), Code):- !, cl_disassemble((Symbol), Code).
 cl_disassemble(Obj, Code):- get_opv(Obj,function,Obj2),!,cl_disassemble(Obj2, Code).
+cl_disassemble(StringL,Code):- to_prolog_string_if_needed(StringL,String),!,cl_disassemble(String,Code).
 cl_disassemble(Function, Code):- string(Function),downcase_atom(Function,DC),!,cl_disassemble(DC, Code).
 cl_disassemble(Function, Code):- 
   writeln('#| DISASSEMBLY FOR':Function),

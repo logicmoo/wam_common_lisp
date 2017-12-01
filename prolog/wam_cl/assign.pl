@@ -82,8 +82,8 @@ compile_assigns(Ctx,Env,Result,[Getf, Var| ValuesForms], Body):- is_place_op(Get
         (Var\==RVar -> rw_add(Ctx,RVar,r) ; (is_only_read_op(Getf)->rw_add(Ctx,RVar,r);rw_add(Ctx,RVar,w))),
         Body = (BodyS,Code,place_op(Env,Getf, UsedVar, ResultVs,Result)).
 
-compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, String], (Code,Body)):- 
-        string(String),is_def_maybe_docs(SetQ),
+compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, StringL], (Code,Body)):- 
+        is_stringp(StringL),to_prolog_string(StringL,String),is_def_maybe_docs(SetQ),
         Code = asserta(doc:doc_string(Var,_Package,variable,String)),
 	!, compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm], Body).
 

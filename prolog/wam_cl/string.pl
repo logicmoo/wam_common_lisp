@@ -33,7 +33,7 @@ cl_stringp(A, R):- t_or_nil(is_stringp(A),R).
 cl_string(O,S):- to_prolog_string(O,PLS),to_lisp_string(PLS,S).
 
 to_prolog_string(SS,SS):- string(SS),!.
-to_prolog_string(S,SN):- is_symbolp(S),!,pl_symbol_name(S,SN).
+to_prolog_string(S,SN):- is_symbolp(S),!,pl_symbol_name(S,S2),to_prolog_string(S2,SN).
 to_prolog_string('$ARRAY'([_N],claz_base_character,List),SS):- !,always((maplist(to_prolog_codes,List,Codes),text_to_string(Codes,SS))).
 to_prolog_string('$ARRAY'(_,_,List),SS):- !,always((maplist(to_prolog_codes,List,Codes),text_to_string(Codes,SS))).
 % grabs ugly objects

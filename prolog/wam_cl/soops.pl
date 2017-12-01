@@ -156,6 +156,9 @@ find_class(Name,Claz):-
 cl_find_class(Name,Claz):- always(is_symbolp(Name)),once((find_class(Name,Claz),claz_to_symbol(Claz,Symbol),Name==Symbol)).
 cl_find_class(_,[]).
   
+
+cl_slot_exists_p(Obj,Slot,Value):- t_or_nil(get_opv(Obj,Slot,_),Value).
+
 cl_slot_value(Obj,Slot,Value):- always(get_opv(Obj,Slot,Value)).
 
 cl_defstruct(Name,[[Name,KeyWords]|Slots]):- !, always(define_struct(Name,KeyWords,Slots,_Kind)).
