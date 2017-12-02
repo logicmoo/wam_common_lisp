@@ -237,12 +237,12 @@ cl_load(File,t):-
 
 lisp_reader_compiled_eval(Forms):- reader_intern_symbols(Forms,FForms),lisp_compiled_eval(FForms).
 
-lisp_grovel_in_package(Form):-!,writeq(Form).
+lisp_grovel_in_package(Form):- shrink_lisp_strings(Form,Form1),wdmsg(lisp_grovel_in_package:-Form1),nl,fail.
 lisp_grovel_in_package(Form):-
   always((reader_intern_symbols(Form,FForm),
   lisp_grovel(FForm))).
 
-lisp_grovel(Form):- shrink_lisp_strings(Form,Form1),wdmsg(Form1),nl,nl,fail.
+lisp_grovel(Form):- shrink_lisp_strings(Form,Form1),wdmsg(lisp_grovel:-Form1),nl,fail.
 lisp_grovel([load,File|_]):- !, cl_grovel_file(File, _Load_Ret).
 lisp_grovel(['compile-file',File|_]):- !, cl_grovel_file(File, _Load_Ret).
 lisp_grovel(['in-package',Package|_]):- !, cl_in_package(Package, _Load_Ret).
