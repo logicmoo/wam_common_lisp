@@ -255,5 +255,80 @@ lw:- cl_load("wam-cl-params",_).
 
 :- fixup_exports.
 
+:- cddd.
 
+end_of_file.
+
+
+
+ X = "
+(defmacro yfor  (variable what-to-do &rest llist)
+  (let ((iteration-variable (gensym))
+          (iteration-expression (gensym))
+          stepping-variable)
+    `(let ((,iteration-variable nil)
+           (,iteration-expression nil) )
+       ,(record-in-loop-alist `(,variable ,iteration-variable) 'iteration-variable)
+       #|
+        #+ignore
+           (format t \"~% yfor variable is: ~a ~% and it is ~a to in\"
+                       (intern (symbol-name what-to-do))
+                (eq 'in 
+                 (intern (symbol-name what-to-do))))
+                  |#
+       ,(case (intern (symbol-name what-to-do))
+          (in
+            (record-in-loop-alist `(endp ,iteration-expression) 'end-test
+             )
+            (add-elements-to-clause 'next
+            `(setf ,iteration-variable (car ,iteration-expression))
+            `(setf ,iteration-expression (cdr ,iteration-expression)))
+            (add-elements-to-clause 'initializations
+                                    `(,iteration-variable  ;(car ,@llist))
+                                                           (car ,iteration-expression))
+                                    `(,iteration-expression  ,@llist))
+            )   
+          (on
+            (record-in-loop-alist iteration-expression 'iteration-control-variable
+             )
+            (record-in-loop-alist `(endp ,iteration-expression) 'end-test
+             )
+            (add-elements-to-clause 'next
+                             `(setf ,iteration-variable ,iteration-expression)
+                             `(setf ,iteration-expression (cdr ,iteration-expression)))
+            ; note that since you are in a let*, don't eval the expression twice, use
+            ; the variable that it will be bound to
+            (add-elements-to-clause 'initializations
+                             `(,iteration-variable  (car ,iteration-expression))
+                            `(,iteration-expression ,@llist)))
+          (from     
+            (if (null (fifth llist)) (setf stepping-variable 1)
+                  (setf stepping-variable (fifth llist)))
+            (cond
+              ((> (length llist) 5) 
+                (lerror \"YL:Too many clauses in (yfor ~a ~a ..)\" variable
+                                       what-to-do))
+              ((and (minusp stepping-variable)(<= (first llist) (third llist)))
+               (lerror \"YL:Cannot decrement from ~a to ~a\" 
+                        (first llist) (third llist)))
+              (t 
+               (add-element-to-loop-alist `(,iteration-variable ,(first llist))
+                                          'initializations
+                )
+               (add-element-to-loop-alist `(setf ,iteration-variable
+                                            (+ ,iteration-variable ,stepping-variable)) 'next
+                )
+               (if (minusp stepping-variable )
+                   (add-element-to-loop-alist `(< ,iteration-variable ,(third llist))
+                                              'end-test 
+                    )
+                   (add-element-to-loop-alist `(> ,iteration-variable ,(third llist))
+                                              'end-test
+                    )))))
+       ))) t)
+
+       ",
+    parse_sexpr(X,Out),
+    wdmsg(parse_sexpr(X,Out)).
+    
 

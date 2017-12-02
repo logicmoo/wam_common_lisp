@@ -37,12 +37,12 @@ feature_member0([kw_and|X],Features):- \+ ( member(E,X), \+ feature_member0(E,Fe
 
 
 % #+
-resolve_1inline([OP,Flag,Form], Code):- nonvar(OP), same_symbol(OP,'#+'),nonvar(Flag),!, 
+resolve_1inline([OP,Flag,Form], Code):- atomic(OP), same_symbol(OP,'#+'),nonvar(Flag),!, 
    always(( symbol_value(xx_features_xx,FEATURES),
      (feature_member(Flag,FEATURES) -> Code = Form ; Code = '$COMMENT'(flag_removed(+Flag,Form))))).
    
 % #-
-resolve_1inline([OP,Flag,Form], Code):- nonvar(OP), same_symbol(OP,'#-'),nonvar(Flag),!,
+resolve_1inline([OP,Flag,Form], Code):- atomic(OP), same_symbol(OP,'#-'),nonvar(Flag),!,
    always(( symbol_value(xx_features_xx,FEATURES),
      (\+ feature_member(Flag,FEATURES) -> Code = Form ; Code = '$COMMENT'(flag_removed(+Flag,Form))))).
 

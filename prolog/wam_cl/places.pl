@@ -35,6 +35,10 @@ place_op(Env, Oper, Obj, Value,  Result):-
   always(to_place(Obj,RObj,Place)),!,
     always(place_op(Env, Oper, RObj, Place, Value,  Result)).
 
+listify(L,L):-L==[],!.
+listify([H|T],[H|T]):-!.
+listify(H,[H]).
+
 
 place_op(Env,getf,Obj,Place,[Value],Value):-!,get_place_value(Env, Obj, Place, Value).
 place_op(Env,setf,Obj,Place, [Value], Value):-!,set_place_value(Env, Obj, Place, Value).
@@ -49,13 +53,32 @@ place_op(Env,decf, Obj, Place, LV,  Result):- value_or(LV,Value,1),!,
    Result is Old+ Value,
    set_place_value(Env, Obj, Place, Result).
 
+place_op(Env,pop, Obj, Place, [],  Result):- 
+   get_place_value(Env, Obj, Place, Old),
+   listify(Old,OldL),
+   (OldL = [Result|New]-> true ; (Old=[],New=[],Result=[])),
+   set_place_value(Env, Obj, Place, New).
+
+place_op(Env,pushnew, Obj, Place, LV,  Result):- value_or(LV,Value,[]),!,
+   get_place_value(Env, Obj, Place, Old),
+   listify(Old,OldL),
+   Result = [Value|OldL],
+   set_place_value(Env, Obj, Place, Result).
+
+place_extract([Value,Place],[Value],Place).
+place_extract([Place],[],Place).
+place_extract([Value|Place],Value,Place).
 
  
 get_place_value(Env, Obj, value, Value):- atom(Obj),!,get_symbol_value(Env,Obj,Value).
 get_place_value(_Env, Obj, Place, Value):- get_opv(Obj, Place, Value).
+get_place_value(_,[H|_],car,H).
+get_place_value(_,[_|T],cdr,T).
 
 set_place_value(Env, Obj, value, Value):- atom(Obj),!,set_symbol_value(Env,Obj,Value).
 set_place_value(_Env, Obj, Place, Value):- set_opv(Obj, Place, Value).
+set_place_value(_,Cons,car,H):- cl_rplaca(Cons,H,_).
+set_place_value(_,Cons,cdr,T):- cl_rplacd(Cons,T,_).
 
 
 %with_place_value(Env,OPR,Obj,Place, Value):-!, type_or_class_nameof(Obj,Type),with_place_value(Env,OPR,Obj,Type,Place,Value).

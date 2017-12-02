@@ -144,9 +144,9 @@ find_or_create_class(Name,Kind):-
    %to_prolog_string(Name,SName),
    new_named_opv(claz_structure_object,Name,[],Kind),!.
 
-find_class(Name,Claz):- atom(Name),atom_concat_or_rtrace('claz_',_,Name),!,Claz=Name.
 find_class(Name,Claz):-
   get_struct_opv(Claz,symbolname,Name),!.
+find_class(Name,Claz):- atom(Name),atom_concat_or_rtrace('claz_',_,Name),!,Claz=Name.
 %find_class(Name,Claz):- get_struct_opv(Claz,name,Name),!.
 find_class(Name,Claz):-
   to_prolog_string(Name,StringC)->string_upper(StringC,NameS),
@@ -458,6 +458,7 @@ add_opv_i(Obj,Prop,Value):-  add_opv_new(Obj,Prop,Value).
 
 % add_opv_pred(MPred,Obj,Key,Value):- strip_module(MPred,M,Pred),Assertion=.. [Pred,Obj,Key,Value], ( \+ M:Assertion -> assert(M:Assertion) ; true).
 
+add_opv_new(Obj,Prop,V):- to_prolog_string_if_needed(V,V0),!,show_call_trace(add_opv_new(Obj,Prop,V0)).
 add_opv_new(Obj,Prop,V):-
    always(\+ is_list(Obj)),
    get_obj_pred(Obj,Prop,Pred),

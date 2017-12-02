@@ -49,6 +49,7 @@ cl_defpackage(Name,P1,R):- do_defpackage(Name,[P1],R).
 cl_defpackage(Name,R):- do_defpackage(Name,[],R).
 
 
+do_defpackage(L,B,T):- to_prolog_string_if_needed(L,Loc),!,do_defpackage(Loc,B,T).
 do_defpackage(AName,List,Package):-
   atom_string(AName,Name),  
   atom_concat_or_rtrace(pkg_,Name,Down),prologcase_name(Down,Package),
@@ -70,7 +71,9 @@ find_package(S,Package):-
   as_string_upper(S,SN),
   (package_name(Package,SN) ; get_opv_i(Package,nicknames,SN)),!.
 
-find_package_or_die(X,Y):- find_package(X,Y) -> true ; throw(find_package_or_die(X,Y)).  
+find_package_or_die(L,T):- to_prolog_string_if_needed(L,Loc),!,find_package_or_die(Loc,T).
+find_package_or_die(X,Y):-
+ find_package(X,Y) -> true ; throw(find_package_or_die(X,Y)).  
 
 as_package_object(Package,'$OBJ'(claz_package,Package)).
 
@@ -99,7 +102,7 @@ cl_import(Symbol,Result):- reading_package(Package),cl_import(Symbol,Package,Res
 cl_import(List,Pack,t):- is_list(List),maplist([Symbol]>>cl_import(Symbol,Pack,_),List).
 cl_import(Symbol,Pack,t):- 
    find_package_or_die(Pack,Package),
-   cl_symbol_name(Symbol,String),
+   pl_symbol_name(Symbol,String),
    package_find_symbol_or_missing(String,Package,OldSymbol,IntExt),!,
    package_import_symbol_step2(Package,Symbol,String,OldSymbol,IntExt).
 
@@ -124,7 +127,7 @@ cl_export(Symbol,Result):- reading_package(Package),cl_export(Symbol,Package,Res
 cl_export(List,Pack,t):- is_list(List),maplist([Symbol]>>cl_export(Symbol,Pack,_),List).
 cl_export(Symbol,Pack,t):- 
    find_package_or_die(Pack,Package),
-   cl_symbol_name(Symbol,String),
+   pl_symbol_name(Symbol,String),
    package_find_symbol_or_missing(String,Package,OldSymbol,IntExt),!,
    package_export_symbol_step2(Package,Symbol,String,OldSymbol,IntExt).
 
@@ -148,7 +151,7 @@ cl_unexport(Symbol,Result):- reading_package(Package),cl_unexport(Symbol,Package
 cl_unexport(List,Pack,t):- is_list(List),maplist([Symbol]>>cl_unexport(Symbol,Pack,_),List).
 cl_unexport(Symbol,Pack,t):- 
    find_package_or_die(Pack,Package),
-   cl_symbol_name(Symbol,String),
+   pl_symbol_name(Symbol,String),
    package_find_symbol_or_missing(String,Package,OldSymbol,IntExt),!,
    package_unexport_symbol_step2(Package,Symbol,String,OldSymbol,IntExt).
 
@@ -164,7 +167,7 @@ cl_shadow(Symbol,Result):- reading_package(Package),cl_shadow(Symbol,Package,Res
 cl_shadow(List,Pack,t):- is_list(List),maplist([Symbol]>>cl_shadow(Symbol,Pack,_),List).
 cl_shadow(Symbol,Pack,t):- 
    find_package_or_die(Pack,Package),
-   cl_symbol_name(Symbol,String),
+   pl_symbol_name(Symbol,String),
    package_find_symbol_or_missing(String,Package,OldSymbol,IntExt),!,
    package_shadow_symbol_step2(Package,String,OldSymbol,IntExt).
 

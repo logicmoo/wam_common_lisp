@@ -3556,6 +3556,8 @@ struct_opv(claz_jar_stream,type,integer,zlot_jar_stream_bytes_per_unit).
 struct_opv(claz_jar_stream,type,pathname,zlot_jar_stream_pathname).
 struct_opv(claz_jar_stream,type,prolog_input_stream,zlot_jar_stream_input).
 struct_opv(claz_jar_stream,type,prolog_reader,zlot_jar_stream_reader).
+struct_opv(claz_keyword,symbolname,keyword).
+struct_opv(claz_keyword,include,claz_symbol).
 struct_opv(claz_lambda_list_unavailable,include,claz_debug_debug_condition).
 struct_opv(claz_lambda_list_unavailable,super_priority,[claz_debug_debug_condition,claz_serious_condition,claz_condition,claz_sys_slot_object,claz_t]).
 struct_opv(claz_lexenv,name,"HANDLED-CONDITIONS",zlot_lexenv_handled_conditions).

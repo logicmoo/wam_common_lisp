@@ -24,9 +24,11 @@ i_class(function(OP),Class):- get_opv(OP,function,Obj),cl_class_of(Obj,Class).
 i_class([_|_],claz_cons):-!.
 i_class('$OBJ'(Type,_Data),Type).
 i_class('$CHAR'(_),claz_character).
+i_class('$COMPLEX'(_,_),claz_complex).
+i_class('$NUMBER'(Type,_),Type).
 % atomics
 i_class([],claz_null):-!.
-i_class(Str,claz_string):- string(Str).
+i_class(Str,claz_string):- is_stringp(Str).
 i_class(t,claz_symbol).
 i_class(Dict,Type):- is_dict(Dict,Type).
 i_class(Number,claz_integer):- integer(Number).
@@ -42,7 +44,7 @@ i_type([_|_],cons):-!.
 i_type(Obj,Type):- get_opv_i(Obj,typeof,Type).
 i_type(Obj,Type):- get_opv_i(Obj,classof,Class),claz_to_symbol(Class,Type).
 i_type(Dict,Type):- is_dict(Dict,Type).
-i_type(Str,string):- string(Str).
+i_type(Str,string):- is_stringp(Str).
 i_type(t,boolean).
 i_type('$CHAR'(_),character).
 i_type(Obj,Type):- number(Obj),!,number_type_of(Obj,Type).
@@ -61,10 +63,11 @@ type_named('$OBJ'(_,Type),Type):- atom(Type),!.
 type_named(Type,Type):- atomic(Type).
 
 
-cl_typep(Obj,Type,Result):- t_or_nil(is_typep(Obj,Type),Result).
+cl_typep(Obj,Type,Result):- t_or_nil(is_typep(Obj,Type),Result),push_values([Result,t],_).
 
 is_subtypep(SubType,Type):- find_class(SubType,SubClass),find_class(Type,Class),is_subclass(SubClass,Class).
-is_subclass(SubClass,Class):- get_struct_opv(SubClass,instance,Class);get_struct_opv(SubClass,super_priority,Classes),memberchk(Class,Classes).
+is_subclass(Class,Class).
+is_subclass(SubClass,Class):- get_struct_opv(SubClass,include,Class);(get_struct_opv(SubClass,super_priority,Classes),memberchk(Class,Classes)).
 is_typep(Obj,Type):- i_type(Obj,SubType),is_subtypep(SubType,Type),!.
 
 cl_type_of(O,T):- i_type(O,T),!.

@@ -26,31 +26,44 @@ as_string_upper(S,U):- to_prolog_string(S,D),string_upper(D,U).
 
 to_prolog_string_if_needed(L,Loc):- \+ atomic(L),is_stringp(L),!,to_prolog_string(L,Loc).
 
+is_characterp(X):-var(X),!,fail.
+is_characterp('$CHAR'(V)):- nonvar(V).
+
+is_stringp(X):-var(X),!,fail.
 is_stringp(X):- string(X).
 is_stringp('$ARRAY'([_N],claz_base_character,List)):- nonvar(List).
+
 cl_stringp(A, R):- t_or_nil(is_stringp(A),R).
 
 cl_string(O,S):- to_prolog_string(O,PLS),to_lisp_string(PLS,S).
 
-to_prolog_string(SS,SS):- string(SS),!.
+to_prolog_string(SS,SS):- notrace(var(SS)),!,break.
+to_prolog_string(SS,SS):- notrace(string(SS)),!.
+to_prolog_string('$ARRAY'([_N],claz_base_character,List),SS):- !,always(lisp_chars_to_pl_string(List,SS)).
+%to_prolog_string('$ARRAY'(_,_,List),SS):-  !,lisp_chars_to_pl_string(List,SS).
 to_prolog_string(S,SN):- is_symbolp(S),!,pl_symbol_name(S,S2),to_prolog_string(S2,SN).
-to_prolog_string('$ARRAY'([_N],claz_base_character,List),SS):- !,always((maplist(to_prolog_codes,List,Codes),text_to_string(Codes,SS))).
-to_prolog_string('$ARRAY'(_,_,List),SS):- !,always((maplist(to_prolog_codes,List,Codes),text_to_string(Codes,SS))).
-% grabs ugly objects
-to_prolog_string(S,SN):- atom_concat_or_rtrace(':',S0,S),!,to_prolog_string(S0,SN).% TODO add a warjing that hte keyword was somehow misrepresented
-to_prolog_string(S,SN):- atom_concat_or_rtrace('kw_',S0,S),!,to_prolog_string(S0,SN). % TODO add a warjing that hte keyword was somehow missing
-to_prolog_string(S,SN):- notrace(catch(text_to_string(S,SN),_,fail)),!.
+to_prolog_string('$CHAR'(Code),Char):- !, (\+ number(Code)->Char=Code;char_code(Char,Code)).
 
-to_prolog_codes('$CHAR'(Code),Char):- !, (\+ number(Code)->Char=Code;char_code(Char,Code)).
-to_prolog_codes((Code),Char):- (\+ number(Code)->Char=Code;char_code(Char,Code)).
+
+
+% grabs ugly objects
+%to_prolog_string(S,SN):- atom_concat_or_rtrace(':',S0,S),!,to_prolog_string(S0,SN).% TODO add a warjing that hte keyword was somehow misrepresented
+%to_prolog_string(S,SN):- atom_concat_or_rtrace('kw_',S0,S),!,to_prolog_string(S0,SN). % TODO add a warjing that hte keyword was somehow missing
+%to_prolog_string(S,SN):- notrace(catch(text_to_string(S,SN),_,fail)),!.
 
 to_lisp_string('$ARRAY'([N],claz_base_character,List),'$ARRAY'([N],claz_base_character,List)):-!.
 to_lisp_string(Str,'$ARRAY'([*],claz_base_character,List)):- atom_chars(Str,Chars),maplist(make_character,Chars,List).
+
+to_prolog_codes('$CHAR'(Code),Char):- !, (\+ number(Code)->Char=Code;char_code(Char,Code)).
+to_prolog_codes(Code,Char):- (\+ number(Code)->Char=Code;char_code(Char,Code)).
+
 
 
 % SHARED SECTION
 :- multifile(wl:coercion/3).
 wl:coercion(In, prolog_string, Out):- to_prolog_string(In,Out).
+wl:coercion(In, claz_string, Out):- cl_string(In,Out).
+wl:coercion(In, claz_character, Out):- make_character(In,Out).
 wl:coercion(In, string, Out):- cl_string(In,Out).
 wl:coercion(In, list, Out):- is_stringp(In),to_lisp_string(In,Out).
 wl:coercion(In, prolog_list, Out):- functor(In,_F,A),arg(A,In,Out),is_list(Out).

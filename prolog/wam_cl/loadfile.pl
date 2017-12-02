@@ -155,6 +155,7 @@ do_compile_1file(_Keys,File0):-
           close(Stream))).
 
 lisp_compile_to_prolog(Stream,Expression):- is_stream(Stream),!,  
+  with_output_to(user_output,lisp_compile_to_prolog(Expression)),
   with_output_to(Stream,lisp_compile_to_prolog(Expression)),!.
 lisp_compile_to_prolog(Package,Expression):-  
   always(locally_let(xx_package_xx=Package,
@@ -218,7 +219,8 @@ lisp_compile_to_prolog_pass3(MP):- write_trans(MP).
 */
 
 
-cl_grovel_file(File,t):- pl_compiled_filename(File,PL),!,wdmsg(ensure_groveled(PL)),ensure_loaded(PL).
+cl_grovel_file(L,T):- to_prolog_string_if_needed(L,Loc),!,cl_grovel_file(Loc,T).
+cl_grovel_file(File,t):- pl_compiled_filename(File,PL),exists_file(PL),!,wdmsg(ensure_groveled(PL)),ensure_loaded(PL).
 cl_grovel_file(File,t):- in_comment(format('~N; Grovel.. ~w~n',[File])),
    locally(local_override(with_forms,lisp_grovel),
     with_each_file(with_each_form(lisp_grovel_in_package),File)).
@@ -227,24 +229,26 @@ cl_load(L,T):- to_prolog_string_if_needed(L,Loc),!,cl_load(Loc,T).
 cl_load('$OBJ'(_Pathname,Loc),T):- string(Loc),!,cl_load(Loc,T).
 cl_load(File,T):-
   local_override(with_forms,lisp_grovel),!,in_comment(format('~N; Grovel.. (LOAD ~w)~n',[File])),cl_grovel_file(File,T),!.
-cl_load(File,t):- pl_compiled_filename(File,PL),!,in_comment(dbmsg(ensure_loaded(PL))),!,ensure_loaded(PL).
+cl_load(File,t):- pl_compiled_filename(File,PL),exists_file(PL),!,in_comment(dbmsg(ensure_loaded(PL))),!,ensure_loaded(PL).
 cl_load(File,t):- 
   cl_grovel_file(File,t),
-  with_each_file(with_each_form(lisp_reader_compiled_eval()),File).
+  with_each_file(with_each_form(lisp_reader_compiled_eval),File).
 
 
 lisp_reader_compiled_eval(Forms):- reader_intern_symbols(Forms,FForms),lisp_compiled_eval(FForms).
 
+lisp_grovel_in_package(Form):-!,writeq(Form).
 lisp_grovel_in_package(Form):-
   always((reader_intern_symbols(Form,FForm),
   lisp_grovel(FForm))).
 
+lisp_grovel(Form):- shrink_lisp_strings(Form,Form1),wdmsg(Form1),nl,nl,fail.
 lisp_grovel([load,File|_]):- !, cl_grovel_file(File, _Load_Ret).
 lisp_grovel(['compile-file',File|_]):- !, cl_grovel_file(File, _Load_Ret).
 lisp_grovel(['in-package',Package|_]):- !, cl_in_package(Package, _Load_Ret).
 lisp_grovel(['use-package',Package|_]):- !, cl_use_package(Package, _Load_Ret).
-
-lisp_grovel(Form):- always(lisp_compile(Form,PrologCode)),!,
+lisp_grovel(Form):-
+  always(lisp_compile(Form,PrologCode)),!,
   always(grovel_prolog_code(PrologCode)),!.
 
 grovel_prolog_code(PrologCode):- \+ compound(PrologCode),!.

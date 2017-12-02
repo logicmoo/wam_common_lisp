@@ -70,7 +70,7 @@ both_outputs(G):-
   (CO\==O -> with_output_to(CO,G) ; true),G)).
 
 
-dbmsg(X):- both_outputs(dbmsg0(X)).
+dbmsg(X):- shrink_lisp_strings(X,X0),both_outputs(dbmsg0(X0)).
 
 in_comment(X):- notrace((write('/* '),(X),writeln(' */'))).
 

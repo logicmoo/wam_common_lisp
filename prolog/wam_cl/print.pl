@@ -25,6 +25,13 @@ trim_full_stop(SPClosure,TSPClosure):-atom_concat_or_rtrace(SPClosureN,' ',SPClo
 trim_full_stop(SPClosure,SPClosureN):-atom_concat_or_rtrace(SPClosureN,'.',SPClosure).
 trim_full_stop(SPClosure,SPClosure).
 
+lisp_chars_to_pl_string(List,SS):- always((maplist(to_prolog_codes,List,Codes),text_to_string(Codes,SS))).
+
+shrink_lisp_strings(Str,PStr):- \+ compound(Str),!,Str=PStr.
+%shrink_lisp_strings(Str,PStr):- is_stringp(Str),!,to_prolog_string(Str,PStr).
+shrink_lisp_strings(Str,PStr):- is_list(Str),maplist(is_characterp,Str),lisp_chars_to_pl_string(Str,PStr),!.
+shrink_lisp_strings(C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(shrink_lisp_strings,C1O,C2O),C2=..[F|C2O].
+
 sexpr1(X) --> {is_ftVar(X),(get_var_name(X,N)->format(atom(NN),'~w',[N]);format(atom(NN),'~w',[X]))},!,[NN].
 sexpr1(Str)--> {is_stringp(Str),to_prolog_string(Str,PStr)},!,[PStr].
 sexpr1([function, Expression]) --> ['#'''], !, sexpr1(Expression).
@@ -42,18 +49,20 @@ sexpr1('$OBJ'(T,X)) --> {T==claz_pathname},['#P'],sexpr1(X).
 sexpr1('$COMPLEX'(R,I)) --> ['#C('],sexpr1(R),sexpr1(I),[')'].
 sexpr1('$RATIO'(R,I)) --> [''],sexpr1(R),['/'],sexpr1(I),[''].
 
-sexpr1('$NUMBER'(d,V)) --> {format_number(O,'d',V)},[O].
-sexpr1('$NUMBER'(l,V)) --> {format_number(O,'L',V)},[O].
-sexpr1('$NUMBER'(s,V)) --> {format_number(O,'s',V)},[O].
+sexpr1('$NUMBER'(claz_double_float,V)) --> {format_number(O,'d',V)},[O].
+sexpr1('$NUMBER'(claz_single_float,V)) --> {format_number(O,'e',V)},[O].
+sexpr1('$NUMBER'(claz_long_float,V)) --> {format_number(O,'L',V)},[O]. % SBCL = claz_double_float
+sexpr1('$NUMBER'(claz_short_float,V)) --> {format_number(O,'s',V)},[O]. % SBCL = claz_single_float
 sexpr1('$NUMBER'(T,V)) --> {format_number(O,T,V)},[O].
 sexpr1('$S'(X)) --> ['#S'],sexpr1(X).
 sexpr1('$OBJ'(T,X)) --> ['#S'],{is_list(X),is_structure_class(T),claz_to_symbol(T,TP)},sexpr1(TP),sexpr1(X).
 sexpr1('$OBJ'(T,X)) --> ['#<'],{claz_to_symbol(T,TP)},!,sexpr1(TP),sexpr1(X),['>'].
 sexpr1('$OBJ'(T,X)) --> ['#<'],!,sexpr1(T),sexpr1(X),['>'].
-sexpr1('$COMMA'(X)) --> [','],sexpr1(X).
+%sexpr1('$COMMA'(X)) --> [','],sexpr1(X).
 
 sexpr1(['$COMMA',X]) --> [','],sexpr1(X).
 sexpr1(['$BQ',X])--> ['`'],sexpr1(X).
+sexpr1(['$BQ-COMMA-ELIPSE',X])--> [',@'],sexpr1(X).
 sexpr1([]) --> !, ['(',')'].
 sexpr1([X|Y]) --> ['('],  sexpr1(X), lisplist(Y,')').
 sexpr1(X) --> {compound(X),compound_name_arguments(X,F,ARGS)}, ['#<'],[F],lisplist(ARGS,'>').
@@ -90,8 +99,11 @@ writeExpression(Expression):-
 	sexpr1(Expression, TokenL, []), !, %	write('  '),
 	writeTokenL(TokenL).
 
-no_right_padding('#').
-no_right_padding('@').
+no_right_padding(')'):-!,fail.
+no_right_padding('#'):-!,fail.
+no_right_padding('#''').
+no_right_padding('#C(').
+no_right_padding('`').
 no_right_padding('#<').
 no_right_padding('#P').
 no_right_padding('#\'').
@@ -99,6 +111,8 @@ no_right_padding('''').
 no_right_padding('#S').
 no_right_padding(',').
 no_right_padding('(').
+no_right_padding(',@').
+
 no_right_padding(S):- atom_concat(_,'(',S).
 no_right_padding(S):- atom_concat('#',_,S).
 %no_right_padding(')').            

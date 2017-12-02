@@ -72,6 +72,14 @@ compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, Atom2| Rest], Body):- is_p
 compile_assigns(Ctx,Env,Result,[Defvar, Var], Body):- is_def_nil(Defvar),!,
   compile_assigns(Ctx,Env,Result,[Defvar, Var , nil],Body).
 
+compile_assigns(Ctx,Env,Result,[Getf|ValuePlace], Body):- is_place_op_verbatum(Getf),     
+        debug_var([Getf,'_R'],Result),
+        debug_var([Getf,'_Env'],Env),
+        place_extract(ValuePlace,Value,Place),
+        extract_var_atom(Place,RVar),
+        (is_only_read_op(Getf)->rw_add(Ctx,RVar,r);rw_add(Ctx,RVar,w)),
+        Body = (place_op(Env,Getf, Place, Value, Result)).
+
 compile_assigns(Ctx,Env,Result,[Getf, Var| ValuesForms], Body):- is_place_op(Getf),     
 	must_maplist(expand_ctx_env_forms(Ctx,Env),ValuesForms, ValuesBody,ResultVs),
         list_to_conjuncts([true|ValuesBody],BodyS),!,
@@ -241,6 +249,9 @@ is_place_op(incf).
 is_place_op(decf).
 is_place_op(rotatef).
 is_place_op(shiftf).
+is_place_op_verbatum(push).
+is_place_op_verbatum(pushnew).
+is_place_op_verbatum(pop).
 
 
 is_parallel_op(psetf).
