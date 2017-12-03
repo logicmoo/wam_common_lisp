@@ -253,6 +253,7 @@ package_use_list(pkg_cl, pkg_clos).
 package_use_list(pkg_user, pkg_cl).
 package_use_list(pkg_user, pkg_ext).
 package_use_list(pkg_user, pkg_java).
+package_use_list(pkg_user, pkg_clos).
 package_use_list(pkg_tl, pkg_cl).
 package_use_list(pkg_tl, pkg_ext).
 package_use_list(pkg_clos, pkg_cl).

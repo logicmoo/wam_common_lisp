@@ -55,6 +55,19 @@
 (is eq 1 (if t 1 2))
 (is eq 2 (if nil 1 2))
 
+(defun fib (n)
+  (if (> n 1)
+    (+ (fib (- n 1))
+       (fib (- n 2)))
+    1))
+
+(disassemble #'fib)
+
+
+(is eql 89 (fib 10))
+
+
+
 (defun accum (r) (if (= 0 r) (list 0) (cons r (accum (- r 1)))))
 
 (disassemble #'accum)
@@ -134,14 +147,6 @@ f_u_fifteen(MResult) :-
 
 (is eq 15 (fifteen))
 
-
-(defun fib (n)
-  (if (> n 1)
-    (+ (fib (- n 1))
-       (fib (- n 2)))
-    1))
-
-(is eql 89 (fib 10))
 
 (is eq 'string_l (DEFUN string_l (x )(COND ((STRINGP x )x )((SYMBOLP x )(symbol-name x ))(T (ERROR "type error" )))))
 

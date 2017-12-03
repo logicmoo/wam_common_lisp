@@ -255,9 +255,10 @@ lw:- cl_load("wam-cl-params",_).
 
 :- fixup_exports.
 
+end_of_file.
+
 :- cddd.
 
-end_of_file.
 
 
 

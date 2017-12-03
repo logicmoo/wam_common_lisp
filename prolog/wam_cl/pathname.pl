@@ -63,11 +63,11 @@ with_fstem(Path,File,Found):-
    found_strem(Path,File,[''|SearchTypes],Found),!.
 
 found_strem(Path0,File0,SearchTypes,Found):- 
-   txt2a(Path0,Path),txt2a(File0,File),    
+   txt2a(Path0,Path),txt2a(File0,File),    !,
    ((absolute_file_name(File,Found,[relative_to(Path),
      extensions(SearchTypes),access(read),file_errors(fail),expand(true),solutions(all)]),exists_file(Found))-> true;
-   absolute_file_name(File,Found,[relative_to(Path),
-     access(read),file_type(directory),file_errors(fail),expand(true),solutions(all)]),exists_directory(Found)).
+   (fail,absolute_file_name(File,Found,[relative_to(Path),
+     access(read),file_type(directory),file_errors(fail),expand(true),solutions(all)]),exists_directory(Found))).
 
 
 

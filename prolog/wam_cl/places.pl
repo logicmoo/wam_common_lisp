@@ -35,9 +35,9 @@ place_op(Env, Oper, Obj, Value,  Result):-
   always(to_place(Obj,RObj,Place)),!,
     always(place_op(Env, Oper, RObj, Place, Value,  Result)).
 
-listify(L,L):-L==[],!.
-listify([H|T],[H|T]):-!.
-listify(H,[H]).
+plistify(L,L):-L==[],!.
+plistify([H|T],[H|T]):-!.
+plistify(H,[H]).
 
 
 place_op(Env,getf,Obj,Place,[Value],Value):-!,get_place_value(Env, Obj, Place, Value).
@@ -55,13 +55,13 @@ place_op(Env,decf, Obj, Place, LV,  Result):- value_or(LV,Value,1),!,
 
 place_op(Env,pop, Obj, Place, [],  Result):- 
    get_place_value(Env, Obj, Place, Old),
-   listify(Old,OldL),
+   plistify(Old,OldL),
    (OldL = [Result|New]-> true ; (Old=[],New=[],Result=[])),
    set_place_value(Env, Obj, Place, New).
 
 place_op(Env,pushnew, Obj, Place, LV,  Result):- value_or(LV,Value,[]),!,
    get_place_value(Env, Obj, Place, Old),
-   listify(Old,OldL),
+   plistify(Old,OldL),
    Result = [Value|OldL],
    set_place_value(Env, Obj, Place, Result).
 

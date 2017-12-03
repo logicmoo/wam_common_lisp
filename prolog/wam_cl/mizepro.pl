@@ -30,7 +30,9 @@ body_cleanup_keep_debug_vars(Ctx,CodeSt,CodeOutNow):-
    fast_get_sets(Ctx,',',Code5a,Code5),
    term_attvars(Code5,AttVars5),maplist(del_attr_rev2(rwstate),AttVars5),   
    body_cleanup_keep_debug_vars1(Ctx,Code5,CodeOut),
-   add_type_checks(Ctx,CodeOut,CodeOutNow))).
+   add_type_checks_maybe(Ctx,CodeOut,CodeOutNow))).
+
+add_type_checks_maybe(_,IO,IO).
 
 
 body_cleanup_keep_debug_vars1(Ctx,Code0,CodeOut):-
