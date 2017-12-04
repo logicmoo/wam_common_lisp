@@ -223,7 +223,7 @@ lisp_grovel(MP):- write_trans(MP).
 */
 
 
-cl_load(L,T):- trace,to_prolog_string_if_needed(L,Loc),!,cl_load(Loc,T).
+cl_load(L,T):- to_prolog_string_if_needed(L,Loc),!,cl_load(Loc,T).
 cl_load('$OBJ'(_Pathname,Loc),T):- !, cl_load(Loc,T).
 cl_load(File,t):- pl_compiled_filename(File,PL),exists_file(PL),!,in_comment(dbmsg(ensure_loaded(PL))),!,ensure_loaded(PL).
 %cl_load(File,R):- cl_compile_file(File,t),!,pl_compiled_filename(File,PL),exists_file(PL),!,in_comment(dbmsg(ensure_loaded(PL))),!,ensure_loaded(PL).

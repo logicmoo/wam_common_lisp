@@ -32,6 +32,7 @@ cl_keywordp(Symbol,TF):-  t_or_nil(is_keywordp(Symbol),TF).
 cl_symbolp(Symbol,TF):-  t_or_nil(is_symbolp(Symbol),TF).
 
 cl_gensym(Symbol):- cl_gensym("G",Symbol).
+cl_gensym(Integer,Symbol):- integer(Integer),!,atom_concat('G',Integer,SymbolName),cl_make_symbol(SymbolName,Symbol).
 cl_gensym(Name,Symbol):- to_prolog_string(Name,String), gensym(String,SymbolName),cl_make_symbol(SymbolName,Symbol).
 
 
@@ -103,7 +104,25 @@ create_keyword(Name,Symbol):- string_upper(Name,String),
 
 
 
+f_u_put(Symbol,Prop,Value):- 
+  assertion(is_symbolp(Symbol)), 
+  cl_symbol_plist(Symbol,PList),
+ (set_plist_value(PList,Prop,Value)->true; set_opv(Symbol,symbol_plist,[Prop,Value|PList])).
 
+%(get x y) ==  (getf (symbol-plist x) y)
+cl_get(Symbol,Prop,Optionals,Value):- assertion(is_symbolp(Symbol)),
+  nth_value(Optionals,1,[],Default),cl_symbol_plist(Symbol,PList),
+  get_plist_value(PList,Prop,Default,Value),!.
+
+get_plist_value([Prop,Value|_],Prop,_Default,Value):-!.
+get_plist_value([_,_|PList],Prop,Default,Value):- !, get_plist_value(PList,Prop,Default,Value).
+get_plist_value([],_Prop,Default,Default).
+
+set_plist_value([Prop|CDR],Prop,Value):- !, nb_setarg(1,CDR,Value).
+set_plist_value([_,_,Next|PList],Prop,Value):- !, set_plist_value([Next|PList],Prop,Value).
+%set_plist_value([Next|PList],Prop,Value):-
+  
+cl_symbol_plist(Symbol,Value):- assertion(is_symbolp(Symbol)),get_opv(Symbol,symbol_plist,Value)->true;Value=[].
 
 
 
@@ -125,17 +144,22 @@ print_symbol_from(Symbol,PrintP,SPackage):-
     print_prefixed_symbol(Name,PrintP,SPackage,kw_internal);
     print_prefixed_symbol(Name,PrintP,SPackage,IntExt)).
 
-print_package_or_hash(Var):- var(Var),!,writeq(Var).
-print_package_or_hash([]):- !,write("#").
-print_package_or_hash(P):- package_name(P,Symbol),shorter_name(Symbol,Short),!,write(Short).
-print_package_or_hash(P):- package_name(P,N),!,write(N).
-print_package_or_hash(P):- trace,writeq(failed_print_package_or_hash(P)).
+short_package_or_hash(Var,O):- var(Var),!,O=(Var).
+short_package_or_hash([],O):- !,O=("#").
+short_package_or_hash(P,O):- pl_package_name(P,Symbol),shorter_name(Symbol,Short),!,O=(Short).
+short_package_or_hash(P,O):- pl_package_name(P,N),!,O=(N).
+short_package_or_hash(P,O):- trace,O=(failed_short_package_or_hash(P)).
 
+print_package_or_hash(P):-short_package_or_hash(P,O),write(O).
+
+pl_package_name(P,PL):-cl_package_name(P,LS),to_prolog_string_anyways(LS,PL).
 
 shorter_name(PN,NN):- package_nicknames(PN,NN),atom_length(PN,B),atom_length(NN,A),A<B.
 shorter_name("SYSTEM","SYS").
 shorter_name("COMMON-LISP","CL").
+%symbol printer might just use 
 shorter_name("COMMON-LISP-USER","U").
+%shorter_name("COMMON-LISP-USER","CL-USER").
 shorter_name("SYSTEM","SYS").
 shorter_name("EXTENSIONS","EXT").
 shorter_name(S,S).

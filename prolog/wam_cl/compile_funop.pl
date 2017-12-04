@@ -21,13 +21,14 @@
 :- discontiguous(compile_funop/5).
 
 % Use a previous DEFMACRO
-
 compile_funop(Ctx,Env,Result,LispCode,CompileBody):-
-  fail, macroexpand_1_or_fail(LispCode,CompileBody0Result),
+  fail, %DISABLED
+  macroexpand_1_or_fail(LispCode,[],CompileBody0Result),
   must_compile_body(Ctx,Env,Result,CompileBody0Result, CompileBody).
 
 
-macroexpand_1_or_fail([Procedure|Arguments],CompileBody0Result):- nonvar(Procedure),
+macroexpand_1_or_fail([Procedure|Arguments],MacroEnv,CompileBody0Result):- nonvar(Procedure),
+   debug_var('MacroEnvArgs',MacroEnv),
    user:macro_lambda(defmacro(Procedure),_FProcedure, FormalParams, LambdaExpression,_),!,
    always((debug_var('EnvThru',EnvThru),debug_var('NewEnv',NewEnv),
    debug_var('Env',Env),debug_var('NextEnv',NextEnv),debug_var('CommaResult',CommaResult),
@@ -43,7 +44,17 @@ macroexpand_1_or_fail([Procedure|Arguments],CompileBody0Result):- nonvar(Procedu
    always(MCBR),
    dbmsg(comment(macroResult(BindCode,Code,CommaResult,CompileBody0Result))))),!.
 
-cl_macroexpand_1(LispCode,Result):- macroexpand_1_or_fail(LispCode,Result)->true;Result=LispCode.
+:- dynamic(wl:uses_rest_only/1).
+:- discontiguous(wl:uses_rest_only/1).
+
+wl:uses_rest_only(cl_macroexpand_1).
+wl:uses_rest_only(cl_macroexpand).
+
+cl_macroexpand_1([LispCode|Optional],Result):- macroexpand_1_or_fail(LispCode,Optional,Result)->true;Result=LispCode.
+cl_macroexpand([LispCode|Optional],Result):-
+  macroexpand_1_or_fail(LispCode,Optional,Mid)->
+    cl_macroexpand([Mid|Optional],Result)
+     ; Result=LispCode.
 
 
 % Operator
@@ -79,14 +90,6 @@ compile_funop(Ctx,CallEnv,Result,[FunctionName | FunctionArgs], Body):- nonvar(F
 % compile_body(Ctx,Env,Result,['funcall',Function|ARGS], Body):- ...
 
 
-
-
-uses_exact(FunctionName,ArgInfo):-  wl:arglist_info(FunctionName,_,_,ArgInfo),!,ArgInfo.complex ==0 .
-
-uses_rest(FunctionName):-  wl:arglist_info(FunctionName,_,_,ArgInfo),!,ArgInfo.complex \==0 .
-uses_rest(FunctionName):- same_symbol(FunctionName,F),wl:declared(F,lambda(['&rest',_])).
-% Non built-in function expands into an explicit function call
-
 find_function_or_macro(Ctx,Env,FunctionName,Args,Result,ExpandedFunction):-
    length(Args,Len0),Len is Len0+1,
    find_function_or_macro_name(Ctx,Env,FunctionName,Len, ProposedName),!,
@@ -103,33 +106,80 @@ find_function_or_macro_name(_Ctx,_Env,FunctionName,_Len, ProposedName):-
       function_case_name(Name,Package,ProposedName);
       function_case_name(FunctionName,Package,ProposedName)).
 
-return_arg_is_first_p(P):- return_arg_is_first(P).
-return_arg_is_first_p(P):- atom_concat_or_rtrace('f_',P,PP), return_arg_is_first(PP).
-return_arg_is_first_p(P):- atom_concat_or_rtrace('f_',PP,P), return_arg_is_first(PP).
+/*
 
-align_args(_FunctionName,ProposedName,Args,Result,[Result,Args]):-
-    return_arg_is_first_p(ProposedName),!.
+exact = ;; takes whatever is supplied
+  append(p1,p2,R)
 
+uses_rest_only_p =  ;; requires param parsing
+  defclass([Arg1|ArgS],R)
+
+exact_and_restkeys =  ;; requires param parsing
+  defclass(r1,r2,[Arg3|ArgS],R)
+
+reversed = ;; simplifes hand coding of complex
+  defclass(R,[Arg1|ArgS])
+
+environmented
+  fun(E),
+
+
+ fun(r1,r2,[op1,opt2|RestAndkeys],R)
+*/
+
+
+uses_exact(FunctionName):-  wl:arglist_info(FunctionName,_,_,ArgInfo),!,ArgInfo.complex ==0 .
+
+exact_and_restkeys(_FunctionName,_Exacts):- fail.
+
+uses_rest_only_p(P):- uses_rest_only0(P),!.
+uses_rest_only_p(P):- atom_concat_or_rtrace('f_',P,PP), uses_rest_only0(PP).
+uses_rest_only_p(P):- atom_concat_or_rtrace('f_',PP,P), uses_rest_only0(PP).
+
+uses_rest_only0(FunctionName):-  wl:arglist_info(FunctionName,_,_,ArgInfo),!,ArgInfo.complex \==0 .
+uses_rest_only0(FunctionName):- same_symbol(FunctionName,F),wl:declared(F,lambda(['&rest',_])),!.
+uses_rest_only0(P):- wl:arg_lambda_type(rest_only,P),!.
+uses_rest_only0(P):- wl:uses_rest_only(P).
+
+% Non built-in function expands into an explicit function call
+
+% invoke(r1,r2,r3,RET).
 align_args(FunctionName,ProposedName,Args,Result,ArgsPlusResult):- 
-   (uses_rest(FunctionName);uses_rest(ProposedName)),
-   append([Args], [Result], ArgsPlusResult).
-
-align_args(FunctionName,ProposedName,Args,Result,ArgsPlusResult):- 
-   (uses_exact(FunctionName,_ArgInfo);uses_exact(ProposedName,_ArgInfo)),
+  (uses_exact(FunctionName);uses_exact(ProposedName)),
    append(Args, [Result], ArgsPlusResult).
 
+% invoke([r1,r2,r3],RET).
+align_args(FunctionName,ProposedName,Args,Result,[Args,Result]):-
+  (uses_rest_only_p(FunctionName);uses_rest_only_p(ProposedName)).
+
+% invoke(r1,r2,[r3],RET).
+align_args(FunctionName,ProposedName,Args,Result,ArgsPlusResult):- 
+  (exact_and_restkeys(FunctionName,N);exact_and_restkeys(ProposedName,N)),
+  length(Left,N),append(Left,Rest,Args),
+  append(Left, [Rest,Result], ArgsPlusResult).
+
+% begin to guess
 align_args(_FunctionName,ProposedName,Args,Result,ArgsPlusResult):- 
    append(Args, [Result], ArgsPlusResult),
    length(ArgsPlusResult,Len),
    functor(G,ProposedName,Len),
    current_predicate(_,G),!.
 
+% guess invoke(r1,RET).
 align_args(_FunctionName,ProposedName,[Arg],Result,[Arg,Result]):- functor(G,ProposedName,2),current_predicate(_,G),!.
 
+% guess invoke([r1,r2,r3],RET).
 align_args(_FunctionName,ProposedName,Args,Result,ArgsPlusResult):- functor(G,ProposedName,2),current_predicate(_,G),!,
-   append([Args], [Result], ArgsPlusResult).
+  append([Args], [Result], ArgsPlusResult).
 
-align_args(_FunctionName,_ProposedName,Args,Result,ArgsPlusResult):- 
+% fallback to invoke([r1,r2,r3],RET).
+align_args(FunctionName, ProposedName,Args,Result,[Args,Result]):-
+  (is_lisp_operator(FunctionName) ; is_lisp_operator(ProposedName)),!.
+
+/*
+% guess invoke(r1,r2,r3,RET).
+*/
+align_args(_FunctionName,_ProposedName,Args,Result,ArgsPlusResult):-  
    append(Args, [Result], ArgsPlusResult).
 
 

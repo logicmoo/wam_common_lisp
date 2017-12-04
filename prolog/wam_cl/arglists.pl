@@ -267,8 +267,10 @@ ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,_,['&body',F|FormalParms],Par
 
  
 % &environment
-ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,Mode,['&environment',F|FormalParms],Params,[F|Names],[V|PVars],(must(as_env(F,V,'$env')),Code)):- 
+ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,Mode,['&environment',F|FormalParms],Params,[F|Names],[V|PVars],
+ (must(as_env(F,V,'$env')),Code)):- 
   arginfo_incr(env,ArgInfo),
+  arginfo_incr(complex,ArgInfo),   
   ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,Mode,FormalParms,Params,Names,PVars,Code).
 ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,Mode,['&environment'],Params,Names,PVars,Code):-!,
    arginfo_incr(env,ArgInfo),
@@ -375,6 +377,7 @@ expand_function_head(Ctx,EnvInOut,[FunctionName | FormalParms],Head,ZippedArgBin
    debug_var('BinderCode',BindCode),
    HeadDefCode = (asserta(wl:arglist_info(FunctionName,FormalParms,ActualArgs,ArgInfo))),
    HeadCodeOut = (must_bind_parameters(EnvInOut,FormalParms,Arguments,EnvInOut,BindCode),always(BindCode)),
+   call(HeadDefCode),
    Head =.. [FunctionName | HeadArgs])).
 
 % Creates a function Head and an argument unpacker using Code to unpack
@@ -382,6 +385,7 @@ expand_function_head(Ctx,Env,[FunctionName | FormalParms],Head,ZippedArgBindings
        function_head_params(Ctx,Env,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,_Names,_PVars,HeadCode),
        append(ActualArgs, [Result], HeadArgs),
        HeadDefCode = (asserta(wl:arglist_info(FunctionName,FormalParms,ActualArgs,ArgInfo))),
+       call(HeadDefCode),
        Head =.. [FunctionName | HeadArgs].
 expand_function_head(Ctx,Env,FunctionName , Head, ZippedArgBindings, Result,HeadDefCode,HeadCode):-
     expand_function_head(Ctx,Env,[FunctionName], Head, ZippedArgBindings, Result,HeadDefCode,HeadCode).
@@ -400,10 +404,10 @@ function_head_params(Ctx,Env,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,Na
 	zip_with(Names, PVars, [Var, Val, bv(Var,Val)]^true, ZippedArgBindings),!,
         add_alphas(Ctx,Names),
    % RestNKeysOut=RestNKeysIn,
-   ((\+ get_dict(rest,ArgInfo,0); \+ get_dict(key,ArgInfo,0)) ->  
+   ((\+ get_dict(rest,ArgInfo,0);  \+ get_dict(key,ArgInfo,0); \+ get_dict(complex,ArgInfo,0)) ->  
      (append(ActualArgsMaybe,RestNKeysIn,ActualArgs00),ActualArgs0=[ActualArgs00]) ; ActualArgs0 = ActualArgsMaybe),
    ActualArgs0 = ActualArgs1,
-    (\+ get_dict(env,ArgInfo,0) ->  append(ActualArgs1,[Env],ActualArgs) ; ActualArgs = ActualArgs1).
+    ((fail, \+ get_dict(env,ArgInfo,0)) ->  append(ActualArgs1,[Env],ActualArgs) ; ActualArgs = ActualArgs1).
 
 bind_formal_arginfo(ArgInfo, Arguments, OldEnv, NewEnv,BindCode):-
       ( ArgInfo.rest==0 -> bind_formal_arginfo_no_rest(ArgInfo, Arguments, OldEnv, NewEnv,BindCode);
@@ -455,7 +459,7 @@ must_or(Goal,Else):- Goal->true;Else.
 
 correct_formal_params(Mode,ReMode):-  correct_formal_params_c38(Mode,RMode1),
   correct_formal_params_destructuring(RMode1,ReMode).
-correct_formal_params_c38(Mode,ReMode):- atom(Mode),atom_concat_or_rtrace('c38_',Sym,Mode),!,atom_concat_or_rtrace('&',Sym,ReMode).
+correct_formal_params_c38(Mode,ReMode):- atom(Mode),atom_concat('c38_',Sym,Mode),!,atom_concat_or_rtrace('&',Sym,ReMode).
 correct_formal_params_c38(Mode,Mode):- \+ compound(Mode),!.
 correct_formal_params_c38([F0|FormalParms0],[F|FormalParms]):- 
   correct_formal_params_c38(F0,F),correct_formal_params_c38(FormalParms0,FormalParms).

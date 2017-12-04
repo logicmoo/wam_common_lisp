@@ -24,7 +24,7 @@ xlisting_config:xlisting_always(G):- G=package:_, current_predicate(_,G),predica
 
 
 cl_in_package(S,Package):- find_package_or_die(S,Package),
-   set_symbol_value('xx_package_xx',Package).
+   f_sys_set_symbol_value('xx_package_xx',Package).
 
 cl_use_package(Package,R):- reading_package(CurrentPackage),
                        cl_use_package(Package,CurrentPackage,R).

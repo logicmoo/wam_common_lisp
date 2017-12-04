@@ -65,8 +65,11 @@ make_character0(N,'$CHAR'(S)):- integer(N),(char_type(N,alnum)->name(S,[N]);S=N)
 make_character0(N,C):- text_to_string_safe(N,Str),char_code_from_name(Str,Code),make_character0(Code,C),!.
 make_character0(C,'$CHAR'(C)).
 
-to_prolog_codes('$CHAR'(Code),Char):- !, (\+ number(Code)->Char=Code;char_code(Char,Code)).
-to_prolog_codes(Code,Char):- (\+ number(Code)->Char=Code;char_code(Char,Code)).
+to_prolog_char('$CHAR'(X),O):-!,to_prolog_char(X,O).
+to_prolog_char((Code),Char):- number(Code),!,char_code(Char,Code).
+to_prolog_char((Atom),Char):- name(Atom,[C|Odes]),!,
+  (Odes==[] -> char_code(Char,C); 
+  (text_to_string(Atom,String),char_code_from_name(String,Code),char_code(Char,Code))).
 
 
 

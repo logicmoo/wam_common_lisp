@@ -97,7 +97,16 @@ show_uncaught_or_fail((A,B)):-!,show_uncaught_or_fail(A),show_uncaught_or_fail(B
 show_uncaught_or_fail(G):- notrace(flush_all_output_safe),
   (catch(G,E,notrace((wdmsg(uncaught(E)),!,fail)))*->true;notrace((wdmsg(failed(G)),!,fail))).
 
+set_prompt_from_package:-
+  ignore((symbol_value(_ReplEnv, xx_package_xx, Package),
+        short_package_or_hash(Package,Name0),
+        (Name0=="U"->Name="CL-USER";Name=Name0),
+        atom_concat(Name,'> ',Prompt),
+        prompt(_,Prompt))).
+
 read_eval_print(Result):-		% dodgy use of cuts to force a single evaluation
+        set_prompt_from_package,
+
         quietly(show_uncaught_or_fail(read_no_parse(Expression))),!,
         quietly(show_uncaught_or_fail(lisp_add_history(Expression))),!,
         nb_linkval('$mv_return',[Result]),

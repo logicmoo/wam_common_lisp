@@ -29,7 +29,7 @@ must_compile_closure_body(Ctx,Env,Result,Function, Body):-
 % compile_body(Ctx,Env,Result,Function, Body).
 % Expands a Lisp-like function body into its Prolog equivalent
 
-must_compile_body(Ctx,Env,Result,LispCode, Body):-
+must_compile_body(Ctx,Env,ResultO,LispCode, BodyO):-
   notrace((maybe_debug_var('_rCtx',Ctx),
   maybe_debug_var('_rEnv',Env),
   maybe_debug_var('_rResult',Result),
@@ -37,6 +37,7 @@ must_compile_body(Ctx,Env,Result,LispCode, Body):-
   maybe_debug_var('_rBody',Body))),
   resolve_reader_macros(LispCode,Forms),!,
   always(compile_body(Ctx,Env,Result,Forms, Body)),
+  ((Body==true,fail) -> BodyO=(ResultO=Result) ; ResultO=Result,BodyO=Body),
   % nb_current('$compiler_PreviousResult',THE),setarg(1,THE,Result),
   !.
 
@@ -110,7 +111,9 @@ compiler_macro_left_right(and,[Form1|Rest], [and,Form1,[and|Rest]]).
 :- discontiguous(compile_body/5).
 
 % Prolog vars
-compile_body(_Ctx,_Env,Result,Var, true):- is_ftVar(Var), !, Result = Var.
+compile_body(_Ctx,_Env,Result,Var, true):- Result == Var,!.
+compile_body(_Ctx,_Env,Result,Var, true):- attvar(Var),!, Result = Var.
+compile_body(_Ctx,_Env,Result,Var, true):- is_ftVar(Var), !,dumpST,trace, Result = Var.
 compile_body(Ctx,Env,Result,Var, Code):- is_ftVar(Var), !, % NEVER SEEN
   debug_var("EVAL",Var),
   must_compile_body(Ctx,Env,Result,[eval,Var], Code).
@@ -225,7 +228,7 @@ compile_body(Ctx,Env,Result,[OP,Flag,Form|MORE], Code):- same_symbol(OP,'#-'),!,
 % EVAL-WHEN
 compile_body(Ctx,Env,Result,[OP,Flags|Forms], Code):-  same_symbol(OP,'eval-when'), !,
  always(((member(X,Flags),is_when(X) )
-  -> must_compile_body(Ctx,Env,Result,[progn,Forms], Code) ; Code = true)).
+  -> must_compile_body(Ctx,Env,Result,[progn|Forms], Code) ; (Result=[];Code = true))).
 
 
 compile_body(Ctx,Env,Result, Body, Code):- 
@@ -536,7 +539,7 @@ setq_values(Env,[Var|Vars],[Val|Values]):-
    set_symbol_value(Env,Var,Val),
    setq_values(Env,Vars,Values).
 
-set_symbol_value(Var,Val):-
+f_sys_set_symbol_value(Var,Val):-
   env_current(Env),
   set_symbol_value(Env,Var,Val).
 
@@ -561,8 +564,14 @@ compiler_macro_left_right(BinOP,L, Identity):- binop_identity(BinOP,Identity),L=
 % BinOP-1
 compiler_macro_left_right(BinOP,[Form1|NoMore], [BinOP,Identity,Form1]):- NoMore==[], binop_identity(BinOP,Identity).
 % BinOP-3+
+compile_body(Ctx,Env,Result,[BinOP,Form1,Form2,Form3|FormS],Code):- fail, binop_identity(BinOP,_Identity),
+  compile_body(Ctx,Env,Result,[BinOP,[BinOP,Form1,Form2],Form3|FormS],Code),!.
+  
+% BinOP-3+
 compile_body(Ctx,Env,Result,[BinOP,Form1,Form2,Form3|FormS],Code):- binop_identity(BinOP,_Identity),
   compile_body(Ctx,Env,Result1,[BinOP,Form1,Form2],Code1),
+  %rw_add(Ctx,Result1,w),
+  freeze(Result1,var(Result1)),
   compile_body(Ctx,Env,Result,[BinOP,Result1,Form3|FormS],Code2),
   Code = (Code1,Code2).
 

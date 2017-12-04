@@ -88,29 +88,24 @@ compile_macro(Ctx,CallEnv,Macro,[Name0,FormalParms|FunctionBody0], CompileBody):
    always(maybe_get_docs(function,Macro,FunctionBody0,FunctionBody,DocCode)),
    %reader_intern_symbols
    MacroHead=[Macro|FormalParms],
-   set_opv(Macro,classof,claz_macro),
-   set_opv(Symbol,compile_as,kw_operator),
-   set_opv(Symbol,function,Macro),
+   FunDef = (set_opv(Macro,classof,claz_macro),set_opv(Symbol,compile_as,kw_operator),set_opv(Symbol,function,Macro)),
+   FunDef,
    within_labels_context(Symbol, make_mcompiled(Ctx,CallEnv,MResult,Symbol,MacroHead,FunctionBody,
      NewMacroHead,HeadDefCode,BodyCode,Fun)),
    %NewMacroHead=..[M|ARGS],RNewMacroHead=..[MM|ARGS], atom_concat_or_rtrace(M,'_mexpand1',MM),   
    get_alphas(Ctx,Alphas),
-   debug_var('FnResult',FResult),
-   debug_var('Fun',Fun),
+   debug_var('FnResult',FResult),debug_var('Fun',Fun),
    subst(NewMacroHead,MResult,FResult,FunctionHead),
-
- 
-
+   
  CompileBody = (
    DocCode,
    HeadDefCode,
    asserta(user:macro_lambda(defmacro(Name0),Macro, FormalParms, [progn | FunctionBody],Alphas)),
-   asserta((user:FunctionHead  :- (BodyCode, 
+   asserta((user:FunctionHead  :- 
+    (BodyCode, 
        cl_eval(MResult,FResult)))),
    % nop((user:RNewMacroHead  :- BodyCode)),
-   set_opv(Macro,classof,claz_macro),
-   set_opv(Symbol,compile_as,kw_operator),
-   set_opv(Symbol,function,Macro)).
+   FunDef).
 
 varuse:attr_unify_hook(_,Other):- var(Other).
 
@@ -123,12 +118,13 @@ make_mcompiled(Ctx,_UnusedEnv,CResult,Symbol,FunctionHead,FunctionBody,Head,Head
     %add_tracked_var(Ctx,R,MResult),
     %put_attr(MResult,varuse,retval),
     %rw_add(Ctx,R,ret),
+    % Var=MResult,MResult=CResult,
    ((fail,sub_term(Sub,Body0),compound(Sub),(Sub= (Body=Var)),var(Var),Var==MResult, is_list(Body))->
      (lisp_compile(CResult,Body,BodyCode0),
       subst(Body0,Sub,BodyCode0,BodyCode),Fun=t);
     (((var(MResult)))
     -> (MResult=CResult,sanitize_true(Ctx,((CallEnv=HeadEnv,HeadCode,Body0)),BodyCode))
-     ; (body_cleanup(Ctx,((CallEnv=HeadEnv,HeadCode,Body0,MResult=CResult)),BodyCode)))).
+     ; (MResult=CResult,body_cleanup(Ctx,((CallEnv=HeadEnv,HeadCode,Body0,MResult=CResult)),BodyCode)))).
 
 
 cl_defun(Name,FormalParms,FunctionBody,Result):-

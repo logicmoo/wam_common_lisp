@@ -25,7 +25,9 @@ trim_full_stop(SPClosure,TSPClosure):-atom_concat_or_rtrace(SPClosureN,' ',SPClo
 trim_full_stop(SPClosure,SPClosureN):-atom_concat_or_rtrace(SPClosureN,'.',SPClosure).
 trim_full_stop(SPClosure,SPClosure).
 
-lisp_chars_to_pl_string(List,SS):- always((maplist(to_prolog_codes,List,Codes),text_to_string(Codes,SS))).
+lisp_chars_to_pl_string(Str,Str):- string(Str),!.
+lisp_chars_to_pl_string(Str,SS):- \+ is_list(Str),!,always((atom_chars(Str,Codes),text_to_string(Codes,SS))).
+lisp_chars_to_pl_string(List,SS):- always((maplist(to_prolog_char,List,Codes),text_to_string(Codes,SS))).
 
 shrink_lisp_strings(Str,PStr):- \+ compound(Str),!,Str=PStr.
 %shrink_lisp_strings(Str,PStr):- is_stringp(Str),!,to_prolog_string(Str,PStr).
@@ -65,6 +67,7 @@ sexpr1('$OBJ'(T,X)) --> {T==claz_function},['#\''],sexpr1(X).
 sexpr1('$OBJ'(T,X)) --> {T==claz_vector},['#'],sexpr1(X).
 sexpr1('$OBJ'(T,X)) --> {T==claz_pathname},['#P'],sexpr1(X).
 sexpr1('$OBJ'(T,X)) --> ['#S'],{is_list(X),is_structure_class(T),claz_to_symbol(T,TP)},sexpr1(TP),sexpr1(X).
+sexpr1('$OBJ'(claz_package,X)) -->  !,sexpr1(X).
 sexpr1('$OBJ'(T,X)) --> ['#<'],{claz_to_symbol(T,TP)},!,sexpr1(TP),sexpr1(X),['>'].
 sexpr1('$OBJ'(T,X)) --> ['#<'],!,sexpr1(T),sexpr1(X),['>'].
 sexpr1(X) --> {compound_name_arguments(X,F,ARGS)}, ['#<'],[F],lisplist(ARGS,'>').

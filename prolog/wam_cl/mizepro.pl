@@ -195,6 +195,8 @@ mize_body1(_Ctx,_F,InOut,InOut).
 
 mize_body_1e(_Ctx,_,C1,C1):- non_code(C1),!.
 mize_body_1e(_Ctx,_F,(A=B),true):- A==B,!.
+mize_body_1e(_Ctx,_F,(A==B),true):- A==B,!.
+mize_body_1e(_Ctx,_,cl_list(G, R),R=G).
 mize_body_1e(_Ctx,_,C1,L=[R]):- structure_applies(C1 , (L=[R, []])). % lisp_compiler_option(elim_vars,true).
 mize_body_1e(Ctx,F,(C1,C2),CodeJoined):-!,mize_body1(Ctx,F,C1,C1O),mize_body1(Ctx,F,C2,C2O),conjoin_0(C1O,C2O,CodeJoined).
 mize_body_1e(Ctx,_,symbol_value(_Env, Sym, Sym_Get),true):- 
@@ -223,6 +225,8 @@ mize_body2(_Ctx,_F,InOut,InOut).
   
 mize_body_2e(_Ctx,_,C1,C1):- non_code(C1),!.
 mize_body_2e(_,_,In,ITE):- structure_applies(In,(ITE,R=V)), var(R),var(V),ifthenelse(ITE),R=V.
+%mize_body_2e(_Ctx,_,(S1=V,R=S2,B),(R=V,B)):- trace, var(S1),S1==S2.
+mize_body_2e(_Ctx,_,(S1=V,R=S2),(R=V)):- var(S1),S1==S2,(var(R);var(V)),S2='$error'.
 mize_body_2e(_Ctx,_,t_or_nil(G, R),G):- R==t.
 mize_body_2e(_Ctx,_,t_or_nil(G, R),\+ G):- R==[].
 mize_body_2e(_Ctx,_,(t_or_nil(G, R),(R \==[]-> B ; C)),(G->B;C)):- var(R).
@@ -231,7 +235,7 @@ mize_body_2e(_Ctx,_,(t_or_nil(G, R),(R \==[])),G):- var(R).
 mize_body_2e(_Ctx,_,(PARG,A=B), PARG):- lisp_compiler_option(elim_xvars,true),compound(PARG),functor(PARG,_,Ar),arg(Ar,PARG,PP),(A==PP;B==PP),!,A=B.
 mize_body_2e(_Ctx,_,G,true):- lisp_compiler_option(elim_always_trues,true), always_true(G).
 mize_body_2e(_Ctx,_,Var is Ground,Var = Result):- lisp_compiler_option(elim_vars,true), var(Var),ground(Ground), Result is Ground.
-mize_body_2e(_Ctx,_,Number=:=Var,Number==Var):- (number(Number),var(Var));number(Var),var(Number),!.
+% mize_body_2e(_Ctx,_,Number=:=Var,Number==Var):- (number(Number),var(Var));number(Var),var(Number),!.
 
 mize_body_2e(Ctx,_F,C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(mize_body2(Ctx,F),C1O,C2O),C2=..[F|C2O].
 mize_body_2e(_Ctx,_,C1,C1):-!.
@@ -355,7 +359,7 @@ never_inline_fa(F,_):- atom_concat_or_rtrace(_,' tabled',F).
 never_inline_fa(F,_):- atom_concat_or_rtrace('cl_',_,F).
 never_inline_fa(start_tabling,_).
 never_inline_fa(symbol_value,_).
-never_inline_fa(set_symbol_value,_).
+never_inline_fa(f_sys_set_symbol_value,_).
 never_inline_fa(get_opv,_).
 never_inline_fa(member,_).
 never_inline_fa(as_rest,_).

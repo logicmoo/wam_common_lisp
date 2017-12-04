@@ -134,9 +134,9 @@ value_default(claz_object,mut([],claz_object)).
              Kind).
 */
 
-:- assert(user:return_arg_is_first(cl_defstruct)).
-:- assert(user:return_arg_is_first(cl_make_instance)).
-:- assert(user:return_arg_is_first(cl_defclass)).
+:- assert(wl:arg_lambda_type(rest_only,cl_defstruct)).
+:- assert(wl:arg_lambda_type(rest_only,cl_make_instance)).
+:- assert(wl:arg_lambda_type(rest_only,cl_defclass)).
 
 
 find_or_create_class(Name,Kind):- find_class(Name,Kind),Kind\==[],!.
@@ -161,11 +161,11 @@ cl_slot_exists_p(Obj,Slot,Value):- t_or_nil(get_opv(Obj,Slot,_),Value).
 
 cl_slot_value(Obj,Slot,Value):- always(get_opv(Obj,Slot,Value)).
 
-cl_defstruct(Name,[[Name,KeyWords]|Slots]):- !, always(define_struct(Name,KeyWords,Slots,_Kind)).
-cl_defstruct(Name,[[Name|KeyWords]|Slots]):- !, always(define_struct(Name,KeyWords,Slots,_Kind)).
-cl_defstruct(Name,[Name|Slots]):- always(define_struct(Name,[],Slots,_Kind)).
+cl_defstruct([[Name,KeyWords]|Slots],Name):- !, always(define_struct(Name,KeyWords,Slots,_Kind)).
+cl_defstruct([[Name|KeyWords]|Slots],Name):- !, always(define_struct(Name,KeyWords,Slots,_Kind)).
+cl_defstruct([Name|Slots],Name):- always(define_struct(Name,[],Slots,_Kind)).
 
-cl_defclass(Kind,[Name,Supers,Slots|KwInfo]):- !, always(define_class(Name,[[kw_include|Supers]|KwInfo],Slots,Kind)).
+cl_defclass([Name,Supers,Slots|KwInfo],Kind):- !, always(define_class(Name,[[kw_include|Supers]|KwInfo],Slots,Kind)).
 
 
 define_class(Name,KeyWords,SlotsIn,Kind):- 
@@ -227,9 +227,9 @@ make_default_constructor(Kind):-
  set_opv(Function,classof,claz_compiled_function),
  set_opv(Sym,compile_as,kw_function),
  set_opv(Sym,function,Function),
- assert(user:return_arg_is_first(Function)),
- Head=..[Function,Obj,List],
- Body=..[cl_make_instance,Obj,[Kind|List]],
+ assert(wl:arg_lambda_type(rest_only,Function)),
+ Head=..[Function,List,Obj],
+ Body=..[cl_make_instance,[Kind|List],Obj],
  assert(user:(Head:-Body)))).
  
 
@@ -358,7 +358,7 @@ un_kw1(Prop,Prop).
 
 add_kw_opv(Obj,Key,V):- un_kw(Key,Prop),add_opv_new(Obj,Prop,V).
 
-f_u_get_opv(Obj,Result):- findall([Prop|Value],get_opv(Obj,Prop,Value),Result).
+f_u_get_opv(Obj,Result):- findall([Prop|Value],f_u_get_opv(Obj,Prop,Value),Result).
 f_u_get_opv(Obj,Prop,Value):- get_opv(Obj,Prop,Value).
 	
 add_opv_maybe(Obj,Prop,_):- get_opv_i(Obj,Prop,_),!.
@@ -372,7 +372,7 @@ get_opv_i(Obj,Key,Value):- un_kw(Key,Prop),get_opv_ii(Obj,Prop,Value).
 get_opv_ii(Obj,value, Value):- Obj==quote, throw(get_opv_i(quote, value, Value)).
 get_opv_ii(Obj,Prop,Value):- nonvar(Obj), has_prop_value_getter(Obj,Prop,Getter),call(Getter,Obj,Prop,Value).
 
-get_opv_ii(Sym,value,Value):- nb_current(Sym,Value)*->true;get_opv_iii(Sym,value,Value).
+get_opv_ii(Sym,value,Value):- ((atom(Sym);var(Sym)),nb_current(Sym,Value))*->true;get_opv_iii(Sym,value,Value).
 
 get_opv_ii(Obj,Prop,Value):- Prop\==value,get_opv_iii(Obj,Prop,Value).
 
