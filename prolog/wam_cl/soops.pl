@@ -63,7 +63,7 @@ new_unnamed_opv(SKind,Name,Attrs,Obj):-
   atomic_list_concat([Pre,Name],'_',PName),
   prologcase_name(PName,Obj),
   to_prolog_string_anyways(Name,SName),set_opv(Obj,sname,SName),
-  add_opv_i(Obj,classof,Kind),
+  add_opv_new(Obj,classof,Kind),
   ensure_opv_type_inited(Kind),  
   construct_opv(Obj,Kind),
   init_slot_props(Kind,1,Obj,Attrs),
@@ -153,7 +153,7 @@ find_class(Name,Claz):-
   get_struct_opv(Claz,namestring,NameS).
 
 
-cl_find_class(Name,Claz):- always(is_symbolp(Name)),once((find_class(Name,Claz),claz_to_symbol(Claz,Symbol),Name==Symbol)).
+cl_find_class(Name,Claz):- always(is_symbolp(Name)),once((find_class(Name,Claz),claz_to_symbol(Claz,Sym),Name==Sym)).
 cl_find_class(_,[]).
   
 
@@ -222,11 +222,11 @@ make_default_constructor(Kind):-
  always((
  get_struct_opv(Kind,symbolname,Name),to_prolog_string_anyways(Name,SName),
  atom_concat_or_rtrace("MAKE-",SName,FnName),
- reader_intern_symbols(FnName,Symbol),
- find_function_or_macro_name(_,_,Symbol,3,Function),
+ reader_intern_symbols(FnName,Sym),
+ find_function_or_macro_name(_,_,Sym,3,Function),
  set_opv(Function,classof,claz_compiled_function),
- set_opv(Symbol,compile_as,kw_function),
- set_opv(Symbol,function,Function),
+ set_opv(Sym,compile_as,kw_function),
+ set_opv(Sym,function,Function),
  assert(user:return_arg_is_first(Function)),
  Head=..[Function,Obj,List],
  Body=..[cl_make_instance,Obj,[Kind|List]],
@@ -274,8 +274,8 @@ maybe_add_kw_function(Kind,L,R,Key,ArgList,LispBody):-
    maybe_add_function(FnName,ArgList,LispBody,_).
 
 maybe_add_function(FnName,ArgList,LispBody,R):-
-   reader_intern_symbols(FnName,Symbol),
-   (is_fboundp(Symbol)->R=Symbol;
+   reader_intern_symbols(FnName,Sym),
+   (is_fboundp(Sym)->R=Sym;
      (R=Result,as_sexp(LispBody,SLispBody),
        reader_intern_symbols(pkg_user,[defun,FnName,ArgList,[progn,SLispBody]],LispInterned),
          lisp_compile(Result,LispInterned,PrologCode),always(PrologCode))).
@@ -321,47 +321,16 @@ get_struct_opv(Obj, KW, Value,Info):-
   call((soops:struct_opv(Obj, Key, Value,Info))).
 
 
-
-:- discontiguous soops:struct_opv/4.
-:- dynamic((soops:struct_opv/4)).
-:- include('ci.pro').
-
-
 get_szlot(Prefix,Type,Key,SlotInfo):-
   Type=..[Kind|Params],
-  claz_to_symbol(Kind,Symbol),
-  to_prolog_string_anyways(Symbol,ClassName),
+  claz_to_symbol(Kind,Sym),
+  to_prolog_string_anyways(Sym,ClassName),
   un_kw(Key,UKey),  
   atomic_list_concat([ClassName,UKey],'_',SlotInfo0),
   atom_concat_or_rtrace(Prefix,SlotInfo0,SlotInfo1),
   prologcase_name(SlotInfo1,SlotInfo2),
   SlotInfo=..[SlotInfo2|Params].
    
-cleanup_mop:-  
- ignore((get_struct_opv(X,include,claz_object),get_struct_opv(X,include,Y),Y\==claz_object,show_call_trace(retract(soops:struct_opv(X,include,claz_object))),fail)),
- ignore((get_struct_opv(X,include,claz_t),get_struct_opv(X,include,Y),Y\==claz_t,show_call_trace(retract(soops:struct_opv(X,include,claz_t))),fail)).
-
-save_mop:- cleanup_mop,tell('ci3.pro'),
- forall(member(Assert,[get_struct_opv(_,P,_),get_struct_opv(_,P,_,_),get_struct_opv(_,P,_,_,_)]),
-   forall(soops:Assert,
-      ignore((P\==slot1,P\==has_slots,format('~q.~n',[Assert]))))), told.
-:- style_check(-discontiguous).
-
-make_soops:- cleanup_mop,tell('si2.pro'),
-   forall(member(Assert,[o_p_v(_,_,_)]),
-     forall(clause(soops:Assert,true),
-        ignore((P\==slot1,P\==has_slots,format('~q.~n',[Assert]))))), told.
-
-:- multifile soops:o_p_v/3.
-:- dynamic soops:o_p_v/3.
-
-soops:o_p_v(Symbol,defined_as,defconstant):- is_keywordp(Symbol).
-soops:o_p_v(Symbol,typeof,keyword):- is_keywordp(Symbol).
-:- include('si.pro').
-soops:o_p_v(Symbol,typeof,Kind):- soops:o_p_v(Symbol,classof,Class),
-  \+ clause(soops:o_p_v(Symbol,typeof,_AnyType),true),
-  claz_to_symbol(Class,Kind).
-%:- include('si2.pro').
 /*
 %o_p_v(hash_table_znst_12,
 ["SYS", [
@@ -382,37 +351,47 @@ un_kw1(Prop,Prop):- var(Prop),!.
 un_kw1(Key,Prop):- \+ atomic(Key),!,lisp_dump_break,Key=Prop.
 un_kw1([],[]):-!.
 un_kw1(Key,Prop):- \+ atomic_list_concat([_,_|_],'_',Key),!,Prop=Key.
-un_kw1(Key,Prop):- Prop\==name,to_prolog_string_anyways(Key,Str),downcase_atom(Str,Prop),!.
-un_kw1(Key,Prop):- atom_concat_or_rtrace('kw_',Prop,Key),!.
-un_kw1(Key,Prop):- atom_concat_or_rtrace(':',Prop,Key),!.
+un_kw1(Key,Prop):- Prop\==name,to_prolog_string_anyways(Key,Str),prologcase_name(Str,Prop),!.
+un_kw1(Key,Prop):- atom_concat_or_rtrace('kw_',Prop,Key),lisp_dump_break,!.
+un_kw1(Key,Prop):- atom_concat_or_rtrace(':',Prop,Key),lisp_dump_break,!.
 un_kw1(Prop,Prop).
 
-add_kw_opv(Obj,Key,V):- un_kw(Key,Prop),add_opv_i(Obj,Prop,V).
+add_kw_opv(Obj,Key,V):- un_kw(Key,Prop),add_opv_new(Obj,Prop,V).
 
 f_u_get_opv(Obj,Result):- findall([Prop|Value],get_opv(Obj,Prop,Value),Result).
 f_u_get_opv(Obj,Prop,Value):- get_opv(Obj,Prop,Value).
 	
 add_opv_maybe(Obj,Prop,_):- get_opv_i(Obj,Prop,_),!.
-add_opv_maybe(Obj,Prop,Value):- add_opv_i(Obj,Prop,Value),!.
+add_opv_maybe(Obj,Prop,Value):- add_opv_new(Obj,Prop,Value),!.
 
 get_opv(Obj,_,_):- string(Obj),!,fail.
 get_opv(Obj,Prop,Value):- no_repeats(Obj-Prop,get_opv_i(Obj,Prop,Value)).
 
-get_opv_i(Obj,Key,Value):- un_kw(Key,Prop),get_opv_ki(Obj,Prop,Value).
+get_opv_i(Obj,Key,Value):- un_kw(Key,Prop),get_opv_ii(Obj,Prop,Value).
 
-get_opv_ki(Obj, value, Value):- Obj==quote, throw(get_opv_i(quote, value, Value)).
-get_opv_ki(Obj,Prop,Value):- soops:o_p_v(Obj,Prop,Value).
-get_opv_ki(Obj,Prop,Value):- nonvar(Obj), has_prop_value_getter(Obj,Prop,Getter),call(Getter,Obj,Prop,Value).
-get_opv_ki(Obj,Prop,Value):- soops:struct_opv(Obj,Prop,Value).
+get_opv_ii(Obj,value, Value):- Obj==quote, throw(get_opv_i(quote, value, Value)).
+get_opv_ii(Obj,Prop,Value):- nonvar(Obj), has_prop_value_getter(Obj,Prop,Getter),call(Getter,Obj,Prop,Value).
 
-get_opv_ki(Obj,Prop,Value):- nonvar(Obj),nonvar(Prop),
+get_opv_ii(Sym,value,Value):- nb_current(Sym,Value)*->true;get_opv_iii(Sym,value,Value).
+
+get_opv_ii(Obj,Prop,Value):- Prop\==value,get_opv_iii(Obj,Prop,Value).
+
+get_opv_ii(Obj,Prop,Value):- nonvar(Obj),nonvar(Prop),
   notrace((Prop\==classof,Prop\==typeof,Prop\==value,Prop\==conc_name)),
-  get_opv_ii(Obj,Prop,Value).
+  get_opv_pi(Obj,Prop,Value).
 
-get_opv_ii(Obj,Prop,Value):-
+get_opv_iii(Sym,defined_as,defconstant):- nonvar(Sym),is_keywordp(Sym).
+get_opv_iii(Sym,typeof,keyword):- nonvar(Sym),is_keywordp(Sym).
+get_opv_iii(Sym,classof,claz_symbol):- nonvar(Sym),is_keywordp(Sym).
+get_opv_iii(Obj,Prop,Value):- soops:o_p_v(Obj,Prop,Value).
+get_opv_iii(Sym,typeof,Kind):- get_opv_iii(Sym,classof,Class), \+ clause(soops:o_p_v(Sym,typeof,_),true), claz_to_symbol(Class,Kind).
+get_opv_iii(Obj,Prop,Value):- soops:struct_opv(Obj,Prop,Value).
+
+
+get_opv_pi(Obj,Prop,Value):-
   get_obj_pred(Obj,Prop,Pred),
   call(Pred,Obj,Value).
-get_opv_ii(Obj,Prop,Value):- fail, get_obj_prefix(Obj,Prefix),atom_concat_or_rtrace(Prefix,DashKey,Prop),atom_concat_or_rtrace('_',Key,DashKey),!,
+get_opv_pi(Obj,Prop,Value):- fail, get_obj_prefix(Obj,Prefix),atom_concat_or_rtrace(Prefix,DashKey,Prop),atom_concat_or_rtrace('_',Key,DashKey),!,
   get_opv_i(Obj,Key,Value).
   
 
@@ -442,41 +421,43 @@ instance_prefix1(Kind, Prefix):- claz_to_symbol(Kind, Prefix).
 
 cl_class_name(C,S):- claz_to_symbol(C,S).
 
-claz_to_symbol(C,S):- claz_to_symbol0(C,S),!.
+claz_to_symbol(C,S):- claz_to_symbol0(C,S)*->true;claz_to_symbol1(C,S).
 
 claz_to_symbol0(C,S):- get_struct_opv(C,symbolname,S).
 %claz_to_symbol0(C,S):- get_struct_opv(C,name,S), \+ string(S).
 claz_to_symbol0(C,S):- get_struct_opv(C,type,S).
-claz_to_symbol0(C,S):- claz_to_symbol1(C,S),!.
-
-claz_to_symbol1(claz_symbol,symbol).
-claz_to_symbol1(claz_package,package).
-claz_to_symbol1(claz_number,number).
-claz_to_symbol1(Class,Symbol):-atom(Class),atom_concat_or_rtrace('claz_',Symbol,Class).
-claz_to_symbol1(Class,Symbol):-Class=Symbol.
+claz_to_symbol0(claz_symbol,symbol).
+claz_to_symbol0(claz_package,package).
+claz_to_symbol0(claz_number,number).
 
 
-add_opv(Obj,Prop,Value):- add_opv_i(Obj,Prop,Value).
+claz_to_symbol1(Class,Sym):-atom(Class),atom_concat_or_rtrace('claz_',Sym,Class).
+claz_to_symbol1(Class,Sym):-Class=Sym.
 
-add_opv_i(Symbol,value,SValue):- atom(SValue),
- (atom_contains(SValue,'(');atom_contains(SValue,' ')),
-  (as_sexp(SValue,Value)->SValue\==Value),!,set_opv(Symbol,value,Value).
-add_opv_i(Obj,Prop,Value):-  add_opv_new(Obj,Prop,Value).
+
+add_opv(Obj,Prop,Value):- add_opv_new(Obj,Prop,Value),!.
 
 
 % add_opv_pred(MPred,Obj,Key,Value):- strip_module(MPred,M,Pred),Assertion=.. [Pred,Obj,Key,Value], ( \+ M:Assertion -> assert(M:Assertion) ; true).
 
-add_opv_new(Obj,Prop,V):- to_prolog_string_if_needed(V,V0),!,show_call_trace(add_opv_new(Obj,Prop,V0)).
-add_opv_new(Obj,Prop,V):-
-   always(\+ is_list(Obj)),
-   get_obj_pred(Obj,Prop,Pred),
-   modulize(call(Pred,Obj,V),OPred),predicate_property(OPred,dynamic),
-   assert_if_new(OPred),!.
+% add_opv_new(Sym,value,SValue):- atom(SValue),(atom_contains(SValue,'(');atom_contains(SValue,' ')),(as_sexp(SValue,Value)->SValue\==Value),!,set_opv(Sym,value,Value).
+% add_opv_new(Obj,Prop,Value):-  add_opv_new(Obj,Prop,Value).
+add_opv_new(Obj,Prop,V):- (\+atomic(V)),is_stringp(V),to_prolog_string_if_needed(V,V0),!,show_call_trace(add_opv_new(Obj,Prop,V0)).
+add_opv_new(Obj,Key,Value):- 
+  always(\+ is_list(Obj)),
+  un_kw(Key,Prop),
+  add_opv_new_i(Obj,Prop,Value).
 
-add_opv_new(Obj,Key,Value):-
- always(\+ is_list(Obj)),
- un_kw(Key,Prop),
- show_call_trace(assert_if_new(soops:o_p_v(Obj,Prop,Value))).
+add_opv_new_i(Obj,Prop,Value):- nonvar(Obj), has_prop_value_setter(Obj,Prop,Setter),once(call(Setter,Obj,Prop,Value)),fail.
+add_opv_new_i(Obj,Prop,Value):- Prop==value, nonvar(Obj),nb_setval(Obj,Value).
+add_opv_new_i(Obj,Prop,Val):- 
+   get_obj_pred(Obj,Prop,Pred),
+   modulize(call(Pred,Obj,Val),OPred),
+   predicate_property(OPred,dynamic),
+   assert_if_new(OPred),!.
+add_opv_new_i(Obj,Prop,Value):-show_call_trace(assert_if_new(soops:o_p_v(Obj,Prop,Value))).
+
+delete_opvalues(Obj,Key):- Key == value, nb_delete(Obj),fail.
 delete_opvalues(Obj,Key):- 
  always(\+ is_list(Obj)),
  un_kw(Key,Prop),
@@ -488,12 +469,12 @@ delete_opvalues(Obj,Key):-
    forall(clause(OPred,true,Ref),erase(Ref)))).
 
 delete_obj(Obj):- 
+   obj_properties(Obj,Props),!,
+   maplist(delete_opvalues(Obj),Props).
+delete_obj(Obj):- 
    always(\+ is_list(Obj)),
    ignore(forall(retract(soops:o_p_v(Obj,_,_)),true)).
 
-delete_obj12(Obj):- 
-   obj_properties(Obj,Props),
-   maplist(delete_opvalues(Obj),Props).
 
 obj_properties(Obj,Props):- 
    findall(Prop,get_opv_i(Obj,Prop,_),Props).
@@ -513,10 +494,10 @@ modulize(Pred,Pred).
 
 symbol_set_get(sys_xx_stdin_xx,claz_prolog_output_stream,set_input,current_input).
 
-has_prop_value_setter(Symbol,value,prolog_direct(Setter/1)):- symbol_set_get(Symbol,Setter,_Getter).
+has_prop_value_setter(Sym,value,prolog_direct(Setter/1)):- symbol_set_get(Sym,Setter,_Getter).
 has_prop_value_setter(sys_xx_stdout_xx,value,prolog_direct(set_output/1)).
 
-has_prop_value_getter(Symbol,value,prolog_direct(Getter/1)):- symbol_set_get(Symbol,_Setter,Getter).
+has_prop_value_getter(Sym,value,prolog_direct(Getter/1)):- symbol_set_get(Sym,_Setter,Getter).
 has_prop_value_getter(sys_xx_stdout_xx,value,prolog_direct(current_output/1)).
 %has_prop_value_setter(sys_xx_stderr_xx,value,prolog_direct(set_error/1)).
 %has_prop_value_getter(sys_xx_stderr_xx,value,prolog_direct(current_error/1)).
@@ -529,7 +510,7 @@ update_opv(Obj,Prop,Value):- set_opv(Obj,Prop,Value).
 
 set_opv(Obj,Prop,Value):- set_opv_i(Obj,Prop,Value).
 set_opv_i(Obj,Prop,Value):- has_prop_value_setter(Obj,Prop,Setter),!,call(Setter,Obj,Prop,Value).
-set_opv_i(Obj,Prop,Value):- delete_opvalues(Obj,Prop),add_opv_i(Obj,Prop,Value).
+set_opv_i(Obj,Prop,Value):- delete_opvalues(Obj,Prop),add_opv_new(Obj,Prop,Value).
 
 :- dynamic(is_obj_type/1).
 
@@ -562,13 +543,18 @@ add_slot_def_props(N,Kind,Key,MoreInfo):-
    ignore((kind_attribute_pred(Kind,Key,Pred),assert_struct_opv4(Kind,accessor_predicate,Pred,SlotInfo))),
    add_slot_more_info(Key,Kind,SlotInfo,MoreInfo))).
 
+is_slot_name(KW):- \+ is_list(KW).
+
 add_slot_more_info(_SlotKW,_Kind,_SlotInfo,[]):-!.
-add_slot_more_info(SlotName,Kind,SlotInfo,[KW,Value|MoreInfo]):- \+ is_list(KW),
-   assert_slot_prop(SlotName,Kind,KW,Value,SlotInfo),
+add_slot_more_info(_SlotKW,_Kind,_SlotInfo,[[]]):-!.
+add_slot_more_info(SlotName,Kind,SlotInfo,[KW,Value|MoreInfo]):- is_slot_name(KW),
+   assert_slot_prop(SlotName,Kind,KW,Value,SlotInfo),!,
    add_slot_more_info(SlotName,Kind,SlotInfo,MoreInfo).
-add_slot_more_info(SlotName,Kind,SlotInfo,[[KW,Value]|MoreInfo]):- \+ is_list(KW),
-   assert_slot_prop(SlotName,Kind,KW,Value,SlotInfo),
+add_slot_more_info(SlotName,Kind,SlotInfo,[[KW,Value]|MoreInfo]):- is_slot_name(KW),
+   assert_slot_prop(SlotName,Kind,KW,Value,SlotInfo),!,
    add_slot_more_info(SlotName,Kind,SlotInfo,MoreInfo).
+add_slot_more_info(SlotName,Kind,SlotInfo,[[Value]]):-
+   assert_slot_prop(SlotName,Kind,initarg,Value,SlotInfo),!.
 
 assert_slot_prop(SlotName,Kind,KW,Value,SlotInfo):-
   un_kw(KW,Prop),!,
@@ -606,9 +592,59 @@ type_attribute_pred0(Kind,Prop,Pred):- nonvar(Prop),
 
 construct_opv(Obj,Kind):- get_opv(Obj,instance,Kind),!.
 construct_opv(Obj,Kind):-
-  add_opv_i(Obj,instance,Kind),
+  add_opv_new(Obj,instance,Kind),
   forall(soops:struct_opv(Kind,include,Super),construct_opv(Obj,Super)).  
 
+
+
+
+
+:- discontiguous soops:struct_opv/4.
+:- dynamic((soops:struct_opv/4)).
+:- include('ci.pro').
+cleanup_mop:-  
+ ignore((get_struct_opv(X,include,claz_object),get_struct_opv(X,include,Y),Y\==claz_object,show_call_trace(retract(soops:struct_opv(X,include,claz_object))),fail)),
+ ignore((get_struct_opv(X,include,claz_t),get_struct_opv(X,include,Y),Y\==claz_t,show_call_trace(retract(soops:struct_opv(X,include,claz_t))),fail)).
+
+save_mop:- cleanup_mop,tell('ci3.pro'),
+ forall(member(Assert,[get_struct_opv(_,P,_),get_struct_opv(_,P,_,_),get_struct_opv(_,P,_,_,_)]),
+   forall(soops:Assert,
+      ignore((P\==slot1,P\==has_slots,format('~q.~n',[Assert]))))), told.
+:- style_check(-discontiguous).
+
+make_soops:- cleanup_mop,tell('si2.pro'),
+   forall(member(Assert,[o_p_v(_,_,_)]),
+     forall(clause(soops:Assert,true),
+        ignore((P\==slot1,P\==has_slots,format('~q.~n',[Assert]))))), told.
+
+:- multifile soops:o_p_v/3.
+:- dynamic soops:o_p_v/3.
+
+load_si:-
+  open('si.pro',read,Stream),
+  repeat,
+    read_term(Stream,Value,[]),
+    (Value==end_of_file->!;
+      (load_si_value(Value),fail)).
+load_si_value(Value):- assert_if_new(Value).
+
+process_si:- 
+   doall((
+    clause(soops:o_p_v(X,Y,Z),true,Ref),
+    process_si(soops:o_p_v(X,Y,Z)),
+    erase(Ref))).
+   
+process_si(soops:o_p_v(X,Y,Z)):- Y==value, show_call_trace(nb_setval(X,Z)).
+
+:- if(true).
+:- include('si.pro').
+:- else.
+:- load_si.
+:- endif.
+
+:- process_si.
+
+%:- include('si2.pro').
 
 :- fixup_exports.
 

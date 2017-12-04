@@ -104,8 +104,8 @@ find_function_or_macro_name(_Ctx,_Env,FunctionName,_Len, ProposedName):-
       function_case_name(FunctionName,Package,ProposedName)).
 
 return_arg_is_first_p(P):- return_arg_is_first(P).
-return_arg_is_first_p(P):- atom_concat('f_',P,PP), return_arg_is_first(PP).
-return_arg_is_first_p(P):- atom_concat('f_',PP,P), return_arg_is_first(PP).
+return_arg_is_first_p(P):- atom_concat_or_rtrace('f_',P,PP), return_arg_is_first(PP).
+return_arg_is_first_p(P):- atom_concat_or_rtrace('f_',PP,P), return_arg_is_first(PP).
 
 align_args(_FunctionName,ProposedName,Args,Result,[Result,Args]):-
     return_arg_is_first_p(ProposedName),!.

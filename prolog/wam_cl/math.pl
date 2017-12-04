@@ -40,9 +40,9 @@ cl_sqrt(X,Y):- \+ integer(X)-> (Y is sqrt(X)) ; (IY is sqrt(X), RY is floor(IY),
 %cl_log(X,Y):- Y is log(X).
 
 define_cl_math(_,0).
-% define_cl_math(F,0):- atom_concat('cl_',F,CLN), P=..[CLN,X],FP=..[F], assertz(P:- X is FP).
-% define_cl_math(F,1):- atom_concat('cl_',F,CLN), P=..[CLN,X,R],FP=..[F,X], show_call_trace(user:assertz(P:- R is FP)).
-define_cl_math(F,2):- atom_concat('cl_',F,CLN), P=..[CLN,X,Y,R],FP=..[F,X,Y], show_call_trace(user:assertz(P:- R is FP)).
+% define_cl_math(F,0):- atom_concat_or_rtrace('cl_',F,CLN), P=..[CLN,X],FP=..[F], assertz(P:- X is FP).
+% define_cl_math(F,1):- atom_concat_or_rtrace('cl_',F,CLN), P=..[CLN,X,R],FP=..[F,X], show_call_trace(user:assertz(P:- R is FP)).
+define_cl_math(F,2):- atom_concat_or_rtrace('cl_',F,CLN), P=..[CLN,X,Y,R],FP=..[F,X,Y], show_call_trace(user:assertz(P:- R is FP)).
 define_cl_math(_,_).
 
 f_u_c43(N1,N2,Ret):- Ret is (N1 + N2).

@@ -112,6 +112,15 @@ would be incorrect because rplaca does not return its last argument.
 end_of_file.
 
 
+
+ (get-setf-expansion '(symbol-value 't))
+(#:TEMP-5499) ;
+('T) ;
+(#:NEW-5498) ;
+(SYSTEM::SET-SYMBOL-VALUE #:TEMP-5499 #:NEW-5498) ;
+(SYMBOL-VALUE #:TEMP-5499)
+
+
 (get-setf-expansion (symbol-value 't))
 NIL ;
 NIL ;

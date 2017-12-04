@@ -212,7 +212,7 @@ parse_sexpr_untyped_read(In, Expr):-
 
 eval_repl_hooks(V,_):-var(V),!,fail.
 eval_repl_hooks(nil,  []):-!.
-eval_repl_hooks(Atom, R):- atom(Atom),atom_concat(_,'.',Atom),notrace(catch(read_term_from_atom(Atom,Term,[variable_names(Vs),syntax_errors(true)]),_,fail)),
+eval_repl_hooks(Atom, R):- atom(Atom),atom_concat_or_rtrace(_,'.',Atom),notrace(catch(read_term_from_atom(Atom,Term,[variable_names(Vs),syntax_errors(true)]),_,fail)),
   callable(Term),current_predicate(_,Term),b_setval('$variable_names',Vs),t_or_nil((user:call(Term)*->dmsg(Term);(dmsg(no(Term)),fail)),R).
 eval_repl_hooks([debug,A], t):- !,debug(lisp(A)).
 eval_repl_hooks([nodebug,A], t):- !, nodebug(lisp(A)).
@@ -255,9 +255,10 @@ lw:- cl_load("wam-cl-params",_).
 
 :- fixup_exports.
 
+%:- cddd.
+
 end_of_file.
 
-:- cddd.
 
 
 

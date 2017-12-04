@@ -101,20 +101,20 @@ same_reduced_atoms(X,X).
 same_reduced_atoms(X,Y):- reduce_atom(X,XX),X\==XX,!,same_reduced_atoms(XX,Y).
 same_reduced_atoms(Y,X):- reduce_atom(X,XX),X\==XX,!,same_reduced_atoms(Y,XX).
 
-reduce_atom(X,XX):- reduce_atom0(X,XX),XX\==''.
+reduce_atom(X,XX):- atom(X),reduce_atom0(X,XX),XX\==''.
 reduce_atom0(X,XX):- downcase_atom(X,XX)->X\==XX.
-%reduce_atom(X,XX):- atom_concat('%',XX,X).
-%reduce_atom(X,XX):- atom_concat('$',XX,X).
+%reduce_atom(X,XX):- atom_concat_or_rtrace('%',XX,X).
+%reduce_atom(X,XX):- atom_concat_or_rtrace('$',XX,X).
 reduce_atom0(X,XX):- prologcase_name(X,XX)->X\==XX.
-reduce_atom0(X,XX):- atom_concat(':',XX,X).
-reduce_atom0(X,XX):- atom_concat('cl_',XX,X).
-reduce_atom0(X,XX):- atom_concat('f_',XX,X).
+reduce_atom0(X,XX):- atom_concat_or_rtrace(':',XX,X).
+reduce_atom0(X,XX):- atom_concat_or_rtrace('cl_',XX,X).
+reduce_atom0(X,XX):- atom_concat_or_rtrace('f_',XX,X).
 /*
-reduce_atom(X,XX):- atom_concat('u_',XX,X).
-reduce_atom(X,XX):- atom_concat('kw_',XX,X).
-reduce_atom(X,XX):- atom_concat('sys_',XX,X).
-reduce_atom(X,XX):- atom_concat('ext_',XX,X).
-reduce_atom(X,XX):- atom_concat(XX,'_mexpand1',X).
+reduce_atom(X,XX):- atom_concat_or_rtrace('u_',XX,X).
+reduce_atom(X,XX):- atom_concat_or_rtrace('kw_',XX,X).
+reduce_atom(X,XX):- atom_concat_or_rtrace('sys_',XX,X).
+reduce_atom(X,XX):- atom_concat_or_rtrace('ext_',XX,X).
+reduce_atom(X,XX):- atom_concat_or_rtrace(XX,'_mexpand1',X).
 */
 
 

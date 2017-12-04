@@ -72,23 +72,25 @@ compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, Atom2| Rest], Body):- is_p
 compile_assigns(Ctx,Env,Result,[Defvar, Var], Body):- is_def_nil(Defvar),!,
   compile_assigns(Ctx,Env,Result,[Defvar, Var , nil],Body).
 
-compile_assigns(Ctx,Env,Result,[Getf|ValuePlace], Body):- is_place_op_verbatum(Getf),     
-        debug_var([Getf,'_R'],Result),
-        debug_var([Getf,'_Env'],Env),
+compile_assigns(Ctx,Env,Result,[Getf|ValuePlace], Body):- 
+    (is_place_read(Getf);is_place_write(Getf);is_place_op_verbatum(Getf)),
+        debug_var([Getf,'_R'],Result),debug_var([Getf,'_Env'],Env),
         place_extract(ValuePlace,Value,Place),
-        extract_var_atom(Place,RVar),
-        (is_only_read_op(Getf)->rw_add(Ctx,RVar,r);rw_add(Ctx,RVar,w)),
-        Body = (place_op(Env,Getf, Place, Value, Result)).
-
-compile_assigns(Ctx,Env,Result,[Getf, Var| ValuesForms], Body):- is_place_op(Getf),     
+        when_must(extract_var_atom(ValuePlace,RVar),
+         (when_must(is_place_read(Getf),rw_add(Ctx,RVar,r)),
+          when_must(is_place_write(Getf),rw_add(Ctx,RVar,w)))),
+        Body = (place_op(Env,Getf, Value,Place, Result)).
+/*
+compile_assigns(Ctx,Env,Result,[Getf, Var| ValuesForms], Body):- is_place_write(Getf),     
 	must_maplist(expand_ctx_env_forms(Ctx,Env),ValuesForms, ValuesBody,ResultVs),
         list_to_conjuncts([true|ValuesBody],BodyS),!,
         debug_var([Getf,'_R'],Result),
         debug_var([Getf,'_Env'],Env),
         extract_var_atom(Var,RVar),
         compile_place(Ctx,Env,UsedVar,Var,Code),
-        (Var\==RVar -> rw_add(Ctx,RVar,r) ; (is_only_read_op(Getf)->rw_add(Ctx,RVar,r);rw_add(Ctx,RVar,w))),
+        (Var\==RVar -> rw_add(Ctx,RVar,r) ; (is_place_read(Getf)->rw_add(Ctx,RVar,r);rw_add(Ctx,RVar,w))),
         Body = (BodyS,Code,place_op(Env,Getf, UsedVar, ResultVs,Result)).
+*/
 
 compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, StringL], (Code,Body)):- 
         is_stringp(StringL),to_prolog_string(StringL,String),is_def_maybe_docs(SetQ),
@@ -240,15 +242,16 @@ is_pair_op(psetq).
 is_pair_op(setf).
 is_pair_op(psetf).
 
-is_only_read_op(getf).
+is_place_read(getf).
 
-is_place_op(setf).
-is_place_op(psetf).
-is_place_op(getf).
-is_place_op(incf).
-is_place_op(decf).
-is_place_op(rotatef).
-is_place_op(shiftf).
+is_place_write(setf).
+is_place_write(psetf).
+is_place_write(incf).
+is_place_write(decf).
+is_place_write(rotatef).
+is_place_write(shiftf).
+is_place_write(V):- is_place_op_verbatum(V).
+
 is_place_op_verbatum(push).
 is_place_op_verbatum(pushnew).
 is_place_op_verbatum(pop).

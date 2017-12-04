@@ -48,11 +48,17 @@ cl_defpackage(Name,P1,P2,R):- do_defpackage(Name,[P1,P2],R).
 cl_defpackage(Name,P1,R):- do_defpackage(Name,[P1],R).
 cl_defpackage(Name,R):- do_defpackage(Name,[],R).
 
+cl_make_package(Name,P1,P2,P3,R):- do_defpackage(Name,[P1,P2,P3],R).
+cl_make_package(Name,P1,P2,R):- do_defpackage(Name,[P1,P2],R).
+cl_make_package(Name,P1,R):- do_defpackage(Name,[P1],R).
+cl_make_package(Name,R):- do_defpackage(Name,[],R).
+
 
 do_defpackage(L,B,T):- to_prolog_string_if_needed(L,Loc),!,do_defpackage(Loc,B,T).
 do_defpackage(AName,List,Package):-
   atom_string(AName,Name),  
   atom_concat_or_rtrace(pkg_,Name,Down),prologcase_name(Down,Package),
+  add_opv(Package,classof,claz_package),
   asserta(package_name(Package,Name)),
   init_slot_props(claz_package,2,Package,List), 
   string_upper(Name,UName),

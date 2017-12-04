@@ -24,7 +24,9 @@
 as_string_upper(C,SN):- compound(C),\+ is_list(C),functor(C,_P,A),arg(A,C,S),!, as_string_upper(S,SN).
 as_string_upper(S,U):- to_prolog_string(S,D),string_upper(D,U).
 
-to_prolog_string_if_needed(L,Loc):- \+ atomic(L),is_stringp(L),!,to_prolog_string(L,Loc).
+to_prolog_string_if_needed(L,Loc):- \+ atomic(L),is_stringp(L),!,always(to_prolog_string(L,Loc)).
+to_prolog_string_if_needed(L,Loc):- \+ string(L),is_symbolp(L),!,always(to_prolog_string(L,Loc)).
+
 
 is_characterp(X):-var(X),!,fail.
 is_characterp('$CHAR'(V)):- nonvar(V).
@@ -39,7 +41,7 @@ cl_string(O,S):- to_prolog_string(O,PLS),to_lisp_string(PLS,S).
 
 to_prolog_string(SS,SS):- notrace(var(SS)),!,break.
 to_prolog_string(SS,SS):- notrace(string(SS)),!.
-to_prolog_string('$ARRAY'([_N],claz_base_character,List),SS):- !,always(lisp_chars_to_pl_string(List,SS)).
+to_prolog_string('$ARRAY'(_N,claz_base_character,List),SS):- !,always(lisp_chars_to_pl_string(List,SS)).
 %to_prolog_string('$ARRAY'(_,_,List),SS):-  !,lisp_chars_to_pl_string(List,SS).
 to_prolog_string(S,SN):- is_symbolp(S),!,pl_symbol_name(S,S2),to_prolog_string(S2,SN).
 to_prolog_string('$CHAR'(Code),Char):- !, (\+ number(Code)->Char=Code;char_code(Char,Code)).
@@ -53,6 +55,15 @@ to_prolog_string('$CHAR'(Code),Char):- !, (\+ number(Code)->Char=Code;char_code(
 
 to_lisp_string('$ARRAY'([N],claz_base_character,List),'$ARRAY'([N],claz_base_character,List)):-!.
 to_lisp_string(Str,'$ARRAY'([*],claz_base_character,List)):- atom_chars(Str,Chars),maplist(make_character,Chars,List).
+make_character(I,O):-notrace(make_character0(I,O)).
+make_character0(S,'$CHAR'(S)):- var(S),!.
+make_character0('$CHAR'(S),C):- !, make_character0(S,C).
+make_character0(S,'$CHAR'(Char)):- number(S), S < 4096,char_code(Char,S).
+make_character0(S,'$CHAR'(S)):- atom(S),name(S,[_]),!.
+make_character0(S,'$CHAR'(S)):- atom(S),char_code(S,_),!.
+make_character0(N,'$CHAR'(S)):- integer(N),(char_type(N,alnum)->name(S,[N]);S=N),!.
+make_character0(N,C):- text_to_string_safe(N,Str),char_code_from_name(Str,Code),make_character0(Code,C),!.
+make_character0(C,'$CHAR'(C)).
 
 to_prolog_codes('$CHAR'(Code),Char):- !, (\+ number(Code)->Char=Code;char_code(Char,Code)).
 to_prolog_codes(Code,Char):- (\+ number(Code)->Char=Code;char_code(Char,Code)).

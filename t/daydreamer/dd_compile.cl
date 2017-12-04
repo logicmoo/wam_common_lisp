@@ -34,5 +34,7 @@
 (compile-file "dd_utils")
 (compile-file "dd_rule1")
 (compile-file "dd_rule2")
+(compile-file "dd_rule2a")
+(compile-file "dd_rule3")
 
 ; End of file.

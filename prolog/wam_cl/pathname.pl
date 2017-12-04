@@ -54,9 +54,9 @@ check_file_types(SearchTypes):-
    maplist(to_file_exts,FileTypes,SearchTypes),!.
 check_file_types(['.cl','.lisp','.lsp','.el']).
 
-to_file_exts(Str,Atom):- to_prolog_string(Str,At),atom_concat_or_rtrace('.',At,Atom),!.
-%txt2a(TXT,A):- to_prolog_string(TXT,T),!,always((text_to_string(T,S),atom_string(A,S))),!.
-txt2a(TXT,A):- always((text_to_string(TXT,S),atom_string(A,S))),!.
+to_file_exts(Str,Atom):- to_prolog_string_anyways(Str,At),atom_concat_or_rtrace('.',At,Atom),!.
+txt2a(TXT,A):- to_prolog_string_anyways(TXT,T),!,always((text_to_string(T,S),atom_string(A,S))),!.
+%txt2a(TXT,A):- always((text_to_string(TXT,S),atom_string(A,S))),!.
 
 with_fstem(Path,File,Found):-   
    notrace(check_file_types(SearchTypes)),

@@ -36,15 +36,17 @@ feature_member0([kw_or|X],Features):- member(E,X), feature_member0(E,Features).
 feature_member0([kw_and|X],Features):- \+ ( member(E,X), \+ feature_member0(E,Features)).
 
 
+resolve_1inline([OP,_Flag,_Form], _Code):- \+ atomic(OP),!,fail.
+resolve_1inline([_OP,Flag,_Form], _Code):- var(Flag),!,fail.
 % #+
-resolve_1inline([OP,Flag,Form], Code):- atomic(OP), same_symbol(OP,'#+'),nonvar(Flag),!, 
+resolve_1inline([OP,Flag,Form], Code):- same_symbol(OP,'#+'),!,
    always(( symbol_value(xx_features_xx,FEATURES),
      (feature_member(Flag,FEATURES) -> Code = Form ; Code = '$COMMENT'(flag_removed(+Flag,Form))))).
    
 % #-
-resolve_1inline([OP,Flag,Form], Code):- atomic(OP), same_symbol(OP,'#-'),nonvar(Flag),!,
+resolve_1inline([OP,Flag,Form], Code):- same_symbol(OP,'#-'),!,
    always(( symbol_value(xx_features_xx,FEATURES),
-     (\+ feature_member(Flag,FEATURES) -> Code = Form ; Code = '$COMMENT'(flag_removed(+Flag,Form))))).
+     (\+ feature_member(Flag,FEATURES) -> Code = Form ; Code = '$COMMENT'(flag_removed(-Flag,Form))))).
 
 
 resolve_inlines(IO,IO):- \+ compound(IO),!.
@@ -57,7 +59,7 @@ resolve_inlines([I|II],[O|OO]):-resolve_inlines(I,O),!,resolve_inlines(II,OO).
 resolve_inlines(IO,IO).
 
 
-as_sexp(I,O):- as_sexp1(I,M),resolve_reader_macros(M,M2),remove_comments(M2,O).
+as_sexp(I,O):- as_sexp1(I,M),resolve_reader_macros(M,M2),remove_comments(M2,O),!.
 
 as_sexp1(Var,Var):-var(Var).
 as_sexp1(NIL,NIL):-NIL==[],!.
@@ -80,7 +82,8 @@ expand_pterm_to_sterm(VAR,VAR):- notrace(is_ftVar(VAR)),!.
 expand_pterm_to_sterm('NIL',[]):-!.
 expand_pterm_to_sterm(nil,[]):-!.
 expand_pterm_to_sterm(VAR,VAR):- \+ compound(VAR),!.
-expand_pterm_to_sterm(ExprI,ExprO):- ExprI=..[F|Expr],atom_concat_or_rtrace('$',_,F),must_maplist(expand_pterm_to_sterm,Expr,TT),ExprO=..[F|TT].
+expand_pterm_to_sterm(ExprI,ExprO):- ExprI=..[F|Expr],atom_concat_or_rtrace('#',_,F),!,must_maplist(expand_pterm_to_sterm,Expr,TT),ExprO=[F|TT].
+expand_pterm_to_sterm(ExprI,ExprO):- ExprI=..[F|Expr],atom_concat_or_rtrace('$',_,F),!,must_maplist(expand_pterm_to_sterm,Expr,TT),ExprO=..[F|TT].
 expand_pterm_to_sterm([X|L],[Y|Ls]):-!,expand_pterm_to_sterm(X,Y),expand_pterm_to_sterm(L,Ls),!.
 expand_pterm_to_sterm(X,STerm):- compound_name_arguments(X,F,L),expand_pterm_to_sterm(L,Y),!,maybe_sterm(F,Y,STerm).
 expand_pterm_to_sterm(X,X).

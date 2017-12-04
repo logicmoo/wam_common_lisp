@@ -208,7 +208,7 @@ compile_body(Ctx,Env,Result,[prog2,Form1,Form2|FormS],Code):- !,
    Code = (Body1, Body2, BodyS).
 
 % `, Backquoted commas
-compile_body(_Cx,Env,Result,['$BQ',Form], Code):-!,compile_bq(Env,Result,Form,Code).
+compile_body(_Cx,Env,Result,['#BQ',Form], Code):-!,compile_bq(Env,Result,Form,Code).
 compile_body(_Cx,Env,Result,['`',Form], Code):-!,compile_bq(Env,Result,Form,Code).
 
 % #+

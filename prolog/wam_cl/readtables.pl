@@ -33,7 +33,11 @@ reader_intern_symbols(Package,SymbolName,Symbol):-
 
 
 reader_intern_symbols(_Package,Some,Some):- \+ compound(Some),!.
+reader_intern_symbols(Package,[S|Some],[SR|SomeR]):-!, 
+  reader_intern_symbols(Package,S,SR),
+  reader_intern_symbols(Package,Some,SomeR),!.
 reader_intern_symbols(_,I,I):- is_comment(I,_),!.
+reader_intern_symbols(_Package,'$STRING'(Expr),LispO):- !, text_to_string_safe(Expr,Text),!,notrace(to_lisp_string(Text,LispO)).
 reader_intern_symbols(_Package,'$NUMBER'(X,Y),'$NUMBER'(X,Y)):-!.
 reader_intern_symbols(_Package,'$COMPLEX'(X,Y),'$COMPLEX'(X,Y)):-!.
 reader_intern_symbols(_Package,'$CHAR'(X),'$CHAR'(X)):-!.
@@ -46,26 +50,23 @@ reader_intern_symbols(_,'$OBJ'([Unbound]),'$OBJ'(unbound,[])):- Unbound = unboun
 reader_intern_symbols(_,'$OBJ'(Function,F),function(F)):- Function==function,!.
 reader_intern_symbols(Package,'$OBJ'(Expr),'$OBJ'(ExprO)):-!,reader_intern_symbols(Package,(Expr),(ExprO)).
 
-reader_intern_symbols(Package,ExprI,ExprO):- ExprI=..[F,C,D|Expr],F=='$ARRAY',  
+reader_intern_symbols(Package,ExprI,ExprO):- ExprI=..[F,C,D|Expr],F=='$ARRAY',!,  
   ((find_or_create_class(D,K),atom(K));reader_intern_symbols(Package,C,K)),
   must_maplist(reader_intern_symbols(Package),Expr,TT),ExprO=..[F,C,K|TT].
 
-reader_intern_symbols(Package,ExprI,ExprO):- ExprI=..[F,C|Expr],F=='$OBJ',  
+reader_intern_symbols(Package,ExprI,ExprO):- ExprI=..[F,C|Expr],F=='$OBJ',!,
   ((find_or_create_class(C,K),atom(K));reader_intern_symbols(Package,C,K)),
   must_maplist(reader_intern_symbols(Package),Expr,TT),ExprO=..[F,K|TT].
-reader_intern_symbols(Package,ExprI,ExprO):- ExprI=..[F|Expr],atom_concat('$',_,F),!,
+reader_intern_symbols(Package,ExprI,ExprO):- ExprI=..[F|Expr],atom_concat_or_rtrace('$',_,F),!,
   must_maplist(reader_intern_symbols(Package),Expr,TT),ExprO=..[F|TT].
 
-reader_intern_symbols(Package,[S|Some],[SR|SomeR]):- 
-  reader_intern_symbols(Package,S,SR),
-  reader_intern_symbols(Package,Some,SomeR).
-
 reader_intern_symbols(Package,C1,C2):- 
-  compound_name_arguments(C1,F,C1O),
+  compound_name_arguments(C1,F,C1O),!,
   must_maplist(reader_intern_symbols(Package),C1O,C2O),C2=..[F|C2O].
 reader_intern_symbols(_Package,Some,Some).
 
 
+simple_atom_token(SymbolName):- atom_concat_or_rtrace('#',_,SymbolName),upcase_atom(SymbolName,SymbolName).
 simple_atom_token(SymbolName):- atom_concat_or_rtrace('$',_,SymbolName),upcase_atom(SymbolName,SymbolName).
 simple_atom_token(SymbolName):- string_upper(SymbolName,UP),string_lower(SymbolName,DOWN),!,UP==DOWN.
 

@@ -40,11 +40,18 @@ body_cleanup_keep_debug_vars1(Ctx,Code0,CodeOut):-
 
 fast_get_sets(_Ctx,_,Code5,Code5).
 
+non_code(NC):- \+ compound(NC),!.
+non_code(NC):- is_dict(NC),!.
+non_code(NC):- \+ callable(NC),!.
+non_code(NC):- is_self_evaluating_object(NC),!.
+
 skip_optimize(Var):-var(Var),!.
-skip_optimize(NC):- \+ compound(NC),!.
+skip_optimize(NC):- non_code(NC),!.
+skip_optimize(NC):- is_dict(NC),!.
+skip_optimize(NC):- is_self_evaluating_object(NC),!.
 skip_optimize([_|_]):-!.
 skip_optimize(_:P):-!,skip_optimize(P).
-skip_optimize(P):- functor(P,F,_),atom_concat('$',_,F).
+skip_optimize(P):- functor(P,F,_),atom_concat_or_rtrace('$',_,F).
 skip_optimize(retractall(_)).
 skip_optimize(retract(_)).
 skip_optimize(erase(_)).
@@ -60,7 +67,7 @@ functor_arg_is_body(F,_):- atom_concat_or_rtrace(assert,_,F).
 functor_arg_is_body(((:-)),1).
 
 %oper_mize(_Whole,_Ctx,_,Code,Code):-!.
-oper_mize(_Whole,_Ctx,_,Code,Out):- \+ compound(Code),!,Out=Code.
+oper_mize(_Whole,_Ctx,_,Code,Out):- non_code(Code),!,Out=Code.
 oper_mize(_Whole,_Ctx,_,Code,Out):- skip_optimize(Code),Out=Code.
 %oper_mize(_Whole,Ctx,F,(:-C1),(:-C2)):-!, oper_mize(C1,Ctx,F,C1,C2).
 
@@ -100,7 +107,7 @@ body_mize(Skip,Whole,Ctx,F,(C1,C2),Joined):-!,
    body_mize(Skip,Whole,Ctx,F,C1,C1O),
    body_mize(Skip,Whole,Ctx,F,C2,C2O),conjoin_0(C1O,C2O,Joined).
 %body_mize(Skip,_Whole,_Ctx,_,C1,Out):- maybe_optimize(C1), get_optimized(C1,Out).
-body_mize(__Skip,_Whole,_Ctx,_,C1,C1):- \+ compound(C1),!.
+body_mize(__Skip,_Whole,_Ctx,_,C1,C1):- non_code(C1),!.
 body_mize(Skip,Whole,Ctx,F,call(C1),call(C2)):-!, oper_mize(Skip,Whole,Ctx,F,C1,C2).
 body_mize(Skip,Whole,Ctx,F,(C1,C2),Joined):-!,
    oper_mize(Skip,Whole,Ctx,F,C1,C1O),
@@ -127,7 +134,7 @@ maybe_optimize(_).
 
 del_attr_rev2(Name,Var):- del_attr(Var,Name).
 
-sanitize_true(_, C1,C2):- \+ compound(C1),!,C2=C1.
+sanitize_true(_, C1,C2):- non_code(C1),!,C2=C1.
 sanitize_true(Ctx,(C1,C2),Joined):-!,sanitize_true(Ctx,C1,C1O),sanitize_true(Ctx,C2,C2O),conjoin_0(C1O,C2O,Joined).
 sanitize_true(Ctx,(C1 -> C2 ; CodeC),(C1O -> C2O ; CodeCCO)):-!,sanitize_true(Ctx,C1,C1O),sanitize_true(Ctx,C2,C2O),sanitize_true(Ctx,CodeC,CodeCCO).
 sanitize_true(Ctx,C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(sanitize_true(Ctx),C1O,C2O),C2=..[F|C2O].
@@ -152,7 +159,7 @@ conjoin_0(C1,C2,(C11,C21)):- !,visit_lit(C1,C11),!,visit_lit(C2,C21).
 visit_lit(C1,C1).
 
 
-mize_body(_Ctx,_,C1,C1):- \+ compound(C1),!.
+mize_body(_Ctx,_,C1,C1):- non_code(C1),!.
 mize_body(Ctx,F, :-(C1), :-(C1O)):-!,mize_body(Ctx,F,C1,C1O).
 
 
@@ -186,7 +193,7 @@ mize_body1(Ctx,F,In,Out):-
 mize_body1(_Ctx,_F,InOut,InOut).
 
 
-mize_body_1e(_Ctx,_,C1,C1):- \+ compound(C1),!.
+mize_body_1e(_Ctx,_,C1,C1):- non_code(C1),!.
 mize_body_1e(_Ctx,_F,(A=B),true):- A==B,!.
 mize_body_1e(_Ctx,_,C1,L=[R]):- structure_applies(C1 , (L=[R, []])). % lisp_compiler_option(elim_vars,true).
 mize_body_1e(Ctx,F,(C1,C2),CodeJoined):-!,mize_body1(Ctx,F,C1,C1O),mize_body1(Ctx,F,C2,C2O),conjoin_0(C1O,C2O,CodeJoined).
@@ -214,7 +221,7 @@ mize_body2(Ctx,F,In,Out):-
 mize_body2(_Ctx,_F,InOut,InOut).
 
   
-mize_body_2e(_Ctx,_,C1,C1):- \+ compound(C1),!.
+mize_body_2e(_Ctx,_,C1,C1):- non_code(C1),!.
 mize_body_2e(_,_,In,ITE):- structure_applies(In,(ITE,R=V)), var(R),var(V),ifthenelse(ITE),R=V.
 mize_body_2e(_Ctx,_,t_or_nil(G, R),G):- R==t.
 mize_body_2e(_Ctx,_,t_or_nil(G, R),\+ G):- R==[].
@@ -231,7 +238,7 @@ mize_body_2e(_Ctx,_,C1,C1):-!.
 
 mize_body3(_Ctx,_,C1,C1):- var(C1),del_attr(C1,rwstate).
 mize_body3(_Ctx,_,C1=C2, true):- var(C1),var(C2),lisp_compiler_option(elim_vars,true),C1==C2,!.
-mize_body3(_Ctx,_,C1,C1):- \+ compound(C1),!.
+mize_body3(_Ctx,_,C1,C1):- non_code(C1),!.
 
 % mize_body3(_Ctx,_F,(C1,A=B),C1):- ifthenelse(C1),var(A),var(B),A=B.
 mize_body3(Ctx,_F,C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(mize_body3(Ctx,F),C1O,C2O),C2=..[F|C2O].
@@ -239,7 +246,7 @@ mize_body3(_Ctx,_,C1,C1):-!.
 
 
 %env_mize(_Ctx,_,C1,C1):-!.
-env_mize(_Ctx,_,C1,C1):- \+ compound(C1),!.
+env_mize(_Ctx,_,C1,C1):- non_code(C1),!.
 env_mize(Ctx,F,C1,CodeOut):- C1 = ( Env=[bv(N, Var)|Rest], C2), var(Env),atom(N), Rest==[],  
   \+ contains_var(N,C2),
    \+ contains_var(Env,C2),
@@ -314,9 +321,9 @@ do_conjs2(F,C2,Rest,Conjs):- Conjs=..[F,C2|Rest].
 
 %inline_body(_,_,_,C1,C1).
 inline_body(_Never,_Ctx,_,C1,C1):- var(C1),!.
-inline_body(_Never,_Ctx,_,Code,Out):- skip_optimize(Code),Out=Code.
-inline_body(Never,_Ctx,_,Code,Out):- functor(Code,F,N),member(F/N,Never),Out=Code.
+inline_body(_Never,_Ctx,_,Code,Out):- skip_optimize(Code),!,Out=Code.
 inline_body(Never,Ctx,F,(C1,C2),CodeJoined):-!,inline_body(Never,Ctx,F,C1,C1O),inline_body(Never,Ctx,F,C2,C2O),conjoin_0(C1O,C2O,CodeJoined).
+inline_body(Never,_Ctx,_,Code,Out):- compound(Code),functor(Code,F,N),member(F/N,Never),!,Out=Code.
 inline_body(_Never,_Ctx,_,C1,Out):- 
   maybe_inline(C1), 
   term_variables(C1,MustHaveAll),
@@ -324,10 +331,11 @@ inline_body(_Never,_Ctx,_,C1,Out):-
   get_inlined(C1,Out),
   term_variables(Out,NewVars),
   C1=@=Before,
-  subset(MustHaveAll,NewVars).
-inline_body(_Never,_Ctx,_,C1,C1):- \+ compound(C1),!.
-inline_body(Never,Ctx,_F,C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(inline_body(Never,Ctx,F),C1O,C2O),C2=..[F|C2O].
-inline_body(_Never,_Ctx,_,C1,C1):-!.
+  subset(MustHaveAll,NewVars),!.
+inline_body(_Never,_Ctx,_,C1,C1):- non_code(C1),!.
+inline_body(Never,Ctx,_F,C1,C2):- compound_name_arguments(C1,F,C1O),
+  must_maplist(inline_body(Never,Ctx,F),C1O,C2O),!,C2=..[F|C2O].
+inline_body(_Never,_Ctx,_F,C1,C1):-!.
 
 list_to_disj([C1],(C1O)):-!, list_to_disj(C1,C1O).
 list_to_disj([C1,C2],(C1O;C2O)):-!, list_to_disj(C1,C1O),list_to_disj(C2,C2O).

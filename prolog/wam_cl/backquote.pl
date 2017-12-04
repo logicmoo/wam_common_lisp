@@ -34,17 +34,7 @@ macro_expand([X|Xs], [MX|MXs]):-
 macro_expand(X, X):-
 	atomic(X),
 	!.        
-/*
-expand_commas(_,One,Out):- \+ compound(One),!,One=Out.
-expand_commas(Env,['$COMMA',One],Out):- !, symbol_value(One,Env,Out).
-expand_commas(Env,'$COMMA'(One),Out):- !, symbol_value(One,Env,Out).
-expand_commas(Env,['$BQ',One],Out):- !, expand_commas(Env,One,Mid), (One==Mid ->  Out=['$BQ',Mid] ; Out=Mid),!.
-expand_commas(Env,One,Out):- is_list(One),!,maplist(expand_commas(Env),One,Out).
-expand_commas(Env,One,Out):-
-  compound_name_arguments(One,F,Args),
-  maplist(expand_commas(Env),Args,ArgsOut),
-  Out=..[F|ArgsOut],!.
-*/
+
 
 ec_lisp_eval(Env,Result,Form,true):- atom(Form),!,symbol_value(Env,Form,Result).
 %ec_lisp_eval(Env,Result,Result,true).
@@ -52,15 +42,14 @@ ec_lisp_eval(Env,Result,Form,true):- atom(Form),!,symbol_value(Env,Form,Result).
 ec_lisp_eval(Env,['eval_in_env',Result,Env],Result,true).
 
 expand_commas(_,Result,Form,true):- \+ compound(Form),!,Result=Form.
-expand_commas(Env,Result,['$COMMA',Form],Code):- ec_lisp_eval(Env,Result,Form,Code).
-%expand_commas(Env,Result,'$COMMA'(Form),Code):- ec_lisp_eval(Env,Result,Form,Code).
-expand_commas(Env,[quote,Result],['$BQ',Form],Code):- expand_commas(Env,Result,Form,Code).
+expand_commas(Env,Result,['#COMMA',Form],Code):- ec_lisp_eval(Env,Result,Form,Code).
+expand_commas(Env,[quote,Result],['#BQ',Form],Code):- expand_commas(Env,Result,Form,Code).
 expand_commas(_,SelfEval,SelfEval,true):- notrace(is_self_evaluating_object(SelfEval)),!.
-expand_commas(Env,[R|Result],[F,['$BQ-COMMA-ELIPSE',Form]],Code):- Form\=['$COMMA',_], 
+expand_commas(Env,[R|Result],[F,['#BQ-COMMA-ELIPSE',Form]],Code):- Form\=['#COMMA',_], 
   expand_commas(Env,R,F,Code1),
   lisp_compile(Env,Result,Form,Code2),
   Code = (Code1,Code2).
-expand_commas(Env,[R|Result],[F|['$BQ-COMMA-ELIPSE',Form]],Code):- Form\=['$COMMA',_], 
+expand_commas(Env,[R|Result],[F|['#BQ-COMMA-ELIPSE',Form]],Code):- Form\=['#COMMA',_], 
   expand_commas(Env,R,F,Code1),
   lisp_compile(Env,Result,Form,Code2),
   Code = (Code1,Code2).
@@ -77,15 +66,14 @@ expand_commas(Env,Result,Forms,Code):-
 
 
 compile_bq(_,Result,Form,true):- \+ compound(Form),!,Result=Form.
-compile_bq(Env,Result,['$COMMA',Form],Code):- lisp_compile(Env,Result,Form,Code).
-%compile_bq(Env,Result,'$COMMA'(Form),Code):- lisp_compile(Env,Result,Form,Code).
-compile_bq(Env,[quote,Result],['$BQ',Form],Code):- compile_bq(Env,Result,Form,Code).
+compile_bq(Env,Result,['#COMMA',Form],Code):- lisp_compile(Env,Result,Form,Code).
+compile_bq(Env,[quote,Result],['#BQ',Form],Code):- compile_bq(Env,Result,Form,Code).
 compile_bq(_,SelfEval,SelfEval,true):- notrace(is_self_evaluating_object(SelfEval)),!.
-compile_bq(Env,[R|Result],[F,['$BQ-COMMA-ELIPSE',Form]],Code):- Form\=['$COMMA',_], Form\='$COMMA'(_), 
+compile_bq(Env,[R|Result],[F,['#BQ-COMMA-ELIPSE',Form]],Code):- Form\=['#COMMA',_],
   compile_bq(Env,R,F,Code1),
   lisp_compile(Env,Result,Form,Code2),
   Code = (Code1,Code2).
-compile_bq(Env,[R|Result],[F|['$BQ-COMMA-ELIPSE',Form]],Code):- Form\=['$COMMA',_], Form\='$COMMA'(_), 
+compile_bq(Env,[R|Result],[F|['#BQ-COMMA-ELIPSE',Form]],Code):- Form\=['#COMMA',_],
   compile_bq(Env,R,F,Code1),
   lisp_compile(Env,Result,Form,Code2),
   Code = (Code1,Code2).

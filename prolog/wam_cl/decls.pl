@@ -93,7 +93,7 @@ compile_macro(Ctx,CallEnv,Macro,[Name0,FormalParms|FunctionBody0], CompileBody):
    set_opv(Symbol,function,Macro),
    within_labels_context(Symbol, make_mcompiled(Ctx,CallEnv,MResult,Symbol,MacroHead,FunctionBody,
      NewMacroHead,HeadDefCode,BodyCode,Fun)),
-   %NewMacroHead=..[M|ARGS],RNewMacroHead=..[MM|ARGS], atom_concat(M,'_mexpand1',MM),   
+   %NewMacroHead=..[M|ARGS],RNewMacroHead=..[MM|ARGS], atom_concat_or_rtrace(M,'_mexpand1',MM),   
    get_alphas(Ctx,Alphas),
    debug_var('FnResult',FResult),
    debug_var('Fun',Fun),

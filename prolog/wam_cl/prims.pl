@@ -39,13 +39,12 @@ is_self_evaluating_object(X):- var(X),!.
 is_self_evaluating_object(X):- atomic(X),!,is_self_evaluationing_const(X).
 is_self_evaluating_object('$OBJ'(_,_)):-!.
 is_self_evaluating_object('$CHAR'(_)):-!.
-is_self_evaluating_object(P):-functor(P,F,_),atom_concat_or_rtrace('$',_,F),!.
-
 is_self_evaluating_object(X):- (is_dict(X);is_array(X);is_rbtree(X)),!.
+is_self_evaluating_object(P):-functor(P,F,_),atom_concat_or_rtrace('$',_,F),!.
 
 is_self_evaluationing_const(X):- atomic(X),is_self_evaluationing_const0(X),!.
 is_self_evaluationing_const0(X):- (X==t;X==[];number(X);is_keywordp(X);string(X);(blob(X,T),T\==text)),!.
-is_self_evaluationing_const0(X):- is_functionp(X).
+is_self_evaluationing_const0(X):- is_functionp(X),!.
 
 is_functionp(X):- \+ atom(X),!,fail.
 is_functionp(X):- atom_concat_or_rtrace('f_',_,X),!.
@@ -88,6 +87,10 @@ wl:declared(cl_list,inline(list)).
 wl:declared(cl_list,uses_rest).
 cl_list(List,List).
 
+
+% assoc item alist
+cl_assoc(Key,List,KV):- member(KV,List),KV=[Key|_],!.
+cl_assoc(_Key,_List,[]).
 
 cl_lisp_not(Boolean, Result):-
 		Boolean = []

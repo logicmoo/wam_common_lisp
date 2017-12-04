@@ -69,7 +69,7 @@ create_jump(TB,Label,Pred,Env,call(Pred,Env)):- compute_new_address(TB,Label,Pre
 simplify_call(call(Pred,Env),COUT):- atom(Pred),!, COUT=..[Pred,Env].
 simplify_call(COUT,COUT).
 
-compute_new_address(_, Label,Pred):- atom_concat('block_exit_',_,Label),!,Pred=Label.
+compute_new_address(_, Label,Pred):- atom_concat_or_rtrace('block_exit_',_,Label),!,Pred=Label.
 compute_new_address(TB,Label,Pred):- always(atomic_list_concat([TB,Label],'_',Pred)).
 
 

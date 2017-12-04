@@ -40,8 +40,8 @@
 
 :- thread_local(t_l:s_reader_info/1).
 
-notrace_catch_fail(G):- notrace(catch(G,_,fail)).
-notrace_catch_fail(G,E,C):- notrace(catch(G,E,C)).
+notrace_catch_fail(G):- notrace(catch(G,_,fail)),!.
+notrace_catch_fail(G,E,C):- notrace(catch(G,E,C)),!.
 %% with_lisp_translation( +FileOrStream, :Pred1) is det.
 %
 % With File or Stream read all S-expressions submitting each to Pred1
@@ -49,7 +49,7 @@ notrace_catch_fail(G,E,C):- notrace(catch(G,E,C)).
 with_lisp_translation(In,Pred1):- 
    is_stream(In),!,
    repeat,
-      lisp_read(In,O),
+      once(lisp_read(In,O)),
       (O== end_of_file -> (with_rest_info(Pred1),!) ; 
       (must_det(once(maybe_notrace(call_proc(Pred1,O)))),fail)),!.
 with_lisp_translation(Other,Pred1):- 
@@ -57,14 +57,16 @@ with_lisp_translation(Other,Pred1):-
      with_lisp_translation(In,Pred1),
      ignore(notrace_catch_fail(close(In),_,true))),!.
 
-call_proc(Pred1,O):- call(Pred1,O),with_rest_info(Pred1).
+call_proc(Pred1,O):- call(Pred1,O),!,with_rest_info(Pred1),!.
 
-with_rest_info(Pred1):- forall(retract(t_l:s_reader_info(O2)),must_det(call(Pred1,O2))).
+with_rest_info(Pred1):- 
+ forall(clause(t_l:s_reader_info(O2),_,Ref),
+  (must_det(call(Pred1,O2)),erase(Ref))).
 
 parse_sexpr_untyped(I,O):- quietly(parse_sexpr(I,M)),!,quietly(to_untyped(M,O)),!.
 
 read_pending_whitespace(In):- repeat, peek_char(In,Code),
-   (( \+ char_type(Code,space), \+ char_type(Code,white))-> ! ; (get_char(In,_),fail)).
+   (( \+ char_type(Code,space), \+ char_type(Code,white))-> ! ; (get_char(In,_),fail)),!.
 
 
 make_tmpfile_name(Name,Temp):- 
@@ -82,7 +84,7 @@ make_tmpfile_name(Name,Temp):-
 with_lisp_translation_cached(M:LFile,WithPart2,WithPart1):- 
    absolute_file_name(LFile,File),
    make_tmpfile_name(LFile,Temp),
-   maybe_cache_lisp_translation(File,Temp,WithPart2),
+   maybe_cache_lisp_translation(File,Temp,WithPart2),!,
    finish_lisp_translation_cached(M,File,Temp,WithPart1).
 
 finish_lisp_translation_cached(M,File,Temp,WithPart1):-
@@ -307,7 +309,7 @@ read_dispatch(E,[DispatCH|In],Out):- read_dispatch_char([DispatCH],E,In,Out).
 read_dispatch_char(DispatCH,Form,In,Out):- sread_dyn:plugin_read_dispatch_char(DispatCH,Form,In,Out),!.
 % read_dispatch_char(`@`,Form,In,Out):- phrase(sexpr(Form), In, Out),!.
 
-read_dispatch_error(Form,In,Out):- lisp_dumpST,trace_or_throw((read_dispatch_error(Form,In,Out))).
+read_dispatch_error(Form,In,Out):- trace, dumpST,trace_or_throw((read_dispatch_error(Form,In,Out))).
 
 
 
@@ -316,13 +318,17 @@ read_dispatch_error(Form,In,Out):- lisp_dumpST,trace_or_throw((read_dispatch_err
 :- dynamic(sread_dyn:plugin_read_dispatch_char/4).
 
 :- use_module(library(dcg/basics)).
+
 % #x Hex
+sread_dyn:plugin_read_dispatch_char([DispatCH],Form,In,Out):-
+  member(DispatCH,`Xx`),(phrase((`-`,dcg_basics:xinteger(FormP)), In, Out)),!,Form is -FormP.
+
 sread_dyn:plugin_read_dispatch_char([DispatCH],Form,In,Out):-
   member(DispatCH,`Xx`),!,always(phrase(dcg_basics:xinteger(Form), In, Out)),!.
 
 % #B Binary
 sread_dyn:plugin_read_dispatch_char([DispatCH],Form,In,Out):-
-  member(DispatCH,`Bb`),!,phrase(radix_number(2,Form), In, Out),!.
+  member(DispatCH,`Bb`),!,phrase(signed_radix_2(2,Form), In, Out),!.
 
 % #O Octal
 sread_dyn:plugin_read_dispatch_char([DispatCH],Form,In,Out):-
@@ -398,8 +404,8 @@ sexpr((Txt))                 --> `#|`, lazy_list_location(file(_,_,I,CP)),
 */
 sexpr(['#'(quote),E])              --> `'`, !, swhite, sexpr(E).
 sexpr(['#'(backquote),E])         --> [96] , !, swhite, sexpr(E).
-sexpr(['$BQ-COMMA-ELIPSE',E]) --> `,@`, !, swhite, sexpr(E).
-sexpr('$COMMA'(E))            --> `,`, !, swhite, sexpr(E).
+sexpr(['#BQ-COMMA-ELIPSE',E]) --> `,@`, !, swhite, sexpr(E).
+sexpr(['#COMMA',E])            --> `,`, !, swhite, sexpr(E).
 sexpr('$OBJ'(claz_bracket_vector,V))                 --> `[`, sexpr_vector(V,`]`),!, swhite.
 sexpr('#'(A))              --> `|`, !, read_string_until(S,`|`), swhite,{maybe_notrace(atom_string(A,S))}.
 
@@ -413,7 +419,7 @@ sexpr('$STRING'(S))             --> s_string(S).
 
 sexpr(E)                      --> `#`,read_dispatch(E),!.
 
-sexpr('$CHAR'(C))                 --> `#\\`,ch(`u`),remove_optional_char(`+`),dcg_basics:xinteger(C),!.
+sexpr('$CHAR'(C))                 --> `#\\`,ci(`u`),remove_optional_char(`+`),dcg_basics:xinteger(C),!.
 sexpr('$CHAR'(C))                 --> `#\\`,!,rsymbol(``,C), swhite.
 sexpr(['#-',K,O]) --> `#-`,sexpr(C),swhite,sexpr(O),!,{as_keyword(C,K)}.
 sexpr(['#+',K,O]) --> `#+`,sexpr(C),swhite,sexpr(O),!,{as_keyword(C,K)}.
@@ -522,6 +528,12 @@ always(G,H,T):- always(phrase(G,H,T)).
 
 :- export('//'(sexpr_list,1)).
  
+
+peek_symbol_breaker_or_number --> sexpr_dcgPeek([C]),{\+ sym_char(C),\+ char_type(C,digit)}.
+peek_symbol_breaker --> sexpr_dcgPeek([C]),{\+ sym_char(C)}.
+peek_symbol_breaker --> one_blank.
+
+sexpr_list(X) --> one_blank,!,sexpr_list(X).
 sexpr_list([]) --> `)`, !.
 sexpr_list(_) --> `.`, [C], {\+ sym_char(C)}, !, {fail}.
 sexpr_list([Car|Cdr]) --> sexpr(Car), !, sexpr_rest(Cdr).
@@ -531,8 +543,11 @@ sexpr_rest(E) --> `.`, [C], {\+ sym_char(C)}, !, sexpr(E,C), !, `)`.
 sexpr_rest(E) --> `@`, rsymbol(`?`,E), `)`.
 sexpr_rest([Car|Cdr]) --> sexpr(Car), !, sexpr_rest(Cdr).
 
-sexpr_vector([],End) --> End, !.
-sexpr_vector([First|Rest],End) --> sexpr(First), !, sexpr_vector(Rest,End).
+sexpr_vector(O,End) --> sexpr_vector0(IO,End),!,always(O=IO).
+
+sexpr_vector0(X) --> one_blank,!,sexpr_vector0(X).
+sexpr_vector0([],End) --> End, !.
+sexpr_vector0([First|Rest],End) --> sexpr(First), !, sexpr_vector0(Rest,End).
 
 sexpr_string([C|S]) --> `\\`, lchar(C),!, sexpr_string(S).
 sexpr_string([]) --> `"`, !.
@@ -562,7 +577,8 @@ rsymbol_maybe(Prepend,ES) --> rsymbol(Prepend,E),{maybe_string(E,ES)}.
 maybe_string(E,ES):- nb_current('$maybe_string',t),!,text_to_string_safe(E,ES).
 maybe_string(E,E).
 
-sym_continue([H|T]) --> [H], {sym_char(H)}, sym_continue(T).
+sym_continue([H|T]) --> [H], {sym_char(H)},!, sym_continue(T).
+sym_continue([]) --> peek_symbol_breaker,!.
 sym_continue([]) --> [].
 
 string_vector([First|Rest]) --> sexpr(First), !, string_vector(Rest).
@@ -646,6 +662,7 @@ sexpr(E,C,X,Z) :- swhite([C|X],Y), sexpr(E,Y,Z).
 % )
 %
 sym_char(C) :- nb_current('$maybe_string',t),!, bx(C >  32), \+ (member(C,[34,59,40,41,35,39,44,96|`.:;!%`])).  
+sym_char(46).
 sym_char(C) :- bx(C >  32), \+ (member(C,[34,59,40,41,35,39,44,96])).  
 
 :- nb_setval('$maybe_string',[]).
@@ -691,15 +708,12 @@ to_untyped(S,S):- number(S),!.
 to_untyped(Var,'$VAR'(Name)):-svar(Var,Name),!.
 to_untyped(Atom,Atom):- \+ compound(Atom),!.
 to_untyped('@'(Var),'$VAR'(Name)):-svar_fixvarname(Var,Name),!.
-to_untyped('$BQ'(VarName),'$BQ'(VarName)):-!.
 to_untyped('#'(S),O):- !, (nonvar(S)->to_untyped(S,O) ; O='#'(S)).
 to_untyped('#\\'(S),C):-!,to_untyped('$CHAR'(S),C),!.
 to_untyped('$CHAR'(S),C):-to_char(S,C),!.
 to_untyped('$CHAR'(S),'$CHAR'(S)):-!.
-% to_untyped('$STRING'(S),(S)):-!.
 to_untyped('$OBJ'([FUN, F]),O):- atom(FUN),!,to_untyped('$OBJ'(FUN, F),O).
 to_untyped('$OBJ'([FUN| F]),O):- atom(FUN),!,to_untyped('$OBJ'(FUN, F),O).
-to_untyped('$COMMA'(S),'$COMMA'(O)):-to_untyped(S,O),!.
 to_untyped('$OBJ'(S),'$OBJ'(O)):-to_untyped(S,O),!.
 to_untyped('$OBJ'(Ungly,S),'$OBJ'(Ungly,O)):-to_untyped(S,O),!.
 to_untyped('$OBJ'(Ungly,S),O):-to_untyped(S,SO),!,O=..[Ungly,SO].
@@ -713,8 +727,8 @@ to_untyped('$EXP'(I,T,E),'$EXP'(I,T,E)):-!.
 
 % to_untyped([[]],[]):-!.
 to_untyped('$STR'(Expr),Forms):- (text_to_string_safe(Expr,Forms);to_untyped(Expr,Forms)),!.
-to_untyped('$STRING'(Expr),Forms):- (text_to_string_safe(Expr,Forms);to_untyped(Expr,Forms)),!.
-to_untyped(['#'(Backquote),Rest],Out):- Backquote == backquote, !,to_untyped(['#'('$BQ'),Rest],Out).
+to_untyped('$STRING'(Expr),'$STRING'(Forms)):- (text_to_string_safe(Expr,Forms);to_untyped(Expr,Forms)),!.
+to_untyped(['#'(Backquote),Rest],Out):- Backquote == backquote, !,to_untyped(['#'('#BQ'),Rest],Out).
 to_untyped(['#'(S)|Rest],OOut):- nonvar(S), is_list(Rest),must_maplist(to_untyped,[S|Rest],[F|Mid]), 
           ((atom(F),t_l:s2p(F))-> Out=..[F|Mid];Out=[F|Mid]),
           to_untyped(Out,OOut).
@@ -1161,8 +1175,8 @@ sexpr_sterm_to_pterm(TD,[S|STERM],PTERM):- is_list(STERM),next_args_are_lists_un
 sexpr_sterm_to_pterm(TD,STERM,PTERM):- TD1 is TD+1, is_list(STERM),!, sexpr_sterm_to_pterm_list(TD1,STERM,PLIST),s_univ(TD,PTERM,PLIST),!.
 sexpr_sterm_to_pterm(_TD,VAR,VAR).
 
-is_quoter('$BQ').
-is_quoter('$COMMA').
+is_quoter('#BQ').
+is_quoter('#COMMA').
 is_quoter('quote').
 
 next_args_are_lists_unless_string(defmacro,1).
@@ -1190,7 +1204,7 @@ s_univ(_TD,P,S):-P=S.
 l_arity(F,A):- clause_b(arity(F,A)).
 l_arity(function,1).
 l_arity(quote,1).
-l_arity('$BQ',1).
+l_arity('#BQ',1).
 l_arity(F,A):-current_predicate(F/A).
 l_arity(_,1).
 
@@ -1316,7 +1330,7 @@ input_to_forms_debug(String,Decoder):-input_to_forms(String,Wff,Vs),
 %
 input_to_forms(Codes,FormsOut,Vars):- 
   b_setval('$variable_names',[])-> 
-  input_to_forms0(Codes,FormsOut,Vars) ->
+  quietly(input_to_forms0(Codes,FormsOut,Vars)) ->
   nop(set_variable_names_safe(Vars)).
   
 is_variable_names_safe(Vars):- var(Vars),!.
@@ -1335,7 +1349,7 @@ set_variable_names_safe(Vars):-
 
 input_to_forms0(Codes,FormsOut,Vars):- 
     % is_openable(Codes),!,
-    !, parse_sexpr(Codes, Forms0),
+    !, parse_sexpr(Codes, Forms0),!,
     once((to_untyped(Forms0, Forms1),extract_lvars(Forms1,FormsOut,Vars))).
 input_to_forms0(Forms,FormsOut,Vars):-
     (to_untyped(Forms, Forms1) ->
