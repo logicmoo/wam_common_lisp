@@ -39,7 +39,7 @@ create_struct1(Kind,[Value],Value):- data_record(Kind,[_]),!.
 create_struct1(Kind,ARGS,Obj):-create_instance(Kind,ARGS,Obj),!.
 create_struct1(_Type,Value,Value).
 
-cl_make_instance(Obj,[Name|Slots]):- always(create_instance(Name,Slots,Obj)).
+cl_make_instance([Name|Slots],Obj):- always(create_instance(Name,Slots,Obj)).
 
 create_struct(X,Y):-create_instance(X,Y).
 create_struct(X,Y,Z):-create_instance(X,Y,Z).

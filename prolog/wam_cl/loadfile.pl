@@ -132,8 +132,9 @@ Notes: None.
 */
 
 cl_compile_file(File,R):-
-  cl_compile_file(File,keys([]),R).
-cl_compile_file(File,keys(Keys),R):-
+  cl_compile_file(File,([]),R).
+:-assert(wl:arg_lambda_type(req(1),cl_compile_file)).
+cl_compile_file(File,Keys,R):-
   do_compile_1file(Keys,File),!,
   cl_truename(File,R),!.
 
@@ -222,12 +223,16 @@ lisp_grovel(MP):- write_trans(MP).
    %*compile-file-truename*
 */
 
-
-cl_load(L,T):- to_prolog_string_if_needed(L,Loc),!,cl_load(Loc,T).
-cl_load('$OBJ'(_Pathname,Loc),T):- !, cl_load(Loc,T).
-cl_load(File,t):- pl_compiled_filename(File,PL),exists_file(PL),!,in_comment(dbmsg(ensure_loaded(PL))),!,ensure_loaded(PL).
+cl_load(L,T):- cl_load(L,[],T).
+:-assert(wl:arg_lambda_type(req(1),cl_load)).
+cl_load(L,Keys,T):- to_prolog_string_if_needed(L,Loc),!,cl_load(Loc,Keys,T).
+cl_load('$OBJ'(_Pathname,Loc),Keys,T):- !, cl_load(Loc,Keys,T).
+cl_load(File,_Keys,t):-
+   % check maybe for fresh
+   pl_compiled_filename(File,PL),exists_file(PL),!,in_comment(dbmsg(ensure_loaded(PL))),!,ensure_loaded(PL).
 %cl_load(File,R):- cl_compile_file(File,t),!,pl_compiled_filename(File,PL),exists_file(PL),!,in_comment(dbmsg(ensure_loaded(PL))),!,ensure_loaded(PL).
-cl_load(File,t):- with_each_file(with_each_form(lisp_reader_compiled_eval),File).
+cl_load(File,_Keys,t):- 
+  with_each_file(with_each_form(lisp_reader_compiled_eval),File).
 
 
 lisp_reader_compiled_eval(PExpression):- 

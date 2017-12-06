@@ -6364,8 +6364,7 @@ struct_opv(claz_symbol,name,"PACKAGE",zlot_symbol_package).
 struct_opv(claz_symbol,name,"PROPERTY-LIST",zlot_symbol_property_list).
 struct_opv(claz_symbol,name,"SPECIAL-INDEX",zlot_symbol_special_index).
 struct_opv(claz_symbol,name,"VALUE",zlot_symbol_value).
-struct_opv(claz_symbol,predicate,symbol_value,zlot_symbol_value).
-struct_opv(claz_symbol,prototype,mu1).
+struct_opv(claz_symbol,predicate,symbolp,zlot_symbol_value).
 struct_opv(claz_symbol,prototype,t).
 struct_opv(claz_symbol,read_only,t,zlot_symbol_name).
 struct_opv(claz_symbol,slot,flags,zlot_symbol_flags).

@@ -282,3 +282,45 @@
 
 (my-describe Eric)
 
+
+(defun generate-defclass (class-name class-options supers slots)
+  (let ((conc-name nil)
+        (predicate nil)
+        (predicate-forms nil))
+    (loop
+       for (option-name . args) in class-options
+       do (ecase option-name
+            (:conc-name
+             (when conc-name
+               (error "Can't specify the :CONC-NAME argument more than once."))
+             (setf conc-name (first args)))
+            (:predicate
+             (when predicate
+               (error "Can't specify the :PREDICATE argument more than once."))
+             (setf predicate (if (eql t (first args))
+                                 (intern (strcat class-name :-p) *package*)
+                                 (first args))))))
+    (setf slots
+          (mapcar
+           (lambda (slot-spec)
+             (destructuring-bind (name
+                                  &optional initform
+                                  &rest options)
+                 (ensure-list slot-spec)
+               `(,name
+                 :initform ,initform
+                 ,@(when conc-name
+                     `(:accessor ,(intern (strcat conc-name name)
+                                          (symbol-package conc-name))))
+                 :initarg ,(intern (symbol-name name) :keyword)
+                 ,@options)))
+           slots)
+          predicate-forms
+          (if predicate
+              (with-unique-names (obj)
+                `((defmethod ,predicate ((,obj ,class-name)) t)
+                  (defmethod ,predicate ((,obj t)) nil)))
+              nil))
+    `(prog1
+         (defclass ,class-name ,supers ,slots)
+       ,@predicate-forms)))
