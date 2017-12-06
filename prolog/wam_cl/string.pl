@@ -44,7 +44,7 @@ to_prolog_string(SS,SS):- notrace(string(SS)),!.
 to_prolog_string('$ARRAY'(_N,claz_base_character,List),SS):- !,always(lisp_chars_to_pl_string(List,SS)).
 %to_prolog_string('$ARRAY'(_,_,List),SS):-  !,lisp_chars_to_pl_string(List,SS).
 to_prolog_string(S,SN):- is_symbolp(S),!,pl_symbol_name(S,S2),to_prolog_string(S2,SN).
-to_prolog_string('$CHAR'(Code),Char):- !, (\+ number(Code)->Char=Code;char_code(Char,Code)).
+to_prolog_string('$CHAR'(Code),Str):- !, (\+ number(Code)->Char=Code;char_code(Char,Code)),text_to_string(Char,Str).
 
 
 
@@ -101,87 +101,112 @@ index_of_first_failure(_,_,_,_,[]).
 
 % http://clhs.lisp.se/Body/f_stgeq_.htm
 
-% string<
-wl:type_checked(cl_string_c60(prolog_list,prolog_list,index)).
-cl_string_c60(X,Y,R):- index_of_first_success(0,@<,X,Y,R).
-
 % string>
-wl:type_checked(cl_string_c62(prolog_list,prolog_list,index)).
-cl_string_c62(X,Y,R):- index_of_first_success(0,@>,X,Y,R).
+:-assert(wl:arg_lambda_type(req(2),cl_string_c62)).
+wl:type_checked(cl_string_c62(prolog_list,prolog_list,keys,index)).
+cl_string_c62(X,Y,Keys,R):-
+   range_1_and_2(X,Y,Keys,XR,YR,Start1),
+   index_of_first_success(Start1,@>,XR,YR,R).
+
 
 % string>=
-wl:type_checked(cl_string_c62_c61(prolog_list,prolog_list,index)).
-cl_string_c62_c61(X,Y,R):- index_of_first_success(0,@>=,X,Y,R).
+:-assert(wl:arg_lambda_type(req(2),cl_string_c62_c61)).
+wl:type_checked(cl_string_c62_c61(prolog_list,prolog_list,keys,index)).
+cl_string_c62_c61(X,Y,Keys,R):-
+   range_1_and_2(X,Y,Keys,XR,YR,Start1),
+   index_of_first_success(Start1,@>=,XR,YR,R).
+
+
+% string<
+:-assert(wl:arg_lambda_type(req(2),cl_string_c60)).
+wl:type_checked(cl_string_c60(prolog_list,prolog_list,keys,index)).
+cl_string_c60(X,Y,Keys,R):-
+   range_1_and_2(X,Y,Keys,XR,YR,Start1),
+   index_of_first_success(Start1,@<,XR,YR,R).
+
 
 % string<=
-wl:type_checked(cl_string_c60_c61(prolog_list,prolog_list,index)).
-cl_string_c60_c61(X,Y,R):- index_of_first_success(0,@<=,X,Y,R).
+:-assert(wl:arg_lambda_type(req(2),cl_string_c60_c61)).
+wl:type_checked(cl_string_c60_c61(prolog_list,prolog_list,keys,index)).
+cl_string_c60_c61(X,Y,Keys,R):-
+   range_1_and_2(X,Y,Keys,XR,YR,Start1),
+   index_of_first_success(Start1,@=<,XR,YR,R).
 
 % string/=
-wl:type_checked(cl_string_c47_c61(prolog_list,prolog_list,index)).
-cl_string_c47_c61(X,Y,R):- index_of_first_success(0,\==,X,Y,R).
-
+:-assert(wl:arg_lambda_type(req(2),cl_string_c47_c61)).
+wl:type_checked(cl_string_c47_c61(prolog_list,prolog_list,keys,index)).
+cl_string_c47_c61(X,Y,Keys,R):-
+   range_1_and_2(X,Y,Keys,XR,YR,Start1),
+   index_of_first_success(Start1,\==,XR,YR,R).
 
 % string-lessp
-wl:type_checked(cl_string_lessp(prolog_list,prolog_list,index)).
-cl_string_lessp(X,Y,R):- index_of_first_success(0,char_lessp,X,Y,R).
+:-assert(wl:arg_lambda_type(req(2),cl_string_lessp)).
+wl:type_checked(cl_string_lessp(prolog_list,prolog_list,keys,index)).
+cl_string_lessp(X,Y,Keys,R):-
+   range_1_and_2(X,Y,Keys,XR,YR,Start1),
+   index_of_first_success(Start1,char_lessp,XR,YR,R).
 
 % string-not-lessp
-wl:type_checked(cl_string_not_lessp(prolog_list,prolog_list,index)).
-cl_string_not_lessp(X,Y,R):- index_of_first_failure(0,char_lessp,X,Y,R).
+:-assert(wl:arg_lambda_type(req(2),cl_string_not_lessp)).
+wl:type_checked(cl_string_not_lessp(prolog_list,prolog_list,keys,index)).
+cl_string_not_lessp(X,Y,Keys,R):-
+   range_1_and_2(X,Y,Keys,XR,YR,Start1),
+   index_of_first_failure(Start1,char_lessp,XR,YR,R).
 
 % string-greaterp
-wl:type_checked(cl_string_greaterp(prolog_list,prolog_list,index)).
-cl_string_greaterp(X,Y,R):- index_of_first_success(0,char_greaterp,X,Y,R).
+:-assert(wl:arg_lambda_type(req(2),cl_string_greaterp)).
+wl:type_checked(cl_string_greaterp(prolog_list,prolog_list,keys,index)).
+cl_string_greaterp(X,Y,Keys,R):-
+   range_1_and_2(X,Y,Keys,XR,YR,Start1),
+   index_of_first_success(Start1,char_greaterp,XR,YR,R).
 
 % string-not-greaterp
-wl:type_checked(cl_string_not_greaterp(prolog_list,prolog_list,index)).
-cl_string_not_greaterp(X,Y,R):- index_of_first_failure(0,char_greaterp,X,Y,R).
-
-% string-not-equal
-wl:type_checked(cl_string_not_equal(prolog_list,prolog_list,index)).
-cl_string_not_equal(X,Y,R):- index_of_first_failure(0,char_same,X,Y,R).
+:-assert(wl:arg_lambda_type(req(2),cl_string_not_greaterp)).
+wl:type_checked(cl_string_not_greaterp(prolog_list,prolog_list,keys,index)).
+cl_string_not_greaterp(X,Y,Keys,R):-
+   range_1_and_2(X,Y,Keys,XR,YR,Start1),
+   index_of_first_failure(Start1,char_greaterp,XR,YR,R).
 
 char_lessp(X,Y):- to_prolog_char(X,XX),to_prolog_char(Y,YY), char_type(XX,upper(XXX)),char_type(YY,upper(YYY)), XXX@<YYY.
 char_greaterp(X,Y):- to_prolog_char(X,XX),to_prolog_char(Y,YY), char_type(XX,upper(XXX)),char_type(YY,upper(YYY)), XXX@>YYY.
 char_same(X,Y):- to_prolog_char(X,XX),to_prolog_char(Y,YY), char_type(XX,upper(XXX)),char_type(YY,upper(YYY)), XXX==YYY.
+char_same(X,Y):- to_prolog_char(X,XX),to_prolog_char(Y,YY), XX==YY.
+
 
 % string-equals
-wl:type_checked(cl_string_equals(prolog_string,prolog_string,boolean)).
-cl_string_equals(X,Y,R):- t_or_nil(is_string_equal_case_insensitive(X,Y),R).
+wl:type_checked(cl_string_equals(prolog_list,prolog_list,keys,boolean)).
+:-assert(wl:arg_lambda_type(req(2),cl_string_equals)).
+cl_string_equals(X,Y,Keys,R):-
+   range_1_and_2(X,Y,Keys,XR,YR,Start1),
+   index_of_first_failure(Start1,char_same,XR,YR,Index),
+   t_or_nil(Index==[],R).
+
+
+% string-not-equal
+:-assert(wl:arg_lambda_type(req(2),cl_string_not_equal)).
+wl:type_checked(cl_string_not_equal(prolog_list,prolog_list,keys,index)).
+cl_string_not_equal(X,Y,Keys,R):-
+   range_1_and_2(X,Y,Keys,XR,YR,Start1),
+   index_of_first_failure(Start1,char_same,XR,YR,R).
+
 
 % string=
-wl:type_checked(cl_string_c61(prolog_string,prolog_string,boolean)).
-cl_string_c61(X,Y,R):- t_or_nil(is_string_equal_case_sensitive(X,Y),R).
-
-% string= with Keys ?
-wl:type_checked(cl_string_c61(prolog_list,prolog_list,keys,index)).
+wl:type_checked(cl_string_c61(prolog_list,prolog_list,keys,boolean)).
+:-assert(wl:arg_lambda_type(req(2),cl_string_c61)).
 cl_string_c61(X,Y,Keys,R):-
-   range_1_and_2(X,Y,Keys,XR,YR,_),
-   t_or_nil(is_string_equal_case_sensitive(XR,YR),R).
-
-% string-equals with Keys ?
-wl:type_checked(cl_string_equals(prolog_list,prolog_list,keys,index)).
-cl_string_equals(X,Y,Keys,R):-
-   range_1_and_2(X,Y,Keys,XR,YR,_),
-   t_or_nil(is_string_equal_case_insensitive(XR,YR),R).
+   range_1_and_2(X,Y,Keys,XR,YR,Start1),
+   index_of_first_failure(Start1,char_exact,XR,YR,Index),
+   t_or_nil(Index==[],R).
 
 
-
-is_string_equal_case_sensitive(X,Y):- to_prolog_string(X,XX),to_prolog_string(Y,YY),XX==YY.
-is_string_equal_case_insensitive(X,Y):- to_prolog_string(X,XX),to_prolog_string(Y,YY),
-  (XX==YY-> true ; (string_upper(XX,XXX),string_upper(YY,YYY),XXX==YYY)).
+%is_string_equal_case_sensitive(X,Y):- to_prolog_string(X,XX),to_prolog_string(Y,YY),XX==YY.
+%is_string_equal_case_insensitive(X,Y):- to_prolog_string(X,XX),to_prolog_string(Y,YY),
+%  (XX==YY-> true ; (string_upper(XX,XXX),string_upper(YY,YYY),XXX==YYY)).
 
 wl:type_checked(cl_length(prolog_list,integer)).
 cl_length(Sequence,Len):- length(Sequence,Len).
 
 
-% string< with Keys ?
-wl:type_checked(cl_string_c60(prolog_list,prolog_list,keys,index)).
-cl_string_c60(X,Y,Keys,R):-
-   range_1_and_2(X,Y,Keys,XR,YR,Start1),
-   index_of_first_success(0,@<,XR,YR,RM),
-   R is Start1+RM.
 
 range_1_and_2(X,Y,[],X,Y,0):-!.
 range_1_and_2(X,Y,Keys,XR,YR,Start1):-
@@ -191,6 +216,7 @@ range_1_and_2(X,Y,Keys,XR,YR,Start1):-
    range_subseq(Y,Start2,End2,YR).
 
 % key_value(Keys,Name,Value,Default).
+key_value(Keys,Name,Value,_Default):- get_plist_value(Keys,Name,Value,Never)->Never\==Value,!.
 key_value(Keys,Name,Value,_Default):- Keys.Name=Value,!.
 key_value(_Keys,_Name,Default,Default).
 

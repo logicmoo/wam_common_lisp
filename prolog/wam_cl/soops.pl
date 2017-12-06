@@ -23,6 +23,7 @@
 :- discontiguous soops:struct_opv/4.
 :- dynamic((soops:struct_opv/4)).
 
+%:- use_module(library(globals_api)).
 
 :- multifile(xlisting_config:xlisting_always/1).
 :- dynamic(xlisting_config:xlisting_always/1).
@@ -144,9 +145,9 @@ find_or_create_class(Name,Kind):-
    %to_prolog_string_anyways(Name,SName),
    new_named_opv(claz_structure_object,Name,[],Kind),!.
 
-find_class(Name,Claz):-
-  get_struct_opv(Claz,symbolname,Name),!.
 find_class(Name,Claz):- atom(Name),atom_concat_or_rtrace('claz_',_,Name),!,Claz=Name.
+find_class(Name,Claz):- (var(Name) -> break ; true) , 
+  get_struct_opv(Claz,symbolname,Name),!.
 %find_class(Name,Claz):- get_struct_opv(Claz,name,Name),!.
 find_class(Name,Claz):-
   to_prolog_string_anyways(Name,StringC)->string_upper(StringC,NameS),
@@ -358,7 +359,8 @@ un_kw1(Prop,Prop).
 
 add_kw_opv(Obj,Key,V):- un_kw(Key,Prop),add_opv_new(Obj,Prop,V).
 
-f_u_get_opv(Obj,Result):- findall([Prop|Value],f_u_get_opv(Obj,Prop,Value),Result).
+:-assert(wl:arg_lambda_type(exact_only,f_u_get_opv)).
+f_u_get_opv(Obj,Result):- findall([Prop|Value],get_opv(Obj,Prop,Value),Result).
 f_u_get_opv(Obj,Prop,Value):- get_opv(Obj,Prop,Value).
 	
 add_opv_maybe(Obj,Prop,_):- get_opv_i(Obj,Prop,_),!.
@@ -444,7 +446,7 @@ add_opv(Obj,Prop,Value):- add_opv_new(Obj,Prop,Value),!.
 % add_opv_new(Obj,Prop,Value):-  add_opv_new(Obj,Prop,Value).
 add_opv_new(Obj,Prop,V):- (\+atomic(V)),is_stringp(V),to_prolog_string_if_needed(V,V0),!,show_call_trace(add_opv_new(Obj,Prop,V0)).
 add_opv_new(Obj,Key,Value):- 
-  always(\+ is_list(Obj)),
+  always(\+ is_list(Obj);Obj==[]),
   un_kw(Key,Prop),
   add_opv_new_i(Obj,Prop,Value).
 
@@ -459,7 +461,7 @@ add_opv_new_i(Obj,Prop,Value):-show_call_trace(assert_if_new(soops:o_p_v(Obj,Pro
 
 delete_opvalues(Obj,Key):- Key == value, nb_delete(Obj),fail.
 delete_opvalues(Obj,Key):- 
- always(\+ is_list(Obj)),
+ always(\+ is_list(Obj);Obj==[]),
  un_kw(Key,Prop),
    ignore(forall(retract(soops:o_p_v(Obj,Prop,_)),true)),
    ignore((
@@ -472,7 +474,7 @@ delete_obj(Obj):-
    obj_properties(Obj,Props),!,
    maplist(delete_opvalues(Obj),Props).
 delete_obj(Obj):- 
-   always(\+ is_list(Obj)),
+   always(\+ is_list(Obj);Obj==[]),
    ignore(forall(retract(soops:o_p_v(Obj,_,_)),true)).
 
 
