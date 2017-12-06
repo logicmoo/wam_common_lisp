@@ -131,9 +131,10 @@ compile, declare, eval-when, pathname, logical-pathname,
 Notes: None.
 */
 
+
 cl_compile_file(File,R):-
   cl_compile_file(File,([]),R).
-:-assert(wl:arg_lambda_type(req(1),cl_compile_file)).
+:-assertz(wl:arg_lambda_type(req(1),cl_compile_file)).
 cl_compile_file(File,Keys,R):-
   do_compile_1file(Keys,File),!,
   cl_truename(File,R),!.
@@ -164,7 +165,8 @@ lisp_compile_to_prolog_output(Stream,PExpression):-
   reading_package(Pkg),
   as_sexp(PExpression,Expression),
   % wdmsg(:- lisp_compile_to_prolog(Pkg,Expression)),
-  always(with_output_to(Stream,lisp_compile_to_prolog(Pkg,Expression))),!.
+  always(with_output_to(Stream,
+    lisp_compile_to_prolog(Pkg,Expression))),!.
 
 
 lisp_compile_to_prolog(_,COMMENTP):- is_comment(COMMENTP,String),!,write('/*'),write(String),writeln('*/').
@@ -175,43 +177,38 @@ lisp_compile_to_prolog(Pkg,Expression):-
 
 
 lisp_compile_to_prolog(PExpression):-   
- always((
+ notrace((always((
   as_sexp(PExpression,SExpression),  
   nl,
   flush_all_output_safe,
   write('/*********** '),
-  ignore((nb_current('$lisp_translation_stream',In),stream_property(In,file_name(File)),write(File))),
-  ignore((nb_current('$lisp_translation_line',LineChars),write(:),write(LineChars))),
+  ignore(notrace_catch_fail((nb_current('$lisp_translation_stream',In),stream_property(In,file_name(File)),write(File)))),
+  ignore(notrace_catch_fail((nb_current('$lisp_translation_line',LineChars),write(:),write(LineChars)))),
   writeln(' **********************/'),
   reading_package(Pkg),
-  dbmsg(:- lisp_compile_to_prolog(Pkg,SExpression)),
+  dbmsg_real(:- lisp_compile_to_prolog(Pkg,SExpression)),
   reader_intern_symbols(SExpression,Expression),  
-  debug_var('_Ignored',Result),
-  lisp_compile(Result,Expression,PrologCode),
-  dbmsg(:- PrologCode),
-  lisp_grovel(PrologCode))),!.
+  debug_var('_Ignored',Result))),
+  lisp_compile(Result,Expression,PrologCode))),
+  dbmsg_real(:- PrologCode),!,
+  lisp_grovel(PrologCode).
    
 
-lisp_grovel((A,B)):-!, lisp_grovel(A),lisp_grovel(B).
-lisp_grovel(asserta(PrologCode)):- !, lisp_grovel(PrologCode).
-lisp_grovel(assertz(PrologCode)):- !, lisp_grovel(PrologCode).
-lisp_grovel(assert(PrologCode)):- !, lisp_grovel(PrologCode).
-
-% lisp_grovel(PrologCode):- \+ compound(PrologCode),!.
-
 lisp_grovel(PrologCode):- \+ compound(PrologCode),!.
-lisp_grovel(cl_in_package(Into, Package)):-!, cl_in_package(Into, Package).
-lisp_grovel(cl_use_package(Package, Load_Ret)):-!, cl_use_package(Package, Load_Ret).
-lisp_grovel(cl_load(File, Load_Ret)):- !, cl_compile_file(File, Load_Ret).
-lisp_grovel(cl_compile_file(File, Load_Ret)):- !, cl_compile_file(File, Load_Ret).
-lisp_grovel(asserta(PrologCode)):- !, lisp_grovel(PrologCode).
-lisp_grovel(assertz(PrologCode)):- !, lisp_grovel(PrologCode).
-lisp_grovel(assert(PrologCode)):- !, lisp_grovel(PrologCode).
 lisp_grovel((A,B)):-!, lisp_grovel(A),lisp_grovel(B).
-lisp_grovel(MP):- strip_module(MP,_,P),functor(P,F,_),arg(_,
-  v(doc_string,macro_lambda,function_lambda,arglist_info),F),!,
-  show_call_trace(asserta(MP)).
+lisp_grovel(asserta(PrologCode)):- !, lisp_grovel_assert(PrologCode).
+lisp_grovel(assertz(PrologCode)):- !, lisp_grovel_assert(PrologCode).
+lisp_grovel(assert(PrologCode)):- !, lisp_grovel_assert(PrologCode).
+lisp_grovel(cl_in_package(Into, Package)):- nonvar(Into),!, cl_in_package(Into, Package).
+%lisp_grovel(cl_use_package(Package, Load_Ret)):- nonvar(Into),!, cl_use_package(Package, Load_Ret).
+lisp_grovel(cl_load(File,Keys,Load_Ret)):- !, cl_compile_file(File,Keys,Load_Ret).
+%lisp_grovel(cl_compile_file(File,Keys,Load_Ret)):- !, cl_compile_file(File,Keys,Load_Ret).
 lisp_grovel(_).
+
+lisp_grovel_assert(MP):- compound(MP),strip_module(MP,_,P),functor(P,F,_),
+  arg(_, v(doc_string,macro_lambda,function_lambda,arglist_info),F),!,
+  show_call_trace(asserta(MP)).
+lisp_grovel_assert(_).
 
 /*
 lisp_grovel(MP):- strip_module(MP,_,P),functor(P,F,_),arg(_,
@@ -224,12 +221,12 @@ lisp_grovel(MP):- write_trans(MP).
 */
 
 cl_load(L,T):- cl_load(L,[],T).
-:-assert(wl:arg_lambda_type(req(1),cl_load)).
+:-assertz(wl:arg_lambda_type(req(1),cl_load)).
 cl_load(L,Keys,T):- to_prolog_string_if_needed(L,Loc),!,cl_load(Loc,Keys,T).
 cl_load('$OBJ'(_Pathname,Loc),Keys,T):- !, cl_load(Loc,Keys,T).
 cl_load(File,_Keys,t):-
    % check maybe for fresh
-   pl_compiled_filename(File,PL),exists_file(PL),!,in_comment(dbmsg(ensure_loaded(PL))),!,ensure_loaded(PL).
+   pl_compiled_filename(File,PL),exists_file(PL),!,dbmsg(in_comment(ensure_loaded(PL))),!,ensure_loaded(PL).
 %cl_load(File,R):- cl_compile_file(File,t),!,pl_compiled_filename(File,PL),exists_file(PL),!,in_comment(dbmsg(ensure_loaded(PL))),!,ensure_loaded(PL).
 cl_load(File,_Keys,t):- 
   with_each_file(with_each_form(lisp_reader_compiled_eval),File).
@@ -250,7 +247,7 @@ lisp_reader_compiled_eval(PExpression):-
   debug_var('_Ignored',Result),
   lisp_compile(Result,Expression,PrologCode),
   dbmsg(:- PrologCode),
-  PrologCode)).
+  call(PrologCode))).
 
 
 

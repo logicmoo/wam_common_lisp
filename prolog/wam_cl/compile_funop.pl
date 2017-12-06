@@ -42,7 +42,7 @@ macroexpand_1_or_fail([Procedure|Arguments],MacroEnv,CompileBody0Result):- nonva
    always(Code),
    must_compile_body(Ctx,NextEnv,CompileBody0Result,CommaResult, MCBR),
    always(MCBR),
-   dbmsg(comment(macroResult(BindCode,Code,CommaResult,CompileBody0Result))))),!.
+   dbmsg_cmt((macroResult(BindCode,Code,CommaResult,CompileBody0Result))))),!.
 
 :- dynamic(wl:uses_rest_only/1).
 :- discontiguous(wl:uses_rest_only/1).

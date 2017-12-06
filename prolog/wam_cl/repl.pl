@@ -168,10 +168,10 @@ eval_at_repl(Expression,Result):- notrace(tracing), !, trace,eval_at_repl_tracin
 eval_at_repl(Expression,Result):-
   notrace(as_sexp(Expression,SExpression)),
   (reader_intern_symbols(SExpression,LExpression)),
-  notrace(dbmsg(:- lisp_compiled_eval(LExpression))),
+  notrace(dbmsg_cmt(:- lisp_compiled_eval(LExpression))),
   notrace(debug_var('ReplEnv',Env)),
   timel('COMPILER',always_catch(maybe_ltrace(lisp_compile(Env,Result,LExpression,Code)))),
-  notrace(dbmsg(:-Code)),
+  notrace(dbmsg_cmt(repl_exec:-Code)),
   (notrace(tracing)-> Code ; 
    timel('EXEC',always_catch(ignore(always(maybe_ltrace(call(user:Code))))))),!.
 
@@ -180,11 +180,12 @@ eval_at_repl_tracing(Expression,Result):-
   (reader_intern_symbols(SExpression,LExpression)),
   writeq((reader_intern_symbols(SExpression,LExpression))),nl,
   notrace(debug_var('ReplEnv',Env)),
-  notrace(cls),
+  %notrace(cls),
    notrace((writeln(==================================================================))),
    notrace((writeln(==================================================================))),
    notrace((writeln(==================================================================))),
-   notrace(dbmsg(:- lisp_compiled_eval(LExpression))),
+   %notrace
+   (dbmsg(:- lisp_compiled_eval(LExpression))),
    notrace((writeln(==================================================================))),
    notrace((writeln(==================================================================))),
    notrace((writeln(==================================================================))),

@@ -40,7 +40,7 @@ is_self_evaluating_object(X):- atomic(X),!,is_self_evaluationing_const(X).
 is_self_evaluating_object('$OBJ'(_,_)):-!.
 is_self_evaluating_object('$CHAR'(_)):-!.
 is_self_evaluating_object(X):- (is_dict(X);is_array(X);is_rbtree(X)),!.
-is_self_evaluating_object(P):-functor(P,F,_),atom_concat_or_rtrace('$',_,F),!.
+is_self_evaluating_object(P):- compound_name_arity(P,F,_),atom_concat_or_rtrace('$',_,F),!.
 
 is_self_evaluationing_const(X):- atomic(X),is_self_evaluationing_const0(X),!.
 is_self_evaluationing_const0(X):- (X==t;X==[];number(X);is_keywordp(X);string(X);(blob(X,T),T\==text)),!.
@@ -138,7 +138,7 @@ cl_null(Obj,Ret):- t_or_nil(Obj == [] , Ret).
 cl_atom(Obj,Ret):-  t_or_nil( Obj\=[_|_] , Ret).
 cl_consp(Obj,Ret):-  t_or_nil( Obj=[_|_] , Ret).
 
-:-assert(wl:arg_lambda_type(rest_only,cl_nconc)).
+:-assertz(wl:arg_lambda_type(rest_only,cl_nconc)).
 cl_nconc([L1,L2],Ret):- !, append(L1,L2,Ret).
 cl_nconc([L1],L1):-!.
 cl_nconc([L1,L2|Lists],Ret):- !,cl_nconc([L2|Lists],LL2), append(L1,LL2,Ret).
@@ -149,7 +149,7 @@ cl_copy_list([M|List],[M|Copy]):-cl_copy_list(List,Copy).
 
 
 
-:-assert(wl:arg_lambda_type(req(1),cl_last)).
+:-assertz(wl:arg_lambda_type(req(1),cl_last)).
 cl_last(List,[],Tail):-  !, cl_last_1(List,Tail).
 cl_last(List,[N],Ret):- 
   (N=1 -> cl_last_1(List,Ret);

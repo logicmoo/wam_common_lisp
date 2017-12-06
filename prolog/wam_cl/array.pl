@@ -62,7 +62,7 @@ cl_subseq(Seq,Offset,Result):-
   always(pl_subseq(Mid,Offset,MOut)),
   always(coerce_to(MOut, object(Was,Info),Result)).
 
-pl_subseq([], _Skip, []).
+pl_subseq([], Skip, []):- Skip =:=0 -> true ; throw('should not be greater than :END').
 pl_subseq([Head|Tail], Skip, [Head|Cmpl]) :- Skip<1,!,
 	pl_subseq(Tail, Skip, Cmpl).
 pl_subseq([_|Tail], Skip, Cmpl) :- Skip2 is Skip-1,

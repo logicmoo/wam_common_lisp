@@ -16,17 +16,17 @@
 :- set_module(class(library)).
 :- include('header.pro').
 
-do_correctly(P,AT):- functor(P,F,A),functor(AT,F,A),wl:type_checked(AT).
+do_correctly(P,AT):- compound(P),functor(P,F,A),functor(AT,F,A),wl:type_checked(AT).
 
 
+%correctly(P,P):- is_self_evaluating_object(P),!.
 correctly(P,AT):- P=..[_|L],make_correctly(P,AT,1,L,Agenda),!,call(Agenda).
 
-
-make_correctly(P,AT,N,[R],Out):- 
+make_correctly(P,_,_,_,P):- \+ compound(P).
+make_correctly(P,AT,N,[R],Out):- !, 
  (arg(N,AT,Type) ->
   (setarg(N,P,Ret),Out=(P,coerce_to(Ret,Type,R)));
   (Out=P)).
-
 make_correctly(P,AT,From,[H|T],TTT):- arg(From,AT,Type), setarg(From,P,NewArg), From2 is From+1,
     Coerce = coerce_to(H,Type,NewArg),
    (nonvar(H) -> (Coerce,TTT=TT); (TTT= (Coerce,TT))),
@@ -59,9 +59,7 @@ add_type_checks(_Ctx,Some,Some):- is_self_evaluating_object(Some),!.
 
 add_type_checks(Ctx,(A,B),(AA,BB)):-!, add_type_checks(Ctx,A,AA),add_type_checks(Ctx,B,BB).
 
-add_type_checks(Ctx,[S|Some],[SR|SomeR]):- 
-  add_type_checks(Ctx,S,SR),
-  add_type_checks(Ctx,Some,SomeR).
+add_type_checks(Ctx,[S|Some],[SR|SomeR]):- add_type_checks(Ctx,S,SR),add_type_checks(Ctx,Some,SomeR).
 
 add_type_checks(_Ctx,C1,C2):- 
   compound_name_arguments(C1,F,C1O),

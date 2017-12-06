@@ -85,7 +85,7 @@ unintern_symbol(String,Package,Symbol,IntExt):-
    always((package_find_symbol(String,Package,FoundSymbol,IntExt),FoundSymbol==Symbol)).
 
 
-:-assert(wl:arg_lambda_type(exact_only,cl_make_symbol)).
+:-assertz(wl:arg_lambda_type(exact_only,cl_make_symbol)).
 cl_make_symbol(SymbolName,Symbol):- 
    prologcase_name(SymbolName,ProposedName),
    gensym(ProposedName,Symbol),
@@ -112,13 +112,13 @@ create_keyword(Name,Symbol):- string_upper(Name,String),
 
 
 
-:-assert(wl:arg_lambda_type(req(2),cl_get)).
+:-assertz(wl:arg_lambda_type(req(2),cl_get)).
 %(get x y) ==  (getf (symbol-plist x) y)
 cl_get(Symbol,Prop,Optionals,Value):- assertion(is_symbolp(Symbol)),
   nth_value(Optionals,1,[],Default),cl_symbol_plist(Symbol,PList),
   get_plist_value(PList,Prop,Default,Value),!.
 
-:-assert(wl:arg_lambda_type(exact_only,f_u_put)).
+:-assertz(wl:arg_lambda_type(exact_only,f_u_put)).
 f_u_put(Symbol,Prop,Value,Ret):- 
   assertion(is_symbolp(Symbol)), 
   cl_symbol_plist(Symbol,PList),

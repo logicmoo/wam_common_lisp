@@ -24,7 +24,7 @@
 
 % DEFSETF (short form)
 %compile_body(Ctx,Env,Symbol,[defsetf,AccessFun,UpdateFn],assert(defsetf_short(AccessFun,UpdateFn))).
-%compile_body(Ctx,Env,Symbol,[defsetf,AccessFun,FormalParms,Variables|FunctionBody0],assert(defsetf_short(AccessFun,UpdateFn)))
+%compile_body(Ctx,Env,Symbol,[defsetf,AccessFun,FormalParms,Variables|FunctionBody0],assertz(defsetf_short(AccessFun,UpdateFn)))
 
 % handler-caserestart-casedestructuring-bind
 
@@ -59,8 +59,8 @@ compile_decls(Ctx,Env,Result,[LABELS,[MACROLET|MORE]|Progn], CompileBody):- memb
     CompileBody = (CompileBody0,CompileBody1).
 
 
-compile_decls(_Ctx,_Env,Symbol,[Fun,Symbol,A2|AMORE],assert(P)):- notrace(is_def_at_least_two_args(Fun)),!,P=..[Fun,Symbol,A2,AMORE].
-compile_decls(_Ctx,_Env,Symbol,[Fun0,Symbol,A2|AMORE],assert(P)):- notrace((is_def_at_least_two_args(Fun),same_symbol(Fun,Fun0))),!,P=..[Fun,Symbol,A2,AMORE].
+compile_decls(_Ctx,_Env,Symbol,[Fun,Symbol,A2|AMORE],assertz(P)):- notrace(is_def_at_least_two_args(Fun)),!,P=..[Fun,Symbol,A2,AMORE].
+compile_decls(_Ctx,_Env,Symbol,[Fun0,Symbol,A2|AMORE],assertz(P)):- notrace((is_def_at_least_two_args(Fun),same_symbol(Fun,Fun0))),!,P=..[Fun,Symbol,A2,AMORE].
 
 is_def_at_least_two_args(defgeneric).
 is_def_at_least_two_args(define_compiler_macro).
@@ -100,7 +100,7 @@ compile_macro(Ctx,CallEnv,Macro,[Name0,FormalParms|FunctionBody0], CompileBody):
  CompileBody = (
    DocCode,
    HeadDefCode,
-   asserta(user:macro_lambda(defmacro(Name0),Macro, FormalParms, [progn | FunctionBody],Alphas)),
+   asserta(user:macro_lambda(defmacro(Name0),Macro, FormalParms, [progn | FunctionBody],Alphas):-true),
    asserta((user:FunctionHead  :- 
     (BodyCode, 
        cl_eval(MResult,FResult)))),
@@ -142,7 +142,7 @@ compile_function(Ctx,Env,Function,[Name,FormalParms|FunctionBody0], CompileBody)
  CompileBody = (
    DocCode,
    HeadDefCode,
-   asserta(user:function_lambda(defun(Name),Function, FormalParms, FunctionBody)),   
+   asserta(user:function_lambda(defun(Name),Function, FormalParms, FunctionBody):-true),
    asserta((user:Head  :- BodyCode)),
    set_opv(Function,classof,claz_compiled_function),
    set_opv(Symbol,compile_as,kw_function),

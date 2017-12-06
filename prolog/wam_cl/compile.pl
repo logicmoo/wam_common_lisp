@@ -25,21 +25,21 @@ new_compile_ctx(Ctx):- list_to_rbtree([type-ctx],Ctx0),put_attr(Ctx,tracker,Ctx0
 lisp_compiled_eval(SExpression):-
   notrace(as_sexp(SExpression,Expression)),
   lisp_compiled_eval(Expression,Result),
-  dbmsg(result(Result)).
+  dbmsg_cmt(result(Result)).
 
 lisp_compiled_eval(SExpression,Result):-
   notrace(as_sexp(SExpression,Expression)),
-  dbmsg(lisp_compiled_eval(Expression)),
+  %dbmsg(lisp_compiled_eval(Expression)),
   lisp_compile(Result,Expression,Code),
-  dbmsg(Code),
+  dbmsg_cmt((lisp_compiled_eval(Expression):- Code)),
   always((Code)),!.
 
 %lisp_compile(SExpression):- source_location(_,_),!,dbmsg((:-lisp_compile(SExpression))).
 lisp_compile(SExpression):-
   notrace(as_sexp(SExpression,Expression)),
-  dbmsg(lisp_compile(Expression)),
+  dbmsg(:- lisp_compile(Expression)),
   lisp_compile(Expression,Code),!,
-  dbmsg(Code).
+  dbmsg(:- Code).
 
 lisp_compile(Expression,Body):-
    debug_var('_Ignored',Result),
@@ -139,7 +139,7 @@ f_sys_memq(E,L,R):- t_or_nil((member(Q,L),Q==E),R).
 must_compile_progn(Ctx,Env,Result,FormsIn, PreviousResult, Body):-
   notrace((maybe_debug_var('_rCtx',Ctx),
   maybe_debug_var('_rEnv',Env),
-  maybe_debug_var('_rResult',Result),
+  %maybe_debug_var('_rResult',Result),
   maybe_debug_var('_rPrevRes',PreviousResult),
   maybe_debug_var('_rForms',Forms),
   maybe_debug_var('_rBody',Body))),

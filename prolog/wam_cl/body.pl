@@ -31,8 +31,8 @@ must_compile_closure_body(Ctx,Env,Result,Function, Body):-
 
 must_compile_body(Ctx,Env,ResultO,LispCode, BodyO):-
   notrace((maybe_debug_var('_rCtx',Ctx),
-  maybe_debug_var('_rEnv',Env),
-  maybe_debug_var('_rResult',Result),
+  %maybe_debug_var('_rEnv',Env),
+  %maybe_debug_var('_rResult',Result),
   maybe_debug_var('_LispCode',LispCode),
   maybe_debug_var('_rBody',Body))),
   resolve_reader_macros(LispCode,Forms),!,

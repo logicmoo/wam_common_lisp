@@ -50,7 +50,7 @@
 
 (is eq t (stringp "abc"))
 
-;;  "FAILED: when matching ~a and ~a~%", ['$CHAR'(b), '$CHAR'(c)], "bc", t).
+;;  "FAI "this has ben fix" LED: when matching ~a and ~a~%", ['$CHAR'(b), '$CHAR'(c)], "bc", t).
 (is equal (subseq "abc" 1) "bc")
 
 (is eq 1 (if t 1 2))

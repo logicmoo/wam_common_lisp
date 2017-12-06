@@ -17,6 +17,23 @@
 :- set_module(class(library)).
 
 
+di_test:- lisp_compile_to_prolog(pkg_user,
+
+                          [ defun,
+                            'mapcar-visualize',
+                            [func, l],
+
+                            [ if,
+                              [null, l],
+                              [],
+
+                              [ cons,
+                                [apply, func, [list, [first, l]]],
+                                [mapcar, func, [rest, l]]
+                              ]
+                            ]
+                          ]).
+
 show_call_trace(G):- G *-> wdmsg(G); (wdmsg(warn(failed(show_call_trace(G)))),fail).
 
 on_x_rtrace(G):- catch(G,E,(dbmsg(E),rtrace(G),break)).
@@ -73,33 +90,48 @@ both_outputs(G):-
   (is_user_output -> G ; (with_output_to(user_output,G),G)).
 
 
-dbmsg(X):- both_outputs(dbmsg0(X)).
+%colormsg1(Msg,Args):- mesg_color(Msg,Ctrl),!,ansicall_maybe(Ctrl,format(Msg,Args)).
+%colormsg1(Msg):- writeq(Msg),nl,nl,!. %notrace(colormsg11(Msg)).
+colormsg1(Msg):- mesg_color(Msg,Ctrl),!,ansicall_maybe(Ctrl,fmt90(Msg)).
 
-in_comment(X):- notrace((write('/* '),(X),writeln(' */'))).
+%ansicall_maybe(_Ctrl,Cmd):- !,nl,nl,portray_clause_w_vars(Cmd),nl,nl,(Cmd),break.
+ansicall_maybe(_Ctrl,Cmd):- current_output(O), \+ stream_property(O,tty(true)),!,call(Cmd).
+ansicall_maybe(Ctrl,Cmd):- always(shrink_lisp_strings(Cmd,Cmd0)),!,call(ansicall(Ctrl,Cmd0)).
 
+dbmsg_cmt(Var):- shrink_lisp_strings(Var,O), wdmsg(O).
+dbmsg(X):- dbmsg_cmt(X).
+dbmsg_real(X):- notrace(both_outputs(dbmsg0(X))),!.
 
+in_comment(X):- notrace(setup_call_cleanup(write('/* '),(X),writeln(' */'))).
+
+% is_assert_op(_,_):-!,fail.
+is_assert_op(A,_):- \+ compound(A),!,fail.
+is_assert_op(M:I,M:O):- is_assert_op(I,O).
+is_assert_op(asserta(P),P).
+is_assert_op(assertz(P),P).
+is_assert_op(assert_if_new(P),P).
+is_assert_op(assert(P),P).
+
+% notrace((dbmsg0(Var))).
 
 dbmsg0(Var):- var(Var),!,in_comment(colormsg1(dbmsg_var(Var))).
-dbmsg0(Str):- string(Str),!,in_comment(colormsg1(Str,[])).
+dbmsg0(Str):- string(Str),!,in_comment(colormsg1(Str)).
 % dbmsg0(StringL):- to_prolog_string_if_needed(StringL,String),!,dbmsg0(String).
-dbmsg0(:-((B,asserta(A)))):- !, dbmsg0(:- B), dbmsg0(:-asserta(A)).
-dbmsg0(:-((asserta(A),B))):- !, dbmsg0(:-asserta(A)),dbmsg0(:- B).
+dbmsg0(:-((B,A))):-  is_assert_op(A,AA), !,dbmsg0(:- B),dbmsg_assert( AA).
+dbmsg0(:-((A,B))):-  is_assert_op(A,AA), !,dbmsg_assert( AA),dbmsg0(:- B).
+dbmsg0(:- A):- is_assert_op(A,AA),!,
+  dbmsg_assert(AA).
 
 dbmsg0(comment(X)):- shrink_lisp_strings(X,X0), in_comment(fmt9(X0)).
 dbmsg0(N=V):- shrink_lisp_strings(N=V,X0),  in_comment(fmt9(X0)).
-dbmsg0(:- asserta(A)):- !, colormsg1(A).
-dbmsg0(:- assert(A)):- !, colormsg1(A).
-dbmsg0(H :- Body):- !,colormsg1(H :- Body),!.
-dbmsg0(:- Body):- !,colormsg1(:- Body),!.
-dbmsg0(X):- shrink_lisp_strings(X,X0), in_comment(colormsg1(:- X0)),!.
+%dbmsg0(:- Body):- !,colormsg1(:- Body),!.
+dbmsg0(X):- colormsg1(X),!.
 % dbmsg(:- Body):- !, dmsg(:- Body).
 
-
-colormsg1(Msg,Args):- mesg_color(Msg,Ctrl),!,ansicall_maybe(Ctrl,format(Msg,Args)).
-colormsg1(Msg):- mesg_color(Msg,Ctrl),!,ansicall_maybe(Ctrl,fmt90(Msg)).
-
-ansicall_maybe(Ctrl,Cmd):- current_output(O), \+ stream_property(O,tty(true)),!,call(ansicall(Ctrl,Cmd)).
-ansicall_maybe(Ctrl,Cmd):- shrink_lisp_strings(Cmd,Cmd0),call(ansicall(Ctrl,Cmd0)).
+dbmsg_assert(user:(HBody)):- !,dbmsg_assert((HBody)).
+dbmsg_assert(user:H :- Body):- !,dbmsg_assert(H :- Body),!.
+dbmsg_assert(M:Body:- (true,[])):-!,colormsg1("\n% asserting fact...\n"),!,colormsg1(M:Body),!.
+dbmsg_assert(Body):- colormsg1("\n% asserting...\n"),!,colormsg1(Body),!.
 
 :- dynamic(lisp_compiler_option/2).
 :- dynamic(lisp_compiler_option_local/2).

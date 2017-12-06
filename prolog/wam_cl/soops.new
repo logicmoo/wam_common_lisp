@@ -23,7 +23,7 @@
 :- discontiguous soops:struct_opv/4.
 :- dynamic((soops:struct_opv/4)).
 
-%:- use_module(library(globals_api)).
+:- use_module(library(globals_api)).
 
 :- multifile(xlisting_config:xlisting_always/1).
 :- dynamic(xlisting_config:xlisting_always/1).
@@ -40,7 +40,7 @@ create_struct1(Kind,[Value],Value):- data_record(Kind,[_]),!.
 create_struct1(Kind,ARGS,Obj):-create_instance(Kind,ARGS,Obj),!.
 create_struct1(_Type,Value,Value).
 
-cl_make_instance([Name|Slots],Obj):- always(create_instance(Name,Slots,Obj)).
+cl_make_instance(Obj,[Name|Slots]):- always(create_instance(Name,Slots,Obj)).
 
 create_struct(X,Y):-create_instance(X,Y).
 create_struct(X,Y,Z):-create_instance(X,Y,Z).
@@ -135,9 +135,9 @@ value_default(claz_object,mut([],claz_object)).
              Kind).
 */
 
-:-assertz(wl:arg_lambda_type(rest_only,cl_defstruct)).
-:-assertz(wl:arg_lambda_type(rest_only,cl_make_instance)).
-:-assertz(wl:arg_lambda_type(rest_only,cl_defclass)).
+:- assert(wl:arg_lambda_type(rest_only,cl_defstruct)).
+:- assert(wl:arg_lambda_type(rest_only,cl_make_instance)).
+:- assert(wl:arg_lambda_type(rest_only,cl_defclass)).
 
 
 find_or_create_class(Name,Kind):- find_class(Name,Kind),Kind\==[],!.
@@ -145,9 +145,9 @@ find_or_create_class(Name,Kind):-
    %to_prolog_string_anyways(Name,SName),
    new_named_opv(claz_structure_object,Name,[],Kind),!.
 
-find_class(Name,Claz):- atom(Name),atom_concat_or_rtrace('claz_',_,Name),!,Claz=Name.
-find_class(Name,Claz):- (var(Name) -> break ; true) , 
+find_class(Name,Claz):-
   get_struct_opv(Claz,symbolname,Name),!.
+find_class(Name,Claz):- atom(Name),atom_concat_or_rtrace('claz_',_,Name),!,Claz=Name.
 %find_class(Name,Claz):- get_struct_opv(Claz,name,Name),!.
 find_class(Name,Claz):-
   to_prolog_string_anyways(Name,StringC)->string_upper(StringC,NameS),
@@ -212,27 +212,26 @@ generate_missing_struct_functions(Kind):-
   always(( get_struct_opv(Kind,symbolname,Name),
   to_prolog_string_anyways(Name,SName),
  % define keyword defaults now
- make_default_constructor(Kind,Code),
- always(Code),
+ make_default_constructor(Kind),
  maybe_add_kw_function(Kind,SName,"-P",kw_predicate, [obj],( eq('class-of'(obj),quote(Kind)))),
  % make accessors
  struct_opv_else(Kind,kw_conc_name,ConcatName,string_concat(SName,"-",ConcatName)),
  forall(get_struct_opv(Kind,slot,Keyword,ZLOT),
    maybe_add_get_set_functions(Kind,ConcatName,Keyword,ZLOT)))).
 
-make_default_constructor(Kind,Code):- 
+make_default_constructor(Kind):- 
  always((
  get_struct_opv(Kind,symbolname,Name),to_prolog_string_anyways(Name,SName),
  atom_concat_or_rtrace("MAKE-",SName,FnName),
  reader_intern_symbols(FnName,Sym),
- find_function_or_macro_name(_,_,Sym,3,Function), 
+ find_function_or_macro_name(_,_,Sym,3,Function),
+ set_opv(Function,classof,claz_compiled_function),
+ set_opv(Sym,compile_as,kw_function),
+ set_opv(Sym,function,Function),
+ assert(wl:arg_lambda_type(rest_only,Function)),
  Head=..[Function,List,Obj],
  Body=..[cl_make_instance,[Kind|List],Obj],
- Code = (assertz(wl:arg_lambda_type(rest_only,Function)),
-         set_opv(Function,classof,claz_compiled_function),
-         set_opv(Sym,compile_as,kw_function),
-         set_opv(Sym,function,Function),
-         assertz(user:(Head:-Body))))).
+ assert(user:(Head:-Body)))).
  
 
 maybe_add_get_set_functions(Kind,ConcatName,Keyword,ZLOT):- 
@@ -360,7 +359,7 @@ un_kw1(Prop,Prop).
 
 add_kw_opv(Obj,Key,V):- un_kw(Key,Prop),add_opv_new(Obj,Prop,V).
 
-:-assertz(wl:arg_lambda_type(exact_only,f_u_get_opv)).
+:-assert(wl:arg_lambda_type(exact_only,f_u_get_opv)).
 f_u_get_opv(Obj,Result):- findall([Prop|Value],get_opv(Obj,Prop,Value),Result).
 f_u_get_opv(Obj,Prop,Value):- get_opv(Obj,Prop,Value).
 	
@@ -373,15 +372,19 @@ get_opv(Obj,Prop,Value):- no_repeats(Obj-Prop,get_opv_i(Obj,Prop,Value)).
 get_opv_i(Obj,Key,Value):- un_kw(Key,Prop),get_opv_ii(Obj,Prop,Value).
 
 get_opv_ii(Obj,value, Value):- Obj==quote, throw(get_opv_i(quote, value, Value)).
-get_opv_ii(Obj,Prop,Value):- nonvar(Obj), has_prop_value_getter(Obj,Prop,Getter),call(Getter,Obj,Prop,Value).
+get_opv_ii(Obj,Prop,Value):- nonvar(Obj), has_prop_value_getter(Obj,Prop,Getter),once(call(Getter,Obj,Prop,Value)).
 
-get_opv_ii(Sym,value,Value):- ((atom(Sym);var(Sym)),nb_current(Sym,Value))*->true;get_opv_iii(Sym,value,Value).
+get_opv_ii(Sym,Prop,Value):- ((atom(Sym);var(Sym)),nb_current(Sym,Holder),!,
+   no_repeats(Prop,(((oo_get_attr(Holder,Prop,Value),is_bb_prop(Prop), \+ is_collection_prop(Prop)));get_opv_iii(Sym,Prop,Value)))).
+get_opv_ii(Obj,Prop,Value):- get_opv_iii(Obj,Prop,Value).
+%get_opv_ii(Sym,value,Value):- ((atom(Sym);var(Sym)),nb_current(Sym,Value))*->true;get_opv_iii(Sym,value,Value).
+%get_opv_ii(Obj,Prop,Value):- Prop\==value,get_opv_iii(Obj,Prop,Value).
 
-get_opv_ii(Obj,Prop,Value):- Prop\==value,get_opv_iii(Obj,Prop,Value).
+is_bb_prop(property_list).
+is_bb_prop(value).
 
-get_opv_ii(Obj,Prop,Value):- nonvar(Obj),nonvar(Prop),
-  notrace((Prop\==classof,Prop\==typeof,Prop\==value,Prop\==conc_name)),
-  get_opv_pi(Obj,Prop,Value).
+is_collection_prop(uses).
+is_collection_prop(nicknames).
 
 get_opv_iii(Sym,defined_as,defconstant):- nonvar(Sym),is_keywordp(Sym).
 get_opv_iii(Sym,typeof,keyword):- nonvar(Sym),is_keywordp(Sym).
@@ -389,6 +392,9 @@ get_opv_iii(Sym,classof,claz_symbol):- nonvar(Sym),is_keywordp(Sym).
 get_opv_iii(Obj,Prop,Value):- soops:o_p_v(Obj,Prop,Value).
 get_opv_iii(Sym,typeof,Kind):- get_opv_iii(Sym,classof,Class), \+ clause(soops:o_p_v(Sym,typeof,_),true), claz_to_symbol(Class,Kind).
 get_opv_iii(Obj,Prop,Value):- soops:struct_opv(Obj,Prop,Value).
+get_opv_iii(Obj,Prop,Value):- nonvar(Obj),nonvar(Prop),
+  notrace((Prop\==classof,Prop\==typeof,Prop\==value,Prop\==conc_name)),
+  get_opv_pi(Obj,Prop,Value).
 
 
 get_opv_pi(Obj,Prop,Value):-
@@ -441,7 +447,7 @@ claz_to_symbol1(Class,Sym):-Class=Sym.
 add_opv(Obj,Prop,Value):- add_opv_new(Obj,Prop,Value),!.
 
 
-% add_opv_pred(MPred,Obj,Key,Value):- strip_module(MPred,M,Pred),Assertion=.. [Pred,Obj,Key,Value], ( \+ M:Assertion -> assertz(M:Assertion) ; true).
+% add_opv_pred(MPred,Obj,Key,Value):- strip_module(MPred,M,Pred),Assertion=.. [Pred,Obj,Key,Value], ( \+ M:Assertion -> assert(M:Assertion) ; true).
 
 % add_opv_new(Sym,value,SValue):- atom(SValue),(atom_contains(SValue,'(');atom_contains(SValue,' ')),(as_sexp(SValue,Value)->SValue\==Value),!,set_opv(Sym,value,Value).
 % add_opv_new(Obj,Prop,Value):-  add_opv_new(Obj,Prop,Value).
@@ -451,14 +457,23 @@ add_opv_new(Obj,Key,Value):-
   un_kw(Key,Prop),
   add_opv_new_i(Obj,Prop,Value).
 
-add_opv_new_i(Obj,Prop,Value):- nonvar(Obj), has_prop_value_setter(Obj,Prop,Setter),once(call(Setter,Obj,Prop,Value)),fail.
-add_opv_new_i(Obj,Prop,Value):- Prop==value, nonvar(Obj),nb_setval(Obj,Value).
+add_opv_new_i(Obj,Prop,Value):- always(nonvar(Obj)),always(nonvar(Prop)), has_prop_value_setter(Obj,Prop,Setter),once(call(Setter,Obj,Prop,Value)),fail.
 add_opv_new_i(Obj,Prop,Val):- 
    get_obj_pred(Obj,Prop,Pred),
    modulize(call(Pred,Obj,Val),OPred),
    predicate_property(OPred,dynamic),
-   assert_if_new(OPred),!.
-add_opv_new_i(Obj,Prop,Value):-show_call_trace(assert_if_new(soops:o_p_v(Obj,Prop,Value))).
+   show_call_trace(assert_if_new(OPred)),!.
+
+add_opv_new_i(Obj,Prop,Val):- atom(Obj), is_bb_prop(Prop), \+ is_collection_prop(Prop),add_opv_new_i_bb(Obj,Prop,Val),!.
+add_opv_new_i(Obj,Prop,Value):- show_call_trace(assert_if_new(soops:o_p_v(Obj,Prop,Value))).
+
+
+create_holder(O):- O=  att(type,holder,[]).
+
+add_opv_new_i_bb(Sym,Prop,Value):- nb_current(Sym,Holder), nonvar(Holder),show_call_trace((oo_put_attr(Holder,Prop,Value))),!.
+add_opv_new_i_bb(Sym,Prop,Value):- create_holder(Holder0),!,nb_setval(Sym,Holder0),
+  b_getval(Sym,Holder),!, show_call_trace(oo_put_attr(Holder,Prop,Value)),!.  
+
 
 delete_opvalues(Obj,Key):- Key == value, nb_delete(Obj),fail.
 delete_opvalues(Obj,Key):- 
@@ -637,7 +652,8 @@ process_si:-
     process_si(soops:o_p_v(X,Y,Z)),
     erase(Ref))).
    
-process_si(soops:o_p_v(X,Y,Z)):- Y==value, show_call_trace(nb_setval(X,Z)).
+%%process_si(soops:o_p_v(X,Y,Z)):- Y==value, show_call_trace(nb_setval(X,Z)).
+process_si(soops:o_p_v(X,Y,Z)):- is_bb_prop(Y), show_call_trace(set_opv(X,Y,Z)).
 
 :- if(true).
 :- include('si.pro').
@@ -645,10 +661,7 @@ process_si(soops:o_p_v(X,Y,Z)):- Y==value, show_call_trace(nb_setval(X,Z)).
 :- load_si.
 :- endif.
 
-:- process_si.
-
 %:- include('si2.pro').
 
 :- fixup_exports.
-
 
