@@ -27,6 +27,10 @@ compile_funop(Ctx,Env,Result,LispCode,CompileBody):-
   must_compile_body(Ctx,Env,Result,CompileBody0Result, CompileBody).
 
 
+macroexpand_all(LispCode,MacroEnv,Result):-
+  macroexpand_1_or_fail(LispCode,MacroEnv,Mid) ->
+    macroexpand_all(Mid,MacroEnv,Result) ; Result=LispCode.
+
 macroexpand_1_or_fail([Procedure|Arguments],MacroEnv,CompileBody0Result):- nonvar(Procedure),
    debug_var('MacroEnvArgs',MacroEnv),
    user:macro_lambda(defmacro(Procedure),_FProcedure, FormalParams, LambdaExpression,_),!,
@@ -47,14 +51,20 @@ macroexpand_1_or_fail([Procedure|Arguments],MacroEnv,CompileBody0Result):- nonva
 :- dynamic(wl:uses_rest_only/1).
 :- discontiguous(wl:uses_rest_only/1).
 
-wl:uses_rest_only(cl_macroexpand_1).
-wl:uses_rest_only(cl_macroexpand).
 
-cl_macroexpand_1([LispCode|Optional],Result):- macroexpand_1_or_fail(LispCode,Optional,Result)->true;Result=LispCode.
-cl_macroexpand([LispCode|Optional],Result):-
-  macroexpand_1_or_fail(LispCode,Optional,Mid)->
-    cl_macroexpand([Mid|Optional],Result)
-     ; Result=LispCode.
+% macroexpand-1
+wl:uses_rest_only(cl_macroexpand).
+cl_macroexpand_1([LispCode|Optionals],Result):- 
+  nth_value(Optionals,1,'$env',MacroEnv),
+  macroexpand_1_or_fail(LispCode,MacroEnv,R)->push_values([R,t],Result);push_values([LispCode,[]],Result).
+
+% macroexpand
+wl:uses_rest_only(cl_macroexpand_1).
+cl_macroexpand([LispCode|Optionals],Result):- 
+  nth_value(Optionals,1,'$env',MacroEnv),
+  macroexpand_all(LispCode,MacroEnv,R),!,
+  (R\==LispCode->push_values([R,t],Result);push_values([R,[]],Result)).
+
 
 
 % Operator
