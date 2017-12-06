@@ -200,14 +200,12 @@ mize_body_1e(_Ctx,_,cl_list(G, R),R=G).
 mize_body_1e(_Ctx,_,C1,L=[R]):- structure_applies(C1 , (L=[R, []])). % lisp_compiler_option(elim_vars,true).
 mize_body_1e(Ctx,F,(C1,C2),CodeJoined):-!,mize_body1(Ctx,F,C1,C1O),mize_body1(Ctx,F,C2,C2O),conjoin_0(C1O,C2O,CodeJoined).
 mize_body_1e(Ctx,_,symbol_value(_Env, Sym, Sym_Get),true):- 
-  % lisp_compiler_option(safe(elim_symbolvalues_vars),true), 
- 
+  % lisp_compiler_option(safe(elim_symbolvalues_vars),true),  
   get_var_tracker(Ctx,Sym,Dict),
-  Dict.w==1,
-  Dict.p==1,
+  Dict.w=1, % ;Dict.p==1,
   % Dict.u<2,
-  Dict.r>0,
-  rw_add(Ctx,Sym,u),
+  %Dict.r>=0,
+  % rw_add(Ctx,Sym,u),
   Dict.vars=[Was|_],!,
   must(Was=Sym_Get).
 %mize_body1(Ctx,_F,C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(mize_body1(Ctx,F),C1O,C2O),C2=..[F|C2O].
