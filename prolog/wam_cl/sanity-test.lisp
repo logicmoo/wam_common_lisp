@@ -38,7 +38,7 @@
 
 (write-line "Running smoke test!")
 
-(is eq 1 1)
+(progn (prolog-inline "rtrace") (is eq 1 1))
 (is equal (list 1 'a 'b) (cons 1 '(a b)))
 
 (is eq 2 (if nil 1 2))

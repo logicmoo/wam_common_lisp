@@ -106,31 +106,12 @@ find_function_or_macro_name(_Ctx,_Env,FunctionName,_Len, ProposedName):-
       function_case_name(Name,Package,ProposedName);
       function_case_name(FunctionName,Package,ProposedName)).
 
-/*
-
-exact = ;; takes whatever is supplied
-  append(p1,p2,R)
-
-uses_rest_only_p =  ;; requires param parsing
-  defclass([Arg1|ArgS],R)
-
-exact_and_restkeys =  ;; requires param parsing
-  defclass(r1,r2,[Arg3|ArgS],R)
-
-reversed = ;; simplifes hand coding of complex
-  defclass(R,[Arg1|ArgS])
-
-environmented
-  fun(E),
-
-
- fun(r1,r2,[op1,opt2|RestAndkeys],R)
-*/
-
 
 uses_exact(FunctionName):-  wl:arglist_info(FunctionName,_,_,ArgInfo),!,ArgInfo.complex ==0 .
+uses_exact(P):- wl:arg_lambda_type(exact_only,P),!.
 
-exact_and_restkeys(_FunctionName,_Exacts):- fail.
+% exact_and_restkeys(FunctionName,Requireds):- current_predicate(FunctionName/N), Requireds is N-2,Requireds>0.
+exact_and_restkeys(P,N):- wl:arg_lambda_type(req(N),P),!.
 
 uses_rest_only_p(P):- uses_rest_only0(P),!.
 uses_rest_only_p(P):- atom_concat_or_rtrace('f_',P,PP), uses_rest_only0(PP).
@@ -152,29 +133,25 @@ align_args(FunctionName,ProposedName,Args,Result,ArgsPlusResult):-
 align_args(FunctionName,ProposedName,Args,Result,[Args,Result]):-
   (uses_rest_only_p(FunctionName);uses_rest_only_p(ProposedName)).
 
-% invoke(r1,r2,[r3],RET).
+% invoke(r1,r2,[o3,key1,value1],RET).
 align_args(FunctionName,ProposedName,Args,Result,ArgsPlusResult):- 
   (exact_and_restkeys(FunctionName,N);exact_and_restkeys(ProposedName,N)),
   length(Left,N),append(Left,Rest,Args),
   append(Left, [Rest,Result], ArgsPlusResult).
 
-% begin to guess
-align_args(_FunctionName,ProposedName,Args,Result,ArgsPlusResult):- 
-   append(Args, [Result], ArgsPlusResult),
-   length(ArgsPlusResult,Len),
-   functor(G,ProposedName,Len),
-   current_predicate(_,G),!.
 
 % guess invoke(r1,RET).
-align_args(_FunctionName,ProposedName,[Arg],Result,[Arg,Result]):- functor(G,ProposedName,2),current_predicate(_,G),!.
+align_args(_FunctionName,ProposedName,[Arg],Result,[Arg,Result]):- 
+  is_defined(ProposedName,2),is_defined(ProposedName,3).
 
 % guess invoke([r1,r2,r3],RET).
-align_args(_FunctionName,ProposedName,Args,Result,ArgsPlusResult):- functor(G,ProposedName,2),current_predicate(_,G),!,
-  append([Args], [Result], ArgsPlusResult).
+%align_args(FunctionName,ProposedName,Args,Result,[Args,Result]):- 
+%   only_arity(FunctionName,2);only_arity(ProposedName,2).
 
+  
 % fallback to invoke([r1,r2,r3],RET).
-align_args(FunctionName, ProposedName,Args,Result,[Args,Result]):-
-  (is_lisp_operator(FunctionName) ; is_lisp_operator(ProposedName)),!.
+%align_args(FunctionName, ProposedName,Args,Result,[Args,Result]):- 
+%  (is_lisp_operator(FunctionName) ; is_lisp_operator(ProposedName)),!.
 
 /*
 % guess invoke(r1,r2,r3,RET).
@@ -182,6 +159,12 @@ align_args(FunctionName, ProposedName,Args,Result,[Args,Result]):-
 align_args(_FunctionName,_ProposedName,Args,Result,ArgsPlusResult):-  
    append(Args, [Result], ArgsPlusResult).
 
+
+only_arity(ProposedName,N):-
+  is_defined(ProposedName,N),
+  forall((between(0,6,Other),Other\=N),  \+ is_defined(ProposedName,Other)).
+
+is_defined(ProposedName,N):- functor(G,ProposedName,N),current_predicate(_,G).
 
 maybe_symbol_package(Symbol,Package):-  get_opv(Symbol,package,Package),!.
 maybe_symbol_package(_Symbol,Package):- reading_package(Package).
