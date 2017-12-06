@@ -22,6 +22,7 @@
 :- use_module(library(must_trace)).
 :- use_module(library(logicmoo_util_terms)).
 :- use_module(library(logicmoo_util_common)).
+:- user:use_module(library(globals_api)).
 %:- use_module(utils_list).
 :- use_module(utils_higher_order).
 :- use_module(library(dmsg)).

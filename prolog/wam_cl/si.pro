@@ -21588,7 +21588,7 @@ o_p_v(hash_table_znst_11,instance,claz_structure_object).
 o_p_v(hash_table_znst_11,instance,claz_t).
 o_p_v(hash_table_znst_11,name,"znst_11").
 o_p_v(hash_table_znst_11,test,equalp).
-o_p_v(hash_table_znst_12,"SYS",[['$S'([logical_pathname,kw_host,"SYS",kw_device,kw_unspecific,kw_directory,[kw_relative],kw_name,kw_wild,kw_type,"LISP",kw_version,[]]),"*.lisp"],['$S'([logical_pathname,kw_host,"SYS",kw_device,kw_unspecific,kw_directory,[kw_relative],kw_name,kw_wild,kw_type,[],kw_version,[]]),"*"],['$S'([logical_pathname,kw_host,"SYS",kw_device,kw_unspecific,kw_directory,[kw_absolute],kw_name,kw_wild,kw_type,[],kw_version,[]]),"/*"]]).
+%o_p_v(hash_table_znst_12,"SYS",[['$S'([logical_pathname,kw_host,"SYS",kw_device,kw_unspecific,kw_directory,[kw_relative],kw_name,kw_wild,kw_type,"LISP",kw_version,[]]),"*.lisp"],['$S'([logical_pathname,kw_host,"SYS",kw_device,kw_unspecific,kw_directory,[kw_relative],kw_name,kw_wild,kw_type,[],kw_version,[]]),"*"],['$S'([logical_pathname,kw_host,"SYS",kw_device,kw_unspecific,kw_directory,[kw_absolute],kw_name,kw_wild,kw_type,[],kw_version,[]]),"/*"]]).
 o_p_v(hash_table_znst_12,classof,claz_hash_table).
 o_p_v(hash_table_znst_12,instance,claz_hash_table(claz_t,claz_t)).
 o_p_v(hash_table_znst_12,instance,claz_hash_table).

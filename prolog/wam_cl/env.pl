@@ -76,8 +76,6 @@ push_list_prepend(O,Env,Name,Value):- Env=[H|T],ct(O,2,Env,[H|T]),ct(O,1,Env,bv(
 
 
 
-
-
 add_to_env(Env,Name,Value):- update_or_append(nb_setarg,Env,Name,Value).
 %add_to_env(Name,Value):- env_toplevel(Env),update_or_prepend(nb_setarg,Env,Name,Value).
 

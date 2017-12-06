@@ -124,7 +124,7 @@ f_u_put(Symbol,Prop,Value,Ret):-
   cl_symbol_plist(Symbol,PList),
  rtrace(((set_plist_value(Ret,PList,Prop,Value)
       ->true; 
-   (Ret=Value, set_opv(Symbol,property_list,[Prop,Value|PList]))))),!.
+   (Ret=Value, set_opv(Symbol,plist,[Prop,Value|PList]))))),!.
 f_sys_put(Symbol,Prop,Value,Ret):- f_u_put(Symbol,Prop,Value,Ret).
   
 
@@ -138,7 +138,7 @@ set_plist_value(Old,[Prop|CDR],Prop,Value):- !,arg(1,CDR,Old),nb_setarg(1,CDR,Va
 set_plist_value(Old,[_,_,Next|PList],Prop,Value):- !, set_plist_value(Old,[Next|PList],Prop,Value).
 %set_plist_value(Old,[Next|PList],Prop,Value):-
   
-cl_symbol_plist(Symbol,Value):- assertion(is_symbolp(Symbol)),get_opv(Symbol,property_list,Value)->true;Value=[].
+cl_symbol_plist(Symbol,Value):- assertion(is_symbolp(Symbol)),get_opv(Symbol,plist,Value)->true;Value=[].
 
 
 
@@ -186,7 +186,6 @@ print_prefixed_symbol(Symbol,_P,SP,kw_internal):-!, print_package_or_hash(SP),wr
 print_prefixed_symbol(Symbol,PrintP,SP,kw_external):- package_use_list(PrintP,SP),!,write(Symbol).
 print_prefixed_symbol(Symbol,_P,SP,kw_external):- !, print_package_or_hash(SP),write(':'),write(Symbol).
 print_prefixed_symbol(Symbol,_,SP,_):- print_package_or_hash(SP),write('::'),write(Symbol).
-
 
 
 

@@ -156,7 +156,7 @@ symbol_value_or(Env,Var,G,Value):-
 symbol_value0(Env,Var,Value):-  bvof(bv(Var, Value),_,Env).
 symbol_value0(_Env,Var,_Value):- notrace((nonvar(Var),is_functionp(Var),wdmsg(is_functionp(Var)))),!,lisp_dump_break.
 symbol_value0(_Env,Var,Result):- get_opv(Var, value, Result),!.
-symbol_value0(_Env,Var,Result):- atom(Var),nb_current(Var,Result),!.
+symbol_value0(_Env,Var,Result):- atom(Var),get_opv(Var,value,Result),!.
 symbol_value0(Env,[Place,Obj],Result):- place_op(Env,getf,[Place,Obj],[],Result).
 
 
@@ -181,7 +181,7 @@ set_symbol_value(Env,Var,Result):- ensure_env(Env),!,
            -> update_opv(Var, value, Result) 
            ; set_symbol_value_last_chance(Env,Var,Result)))).
 
-set_symbol_value_last_chance(_Env,Var,Result):- nb_current(Var,_)-> nb_setval(Var,Result),!.
+%set_symbol_value_last_chance(_Env,Var,Result):- nb_current(Var,_)-> nb_setval(Var,Result),!.
 %set_symbol_value_last_chance(Env,Var,Result):- add_to_env(Env,Var,Result),!.
 set_symbol_value_last_chance(_Env,Var,Result):- set_opv(Var, value, Result),!.
 set_symbol_value_last_chance(_Env,Var,_Result):- 

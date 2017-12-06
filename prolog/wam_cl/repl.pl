@@ -263,8 +263,10 @@ lw:- cl_load("wam-cl-params",_).
 
 :- ignore((((((clause(arithmetic:eval(P,_,_),_),nonvar(P)),(functor(P,F,A),show_call_trace(define_cl_math(F,A)))))),fail)).
 
+classof:attr_unify_hook(A,B):- trace,wdmsg(classof:attr_unify_hook(A,B)), break.
 :- fixup_exports.
 
+%:- process_si.
 %:- cddd.
 
 end_of_file.

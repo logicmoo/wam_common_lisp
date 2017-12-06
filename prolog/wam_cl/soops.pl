@@ -23,8 +23,6 @@
 :- discontiguous soops:struct_opv/4.
 :- dynamic((soops:struct_opv/4)).
 
-%:- use_module(library(globals_api)).
-
 :- multifile(xlisting_config:xlisting_always/1).
 :- dynamic(xlisting_config:xlisting_always/1).
 
@@ -370,15 +368,15 @@ add_opv_maybe(Obj,Prop,Value):- add_opv_new(Obj,Prop,Value),!.
 get_opv(Obj,_,_):- string(Obj),!,fail.
 get_opv(Obj,Prop,Value):- no_repeats(Obj-Prop,get_opv_i(Obj,Prop,Value)).
 
-get_opv_i(Obj,Key,Value):- un_kw(Key,Prop),get_opv_ii(Obj,Prop,Value).
+get_opv_i(Obj,Key,Value):- un_kw(Key,Prop)->get_opv_ii(Obj,Prop,Value).
 
-get_opv_ii(Obj,value, Value):- Obj==quote, throw(get_opv_i(quote, value, Value)).
-get_opv_ii(Obj,Prop,Value):- nonvar(Obj), has_prop_value_getter(Obj,Prop,Getter),call(Getter,Obj,Prop,Value).
+%get_opv_ii(Obj,value, Value):- Obj==quote, throw(get_opv_i(quote, value, Value)).
 
-get_opv_ii(Sym,value,Value):- ((atom(Sym);var(Sym)),nb_current(Sym,Value))*->true;get_opv_iii(Sym,value,Value).
-
-get_opv_ii(Obj,Prop,Value):- Prop\==value,get_opv_iii(Obj,Prop,Value).
-
+get_opv_ii(Obj,Prop,Value):- has_prop_value_getter(Obj,Prop,Getter),call(Getter,Obj,Prop,Value).
+get_opv_ii(Obj,Prop,Value):- compound(Obj),compound_deref(Obj,Real),!,get_opv_ii(Real,Prop,Value).
+%get_opv_ii(Sym,value,Value):- ((atom(Sym);var(Sym)),nb_current(Sym,Value))*->true;get_opv_iii(Sym,value,Value).
+get_opv_ii(Obj,Prop,Value):- % Prop\==value,
+  get_opv_iii(Obj,Prop,Value).
 get_opv_ii(Obj,Prop,Value):- nonvar(Obj),nonvar(Prop),
   notrace((Prop\==classof,Prop\==typeof,Prop\==value,Prop\==conc_name)),
   get_opv_pi(Obj,Prop,Value).
@@ -389,21 +387,46 @@ get_opv_iii(Sym,classof,claz_symbol):- nonvar(Sym),is_keywordp(Sym).
 get_opv_iii(Obj,Prop,Value):- soops:o_p_v(Obj,Prop,Value).
 get_opv_iii(Sym,typeof,Kind):- get_opv_iii(Sym,classof,Class), \+ clause(soops:o_p_v(Sym,typeof,_),true), claz_to_symbol(Class,Kind).
 get_opv_iii(Obj,Prop,Value):- soops:struct_opv(Obj,Prop,Value).
+get_opv_iii(Obj,Prop,Value):- atom(Obj),has_ref_object(Obj,Ref),!,nb_current_value(Ref,Prop,Value).
 
+compound_deref('$OBJ'(claz_reference,B),B):- atom(B).
 
-get_opv_pi(Obj,Prop,Value):-
-  get_obj_pred(Obj,Prop,Pred),
-  call(Pred,Obj,Value).
+get_opv_pi(Obj,Prop,Value):- get_obj_pred(Obj,Prop,Pred), call(Pred,Obj,Value).
 get_opv_pi(Obj,Prop,Value):- fail, get_obj_prefix(Obj,Prefix),atom_concat_or_rtrace(Prefix,DashKey,Prop),atom_concat_or_rtrace('_',Key,DashKey),!,
   get_opv_i(Obj,Key,Value).
   
+
+set_ref_object(Ref,Object):- quietly(nb_setval(Ref,Object)),!.
+release_ref_object(Ref):- wdmsg(release_ref_object(Ref)),quietly(nb_setval(Ref,[])),!.
+has_ref_object(Ref,Object):- nb_current(Ref,Object),Object\==[].
+get_ref_object(Ref,Object):- has_ref_object(Ref,Object).
+get_ref_object(Ref,Object):- atom(Ref), 
+   %oo_empty(Object0),
+   put_attr(Object0,classof,claz_ref),
+   nb_put_attr(Object0,ref,Ref),
+   must(nb_setval(Ref,Object0)),!,
+   must(b_getval(Ref,Object)),!.
+
+/*
+set_ref_object(Ref,Object):- quietly(nb_set_value(?(Ref),pointer,Object)),!.
+release_ref_object(Ref):- wdmsg(release_ref_object(Ref)),quietly(nb_set_value(?(Ref),pointer,[])),!.
+has_ref_object(Ref,Object):- nb_current_value(?(Ref),pointer,Object),Object\=[],!.
+get_ref_object(Ref,Object):- nb_current_value(?(Ref),pointer,Object),Object\=[],!.
+get_ref_object(Ref,Object):- 
+   oo_empty(Object0),
+   oo_put_attr(Object0,classof,claz_ref),
+   oo_put_attr(Object0,ref,Ref),
+   must(nb_set_value(?(Ref),pointer,Object0)),!,
+   must(nb_current_value(?(Ref),pointer,Object)),!.
+*/
+
 
 get_obj_prefix(Obj,Prefix):- quietly(((type_or_class_nameof(Obj,Class),!,type_prop_prefix(Class,Prefix)))).
 
 type_prop_prefix(Class,Prefix):- get_opv(Class,conc_name,Prefix),!.
 type_prop_prefix(Class,Prefix):- claz_to_symbol(Class,Prefix),!.
 
-get_o_kind(Obj,Kind):- get_opv_i(Obj,classof,Class),!,claz_to_symbol(Class,Kind).
+%get_o_kind(Obj,Kind):- get_opv_iii(Obj,classof,Class),!,claz_to_symbol(Class,Kind).
 get_o_kind(Obj,Kind):- type_or_class_nameof(Obj,Class),claz_to_symbol(Class,Kind).
 
 get_obj_pred(Obj,Prop,Pred):- get_o_kind(Obj,Kind),kind_attribute_pred(Kind,Prop,Pred).
@@ -452,15 +475,19 @@ add_opv_new(Obj,Key,Value):-
   add_opv_new_i(Obj,Prop,Value).
 
 add_opv_new_i(Obj,Prop,Value):- nonvar(Obj), has_prop_value_setter(Obj,Prop,Setter),once(call(Setter,Obj,Prop,Value)),fail.
-add_opv_new_i(Obj,Prop,Value):- Prop==value, nonvar(Obj),nb_setval(Obj,Value).
-add_opv_new_i(Obj,Prop,Val):- 
+%add_opv_new_i(Obj,Prop,Value):- Prop==value, nonvar(Obj),nb_setval(Obj,Value).
+add_opv_new_i(Ref,Prop,Value):- get_ref_object(Ref,Object),!,
+   retractall(soops:o_p_v(Ref,Prop,_Value)),
+   show_call_trace(always(nb_put_attr(Object,Prop,Value))).
+
+add_opv_new_i(Obj,Prop,Val):-  fail,
    get_obj_pred(Obj,Prop,Pred),
    modulize(call(Pred,Obj,Val),OPred),
    predicate_property(OPred,dynamic),
    assert_if_new(OPred),!.
-add_opv_new_i(Obj,Prop,Value):-show_call_trace(assert_if_new(soops:o_p_v(Obj,Prop,Value))).
+%add_opv_new_i(Obj,Prop,Value):-show_call_trace(assert_if_new(soops:o_p_v(Obj,Prop,Value))).
 
-delete_opvalues(Obj,Key):- Key == value, nb_delete(Obj),fail.
+%delete_opvalues(Obj,Key):- Key == value, nb_delete(Obj),fail.
 delete_opvalues(Obj,Key):- 
  always(\+ is_list(Obj);Obj==[]),
  un_kw(Key,Prop),
@@ -497,11 +524,11 @@ modulize(Pred,Pred).
 
 symbol_set_get(sys_xx_stdin_xx,claz_prolog_output_stream,set_input,current_input).
 
-has_prop_value_setter(Sym,value,prolog_direct(Setter/1)):- symbol_set_get(Sym,Setter,_Getter).
 has_prop_value_setter(sys_xx_stdout_xx,value,prolog_direct(set_output/1)).
+has_prop_value_setter(Sym,value,prolog_direct(Setter/1)):- symbol_set_get(Sym,Setter,_Getter).
 
-has_prop_value_getter(Sym,value,prolog_direct(Getter/1)):- symbol_set_get(Sym,_Setter,Getter).
 has_prop_value_getter(sys_xx_stdout_xx,value,prolog_direct(current_output/1)).
+has_prop_value_getter(Sym,value,prolog_direct(Getter/1)):- symbol_set_get(Sym,_Setter,Getter).
 %has_prop_value_setter(sys_xx_stderr_xx,value,prolog_direct(set_error/1)).
 %has_prop_value_getter(sys_xx_stderr_xx,value,prolog_direct(current_error/1)).
 
@@ -511,9 +538,10 @@ prolog_direct(Pred/3,Obj,Prop,Value):- call(Pred,Obj,Prop,Value).
    
 update_opv(Obj,Prop,Value):- set_opv(Obj,Prop,Value).
 
-set_opv(Obj,Prop,Value):- set_opv_i(Obj,Prop,Value).
-set_opv_i(Obj,Prop,Value):- has_prop_value_setter(Obj,Prop,Setter),!,call(Setter,Obj,Prop,Value).
-set_opv_i(Obj,Prop,Value):- delete_opvalues(Obj,Prop),add_opv_new(Obj,Prop,Value).
+set_opv(Obj,Key,Value):- un_kw(Key,Prop),set_opv_i(Obj,Prop,Value).
+set_opv_i(Obj,Prop,Value):- has_prop_value_setter(Obj,Prop,Setter),once(call(Setter,Obj,Prop,Value)).
+set_opv_i(Obj,Prop,Value):- % delete_opvalues(Obj,Prop),
+   add_opv_new(Obj,Prop,Value).
 
 :- dynamic(is_obj_type/1).
 
@@ -576,6 +604,7 @@ get_opv_else(Obj,Prop,Value,Else):- get_opv(Obj,Prop,Value)*->true;Else.
 
 :- dynamic(type_attribute_pred_dyn/3).
 
+decl_mapped_opv(_,_):-!.
 decl_mapped_opv(Kind,Maps):- is_list(Maps),!,maplist(decl_mapped_opv(Kind),Maps).
 decl_mapped_opv(Kind,KW=Pred):- un_kw(KW,Prop),
   show_call_trace(assert_if_new(type_attribute_pred_dyn(Kind,Prop,Pred))),
@@ -632,12 +661,14 @@ load_si:-
 load_si_value(Value):- assert_if_new(Value).
 
 process_si:- 
+   ensure_loaded(package),
    doall((
     clause(soops:o_p_v(X,Y,Z),true,Ref),
     process_si(soops:o_p_v(X,Y,Z)),
     erase(Ref))).
    
-process_si(soops:o_p_v(X,Y,Z)):- Y==value, show_call_trace(nb_setval(X,Z)).
+%process_si(soops:o_p_v(X,Y,Z)):- Y==value, show_call_trace(nb_setval(X,Z)).
+process_si(soops:o_p_v(X,Y,Z)):- X\==[], set_opv(X,Y,Z).
 
 :- if(true).
 :- include('si.pro').
@@ -645,10 +676,10 @@ process_si(soops:o_p_v(X,Y,Z)):- Y==value, show_call_trace(nb_setval(X,Z)).
 :- load_si.
 :- endif.
 
-:- process_si.
-
 %:- include('si2.pro').
 
 :- fixup_exports.
+
+
 
 

@@ -191,16 +191,15 @@ f_u_fifteen(MResult) :-
 
 (is eql 13 (progn (print (distance-from-origin my-point))))
 
-(reflect-in-y-axis my-point)
+(is = 4 (reflect-in-y-axis my-point))
 
-my-point
+(is eq my-point my-point)
 
 (setf a-similar-point #s(point :x 3 :y -4 :z 12))
 
-(equal my-point a-similar-point)
+(is eq nil (equal my-point a-similar-point))
 
-(equalp my-point a-similar-point)
-
+(is eq nil (equalp my-point a-similar-point) )
 
 
 ;; 3.2. defclass
@@ -214,7 +213,7 @@ my-point
 
 (setf my-point (make-instance 'point))
 
-(type-of my-point)
+(is eq 'point (type-of my-point))
 
 (defun set-point-values (point x y z)
   (setf (slot-value point 'x) x
@@ -245,7 +244,8 @@ my-point
 ;; #-(or cormanlisp CLISP WAM-CL)
 (typep my-point (class-of my-point))
 
-(class-of (class-of my-point))
+(is eq (class-of (find-class 'STANDARD-CLASS))
+       (class-of (class-of my-point)))
 
 ;; 3.4. you don't need clos to use clos
 
@@ -257,9 +257,9 @@ my-point
 
 (find-class t)
 
-(defstruct foo)
+(is eq 'foo (defstruct foo))
 
-(class-of (make-foo))
+(is eq (find-class 'foo) (class-of (make-foo)))
 
 ;; 3.5 slots
 
