@@ -38,7 +38,8 @@
 
 (write-line "Running smoke test!")
 
-(progn (prolog-inline "rtrace") (is eq 1 1))
+; (progn (prolog-inline "rtrace") (is eq 1 1))
+(is eq 1 1)
 (is equal (list 1 'a 'b) (cons 1 '(a b)))
 
 (is eq 2 (if nil 1 2))
@@ -177,9 +178,7 @@ f_u_fifteen(MResult) :-
   (setf (point-y point)
         (- (point-y point))))
 
-(list (setf my-point  (progn (prolog-inline "rtrace") (make-point :x 3 :y 4 :z 12)))
-      (setf my-point2 (make-point :x 3 :y 4 :z 12)))
-
+(list (setf my-point (make-point :x 3 :y 4 :z 12)) (setf my-point2 (make-point :x 3 :y 4 :z 12)))
 (setf my-point3 #S(POINT :X 3 :Y 4 :Z 12))
 (setf my-point4d (make-point4d :x 3 :y 4 :z 12 :t 1))
 

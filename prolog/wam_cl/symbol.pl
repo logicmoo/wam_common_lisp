@@ -35,6 +35,10 @@ cl_gensym(Symbol):- cl_gensym("G",Symbol).
 cl_gensym(Integer,Symbol):- integer(Integer),!,atom_concat('G',Integer,SymbolName),cl_make_symbol(SymbolName,Symbol).
 cl_gensym(Name,Symbol):- to_prolog_string(Name,String), gensym(String,SymbolName),cl_make_symbol(SymbolName,Symbol).
 
+cl_gentemp(Symbol):- cl_gentemp("T",Symbol).
+cl_gentemp(Name,Symbol):- reading_package(Package),cl_gentemp(Name,Package,Symbol).
+cl_gentemp(Name,Package,Symbol):- to_prolog_string(Name,String), gensym(String,SymbolName),cl_intern(SymbolName,Package,Symbol).
+
 
 is_boundp(Symbol):- is_keywordp(Symbol);get_opv(Symbol,value,_).
 is_constantp(Object):- is_self_evaluationing_const(Object);get_opv(Object,defined_as,defconstant).
@@ -81,10 +85,16 @@ unintern_symbol(String,Package,Symbol,IntExt):-
    always((package_find_symbol(String,Package,FoundSymbol,IntExt),FoundSymbol==Symbol)).
 
 
+:-assert(wl:arg_lambda_type(exact_only,cl_make_symbol)).
 cl_make_symbol(SymbolName,Symbol):- 
    prologcase_name(SymbolName,ProposedName),
    gensym(ProposedName,Symbol),
    create_symbol(SymbolName,[],Symbol).
+
+cl_make_symbol(SymbolName,Package,Symbol):- 
+   prologcase_name(SymbolName,ProposedName),
+   gensym(ProposedName,Symbol),
+   create_symbol(SymbolName,Package,Symbol).
 
 
 create_symbol(String,pkg_kw,Symbol):-!,create_keyword(String,Symbol).
@@ -102,27 +112,33 @@ create_keyword(Name,Symbol):- string_upper(Name,String),
 
 
 
-
-
-f_u_put(Symbol,Prop,Value):- 
-  assertion(is_symbolp(Symbol)), 
-  cl_symbol_plist(Symbol,PList),
- (set_plist_value(PList,Prop,Value)->true; set_opv(Symbol,symbol_plist,[Prop,Value|PList])).
-
+:-assert(wl:arg_lambda_type(req(2),cl_get)).
 %(get x y) ==  (getf (symbol-plist x) y)
 cl_get(Symbol,Prop,Optionals,Value):- assertion(is_symbolp(Symbol)),
   nth_value(Optionals,1,[],Default),cl_symbol_plist(Symbol,PList),
   get_plist_value(PList,Prop,Default,Value),!.
 
+:-assert(wl:arg_lambda_type(exact_only,f_u_put)).
+f_u_put(Symbol,Prop,Value,Ret):- 
+  assertion(is_symbolp(Symbol)), 
+  cl_symbol_plist(Symbol,PList),
+ rtrace(((set_plist_value(Ret,PList,Prop,Value)
+      ->true; 
+   (Ret=Value, set_opv(Symbol,property_list,[Prop,Value|PList]))))),!.
+f_sys_put(Symbol,Prop,Value,Ret):- f_u_put(Symbol,Prop,Value,Ret).
+  
+
+nth_value(Optionals,N,Default,Value):- nth1(N,Optionals,Value)->true;Default=Value.
+
 get_plist_value([Prop,Value|_],Prop,_Default,Value):-!.
 get_plist_value([_,_|PList],Prop,Default,Value):- !, get_plist_value(PList,Prop,Default,Value).
 get_plist_value([],_Prop,Default,Default).
 
-set_plist_value([Prop|CDR],Prop,Value):- !, nb_setarg(1,CDR,Value).
-set_plist_value([_,_,Next|PList],Prop,Value):- !, set_plist_value([Next|PList],Prop,Value).
-%set_plist_value([Next|PList],Prop,Value):-
+set_plist_value(Old,[Prop|CDR],Prop,Value):- !,arg(1,CDR,Old),nb_setarg(1,CDR,Value),!.
+set_plist_value(Old,[_,_,Next|PList],Prop,Value):- !, set_plist_value(Old,[Next|PList],Prop,Value).
+%set_plist_value(Old,[Next|PList],Prop,Value):-
   
-cl_symbol_plist(Symbol,Value):- assertion(is_symbolp(Symbol)),get_opv(Symbol,symbol_plist,Value)->true;Value=[].
+cl_symbol_plist(Symbol,Value):- assertion(is_symbolp(Symbol)),get_opv(Symbol,property_list,Value)->true;Value=[].
 
 
 
@@ -176,4 +192,4 @@ print_prefixed_symbol(Symbol,_,SP,_):- print_package_or_hash(SP),write('::'),wri
 
 :- fixup_exports.
 
-
+% :- cl_intern("PUT",pkg_sys,_Symbol).
