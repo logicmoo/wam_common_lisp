@@ -135,11 +135,66 @@ t_or_nil(G,Ret):- G->Ret=t;Ret=[].
 
 cl_not(Obj,Ret):- t_or_nil(Obj == [] , Ret).
 cl_null(Obj,Ret):- t_or_nil(Obj == [] , Ret).
+cl_atom(Obj,Ret):-  t_or_nil( Obj\=[_|_] , Ret).
+cl_consp(Obj,Ret):-  t_or_nil( Obj=[_|_] , Ret).
 
+:-assert(wl:arg_lambda_type(rest_only,cl_nconc)).
+cl_nconc([L1,L2],Ret):- !, append(L1,L2,Ret).
+cl_nconc([L1],L1):-!.
+cl_nconc([L1,L2|Lists],Ret):- !,cl_nconc([L2|Lists],LL2), append(L1,LL2,Ret).
+cl_nconc(X,X):-!.
+
+cl_copy_list(List,List):- \+ compound(List),!.
+cl_copy_list([M|List],[M|Copy]):-cl_copy_list(List,Copy).
+
+
+
+:-assert(wl:arg_lambda_type(req(1),cl_last)).
+cl_last(List,[],Tail):-  !, cl_last_1(List,Tail).
+cl_last(List,[N],Ret):- 
+  (N=1 -> cl_last_1(List,Ret);
+  (N=0 -> cl_last_0(List,Ret);
+ (( length([R|RightM1],N),
+  [R|RightM1]=Right,
+  (append(_,Right,List)->Ret=Right;
+  (append(_,List,Right)->Ret=List;
+  ((cl_last_1(List,R1),   
+    append(RightM1,R1,Ret),
+      append(_,Ret,List))->true;Ret=List))))))).
+
+cl_last_0([_|List],R):- !, cl_last_0(List,R).
+cl_last_0(A,A).
+cl_last_1([A],[A]):-!.
+cl_last_1([_,H|List],R):- !, cl_last_1([H|List],R).
+cl_last_1([A|R],[A|R]):-!.
+cl_last_1(_,[]).
+
+/*
+ (last nil) =>  NIL
+ (last '(1 2 3)) =>  (3)
+ (last '(1 2 . 3)) =>  (2 . 3)
+ (setq x (list 'a 'b 'c 'd)) =>  (A B C D)
+ (last x) =>  (D)
+ (rplacd (last x) (list 'e 'f)) x =>  (A B C D E F)
+ (last x) =>  (F)
+
+ (last '(a b c))   =>  (C)
+
+ (last '(a b c) 0) =>  ()
+ (last '(a b c) 1) =>  (C)
+ (last '(a b c) 2) =>  (B C)
+ (last '(a b c) 3) =>  (A B C)
+ (last '(a b c) 4) =>  (A B C)
+
+ (last '(a . b) 0) =>  B
+ (last '(a . b) 1) =>  (A . B)
+ (last '(a . b) 2) =>  (A . B)
+*/
 cl_eq(A,B,Ret):- t_or_nil( is_eq(A,B) , Ret).
 cl_eql(A,B,Ret):- t_or_nil( is_eql(A,B) , Ret).
 cl_equal(A,B,Ret):- t_or_nil( is_equal(A,B) , Ret).
 cl_equalp(A,B,Ret):- t_or_nil( is_equalp(A,B) , Ret).
+
 
 
 is_eql(X,Y):- same_term(X,Y)->true;cl_type_of(X,T),cl_type_of(Y,T), notrace(catch(X=:=Y,_,fail)).
