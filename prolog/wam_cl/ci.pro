@@ -6292,7 +6292,7 @@ struct_opv(claz_structure_class,writers,[[setf,sys_class_defstruct_form]],zlot_c
 struct_opv(claz_structure_object,classof,claz_built_in_class).
 struct_opv(claz_structure_object,classof,claz_clos_structure_class).
 struct_opv(claz_structure_object,classof,claz_structure_class).
-struct_opv(claz_structure_object,include,claz_structure_c33_object).
+% struct_opv(claz_structure_object,include,claz_structure_c33_object).
 struct_opv(claz_structure_object,include,claz_sys_slot_object).
 struct_opv(claz_structure_object,include,claz_t).
 struct_opv(claz_structure_object,name,"ALTERNATE-METACLASS",zlot_structure_object_alternate_metaclass).
@@ -6338,7 +6338,7 @@ struct_opv(claz_structure_object,slot,pure,zlot_structure_object_pure).
 struct_opv(claz_structure_object,slot,slots,zlot_structure_object_slots).
 struct_opv(claz_structure_object,slot,structure_class,zlot_structure_object_structure_class).
 struct_opv(claz_structure_object,slot,type,zlot_structure_object_type).
-struct_opv(claz_structure_object,super_priority,[claz_structure_c33_object,claz_structure_object,claz_sys_slot_object,claz_t]).
+%struct_opv(claz_structure_object,super_priority,[claz_structure_c33_object,claz_structure_object,claz_sys_slot_object,claz_t]).
 struct_opv(claz_structure_object,super_priority,[claz_sys_slot_object,claz_t]).
 struct_opv(claz_structure_object,super_priority,[claz_t]).
 struct_opv(claz_structure_object,symbolname,structure_object).

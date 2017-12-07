@@ -540,8 +540,9 @@ setq_values(Env,[Var|Vars],[Val|Values]):-
    setq_values(Env,Vars,Values).
 
 f_sys_set_symbol_value(Var,Val):-
-  env_current(Env),
-  set_symbol_value(Env,Var,Val).
+  set_opv(Var,value,Val).
+%  env_current(Env),
+  %set_symbol_value(Env,Var,Val).
 
 %   zip_with(Xs, Ys, Pred, Zs)
 %   is true if Pred(X, Y, Z) is true for all X, Y, Z.

@@ -350,6 +350,10 @@ un_kw(Key,Prop):- notrace(un_kw1(Key,Prop)).
 un_kw1(Prop,Prop):- var(Prop),!.
 un_kw1(Key,Prop):- \+ atomic(Key),!,lisp_dump_break,Key=Prop.
 un_kw1([],[]):-!.
+un_kw1(Key,Prop):- soops:struct_opv(K, accessor, Key, Slot),
+  (soops:struct_opv(K, keyword, KW, Slot);
+    soops:struct_opv(K, slot, KW, Slot)),!,un_kw1(KW,Prop).
+
 un_kw1(Key,Prop):- \+ atomic_list_concat([_,_|_],'_',Key),!,Prop=Key.
 un_kw1(Key,Prop):- Prop\==name,to_prolog_string_anyways(Key,Str),prologcase_name(Str,Prop),!.
 un_kw1(Key,Prop):- atom_concat_or_rtrace('kw_',Prop,Key),lisp_dump_break,!.
@@ -477,7 +481,7 @@ add_opv_new(Obj,Key,Value):-
 add_opv_new_i(Obj,Prop,Value):- nonvar(Obj), has_prop_value_setter(Obj,Prop,Setter),once(call(Setter,Obj,Prop,Value)),fail.
 %add_opv_new_i(Obj,Prop,Value):- Prop==value, nonvar(Obj),nb_setval(Obj,Value).
 add_opv_new_i(Ref,Prop,Value):- get_ref_object(Ref,Object),!,
-   retractall(soops:o_p_v(Ref,Prop,_Value)),
+  % retractall(soops:o_p_v(Ref,Prop,_Value)),
    show_call_trace(always(nb_put_attr(Object,Prop,Value))).
 
 add_opv_new_i(Obj,Prop,Val):-  fail,

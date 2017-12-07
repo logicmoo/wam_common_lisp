@@ -32,6 +32,8 @@ get_var_tracker(Ctx0,Atom,Dict):- get_attr(Ctx0,tracker,Ctx), must(sanity(atom(A
 get_var_tracker(Ctx0,Atom,Dict):-  get_attr(Ctx0,tracker,Ctx),Dict=rw{name:Atom,r:0,w:0,p:0,ret:0,u:0,vars:[]},oo_put_attr(Ctx,var_tracker(Atom),Dict),!.
 
 
+locally_let(_,G):- !, G.
+
 locally_let([N=V|More],G):- castify(V,Value),!,locally_let([N=Value|More],G).
 locally_let([N=V|More],G):- castify(N,Symbol),!,locally_let([Symbol=V|More],G).
 locally_let([N=V|More],G):- 

@@ -32,7 +32,7 @@ is_characterp(X):-var(X),!,fail.
 is_characterp('$CHAR'(V)):- nonvar(V).
 
 is_stringp(X):-var(X),!,fail.
-is_stringp(X):- string(X).
+%is_stringp(X):- string(X),nop(dmsg(is_stringp(X))).
 is_stringp('$ARRAY'([_N],claz_base_character,List)):- nonvar(List).
 
 cl_stringp(A, R):- t_or_nil(is_stringp(A),R).
@@ -75,18 +75,18 @@ to_prolog_char((Atom),Char):- name(Atom,[C|Odes]),!,
 
 % SHARED SECTION
 :- multifile(wl:coercion/3).
-wl:coercion(In, prolog_string, Out):- to_prolog_string(In,Out).
+wl:coercion(In, claz_prolog_string, Out):- to_prolog_string(In,Out).
 wl:coercion(In, claz_string, Out):- cl_string(In,Out).
 wl:coercion(In, claz_character, Out):- make_character(In,Out).
-wl:coercion(In, string, Out):- cl_string(In,Out).
-wl:coercion(In, list, Out):- is_stringp(In),to_lisp_string(In,Out).
-wl:coercion(In, prolog_list, Out):- functor(In,_F,A),arg(A,In,Out),is_list(Out).
+wl:coercion(In, claz_string, Out):- cl_string(In,Out).
+wl:coercion(In, claz_sequence, Out):- is_stringp(In),to_lisp_string(In,Out).
+wl:coercion(In, claz_cons, Out):- functor(In,_F,A),arg(A,In,Out),is_list(Out).
 
 wl:coercion(List, object(_,'$ARRAY'(A1,A2)), '$ARRAY'(A1,A2,List)).
 wl:coercion(In, sequence(string,'$ARRAY'(A1,A2)), List):- is_stringp(In),to_lisp_string(In,'$ARRAY'(A1,A2,List)).
 
-wl:coercion([H|T], object(Cons,_), [H|T]):- Cons==cons.
-wl:coercion([H|T], sequence(cons,cons), [H|T]):-!. 
+wl:coercion([H|T], object(Cons,_), [H|T]):- Cons==claz_cons.
+wl:coercion([H|T], sequence(claz_cons,claz_cons), [H|T]):-!. 
 
 % index_of_first(N,Pred,X,Y,R)
 index_of_first_success(N,Pred,[X|XX],[Y|YY],R):- !,
@@ -103,7 +103,7 @@ index_of_first_failure(_,_,_,_,[]).
 
 % string>
 :-assertz(wl:arg_lambda_type(req(2),cl_string_c62)).
-wl:type_checked(cl_string_c62(prolog_list,prolog_list,keys,index)).
+wl:type_checked(cl_string_c62(claz_cons,claz_cons,keys,index)).
 cl_string_c62(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_success(Start1,@>,XR,YR,R).
@@ -111,7 +111,7 @@ cl_string_c62(X,Y,Keys,R):-
 
 % string>=
 :-assertz(wl:arg_lambda_type(req(2),cl_string_c62_c61)).
-wl:type_checked(cl_string_c62_c61(prolog_list,prolog_list,keys,index)).
+wl:type_checked(cl_string_c62_c61(claz_cons,claz_cons,keys,index)).
 cl_string_c62_c61(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_success(Start1,@>=,XR,YR,R).
@@ -119,7 +119,7 @@ cl_string_c62_c61(X,Y,Keys,R):-
 
 % string<
 :-assertz(wl:arg_lambda_type(req(2),cl_string_c60)).
-wl:type_checked(cl_string_c60(prolog_list,prolog_list,keys,index)).
+wl:type_checked(cl_string_c60(claz_cons,claz_cons,keys,index)).
 cl_string_c60(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_success(Start1,@<,XR,YR,R).
@@ -127,42 +127,42 @@ cl_string_c60(X,Y,Keys,R):-
 
 % string<=
 :-assertz(wl:arg_lambda_type(req(2),cl_string_c60_c61)).
-wl:type_checked(cl_string_c60_c61(prolog_list,prolog_list,keys,index)).
+wl:type_checked(cl_string_c60_c61(claz_cons,claz_cons,keys,index)).
 cl_string_c60_c61(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_success(Start1,@=<,XR,YR,R).
 
 % string/=
 :-assertz(wl:arg_lambda_type(req(2),cl_string_c47_c61)).
-wl:type_checked(cl_string_c47_c61(prolog_list,prolog_list,keys,index)).
+wl:type_checked(cl_string_c47_c61(claz_cons,claz_cons,keys,index)).
 cl_string_c47_c61(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_success(Start1,\==,XR,YR,R).
 
 % string-lessp
 :-assertz(wl:arg_lambda_type(req(2),cl_string_lessp)).
-wl:type_checked(cl_string_lessp(prolog_list,prolog_list,keys,index)).
+wl:type_checked(cl_string_lessp(claz_cons,claz_cons,keys,index)).
 cl_string_lessp(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_success(Start1,char_lessp,XR,YR,R).
 
 % string-not-lessp
 :-assertz(wl:arg_lambda_type(req(2),cl_string_not_lessp)).
-wl:type_checked(cl_string_not_lessp(prolog_list,prolog_list,keys,index)).
+wl:type_checked(cl_string_not_lessp(claz_cons,claz_cons,keys,index)).
 cl_string_not_lessp(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_failure(Start1,char_lessp,XR,YR,R).
 
 % string-greaterp
 :-assertz(wl:arg_lambda_type(req(2),cl_string_greaterp)).
-wl:type_checked(cl_string_greaterp(prolog_list,prolog_list,keys,index)).
+wl:type_checked(cl_string_greaterp(claz_cons,claz_cons,keys,index)).
 cl_string_greaterp(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_success(Start1,char_greaterp,XR,YR,R).
 
 % string-not-greaterp
 :-assertz(wl:arg_lambda_type(req(2),cl_string_not_greaterp)).
-wl:type_checked(cl_string_not_greaterp(prolog_list,prolog_list,keys,index)).
+wl:type_checked(cl_string_not_greaterp(claz_cons,claz_cons,keys,index)).
 cl_string_not_greaterp(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_failure(Start1,char_greaterp,XR,YR,R).
@@ -174,7 +174,7 @@ char_same(X,Y):- to_prolog_char(X,XX),to_prolog_char(Y,YY), XX==YY.
 
 
 % string-equals
-wl:type_checked(cl_string_equals(prolog_list,prolog_list,keys,boolean)).
+wl:type_checked(cl_string_equals(claz_cons,claz_cons,keys,boolean)).
 :-assertz(wl:arg_lambda_type(req(2),cl_string_equals)).
 cl_string_equals(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
@@ -184,14 +184,14 @@ cl_string_equals(X,Y,Keys,R):-
 
 % string-not-equal
 :-assertz(wl:arg_lambda_type(req(2),cl_string_not_equal)).
-wl:type_checked(cl_string_not_equal(prolog_list,prolog_list,keys,index)).
+wl:type_checked(cl_string_not_equal(claz_cons,claz_cons,keys,index)).
 cl_string_not_equal(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_failure(Start1,char_same,XR,YR,R).
 
 
 % string=
-wl:type_checked(cl_string_c61(prolog_list,prolog_list,keys,boolean)).
+wl:type_checked(cl_string_c61(claz_cons,claz_cons,keys,boolean)).
 :-assertz(wl:arg_lambda_type(req(2),cl_string_c61)).
 cl_string_c61(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
@@ -203,7 +203,7 @@ cl_string_c61(X,Y,Keys,R):-
 %is_string_equal_case_insensitive(X,Y):- to_prolog_string(X,XX),to_prolog_string(Y,YY),
 %  (XX==YY-> true ; (string_upper(XX,XXX),string_upper(YY,YYY),XXX==YYY)).
 
-wl:type_checked(cl_length(prolog_list,integer)).
+wl:type_checked(cl_length(claz_cons,integer)).
 cl_length(Sequence,Len):- length(Sequence,Len).
 
 

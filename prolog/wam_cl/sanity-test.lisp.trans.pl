@@ -186,7 +186,7 @@ f_u_is(U_eqf_Param, U_expected_Param, U_actual_Param, FnResult) :-
    set_opv(u_is, compile_as, kw_operator),
    set_opv(u_is, function, f_u_is).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1456 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1476 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  ['write-line', '$STRING'("Running smoke test!")]).
 :- cl_write_line('$ARRAY'([*],
@@ -215,11 +215,11 @@ f_u_is(U_eqf_Param, U_expected_Param, U_actual_Param, FnResult) :-
 		 Write_line_Ret).
 /* (progn (prolog-inline "rtrace") (is eq 1 1))*/
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1539 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1559 **********************/
 :- lisp_compile_to_prolog(pkg_user, [is, eq, 1, 1]).
 :- f_u_is(eq, 1, 1, U_is_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1551 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1571 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ (is),
@@ -232,19 +232,19 @@ f_u_is(U_eqf_Param, U_expected_Param, U_actual_Param, FnResult) :-
 	  [cons, 1, [quote, [u_a, u_b]]],
 	  U_is_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1594 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1614 **********************/
 :- lisp_compile_to_prolog(pkg_user, [is, eq, 2, [if, [], 1, 2]]).
 :- f_u_is(eq, 2, [if, [], 1, 2], U_is_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1618 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1638 **********************/
 :- lisp_compile_to_prolog(pkg_user, [is, eq, t, [keywordp, ':k']]).
 :- f_u_is(eq, t, [keywordp, kw_k], U_is_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1643 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1663 **********************/
 :- lisp_compile_to_prolog(pkg_user, [is, eq, 10, [if, t, 10, 20]]).
 :- f_u_is(eq, 10, [if, t, 10, 20], U_is_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1668 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1688 **********************/
 :- lisp_compile_to_prolog(pkg_user, [is, eq, t, [stringp, '$STRING'("abc")]]).
 :- f_u_is(eq,
 	  t,
@@ -255,9 +255,9 @@ f_u_is(U_eqf_Param, U_expected_Param, U_actual_Param, FnResult) :-
 		     ['$CHAR'(a), '$CHAR'(b), '$CHAR'(c)])
 	  ],
 	  U_is_Ret).
-/*;  "FAILED: when matching ~a and ~a~%", ['$CHAR'(b), '$CHAR'(c)], "bc", t).*/
+/*;  "FAI "this has ben fix" LED: when matching ~a and ~a~%", ['$CHAR'(b), '$CHAR'(c)], "bc", t).*/
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1772 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1812 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ (is),
@@ -276,15 +276,15 @@ f_u_is(U_eqf_Param, U_expected_Param, U_actual_Param, FnResult) :-
 	  '$ARRAY'([*], claz_base_character, ['$CHAR'(b), '$CHAR'(c)]),
 	  U_is_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1806 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1846 **********************/
 :- lisp_compile_to_prolog(pkg_user, [is, eq, 1, [if, t, 1, 2]]).
 :- f_u_is(eq, 1, [if, t, 1, 2], U_is_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1827 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1867 **********************/
 :- lisp_compile_to_prolog(pkg_user, [is, eq, 2, [if, [], 1, 2]]).
 :- f_u_is(eq, 2, [if, [], 1, 2], U_is_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1851 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1891 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ defun,
@@ -323,15 +323,15 @@ f_u_fib(N_Param, _rPrevRes) :-
    set_opv(u_fib, compile_as, kw_function),
    set_opv(u_fib, function, f_u_fib).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1932 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1972 **********************/
 :- lisp_compile_to_prolog(pkg_user, [disassemble, function(fib)]).
 :- cl_disassemble(function(u_fib), Disassemble_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1954 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1994 **********************/
 :- lisp_compile_to_prolog(pkg_user, [is, eql, 89, [fib, 10]]).
 :- f_u_is(eql, 89, [u_fib, 10], U_is_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1978 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:2018 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ defun,
@@ -365,7 +365,7 @@ f_u_accum(U_r_Param, _rPrevRes) :-
    set_opv(u_accum, compile_as, kw_function),
    set_opv(u_accum, function, f_u_accum).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:2044 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:2084 **********************/
 :- lisp_compile_to_prolog(pkg_user, [disassemble, function(accum)]).
 :- cl_disassemble(function(u_accum), Disassemble_Ret).
 /* DISASSEMBLY FOR:f_u_accum
@@ -381,11 +381,11 @@ f_u_accum(A, G) :-
 
 */
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:2221 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:2261 **********************/
 :- lisp_compile_to_prolog(pkg_user, [is, equal, [list, 4, 3, 2, 1, 0], [accum, 4]]).
 :- f_u_is(equal, [list, 4, 3, 2, 1, 0], [u_accum, 4], U_is_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:2260 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:2300 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ defmacro,
@@ -418,15 +418,15 @@ f_u_defwrap(U_name_Param, FnResult) :-
    set_opv(u_defwrap, compile_as, kw_operator),
    set_opv(u_defwrap, function, f_u_defwrap).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:2306 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:2346 **********************/
 :- lisp_compile_to_prolog(pkg_user, [defwrap, foo]).
 :- f_u_defwrap(u_foo, U_defwrap_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:2320 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:2360 **********************/
 :- lisp_compile_to_prolog(pkg_user, [is, eq, 1, [foo]]).
 :- f_u_is(eq, 1, [u_foo], U_is_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:2336 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:2376 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ (is),
@@ -439,7 +439,7 @@ f_u_defwrap(U_name_Param, FnResult) :-
 	  [quote, [defun, u_foo, [], 1]],
 	  U_is_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:2398 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:2438 **********************/
 :- lisp_compile_to_prolog(pkg_user, ['write-line', '$STRING'("PASSED")]).
 :- cl_write_line('$ARRAY'([*],
 			  claz_base_character,
@@ -453,7 +453,7 @@ f_u_defwrap(U_name_Param, FnResult) :-
 			  ]),
 		 Write_line_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:2421 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:2461 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ defun,
@@ -509,7 +509,7 @@ f_u_fifteen(MResult) :-
    set_opv(u_fifteen, function, f_u_fifteen).
 /*; unused*/
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:2735 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:2775 **********************/
 :- lisp_compile_to_prolog(pkg_user, [disassemble, function(fifteen)]).
 :- cl_disassemble(function(u_fifteen), Disassemble_Ret).
 /*
@@ -544,11 +544,11 @@ f_u_fifteen(MResult) :-
 
 */
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:3893 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:3933 **********************/
 :- lisp_compile_to_prolog(pkg_user, [is, eq, 15, [fifteen]]).
 :- f_u_is(eq, 15, [u_fifteen], U_is_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:3916 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:3956 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ (is),
@@ -600,7 +600,7 @@ f_u_fifteen(MResult) :-
 	  ],
 	  U_is_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4035 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4075 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  [is, eq, [], ['TAGBODY', 1, ['PRINT', '$STRING'("hi")]]]).
 :- f_u_is(eq,
@@ -612,7 +612,7 @@ f_u_fifteen(MResult) :-
 	  ],
 	  U_is_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4073 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4113 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  [is, eq, [], ['TAGBODY', a, ['PRINT', '$STRING'("hi")]]]).
 :- f_u_is(eq,
@@ -624,20 +624,20 @@ f_u_fifteen(MResult) :-
 	  ],
 	  U_is_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4111 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4151 **********************/
 :- lisp_compile_to_prolog(pkg_user, [is, eq, [], ['LET', [[val, 1]], []]]).
 :- f_u_is(eq, [], [let, [[u_val, 1]], []], U_is_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4143 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4183 **********************/
 :- lisp_compile_to_prolog(pkg_user, [is, eq, [], ['LET', [[val, 1]]]]).
 :- f_u_is(eq, [], [let, [[u_val, 1]]], U_is_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4173 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4213 **********************/
 :- lisp_compile_to_prolog(pkg_user, [is, eql, 1, ['LET', [[val, 1]], val]]).
 :- f_u_is(eql, 1, [let, [[u_val, 1]], u_val], U_is_Ret).
 /*; 3.1. Review of defstruct*/
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4236 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4276 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ progn,
@@ -648,12 +648,12 @@ f_u_fifteen(MResult) :-
    f_u_is(eq, [quote, u_point], [defstruct, u_point, u_x, u_y, u_z], U_is_Ret).
 /*; (defstruct point x y z)*/
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4348 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4388 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  [is, eq, [quote, point4d], [defstruct, point4d, x, y, z, t]]).
 :- f_u_is(eq, [quote, u_point4d], [defstruct, u_point4d, u_x, u_y, u_z, t], U_is_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4394 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4434 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ defun,
@@ -710,7 +710,7 @@ f_u_distance_from_origin(U_point_Param, MResult) :-
    set_opv(u_distance_from_origin, compile_as, kw_function),
    set_opv(u_distance_from_origin, function, f_u_distance_from_origin).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4560 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4600 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ defun,
@@ -748,7 +748,7 @@ f_u_reflect_in_y_axis(U_point_Param, MResult) :-
    set_opv(u_reflect_in_y_axis, compile_as, kw_function),
    set_opv(u_reflect_in_y_axis, function, f_u_reflect_in_y_axis).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4648 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4688 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ list,
@@ -769,17 +769,17 @@ f_u_reflect_in_y_axis(U_point_Param, MResult) :-
    place_op(TLEnv, setf, [value, u_my_point2], [U_make_point_Ret34], Setf_R35),
    List_Ret=[Setf_R, Setf_R35].
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4746 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4786 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ setf,
 			    'my-point3',
 			    '$S'(['POINT', ':X', 3, ':Y', 4, ':Z', 12])
 			  ]).
-:- create_struct([u_point, kw_x, 3, kw_y, 4, kw_z, 12], _97092),
-   place_op(TLEnv, setf, [value, u_my_point3], [_97092], Setf_R).
+:- create_struct([u_point, kw_x, 3, kw_y, 4, kw_z, 12], _7802),
+   place_op(TLEnv, setf, [value, u_my_point3], [_7802], Setf_R).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4789 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4829 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ setf,
@@ -789,17 +789,17 @@ f_u_reflect_in_y_axis(U_point_Param, MResult) :-
 :- f_u_make_point4d(kw_x, 3, kw_y, 4, kw_z, 12, kw_t, 1, U_make_point4d_Ret),
    place_op(TLEnv, setf, [value, u_my_point4d], [U_make_point4d_Ret], Setf_R).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4845 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4885 **********************/
 :- lisp_compile_to_prolog(pkg_user, [is, eq, t, ['point-p', 'my-point']]).
 :- f_u_is(eq, t, [u_point_p, u_my_point], U_is_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4875 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4915 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  [is, eq, [quote, point], ['type-of', 'my-point']]).
 :- f_u_is(eq, [quote, u_point], [type_of, u_my_point], U_is_Ret).
 /*flag_removed(+ :IGNORE,[#+,:WAM-CL,[prolog-call,$STRING(break)]])*/
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4951 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4991 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ (is),
@@ -811,59 +811,65 @@ f_u_reflect_in_y_axis(U_point_Param, MResult) :-
 			    ]
 			  ]).
 :- f_u_is(eql, 13, [progn, [print, [u_distance_from_origin, u_my_point]]], U_is_Ret).
+/*; #+CLISP (BREAK)*/
+/*; #+WAM-CL (prolog-call "break")*/
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5012 **********************/
-:- lisp_compile_to_prolog(pkg_user, ['reflect-in-y-axis', 'my-point']).
-:- symbol_value(TLEnv, u_my_point, U_my_point_Get),
-   f_u_reflect_in_y_axis(U_my_point_Get, U_reflect_in_y_axis_Ret).
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5106 **********************/
+:- lisp_compile_to_prolog(pkg_user, [is, =, -4, ['reflect-in-y-axis', 'my-point']]).
+:- f_u_is(=, -4, [u_reflect_in_y_axis, u_my_point], U_is_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5042 **********************/
-:- lisp_compile_to_prolog(pkg_user, 'my-point').
-:- symbol_value(TLEnv, u_my_point, U_my_point_Get).
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5146 **********************/
+:- lisp_compile_to_prolog(pkg_user, [is, eq, 'my-point', 'my-point']).
+:- f_u_is(eq, u_my_point, u_my_point, U_is_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5052 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5173 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ setf,
 			    'a-similar-point',
 			    '$S'([point, ':x', 3, ':y', -4, ':z', 12])
 			  ]).
-:- create_struct([u_point, kw_x, 3, kw_y, -4, kw_z, 12], _97216),
-   place_op(TLEnv, setf, [value, u_a_similar_point], [_97216], Setf_R).
+:- create_struct([u_point, kw_x, 3, kw_y, -4, kw_z, 12], _7988),
+   place_op(TLEnv, setf, [value, u_a_similar_point], [_7988], Setf_R).
+/* (is eq t (equal my-point a-similar-point))*/
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5103 **********************/
-:- lisp_compile_to_prolog(pkg_user, [equal, 'my-point', 'a-similar-point']).
-:- symbol_value(TLEnv, u_my_point, U_my_point_Get),
-   symbol_value(TLEnv, u_a_similar_point, U_a_similar_point_Get),
-   cl_equal(U_my_point_Get, U_a_similar_point_Get, Equal_Ret).
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5270 **********************/
+:- lisp_compile_to_prolog(pkg_user,
+			  [is, eq, [], [eq, 'my-point', 'a-similar-point']]).
+:- f_u_is(eq, [], [eq, u_my_point, u_a_similar_point], U_is_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5137 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5313 **********************/
 :- lisp_compile_to_prolog(pkg_user, [equalp, 'my-point', 'a-similar-point']).
 :- symbol_value(TLEnv, u_my_point, U_my_point_Get),
    symbol_value(TLEnv, u_a_similar_point, U_a_similar_point_Get),
    cl_equalp(U_my_point_Get, U_a_similar_point_Get, Equalp_Ret).
+
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5348 **********************/
+:- lisp_compile_to_prolog(pkg_user,
+			  [is, eq, t, [equalp, 'my-point', 'a-similar-point']]).
+:- f_u_is(eq, t, [equalp, u_my_point, u_a_similar_point], U_is_Ret).
 /*; 3.2. defclass*/
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5192 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5413 **********************/
 :- lisp_compile_to_prolog(pkg_user, [unintern, [quote, point]]).
 :- cl_unintern(u_point, Unintern_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5211 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5432 **********************/
 :- lisp_compile_to_prolog(pkg_user, [defclass, point, [], [x, y, z]]).
 :- cl_defclass([u_point, [], [u_x, u_y, u_z]], Defclass_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5248 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5469 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  [setf, 'my-point', ['make-instance', [quote, point]]]).
 :- cl_make_instance([u_point], Make_instance_Ret),
    place_op(TLEnv, setf, [value, u_my_point], [Make_instance_Ret], Setf_R).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5288 **********************/
-:- lisp_compile_to_prolog(pkg_user, ['type-of', 'my-point']).
-:- symbol_value(TLEnv, u_my_point, U_my_point_Get),
-   cl_type_of(U_my_point_Get, Type_of_Ret).
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5509 **********************/
+:- lisp_compile_to_prolog(pkg_user,
+			  [is, eq, [quote, point], ['type-of', 'my-point']]).
+:- f_u_is(eq, [quote, u_point], [type_of, u_my_point], U_is_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5308 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5544 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ defun,
@@ -920,12 +926,12 @@ f_u_set_point_values(U_point_Param, U_x_Param, U_y_Param, U_z_Param, MResult) :-
    set_opv(u_set_point_values, compile_as, kw_function),
    set_opv(u_set_point_values, function, f_u_set_point_values).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5445 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5681 **********************/
 :- lisp_compile_to_prolog(pkg_user, ['set-point-values', 'my-point', 3, 4, 12]).
 :- symbol_value(TLEnv, u_my_point, U_my_point_Get),
    f_u_set_point_values(U_my_point_Get, 3, 4, 12, U_set_point_values_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5481 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5717 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ defun,
@@ -977,48 +983,55 @@ f_u_distance_from_origin(U_point_Param, MResult) :-
    set_opv(u_distance_from_origin, compile_as, kw_function),
    set_opv(u_distance_from_origin, function, f_u_distance_from_origin).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5594 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5830 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  ['DISASSEMBLE', function('distance-from-origin')]).
 :- cl_disassemble(function(u_distance_from_origin), Disassemble_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5633 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5869 **********************/
 :- lisp_compile_to_prolog(pkg_user, ['distance-from-origin', 'my-point']).
 :- symbol_value(TLEnv, u_my_point, U_my_point_Get),
    f_u_distance_from_origin(U_my_point_Get, U_distance_from_origin_Ret).
 /*; 3.3. classes are objects*/
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5695 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5931 **********************/
 :- lisp_compile_to_prolog(pkg_user, ['find-class', [quote, point]]).
 :- cl_find_class(u_point, Find_class_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5716 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5952 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  ['class-name', ['find-class', [quote, point]]]).
 :- cl_find_class(u_point, Find_class_Ret),
    cl_class_name(Find_class_Ret, Class_name_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5750 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5986 **********************/
 :- lisp_compile_to_prolog(pkg_user, ['class-of', 'my-point']).
 :- symbol_value(TLEnv, u_my_point, U_my_point_Get),
    cl_class_of(U_my_point_Get, Class_of_Ret).
 /*; #-(or cormanlisp CLISP WAM-CL)*/
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5805 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:6041 **********************/
 :- lisp_compile_to_prolog(pkg_user, [typep, 'my-point', ['class-of', 'my-point']]).
 :- symbol_value(TLEnv, u_my_point, U_my_point_Get),
    symbol_value(TLEnv, u_my_point, U_my_point_Get20),
    cl_class_of(U_my_point_Get20, Class_of_Ret),
    cl_typep(U_my_point_Get, Class_of_Ret, Typep_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5843 **********************/
-:- lisp_compile_to_prolog(pkg_user, ['class-of', ['class-of', 'my-point']]).
-:- symbol_value(TLEnv, u_my_point, U_my_point_Get),
-   cl_class_of(U_my_point_Get, Class_of_Ret),
-   cl_class_of(Class_of_Ret, Class_of_Ret20).
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:6079 **********************/
+:- lisp_compile_to_prolog(pkg_user,
+			  
+			  [ (is),
+			    eq,
+			    ['find-class', [quote, 'STANDARD-CLASS']],
+			    ['class-of', ['class-of', 'my-point']]
+			  ]).
+:- f_u_is(eq,
+	  [find_class, [quote, standard_class]],
+	  [class_of, [class_of, u_my_point]],
+	  U_is_Ret).
 /*; 3.4. you don't need clos to use clos*/
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5916 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:6196 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ let,
@@ -1053,21 +1066,26 @@ f_u_distance_from_origin(U_point_Param, MResult) :-
    nb_setval('$mv_return',
 	     [U_the_symbol_class_Get, Class_name_Ret, Eq_Ret, Class_of_Ret40]).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:6122 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:6402 **********************/
 :- lisp_compile_to_prolog(pkg_user, ['find-class', t]).
 :- cl_find_class(t, Find_class_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:6138 **********************/
-:- lisp_compile_to_prolog(pkg_user, [defstruct, foo]).
-:- cl_defstruct([u_foo], Defstruct_Ret).
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:6418 **********************/
+:- lisp_compile_to_prolog(pkg_user, [is, eq, [quote, foo], [defstruct, foo]]).
+:- f_u_is(eq, [quote, u_foo], [defstruct, u_foo], U_is_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:6155 **********************/
-:- lisp_compile_to_prolog(pkg_user, ['class-of', ['make-foo']]).
-:- f_u_make_foo(U_make_foo_Ret),
-   cl_class_of(U_make_foo_Ret, Class_of_Ret).
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:6448 **********************/
+:- lisp_compile_to_prolog(pkg_user,
+			  
+			  [ (is),
+			    eq,
+			    ['find-class', [quote, foo]],
+			    ['class-of', ['make-foo']]
+			  ]).
+:- f_u_is(eq, [find_class, [quote, u_foo]], [class_of, [u_make_foo]], U_is_Ret).
 /*; 3.5 slots*/
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:6192 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:6511 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ defclass,
@@ -1090,7 +1108,7 @@ f_u_distance_from_origin(U_point_Param, MResult) :-
 	       ],
 	       Defclass_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:6338 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:6657 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ setf,
@@ -1104,7 +1122,7 @@ f_u_distance_from_origin(U_point_Param, MResult) :-
 :- cl_make_instance([u_daft_point], Make_instance_Ret),
    place_op(TLEnv, setf, [slot_value, Make_instance_Ret, u_z], [42], Setf_R).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:6393 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:6712 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ setf,
@@ -1115,7 +1133,7 @@ f_u_distance_from_origin(U_point_Param, MResult) :-
    place_op(TLEnv, setf, [value, u_my_daft_point], [Make_instance_Ret], Setf_R).
 /*flag_removed(+ :PERFECT,[list,[daft-x,my-daft-point],[daft-y,my-daft-point],[progn,[#+,:WAM-CL,[prolog-trace]],[daft-z,my-daft-point]]])*/
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:6582 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:6901 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ let,
@@ -1137,7 +1155,7 @@ f_u_distance_from_origin(U_point_Param, MResult) :-
 /*flag_removed(+ :PERFECT,[list,[daft-x,my-daft-point],[daft-y,my-daft-point],[daft-z,my-daft-point]])*/
 /*; 3.6 Subclasses and inheritance*/
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:6818 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:7137 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ defclass,
@@ -1170,7 +1188,7 @@ f_u_distance_from_origin(U_point_Param, MResult) :-
 	       ],
 	       Defclass_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:6940 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:7259 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ defclass,
@@ -1193,7 +1211,7 @@ f_u_distance_from_origin(U_point_Param, MResult) :-
 	       ],
 	       Defclass_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:7015 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:7334 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ defclass,
@@ -1208,7 +1226,7 @@ f_u_distance_from_origin(U_point_Param, MResult) :-
 	       ],
 	       Defclass_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:7089 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:7408 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ 'class-direct-superclasses',
@@ -1220,11 +1238,11 @@ f_u_distance_from_origin(U_point_Param, MResult) :-
 /*; ACL needs to instantiate a class before its precedence-list becomes visible*/
 /*; #+allegro*/
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:7289 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:7608 **********************/
 :- lisp_compile_to_prolog(pkg_user, ['make-instance', [quote, aardvark]]).
 :- cl_make_instance([u_aardvark], Make_instance_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:7316 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:7635 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ 'class-precedence-list',
@@ -1233,7 +1251,7 @@ f_u_distance_from_origin(U_point_Param, MResult) :-
 :- cl_find_class(u_aardvark, Find_class_Ret),
    f_clos_class_precedence_list(Find_class_Ret, Clos_class_precedence_list_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:7416 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:7735 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ defclass,
@@ -1260,7 +1278,7 @@ f_u_distance_from_origin(U_point_Param, MResult) :-
 	       ],
 	       Defclass_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:7523 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:7842 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ defclass,
@@ -1295,12 +1313,12 @@ f_u_distance_from_origin(U_point_Param, MResult) :-
 /*; ACL needs to instantiate a class before its precedence-list becomes visible*/
 /*; #+allegro */
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:7747 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:8066 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  ['make-instance', [quote, 'figurine-aardvark']]).
 :- cl_make_instance([u_figurine_aardvark], Make_instance_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:7783 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:8102 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ 'class-precedence-list',
@@ -1309,7 +1327,7 @@ f_u_distance_from_origin(U_point_Param, MResult) :-
 :- cl_find_class(u_figurine_aardvark, Find_class_Ret),
    f_clos_class_precedence_list(Find_class_Ret, Clos_class_precedence_list_Ret).
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:7902 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:8221 **********************/
 :- lisp_compile_to_prolog(pkg_user,
 			  
 			  [ setf,
@@ -1357,7 +1375,7 @@ f_u_distance_from_origin(U_point_Param, MResult) :-
    place_op(TLEnv, setf, [value, u_eric], [Make_instance_Ret], Setf_R).
 /*flag_removed(+ :HAS_SHIFTF,[shiftf,[cute-p,Eric],t])*/
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:8158 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:8477 **********************/
 :- lisp_compile_to_prolog(pkg_user, ['slot-value', 'Eric', [quote, diet]]).
 :- symbol_value(TLEnv, u_eric, U_eric_Get),
    cl_slot_value(U_eric_Get, u_diet, Slot_value_Ret).

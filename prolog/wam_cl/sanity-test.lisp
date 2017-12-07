@@ -33,7 +33,8 @@
          (progn
            (format t "FAILED: when matching ~a and ~a~%" ,a ,b)
 	   #+WAM-CL (prolog-inline "trace")
-           #+WAM-CL '(quit 1)  #+CLISP (quit 1))
+           #+WAM-CL '(quit 1) 
+	   #+CLISP (BREAK) #+CLISP (quit 1))
          (format t "OK: ~a is ~a to ~a~%" ',expected ',eqf ',actual)))))
 
 (write-line "Running smoke test!")
@@ -191,15 +192,22 @@ f_u_fifteen(MResult) :-
 
 (is eql 13 (progn (print (distance-from-origin my-point))))
 
-(is = 4 (reflect-in-y-axis my-point))
+;; #+CLISP (BREAK)
+;; #+WAM-CL (prolog-call "break")
+
+(is = -4 (reflect-in-y-axis my-point))
 
 (is eq my-point my-point)
 
 (setf a-similar-point #s(point :x 3 :y -4 :z 12))
 
-(is eq nil (equal my-point a-similar-point))
+; (is eq t (equal my-point a-similar-point))
 
-(is eq nil (equalp my-point a-similar-point) )
+(is eq nil (eq my-point a-similar-point))
+
+(equalp my-point a-similar-point)
+
+(is eq t (equalp my-point a-similar-point) )
 
 
 ;; 3.2. defclass
@@ -244,7 +252,7 @@ f_u_fifteen(MResult) :-
 ;; #-(or cormanlisp CLISP WAM-CL)
 (typep my-point (class-of my-point))
 
-(is eq (class-of (find-class 'STANDARD-CLASS))
+(is eq (find-class 'STANDARD-CLASS)
        (class-of (class-of my-point)))
 
 ;; 3.4. you don't need clos to use clos

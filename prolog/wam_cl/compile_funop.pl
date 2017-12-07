@@ -112,7 +112,7 @@ find_function_or_macro_name(_Ctx,_Env,FunctionName,Len, ProposedName):-
   some_function_or_macro(FunctionName,Len,['','cl_','pf_','sf_','mf_','f_'],ProposedName),!.
 find_function_or_macro_name(_Ctx,_Env,FunctionName,_Len, ProposedName):-
     maybe_symbol_package(FunctionName,Package),
-    (cl_symbol_name(FunctionName,Name) ->
+    (pl_symbol_name(FunctionName,Name) ->
       function_case_name(Name,Package,ProposedName);
       function_case_name(FunctionName,Package,ProposedName)).
 

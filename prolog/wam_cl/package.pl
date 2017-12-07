@@ -68,7 +68,8 @@ do_defpackage(AName,List,Package):-
 cl_find_package(S,Obj):- find_package(S,Package),!,must(as_package_object(Package,Obj)).
 cl_find_package(_,[]).
 
-cl_package_name(S,Name):- find_package(S,Package),get_opv(Package,name,Name).
+pl_package_name(S,Name):- find_package(S,Package),get_opv(Package,name,Name).
+cl_package_name(P,N):- pl_package_name(P,S),to_lisp_string(S,N).
 
 find_package(Obj,Res):- to_prolog_string_if_needed(Obj,F),!,find_package(F,Res).
 find_package('$OBJ'(claz_package,UP),Package):-find_package(UP,Package).
@@ -102,6 +103,7 @@ package_find_symbol_or_missing(_String,_Package,_NoSymbol,'$missing').
 package_find_symbol(String,Package,Symbol,kw_external):- package_external_symbols(Package,String,Symbol),!.
 package_find_symbol(String,Package,Symbol,kw_internal):- package_internal_symbols(Package,String,Symbol),!.
 package_find_symbol(String,PW,Symbol,kw_inherited):-  package_use_list(PW,Package),package_external_symbols(Package,String,Symbol),!.
+package_find_symbol(String,Package,Symbol,Found):-  to_prolog_string_if_needed(String,PlString),!,package_find_symbol(PlString,Package,Symbol,Found).
 
 % @TODO Add symbol shadowing 
 cl_import(Symbol,Result):- reading_package(Package),cl_import(Symbol,Package,Result).

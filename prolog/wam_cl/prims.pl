@@ -197,15 +197,20 @@ cl_equalp(A,B,Ret):- t_or_nil( is_equalp(A,B) , Ret).
 
 
 
-is_eql(X,Y):- same_term(X,Y)->true;cl_type_of(X,T),cl_type_of(Y,T), notrace(catch(X=:=Y,_,fail)).
+is_eql(X,Y):- is_eq(X,Y)->true;cl_type_of(X,T),cl_type_of(Y,T), notrace(catch(X=:=Y,_,fail)).
 is_eq(X,Y):- same_term(X,Y).
 % is_eq(X,Y):- X==Y, (\+ compound(X)-> true ; \+ \+ ((gensym(cookie,Cook),setarg(1,X,Cook),X==Y))).
 is_equal(X,Y):- (X=@=Y->true;is_eql(X,Y)).
 is_equalp(X,Y):- is_equal(X,Y)->true;((f_u_to_pvs(X,XX),f_u_to_pvs(Y,YY), XX=@=YY)-> true ; ( \+ X\=Y)).
 
+personal_props(sname).
+personal_props(ref).
+personal_props(classof).
+personal_props(instance).
 f_u_to_pvs(X,[float|XX]):- notrace(catch(XX is (1.0 * X),_,fail)),!.
-f_u_to_pvs(X,XX):- findall([P|V],(get_opv(X,P,V);get_struct_opv(X,P,V)),List),List\==[],sort(List,XX),!.
-f_u_to_pvs(X,[str|XX]):- format(string(S),'~w',[X]),string_upper(S,XX),!.
+f_u_to_pvs(X,XX):- findall([P|V],((get_opv(X,P,V);get_struct_opv(X,P,V)),\+ personal_props(P)),List),
+  List\==[],sort(List,XX),!.
+f_u_to_pvs(X,[str|XX]):- format(string(S),'~w',[X]),to_string_upper(S,XX),!.
 
 
 

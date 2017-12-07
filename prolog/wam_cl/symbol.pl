@@ -16,8 +16,8 @@
 :- set_module(class(library)).
 :- include('header.pro').
 
-wl:type_checked(cl_symbol_name(symbol,string)).
-cl_symbol_name(Symbol,Name):- pl_symbol_name(Symbol,Name).
+wl:type_checked(cl_symbol_name(claz_symbol,claz_string)).
+cl_symbol_name(Symbol,Str):- pl_symbol_name(Symbol,Name),to_lisp_string(Name,Str).
 pl_symbol_name(Symbol,Name):- package_external_symbols(pkg_kw,Name,Symbol)->true;get_opv(Symbol,name,Name).
 cl_symbol_package(Symbol,Package):- is_keywordp(Symbol)->Package=pkg_kw;get_opv(Symbol,package,Package).
 cl_symbol_value(Symbol,Value):- is_keywordp(Symbol)->Symbol=Value;do_or_die(get_opv(Symbol,value,Value)).
@@ -152,9 +152,9 @@ print_symbol_at(Symbol,PrintP):-
   cl_symbol_package(Symbol,SPackage),!,
   print_symbol_from(Symbol,PrintP,SPackage),!.
 
-print_symbol_from(Symbol,_PrintP,Pkg):- Pkg == kw_pkg, !, cl_symbol_name(Symbol,Name),write(':'),write(Name).
+print_symbol_from(Symbol,_PrintP,Pkg):- Pkg == kw_pkg, !, pl_symbol_name(Symbol,Name),write(':'),write(Name).
 print_symbol_from(Symbol,PrintP,SPackage):-
-  cl_symbol_name(Symbol,Name),
+  pl_symbol_name(Symbol,Name),
   must(package_find_symbol(Name,SPackage,FoundSymbol,IntExt)),
   must( Symbol\== FoundSymbol -> 
     print_prefixed_symbol(Name,PrintP,SPackage,kw_internal);
@@ -167,8 +167,6 @@ short_package_or_hash(P,O):- pl_package_name(P,N),!,O=(N).
 short_package_or_hash(P,O):- trace,O=(failed_short_package_or_hash(P)).
 
 print_package_or_hash(P):-short_package_or_hash(P,O),write(O).
-
-pl_package_name(P,PL):-cl_package_name(P,LS),to_prolog_string_anyways(LS,PL).
 
 shorter_name(PN,NN):- package_nicknames(PN,NN),atom_length(PN,B),atom_length(NN,A),A<B.
 shorter_name("SYSTEM","SYS").

@@ -176,7 +176,7 @@ writeTokenL3([Token|TokenL]):-
 
 
 
-write_atom_obj(Package):- package_name(Package,Name),!,write('#<PACKAGE '),write(Name),write('>').
+write_atom_obj(Package):- pl_package_name(Package,Name),!,write('#<PACKAGE '),write(Name),write('>').
 write_atom_obj(Atom):- atom(Atom),atomic_list_concat([Type,Named],'_znst_',Atom),
    atomic_concat('claz_',Type,Kind),!,
    write('#<'),write(Kind),write(' '),write(Named),write('>').
