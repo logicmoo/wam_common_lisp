@@ -88,7 +88,7 @@ cl_format([Stream,Fmt],t):- !, cl_print(cl_format(Stream,Fmt),_).
 cl_format([Stream,Fmt|ArgS],t):-cl_print(cl_format(Stream,Fmt,ArgS),_).
 
 cl_prin1(X,X):-copy_term(X,Y),writeExpression(Y),nl.
-cl_princ(X,X):-stringp(X),!,to_prolog_string(X,S),write(S).
+cl_princ(X,X):-is_stringp(X),!,to_prolog_string(X,S),write(S).
 cl_princ(X,X):-copy_term(X,Y),writeExpression(Y),nl.
 cl_print(X,X):-cl_prin1(X,X),nl.
 cl_terpri(t):-nl.
