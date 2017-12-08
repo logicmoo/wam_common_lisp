@@ -200,7 +200,7 @@ lisp_grovel((A,B)):-!, lisp_grovel(A),lisp_grovel(B).
 lisp_grovel(asserta(PrologCode)):- !, lisp_grovel_assert(PrologCode).
 lisp_grovel(assertz(PrologCode)):- !, lisp_grovel_assert(PrologCode).
 lisp_grovel(assert(PrologCode)):- !, lisp_grovel_assert(PrologCode).
-lisp_grovel(cl_in_package(Into, Package)):- nonvar(Into),!, trace, cl_in_package(Into, Package).
+lisp_grovel(cl_in_package(Into, Package)):- nonvar(Into),!, cl_in_package(Into, Package).
 lisp_grovel(cl_use_package(Package, Load_Ret)):- nonvar(Package),!, cl_use_package(Package, Load_Ret).
 %lisp_grovel(cl_load(File,Keys,Load_Ret)):- !, cl_compile_file(File,Keys,Load_Ret).
 %lisp_grovel(cl_compile_file(File,Keys,Load_Ret)):- !, cl_compile_file(File,Keys,Load_Ret).
