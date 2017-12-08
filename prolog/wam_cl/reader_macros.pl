@@ -82,22 +82,23 @@ expand_pterm_to_sterm(VAR,VAR):- notrace(is_ftVar(VAR)),!.
 expand_pterm_to_sterm('NIL',[]):-!.
 expand_pterm_to_sterm(nil,[]):-!.
 expand_pterm_to_sterm(VAR,VAR):- \+ compound(VAR),!.
-expand_pterm_to_sterm(ExprI,ExprO):- ExprI=..[F|Expr],atom_concat_or_rtrace('#',_,F),!,must_maplist(expand_pterm_to_sterm,Expr,TT),ExprO=[F|TT].
-expand_pterm_to_sterm(ExprI,ExprO):- ExprI=..[F|Expr],atom_concat_or_rtrace('$',_,F),!,must_maplist(expand_pterm_to_sterm,Expr,TT),ExprO=..[F|TT].
 expand_pterm_to_sterm([X|L],[Y|Ls]):-!,expand_pterm_to_sterm(X,Y),expand_pterm_to_sterm(L,Ls),!.
-expand_pterm_to_sterm(X,STerm):- compound_name_arguments(X,F,L),expand_pterm_to_sterm(L,Y),!,maybe_sterm(F,Y,STerm).
-expand_pterm_to_sterm(X,X).
-maybe_sterm(F,Y,PTerm):- keep_as_compund(F),PTerm=..[F|Y].
-maybe_sterm(F,Y,[F|Y]).
-keep_as_compund(function).
-keep_as_compund(closure).
-keep_as_compund(prolog).
-keep_as_compund(ugly).
-keep_as_compund('$OBJ').
-keep_as_compund('$CHAR').
-keep_as_compund(v).
-keep_as_compund(obj).
-keep_as_compund(D):-atom_concat_or_rtrace('$',_,D).
+expand_pterm_to_sterm(ExprI,ExprI):- compound_name_arguments(ExprI,F,_),keep_as_pl_verbatum(F),!.
+expand_pterm_to_sterm(ExprI,[ExprI]):- compound_name_arity(ExprI,_,0),!.
+expand_pterm_to_sterm(ExprI,ExprO):- compound_name_arguments(ExprI,F,Expr),keep_as_pl_term(F),!,expand_pterm_to_sterm(Expr,TT),ExprO=..[F|TT].
+expand_pterm_to_sterm(X,[F|Y]):- compound_name_arguments(X,F,L),expand_pterm_to_sterm(L,Y),!.
+
+keep_as_pl_verbatum(closure).
+
+keep_as_pl_term(function).
+keep_as_pl_term(closure).
+keep_as_pl_term(prolog).
+keep_as_pl_term(ugly).
+keep_as_pl_term('$OBJ').
+keep_as_pl_term('#\\').
+keep_as_pl_term(v).
+keep_as_pl_term(obj).
+keep_as_pl_term(D):-atom_concat_or_rtrace('$',_,D).
 
 
 

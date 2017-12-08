@@ -419,8 +419,8 @@ sexpr('$STRING'(S))             --> s_string(S).
 
 sexpr(E)                      --> `#`,read_dispatch(E),!.
 
-sexpr('$CHAR'(C))                 --> `#\\`,ci(`u`),remove_optional_char(`+`),dcg_basics:xinteger(C),!.
-sexpr('$CHAR'(C))                 --> `#\\`,!,rsymbol(``,C), swhite.
+sexpr('#\\'(C))                 --> `#\\`,ci(`u`),remove_optional_char(`+`),dcg_basics:xinteger(C),!.
+sexpr('#\\'(C))                 --> `#\\`,!,rsymbol(``,C), swhite.
 sexpr(['#-',K,O]) --> `#-`,sexpr(C),swhite,sexpr(O),!,{as_keyword(C,K)}.
 sexpr(['#+',K,O]) --> `#+`,sexpr(C),swhite,sexpr(O),!,{as_keyword(C,K)}.
 sexpr('$OBJ'(claz_pathname,C)) --> `#`,ci(`p`),s_string(C).
@@ -709,9 +709,9 @@ to_untyped(Var,'$VAR'(Name)):-svar(Var,Name),!.
 to_untyped(Atom,Atom):- \+ compound(Atom),!.
 to_untyped('@'(Var),'$VAR'(Name)):-svar_fixvarname(Var,Name),!.
 to_untyped('#'(S),O):- !, (nonvar(S)->to_untyped(S,O) ; O='#'(S)).
-to_untyped('#\\'(S),C):-!,to_untyped('$CHAR'(S),C),!.
-to_untyped('$CHAR'(S),C):-to_char(S,C),!.
-to_untyped('$CHAR'(S),'$CHAR'(S)):-!.
+to_untyped('#\\'(S),C):-!,to_untyped('#\\'(S),C),!.
+to_untyped('#\\'(S),C):-to_char(S,C),!.
+to_untyped('#\\'(S),'#\\'(S)):-!.
 to_untyped('$OBJ'([FUN, F]),O):- atom(FUN),!,to_untyped('$OBJ'(FUN, F),O).
 to_untyped('$OBJ'([FUN| F]),O):- atom(FUN),!,to_untyped('$OBJ'(FUN, F),O).
 to_untyped('$OBJ'(S),'$OBJ'(O)):-to_untyped(S,O),!.
@@ -743,13 +743,13 @@ to_untyped(ExprI,ExprO):- always(ExprI=..Expr),
 to_number(S,S):-number(S),!.
 to_number(S,N):- text_to_string_safe(S,Str),number_string(N,Str),!.
 
-to_char(S,'$CHAR'(S)):- var(S),!.
+to_char(S,'#\\'(S)):- var(S),!.
 to_char(S,C):- atom(S),name(S,[N]),!,to_char(N,C).
-to_char(N,'$CHAR'(S)):- integer(N),(char_type(N,alnum)->name(S,[N]);S=N),!.
+to_char(N,'#\\'(S)):- integer(N),(char_type(N,alnum)->name(S,[N]);S=N),!.
 to_char('#'(S),C):- !, to_char(S,C).
-to_char('$CHAR'(S),C):- !, to_char(S,C).
+to_char('#\\'(S),C):- !, to_char(S,C).
 to_char(N,C):- text_to_string_safe(N,Str),char_code_from_name(Str,Code),to_char(Code,C),!.
-to_char(C,'$CHAR'(C)).
+to_char(C,'#\\'(C)).
 
 char_code_from_name(Str,Code):-find_from_name(Str,Code),!.
 char_code_from_name(Str,Code):-text_upper(Str,StrU),find_from_name2(StrU,Code).

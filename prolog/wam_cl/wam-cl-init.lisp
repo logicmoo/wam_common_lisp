@@ -5,7 +5,8 @@
 (defvar *lisp-file-type* "lisp") 
 (defvar *default-pathname-defaults* #P"")
  
-(defun dd (let ((*lisp-file-type* "cl") 
+(defun dd () 
+ (let ((*lisp-file-type* "cl") 
         (*default-pathname-defaults* (merge-pathnames "daydreamer/"))) (load "dd")))
 
 
@@ -25,19 +26,17 @@
 (write-line "                "))
 
 (show-ascii-art)
-(load "wam-cl-init1")
-(load "wam-cl-init2")
-(load "wam-cl-init3")
-(write-line " WAM CommonLisp ")
-(read-eval-print-loop)
+(load "wam-cl-init-1")
+'(load "wam-cl-init2")
+'(load "wam-cl-init3")
+'(write-line " WAM CommonLisp ")
+'(read-eval-print-loop)
 
  
 
-end_of_file.
+#|
 
-
-(when (eq (symbol-package sym) p)
-(format t "~a ~a ~a ~a~%" 
+;; (when (eq (symbol-package sym) p) (format t "~a ~a ~a ~a~%" ......)) 
 
 (defun packagesyminfo (p0)
  (let ((p (find-package p0)))
@@ -66,3 +65,5 @@ end_of_file.
     sn (package-name (symbol-package sym)))))))
 (packagesyminfo :cl)
 
+
+|#

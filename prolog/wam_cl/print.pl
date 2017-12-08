@@ -35,7 +35,7 @@ shrink_lisp_strings([A|Str],PStr):- is_list(Str),maplist(is_characterp_lisp,[A|S
 shrink_lisp_strings(C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(shrink_lisp_strings,C1O,C2O),
   compound_name_arguments(C2,F,C2O). %%$C2=..[F|C2O].
 
-is_characterp_lisp(X):- compound(X),X='$CHAR'(_),is_characterp(X).
+is_characterp_lisp(X):- compound(X),X='#\\'(_),is_characterp(X).
 
 sexpr1(X) --> {is_ftVar(X),(get_var_name(X,N)->format(atom(NN),'~w',[N]);format(atom(NN),'~w',[X]))},!,[NN].
 sexpr1(Str)--> {is_stringp(Str),to_prolog_string(Str,PStr)},!,[PStr].
@@ -48,7 +48,7 @@ sexpr1([X|Y]) --> ['('],  sexpr1(X), lisplist(Y,')').
 sexpr1([quote, Expression]) --> [''''], !, sexpr1(Expression).
 sexpr1([function,Expression]) --> ['#'''], !, sexpr1(Expression).
 sexpr1(function(Expression)) --> ['#'''], !, sexpr1(Expression).
-sexpr1('$CHAR'(X)) --> {format(atom(NN),'#\\~w',[X])},!,[NN].
+sexpr1('#\\'(X)) --> {format(atom(NN),'#\\~w',[X])},!,[NN].
 sexpr1('$STRING'(X)) --> {format(atom(NN),'~q',[X])},!,[NN].
 sexpr1('$COMPLEX'(R,I)) --> ['#C('],sexpr1(R),sexpr1(I),[')'].
 sexpr1('$RATIO'(R,I)) --> [''],sexpr1(R),['/'],sexpr1(I),[''].
@@ -59,7 +59,7 @@ sexpr1('$NUMBER'(claz_short_float,V)) --> {format_number(O,'s',V)},[O]. % SBCL =
 sexpr1('$NUMBER'(T,V)) --> {format_number(O,T,V)},[O].
 sexpr1('$S'(X)) --> ['#S'],sexpr1(X).
 
-sexpr1('$OBJ'('$CHAR',(X))) --> sexpr1('$CHAR'(X)).
+sexpr1('$OBJ'('#\\',(X))) --> sexpr1('#\\'(X)).
 sexpr1(PClosure) --> {compound(PClosure),functor(PClosure,closure,_),with_output_to(atom(SPClosure),fmt9(PClosure)),trim_full_stop(SPClosure,TSPClosure)}, ['{',TSPClosure,'}.'], !.
 sexpr1(Dict) --> {is_dict(Dict,T),Dict=..[_,_|Rest]},!, ['#<'],sexpr1(T),lisplist(Rest,'>').
 sexpr1('$OBJ'([T,X])) --> sexpr1('$OBJ'(T,X)).
@@ -88,6 +88,7 @@ cl_format([Stream,Fmt],t):- !, cl_print(cl_format(Stream,Fmt),_).
 cl_format([Stream,Fmt|ArgS],t):-cl_print(cl_format(Stream,Fmt,ArgS),_).
 
 cl_prin1(X,X):-copy_term(X,Y),writeExpression(Y),nl.
+cl_princ(X,X):-stringp(X),!,to_prolog_string(X,S),write(S).
 cl_princ(X,X):-copy_term(X,Y),writeExpression(Y),nl.
 cl_print(X,X):-cl_prin1(X,X),nl.
 cl_terpri(t):-nl.

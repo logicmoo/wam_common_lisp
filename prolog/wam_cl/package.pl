@@ -85,7 +85,7 @@ find_package_or_die(X,Y):-
 as_package_object(Package,'$OBJ'(claz_package,Package)).
 
 
-reading_package(Package):- symbol_value('xx_package_xx',UP),find_package(UP,Package).
+reading_package(Package):- always((get_opv('xx_package_xx',value,UP),find_package(UP,Package))),!.
 reading_package(pkg_user).
 % TODO
 writing_package(Package):- reading_package(Package).

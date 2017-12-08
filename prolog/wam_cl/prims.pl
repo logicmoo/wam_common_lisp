@@ -38,7 +38,7 @@ prims:cl_exact.
 is_self_evaluating_object(X):- var(X),!.
 is_self_evaluating_object(X):- atomic(X),!,is_self_evaluationing_const(X).
 is_self_evaluating_object('$OBJ'(_,_)):-!.
-is_self_evaluating_object('$CHAR'(_)):-!.
+is_self_evaluating_object('#\\'(_)):-!.
 is_self_evaluating_object(X):- (is_dict(X);is_array(X);is_rbtree(X)),!.
 is_self_evaluating_object(P):- compound_name_arity(P,F,_),atom_concat_or_rtrace('$',_,F),!.
 

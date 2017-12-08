@@ -23,13 +23,13 @@
 :- cl_in_package('$ARRAY'([*],
 			  claz_base_character,
 			  
-			  [ '$CHAR'('C'),
-			    '$CHAR'('L'),
-			    '$CHAR'(-),
-			    '$CHAR'('U'),
-			    '$CHAR'('S'),
-			    '$CHAR'('E'),
-			    '$CHAR'('R')
+			  [ '#\\'('C'),
+			    '#\\'('L'),
+			    '#\\'(-),
+			    '#\\'('U'),
+			    '#\\'('S'),
+			    '#\\'('E'),
+			    '#\\'('R')
 			  ]),
 		 In_package_Ret).
 
@@ -155,14 +155,14 @@ var_tracker(u_expected)=rw{name:u_expected, p:1, r:0, ret:0, u:0, vars:[U_expect
 wl:arglist_info(f_u_is, [u_eqf, u_expected, u_actual], [U_eqf_Param, U_expected_Param, U_actual_Param], arginfo{all:3, allow_other_keys:0, aux:0, complex:0, env:0, key:0, names:[u_eqf, u_expected, u_actual], opt:0, req:3, rest:0}).
 
 % asserting...
-macro_lambda(defmacro(u_is), f_u_is, [u_eqf, u_expected, u_actual], [progn, [let, [[u_a, [gensym, '$ARRAY'([*], claz_base_character, ['$CHAR'(a)])]], [u_b, [gensym, '$ARRAY'([*], claz_base_character, ['$CHAR'(b)])]]], ['#BQ', [let, [[['#COMMA', u_a], ['#COMMA', u_expected]], [['#COMMA', u_b], ['#COMMA', u_actual]]], [if, [not, [['#COMMA', u_eqf], ['#COMMA', u_a], ['#COMMA', u_b]]], [progn, [format, t, '$ARRAY'([*], claz_base_character, ['$CHAR'('F'), '$CHAR'('A'), '$CHAR'('I'), '$CHAR'('L'), '$CHAR'('E'), '$CHAR'('D'), '$CHAR'(:), '$CHAR'(' '), '$CHAR'(w), '$CHAR'(h), '$CHAR'(e), '$CHAR'(n), '$CHAR'(' '), '$CHAR'(m), '$CHAR'(a), '$CHAR'(t), '$CHAR'(c), '$CHAR'(h), '$CHAR'(i), '$CHAR'(n), '$CHAR'(g), '$CHAR'(' '), '$CHAR'(~), '$CHAR'(a), '$CHAR'(' '), '$CHAR'(a), '$CHAR'(n), '$CHAR'(d), '$CHAR'(' '), '$CHAR'(~), '$CHAR'(a), '$CHAR'(~), '$CHAR'('%')]), ['#COMMA', u_a], ['#COMMA', u_b]], [u_prolog_inline, '$ARRAY'([*], claz_base_character, ['$CHAR'(t), '$CHAR'(r), '$CHAR'(a), '$CHAR'(c), '$CHAR'(e)])], [quote, [ext_quit, 1]]], [format, t, '$ARRAY'([*], claz_base_character, ['$CHAR'('O'), '$CHAR'('K'), '$CHAR'(:), '$CHAR'(' '), '$CHAR'(~), '$CHAR'(a), '$CHAR'(' '), '$CHAR'(i), '$CHAR'(s), '$CHAR'(' '), '$CHAR'(~), '$CHAR'(a), '$CHAR'(' '), '$CHAR'(t), '$CHAR'(o), '$CHAR'(' '), '$CHAR'(~), '$CHAR'(a), '$CHAR'(~), '$CHAR'('%')]), [quote, ['#COMMA', u_expected]], [quote, ['#COMMA', u_eqf]], [quote, ['#COMMA', u_actual]]]]]]]], [u_b, u_a, u_actual, u_expected, u_eqf, f_u_is]).
+macro_lambda(defmacro(u_is), f_u_is, [u_eqf, u_expected, u_actual], [progn, [let, [[u_a, [gensym, '$ARRAY'([*], claz_base_character, ['#\\'(a)])]], [u_b, [gensym, '$ARRAY'([*], claz_base_character, ['#\\'(b)])]]], ['#BQ', [let, [[['#COMMA', u_a], ['#COMMA', u_expected]], [['#COMMA', u_b], ['#COMMA', u_actual]]], [if, [not, [['#COMMA', u_eqf], ['#COMMA', u_a], ['#COMMA', u_b]]], [progn, [format, t, '$ARRAY'([*], claz_base_character, ['#\\'('F'), '#\\'('A'), '#\\'('I'), '#\\'('L'), '#\\'('E'), '#\\'('D'), '#\\'(:), '#\\'(' '), '#\\'(w), '#\\'(h), '#\\'(e), '#\\'(n), '#\\'(' '), '#\\'(m), '#\\'(a), '#\\'(t), '#\\'(c), '#\\'(h), '#\\'(i), '#\\'(n), '#\\'(g), '#\\'(' '), '#\\'(~), '#\\'(a), '#\\'(' '), '#\\'(a), '#\\'(n), '#\\'(d), '#\\'(' '), '#\\'(~), '#\\'(a), '#\\'(~), '#\\'('%')]), ['#COMMA', u_a], ['#COMMA', u_b]], [u_prolog_inline, '$ARRAY'([*], claz_base_character, ['#\\'(t), '#\\'(r), '#\\'(a), '#\\'(c), '#\\'(e)])], [quote, [ext_quit, 1]]], [format, t, '$ARRAY'([*], claz_base_character, ['#\\'('O'), '#\\'('K'), '#\\'(:), '#\\'(' '), '#\\'(~), '#\\'(a), '#\\'(' '), '#\\'(i), '#\\'(s), '#\\'(' '), '#\\'(~), '#\\'(a), '#\\'(' '), '#\\'(t), '#\\'(o), '#\\'(' '), '#\\'(~), '#\\'(a), '#\\'(~), '#\\'('%')]), [quote, ['#COMMA', u_expected]], [quote, ['#COMMA', u_eqf]], [quote, ['#COMMA', u_actual]]]]]]]], [u_b, u_a, u_actual, u_expected, u_eqf, f_u_is]).
 
 % asserting...
 f_u_is(U_eqf_Param, U_expected_Param, U_actual_Param, FnResult) :-
 	Env=[bv(u_eqf, U_eqf_Param), bv(u_expected, U_expected_Param), bv(u_actual, U_actual_Param)],
-	catch(( cl_gensym('$ARRAY'([*], claz_base_character, ['$CHAR'(a)]),
+	catch(( cl_gensym('$ARRAY'([*], claz_base_character, ['#\\'(a)]),
 			  Gensym_Ret),
-		cl_gensym('$ARRAY'([*], claz_base_character, ['$CHAR'(b)]),
+		cl_gensym('$ARRAY'([*], claz_base_character, ['#\\'(b)]),
 			  Gensym_Ret37),
 		LETENV=[[bv(u_a, Gensym_Ret), bv(u_b, Gensym_Ret37)]|Env],
 		symbol_value(LETENV, u_a, U_a_Get),
@@ -177,7 +177,7 @@ f_u_is(U_eqf_Param, U_expected_Param, U_actual_Param, FnResult) :-
 		symbol_value(LETENV, u_expected, U_expected_Get112),
 		symbol_value(LETENV, u_eqf, U_eqf_Get119),
 		symbol_value(LETENV, u_actual, U_actual_Get126),
-		[let, [[U_a_Get, U_expected_Get], [U_b_Get, U_actual_Get]], [if, [not, [U_eqf_Get, U_a_Get84, U_b_Get91]], [progn, [format, t, '$ARRAY'([*], claz_base_character, ['$CHAR'('F'), '$CHAR'('A'), '$CHAR'('I'), '$CHAR'('L'), '$CHAR'('E'), '$CHAR'('D'), '$CHAR'(:), '$CHAR'(' '), '$CHAR'(w), '$CHAR'(h), '$CHAR'(e), '$CHAR'(n), '$CHAR'(' '), '$CHAR'(m), '$CHAR'(a), '$CHAR'(t), '$CHAR'(c), '$CHAR'(h), '$CHAR'(i), '$CHAR'(n), '$CHAR'(g), '$CHAR'(' '), '$CHAR'(~), '$CHAR'(a), '$CHAR'(' '), '$CHAR'(a), '$CHAR'(n), '$CHAR'(d), '$CHAR'(' '), '$CHAR'(~), '$CHAR'(a), '$CHAR'(~), '$CHAR'('%')]), U_a_Get98, U_b_Get105], [u_prolog_inline, '$ARRAY'([*], claz_base_character, ['$CHAR'(t), '$CHAR'(r), '$CHAR'(a), '$CHAR'(c), '$CHAR'(e)])], [quote, [ext_quit, 1]]], [format, t, '$ARRAY'([*], claz_base_character, ['$CHAR'('O'), '$CHAR'('K'), '$CHAR'(:), '$CHAR'(' '), '$CHAR'(~), '$CHAR'(a), '$CHAR'(' '), '$CHAR'(i), '$CHAR'(s), '$CHAR'(' '), '$CHAR'(~), '$CHAR'(a), '$CHAR'(' '), '$CHAR'(t), '$CHAR'(o), '$CHAR'(' '), '$CHAR'(~), '$CHAR'(a), '$CHAR'(~), '$CHAR'('%')]), [quote, U_expected_Get112], [quote, U_eqf_Get119], [quote, U_actual_Get126]]]]=MResult
+		[let, [[U_a_Get, U_expected_Get], [U_b_Get, U_actual_Get]], [if, [not, [U_eqf_Get, U_a_Get84, U_b_Get91]], [progn, [format, t, '$ARRAY'([*], claz_base_character, ['#\\'('F'), '#\\'('A'), '#\\'('I'), '#\\'('L'), '#\\'('E'), '#\\'('D'), '#\\'(:), '#\\'(' '), '#\\'(w), '#\\'(h), '#\\'(e), '#\\'(n), '#\\'(' '), '#\\'(m), '#\\'(a), '#\\'(t), '#\\'(c), '#\\'(h), '#\\'(i), '#\\'(n), '#\\'(g), '#\\'(' '), '#\\'(~), '#\\'(a), '#\\'(' '), '#\\'(a), '#\\'(n), '#\\'(d), '#\\'(' '), '#\\'(~), '#\\'(a), '#\\'(~), '#\\'('%')]), U_a_Get98, U_b_Get105], [u_prolog_inline, '$ARRAY'([*], claz_base_character, ['#\\'(t), '#\\'(r), '#\\'(a), '#\\'(c), '#\\'(e)])], [quote, [ext_quit, 1]]], [format, t, '$ARRAY'([*], claz_base_character, ['#\\'('O'), '#\\'('K'), '#\\'(:), '#\\'(' '), '#\\'(~), '#\\'(a), '#\\'(' '), '#\\'(i), '#\\'(s), '#\\'(' '), '#\\'(~), '#\\'(a), '#\\'(' '), '#\\'(t), '#\\'(o), '#\\'(' '), '#\\'(~), '#\\'(a), '#\\'(~), '#\\'('%')]), [quote, U_expected_Get112], [quote, U_eqf_Get119], [quote, U_actual_Get126]]]]=MResult
 	      ),
 	      block_exit(u_is, MResult),
 	      true),
@@ -192,25 +192,25 @@ f_u_is(U_eqf_Param, U_expected_Param, U_actual_Param, FnResult) :-
 :- cl_write_line('$ARRAY'([*],
 			  claz_base_character,
 			  
-			  [ '$CHAR'('R'),
-			    '$CHAR'(u),
-			    '$CHAR'(n),
-			    '$CHAR'(n),
-			    '$CHAR'(i),
-			    '$CHAR'(n),
-			    '$CHAR'(g),
-			    '$CHAR'(' '),
-			    '$CHAR'(s),
-			    '$CHAR'(m),
-			    '$CHAR'(o),
-			    '$CHAR'(k),
-			    '$CHAR'(e),
-			    '$CHAR'(' '),
-			    '$CHAR'(t),
-			    '$CHAR'(e),
-			    '$CHAR'(s),
-			    '$CHAR'(t),
-			    '$CHAR'(!)
+			  [ '#\\'('R'),
+			    '#\\'(u),
+			    '#\\'(n),
+			    '#\\'(n),
+			    '#\\'(i),
+			    '#\\'(n),
+			    '#\\'(g),
+			    '#\\'(' '),
+			    '#\\'(s),
+			    '#\\'(m),
+			    '#\\'(o),
+			    '#\\'(k),
+			    '#\\'(e),
+			    '#\\'(' '),
+			    '#\\'(t),
+			    '#\\'(e),
+			    '#\\'(s),
+			    '#\\'(t),
+			    '#\\'(!)
 			  ]),
 		 Write_line_Ret).
 /* (progn (prolog-inline "rtrace") (is eq 1 1))*/
@@ -252,10 +252,10 @@ f_u_is(U_eqf_Param, U_expected_Param, U_actual_Param, FnResult) :-
 	  [ stringp,
 	    '$ARRAY'([*],
 		     claz_base_character,
-		     ['$CHAR'(a), '$CHAR'(b), '$CHAR'(c)])
+		     ['#\\'(a), '#\\'(b), '#\\'(c)])
 	  ],
 	  U_is_Ret).
-/*;  "FAI "this has ben fix" LED: when matching ~a and ~a~%", ['$CHAR'(b), '$CHAR'(c)], "bc", t).*/
+/*;  "FAI "this has ben fix" LED: when matching ~a and ~a~%", ['#\\'(b), '#\\'(c)], "bc", t).*/
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1812 **********************/
 :- lisp_compile_to_prolog(pkg_user,
@@ -270,10 +270,10 @@ f_u_is(U_eqf_Param, U_expected_Param, U_actual_Param, FnResult) :-
 	  [ subseq,
 	    '$ARRAY'([*],
 		     claz_base_character,
-		     ['$CHAR'(a), '$CHAR'(b), '$CHAR'(c)]),
+		     ['#\\'(a), '#\\'(b), '#\\'(c)]),
 	    1
 	  ],
-	  '$ARRAY'([*], claz_base_character, ['$CHAR'(b), '$CHAR'(c)]),
+	  '$ARRAY'([*], claz_base_character, ['#\\'(b), '#\\'(c)]),
 	  U_is_Ret).
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:1846 **********************/
@@ -444,12 +444,12 @@ f_u_defwrap(U_name_Param, FnResult) :-
 :- cl_write_line('$ARRAY'([*],
 			  claz_base_character,
 			  
-			  [ '$CHAR'('P'),
-			    '$CHAR'('A'),
-			    '$CHAR'('S'),
-			    '$CHAR'('S'),
-			    '$CHAR'('E'),
-			    '$CHAR'('D')
+			  [ '#\\'('P'),
+			    '#\\'('A'),
+			    '#\\'('S'),
+			    '#\\'('S'),
+			    '#\\'('E'),
+			    '#\\'('D')
 			  ]),
 		 Write_line_Ret).
 
@@ -498,7 +498,7 @@ function_lambda(defun(u_fifteen), f_u_fifteen, [], [[let, [u_val], [tagbody, [se
 f_u_fifteen(MResult) :-
 	Env=[],
 	catch(( TBEnv=[[bv(u_val, [])]|Env],
-		addr_tagbody_1_addr_enter_1(TBEnv),
+		addr_tagbody_4_addr_enter_4(TBEnv),
 		symbol_value(TBEnv, u_val, U_val_Get),
 		U_val_Get=MResult
 	      ),
@@ -583,16 +583,16 @@ f_u_fifteen(MResult) :-
 		  '$ARRAY'([*],
 			   claz_base_character,
 			   
-			   [ '$CHAR'(t),
-			     '$CHAR'(y),
-			     '$CHAR'(p),
-			     '$CHAR'(e),
-			     '$CHAR'(' '),
-			     '$CHAR'(e),
-			     '$CHAR'(r),
-			     '$CHAR'(r),
-			     '$CHAR'(o),
-			     '$CHAR'(r)
+			   [ '#\\'(t),
+			     '#\\'(y),
+			     '#\\'(p),
+			     '#\\'(e),
+			     '#\\'(' '),
+			     '#\\'(e),
+			     '#\\'(r),
+			     '#\\'(r),
+			     '#\\'(o),
+			     '#\\'(r)
 			   ])
 		]
 	      ]
@@ -608,7 +608,7 @@ f_u_fifteen(MResult) :-
 	  
 	  [ tagbody,
 	    1,
-	    [print, '$ARRAY'([*], claz_base_character, ['$CHAR'(h), '$CHAR'(i)])]
+	    [print, '$ARRAY'([*], claz_base_character, ['#\\'(h), '#\\'(i)])]
 	  ],
 	  U_is_Ret).
 
@@ -620,7 +620,7 @@ f_u_fifteen(MResult) :-
 	  
 	  [ tagbody,
 	    u_a,
-	    [print, '$ARRAY'([*], claz_base_character, ['$CHAR'(h), '$CHAR'(i)])]
+	    [print, '$ARRAY'([*], claz_base_character, ['#\\'(h), '#\\'(i)])]
 	  ],
 	  U_is_Ret).
 
@@ -763,9 +763,9 @@ f_u_reflect_in_y_axis(U_point_Param, MResult) :-
 			      ['make-point', ':x', 3, ':y', 4, ':z', 12]
 			    ]
 			  ]).
-:- f_u_make_point(kw_x, 3, kw_y, 4, kw_z, 12, U_make_point_Ret),
+:- f_u_make_point([kw_x, 3, kw_y, 4, kw_z, 12], U_make_point_Ret),
    place_op(TLEnv, setf, [value, u_my_point], [U_make_point_Ret], Setf_R),
-   f_u_make_point(kw_x, 3, kw_y, 4, kw_z, 12, U_make_point_Ret34),
+   f_u_make_point([kw_x, 3, kw_y, 4, kw_z, 12], U_make_point_Ret34),
    place_op(TLEnv, setf, [value, u_my_point2], [U_make_point_Ret34], Setf_R35),
    List_Ret=[Setf_R, Setf_R35].
 
@@ -776,8 +776,8 @@ f_u_reflect_in_y_axis(U_point_Param, MResult) :-
 			    'my-point3',
 			    '$S'(['POINT', ':X', 3, ':Y', 4, ':Z', 12])
 			  ]).
-:- create_struct([u_point, kw_x, 3, kw_y, 4, kw_z, 12], _7802),
-   place_op(TLEnv, setf, [value, u_my_point3], [_7802], Setf_R).
+:- create_struct([u_point, kw_x, 3, kw_y, 4, kw_z, 12], _14554),
+   place_op(TLEnv, setf, [value, u_my_point3], [_14554], Setf_R).
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4829 **********************/
 :- lisp_compile_to_prolog(pkg_user,
@@ -786,7 +786,7 @@ f_u_reflect_in_y_axis(U_point_Param, MResult) :-
 			    'my-point4d',
 			    ['make-point4d', ':x', 3, ':y', 4, ':z', 12, ':t', 1]
 			  ]).
-:- f_u_make_point4d(kw_x, 3, kw_y, 4, kw_z, 12, kw_t, 1, U_make_point4d_Ret),
+:- f_u_make_point4d([kw_x, 3, kw_y, 4, kw_z, 12, kw_t, 1], U_make_point4d_Ret),
    place_op(TLEnv, setf, [value, u_my_point4d], [U_make_point4d_Ret], Setf_R).
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4885 **********************/
@@ -829,8 +829,8 @@ f_u_reflect_in_y_axis(U_point_Param, MResult) :-
 			    'a-similar-point',
 			    '$S'([point, ':x', 3, ':y', -4, ':z', 12])
 			  ]).
-:- create_struct([u_point, kw_x, 3, kw_y, -4, kw_z, 12], _7988),
-   place_op(TLEnv, setf, [value, u_a_similar_point], [_7988], Setf_R).
+:- create_struct([u_point, kw_x, 3, kw_y, -4, kw_z, 12], _33278),
+   place_op(TLEnv, setf, [value, u_a_similar_point], [_33278], Setf_R).
 /* (is eq t (equal my-point a-similar-point))*/
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5270 **********************/
@@ -1352,24 +1352,24 @@ f_u_distance_from_origin(U_point_Param, MResult) :-
 		      kw_made_by,
 		      '$ARRAY'([*],
 			       claz_base_character,
-			       ['$CHAR'('J'), '$CHAR'(e), '$CHAR'(n)]),
+			       ['#\\'('J'), '#\\'(e), '#\\'(n)]),
 		      kw_made_in,
 		      '$ARRAY'([*],
 			       claz_base_character,
 			       
-			       [ '$CHAR'('B'),
-				 '$CHAR'(r),
-				 '$CHAR'(i),
-				 '$CHAR'(t),
-				 '$CHAR'(t),
-				 '$CHAR'(a),
-				 '$CHAR'(n),
-				 '$CHAR'(y)
+			       [ '#\\'('B'),
+				 '#\\'(r),
+				 '#\\'(i),
+				 '#\\'(t),
+				 '#\\'(t),
+				 '#\\'(a),
+				 '#\\'(n),
+				 '#\\'(y)
 			       ]),
 		      kw_aardvark_name,
 		      '$ARRAY'([*],
 			       claz_base_character,
-			       ['$CHAR'('E'), '$CHAR'(r), '$CHAR'(i), '$CHAR'(c)])
+			       ['#\\'('E'), '#\\'(r), '#\\'(i), '#\\'(c)])
 		    ],
 		    Make_instance_Ret),
    place_op(TLEnv, setf, [value, u_eric], [Make_instance_Ret], Setf_R).

@@ -32,18 +32,19 @@ get_var_tracker(Ctx0,Atom,Dict):- get_attr(Ctx0,tracker,Ctx), must(sanity(atom(A
 get_var_tracker(Ctx0,Atom,Dict):-  get_attr(Ctx0,tracker,Ctx),Dict=rw{name:Atom,r:0,w:0,p:0,ret:0,u:0,vars:[]},oo_put_attr(Ctx,var_tracker(Atom),Dict),!.
 
 
-locally_let(_,G):- !, G.
+%locally_let(_,G):- !, G.
 
-locally_let([N=V|More],G):- castify(V,Value),!,locally_let([N=Value|More],G).
-locally_let([N=V|More],G):- castify(N,Symbol),!,locally_let([Symbol=V|More],G).
+locally_let([N=V|More],G):- castify(V,Value),V\==Value,!,locally_let([N=Value|More],G).
+locally_let([N=V|More],G):- castify(N,Symbol),N\==Symbol,!,locally_let([Symbol=V|More],G).
 locally_let([N=V|More],G):- 
- symbol_value(N,Was),
+ always(symbol_value(N,Was)),
   setup_call_cleanup(
      f_sys_set_symbol_value(N,V),
-     once(locally($(N)=V,locally_let(More,G))),
+     %once(locally($(N)=V,..)),
+     (locally_let(More,G),f_sys_set_symbol_value(N,Was)),
      f_sys_set_symbol_value(N,Was)).
    
-locally_let([],G):- always(G).
+locally_let([],G):- !, always(G).
 locally_let(N=V,G):-!,locally_let([N=V],G).
 
 castify(O,O):- \+compound(O),!,fail.
@@ -54,6 +55,7 @@ castify(P,S):- P=..[F,M],!, castify1(M,MM),must(get_opv(MM,F,S)).
 castify1(O,O):- \+compound(O),!.
 castify1(O,O):- is_list(O),!.
 castify1(I,O):- castify(I,O).
+castify1(O,O).
 
 extract_var_atom([_,RVar|_],RVar):-atomic(RVar).
 extract_var_atom(Var,Var).

@@ -144,7 +144,7 @@ find_or_create_class(Name,Kind):-
    new_named_opv(claz_structure_object,Name,[],Kind),!.
 
 find_class(Name,Claz):- atom(Name),atom_concat_or_rtrace('claz_',_,Name),!,Claz=Name.
-find_class(Name,Claz):- (var(Name) -> break ; true) , 
+find_class(Name,Claz):- (var(Name) -> lisp_dump_break ; true) , 
   get_struct_opv(Claz,symbolname,Name),!.
 %find_class(Name,Claz):- get_struct_opv(Claz,name,Name),!.
 find_class(Name,Claz):-
@@ -376,22 +376,25 @@ get_opv_i(Obj,Key,Value):- un_kw(Key,Prop)->get_opv_ii(Obj,Prop,Value).
 
 %get_opv_ii(Obj,value, Value):- Obj==quote, throw(get_opv_i(quote, value, Value)).
 
-get_opv_ii(Obj,Prop,Value):- has_prop_value_getter(Obj,Prop,Getter),call(Getter,Obj,Prop,Value).
 get_opv_ii(Obj,Prop,Value):- compound(Obj),compound_deref(Obj,Real),!,get_opv_ii(Real,Prop,Value).
 %get_opv_ii(Sym,value,Value):- ((atom(Sym);var(Sym)),nb_current(Sym,Value))*->true;get_opv_iii(Sym,value,Value).
-get_opv_ii(Obj,Prop,Value):- % Prop\==value,
-  get_opv_iii(Obj,Prop,Value).
-get_opv_ii(Obj,Prop,Value):- nonvar(Obj),nonvar(Prop),
-  notrace((Prop\==classof,Prop\==typeof,Prop\==value,Prop\==conc_name)),
-  get_opv_pi(Obj,Prop,Value).
+get_opv_ii(Obj,Prop,Value):- nonvar(Prop),!,(get_opv_iii(Obj,Prop,Value) *-> true; get_opv_else(Obj,Prop,Value)).
+get_opv_ii(Obj,Prop,Value):- get_opv_iii(Obj,Prop,Value).
 
-get_opv_iii(Sym,defined_as,defconstant):- nonvar(Sym),is_keywordp(Sym).
-get_opv_iii(Sym,typeof,keyword):- nonvar(Sym),is_keywordp(Sym).
-get_opv_iii(Sym,classof,claz_symbol):- nonvar(Sym),is_keywordp(Sym).
+get_opv_else(Sym,Prop,Value):- nonvar(Sym),is_keywordp(Sym),!,get_type_default(is_keywordp,Prop,Value).
+get_opv_else(Obj,Prop,Value):- nonvar(Obj),nonvar(Prop),notrace((Prop\==classof,Prop\==typeof,Prop\==value,Prop\==conc_name)),get_opv_pi(Obj,Prop,Value).
+get_opv_else(Obj,typeof,Symbol):- get_opv_iii(Obj,classof,Value),claz_to_symbol(Value,Symbol).
+
+get_type_default(Name,name,Str):- string_concat(kw_,Str,Name).
+get_type_default(_,package,pkg_keyword).
+get_type_default(_,classof,clz_keyword).
+get_type_default(_,defined_as,defconstant).
+get_type_default(_,typeof,keyword).
+
+get_opv_iii(Obj,Prop,Value):- has_prop_value_getter(Obj,Prop,Getter),call(Getter,Obj,Prop,Value).
 get_opv_iii(Obj,Prop,Value):- soops:o_p_v(Obj,Prop,Value).
-get_opv_iii(Sym,typeof,Kind):- get_opv_iii(Sym,classof,Class), \+ clause(soops:o_p_v(Sym,typeof,_),true), claz_to_symbol(Class,Kind).
+get_opv_iii(Obj,Prop,Value):- atom(Obj),nb_current(Obj,Ref),nb_current_value(Ref,Prop,Value).
 get_opv_iii(Obj,Prop,Value):- soops:struct_opv(Obj,Prop,Value).
-get_opv_iii(Obj,Prop,Value):- atom(Obj),has_ref_object(Obj,Ref),!,nb_current_value(Ref,Prop,Value).
 
 compound_deref('$OBJ'(claz_reference,B),B):- atom(B).
 
@@ -406,7 +409,7 @@ has_ref_object(Ref,Object):- nb_current(Ref,Object),Object\==[].
 get_ref_object(Ref,Object):- has_ref_object(Ref,Object).
 get_ref_object(Ref,Object):- atom(Ref), 
    %oo_empty(Object0),
-   put_attr(Object0,classof,claz_ref),
+   %put_attr(Object0,classof,claz_ref),
    nb_put_attr(Object0,ref,Ref),
    must(nb_setval(Ref,Object0)),!,
    must(b_getval(Ref,Object)),!.
@@ -481,7 +484,7 @@ add_opv_new(Obj,Key,Value):-
 add_opv_new_i(Obj,Prop,Value):- nonvar(Obj), has_prop_value_setter(Obj,Prop,Setter),once(call(Setter,Obj,Prop,Value)),fail.
 %add_opv_new_i(Obj,Prop,Value):- Prop==value, nonvar(Obj),nb_setval(Obj,Value).
 add_opv_new_i(Ref,Prop,Value):- get_ref_object(Ref,Object),!,
-  % retractall(soops:o_p_v(Ref,Prop,_Value)),
+   retractall(soops:o_p_v(Ref,Prop,_)),
    show_call_trace(always(nb_put_attr(Object,Prop,Value))).
 
 add_opv_new_i(Obj,Prop,Val):-  fail,

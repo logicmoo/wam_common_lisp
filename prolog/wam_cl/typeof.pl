@@ -23,7 +23,7 @@ i_class(Var,claz_locative):-var(Var).
 i_class(function(OP),Class):- get_opv(OP,function,Obj),cl_class_of(Obj,Class).
 i_class([_|_],claz_cons):-!.
 i_class('$OBJ'(Type,_Data),Type).
-i_class('$CHAR'(_),claz_character).
+i_class('#\\'(_),claz_character).
 i_class('$COMPLEX'(_,_),claz_complex).
 i_class('$NUMBER'(Type,_),Type).
 % atomics
@@ -46,7 +46,7 @@ i_type(Obj,Type):- get_opv_i(Obj,classof,Class),claz_to_symbol(Class,Type).
 i_type(Dict,Type):- is_dict(Dict,Type).
 i_type(Str,string):- is_stringp(Str).
 i_type(t,boolean).
-i_type('$CHAR'(_),character).
+i_type('#\\'(_),character).
 i_type(Obj,Type):- number(Obj),!,number_type_of(Obj,Type).
 i_type('$OBJ'(Type,_Data),Type).
 i_type(Atom,Type):- atom(Atom),atomic_list_concat([Type,_Name],'_znst_',Atom).

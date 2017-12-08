@@ -40,7 +40,7 @@ reader_intern_symbols(_,I,I):- is_comment(I,_),!.
 reader_intern_symbols(_Package,'$STRING'(Expr),LispO):- !, text_to_string_safe(Expr,Text),!,notrace(to_lisp_string(Text,LispO)).
 reader_intern_symbols(_Package,'$NUMBER'(X,Y),'$NUMBER'(X,Y)):-!.
 reader_intern_symbols(_Package,'$COMPLEX'(X,Y),'$COMPLEX'(X,Y)):-!.
-reader_intern_symbols(_Package,'$CHAR'(X),'$CHAR'(X)):-!.
+reader_intern_symbols(_Package,'#\\'(X),'#\\'(X)):-!.
 
 reader_intern_symbols(P,I,O):- resolve_reader_macros(I,M)->I\==M,!,reader_intern_symbols(P,M,O).
 

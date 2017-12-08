@@ -149,7 +149,8 @@ do_compile_1file(Keys,File0):-
      [sym('sys::*compile-file-pathname*')=str(File),
       sym('sys::*compile-file-truename*')=str(OSFile),
       % sym('sys::*output-file-pathname*')=str(PLFile),
-      sym('cl:*package*')=value(sym('*package*'))], 
+      sym('cl:*package*')=value(sym('*package*')),
+      sym('cl:*readtable*')=value(sym('*readtable*'))], 
      setup_call_cleanup(
       open(PLFile,write,Stream),          
          do_compile_1file_to_stream(Keys,File0,Stream),
@@ -199,9 +200,9 @@ lisp_grovel((A,B)):-!, lisp_grovel(A),lisp_grovel(B).
 lisp_grovel(asserta(PrologCode)):- !, lisp_grovel_assert(PrologCode).
 lisp_grovel(assertz(PrologCode)):- !, lisp_grovel_assert(PrologCode).
 lisp_grovel(assert(PrologCode)):- !, lisp_grovel_assert(PrologCode).
-lisp_grovel(cl_in_package(Into, Package)):- nonvar(Into),!, cl_in_package(Into, Package).
-%lisp_grovel(cl_use_package(Package, Load_Ret)):- nonvar(Into),!, cl_use_package(Package, Load_Ret).
-lisp_grovel(cl_load(File,Keys,Load_Ret)):- !, cl_compile_file(File,Keys,Load_Ret).
+lisp_grovel(cl_in_package(Into, Package)):- nonvar(Into),!, trace, cl_in_package(Into, Package).
+lisp_grovel(cl_use_package(Package, Load_Ret)):- nonvar(Package),!, cl_use_package(Package, Load_Ret).
+%lisp_grovel(cl_load(File,Keys,Load_Ret)):- !, cl_compile_file(File,Keys,Load_Ret).
 %lisp_grovel(cl_compile_file(File,Keys,Load_Ret)):- !, cl_compile_file(File,Keys,Load_Ret).
 lisp_grovel(_).
 
@@ -228,8 +229,14 @@ cl_load(File,_Keys,t):-
    % check maybe for fresh
    pl_compiled_filename(File,PL),exists_file(PL),!,dbmsg(in_comment(ensure_loaded(PL))),!,ensure_loaded(PL).
 %cl_load(File,R):- cl_compile_file(File,t),!,pl_compiled_filename(File,PL),exists_file(PL),!,in_comment(dbmsg(ensure_loaded(PL))),!,ensure_loaded(PL).
-cl_load(File,_Keys,t):- 
-  with_each_file(with_each_form(lisp_reader_compiled_eval),File).
+cl_load(File,Keys,t):- 
+  with_each_file(load_1file(Keys),File).
+
+load_1file(_Keys,File):- 
+     locally_let(
+     [sym('cl:*readtable*')=value(sym('*readtable*')),
+      sym('cl:*package*')=value(sym('*package*'))], 
+         with_each_form(lisp_reader_compiled_eval,File)).
 
 
 lisp_reader_compiled_eval(PExpression):- 

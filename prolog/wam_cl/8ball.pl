@@ -38,6 +38,9 @@ show_call_trace(G):- G *-> wdmsg(G); (wdmsg(warn(failed(show_call_trace(G)))),fa
 
 on_x_rtrace(G):- catch(G,E,(dbmsg(E),rtrace(G),break)).
 atom_concat_or_rtrace(X,Y,Z):- tracing->atom_concat(X,Y,Z);catch(atom_concat(X,Y,Z),_,break).
+
+lisp_dump_break:- both_outputs(dumpST),!,throw(lisp_dump_break).
+lisp_dump_break:- throw(lisp_dump_break).
 lisp_dump_break:- lisp_dumpST,break.
 lisp_dumpST:- both_outputs(dumpST).
 
@@ -76,8 +79,8 @@ gripe_problem0(Problem,G):-
      notrace(( 
      wdmsg((Problem:-G)),lisp_dumpST,
      dbmsg((Problem:-G)))),
-     trace,break,
-     (rtrace(G)*->(notrace,break);(wdmsg(failed_rtrace(G)),notrace,break,!,fail)).
+     trace,lisp_dump_break,
+     (rtrace(G)*->(notrace,lisp_dump_break);(wdmsg(failed_rtrace(G)),notrace,lisp_dump_break,!,fail)).
 
 
 :- meta_predicate(timel(+,:)).
