@@ -35,23 +35,40 @@ cl_set_nthcdr(_,[],[]):-!.
 cl_set_nthcdr(0,List,Tail):- nb_setarg(2,List,Tail).
 cl_set_nthcdr(Index,[_|List],Tail):- Next is Index-1,cl_set_nthcdr(Next,List,Tail).
 
-cl_aref(List,Index,RetVal):- cl_nthcdr(List,Index,RetVal).
+wl:arg_lambda_type(req(1),cl_aref).
+cl_aref(Obj,Indexes,RetVal):-!, get_array_data(Obj,List),!,nth_index(Indexes,List,RetVal).
+%cl_aref(List,Index,RetVal):- cl_nthcdr(List,Index,RetVal).
+
+nth_index([Index],List,RetVal):- !, cl_nth(Index,List,RetVal). 
+nth_index([],List,List):-!.
+nth_index([Index|Indexes],List,RetVal):- cl_nth(Index,List,IndexedVal),nth_index(Indexes,IndexedVal,RetVal).
+
+get_array_data(List,List):- is_list(List).
+get_array_data(Obj,List):- get_opv(Obj,data,List),!.
+get_array_data(Obj,List):- get_opv(Obj,array,Obj2),!,get_array_data(Obj2,List).
 
 
+wl:uses_rest_only(cl_make_array).
 cl_make_array(Dims,RetVal):- e1_as_list(Dims,DimsL),
- create_instance(clz_array,[dims=DimsL],RetVal).
+ create_instance(claz_array,[dims=DimsL],RetVal).
 cl_make_array(Dims,Keys,RetVal):- e1_as_list(Dims,DimsL),
- create_instance(clz_array,[dims=DimsL|Keys],RetVal).
+ create_instance(claz_array,[dims=DimsL|Keys],RetVal).
 
+wl:uses_rest_only(cl_vector).
 cl_vector(Elements,RetVal):-
  length(Elements,Size),
- create_struct(clz_array,[dims=[Size],data=Elements],RetVal).
+ create_struct(claz_array,[dims=[Size],data=Elements],RetVal).
 
 cl_vectorp(Obj,RetVal):- t_or_nil(is_vectorp(Obj),RetVal).
 cl_arrayp(Obj,RetVal):- t_or_nil(is_arrayp(Obj),RetVal).
+cl_listp(Obj,RetVal):- t_or_nil(is_listp(Obj),RetVal).
+cl_endp(Obj,RetVal):- t_or_nil(is_endp(Obj), RetVal).
+
 
 is_vectorp(Obj):- get_opv(Obj,dims,List),List=[_].
-is_arrayp(Obj):- get_opv(Obj,classof,clz_array).
+is_arrayp(Obj):- get_opv(Obj,classof,claz_array).
+is_listp(Obj):- is_list(Obj).
+is_endp(Obj):- Obj == [].
 
 cl_adjustable_array_p(Obj,RetVal):-
   t_or_nil(get_opv(Obj,adjustable,t),RetVal).
