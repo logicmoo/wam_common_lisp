@@ -19,14 +19,15 @@
 body_cleanup(Ctx,CodeIn,CodeOut):- quietly(body_cleanup_keep_debug_vars(Ctx,CodeIn,CodeOut)).
 
 body_cleanup_keep_debug_vars(Ctx,CodeSt,CodeOutNow):- 
- must_det_l((
+ always((   
    sanitize_true(Ctx,CodeSt,CodeIn),
    term_attvars(CodeIn,AttVars),maplist(del_attr_rev2(freeze),AttVars),
    inline_operation([],Ctx,',',CodeIn,Code0),
    body_cleanup_keep_debug_vars1(Ctx,Code0,Code2),
    body_cleanup_keep_debug_vars1(Ctx,Code2,Code3),
    env_mize(Ctx,',',Code3,Code4),
-   inline_operation([],Ctx,',',Code4,Code5a),
+   inline_operation([],Ctx,',',Code4,Code5ab),
+   inline_body([],Ctx,',',Code5ab,Code5a),
    fast_get_sets(Ctx,',',Code5a,Code5),
    term_attvars(Code5,AttVars5),maplist(del_attr_rev2(rwstate),AttVars5),   
    body_cleanup_keep_debug_vars1(Ctx,Code5,CodeOut),
@@ -38,6 +39,11 @@ add_type_checks_maybe(_,IO,IO).
 body_cleanup_keep_debug_vars1(Ctx,Code0,CodeOut):-
  must_det_l((oper_mize(Code0,Ctx,',',Code0,Code1), mize_body(Ctx,',',Code1,CodeOut))).
 
+
+fast_get_sets(_Ctx,_,Code5,Code5):- \+ compound(Code5),!.
+fast_get_sets(Ctx,F,(C1,C2,C4),C5):- conjoinment(C1,C2,C3),!,fast_get_sets(Ctx,F,(C3,C4),C5).
+fast_get_sets(Ctx,F,(C1,C2),Joined):- conjoinment(C1,C2,C3),!,fast_get_sets(Ctx,F,C3,Joined).
+fast_get_sets(Ctx,_F,C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(fast_get_sets(Ctx,F),C1O,C2O),C2=..[F|C2O].
 fast_get_sets(_Ctx,_,Code5,Code5).
 
 non_compound_code(NC):- \+ callable(NC),!.
@@ -150,8 +156,7 @@ conjoin_0(clean_escape(_),_,true):- trace,!.
 conjoin_0((clean_escape(_),_),_,true):- trace.
 conjoin_0((C1,clean_escape(_)),_,C3):- trace,visit_lit(C1,C3).
 conjoin_0(C1,(clean_escape(_),_),C3):- trace,visit_lit(C1,C3).
-conjoin_0(get_var(ReplEnv, Var, Value),get_var(ReplEnv, Var, Value),
-           get_var(ReplEnv, Var, Value)).
+conjoin_0(C1,C2,C3):- conjoinment(C1,C2,C3),!.
 conjoin_0((C1,C1O),C2,(C1,AAB)):-!, 
   conjoin_0(C1O,C2,AAB).
 conjoin_0(C1,C2,(C11,C21)):- !,visit_lit(C1,C11),!,visit_lit(C2,C21).
@@ -182,41 +187,82 @@ structure_variant(A,B):- copy_term_nat(A,CA),copy_term(B,CB),numbervars(CA,0,_),
   \+ (CA \= CB),
    A=B.
 
+conjoinment0(A,B,_):- ( ( \+ compound(A)) ; \+ compound(B)), !,fail.
+conjoinment0(get_var(ReplEnv1, Var1, Value1),get_var(ReplEnv2, Var2, Value2),
+           get_var(ReplEnv1, Var1, Value1)):- Var1==Var2,ReplEnv2==ReplEnv1,Value1=Value2.
+
+conjoinment0(get_var(ReplEnv1, Var1, Value1),get_var(ReplEnv2, Var2, Value2),
+           (get_var(ReplEnv2, Var2, Value2),get_var(ReplEnv1, Var1, Value1))):- 
+               Var1 @> Var2,!.
+               %fail,
+               %Value1=Value2,!.
+
+
+                                    %get_var(LETENV318, u_l, Nreverse_Param),
+                                    %U_l=[CAR496|Nreverse_Param],
+                                    %set_var(LETENV318, setq, u_l, U_l)
+
+
+conjoinment1(A,B,_):- ( ( \+ compound(A)) ; \+ compound(B)), !,fail.
+conjoinment1(C1,(AEQB,C2),(C3,AEQB)):- move_down(AEQB),conjoinment0(C1,C2,C3).
+conjoinment1(C1,C2,C3):- conjoinment0(C1,C2,C3).
+
+conjoinment(C1,C2,C3):-conjoinment1(C1,C2,C3).
+
+move_down(AEB):-var(AEB),!,fail.
+move_down(A=B):- nop(var(A)),
+  is_list(B).
+
 ifthenelse(P):-structure_applies(P,( _ -> _ ; _ )).
+
+structure_applies_here(In,In2,Body):- var(In2),In=In2,!,call(Body).
+structure_applies_here(In,In2,Body):- structure_applies(In,In2),call(Body).
 
 mize_body1(_Ctx,_F,In,Out):-skip_optimize(In),!,In=Out.
 mize_body1(Ctx,F,In,Out):-  
    clause(mize_body_1e(Ctx,F,In2,Out2),Body),
-   structure_applies(In,In2),
-   call(Body),!,
+   structure_applies_here(In,In2,Body),!,
    (In \== Out2 -> mize_body1(Ctx,F,Out2,Out);Out=In),!.
 mize_body1(_Ctx,_F,InOut,InOut).
 
+idiom_replace(set_var(E, OP, N, V),set_var(E, N, V)):- var(V), atom(N),atom(OP),memberchk(OP,[psetq,setf,setq]).
+idiom_replace(set_place(E, OP, N, V),set_var(E, N, V)):- var(V), atom(N),atom(OP),memberchk(OP,[psetq,setf,setq]).
+idiom_replace(set_var(E, OP, [PLACE, N], V),set_place(E, OP, [PLACE, N], V)):- var(V), atom(N),atom(OP),memberchk(OP,[setf]).
+
 
 mize_body_1e(_Ctx,_,C1,C1):- non_compound_code(C1),!.
+mize_body_1e(_Ctx,_,C1,C2):- idiom_replace(C1,C2).
 mize_body_1e(_Ctx,_F,(A=B),true):- A==B,!.
 mize_body_1e(_Ctx,_F,(A==B),true):- A==B,!.
 mize_body_1e(_Ctx,_,cl_list(G, R),R=G).
 mize_body_1e(_Ctx,_,C1,L=[R]):- structure_applies(C1 , (L=[R, []])). % lisp_compiler_option(elim_vars,true).
+
+mize_body_1e(Ctx,F,(C1,C2,C4),C5):- conjoinment(C1,C2,C3),!,mize_body_1e(Ctx,F,(C3,C4),C5).
+mize_body_1e(Ctx,F,(C1,C2),Joined):- conjoinment(C1,C2,C3),!,mize_body_1e(Ctx,F,C3,Joined).
+
 mize_body_1e(Ctx,F,(C1,C2),CodeJoined):-!,mize_body1(Ctx,F,C1,C1O),mize_body1(Ctx,F,C2,C2O),conjoin_0(C1O,C2O,CodeJoined).
-mize_body_1e(Ctx,_,get_var(_Env, Sym, Sym_Get),true):- 
-  % lisp_compiler_option(safe(elim_symbolvalues_vars),true),  
+mize_body_1e(Ctx,_,get_var(Env, Sym, Sym_Get),OUT):-  
+  nop(OUT = 'O'(get_var(Env, Sym, Sym_Get),true)),
+  OUT = true,
+  lisp_compiler_option(safe(elim_symbolvalues_vars),true),  
   get_var_tracker(Ctx,Sym,Dict),
   Dict.w=1, % ;Dict.p==1,
   % Dict.u<2,
   %Dict.r>=0,
   % rw_add(Ctx,Sym,u),
-  Dict.vars=[Was|_],!,
-  must(Was=Sym_Get).
+  Dict.vars=[Was|_],
+  Was\==Sym_Get,!,
+  (must(Was=Sym_Get)).
 %mize_body1(Ctx,_F,C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(mize_body1(Ctx,F),C1O,C2O),C2=..[F|C2O].
 %mize_body1(Ctx,F,C1,C2):- is_list(C1),must_maplist(mize_body1(Ctx,F),C1,C2).
 mize_body_1e(_Ctx,_,C1,C1):-!.
 
+'O'(Old,New):- New,nop(Old).
+% 'O'(Old,New):- nop(New),Old.
 
 mize_body2(Ctx,F,In,Out):-  
    clause(mize_body_2e(Ctx,F,In2,Out2),Body),
-   structure_applies(In,In2),
-   call(Body),!,
+   structure_applies_here(In,In2,Body),!,   
    (In\==Out2 -> mize_body2(Ctx,F,Out2,Out);Out=In),!.
 mize_body2(_Ctx,_F,InOut,InOut).
 
@@ -293,8 +339,17 @@ inline_operation(Never,Ctx,FF,(asserta(MH:-C1)),Wrapper):-
    inline_body([F/A|Never],Ctx,FF,C1,C2),
    Wrapper = asserta(MH :- C2).
 
+inline_operation(Never,Ctx,FF,(asserta_tracked(P,MH:-C1)),Wrapper):- 
+   strip_module(MH,_,H),
+   functor(H,F,A),
+   %tabling:rename_term(H,HH),  
+   %wdmsg(Wrapper),
+   %always(ensure_tabled(M,H)),
+   inline_body([F/A|Never],Ctx,FF,C1,C2),
+   Wrapper = asserta_tracked(P,MH :- C2).
 
-% asserta/ (:- / 1)
+
+% asserta_tracked/ (:- / 1)
 inline_operation(Never,Ctx,FF,PAB,Conjs):- PAB=..[F,C1|Rest],
     functor(PAB,F,A),functor_arg_is_body(F,A),!,
     inline_operation(Never,Ctx,FF,C1,C2),
@@ -307,7 +362,7 @@ ensure_tabled(M,H):-
  M:(
   (use_module(library(tabling))),
   (multifile('$tabled'/1)),
-  %(dynamic('$tabled'/1)),asserta(M:'$tabled'(H)),
+  %(dynamic('$tabled'/1)),asserta_tracked(M:'$tabled'(H)),
   (multifile('$table_mode'/3)),
   (multifile('$table_update'/4)),
   
@@ -324,6 +379,8 @@ do_conjs2(F,C2,Rest,Conjs):- Conjs=..[F,C2|Rest].
 %inline_body(_,_,_,C1,C1).
 inline_body(_Never,_Ctx,_,C1,C1):- var(C1),!.
 inline_body(_Never,_Ctx,_,Code,Out):- skip_optimize(Code),!,Out=Code.
+inline_body(Never,Ctx,F,(C1,C2,C4),C5):- conjoinment(C1,C2,C3),!,inline_body(Never,Ctx,F,(C3,C4),C5).
+inline_body(Never,Ctx,F,(C1,C2),Joined):- conjoinment(C1,C2,C3),!,inline_body(Never,Ctx,F,C3,Joined).
 inline_body(Never,Ctx,F,(C1,C2),CodeJoined):-!,inline_body(Never,Ctx,F,C1,C1O),inline_body(Never,Ctx,F,C2,C2O),conjoin_0(C1O,C2O,CodeJoined).
 inline_body(Never,_Ctx,_,Code,Out):- compound(Code),functor(Code,F,N),member(F/N,Never),!,Out=Code.
 inline_body(_Never,_Ctx,_,C1,Out):- 
@@ -363,7 +420,7 @@ never_inline_fa(member,_).
 never_inline_fa(as_rest,_).
 never_inline_fa(t_or_nil,_).
 
-always_inline(P):- never_inline(P),!,fail.
+%always_inline(P):- never_inline(P),!,fail.
 always_inline(P):- compound(P),functor(P,F,A),always_inline_fa(F,A).
 %always_inline(P):- clause(P,B)->(B==true;B=t_or_nil(_,_)).
 
