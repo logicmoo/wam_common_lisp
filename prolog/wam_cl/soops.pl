@@ -485,7 +485,8 @@ add_opv_new_i(Obj,Prop,Value):- nonvar(Obj), has_prop_value_setter(Obj,Prop,Sett
 %add_opv_new_i(Obj,Prop,Value):- Prop==value, nonvar(Obj),nb_setval(Obj,Value).
 add_opv_new_i(Ref,Prop,Value):- get_ref_object(Ref,Object),!,
    retractall(soops:o_p_v(Ref,Prop,_)),
-   show_call_trace(always(nb_put_attr(Object,Prop,Value))).
+   %show_call_trace
+   (always(nb_put_attr(Object,Prop,Value))).
 
 add_opv_new_i(Obj,Prop,Val):-  fail,
    get_obj_pred(Obj,Prop,Pred),
@@ -617,7 +618,7 @@ decl_mapped_opv(Kind,KW=Pred):- un_kw(KW,Prop),
   show_call_trace(assert_if_new(type_attribute_pred_dyn(Kind,Prop,Pred))),
   modulize(call(Pred,Obj,Val),OPred),
   forall(OPred,add_opv_new(Obj,Prop,Val)),
-  nop(asserta((OPred:- (is_kind(Obj,Kind),(fail->!;true),get_opv(Obj,Prop,Val))))).
+  nop(asserta_tracked((OPred:- (is_kind(Obj,Kind),(fail->!;true),get_opv(Obj,Prop,Val))))).
 
 is_kind(O,_K):- nonvar(O).
 

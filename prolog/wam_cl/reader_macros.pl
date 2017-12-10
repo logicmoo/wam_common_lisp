@@ -21,7 +21,7 @@
 resolve_reader_macros(I,O):- remove_comments(I,M),resolve_inlines(M,M2),remove_comments(M2,O).
 
 
-str_to_expression(Str, Expression):- lisp_add_history(Str),parse_sexpr_untyped_read(string(Str), Expression),!.
+str_to_expression(Str, Expression):- lisp_add_history(Str),parse_sexpr_interned(string(Str), Expression),!.
 str_to_expression(Str, Expression):- with_input_from_string(Str,read_and_parse(Expression)),!.
 
 remove_comments(IO,IO):- \+ compound(IO),!.
@@ -40,12 +40,12 @@ resolve_1inline([OP,_Flag,_Form], _Code):- \+ atomic(OP),!,fail.
 resolve_1inline([_OP,Flag,_Form], _Code):- var(Flag),!,fail.
 % #+
 resolve_1inline([OP,Flag,Form], Code):- same_symbol(OP,'#+'),!,
-   always(( symbol_value(xx_features_xx,FEATURES),
+   always(( get_var(xx_features_xx,FEATURES),
      (feature_member(Flag,FEATURES) -> Code = Form ; Code = '$COMMENT'(flag_removed(+Flag,Form))))).
    
 % #-
 resolve_1inline([OP,Flag,Form], Code):- same_symbol(OP,'#-'),!,
-   always(( symbol_value(xx_features_xx,FEATURES),
+   always(( get_var(xx_features_xx,FEATURES),
      (\+ feature_member(Flag,FEATURES) -> Code = Form ; Code = '$COMMENT'(flag_removed(-Flag,Form))))).
 
 
@@ -59,14 +59,18 @@ resolve_inlines([I|II],[O|OO]):-resolve_inlines(I,O),!,resolve_inlines(II,OO).
 resolve_inlines(IO,IO).
 
 
-as_sexp(I,O):- as_sexp1(I,M),resolve_reader_macros(M,M2),remove_comments(M2,O),!.
+as_sexp(I,O):- as_sexp1(I,M),resolve_reader_macros(M,M2),remove_comments(M2,O).
+as_sexp_interned(I,OO):- is_list(I),!,I=OO.
+as_sexp_interned(I,OO):- as_sexp(I,O),!,reader_intern_symbols(O,OO).
 
 as_sexp1(Var,Var):-var(Var).
 as_sexp1(NIL,NIL):-NIL==[],!.
-as_sexp1(Stream,Expression):- is_stream(Stream),!,must(parse_sexpr_untyped(Stream,SExpression)),!,as_sexp2(SExpression,Expression).
+as_sexp1(Stream,Expression):- is_stream(Stream),!,must(parse_sexpr_untyped(Stream,SExpression)),!,
+  as_sexp2(SExpression,Expression).
 as_sexp1(s(Str),Expression):- !, must(parse_sexpr_untyped(string(Str),SExpression)),!,as_sexp2(SExpression,Expression).
 as_sexp1(Str,Expression):- notrace(catch(text_to_string(Str,String),_,fail)),!, 
-    always(parse_sexpr_untyped(string(String),SExpression)),!,as_sexp2(SExpression,Expression).
+    always(parse_sexpr_untyped(string(String),SExpression)),!,
+    as_sexp2(SExpression,Expression).
 as_sexp1(Str,Expression):- as_sexp2(Str,Expression),!.
 
 as_sexp2(Str,Expression):- is_list(Str),!,maplist(expand_pterm_to_sterm,Str,Expression).

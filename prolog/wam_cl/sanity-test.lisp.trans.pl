@@ -165,18 +165,18 @@ f_u_is(U_eqf_Param, U_expected_Param, U_actual_Param, FnResult) :-
 		cl_gensym('$ARRAY'([*], claz_base_character, ['#\\'(b)]),
 			  Gensym_Ret37),
 		LETENV=[[bv(u_a, Gensym_Ret), bv(u_b, Gensym_Ret37)]|Env],
-		symbol_value(LETENV, u_a, U_a_Get),
-		symbol_value(LETENV, u_expected, U_expected_Get),
-		symbol_value(LETENV, u_b, U_b_Get),
-		symbol_value(LETENV, u_actual, U_actual_Get),
-		symbol_value(LETENV, u_eqf, U_eqf_Get),
-		symbol_value(LETENV, u_a, U_a_Get84),
-		symbol_value(LETENV, u_b, U_b_Get91),
-		symbol_value(LETENV, u_a, U_a_Get98),
-		symbol_value(LETENV, u_b, U_b_Get105),
-		symbol_value(LETENV, u_expected, U_expected_Get112),
-		symbol_value(LETENV, u_eqf, U_eqf_Get119),
-		symbol_value(LETENV, u_actual, U_actual_Get126),
+		get_var(LETENV, u_a, U_a_Get),
+		get_var(LETENV, u_expected, U_expected_Get),
+		get_var(LETENV, u_b, U_b_Get),
+		get_var(LETENV, u_actual, U_actual_Get),
+		get_var(LETENV, u_eqf, U_eqf_Get),
+		get_var(LETENV, u_a, U_a_Get84),
+		get_var(LETENV, u_b, U_b_Get91),
+		get_var(LETENV, u_a, U_a_Get98),
+		get_var(LETENV, u_b, U_b_Get105),
+		get_var(LETENV, u_expected, U_expected_Get112),
+		get_var(LETENV, u_eqf, U_eqf_Get119),
+		get_var(LETENV, u_actual, U_actual_Get126),
 		[let, [[U_a_Get, U_expected_Get], [U_b_Get, U_actual_Get]], [if, [not, [U_eqf_Get, U_a_Get84, U_b_Get91]], [progn, [format, t, '$ARRAY'([*], claz_base_character, ['#\\'('F'), '#\\'('A'), '#\\'('I'), '#\\'('L'), '#\\'('E'), '#\\'('D'), '#\\'(:), '#\\'(' '), '#\\'(w), '#\\'(h), '#\\'(e), '#\\'(n), '#\\'(' '), '#\\'(m), '#\\'(a), '#\\'(t), '#\\'(c), '#\\'(h), '#\\'(i), '#\\'(n), '#\\'(g), '#\\'(' '), '#\\'(~), '#\\'(a), '#\\'(' '), '#\\'(a), '#\\'(n), '#\\'(d), '#\\'(' '), '#\\'(~), '#\\'(a), '#\\'(~), '#\\'('%')]), U_a_Get98, U_b_Get105], [u_prolog_inline, '$ARRAY'([*], claz_base_character, ['#\\'(t), '#\\'(r), '#\\'(a), '#\\'(c), '#\\'(e)])], [quote, [ext_quit, 1]]], [format, t, '$ARRAY'([*], claz_base_character, ['#\\'('O'), '#\\'('K'), '#\\'(:), '#\\'(' '), '#\\'(~), '#\\'(a), '#\\'(' '), '#\\'(i), '#\\'(s), '#\\'(' '), '#\\'(~), '#\\'(a), '#\\'(' '), '#\\'(t), '#\\'(o), '#\\'(' '), '#\\'(~), '#\\'(a), '#\\'(~), '#\\'('%')]), [quote, U_expected_Get112], [quote, U_eqf_Get119], [quote, U_actual_Get126]]]]=MResult
 	      ),
 	      block_exit(u_is, MResult),
@@ -408,7 +408,7 @@ macro_lambda(defmacro(u_defwrap), f_u_defwrap, [u_name], [progn, ['#BQ', [defun,
 % asserting...
 f_u_defwrap(U_name_Param, FnResult) :-
 	Env=[bv(u_name, U_name_Param)],
-	catch(( symbol_value(Env, u_name, U_name_Get),
+	catch(( get_var(Env, u_name, U_name_Get),
 		[defun, U_name_Get, [], 1]=MResult
 	      ),
 	      block_exit(u_defwrap, MResult),
@@ -499,7 +499,7 @@ f_u_fifteen(MResult) :-
 	Env=[],
 	catch(( TBEnv=[[bv(u_val, [])]|Env],
 		addr_tagbody_4_addr_enter_4(TBEnv),
-		symbol_value(TBEnv, u_val, U_val_Get),
+		get_var(TBEnv, u_val, U_val_Get),
 		U_val_Get=MResult
 	      ),
 	      block_exit(u_fifteen, MResult),
@@ -517,26 +517,26 @@ f_u_fifteen(MResult) :-
 /* this first one should get deleted since its inlined away in f_u_fifteen */
 
 addr_tagbody_1_addr_enter_1(Env10) :-
-        symbol_setter(Env10, setq, u_val, 1),
+        set_var(Env10, setq, u_val, 1),
         addr_tagbody_1_u_point_a(Env10).
 addr_tagbody_1_u_point_c(Incf_Env) :-
-        place_op(Incf_Env, incf, [value, u_val], [4], Incf_R),
+        set_place(Incf_Env, incf, [value, u_val], [4], Incf_R),
         addr_tagbody_1_u_point_b(Incf_Env).
 addr_tagbody_1_u_point_a(Incf_Env19) :-
-        place_op(Incf_Env19, incf, [value, u_val], [2], Incf_R18),
+        set_place(Incf_Env19, incf, [value, u_val], [2], Incf_R18),
         addr_tagbody_1_u_point_c(Incf_Env19).
 addr_tagbody_1_u_point_u(Incf_Env23) :-
-        place_op(Incf_Env23, incf, [value, u_val], [2], Incf_R22),
+        set_place(Incf_Env23, incf, [value, u_val], [2], Incf_R22),
         addr_tagbody_1_u_point_c(Incf_Env23).
 addr_tagbody_1_u_point_b(Incf_Env27) :-
-        place_op(Incf_Env27, incf, [value, u_val], [8], _GORES15).
+        set_place(Incf_Env27, incf, [value, u_val], [8], _GORES15).
 
 f_u_fifteen(MResult) :-
         Env=[],
         catch(( TBEnv=[[bv(u_val, [])]|Env],
-                symbol_setter(TBEnv, setq, u_val, 1),
+                set_var(TBEnv, setq, u_val, 1),
                 addr_tagbody_1_u_point_a(TBEnv),
-                symbol_value(TBEnv, u_val, U_val_Get),
+                get_var(TBEnv, u_val, U_val_Get),
                 U_val_Get=MResult
               ),
               block_exit(u_fifteen, MResult),
@@ -693,12 +693,12 @@ f_u_distance_from_origin(U_point_Param, MResult) :-
 		LETENV45=[[bv(u_y, U_point_y_Ret)]|LETENV],
 		f_u_point_z(U_point_Param, U_point_z_Ret),
 		LETENV57=[[bv(u_z, U_point_z_Ret)]|LETENV45],
-		symbol_value(LETENV57, u_x, U_x_Get72),
+		get_var(LETENV57, u_x, U_x_Get72),
 		*(U_x_Get72, U_x_Get72, Xx_Ret),
-		symbol_value(LETENV57, u_y, U_y_Get78),
+		get_var(LETENV57, u_y, U_y_Get78),
 		*(U_y_Get78, U_y_Get78, Xx_Ret79),
 		+(Xx_Ret, Xx_Ret79, C43_Ret),
-		symbol_value(LETENV57, u_z, U_z_Get86),
+		get_var(LETENV57, u_z, U_z_Get86),
 		*(U_z_Get86, U_z_Get86, Xx_Ret87),
 		+(C43_Ret, Xx_Ret87, C43_Ret88),
 		cl_sqrt(C43_Ret88, Sqrt_Ret),
@@ -735,7 +735,7 @@ f_u_reflect_in_y_axis(U_point_Param, MResult) :-
 	Setf_Env=[bv(u_point, U_point_Param)],
 	catch(( f_u_point_y(U_point_Param, U_point_y_Ret),
 		-(0, U_point_y_Ret, C45_Ret),
-		place_op(Setf_Env,
+		set_place(Setf_Env,
 			 setf,
 			 [u_point_y, U_point_Param],
 			 [C45_Ret],
@@ -764,9 +764,9 @@ f_u_reflect_in_y_axis(U_point_Param, MResult) :-
 			    ]
 			  ]).
 :- f_u_make_point([kw_x, 3, kw_y, 4, kw_z, 12], U_make_point_Ret),
-   place_op(TLEnv, setf, [value, u_my_point], [U_make_point_Ret], Setf_R),
+   set_place(TLEnv, setf, [value, u_my_point], [U_make_point_Ret], Setf_R),
    f_u_make_point([kw_x, 3, kw_y, 4, kw_z, 12], U_make_point_Ret34),
-   place_op(TLEnv, setf, [value, u_my_point2], [U_make_point_Ret34], Setf_R35),
+   set_place(TLEnv, setf, [value, u_my_point2], [U_make_point_Ret34], Setf_R35),
    List_Ret=[Setf_R, Setf_R35].
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4786 **********************/
@@ -777,7 +777,7 @@ f_u_reflect_in_y_axis(U_point_Param, MResult) :-
 			    '$S'(['POINT', ':X', 3, ':Y', 4, ':Z', 12])
 			  ]).
 :- create_struct([u_point, kw_x, 3, kw_y, 4, kw_z, 12], _14554),
-   place_op(TLEnv, setf, [value, u_my_point3], [_14554], Setf_R).
+   set_place(TLEnv, setf, [value, u_my_point3], [_14554], Setf_R).
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4829 **********************/
 :- lisp_compile_to_prolog(pkg_user,
@@ -787,7 +787,7 @@ f_u_reflect_in_y_axis(U_point_Param, MResult) :-
 			    ['make-point4d', ':x', 3, ':y', 4, ':z', 12, ':t', 1]
 			  ]).
 :- f_u_make_point4d([kw_x, 3, kw_y, 4, kw_z, 12, kw_t, 1], U_make_point4d_Ret),
-   place_op(TLEnv, setf, [value, u_my_point4d], [U_make_point4d_Ret], Setf_R).
+   set_place(TLEnv, setf, [value, u_my_point4d], [U_make_point4d_Ret], Setf_R).
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:4885 **********************/
 :- lisp_compile_to_prolog(pkg_user, [is, eq, t, ['point-p', 'my-point']]).
@@ -830,7 +830,7 @@ f_u_reflect_in_y_axis(U_point_Param, MResult) :-
 			    '$S'([point, ':x', 3, ':y', -4, ':z', 12])
 			  ]).
 :- create_struct([u_point, kw_x, 3, kw_y, -4, kw_z, 12], _33278),
-   place_op(TLEnv, setf, [value, u_a_similar_point], [_33278], Setf_R).
+   set_place(TLEnv, setf, [value, u_a_similar_point], [_33278], Setf_R).
 /* (is eq t (equal my-point a-similar-point))*/
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5270 **********************/
@@ -840,8 +840,8 @@ f_u_reflect_in_y_axis(U_point_Param, MResult) :-
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5313 **********************/
 :- lisp_compile_to_prolog(pkg_user, [equalp, 'my-point', 'a-similar-point']).
-:- symbol_value(TLEnv, u_my_point, U_my_point_Get),
-   symbol_value(TLEnv, u_a_similar_point, U_a_similar_point_Get),
+:- get_var(TLEnv, u_my_point, U_my_point_Get),
+   get_var(TLEnv, u_a_similar_point, U_a_similar_point_Get),
    cl_equalp(U_my_point_Get, U_a_similar_point_Get, Equalp_Ret).
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5348 **********************/
@@ -862,7 +862,7 @@ f_u_reflect_in_y_axis(U_point_Param, MResult) :-
 :- lisp_compile_to_prolog(pkg_user,
 			  [setf, 'my-point', ['make-instance', [quote, point]]]).
 :- cl_make_instance([u_point], Make_instance_Ret),
-   place_op(TLEnv, setf, [value, u_my_point], [Make_instance_Ret], Setf_R).
+   set_place(TLEnv, setf, [value, u_my_point], [Make_instance_Ret], Setf_R).
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5509 **********************/
 :- lisp_compile_to_prolog(pkg_user,
@@ -903,17 +903,17 @@ function_lambda(defun(u_set_point_values), f_u_set_point_values, [u_point, u_x, 
 % asserting...
 f_u_set_point_values(U_point_Param, U_x_Param, U_y_Param, U_z_Param, MResult) :-
 	Setf_Env=[bv(u_point, U_point_Param), bv(u_x, U_x_Param), bv(u_y, U_y_Param), bv(u_z, U_z_Param)],
-	catch(( place_op(Setf_Env,
+	catch(( set_place(Setf_Env,
 			 setf,
 			 [slot_value, U_point_Param, u_x],
 			 [U_x_Param],
 			 Setf_R),
-		place_op(Setf_Env,
+		set_place(Setf_Env,
 			 setf,
 			 [slot_value, U_point_Param, u_y],
 			 [U_y_Param],
 			 Setf_R45),
-		place_op(Setf_Env,
+		set_place(Setf_Env,
 			 setf,
 			 [slot_value, U_point_Param, u_z],
 			 [U_z_Param],
@@ -928,7 +928,7 @@ f_u_set_point_values(U_point_Param, U_x_Param, U_y_Param, U_z_Param, MResult) :-
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5681 **********************/
 :- lisp_compile_to_prolog(pkg_user, ['set-point-values', 'my-point', 3, 4, 12]).
-:- symbol_value(TLEnv, u_my_point, U_my_point_Get),
+:- get_var(TLEnv, u_my_point, U_my_point_Get),
    f_u_set_point_values(U_my_point_Get, 3, 4, 12, U_set_point_values_Ret).
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5717 **********************/
@@ -966,12 +966,12 @@ f_u_distance_from_origin(U_point_Param, MResult) :-
 		cl_slot_value(U_point_Param, u_y, Slot_value_Ret37),
 		cl_slot_value(U_point_Param, u_z, Slot_value_Ret42),
 		LETENV=[[bv(u_x, Slot_value_Ret), bv(u_y, Slot_value_Ret37), bv(u_z, Slot_value_Ret42)]|Env],
-		symbol_value(LETENV, u_x, U_x_Get56),
+		get_var(LETENV, u_x, U_x_Get56),
 		*(U_x_Get56, U_x_Get56, Xx_Ret),
-		symbol_value(LETENV, u_y, U_y_Get62),
+		get_var(LETENV, u_y, U_y_Get62),
 		*(U_y_Get62, U_y_Get62, Xx_Ret63),
 		+(Xx_Ret, Xx_Ret63, C43_Ret),
-		symbol_value(LETENV, u_z, U_z_Get70),
+		get_var(LETENV, u_z, U_z_Get70),
 		*(U_z_Get70, U_z_Get70, Xx_Ret71),
 		+(C43_Ret, Xx_Ret71, C43_Ret72),
 		cl_sqrt(C43_Ret72, Sqrt_Ret),
@@ -990,7 +990,7 @@ f_u_distance_from_origin(U_point_Param, MResult) :-
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5869 **********************/
 :- lisp_compile_to_prolog(pkg_user, ['distance-from-origin', 'my-point']).
-:- symbol_value(TLEnv, u_my_point, U_my_point_Get),
+:- get_var(TLEnv, u_my_point, U_my_point_Get),
    f_u_distance_from_origin(U_my_point_Get, U_distance_from_origin_Ret).
 /*; 3.3. classes are objects*/
 
@@ -1006,14 +1006,14 @@ f_u_distance_from_origin(U_point_Param, MResult) :-
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:5986 **********************/
 :- lisp_compile_to_prolog(pkg_user, ['class-of', 'my-point']).
-:- symbol_value(TLEnv, u_my_point, U_my_point_Get),
+:- get_var(TLEnv, u_my_point, U_my_point_Get),
    cl_class_of(U_my_point_Get, Class_of_Ret).
 /*; #-(or cormanlisp CLISP WAM-CL)*/
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:6041 **********************/
 :- lisp_compile_to_prolog(pkg_user, [typep, 'my-point', ['class-of', 'my-point']]).
-:- symbol_value(TLEnv, u_my_point, U_my_point_Get),
-   symbol_value(TLEnv, u_my_point, U_my_point_Get20),
+:- get_var(TLEnv, u_my_point, U_my_point_Get),
+   get_var(TLEnv, u_my_point, U_my_point_Get20),
    cl_class_of(U_my_point_Get20, Class_of_Ret),
    cl_typep(U_my_point_Get, Class_of_Ret, Typep_Ret).
 
@@ -1055,13 +1055,13 @@ f_u_distance_from_origin(U_point_Param, MResult) :-
 			  ]).
 :- cl_find_class(symbol, Find_class_Ret),
    LETENV=[[bv(u_the_symbol_class, Find_class_Ret)]|TLEnv],
-   symbol_value(LETENV, u_the_symbol_class, U_the_symbol_class_Get),
-   symbol_value(LETENV, u_the_symbol_class, U_the_symbol_class_Get28),
+   get_var(LETENV, u_the_symbol_class, U_the_symbol_class_Get),
+   get_var(LETENV, u_the_symbol_class, U_the_symbol_class_Get28),
    cl_class_name(U_the_symbol_class_Get28, Class_name_Ret),
-   symbol_value(LETENV, u_the_symbol_class, U_the_symbol_class_Get32),
+   get_var(LETENV, u_the_symbol_class, U_the_symbol_class_Get32),
    cl_class_of(symbol, Class_of_Ret),
    cl_eq(U_the_symbol_class_Get32, Class_of_Ret, Eq_Ret),
-   symbol_value(LETENV, u_the_symbol_class, U_the_symbol_class_Get39),
+   get_var(LETENV, u_the_symbol_class, U_the_symbol_class_Get39),
    cl_class_of(U_the_symbol_class_Get39, Class_of_Ret40),
    nb_setval('$mv_return',
 	     [U_the_symbol_class_Get, Class_name_Ret, Eq_Ret, Class_of_Ret40]).
@@ -1120,7 +1120,7 @@ f_u_distance_from_origin(U_point_Param, MResult) :-
 			    42
 			  ]).
 :- cl_make_instance([u_daft_point], Make_instance_Ret),
-   place_op(TLEnv, setf, [slot_value, Make_instance_Ret, u_z], [42], Setf_R).
+   set_place(TLEnv, setf, [slot_value, Make_instance_Ret, u_z], [42], Setf_R).
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:6712 **********************/
 :- lisp_compile_to_prolog(pkg_user,
@@ -1130,7 +1130,7 @@ f_u_distance_from_origin(U_point_Param, MResult) :-
 			    ['make-instance', [quote, 'daft-point'], ':x', 19]
 			  ]).
 :- cl_make_instance([u_daft_point, kw_x, 19], Make_instance_Ret),
-   place_op(TLEnv, setf, [value, u_my_daft_point], [Make_instance_Ret], Setf_R).
+   set_place(TLEnv, setf, [value, u_my_daft_point], [Make_instance_Ret], Setf_R).
 /*flag_removed(+ :PERFECT,[list,[daft-x,my-daft-point],[daft-y,my-daft-point],[progn,[#+,:WAM-CL,[prolog-trace]],[daft-z,my-daft-point]]])*/
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:6901 **********************/
@@ -1148,10 +1148,10 @@ f_u_distance_from_origin(U_point_Param, MResult) :-
 			  ]).
 :- cl_make_instance([u_daft_point], Make_instance_Ret),
    Setf_Env=[[bv(u_temp, Make_instance_Ret)]|TLEnv],
-   symbol_value(Setf_Env, u_temp, U_temp_Get),
-   place_op(Setf_Env, setf, [u_daft_y, U_temp_Get], [999], Setf_R),
-   symbol_value(Setf_Env, u_temp, U_temp_Get32),
-   place_op(Setf_Env, setf, [slot_value, U_temp_Get32, u_z], [0], Setf_R31).
+   get_var(Setf_Env, u_temp, U_temp_Get),
+   set_place(Setf_Env, setf, [u_daft_y, U_temp_Get], [999], Setf_R),
+   get_var(Setf_Env, u_temp, U_temp_Get32),
+   set_place(Setf_Env, setf, [slot_value, U_temp_Get32, u_z], [0], Setf_R31).
 /*flag_removed(+ :PERFECT,[list,[daft-x,my-daft-point],[daft-y,my-daft-point],[daft-z,my-daft-point]])*/
 /*; 3.6 Subclasses and inheritance*/
 
@@ -1372,10 +1372,10 @@ f_u_distance_from_origin(U_point_Param, MResult) :-
 			       ['#\\'('E'), '#\\'(r), '#\\'(i), '#\\'(c)])
 		    ],
 		    Make_instance_Ret),
-   place_op(TLEnv, setf, [value, u_eric], [Make_instance_Ret], Setf_R).
+   set_place(TLEnv, setf, [value, u_eric], [Make_instance_Ret], Setf_R).
 /*flag_removed(+ :HAS_SHIFTF,[shiftf,[cute-p,Eric],t])*/
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/sanity-test.lisp:8477 **********************/
 :- lisp_compile_to_prolog(pkg_user, ['slot-value', 'Eric', [quote, diet]]).
-:- symbol_value(TLEnv, u_eric, U_eric_Get),
+:- get_var(TLEnv, u_eric, U_eric_Get),
    cl_slot_value(U_eric_Get, u_diet, Slot_value_Ret).

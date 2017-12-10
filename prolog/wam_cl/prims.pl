@@ -49,6 +49,7 @@ is_self_evaluationing_const0(X):- is_functionp(X),!.
 is_functionp(X):- \+ atom(X),!,fail.
 is_functionp(X):- atom_concat_or_rtrace('f_',_,X),!.
 is_functionp(X):- atom_concat_or_rtrace('cl_',_,X),!.
+is_consp(Obj):- nonvar(Obj),Obj=[_|_].
 
 %:- dynamic(op_replacement/2).
 wl:op_replacement(first,cl_car).
@@ -67,9 +68,11 @@ cl_cdr(List, Result):- List==[]->Result=[];
 
 wl:op_replacement(setcar,cl_rplaca).
 cl_rplaca(Cons,Obj,Cons):- nb_setarg(1,Cons,Obj).
+f_sys_set_car(A,B,C):-cl_rplaca(A,B,C).
 
 wl:op_replacement(setcdr,cl_rplacd).
 cl_rplacd(Cons,Obj,Cons):- nb_setarg(2,Cons,Obj).
+f_sys_set_cdr(A,B,C):-cl_rplacd(A,B,C).
 
 
 wl:declared(cl_cons,inline(cons)).
@@ -136,7 +139,8 @@ t_or_nil(G,Ret):- G->Ret=t;Ret=[].
 cl_not(Obj,Ret):- t_or_nil(Obj == [] , Ret).
 cl_null(Obj,Ret):- t_or_nil(Obj == [] , Ret).
 cl_atom(Obj,Ret):-  t_or_nil( Obj\=[_|_] , Ret).
-cl_consp(Obj,Ret):-  t_or_nil( Obj=[_|_] , Ret).
+cl_consp(Obj,RetVal):- t_or_nil(is_consp(Obj),RetVal).
+cl_functionp(Obj,RetVal):- t_or_nil(is_functionp(Obj),RetVal).
 
 :-assertz(wl:arg_lambda_type(rest_only,cl_nconc)).
 cl_nconc([L1,L2],Ret):- !, append(L1,L2,Ret).

@@ -81,6 +81,7 @@ __        ___    __  __        ____ _
 	prompts('> ', '> '),
 	%tidy_database,
         el_new(ENV),nb_setval('$env_toplevel',ENV),
+        do_before_tpl,
 	repeat,
         catch(read_eval_print(Result),'$aborted',fail),
    	notrace(Result == end_of_file),!,
@@ -98,7 +99,7 @@ show_uncaught_or_fail(G):- notrace(flush_all_output_safe),
   (catch(G,E,notrace((wdmsg(uncaught(E)),!,fail)))*->true;notrace((wdmsg(failed(G)),!,fail))).
 
 set_prompt_from_package:-
-  quietly((ignore((symbol_value(_ReplEnv, xx_package_xx, Package),
+  quietly((ignore((get_var(_ReplEnv, xx_package_xx, Package),
         short_package_or_hash(Package,Name0),
         (Name0=="U"->Name="CL-USER";Name=Name0),
         always(nonvar(Name)),
@@ -171,7 +172,7 @@ eval_at_repl(Expression,Result):-
   notrace(dbmsg_cmt(:- lisp_compiled_eval(LExpression))),
   notrace(debug_var('ReplEnv',Env)),
   timel('COMPILER',always_catch(maybe_ltrace(lisp_compile(Env,Result,LExpression,Code)))),
-  notrace(dbmsg_cmt(repl_exec:-Code)),
+  notrace(dbmsg_real(:-Code)),
   (notrace(tracing)-> Code ; 
    timel('EXEC',always_catch(ignore(always(maybe_ltrace(call(user:Code))))))),!.
 
@@ -193,7 +194,7 @@ eval_at_repl_tracing(Expression,Result):-
    notrace((writeln(==================================================================))),
    notrace((writeln(==================================================================))),
    notrace((writeln(==================================================================))),
-   notrace(dbmsg(:-Code)),
+   (dbmsg_real(:-Code)),
    notrace((writeln(==================================================================))),
    notrace((writeln(==================================================================))),
    notrace((writeln(==================================================================))),
@@ -264,6 +265,13 @@ lw:- cl_load("wam-cl-params",_).
 :- ignore((((((clause(arithmetic:eval(P,_,_),_),nonvar(P)),(functor(P,F,A),show_call_trace(define_cl_math(F,A)))))),fail)).
 
 classof:attr_unify_hook(A,B):- trace,wdmsg(classof:attr_unify_hook(A,B)),lisp_dump_break. %  break.
+
+do_before_tpl:- assert_if_new(wl:interned_eval(("()"))),
+  set_prolog_flag(lisp_autointern,true),
+  forall(retract(wl:interned_eval(G)),always(lisp_compiled_eval(G,_))),
+  set_prolog_flag(lisp_autointern,false).
+
+
 :- fixup_exports.
 
 %:- process_si.

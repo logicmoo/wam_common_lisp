@@ -140,6 +140,8 @@ cl_compile_file(File,Keys,R):-
   cl_truename(File,R),!.
 
   
+
+%  For top level eval-when forms, :compile-toplevel specifies that the compiler must evaluate the body at compile time, and :load-toplevel specifies that the compiler must arrange to evaluate the body at load time. For non-top level eval-when forms, :execute specifies that the body must be executed in the run-time environment.
 do_compile_1file(Keys,File0):-
    %ignore(R=t),
    search_for(File0,File),
@@ -148,6 +150,7 @@ do_compile_1file(Keys,File0):-
    locally_let(
      [sym('sys::*compile-file-pathname*')=str(File),
       sym('sys::*compile-file-truename*')=str(OSFile),
+      sym('sys::*compiler-mode*')=sym(':compile-toplevel'),      
       % sym('sys::*output-file-pathname*')=str(PLFile),
       sym('cl:*package*')=value(sym('*package*')),
       sym('cl:*readtable*')=value(sym('*readtable*'))], 
@@ -235,7 +238,8 @@ cl_load(File,Keys,t):-
 load_1file(_Keys,File):- 
      locally_let(
      [sym('cl:*readtable*')=value(sym('*readtable*')),
-      sym('cl:*package*')=value(sym('*package*'))], 
+      sym('cl:*package*')=value(sym('*package*')),
+      sym('sys::*compiler-mode*')=sym(':load-toplevel')], 
          with_each_form(lisp_reader_compiled_eval,File)).
 
 

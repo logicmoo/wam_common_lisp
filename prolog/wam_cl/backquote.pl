@@ -45,15 +45,15 @@ bq_append(A,B,C):- always(append(A,B,C)),!.
 
 
 
-ec_lisp_eval(Env,Result,Form,true):- atom(Form),!,symbol_value(Env,Form,Result).
+ec_lisp_eval(Env,Result,Form,true):- atom(Form),!,get_var(Env,Form,Result).
 %bq_call(Eval,Env,Result,Result,true).
 % @TODO fix this workaround 
 ec_lisp_eval(Env,['eval_in_env',Result,Env],Result,true).
 
 
-is_quoted(SelfEval):-SelfEval=[Q,_],atom(Q),is_quote(Q).
-is_quote(quote).
-is_quote('#BQ').
+is_quoted(SelfEval):-SelfEval=[Q,_],atom(Q),fail,nop(is_quote(Q)).
+%is_quote(quote).
+%is_quote('#BQ').
 
 expand_backquote(_Eval,_,Result,Form,true):- \+ compound(Form),!,Result=Form.
 expand_backquote(_Eval,_,SelfEval,SelfEval,true):- notrace(is_self_evaluating_object(SelfEval)),!.

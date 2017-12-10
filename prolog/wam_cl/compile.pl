@@ -23,12 +23,12 @@
 new_compile_ctx(Ctx):- list_to_rbtree([type-ctx],Ctx0),put_attr(Ctx,tracker,Ctx0).
 
 lisp_compiled_eval(SExpression):-
-  notrace(as_sexp(SExpression,Expression)),
+  notrace(as_sexp_interned(SExpression,Expression)),
   lisp_compiled_eval(Expression,Result),
   dbmsg_cmt(result(Result)).
 
 lisp_compiled_eval(SExpression,Result):-
-  notrace(as_sexp(SExpression,Expression)),
+  notrace(as_sexp_interned(SExpression,Expression)),
   %dbmsg(lisp_compiled_eval(Expression)),
   lisp_compile(Result,Expression,Code),
   dbmsg_cmt((lisp_compiled_eval(Expression):- Code)),
@@ -36,12 +36,13 @@ lisp_compiled_eval(SExpression,Result):-
 
 %lisp_compile(SExpression):- source_location(_,_),!,dbmsg((:-lisp_compile(SExpression))).
 lisp_compile(SExpression):-
-  notrace(as_sexp(SExpression,Expression)),
+  notrace(as_sexp_interned(SExpression,Expression)),
   dbmsg(:- lisp_compile(Expression)),
   lisp_compile(Expression,Code),!,
-  dbmsg(:- Code).
+  dbmsg_real(:- Code).
 
-lisp_compile(Expression,Body):-
+lisp_compile(SExpression,Body):-
+   notrace(as_sexp_interned(SExpression,Expression)),
    debug_var('_Ignored',Result),
    lisp_compile(Result,Expression,Body).
 

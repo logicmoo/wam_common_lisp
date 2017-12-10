@@ -41,11 +41,11 @@ sexpr1(X) --> {is_ftVar(X),(get_var_name(X,N)->format(atom(NN),'~w',[N]);format(
 sexpr1(Str)--> {is_stringp(Str),to_prolog_string(Str,PStr)},!,[PStr].
 sexpr1([]) --> !, ['(',')'].
 sexpr1(X)--> {\+compound(X)},!,[X].
+sexpr1(['quote', Expression]) --> [''''], !, sexpr1(Expression).
 sexpr1(['#COMMA',X]) --> [','],sexpr1(X).
 sexpr1(['#BQ',X])--> ['`'],sexpr1(X).
 sexpr1(['#BQ-COMMA-ELIPSE',X])--> [',@'],sexpr1(X).
 sexpr1([X|Y]) --> ['('],  sexpr1(X), lisplist(Y,')').
-sexpr1([quote, Expression]) --> [''''], !, sexpr1(Expression).
 sexpr1([function,Expression]) --> ['#'''], !, sexpr1(Expression).
 sexpr1(function(Expression)) --> ['#'''], !, sexpr1(Expression).
 sexpr1('#\\'(X)) --> {format(atom(NN),'#\\~w',[X])},!,[NN].
@@ -177,11 +177,11 @@ writeTokenL3([Token|TokenL]):-
 
 
 
-write_atom_obj(Package):- pl_package_name(Package,Name),!,write('#<PACKAGE '),write(Name),write('>').
 write_atom_obj(Atom):- atom(Atom),atomic_list_concat([Type,Named],'_znst_',Atom),
    atomic_concat('claz_',Type,Kind),!,
    write('#<'),write(Kind),write(' '),write(Named),write('>').
 write_atom_obj(Symbol):-  print_symbol(Symbol),!.
+write_atom_obj(Package):- pl_package_name(Package,Name),!,write('#<PACKAGE '),write(Name),write('>').
 
 
 :- fixup_exports.

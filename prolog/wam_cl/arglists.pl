@@ -362,8 +362,8 @@ compile_init(Var,FinalResult,[InitForm|_More],
 % [name, 'package-designator', '&optional', [error, t]]
 
 
-set_symbol_value_if_missing(Env, Var, In, G, Thru):- var(In),!,G,set_symbol_value(Env,Var,Thru).
-set_symbol_value_if_missing(Env, Var, In, _, Thru):- set_symbol_value(Env,Var,In),!,In=Thru.
+set_symbol_value_if_missing(Env, Var, In, G, Thru):- var(In),!,G,set_var(Env,Var,Thru).
+set_symbol_value_if_missing(Env, Var, In, _, Thru):- set_var(Env,Var,In),!,In=Thru.
 
 simple_atom_var(Atom):- atom(Atom), Atom\=nil,Atom\=[], \+ arg(_, v('&optional', '&key', '&aux', '&rest', '&body', '&environment'),Atom).
 

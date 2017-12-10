@@ -207,20 +207,16 @@ is_lisp_package(P):- package_name(P,_).
 :- dynamic package_external_symbols/3.
 :- dynamic package_internal_symbols/3.
 
-package_name(pkg_cl,"COMMON-LISP").
+package_name(pkg_kw,"KEYWORD").
+package_name(pkg_prolog,"PROLOG").
 package_name(pkg_user,"COMMON-LISP-USER").
-package_name(pkg_tl,"TOP-LEVEL").
-package_name(pkg_debug,"DEBUG").
-package_name(pkg_charset,"CHARSET").
+package_name(pkg_cl,"COMMON-LISP").
 package_name(pkg_clos,"CLOS").
 package_name(pkg_custom,"CUSTOM").
+package_name(pkg_debug,"DEBUG").
 package_name(pkg_ext,"EXTENSIONS").
 package_name(pkg_ffi,"FFI").
 package_name(pkg_format,"FORMAT").
-package_name(pkg_gray,"GRAY").
-package_name(pkg_gstream,"GSTREAM").
-package_name(pkg_i18n,"I18N").
-package_name(pkg_kw,"KEYWORD").
 package_name(pkg_loop,"LOOP").
 package_name(pkg_os,"POSIX").
 package_name(pkg_precompiler,"PRECOMPILER").
@@ -232,8 +228,12 @@ package_name(pkg_sequence,"SEQUENCE").
 package_name(pkg_socket,"SOCKET").
 package_name(pkg_sys,"SYSTEM").
 package_name(pkg_threads,"THREADS").
+package_name(pkg_tl,"TOP-LEVEL").
 package_name(pkg_xp,"XP").
-
+package_name(pkg_charset,"CHARSET").
+package_name(pkg_gray,"GRAY").
+package_name(pkg_gstream,"GSTREAM").
+package_name(pkg_i18n,"I18N").
 package_name(pkg_java,"JAVA").
 package_name(pkg_jvm,"JVM").
 
@@ -246,27 +246,51 @@ package_nicknames(pkg_user, "U").
 package_nicknames(pkg_user, "USER").
 package_nicknames(pkg_user, "CL-USER").
 package_nicknames(pkg_user, "EMACS-CL-USER").
-package_nicknames(pkg_tl, "TPL").
 package_nicknames(pkg_ext, "EXT").
-package_nicknames(pkg_os, "OS").
-package_nicknames(pkg_clos, "MOP").
-package_nicknames(pkg_precompiler, "PRE").
-package_nicknames(pkg_profiler, "PROF").
+package_nicknames(pkg_prolog, "P").
+package_nicknames(pkg_prolog, "INT").
 package_nicknames(pkg_sys, "SYS").
 package_nicknames(pkg_sys, "WAM-CL").
+package_nicknames(pkg_os, "OS").
+package_nicknames(pkg_clos, "MOP").
+package_nicknames(pkg_tl, "TPL").
+package_nicknames(pkg_precompiler, "PRE").
+package_nicknames(pkg_profiler, "PROF").
+
+
 
 :- decl_mapped_opv(claz_package,[nicknames=package_nicknames]).
 
-package_use_list(pkg_cl, pkg_clos).
-package_use_list(pkg_user, pkg_cl).
-package_use_list(pkg_user, pkg_ext).
-package_use_list(pkg_user, pkg_java).
-package_use_list(pkg_user, pkg_clos).
-package_use_list(pkg_tl, pkg_cl).
-package_use_list(pkg_tl, pkg_ext).
+%package_use_list(pkg_cl, pkg_clos).
+
+
+package_use_list(pkg_cl, pkg_ext).
+package_use_list(pkg_cl, pkg_prolog).
+package_use_list(pkg_cl, pkg_sys).
+
 package_use_list(pkg_clos, pkg_cl).
 package_use_list(pkg_clos, pkg_ext).
+package_use_list(pkg_clos, pkg_prolog).
 package_use_list(pkg_clos, pkg_sys).
+
+package_use_list(pkg_prolog, pkg_cl).
+package_use_list(pkg_prolog, pkg_clos).
+package_use_list(pkg_prolog, pkg_ext).
+package_use_list(pkg_prolog, pkg_sys).
+
+package_use_list(pkg_sys, pkg_cl).
+package_use_list(pkg_sys, pkg_ext).
+package_use_list(pkg_sys, pkg_prolog).
+
+package_use_list(pkg_user, pkg_cl).
+package_use_list(pkg_user, pkg_clos).
+package_use_list(pkg_user, pkg_ext).
+package_use_list(pkg_user, pkg_prolog).
+package_use_list(pkg_user, pkg_sys).
+
+package_use_list(pkg_tl, pkg_cl).
+package_use_list(pkg_tl, pkg_ext).
+
 package_use_list(pkg_ext, pkg_cl).
 package_use_list(pkg_ext, pkg_custom).
 package_use_list(pkg_ext, pkg_gray).
@@ -279,14 +303,14 @@ package_use_list(pkg_ffi, pkg_cl).
 package_use_list(pkg_ffi, pkg_ext).
 package_use_list(pkg_format, pkg_cl).
 package_use_list(pkg_format, pkg_ext).
-package_use_list(pkg_java, pkg_cl).
-package_use_list(pkg_java, pkg_ext).
+
 package_use_list(pkg_jvm, pkg_cl).
 package_use_list(pkg_jvm, pkg_ext).
 package_use_list(pkg_jvm, pkg_sys).
-package_use_list(pkg_lisp, pkg_cl).
-package_use_list(pkg_lisp, pkg_ext).
-package_use_list(pkg_lisp, pkg_sys).
+package_use_list(pkg_java, pkg_cl).
+package_use_list(pkg_java, pkg_ext).
+package_use_list(pkg_java, pkg_sys).
+
 package_use_list(pkg_loop, pkg_cl).
 package_use_list(pkg_os, pkg_cl).
 package_use_list(pkg_os, pkg_ext).
@@ -302,8 +326,6 @@ package_use_list(pkg_regexp, pkg_cl).
 package_use_list(pkg_screen, pkg_cl).
 package_use_list(pkg_screen, pkg_ext).
 package_use_list(pkg_sequence, pkg_cl).
-package_use_list(pkg_sys, pkg_cl).
-package_use_list(pkg_sys, pkg_ext).
 package_use_list(pkg_threads, pkg_cl).
 package_use_list(pkg_threads, pkg_ext).
 package_use_list(pkg_threads, pkg_sys).

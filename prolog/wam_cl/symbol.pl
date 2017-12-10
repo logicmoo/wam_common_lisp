@@ -122,7 +122,7 @@ cl_get(Symbol,Prop,Optionals,Value):- assertion(is_symbolp(Symbol)),
 f_u_put(Symbol,Prop,Value,Ret):- 
   assertion(is_symbolp(Symbol)), 
   cl_symbol_plist(Symbol,PList),
- rtrace(((set_plist_value(Ret,PList,Prop,Value)
+  (((set_plist_value(Ret,PList,Prop,Value)
       ->true; 
    (Ret=Value, set_opv(Symbol,plist,[Prop,Value|PList]))))),!.
 f_sys_put(Symbol,Prop,Value,Ret):- f_u_put(Symbol,Prop,Value,Ret).

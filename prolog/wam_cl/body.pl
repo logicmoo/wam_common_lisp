@@ -213,22 +213,57 @@ compile_body(Ctx,Env,Result,[prog2,Form1,Form2|FormS],Code):- !,
 % `, Backquoted commas
 compile_body(_Cx,Env,Result,['#BQ',Form], Code):-!,compile_bq(Env,Result,Form,Code),!.
 compile_body(_Cx,Env,Result,['`',Form], Code):-!,compile_bq(Env,Result,Form,Code),!.
+compile_body(Ctx,Env,Result,['#COMMA',Form], (Code,cl_eval(CommaResult,Result))):-!,compile_body(Ctx,Env,CommaResult,Form,Code),!.
+compile_body(Ctx,Env,Result,['#BQ-COMMA-ELIPSE',Form], (Code,cl_eval(CommaResult,Result))):- dump_trace_lisp,!,compile_body(Ctx,Env,CommaResult,Form,Code),!.
+
 
 % #+
 compile_body(Ctx,Env,Result,[OP,Flag,Form|MORE], Code):- same_symbol(OP,'#+'),!, 
-   always(( symbol_value(xx_features_xx,FEATURES),
+   always(( get_var(xx_features_xx,FEATURES),
           ( member(Flag,FEATURES) -> must_compile_body(Ctx,Env,Result,Form, Code) ; compile_body(Ctx,Env,Result,MORE, Code)))).
   
 % #-
 compile_body(Ctx,Env,Result,[OP,Flag,Form|MORE], Code):- same_symbol(OP,'#-'),!,
-   always(( symbol_value(xx_features_xx,FEATURES),
+   always(( get_var(xx_features_xx,FEATURES),
           ( \+ member(Flag,FEATURES) -> must_compile_body(Ctx,Env,Result,Form, Code) ; 
              compile_body(Ctx,Env,Result,MORE, Code)))).
 
 % EVAL-WHEN
+compile_body(Ctx,Env,Result,[OP,Flags,Forms], OutCode):-  same_symbol(OP,'eval-when'), !,
+  (is_when(Flags) ->
+    (must_compile_body(Ctx,Env,Result,[progn,Forms],Code),OutCode = do_when(Flags,Code,Result));
+    (Result=[],OutCode=wdmsg(skipping([OP,Flags,Forms])))).
+
+do_when(Flags,Code,Result):- 
+   (is_when(Flags) -> locally_let(sym('sys::*compiler-mode*')=sym(':execute'),Code);Result=[]).
+
+% assuem always true (debugging) 
+compile_body(Ctx,Env,Result,[OP,_Flags|Forms], Code):-   same_symbol(OP,'eval-when'), !,must_compile_body(Ctx,Env,Result,[progn,Forms],Code).
+
+% Maybe later we'll try something simular?
 compile_body(Ctx,Env,Result,[OP,Flags|Forms], Code):-  same_symbol(OP,'eval-when'), !,
- always(((member(X,Flags),is_when(X) )
-  -> must_compile_body(Ctx,Env,Result,[progn|Forms], Code) ; (Result=[];Code = true))).
+ always((
+ (member(X,Flags),is_when(X))
+  -> must_compile_body(Ctx,Env,Result,
+    [let,[[sys_xx_compiler_mode_xx,sys_xx_compiler_mode_xx]],
+     [progn,[sys_removef_list_value,sys_xx_compiler_mode_xx,kw_compile_toplevel],
+            [sys_insertf_list_value,sys_xx_compiler_mode_xx,kw_execute]|Forms]],Code)
+   ; (Result=[],Code = true))).
+
+f_sys_removef_list_value(Symbol,Value,New):- get_var(Symbol,Was),delete(Was,Value,New),set_var(Symbol,New).
+f_sys_insertf_list_value(Symbol,Value,New):- get_var(Symbol,Was),list_to_set([Value|Was],New),set_var(Symbol,New).
+% COMPILE-TOPLEVEL LOAD-TOPLEVEL EXECUTE
+is_when(List):- is_list(List),!,member(KW,List),is_when(KW).
+is_when(kw_eval):- !,is_when(kw_execute).
+is_when(kw_compile):- !,is_when(kw_compile_toplevel).
+is_when(kw_load):- !,is_when(kw_load_toplevel).
+%is_when(X):- dbmsg(warn(free_pass(is_when(X)))).
+is_when(X):- get_var(sys_xx_compiler_mode_xx,List),
+  (is_list(List)->memberchk(X,List);X=List).
+
+
+% makes  sys_xx_compiler_mode_xx 
+wl:interned_eval("(defparameter sys:*compiler-mode* :execute)").
 
 
 compile_body(Ctx,Env,Result, Body, Code):- 
@@ -239,9 +274,6 @@ compile_body(Ctx,Env,Result, Body, Code):-
 compile_body(Ctx,Env,Result,['eval',Form1],
   (Body1,cl_eval(Result1,Result))):- !,
    must_compile_body(Ctx,Env,Result1,Form1, Body1).
-
-% COMPILE-TOPLEVEL LOAD-TOPLEVEL EXECUTE
-is_when(X):- dbmsg(warn(free_pass(is_when(X)))).
 
 
 must_compile_test_body(Ctx,Env,TestResult,Test,TestBody,TestResultBody):-
@@ -536,13 +568,13 @@ setq_values(Env,Vars):- nb_current('$mv_return',Values),setq_values(Env,Vars,Val
 setq_values(_Env,_,[]):-!.
 setq_values(_Env,[],_):-!.
 setq_values(Env,[Var|Vars],[Val|Values]):-
-   set_symbol_value(Env,Var,Val),
+   set_var(Env,Var,Val),
    setq_values(Env,Vars,Values).
 
 f_sys_set_symbol_value(Var,Val):-
   set_opv(Var,value,Val).
 %  env_current(Env),
-  %set_symbol_value(Env,Var,Val).
+  %set_var(Env,Var,Val).
 
 %   zip_with(Xs, Ys, Pred, Zs)
 %   is true if Pred(X, Y, Z) is true for all X, Y, Z.

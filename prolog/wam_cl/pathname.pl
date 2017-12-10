@@ -33,7 +33,7 @@ make_pathanme(Pathname,'$OBJ'(claz_pathname,Pathname)).
 pl_compiled_filename(Obj,PL):- to_prolog_string(Obj,M),pl_compiled_filename0(M,PL).
 pl_compiled_filename0(Obj,PL):- compound(Obj),arg(2,Obj,From),string(From),
    search_for(From,File),pl_compiled_filename(File,PL),!.
-pl_compiled_filename0(File,PL):- symbol_value(sys_xx_compile_file_type_xx,Ext),
+pl_compiled_filename0(File,PL):- get_var(sys_xx_compile_file_type_xx,Ext),
    search_for(File,Found),atomic_list_concat([Found,Ext],'.',PL),exists_file(PL),!.
 
 

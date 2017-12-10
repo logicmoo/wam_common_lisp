@@ -150,8 +150,8 @@ conjoin_0(clean_escape(_),_,true):- trace,!.
 conjoin_0((clean_escape(_),_),_,true):- trace.
 conjoin_0((C1,clean_escape(_)),_,C3):- trace,visit_lit(C1,C3).
 conjoin_0(C1,(clean_escape(_),_),C3):- trace,visit_lit(C1,C3).
-conjoin_0(symbol_value(ReplEnv, Var, Value),symbol_value(ReplEnv, Var, Value),
-           symbol_value(ReplEnv, Var, Value)).
+conjoin_0(get_var(ReplEnv, Var, Value),get_var(ReplEnv, Var, Value),
+           get_var(ReplEnv, Var, Value)).
 conjoin_0((C1,C1O),C2,(C1,AAB)):-!, 
   conjoin_0(C1O,C2,AAB).
 conjoin_0(C1,C2,(C11,C21)):- !,visit_lit(C1,C11),!,visit_lit(C2,C21).
@@ -199,7 +199,7 @@ mize_body_1e(_Ctx,_F,(A==B),true):- A==B,!.
 mize_body_1e(_Ctx,_,cl_list(G, R),R=G).
 mize_body_1e(_Ctx,_,C1,L=[R]):- structure_applies(C1 , (L=[R, []])). % lisp_compiler_option(elim_vars,true).
 mize_body_1e(Ctx,F,(C1,C2),CodeJoined):-!,mize_body1(Ctx,F,C1,C1O),mize_body1(Ctx,F,C2,C2O),conjoin_0(C1O,C2O,CodeJoined).
-mize_body_1e(Ctx,_,symbol_value(_Env, Sym, Sym_Get),true):- 
+mize_body_1e(Ctx,_,get_var(_Env, Sym, Sym_Get),true):- 
   % lisp_compiler_option(safe(elim_symbolvalues_vars),true),  
   get_var_tracker(Ctx,Sym,Dict),
   Dict.w=1, % ;Dict.p==1,
@@ -352,11 +352,11 @@ never_inline(P):- predicate_property(P,foreign).
 never_inline(P):- predicate_property(P,imported_from(system)).
 never_inline(P):- predicate_property(P,number_of_clauses(N)),N==0.
 never_inline(P):- compound(P),functor(P,F,A),never_inline_fa(F,A).
-never_inline_fa(place_op,_).
+never_inline_fa(set_place,_).
 never_inline_fa(F,_):- atom_concat_or_rtrace(_,' tabled',F).
 never_inline_fa(F,_):- atom_concat_or_rtrace('cl_',_,F).
 never_inline_fa(start_tabling,_).
-never_inline_fa(symbol_value,_).
+never_inline_fa(get_var,_).
 never_inline_fa(f_sys_set_symbol_value,_).
 never_inline_fa(get_opv,_).
 never_inline_fa(member,_).

@@ -25,13 +25,19 @@ value_or([],Value,Value).
 %place_op(Env,PlOP,Obj,Value,Result):- var(Env),ensure_env(Env), \+ var(Env),!, place_op(Env,PlOP,Obj,Value,Result).
 
 to_place([value,Obj],Obj,value):-!.
+to_place([symbol_value,Obj],Obj,value):-!.
 to_place([slot_value,Obj,Place],Obj,Place):-!.
+to_place([aref,Obj|Index],Obj,[aref|Index]):-!.
 to_place([Place,Obj],Obj,Place):-!.
 to_place([Place,Obj|Args],Obj,[Place|Args]):-!.
-to_place([Obj],Obj,value):-!.
+%to_place([Obj],Obj,value):-!.
 to_place(Obj,Obj,value).
 
-place_op(Env, Oper, Obj, Value,  Result):-
+get_place(Env, Oper, Obj, Value,  Result):-
+  always(to_place(Obj,RObj,Place)),!,
+    always(place_op(Env, Oper, RObj, Place, Value,  Result)).
+
+set_place(Env, Oper, Obj, Value,  Result):-
   always(to_place(Obj,RObj,Place)),!,
     always(place_op(Env, Oper, RObj, Place, Value,  Result)).
 
@@ -49,7 +55,7 @@ place_op(Env,incf, Obj, Place, LV,  Result):- value_or(LV,Value,1),!,
 
 place_op(Env,decf, Obj, Place, LV,  Result):- value_or(LV,Value,1),!,
    get_place_value(Env, Obj, Place, Old),
-   Result is Old+ Value,
+   Result is Old- Value,
    set_place_value(Env, Obj, Place, Result).
 
 place_op(Env,pop, Obj, Place, [],  Result):- 
@@ -68,16 +74,15 @@ place_extract([Value,Place],[Value],Place).
 place_extract([Place],[],Place).
 place_extract([Value|Place],Value,Place).
 
- 
-get_place_value(Env, Obj, value, Value):- atom(Obj),!,get_symbol_value(Env,Obj,Value).
-get_place_value(_Env, Obj, Place, Value):- get_opv(Obj, Place, Value).
 get_place_value(_,[H|_],car,H).
 get_place_value(_,[_|T],cdr,T).
+get_place_value(Env, Obj, value, Value):- atom(Obj),!,get_symbol_value(Env,Obj,Value).
+get_place_value(_Env, Obj, Place, Value):- get_opv(Obj, Place, Value).
 
-set_place_value(Env, Obj, value, Value):- atom(Obj),!,set_symbol_value(Env,Obj,Value).
+set_place_value(_,Cons,car,H):- is_consp(Cons),!, cl_rplaca(Cons,H,_).
+set_place_value(_,Cons,cdr,T):- is_consp(Cons),!, cl_rplacd(Cons,T,_).
+set_place_value(Env, Obj, value, Value):- atom(Obj),!,set_var(Env,Obj,Value).
 set_place_value(_Env, Obj, Place, Value):- set_opv(Obj, Place, Value).
-set_place_value(_,Cons,car,H):- cl_rplaca(Cons,H,_).
-set_place_value(_,Cons,cdr,T):- cl_rplacd(Cons,T,_).
 
 
 %with_place_value(Env,OPR,Obj,Place, Value):-!, type_or_class_nameof(Obj,Type),with_place_value(Env,OPR,Obj,Type,Place,Value).

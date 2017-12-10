@@ -93,8 +93,8 @@ compute_new_address(TB,Label,Pred):- always(atomic_list_concat([TB,Label],'_',Pr
  addr_tagbody_1_u_point_b(ENV) :-
        cl_print("(incf val 08)", _Print_Ret10),
        trace,
-       place_op(ENV, incf, u_val, [8], _Incf_Ret11),
-       symbol_value(ENV, u_val, U_Val_Res),
+       set_place(ENV, incf, u_val, [8], _Incf_Ret11),
+       get_var(ENV, u_val, U_Val_Res),
        cl_print(U_Val_Res, U_Val_Res),
        addr_tagbody_1_u_point_a(ENV).
 
@@ -400,29 +400,29 @@ USER>
 
 
  addr_tagbody_1_addr_enter_1(ENV) :-
-       symbol_setter(ENV, setq, u_val, 1),
+       set_var(ENV, setq, u_val, 1),
        addr_tagbody_1_u_point_a(ENV).
 
  addr_tagbody_1_u_point_c(ENV) :-
-       place_op(ENV, incf, u_val, [4], _Incf_R),
+       set_place(ENV, incf, u_val, [4], _Incf_R),
        addr_tagbody_1_u_point_b(ENV).
 
  addr_tagbody_1_u_point_a(ENV) :-
        push_label(u_point_u, addr_tagbody_1, []),
-       place_op(ENV, incf, u_val, [2], _Incf_R5),
+       set_place(ENV, incf, u_val, [2], _Incf_R5),
        addr_tagbody_1_u_point_c(ENV).
 
  addr_tagbody_1_u_point_u(ENV) :-
-       place_op(ENV, incf, u_val, [2], _Incf_R8),
+       set_place(ENV, incf, u_val, [2], _Incf_R8),
        addr_tagbody_1_u_point_c(ENV).
 
  addr_tagbody_1_u_point_b(ENV) :-
-       place_op(ENV, incf, u_val, [8], _Incf_R3).
+       set_place(ENV, incf, u_val, [8], _Incf_R3).
 
 
  :- TOPEnv=[[bv(u_val, [[]|_1330])]|toplevel],
    addr_tagbody_1_addr_enter_1(TOPEnv),
-   symbol_value(TOPEnv, u_val, U_val_Get).
+   get_var(TOPEnv, u_val, U_val_Get).
 
 |#
 15

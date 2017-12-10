@@ -37,7 +37,7 @@ get_var_tracker(Ctx0,Atom,Dict):-  get_attr(Ctx0,tracker,Ctx),Dict=rw{name:Atom,
 locally_let([N=V|More],G):- castify(V,Value),V\==Value,!,locally_let([N=Value|More],G).
 locally_let([N=V|More],G):- castify(N,Symbol),N\==Symbol,!,locally_let([Symbol=V|More],G).
 locally_let([N=V|More],G):- 
- always(symbol_value(N,Was)),
+ always(get_var(N,Was)),
   setup_call_cleanup(
      f_sys_set_symbol_value(N,V),
      %once(locally($(N)=V,..)),
@@ -82,7 +82,7 @@ compile_assigns(Ctx,Env,Result,[Getf|ValuePlace], Body):- is_place_op_verbatum(G
         place_extract(ValuePlace,Value,Place),
         extract_var_atom(Place,RVar),
         (is_only_read_op(Getf)->rw_add(Ctx,RVar,r);rw_add(Ctx,RVar,w)),
-        Body = (place_op(Env,Getf, Place, Value, Result)).
+        Body = (set_place(Env,Getf, Place, Value, Result)).
 
 compile_assigns(Ctx,Env,Result,[Getf, Var| ValuesForms], Body):- is_place_op(Getf),     
 	must_maplist(expand_ctx_env_forms(Ctx,Env),ValuesForms, ValuesBody,ResultVs),
@@ -92,7 +92,7 @@ compile_assigns(Ctx,Env,Result,[Getf, Var| ValuesForms], Body):- is_place_op(Get
         extract_var_atom(Var,RVar),
         compile_place(Ctx,Env,UsedVar,Var,Code),
         (Var\==RVar -> rw_add(Ctx,RVar,r) ; (is_only_read_op(Getf)->rw_add(Ctx,RVar,r);rw_add(Ctx,RVar,w))),
-        Body = (BodyS,Code,place_op(Env,Getf, UsedVar, ResultVs,Result)).
+        Body = (BodyS,Code,set_place(Env,Getf, UsedVar, ResultVs,Result)).
 
 compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, StringL], (Code,Body)):- 
         is_stringp(StringL),to_prolog_string(StringL,String),is_def_maybe_docs(SetQ),
@@ -106,7 +106,7 @@ compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm], Body):- is_symbol_setter(
         !,	
 	must_compile_body(Ctx,Env,ResultV,ValueForm, ValueBody),
         ((op_return_type(SetQ,RT),RT=name) ->  =(Var,Result) ; =(ResultV,Result)),
-        Body = (ValueBody, symbol_setter(Env,SetQ, Var, ResultV)).
+        Body = (ValueBody, set_var(Env,SetQ, Var, ResultV)).
 
 
 % catches an internal error in this compiler 
@@ -119,7 +119,7 @@ compile_symbol_getter(Ctx,Env,Value, Var, Body):-  must(atom(Var)),!,
         add_tracked_var(Ctx,Var,Value),
         rw_add(Ctx,Var,r),
         debug_var('Env',Env),
-        Body = symbol_value(Env, Var, Value).   
+        Body = get_var(Env, Var, Value).   
 
 % compile_place(Ctx,Env,Result,Var,Code).
 compile_place(_Ctx,_Env,[value,Var],Var,true):- \+ is_list(Var),!.
@@ -144,12 +144,12 @@ extract_variable_value([Val|Vals], FoundVal, Hole):-
 	;	extract_variable_value(Vals, FoundVal, Hole).
 
 
-bind_dynamic_value(Env,Var,Result):- set_symbol_value(Env,Var,Result).
+bind_dynamic_value(Env,Var,Result):- set_var(Env,Var,Result).
 
-get_symbol_value(Env,Obj,Value):- symbol_value(Env,Obj,Value).
+get_symbol_value(Env,Obj,Value):- get_var(Env,Obj,Value).
 
-symbol_value(Var,Value):- env_current(Env), symbol_value(Env,Var,Value).
-symbol_value(Env,Var,Value):-
+get_var(Var,Value):- env_current(Env), get_var(Env,Var,Value).
+get_var(Env,Var,Value):-
   symbol_value_or(Env,Var,
     symbol_value_error(Env,Var,Value),Value).
 
@@ -161,7 +161,7 @@ symbol_value0(Env,Var,Value):-  bvof(bv(Var, Value),_,Env).
 symbol_value0(_Env,Var,_Value):- notrace((nonvar(Var),is_functionp(Var),wdmsg(is_functionp(Var)))),!,lisp_dump_break.
 symbol_value0(_Env,Var,Result):- get_opv(Var, value, Result),!.
 symbol_value0(_Env,Var,Result):- atom(Var),get_opv(Var,value,Result),!.
-symbol_value0(Env,[Place,Obj],Result):- place_op(Env,getf,[Place,Obj],[],Result).
+symbol_value0(Env,[Place,Obj],Result):- set_place(Env,getf,[Place,Obj],[],Result).
 
 
 symbol_value_error(_Env,Var,_Result):- lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Var).
@@ -175,9 +175,9 @@ bvof(E,M,[L|L2]):- ((nonvar(L),bvof(E,M,L))->true;(nonvar(L2),bvof(E,M,L2))).
 
 
 
-set_symbol_value(Env,Var,Result):-var(Result),!,symbol_value(Env,Var,Result).
+set_var(Env,Var,Result):-var(Result),!,get_var(Env,Var,Result).
 
-set_symbol_value(Env,Var,Result):- ensure_env(Env),!,
+set_var(Env,Var,Result):- ensure_env(Env),!,
      (bvof(bv(Var,_),BV,Env)
       -> nb_setarg(2,BV,Result)
       ;	( 
@@ -195,7 +195,7 @@ set_symbol_value_last_chance(_Env,Var,_Result):-
 
 
 env_sym_arg_val(Env,Var,InValue,Value):-
-  set_symbol_value(Env,Var,InValue),
+  set_var(Env,Var,InValue),
   Value=InValue,!.
 
 env_sym_arg_val(Env,Var,InValue,Value):- !,
@@ -203,23 +203,23 @@ env_sym_arg_val(Env,Var,InValue,Value):- !,
     lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Var).
 
 %TODO Make it a constantp
-symbol_setter(Env,defconstant, Var, Result):- 
-   set_symbol_value(Env,Var,Result),
+set_var(Env,defconstant, Var, Result):- 
+   set_var(Env,Var,Result),
    set_opv(Var,declared_as,defconstant).
-symbol_setter(Env,defconst, Var, Result):- 
-  symbol_setter(Env,defconstant, Var, Result).
+set_var(Env,defconst, Var, Result):- 
+  set_var(Env,defconstant, Var, Result).
 
-symbol_setter(Env,defparameter, Var, Result):- 
+set_var(Env,defparameter, Var, Result):- 
    set_opv(Var,declared_as,defparameter),
-   set_symbol_value(Env,Var,Result).
+   set_var(Env,Var,Result).
 
-symbol_setter(_Env,defvar, Var, Result):-   
+set_var(_Env,defvar, Var, Result):-   
    (get_opv(Var, value, _) -> true ; update_opv(Var, value, Result)),
    set_opv(Var,declared_as,defvar).
 
-symbol_setter(Env,setq, Var, Result):- !, set_symbol_value(Env,Var,Result).
+set_var(Env,setq, Var, Result):- !, set_var(Env,Var,Result).
 
-symbol_setter(Env,psetq, Var, Result):- !, symbol_setter(Env,setq, Var, Result).
+set_var(Env,psetq, Var, Result):- !, set_var(Env,setq, Var, Result).
 
 
 is_symbol_setter(_Env,OP):- is_pair_op(OP).
@@ -265,7 +265,7 @@ pairify([],[],[]).
 pairify([Var, ValueForm | Rest],[Var | Atoms],[ValueForm | Forms]):-
    pairify(Rest,Atoms,Forms).
 
-set_with_prolog_var(Ctx,Env,SetQ,Var,Result,symbol_setter(Env,SetQ, Var, Result)):-
+set_with_prolog_var(Ctx,Env,SetQ,Var,Result,set_var(Env,SetQ, Var, Result)):-
   rw_add(Ctx,Var,w).
 
 expand_ctx_env_forms(Ctx, Env,Forms,Body, Result):- 
