@@ -18,6 +18,8 @@
 ;; not charge a fee for this document or for its distribution.
 |#
 
+(load "wam-cl-init")
+
 (in-package "CL-USER")
 
 #+WAM-CL (prolog-call "cls.")
