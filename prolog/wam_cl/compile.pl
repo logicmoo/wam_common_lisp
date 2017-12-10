@@ -144,22 +144,30 @@ must_compile_progn(Ctx,Env,Result,FormsIn, PreviousResult, Body):-
   maybe_debug_var('_rPrevRes',PreviousResult),
   maybe_debug_var('_rForms',Forms),
   maybe_debug_var('_rBody',Body))),
-  resolve_reader_macros(FormsIn,Forms),!,
-   always(compile_progn(Ctx,Env,Result,Forms, PreviousResult,Body0)),
-   notrace((sanitize_true(Ctx,Body0,Body))).
+  quietly(resolve_reader_macros(FormsIn,Forms)),!,
+   always(((compile_progn(Ctx,Env,Result,Forms,PreviousResult,Body0),nonvar(Body0)))),
+   quietly((sanitize_true(Ctx,Body0,Body))).
 
 compile_progn(_Cx,_Ev,Result,Var,_PreviousResult,Out):- notrace(is_ftVar(Var)),!,Out=cl_eval([progn|Var],Result).
 compile_progn(_Cx,_Ev,Result,[], PreviousResult,true):-!, PreviousResult = Result.
-compile_progn(Ctx,Env,Result,[Form | Forms], _PreviousResult, Body):-  !,
-   %locally(
-     %local_override('$compiler_PreviousResult',the(PreviousResult)),
-	must_compile_body(Ctx,Env,FormResult, Form,FormBody), %),
+compile_progn(Ctx,Env,Result,[Form | Forms], PreviousResult, Body):-  !,
+	must_compile_progbody(Ctx,Env,FormResult, Form,PreviousResult,FormBody),
 	must_compile_progn(Ctx,Env,Result, Forms, FormResult, FormSBody),
         Body = (FormBody,FormSBody).
-compile_progn(Ctx,Env,Result, Form , _PreviousResult, Body):-
+compile_progn(Ctx,Env,Result, Form , PreviousResult, Body):-
         % locally(
   % local_override('$compiler_PreviousResult',the(PreviousResult)),
-	     must_compile_body(Ctx,Env,Result,Form, Body).
+       must_compile_progbody(Ctx,Env,Result,Form,PreviousResult, Body).
+
+
+% Compiler Plugin
+must_compile_progbody(Ctx,Env,Result,Form,PreviousResult,FormBody):-  
+	shared_lisp_compiler:plugin_expand_progbody(Ctx,Env,Result,Form,PreviousResult,FormBody),!.
+must_compile_progbody(Ctx,Env,Result,Form,_PreviousResult,FormBody):-
+        % locally(
+  % local_override('$compiler_PreviousResult',the(PreviousResult)),
+	must_compile_body(Ctx,Env,Result,Form,FormBody).
+        %).
 
 
 

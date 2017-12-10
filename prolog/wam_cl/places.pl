@@ -18,7 +18,8 @@
 :- ensure_loaded((utils_for_swi)).
 
 value_or([Value],Value,_):- !.
-value_or([],Value,Value).
+value_or([],Value,Value):- !.
+value_or([Value],Value,_).
                                   
 %place_op(Env,PlOP,[Place,Obj],[],Result):- place_op(Env,PlOP,Obj,[Place],Result).
 

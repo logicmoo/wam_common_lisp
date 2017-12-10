@@ -33,7 +33,7 @@ macroexpand_all(LispCode,MacroEnv,Result):-
 
 macroexpand_1_or_fail([Procedure|Arguments],MacroEnv,CompileBody0Result):- nonvar(Procedure),
    debug_var('MacroEnvArgs',MacroEnv),
-   user:macro_lambda(defmacro(Procedure),_FProcedure, FormalParams, LambdaExpression,_),!,
+   get_lambda_def(defmacro,Procedure, FormalParams, LambdaExpression),!,
    always((debug_var('EnvThru',EnvThru),debug_var('NewEnv',NewEnv),
    debug_var('Env',Env),debug_var('NextEnv',NextEnv),debug_var('CommaResult',CommaResult),
    must_bind_parameters(NewEnv, FormalParams, Arguments,EnvThru,BindCode),!,

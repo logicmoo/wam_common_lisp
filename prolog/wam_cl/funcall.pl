@@ -48,15 +48,16 @@ apply_c(EnvIn,closure(ClosureEnvironment,ClosureResult,FormalParams,ClosureBody)
 	closure([ClosureEnvironment|EnvIn],ClosureResult,FormalParams,ClosureBody,ActualParams, Result).
     
 apply_c(EnvIn,ProcedureName, ActualParams, Result):-
-	user:macro_lambda(_Scope,ProcedureName,FormalParams, LambdaExpression,[]),!,
+	get_lambda_def(defmacro,ProcedureName,FormalParams, LambdaExpression),!,
 	must_bind_parameters(EnvIn,FormalParams, ActualParams, Env,BinderCode),
         always(BinderCode),
         lisp_env_eval(LambdaExpression, Env, Result),
 	!.
-apply_c(Env,ProcedureName, Args, Result):-
+/*apply_c(Env,ProcedureName, Args, Result):-
 	named_lambda(ProcedureName, LambdaExpression),!,
 	apply_c(Env,LambdaExpression, Args, Result),
 	!.
+*/
 
 apply_c(_,F,ARGS,R):- atom(F),append(ARGS,[R],RARGS),length(RARGS,A),current_predicate(F/A),!,apply(F,RARGS),!.
 apply_c(_,F,ARGS,R):- atom(F),CALL=..[F|ARGS],current_predicate(_,CALL),!,(catch(CALL,E,(dumpST,dmsg(CALL->E),!,fail))->R=t;R=[]).

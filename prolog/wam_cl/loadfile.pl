@@ -166,11 +166,10 @@ do_compile_1file_to_stream(_Keys,File0,Stream):-
   
 
 lisp_compile_to_prolog_output(Stream,PExpression):- 
-  reading_package(Pkg),
   as_sexp(PExpression,Expression),
   % wdmsg(:- lisp_compile_to_prolog(Pkg,Expression)),
   always(with_output_to(Stream,
-    lisp_compile_to_prolog(Pkg,Expression))),!.
+    lisp_compile_to_prolog(Expression))),!.
 
 
 lisp_compile_to_prolog(_,COMMENTP):- is_comment(COMMENTP,String),!,write('/*'),write(String),writeln('*/').
@@ -195,34 +194,34 @@ lisp_compile_to_prolog(PExpression):-
   debug_var('_Ignored',Result))),
   lisp_compile(Result,Expression,PrologCode))),
   dbmsg_real(:- PrologCode),!,
-  lisp_grovel(PrologCode).
+  lisp_grovel(PrologCode),!.
    
+grovel_time_called(do_when).
+grovel_time_called(cl_in_package).
+grovel_time_called(cl_use_package).
+grovel_time_called(set_opv).
+%grovel_time_called(sys_trace).
 
-lisp_grovel(PrologCode):- \+ compound(PrologCode),!.
+lisp_grovel(PrologCode):- ( \+ compound(PrologCode); \+ callable(PrologCode)),!.
 lisp_grovel((A,B)):-!, lisp_grovel(A),lisp_grovel(B).
-lisp_grovel(asserta(PrologCode)):- !, lisp_grovel_assert(PrologCode).
+lisp_grovel(asserta_tracked(T,PrologCode)):- !, lisp_grovel_assert(T,PrologCode).
 lisp_grovel(assertz(PrologCode)):- !, lisp_grovel_assert(PrologCode).
+lisp_grovel(asserta(PrologCode)):- !, lisp_grovel_assert(PrologCode).
+lisp_grovel(assert_if_new(PrologCode)):- !, lisp_grovel_assert(PrologCode).
 lisp_grovel(assert(PrologCode)):- !, lisp_grovel_assert(PrologCode).
-lisp_grovel(cl_in_package(Into, Package)):- nonvar(Into),!, cl_in_package(Into, Package).
-lisp_grovel(cl_use_package(Package, Load_Ret)):- nonvar(Package),!, cl_use_package(Package, Load_Ret).
+lisp_grovel(PAB):- PAB=..[F,A|_],grovel_time_called(F),!,(var(A)-> true;call(PAB)),!.
+%lisp_grovel(PAB):- grovel_time_called(PAB)->always(PAB);true.
 %lisp_grovel(cl_load(File,Keys,Load_Ret)):- !, cl_compile_file(File,Keys,Load_Ret).
 %lisp_grovel(cl_compile_file(File,Keys,Load_Ret)):- !, cl_compile_file(File,Keys,Load_Ret).
 lisp_grovel(_).
 
-lisp_grovel_assert(MP):- compound(MP),strip_module(MP,_,P),functor(P,F,_),
-  arg(_, v(doc_string,macro_lambda,function_lambda,arglist_info),F),!,
-  show_call_trace(asserta(MP)).
-lisp_grovel_assert(_).
-
-/*
-lisp_grovel(MP):- strip_module(MP,_,P),functor(P,F,_),arg(_,
-  v(doc_string,macro_lambda,function_lambda,arglist_info),F),!,
-  asserta(MP),
-  write_trans(MP).
-lisp_grovel(MP):- write_trans(MP).
-   
+lisp_grovel_assert(T,MP):- compound(MP),strip_module(MP,_,P),functor(P,F,_),
+  arg(_, v(doc_string,macro_lambda,function_lambda,lambda_def,arglist_info),F),!,
+  show_call_trace(asserta_tracked(T,MP)).
+lisp_grovel_assert(_,_).
+lisp_grovel_assert(T):-assert(T).
    %*compile-file-truename*
-*/
+
 
 cl_load(L,T):- cl_load(L,[],T).
 :-assertz(wl:arg_lambda_type(req(1),cl_load)).

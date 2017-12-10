@@ -125,7 +125,7 @@ compile_body(Ctx,Env,Result, 's'(Str),  Body):-
 
 % Compiler Plugin
 compile_body(Ctx,Env,Result,InstrS,Code):-
-  shared_lisp_compiler:plugin_expand_function_body(Ctx,Env,Result,InstrS,Code),!.
+  shared_lisp_compiler:plugin_expand_progbody(Ctx,Env,Result,InstrS,_PreviousResult,Code),!.
 
 % PROGN
 compile_body(Ctx,Env,Result,[progn|Forms], Body):- !, must_compile_progn(Ctx,Env,Result,Forms,[],Body).
@@ -559,7 +559,11 @@ compile_body(_Ctx,_Env,[],['values'], nb_setval('$mv_return',[])):-!.
 
 % Macro MULTIPLE-VALUE-BIND
 compile_body(Ctx,Env,Result,[OP,Vars,Eval1|ProgN], Body):- same_symbol(OP,'multiple-value-bind'),
-  must_compile_body(Ctx,Env,Result,[let,Vars,[progn,Eval1,['setqvalues',Vars]|ProgN]],Body).
+  %maplist(maybe_special_letvars,VarNames,VarNamesSpecials),
+  must_compile_body(Ctx,Env,Result,[let,Vars,[progn,Eval1,['#setqFromValues',Vars]|ProgN]],Body).
+
+  
+%maybe_special_letvars(Var,[Var,[if,[boundp,[quote,Var]],[get_var,Var],[]] ]).
 
 % Macro MULTIPLE-VALUE-LIST
 compile_body(Ctx,Env,Result,[OP,Eval1], (Body,nb_current('$mv_return',Result))):-
@@ -571,21 +575,22 @@ compile_body(Ctx,Env,Result,[OP,Eval1], (Body,nb_current('$mv_return',Result))):
 % Macro MULTIPLE-VALUE-CALL
 compile_body(Ctx,Env,Result,[OP,Function|Progn], Body):-
   same_symbol(OP,'multiple-value-call'),
-  must_compile_body(Ctx,Env,Result,[progn,[progn|Progn],['apply',Function,['returnvalues']]],Body).
+  must_compile_body(Ctx,Env,Result,[progn,[progn|Progn],['apply',Function,['#returnFomLastValues']]],Body).
 
 % synthetic RETURN-VALUES -> values
-compile_body(_Ctx,_Env,Values,['returnvalues'], nb_current('$mv_return',Values)).
+compile_body(_Ctx,_Env,Values,['#returnFomLastValues'], nb_current('$mv_return',Values)).
 
 % synthetic SETQ-VALUES (vars*)
-compile_body(_Ctx,Env,[],['setqvalues',Vars], setq_values(Env,Vars)):-!.
+compile_body(_Ctx,Env,[],['#setqFromValues',Vars], setq_from_values(Env,Vars)):-!.
 
 
-setq_values(Env,Vars):- nb_current('$mv_return',Values),setq_values(Env,Vars,Values).
-setq_values(_Env,_,[]):-!.
-setq_values(_Env,[],_):-!.
-setq_values(Env,[Var|Vars],[Val|Values]):-
+setq_from_values(Env,Vars):- nb_current('$mv_return',Values),setq_from_values_each(Env,Vars,Values).
+
+setq_from_values_each(_Env,_,[]):- lisp_dump_break,!.
+setq_from_values_each(_Env,[],_):-!.
+setq_from_values_each(Env,[Var|Vars],[Val|Values]):-
    set_var(Env,Var,Val),
-   setq_values(Env,Vars,Values).
+   setq_from_values_each(Env,Vars,Values).
 
 f_sys_set_symbol_value(Var,Val):-
   set_opv(Var,value,Val).

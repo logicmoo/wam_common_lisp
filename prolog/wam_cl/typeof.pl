@@ -41,6 +41,7 @@ i_class(function(_),claz_function).
 i_type(Var,sys_locative):-var(Var).
 i_type([],null):-!.
 i_type([_|_],cons):-!.
+i_type(Obj,Type):- get_opv_i(Obj,dims,List),(List=[N] -> Type = [simple_vector,N]; Type = [array,List]).
 i_type(Obj,Type):- get_opv_i(Obj,typeof,Type).
 i_type(Obj,Type):- get_opv_i(Obj,classof,Class),claz_to_symbol(Class,Type).
 i_type(Dict,Type):- is_dict(Dict,Type).

@@ -46,6 +46,7 @@ compound_starts_with(A,A):-!.
 compound_starts_with((A,_),B):- compound(A),A=B.
 
 skip_type_checks(asserta(_)).
+skip_type_checks(asserta_tracked(_,_)).
 skip_type_checks(assertz(_)).
 skip_type_checks(assert(_)).
 

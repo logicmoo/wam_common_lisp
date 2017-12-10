@@ -47,17 +47,71 @@ loop_1var_n_step([Variable, Form],[bind, Variable, Form],[]).
 loop_1var_n_step(Variable,[bind, Variable, []],[]).
 
 
-shared_lisp_compiler:plugin_expand_function_body(Ctx,Env,Result,InstrS,Code):- 
+shared_lisp_compiler:plugin_expand_progbody(Ctx,Env,Result,InstrS,_PreviousResult,Code):- 
   compile_body_block(Ctx,Env,Result,InstrS,Code),!.
+
+
+% (DO ((temp-var 1 (1+ temp-var) ) )((> temp-var 3) (print :done)) (PRINT temp-var) )
+/* 
+
+
+(DO ((temp-var 1 (1+ temp-var) ) )((> temp-var 3)(PRINT :done) )(PRINt temp-var) )
+
+
+  LETENV=[[bv(u_temp_var, 1)]|ReplEnv],
+    catch(( 
+      repeat,
+        get_var(BlockExitEnv, u_temp_var, U_temp_var_Get),
+        (   U_temp_var_Get>3
+        ->  cl_print(kw_done, Print_Ret),
+            throw(block_exit([], Print_Ret)),
+            _rPrevRes115=Print_Ret
+        ;   cl_print(U_temp_var_Get, Print_Ret46),
+            '1+'(U_temp_var_Get, D1_c43_Ret),
+            set_var(BlockExitEnv, psetq, u_temp_var, D1_c43_Ret),
+            fail,
+            _rPrevRes115=_GORES
+        ).
+
+   catch(( 
+          repeat,
+          (ExitTest -> (print :done) ; (TagBody, IncrCode, fail)).
+*/
 
 %compile_body_block(_Ctx,_Env,Result,exit( Tag), push_label(exit( Tag)) ):- debug_var("_GORES",Result).
 %compile_body_block(_Ctx,_Env,Result,enter( Tag), push_label(enter( Tag)) ):- debug_var("_GORES",Result).
-compile_body_block(Ctx,Env,Result,[do,LoopVars,[EndTest|ResultForms]|TagBody], Code):- 
+% Macro DO,DO*
+
+% Macro DO,DO*
+compile_body_block(Ctx,Env,Result,[DO_MAYBE_STAR,LoopVars,[EndTest|ResultForms]|TagBody], Code):- 
+   (DO_MAYBE_STAR==do_xx -> LET=let_xx ; 
+   (DO_MAYBE_STAR==   do -> LET=let ; 
+    fail)),
    loop_vars_to_let_n_step(LoopVars,LetVars,[],PSetQStepCode),
-   gensym_in_labels(dosym,DoTag),
+   gensym_in_labels(do_label_,DoTag),
    must_compile_body(Ctx,Env,Result,
+    [LET,LetVars,
     [block,[],       
+          [tagbody,
+            [label,DoTag],
+            [if,
+              EndTest,
+               [return,[progn|ResultForms]],
+               [progn,[progn|TagBody],[psetq|PSetQStepCode],[go,DoTag]]
+            ]
+           ]
+        ]
+     ],  Code).
+/*
+compile_body_block(Ctx,Env,Result,[DO_MAYBE_STAR,LoopVars,[EndTest|ResultForms]|TagBody], Code):- 
+   (DO_MAYBE_STAR==do_xx -> LET=let_xx ; 
+   (DO_MAYBE_STAR==   do -> LET=let ; 
+    fail)),
+   loop_vars_to_let_n_step(LoopVars,LetVars,[],PSetQStepCode),
+   gensym_in_labels(do_label_,DoTag),
+   must_compile_body(Ctx,Env,Result,
       [let,LetVars,
+     [block,[],             
           [tagbody,
             [label,DoTag],
             [if,
@@ -68,6 +122,7 @@ compile_body_block(Ctx,Env,Result,[do,LoopVars,[EndTest|ResultForms]|TagBody], C
             [go,DoTag]]
        ]
      ],  Code).
+*/
 
 
 compile_body_block(Ctx,Env,Result,RETURN_FROM,Body):- 

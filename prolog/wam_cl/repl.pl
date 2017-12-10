@@ -20,11 +20,11 @@
 
 :- dynamic 
 	user:named_lambda/2,
-        user:macro_lambda/5,
+        user:macro_lambda/3,
         user:function_lambda/4.
 :- multifile 
 	user:named_lambda/2,
-        user:macro_lambda/5,
+        user:macro_lambda/3,
         user:function_lambda/4.
 
 :- initialization((lisp,prolog),main).
@@ -167,7 +167,7 @@ eval_at_repl(Var,  R):- notrace(var(Var)),!, R=Var.
 eval_at_repl(Expression, Result):- quietly(eval_repl_hooks(Expression,Result)),!.
 eval_at_repl(Expression,Result):- notrace(tracing), !, trace,eval_at_repl_tracing(Expression,Result).
 eval_at_repl(Expression,Result):-
-  notrace(as_sexp(Expression,SExpression)),
+  quietly(as_sexp(Expression,SExpression)),
   (reader_intern_symbols(SExpression,LExpression)),
   notrace(dbmsg_cmt(:- lisp_compiled_eval(LExpression))),
   notrace(debug_var('ReplEnv',Env)),

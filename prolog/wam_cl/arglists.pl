@@ -162,9 +162,14 @@ lisp_operator('define-variable-pattern').
 lisp_operator(u_define_caller_pattern).
 lisp_operator(f_u_define_caller_pattern).
 lisp_operator(S):- nonvar(S),compiler_macro_left_right(S,_,_).
-lisp_operator(S):-user:macro_lambda(_Scope,S, _,_, _).
+lisp_operator(S):- get_lambda_def(defmacro,S,_,_).
 lisp_operator(S):-is_special_op(S,P),currently_visible_package(P).
 %lisp_operator(S):-is_special_op(S,_P).
+
+get_lambda_def(DefType,ProcedureName,FormalParams,LambdaExpression):-
+  wl:lambda_def(DefType,ProcedureName,_,FormalParams,LambdaExpression).
+get_lambda_def(DefType,ProcedureName,FormalParams,LambdaExpression):-
+  wl:lambda_def(DefType,_,ProcedureName,FormalParams,LambdaExpression).
 
 
 is_special_op(S,P):- get_opv(S,compile_as,kw_operator),get_opv(S,package,P).

@@ -96,7 +96,7 @@ compile_assigns(Ctx,Env,Result,[Getf, Var| ValuesForms], Body):- is_place_op(Get
 
 compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, StringL], (Code,Body)):- 
         is_stringp(StringL),to_prolog_string(StringL,String),is_def_maybe_docs(SetQ),
-        Code = asserta(doc:doc_string(Var,_Package,variable,String)),
+        Code = asserta_tracked(Var,doc:doc_string(Var,_Package,variable,String)),
 	!, compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm], Body).
 
 
@@ -134,7 +134,8 @@ compile_each(Ctx,Env,[VarR|Result],[Var|Eval],Code):-
   compile_each(Ctx,Env,Result,Eval,Code1),
   conjoin_0(Code0,Code1,Code).
 
-rwstate:attr_unify_hook(_,_):-fail.
+rwstate:attr_unify_hook(_,_):-!,fail.
+rwstate:attr_unify_hook(_,V):-always(var(V)),fail.
 
 
 extract_variable_value([Val|Vals], FoundVal, Hole):-
@@ -251,8 +252,8 @@ is_place_op(psetf).
 is_place_op(getf).
 is_place_op(incf).
 is_place_op(decf).
-is_place_op(rotatef).
-is_place_op(shiftf).
+is_place_op_verbatum(rotatef).
+is_place_op_verbatum(shiftf).
 is_place_op_verbatum(push).
 is_place_op_verbatum(pushnew).
 is_place_op_verbatum(pop).
