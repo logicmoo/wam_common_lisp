@@ -84,9 +84,10 @@ compile_body_block(Ctx,Env,Result,RETURN_FROM,Body):-
  compile_body_block_in_throw(Ctx,Env,Result,RETURN_FROM,Body).
 
 
-compile_body_block_in_throw(Ctx,Env,ValueResult,[RETURN_FROM,Tag,ValueForm],(ValueFormCode, Code) ):- 
+compile_body_block_in_throw(Ctx,Env,ThrowResult,[RETURN_FROM,Tag,ValueForm],(ValueFormCode, Code) ):- 
    same_symbol(RETURN_FROM,'return-from'), 
    debug_var('RetResult',ValueResult),
+   debug_var('ThrowResult',ThrowResult),
    must_compile_body(Ctx,Env,ValueResult,ValueForm,ValueFormCode),
    %suffixed_atom_concat(block_ret_,Tag,Var),
    %suffixed_atom_concat(block_exit_,Tag,ExitTag),

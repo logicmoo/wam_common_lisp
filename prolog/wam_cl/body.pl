@@ -36,7 +36,7 @@ must_compile_body(Ctx,Env,ResultO,LispCode, BodyO):-
   maybe_debug_var('_LispCode',LispCode),
   maybe_debug_var('_rBody',Body))),
   resolve_reader_macros(LispCode,Forms),!,
-  always(compile_body(Ctx,Env,Result,Forms, Body)),
+  always((compile_body(Ctx,Env,Result,Forms, Body),nonvar(Body))),
   ((Body==true,fail) -> BodyO=(ResultO=Result) ; ResultO=Result,BodyO=Body),
   % nb_current('$compiler_PreviousResult',THE),setarg(1,THE,Result),
   !.
@@ -210,7 +210,7 @@ compile_body(Ctx,Env,Result,[prog2,Form1,Form2|FormS],Code):- !,
    must_compile_progn(Ctx,Env,_ResultS,FormS,Result,BodyS),
    Code = (Body1, Body2, BodyS).
 
-% `, Backquoted commas
+% ` Backquoted 
 compile_body(_Cx,Env,Result,['#BQ',Form], Code):-!,compile_bq(Env,Result,Form,Code),!.
 compile_body(_Cx,Env,Result,['`',Form], Code):-!,compile_bq(Env,Result,Form,Code),!.
 compile_body(Ctx,Env,Result,['#COMMA',Form], (Code,cl_eval(CommaResult,Result))):-!,compile_body(Ctx,Env,CommaResult,Form,Code),!.
@@ -277,39 +277,72 @@ compile_body(Ctx,Env,Result,['eval',Form1],
 
 
 must_compile_test_body(Ctx,Env,TestResult,Test,TestBody,TestResultBody):-
-  always(compile_test_body(Ctx,Env,TestResult,Test,TestBody,TestResultBody)).
+  always(compile_test_body(Ctx,Env,TestResult,Test,TestBody,TestResultBody)),!.
+
+:- discontiguous(compile_test_body/6).
 
 % IF (null ...)
-compile_test_body(Ctx,Env,unused,[stringp,Test],TestBody,is_stringp(TestResult)):-
-   debug_var("StringPArg",TestResult),
-   must_compile_body(Ctx,Env,TestResult,Test,  TestBody),!.
-compile_test_body(Ctx,Env,unused,[symbolp,Test],TestBody,is_symbolp(TestResult)):-
-   debug_var("StringPArg",TestResult),
-   must_compile_body(Ctx,Env,TestResult,Test,  TestBody),!.
 compile_test_body(Ctx,Env,TestResult,[null,Test],TestBody,TestResultBody):-
    debug_var("TestNullResult",TestResult),
    must_compile_body(Ctx,Env,TestResult,Test,  TestBody),
    TestResultBody = (TestResult == []).
 
-compile_test_body(Ctx,Env,TestResult,[=,V1,V2],(TestBody1,TestBody2),TestResultBody):-
-   debug_var("TestEqualResult",TestResult),
-   must_compile_body(Ctx,Env,TestResult1,V1,  TestBody1),
-   must_compile_body(Ctx,Env,TestResult2,V2,  TestBody2),
-   TestResultBody = (TestResult1 =:= TestResult2).
+if_op_1_then_test(stringp,is_stringp).
+if_op_1_then_test(symbolp,is_symbolp).
+if_op_1_then_test(OP,PRED):- 
+  find_lisp_function(OP,1,FUN),
+  is_defined(FUN,2),   
+  PFUN=..[FUN,A1,RET],
+  clause(PFUN,t_or_nil(PPRED,Ret)),
+  PPRED=..[PRED,AA1],
+  RET==Ret,AA1==A1.
+compile_test_body(Ctx,Env,Unused,[OP,Arg1],Arg1Body,PredBody):- if_op_1_then_test(OP,Pred),   
+   must_compile_body(Ctx,Env,Arg1Result,Arg1,Arg1Body),
+   debug_var("Unused",Unused),
+   debug_var("PredArgResult",Arg1Result),
+   PredBody =.. [Pred,Arg1Result].
+
+if_oper_then_test(OP,A1,PredBody):- 
+  find_lisp_function(OP,1,FUN),
+  is_defined(FUN,2),   
+  PFUN=..[FUN,A1,RET],
+  clause(PFUN,t_or_nil(PredBody,Ret)),
+  RET==Ret.
+compile_test_body(Ctx,Env,Unused,[OP,Arg1],Arg1Body,PredBody):- if_oper_then_test(OP,Arg1Result,PredBody),   
+   must_compile_body(Ctx,Env,Arg1Result,Arg1,Arg1Body),
+   debug_var("Unused",Unused),debug_var("PredArgResult",Arg1Result).
+   
 
 
-% IF TEST
+if_op_2_then_test('=','=:=').
+if_op_2_then_test(OP,PRED):- 
+  find_lisp_function(OP,2,FUN),
+  is_defined(FUN,3),   
+  PFUN=..[FUN,A1,A2,RET],
+  clause(PFUN,t_or_nil(PPRED,Ret)),
+  PPRED=..[PRED,AA1,AA2],
+  RET==Ret,AA1==A1,AA2==A2.
+%cl_eq(A,B,Ret):- t_or_nil( is_eq(A,B) , Ret).
+compile_test_body(Ctx,Env,Unused,[OP,Arg1,Arg2],(Arg1Body,Arg2Body),PredBody):- if_op_2_then_test(OP,Pred),
+   must_compile_body(Ctx,Env,Arg1Result,Arg1,Arg1Body),
+   must_compile_body(Ctx,Env,Arg2Result,Arg2,Arg2Body),
+   debug_var("Unused",Unused),
+   debug_var("PredArg1Result",Arg1Result),
+   debug_var("PredArg2Result",Arg2Result),
+   PredBody =.. [Pred,Arg1Result,Arg2Result].
+
+% Default TEST compilation
 compile_test_body(Ctx,Env,TestResult,Test,TestBody,TestResultBody):-
    debug_var("GTestResult",TestResult),
    must_compile_body(Ctx,Env,TestResult,Test,  TestBody),
    TestResultBody = (TestResult \== []).
 
 
-
+% IF-3
 compile_body(Ctx,Env,Result,[if, Test, IfTrue, IfFalse], Body):-
 	!,
    debug_var("IFTEST",TestResult),
-   compile_test_body(Ctx,Env,TestResult,Test,TestBody,TestResultBody),
+   must_compile_test_body(Ctx,Env,TestResult,Test,TestBody,TestResultBody),
    must_compile_body(Ctx,Env,TrueResult,IfTrue, TrueBody),
    must_compile_body(Ctx,Env,FalseResult,IfFalse, FalseBody),
    debug_var("TrueResult",TrueResult),
@@ -323,23 +356,6 @@ compile_body(Ctx,Env,Result,[if, Test, IfTrue, IfFalse], Body):-
 					Result      = FalseResult)	) ).
 
 
-% IF-3
-compile_body(Ctx,Env,Result,[if, Test, IfTrue, IfFalse], Body):-
-	!,
-   debug_var("IFTEST",TestResult),
-   debug_var("TrueResult",TrueResult),
-   debug_var("FalseResult",FalseResult),
-
-   compile_test_body(Ctx,Env,TestResult,Test,TestBody,TestResultBody),
-   must_compile_body(Ctx,Env,TrueResult,IfTrue, TrueBody),
-   must_compile_body(Ctx,Env,FalseResult,IfFalse, FalseBody),
-
-        Body = (	TestBody,
-			( TestResultBody
-				->     ( TrueBody,
-					Result      = TrueResult)
-				;  	(FalseBody,
-					Result      = FalseResult)	) ).
 
 % DOLIST
 compile_body(Ctx,Env,Result,['dolist',[Var,List]|FormS], Code):- !,
@@ -523,7 +539,7 @@ compile_let(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body):- !,
         freeze(Var,ignore(((var(Val),add_tracked_var(Ctx,Var,Val))))),
         zip_with(Variables, Values, [Var, Val, bv(Var,Val)]^true,Bindings),
         add_alphas(Ctx,Variables),
-        debug_var("LETENV",BindingsEnvironment),
+        debug_var("LEnv",BindingsEnvironment),
         ignore((member(VarN,[Variable,Var]),atom(VarN),var(Val),debug_var([VarN,'_Let'],Val))),        
 	must_compile_progn(Ctx,BindingsEnvironment,Result,BodyForms, [], BodyFormsBody),
          Body = ( ValueBody,BindingsEnvironment=[Bindings|Env], BodyFormsBody ).
