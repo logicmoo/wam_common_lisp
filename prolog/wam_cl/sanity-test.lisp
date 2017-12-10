@@ -88,6 +88,7 @@ f_u_accum(A, G) :-
 (is equal (list 4 3 2 1 0) (accum 4))
 
 (defmacro defwrap (name) `(defun ,name () 1))
+;;; :- ensure_loaded('sanity-test.lisp.trans.pl').
 (defwrap foo)
 (is eq 1 (foo))
 (is equal (macroexpand-1 '(defwrap foo)) '(defun foo nil 1))
@@ -149,6 +150,9 @@ f_u_fifteen(MResult) :-
 
 (is eq 15 (fifteen))
 
+(defun do-four () (DO ((temp-one 1 (1+ temp-one) )(temp-two 0 (1- temp-two) ) )((> (- temp-one temp-two) 5) temp-one)() ))
+
+(is = 4  (do-four))
 
 (is eq 'string_l (DEFUN string_l (x )(COND ((STRINGP x )x )((SYMBOLP x )(symbol-name x ))(T (ERROR "type error" )))))
 

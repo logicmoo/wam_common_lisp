@@ -55,6 +55,19 @@
 :- dynamic(wl:declared/2).
 :- discontiguous(wl:declared/2).
 
+:- multifile(wl:arg_lambda_type/2).
+:- dynamic(wl:arg_lambda_type/2).
+:- discontiguous(wl:arg_lambda_type/2).
+
+:- multifile(wl:uses_rest_only/1).
+:- dynamic(wl:uses_rest_only/1).
+:- discontiguous(wl:uses_rest_only/1).
+
+:- multifile(wl:interned_eval/1).
+:- dynamic(wl:interned_eval/1).
+:- discontiguous(wl:interned_eval/1).
+
+
 :- multifile(wl:type_checked/1).
 :- dynamic(wl:type_checked/1).
 :- discontiguous(wl:type_checked/1).
@@ -64,11 +77,23 @@
 :- dynamic(wl:coercion/3).
 :- discontiguous(wl:coercion/3).
 
+:- discontiguous(wl:lambda_def/5).
+:- dynamic(wl:lambda_def/5).
+:- multifile(wl:lambda_def/5).
+:- export(wl:lambda_def/5).
+:- system:import(wl:lambda_def/5).
+
+:- discontiguous(wl:arglist_info/5).
+:- dynamic(wl:arglist_info/5).
+:- multifile(wl:arglist_info/5).
+:- export(wl:arglist_info/5).
+:- system:import(wl:arglist_info/5).
+
+:- discontiguous(wl:arglist_info/4).
 :- dynamic(wl:arglist_info/4).
 :- multifile(wl:arglist_info/4).
-
-:- dynamic(wl:function_lambda/4).
-:- multifile(wl:function_lambda/4).
+:- export(wl:arglist_info/4).
+:- system:import(wl:arglist_info/4).
 
 %:- dynamic(compile_assigns/4).
 %:- multifile(compile_assigns/4).

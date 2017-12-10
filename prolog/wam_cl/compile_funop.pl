@@ -68,29 +68,29 @@ cl_macroexpand([LispCode|Optionals],Result):-
 
 
 % Operator
-expand_arguments_maybe_macro(_Ctx,_CallEnv,FunctionName,_N,FunctionArgs,true, FunctionArgs):- is_lisp_operator(FunctionName),!.
-expand_arguments_maybe_macro(Ctx,CallEnv,FunctionName,0,FunctionArgs,ArgBody, Args):-
-  expand_arguments(Ctx,CallEnv,FunctionName,0,FunctionArgs,ArgBody, Args).
+expand_arguments_maybe_macro(_Ctx,_CallEnv,FN,_N,FunctionArgs,true, FunctionArgs):- is_lisp_operator(FN),!.
+expand_arguments_maybe_macro(Ctx,CallEnv,FN,0,FunctionArgs,ArgBody, Args):-
+  expand_arguments(Ctx,CallEnv,FN,0,FunctionArgs,ArgBody, Args).
 
 
 compile_funop(Ctx,Env,Result,[Op | FunctionArgs], Body):- nonvar(Op),wl:op_replacement(Op,Op2), !,
   must_compile_body(Ctx,Env,Result,[Op2 | FunctionArgs],Body).
 
 
-compile_funop(Ctx,Env,Result,[FunctionName ], Body):- is_list(FunctionName),!,
-  must_compile_body(Ctx,Env,Result,FunctionName,Body).
+compile_funop(Ctx,Env,Result,[FN ], Body):- is_list(FN),!,
+  must_compile_body(Ctx,Env,Result,FN,Body).
 
-compile_funop(Ctx,Env,Result,[FunctionName , A| FunctionArgs], Body):- is_list(FunctionName),!,
-  must_compile_body(Ctx,Env,Result,[funcall,FunctionName, A | FunctionArgs],Body).
+compile_funop(Ctx,Env,Result,[FN , A| FunctionArgs], Body):- is_list(FN),!,
+  must_compile_body(Ctx,Env,Result,[funcall,FN, A | FunctionArgs],Body).
 
-compile_funop(Ctx,Env,Result,[FunctionName | FunctionArgs], Body):- \+ atom(FunctionName),!,
-  dumpST,trace,must_compile_body(Ctx,Env,Result,[funcall_obj,FunctionName | FunctionArgs],Body).
+compile_funop(Ctx,Env,Result,[FN | FunctionArgs], Body):- \+ atom(FN),!,
+  dumpST,trace,must_compile_body(Ctx,Env,Result,[funcall_obj,FN | FunctionArgs],Body).
 
 
-compile_funop(Ctx,CallEnv,Result,[FunctionName | FunctionArgs], Body):- nonvar(FunctionName),
-      expand_arguments_maybe_macro(Ctx,CallEnv,FunctionName,0,FunctionArgs,ArgBody, Args),
-      debug_var([FunctionName,'_Ret'],Result),      
-      find_function_or_macro(Ctx,CallEnv,FunctionName,Args,Result,ExpandedFunction),      
+compile_funop(Ctx,CallEnv,Result,[FN | FunctionArgs], Body):- nonvar(FN),
+      expand_arguments_maybe_macro(Ctx,CallEnv,FN,0,FunctionArgs,ArgBody, Args),
+      debug_var([FN,'_Ret'],Result),      
+      find_function_or_macro(Ctx,CallEnv,FN,Args,Result,ExpandedFunction),      
       Body = (ArgBody,ExpandedFunction).
 
 
@@ -99,75 +99,98 @@ compile_funop(Ctx,CallEnv,Result,[FunctionName | FunctionArgs], Body):- nonvar(F
 % FUNCTION FUNCALL
 % compile_body(Ctx,Env,Result,['funcall',Function|ARGS], Body):- ...
 
+find_lisp_function(FN,ARITY,ProposedName):-
+  find_function_or_macro_name(_Ctx,_Env,FN,ARITY, ProposedName).
 
-find_function_or_macro(Ctx,Env,FunctionName,Args,Result,ExpandedFunction):-
-   length(Args,Len0),Len is Len0+1,
-   find_function_or_macro_name(Ctx,Env,FunctionName,Len, ProposedName),!,
-   align_args(FunctionName,ProposedName,Args,Result,ArgsPlusResult),
+find_function_or_macro(Ctx,Env,FN,Args,Result,ExpandedFunction):-
+   length(Args,ArgsLen),
+   find_function_or_macro_name(Ctx,Env,FN,ArgsLen, ProposedName),!,
+   align_args_or_fallback(FN,ProposedName,Args,Result,ArgsPlusResult),
    ExpandedFunction =.. [ ProposedName | ArgsPlusResult].
    
-find_function_or_macro_name(_Ctx,_Env,FunctionName,_Len, ProposedName):- 
-  get_opv(FunctionName,function,ProposedName),!.
-find_function_or_macro_name(_Ctx,_Env,FunctionName,Len, ProposedName):-
-  some_function_or_macro(FunctionName,Len,['','cl_','pf_','sf_','mf_','f_'],ProposedName),!.
-find_function_or_macro_name(_Ctx,_Env,FunctionName,_Len, ProposedName):-
-    maybe_symbol_package(FunctionName,Package),
-    (pl_symbol_name(FunctionName,Name) ->
+find_function_or_macro_name(_Ctx,_Env,FN,_Len, ProposedName):- 
+  get_opv(FN,function,ProposedName),!.
+find_function_or_macro_name(_Ctx,_Env,FN,ArgLen, ProposedName):-
+  some_defined_function_or_macro(FN,ArgLen,['','cl_','pf_','sf_','mf_','f_'],ProposedName),!.
+
+find_function_or_macro_name(_Ctx,_Env,FN,ArgsLen, ProposedName):- upcase_atom(FN,FN),
+    Arity is ArgsLen+1,is_defined(FN,Arity),ProposedName=FN.
+
+find_function_or_macro_name(_Ctx,_Env,FN,_Len, ProposedName):-
+    maybe_symbol_package(FN,Package),
+    (pl_symbol_name(FN,Name) ->
       function_case_name(Name,Package,ProposedName);
-      function_case_name(FunctionName,Package,ProposedName)).
+      function_case_name(FN,Package,ProposedName)).
 
 
-uses_exact(FunctionName):-  wl:arglist_info(FunctionName,_,_,ArgInfo),!,ArgInfo.complex ==0 .
-uses_exact(P):- wl:arg_lambda_type(exact_only,P),!.
+uses_exact(F):-premute_names(F,FF),uses_exact0(FF).
 
-% exact_and_restkeys(FunctionName,Requireds):- current_predicate(FunctionName/N), Requireds is N-2,Requireds>0.
-exact_and_restkeys(P,N):- wl:arg_lambda_type(req(N),P),!.
+uses_exact0(F):- wl:arg_lambda_type(exact_only,F),!.
+uses_exact0(FN):-  function_arg_info(FN,ArgInfo),!,ArgInfo.complex ==0,ArgInfo.opt==0,ArgInfo.rest==0,ArgInfo.env==0,length(ArgInfo.names,ArgInfo.req).
 
-uses_rest_only_p(P):- uses_rest_only0(P),!.
-uses_rest_only_p(P):- atom_concat_or_rtrace('f_',P,PP), uses_rest_only0(PP).
-uses_rest_only_p(P):- atom_concat_or_rtrace('f_',PP,P), uses_rest_only0(PP).
+function_arg_info(FN,ArgInfo):- wl:arglist_info(FN,_,_,_,ArgInfo).
+function_arg_info(FN,ArgInfo):- wl:arglist_info(_,FN,_,_,ArgInfo).
+% exact_and_restkeys(FN,Requireds):- current_predicate(FN/N), Requireds is N-2,Requireds>0.
 
-uses_rest_only0(FunctionName):-  wl:arglist_info(FunctionName,_,_,ArgInfo),!,ArgInfo.complex \==0 .
-uses_rest_only0(FunctionName):- same_symbol(FunctionName,F),wl:declared(F,lambda(['&rest',_])),!.
-uses_rest_only0(P):- wl:arg_lambda_type(rest_only,P),!.
-uses_rest_only0(P):- wl:uses_rest_only(P).
+exact_and_restkeys(F,N):- premute_names(F,FF), exact_and_restkeys0(FF,N).
+
+exact_and_restkeys0(F,N):- function_arg_info(F,ArgInfo),ArgInfo.req=N,ArgInfo.all\==N,!.
+exact_and_restkeys0(F,N):- wl:arg_lambda_type(req(N),F),!.
+exact_and_restkeys0(F,_):- uses_exact0(F),!,fail.
+exact_and_restkeys0(F,0):- uses_rest_only0(F),!.
+
+
+premute_names(F,F).
+premute_names(F,FF):- atom_concat_or_rtrace('f_',F,FF).
+premute_names(F,FF):- atom_concat_or_rtrace('cl_',F,FF).
+premute_names(F,FF):- atom_concat_or_rtrace('f_',FF,F).
+premute_names(F,FF):- atom_concat_or_rtrace('cl_',FF,F).
+
+uses_rest_only_p(F):- premute_names(F,FF),uses_rest_only0(FF),!.
+
+uses_rest_only0(F):- wl:arg_lambda_type(rest_only,F),!.
+uses_rest_only0(F):- wl:uses_rest_only(F),!.
+uses_rest_only0(F):- function_arg_info(F,ArgInfo),ArgInfo.complex \==0,!.
+uses_rest_only0(F):- same_symbol(F,FF),wl:declared(FF,lambda(['&rest',_])),!.
+uses_rest_only0(F):-  function_arg_info(F,ArgInfo),ArgInfo.req==0,ArgInfo.all\==0,!.
+%uses_rest_only0(F):- wl:arg_lambda_type(req(0),F),!.
 
 % Non built-in function expands into an explicit function call
 
 % invoke(r1,r2,r3,RET).
-align_args(FunctionName,ProposedName,Args,Result,ArgsPlusResult):- 
-  (uses_exact(FunctionName);uses_exact(ProposedName)),
+align_args(FN,ProposedName,Args,Result,ArgsPlusResult):- 
+  (uses_exact(FN);uses_exact(ProposedName)),
    append(Args, [Result], ArgsPlusResult).
 
 % invoke([r1,r2,r3],RET).
-align_args(FunctionName,ProposedName,Args,Result,[Args,Result]):-
-  (uses_rest_only_p(FunctionName);uses_rest_only_p(ProposedName)).
+align_args(FN,ProposedName,Args,Result,[Args,Result]):-
+  (uses_rest_only_p(FN);uses_rest_only_p(ProposedName)).
 
 % invoke(r1,r2,[o3,key1,value1],RET).
-align_args(FunctionName,ProposedName,Args,Result,ArgsPlusResult):- 
-  (exact_and_restkeys(FunctionName,N);exact_and_restkeys(ProposedName,N)),
+align_args(FN,ProposedName,Args,Result,ArgsPlusResult):- 
+  (exact_and_restkeys(FN,N);exact_and_restkeys(ProposedName,N)),
   length(Left,N),append(Left,Rest,Args),
   append(Left, [Rest,Result], ArgsPlusResult).
 
 
 % guess invoke(r1,RET).
-align_args(_FunctionName,ProposedName,[Arg],Result,[Arg,Result]):- 
-  is_defined(ProposedName,2),is_defined(ProposedName,3).
+%align_args(_FN,ProposedName,[Arg],Result,[Arg,Result]):- 
+%  is_defined(ProposedName,2),is_defined(ProposedName,3).
 
 % guess invoke([r1,r2,r3],RET).
-%align_args(FunctionName,ProposedName,Args,Result,[Args,Result]):- 
-%   only_arity(FunctionName,2);only_arity(ProposedName,2).
+%align_args(FN,ProposedName,Args,Result,[Args,Result]):- 
+%   only_arity(FN,2);only_arity(ProposedName,2).
 
   
 % fallback to invoke([r1,r2,r3],RET).
-%align_args(FunctionName, ProposedName,Args,Result,[Args,Result]):- 
-%  (is_lisp_operator(FunctionName) ; is_lisp_operator(ProposedName)),!.
+%align_args(FN, ProposedName,Args,Result,[Args,Result]):- 
+%  (is_lisp_operator(FN) ; is_lisp_operator(ProposedName)),!.
 
 /*
 % guess invoke(r1,r2,r3,RET).
 */
-align_args(_FunctionName,_ProposedName,Args,Result,ArgsPlusResult):-  
-   append(Args, [Result], ArgsPlusResult).
+align_args_or_fallback(FN,ProposedName,Args,Result,ArgsPlusResult):- align_args(FN,ProposedName,Args,Result,ArgsPlusResult),!.
+align_args_or_fallback(_,_ProposedName,Args,Result,ArgsPlusResult):- append(Args, [Result], ArgsPlusResult).
 
 
 only_arity(ProposedName,N):-
@@ -180,14 +203,16 @@ maybe_symbol_package(Symbol,Package):-  get_opv(Symbol,package,Package),!.
 maybe_symbol_package(_Symbol,Package):- reading_package(Package).
 
 
-some_function_or_macro(FunctionName,Len,[Name|NameS],NewName):-
-   atom_concat_or_rtrace(Name,FunctionName,ProposedPName),   
+some_defined_function_or_macro(FN,ArgLen,[Name|NameS],NewName):-
+   atom_concat_or_rtrace(Name,FN,ProposedPName),   
    (((ProposedPName = ProposedName; prologcase_name(ProposedPName,ProposedName)),
-    guess_functor(P,ProposedName,Len),current_predicate(_,P),\+ predicate_property(user:P,imported_from(system)))-> ProposedName=NewName;
-   some_function_or_macro(FunctionName,Len,NameS,NewName)).
+    guess_lisp_functor(P,ProposedName,ArgLen),current_predicate(_,P),
+    \+ predicate_property(user:P,imported_from(system)))-> ProposedName=NewName;
+   some_defined_function_or_macro(FN,ArgLen,NameS,NewName)).
 
-guess_functor(P,ProposedName,Len):- var(P),var(Len),!,current_predicate(ProposedName/Len),functor(P,ProposedName,Len).
-guess_functor(P,ProposedName,Len):- functor(P,ProposedName,Len).
+guess_lisp_functor(P,F,ArgLen):- (number(ArgLen)->A is ArgLen+1; A= _),!,guess_prolog_functor(P,F,A). 
+guess_prolog_functor(P,F,A):- (var(F);var(A)),!,current_predicate(F/A),functor(P,F,A).
+guess_prolog_functor(P,F,A):- functor(P,F,A).
 
 :- fixup_exports.
 
