@@ -401,12 +401,19 @@ I should clarify, SWALE and DAYDREAMER are *not* buggy implementations of Prolog
 ## Installation 
 ````
 $ swipl
-Run `?- pack_install(wam_common_lisp)`.
+Welcome to SWI-Prolog (threaded, 64 bits, version 7.7.4-36-gc02793b-DIRTY-BIRDY)
+SWI-Prolog comes with ABSOLUTELY NO WARRANTY. This is free software.
+Please run ?- license. for legal details.
+
+For online help and background, visit http://www.swi-prolog.org
+For built-in help, use ?- help(Topic). or ?- apropos(Word).
+
+`?- pack_install(wam_common_lisp)`.
+
 ````
 
-### try it
+### Try it
 ````
-$ swipl
 
 ?- use_module(library(wamcl)).
 true.
@@ -429,9 +436,41 @@ CL-USER> (sqrt -1)
 % 22 inferences, 0.000 CPU in 0.000 seconds (95% CPU, 824897 Lips)
 #C(0 1)
 ````
+## Start an inferior prolog
+````
+CL-USER> prolog.
+% Break level 1
+[1]  ?- writeln("press ctrl-d to return to lisp").
+press ctrl-d to return to lisp
+true.
 
-### navigate disk
+[1]  ?- ^D
+% Exit break level 1
+% prolog.
+T
+CL-USER>
+````
+## Exit lisp
+<press cntrl-d>
+````
+CL-USER> ^DEND-OF-FILE
+true.
+?-
+````
+ 
+## Start in REPL
+````
+$ swipl prolog/wamcl.pl
+ 
+ \ \      / / \  |  \/  |      / ___| |
+ \ \ /\ / / _ \ | |\/| |_____| |   | |
+  \ V  V / ___ \| |  | |_____| |___| |___
+   \_/\_/_/   \_\_|  |_|      \____|_____|
 
+Common Lisp, written in Prolog
+CL-USER>
+````
+## Navigate disk
 ````
 CL-USER> pwd.
 % /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/
@@ -450,13 +489,13 @@ CL-USER>
 ````
 
 ### Translate a file to prolog
-Translate a file to prolog
-
+````
 CL-USER> (compile-file "hello.lisp")
 <...snip...>
 % 97,548 inferences, 0.023 CPU in 0.023 seconds (100% CPU, 4227371 Lips)
 #P/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/hello.lisp
 CL-USER>
+````
 
 ### Open PceEmacs on a translated file
 CL-USER> (edit (compile-file "hello.lisp"))
