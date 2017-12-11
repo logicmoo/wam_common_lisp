@@ -389,32 +389,28 @@ true.
 ## Start in REPL
 ````
 $ swipl prolog/wamcl.pl
- 
- \ \      / / \  |  \/  |      / ___| |
- \ \ /\ / / _ \ | |\/| |_____| |   | |
-  \ V  V / ___ \| |  | |_____| |___| |___
-   \_/\_/_/   \_\_|  |_|      \____|_____|
 
 Common Lisp, written in Prolog
 CL-USER>
 ````
-## Navigate disk
-````
-CL-USER> pwd.
-% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/
 
-CL-USER> :cd t
-% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/
-
-CL-USER> ls.
-% baby2015/                           credit_tim_finin.sip.msg            MicroPrologII/                      test_cisp/
-% credit_neil_smith.html              daydreamer/                         reference/                          travis.pl
-% credit_neil_smith_prolog.html       hello.lisp                          test_1000/
-% credit_tim_finin.html               km/                                 test_1500/
-% ls.
-T
-CL-USER>
+### Compile a system Image and run it
 ````
+$ swipl ../prolog/wamcl.pl --exe wamcl
+$ ./wamcl
+````
+
+### Reattach to a system Image and debug
+````
+$ swipl -x wamcl --debug
+````
+
+### Run some lisp file
+````
+$ echo '(print (cons "hello" *ARGS*))' > hello.lisp
+$ swipl -x wamcl hello.lisp world
+````
+
 
 ### Translate a file to prolog
 ````
@@ -438,23 +434,23 @@ CL-USER> (prolog:consult (compile-file "hello.lisp"))
 CL-USER> (load "hello.lisp" :compile t)   ;;; same as the above
 `````
 
-### Compile a system Image and run it
-````
-$ swipl ../prolog/wamcl.pl --exe wamcl
-$ ./wamcl
-````
-
-### Reattach to a system Image and debug
-````
-$ swipl -x wamcl --debug
-````
-
 ### Make an executable and run it
 ````
 $ echo '(print (cons "hello" *ARGS*))' > hello.lisp
 $ ./wamcl -c hello.lisp -o hello.pl --exe hello
 $ ./hello world
 ```` 
+
+### Attach to your image
+````
+$ swipl -x hello --repl
+````
+
+### Run your translated lisp
+````
+$ swipl hello.pl world
+````
+
 ### See the source
 ````
 $ cat hello.pl
@@ -480,17 +476,21 @@ $ cat hello.pl
 % Total time: 0.02 seconds
 ````
 
-### Attach to your image
+## Navigate disk
 ````
-$ swipl -x hello --repl
+CL-USER> pwd.
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/
+
+CL-USER> :cd t
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/
+
+CL-USER> ls.
+% baby2015/                           credit_tim_finin.sip.msg            MicroPrologII/                      test_cisp/
+% credit_neil_smith.html              daydreamer/                         reference/                          travis.pl
+% credit_neil_smith_prolog.html       hello.lisp                          test_1000/
+% credit_tim_finin.html               km/                                 test_1500/
+% ls.
+T
+CL-USER>
 ````
 
-### Run your translated lisp
-````
-$ swipl hello.pl world
-````
-
-### Run your nontranslated lisp
-````
-$ swipl -x wamcl hello.lisp world
-````
