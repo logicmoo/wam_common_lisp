@@ -3,60 +3,61 @@ Common Lisp in Prolog
 
 [![Build Status](https://travis-ci.org/rla/simple-template.svg)](https://travis-ci.org/rla/simple-template)
 
-This library is designed to *not* be an ad-hoc, informally-specified, bug-ridden, slow implementation of half of Common Lisp.
+This library is designed to *not* be just another an ad-hoc, informally-specified, bug-ridden, slow implementation of half of Common Lisp.
 
 
 https://github.com/TeamSPoon/wam_common_lisp
 
 ![](t/Common Lisp.png)
 
-## Useful to Me?
+
+## Installation 
 
 Run `?- pack_install(wam_common_lisp)`.
 
 
-## NOTES:
+## Useful to Me?
+
+* Translates Lisp source files into Prolog source files.  ( compilation is done by Host prolog on the Translated source (from either disk or memory)) 
+
+* At the REPL, forms are converted from Lisp to Prolog then call/1d 
+
+* Being written as a SWI-Prolog "pack" 
+
+* Picks up freebies .. whatever the host prolog system offers such as 
+**Makes Plaform Executables and. DLL/So files 
+**Garbage Collection 
+**Memoization 
+**Embedding (from C/C++/Python/C#/Mono/Java)  
+
+* Gives MOP/CLOS to Prolog programmers 
  
-* WAM-CL currently produces Prolog code an average 6 times slower than the handwritten Prolog code.
-   
-* Handwritten Prolog is *only* 2-3 slower than compiled SBCL
+* Goal is to ensure can run in YAP (which Lisp to Prolog benchmarking shows about 4x speedup over SWI)
+Very importantly we need to ensure we can run well in
+** Sicstus
+** PrologCafe
+** Yield-Prolog
+** Jekejeke
+** EcLiPSe Prolog
  
-* Most simple functions optimize to how handwritten code looks/works
+* Most simple functions optimize to how handwritten code might look.. *only* 2-3 slower than compiled SBCL
 
 * comp.lang.lisp thread https://groups.google.com/forum/#!topic/comp.lang.lisp/0G77ebK3DIw
 
 * comp.lang.prolog thread https://groups.google.com/forum/#!topic/comp.lang.prolog/85jyECdWTxc
 
-## About this Lisp: 
-
-* Translates Lisp source files into Prolog source files.  ( compilation is done to Translated source) 
-
-* At the REPL, forms are converted from Lisp to Prolog then call/1d 
-
-* Being written as an SWI-Prolog "pack" 
-
-* Continue to ensure can run in YAP (which Lisp to Prolog benchmarking shows about 4x speedup) 
-
-* One small code so far seems to run much faster than ECL, ABCL, CLISP  but about ¼ the speed of SBCL 
-
-* Picks up freebies .. whatever the host prolog system offers such as 
-**Makes  Executables and. So files 
-**Garbage Collection 
-**Memoization 
-**Embedding (from C/C++/Python/C#/Mono/Java)  
-* Gives back OO to Prolog programmers 
-
-
-## Roadmap Items 
-* To keep later `copy_term/2's` cheap, it passes entire object references as atoms  (nb_current/2 allows access to the object's property map)
-* Expect to pass most all CL-ANSI tests 
-* Using SWICLI as FFI (SWICLI itself still needs work) 
-* ASDF 
-* Quicklisp 
+## Goals and TODOs
 * Document this pack!
 * Write tests
 * Untangle the 'pack' install deps
 * Still in progress (Moving predicates over here from logicmoo_base)
+* Keep later `copy_term/2's` cheap, 
+* Experment with way to passes entire term object object references as atoms  (nb_current/2 allows access to the object's property map)
+* Ensure passes most all CL-ANSI tests 
+** Hardest part is making sure it throws/complains about all the things it needs to
+* Using SWICLI as FFI (SWICLI itself still needs work) 
+* Ensure works with ASDF-INSTALL
+* Quicklisp 
 
 
 ## Usaage output of --help)
@@ -163,6 +164,7 @@ handle_program_args('--eval', '-x', A) :-
 
 
 ## WHY ?!?!?!
+==============
 
 
 ### Myth busting
@@ -184,6 +186,8 @@ handle_program_args('--eval', '-x', A) :-
 
 
 ### State of affairs
+* One small code example so far runs about ¼ the speed of SBCL 
+
 ````
 CL-USER>  (defun fib (n) (if (<= n 1) 1 (+ (fib (- n 1)) (fib (- n 2)))))
 % :- lisp_compiled_eval(
@@ -272,6 +276,7 @@ fibp2(N, F) :-
 % run time  : 25.516 secs (real time : 26.290 secs)
 ````
 
+
 ## Copyright and License
 
 Copyright (c) 2017, [Douglas Miles](https://twitter.com/logicmoo)
@@ -355,7 +360,7 @@ All rights reserved.
 Please ask to be added to TeamSPoon !
 
 
-## FUTHER THOUHTS:
+## FUTHER MISTHOUHTS:
 
 I'll reply inline and correct some of the confusing misstatements I had made.
 > > 
