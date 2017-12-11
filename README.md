@@ -37,16 +37,15 @@ Run `?- pack_install(wam_common_lisp)`.
 
 * Continue to ensure can run in YAP (which Lisp to Prolog benchmarking shows about 4x speedup) 
 
-* One small code so far seems to run much faster than ECL, ABCL, CLISP  but about ¼ the speed of SBCL 
+* One small code so far seems to run much faster than ECL, ABCL, CLISP  but about Â¼ the speed of SBCL 
 
 * Picks up freebies .. whatever the host prolog system offers such as 
 **Makes  Executables and. So files 
 **Garbage Collection 
 **Memoization 
 **Embedding (from C/C++/Python/C#/Mono/Java)  
-
-
 * Gives back OO to Prolog programmers 
+
 
 ## Roadmap Items 
 * To keep later `copy_term/2's` cheap, it passes entire object references as atoms  (nb_current/2 allows access to the object's property map)
@@ -54,98 +53,13 @@ Run `?- pack_install(wam_common_lisp)`.
 * Using SWICLI as FFI (SWICLI itself still needs work) 
 * ASDF 
 * Quicklisp 
+* Document this pack!
+* Write tests
+* Untangle the 'pack' install deps
+* Still in progress (Moving predicates over here from logicmoo_base)
 
 
-
-````
-CL-USER>  (defun fib (n) (if (<= n 1) 1 (+ (fib (- n 1)) (fib (- n 2)))))
-% :- lisp_compiled_eval(
-%                     [ defun,
-%                       u_fib,
-%                       [n],
-%                       [if, [<=, n, 1], 1, [+, [u_fib, [-, n, 1]], [u_fib, [-, n, 2]]]]
-%                     ]).
-% COMPILER
-/*
-alphas=[n].
-type=ctx.
-var_tracker(n)=rw{name:n, p:1, r:3, ret:0, u:0, vars:[N_Param, N_Get, N_Get29, N_Get36], w:1}.
- */
-% inlined(-(N_Param, 1, C45_Ret)) :-
-%       C45_Ret is N_Param-1.
-% inlined(-(N_Param, 2, C45_Ret38)) :-
-%       C45_Ret38 is N_Param-2.
-% inlined(+(Fib_Ret, Fib_Ret39, C43_Ret)) :-
-%       C43_Ret is Fib_Ret+Fib_Ret39.
-% 345,783 inferences, 0.074 CPU in 0.077 seconds (97% CPU, 4661956 Lips)
-
-% asserting... u
-wl:arglist_info(f_u_fib, [n], [N_Param], arginfo{all:1, allow_other_keys:0, aux:0, complex:0, env:0, key:0, names:[n], opt:0, req:1, rest:0}).
-
-% asserting... u
-wl:lambda_def(defun, u_fib, f_u_fib, [n], [[if, [<=, n, 1], 1, [+, [u_fib, [-, n, 1]], [u_fib, [-, n, 2]]]]]).
-
-% asserting... u
-f_u_fib(N_Param, _rPrevRes) :-
-        (   N_Param=<1
-        ->  _rPrevRes=1
-        ;   N_Param is N_Param-1,
-            f_u_fib(N_Param, Fib_Ret39),
-            N_Param is N_Param-2,
-            f_u_fib(N_Param, Fib_Ret39),
-            Fib_Ret39 is Fib_Ret39+Fib_Ret39,
-            _rPrevRes=Fib_Ret39
-        ).
-:- set_opv(f_u_fib, classof, claz_compiled_function),
-   set_opv(u_fib, compile_as, kw_function),
-   set_opv(u_fib, function, f_u_fib).
-% EXEC
-% 409 inferences, 0.000 CPU in 0.000 seconds (97% CPU, 1768029 Lips)
-FIB
-CL-USER>
-````
-is very close to
-````
-% HANDWRITTEN
-fibp2(N, F) :-
-        N =< 1 
-        -> F = 1 
-        ;
-        N1 is N-1,
-        N2 is N-2,
-        fibp2(N1, F1),
-        fibp2(N2, F2),
-        F is F1+F2.
-````
-
-
-
-````
-% SBCL 1.3.1
-% * (defun fib (n) (if (<= n 1) 1 (the fixnum (+ (fib (- n 1)) (fib (- n 2))))))
-% * (time (fib 38))
-% 1.264000 seconds of total run time (1.264000 user, 0.000000 system)
-````
-
-````
-% YAP-Prolog 
-% ?- time(fib(38,O)).
-% 3.124 CPU in 3.148 seconds ( 99% CPU)
-````
-
-````
-% SWI-Prolog
-% ?- timel(fib(38,O)).
-% 24.558 CPU in 24.826 seconds (99% CPU, 18027611 Lips)
-````
-
-````
-% ECL 15.3.7
-% > (time (fib 38))
-% run time  : 25.516 secs (real time : 26.290 secs)
-````
-
-## Usage (output of --help)
+## Usaage output of --help)
 ````
 WAM-CL (https://github.com/TeamSPoon/wam_common_lisp) is an ANSI Common Lisp implementation.
 
@@ -258,19 +172,15 @@ prolog-in-lisp(s) are *not* 1000x slower than prolog-in-c but certainly not as f
 This leads to another class of programs 
 
 > > and be at least in the top 3 impls
-> >         for speed …   Also the type of lisp programs I like to run (SWALE, DAYDREAMER) are buggy partial impl of Greenspun's rule as applied to Prolog (Instead of Lisp)
+> >         for speed Â…   Also the type of lisp programs I like to run (SWALE, DAYDREAMER) are buggy partial impl of Greenspun's rule as applied to Prolog (Instead of Lisp)
 
 I should clarify, SWALE and DAYDREAMER are *not* buggy implementations of Prolog! they are their own things.  But there are certain routines they contain that make extensive use of unification and backtracking.  These routines  (for decades now) are examples where the data representations and processing their capabilities (well mostly domain sizes) have been scaled back due to virtually creating the same penalties of the "prolog-in-lisp" scenario.  This scenario is similar to taking an assembly language program that twiddles bitmasks and using bignum math to emulate the registers of the  Intel-4930k CPU. *You might just see some performance differences? We will be very lucky if 4x-10x was the only speed difference between running that same assembly code program directly on the processor or in our program.
 
-> > 
-> > - Douglas Miles
-> 
-````
 
 ## WHY?!!?
 
 
-###First, the nonpractical reasons (to answer several questions we all have)
+### First, the nonpractical reasons (to answer several questions we all have)
 
 
 * Is it really super easy to implement _anything_ on Prolog?  Some junior Prolog programmers would be surprised by Prolog doing any OO let alone MOP.  After all, Prolog is very very simple when it comes to its types. 
@@ -279,13 +189,101 @@ I should clarify, SWALE and DAYDREAMER are *not* buggy implementations of Prolog
 
 * Other myths "prolog doesn't scale".. least will be busted that whenever a lisp program (that scales according to whatever "scale" means) is running on a lisp-in-prolog (like WAM-CL) 
 
-###Practical reasons: 
+### Practical reasons: 
 
 * Several decades of Common Lisp development libraries can, within a matter of hours, be translated to useable Prolog development libraries. 
 
 * Also, DAYDREAMER, Knowledge Machine, SWALE, and CYC might perform differently and be more practical at non-toy domains. 
 
 
+### State of affairs
+````
+CL-USER>  (defun fib (n) (if (<= n 1) 1 (+ (fib (- n 1)) (fib (- n 2)))))
+% :- lisp_compiled_eval(
+%                     [ defun,
+%                       u_fib,
+%                       [n],
+%                       [if, [<=, n, 1], 1, [+, [u_fib, [-, n, 1]], [u_fib, [-, n, 2]]]]
+%                     ]).
+% COMPILER
+/*
+alphas=[n].
+type=ctx.
+var_tracker(n)=rw{name:n, p:1, r:3, ret:0, u:0, vars:[N_Param, N_Get, N_Get29, N_Get36], w:1}.
+ */
+% inlined(-(N_Param, 1, C45_Ret)) :-
+%       C45_Ret is N_Param-1.
+% inlined(-(N_Param, 2, C45_Ret38)) :-
+%       C45_Ret38 is N_Param-2.
+% inlined(+(Fib_Ret, Fib_Ret39, C43_Ret)) :-
+%       C43_Ret is Fib_Ret+Fib_Ret39.
+% 345,783 inferences, 0.074 CPU in 0.077 seconds (97% CPU, 4661956 Lips)
+
+% asserting... u
+wl:arglist_info(f_u_fib, [n], [N_Param], arginfo{all:1, allow_other_keys:0, aux:0, complex:0, env:0, key:0, names:[n], opt:0, req:1, rest:0}).
+
+% asserting... u
+wl:lambda_def(defun, u_fib, f_u_fib, [n], [[if, [<=, n, 1], 1, [+, [u_fib, [-, n, 1]], [u_fib, [-, n, 2]]]]]).
+
+% asserting... u
+f_u_fib(N_Param, _rPrevRes) :-
+        (   N_Param=<1
+        ->  _rPrevRes=1
+        ;   N_Param is N_Param-1,
+            f_u_fib(N_Param, Fib_Ret39),
+            N_Param is N_Param-2,
+            f_u_fib(N_Param, Fib_Ret39),
+            Fib_Ret39 is Fib_Ret39+Fib_Ret39,
+            _rPrevRes=Fib_Ret39
+        ).
+:- set_opv(f_u_fib, classof, claz_compiled_function),
+   set_opv(u_fib, compile_as, kw_function),
+   set_opv(u_fib, function, f_u_fib).
+% EXEC
+% 409 inferences, 0.000 CPU in 0.000 seconds (97% CPU, 1768029 Lips)
+FIB
+CL-USER>
+````
+is very close to
+````
+% HANDWRITTEN
+fibp2(N, F) :-
+        N =< 1 
+        -> F = 1 
+        ;
+        N1 is N-1,
+        N2 is N-2,
+        fibp2(N1, F1),
+        fibp2(N2, F2),
+        F is F1+F2.
+````
+
+
+
+````
+% SBCL 1.3.1
+% * (defun fib (n) (if (<= n 1) 1 (the fixnum (+ (fib (- n 1)) (fib (- n 2))))))
+% * (time (fib 38))
+% 1.264000 seconds of total run time (1.264000 user, 0.000000 system)
+````
+
+````
+% YAP-Prolog 
+% ?- time(fib(38,O)).
+% 3.124 CPU in 3.148 seconds ( 99% CPU)
+````
+
+````
+% SWI-Prolog
+% ?- timel(fib(38,O)).
+% 24.558 CPU in 24.826 seconds (99% CPU, 18027611 Lips)
+````
+
+````
+% ECL 15.3.7
+% > (time (fib 38))
+% run time  : 25.516 secs (real time : 26.290 secs)
+````
 
 ## Copyright and License
 
@@ -355,12 +353,6 @@ git commit -m "Preparing for next development iteration, 0.0.2."
 git push origin master
 ```
 
-# Some TODOs
-
-Document this pack!
-Write tests
-Untangle the 'pack' install deps
-Still in progress (Moving predicates over here from logicmoo_base)
 
 
 [BSD 2-Clause License](LICENSE.md)
