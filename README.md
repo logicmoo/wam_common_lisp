@@ -1,8 +1,6 @@
 Common Lisp in Prolog 
 =================
 
-[![Build Status](https://travis-ci.org/rla/simple-template.svg)](https://travis-ci.org/rla/simple-template)
-
 This library is designed to *not* be just another an ad-hoc, informally-specified, bug-ridden, slow implementation of half of Common Lisp.
 
 
@@ -53,6 +51,8 @@ Very importantly we need to ensure we can run well in
 * Using SWICLI as FFI (SWICLI itself still needs work) 
 * Ensure works with ASDF-INSTALL
 * Quicklisp 
+* [(FAKE TODO![Build Status](https://travis-ci.org/rla/simple-template.svg)](https://rlaanemets.com/post/show/adding-travis-to-swi-prolog-packs))
+
 
 
 ## Usaage output of --help)
