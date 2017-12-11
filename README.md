@@ -55,6 +55,31 @@ Very importantly we need to ensure we can run well in
 
 
 
+## WHY ?!?!?!
+==============
+
+
+### Myth busting
+
+
+* Is it really super easy to implement _anything_ on Prolog?  Some junior Prolog programmers would be surprised by Prolog doing any OO let alone MOP.  After all, Prolog is very very simple when it comes to its types. 
+
+* If it can be done, in the end, will it look as ugly as trying to implement and maintain a CommonLisp in a programing language like LOGO?  Everyone who graduates with a CS degree was tasked with several disarming hour just trying to do something as simple as adding up a list of numbers in Prolog. In moments of horror they think how simple it would have been it has it been any other language than Prolog.  Most come away with the misunderstanding that Prolog is only capable of certain pure tasks. And too awkward for everything else.  Much like how LOGO is the best language for mornings you've woken desperately needing to draw a box inside a circle.  Not so much for those mornings, you need to implement an HTTP client. 
+
+* Other myths "prolog doesn't scale".. least will be busted that whenever a lisp program (that scales according to whatever "scale" means) is running on a lisp-in-prolog (like WAM-CL) 
+
+* Some people say it's absolutely absurd to try to implement common Lisp inside a Prolog because of the final result would be to inefficient run to slow use it too much memory etc .
+
+### Practical reasons: 
+
+* Several decades of Common Lisp development libraries can, within a matter of hours, be translated to useable Prolog development libraries. 
+
+* Also, DAYDREAMER, Knowledge Machine, SWALE, and CYC might perform differently and be more practical at non-toy domains. 
+
+
+
+
+
 ## Usaage output of --help)
 ````
 WAM-CL (https://github.com/TeamSPoon/wam_common_lisp) is an ANSI Common Lisp implementation.
@@ -157,29 +182,6 @@ handle_program_args('--eval', '-x', A) :-
 ````
 
 
-
-## WHY ?!?!?!
-==============
-
-
-### Myth busting
-
-
-* Is it really super easy to implement _anything_ on Prolog?  Some junior Prolog programmers would be surprised by Prolog doing any OO let alone MOP.  After all, Prolog is very very simple when it comes to its types. 
-
-* If it can be done, in the end, will it look as ugly as trying to implement and maintain a CommonLisp in a programing language like LOGO?  Everyone who graduates with a CS degree was tasked with several disarming hour just trying to do something as simple as adding up a list of numbers in Prolog. In moments of horror they think how simple it would have been it has it been any other language than Prolog.  Most come away with the misunderstanding that Prolog is only capable of certain pure tasks. And too awkward for everything else.  Much like how LOGO is the best language for mornings you've woken desperately needing to draw a box inside a circle.  Not so much for those mornings, you need to implement an HTTP client. 
-
-* Other myths "prolog doesn't scale".. least will be busted that whenever a lisp program (that scales according to whatever "scale" means) is running on a lisp-in-prolog (like WAM-CL) 
-
-* Some people say it's absolutely absurd to try to implement common Lisp inside a Prolog because of the final result would be to inefficient run to slow use it too much memory etc .
-
-### Practical reasons: 
-
-* Several decades of Common Lisp development libraries can, within a matter of hours, be translated to useable Prolog development libraries. 
-
-* Also, DAYDREAMER, Knowledge Machine, SWALE, and CYC might perform differently and be more practical at non-toy domains. 
-
-
 ### State of affairs
 * One small code example so far runs about ¼ the speed of SBCL 
 
@@ -278,81 +280,7 @@ Copyright (c) 2017, [Douglas Miles](https://twitter.com/logicmoo)
 
 This project is licensed under the [MIT License](LICENSE.md).
 
-
-# Releasing Common Lisp-Prolog
-
-There're no hard rules about when to release wam_common_lisp. Release bug fixes frequently, features not so frequently and breaking API changes rarely.
-
-### Release
-
-Run tests, check that all tests succeed locally.
-
-```prolog
-?- run_tests(wam_common_lisp).
-
-```
-
-Increment the version, modify [pack.pl](pack.pl).
-
-*  Increment the third number if the release has bug fixes and/or very minor features, only (eg. change `0.0.1` to `0.0.2`).
-*  Increment the second number if the release contains major features or breaking API changes (eg. change `0.0.1` to `0.2.0`).
-
-Remove the line with "Your contribution here.", since there will be no more contributions to this release.
-
-Remove the "Stable Release" section in README that warns users that they are reading the documentation for an unreleased version.
-
-Commit your changes.
-
-```
-git add README.md CHANGELOG.md pack.pl
-git commit -m "Preparing for release, 0.0.2."
-git push origin master
-```
-
-Release.
-
-```
-$ @TODO
- 
-Tagged v0.0.2.
-Pushed git commits and tags.
-Pushed wam_common_lisp 0.0.2 to swi-prolog.org.
-```
-
-### Prepare for the Next Version
-
-Add the next release to [CHANGELOG.md](CHANGELOG.md).
-
-```
-Next Release
-============
-
-* Your contribution here.
-```
-
-Increment the third version number in [pack.pl](pack.pl).
-
-Commit your changes.
-
-```
-git add CHANGELOG.md pack.pl
-git commit -m "Preparing for next development iteration, 0.0.2."
-git push origin master
-```
-
-
-
-[BSD 2-Clause License](LICENSE.md)
-
-Copyright (c) 2017, 
-Douglas Miles <logicmoo@gmail.com> and TeamSPoon
-All rights reserved.
-
-# Dislike having tons of forks that are several commits behind the main git repo?
-
-(Why feel obligated to maintain a git fork just to contribute ?)
-
-Please ask to be added to TeamSPoon !
+CONRIBUTING
 
 
 ## FUTHER MISTHOUGHT:
