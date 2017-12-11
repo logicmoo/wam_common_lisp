@@ -158,29 +158,14 @@ handle_program_args('--eval', '-x', A) :-
         lisp_compiled_eval(A, _).
 
 
-```
-
-
 ````
-Hi, I'll reply inline and correct some of the confusing misstatements I had made.
-> > 
-> >    I've only spent a week on it ...    I hope to recruit people that seem to know both Lisp and Prolog languages.
-> > 
-> >        The main purpose is this impl is it to run prolog-in-lisp 1000x  faster than the fastest lisps
-prolog-in-lisp(s) are *not* 1000x slower than prolog-in-c but certainly not as fast (I apologize, I should have said 5-10x time slower).  The problem arises for Prolog programs like: English to CommonLogic converters (used in Natural Language Understanding), large-scale ontology checkers, KL-ONE language interpreters, and PDDL planners (Planning Domain Definition Language).  Such programs perform fine when written entirely in Lisp or Prolog (neither better or worse).  The problem is that they more often perform unacceptably poor when written in Prolog and then ran on a prolog-in-lisp interpreter.    
-
-This leads to another class of programs 
-
-> > and be at least in the top 3 impls
-> >         for speed    Also the type of lisp programs I like to run (SWALE, DAYDREAMER) are buggy partial impl of Greenspun's rule as applied to Prolog (Instead of Lisp)
-
-I should clarify, SWALE and DAYDREAMER are *not* buggy implementations of Prolog! they are their own things.  But there are certain routines they contain that make extensive use of unification and backtracking.  These routines  (for decades now) are examples where the data representations and processing their capabilities (well mostly domain sizes) have been scaled back due to virtually creating the same penalties of the "prolog-in-lisp" scenario.  This scenario is similar to taking an assembly language program that twiddles bitmasks and using bignum math to emulate the registers of the  Intel-4930k CPU. *You might just see some performance differences? We will be very lucky if 4x-10x was the only speed difference between running that same assembly code program directly on the processor or in our program.
 
 
-## WHY?!!?
+
+## WHY ?!?!?!
 
 
-### First, the nonpractical reasons (to answer several questions we all have)
+### Myth busting
 
 
 * Is it really super easy to implement _anything_ on Prolog?  Some junior Prolog programmers would be surprised by Prolog doing any OO let alone MOP.  After all, Prolog is very very simple when it comes to its types. 
@@ -188,6 +173,8 @@ I should clarify, SWALE and DAYDREAMER are *not* buggy implementations of Prolog
 * If it can be done, in the end, will it look as ugly as trying to implement and maintain a CommonLisp in a programing language like LOGO?  Everyone who graduates with a CS degree was tasked with several disarming hour just trying to do something as simple as adding up a list of numbers in Prolog. In moments of horror they think how simple it would have been it has it been any other language than Prolog.  Most come away with the misunderstanding that Prolog is only capable of certain pure tasks. And too awkward for everything else.  Much like how LOGO is the best language for mornings you've woken desperately needing to draw a box inside a circle.  Not so much for those mornings, you need to implement an HTTP client. 
 
 * Other myths "prolog doesn't scale".. least will be busted that whenever a lisp program (that scales according to whatever "scale" means) is running on a lisp-in-prolog (like WAM-CL) 
+
+* Some people say it's absolutely absurd to try to implement common Lisp inside a Prolog because of the final result would be to inefficient run to slow use it too much memory etc .
 
 ### Practical reasons: 
 
@@ -367,33 +354,27 @@ All rights reserved.
 
 Please ask to be added to TeamSPoon !
 
-````
 
+## FUTHER THOUHTS:
 
-````
-OLD (mis-)Thoughts:
+I'll reply inline and correct some of the confusing misstatements I had made.
+> > 
+> >    I've only spent a week on it ...    I hope to recruit people that seem to know both Lisp and Prolog languages.
+> > 
+> >        The main purpose is this impl is it to run prolog-in-lisp 1000x  faster than the fastest lisps
+prolog-in-lisp(s) are *not* 1000x slower than prolog-in-c but certainly not as fast (I apologize, I should have said 5-10x time slower).  The problem arises for Prolog programs like: English to CommonLogic converters (used in Natural Language Understanding), large-scale ontology checkers, KL-ONE language interpreters, and PDDL planners (Planning Domain Definition Language).  Such programs perform fine when written entirely in Lisp or Prolog (neither better or worse).  The problem is that they more often perform unacceptably poor when written in Prolog and then ran on a prolog-in-lisp interpreter.    
 
-My task is to create a Prolog version of a Common Lisp Interpretor.   
-Intially starting out with Lisp500.  I haven't checked yet if Lisp 500 will be good enough to run most Lisp programs it's not quite common Lisp obviously but at least it's accepted widely enough that it even CL-BENCH references it.
-If there's a better common Lisp out there for us and we get there faster than I'll take you up on the offer to use that Lisp and said this Lisp for example one might find armed they are common Lisp.   
-The reason for choosing Lisp 500 is it would require you to only implement 158 initial trampolines from there core500.lisp  is loaded on top of your Prolog system initial Lisp500.pl.  
-Presently lisp500.pl has a C functions including comments as you can see it's manipulating memory arrays and a completely idiomatic port of the 158  C  functions would probably not be ideal but I'm allowing this to be possible if it allows you to get the job completed faster.    See,  If I was doing this work myself,  I would probably begin to work on the C idiomatically but then within a short amount of time realize that this approach is creating more work compared to implementing the exact function that the core Lisp file requires CAR/APPLY etc.  But I don't feel comfortable going straight to the core list functionality until I've at least had a crack at idiomatic C.  I leave this up to your discretion.
-Regardless how this first part was done you would get to the point where you are loading the core500.lisp.  You now have a toy Lisp interpreter.    You know that the bounty is complete when you can run the either the package or unpackaged version of knowledge machine in your Lisp implementation.      If this target was a little too far off then I would first go for passing of the ANSI Common Lisp Test Suite.  http://common-lisp.net/project/ansi-test/ or as much as possible.   After a reasonable number of ANSI tests can be passed I would then start using smaller list programs which can be added to the test directory the finalists program that I like to feel the run is called the knowledge machine and that's in the test directory right now and in there is a script file that runs the tests for the seat the KM system.
+This leads to another class of programs 
 
+> > and be at least in the top 3 impls
+> >         for speed    Also the type of lisp programs I like to run (SWALE, DAYDREAMER) are buggy partial impl of Greenspun's rule as applied to Prolog (Instead of Lisp)
 
-
-
-NOTES:
-CL ANSI tests I suppose at this very moment I should be testing the C version in seeing how far it gets in the ANSI tests to get his myself a baseline to find out if Lisp 500s actually really worth it.  
-I would like to also find out if there is a way of eventually getting the CLOS out of Lisp 500.  Some people suggested using closette for this particular work order getting classes in necessary but it is in the plan and if it seems like this is not an happen starting with with 500 but starting with the different lisp  I would try to figure this as soon as possible.
+I should clarify, SWALE and DAYDREAMER are *not* buggy implementations of Prolog! they are their own things.  But there are certain routines they contain that make extensive use of unification and backtracking.  These routines  (for decades now) are examples where the data representations and processing their capabilities (well mostly domain sizes) have been scaled back due to virtually creating the same penalties of the "prolog-in-lisp" scenario.  This scenario is similar to taking an assembly language program that twiddles bitmasks and using bignum math to emulate the registers of the  Intel-4930k CPU. *You might just see some performance differences? We will be very lucky if 4x-10x was the only speed difference between running that same assembly code program directly on the processor or in our program.
 
 
 
-FUTHER THOUHTS:
 
-Some people say it's absolutely absurd to try to implement common Lisp inside a Prolog because of the final result would be to inefficient run to slow use it too much memory etc . A week ago when the JavaScript version of miniKanren ran faster than the Scheme version because in their particular use case the user types in code and expected it to run as quickly as possible in which it did because it skipped over some compilation step.  All the JavaScript version did was create a list of uncompiled closures.  Our analogy here is that Lisp macros can almost always be compiled down into a set of Lisp functions after they been expanded properly.  However we also know that they can be interpreted and that the Lisp interpreter does not really have to compile these macros and said do term replacement.  While this is prolog chief capability that is to put terms inside of terms during unification you may ask is really Lisp just macro after macro and would we really get a speed of benefit by doing this.  This argument may be flawed but it was just a thought.
 
-My usescase .. A propositional resolution program such as CYC, SNARK or KM (knowledge machine) is an exercise into how quickly it can select properly with correct piece of code to invoke this or that .   I believe does not lend itself that greatly to compilation.   This thread will  probably quickly have very knowledgeable people helping me out by telling me why this is not a great idea.  Truthfully I rather doubt that my hypothesis is true that it would run these programs faster but I do believe they will not run is slow and some programming communities would predict.    That said the task is not to make it run fast for me but just to work at all would be wonderful.  
 
 
 ```` 
