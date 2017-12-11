@@ -263,7 +263,7 @@ is_when(X):- get_var(sys_xx_compiler_mode_xx,List),
 
 
 % makes  sys_xx_compiler_mode_xx 
-wl:interned_eval("(defparameter sys:*compiler-mode* :execute)").
+wl:interned_eval("(defparameter sys::*compiler-mode* :execute)").
 
 
 compile_body(Ctx,Env,Result, Body, Code):- 
@@ -594,6 +594,7 @@ setq_from_values_each(Env,[Var|Vars],[Val|Values]):-
 
 f_sys_set_symbol_value(Var,Val):-
   set_opv(Var,value,Val).
+
 %  env_current(Env),
   %set_var(Env,Var,Val).
 

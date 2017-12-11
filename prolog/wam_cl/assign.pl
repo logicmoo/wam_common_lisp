@@ -175,9 +175,9 @@ bvof(E,M,T):-E=T,!,M=T.
 bvof(E,M,[L|L2]):- ((nonvar(L),bvof(E,M,L))->true;(nonvar(L2),bvof(E,M,L2))).
 
 
+set_var(Var,Val):- ensure_env(Env),!,set_var(Env,Var,Val).
 
 set_var(Env,Var,Result):-var(Result),!,get_var(Env,Var,Result).
-
 set_var(Env,Var,Result):- ensure_env(Env),!,
      (bvof(bv(Var,_),BV,Env)
       -> nb_setarg(2,BV,Result)

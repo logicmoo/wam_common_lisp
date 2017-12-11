@@ -159,10 +159,29 @@ do_compile_1file(Keys,File0):-
          do_compile_1file_to_stream(Keys,File0,Stream),
          close(Stream))).
 
-
+% The Prolog translator is still unfinished and experimental. You can install the package by typing pack_install(transpiler) in the SWI-Prolog console. Now, you can use the translator to convert JavaScript source code into Lua:
 do_compile_1file_to_stream(_Keys,File0,Stream):-
   search_for(File0,File),
-  with_each_file(with_each_form(lisp_compile_to_prolog_output(Stream)),File).
+  to_prolog_string(File0,Name),
+  get_time(Epoch),format_time(string(EpochS), '%+', Epoch),
+  working_directory(PWD,PWD),
+  statistics(runtime,[Start,_]),
+  format(Stream,'
+% WAM-CL translated Lisp File (see https://github.com/TeamSPoon/wam_common_lisp/tree/master/prolog/wam_cl )
+% File: ~q (~w)
+% PWD: ~w
+% Start time: ~w
+
+:-style_check(-discontiguous).
+:-style_check(-singleton).
+:-use_module(library(wamcl_runtime)).
+
+',[Name,File,PWD,EpochS]),
+  with_output_to(Stream,statistics),
+  with_each_file(with_each_form(lisp_compile_to_prolog_output(Stream)),File),
+   statistics(runtime,[End,_]),
+   Total is (End - Start)/1000,
+   format(Stream,'~n~n% Total time: ~w seconds~n~n',[Total]).
   
 
 lisp_compile_to_prolog_output(Stream,PExpression):- 

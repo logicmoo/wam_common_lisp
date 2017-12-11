@@ -1,0 +1,3 @@
+
+(print (cons "hello" *ARGS*))
+
