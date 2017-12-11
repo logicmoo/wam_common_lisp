@@ -11,11 +11,6 @@ https://github.com/TeamSPoon/wam_common_lisp
 ![](t/Common Lisp.png)
 
 
-## Installation 
-
-Run `?- pack_install(wam_common_lisp)`.
-
-
 ## Useful to Me?
 
 * Translates Lisp source files into Prolog source files.  ( compilation is done by Host prolog on the Translated source (from either disk or memory)) 
@@ -41,10 +36,10 @@ Very importantly we need to ensure we can run well in
 ** EcLiPSe Prolog
  
 * Most simple functions optimize to how handwritten code might look.. *only* 2-3 slower than compiled SBCL
-
 * comp.lang.lisp thread https://groups.google.com/forum/#!topic/comp.lang.lisp/0G77ebK3DIw
-
 * comp.lang.prolog thread https://groups.google.com/forum/#!topic/comp.lang.prolog/85jyECdWTxc
+* other README.MD https://github.com/TeamSPoon/wam_common_lisp/tree/master/prolog/wam_cl
+* HOWTO Ats bottem
 
 ## Goals and TODOs
 * Document this pack!
@@ -360,7 +355,7 @@ All rights reserved.
 Please ask to be added to TeamSPoon !
 
 
-## FUTHER MISTHOUHTS:
+## FUTHER MISTHOUGHT:
 
 I'll reply inline and correct some of the confusing misstatements I had made.
 > > 
@@ -375,8 +370,6 @@ This leads to another class of programs
 > >         for speed    Also the type of lisp programs I like to run (SWALE, DAYDREAMER) are buggy partial impl of Greenspun's rule as applied to Prolog (Instead of Lisp)
 
 I should clarify, SWALE and DAYDREAMER are *not* buggy implementations of Prolog! they are their own things.  But there are certain routines they contain that make extensive use of unification and backtracking.  These routines  (for decades now) are examples where the data representations and processing their capabilities (well mostly domain sizes) have been scaled back due to virtually creating the same penalties of the "prolog-in-lisp" scenario.  This scenario is similar to taking an assembly language program that twiddles bitmasks and using bignum math to emulate the registers of the  Intel-4930k CPU. *You might just see some performance differences? We will be very lucky if 4x-10x was the only speed difference between running that same assembly code program directly on the processor or in our program.
-
-
 
 
 
@@ -401,4 +394,87 @@ I should clarify, SWALE and DAYDREAMER are *not* buggy implementations of Prolog
 
 ````
 
+## HOWTO/QUICKSTART
+===================
 
+
+## Installation 
+````
+$ swipl
+Run `?- pack_install(wam_common_lisp)`.
+````
+
+### try it
+````
+$ swipl
+
+?- use_module(library(wamcl)).
+true.
+
+?- lisp.
+
+__        ___    __  __        ____ _
+\ \      / / \  |  \/  |      / ___| |
+ \ \ /\ / / _ \ | |\/| |_____| |   | |
+  \ V  V / ___ \| |  | |_____| |___| |___
+   \_/\_/_/   \_\_|  |_|      \____|_____|
+
+Common Lisp, written in Prolog
+CL-USER> (sqrt -1)
+% :- lisp_compiled_eval([sqrt, -1]).
+% COMPILER
+% 32,324 inferences, 0.006 CPU in 0.006 seconds (97% CPU, 5643884 Lips)
+:- cl_sqrt(-1, Sqrt_Ret).
+% EXEC
+% 22 inferences, 0.000 CPU in 0.000 seconds (95% CPU, 824897 Lips)
+#C(0 1)
+````
+
+### navigate disk
+
+````
+CL-USER> pwd.
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/
+
+CL-USER> :cd t
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/
+
+CL-USER> ls.
+% baby2015/                           credit_tim_finin.sip.msg            MicroPrologII/                      test_cisp/
+% credit_neil_smith.html              daydreamer/                         reference/                          travis.pl
+% credit_neil_smith_prolog.html       hello.lisp                          test_1000/
+% credit_tim_finin.html               km/                                 test_1500/
+% ls.
+T
+CL-USER>
+````
+
+### Translate a file to prolog
+Translate a file to prolog
+
+CL-USER> (compile-file "hello.lisp")
+<...snip...>
+% 97,548 inferences, 0.023 CPU in 0.023 seconds (100% CPU, 4227371 Lips)
+#P/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/hello.lisp
+CL-USER>
+
+### Open PceEmacs on a translated file
+CL-USER> (edit (compile-file "hello.lisp"))
+.... Opens PCEMACS ....
+
+### Load a file
+CL-USER> (prolog:consult (compile-file "hello.lisp"))
+
+CL-USER> (load "hello.lisp" :compile t)   ;;; same as the above
+
+
+
+### .... docvument
+cd $PACKDIR/wam_common_lisp/prolog/wam_cl
+$ swipl ../wamcl.pl --exe wamcl
+$ ./wamcl -c hello.lisp -o hello.pl --exe hello
+$ ./hello world
+$ swipl -x hello --repl
+$ swipl hello.pl
+$ swipl -x wamcl.prc
+% swipl -x wamcl.prc hello.lisp world
