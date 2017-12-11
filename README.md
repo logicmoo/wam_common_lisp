@@ -1,9 +1,10 @@
 Common Lisp in Prolog 
 =================
 
-This library provides an ad-hoc, informally-specified, bug-ridden, slow implementation of half of Common Lisp.
+[![Build Status](https://travis-ci.org/rla/simple-template.svg)](https://travis-ci.org/rla/simple-template)
 
- API to Common Lisp
+This library is designed to *not* be an ad-hoc, informally-specified, bug-ridden, slow implementation of half of Common Lisp.
+
 
 https://github.com/TeamSPoon/wam_common_lisp
 
@@ -14,63 +15,96 @@ https://github.com/TeamSPoon/wam_common_lisp
 Run `?- pack_install(wam_common_lisp)`.
 
 
-/*
- 
 ## NOTES:
  
-* WAM-CL currently produces code 6 times slower than the handwritten code
+* WAM-CL currently produces Prolog code an average 6 times slower than the handwritten Prolog code.
+   
+* Handwritten Prolog is *only* 2-3 slower than compiled SBCL
  
-* Handwritten Prolog is 2-3 slower than SBCL
- 
-* If WAM-CL becomes fast as handwritten code,
-** it will be 17 times faster than CLISP
-** it will be 6 times faster than ECL
- 
- 
- 
-```` 
+* Most simple functions optimize to how handwritten code looks/works
 
-(declaim (optimize (speed 3) (debug 0) (safety 0)))(defun fib (n) (if (<= (1- n) 0) n (the fixnum (+ (fib (- n 1)) (fib (- n 2))))))
- (time (fib 38))
+* comp.lang.lisp thread https://groups.google.com/forum/#!topic/comp.lang.lisp/0G77ebK3DIw
+
+* comp.lang.prolog thread https://groups.google.com/forum/#!topic/comp.lang.prolog/85jyECdWTxc
+
+## About this Lisp: 
+
+* Translates Lisp source files into Prolog source files.  ( compilation is done to Translated source) 
+
+* At the REPL, forms are converted from Lisp to Prolog then call/1d 
+
+* Being written as an SWI-Prolog "pack" 
+
+* Continue to ensure can run in YAP (which Lisp to Prolog benchmarking shows about 4x speedup) 
+
+* One small code so far seems to run much faster than ECL, ABCL, CLISP  but about ¼ the speed of SBCL 
+
+* Picks up freebies .. whatever the host prolog system offers such as 
+**Makes  Executables and. So files 
+**Garbage Collection 
+**Memoization 
+**Embedding (from C/C++/Python/C#/Mono/Java)  
 
 
-(declaim (optimize (speed 0) (debug 3) (safety 3)))(defun fib (n)(declare (optimize  (safety 3) (debug 0)) (fixnum n)) (if (<= (1- n) 0) n (the fixnum (+ (fib (- n 1)) (fib (- n 2)))))) (time (fib 41))
+* Gives back OO to Prolog programmers 
 
-(declaim (ftype (function (fixnum) fixnum) fib))(declaim (optimize (speed 3) (debug 0) (safety 0)))(defun fib (n)(declare (optimize speed (safety 0) (debug 0))) (if (<= (1- n) 0) n (the fixnum (+ (fib (- n 1)) (fib (- n 2)))))) (time (fib 41))
-
-
-
-(declaim (ftype (function (fixnum) fixnum) fib))(declaim (optimize (speed 2) (debug 2) (safety 2)))(defun fib (n)(declare (optimize speed (safety 2) (debug 2)) (fixnum n)) (if (<= (1- n) 0) n (the fixnum (+ (fib (- n 1)) (fib (- n 2)))))) (time (fib 41))
-
-(declaim (ftype (function (fixnum) fixnum) fib))(declaim (optimize (speed 2) (debug 2) (safety 2)))(defun fib (n)(declare (optimize speed (safety 2) (debug 2)) (fixnum n)) (if (<= (1- n) 0) n (the fixnum (+ (fib (- n 1)) (fib (- n 2)))))) (time (fib 40))
+## Roadmap Items 
+* To keep later `copy_term/2's` cheap, it passes entire object references as atoms  (nb_current/2 allows access to the object's property map)
+* Expect to pass most all CL-ANSI tests 
+* Using SWICLI as FFI (SWICLI itself still needs work) 
+* ASDF 
+* Quicklisp 
 
 
 
 ````
- 
-*/
+CL-USER>  (defun fib (n) (if (<= n 1) 1 (+ (fib (- n 1)) (fib (- n 2)))))
+% :- lisp_compiled_eval(
+%                     [ defun,
+%                       u_fib,
+%                       [n],
+%                       [if, [<=, n, 1], 1, [+, [u_fib, [-, n, 1]], [u_fib, [-, n, 2]]]]
+%                     ]).
+% COMPILER
+/*
+alphas=[n].
+type=ctx.
+var_tracker(n)=rw{name:n, p:1, r:3, ret:0, u:0, vars:[N_Param, N_Get, N_Get29, N_Get36], w:1}.
+ */
+% inlined(-(N_Param, 1, C45_Ret)) :-
+%       C45_Ret is N_Param-1.
+% inlined(-(N_Param, 2, C45_Ret38)) :-
+%       C45_Ret38 is N_Param-2.
+% inlined(+(Fib_Ret, Fib_Ret39, C43_Ret)) :-
+%       C43_Ret is Fib_Ret+Fib_Ret39.
+% 345,783 inferences, 0.074 CPU in 0.077 seconds (97% CPU, 4661956 Lips)
 
+% asserting... u
+wl:arglist_info(f_u_fib, [n], [N_Param], arginfo{all:1, allow_other_keys:0, aux:0, complex:0, env:0, key:0, names:[n], opt:0, req:1, rest:0}).
 
-````
-% WAM-CL 
-fibc(A, K) :- !,
-        B=[[bv(n, [A|_])]],
-        sym_arg_val_envc(n, A, C, B),
-        >(C, 1, D),
-        (   D\=[]
-        ->  sym_arg_val_envc(n, A, E, B),
-            -(E, 1, F),
-            fibc(F, I),
-            sym_arg_val_envc(n, A, G, B),
-            -(G, 2, H),
-            fibc(H, J),
-            +(I, J, L),
-            K=L
-        ;   K=1
+% asserting... u
+wl:lambda_def(defun, u_fib, f_u_fib, [n], [[if, [<=, n, 1], 1, [+, [u_fib, [-, n, 1]], [u_fib, [-, n, 2]]]]]).
+
+% asserting... u
+f_u_fib(N_Param, _rPrevRes) :-
+        (   N_Param=<1
+        ->  _rPrevRes=1
+        ;   N_Param is N_Param-1,
+            f_u_fib(N_Param, Fib_Ret39),
+            N_Param is N_Param-2,
+            f_u_fib(N_Param, Fib_Ret39),
+            Fib_Ret39 is Fib_Ret39+Fib_Ret39,
+            _rPrevRes=Fib_Ret39
         ).
-fibc(_, _) :- '<<=='(fibc(n),if(n>1, fibc(n-1)+fibc(n-2), 1)).
+:- set_opv(f_u_fib, classof, claz_compiled_function),
+   set_opv(u_fib, compile_as, kw_function),
+   set_opv(u_fib, function, f_u_fib).
+% EXEC
+% 409 inferences, 0.000 CPU in 0.000 seconds (97% CPU, 1768029 Lips)
+FIB
+CL-USER>
 ````
-
+is very close to
 ````
 % HANDWRITTEN
 fibp2(N, F) :-
@@ -88,25 +122,20 @@ fibp2(N, F) :-
 
 ````
 % SBCL 1.3.1
+% * (defun fib (n) (if (<= n 1) 1 (the fixnum (+ (fib (- n 1)) (fib (- n 2))))))
 % * (time (fib 38))
 % 1.264000 seconds of total run time (1.264000 user, 0.000000 system)
 ````
 
 ````
-% YAP-Prolog (Hand written)
-% ?- time(fibp2(38,O)).
+% YAP-Prolog 
+% ?- time(fib(38,O)).
 % 3.124 CPU in 3.148 seconds ( 99% CPU)
 ````
 
 ````
-% YAP-Lisp (WAM-CL)
-% ?- time(fibc(38,O)).
-% 20.184 CPU in 20.340 seconds ( 99% CPU)
-````
-
-````
-% SWI-Prolog (Hand written)
-% ?- timel(fibp2(38,O)).
+% SWI-Prolog
+% ?- timel(fib(38,O)).
 % 24.558 CPU in 24.826 seconds (99% CPU, 18027611 Lips)
 ````
 
@@ -116,19 +145,147 @@ fibp2(N, F) :-
 % run time  : 25.516 secs (real time : 26.290 secs)
 ````
 
+## Usage (output of --help)
 ````
-% CLISP 2.49
-% (time (fib 38))
-% 53.0 sec.
-````
+WAM-CL (https://github.com/TeamSPoon/wam_common_lisp) is an ANSI Common Lisp implementation.
+
+Usage:  $wamcl [prolog-options] [wamcl-options] [lispfile [argument ...]]
+
+Host Prolog options:
+
+-x state         Start from Image state (must be first)
+                 (may be used to debug saved lisp EXEs)
+
+-[LGT]size[KMG]  Specify {Local,Global,Trail} limits
+[+/-]tty         Allow tty control
+-O               Optimised compilation
+--nosignals      Do not modify any signal handling
+--nodebug        Omit generation of debug info
+--version        Print the Prolog version information
+
+WAM-CL Options:
+
+ -?, --help    - print this help and exit
+
+Lisp Startup actions:
+ --ansi        - more ANSI CL compliance  (TODO)
+ -p package    - start in the package
+ -norc         - do not load the user ~/.wamclrc file   (TODO)
+ -lp dir       - add dir to *LOAD-PATHS* (can be repeated)    (TODO)
+ -i file       - load initfile (can be repeated)
+
+Compiler actions put WAM-CL into a batch mode:
+ -x expressions - execute the expressions (mixed into compiler actions)
+ -c [-l] lispfile [-o outputfile] - compile or load a lispfile
+               [--exe outputfile] - make a platform binary
+
+Which are overridden by:
+
+  --repl                Enter the interactive read-eval-print loop when done
+  --load <filename>     File to load
+  --eval <form>         Form to eval
+
+Default action is an interactive read-eval-print loop.
+
+  --quit, -norepl       Exit with status code (instead) from prevous option processing.
+                        Otherwise, an interactive read-eval-print loop is entered.
+
+   "lispfile"           When "lispfile" is given, it is loaded (via --load)
+
+Remaining arguments are placed in EXT:*ARGS* as strings.
+
+
+Examples:
+
+$PACKDIR/wam_common_lisp/prolog/wam_cl$
+
+# creating your first image
+$ swipl ../wamcl.pl --exe wamcl
+# try it
+$ ./wamcl
+$ ./wamcl -c hello.lisp -o hello.pl --exe hello
+$ ./hello world
+$ swipl -x hello --repl
+$ swipl hello.pl
+$ swipl -x wamcl.prc
+% swipl -x wamcl.prc hello.lisp world
+
+
+Extended Info:
+
+handle_program_args('--help', -?) :-
+        listing(handle_program_args),
+        show_help,
+        set_interactive(false).
+handle_program_args('--debug', '-debug') :-
+        cl_push_new(xx_features_xx, kw_debugger).
+handle_program_args('--quit', '-norepl') :-
+        set_interactive(false).
+handle_program_args('--repl', '-repl') :-
+        set_interactive(true).
+handle_program_args('--ansi', '-ansi') :-
+        cl_push_new(xx_features_xx, kw_ansi).
+handle_program_args('--package', '-p', A) :-
+        cl_inpackage(A).
+handle_program_args('--exe', '-o', A) :-
+        qsave_program(A),
+        set_interactive(false).
+handle_program_args('--compile', '-c', A) :-
+        cl_compile_file(A, [], _),
+        set_interactive(false).
+handle_program_args('--l', '-l', A) :-
+        cl_load(A, [], _),
+        set_interactive(false).
+handle_program_args('--load', '-i', A) :-
+        set_interactive(true),
+        cl_load(A, [], _).
+handle_program_args('--eval', '-x', A) :-
+        set_interactive(true),
+        lisp_compiled_eval(A, _).
+
+
+```
+
 
 ````
-% SWI-Lisp (WAM-CL)
-% ?- time(fibc(38,O)).
-% 113.043 CPU in 114.324 seconds (99% CPU, 15665558 Lips)
+Hi, I'll reply inline and correct some of the confusing misstatements I had made.
+> > 
+> >    I've only spent a week on it ...    I hope to recruit people that seem to know both Lisp and Prolog languages.
+> > 
+> >        The main purpose is this impl is it to run prolog-in-lisp 1000x  faster than the fastest lisps
+prolog-in-lisp(s) are *not* 1000x slower than prolog-in-c but certainly not as fast (I apologize, I should have said 5-10x time slower).  The problem arises for Prolog programs like: English to CommonLogic converters (used in Natural Language Understanding), large-scale ontology checkers, KL-ONE language interpreters, and PDDL planners (Planning Domain Definition Language).  Such programs perform fine when written entirely in Lisp or Prolog (neither better or worse).  The problem is that they more often perform unacceptably poor when written in Prolog and then ran on a prolog-in-lisp interpreter.    
+
+This leads to another class of programs 
+
+> > and be at least in the top 3 impls
+> >         for speed …   Also the type of lisp programs I like to run (SWALE, DAYDREAMER) are buggy partial impl of Greenspun's rule as applied to Prolog (Instead of Lisp)
+
+I should clarify, SWALE and DAYDREAMER are *not* buggy implementations of Prolog! they are their own things.  But there are certain routines they contain that make extensive use of unification and backtracking.  These routines  (for decades now) are examples where the data representations and processing their capabilities (well mostly domain sizes) have been scaled back due to virtually creating the same penalties of the "prolog-in-lisp" scenario.  This scenario is similar to taking an assembly language program that twiddles bitmasks and using bignum math to emulate the registers of the  Intel-4930k CPU. *You might just see some performance differences? We will be very lucky if 4x-10x was the only speed difference between running that same assembly code program directly on the processor or in our program.
+
+> > 
+> > - Douglas Miles
+> 
 ````
 
-## Usage
+## WHY?!!?
+
+
+###First, the nonpractical reasons (to answer several questions we all have)
+
+
+* Is it really super easy to implement _anything_ on Prolog?  Some junior Prolog programmers would be surprised by Prolog doing any OO let alone MOP.  After all, Prolog is very very simple when it comes to its types. 
+
+* If it can be done, in the end, will it look as ugly as trying to implement and maintain a CommonLisp in a programing language like LOGO?  Everyone who graduates with a CS degree was tasked with several disarming hour just trying to do something as simple as adding up a list of numbers in Prolog. In moments of horror they think how simple it would have been it has it been any other language than Prolog.  Most come away with the misunderstanding that Prolog is only capable of certain pure tasks. And too awkward for everything else.  Much like how LOGO is the best language for mornings you've woken desperately needing to draw a box inside a circle.  Not so much for those mornings, you need to implement an HTTP client. 
+
+* Other myths "prolog doesn't scale".. least will be busted that whenever a lisp program (that scales according to whatever "scale" means) is running on a lisp-in-prolog (like WAM-CL) 
+
+###Practical reasons: 
+
+* Several decades of Common Lisp development libraries can, within a matter of hours, be translated to useable Prolog development libraries. 
+
+* Also, DAYDREAMER, Knowledge Machine, SWALE, and CYC might perform differently and be more practical at non-toy domains. 
+
+
 
 ## Copyright and License
 
@@ -154,11 +311,6 @@ Increment the version, modify [pack.pl](pack.pl).
 
 *  Increment the third number if the release has bug fixes and/or very minor features, only (eg. change `0.0.1` to `0.0.2`).
 *  Increment the second number if the release contains major features or breaking API changes (eg. change `0.0.1` to `0.2.0`).
-
-
-```
-### 0.0.2 (2/10/2017)
-```
 
 Remove the line with "Your contribution here.", since there will be no more contributions to this release.
 
@@ -224,85 +376,12 @@ All rights reserved.
 Please ask to be added to TeamSPoon !
 
 ````
-% =====================================================
-% File: sanity_tests.pl
-% =====================================================
-
-:- use_module(library(multivar)).
-:- use_module(library(pfc)).
-
-isa(i1,c1).
-predicate_function_canonical(isa,instanceOf).
-
-% weaken_goals/2 that converts arguments (from legacy code)
-% into metaterms which allow logical constraints to be placed upon unification
-% in the case of atoms, they are "weakened" to non ground terms
-predicate_hold_aliases(Spec),{mpred_functor(Spec,F,A),functor(P,F,A)} 
-  ==> (  P, { weaken_goal(P,Q) } ==> {ignore(call(retract,P))},Q ).
-       
-predicate_hold_aliases(loves/2).
-
-% the predicate is weakened on read (all args)
-loves(sue,joe).
-loves(joe,fred).
-
-/*
-?- loves(X,joe).
-X = _{ '$value'= X, iz = sue}.
-*/
-
-% so that one may use "typed unification"
-tFemale(sue).
-~tFemale(joe).
-
-/*
-?-  use_module(library(attvar_reader)).  % allows attvars to be read from files and console
-
-?- loves( X{iza=tFemale},joe).
-X = _{ '$value'= X, iz = sue, iza=[tFemale]}.
-Yes.
-
-?- loves( sue, Y{iza=tFemale}).
-Y = _{ '$value'= X, iz = fred}.
-Yes.
-
-% this was Joe was asserted to specifically not to be a tFemale.
-% However the gender of Fred is still unknown
-
-*/
-
-:- if(false).
-
-%  @TODO  Move this to a different set of exmaples
-% this gets hairy to the instances can belong to several intensional types, extensional collections and datatypes.
-:- ensure_loaded(library('logicmoo/pfc/user_transitiveViaArg.pfc')).
-% both arguments must have at least some type attributes in common
-meta_argtypes(loves(X,X)).  % 
 
 
-:- endif.
-
-% =====================================================
-end_of_file.
-% =====================================================
-
-
-
-?- p(X,X) = p(i1,instanceOf(c1)).
-
-X = _{ '$value'= X, iz = c1, iza=[c1]}.
-Yes
-
-?- use_module(clause_attvars).
-
-?- p(X,X) = p(i1,instanceOf(c1)), asserta(x_was(X)).
-
-?- 
 ````
+OLD (mis-)Thoughts:
 
-
-
-My task is to create a Prolog  version of a Common Lisp Interpretor.   
+My task is to create a Prolog version of a Common Lisp Interpretor.   
 Intially starting out with Lisp500.  I haven't checked yet if Lisp 500 will be good enough to run most Lisp programs it's not quite common Lisp obviously but at least it's accepted widely enough that it even CL-BENCH references it.
 If there's a better common Lisp out there for us and we get there faster than I'll take you up on the offer to use that Lisp and said this Lisp for example one might find armed they are common Lisp.   
 The reason for choosing Lisp 500 is it would require you to only implement 158 initial trampolines from there core500.lisp  is loaded on top of your Prolog system initial Lisp500.pl.  
@@ -318,12 +397,30 @@ I would like to also find out if there is a way of eventually getting the CLOS o
 
 
 
-
 FUTHER THOUHTS:
 
 Some people say it's absolutely absurd to try to implement common Lisp inside a Prolog because of the final result would be to inefficient run to slow use it too much memory etc . A week ago when the JavaScript version of miniKanren ran faster than the Scheme version because in their particular use case the user types in code and expected it to run as quickly as possible in which it did because it skipped over some compilation step.  All the JavaScript version did was create a list of uncompiled closures.  Our analogy here is that Lisp macros can almost always be compiled down into a set of Lisp functions after they been expanded properly.  However we also know that they can be interpreted and that the Lisp interpreter does not really have to compile these macros and said do term replacement.  While this is prolog chief capability that is to put terms inside of terms during unification you may ask is really Lisp just macro after macro and would we really get a speed of benefit by doing this.  This argument may be flawed but it was just a thought.
 
 My usescase .. A propositional resolution program such as CYC, SNARK or KM (knowledge machine) is an exercise into how quickly it can select properly with correct piece of code to invoke this or that .   I believe does not lend itself that greatly to compilation.   This thread will  probably quickly have very knowledgeable people helping me out by telling me why this is not a great idea.  Truthfully I rather doubt that my hypothesis is true that it would run these programs faster but I do believe they will not run is slow and some programming communities would predict.    That said the task is not to make it run fast for me but just to work at all would be wonderful.  
 
+
+```` 
+
+(declaim (optimize (speed 3) (debug 0) (safety 0)))(defun fib (n) (if (<= (1- n) 0) n (the fixnum (+ (fib (- n 1)) (fib (- n 2))))))
+ (time (fib 38))
+
+
+(declaim (optimize (speed 0) (debug 3) (safety 3)))(defun fib (n)(declare (optimize  (safety 3) (debug 0)) (fixnum n)) (if (<= (1- n) 0) n (the fixnum (+ (fib (- n 1)) (fib (- n 2)))))) (time (fib 41))
+
+(declaim (ftype (function (fixnum) fixnum) fib))(declaim (optimize (speed 3) (debug 0) (safety 0)))(defun fib (n)(declare (optimize speed (safety 0) (debug 0))) (if (<= (1- n) 0) n (the fixnum (+ (fib (- n 1)) (fib (- n 2)))))) (time (fib 41))
+
+
+
+(declaim (ftype (function (fixnum) fixnum) fib))(declaim (optimize (speed 2) (debug 2) (safety 2)))(defun fib (n)(declare (optimize speed (safety 2) (debug 2)) (fixnum n)) (if (<= (1- n) 0) n (the fixnum (+ (fib (- n 1)) (fib (- n 2)))))) (time (fib 41))
+
+(declaim (ftype (function (fixnum) fixnum) fib))(declaim (optimize (speed 2) (debug 2) (safety 2)))(defun fib (n)(declare (optimize speed (safety 2) (debug 2)) (fixnum n)) (if (<= (1- n) 0) n (the fixnum (+ (fib (- n 1)) (fib (- n 2)))))) (time (fib 40))
+
+
+````
 
 
