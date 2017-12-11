@@ -4,12 +4,15 @@ Common Lisp in Prolog
 This library is designed to *not* be just another an ad-hoc, informally-specified, bug-ridden, slow implementation of half of Common Lisp.
 
 
-https://github.com/TeamSPoon/wam_common_lisp
+https://github.com/TeamSPoon/wam_common_lisp 
+## Copyright and License
 
-![](t/Common Lisp.png)
+Copyright (c) 2017, [Douglas Miles](https://twitter.com/logicmoo)
+
+This project is licensed under the [MIT License](LICENSE.md).
 
 
-## Useful to Me?
+## Useful to Me?  [CONTRIBUTING.md]
 
 * Translates Lisp source files into Prolog source files.  ( compilation is done by Host prolog on the Translated source (from either disk or memory)) 
 
@@ -76,6 +79,195 @@ Very importantly we need to ensure we can run well in
 
 * Also, DAYDREAMER, Knowledge Machine, SWALE, and CYC might perform differently and be more practical at non-toy domains. 
 
+
+## FUTHER MISTHOUGHT:
+
+I'll reply inline and correct some of the confusing misstatements I had made.
+> > 
+> >    I've only spent a week on it ...    I hope to recruit people that seem to know both Lisp and Prolog languages.
+> > 
+> >        The main purpose is this impl is it to run prolog-in-lisp 1000x  faster than the fastest lisps
+prolog-in-lisp(s) are *not* 1000x slower than prolog-in-c but certainly not as fast (I apologize, I should have said 5-10x time slower).  The problem arises for Prolog programs like: English to CommonLogic converters (used in Natural Language Understanding), large-scale ontology checkers, KL-ONE language interpreters, and PDDL planners (Planning Domain Definition Language).  Such programs perform fine when written entirely in Lisp or Prolog (neither better or worse).  The problem is that they more often perform unacceptably poor when written in Prolog and then ran on a prolog-in-lisp interpreter.    
+
+This leads to another class of programs 
+
+> > and be at least in the top 3 impls
+> >         for speed    Also the type of lisp programs I like to run (SWALE, DAYDREAMER) are buggy partial impl of Greenspun's rule as applied to Prolog (Instead of Lisp)
+
+I should clarify, SWALE and DAYDREAMER are *not* buggy implementations of Prolog! they are their own things.  But there are certain routines they contain that make extensive use of unification and backtracking.  These routines  (for decades now) are examples where the data representations and processing their capabilities (well mostly domain sizes) have been scaled back due to virtually creating the same penalties of the "prolog-in-lisp" scenario.  This scenario is similar to taking an assembly language program that twiddles bitmasks and using bignum math to emulate the registers of the  Intel-4930k CPU. *You might just see some performance differences? We will be very lucky if 4x-10x was the only speed difference between running that same assembly code program directly on the processor or in our program.
+
+
+## HOWTO/QUICKSTART
+===================
+
+
+## Installation 
+````
+$ swipl
+Welcome to SWI-Prolog (threaded, 64 bits, version 7.7.4-36-gc02793b-DIRTY-BIRDY)
+SWI-Prolog comes with ABSOLUTELY NO WARRANTY. This is free software.
+Please run ?- license. for legal details.
+
+For online help and background, visit http://www.swi-prolog.org
+For built-in help, use ?- help(Topic). or ?- apropos(Word).
+
+`?- pack_install(wam_common_lisp)`.
+
+````
+
+### Try it
+````
+
+?- use_module(library(wamcl)).
+true.
+
+?- lisp.
+
+__        ___    __  __        ____ _
+\ \      / / \  |  \/  |      / ___| |
+ \ \ /\ / / _ \ | |\/| |_____| |   | |
+  \ V  V / ___ \| |  | |_____| |___| |___
+   \_/\_/_/   \_\_|  |_|      \____|_____|
+
+Common Lisp, written in Prolog
+CL-USER> (sqrt -1)
+% :- lisp_compiled_eval([sqrt, -1]).
+% COMPILER
+% 32,324 inferences, 0.006 CPU in 0.006 seconds (97% CPU, 5643884 Lips)
+:- cl_sqrt(-1, Sqrt_Ret).
+% EXEC
+% 22 inferences, 0.000 CPU in 0.000 seconds (95% CPU, 824897 Lips)
+#C(0 1)
+````
+## Start an inferior prolog
+````
+CL-USER> prolog.
+% Break level 1
+[1]  ?- writeln("press ctrl-d to return to lisp").
+press ctrl-d to return to lisp
+true.
+
+[1]  ?- ^D
+% Exit break level 1
+% prolog.
+T
+CL-USER>
+````
+## Exit lisp
+<press cntrl-d>
+````
+CL-USER> ^DEND-OF-FILE
+true.
+?-
+````
+ 
+## Start in REPL
+````
+$ swipl prolog/wamcl.pl
+
+Common Lisp, written in Prolog
+CL-USER>
+````
+
+### Compile a system Image and run it
+````
+$ swipl ../prolog/wamcl.pl --exe wamcl
+$ ./wamcl
+````
+
+### Reattach to a system Image and debug
+````
+$ swipl -x wamcl --debug
+````
+
+### Run some lisp file
+````
+$ echo '(print (cons "hello" *ARGS*))' > hello.lisp
+$ swipl -x wamcl hello.lisp world
+````
+
+
+### Translate a file to prolog
+````
+CL-USER> (compile-file "hello.lisp")
+<...snip...>
+% 97,548 inferences, 0.023 CPU in 0.023 seconds (100% CPU, 4227371 Lips)
+#P/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/hello.lisp
+CL-USER>
+````
+
+### Open PceEmacs on a translated file
+````
+CL-USER> (edit (compile-file "hello.lisp"))
+.... Opens PCEMACS ....
+````
+
+### Load a file
+````
+CL-USER> (prolog:consult (compile-file "hello.lisp"))
+
+CL-USER> (load "hello.lisp" :compile t)   ;;; same as the above
+`````
+
+### Make an executable and run it
+````
+$ echo '(print (cons "hello" *ARGS*))' > hello.lisp
+$ ./wamcl -c hello.lisp -o hello.pl --exe hello
+$ ./hello world
+```` 
+
+### Attach to your image
+````
+$ swipl -x hello --repl
+````
+
+### Run your translated lisp
+````
+$ swipl hello.pl world
+````
+
+### See the source
+````
+$ cat hello.pl
+````
+````
+% WAM-CL translated Lisp File (see https://github.com/TeamSPoon/wam_common_lisp/tree/master/prolog/wam_cl )
+% File: "hello.lisp" (/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/hello.lisp)
+% PWD: /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/
+% Start time: Mon Dec 11 12:48:38 2017
+
+:-style_check(-discontiguous).
+:-style_check(-singleton).
+:-use_module(library(wamcl_runtime)).
+
+
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/hello.lisp:0 **********************/
+:- lisp_compile_to_prolog(pkg_user, [print, [cons, '$STRING'("hello"), '*ARGS*']]).
+:- get_var(TLEnv, ext_xx_args_xx, Ext_xx_args_xx_Get),
+   Print_Param=['$ARRAY'([*], claz_base_character, "hello")|Ext_xx_args_xx_Get],
+   cl_print(Print_Param, _Ignored).
+
+
+% Total time: 0.02 seconds
+````
+
+## Navigate disk
+````
+CL-USER> pwd.
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/
+
+CL-USER> :cd t
+% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/
+
+CL-USER> ls.
+% baby2015/                           credit_tim_finin.sip.msg            MicroPrologII/                      test_cisp/
+% credit_neil_smith.html              daydreamer/                         reference/                          travis.pl
+% credit_neil_smith_prolog.html       hello.lisp                          test_1000/
+% credit_tim_finin.html               km/                                 test_1500/
+% ls.
+T
+CL-USER>
+````
 
 
 
@@ -274,32 +466,6 @@ fibp2(N, F) :-
 ````
 
 
-## Copyright and License
-
-Copyright (c) 2017, [Douglas Miles](https://twitter.com/logicmoo)
-
-This project is licensed under the [MIT License](LICENSE.md).
-
-CONRIBUTING
-
-
-## FUTHER MISTHOUGHT:
-
-I'll reply inline and correct some of the confusing misstatements I had made.
-> > 
-> >    I've only spent a week on it ...    I hope to recruit people that seem to know both Lisp and Prolog languages.
-> > 
-> >        The main purpose is this impl is it to run prolog-in-lisp 1000x  faster than the fastest lisps
-prolog-in-lisp(s) are *not* 1000x slower than prolog-in-c but certainly not as fast (I apologize, I should have said 5-10x time slower).  The problem arises for Prolog programs like: English to CommonLogic converters (used in Natural Language Understanding), large-scale ontology checkers, KL-ONE language interpreters, and PDDL planners (Planning Domain Definition Language).  Such programs perform fine when written entirely in Lisp or Prolog (neither better or worse).  The problem is that they more often perform unacceptably poor when written in Prolog and then ran on a prolog-in-lisp interpreter.    
-
-This leads to another class of programs 
-
-> > and be at least in the top 3 impls
-> >         for speed    Also the type of lisp programs I like to run (SWALE, DAYDREAMER) are buggy partial impl of Greenspun's rule as applied to Prolog (Instead of Lisp)
-
-I should clarify, SWALE and DAYDREAMER are *not* buggy implementations of Prolog! they are their own things.  But there are certain routines they contain that make extensive use of unification and backtracking.  These routines  (for decades now) are examples where the data representations and processing their capabilities (well mostly domain sizes) have been scaled back due to virtually creating the same penalties of the "prolog-in-lisp" scenario.  This scenario is similar to taking an assembly language program that twiddles bitmasks and using bignum math to emulate the registers of the  Intel-4930k CPU. *You might just see some performance differences? We will be very lucky if 4x-10x was the only speed difference between running that same assembly code program directly on the processor or in our program.
-
-
 
 
 
@@ -321,176 +487,3 @@ I should clarify, SWALE and DAYDREAMER are *not* buggy implementations of Prolog
 
 
 ````
-
-## HOWTO/QUICKSTART
-===================
-
-
-## Installation 
-````
-$ swipl
-Welcome to SWI-Prolog (threaded, 64 bits, version 7.7.4-36-gc02793b-DIRTY-BIRDY)
-SWI-Prolog comes with ABSOLUTELY NO WARRANTY. This is free software.
-Please run ?- license. for legal details.
-
-For online help and background, visit http://www.swi-prolog.org
-For built-in help, use ?- help(Topic). or ?- apropos(Word).
-
-`?- pack_install(wam_common_lisp)`.
-
-````
-
-### Try it
-````
-
-?- use_module(library(wamcl)).
-true.
-
-?- lisp.
-
-__        ___    __  __        ____ _
-\ \      / / \  |  \/  |      / ___| |
- \ \ /\ / / _ \ | |\/| |_____| |   | |
-  \ V  V / ___ \| |  | |_____| |___| |___
-   \_/\_/_/   \_\_|  |_|      \____|_____|
-
-Common Lisp, written in Prolog
-CL-USER> (sqrt -1)
-% :- lisp_compiled_eval([sqrt, -1]).
-% COMPILER
-% 32,324 inferences, 0.006 CPU in 0.006 seconds (97% CPU, 5643884 Lips)
-:- cl_sqrt(-1, Sqrt_Ret).
-% EXEC
-% 22 inferences, 0.000 CPU in 0.000 seconds (95% CPU, 824897 Lips)
-#C(0 1)
-````
-## Start an inferior prolog
-````
-CL-USER> prolog.
-% Break level 1
-[1]  ?- writeln("press ctrl-d to return to lisp").
-press ctrl-d to return to lisp
-true.
-
-[1]  ?- ^D
-% Exit break level 1
-% prolog.
-T
-CL-USER>
-````
-## Exit lisp
-<press cntrl-d>
-````
-CL-USER> ^DEND-OF-FILE
-true.
-?-
-````
- 
-## Start in REPL
-````
-$ swipl prolog/wamcl.pl
-
-Common Lisp, written in Prolog
-CL-USER>
-````
-
-### Compile a system Image and run it
-````
-$ swipl ../prolog/wamcl.pl --exe wamcl
-$ ./wamcl
-````
-
-### Reattach to a system Image and debug
-````
-$ swipl -x wamcl --debug
-````
-
-### Run some lisp file
-````
-$ echo '(print (cons "hello" *ARGS*))' > hello.lisp
-$ swipl -x wamcl hello.lisp world
-````
-
-
-### Translate a file to prolog
-````
-CL-USER> (compile-file "hello.lisp")
-<...snip...>
-% 97,548 inferences, 0.023 CPU in 0.023 seconds (100% CPU, 4227371 Lips)
-#P/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/hello.lisp
-CL-USER>
-````
-
-### Open PceEmacs on a translated file
-````
-CL-USER> (edit (compile-file "hello.lisp"))
-.... Opens PCEMACS ....
-````
-
-### Load a file
-````
-CL-USER> (prolog:consult (compile-file "hello.lisp"))
-
-CL-USER> (load "hello.lisp" :compile t)   ;;; same as the above
-`````
-
-### Make an executable and run it
-````
-$ echo '(print (cons "hello" *ARGS*))' > hello.lisp
-$ ./wamcl -c hello.lisp -o hello.pl --exe hello
-$ ./hello world
-```` 
-
-### Attach to your image
-````
-$ swipl -x hello --repl
-````
-
-### Run your translated lisp
-````
-$ swipl hello.pl world
-````
-
-### See the source
-````
-$ cat hello.pl
-````
-````
-% WAM-CL translated Lisp File (see https://github.com/TeamSPoon/wam_common_lisp/tree/master/prolog/wam_cl )
-% File: "hello.lisp" (/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/hello.lisp)
-% PWD: /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/
-% Start time: Mon Dec 11 12:48:38 2017
-
-:-style_check(-discontiguous).
-:-style_check(-singleton).
-:-use_module(library(wamcl_runtime)).
-
-
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/hello.lisp:0 **********************/
-:- lisp_compile_to_prolog(pkg_user, [print, [cons, '$STRING'("hello"), '*ARGS*']]).
-:- get_var(TLEnv, ext_xx_args_xx, Ext_xx_args_xx_Get),
-   Print_Param=['$ARRAY'([*], claz_base_character, "hello")|Ext_xx_args_xx_Get],
-   cl_print(Print_Param, _Ignored).
-
-
-% Total time: 0.02 seconds
-````
-
-## Navigate disk
-````
-CL-USER> pwd.
-% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/
-
-CL-USER> :cd t
-% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/
-
-CL-USER> ls.
-% baby2015/                           credit_tim_finin.sip.msg            MicroPrologII/                      test_cisp/
-% credit_neil_smith.html              daydreamer/                         reference/                          travis.pl
-% credit_neil_smith_prolog.html       hello.lisp                          test_1000/
-% credit_tim_finin.html               km/                                 test_1500/
-% ls.
-T
-CL-USER>
-````
-
