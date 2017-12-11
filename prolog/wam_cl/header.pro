@@ -16,9 +16,19 @@
  *
  *******************************************************************/
 
-:- set_prolog_flag(verbose_load,full).
-:- set_prolog_flag(verbose,normal).
-:- set_prolog_flag(verbose_autoload,true).
+:- set_prolog_flag(generate_debug_info, false).
+
+% :- require([colormsg1/1]).
+
+
+:- if(current_prolog_flag(debug,false)).
+
+%:- set_prolog_flag(last_call_optimisation,true).
+ :- set_prolog_flag(compile_meta_arguments,false).
+%:- set_prolog_flag(access_level,system).
+
+:- endif.
+
 :- use_module(library(must_trace)).
 :- use_module(library(logicmoo_util_terms)).
 :- use_module(library(logicmoo_util_common)).
@@ -26,12 +36,6 @@
 %:- use_module(utils_list).
 :- use_module(utils_higher_order).
 :- use_module(library(dmsg)).
-
-% :- require([colormsg1/1]).
-
-:- set_prolog_flag(verbose_load,full).
-:- set_prolog_flag(verbose,normal).
-:- set_prolog_flag(verbose_autoload,true).
 
 
 :- dynamic(tst:is_local_test/1).
@@ -66,6 +70,10 @@
 :- multifile(wl:interned_eval/1).
 :- dynamic(wl:interned_eval/1).
 :- discontiguous(wl:interned_eval/1).
+
+:- multifile(wl:wam_cl_setup/1).
+:- dynamic(wl:wam_cl_setup/1).
+:- discontiguous(wl:wam_cl_setup/1).
 
 
 :- multifile(wl:type_checked/1).
@@ -104,6 +112,7 @@
 :- discontiguous(ssip_define/2).
 
 :- ensure_loaded('8ball.pl').
+:- ensure_loaded('disassemble.pl').
 :- ensure_loaded('typecheck.pl').
 :- ensure_loaded('evil_workarounds.pl').
 :- ensure_loaded('arglists.pl').
@@ -142,7 +151,7 @@
 :- ensure_loaded('tests.pl').
 :- ensure_loaded('typeof.pl').
 :- ensure_loaded('math.pl').
-:- ensure_loaded('disassemble.pl').
+
 
 
 /*

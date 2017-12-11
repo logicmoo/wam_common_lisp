@@ -79,10 +79,14 @@ prompts(Old1,_Old2):- var(Old1) -> prompt(Old1,Old1) ; prompt(_,Old1).
 
 classof:attr_unify_hook(A,B):- trace,wdmsg(classof:attr_unify_hook(A,B)),lisp_dump_break. %  break.
 
-do_before_tpl:- assert_if_new(wl:interned_eval(("()"))),
+code_load_hooks:-
+  (current_prolog_flag(os_argv,Y)->handle_all_os_program_args(Y)),
   set_prolog_flag(lisp_autointern,true),
-  forall(retract(wl:interned_eval(G)),always(lisp_compiled_eval(G,_))),
-  set_prolog_flag(lisp_autointern,false),
+   forall(retract(wl:interned_eval(G)),always(  locally_let(xx_package_xx=pkg_prolog,lisp_compiled_eval(G,_)))),
+   forall(retract(wl:wam_cl_setup(G)),always((G))),
+  set_prolog_flag(lisp_autointern,false).
+
+do_before_tpl:- code_load_hooks,
   (current_prolog_flag(argv,Y)->handle_all_program_args(Y)).
   
 
@@ -172,8 +176,38 @@ $ swipl -x wamcl.prc
 
 ').
 
-:- discontiguous cl:handle_program_args/2. 
-:- discontiguous cl:handle_program_args/3. 
+:- set_prolog_flag(backtrace,true).
+:- set_prolog_flag(backtrace_depth,500).
+:- set_prolog_flag(backtrace_goal_depth,10).
+:- set_prolog_flag(backtrace_show_lines,true).
+:- set_prolog_flag(toplevel_print_anon,true).
+
+set_lisp_option(verbose):- 
+   set_prolog_flag(verbose_load,full),
+   set_prolog_flag(verbose,normal),
+   set_prolog_flag(verbose_autoload,true),
+   set_prolog_flag(verbose_file_search,true).
+
+set_lisp_option(quiet):- 
+ set_prolog_flag(verbose,silent),
+ set_prolog_flag(verbose_autoload,false),
+ set_prolog_flag(verbose_load,silent),
+ set_prolog_flag(verbose_file_search,false).
+
+set_lisp_option(debug):-
+  set_lisp_option(verbose),
+  set_prolog_flag(debug,true).
+
+set_lisp_option(optimize):- 
+  set_prolog_flag(last_call_optimisation,true).
+
+
+handle_all_os_program_args(ARGV):- 
+  ignore((memberchk('-O',ARGV),set_lisp_option(quiet),set_lisp_option(optimize))),
+  ignore((memberchk('--nodebug',ARGV),set_lisp_option(quiet))),
+  ignore((memberchk('--debug',ARGV),set_lisp_option(debug))).
+  
+
 handle_all_program_args([N,V|More]):- handle_1program_arg(N=V),!,handle_all_program_args(More).
 handle_all_program_args([N|More]):- handle_1program_arg(N),!,handle_all_program_args(More).
 handle_all_program_args(More):- maplist(to_lisp_string,More,List),set_var(ext_xx_args_xx,List).
@@ -188,6 +222,9 @@ handle_1program_arg(N=V):-  handle_program_args(N,_,V),!.
 handle_1program_arg(N=V):-!,handle_program_args(N,_,V).
 handle_1program_arg(N):- handle_program_args(N,_),!.
 handle_1program_arg(N):- handle_program_args(_,N),!.
+
+:- discontiguous handle_program_args/2. 
+:- discontiguous handle_program_args/3. 
 
 % helpfull
 handle_program_args('--help','-?'):- listing(handle_program_args),show_help,set_interactive(false).
@@ -292,7 +329,7 @@ eval_at_repl(Expression,Result):-
   notrace(debug_var('ReplEnv',Env)),
   timel('COMPILER',always_catch(maybe_ltrace(lisp_compile(Env,Result,LExpression,Code)))),
   notrace(dbmsg_real(:-Code)),
-  (notrace(tracing)-> Code ; 
+  (notrace(tracing)-> (user:Code) ; 
    timel('EXEC',always_catch(ignore(always(maybe_ltrace(call(user:Code))))))),!.
 
 eval_at_repl_tracing(Expression,Result):-
@@ -308,7 +345,7 @@ eval_at_repl_tracing(Expression,Result):-
    notrace((writeln(==================================================================))),
    notrace((writeln(==================================================================))),
    notrace((writeln(==================================================================))),
-  lisp_compile(Env,Result,LExpression,Code),
+  timel('COMPILE',lisp_compile(Env,Result,LExpression,Code)),
   % notrace(cls),
    notrace((writeln(==================================================================))),
    notrace((writeln(==================================================================))),
@@ -317,7 +354,7 @@ eval_at_repl_tracing(Expression,Result):-
    notrace((writeln(==================================================================))),
    notrace((writeln(==================================================================))),
    notrace((writeln(==================================================================))),
-  Code.
+  timel('EXEC',(user:Code)).
 
 eval(Expression, Result):- env_current(Env), eval(Expression, Env, Result).
 
@@ -383,7 +420,6 @@ lw:- cl_load("wam-cl-params",_).
 :- fixup_exports.
 
 :- set_prolog_flag(verbose_autoload,false).
-:- ignore((((((clause(arithmetic:eval(P,_,_),_),nonvar(P)),(functor(P,F,A),show_call_trace(define_cl_math(F,A)))))),fail)).
 %:- initialization(lisp,restore).
 %:- initialization(lisp,program).
 :- initialization(lisp,main).

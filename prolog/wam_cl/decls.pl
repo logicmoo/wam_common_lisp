@@ -124,8 +124,8 @@ make_mcompiled(Ctx,_UnusedEnv,CResult,Symbol,FunctionHead,FunctionBody,Head,Head
      (lisp_compile(CResult,Body,BodyCode0),
       subst(Body0,Sub,BodyCode0,BodyCode),Fun=t);
     (((var(MResult)))
-    -> (MResult=CResult,sanitize_true(Ctx,((CallEnv=HeadEnv,HeadCode,Body0)),BodyCode))
-     ; (MResult=CResult,body_cleanup(Ctx,((CallEnv=HeadEnv,HeadCode,Body0,MResult=CResult)),BodyCode)))).
+    -> (MResult=CResult,body_cleanup_keep_debug_vars(Ctx,((CallEnv=HeadEnv,HeadCode,Body0)),BodyCode))
+     ; (MResult=CResult,body_cleanup_no_optimize(Ctx,((CallEnv=HeadEnv,HeadCode,Body0,MResult=CResult)),BodyCode)))).
 
 
 cl_defun(Name,FormalParms,FunctionBody,Result):-
@@ -158,8 +158,8 @@ make_compiled(Ctx,_UnusedEnv,MResult,Symbol,FunctionHead,FunctionBody,Head,HeadD
     compile_body(Ctx,CallEnv,Result,[block,Symbol|FunctionBody],Body0),
     show_ctx_info(Ctx),
     (((var(Result)))
-    -> body_cleanup(Ctx,((CallEnv=HeadEnv,HeadCode,Body0)),BodyCode)
-     ; (body_cleanup(Ctx,((CallEnv=HeadEnv,HeadCode,Body0,MResult=Result)),BodyCode))).
+    -> body_cleanup_keep_debug_vars(Ctx,((CallEnv=HeadEnv,HeadCode,Body0)),BodyCode)
+     ; (body_cleanup_no_optimize(Ctx,((CallEnv=HeadEnv,HeadCode,Body0,MResult=Result)),BodyCode))).
 
 
 :- fixup_exports.

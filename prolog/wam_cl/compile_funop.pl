@@ -22,14 +22,32 @@
 
 % Use a previous DEFMACRO
 compile_funop(Ctx,Env,Result,LispCode,CompileBody):-
-  fail, %DISABLED
+  % fail, %DISABLED
   macroexpand_1_or_fail(LispCode,[],CompileBody0Result),
   must_compile_body(Ctx,Env,Result,CompileBody0Result, CompileBody).
-
 
 macroexpand_all(LispCode,MacroEnv,Result):-
   macroexpand_1_or_fail(LispCode,MacroEnv,Mid) ->
     macroexpand_all(Mid,MacroEnv,Result) ; Result=LispCode.
+
+get_macro_function(Ctx,Env,Procedure, Arguments,MResult,FnResult,CallBody):- 
+       atom(Procedure),
+   length(Arguments,ArgsLen),
+   find_function_or_macro_name(Ctx,Env,Procedure,ArgsLen, ProposedName),!,
+   align_args_or_fallback(Procedure,ProposedName,Arguments,FnResult,ArgsPlusResult),
+   ExpandedFunction =.. [ ProposedName | ArgsPlusResult],
+   clause(ExpandedFunction,Conj),
+   unify_conj(Conj,(CallBody,cl_eval(MResult, FnResult))).
+
+unify_conj(Conj,To):- nonvar(Conj),Conj=To,!.
+unify_conj((CA,(CB,CC)),(A,B)):- var(A),nonvar(B),!, unify_conj(((CA,CB),CC),(A,B)).
+unify_conj((CA,(CB,CC)), AB):- unify_conj(((CA,CB),CC),AB).
+
+   
+
+
+macroexpand_1_or_fail([Procedure|Arguments],MacroEnv,MResult):- nonvar(Procedure),   
+   get_macro_function(_Ctx,MacroEnv,Procedure, Arguments, MResult, _FnResult, CallBody),!,always(CallBody),!.
 
 macroexpand_1_or_fail([Procedure|Arguments],MacroEnv,CompileBody0Result):- nonvar(Procedure),
    debug_var('MacroEnvArgs',MacroEnv),
@@ -76,9 +94,9 @@ expand_arguments_maybe_macro(Ctx,CallEnv,FN,0,FunctionArgs,ArgBody, Args):-
 compile_funop(Ctx,Env,Result,[Op | FunctionArgs], Body):- nonvar(Op),wl:op_replacement(Op,Op2), !,
   must_compile_body(Ctx,Env,Result,[Op2 | FunctionArgs],Body).
 
-
+% progn mismatch?
 compile_funop(Ctx,Env,Result,[FN ], Body):- is_list(FN),!,
-  must_compile_body(Ctx,Env,Result,FN,Body).
+  trace,must_compile_body(Ctx,Env,Result,FN,Body).
 
 compile_funop(Ctx,Env,Result,[FN , A| FunctionArgs], Body):- is_list(FN),!,
   must_compile_body(Ctx,Env,Result,[funcall,FN, A | FunctionArgs],Body).
@@ -89,7 +107,7 @@ compile_funop(Ctx,Env,Result,[FN | FunctionArgs], Body):- \+ atom(FN),!,
 
 compile_funop(Ctx,CallEnv,Result,[FN | FunctionArgs], Body):- nonvar(FN),
       expand_arguments_maybe_macro(Ctx,CallEnv,FN,0,FunctionArgs,ArgBody, Args),
-      debug_var([FN,'_Ret'],Result),      
+      %debug_var([FN,'_Ret'],Result),      
       find_function_or_macro(Ctx,CallEnv,FN,Args,Result,ExpandedFunction),      
       Body = (ArgBody,ExpandedFunction).
 

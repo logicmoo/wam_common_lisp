@@ -47,9 +47,15 @@ lisp_dumpST:- both_outputs(dumpST).
 true_or_die(Goal):-functor(Goal,_,A),arg(A,Goal,Ret),always((Goal,Ret\==[])).
 
 % Must always succeed (or else there is a bug in the lisp impl!)
+always((A->B;C)):- !, (A-> always(B);always(C)).
+always((A,!,B)):-!,always(A),!,always(B).
 always((A,B)):-!,always(A),always(B).
 always(notrace(G)):- !, quietly_must_or_rtrace(G).
-always(G):- notrace(tracing),!,(G->true;break). % nonquietly_must_or_rtrace(G).
+always(always(G)):-!,always(G).
+always(call(G)):-!,always(G).
+always(G):- notrace(tracing),!,G. % nonquietly_must_or_rtrace(G).
+always(G):- !,( G-> true; (trace,G)).
+%always(G):- notrace(tracing),!,(G->true;break). % nonquietly_must_or_rtrace(G).
 always(G):- nonquietly_must_or_rtrace(G),!.
 
 % Must certainly succeed (or else there is a bug in the users code!)
@@ -66,7 +72,7 @@ with_nat_term(G):-
     maplist(del_attr_rev2(tracker),Vs),
    G))).
 
-quietly_must_or_rtrace(G):- 
+quietly_must_or_rtrace(G):-  
   (catch(quietly(G),E,gripe_problem(uncaught(E),G)) 
    *-> true ; (gripe_problem(fail_must_or_rtrace_failed,G),!,fail)),!.
 nonquietly_must_or_rtrace(G):- 
@@ -137,7 +143,11 @@ dbmsg0(X):- colormsg1(X),!.
 dbmsg_assert(Where,user:(HBody)):- !,dbmsg_assert(Where,(HBody)).
 dbmsg_assert(Where,user:H :- Body):- !,dbmsg_assert(Where,H :- Body),!.
 %dbmsg_assert(Where,M:Body:- (true,[])):-!,colormsg1("\n% asserting fact...\n"),!,colormsg1(M:Body),!.
-dbmsg_assert(Where,Body):- colormsg1("\n% asserting... ~w ",[Where]),!,colormsg1(Body),!.
+dbmsg_assert(Where,Body):- colormsg1("\n% asserting... ~w ",[Where]),!,colormsg1(Body),!,
+ body_cleanup(_,Body,Cleaned),
+ (Body==Cleaned-> true;
+ (colormsg1("\n% cleanup... ~w ",[Where]),!,colormsg1(Cleaned))),!.
+
 
 :- dynamic(lisp_compiler_option/2).
 :- dynamic(lisp_compiler_option_local/2).

@@ -261,12 +261,11 @@ package_nicknames(pkg_profiler, "PROF").
 
 :- decl_mapped_opv(claz_package,[nicknames=package_nicknames]).
 
-%package_use_list(pkg_cl, pkg_clos).
-
 
 package_use_list(pkg_cl, pkg_ext).
 package_use_list(pkg_cl, pkg_prolog).
 package_use_list(pkg_cl, pkg_sys).
+%package_use_list(pkg_cl, pkg_clos).
 
 package_use_list(pkg_clos, pkg_cl).
 package_use_list(pkg_clos, pkg_ext).
@@ -274,9 +273,17 @@ package_use_list(pkg_clos, pkg_prolog).
 package_use_list(pkg_clos, pkg_sys).
 
 package_use_list(pkg_prolog, pkg_cl).
-package_use_list(pkg_prolog, pkg_clos).
 package_use_list(pkg_prolog, pkg_ext).
 package_use_list(pkg_prolog, pkg_sys).
+package_use_list(pkg_prolog, pkg_clos).
+package_use_list(pkg_prolog, pkg_custom).
+package_use_list(pkg_prolog, pkg_gray).
+package_use_list(pkg_prolog, pkg_gstream).
+package_use_list(pkg_prolog, pkg_i18n).
+package_use_list(pkg_prolog, pkg_os).
+package_use_list(pkg_prolog, pkg_socket).
+package_use_list(pkg_prolog, pkg_threads).
+
 
 package_use_list(pkg_sys, pkg_cl).
 package_use_list(pkg_sys, pkg_ext).
@@ -299,6 +306,12 @@ package_use_list(pkg_ext, pkg_i18n).
 package_use_list(pkg_ext, pkg_os).
 package_use_list(pkg_ext, pkg_socket).
 package_use_list(pkg_ext, pkg_threads).
+/*
+package_use_list(pkg_ext, pkg_clos).
+package_use_list(pkg_ext, pkg_sys).
+package_use_list(pkg_ext, pkg_prolog).
+*/
+
 package_use_list(pkg_ffi, pkg_cl).
 package_use_list(pkg_ffi, pkg_ext).
 package_use_list(pkg_format, pkg_cl).

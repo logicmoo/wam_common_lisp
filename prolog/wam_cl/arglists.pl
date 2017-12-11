@@ -352,7 +352,7 @@ tfa(FormalParms):-
   function_head_params(Ctx,Env,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,Names,PVars,Code0),
   maplist(debug_var,Names,PVars),
   dbmsg(arginfo(ArgInfo,formal=FormalParms,params=ActualArgs,names=Names,vars=PVars,zab=ZippedArgBindings)),
-  body_cleanup(Ctx,Code0,Code),
+  body_cleanup_keep_debug_vars(Ctx,Code0,Code),
   dbmsg(:-Code),!.
 
 % compile_init(F,P,InitForm,Init)

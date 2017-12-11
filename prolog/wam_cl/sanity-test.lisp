@@ -18,26 +18,29 @@
 ;; not charge a fee for this document or for its distribution.
 |#
 
+#+WAM-CL (prolog-call "cls.")
+
+(defun mapcar-visualize (func l) (if (null l) () (cons (apply func (list (first l))) (mapcar func (rest l)))))
+
 (load "wam-cl-init")
 
 (in-package "CL-USER")
 
-#+WAM-CL (prolog-call "cls.")
-
-(defun mapcar-visualize (func l) (if (null l) () (cons (apply func (list (first l))) (mapcar func (rest l)))))
 
 
 ;; Test macro
 (defmacro is (eqf expected actual)
   (let ((a (gensym "a")) (b (gensym "b")))
     `(let ((,a ,expected) (,b ,actual))
-       (if (not (,eqf ,a ,b))
+       (if (,eqf ,a ,b)
+         (format t "OK: ~a is ~a to ~a~%" ',expected ',eqf ',actual)
          (progn
            (format t "FAILED: when matching ~a and ~a~%" ,a ,b)
 	   #+WAM-CL (prolog-inline "trace")
-           #+WAM-CL '(quit 1) 
-	   #+CLISP (BREAK) #+CLISP (quit 1))
-         (format t "OK: ~a is ~a to ~a~%" ',expected ',eqf ',actual)))))
+	   #+CLISP (BREAK)
+	   #+CLISP (quit 1))
+         ))))
+
 
 (write-line "Running smoke test!")
 

@@ -114,12 +114,12 @@ compile_symbol_getter(Ctx,Env,Result,Var, Body):- Var==mapcar,!,
   dbmsg(compile_symbol_getter(Ctx,Env,Result,Var, Body)), lisp_dump_break.
 
 
-compile_symbol_getter(Ctx,Env,Value, Var, Body):-  must(atom(Var)),!,
+compile_symbol_getter(Ctx,Env,Value, Var, Body):-  always((atom(Var),!,
         debug_var([Var,'_Get'],Value),
         add_tracked_var(Ctx,Var,Value),
         rw_add(Ctx,Var,r),
         debug_var('Env',Env),
-        Body = get_var(Env, Var, Value).   
+        Body = get_var(Env, Var, Value))).
 
 % compile_place(Ctx,Env,Result,Var,Code).
 compile_place(_Ctx,_Env,[value,Var],Var,true):- \+ is_list(Var),!.

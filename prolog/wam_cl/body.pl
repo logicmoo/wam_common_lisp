@@ -29,11 +29,15 @@ must_compile_closure_body(Ctx,Env,Result,Function, Body):-
 % compile_body(Ctx,Env,Result,Function, Body).
 % Expands a Lisp-like function body into its Prolog equivalent
 
+preserved_var:attr_unify_hook(_,_):- fail.
+
+must_compile_body(_Ctx,_Env,ResultO,LispCode, Body):- var(LispCode), get_attr(LispCode,preserved_var,t),!,true=Body,
+   ResultO = LispCode.
 must_compile_body(Ctx,Env,ResultO,LispCode, BodyO):-
   notrace((maybe_debug_var('_rCtx',Ctx),
   %maybe_debug_var('_rEnv',Env),
   %maybe_debug_var('_rResult',Result),
-  maybe_debug_var('_LispCode',LispCode),
+  %maybe_debug_var('_LispCode',LispCode),
   maybe_debug_var('_rBody',Body))),
   resolve_reader_macros(LispCode,Forms),!,
   always((compile_body(Ctx,Env,Result,Forms, Body),nonvar(Body))),
@@ -160,7 +164,7 @@ compile_body(_Cx,_Ev,SelfEval,SelfEval,true):- notrace(is_self_evaluating_object
 
 % symbols
 compile_body(Ctx,Env,Value,Atom, Body):- atom(Atom),!,
-  always(compile_symbol_getter(Ctx,Env,Value, Atom, Body)).
+  always(assign:compile_symbol_getter(Ctx,Env,Value, Atom, Body)).
 
 % QUOTE
 compile_body(_Cx,_Ev,Item,[quote, Item],  true):- !.
@@ -360,7 +364,7 @@ compile_body(Ctx,Env,Result,[if, Test, IfTrue, IfFalse], Body):-
 % DOLIST
 compile_body(Ctx,Env,Result,['dolist',[Var,List]|FormS], Code):- !,
     must_compile_body(Ctx,Env,ResultL,List,ListBody),
-    must_compile_body(Ctx,Env2,Result,[progn,FormS], Body),
+    must_compile_body(Ctx,Env2,Result,[progn|FormS], Body),
     debug_var('BV',BV),debug_var('Env2',Env2),debug_var('Ele',X),debug_var('List',ResultL),
     Code = (ListBody,
       (( BV = bv(Var,X),Env2 = [BV|Env])),
@@ -375,6 +379,8 @@ compile_body(Ctx,Env,Result,[CASE,VarForm|Clauses], Body):-  member(CASE,[case,e
   compile_body(Ctx,Env,Key,VarForm,VarBody),
    debug_var('Key',Key),
    make_holder(SOf),    
+   preserved_prolog_var(Key),
+
    cases_to_conds(SOf,Key,Clauses,Conds),
    nb_holder_value(SOf,Values),
    (CASE\==case -> (Values==t -> true ; nb_set_last_tail(Conds,[[t,['type_error',Key,[quote,[member|Values]]]]])) ; true),
@@ -393,12 +399,15 @@ cases_to_conds(SOf,V,[[Set|Tail]|Tail2], [[['sys_memq',V,[quote,Set]],[progn|Tai
 cases_to_conds(SOf,V,[[Item|Tail]|Tail2], [[['eq',V,[quote,Item]],[progn|Tail]]|X]) :- nb_holder_append(SOf,Item),
    cases_to_conds(SOf,V,Tail2,X).
 
+preserved_prolog_var(Key):- put_attr(Key,preserved_var,t).
+
 % Macro TYPECASE, CTYPECASE, ETYPECASE
 %   (typecase A ((x...) B C...)...)  -->
 %   (let ((@ A)) (cond ((memv @ '(x...)) B C...)...))
 compile_body(Ctx,Env,Result,[CASE,VarForm|Clauses], Body):-  member(CASE,[typecase,etypecase,ctypecase]),
   compile_body(Ctx,Env,Key,VarForm,VarBody),
    debug_var('Key',Key),
+   preserved_prolog_var(Key),
    make_holder(SOf),    
    typecases_to_conds(SOf,Key,Clauses,Conds),
    nb_holder_value(SOf,Values),

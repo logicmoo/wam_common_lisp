@@ -83,7 +83,7 @@ asserts_to_prolog_code(A, [:-A]).
 lisp_compiler_term_expansion( ( <<== FunctionBodyP), ( :-   (Code, writeExpression(Result)) ):-
         must_det_l((expand_pterm_to_sterm(FunctionBodyP,FunctionBody),
         lisp_compile(Result,FunctionBody,Body),
-        body_cleanup(Ctx,Body,Code))).
+        body_cleanup_keep_debug_vars(Ctx,Body,Code))).
 
 
 ssip_compiler_term_expansion(Symbol,lambda(Args,Body),[OOUT]):- atom(Symbol),is_list(Args),

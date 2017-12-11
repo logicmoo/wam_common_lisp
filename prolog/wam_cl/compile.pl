@@ -31,7 +31,7 @@ lisp_compiled_eval(SExpression,Result):-
   notrace(as_sexp_interned(SExpression,Expression)),
   %dbmsg(lisp_compiled_eval(Expression)),
   lisp_compile(Result,Expression,Code),
-  dbmsg_cmt((lisp_compiled_eval(Expression):- Code)),
+  % dbmsg_cmt((lisp_compiled_eval(Expression):- Code)),
   always((Code)),!.
 
 %lisp_compile(SExpression):- source_location(_,_),!,dbmsg((:-lisp_compile(SExpression))).
@@ -61,7 +61,7 @@ lisp_compile(Ctx,Env,Result,SExpression,Body):-
 
 compile_forms(Ctx,Env,Result,FunctionBody,Code):-
    must_compile_progn(Ctx,Env,Result,FunctionBody, [], Body),!,
-   body_cleanup(Ctx,Body,Code).
+   body_cleanup_keep_debug_vars(Ctx,Body,Code).
 
 :- nop( debug_var('FirstForm',Var)),
    nb_linkval('$compiler_PreviousResult',the(Var)).
@@ -141,7 +141,7 @@ must_compile_progn(Ctx,Env,Result,FormsIn, PreviousResult, Body):-
   notrace((maybe_debug_var('_rCtx',Ctx),
   maybe_debug_var('_rEnv',Env),
   %maybe_debug_var('_rResult',Result),
-  maybe_debug_var('_rPrevRes',PreviousResult),
+  %maybe_debug_var('_rPrevRes',PreviousResult),
   maybe_debug_var('_rForms',Forms),
   maybe_debug_var('_rBody',Body))),
   quietly(resolve_reader_macros(FormsIn,Forms)),!,

@@ -66,7 +66,13 @@ print_reassembed_clause(ExceptFor,Module,P):-
 
 make_pretty(I,O):-make_pretty(eval,0,I,O).
 
-print_clause_plain(I):-make_pretty(I,O),wdmsg(O).
+print_clause_plain(I):-
+  current_prolog_flag(color_term, Was),
+  make_pretty(I,O),
+    setup_call_cleanup(set_prolog_flag(color_term, false),
+     fmt99(O),
+     set_prolog_flag(color_term, Was)).
+  
 % print_clause_plain(C):- portray_clause_w_vars(O).
 
 make_pretty(Function,Arity,I,O):- shrink_lisp_strings(I,M), pretty_varnames(Function,Arity,M,O).
@@ -92,9 +98,9 @@ pretty_varnames(_,_,H,H):- \+ compound(H),!. % may_debug_var(F,'_Call',H).
 pretty_varnames(_,_,H,H):- pretty1(H),!.
 pretty_varnames(_,_,H,H):- 
  always((functor(H,F,A),
-   H=..[F,P1|ARGS],
-   may_debug_var(F,'_Param',P1),
+   H=..[F,P1|ARGS],   
    arg(A,H,R),may_debug_var(F,'_Ret',R),   
+   may_debug_var(F,'_Param',P1),
    must_maplist_det(pretty_varnames(F,A),[P1|ARGS],_ARGSO))),!. % ,HH=..[F,P1|ARGSO].
 pretty_varnames(_,_,G,G).
 
