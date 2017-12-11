@@ -39,7 +39,7 @@ Very importantly we need to ensure we can run well in
 * comp.lang.lisp thread https://groups.google.com/forum/#!topic/comp.lang.lisp/0G77ebK3DIw
 * comp.lang.prolog thread https://groups.google.com/forum/#!topic/comp.lang.prolog/85jyECdWTxc
 * other README.MD https://github.com/TeamSPoon/wam_common_lisp/tree/master/prolog/wam_cl
-* HOWTO Ats bottem
+* HOWTO https://github.com/TeamSPoon/wam_common_lisp/blob/master/README.md#howtoquickstart
 
 ## Goals and TODOs
 * Document this pack!
