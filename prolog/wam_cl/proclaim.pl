@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(evil, []).
 :- set_module(class(library)).
-:- include('header.pro').
+:- include('header').
 
 cl_declare(_,_).
 cl_proclaim(_,_).

@@ -17,7 +17,7 @@
  *******************************************************************/
 :- module(decls, []).
 :- set_module(class(library)).
-:- include('header.pro').
+:- include('header').
 :- set_module(class(library)).
 :- ensure_loaded(utils_for_swi).
 
@@ -115,11 +115,6 @@ make_mcompiled(Ctx,_UnusedEnv,CResult,Symbol,FunctionHead,FunctionBody,Head,Head
     debug_var("CallEnv",CallEnv),debug_var('CResult',CResult),debug_var('MResult',MResult),
     compile_body(Ctx,CallEnv,MResult,[block,Symbol|FunctionBody],Body0),
     show_ctx_info(Ctx),
-    %gensym(retval,R),
-    %add_tracked_var(Ctx,R,MResult),
-    %put_attr(MResult,varuse,retval),
-    %rw_add(Ctx,R,ret),
-    % Var=MResult,MResult=CResult,
    ((fail,sub_term(Sub,Body0),compound(Sub),(Sub= (Body=Var)),var(Var),Var==MResult, is_list(Body))->
      (lisp_compile(CResult,Body,BodyCode0),
       subst(Body0,Sub,BodyCode0,BodyCode),Fun=t);

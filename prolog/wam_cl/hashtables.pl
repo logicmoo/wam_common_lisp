@@ -16,7 +16,7 @@
 
 :- set_module(class(library)).
 
-:- include('header.pro').
+:- include('header').
 
 cl_make_hash_table(X):- create_struct(claz_hash_table,X).
   

@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(print, []).
 :- set_module(class(library)).
-:- include('header.pro').
+:- include('header').
 
 
 % Grammar rules for printing Lisp s-expressions.

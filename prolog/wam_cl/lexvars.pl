@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(assign, []).
 :- set_module(class(library)).
-:- include('header.pro').
+:- include('header').
 :- ensure_loaded((utils_for_swi)).
 
 % local symbol?
@@ -239,6 +239,7 @@ is_def_maybe_docs(defvar).
 is_def_maybe_docs(defconstant).
 is_def_maybe_docs(defconst).
 
+is_place_write(P):- is_place_op(P), \+ is_only_read_op(P).
 is_pair_op(setq).
 is_pair_op(psetq).
 

@@ -16,7 +16,7 @@
 
 :- set_module(class(library)).
 
-:- include('header.pro').
+:- include('header').
 
 
 % Connection to LPA's built-in error handler

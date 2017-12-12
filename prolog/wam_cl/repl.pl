@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(cl, []).
 :- set_module(class(library)).
-:- include('header.pro').
+:- include('header').
 
 :- use_module(sreader).
 
@@ -379,11 +379,24 @@ parse_sexpr_untyped_read(In, Expr):-
 
 eval_repl_hooks(V,_):-var(V),!,fail.
 eval_repl_hooks(nil,  []):-!.
+
+eval_repl_hooks(KW, Ret):- atom(KW),atom_concat(':',UC,KW),downcase_atom(UC,DC),atom_concat('kw_',DC,US),!,trace,!,eval_repl_hooks(US,Ret).
+% :cd t
+eval_repl_hooks(KW, Ret):- is_keywordp(KW),to_prolog_string(KW,PStr),name(UC,PStr),downcase_atom(UC,Atom),
+  
+  (current_predicate(Atom/2)-> (read_prolog_object(PrologArg),call(Atom,PrologArg,Ret));
+  (current_predicate(Atom/1)-> (trace,read_prolog_object(PrologArg),!,t_or_nil(call(Atom,PrologArg),Ret));
+  (current_predicate(Atom/0)-> (call(Atom))))).
+
+% make.  ls.  pwd. 
 eval_repl_hooks(Atom, R):- atom(Atom),atom_concat_or_rtrace(_,'.',Atom),notrace(catch(read_term_from_atom(Atom,Term,[variable_names(Vs),syntax_errors(true)]),_,fail)),
   callable(Term),current_predicate(_,Term),b_setval('$variable_names',Vs),t_or_nil((user:call(Term)*->dmsg(Term);(dmsg(no(Term)),fail)),R).
+
 eval_repl_hooks([debug,A], t):- !,debug(lisp(A)).
 eval_repl_hooks([nodebug,A], t):- !, nodebug(lisp(A)).
+
 eval_repl_hooks([UC|A], R):- atom(UC),downcase_atom(UC,DC),DC\==UC,!,eval_repl_hooks([DC|A], R).
+
 eval_repl_hooks([X], R):-!, eval_repl_atom( X, R),!.
 eval_repl_hooks( X , R):- eval_repl_atom( X, R),!.
 
@@ -399,7 +412,7 @@ eval_repl_atom(noltrace, t):- set_prolog_flag(lisp_trace,false),nodebug(lisp(tra
 eval_repl_atom(debug, t):- debug(lisp(_)),debug,debugging.
 eval_repl_atom(nodebug, t):- nodebug(lisp(_)),nodebug,debugging.
 
-eval_repl_atom(make, O):- !, always((make, cl_compile_file_mask(pack('wam_commmon_lisp/prolog/wam_cl/lisp/'),keys([]),O))).
+%eval_repl_atom(make, O):- !, always((make, cl_compile_file_mask(pack('wam_commmon_lisp/prolog/wam_cl/lisp/'),keys([]),O))).
 
 eval_repl_atom(UC, R):- atom(UC),downcase_atom(UC,DC),DC\==UC,eval_repl_atom(DC, R).
 
@@ -415,6 +428,8 @@ lw:- cl_load("wam-cl-params",_).
 %lisp_add_history("prolog.")
 %:- lisp_add_history("lisp.").
 
+
+:- cd('/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/').
 
 
 :- fixup_exports.

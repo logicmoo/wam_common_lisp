@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(places, []).
 :- set_module(class(library)).
-:- include('header.pro').
+:- include('header').
 :- ensure_loaded((utils_for_swi)).
 
 value_or([Value],Value,_):- !.

@@ -16,7 +16,7 @@
 
 :- set_module(class(library)).
 
-:- include('header.pro').
+:- include('header').
 
 :- dynamic(tst:is_local_test/1).
 :- multifile(tst:is_local_test/1).

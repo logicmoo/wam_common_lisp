@@ -20,7 +20,7 @@
 
 :- set_module(class(library)).
 
-:- include('header.pro').
+:- include('header').
 
 
 tst:is_local_test(do(0.0),

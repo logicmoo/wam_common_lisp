@@ -83,6 +83,7 @@ wl:coercion(In, claz_sequence, Out):- is_stringp(In),to_lisp_string(In,Out).
 wl:coercion(In, claz_cons, Out):- functor(In,_F,A),arg(A,In,Out),is_list(Out).
 
 wl:coercion(List, object(_,'$ARRAY'(A1,A2)), '$ARRAY'(A1,A2,List)).
+wl:coercion(In, sequence(string,'$ARRAY'(A1,A2)), List):- string(In),to_lisp_string(In,'$ARRAY'(A1,A2,List)).
 wl:coercion(In, sequence(string,'$ARRAY'(A1,A2)), List):- is_stringp(In),to_lisp_string(In,'$ARRAY'(A1,A2,List)).
 
 wl:coercion([H|T], object(Cons,_), [H|T]):- Cons==claz_cons.

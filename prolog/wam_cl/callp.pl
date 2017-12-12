@@ -22,7 +22,7 @@
 
 :- set_module(class(library)).
 
-:- include('header.pro').
+:- include('header').
 
 
 cl:cl_trace(t):- rtrace,trace.
@@ -99,6 +99,11 @@ compile_prolog_call(Ctx,Env,Prev,[sys_prolog_inline,Call],Prev, Term ):-
    read_prolog_from_lisp(Call,Term0),
    expand_prolog(Prev,Ctx,Env,Term0,Term).
 
+as_prolog_object(Operand,PrologArg):- is_stringp(Operand),to_prolog_string(Operand,PrologArg).
+as_prolog_object(Operand,PrologArg):- is_unmberp(Operand),to_prolog_number(Operand,PrologArg).
+as_prolog_object(PrologArg,PrologArg).
+
+read_prolog_object(Operand):- read(Operand).
 
 :- fixup_exports.
 

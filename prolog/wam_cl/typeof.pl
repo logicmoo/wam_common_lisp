@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(typeof, []).
 :- set_module(class(library)).
-:- include('header.pro').
+:- include('header').
 
 cl_class_of(Obj,Class):- i_class(Obj,Class),!.
 

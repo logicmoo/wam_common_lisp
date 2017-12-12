@@ -22,7 +22,7 @@
  *******************************************************************/
 :- module(pnames, []).
 :- set_module(class(library)).
-:- include('header.pro').
+:- include('header').
 %:- set_prolog_flag(verbose_load,full).
 :- set_prolog_flag(verbose,normal).
 %:- set_prolog_flag(verbose_autoload,true).
@@ -81,7 +81,19 @@ filter_var_chars0([42|T],[95,120,95|Rest]):-!,filter_var_chars0(T,Rest).
 filter_var_chars0([H|T],[H|Rest]):-  code_type(H, prolog_identifier_continue),!,filter_var_chars0(T,Rest).
 filter_var_chars0([H|T],Rest):- number_codes(H,Codes), filter_var_chars0(T,Mid),append([95, 99|Codes],[95|Mid],Rest).
 
-p_n_atom0(Atom,UP):- atom(Atom),!,name(Atom,[C|Was]),to_upper(C,U),filter_var_chars([U|Was],CS),name(UP,CS).
+atom_concat_some_left(L,R,LR):- atom_concat(L,R,LR),atom_length(R,Len),Len>0.
+atom_concat_some_left(L,R,LR):- upcase_atom(L,L0),L\==L0,atom_concat(L0,R,LR),atom_length(R,Len),Len>0.
+atom_concat_some_left(L,R,LR):- downcase_atom(L,L0),L\==L0,atom_concat(L0,R,LR),atom_length(R,Len),Len>0.
+
+reduce_atomLR(L,R):- atom_concat_some_left('Cl_',LL,L),reduce_atomLR(LL,R).
+reduce_atomLR(L,R):- atom_concat_some_left('U_',LL,L),reduce_atomLR(LL,R).
+reduce_atomLR(L,R):- atom_concat_some_left('F_',LL,L),reduce_atomLR(LL,R).
+reduce_atomLR(L,R):- atom_concat_some_left('Kw_',LL,L),reduce_atomLR(LL,R).
+reduce_atomLR(L,L).
+
+p_n_atom0(Atom,UP):- atom(Atom),!,
+  reduce_atomLR(Atom,AtomR),
+  name(AtomR,[C|Was]),to_upper(C,U),filter_var_chars([U|Was],CS),name(UP,CS).
 p_n_atom0(String,UP):- string(String),!,string_to_atom(String,Atom),!,p_n_atom0(Atom,UP).
 p_n_atom0([C|S],UP):- !,notrace(catch(atom_codes(Atom,[C|S]),_,fail)),!,p_n_atom0(Atom,UP).
 

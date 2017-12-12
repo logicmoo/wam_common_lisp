@@ -145,7 +145,7 @@ method-combination-lambda-list::= (wholevar var*
 :- module(arglists, []).
 
 :- set_module(class(library)).
-:- include('header.pro').
+:- include('header').
 
 
 currently_visible_package(P):- reading_package(Package),
@@ -235,6 +235,14 @@ is_special_op(defstruct, pkg_cl).
 reserved_symbols(_Names,_PVars).
 as_rest(_,R,R).
 as_env(_,E,E).
+
+
+kw_is_present(RestNKeysIn,F,KWP,KWPV):- 
+   ((append(_Left,[F,KWPV|More],RestNKeysIn),length(More,Nth),is_evenp(Nth)) ->
+     KWP=t ; KWP=[]).
+   
+   
+
 
 enforce_atomic(F):- (simple_atom_var(F)->true;(lisp_dump_break)).
 arginfo_incr(Prop,ArgInfo):- get_dict(Prop,ArgInfo,Old),New is Old +1, b_set_dict(Prop,ArgInfo,New).
@@ -373,15 +381,15 @@ set_symbol_value_if_missing(Env, Var, In, _, Thru):- set_var(Env,Var,In),!,In=Th
 simple_atom_var(Atom):- atom(Atom), Atom\=nil,Atom\=[], \+ arg(_, v('&optional', '&key', '&aux', '&rest', '&body', '&environment'),Atom).
 
 % Creates a function Head and an argument unpacker using Code to unpack
-expand_function_head(Ctx,EnvInOut,[FunctionName | FormalParms],Head,ZippedArgBindings, Result,HeadDefCode,HeadCodeOut):-
+expand_function_head(Ctx,EnvIO,[FunctionName | FormalParms],Head,ZippedArgBindings, Result,HeadDefCode,HeadCodeOut):-
    member(Mode,FormalParms),arg(_, v('&optional', '&key', '&aux', '&rest', '&body', '&environment'),Mode),!,
-   must_det_l((function_head_params(Ctx,EnvInOut,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,_Names,_PVars,_HeadCode),
+   must_det_l((function_head_params(Ctx,EnvIO,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,_Names,_PVars,_HeadCode),
    arginfo_incr(complex,ArgInfo),
    append([Arguments], [Result], HeadArgs),
    debug_var('ArgsIn',Arguments),
    debug_var('BinderCode',BindCode),
    HeadDefCode = (asserta(wl:arglist_info(FunctionName,FormalParms,ActualArgs,ArgInfo):-true)),
-   HeadCodeOut = (must_bind_parameters(EnvInOut,FormalParms,Arguments,EnvInOut,BindCode),always(BindCode)),
+   HeadCodeOut = (must_bind_parameters(EnvIO,FormalParms,Arguments,EnvIO,BindCode),always(BindCode)),
    call(HeadDefCode),
    Head =.. [FunctionName | HeadArgs])).
 
@@ -474,9 +482,9 @@ correct_formal_params_destructuring([A, B|R],[A, B, '&rest',R]):- simple_atom_va
 correct_formal_params_destructuring([A|R],[A,'&rest',R]):- simple_atom_var(A),simple_atom_var(R),!.
 correct_formal_params_destructuring(AA,AA).
 
-must_bind_parameters(EnvInOut,FormalParms0,Params,EnvInOut,Code):- 
+must_bind_parameters(EnvIO,FormalParms0,Params,EnvIO,Code):- 
   correct_formal_params(FormalParms0,FormalParms),
-  always(bind_each_param(EnvInOut,FormalParms,Params,Code)).
+  always(bind_each_param(EnvIO,FormalParms,Params,Code)).
 
 bind_each_param(Env, FormalParms, Arguments,BindCode):-
   % append_open_list(Env,bind),

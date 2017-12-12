@@ -36,7 +36,7 @@
 
 :- set_module(class(library)).
 
-:- include('header.pro').
+:- include('header').
 
 
 evalL([], _, []):-!.

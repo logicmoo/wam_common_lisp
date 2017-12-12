@@ -16,12 +16,12 @@
 
 :- set_module(class(library)).
 
-:- include('header.pro').
+:- include('header').
 
 cddd:- cd('/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/daydreamer/').
 
 
-lci :- with_lisp_translation(file('ci2.pro'),print_term).
+lci :- with_lisp_translation(file('ci2.data'),print_term).
 print_term(COMMENTP):- is_comment(COMMENTP,_),!.
 print_term([_|N]):- P=..[struct_opv_new|N],reader_intern_symbols(P,PI), format('~N~q.~n',[PI]).
 
@@ -139,16 +139,18 @@ cl_compile_file(File,Keys,R):-
   do_compile_1file(Keys,File),!,
   cl_truename(File,R),!.
 
-  
-
+cl_compile_file_pathname(OSFile,PLFile):- file_base_name(OSFile,BaseName),atom_concat_or_rtrace(BaseName,'.pro',PLFile).
+cl_compile_file_pathname
 %  For top level eval-when forms, :compile-toplevel specifies that the compiler must evaluate the body at compile time, and :load-toplevel specifies that the compiler must arrange to evaluate the body at load time. For non-top level eval-when forms, :execute specifies that the body must be executed in the run-time environment.
 do_compile_1file(Keys,File0):-
    %ignore(R=t),
    search_for(File0,File),
    prolog_to_os_filename(File,OSFile),
-   atom_concat_or_rtrace(OSFile,'.trans.pl',PLFile),
+   compiled_file_name(OSFile,PLFile),
+
    locally_let(
      [sym('sys::*compile-file-pathname*')=str(File),
+      sym('sys::*compile-file-truename*')=str(OSFile),
       sym('sys::*compile-file-truename*')=str(OSFile),
       sym('sys::*compiler-mode*')=sym(':compile-toplevel'),      
       % sym('sys::*output-file-pathname*')=str(PLFile),
@@ -230,7 +232,7 @@ lisp_grovel(assert_if_new(PrologCode)):- !, lisp_grovel_assert(PrologCode).
 lisp_grovel(assert(PrologCode)):- !, lisp_grovel_assert(PrologCode).
 lisp_grovel(PAB):- PAB=..[F,A|_],grovel_time_called(F),!,(var(A)-> true;call(PAB)),!.
 %lisp_grovel(PAB):- grovel_time_called(PAB)->always(PAB);true.
-%lisp_grovel(cl_load(File,Keys,Load_Ret)):- !, cl_compile_file(File,Keys,Load_Ret).
+lisp_grovel(cl_load(File,Keys,Load_Ret)):- !, trace, cl_compile_file(File,Keys,Load_Ret).
 %lisp_grovel(cl_compile_file(File,Keys,Load_Ret)):- !, cl_compile_file(File,Keys,Load_Ret).
 lisp_grovel(_).
 

@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(mizepro, []).
 :- set_module(class(library)).
-:- include('header.pro').
+:- include('header').
 
 body_cleanup(Ctx,CodeIn,CodeOut):- quietly(body_cleanup_full(Ctx,CodeIn,CodeOut)).
 

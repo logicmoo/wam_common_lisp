@@ -16,7 +16,7 @@
 
 :- set_module(class(library)).
 
-:- include('header.pro').
+:- include('header').
 
 :- discontiguous(compile_body_go_tagbody/5).
 
@@ -41,6 +41,10 @@ compile_body_go_tagbody(_Ctx,Env,Result,[go,Label], Code):- local_override(tagbo
 
 
 add_context_code(_Ctx,Assertion):- user:asserta(Assertion),dbmsg(:-asserta(Assertion)),!.
+add_context_code(Ctx,Assertion):- 
+  always((
+  (nb_current_value(Ctx,symbol,Symbol);(toplevel=Symbol)),
+  user:asserta_tracked(Symbol,Assertion),dbmsg_real(:-asserta_tracked(Symbol,Assertion)))),!.
 % TAGBODY
 compile_body_go_tagbody(Ctx,Env,[],[tagbody| InstrS], Code):- 
   gensym(addr_tagbody_,TB),gensym(addr_enter_,Label),

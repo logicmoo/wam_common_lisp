@@ -16,7 +16,7 @@
 
 :- set_module(class(library)).
 
-:- include('header.pro').
+:- include('header').
 
 % (defparameter cl::*error-output* (make-synonym-stream 'wam-cl::*stderr* ))
 cl_make_synonym_stream(Name,Ret):-

@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(env, []).
 :- set_module(class(library)).
-:- include('header.pro').
+:- include('header').
 
 
 % el_new(el(X,X)):-X=[].

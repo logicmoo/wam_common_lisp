@@ -91,6 +91,10 @@ may_debug_var(R,V):- debug_var(R,V).
 pretty1(as_rest(Name, Rest, _)):- may_debug_var(Name,Rest).
 pretty1(get_var(Env, Name, Val)):- may_debug_var('Env',Env),may_debug_var(Name,Val).
 pretty1(set_var(Env,_Op, Name, Val)):- may_debug_var('Env',Env),may_debug_var(Name,Val).
+pretty1(cl_slot_value(_Env, Name, Val)):- may_debug_var(slot,Name,Val).
+pretty1(set_place(_Env, SETF, [Name|_], Val, _)):- is_place_write(SETF), atom(Name),var(Val),debug_var([Name,'_New'],Val).
+pretty1(P):- P=..[_,_|List],append(_,[Name, Val|_],List),atom(Name),var(Val),may_debug_var(Name,Val).
+
 pretty1([H | B]):- may_debug_var('CAR',H),may_debug_var('CDR',B).
 pretty1(debug_var(R,V)):- may_debug_var(R,V).
 

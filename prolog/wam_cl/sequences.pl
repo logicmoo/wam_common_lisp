@@ -22,7 +22,7 @@
 
 :- set_module(class(library)).
 
-:- include('header.pro').
+:- include('header').
 
 prims:cl_exact.
 

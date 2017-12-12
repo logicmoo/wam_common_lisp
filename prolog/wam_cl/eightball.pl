@@ -164,6 +164,6 @@ system:goal_expansion(always(G),G) :- lisp_compiler_option(speed,S),S>2.
 system:goal_expansion(certainly(G),G) :- lisp_compiler_option(safety,0).
 
 :- fixup_exports.
-:- include('header.pro').
+:- include('header').
 
 

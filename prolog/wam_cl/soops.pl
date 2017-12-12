@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(soops, []).
 :- set_module(class(library)).
-:- include('header.pro').
+:- include('header').
 
 :- multifile(soops:struct_opv/3).
 :- discontiguous soops:struct_opv/3.
@@ -641,18 +641,18 @@ construct_opv(Obj,Kind):-
 
 :- discontiguous soops:struct_opv/4.
 :- dynamic((soops:struct_opv/4)).
-:- include('ci.pro').
+:- include('ci.data').
 cleanup_mop:-  
  ignore((get_struct_opv(X,include,claz_object),get_struct_opv(X,include,Y),Y\==claz_object,show_call_trace(retract(soops:struct_opv(X,include,claz_object))),fail)),
  ignore((get_struct_opv(X,include,claz_t),get_struct_opv(X,include,Y),Y\==claz_t,show_call_trace(retract(soops:struct_opv(X,include,claz_t))),fail)).
 
-save_mop:- cleanup_mop,tell('ci3.pro'),
+save_mop:- cleanup_mop,tell('ci3.data'),
  forall(member(Assert,[get_struct_opv(_,P,_),get_struct_opv(_,P,_,_),get_struct_opv(_,P,_,_,_)]),
    forall(soops:Assert,
       ignore((P\==slot1,P\==has_slots,format('~q.~n',[Assert]))))), told.
 :- style_check(-discontiguous).
 
-make_soops:- cleanup_mop,tell('si2.pro'),
+make_soops:- cleanup_mop,tell('si2.data'),
    forall(member(Assert,[o_p_v(_,_,_)]),
      forall(clause(soops:Assert,true),
         ignore((P\==slot1,P\==has_slots,format('~q.~n',[Assert]))))), told.
@@ -661,7 +661,7 @@ make_soops:- cleanup_mop,tell('si2.pro'),
 :- dynamic soops:o_p_v/3.
 
 load_si:-
-  open('si.pro',read,Stream),
+  open('si.data',read,Stream),
   repeat,
     read_term(Stream,Value,[]),
     (Value==end_of_file->!;
@@ -679,12 +679,12 @@ process_si:-
 process_si(soops:o_p_v(X,Y,Z)):- X\==[], set_opv(X,Y,Z).
 
 :- if(true).
-:- include('si.pro').
+:- include('si.data').
 :- else.
 :- load_si.
 :- endif.
 
-%:- include('si2.pro').
+%:- include('si2.data').
 
 :- fixup_exports.
 

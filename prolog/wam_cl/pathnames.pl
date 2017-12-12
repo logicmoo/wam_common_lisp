@@ -16,7 +16,7 @@
 
 :- set_module(class(library)).
 
-:- include('header.pro').
+:- include('header').
 
 cl_truename(In,Pathname):- search_for(In,O),make_pathanme(O,Pathname).
 

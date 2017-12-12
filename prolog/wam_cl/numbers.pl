@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(mth, []).
 :- set_module(class(library)).
-:- include('header.pro').
+:- include('header').
 
 
 grovel_math:-
@@ -68,9 +68,15 @@ cl_c60(N1,N2,Ret):- t_or_nil(<(N1,N2),Ret).
 cl_c62(N1,N2,Ret):- t_or_nil(<(N1,N2),Ret). 
 '>'(N1,N2,Ret):- t_or_nil(>(N1,N2),Ret). 
 
-
 % Lisp Operators/Functions
-cl_sqrt(X,Y):- \+ integer(X)-> (Y is sqrt(X)) ; (IY is sqrt(X), RY is floor(IY),(RY=:=IY -> Y=RY ; Y=IY)).
+cl_sqrt(X,Y):-
+    X < 0 
+       -> (NX is -X , cl_sqrt(NX,NY), Y = '$COMPLEX'(0, NY))
+     ;
+    (\+ integer(X)
+      -> (Y is sqrt(X)) 
+      ;
+      (IY is sqrt(X), RY is floor(IY),(RY=:=IY -> Y=RY ; Y=IY))).
 
 cl_exp(N,Ret):- Ret is exp(N).
 

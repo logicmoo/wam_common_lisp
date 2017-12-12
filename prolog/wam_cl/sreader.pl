@@ -23,7 +23,7 @@
 :- use_module(library(filestreams)).
 :- use_module(library(bugger)).
 
-:- include('header.pro').
+:- include('header').
 
 
 
@@ -780,7 +780,7 @@ lisp_code_name_extra(7,`bell`).
 
 % @TODO undo this temp speedup
 :- set_prolog_flag(all_lisp_char_names,false).
-:- use_module('chars.pro').
+:- use_module('chars.data').
 /*
 
 (with-open-file (strm "lisp_code_names.pl" :direction :output :if-exists :supersede :if-does-not-exist :create)

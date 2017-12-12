@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(bq, []).
 :- set_module(class(library)).
-:- include('header.pro').
+:- include('header').
                
 
 macro_expand([],[]):-!.

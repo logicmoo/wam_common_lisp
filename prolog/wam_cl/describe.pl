@@ -16,7 +16,7 @@
 
 :- set_module(class(library)).
 
-:- include('header.pro').
+:- include('header').
 
 maybe_get_docs(Type,Name,[Str|FunctionBody],FunctionBody,Code):- is_stringp(Str),to_prolog_string(Str,String),
   Code = asserta_tracked(Name,doc:doc_string(Name,_Package,Type,String)).

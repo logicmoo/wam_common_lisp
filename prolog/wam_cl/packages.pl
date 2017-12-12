@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(package, []).
 :- set_module(class(library)).
-:- include('header.pro').
+:- include('header').
 
 :- multifile(xlisting_config:xlisting_always/1).
 :- dynamic(xlisting_config:xlisting_always/1).
@@ -370,7 +370,7 @@ package_prefix(PN,Pre):- nonvar(PN),package_nicknames(Pk,PN),!,package_prefix(Pk
 package_prefix(Pk,Pre):- is_lisp_package(Pk),atom_concat_or_rtrace('pkg_',Package,Pk),atom_concat_or_rtrace(Package,'_',Pre).
 
 
-save_pi:- tell('pi2.pro'),
+save_pi:- tell('pi2.data'),
    forall(member(Assert,[
      package_shadowing_symbols(_,_),
      package_external_symbols(_,_,_),
@@ -378,6 +378,6 @@ save_pi:- tell('pi2.pro'),
    forall(clause(package:Assert,true),
       ignore((format('~q.~n',[Assert]))))), told.
 
-:- include('pi.pro').
+:- include('pi.data').
 
 :- fixup_exports.

@@ -17,7 +17,7 @@
  *******************************************************************/
 :- module(comp, []).
 :- set_module(class(library)).
-:- include('header.pro').
+:- include('header').
 
 %new_compile_ctx(Ctx):- new_assoc(Ctx)put_attr(Ctx,type,ctx).
 new_compile_ctx(Ctx):- list_to_rbtree([type-ctx],Ctx0),put_attr(Ctx,tracker,Ctx0).
