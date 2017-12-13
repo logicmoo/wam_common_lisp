@@ -245,9 +245,9 @@ lisp_grovel_assert(T):-assert(T).
 
 cl_load(L,T):- cl_load(L,[],T).
 :-assertz(wl:arg_lambda_type(req(1),cl_load)).
-cl_load(L,Keys,T):- to_prolog_string_if_needed(L,Loc),!,cl_load(Loc,Keys,T).
-cl_load('$OBJ'(_Pathname,Loc),Keys,T):- !, cl_load(Loc,Keys,T).
-cl_load(File,_Keys,t):-
+cl_load(L,Keys,T):- to_prolog_string_if_needed(L,Loc)->L\==Loc,!,cl_load(Loc,Keys,T).
+%cl_load('$OBJ'(_Pathname,Loc),Keys,T):- !, cl_load(Loc,Keys,T).
+cl_load(File,_Keys,t):- fail,
    % check maybe for fresh
    pl_compiled_filename(File,PL),exists_file(PL),!,dbmsg(in_comment(ensure_loaded(PL))),!,ensure_loaded(PL).
 %cl_load(File,R):- cl_compile_file(File,t),!,pl_compiled_filename(File,PL),exists_file(PL),!,in_comment(dbmsg(ensure_loaded(PL))),!,ensure_loaded(PL).

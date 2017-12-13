@@ -212,9 +212,9 @@ personal_props(ref).
 personal_props(classof).
 personal_props(instance).
 f_u_to_pvs(X,[float|XX]):- notrace(catch(XX is (1.0 * X),_,fail)),!.
-f_u_to_pvs(X,XX):- findall([P|V],((get_opv(X,P,V);get_struct_opv(X,P,V)),\+ personal_props(P)),List),
+f_u_to_pvs(X,XX):- findall([P|V],((get_opv_ii(X,P,V),\+ personal_props(P))),List),
   List\==[],sort(List,XX),!.
-f_u_to_pvs(X,[str|XX]):- format(string(S),'~w',[X]),to_string_upper(S,XX),!.
+f_u_to_pvs(X,[str|XX]):- format(string(S),'~w',[X]),string_upper(S,XX),!.
 
 
 

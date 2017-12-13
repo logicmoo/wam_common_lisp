@@ -363,14 +363,16 @@ un_kw1(Prop,Prop).
 add_kw_opv(Obj,Key,V):- un_kw(Key,Prop),add_opv_new(Obj,Prop,V).
 
 :-assertz(wl:arg_lambda_type(exact_only,f_sys_get_iprops)).
+wl:interned_eval('`sys:get-iprops').
 f_sys_get_iprops(Obj,Result):- findall([Prop|Value],get_opv(Obj,Prop,Value),Result).
 :-assertz(wl:arg_lambda_type(exact_only,f_sys_get_opv)).
+wl:interned_eval('`sys:get-opv').
 f_sys_get_opv(Obj,Prop,Value):- get_opv(Obj,Prop,Value).
 	
 add_opv_maybe(Obj,Prop,_):- get_opv_i(Obj,Prop,_),!.
 add_opv_maybe(Obj,Prop,Value):- add_opv_new(Obj,Prop,Value),!.
 
-get_opv(Obj,Prop,Value):- get_opv_maybe_ref(Obj,Prop,Value),!.
+get_opv(Obj,Prop,Value):- get_opv_maybe_ref(Obj,Prop,Value).
 /*
 get_opv(Obj,Prop,RealValue):- get_opv_maybe_ref(Obj,Prop,Value),
   ensure_awakened(Value,RealValue),
