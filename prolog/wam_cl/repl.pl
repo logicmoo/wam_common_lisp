@@ -82,9 +82,9 @@ classof:attr_unify_hook(A,B):- trace,wdmsg(classof:attr_unify_hook(A,B)),lisp_du
 code_load_hooks:-
   (current_prolog_flag(os_argv,Y)->handle_all_os_program_args(Y)),
   set_prolog_flag(lisp_autointern,true),
-   forall(retract(wl:interned_eval(G)),always((  locally_let(xx_package_xx=pkg_prolog,lisp_compiled_eval(G,_))))),
-   forall(retract(wl:wam_cl_setup(G)),always((G))),
+   forall(retract(wl:interned_eval(G)),always(do_interned_eval(G))),
   set_prolog_flag(lisp_autointern,false).                 
+
 
 do_before_tpl:- code_load_hooks,
   (current_prolog_flag(argv,Y)->handle_all_program_args(Y)).

@@ -70,8 +70,8 @@ make_character0(C,'#\\'(C)).
 to_prolog_char('#\\'(X),O):-!,to_prolog_char(X,O).
 to_prolog_char((Code),Char):- number(Code),!,char_code(Char,Code).
 to_prolog_char((Atom),Char):- name(Atom,[C|Odes]),!,
-  (Odes==[] -> char_code(Char,C); 
-  (text_to_string(Atom,String),char_code_from_name(String,Code),char_code(Char,Code))).
+  ((Odes==[] -> char_code(Char,C); 
+  ((text_to_string(Atom,String),char_code_from_name(String,Code),char_code(Char,Code))))).
 
 
 

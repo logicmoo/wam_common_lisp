@@ -22,13 +22,13 @@ cl_truename(In,Pathname):- pl_truename(In,O),to_lisp_pathname(O,Pathname).
 
 cl_make_pathname(I,O):- to_lisp_pathname(I,O).
 
+wl:arg_lambda_type(req(1),cl_compile_file_pathname).
 cl_compile_file_pathname(OSFile,Keys,PLFileOut):-
    F = kw_output_file,
    kw_obtain_value_else_p(Keys,F,sys_output_file, 
-     PLFile, guess_compile_file_pathname(OSFile,PLFile), _Present),
+     PLFile, pl_compiled_filename(OSFile,PLFile), _Present),
    to_lisp_pathname(PLFile,PLFileOut).
 
-guess_compile_file_pathname(OSFile,PLFile):- file_base_name(OSFile,BaseName),atom_concat_or_rtrace(BaseName,'.pro',PLFile).
 
 /*
 *COMPILE-FILE-TRUENAME*
@@ -38,8 +38,15 @@ guess_compile_file_pathname(OSFile,PLFile):- file_base_name(OSFile,BaseName),ato
 % *COMPILE-FILE-CLASS-EXTENSION*  sys_xx_compile_file_class_extension_xx
 % *COMPILE-FILE-TYPE*    sys_xx_compile_file_type_xx
 
+
 % (LOAD "sanity-test")
+pl_compiled_filename(OSFile,PLFile):-
+   cl_truename(OSFile,TrueOSFile),
+   to_prolog_pathname(TrueOSFile,OSFileAtom),
+   cl_symbol_value(sys_xx_compile_file_type_xx,StrExt),to_prolog_string(StrExt,Ext),
+   file_name_extension(BaseName,_Was,OSFileAtom),file_name_extension(BaseName,Ext,PLFile).
 pl_compiled_filename(Obj,PL):- to_prolog_string(Obj,M),pl_compiled_filename0(M,PL).
+
 pl_compiled_filename0(Obj,PL):- compound(Obj),arg(2,Obj,From),string(From),
    pl_truename(From,File),pl_compiled_filename(File,PL),!.
 pl_compiled_filename0(File,PL):- get_var(sys_xx_compile_file_type_xx,Ext),
@@ -64,6 +71,15 @@ to_lisp_pathname(Pathname,'$OBJ'(claz_pathname,PathString)):-
 pl_truename(In,M):- cl_symbol_value(xx_default_pathname_defaults_xx,Str),always((to_prolog_pathname(Str,Path))),Path\=='',!, with_fstem(Str,In,M).
 pl_truename(In,M):- with_fstem(".",In,M),!.
 pl_truename(In,M):- stream_property(_,file_name(FD)),once((with_fstem(FD,In,M))).
+
+set_default_path_early:-
+   working_directory(X,X),
+   assert(wl:interned_eval(call((to_lisp_pathname(X,Path),
+     set_opv(sym('cl:*default-pathname-defaults*'),value,Path))))).
+
+:- assert(wl:interned_eval(call((to_lisp_pathname("",Path),
+     set_opv(sym('cl:*default-pathname-defaults*'),value,Path))))).
+
 
 % Uses Symbol value: *SOURCE-FILE-TYPES*
 check_file_types(SearchTypes):- 

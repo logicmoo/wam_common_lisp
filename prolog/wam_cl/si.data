@@ -51218,7 +51218,7 @@ o_p_v(sys_xx_compile_file_type_xx,classof,claz_symbol).
 o_p_v(sys_xx_compile_file_type_xx,declared_as,defparameter).
 o_p_v(sys_xx_compile_file_type_xx,name,"*COMPILE-FILE-TYPE*").
 o_p_v(sys_xx_compile_file_type_xx,package,pkg_sys).
-o_p_v(sys_xx_compile_file_type_xx,value,"abcl").
+o_p_v(sys_xx_compile_file_type_xx,value,"pro").
 o_p_v(sys_xx_compile_file_zip_xx,classof,claz_symbol).
 o_p_v(sys_xx_compile_file_zip_xx,declared_as,defparameter).
 o_p_v(sys_xx_compile_file_zip_xx,name,"*COMPILE-FILE-ZIP*").

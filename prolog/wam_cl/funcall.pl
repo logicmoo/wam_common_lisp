@@ -205,9 +205,9 @@ function_arg_info(FN,ArgInfo):- wl:arglist_info(_,FN,_,_,ArgInfo).
 
 exact_and_restkeys(F,N):- premute_names(F,FF), exact_and_restkeys0(FF,N).
 
+exact_and_restkeys0(F,_):- uses_exact0(F),!,fail.
 exact_and_restkeys0(F,N):- function_arg_info(F,ArgInfo),ArgInfo.req=N,ArgInfo.all\==N,!.
 exact_and_restkeys0(F,N):- wl:arg_lambda_type(req(N),F),!.
-exact_and_restkeys0(F,_):- uses_exact0(F),!,fail.
 exact_and_restkeys0(F,0):- uses_rest_only0(F),!.
 
 

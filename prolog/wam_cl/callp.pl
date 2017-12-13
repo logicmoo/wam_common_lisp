@@ -105,5 +105,45 @@ as_prolog_object(PrologArg,PrologArg).
 
 read_prolog_object(Operand):- read(Operand).
 
+do_interned_eval(call(G)):-!,locally_let(xx_package_xx=pkg_prolog,G).
+do_interned_eval(G):- 
+   locally_let(xx_package_xx=pkg_prolog,lisp_compiled_eval(G,_)).   
+
+%locally_let(_,G):- !, G.
+
+locally_let([N=V|More],G):- castify(V,Value),V\==Value,!,locally_let([N=Value|More],G).
+locally_let([N=V|More],G):- castify(N,Symbol),N\==Symbol,!,locally_let([Symbol=V|More],G).
+locally_let(N=V,G):-!,locally_let([N=V],G).
+locally_let([N=V|More],G):- 
+ always(get_var(N,Was)),
+  setup_call_cleanup(
+     f_sys_set_symbol_value(N,V),
+     %once(locally($(N)=V,..)),
+     (locally_let(More,G),f_sys_set_symbol_value(N,Was)),
+     f_sys_set_symbol_value(N,Was)).
+   
+locally_let([],G):- !, 
+  subst_castifies(G,GG),always(GG).
+
+subst_castifies(G,G):- \+ compound(G),!.
+subst_castifies(G,GG):- castify(G,GG),!.
+subst_castifies(C1,C2):- compound_name_arguments(C1,F,C1O),
+  must_maplist(subst_castifies,C1O,C2O),C2=..[F|C2O].
+
+castify(O,O):- \+compound(O),!,fail.
+castify(str(O),S):-!, castify1(O,M),to_lisp_string(M,S).
+castify(plstr(O),S):-!, castify1(O,M),to_prolog_string(M,S).
+castify(path(O),S):-!, castify1(O,M),to_lisp_pathname(M,S).
+castify(sym(O),S):-!, castify1(O,M),reader_intern_symbols(M,S).
+castify(value(O),S):- castify1(O,M),always(get_opv(M,value,S)).
+castify(value(O),S):- castify1(O,M),always(get_opv(M,value,S)).
+castify(get_slot(Slot,O),S):- castify1(O,M),castify1(Slot,LSlot),always(get_opv(M,LSlot,S)).
+
+castify1(O,O):- \+compound(O),!.
+castify1(O,O):- is_list(O),!.
+castify1(I,O):- castify(I,O).
+castify1(O,O).
+
+
 :- fixup_exports.
 
