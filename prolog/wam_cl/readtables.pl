@@ -124,7 +124,7 @@ atom_symbol_public(SymbolName,Package,_Symbol):- throw('symbol_not_exists'(Symbo
 
 
 string_list_concat(StrS,Sep,String):- atomic_list_concat(L,Sep,String),atomics_to_strings(L,StrS).
-atomics_to_strings([A|L],[S|StrS]):-atom_string(A,S),!,atomics_to_strings(L,StrS).
+atomics_to_strings([A|L],[S|StrS]):- atom(A),atom_string(A,S),!,atomics_to_strings(L,StrS).
 atomics_to_strings([],[]).
 
 atom_symbol_test(SymbolName,Symbol):- reading_package(Package),atom_symbol(SymbolName,Package,Symbol),!.

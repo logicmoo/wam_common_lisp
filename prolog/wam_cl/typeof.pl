@@ -18,6 +18,7 @@
 
 cl_class_of(Obj,Class):- i_class(Obj,Class),!.
 
+i_class(Var,Class):-attvar(Var),get_attr(Var,classof,Class).
 i_class(Var,claz_locative):-var(Var).
 % compounds
 i_class(function(OP),Class):- get_opv(OP,function,Obj),cl_class_of(Obj,Class).

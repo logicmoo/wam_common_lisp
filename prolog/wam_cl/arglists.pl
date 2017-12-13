@@ -242,10 +242,21 @@ kw_is_present(RestNKeysIn,F,KWP,KWPV):-
      KWP=t ; KWP=[]).
    
    
+kw_obtain_value_else_p(RestNKeys,F,KW,Value,ElseInit,PresentP):- 
+   ((append(_Left,[F,Value|More],RestNKeys),length(More,Nth),is_evenp(Nth)) -> PresentP=t ;
+     ((F \== KW ,append(_Left,[F,Value|More],RestNKeys),length(More,Nth),is_evenp(Nth)) -> PresentP=t;
+      (PresentP=[],ElseInit))).
+     
+      
 
 
 enforce_atomic(F):- (simple_atom_var(F)->true;(lisp_dump_break)).
 arginfo_incr(Prop,ArgInfo):- get_dict(Prop,ArgInfo,Old),New is Old +1, b_set_dict(Prop,ArgInfo,New).
+
+arginfo_append(NewItem,Prop,ArgInfo):- get_dict(Prop,ArgInfo,Old),
+  (Old==0 -> b_set_dict(Prop,ArgInfo,[NewItem]);
+  (is_list(Old) -> (append(Old,[NewItem],New),b_set_dict(Prop,ArgInfo,New));
+  (b_set_dict(Prop,ArgInfo,[Old,NewItem])))).
 arginfo_set(Prop,ArgInfo,New):- nb_set_dict(Prop,ArgInfo,New).
 
   

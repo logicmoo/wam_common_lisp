@@ -21577,7 +21577,7 @@ o_p_v(hash_table_znst_1,instance,claz_slot_object).
 o_p_v(hash_table_znst_1,instance,claz_structure_c33_object).
 o_p_v(hash_table_znst_1,instance,claz_structure_object).
 o_p_v(hash_table_znst_1,instance,claz_t).
-o_p_v(hash_table_znst_1,name,"znst_1").
+%o_p_v(hash_table_znst_1,name,"znst_1").
 o_p_v(hash_table_znst_11,classof,claz_hash_table).
 o_p_v(hash_table_znst_11,instance,claz_hash_table(claz_t,claz_t)).
 o_p_v(hash_table_znst_11,instance,claz_hash_table).
@@ -21586,7 +21586,7 @@ o_p_v(hash_table_znst_11,instance,claz_slot_object).
 o_p_v(hash_table_znst_11,instance,claz_structure_c33_object).
 o_p_v(hash_table_znst_11,instance,claz_structure_object).
 o_p_v(hash_table_znst_11,instance,claz_t).
-o_p_v(hash_table_znst_11,name,"znst_11").
+%o_p_v(hash_table_znst_11,name,"znst_11").
 o_p_v(hash_table_znst_11,test,equalp).
 %o_p_v(hash_table_znst_12,"SYS",[['$S'([logical_pathname,kw_host,"SYS",kw_device,kw_unspecific,kw_directory,[kw_relative],kw_name,kw_wild,kw_type,"LISP",kw_version,[]]),"*.lisp"],['$S'([logical_pathname,kw_host,"SYS",kw_device,kw_unspecific,kw_directory,[kw_relative],kw_name,kw_wild,kw_type,[],kw_version,[]]),"*"],['$S'([logical_pathname,kw_host,"SYS",kw_device,kw_unspecific,kw_directory,[kw_absolute],kw_name,kw_wild,kw_type,[],kw_version,[]]),"/*"]]).
 o_p_v(hash_table_znst_12,classof,claz_hash_table).
@@ -21597,7 +21597,7 @@ o_p_v(hash_table_znst_12,instance,claz_slot_object).
 o_p_v(hash_table_znst_12,instance,claz_structure_c33_object).
 o_p_v(hash_table_znst_12,instance,claz_structure_object).
 o_p_v(hash_table_znst_12,instance,claz_t).
-o_p_v(hash_table_znst_12,name,"znst_12").
+%o_p_v(hash_table_znst_12,name,"znst_12").
 o_p_v(hash_table_znst_12,test,equalp).
 o_p_v(hash_table_znst_13,classof,claz_hash_table).
 o_p_v(hash_table_znst_13,instance,claz_hash_table(claz_t,claz_t)).
@@ -21607,7 +21607,7 @@ o_p_v(hash_table_znst_13,instance,claz_slot_object).
 o_p_v(hash_table_znst_13,instance,claz_structure_c33_object).
 o_p_v(hash_table_znst_13,instance,claz_structure_object).
 o_p_v(hash_table_znst_13,instance,claz_t).
-o_p_v(hash_table_znst_13,name,"znst_13").
+%o_p_v(hash_table_znst_13,name,"znst_13").
 o_p_v(hash_table_znst_13,test,ext_stablehash_eq).
 o_p_v(hash_table_znst_14,classof,claz_hash_table).
 o_p_v(hash_table_znst_14,instance,claz_hash_table(claz_t,claz_t)).
@@ -21617,7 +21617,7 @@ o_p_v(hash_table_znst_14,instance,claz_slot_object).
 o_p_v(hash_table_znst_14,instance,claz_structure_c33_object).
 o_p_v(hash_table_znst_14,instance,claz_structure_object).
 o_p_v(hash_table_znst_14,instance,claz_t).
-o_p_v(hash_table_znst_14,name,"znst_14").
+%o_p_v(hash_table_znst_14,name,"znst_14").
 o_p_v(hash_table_znst_14,test,ext_fasthash_eq).
 o_p_v(hash_table_znst_14,warn_if_needs_rehash_after_gc,t).
 o_p_v(host_namestring,classof,claz_symbol).
@@ -27521,7 +27521,7 @@ o_p_v(pathname_znst_15,instance,claz_slot_object).
 o_p_v(pathname_znst_15,instance,claz_structure_c33_object).
 o_p_v(pathname_znst_15,instance,claz_structure_object).
 o_p_v(pathname_znst_15,instance,claz_t).
-o_p_v(pathname_znst_15,name,"znst_15").
+%o_p_v(pathname_znst_15,name,"znst_15").
 o_p_v(pathname_znst_15,name,[]).
 o_p_v(pathname_znst_15,type,[]).
 o_p_v(pathname_znst_15,version,[]).
@@ -29774,7 +29774,7 @@ o_p_v(random_state_znst_8,instance,claz_slot_object).
 o_p_v(random_state_znst_8,instance,claz_structure_c33_object).
 o_p_v(random_state_znst_8,instance,claz_structure_object).
 o_p_v(random_state_znst_8,instance,claz_t).
-o_p_v(random_state_znst_8,name,"znst_8").
+%o_p_v(random_state_znst_8,name,"znst_8").
 o_p_v(rassoc,classof,claz_symbol).
 o_p_v(rassoc,compile_as,kw_function).
 o_p_v(rassoc,function,cl_rassoc).
@@ -29855,7 +29855,7 @@ o_p_v(read_sequence,name,"READ-SEQUENCE").
 o_p_v(read_sequence,package,pkg_cl).
 o_p_v(read_table_znst_3,classof,claz_read_table).
 o_p_v(read_table_znst_3,instance,claz_read_table).
-o_p_v(read_table_znst_3,name,"znst_3").
+%o_p_v(read_table_znst_3,name,"znst_3").
 o_p_v(reader_error,classof,claz_symbol).
 o_p_v(reader_error,name,"READER-ERROR").
 o_p_v(reader_error,package,pkg_cl).
@@ -32430,7 +32430,7 @@ o_p_v(synonym_stream_znst_10,instance,claz_structure_c33_object).
 o_p_v(synonym_stream_znst_10,instance,claz_structure_object).
 o_p_v(synonym_stream_znst_10,instance,claz_synonym_stream).
 o_p_v(synonym_stream_znst_10,instance,claz_t).
-o_p_v(synonym_stream_znst_10,name,"znst_10").
+%o_p_v(synonym_stream_znst_10,name,"znst_10").
 o_p_v(synonym_stream_znst_10,symbol,sys_xx_stderr_xx).
 o_p_v(synonym_stream_znst_2,classof,claz_synonym_stream).
 o_p_v(synonym_stream_znst_2,instance,claz_ansi_stream).
@@ -32441,7 +32441,7 @@ o_p_v(synonym_stream_znst_2,instance,claz_structure_c33_object).
 o_p_v(synonym_stream_znst_2,instance,claz_structure_object).
 o_p_v(synonym_stream_znst_2,instance,claz_synonym_stream).
 o_p_v(synonym_stream_znst_2,instance,claz_t).
-o_p_v(synonym_stream_znst_2,name,"znst_2").
+%o_p_v(synonym_stream_znst_2,name,"znst_2").
 o_p_v(synonym_stream_znst_2,symbol,xx_terminal_io_xx).
 o_p_v(synonym_stream_znst_4,classof,claz_synonym_stream).
 o_p_v(synonym_stream_znst_4,instance,claz_ansi_stream).
@@ -32452,7 +32452,7 @@ o_p_v(synonym_stream_znst_4,instance,claz_structure_c33_object).
 o_p_v(synonym_stream_znst_4,instance,claz_structure_object).
 o_p_v(synonym_stream_znst_4,instance,claz_synonym_stream).
 o_p_v(synonym_stream_znst_4,instance,claz_t).
-o_p_v(synonym_stream_znst_4,name,"znst_4").
+%o_p_v(synonym_stream_znst_4,name,"znst_4").
 o_p_v(synonym_stream_znst_4,symbol,sys_xx_stdin_xx).
 o_p_v(synonym_stream_znst_5,classof,claz_synonym_stream).
 o_p_v(synonym_stream_znst_5,instance,claz_ansi_stream).
@@ -32463,7 +32463,7 @@ o_p_v(synonym_stream_znst_5,instance,claz_structure_c33_object).
 o_p_v(synonym_stream_znst_5,instance,claz_structure_object).
 o_p_v(synonym_stream_znst_5,instance,claz_synonym_stream).
 o_p_v(synonym_stream_znst_5,instance,claz_t).
-o_p_v(synonym_stream_znst_5,name,"znst_5").
+%o_p_v(synonym_stream_znst_5,name,"znst_5").
 o_p_v(synonym_stream_znst_5,symbol,sys_xx_stdout_xx).
 o_p_v(synonym_stream_znst_6,classof,claz_synonym_stream).
 o_p_v(synonym_stream_znst_6,instance,claz_ansi_stream).
@@ -32474,7 +32474,7 @@ o_p_v(synonym_stream_znst_6,instance,claz_structure_c33_object).
 o_p_v(synonym_stream_znst_6,instance,claz_structure_object).
 o_p_v(synonym_stream_znst_6,instance,claz_synonym_stream).
 o_p_v(synonym_stream_znst_6,instance,claz_t).
-o_p_v(synonym_stream_znst_6,name,"znst_6").
+%o_p_v(synonym_stream_znst_6,name,"znst_6").
 o_p_v(synonym_stream_znst_6,symbol,sys_xx_stdout_xx).
 o_p_v(synonym_stream_znst_7,classof,claz_synonym_stream).
 o_p_v(synonym_stream_znst_7,instance,claz_ansi_stream).
@@ -32485,7 +32485,7 @@ o_p_v(synonym_stream_znst_7,instance,claz_structure_c33_object).
 o_p_v(synonym_stream_znst_7,instance,claz_structure_object).
 o_p_v(synonym_stream_znst_7,instance,claz_synonym_stream).
 o_p_v(synonym_stream_znst_7,instance,claz_t).
-o_p_v(synonym_stream_znst_7,name,"znst_7").
+%o_p_v(synonym_stream_znst_7,name,"znst_7").
 o_p_v(synonym_stream_znst_7,symbol,sys_xx_tty_xx).
 o_p_v(synonym_stream_znst_9,classof,claz_synonym_stream).
 o_p_v(synonym_stream_znst_9,instance,claz_ansi_stream).
@@ -32496,7 +32496,7 @@ o_p_v(synonym_stream_znst_9,instance,claz_structure_c33_object).
 o_p_v(synonym_stream_znst_9,instance,claz_structure_object).
 o_p_v(synonym_stream_znst_9,instance,claz_synonym_stream).
 o_p_v(synonym_stream_znst_9,instance,claz_t).
-o_p_v(synonym_stream_znst_9,name,"znst_9").
+%o_p_v(synonym_stream_znst_9,name,"znst_9").
 o_p_v(synonym_stream_znst_9,symbol,xx_terminal_io_xx).
 o_p_v(sys_a,classof,claz_symbol).
 o_p_v(sys_a,name,"A").

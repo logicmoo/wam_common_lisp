@@ -40,8 +40,9 @@ cl_stringp(A, R):- t_or_nil(is_stringp(A),R).
 cl_string(O,S):- to_prolog_string(O,PLS),to_lisp_string(PLS,S).
 
 to_prolog_string(SS,SS):- notrace(var(SS)),!,break.
+to_prolog_string([],"").
 to_prolog_string(SS,SS):- notrace(string(SS)),!.
-to_prolog_string('$ARRAY'(_N,claz_base_character,List),SS):- !,always(lisp_chars_to_pl_string(List,SS)).
+to_prolog_string('$ARRAY'(_N,claz_base_character,List),SS):- !,always(lisp_chars_to_pl_string(List,SS)),!.
 %to_prolog_string('$ARRAY'(_,_,List),SS):-  !,lisp_chars_to_pl_string(List,SS).
 to_prolog_string(S,SN):- is_symbolp(S),!,pl_symbol_name(S,S2),to_prolog_string(S2,SN).
 to_prolog_string('#\\'(Code),Str):- !, (\+ number(Code)->Char=Code;char_code(Char,Code)),text_to_string(Char,Str).
@@ -54,7 +55,8 @@ to_prolog_string('#\\'(Code),Str):- !, (\+ number(Code)->Char=Code;char_code(Cha
 %to_prolog_string(S,SN):- notrace(catch(text_to_string(S,SN),_,fail)),!.
 
 to_lisp_string('$ARRAY'([N],claz_base_character,List),'$ARRAY'([N],claz_base_character,List)):-!.
-to_lisp_string(Str,'$ARRAY'([*],claz_base_character,List)):- atom_chars(Str,Chars),maplist(make_character,Chars,List).
+to_lisp_string(Text,'$ARRAY'([*],claz_base_character,List)):- always((catch(text_to_string(Text,Str),E,(dumpST,wdmsg(E),fail)),string_chars(Str,Chars),maplist(make_character,Chars,List))).
+
 make_character(I,O):-notrace(make_character0(I,O)).
 make_character0(S,'#\\'(S)):- var(S),!.
 make_character0('#\\'(S),C):- !, make_character0(S,C).

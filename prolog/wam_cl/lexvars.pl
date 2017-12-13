@@ -48,7 +48,9 @@ locally_let([],G):- !, always(G).
 locally_let(N=V,G):-!,locally_let([N=V],G).
 
 castify(O,O):- \+compound(O),!,fail.
-castify(str(O),S):-!, castify1(O,M),to_prolog_string(M,S).
+castify(str(O),S):-!, castify1(O,M),to_lisp_string(M,S).
+castify(plstr(O),S):-!, castify1(O,M),to_prolog_string(M,S).
+castify(path(O),S):-!, castify1(O,M),to_lisp_pathname(M,S).
 castify(sym(O),S):-!, castify1(O,M),reader_intern_symbols(M,S).
 castify(P,S):- P=..[F,M],!, castify1(M,MM),must(get_opv(MM,F,S)).
 

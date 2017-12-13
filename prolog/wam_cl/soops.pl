@@ -265,7 +265,7 @@ f_clos_class_precedence_list(C,SL):- f_clos_class_direct_superclasses(C,List1),m
    
 
 to_prolog_string_anyways(I,O):- to_prolog_string(I,O),!.
-to_prolog_string_anyways(I,O):- atom_string(I,O).
+to_prolog_string_anyways(I,O):- always(atom_string(I,O)),!.
   
 
 maybe_add_kw_function(Kind,L,R,Key,ArgList,LispBody):- 
@@ -362,22 +362,52 @@ un_kw1(Prop,Prop).
 
 add_kw_opv(Obj,Key,V):- un_kw(Key,Prop),add_opv_new(Obj,Prop,V).
 
-:-assertz(wl:arg_lambda_type(exact_only,f_u_get_opv)).
-f_u_get_opv(Obj,Result):- findall([Prop|Value],get_opv(Obj,Prop,Value),Result).
-f_u_get_opv(Obj,Prop,Value):- get_opv(Obj,Prop,Value).
+:-assertz(wl:arg_lambda_type(exact_only,f_sys_get_iprops)).
+f_sys_get_iprops(Obj,Result):- findall([Prop|Value],get_opv(Obj,Prop,Value),Result).
+:-assertz(wl:arg_lambda_type(exact_only,f_sys_get_opv)).
+f_sys_get_opv(Obj,Prop,Value):- get_opv(Obj,Prop,Value).
 	
 add_opv_maybe(Obj,Prop,_):- get_opv_i(Obj,Prop,_),!.
 add_opv_maybe(Obj,Prop,Value):- add_opv_new(Obj,Prop,Value),!.
 
-get_opv(Obj,_,_):- string(Obj),!,fail.
-get_opv(Obj,Prop,Value):- no_repeats(Obj-Prop,get_opv_i(Obj,Prop,Value)).
+get_opv(Obj,Prop,Value):- get_opv_maybe_ref(Obj,Prop,Value),!.
+/*
+get_opv(Obj,Prop,RealValue):- get_opv_maybe_ref(Obj,Prop,Value),
+  ensure_awakened(Value,RealValue),
+  (Value==RealValue->true;set_opv(Obj,Prop,RealValue)).
+*/
 
-get_opv_i(Obj,Key,Value):- un_kw(Key,Prop)->get_opv_ii(Obj,Prop,Value).
+is_refp(Value):-  atom(Value),notrace(nb_current(Value,_)),!.
+is_objp(Value):-  compound(Value),functor(Value,'$OBJ',2).
+%is_immediate(Value):-  \+ is_refp(Value), \+ is_objp(Value).
+
+
+ref:attr_unify_hook(Same,Var):- get_attr(Var,ref,SameO)->Same==SameO;var(Var).
+
+ensure_awakened(Value,RealValue):- \+ atom(Value),!,Value=RealValue.
+ensure_awakened(Value,RealValue):- !, Value=RealValue.
+ensure_awakened(Value,RealValue):- notrace(nb_current(Value,RealValue)),!.
+ensure_awakened(Value,RealValue):- soops:o_p_v(Value,instance,_),
+  f_sys_get_iprops(Value,KeyProps), KeyProps\==[],!,
+   always((forall(member([K|V],KeyProps),set_opv(Value,K,V)),
+   trace,nb_current(Value,RealValue))).
+ensure_awakened(Value,RealValue):- Value=RealValue.
+    
+
+get_opv_maybe_ref(Obj,Prop,Value):- no_repeats((Obj-Prop),get_opv_i(Obj,Prop,Value)).
+
+get_opv_i(Obj,Key,Value):- un_kw(Key,Prop)->get_opv_iref(Obj,Prop,Value).
+
+get_opv_iref(Obj,Prop,Value):- attvar(Obj),!,nonvar(Prop),get_attr(Obj,Prop,Value).
+get_opv_iref(Obj,Prop,Value):- compound(Obj),!,compound_deref(Obj,Real),!,get_opv_ii(Real,Prop,Value).
+get_opv_iref(Obj,_,_):- \+ atom(Obj), \+ var(Obj),!,fail.
+get_opv_iref(Obj,Prop,Value):- get_opv_ii(Obj,Prop,Value).
+
 
 %get_opv_ii(Obj,value, Value):- Obj==quote, throw(get_opv_i(quote, value, Value)).
 
-get_opv_ii(Obj,Prop,Value):- compound(Obj),compound_deref(Obj,Real),!,get_opv_ii(Real,Prop,Value).
 %get_opv_ii(Sym,value,Value):- ((atom(Sym);var(Sym)),nb_current(Sym,Value))*->true;get_opv_iii(Sym,value,Value).
+get_opv_ii(Obj,_,_):- \+ atom(Obj), \+ var(Obj),!,fail.
 get_opv_ii(Obj,Prop,Value):- nonvar(Prop),!,(get_opv_iii(Obj,Prop,Value) *-> true; get_opv_else(Obj,Prop,Value)).
 get_opv_ii(Obj,Prop,Value):- get_opv_iii(Obj,Prop,Value).
 
@@ -396,6 +426,7 @@ get_opv_iii(Obj,Prop,Value):- soops:o_p_v(Obj,Prop,Value).
 get_opv_iii(Obj,Prop,Value):- atom(Obj),nb_current(Obj,Ref),nb_current_value(Ref,Prop,Value).
 get_opv_iii(Obj,Prop,Value):- soops:struct_opv(Obj,Prop,Value).
 
+compound_deref(C,_):- \+ compound(C),!,fail.
 compound_deref('$OBJ'(claz_reference,B),B):- atom(B).
 
 get_opv_pi(Obj,Prop,Value):- get_obj_pred(Obj,Prop,Pred), call(Pred,Obj,Value).

@@ -56,7 +56,7 @@ cl_make_package(Name,R):- do_defpackage(Name,[],R).
 
 do_defpackage(L,B,T):- to_prolog_string_if_needed(L,Loc),!,do_defpackage(Loc,B,T).
 do_defpackage(AName,List,Package):-
-  atom_string(AName,Name),  
+  text_to_string(AName,Name),  
   atom_concat_or_rtrace(pkg_,Name,Down),prologcase_name(Down,Package),
   add_opv(Package,classof,claz_package),
   asserta(package_name(Package,Name)),

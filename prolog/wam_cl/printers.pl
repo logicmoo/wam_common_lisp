@@ -27,7 +27,7 @@ trim_full_stop(SPClosure,SPClosure).
 
 lisp_chars_to_pl_string(Str,Str):- string(Str),!.
 lisp_chars_to_pl_string(Str,SS):- \+ is_list(Str),!,always((atom_chars(Str,Codes),text_to_string(Codes,SS))).
-lisp_chars_to_pl_string(List,SS):- always((maplist(to_prolog_char,List,Codes),text_to_string(Codes,SS))).
+lisp_chars_to_pl_string(List,SS):- notrace((must_maplist(to_prolog_char,List,Codes),!,text_to_string(Codes,SS))).
 
 shrink_lisp_strings(Str,PStr):- \+ compound(Str),!,Str=PStr.
 %shrink_lisp_strings(Str,PStr):- is_stringp(Str),!,to_prolog_string(Str,PStr).

@@ -53,8 +53,8 @@ always((A,B)):-!,always(A),always(B).
 always(notrace(G)):- !, quietly_must_or_rtrace(G).
 always(always(G)):-!,always(G).
 always(call(G)):-!,always(G).
-always(G):- notrace(tracing),!,G. % nonquietly_must_or_rtrace(G).
-always(G):- !,( G-> true; (trace,G)).
+always(G):- notrace(tracing),!,( G -> true; (wdmsg(failed(G)),dumpST,wdmsg(failed(G)),break,G,!,fail)),!.
+always(G):- !,( G-> true; (wdmsg(failed(G)),dumpST,wdmsg(failed(G)),trace,G,!,fail)),!.
 %always(G):- notrace(tracing),!,(G->true;break). % nonquietly_must_or_rtrace(G).
 always(G):- nonquietly_must_or_rtrace(G),!.
 

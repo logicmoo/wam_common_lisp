@@ -28,11 +28,11 @@ lisp_compiled_eval(SExpression):-
   dbmsg_cmt(result(Result)).
 
 lisp_compiled_eval(SExpression,Result):-
-  notrace(as_sexp_interned(SExpression,Expression)),
+  quietly(as_sexp_interned(SExpression,Expression)),
   %dbmsg(lisp_compiled_eval(Expression)),
-  lisp_compile(Result,Expression,Code),
+  always(lisp_compile(Result,Expression,Code)),
   % dbmsg_cmt((lisp_compiled_eval(Expression):- Code)),
-  always((Code)),!.
+  (always((Code))),!.
 
 %lisp_compile(SExpression):- source_location(_,_),!,dbmsg((:-lisp_compile(SExpression))).
 lisp_compile(SExpression):-
