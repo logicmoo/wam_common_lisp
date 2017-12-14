@@ -37,7 +37,7 @@ di_test:- lisp_compile_to_prolog(pkg_user,
 show_call_trace(G):- G *-> wdmsg(G); (wdmsg(warn(failed(show_call_trace(G)))),fail).
 
 slow_trace:- notrace(tracing),!,stop_rtrace,nortrace,trace.
-slow_trace.
+slow_trace:- nortrace.
 
 on_x_rtrace(G):- catch(G,E,(dbmsg(E),rtrace(G),break)).
 atom_concat_or_rtrace(X,Y,Z):- tracing->atom_concat(X,Y,Z);catch(atom_concat(X,Y,Z),_,break).
@@ -74,7 +74,9 @@ offer_rtrace(notrace(G)):- !, quietly_must_or_rtrace(G).
 offer_rtrace(always(G)):-!,offer_rtrace(G).
 offer_rtrace(rtrace(G)):-!,offer_rtrace(G).
 offer_rtrace(call(G)):-!,offer_rtrace(G).
-offer_rtrace(G):-trace,slow_trace,G.
+offer_rtrace(G):-slow_trace,trace,maybe_trace(G).
+
+maybe_trace(G):- notrace(tracing)->user:rtrace(G);show_call_trace(user:G).
 /*offer_rtrace(G):- notrace(tracing),!,( G -> true; (wdmsg(failed(G)),dumpST,wdmsg(failed(G)),break,G,!,fail)),!.
 offer_rtrace(G):- !,( G-> true; (wdmsg(failed(G)),dumpST,wdmsg(failed(G)),trace,G,!,fail)),!.
 %offer_rtrace(G):- notrace(tracing),!,(G->true;break). % nonquietly_must_or_rtrace(G).

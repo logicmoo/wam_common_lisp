@@ -20,7 +20,9 @@
 value_or([Value],Value,_):- !.
 value_or([],Value,Value):- !.
 value_or(Value,Value,_).
-                                  
+
+wl:init_args(1,cl_get_setf_expansion).
+
 %place_op(Env,PlOP,[Place,Obj],[],Result):- place_op(Env,PlOP,Obj,[Place],Result).
 
 %place_op(Env,PlOP,Obj,Value,Result):- var(Env),ensure_env(Env), \+ var(Env),!, place_op(Env,PlOP,Obj,Value,Result).

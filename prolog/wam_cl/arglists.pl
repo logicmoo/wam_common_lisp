@@ -400,6 +400,7 @@ compile_init(Var,FinalResult,[InitForm|_More],
 % [name, 'package-designator', '&optional', [error, t]]
 
 
+
 set_var_if_missing(Env, Var, In, G, Thru):- var(In),!,G,set_var(Env,Var,Thru).
 set_var_if_missing(Env, Var, In, _, Thru):- set_var(Env,Var,In),!,In=Thru.
 
@@ -409,37 +410,42 @@ simple_atom_var(Atom):- atom(Atom), Atom\=nil,Atom\=[], correct_formal_params_c3
 set_if_missing_opt(Env, Var, In, G, Thru):- var(In),!,G,set_var(Env,Var,Thru).
 set_if_missing_opt(Env, Var, In, _, Thru):- set_var(Env,Var,In),!,In=Thru.
 
-align_args_local(FN,RequiredArgs,_RestNKeysOut,Result,ArgsPlusResult,wl:init_args(exact_only,FN)):- 
+align_args_local(FN,RequiredArgs,RestNKeys,Whole,Result,LB,_ArgInfo,ArgsPlusResult,wl:init_args(exact_only,FN)):- 
   eval_uses_exact(FN),!,
+  LB = true,
+  RestNKeys = _,
+  RequiredArgs = Whole, 
   append(RequiredArgs, [Result], ArgsPlusResult).
 
+% invoke([r1,r2,r3],RET).
+align_args_local(FN,RequiredArgs,RestNKeys,Whole,Result,LB,_ArgInfo,PARAMS,wl:init_args(bind_parameters,FN)):-
+  eval_uses_bind_parameters(FN),!,
+  LB = append(RequiredArgs,RestNKeys,Whole),
+  PARAMS = [Whole,Result].
+
+% invoke([r1,r2,r3],RET).
+align_args_local(FN,RequiredArgs,RestNKeys,Whole,Result,LB,_ArgInfo,PARAMS,wl:init_args(rest_only,FN)):-
+  eval_uses_rest_only(FN),!,
+  LB = append(RequiredArgs,RestNKeys,Whole),
+  PARAMS = [Whole,Result].   
+
 % invoke(r1,r2,[o3,key1,value1],RET).
-align_args_local(FN,RequiredArgs,RestNKeys,Result,ArgsPlusResult,wl:init_args(N,FN)):- 
+align_args_local(FN,RequiredArgs,RestNKeys,Whole,Result,LB,ArgInfo,ArgsPlusResult,wl:init_args(N,FN)):- 
   eval_uses_exact_and_restkeys(FN,N),!,
-  length(Left,N),
-  append(Left,RestNKeys,BetterArgs),
-  append(RequiredArgs,_,BetterArgs),
+  RestNKeys = _,
+  append(RequiredArgs,[RestNKeys],BetterArgs),
+   (ArgInfo.whole == 0 -> LB = true ; LB = append(RequiredArgs,RestNKeys,Whole)),
   append(BetterArgs,[Result], ArgsPlusResult).
 
-% invoke([r1,r2,r3],RET).
-align_args_local(FN,RequiredArgs,RestNKeys,Result,PARAMS,wl:init_args(bind_parameters,FN)):-
-  eval_uses_bind_parameters(FN),!,
-  append(RequiredArgs,RestNKeys,ALL),
-  PARAMS = [ALL,Result].
-
-% invoke([r1,r2,r3],RET).
-align_args_local(FN,RequiredArgs,RestNKeys,Result,PARAMS,wl:init_args(rest_only,FN)):-
-  eval_uses_rest_only(FN),!,
-  append(RequiredArgs,RestNKeys,ALL),
-  PARAMS = [ALL,Result].
-
-align_args_local(FN,RequiredArgs,RestNKeys,Result,HeadArgs,wl:init_args(Reqs,FN)):-
+align_args_local(FN,RequiredArgs,RestNKeys,Whole,Result,LB,ArgInfo,HeadArgs,wl:init_args(Reqs,FN)):-
  always(is_list(RequiredArgs)),length(RequiredArgs,Reqs),
  append(RequiredArgs,[RestNKeys],RARGS), 
+   (ArgInfo.whole == 0 -> LB = true ; LB = append(RequiredArgs,RestNKeys,Whole)),
  show_call_trace(align_args(FN,FN,RARGS,Result,HeadArgs)),!.
 
-align_args_local(FN,RequiredArgs,RestNKeys,Result,HeadArgs,wl:init_args(Reqs,FN)):-
+align_args_local(FN,RequiredArgs,RestNKeys,Whole,Result,LB,ArgInfo,HeadArgs,wl:init_args(Reqs,FN)):-
  always(is_list(RequiredArgs)),length(RequiredArgs,Reqs),
+   (ArgInfo.whole == 0 -> LB = true ; LB = append(RequiredArgs,RestNKeys,Whole)),
  append(RequiredArgs,[RestNKeys,Result],HeadArgs),!.
 
 
@@ -460,6 +466,7 @@ expand_function_head(Ctx,Env,[FN | FormalParms],Head,ZippedArgEnv, Result,HeadDe
        append(RequiredArgs, [Result], HeadArgs),
        Head =.. [FN | HeadArgs].
 
+
 % eval_uses_bind_parameters
 expand_function_head(Ctx,EnvIO,[FN | FormalParms],Head,ZippedArgEnv, Result,HeadDefCode,HeadCodeOut):-
    eval_uses_bind_parameters(FN),!,
@@ -479,14 +486,15 @@ expand_function_head(Ctx,EnvIO,[FN | FormalParms],Head,ZippedArgEnv, Result,Head
    Head =.. [FN , Whole, Result ])).
 
 % align_args_local
-expand_function_head(Ctx,EnvIO,[FN | FormalParms],Head,ZippedArgEnv, Result,(HeadDefCode,assert_if_new(Used)),HeadCodeOut):-
+expand_function_head(Ctx,EnvIO,[FN | FormalParms],Head,ZippedArgEnv, Result,(HeadDefCode,assert_if_new(Used)),
+  HeadCodeOut):-
    debug_var('_RestNKeys',RestNKeys),
-   always((function_head_params(Ctx,EnvIO,FormalParms,ZippedArgEnv,RestNKeys,_Whole,RequiredArgs,ArgInfo,_Names,_PVars,HeadCode),
+   always((function_head_params(Ctx,EnvIO,FormalParms,ZippedArgEnv,RestNKeys,Whole,RequiredArgs,ArgInfo,_Names,_PVars,HeadCode),
    HeadDefCode = (assert_if_new(wl:arglist_info(FN,FormalParms,RequiredArgs,ArgInfo):-true)),
    always(HeadDefCode),
-   show_call_trace(align_args_local(FN,RequiredArgs,RestNKeys,Result,HeadArgs,Used)),!,
+   show_call_trace(align_args_local(FN,RequiredArgs,RestNKeys,Whole,Result,LB,ArgInfo,HeadArgs,Used)),!,  
    always(assert_if_new(Used:-true)),   
-   HeadCodeOut = HeadCode,   
+   HeadCodeOut = (LB,HeadCode),   
    Head =.. [FN | HeadArgs])).
 
 

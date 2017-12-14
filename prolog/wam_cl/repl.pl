@@ -321,7 +321,7 @@ lisp_add_history(Expression):-
 % basic EVAL statements for built-in procedures
 eval_at_repl(Var,  R):- quietly(var(Var)),!, R=Var.
 eval_at_repl(Expression, Result):- lquietly(eval_repl_hooks(Expression,Result)),!.
-eval_at_repl(Expression,Result):- notrace(tracing), !, trace,eval_at_repl_tracing(Expression,Result).
+eval_at_repl(Expression,Result):- notrace(tracing), !, call_cleanup(eval_at_repl_tracing(Expression,Result),trace).
 eval_at_repl(Expression,Result):-
   lquietly(as_sexp(Expression,SExpression)),
   (reader_intern_symbols(SExpression,LExpression)),
@@ -333,6 +333,7 @@ eval_at_repl(Expression,Result):-
    timel('EXEC',always_catch(ignore(always(maybe_ltrace(call(user:Code))))))),!.
 
 eval_at_repl_tracing(Expression,Result):-
+ notrace,
   lquietly(as_sexp(Expression,SExpression)),
   (reader_intern_symbols(SExpression,LExpression)),
   writeq((reader_intern_symbols(SExpression,LExpression))),nl,
@@ -350,8 +351,9 @@ eval_at_repl_tracing(Expression,Result):-
    quietly((writeln(==================================================================))),
    quietly((writeln(==================================================================))),
    quietly((writeln(==================================================================))),
+   show_call_trace((dbmsg_real(:-Code))),
+   quietly((writeln(==================================================================))),
    timel('PREEXEC',(offer_rtrace((user:Code)))),
-   show_call_debug(offer_rtrace(dbmsg_real(:-Code))),
    quietly((writeln(==================================================================))),
    quietly((writeln(==================================================================))),
    quietly((writeln(==================================================================))),
