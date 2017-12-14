@@ -105,7 +105,7 @@ index_of_first_failure(_,_,_,_,[]).
 % http://clhs.lisp.se/Body/f_stgeq_.htm
 
 % string>
-:-assertz(wl:arg_lambda_type(req(2),cl_string_c62)).
+(wl:init_args(2,cl_string_c62)).
 wl:type_checked(cl_string_c62(claz_cons,claz_cons,keys,index)).
 cl_string_c62(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
@@ -113,7 +113,7 @@ cl_string_c62(X,Y,Keys,R):-
 
 
 % string>=
-:-assertz(wl:arg_lambda_type(req(2),cl_string_c62_c61)).
+(wl:init_args(2,cl_string_c62_c61)).
 wl:type_checked(cl_string_c62_c61(claz_cons,claz_cons,keys,index)).
 cl_string_c62_c61(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
@@ -121,7 +121,7 @@ cl_string_c62_c61(X,Y,Keys,R):-
 
 
 % string<
-:-assertz(wl:arg_lambda_type(req(2),cl_string_c60)).
+(wl:init_args(2,cl_string_c60)).
 wl:type_checked(cl_string_c60(claz_cons,claz_cons,keys,index)).
 cl_string_c60(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
@@ -129,42 +129,42 @@ cl_string_c60(X,Y,Keys,R):-
 
 
 % string<=
-:-assertz(wl:arg_lambda_type(req(2),cl_string_c60_c61)).
+(wl:init_args(2,cl_string_c60_c61)).
 wl:type_checked(cl_string_c60_c61(claz_cons,claz_cons,keys,index)).
 cl_string_c60_c61(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_success(Start1,@=<,XR,YR,R).
 
 % string/=
-:-assertz(wl:arg_lambda_type(req(2),cl_string_c47_c61)).
+(wl:init_args(2,cl_string_c47_c61)).
 wl:type_checked(cl_string_c47_c61(claz_cons,claz_cons,keys,index)).
 cl_string_c47_c61(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_success(Start1,\==,XR,YR,R).
 
 % string-lessp
-:-assertz(wl:arg_lambda_type(req(2),cl_string_lessp)).
+(wl:init_args(2,cl_string_lessp)).
 wl:type_checked(cl_string_lessp(claz_cons,claz_cons,keys,index)).
 cl_string_lessp(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_success(Start1,char_lessp,XR,YR,R).
 
 % string-not-lessp
-:-assertz(wl:arg_lambda_type(req(2),cl_string_not_lessp)).
+(wl:init_args(2,cl_string_not_lessp)).
 wl:type_checked(cl_string_not_lessp(claz_cons,claz_cons,keys,index)).
 cl_string_not_lessp(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_failure(Start1,char_lessp,XR,YR,R).
 
 % string-greaterp
-:-assertz(wl:arg_lambda_type(req(2),cl_string_greaterp)).
+(wl:init_args(2,cl_string_greaterp)).
 wl:type_checked(cl_string_greaterp(claz_cons,claz_cons,keys,index)).
 cl_string_greaterp(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_success(Start1,char_greaterp,XR,YR,R).
 
 % string-not-greaterp
-:-assertz(wl:arg_lambda_type(req(2),cl_string_not_greaterp)).
+(wl:init_args(2,cl_string_not_greaterp)).
 wl:type_checked(cl_string_not_greaterp(claz_cons,claz_cons,keys,index)).
 cl_string_not_greaterp(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
@@ -178,7 +178,7 @@ char_same(X,Y):- to_prolog_char(X,XX),to_prolog_char(Y,YY), XX==YY.
 
 % string-equals
 wl:type_checked(cl_string_equals(claz_cons,claz_cons,keys,boolean)).
-:-assertz(wl:arg_lambda_type(req(2),cl_string_equals)).
+(wl:init_args(2,cl_string_equals)).
 cl_string_equals(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_failure(Start1,char_same,XR,YR,Index),
@@ -186,7 +186,7 @@ cl_string_equals(X,Y,Keys,R):-
 
 
 % string-not-equal
-:-assertz(wl:arg_lambda_type(req(2),cl_string_not_equal)).
+(wl:init_args(2,cl_string_not_equal)).
 wl:type_checked(cl_string_not_equal(claz_cons,claz_cons,keys,index)).
 cl_string_not_equal(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
@@ -195,7 +195,7 @@ cl_string_not_equal(X,Y,Keys,R):-
 
 % string=
 wl:type_checked(cl_string_c61(claz_cons,claz_cons,keys,boolean)).
-:-assertz(wl:arg_lambda_type(req(2),cl_string_c61)).
+(wl:init_args(2,cl_string_c61)).
 cl_string_c61(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_failure(Start1,char_exact,XR,YR,Index),

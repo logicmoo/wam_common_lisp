@@ -20,7 +20,7 @@
 grovel_math:-
   ignore((((((clause(arithmetic:eval(P,_,_),_),nonvar(P)),(functor(P,F,A),always(define_cl_math(F,A)))))),fail)).
 
-wl:wam_cl_setup(grovel_math).
+wl:interned_eval(call(grovel_math)).
 
 % define_cl_math(_,0).
 % define_cl_math(F,0):- atom_concat_or_rtrace('cl_',F,CLN), P=..[CLN,X],FP=..[F], assertz(P:- X is FP).
@@ -50,6 +50,13 @@ is_numberp('$RATIO'(_,_)).
 is_numberp('$COMPLEX'(_,_)).
 is_numberp('$EXP'(_,_,_)).
 is_numberp(P):- number(P).
+
+is_oddp(N):- 1 is N div 2.
+is_evenp(N):- 0 is N div 2.
+
+cl_oddp(N,R):- t_or_nil(is_oddp(N),R).
+cl_evenp(N,R):- t_or_nil(is_evenp(N),R).
+
 
 % Lisp Comparison Predicates
 

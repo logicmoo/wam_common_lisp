@@ -35,7 +35,7 @@ cl_set_nthcdr(_,[],[]):-!.
 cl_set_nthcdr(0,List,Tail):- nb_setarg(2,List,Tail).
 cl_set_nthcdr(Index,[_|List],Tail):- Next is Index-1,cl_set_nthcdr(Next,List,Tail).
 
-wl:arg_lambda_type(req(1),cl_aref).
+wl:init_args(1,cl_aref).
 cl_aref(Obj,Indexes,RetVal):-!, get_array_data(Obj,List),!,nth_index(Indexes,List,RetVal).
 %cl_aref(List,Index,RetVal):- cl_nthcdr(List,Index,RetVal).
 
@@ -48,13 +48,13 @@ get_array_data(Obj,List):- get_opv(Obj,data,List),!.
 get_array_data(Obj,List):- get_opv(Obj,array,Obj2),!,get_array_data(Obj2,List).
 
 
-wl:uses_rest_only(cl_make_array).
+wl:init_args(0,cl_make_array).
 cl_make_array(Dims,RetVal):- e1_as_list(Dims,DimsL),
  create_instance(claz_array,[dims=DimsL],RetVal).
 cl_make_array(Dims,Keys,RetVal):- e1_as_list(Dims,DimsL),
  create_instance(claz_array,[dims=DimsL|Keys],RetVal).
 
-wl:uses_rest_only(cl_vector).
+wl:init_args(0,cl_vector).
 cl_vector(Elements,RetVal):-
  length(Elements,Size),
  create_struct(claz_array,[dims=[Size],data=Elements],RetVal).

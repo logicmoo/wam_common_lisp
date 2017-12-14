@@ -22,7 +22,7 @@ cl_truename(In,Pathname):- pl_truename(In,O),to_lisp_pathname(O,Pathname).
 
 cl_make_pathname(I,O):- to_lisp_pathname(I,O).
 
-wl:arg_lambda_type(req(1),cl_compile_file_pathname).
+wl:init_args(1,cl_compile_file_pathname).
 cl_compile_file_pathname(OSFile,Keys,PLFileOut):-
    F = kw_output_file,
    kw_obtain_value_else_p(Keys,F,sys_output_file, 

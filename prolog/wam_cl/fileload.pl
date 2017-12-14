@@ -134,7 +134,7 @@ Notes: None.
 
 cl_compile_file(File,R):-
   cl_compile_file(File,([]),R).
-:-assertz(wl:arg_lambda_type(req(1),cl_compile_file)).
+(wl:init_args(1,cl_compile_file)).
 cl_compile_file(File,Keys,R):-
   do_compile_1file(Keys,File),!,
   cl_truename(File,R),!.
@@ -244,7 +244,7 @@ lisp_grovel_assert(T):-assert(T).
 
 
 cl_load(L,T):- cl_load(L,[],T).
-:-assertz(wl:arg_lambda_type(req(1),cl_load)).
+(wl:init_args(1,cl_load)).
 cl_load(L,Keys,T):- to_prolog_string_if_needed(L,Loc)->L\==Loc,!,cl_load(Loc,Keys,T).
 %cl_load('$OBJ'(_Pathname,Loc),Keys,T):- !, cl_load(Loc,Keys,T).
 cl_load(File,_Keys,t):- fail,

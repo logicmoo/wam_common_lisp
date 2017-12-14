@@ -23,9 +23,11 @@ xlisting_config:xlisting_always(G):- G=package:_, current_predicate(_,G),predica
   \+ predicate_property(G,imported_from(_)).
 
 
+wl:init_args(exact_only,cl_in_package).
 cl_in_package(S,Package):- find_package_or_die(S,Package),
    f_sys_set_symbol_value('xx_package_xx',Package).
 
+wl:init_args(exact_only,cl_use_package).
 cl_use_package(Package,R):- reading_package(CurrentPackage),
                        cl_use_package(Package,CurrentPackage,R).
 
@@ -43,19 +45,13 @@ cl_use_package(Package,CurrentPackage, t):-
    dmsg(todo(check_for+package_symbolconflicts(package_use_list(CurrentPackage,Package)))).
 
  
-cl_defpackage(Name,P1,P2,P3,R):- do_defpackage(Name,[P1,P2,P3],R).
-cl_defpackage(Name,P1,P2,R):- do_defpackage(Name,[P1,P2],R).
-cl_defpackage(Name,P1,R):- do_defpackage(Name,[P1],R).
-cl_defpackage(Name,R):- do_defpackage(Name,[],R).
-
-cl_make_package(Name,P1,P2,P3,R):- do_defpackage(Name,[P1,P2,P3],R).
-cl_make_package(Name,P1,P2,R):- do_defpackage(Name,[P1,P2],R).
-cl_make_package(Name,P1,R):- do_defpackage(Name,[P1],R).
-cl_make_package(Name,R):- do_defpackage(Name,[],R).
+wl:init_args(1,cl_defpackage).
+cl_defpackage(Name,Keys,R):- cl_make_package(Name,Keys,R).
 
 
-do_defpackage(L,B,T):- to_prolog_string_if_needed(L,Loc),!,do_defpackage(Loc,B,T).
-do_defpackage(AName,List,Package):-
+wl:init_args(1,cl_make_package).
+cl_make_package(L,B,T):- to_prolog_string_if_needed(L,Loc),!,cl_make_package(Loc,B,T).
+cl_make_package(AName,List,Package):-
   text_to_string(AName,Name),  
   atom_concat_or_rtrace(pkg_,Name,Down),prologcase_name(Down,Package),
   add_opv(Package,classof,claz_package),

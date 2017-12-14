@@ -133,9 +133,9 @@ value_default(claz_object,mut([],claz_object)).
              Kind).
 */
 
-:-assertz(wl:arg_lambda_type(rest_only,cl_defstruct)).
-:-assertz(wl:arg_lambda_type(rest_only,cl_make_instance)).
-:-assertz(wl:arg_lambda_type(rest_only,cl_defclass)).
+(wl:init_args(0,cl_defstruct)).
+(wl:init_args(0,cl_make_instance)).
+(wl:init_args(0,cl_defclass)).
 
 
 find_or_create_class(Name,Kind):- find_class(Name,Kind),Kind\==[],!.
@@ -226,7 +226,7 @@ make_default_constructor(Kind,Code):-
  find_function_or_macro_name(_,_,Sym,3,Function), 
  Head=..[Function,List,Obj],
  Body=..[cl_make_instance,[Kind|List],Obj],
- Code = (assertz(wl:arg_lambda_type(rest_only,Function)),
+ Code = (assertz(wl:init_args(0,Function)),
          set_opv(Function,classof,claz_compiled_function),
          set_opv(Sym,compile_as,kw_function),
          set_opv(Sym,function,Function),
@@ -362,10 +362,10 @@ un_kw1(Prop,Prop).
 
 add_kw_opv(Obj,Key,V):- un_kw(Key,Prop),add_opv_new(Obj,Prop,V).
 
-:-assertz(wl:arg_lambda_type(exact_only,f_sys_get_iprops)).
+(wl:init_args(exact_only,f_sys_get_iprops)).
 wl:interned_eval('`sys:get-iprops').
 f_sys_get_iprops(Obj,Result):- findall([Prop|Value],get_opv(Obj,Prop,Value),Result).
-:-assertz(wl:arg_lambda_type(exact_only,f_sys_get_opv)).
+(wl:init_args(exact_only,f_sys_get_opv)).
 wl:interned_eval('`sys:get-opv').
 f_sys_get_opv(Obj,Prop,Value):- get_opv(Obj,Prop,Value).
 	
@@ -377,14 +377,7 @@ get_opv(Obj,Prop,Value):- get_opv_maybe_ref(Obj,Prop,Value).
 get_opv(Obj,Prop,RealValue):- get_opv_maybe_ref(Obj,Prop,Value),
   ensure_awakened(Value,RealValue),
   (Value==RealValue->true;set_opv(Obj,Prop,RealValue)).
-*/
 
-is_refp(Value):-  atom(Value),notrace(nb_current(Value,_)),!.
-is_objp(Value):-  compound(Value),functor(Value,'$OBJ',2).
-%is_immediate(Value):-  \+ is_refp(Value), \+ is_objp(Value).
-
-
-ref:attr_unify_hook(Same,Var):- get_attr(Var,ref,SameO)->Same==SameO;var(Var).
 
 ensure_awakened(Value,RealValue):- \+ atom(Value),!,Value=RealValue.
 ensure_awakened(Value,RealValue):- !, Value=RealValue.
@@ -394,6 +387,15 @@ ensure_awakened(Value,RealValue):- soops:o_p_v(Value,instance,_),
    always((forall(member([K|V],KeyProps),set_opv(Value,K,V)),
    trace,nb_current(Value,RealValue))).
 ensure_awakened(Value,RealValue):- Value=RealValue.
+
+*/
+
+is_refp(Value):-  atom(Value),notrace(nb_current(Value,_)),!.
+is_objp(Value):-  compound(Value),functor(Value,'$OBJ',2).
+%is_immediate(Value):-  \+ is_refp(Value), \+ is_objp(Value).
+
+
+ref:attr_unify_hook(Same,Var):- get_attr(Var,ref,SameO)->Same==SameO;var(Var).
     
 
 get_opv_maybe_ref(Obj,Prop,Value):- no_repeats((Obj-Prop),get_opv_i(Obj,Prop,Value)).
@@ -594,15 +596,18 @@ ensure_opv_type_inited(Kind):-
 
 get_deftype(Kind,DefType):- (is_structure_class(Kind) -> DefType=defstruct; DefType=defclass).
 
-add_class_slots(DefType,Kind,N,[Slot|Slots]):- !, always(add_slot_def(DefType,N,Kind,Slot)),N1 is N + 1,add_class_slots(DefType,Kind,N1,Slots).
+add_class_slots(DefType,Kind,N,[Slot|Slots]):- !, 
+ always((add_slot_def(DefType,N,Kind,Slot),N1 is N + 1,
+  add_class_slots(DefType,Kind,N1,Slots))).
 add_class_slots(_DefType,_Type,_N,[]).
 
-is_oddp(N):- 1 is N div 2.
+list_oddp(Keys):- length(Keys,Len), is_oddp(Len).
 
 add_slot_def(_DefType,N,Kind,Prop):- atom(Prop),!,add_slot_def_props(N,Kind,Prop,[]).
-add_slot_def(defclass,N,Kind,[Prop|Keys]):- !,add_slot_def_props(N,Kind,Prop,Keys).
-add_slot_def(defsturct,N,Kind,[Prop,Default|Keys]):- length(Keys,Len), \+ is_oddp(Len),!,
+add_slot_def(defstruct,N,Kind,[Prop,Default|Keys]):-  
    add_slot_def_props(N,Kind,Prop,[kw_initform,Default|Keys]).
+add_slot_def(_Defclass,N,Kind,[Prop,Default|Keys]):-  \+ list_oddp(Keys),
+   add_slot_def_props(N,Kind,Prop,[Default|Keys]).
 add_slot_def(_DefType,N,Kind,[Prop|Keys]):- add_slot_def_props(N,Kind,Prop,Keys).
 
 add_slot_def_props(N,Kind,Key,MoreInfo):-
@@ -622,9 +627,16 @@ add_slot_more_info(_SlotKW,_Kind,_SlotInfo,[[]]):-!.
 add_slot_more_info(SlotName,Kind,SlotInfo,[KW,Value|MoreInfo]):- is_slot_name(KW),
    assert_slot_prop(SlotName,Kind,KW,Value,SlotInfo),!,
    add_slot_more_info(SlotName,Kind,SlotInfo,MoreInfo).
+
+add_slot_more_info(SlotName,Kind,SlotInfo,[[Default,KW,Value]]):- is_slot_name(KW),
+   assert_slot_prop(SlotName,Kind,kw_initform,Default,SlotInfo),!,
+   assert_slot_prop(SlotName,Kind,KW,Value,SlotInfo),!.
+   
+
 add_slot_more_info(SlotName,Kind,SlotInfo,[[KW,Value]|MoreInfo]):- is_slot_name(KW),
    assert_slot_prop(SlotName,Kind,KW,Value,SlotInfo),!,
    add_slot_more_info(SlotName,Kind,SlotInfo,MoreInfo).
+
 add_slot_more_info(SlotName,Kind,SlotInfo,[[Value]]):-
    assert_slot_prop(SlotName,Kind,initarg,Value,SlotInfo),!.
 

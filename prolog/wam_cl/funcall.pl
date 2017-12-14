@@ -32,8 +32,9 @@ closure(ClosureEnvironment,ClosureResult,FormalParams,ClosureBody,ActualParams,C
 
 cl_eval(Form,Result):- lisp_compile(Result,Form,Body),always(Body).
 
-cl_funcall([function(F)|More],R):-!,cl_funcall([F|More],R).
-cl_funcall([ProcedureName|Args],Result):- env_current(Env),apply_c(Env,ProcedureName, Args, Result).
+wl:init_args(1,cl_funcall).
+cl_funcall(function(F),More,R):-!,cl_funcall(F,More,R).
+cl_funcall(ProcedureName,Args,Result):- env_current(Env),apply_c(Env,ProcedureName, Args, Result).
 % cl_funcall([F|More],R):- append([More],[R],ARGS), lpa_apply(F,ARGS).
 
 
@@ -119,18 +120,15 @@ macroexpand_1_or_fail([Procedure|Arguments],MacroEnv,CompileBody0Result):- nonva
    always(MCBR),
    dbmsg_cmt((macroResult(BindCode,Code,CommaResult,CompileBody0Result))))),!.
 
-:- dynamic(wl:uses_rest_only/1).
-:- discontiguous(wl:uses_rest_only/1).
-
 
 % macroexpand-1
-wl:uses_rest_only(cl_macroexpand).
+wl:init_args(0,cl_macroexpand).
 cl_macroexpand_1([LispCode|Optionals],Result):- 
   nth_value(Optionals,1,'$env',MacroEnv),
   macroexpand_1_or_fail(LispCode,MacroEnv,R)->push_values([R,t],Result);push_values([LispCode,[]],Result).
 
 % macroexpand
-wl:uses_rest_only(cl_macroexpand_1).
+wl:init_args(0,cl_macroexpand_1).
 cl_macroexpand([LispCode|Optionals],Result):- 
   nth_value(Optionals,1,'$env',MacroEnv),
   macroexpand_all(LispCode,MacroEnv,R),!,
@@ -196,7 +194,7 @@ find_function_or_macro_name(_Ctx,_Env,FN,_Len, ProposedName):-
 
 uses_exact(F):-premute_names(F,FF),uses_exact0(FF).
 
-uses_exact0(F):- wl:arg_lambda_type(exact_only,F),!.
+uses_exact0(F):- wl:init_args(exact_only,F),!.
 uses_exact0(FN):-  function_arg_info(FN,ArgInfo),!,ArgInfo.complex ==0,ArgInfo.opt==0,ArgInfo.rest==0,ArgInfo.env==0,length(ArgInfo.names,ArgInfo.req).
 
 function_arg_info(FN,ArgInfo):- wl:arglist_info(FN,_,_,_,ArgInfo).
@@ -205,9 +203,9 @@ function_arg_info(FN,ArgInfo):- wl:arglist_info(_,FN,_,_,ArgInfo).
 
 exact_and_restkeys(F,N):- premute_names(F,FF), exact_and_restkeys0(FF,N).
 
+exact_and_restkeys0(F,N):- wl:init_args(N,F),integer(N),!.
 exact_and_restkeys0(F,_):- uses_exact0(F),!,fail.
 exact_and_restkeys0(F,N):- function_arg_info(F,ArgInfo),ArgInfo.req=N,ArgInfo.all\==N,!.
-exact_and_restkeys0(F,N):- wl:arg_lambda_type(req(N),F),!.
 exact_and_restkeys0(F,0):- uses_rest_only0(F),!.
 
 
@@ -219,12 +217,10 @@ premute_names(F,FF):- atom_concat_or_rtrace('cl_',FF,F).
 
 uses_rest_only_p(F):- premute_names(F,FF),uses_rest_only0(FF),!.
 
-uses_rest_only0(F):- wl:arg_lambda_type(rest_only,F),!.
-uses_rest_only0(F):- wl:uses_rest_only(F),!.
-uses_rest_only0(F):- function_arg_info(F,ArgInfo),ArgInfo.complex \==0,!.
-uses_rest_only0(F):- same_symbol(F,FF),wl:declared(FF,lambda(['&rest',_])),!.
-uses_rest_only0(F):-  function_arg_info(F,ArgInfo),ArgInfo.req==0,ArgInfo.all\==0,!.
-%uses_rest_only0(F):- wl:arg_lambda_type(req(0),F),!.
+uses_rest_only0(F):- wl:init_args(0,F),!.
+uses_rest_only0(F):- function_arg_info(F,ArgInfo),ArgInfo.req==0,ArgInfo.all\==0,!.
+uses_rest_only0(F):- same_symbol(F,FF),wl:declared(FF,lambda(['&rest'|_])),!.
+%uses_rest_only0(F):- wl:init_args(req(0),F),!.
 
 % Non built-in function expands into an explicit function call
 
@@ -233,24 +229,24 @@ align_args(FN,ProposedName,Args,Result,ArgsPlusResult):-
   (uses_exact(FN);uses_exact(ProposedName)),
    append(Args, [Result], ArgsPlusResult).
 
-% invoke([r1,r2,r3],RET).
-align_args(FN,ProposedName,Args,Result,[Args,Result]):-
-  (uses_rest_only_p(FN);uses_rest_only_p(ProposedName)).
-
 % invoke(r1,r2,[o3,key1,value1],RET).
 align_args(FN,ProposedName,Args,Result,ArgsPlusResult):- 
   (exact_and_restkeys(FN,N);exact_and_restkeys(ProposedName,N)),
   length(Left,N),append(Left,Rest,Args),
   append(Left, [Rest,Result], ArgsPlusResult).
 
+% invoke([r1,r2,r3],RET).
+align_args(FN,ProposedName,Args,Result,[Args,Result]):-
+  (uses_rest_only_p(FN);uses_rest_only_p(ProposedName)).
+
 
 % guess invoke(r1,RET).
 %align_args(_FN,ProposedName,[Arg],Result,[Arg,Result]):- 
-%  is_defined(ProposedName,2),is_defined(ProposedName,3).
+% is_defined(ProposedName,2),is_defined(ProposedName,3).
 
 % guess invoke([r1,r2,r3],RET).
 %align_args(FN,ProposedName,Args,Result,[Args,Result]):- 
-%   only_arity(FN,2);only_arity(ProposedName,2).
+%  only_arity(FN,2);only_arity(ProposedName,2).
 
   
 % fallback to invoke([r1,r2,r3],RET).

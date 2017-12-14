@@ -114,12 +114,48 @@ cl_and(Bool1, Bool2, Result):-
 	;	Result = [].
 
 */
+cl_second(List,R):- List=[_,R|_]->true;R=[].
+cl_cadr(List,R):- List=[_,R|_]->true;R=[].
 
 
-cl_mapcar(P, [H|T], [RH|RT]) :- !, cl_apply(P, [H], RH),cl_mapcar(P, T, RT).
-cl_mapcar(_, [], []).
 
 
+cl_reverse(Xs, Ys) :-
+    lists:reverse(Xs, [], Ys, Ys).
+
+cl_nreverse(Xs, Ys) :-
+    lists:reverse(Xs, [], Ys, Ys).
+
+
+
+% string=
+(wl:init_args(2,cl_replace)).
+cl_replace(X,Y,Keys,XR):-
+   range_1_and_2_len(X,Y,Keys,XR,YR,Count),
+   replace_each(Count,XR,YR).
+
+replace_each(0,_XR,_YR):-!.
+replace_each(_,[],_):-!.
+replace_each(_,_,[]):-!.
+replace_each(Count,XR,[Y|YR]):- nb_setarg(1,XR,Y),arg(2,XR,XT),Count2 is Count-1,replace_each(Count2,XT,YR).
+   
+range_1_and_2_len(X,Y,[],X,Y,-1):-!.
+range_1_and_2_len(X,Y,Keys,XR,YR,Length):-
+   key_value(Keys,start1,Start1,0),key_value(Keys,end1,End1,9999999999999),
+   key_value(Keys,start2,Start2,0),key_value(Keys,end2,End2,9999999999999),
+   subseqence_from(X,Start1,XR),
+   subseqence_from(Y,Start2,YR),
+   Length is min(End1-Start1,End2-Start2).
+
+
+wl:init_args(1,cl_mapcar).
+cl_mapcar(P, [[H|T]], [RH|RT]) :- !, cl_apply(P, [H], RH),cl_mapcar(P, [T], RT).
+cl_mapcar(P, [[H|T],[H2|T2]], [RH|RT]) :- !, cl_apply(P, [H,H2], RH),cl_mapcar(P, [T,T2], RT).
+cl_mapcar(P, [[H|T],[H2|T2],[H3|T3]], [RH|RT]) :- !, cl_apply(P, [H,H2,H3], RH),cl_mapcar(P, [T,T2,T3], RT).
+cl_mapcar(_, [[]|_], []).
+
+
+wl:init_args(1,cl_apply).
 cl_apply(closure(Environment,ClosureResult,FormalArgs,Body), Arguments, Result):-!,
   closure(Environment,ClosureResult,FormalArgs,Body,Arguments,Result).
 cl_apply(function(FunctionName), Arguments, Result):-!,cl_apply((FunctionName), Arguments, Result).
@@ -142,7 +178,7 @@ cl_atom(Obj,Ret):-  t_or_nil( Obj\=[_|_] , Ret).
 cl_consp(Obj,RetVal):- t_or_nil(is_consp(Obj),RetVal).
 cl_functionp(Obj,RetVal):- t_or_nil(is_functionp(Obj),RetVal).
 
-:-assertz(wl:arg_lambda_type(rest_only,cl_nconc)).
+(wl:init_args(0,cl_nconc)).
 cl_nconc([L1,L2],Ret):- !, append(L1,L2,Ret).
 cl_nconc([L1],L1):-!.
 cl_nconc([L1,L2|Lists],Ret):- !,cl_nconc([L2|Lists],LL2), append(L1,LL2,Ret).
@@ -153,7 +189,7 @@ cl_copy_list([M|List],[M|Copy]):-cl_copy_list(List,Copy).
 
 
 
-:-assertz(wl:arg_lambda_type(req(1),cl_last)).
+(wl:init_args(1,cl_last)).
 cl_last(List,[],Tail):-  !, cl_last_1(List,Tail).
 cl_last(List,[N],Ret):- 
   (N=1 -> cl_last_1(List,Ret);

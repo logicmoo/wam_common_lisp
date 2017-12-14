@@ -59,9 +59,9 @@
 :- dynamic(wl:declared/2).
 :- discontiguous(wl:declared/2).
 
-:- multifile(wl:arg_lambda_type/2).
-:- dynamic(wl:arg_lambda_type/2).
-:- discontiguous(wl:arg_lambda_type/2).
+:- multifile(wl:init_args/2).
+:- dynamic(wl:init_args/2).
+:- discontiguous(wl:init_args/2).
 
 :- multifile(wl:uses_rest_only/1).
 :- dynamic(wl:uses_rest_only/1).
