@@ -237,8 +237,8 @@ as_rest(_,R,R).
 as_env(_,E,E).
 
 
-kw_is_present(RestNKeysIn,F,KWP,KWPV):- 
-   ((append(_Left,[F,KWPV|More],RestNKeysIn),length(More,Nth),is_evenp(Nth)) ->
+kw_is_present(RestNKeys,F,KWP,KWPV):- 
+   ((append(_Left,[F,KWPV|More],RestNKeys),length(More,Nth),is_evenp(Nth)) ->
      KWP=t ; KWP=[]).
    
    
@@ -261,141 +261,178 @@ arginfo_set(Prop,ArgInfo,New):- nb_set_dict(Prop,ArgInfo,New).
 
   
 
-enter_ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,Required,FormalParms0,Params,Names,PVars,Code):-
+enter_ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,Required,FormalParms0,Params,Names,PVars,Code):-
   correct_formal_params(FormalParms0,FormalParms),
-  ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,Required,FormalParms,Params,Names,PVars,Code).
+  ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,Required,FormalParms,Params,Names,PVars,Code).
 
 
-ordinary_args(_Ctx,_ArgInfo,RestNKeysInOut,RestNKeysInOut,_, [],[],[],[],true):-!.
-ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,_,['&allow-other-keys'|FormalParms],Params,Names,PVars,Code):- !,
+ordinary_args(_Ctx,_ArgInfo,_RestNKeys,_Whole,_, [],[],[],[],true):-!.
+ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,_,['&allow-other-keys'|FormalParms],Params,Names,PVars,Code):- !,
   arginfo_incr(allow_other_keys,ArgInfo),
-  ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,aux,FormalParms,Params,Names,PVars,Code).
-ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,_,['&aux'|FormalParms],Params,Names,PVars,Code):- !,
-  ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,aux,FormalParms,Params,Names,PVars,Code).
-ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,_,['&optional'|FormalParms],Params,Names,PVars,Code):- !, 
-  ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,optional,FormalParms,Params,Names,PVars,Code).
+  ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,aux,FormalParms,Params,Names,PVars,Code).
+ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,_,['&aux'|FormalParms],Params,Names,PVars,Code):- !,
+  ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,aux,FormalParms,Params,Names,PVars,Code).
+ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,_,['&optional'|FormalParms],Params,Names,PVars,Code):- !, 
+  ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,optional,FormalParms,Params,Names,PVars,Code).
 
-ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,_,['&key'|FormalParms],Params,Names,PVars,Code):- !,
-  always(ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,key,FormalParms,Params,Names,PVars,Code)).
+ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,_,['&key'|FormalParms],Params,Names,PVars,Code):- !,
+  always(ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,key,FormalParms,Params,Names,PVars,Code)).
 
-% &body and &rest
-ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,_,['&rest',F|FormalParms],Params,[F|Names],[V|PVars],PCode):- !, 
-  arginfo_set(rest,ArgInfo,F),
-  ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,rest,FormalParms,Params,Names,PVars,Code),
-  PCode = (Code,(as_rest(F,V,RestNKeysOut))).
-% &body and &rest
-ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,_,['&body',F|FormalParms],Params,[F|Names],[V|PVars],PCode):- !, 
-  arginfo_set(rest,ArgInfo,F),
-  ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,rest,FormalParms,Params,Names,PVars,Code),
-  PCode = (Code,(as_rest(F,V,RestNKeysOut))).
+% &rest
+ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,_,['&rest',F|FormalParms],Params,[F|Names],[RestNKeys|PVars],PCode):- !, 
+  arginfo_append(F,rest,ArgInfo),
+  arginfo_append(rest,complex,ArgInfo),
+  ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,rest,FormalParms,Params,Names,PVars,PCode).
+  
+% &body
+ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,_,['&body',F|FormalParms],Params,[F|Names],[V|PVars],PCode):- !, 
+  arginfo_append(F,rest,ArgInfo),
+  arginfo_append(F,body,ArgInfo),
+  arginfo_append(body,complex,ArgInfo),
+  ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,rest,FormalParms,Params,Names,PVars,Code),
+  PCode = (Code,(as_body(F,V,RestNKeys))).
+
+% &whole 
+ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,MODE,['&whole',F|FormalParms],Params,[F|Names],[Whole|PVars],PCode):- !, 
+  arginfo_append(F,whole,ArgInfo),
+  arginfo_append(whole,complex,ArgInfo),
+  ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,MODE,FormalParms,Params,Names,PVars,PCode).
+  
 
  
 % &environment
-ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,Mode,['&environment',F|FormalParms],Params,[F|Names],[V|PVars],
- (must(as_env(F,V,'$env')),Code)):- 
-  arginfo_incr(env,ArgInfo),
-  arginfo_incr(complex,ArgInfo),   
-  ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,Mode,FormalParms,Params,Names,PVars,Code).
-ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,Mode,['&environment'],Params,Names,PVars,Code):-!,
-   arginfo_incr(env,ArgInfo),
-   ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,Mode,['&environment',env],Params,Names,PVars,Code).
+ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,Mode,['&environment',F|FormalParms],Params,[F|Names],[V|PVars],
+ (must(as_env(F,V,'$env')),Code)):-  !,
+  arginfo_append(F,env,ArgInfo),
+  arginfo_append(environment,complex,ArgInfo),
+  ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,Mode,FormalParms,Params,Names,PVars,Code).
+ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,Mode,['&environment'],Params,Names,PVars,Code):-!,
+   arginfo_append('$env',env,ArgInfo),
+   ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,Mode,['&environment',env],Params,Names,PVars,Code).
 
 % Parsing required(s)
-ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,required,[F|FormalParms],[V|Params],[F|Names],[V|PVars],Code):- !,
+ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,required,[F|FormalParms],[V|Params],[F|Names],[V|PVars],Code):- !,
   enforce_atomic(F),
-  arginfo_incr(all,ArgInfo),arginfo_incr(req,ArgInfo),
+  arginfo_append(F,req,ArgInfo),
+  arginfo_append(F,all,ArgInfo),
   % ensure_var_tracker(Ctx,F,V),                               
   rw_add(Ctx,F,w),
   rw_add(Ctx,F,p),
-  ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,required,FormalParms,Params,Names,PVars,Code).
+  ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,required,FormalParms,Params,Names,PVars,Code).
 
 
 % Parsing &optional(s)
-ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,optional,[ [F,InitForm,Supplied]|FormalParms],[V|Params],[F,Supplied|Names],[V,SuppliedV|PVars],PCode):- !,
+ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,optional,[ [F,InitForm,Supplied]|FormalParms],Params,[F,Supplied|Names],[V,SuppliedV|PVars],PCode):- !,
    enforce_atomic(F),
-   arginfo_incr(all,ArgInfo),arginfo_incr(opt,ArgInfo),
+   arginfo_append(F,all,ArgInfo),arginfo_append(F,opt,ArgInfo),
    add_tracked_var(Ctx,F,V),
-   ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,optional,FormalParms,Params,Names,PVars,Code),
-   compile_init(F,V,[InitForm],Init),
-   PCode = (arg_is_present(F,V,Supplied,SuppliedV),Init,Code).
-ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,optional,[[F,InitForm]|FormalParms],[V|Params],[F|Names],[V|PVars],(Init,Code)):- !,
+   ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,optional,FormalParms,Params,Names,PVars,Code),
+   compile_init_opt(ArgInfo,RestNKeys,F,V,[InitForm],InitCode),
+   PCode = (arg_is_present(F,V,Supplied,SuppliedV,ArgInfo.opt,RestNKeys,Whole),InitCode,Code).
+ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,optional,[[F,InitForm]|FormalParms],Params,[F|Names],[V|PVars],(InitCode,Code)):- !,
    enforce_atomic(F),
-   compile_init(F,V,[InitForm],Init),
-   arginfo_incr(all,ArgInfo),arginfo_incr(opt,ArgInfo),
-   ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,optional,FormalParms,Params,Names,PVars,Code).
-ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,optional,[F|FormalParms],Params,Names,PVars,Code):- !,
+   arginfo_append(F,all,ArgInfo),arginfo_append(F,opt,ArgInfo),
+   compile_init_opt(ArgInfo,RestNKeys,F,V,[InitForm],InitCode),
+   ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,optional,FormalParms,Params,Names,PVars,Code).
+ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,optional,[F|FormalParms],Params,Names,PVars,Code):- !,
    enforce_atomic(F),   
-   arginfo_incr(all,ArgInfo),arginfo_incr(opt,ArgInfo),
-   ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,optional,[[F,[]]|FormalParms],Params,Names,PVars,Code).
+   ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,optional,[[F,[]]|FormalParms],Params,Names,PVars,Code).
 
 % Parsing &aux(s)
-ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,aux,[[F,InitForm]|FormalParms],Params,[F|Names],[V|PVars],PCode):- !,
+ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,aux,[[F,InitForm]|FormalParms],Params,[F|Names],[V|PVars],PCode):- !,
    enforce_atomic(F),   
-   arginfo_incr(aux,ArgInfo),
-   compile_init(F,V,[InitForm],Init),
-   ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,aux,FormalParms,Params,Names,PVars,Code),
-   PCode = (Init,Code).
-ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,aux,[F|FormalParms],Params,Names,PVars,Code):-!, 
+   arginfo_append(F,aux,ArgInfo),
+   compile_init(F,V,[InitForm],InitCode),
+   ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,aux,FormalParms,Params,Names,PVars,Code),
+   PCode = (InitCode,Code).
+ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,aux,[F|FormalParms],Params,Names,PVars,Code):-!, 
    enforce_atomic(F),   
-   ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,aux,[[F,[],[]]|FormalParms],Params,Names,PVars,Code).
+   ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,aux,[[F,[],[]]|FormalParms],Params,Names,PVars,Code).
 
 % Parsing &key(s)
-ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,key,[ [F,InitForm,KWP]|FormalParms],Params,[F,KWP|Names],[V,KWPV|PVars],PCode):- !,
+ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,key,[ [F,InitForm,KWPName]|FormalParms],Params,[F,KWPName|Names],[V,PresentP|PVars],PCode):- !,
    enforce_atomic(F),   
-   arginfo_incr(key,ArgInfo),
-   compile_init(F,V,[InitForm],Init),
-   debug_var("RestNKeysMid",RestNKeysMid),
-   ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysMid,key,FormalParms,Params,Names,PVars,Code),
-   PCode = (kw_is_present(RestNKeysIn,F,KWP,KWPV),kw_obtain_value(RestNKeysIn,F,F,V,RestNKeysMid),Init,Code).
-ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,key,[ [[KW,F],InitForm]|FormalParms],Params,[F|Names],[V|PVars],PCode):- !,
+   arginfo_append(F,key,ArgInfo),
+   compile_init(F,V,[InitForm],InitCode),   
+   ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,key,FormalParms,Params,Names,PVars,MoreCode),
+   PCode = (kw_obtain_value_else_p(RestNKeys,F,F,V,InitCode,PresentP),MoreCode).
+ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,key,[ [[KW,F],InitForm]|FormalParms],Params,[F|Names],[V|PVars],PCode):- !,
    enforce_atomic(F),   
-   arginfo_incr(key,ArgInfo),
-   compile_init(F,V,[InitForm],Init),
-   ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysMid,key,FormalParms,Params,Names,PVars,Code),
-   debug_var("RestNKeysMid",RestNKeysMid),
-   PCode = (kw_obtain_value(RestNKeysIn,KW,F,V,RestNKeysMid),Init,Code).
-ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,key,[[F,InitForm]|FormalParms],Params,Names,PVars,Code):- !, 
-   enforce_atomic(F),   
-   arginfo_incr(key,ArgInfo),
-   ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,key,[[[F,F],InitForm]|FormalParms],Params,Names,PVars,Code).
+   arginfo_append(F,key,ArgInfo),
+   compile_init(F,V,[InitForm],InitCode),
+   ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,key,FormalParms,Params,Names,PVars,Code),
+   PCode =(kw_obtain_value_else_p(RestNKeys,KW,F,V,InitCode,_PresentP),Code).
 
-ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,key,[F|FormalParms],Params,Names,PVars,Code):- !, 
-   enforce_atomic(F),   
-   ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,key,[[[F,F],[]]|FormalParms],Params,Names,PVars,Code).
+ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,key,[[F,InitForm]|FormalParms],Params,Names,PVars,Code):- !, 
+   enforce_atomic(F), % loops  back
+   ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,key,[[[F,F],InitForm]|FormalParms],Params,Names,PVars,Code).
+
+ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,key,[F|FormalParms],Params,Names,PVars,Code):- !, 
+   enforce_atomic(F),  % loops  back
+   ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,key,[[[F,F],[]]|FormalParms],Params,Names,PVars,Code).
 
 tfa:- tfa([ item,list,'&key',key,[test, [function, eql], testp],['test-not', [], notp]]).
 tfa(FormalParms):-
   dbmsg(:-tfa(FormalParms)),
   debug_var('TFA_ENV',Env),
   new_compile_ctx(Ctx),
-  function_head_params(Ctx,Env,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,Names,PVars,Code0),
+  function_head_params(Ctx,Env,FormalParms,ZippedArgEnv,Whole,InitialArgs,ArgInfo,Names,PVars,Code0),
   maplist(debug_var,Names,PVars),
-  dbmsg(arginfo(ArgInfo,formal=FormalParms,params=ActualArgs,names=Names,vars=PVars,zab=ZippedArgBindings)),
-  body_cleanup_keep_debug_vars(Ctx,Code0,Code),
+  dbmsg(arginfo(ArgInfo,formal=FormalParms,params=InitialArgs,whole=Whole,names=Names,vars=PVars,zab=ZippedArgEnv)),
+  body_cleanup(Ctx,Code0,Code),
   dbmsg(:-Code),!.
 
-% compile_init(F,P,InitForm,Init)
+
+compile_init_opt(ArgInfo,RestNKeys,Var,FinalResult,[InitForm],
+  (set_if_missing_opt('$env',Var,FinalResult,Code,Result,ArgInfo.opt,RestNKeys))):- 
+    debug_var("Optionals",RestNKeys),
+    lisp_compile(Result,InitForm,Code),!.
+
+% compile_init(F,P,InitForm,InitCode)
 compile_init(Var,FinalResult,[InitForm],
-  (set_symbol_value_if_missing('$env',Var,FinalResult,Code,Result))):- 
+  (set_var_if_missing('$env',Var,FinalResult,Code,Result))):- 
     lisp_compile(Result,InitForm,Code),!.
 compile_init(Var,FinalResult,[InitForm|_More],
-  (set_symbol_value_if_missing('$env',Var,FinalResult,Code,Result))):- 
+  (set_var_if_missing('$env',Var,FinalResult,Code,Result))):- 
     lisp_dump_break,
     lisp_compile(Result,InitForm,Code).
    
 % [name, 'package-designator', '&optional', [error, t]]
 
 
-set_symbol_value_if_missing(Env, Var, In, G, Thru):- var(In),!,G,set_var(Env,Var,Thru).
-set_symbol_value_if_missing(Env, Var, In, _, Thru):- set_var(Env,Var,In),!,In=Thru.
+set_var_if_missing(Env, Var, In, G, Thru):- var(In),!,G,set_var(Env,Var,Thru).
+set_var_if_missing(Env, Var, In, _, Thru):- set_var(Env,Var,In),!,In=Thru.
 
 simple_atom_var(Atom):- atom(Atom), Atom\=nil,Atom\=[], \+ arg(_, v('&optional', '&key', '&aux', '&rest', '&body', '&environment'),Atom).
 
+set_if_missing_opt(Env, Var, In, G, Thru):- var(In),!,G,set_var(Env,Var,Thru).
+set_if_missing_opt(Env, Var, In, _, Thru):- set_var(Env,Var,In),!,In=Thru.
+
+align_args_local(FN,Args,_RestNKeysOut,Result,ArgsPlusResult):- uses_exact(FN),!,
+   append(Args, [Result], ArgsPlusResult).
+
+% invoke(r1,r2,[o3,key1,value1],RET).
+align_args_local(FN,Args,RestNKeys,Result,ArgsPlusResult):- 
+  (exact_and_restkeys(FN,N);exact_and_restkeys(FN,N)),
+  length(Args,Len),always(N==Len),
+  append(Args, [RestNKeys,Result], ArgsPlusResult).
+
+% invoke([r1,r2,r3],RET).
+align_args_local(FN,Args,RestNKeys,Result,PARAMS):-
+  uses_rest_only_p(FN),
+  append(Args,RestNKeys,ALL),
+  PARAMS = [ALL,Result].
+
+align_args_local(FN,Arguments,RestNKeys,Result,HeadArgs):-
+ append(Arguments,[RestNKeys],RARGS),
+ align_args(FN,FN,RARGS,Result,HeadArgs).
+
+
 % Creates a function Head and an argument unpacker using Code to unpack
-expand_function_head(Ctx,EnvIO,[FunctionName | FormalParms],Head,ZippedArgBindings, Result,HeadDefCode,HeadCodeOut):-
-   member(Mode,FormalParms),arg(_, v('&optional', '&key', '&aux', '&rest', '&body', '&environment'),Mode),!,
-   must_det_l((function_head_params(Ctx,EnvIO,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,_Names,_PVars,_HeadCode),
-   arginfo_incr(complex,ArgInfo),
+expand_function_head(Ctx,EnvIO,[FunctionName | FormalParms],Head,ZippedArgEnv, Result,HeadDefCode,HeadCodeOut):-
+   (member(Mode,FormalParms), \+ simple_atom_var(Mode)),!,
+   must_det_l((function_head_params(Ctx,EnvIO,FormalParms,ZippedArgEnv,ActualArgs,ArgInfo,_Names,_PVars,_HeadCode),
+   % arginfo_incr(complex,ArgInfo),
    append([Arguments], [Result], HeadArgs),
    debug_var('ArgsIn',Arguments),
    debug_var('BinderCode',BindCode),
@@ -405,31 +442,34 @@ expand_function_head(Ctx,EnvIO,[FunctionName | FormalParms],Head,ZippedArgBindin
    Head =.. [FunctionName | HeadArgs])).
 
 % Creates a function Head and an argument unpacker using Code to unpack
-expand_function_head(Ctx,Env,[FunctionName | FormalParms],Head,ZippedArgBindings, Result,HeadDefCode,HeadCode):-!,
-       function_head_params(Ctx,Env,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,_Names,_PVars,HeadCode),
+expand_function_head(Ctx,Env,[FunctionName | FormalParms],Head,ZippedArgEnv, Result,HeadDefCode,HeadCode):-!,
+       function_head_params(Ctx,Env,FormalParms,ZippedArgEnv,ActualArgs,ArgInfo,_Names,_PVars,HeadCode),
        append(ActualArgs, [Result], HeadArgs),
        HeadDefCode = (asserta(wl:arglist_info(FunctionName,FormalParms,ActualArgs,ArgInfo):-true)),
        call(HeadDefCode),
        Head =.. [FunctionName | HeadArgs].
-expand_function_head(Ctx,Env,FunctionName , Head, ZippedArgBindings, Result,HeadDefCode,HeadCode):-
-    expand_function_head(Ctx,Env,[FunctionName], Head, ZippedArgBindings, Result,HeadDefCode,HeadCode).
+expand_function_head(Ctx,Env,FunctionName , Head, ZippedArgEnv, Result,HeadDefCode,HeadCode):-
+    expand_function_head(Ctx,Env,[FunctionName], Head, ZippedArgEnv, Result,HeadDefCode,HeadCode).
 
 
 
-function_head_params(Ctx,Env,FormalParms,ZippedArgBindings,ActualArgs,ArgInfo,Names,PVars,Code):-!,
-   debug_var("RestNKeysIn",RestNKeysIn),debug_var("Env",Env),debug_var("RestNKeysOut",RestNKeysOut),
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function_head_params(Ctx,Env,FormalParms,ZippedArgEnv,ActualArgs,ArgInfo,Names,PVars,Code):-!,
+   debug_var("RestNKeys",RestNKeys),debug_var("Env",Env),debug_var("Whole",Whole),
    debug_var("Code",Code),debug_var("ActualArgs",ActualArgs),
-   ArgInfo = arginfo{req:0,all:0,opt:0,rest:0,key:0,aux:0,env:0,allow_other_keys:0,names:Names,complex:0},
-   enter_ordinary_args(Ctx,ArgInfo,RestNKeysOut,RestNKeysIn,required,FormalParms,ActualArgsMaybe,Names,PVars,Code),
+   ArgInfo = arginfo{req:0,all:0,opt:0,rest:0,whole:0,body:0,key:0,aux:0,env:0,allow_other_keys:0,names:Names,complex:0},
+   enter_ordinary_args(Ctx,ArgInfo,RestNKeys,Whole,required,FormalParms,ActualArgsMaybe,Names,PVars,Code),
    maplist(add_tracked_var(Ctx),Names,PVars),
    maplist(debug_var('_Param'),Names,PVars),   
    freeze(Var,ignore((((var(Val),debug_var('_Thru',Var,Val)))))),
    freeze(Var,ignore((((var(Val),add_tracked_var(Ctx,Var,Val)))))),
-	zip_with(Names, PVars, [Var, Val, bv(Var,Val)]^true, ZippedArgBindings),!,
+	zip_with(Names, PVars, [Var, Val, bv(Var,Val)]^true, ZippedArgEnv),!,
         add_alphas(Ctx,Names),
-   % RestNKeysOut=RestNKeysIn,
-   ((\+ get_dict(rest,ArgInfo,0);  \+ get_dict(key,ArgInfo,0); \+ get_dict(complex,ArgInfo,0)) ->  
-     (append(ActualArgsMaybe,RestNKeysIn,ActualArgs00),ActualArgs0=[ActualArgs00]) ; ActualArgs0 = ActualArgsMaybe),
+   Whole = ActualArgs,
+   ((\+ get_dict(rest,ArgInfo,0);  \+ get_dict(key,ArgInfo,0); \+ get_dict(whole,ArgInfo,0); \+ get_dict(complex,ArgInfo,0)) ->  
+     (append(ActualArgsMaybe,RestNKeys,ActualArgs00),ActualArgs0=[ActualArgs00]) ; ActualArgs0 = ActualArgsMaybe),
    ActualArgs0 = ActualArgs1,
     ((fail, \+ get_dict(env,ArgInfo,0)) ->  append(ActualArgs1,[Env],ActualArgs) ; ActualArgs = ActualArgs1).
 
@@ -444,8 +484,9 @@ bind_formal_arginfo_with_rest(ArgInfo, Arguments, OldEnv, NewEnv, _BindCode):-
       bind_formal_old(ArgInfo.names,Left,EnvMid,NewEnv).
 
 bind_formal_arginfo_no_rest(ArgInfo, Arguments, OldEnv, NewEnv, _BindCode):- 
-   bind_formal_old(ArgInfo.names,Arguments,OldEnv,NewEnv),
+      bind_formal_old(ArgInfo.names,Arguments,OldEnv,NewEnv),!.
    
+
 
       
 % Expands the arguments 
