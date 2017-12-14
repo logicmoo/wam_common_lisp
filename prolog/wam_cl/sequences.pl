@@ -82,12 +82,12 @@ cl_cons(Item,
 
 cl_append(A,B,R):- append(A,B,R),!.
 
-wl:declared(cl_error,lambda(['&rest',r])).
+wl:declared(cl_error,inline(error)).
+wl:init_args(0,cl_error).
 cl_error(Args,Res):- cl_format([t|Args],Res),throw(cl_error(Args,Res)).
 
-wl:declared(cl_list,lambda(['&rest',r])).
 wl:declared(cl_list,inline(list)).
-wl:declared(cl_list,uses_rest).
+wl:init_args(0,cl_list).
 cl_list(List,List).
 
 
@@ -188,13 +188,16 @@ cl_copy_list(List,List):- \+ compound(List),!.
 cl_copy_list([M|List],[M|Copy]):-cl_copy_list(List,Copy).
 
 
+wl:type_checked(cl_length(claz_cons,integer)).
+cl_length(Sequence,Len):- always(length(Sequence,Len)).
+
 
 (wl:init_args(1,cl_last)).
 cl_last(List,[],Tail):-  !, cl_last_1(List,Tail).
 cl_last(List,[N],Ret):- 
   (N=1 -> cl_last_1(List,Ret);
   (N=0 -> cl_last_0(List,Ret);
- (( length([R|RightM1],N),
+ (( always(length([R|RightM1],N)),
   [R|RightM1]=Right,
   (append(_,Right,List)->Ret=Right;
   (append(_,List,Right)->Ret=List;

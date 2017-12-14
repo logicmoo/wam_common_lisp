@@ -51,7 +51,7 @@ with_lisp_translation(In,Pred1):-
    repeat,
       once(lisp_read(In,O)),
       (O== end_of_file -> (with_rest_info(Pred1),!) ; 
-      (must_det(once(maybe_notrace(call_proc(Pred1,O)))),fail)),!.
+      (must_det(once((call_proc(Pred1,O)))),fail)),!.
 with_lisp_translation(Other,Pred1):- 
    setup_call_cleanup(l_open_input(Other,In),
      with_lisp_translation(In,Pred1),
@@ -985,7 +985,7 @@ track_stream(In,G):-
         nop(set_stream(In,encoding(octet))),
         (ignore(notrace_catch_fail(line_count(In,Line),_,(Line = -1))),
          b_setval('$lisp_translation_line',Line-Chars),
-           (maybe_notrace(G),!)),
+           ((G),!)),
         Catcher,
         true)->true;Catcher=fail),
      track_stream_cleanup(Catcher,In,Was,Pos).

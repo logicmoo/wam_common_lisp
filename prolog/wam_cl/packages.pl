@@ -61,7 +61,7 @@ cl_make_package(AName,List,Package):-
   (Name==UName -> true ; add_kw_opv(Package,kw_nicknames,UName)).
   %instance_opv(Package,claz_package,[]).
 
-cl_find_package(S,Obj):- find_package(S,Package),!,must(as_package_object(Package,Obj)).
+cl_find_package(S,Obj):- find_package(S,Package),!,always(as_package_object(Package,Obj)).
 cl_find_package(_,[]).
 
 pl_package_name(S,Name):- find_package(S,Package),get_opv(Package,name,Name).

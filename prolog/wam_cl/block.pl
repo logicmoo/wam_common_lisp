@@ -151,7 +151,7 @@ compile_body_block_in_throw(Ctx,Env,ThrowResult,[RETURN_FROM,Tag,ValueForm],(Val
    Code = (throw(block_exit(Tag,ValueResult))).
 
 compile_body_block_in_throw(Ctx,Env,Result,[block,BlockTag|InstrS], 
-  catch((Code,ResultExit=Result),block_exit(BlockTag,Result),true)):-  % must(is_symbolp(BlockTag)),
+  catch((Code,ResultExit=Result),block_exit(BlockTag,Result),true)):-  % always(is_symbolp(BlockTag)),
       (must_compile_body(Ctx,Env,ResultExit,[progn|InstrS],Code)).
 
 /*
@@ -166,7 +166,7 @@ compile_body_block_in_throw(Ctx,Env,GoResult,[RETURN_FROM,Tag,ValueForm],(ValueF
    Code = (throw(block_exit(ExitTag,ValueResult))).
 
 compile_body_block_in_throw(Ctx,Env,Result,[block,BlockTag|InstrS], 
-  catch((Code,ResultExit=Result),block_exit(ExitTag,Result),true)):-  must(is_symbolp(BlockTag)),
+  catch((Code,ResultExit=Result),block_exit(ExitTag,Result),true)):-  always(is_symbolp(BlockTag)),
    suffix_by_context(BlockTag,Tag),
    gensym('_labels',Suffix),
    always(within_labels_context(Suffix,
@@ -188,7 +188,7 @@ compile_body_block_in_tb(Ctx,Env,GoResult,[RETURN_FROM,Tag,ValueForm],(ValueForm
    Code = (set_var(Env,Var,ValueResult),always(ExitTag,Env),clean_escape(_)).
 
 
-compile_body_block_in_tb(Ctx,Env,Result,[block,BlockTag|InstrS], Code):- must(is_symbolp(BlockTag)),
+compile_body_block_in_tb(Ctx,Env,Result,[block,BlockTag|InstrS], Code):- always(is_symbolp(BlockTag)),
   suffix_by_context(BlockTag,Tag),
   gensym('_labels',Suffix),
   always(within_labels_context(Suffix,

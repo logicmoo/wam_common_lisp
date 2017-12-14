@@ -446,8 +446,8 @@ get_ref_object(Ref,Object):- atom(Ref),
    %oo_empty(Object0),
    %put_attr(Object0,classof,claz_ref),
    nb_put_attr(Object0,ref,Ref),
-   must(nb_setval(Ref,Object0)),!,
-   must(b_getval(Ref,Object)),!.
+   always(nb_setval(Ref,Object0)),!,
+   always(b_getval(Ref,Object)),!.
 
 /*
 set_ref_object(Ref,Object):- quietly(nb_set_value(?(Ref),pointer,Object)),!.
@@ -458,8 +458,8 @@ get_ref_object(Ref,Object):-
    oo_empty(Object0),
    oo_put_attr(Object0,classof,claz_ref),
    oo_put_attr(Object0,ref,Ref),
-   must(nb_set_value(?(Ref),pointer,Object0)),!,
-   must(nb_current_value(?(Ref),pointer,Object)),!.
+   always(nb_set_value(?(Ref),pointer,Object0)),!,
+   always(nb_current_value(?(Ref),pointer,Object)),!.
 */
 
 
@@ -601,7 +601,7 @@ add_class_slots(DefType,Kind,N,[Slot|Slots]):- !,
   add_class_slots(DefType,Kind,N1,Slots))).
 add_class_slots(_DefType,_Type,_N,[]).
 
-list_oddp(Keys):- length(Keys,Len), is_oddp(Len).
+list_oddp(Keys):- always(length(Keys,Len)), is_oddp(Len).
 
 add_slot_def(_DefType,N,Kind,Prop):- atom(Prop),!,add_slot_def_props(N,Kind,Prop,[]).
 add_slot_def(defstruct,N,Kind,[Prop,Default|Keys]):-  

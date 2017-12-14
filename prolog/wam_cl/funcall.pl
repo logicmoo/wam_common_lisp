@@ -60,7 +60,7 @@ apply_c(EnvIn,ProcedureName, ActualParams, Result):-
 	!.
 */
 
-apply_c(_,F,ARGS,R):- atom(F),append(ARGS,[R],RARGS),length(RARGS,A),current_predicate(F/A),!,apply(F,RARGS),!.
+apply_c(_,F,ARGS,R):- atom(F),append(ARGS,[R],RARGS),always(length(RARGS,A)),current_predicate(F/A),!,apply(F,RARGS),!.
 apply_c(_,F,ARGS,R):- atom(F),CALL=..[F|ARGS],current_predicate(_,CALL),!,(catch(CALL,E,(dumpST,dmsg(CALL->E),!,fail))->R=t;R=[]).
 apply_c(EnvIn,X, _, R):- ignore(R=[]),
         (debugging(lisp(eval))->dumpST;true),
@@ -76,9 +76,11 @@ apply_c(EnvIn,X, _, R):- ignore(R=[]),
 
 % Use a previous DEFMACRO
 compile_funop(Ctx,Env,Result,LispCode,CompileBody):-
-  % fail, %DISABLED
+  %fail, %DISABLED
   macroexpand_1_or_fail(LispCode,[],CompileBody0Result),
-  must_compile_body(Ctx,Env,Result,CompileBody0Result, CompileBody).
+  must_compile_body(Ctx,Env,Result,CompileBody0Result, CompileBody),
+  dmsg(macroexpanded(LispCode)).
+
 
 macroexpand_all(LispCode,MacroEnv,Result):-
   macroexpand_1_or_fail(LispCode,MacroEnv,Mid) ->
@@ -192,22 +194,39 @@ find_function_or_macro_name(_Ctx,_Env,FN,_Len, ProposedName):-
       function_case_name(FN,Package,ProposedName)).
 
 
-uses_exact(F):-premute_names(F,FF),uses_exact0(FF).
+eval_uses_exact(F):- quietly((premute_names(F,FF),uses_exact0(FF))).
 
 uses_exact0(F):- wl:init_args(exact_only,F),!.
-uses_exact0(FN):-  function_arg_info(FN,ArgInfo),!,ArgInfo.complex ==0,ArgInfo.opt==0,ArgInfo.rest==0,ArgInfo.env==0,length(ArgInfo.names,ArgInfo.req).
+uses_exact0(FN):-  function_arg_info(FN,ArgInfo),!,
+   ArgInfo.complex==0,ArgInfo.opt==0,ArgInfo.rest==0,ArgInfo.env==0,ArgInfo.whole==0,
+   length(ArgInfo.names,NN),
+   arg_info_count(ArgInfo,req,N),!,
+   N==NN.
+   
 
+function_arg_info(FN,ArgInfo):- wl:arglist_info(FN,_,_,ArgInfo).
 function_arg_info(FN,ArgInfo):- wl:arglist_info(FN,_,_,_,ArgInfo).
 function_arg_info(FN,ArgInfo):- wl:arglist_info(_,FN,_,_,ArgInfo).
-% exact_and_restkeys(FN,Requireds):- current_predicate(FN/N), Requireds is N-2,Requireds>0.
 
-exact_and_restkeys(F,N):- premute_names(F,FF), exact_and_restkeys0(FF,N).
 
-exact_and_restkeys0(F,N):- wl:init_args(N,F),integer(N),!.
-exact_and_restkeys0(F,_):- uses_exact0(F),!,fail.
-exact_and_restkeys0(F,N):- function_arg_info(F,ArgInfo),ArgInfo.req=N,ArgInfo.all\==N,!.
-exact_and_restkeys0(F,0):- uses_rest_only0(F),!.
+eval_uses_bind_parameters(F):- quietly((premute_names(F,FF), wl:init_args(bind_parameters,FF))),!.
 
+% eval_uses_exact_and_restkeys(FN,Requireds):- current_predicate(FN/N), Requireds is N-2,Requireds>0.
+
+eval_uses_exact_and_restkeys(F,N):- quietly((premute_names(F,FF), exact_and_restkeys(FF,N))).
+
+exact_and_restkeys(F,N):- wl:init_args(V,F),integer(V),!,V=N.
+exact_and_restkeys(F,1):- is_any_place_op(F),!.
+exact_and_restkeys(F,_):- uses_exact0(F),!,fail.
+exact_and_restkeys(F,N):- function_arg_info(F,ArgInfo),ArgInfo.req=L,ArgInfo.all\==L,!,arg_info_count(ArgInfo,req,N).
+exact_and_restkeys(F,0):- uses_rest_only0(F),!.
+
+arg_info_count(ArgInfo,Prop,N):- 
+  Value=ArgInfo.Prop,
+   (number(Value)->N=Value;
+     (is_list(Value)->length(Value,N);
+       (atom(Value)->N=1;
+         (throw(arg_info_count(ArgInfo,Prop,Value)))))).
 
 premute_names(F,F).
 premute_names(F,FF):- atom_concat_or_rtrace('f_',F,FF).
@@ -215,29 +234,32 @@ premute_names(F,FF):- atom_concat_or_rtrace('cl_',F,FF).
 premute_names(F,FF):- atom_concat_or_rtrace('f_',FF,F).
 premute_names(F,FF):- atom_concat_or_rtrace('cl_',FF,F).
 
-uses_rest_only_p(F):- premute_names(F,FF),uses_rest_only0(FF),!.
+eval_uses_rest_only(F):- quietly((premute_names(F,FF),uses_rest_only0(FF))),!.
 
 uses_rest_only0(F):- wl:init_args(0,F),!.
 uses_rest_only0(F):- function_arg_info(F,ArgInfo),ArgInfo.req==0,ArgInfo.all\==0,!.
-uses_rest_only0(F):- same_symbol(F,FF),wl:declared(FF,lambda(['&rest'|_])),!.
-%uses_rest_only0(F):- wl:init_args(req(0),F),!.
+%uses_rest_only0(F):- same_symbol(F,FF),wl:declared(FF,lambda(['&rest'|_])),!.
 
 % Non built-in function expands into an explicit function call
 
 % invoke(r1,r2,r3,RET).
 align_args(FN,ProposedName,Args,Result,ArgsPlusResult):- 
-  (uses_exact(FN);uses_exact(ProposedName)),
+  (eval_uses_exact(FN);eval_uses_exact(ProposedName)),
    append(Args, [Result], ArgsPlusResult).
 
 % invoke(r1,r2,[o3,key1,value1],RET).
 align_args(FN,ProposedName,Args,Result,ArgsPlusResult):- 
-  (exact_and_restkeys(FN,N);exact_and_restkeys(ProposedName,N)),
-  length(Left,N),append(Left,Rest,Args),
+  (eval_uses_exact_and_restkeys(FN,N);eval_uses_exact_and_restkeys(ProposedName,N)),
+  always(length(Left,N)),append(Left,Rest,Args),
   append(Left, [Rest,Result], ArgsPlusResult).
 
 % invoke([r1,r2,r3],RET).
 align_args(FN,ProposedName,Args,Result,[Args,Result]):-
-  (uses_rest_only_p(FN);uses_rest_only_p(ProposedName)).
+  (eval_uses_rest_only(FN);eval_uses_rest_only(ProposedName)).
+
+% invoke([r1,r2,r3],RET).
+align_args(FN,ProposedName,Args,Result,[Args,Result]):-
+  (eval_uses_bind_parameters(FN);eval_uses_bind_parameters(ProposedName)).
 
 
 % guess invoke(r1,RET).

@@ -83,7 +83,7 @@ lisplist([],EQ) --> [EQ], !.
 lisplist([X|Xs],EQ) --> sexpr1(X), !, lisplist(Xs,EQ).
 lisplist(X,EQ) --> ['.'], sexpr1(X), [EQ].
 
-wl:declared(cl_format,lambda(['&rest',r])).
+wl:init_args(0,cl_format).
 cl_format([Stream,Fmt],t):- !, cl_print(cl_format(Stream,Fmt),_).
 cl_format([Stream,Fmt|ArgS],t):-cl_print(cl_format(Stream,Fmt,ArgS),_).
 

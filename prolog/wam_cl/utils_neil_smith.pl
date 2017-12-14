@@ -76,6 +76,7 @@ asserts_to_prolog_code((A,B),PrologCode):-!,
 asserts_to_prolog_code(:-asserta_tracked(_T,A),[A]).
 asserts_to_prolog_code(:-assert(A),[A]).
 asserts_to_prolog_code(:-asserta(A),[A]).
+asserts_to_prolog_code(:-assert_if_new(A),[A]).
 asserts_to_prolog_code(:-assertz(A),[A]).
 asserts_to_prolog_code(:-A, AA):-!,asserts_to_prolog_code(A,AA).
 asserts_to_prolog_code(A, [:-A]).
@@ -94,7 +95,7 @@ ssip_compiler_term_expansion(Symbol,lambda(Args,Body),[OOUT]):- atom(Symbol),is_
   Head=..[SymbolR|Args],
   subst(Body,Symbol,SymbolR,BodyM),
   OUT= ((Head <<== BodyM)),
-  must(lisp_compiler_term_expansion(OUT,OOUT)),!.
+  always(lisp_compiler_term_expansion(OUT,OOUT)),!.
 
 ssip_compiler_term_expansion(Symbol,Symbol2,ssip_define(Symbol,Symbol2)):-!.
 

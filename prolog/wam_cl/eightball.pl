@@ -36,27 +36,50 @@ di_test:- lisp_compile_to_prolog(pkg_user,
 
 show_call_trace(G):- G *-> wdmsg(G); (wdmsg(warn(failed(show_call_trace(G)))),fail).
 
+slow_trace:- notrace(tracing),!,stop_rtrace,nortrace,trace.
+slow_trace.
+
 on_x_rtrace(G):- catch(G,E,(dbmsg(E),rtrace(G),break)).
 atom_concat_or_rtrace(X,Y,Z):- tracing->atom_concat(X,Y,Z);catch(atom_concat(X,Y,Z),_,break).
 
-lisp_dump_break:- both_outputs(dumpST),!,throw(lisp_dump_break).
-lisp_dump_break:- throw(lisp_dump_break).
+%lisp_dump_break:- both_outputs(dumpST),!,throw(lisp_dump_break).
+%lisp_dump_break:- trace,throw(lisp_dump_break).
 lisp_dump_break:- lisp_dumpST,break.
 lisp_dumpST:- both_outputs(dumpST).
 
 true_or_die(Goal):-functor(Goal,_,A),arg(A,Goal,Ret),always((Goal,Ret\==[])).
 
+lquietly(G):- quietly(G).
+
 % Must always succeed (or else there is a bug in the lisp impl!)
-always((A->B;C)):- !, (A-> always(B);always(C)).
+always((A->B;C)):- !, (on_x_rtrace(user:A) -> always(B);always(C)),!.
 always((A,!,B)):-!,always(A),!,always(B).
 always((A,B)):-!,always(A),always(B).
+always(notrace(G)):- notrace(tracing),!, must(quietly(user:G)),!.
 always(notrace(G)):- !, quietly_must_or_rtrace(G).
+always(quietly(G)):- notrace(tracing),!, always(user:G).
 always(always(G)):-!,always(G).
 always(call(G)):-!,always(G).
-always(G):- notrace(tracing),!,( G -> true; (wdmsg(failed(G)),dumpST,wdmsg(failed(G)),break,G,!,fail)),!.
-always(G):- !,( G-> true; (wdmsg(failed(G)),dumpST,wdmsg(failed(G)),trace,G,!,fail)),!.
+always(G):- notrace(tracing),!,user:G,!.
+always(G):- notrace(tracing),!,( user:G -> true; (wdmsg(failed(G)),dumpST,wdmsg(failed(G)),trace,slow_trace,G,!,fail)),!.
+always(G):- !,nonquietly_must_or_rtrace(user:G),!.
+%always(G):- !,( G-> true; (wdmsg(failed(G)),dumpST,wdmsg(failed(G)),trace,G,!,fail)),!.
 %always(G):- notrace(tracing),!,(G->true;break). % nonquietly_must_or_rtrace(G).
-always(G):- nonquietly_must_or_rtrace(G),!.
+
+% Must offer_rtrace succeed (or else there is a bug in the lisp impl!)
+offer_rtrace((A->B;C)):- !, (A-> offer_rtrace(B);offer_rtrace(C)).
+offer_rtrace((A,!,B)):-!,offer_rtrace(A),!,offer_rtrace(B).
+offer_rtrace((A,B)):-!,offer_rtrace(A),offer_rtrace(B).
+offer_rtrace(notrace(G)):- !, quietly_must_or_rtrace(G).
+offer_rtrace(always(G)):-!,offer_rtrace(G).
+offer_rtrace(rtrace(G)):-!,offer_rtrace(G).
+offer_rtrace(call(G)):-!,offer_rtrace(G).
+offer_rtrace(G):-trace,slow_trace,G.
+/*offer_rtrace(G):- notrace(tracing),!,( G -> true; (wdmsg(failed(G)),dumpST,wdmsg(failed(G)),break,G,!,fail)),!.
+offer_rtrace(G):- !,( G-> true; (wdmsg(failed(G)),dumpST,wdmsg(failed(G)),trace,G,!,fail)),!.
+%offer_rtrace(G):- notrace(tracing),!,(G->true;break). % nonquietly_must_or_rtrace(G).
+offer_rtrace(G):- nonquietly_must_or_rtrace(G),!.
+*/
 
 % Must certainly succeed (or else there is a bug in the users code!)
 certainly((A,B)):-!,certainly(A),certainly(B).
@@ -64,7 +87,7 @@ certainly((A,B)):-!,certainly(A),certainly(B).
 certainly(G):- notrace(tracing),!,G. % nonquietly_must_or_rtrace(G).
 certainly(G):- nonquietly_must_or_rtrace(G).
 
-always_catch(G):- G. %  catch(catch(G,'$aborted',notrace),_,notrace).
+always_catch(G):- catch(catch(G,'$aborted',notrace),E,(wdmsg(always_uncaught(E)),notrace,!,fail)).
 with_nat_term(G):-
   \+ \+ ((
   (term_attvars(G,Vs),
@@ -73,20 +96,22 @@ with_nat_term(G):-
    G))).
 
 quietly_must_or_rtrace(G):-  
-  (catch(quietly(G),E,gripe_problem(uncaught(E),G)) 
+  (catch((G),E,gripe_problem(uncaught(E),(rtrace(G),!,fail)))
    *-> true ; (gripe_problem(fail_must_or_rtrace_failed,G),!,fail)),!.
 nonquietly_must_or_rtrace(G):- 
-  (catch((G),E,gripe_problem(uncaught(E),G)) 
-   *-> true ; (gripe_problem(fail_must_or_rtrace_failed,G),!,fail)),!.
+  (catch((G),E,gripe_problem(uncaught(E),(rtrace(G),!,fail)))
+   *-> true ; (gripe_problem(fail_must_or_rtrace_failed,rtrace((slow_trace,G))),!,fail)),!.
+                        
 
-
-gripe_problem(Problem,G):- always_catch(gripe_problem0(Problem,G)).
+gripe_problem(Problem,G):- always_catch(gripe_problem0(Problem,(G))).
 gripe_problem0(Problem,G):-
      notrace(( 
-     wdmsg((Problem:-G)),lisp_dumpST,
+     wdmsg((Problem:-G)),
+     dumpST,
      dbmsg((Problem:-G)))),
-     trace,lisp_dump_break,
-     (rtrace(G)*->(notrace,lisp_dump_break);(wdmsg(failed_rtrace(G)),notrace,lisp_dump_break,!,fail)).
+     lisp_dump_break,
+     slow_trace,
+     ((G)*->(slow_trace,lisp_dump_break);(wdmsg(failed_rtrace(G)),notrace,lisp_dump_break,!,fail)).
 
 
 :- meta_predicate(timel(+,:)).
@@ -121,6 +146,8 @@ is_assert_op(asserta_tracked(W,P),W,P).
 is_assert_op(assertz(P),u,P).
 is_assert_op(asserta(P),u,P).
 is_assert_op(assert_if_new(P),u,P).
+is_assert_op(asserta_if_new(P),u,P).
+is_assert_op(asserta_new(P),u,P).
 is_assert_op(assert(P),u,P).
 
 fmt99(O):- make_pretty(O,P),fmt9(P).

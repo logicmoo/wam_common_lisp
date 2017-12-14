@@ -43,7 +43,7 @@ eval_string(Str):-
 
 trace_eval_string(Str):-
   str_to_expression(Str, Expression),
-   redo_call_cleanup(trace,eval(Expression, Result),notrace),
+   redo_call_cleanup(trace,eval(Expression, Result),quietly),
      write_results(Result),
      !.
 
@@ -106,7 +106,7 @@ repl_loop:- current_prolog_flag(lisp_repl_goal,Else),Else\==repl_loop,!,Else.
 repl_loop:- lisp_banner,
 	repeat,
         catch(read_eval_print(Result),'$aborted',fail),
-   	notrace(Result == end_of_file),!.
+   	quietly(Result == end_of_file),!.
 
 
 show_help:- writeln('
@@ -251,11 +251,11 @@ tidy_database:-
 	retractall(lambda(_, _)).
 
 show_uncaught_or_fail((A,B)):-!,show_uncaught_or_fail(A),show_uncaught_or_fail(B).
-show_uncaught_or_fail(G):- notrace(flush_all_output_safe),
-  (catch(G,E,notrace((wdmsg(uncaught(E)),!,fail)))*->true;notrace((wdmsg(failed(G)),!,fail))).
+show_uncaught_or_fail(G):- quietly(flush_all_output_safe),
+  (catch(G,E,quietly((wdmsg(uncaught(E)),rtrace(G),!,fail)))*->true;quietly((wdmsg(failed(G)),!,fail))).
 
 set_prompt_from_package:-
-  quietly((ignore((get_var(_ReplEnv, xx_package_xx, Package),
+  lquietly((ignore((get_var(_ReplEnv, xx_package_xx, Package),
         short_package_or_hash(Package,Name0),
         (Name0=="U"->Name="CL-USER";Name=Name0),
         always(nonvar(Name)),
@@ -265,11 +265,11 @@ set_prompt_from_package:-
 read_eval_print(Result):-		% dodgy use of cuts to force a single evaluation
         set_prompt_from_package,
 
-        quietly(show_uncaught_or_fail(read_no_parse(Expression))),!,
-        quietly(show_uncaught_or_fail(lisp_add_history(Expression))),!,
+        lquietly(show_uncaught_or_fail(read_no_parse(Expression))),!,
+        lquietly(show_uncaught_or_fail(lisp_add_history(Expression))),!,
         nb_linkval('$mv_return',[Result]),
         show_uncaught_or_fail(eval_at_repl(Expression,Result)),!,
-        quietly(show_uncaught_or_fail(write_results(Result))),!.
+        lquietly(show_uncaught_or_fail(write_results(Result))),!.
 	
 
 write_results(Result):- 
@@ -300,7 +300,7 @@ read_and_parse1(Expression):-
 	),
 	!.
 */
- 
+
 lisp_add_history(end_of_file):-!.
 lisp_add_history(_):- prolog_load_context(reload,true),!.
 lisp_add_history(_):- prolog_load_context(reloading,true),!.
@@ -319,42 +319,43 @@ lisp_add_history(Expression):-
 :- set_prolog_flag(lisp_no_compile,false).
 
 % basic EVAL statements for built-in procedures
-eval_at_repl(Var,  R):- notrace(var(Var)),!, R=Var.
-eval_at_repl(Expression, Result):- quietly(eval_repl_hooks(Expression,Result)),!.
+eval_at_repl(Var,  R):- quietly(var(Var)),!, R=Var.
+eval_at_repl(Expression, Result):- lquietly(eval_repl_hooks(Expression,Result)),!.
 eval_at_repl(Expression,Result):- notrace(tracing), !, trace,eval_at_repl_tracing(Expression,Result).
 eval_at_repl(Expression,Result):-
-  quietly(as_sexp(Expression,SExpression)),
+  lquietly(as_sexp(Expression,SExpression)),
   (reader_intern_symbols(SExpression,LExpression)),
-  notrace(dbmsg_cmt(:- lisp_compiled_eval(LExpression))),
-  notrace(debug_var('ReplEnv',Env)),
+  quietly(dbmsg_cmt(:- lisp_compiled_eval(LExpression))),
+  quietly(debug_var('ReplEnv',Env)),
   timel('COMPILER',always_catch(maybe_ltrace(lisp_compile(Env,Result,LExpression,Code)))),
-  notrace(dbmsg_real(:-Code)),
+  quietly(dbmsg_real(:-Code)),
   (notrace(tracing)-> (user:Code) ; 
    timel('EXEC',always_catch(ignore(always(maybe_ltrace(call(user:Code))))))),!.
 
 eval_at_repl_tracing(Expression,Result):-
-  quietly(as_sexp(Expression,SExpression)),
+  lquietly(as_sexp(Expression,SExpression)),
   (reader_intern_symbols(SExpression,LExpression)),
   writeq((reader_intern_symbols(SExpression,LExpression))),nl,
-  notrace(debug_var('ReplEnv',Env)),
-  %notrace(cls),
-   notrace((writeln(==================================================================))),
-   notrace((writeln(==================================================================))),
-   notrace((writeln(==================================================================))),
+  quietly(debug_var('ReplEnv',Env)),
+  %quietly(cls),
+   quietly((writeln(==================================================================))),
+   quietly((writeln(==================================================================))),
+   quietly((writeln(==================================================================))),
    dbmsg(:- lisp_compiled_eval(LExpression)),
-   notrace((writeln(==================================================================))),
-   notrace((writeln(==================================================================))),
-   notrace((writeln(==================================================================))),
-  timel('COMPILE',lisp_compile(Env,Result,LExpression,Code)),
-  % notrace(cls),
-   notrace((writeln(==================================================================))),
-   notrace((writeln(==================================================================))),
-   notrace((writeln(==================================================================))),
-   (dbmsg_real(:-Code)),
-   notrace((writeln(==================================================================))),
-   notrace((writeln(==================================================================))),
-   notrace((writeln(==================================================================))),
-  timel('EXEC',(user:Code)).
+   quietly((writeln(==================================================================))),
+   quietly((writeln(==================================================================))),
+   quietly((writeln(==================================================================))),
+  timel('COMPILE',(offer_rtrace(lisp_compile(Env,Result,LExpression,Code)))),
+  % quietly(cls),
+   quietly((writeln(==================================================================))),
+   quietly((writeln(==================================================================))),
+   quietly((writeln(==================================================================))),
+   timel('PREEXEC',(offer_rtrace((user:Code)))),
+   show_call_debug(offer_rtrace(dbmsg_real(:-Code))),
+   quietly((writeln(==================================================================))),
+   quietly((writeln(==================================================================))),
+   quietly((writeln(==================================================================))),
+  timel('EXEC',(offer_rtrace((user:Code)))).
 
 eval(Expression, Result):- env_current(Env), eval(Expression, Env, Result).
 
@@ -370,7 +371,7 @@ eval(Expression, Env, Result):-
 read_and_parse(Expr):-  flush_all_output_safe,current_input(In),parse_sexpr_untyped_read(In, Expr).
 read_no_parse(Expr):-  flush_all_output_safe,current_input(In),parse_sexpr_untyped(In, Expr).
 
-flush_all_output_safe:- forall(stream_property(S,mode(write)),notrace(catch(flush_output(S),_,true))).
+flush_all_output_safe:- forall(stream_property(S,mode(write)),quietly(catch(flush_output(S),_,true))).
 
 parse_sexpr_untyped_read(In, Expr):- 
   parse_sexpr_untyped(In,ExprS),!,
@@ -389,7 +390,7 @@ eval_repl_hooks(KW, Ret):- is_keywordp(KW),to_prolog_string(KW,PStr),name(UC,PSt
   (current_predicate(Atom/0)-> (call(Atom))))).
 
 % make.  ls.  pwd. 
-eval_repl_hooks(Atom, R):- atom(Atom),atom_concat_or_rtrace(_,'.',Atom),notrace(catch(read_term_from_atom(Atom,Term,[variable_names(Vs),syntax_errors(true)]),_,fail)),
+eval_repl_hooks(Atom, R):- atom(Atom),atom_concat_or_rtrace(_,'.',Atom),quietly(catch(read_term_from_atom(Atom,Term,[variable_names(Vs),syntax_errors(true)]),_,fail)),
   callable(Term),current_predicate(_,Term),b_setval('$variable_names',Vs),t_or_nil((user:call(Term)*->dmsg(Term);(dmsg(no(Term)),fail)),R).
 
 eval_repl_hooks([debug,A], t):- !,debug(lisp(A)).

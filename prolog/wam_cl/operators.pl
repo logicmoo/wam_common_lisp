@@ -60,8 +60,8 @@ compile_decls(Ctx,Env,Result,[LABELS,[MACROLET|MORE]|Progn], CompileBody):- memb
     CompileBody = (CompileBody0,CompileBody1).
 
 
-compile_decls(_Ctx,_Env,Symbol,[Fun,Symbol,A2|AMORE],assertz(P)):- notrace(is_def_at_least_two_args(Fun)),!,P=..[Fun,Symbol,A2,AMORE].
-compile_decls(_Ctx,_Env,Symbol,[Fun0,Symbol,A2|AMORE],assertz(P)):- notrace((is_def_at_least_two_args(Fun),same_symbol(Fun,Fun0))),!,P=..[Fun,Symbol,A2,AMORE].
+compile_decls(_Ctx,_Env,Symbol,[Fun,Symbol,A2|AMORE],assertz(P)):- notrace(is_def_at_least_two_args(Fun)),\+ is_fboundp(Fun),!,P=..[Fun,Symbol,A2,AMORE].
+compile_decls(_Ctx,_Env,Symbol,[Fun0,Symbol,A2|AMORE],assertz(P)):- notrace((is_def_at_least_two_args(Fun),same_symbol(Fun,Fun0))),\+ is_fboundp(Fun),!,P=..[Fun,Symbol,A2,AMORE].
 
 is_def_at_least_two_args(defgeneric).
 is_def_at_least_two_args(define_compiler_macro).
@@ -111,7 +111,7 @@ compile_macro(Ctx,CallEnv,Macro,[Name0,FormalParms|FunctionBody0], CompileBody):
 varuse:attr_unify_hook(_,Other):- var(Other).
 
 make_mcompiled(Ctx,_UnusedEnv,CResult,Symbol,FunctionHead,FunctionBody,Head,HeadDefCode,(BodyCode),Fun):-
-    expand_function_head(Ctx,CallEnv,FunctionHead, Head, HeadEnv, CResult,HeadDefCode,HeadCode),
+    always(((expand_function_head(Ctx,CallEnv,FunctionHead, Head, HeadEnv, CResult,HeadDefCode,HeadCode)),
     debug_var("CallEnv",CallEnv),debug_var('CResult',CResult),debug_var('MResult',MResult),
     compile_body(Ctx,CallEnv,MResult,[block,Symbol|FunctionBody],Body0),
     show_ctx_info(Ctx),
@@ -120,7 +120,7 @@ make_mcompiled(Ctx,_UnusedEnv,CResult,Symbol,FunctionHead,FunctionBody,Head,Head
       subst(Body0,Sub,BodyCode0,BodyCode),Fun=t);
     (((var(MResult)))
     -> (MResult=CResult,body_cleanup_keep_debug_vars(Ctx,((CallEnv=HeadEnv,HeadCode,Body0)),BodyCode))
-     ; (MResult=CResult,body_cleanup_no_optimize(Ctx,((CallEnv=HeadEnv,HeadCode,Body0,MResult=CResult)),BodyCode)))).
+     ; (MResult=CResult,body_cleanup_no_optimize(Ctx,((CallEnv=HeadEnv,HeadCode,Body0,MResult=CResult)),BodyCode)))))).
 
 
 cl_defun(Name,FormalParms,FunctionBody,Result):-
@@ -139,14 +139,14 @@ compile_function(Ctx,Env,Function,[Name,FormalParms|FunctionBody0], CompileBody)
    DocCode,
    HeadDefCode,
    asserta(wl:lambda_def(defun,(Name),Function, FormalParms, FunctionBody):-true),
-   asserta((user:Head  :- BodyCode)),
+   asserta_new((user:Head  :- BodyCode)),
    set_opv(Function,classof,claz_compiled_function),
    set_opv(Symbol,compile_as,kw_function),
    set_opv(Symbol,function,Function)),
    debug_var('MResult',MResult).
 
 make_compiled(Ctx,_UnusedEnv,MResult,Symbol,FunctionHead,FunctionBody,Head,HeadDefCode,(BodyCode)):-
-    expand_function_head(Ctx,CallEnv,FunctionHead, Head, HeadEnv, MResult,HeadDefCode,HeadCode),
+   always(( expand_function_head(Ctx,CallEnv,FunctionHead, Head, HeadEnv, MResult,HeadDefCode,HeadCode),
     debug_var("RET",Result),debug_var("CallEnv",CallEnv),debug_var('MResult',MResult),
     %put_attr(MResult,varuse,retval),
     MResult=Result,
@@ -154,7 +154,7 @@ make_compiled(Ctx,_UnusedEnv,MResult,Symbol,FunctionHead,FunctionBody,Head,HeadD
     show_ctx_info(Ctx),
     (((var(Result)))
     -> body_cleanup_keep_debug_vars(Ctx,((CallEnv=HeadEnv,HeadCode,Body0)),BodyCode)
-     ; (body_cleanup_no_optimize(Ctx,((CallEnv=HeadEnv,HeadCode,Body0,MResult=Result)),BodyCode))).
+     ; (body_cleanup_no_optimize(Ctx,((CallEnv=HeadEnv,HeadCode,Body0,MResult=Result)),BodyCode))))).
 
 
 :- fixup_exports.

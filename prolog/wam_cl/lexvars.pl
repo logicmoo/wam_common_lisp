@@ -28,7 +28,7 @@ add_tracked_var(Ctx,Atom,Var):-
    sort([Var|Vars],NewVars),
    b_set_dict(vars,Dict,NewVars).
   
-get_var_tracker(Ctx0,Atom,Dict):- get_attr(Ctx0,tracker,Ctx), must(sanity(atom(Atom))),oo_get_attr(Ctx,var_tracker(Atom),Dict),(is_dict(Dict)->true;(trace,oo_get_attr(Ctx,var_tracker(Atom),_SDict))).
+get_var_tracker(Ctx0,Atom,Dict):- get_attr(Ctx0,tracker,Ctx), always(sanity(atom(Atom))),oo_get_attr(Ctx,var_tracker(Atom),Dict),(is_dict(Dict)->true;(trace,oo_get_attr(Ctx,var_tracker(Atom),_SDict))).
 get_var_tracker(Ctx0,Atom,Dict):-  get_attr(Ctx0,tracker,Ctx),Dict=rw{name:Atom,r:0,w:0,p:0,ret:0,u:0,vars:[]},oo_put_attr(Ctx,var_tracker(Atom),Dict),!.
 
 
@@ -143,7 +143,7 @@ symbol_value0(Env,[Place,Obj],Result):- set_place(Env,getf,[Place,Obj],[],Result
 symbol_value_error(_Env,Var,_Result):- lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Var).
 
 
-push_values([V1|Push],V1):- must(nonvar(Push)),nb_setval('$mv_return',[V1|Push]).
+push_values([V1|Push],V1):- always(nonvar(Push)),nb_setval('$mv_return',[V1|Push]).
 
 bvof(_,_,T):- notrace(((var(T);T==[tl]))),!,fail.
 bvof(E,M,T):-E=T,!,M=T.
@@ -228,6 +228,11 @@ is_place_op(psetf).
 is_place_op(getf).
 is_place_op(incf).
 is_place_op(decf).
+
+is_any_place_op(P):-is_place_op_verbatum(P).
+is_any_place_op(P):-is_parallel_op(P).
+is_any_place_op(P):-is_place_op(P).
+
 is_place_op_verbatum(rotatef).
 is_place_op_verbatum(shiftf).
 is_place_op_verbatum(push).

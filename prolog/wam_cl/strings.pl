@@ -206,9 +206,6 @@ cl_string_c61(X,Y,Keys,R):-
 %is_string_equal_case_insensitive(X,Y):- to_prolog_string(X,XX),to_prolog_string(Y,YY),
 %  (XX==YY-> true ; (string_upper(XX,XXX),string_upper(YY,YYY),XXX==YYY)).
 
-wl:type_checked(cl_length(claz_cons,integer)).
-cl_length(Sequence,Len):- length(Sequence,Len).
-
 
 
 range_1_and_2(X,Y,[],X,Y,0):-!.

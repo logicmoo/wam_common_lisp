@@ -23,12 +23,12 @@
 new_compile_ctx(Ctx):- list_to_rbtree([type-ctx],Ctx0),put_attr(Ctx,tracker,Ctx0).
 
 lisp_compiled_eval(SExpression):-
-  notrace(as_sexp_interned(SExpression,Expression)),
+  quietly(as_sexp_interned(SExpression,Expression)),
   lisp_compiled_eval(Expression,Result),
   dbmsg_cmt(result(Result)).
 
 lisp_compiled_eval(SExpression,Result):-
-  quietly(as_sexp_interned(SExpression,Expression)),
+  lquietly(as_sexp_interned(SExpression,Expression)),
   %dbmsg(lisp_compiled_eval(Expression)),
   always(lisp_compile(Result,Expression,Code)),
   % dbmsg_cmt((lisp_compiled_eval(Expression):- Code)),
@@ -36,13 +36,13 @@ lisp_compiled_eval(SExpression,Result):-
 
 %lisp_compile(SExpression):- source_location(_,_),!,dbmsg((:-lisp_compile(SExpression))).
 lisp_compile(SExpression):-
-  notrace(as_sexp_interned(SExpression,Expression)),
+  quietly(as_sexp_interned(SExpression,Expression)),
   dbmsg(:- lisp_compile(Expression)),
   lisp_compile(Expression,Code),!,
   dbmsg_real(:- Code).
 
 lisp_compile(SExpression,Body):-
-   notrace(as_sexp_interned(SExpression,Expression)),
+   quietly(as_sexp_interned(SExpression,Expression)),
    debug_var('_Ignored',Result),
    lisp_compile(Result,Expression,Body).
 
@@ -55,7 +55,7 @@ lisp_compile(Env,Result,Expression,Body):-
    always(lisp_compile(Ctx,Env,Result,Expression,Body)).
 
 lisp_compile(Ctx,Env,Result,SExpression,Body):-
-   notrace(as_sexp(SExpression,Expression)),
+   quietly(as_sexp(SExpression,Expression)),
    always(compile_forms(Ctx,Env,Result,[Expression],Body)).
 
 
@@ -83,7 +83,7 @@ show_ctx_info3(Ctx):- fmt9(ctx=Ctx).
      
 
 % same_symbol(OP1,OP2):-!, OP1=OP2.
-same_symbol(OP1,OP2):- notrace(same_symbol0(OP1,OP2)).
+same_symbol(OP1,OP2):- quietly(same_symbol0(OP1,OP2)).
 
 %prologcase_name_or_string(S,N):-prologcase_name(S,N).
 
@@ -138,17 +138,17 @@ f_sys_memq(E,L,R):- t_or_nil((member(Q,L),Q==E),R).
 
 
 must_compile_progn(Ctx,Env,Result,FormsIn, PreviousResult, Body):-
-  notrace((maybe_debug_var('_rCtx',Ctx),
+  quietly((maybe_debug_var('_rCtx',Ctx),
   maybe_debug_var('_rEnv',Env),
   %maybe_debug_var('_rResult',Result),
   %maybe_debug_var('_rPrevRes',PreviousResult),
   maybe_debug_var('_rForms',Forms),
   maybe_debug_var('_rBody',Body))),
-  quietly(resolve_reader_macros(FormsIn,Forms)),!,
+  lquietly(resolve_reader_macros(FormsIn,Forms)),!,
    always(((compile_progn(Ctx,Env,Result,Forms,PreviousResult,Body0),nonvar(Body0)))),
-   quietly((sanitize_true(Ctx,Body0,Body))).
+   lquietly((sanitize_true(Ctx,Body0,Body))).
 
-compile_progn(_Cx,_Ev,Result,Var,_PreviousResult,Out):- notrace(is_ftVar(Var)),!,Out=cl_eval([progn|Var],Result).
+compile_progn(_Cx,_Ev,Result,Var,_PreviousResult,Out):- quietly(is_ftVar(Var)),!,Out=cl_eval([progn|Var],Result).
 compile_progn(_Cx,_Ev,Result,[], PreviousResult,true):-!, PreviousResult = Result.
 compile_progn(Ctx,Env,Result,[Form | Forms], PreviousResult, Body):-  !,
 	must_compile_progbody(Ctx,Env,FormResult, Form,PreviousResult,FormBody),

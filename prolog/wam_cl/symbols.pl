@@ -46,7 +46,7 @@ is_fboundp(Symbol):- get_opv(Symbol,function,_).
 is_keywordp(Symbol):- package:package_external_symbols(pkg_kw,_,Symbol).
 is_symbolp(Symbol):- is_keywordp(Symbol);get_opv(Symbol,classof,claz_symbol).
 
-%is_keywordp(Symbol):- atom(Symbol),sanity((must(\+ atom_concat_or_rtrace(':',_,Symbol)))),!,fail.
+%is_keywordp(Symbol):- atom(Symbol),sanity((always(\+ atom_concat_or_rtrace(':',_,Symbol)))),!,fail.
 
 
 
@@ -155,8 +155,8 @@ print_symbol_at(Symbol,PrintP):-
 print_symbol_from(Symbol,_PrintP,Pkg):- Pkg == kw_pkg, !, pl_symbol_name(Symbol,Name),write(':'),write(Name).
 print_symbol_from(Symbol,PrintP,SPackage):-
   pl_symbol_name(Symbol,Name),
-  must(package_find_symbol(Name,SPackage,FoundSymbol,IntExt)),
-  must( Symbol\== FoundSymbol -> 
+  always(package_find_symbol(Name,SPackage,FoundSymbol,IntExt)),
+  always( Symbol\== FoundSymbol -> 
     print_prefixed_symbol(Name,PrintP,SPackage,kw_internal);
     print_prefixed_symbol(Name,PrintP,SPackage,IntExt)).
 

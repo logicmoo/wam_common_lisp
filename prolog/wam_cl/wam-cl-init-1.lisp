@@ -74,7 +74,7 @@
           (t
            (expand-or-get-setf-inverse form environment)))))
 
-(defmacro setf (&rest args &environment environment)
+(defmacro abcl-setf (&rest args &environment environment)
   (let ((numargs (length args)))
     (cond
      ((= numargs 2)

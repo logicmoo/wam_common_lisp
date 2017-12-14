@@ -200,7 +200,7 @@ lisp_compile_to_prolog(Pkg,Expression):-
 
 
 lisp_compile_to_prolog(PExpression):-   
- notrace((always((
+ ((always((
   as_sexp(PExpression,SExpression),  
   nl,
   flush_all_output_safe,
@@ -227,6 +227,8 @@ lisp_grovel((A,B)):-!, lisp_grovel(A),lisp_grovel(B).
 lisp_grovel(asserta_tracked(T,PrologCode)):- !, lisp_grovel_assert(T,PrologCode).
 lisp_grovel(assertz(PrologCode)):- !, lisp_grovel_assert(PrologCode).
 lisp_grovel(asserta(PrologCode)):- !, lisp_grovel_assert(PrologCode).
+lisp_grovel(asserta_if_new(PrologCode)):- !, lisp_grovel_assert(PrologCode).
+lisp_grovel(asserta_new(PrologCode)):- !, lisp_grovel_assert(PrologCode).
 lisp_grovel(assert_if_new(PrologCode)):- !, lisp_grovel_assert(PrologCode).
 lisp_grovel(assert(PrologCode)):- !, lisp_grovel_assert(PrologCode).
 lisp_grovel(PAB):- PAB=..[F,A|_],grovel_time_called(F),!,(var(A)-> true;call(PAB)),!.
@@ -239,7 +241,7 @@ lisp_grovel_assert(T,MP):- compound(MP),strip_module(MP,_,P),functor(P,F,_),
   arg(_, v(doc_string,macro_lambda,function_lambda,lambda_def,arglist_info),F),!,
   show_call_trace(asserta_tracked(T,MP)).
 lisp_grovel_assert(_,_).
-lisp_grovel_assert(T):-assert(T).
+lisp_grovel_assert(T):-lisp_grovel_assert(u,T),!.
    %*compile-file-truename*
 
 
@@ -273,13 +275,15 @@ lisp_reader_compiled_eval(PExpression):-
   writeln(' **********************/'),
   reading_package(Pkg),
   dbmsg(:- lisp_compile_to_prolog(Pkg,SExpression)),
-  reader_intern_symbols(SExpression,Expression),  
-  debug_var('_Ignored',Result),
-  lisp_compile(Result,Expression,PrologCode),
-  dbmsg(:- PrologCode),
-  call(PrologCode))).
+  reader_intern_symbols(SExpression,Expression),
+  process_load_expression(Expression))),!.
 
-
+process_load_expression(COMMENTP):- is_comment(COMMENTP,_Cmt),!. %,dbmsg(comment(Cmt)).
+process_load_expression(Expression):- 
+   debug_var('_IgnoredResult',Result),
+   always(lisp_compile(Result,Expression,PrologCode)),
+   dbmsg(:- PrologCode),
+   always(PrologCode).
 
 
 with_flist(How,List):- must_maplist(with1file(How),List).
