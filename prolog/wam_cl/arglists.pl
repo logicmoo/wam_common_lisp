@@ -158,7 +158,7 @@ kw_is_present(RestNKeys,F,KWP,KWPV):-
      KWP=t ; KWP=[]).
    
    
-kw_obtain_value_else_p(RestNKeys,F,KW,Value,ElseInit,PresentP):- 
+kw_obtain_value_else_p(_Env,RestNKeys,F,KW,Value,ElseInit,PresentP):- 
    ((append(_Left,[F,Value|More],RestNKeys),length(More,Nth),is_evenp(Nth)) -> PresentP=t ;
      ((F \== KW ,append(_Left,[F,Value|More],RestNKeys),length(More,Nth),is_evenp(Nth)) -> PresentP=t;
       (PresentP=[],ElseInit))).
@@ -184,6 +184,9 @@ enter_ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,Mode,FormalParms0,RequiredAr
 
 ordinary_args(_Ctx,_Env,_ArgInfo,_RestNKeys,_Whole,_, [],[],[],[],true):-!.
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,_,['&allow-other-keys'|FormalParms],Params,Names,PVars,Code):- !,
+  arginfo_incr(allow_other_keys,ArgInfo),
+  ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,aux,FormalParms,Params,Names,PVars,Code).
+ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,_,['&allow_other_keys'|FormalParms],Params,Names,PVars,Code):- !,
   arginfo_incr(allow_other_keys,ArgInfo),
   ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,aux,FormalParms,Params,Names,PVars,Code).
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,_,['&aux'|FormalParms],Params,Names,PVars,Code):- !,
@@ -258,7 +261,7 @@ ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,optional,[F|FormalParms],Params,Na
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,aux,[[F,InitForm]|FormalParms],Params,[F|Names],[V|PVars],PCode):- !,
    enforce_atomic(F),   
    arginfo_append(F,aux,ArgInfo),
-   compile_init(Env,F,V,[InitForm],InitCode),
+   compile_aux_or_key(Env,F,V,[InitForm],InitCode),
    ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,aux,FormalParms,Params,Names,PVars,Code),
    PCode = (InitCode,Code).
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,aux,[F|FormalParms],Params,Names,PVars,Code):-!, 
@@ -269,15 +272,15 @@ ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,aux,[F|FormalParms],Params,Names,P
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,[ [F,InitForm,KWPName]|FormalParms],Params,[F,KWPName|Names],[V,PresentP|PVars],PCode):- !,
    enforce_atomic(F),   
    arginfo_append(F,key,ArgInfo),
-   compile_init(Env,F,V,[InitForm],InitCode),   
+   compile_aux_or_key(Env,F,V,[InitForm],InitCode),   
    ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,FormalParms,Params,Names,PVars,MoreCode),
-   PCode = (kw_obtain_value_else_p(RestNKeys,F,F,V,InitCode,PresentP),MoreCode).
+   PCode = (kw_obtain_value_else_p(Env,RestNKeys,F,F,V,InitCode,PresentP),MoreCode).
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,[ [[KW,F],InitForm]|FormalParms],Params,[F|Names],[V|PVars],PCode):- !,
    enforce_atomic(F),   
    arginfo_append(F,key,ArgInfo),
-   compile_init(Env,F,V,[InitForm],InitCode),
+   compile_aux_or_key(Env,F,V,[InitForm],InitCode),
    ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,FormalParms,Params,Names,PVars,Code),
-   PCode =(kw_obtain_value_else_p(RestNKeys,KW,F,V,InitCode,_PresentP),Code).
+   PCode =(kw_obtain_value_else_p(Env,RestNKeys,KW,F,V,InitCode,_PresentP),Code).
 
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,[[F,InitForm]|FormalParms],Params,Names,PVars,Code):- !, 
    enforce_atomic(F), % loops  back
@@ -300,17 +303,17 @@ tfa(FormalParms):-
 
 
 compile_init_opt(Env,ArgInfo,RestNKeys,Var,FinalResult,[InitForm],
-  set_if_missing_opt(Env,Var,FinalResult,Code,Result,Count,RestNKeys)):- 
+  opt_var(Env,Var,FinalResult,Code,Result,Count,RestNKeys)):- 
     arg_info_count(ArgInfo,opt,Count),
     debug_var("Optionals",RestNKeys),
     lisp_compile(Result,InitForm,Code),!.
 
-% compile_init(Env,F,P,InitForm,InitCode)
-compile_init(Env,Var,FinalResult,[InitForm],
-  (set_var_if_missing(Env,Var,FinalResult,Code,Result))):- 
+% compile_aux_or_key(Env,F,P,InitForm,InitCode)
+compile_aux_or_key(Env,Var,FinalResult,[InitForm],
+  (aux_var(Env,Var,FinalResult,Code,Result))):- 
     lisp_compile(Result,InitForm,Code),!.
-compile_init(Env,Var,FinalResult,[InitForm|_More],
-  (set_var_if_missing(Env,Var,FinalResult,Code,Result))):- 
+compile_aux_or_key(Env,Var,FinalResult,[InitForm|_More],
+  (aux_var(Env,Var,FinalResult,Code,Result))):- 
     lisp_dump_break,
     lisp_compile(Result,InitForm,Code).
    
@@ -318,14 +321,15 @@ compile_init(Env,Var,FinalResult,[InitForm|_More],
 
 
 
-set_var_if_missing(Env, Var, In, G, Thru):- var(In),!,G,set_var(Env,Var,Thru).
-set_var_if_missing(Env, Var, In, _, Thru):- set_var(Env,Var,In),!,In=Thru.
+aux_var(Env, Var, In, G, Thru):- var(In),!,G,set_var(Env,Var,Thru).
+aux_var(Env, Var, In, _, Thru):- set_var(Env,Var,In),!,In=Thru.
 
 simple_atom_var(Atom):- atom(Atom), Atom\=nil,Atom\=[], correct_formal_params_c38(Atom,CAtom),
   \+ arg(_, v('&optional', '&key', '&aux', '&rest', '&body', '&environment'),CAtom).
 
-set_if_missing_opt(Env, Var, In, G, Thru):- var(In),!,G,set_var(Env,Var,Thru).
-set_if_missing_opt(Env, Var, In, _, Thru):- set_var(Env,Var,In),!,In=Thru.
+% opt_var(Env,Var,FinalResult,Code,Result,Count,RestNKeys).
+opt_var(Env, Var, FinalResult, _G, _Default, Nth, Optionals):- nth1(Nth,Optionals,Value),nonvar(Value),FinalResult=Value,set_var(Env,Var,Value).
+opt_var(Env, Var, FinalResult, G, Default, _Nth, _Optionals):-  G, FinalResult=Value,FinalResult=Default,set_var(Env,Var,Value).
 
 align_args_local(FN,RequiredArgs,RestNKeys,Whole,Result,LB,_ArgInfo,ArgsPlusResult,wl:init_args(exact_only,FN)):- 
   eval_uses_exact(FN),!,
@@ -543,6 +547,9 @@ bind_parameters(Env,RestNKeys,'&aux',[NDM|FormalParms],Params,(Code1,Code)):-
   bind_parameters(Env,RestNKeys,'&optional',FormalParms,Params,Code).
 
 % Parsing &allow-other-keys
+bind_parameters(Env,RestNKeys,_,['&allow_other_keys'|FormalParms],Params,Code):- !,
+  make_bind_value(':allow-other-keys',t),
+  bind_parameters(Env,RestNKeys,aux,FormalParms,Params,Code).
 bind_parameters(Env,RestNKeys,_,['&allow-other-keys'|FormalParms],Params,Code):- !,
   make_bind_value(':allow-other-keys',t),
   bind_parameters(Env,RestNKeys,aux,FormalParms,Params,Code).

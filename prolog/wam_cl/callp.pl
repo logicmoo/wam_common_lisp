@@ -117,10 +117,10 @@ locally_let(N=V,G):-!,locally_let([N=V],G).
 locally_let([N=V|More],G):- 
  always(get_var(N,Was)),
   setup_call_cleanup(
-     f_sys_set_symbol_value(N,V),
+     set_opv(N,value,V),
      %once(locally($(N)=V,..)),
-     (locally_let(More,G),f_sys_set_symbol_value(N,Was)),
-     f_sys_set_symbol_value(N,Was)).
+     (locally_let(More,G),set_opv(N,value,Was)),
+        set_opv(N,value,Was)).
    
 locally_let([],G):- !, 
   subst_castifies(G,GG),always(GG).

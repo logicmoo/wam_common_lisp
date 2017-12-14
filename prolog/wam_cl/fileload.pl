@@ -244,8 +244,6 @@ lisp_grovel_assert(_,_).
 lisp_grovel_assert(T):-lisp_grovel_assert(u,T),!.
    %*compile-file-truename*
 
-(wl:init_args(1,cl_require)).
-cl_require :tables "tables.lisp")
 
 cl_load(L,T):- cl_load(L,[],T).
 (wl:init_args(1,cl_load)).
@@ -317,6 +315,54 @@ with_each_file(How,File):- working_directory(CD,CD),with_fstem(CD,File,Found),!,
 % with_each_file(How,File):- with_lisp_translation(File,lisp_compiled_eval).
 
 
+
+
+%cl:require( :tables "tables.lisp")
+% asserting... u
+wl:arglist_info(cl_require, [sys_name, c38_optional, u_pathnames], [_Name_Param], arginfo{all:[sys_name, u_pathnames], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_name, u_pathnames], opt:[u_pathnames], req:[sys_name], rest:0, whole:0}).
+% asserting... u
+wl:init_args(1, cl_require).
+% asserting... u
+wl:lambda_def(defun, require, cl_require, [sys_name, c38_optional, u_pathnames], [[let, [[string, [string, sys_name]]], [unless, [find, string, xx_modules_xx, kw_test, function(string_c61)], [u_do_list_designator, [u_file, u_pathnames], [load, u_file]]]]]).
+% asserting... u
+cl_require(Name_Param, RestNKeys, FResult) :-
+        Env=[bv(sys_name, Name_Param), bv(u_pathnames, Pathnames_Param)],
+        opt_var(Env, u_pathnames, Pathnames_Param, true, [], 1, RestNKeys),
+        cl_string(Name_Param, String_Init),
+        LEnv=[[bv(string, String_Init)]|Env],
+        get_var(LEnv, xx_modules_xx, Xx_modules_xx_Get),
+        cl_find(string, Xx_modules_xx_Get, kw_test, function(string_c61), IFTEST),
+        (   IFTEST\==[]
+        ->  FResult=[]
+        ;   get_var(LEnv, u_pathnames, Pathnames_Get),
+            f_u_file(Pathnames_Get, List_designator_Param),
+            get_var(LEnv, u_file, File_Get),
+            cl_load(File_Get, [], Load_Ret),
+            f_u_do_list_designator(List_designator_Param, Load_Ret, ElseResult),
+            FResult=ElseResult
+        ).
+/*:- set_opv(cl_require, classof, claz_compiled_function),
+   set_opv(require, compile_as, kw_function),
+   set_opv(require, function, cl_require).*/
+
+
+% asserting... u
+wl:arglist_info(cl_provide, [sys_name], [_Name_Param], arginfo{all:[sys_name], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_name], opt:0, req:[sys_name], rest:0, whole:0}).
+% asserting... u
+wl:init_args(exact_only, cl_provide).
+% asserting... u
+wl:lambda_def(defun, provide, cl_provide, [sys_name], [[let, [[string, [string, sys_name]]], [pushnew, string, xx_modules_xx, kw_test, function(string_c61)], string]]).
+% asserting... u
+cl_provide(Name_Param, FResult) :-
+       % Env=[bv(sys_name, Name_Param)],
+        cl_string(Name_Param, String_Init),
+       % LEnv=[[bv(string, String_Init)]|Env],
+        cl_pushnew(String_Init,xx_modules_xx, [kw_test, function(string_c61)],_Pushnew_R),
+        String_Init=FResult.
+/*:- set_opv(cl_provide, classof, claz_compiled_function),
+   set_opv(provide, compile_as, kw_function),
+   set_opv(provide, function, cl_provide).
+*/
 :- fixup_exports.
 
 /*

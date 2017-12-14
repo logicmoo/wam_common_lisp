@@ -137,7 +137,7 @@ symbol_value0(Env,Var,Value):-  bvof(bv(Var, Value),_,Env).
 symbol_value0(_Env,Var,_Value):- notrace((nonvar(Var),is_functionp(Var),wdmsg(is_functionp(Var)))),!,lisp_dump_break.
 symbol_value0(_Env,Var,Result):- get_opv(Var, value, Result),!.
 symbol_value0(_Env,Var,Result):- atom(Var),get_opv(Var,value,Result),!.
-symbol_value0(Env,[Place,Obj],Result):- set_place(Env,getf,[Place,Obj],[],Result).
+symbol_value0(Env,[Place,Obj],Result):- trace, set_place(Env,getf,[Place,Obj],[],Result).
 
 
 symbol_value_error(_Env,Var,_Result):- lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Var).
@@ -233,11 +233,12 @@ is_any_place_op(P):-is_place_op_verbatum(P).
 is_any_place_op(P):-is_parallel_op(P).
 is_any_place_op(P):-is_place_op(P).
 
-is_place_op_verbatum(rotatef).
-is_place_op_verbatum(shiftf).
-is_place_op_verbatum(push).
-is_place_op_verbatum(pushnew).
-is_place_op_verbatum(pop).
+is_place_op_verbatum(rotatefsdfsdfsdfsdfsdffs).
+%is_place_op_verbatum(rotatef).
+%is_place_op_verbatum(shiftf).
+%is_place_op_verbatum(push).
+%is_place_op_verbatum(pushnew).
+%is_place_op_verbatum(pop).
 
 
 is_parallel_op(psetf).

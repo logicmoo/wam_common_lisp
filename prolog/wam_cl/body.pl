@@ -601,9 +601,6 @@ setq_from_values_each(Env,[Var|Vars],[Val|Values]):-
    set_var(Env,Var,Val),
    setq_from_values_each(Env,Vars,Values).
 
-f_sys_set_symbol_value(Var,Val):-
-  set_opv(Var,value,Val).
-
 %  env_current(Env),
   %set_var(Env,Var,Val).
 

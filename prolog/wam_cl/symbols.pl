@@ -25,6 +25,10 @@ cl_symbol_function(Symbol,Function):- do_or_die(get_opv(Symbol,function,Function
 do_or_die(G):- G->true;throw(do_or_die(G)).
 
 
+f_sys_set_symbol_value(Var,Val,Val):- set_opv(Var,value,Val).
+cl_set(Var,Val,Val):- rtrace(set_opv(Var,value,Val)).
+
+
 cl_boundp(Symbol,TF):-  t_or_nil(is_boundp(Symbol),TF).
 cl_constantp(Symbol,TF):- t_or_nil(is_constantp(Symbol),TF).
 cl_fboundp(Symbol,TF):-  t_or_nil(is_fboundp(Symbol),TF).
