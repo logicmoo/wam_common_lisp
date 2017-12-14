@@ -479,13 +479,13 @@ expand_function_head(Ctx,EnvIO,[FN | FormalParms],Head,ZippedArgEnv, Result,Head
    Head =.. [FN , Whole, Result ])).
 
 % align_args_local
-expand_function_head(Ctx,EnvIO,[FN | FormalParms],Head,ZippedArgEnv, Result,(HeadDefCode,assert_if_new(HeadDefCode)),HeadCodeOut):-
+expand_function_head(Ctx,EnvIO,[FN | FormalParms],Head,ZippedArgEnv, Result,(HeadDefCode,assert_if_new(Used)),HeadCodeOut):-
+   debug_var('_RestNKeys',RestNKeys),
    always((function_head_params(Ctx,EnvIO,FormalParms,ZippedArgEnv,RestNKeys,_Whole,RequiredArgs,ArgInfo,_Names,_PVars,HeadCode),
    HeadDefCode = (assert_if_new(wl:arglist_info(FN,FormalParms,RequiredArgs,ArgInfo):-true)),
    always(HeadDefCode),
    show_call_trace(align_args_local(FN,RequiredArgs,RestNKeys,Result,HeadArgs,Used)),!,
-   always(assert_if_new(Used:-true)),
-   debug_var('ArgsIn',Used),
+   always(assert_if_new(Used:-true)),   
    HeadCodeOut = HeadCode,   
    Head =.. [FN | HeadArgs])).
 
