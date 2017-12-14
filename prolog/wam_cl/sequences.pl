@@ -31,24 +31,7 @@ prims:cl_exact.
 :- ensure_loaded((utils_writef)).
 :- ensure_loaded(library(lists)).
 
-:- use_module(library('dialect/sicstus/arrays')).
-% :- use_module(library('dialect/sicstus')).
 
-% Numbers, pathnames, and arrays are examples of self-evaluating objects.
-is_self_evaluating_object(X):- var(X),!.
-is_self_evaluating_object(X):- atomic(X),!,is_self_evaluationing_const(X).
-is_self_evaluating_object('$OBJ'(_,_)):-!.
-is_self_evaluating_object('#\\'(_)):-!.
-is_self_evaluating_object(X):- (is_dict(X);is_array(X);is_rbtree(X)),!.
-is_self_evaluating_object(P):- compound_name_arity(P,F,_),atom_concat_or_rtrace('$',_,F),!.
-
-is_self_evaluationing_const(X):- atomic(X),is_self_evaluationing_const0(X),!.
-is_self_evaluationing_const0(X):- (X==t;X==[];number(X);is_keywordp(X);string(X);(blob(X,T),T\==text)),!.
-is_self_evaluationing_const0(X):- is_functionp(X),!.
-
-is_functionp(X):- \+ atom(X),!,fail.
-is_functionp(X):- atom_concat_or_rtrace('f_',_,X),!.
-is_functionp(X):- atom_concat_or_rtrace('cl_',_,X),!.
 is_consp(Obj):- nonvar(Obj),Obj=[_|_].
 
 %:- dynamic(op_replacement/2).
@@ -176,7 +159,6 @@ cl_not(Obj,Ret):- t_or_nil(Obj == [] , Ret).
 cl_null(Obj,Ret):- t_or_nil(Obj == [] , Ret).
 cl_atom(Obj,Ret):-  t_or_nil( Obj\=[_|_] , Ret).
 cl_consp(Obj,RetVal):- t_or_nil(is_consp(Obj),RetVal).
-cl_functionp(Obj,RetVal):- t_or_nil(is_functionp(Obj),RetVal).
 
 (wl:init_args(0,cl_nconc)).
 cl_nconc([L1,L2],Ret):- !, append(L1,L2,Ret).

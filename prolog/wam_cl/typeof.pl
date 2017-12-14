@@ -18,6 +18,20 @@
 
 cl_class_of(Obj,Class):- i_class(Obj,Class),!.
 
+:- use_module(library('dialect/sicstus/arrays')).
+% :- use_module(library('dialect/sicstus')).
+% Numbers, pathnames, and arrays are examples of self-evaluating objects.
+is_self_evaluating_object(X):- var(X),!.
+is_self_evaluating_object(X):- atomic(X),!,is_self_evaluationing_const(X).
+is_self_evaluating_object('$OBJ'(_,_)):-!.
+is_self_evaluating_object('#\\'(_)):-!.
+is_self_evaluating_object(X):- (is_dict(X);is_array(X);is_rbtree(X)),!.
+is_self_evaluating_object(P):- compound_name_arity(P,F,_),atom_concat_or_rtrace('$',_,F),!.
+
+is_self_evaluationing_const(X):- atomic(X),is_self_evaluationing_const0(X),!.
+is_self_evaluationing_const0(X):- (X==t;X==[];number(X);is_keywordp(X);string(X);(blob(X,T),T\==text)),!.
+is_self_evaluationing_const0(X):- is_functionp(X),!.
+
 i_class(Var,Class):-attvar(Var),get_attr(Var,classof,Class).
 i_class(Var,claz_locative):-var(Var).
 % compounds

@@ -64,7 +64,8 @@ print_reassembed_clause(ExceptFor,Module,P):-
            print_reassembed_clause(ExceptFor,Module,Sub),fail)).
 
 
-make_pretty(I,O):-make_pretty(eval,0,I,O).
+make_pretty(I,O):- is_user_output,!,shrink_lisp_strings(I,O), pretty1(O),pretty2(O),pretty3(O).
+make_pretty(I,O):- I=O, pretty1(O),pretty2(O),pretty3(O).
 
 print_clause_plain(I):-
   current_prolog_flag(color_term, Was),
@@ -75,7 +76,6 @@ print_clause_plain(I):-
   
 % print_clause_plain(C):- portray_clause_w_vars(O).
 
-make_pretty(Function,Arity,I,O):- shrink_lisp_strings(I,M), pretty_varnames(Function,Arity,M,O).
 
 may_debug_var(_,_,V):- nonvar(V),!.
 may_debug_var(_,_,V):- variable_name(V,_),!.
@@ -88,25 +88,36 @@ may_debug_var(_,V):- nonvar(V),!.
 may_debug_var(_,V):- variable_name(V,_),!.
 may_debug_var(R,V):- debug_var(R,V).
 
+pretty1(H):- \+ compound(H),!.
 pretty1(as_rest(Name, Rest, _)):- may_debug_var(Name,Rest).
 pretty1(get_var(Env, Name, Val)):- may_debug_var('Env',Env),may_debug_var(Name,Val).
 pretty1(set_var(Env,_Op, Name, Val)):- may_debug_var('Env',Env),may_debug_var(Name,Val).
 pretty1(cl_slot_value(_Env, Name, Val)):- may_debug_var(slot,Name,Val).
 pretty1(set_place(_Env, SETF, [Name|_], Val, _)):- is_place_write(SETF), atom(Name),var(Val),debug_var([Name,'_New'],Val).
+pretty1(Env=[List|_]):- compound(List),var(Env),List=[H|_],compound(H),H=bv(_,_), may_debug_var('Env',Env),
+  maplist(pretty1,List).
+pretty1(Env=List):- compound(List),var(Env),List=[H|_],compound(H),H=bv(_,_), may_debug_var('Env',Env),
+  maplist(pretty1,List).
 pretty1(P):- P=..[_,_|List],append(_,[Name, Val|_],List),atom(Name),var(Val),may_debug_var(Name,Val).
-
-pretty1([H | B]):- may_debug_var('CAR',H),may_debug_var('CDR',B).
 pretty1(debug_var(R,V)):- may_debug_var(R,V).
+pretty1(bv(R,V)):- may_debug_var(R,V).
+pretty1(H):-H=..[_|ARGS],must_maplist_det(pretty1,ARGS).
 
-pretty_varnames(_,_,H,H):- \+ compound(H),!. % may_debug_var(F,'_Call',H).
-pretty_varnames(_,_,H,H):- pretty1(H),!.
-pretty_varnames(_,_,H,H):- 
+pretty2(H):- \+ compound(H),!. % may_debug_var(F,'_Call',H).
+pretty2(H):-  
+ always((functor(H,F,A),
+   H=..[F,P1|ARGS],   
+   (A>1 -> may_debug_var(F,'_Param',P1) ; true),
+   must_maplist_det(pretty2,[P1|ARGS]))),!. % ,HH=..[F,P1|ARGSO].
+
+pretty3(H):- \+ compound(H),!. % may_debug_var(F,'_Call',H).
+pretty3([H | B]):- pretty3(H),pretty3(B),may_debug_var('CAR',H),may_debug_var('CDR',B).
+pretty3(H):-  
  always((functor(H,F,A),
    H=..[F,P1|ARGS],   
    arg(A,H,R),may_debug_var(F,'_Ret',R),   
-   may_debug_var(F,'_Param',P1),
-   must_maplist_det(pretty_varnames(F,A),[P1|ARGS],_ARGSO))),!. % ,HH=..[F,P1|ARGSO].
-pretty_varnames(_,_,G,G).
+   nop(may_debug_var(F,'_Param',P1)),
+   must_maplist_det(pretty3,[P1|ARGS]))),!. % ,HH=..[F,P1|ARGSO].
 
 
 :- fixup_exports.
