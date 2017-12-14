@@ -372,10 +372,10 @@ expand_function_head(Ctx,Env,FN, Head, ZippedArgEnv, Result,HeadDefCode,HeadCode
   expand_function_head(Ctx,Env,[FN], Head, ZippedArgEnv, Result,HeadDefCode,HeadCode).
 
 % eval_uses_exact
-expand_function_head(Ctx,Env,[FN | FormalParms],Head,ZippedArgEnv, Result,HeadDefCode,(RestNKeys=[],HeadCode)):-
+expand_function_head(Ctx,Env,[FN | FormalParms],Head,ZippedArgEnv, Result,HeadDefCode,(HeadCode)):-
    (eval_uses_exact(FN) ; \+ (member(Mode,FormalParms), \+ simple_atom_var(Mode))),!,
-   debug_var('NilRestNKeys',RestNKeys), 
-       function_head_params(Ctx,Env,FormalParms,ZippedArgEnv,RestNKeys,Whole,RequiredArgs,ArgInfo,_Names,_PVars,HeadCode),
+   %debug_var('NilRestNKeys',RestNKeys), 
+       function_head_params(Ctx,Env,FormalParms,ZippedArgEnv,_RestNKeys,Whole,RequiredArgs,ArgInfo,_Names,_PVars,HeadCode),
                HeadDefCode = (assert_if_new(wl:arglist_info(FN,FormalParms,RequiredArgs,ArgInfo):-true),!,
                  assert_if_new(wl:init_args(exact_only,FN):-true)),
                always(HeadDefCode),

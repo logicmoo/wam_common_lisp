@@ -270,7 +270,7 @@ has_block_exists(G):- sub_term(E,G),sub_block_exit(E).
 sub_block_exit(E):- E==fail,!.
 sub_block_exit(E):- \+ compound(E),!,fail.
 sub_block_exit(C):-functor(C,F,A),sub_block_exit_f_a(F,A).
-sub_block_exit_f_a(Addr,_):- atom_contains(Addr,'addr').
+sub_block_exit_f_a(Addr,_):- atom_contains(Addr,'addr_').
 sub_block_exit_f_a(throw,1).
 sub_block_exit_f_a(catch,3).
 

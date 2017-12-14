@@ -144,7 +144,7 @@ wl:interned_eval(("(defparameter sys::*output-file-pathname* ())")).
 %  For top level eval-when forms, :compile-toplevel specifies that the compiler must evaluate the body at compile time, and :load-toplevel specifies that the compiler must arrange to evaluate the body at load time. For non-top level eval-when forms, :execute specifies that the body must be executed in the run-time environment.
 do_compile_1file(Keys,File0):-
    %ignore(R=t),
-   pl_truename(File0,File),
+   pl_probe_file(File0,File),
    prolog_to_os_filename(File,OSFile),
    cl_compile_file_pathname(OSFile,Keys,PLFilePath),
    to_prolog_pathname(PLFilePath,PLFile),
@@ -162,7 +162,7 @@ do_compile_1file(Keys,File0):-
 
 % The Prolog translator is still unfinished and experimental. You can install the package by typing pack_install(transpiler) in the SWI-Prolog console. Now, you can use the translator to convert JavaScript source code into Lua:
 do_compile_1file_to_stream(_Keys,File0,Stream):-
-  pl_truename(File0,File),
+  pl_probe_file(File0,File),
   to_prolog_string(File0,Name),
   get_time(Epoch),format_time(string(EpochS), '%+', Epoch),
   working_directory(PWD,PWD),
@@ -244,6 +244,8 @@ lisp_grovel_assert(_,_).
 lisp_grovel_assert(T):-lisp_grovel_assert(u,T),!.
    %*compile-file-truename*
 
+(wl:init_args(1,cl_require)).
+cl_require :tables "tables.lisp")
 
 cl_load(L,T):- cl_load(L,[],T).
 (wl:init_args(1,cl_load)).

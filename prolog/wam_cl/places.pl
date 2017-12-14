@@ -17,6 +17,40 @@
 :- include('header').
 :- ensure_loaded((utils_for_swi)).
 
+/*
+(defun setf-function-name-p (name)
+  (and (consp name)
+             (consp (%cdr name))
+             (null (%cddr name))
+             (symbolp (%cadr name))
+             (eq (car name) 'setf)))
+*/
+% asserting... u
+wl:arglist_info(f_sys_setf_function_name_p, [sys_name], [Name_Param], arginfo{all:[sys_name], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_name], opt:0, req:[sys_name], rest:0, whole:0}).
+% asserting... u
+wl:init_args(exact_only, f_sys_setf_function_name_p).
+% asserting... u
+wl:lambda_def(defun, sys_setf_function_name_p, f_sys_setf_function_name_p, [sys_name], [[and, [consp, sys_name], [consp, [ext_pf_cdr, sys_name]], [null, [u_pf_cddr, sys_name]], [symbolp, [ext_pf_cadr, sys_name]], [eq, [car, sys_name], [quote, setf]]]]).
+f_sys_setf_function_name_p(Name_Param, TrueResult66) :-
+        (   is_consp(Name_Param)
+        ->  f_ext_pf_cdr(Name_Param, PredArgResult35),
+            (   is_consp(PredArgResult35)
+            ->  f_u_pf_cddr(Name_Param, IFTEST40),
+                (   IFTEST40==[]
+                ->  f_ext_pf_cadr(Name_Param, PredArgResult53),
+                    (   is_symbolp(PredArgResult53)
+                    ->  cl_car(Name_Param, Is_eq_Param),
+                        t_or_nil(is_eq(Is_eq_Param, setf), TrueResult),
+                        TrueResult66=TrueResult
+                    ;   TrueResult66=[]
+                    )
+                ;   TrueResult66=[]
+                )
+            ;   TrueResult66=[]
+            )
+        ;   TrueResult66=[]
+        ).
+
 value_or([Value],Value,_):- !.
 value_or([],Value,Value):- !.
 value_or(Value,Value,_).

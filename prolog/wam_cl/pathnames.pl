@@ -18,9 +18,8 @@
 
 :- include('header').
 
-cl_truename(In,Pathname):- pl_truename(In,O),to_lisp_pathname(O,Pathname).
-
-cl_make_pathname(I,O):- to_lisp_pathname(I,O).
+wl:init_args(0,cl_make_pathname).
+cl_make_pathname(I,O):- cl_make_instance([claz_pathname|I],O).
 
 wl:init_args(1,cl_compile_file_pathname).
 cl_compile_file_pathname(OSFile,Keys,PLFileOut):-
@@ -48,9 +47,9 @@ pl_compiled_filename(OSFile,PLFile):-
 pl_compiled_filename(Obj,PL):- to_prolog_string(Obj,M),pl_compiled_filename0(M,PL).
 
 pl_compiled_filename0(Obj,PL):- compound(Obj),arg(2,Obj,From),string(From),
-   pl_truename(From,File),pl_compiled_filename(File,PL),!.
+   pl_probe_file(From,File),pl_compiled_filename(File,PL),!.
 pl_compiled_filename0(File,PL):- get_var(sys_xx_compile_file_type_xx,Ext),
-   pl_truename(File,Found),atomic_list_concat([Found,Ext],'.',PL),exists_file(PL),!.
+   pl_probe_file(File,Found),atomic_list_concat([Found,Ext],'.',PL),exists_file(PL),!.
 
 
 to_prolog_pathname(Cmp,Out):- compound(Cmp),Cmp='$OBJ'(claz_pathname,S),!,always(to_prolog_pathname(S,Out)).
@@ -68,9 +67,19 @@ to_lisp_pathname(Pathname,'$OBJ'(claz_pathname,PathString)):-
   to_lisp_string(PathStr,PathString).
 
 % Uses Symbol value: *DEFAULT-PATHNAME-DEFAULTS*
-pl_truename(In,M):- cl_symbol_value(xx_default_pathname_defaults_xx,Str),always((to_prolog_pathname(Str,Path))),Path\=='',!, with_fstem(Str,In,M).
-pl_truename(In,M):- with_fstem(".",In,M),!.
-pl_truename(In,M):- stream_property(_,file_name(FD)),once((with_fstem(FD,In,M))).
+cl_truename(In,Pathname):- or_die(cl_probe_file(In,Pathname)).
+cl_probe_file(In,Pathname):- 
+   or_nil((pl_probe_file(In,O)->to_lisp_pathname(O,Pathname))).
+
+nil_lastvar((_,G)):-!, nil_lastvar(G).
+nil_lastvar(G):- functor(G,_,A),arg(A,G,[]).
+
+or_die(G):- G ->true;throw(die(G)).
+or_nil(G):- G ->true;nil_lastvar(G).
+
+pl_probe_file(In,M):- cl_symbol_value(xx_default_pathname_defaults_xx,Str),always((to_prolog_pathname(Str,Path))),Path\=='',!, with_fstem(Str,In,M).
+pl_probe_file(In,M):- with_fstem(".",In,M),!.
+pl_probe_file(In,M):- stream_property(_,file_name(FD)),once((with_fstem(FD,In,M))).
 
 set_default_path_early:-
    working_directory(X,X),
