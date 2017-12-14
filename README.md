@@ -154,8 +154,8 @@ T
 CL-USER>
 ````
 ## Exit lisp
-<press cntrl-d>
 ````
+<press cntrl-d>
 CL-USER> ^DEND-OF-FILE
 true.
 ?-
