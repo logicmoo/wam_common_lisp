@@ -22,7 +22,7 @@
 :- multifile(user:file_search_path/2).
 :-   dynamic(user:file_search_path/2).
 
-dir_from(Rel,Y):-
+dir_from_rc(Rel,Y):-
     ((getenv('LOGICMOO_WS',Dir);
      prolog_load_context(directory,Dir);
      '~/logicmoo_workspace'=Dir;
@@ -30,14 +30,14 @@ dir_from(Rel,Y):-
     absolute_file_name(Rel,Y,[relative_to(Dir),file_type(directory),file_errors(fail)]),
     exists_directory(Y),!.
 
-add_pack_path(Rel):- 
-   dir_from(Rel,Y),
+add_pack_path_rc(Rel):- 
+   dir_from_rc(Rel,Y),
    (( \+ user:file_search_path(pack,Y)) ->asserta(user:file_search_path(pack,Y));true).
 
-:- add_pack_path(packs_sys).
-:- add_pack_path(packs_usr).
-:- add_pack_path(packs_web).
-:- add_pack_path(packs_xtra).
+:- add_pack_path_rc(packs_sys).
+:- add_pack_path_rc(packs_usr).
+:- add_pack_path_rc(packs_web).
+:- add_pack_path_rc(packs_xtra).
 
 :- initialization(attach_packs,now).
 

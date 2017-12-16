@@ -174,7 +174,7 @@ fmt999((:- M:P)):-
   with_output_to(string(A),fmt9(:-P)),
   trim_off(':-',A,B),
   format('~N:- ~q:~s~n',[M,B]).
-fmt999((M:H :- B)):- P= (M:H :- B),
+fmt999((M:H :- Body)):- P= (M:H :- Body),
   with_output_to(string(A),fmt9(:-P)),
   trim_off(':-',A,B),
   format('~N:- ~q:~s~n',[M,B]).
@@ -188,7 +188,7 @@ fmt999(P):- with_output_to(string(A),fmt9(:-P)),
   format('~N~s~n',[B]).
 fmt999(P):- fmt9(P),nl.
 % notrace((dbmsg0(Var))).
-trim_off(W,A,B):- string_concat(W,B,A).
+trim_off(W,A,B):- atomic(A), string_concat(W,B,A).
 trim_off(_,A,A).
 
 dbmsg0(Var):- var(Var),!,in_comment(colormsg1(dbmsg_var(Var))).

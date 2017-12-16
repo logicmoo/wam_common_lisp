@@ -1,3 +1,4 @@
+:- if(\+ current_module(sxpr_reader)).
 :- module(sxpr,[
   codelist_to_forms/2,
   svar_fixvarname/2,
@@ -1385,4 +1386,5 @@ writeqnl(O):-writeq(O),nl.
 
 
 :- fixup_exports.
+:- endif.
 

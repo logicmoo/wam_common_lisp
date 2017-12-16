@@ -1,4 +1,6 @@
 
+:- use_module(library(wamcl)).
+
 :- if(current_prolog_flag(test_header,_)).
 
 :- wdmsg(reload_of_test_header).
@@ -112,13 +114,13 @@ add_pack_path(Rel):-
 
 :- ensure_loaded(library(pfc_test)).
 
+
 :- kb_global(baseKB:ttExpressionType/1).
 
 :- sanity((defaultAssertMt(Mt1),fileAssertMt(Mt2),source_module(Mt3))),sanity((Mt1==Mt2,Mt2==Mt3)).
 
 % logicmoo_clif should maybe load from logicmoo_user
 %:- use_module(library(logicmoo_user)).
-:- use_module(library(logicmoo_clif)).
 :- use_module(library(script_files)).
 :- set_prolog_flag(runtime_debug, 3). 
 
@@ -146,6 +148,7 @@ add_pack_path(Rel):-
 
 :- fixup_exports.
 
+end_of_file.
 
 
 :-
@@ -173,6 +176,7 @@ add_pack_path(Rel):-
 
 :- prolog_load_context(source,File),((atom_contains(File,'.pfc');atom_contains(File,'.clif'))-> sanity(is_pfc_file) ; must_not_be_pfc_file).
 
+
 :- if(is_pfc_file).
 
 %:- mpred_trace_exec.
@@ -192,7 +196,10 @@ add_pack_path(Rel):-
 
 % :- set_prolog_IO(user_input,user_output,user_error).
 
+
 :- if((prolog_load_context(source,File),(atom_contains(File,'.clif')))).
+
+:- use_module(library(logicmoo_clif)).
 
 :-assert(t_l:each_file_term(must_kif_process_after_rename)).
 

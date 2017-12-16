@@ -29,6 +29,12 @@
 
 :- endif.
 
+:- if(\+ current_module(sxpr)).
+:- if(\+ current_module(sxpr_reader)).
+:- ensure_loaded(sreader).
+:- endif.
+:- endif.
+
 :- use_module(library(must_trace)).
 :- use_module(library(logicmoo_util_terms)).
 :- use_module(library(logicmoo_util_common)).
@@ -150,7 +156,6 @@
 :- ensure_loaded(readtables).
 :- ensure_loaded(repl).
 :- ensure_loaded(sequences).
-:- ensure_loaded(sreader).
 :- ensure_loaded(streams).
 :- ensure_loaded(block).
 :- ensure_loaded(tagbody).

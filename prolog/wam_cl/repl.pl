@@ -16,7 +16,6 @@
 :- set_module(class(library)).
 :- include('header').
 
-:- use_module(sreader).
 
 :- dynamic 
 	user:named_lambda/2,
@@ -103,7 +102,7 @@ lisp:-
 
 
 repl_loop:- current_prolog_flag(lisp_repl_goal,Else),Else\==repl_loop,!,Else.
-repl_loop:- lisp_banner,
+repl_loop:- % lisp_banner,
 	repeat,
         catch(read_eval_print(Result),'$aborted',fail),
    	quietly(Result == end_of_file),!.
@@ -439,7 +438,9 @@ lw:- cl_load("wam-cl-params",_).
 
 :- set_prolog_flag(verbose_autoload,false).
 %:- initialization(lisp,restore).
-%:- initialization(lisp,program).
+:- initialization(code_load_hooks).
+:- initialization(lisp_banner).
+
 :- initialization(lisp,main).
 %:- initialization((lisp,prolog),main).
 

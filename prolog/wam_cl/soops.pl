@@ -415,15 +415,15 @@ get_opv_ii(Obj,_,_):- \+ atom(Obj), \+ var(Obj),!,fail.
 get_opv_ii(Obj,Prop,Value):- nonvar(Prop),!,(get_opv_iii(Obj,Prop,Value) *-> true; get_opv_else(Obj,Prop,Value)).
 get_opv_ii(Obj,Prop,Value):- get_opv_iii(Obj,Prop,Value).
 
-get_opv_else(Sym,Prop,Value):- nonvar(Sym),is_keywordp(Sym),!,get_type_default(is_keywordp,Prop,Value).
+get_opv_else(Sym,Prop,Value):- nonvar(Sym),is_keywordp(Sym),!,get_type_default(keyword,Sym,Prop,Value).
 get_opv_else(Obj,Prop,Value):- nonvar(Obj),nonvar(Prop),notrace((Prop\==classof,Prop\==typeof,Prop\==value,Prop\==conc_name)),get_opv_pi(Obj,Prop,Value).
 get_opv_else(Obj,typeof,Symbol):- get_opv_iii(Obj,classof,Value),claz_to_symbol(Value,Symbol).
 
-get_type_default(Name,name,Str):- string_concat(kw_,Str,Name).
-get_type_default(_,package,pkg_keyword).
-get_type_default(_,classof,clz_keyword).
-get_type_default(_,defined_as,defconstant).
-get_type_default(_,typeof,keyword).
+get_type_default(keyword,Name,name,Out):- atom(Name), string_concat(kw_,Str,Name),string_upper(Str,Out).
+get_type_default(keyword,_,package,pkg_keyword).
+get_type_default(keyword,_,classof,clz_keyword).
+get_type_default(keyword,_,defined_as,defconstant).
+get_type_default(keyword,_,typeof,keyword).
 
 get_opv_iii(Obj,Prop,Value):- has_prop_value_getter(Obj,Prop,Getter),call(Getter,Obj,Prop,Value).
 get_opv_iii(Obj,Prop,Value):- soops:o_p_v(Obj,Prop,Value).

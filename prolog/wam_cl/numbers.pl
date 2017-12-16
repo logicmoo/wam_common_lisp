@@ -40,7 +40,7 @@ wl:grovel_pred(M,F,1):-
    \+ atomic_list_concat([_,_,_|_],'_',Prefix),
    Head=..[SF,N,RetVal],
    PBody=..[F,N],
-   show_call_trace(assert_lsp(M:Head :- t_or_nil(M:PBody,RetVal))))),fail)).
+   show_call_trace(assert_lsp(user:Head :- t_or_nil(M:PBody,RetVal))))),fail)).
 
 wl:interned_eval(call(grovel_math)).
 

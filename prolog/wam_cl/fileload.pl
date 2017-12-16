@@ -132,6 +132,8 @@ Notes: None.
 */
 
 
+cl_compile_file(File):-
+  cl_compile_file(File,([]),_).
 cl_compile_file(File,R):-
   cl_compile_file(File,([]),R).
 (wl:init_args(1,cl_compile_file)).
@@ -238,7 +240,7 @@ lisp_grovel_assert(_,_).
 lisp_grovel_assert(T):-lisp_grovel_assert(u,T),!.
    %*compile-file-truename*
 
-
+cl_load(L):- cl_load(L,[],t).
 cl_load(L,T):- cl_load(L,[],T).
 (wl:init_args(1,cl_load)).
 cl_load(L,Keys,T):- to_prolog_string_if_needed(L,Loc)->L\==Loc,!,cl_load(Loc,Keys,T).
