@@ -94,7 +94,7 @@ This leads to another class of programs
 > > and be at least in the top 3 impls
 > >         for speed    Also the type of lisp programs I like to run (SWALE, DAYDREAMER) are buggy partial impl of Greenspun's rule as applied to Prolog (Instead of Lisp)
 
-I should clarify, SWALE and DAYDREAMER are *not* buggy implementations of Prolog! they are their own things.  But there are certain routines they contain that make extensive use of unification and backtracking.  These routines  (for decades now) are examples where the data representations and processing their capabilities (well mostly domain sizes) have been scaled back due to virtually creating the same penalties of the "prolog-in-lisp" scenario.  This scenario is similar to taking an assembly language program that twiddles bitmasks and using bignum math to emulate the registers of the  Intel-4930k CPU. *You might just see some performance differences? We will be very lucky if 4x-10x was the only speed difference between running that same assembly code program directly on the processor or in our program.
+I should clarify, SWALE and DAYDREAMER are *not* buggy implementations of Prolog! they are their own things.  But there are certain routines they contain that make extensive use of unification and backtracking.  The routines these programs use are examples where the domain had to be scaled back.  Only because they are under the penalties of the "prolog-in-lisp" scenario.  This scenario is similar to taking an assembly language program that twiddles bitmasks and using bignum math to emulate the registers of the  Intel-4930k CPU. You might just see some performance differences? Very lucky if it was only a 4x-10x slowdown   
 
 
 ## HOWTO/QUICKSTART
@@ -154,8 +154,8 @@ T
 CL-USER>
 ````
 ## Exit lisp
-<press cntrl-d>
 ````
+<press cntrl-d>
 CL-USER> ^DEND-OF-FILE
 true.
 ?-
