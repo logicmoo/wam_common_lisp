@@ -129,7 +129,6 @@
 :- ensure_loaded(arglists).
 :- ensure_loaded(arrays).
 :- ensure_loaded(backquote).
-:- ensure_loaded(block).
 :- ensure_loaded(body).
 :- ensure_loaded(callp).
 :- ensure_loaded(compile).
@@ -153,7 +152,9 @@
 :- ensure_loaded(sequences).
 :- ensure_loaded(sreader).
 :- ensure_loaded(streams).
-:- ensure_loaded(tagbody).
+:- ensure_loaded(block_tagbody).
+:- ensure_loaded(block).
+%:- ensure_loaded(tagbody).
 :- ensure_loaded(typecheck).
 :- ensure_loaded(typeof).
 :- ensure_loaded(utests).

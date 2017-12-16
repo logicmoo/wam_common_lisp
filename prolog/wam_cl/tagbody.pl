@@ -21,7 +21,10 @@
 :- discontiguous(compile_body_go_tagbody/5).
 
 shared_lisp_compiler:plugin_expand_progbody(Ctx,Env,Result,InstrS,_PreviousResult,Code):- 
-  compile_body_go_tagbody(Ctx,Env,Result,InstrS,Code),!.
+  compile_body_h(Ctx,Env,Result,InstrS,Code),!.
+
+/*shared_lisp_compiler:plugin_expand_progbody(Ctx,Env,Result,InstrS,_PreviousResult,Code):- 
+  compile_body_go_tagbody(Ctx,Env,Result,InstrS,Code),!.*/
 
 
 push_label(_,_,_).
@@ -135,6 +138,7 @@ is_reflow([OP|ARGS],Label):- is_reflow(OP,ARGS,Label).
 is_reflow(OPARGS,Label):- OPARGS=..[OP|ARGS],is_reflow(OP,ARGS,Label).
 is_reflow('go',[Label|_],Label).
 is_reflow('cl_go',[Label|_],Label).
+is_reflow('goto',[Label|_],Label).
 is_reflow('tagbody_go',[Label|_],Label).
 is_reflow('gosub',[Label|_],Label).
 is_reflow('return',_,[]).
