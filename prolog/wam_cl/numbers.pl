@@ -57,6 +57,9 @@ is_evenp(N):- 0 is N div 2.
 cl_oddp(N,R):- t_or_nil(is_oddp(N),R).
 cl_evenp(N,R):- t_or_nil(is_evenp(N),R).
 
+cl_minusp(N,R):- t_or_nil(N<0,R).
+cl_plusp(N,R):- t_or_nil(N>0,R).
+
 
 % Lisp Comparison Predicates
 

@@ -35,6 +35,22 @@ cl_set_nthcdr(_,[],[]):-!.
 cl_set_nthcdr(0,List,Tail):- nb_setarg(2,List,Tail).
 cl_set_nthcdr(Index,[_|List],Tail):- Next is Index-1,cl_set_nthcdr(Next,List,Tail).
 
+get_identiy_pred(Keys,K,Pred):- 
+  key_value(Keys,K,Value) -> to_function(Value,Pred); Pred = (=).
+
+get_test_pred(Keys,Pred):-
+  key_value(Keys,kw_test_not,Value) -> to_neg_function(Value,Pred);
+  key_value(Keys,kw_test,Value)  -> to_function(Value,Pred);
+  Pred = cl_eql.
+
+%to_function(function(Value),Value).
+to_function(Value,Value).
+to_neg_function(Value,not_fn(Neg)):-to_function(Value,Neg).
+not_fn(Value,A):- \+ call(Value,A).
+not_fn(Value,A,B):- \+ call(Value,A,B).
+not_fn(Value,A,B,C):- \+ call(Value,A,B,C).
+
+
 wl:init_args(1,cl_aref).
 cl_aref(Obj,Indexes,RetVal):-!, get_array_data(Obj,List),!,nth_index(Indexes,List,RetVal).
 %cl_aref(List,Index,RetVal):- cl_nthcdr(List,Index,RetVal).

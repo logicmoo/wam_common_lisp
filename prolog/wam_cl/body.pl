@@ -187,6 +187,14 @@ compile_body(Ctx,Env,Result,[or,Form], Body):- must_compile_body(Ctx,Env,Result,
 compile_body(Ctx,Env,Result,[or,Form1|Form2],Code):- Form2\=[_],Form2\=[or|_], !, 
   compile_body(Ctx,Env,Result,[or,Form1,[or|Form2]],Code).
 
+compile_body(Ctx,Env,Result,[or,Form1,Form2],Code):- !,
+   must_compile_body(Ctx,Env,Result1,Form1, Body1),
+   must_compile_body(Ctx,Env,Result2,Form2, Body2),
+   debug_var("FORM1_Res",Result1),
+        Code = (	(Body1,Result1 \== [],Result = Result1) 		
+				-> 	true
+				;  	(Body2, Result = Result2)).
+
 % OR-2 needs to use body compiler below
 compile_body(Ctx,Env,Result,[or,Form1,Form2],Code):- !,
    must_compile_body(Ctx,Env,Result1,Form1, Body1),

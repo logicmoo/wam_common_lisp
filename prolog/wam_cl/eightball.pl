@@ -143,7 +143,7 @@ in_comment(X):- notrace(setup_call_cleanup(write('/* '),(X),writeln(' */'))).
 
 % is_assert_op(_,_):-!,fail.
 is_assert_op(A,_,_):- \+ compound(A),!,fail.
-is_assert_op(M:I,W,M:O):- is_assert_op(I,W,O).
+is_assert_op(M:I,W,M:O):- !, is_assert_op(I,W,O).
 is_assert_op(asserta_tracked(W,P),W,P).
 is_assert_op(assertz(P),u,P).
 is_assert_op(asserta(P),u,P).
@@ -160,8 +160,8 @@ dbmsg0(Str):- string(Str),!,in_comment(colormsg1(Str)).
 % dbmsg0(StringL):- to_prolog_string_if_needed(StringL,String),!,dbmsg0(String).
 dbmsg0(:-((B,A))):-  is_assert_op(A,Where,AA), !,dbmsg0(:- B),dbmsg_assert(Where, AA).
 dbmsg0(:-((A,B))):-  is_assert_op(A,Where,AA), !,dbmsg_assert(Where, AA),dbmsg0(:- B).
-dbmsg0(:- A):- is_assert_op(A,Where,AA),!,
-  dbmsg_assert(Where,AA).
+dbmsg0(:- A):- is_assert_op(A,Where,AA),!,dbmsg_assert(Where,AA).
+dbmsg0(A):- is_assert_op(A,Where,AA),!,dbmsg_assert(Where,AA).
 
 dbmsg0(comment(X)):- shrink_lisp_strings(X,X0), in_comment(fmt99(X0)).
 dbmsg0(N=V):- shrink_lisp_strings(N=V,X0),  in_comment(fmt99(X0)).
@@ -169,8 +169,9 @@ dbmsg0(N=V):- shrink_lisp_strings(N=V,X0),  in_comment(fmt99(X0)).
 dbmsg0(X):- colormsg1(X),!.
 % dbmsg(:- Body):- !, dmsg(:- Body).
 
+dbmsg_assert(Where,(A,B)):- !,dbmsg_assert(Where,A),dbmsg_assert(Where,B).
 dbmsg_assert(Where,user:(HBody)):- !,dbmsg_assert(Where,(HBody)).
-dbmsg_assert(Where,user:H :- Body):- !,dbmsg_assert(Where,H :- Body),!.
+dbmsg_assert(Where,user:H :- Body):- !,dbmsg_assert(Where,(H :- Body)),!.
 %dbmsg_assert(Where,M:Body:- (true,[])):-!,colormsg1("\n% asserting fact...\n"),!,colormsg1(M:Body),!.
 dbmsg_assert(Where,Body):- colormsg1("\n% asserting... ~w ",[Where]),!,colormsg1(Body),!,
  body_cleanup(_,Body,Cleaned),

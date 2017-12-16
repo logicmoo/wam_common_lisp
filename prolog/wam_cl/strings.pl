@@ -205,6 +205,8 @@ cl_string_c61(X,Y,Keys,R):-
 %is_string_equal_case_sensitive(X,Y):- to_prolog_string(X,XX),to_prolog_string(Y,YY),XX==YY.
 %is_string_equal_case_insensitive(X,Y):- to_prolog_string(X,XX),to_prolog_string(Y,YY),
 %  (XX==YY-> true ; (string_upper(XX,XXX),string_upper(YY,YYY),XXX==YYY)).
+cl_char(String,Index,Char):-cl_aref(String,[Index],Char).
+  
 
 
 
@@ -216,8 +218,9 @@ range_1_and_2(X,Y,Keys,XR,YR,Start1):-
    range_subseq(Y,Start2,End2,YR).
 
 % key_value(Keys,Name,Value,Default).
-key_value(Keys,Name,Value,_Default):- get_plist_value(Keys,Name,Value,Never)->Never\==Value,!.
-key_value(Keys,Name,Value,_Default):- Keys.Name=Value,!.
+key_value(Keys,Name,Value):- is_dict(Keys),!,Keys.Name=Value,!.
+key_value(Keys,Name,Value):- get_plist_value(Keys,Name,Value).
+key_value(Keys,Name,Value,_Default):- key_value(Keys,Name,Value),!.
 key_value(_Keys,_Name,Default,Default).
 
 range_subseq(X,0,[],X):-!.

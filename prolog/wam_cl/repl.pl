@@ -432,7 +432,7 @@ lw:- cl_load("wam-cl-params",_).
 %:- lisp_add_history("lisp.").
 
 
-:- cd('/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/').
+%:- cd('/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/').
 
 
 :- fixup_exports.

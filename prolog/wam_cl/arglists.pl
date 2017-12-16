@@ -150,6 +150,7 @@ method-combination-lambda-list::= (wholevar var*
 
 reserved_symbols(_Names,_PVars).
 as_rest(_,R,R).
+as_body(_,B,B).
 as_env(_,E,E).
 
 
@@ -209,7 +210,7 @@ ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,_,['&body',F|FormalParms],Params,[
   arginfo_append(F,body,ArgInfo),
   arginfo_append(body,complex,ArgInfo),
   ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,rest,FormalParms,Params,Names,PVars,Code),
-  PCode = (Code,(as_body(F,V,RestNKeys))).
+  PCode = (Code,as_body(F,V,RestNKeys)).
 
 % &whole 
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,MODE,['&whole',F|FormalParms],Params,[F|Names],[Whole|PVars],PCode):- !, 
@@ -320,7 +321,6 @@ compile_aux_or_key(Env,Var,FinalResult,[InitForm|_More],
 % [name, 'package-designator', '&optional', [error, t]]
 
 
-
 aux_var(Env, Var, In, G, Thru):- var(In),!,G,set_var(Env,Var,Thru).
 aux_var(Env, Var, In, _, Thru):- set_var(Env,Var,In),!,In=Thru.
 
@@ -370,10 +370,19 @@ align_args_local(FN,RequiredArgs,RestNKeys,Whole,Result,LB,ArgInfo,HeadArgs,wl:i
  append(RequiredArgs,[RestNKeys,Result],HeadArgs),!.
 
 
+% eval_uses_exact
+expand_function_head(Ctx,Env,[Fn,A|Rest],Head,ZippedArgEnv,Result,HeadDefCode,HeadCode):- atom(Rest),!,
+      expand_function_head(Ctx,Env,[Fn,A,'&rest',Rest],Head,ZippedArgEnv,Result,HeadDefCode,HeadCode),!.
+expand_function_head(Ctx,Env,[Fn,A,B|Rest],Head,ZippedArgEnv,Result,HeadDefCode,HeadCode):- atom(Rest),!,
+      expand_function_head(Ctx,Env,[Fn,A,B,'&rest',Rest],Head,ZippedArgEnv,Result,HeadDefCode,HeadCode),!.
+expand_function_head(Ctx,Env,[Fn,A,B,C|Rest],Head,ZippedArgEnv,Result,HeadDefCode,HeadCode):- atom(Rest),!,
+      expand_function_head(Ctx,Env,[Fn,A,B,C,'&rest',Rest],Head,ZippedArgEnv,Result,HeadDefCode,HeadCode),!.
+
 % eval Odd Head
 expand_function_head(Ctx,Env,FN, Head, ZippedArgEnv, Result,HeadDefCode,HeadCode):- 
   \+ is_list(FN),!,
   expand_function_head(Ctx,Env,[FN], Head, ZippedArgEnv, Result,HeadDefCode,HeadCode).
+
 
 % eval_uses_exact
 expand_function_head(Ctx,Env,[FN | FormalParms],Head,ZippedArgEnv, Result,HeadDefCode,(HeadCode)):-

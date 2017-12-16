@@ -26,6 +26,7 @@ do_or_die(G):- G->true;throw(do_or_die(G)).
 
 
 f_sys_set_symbol_value(Var,Val,Val):- set_opv(Var,value,Val).
+f_sys_set_symbol_value(Var,Val):- set_opv(Var,value,Val).
 cl_set(Var,Val,Val):- rtrace(set_opv(Var,value,Val)).
 
 
@@ -134,16 +135,17 @@ f_sys_put(Symbol,Prop,Value,Ret):- f_u_put(Symbol,Prop,Value,Ret).
 
 nth_value(Optionals,N,Default,Value):- nth1(N,Optionals,Value)->true;Default=Value.
 
-get_plist_value([Prop,Value|_],Prop,_Default,Value):-!.
-get_plist_value([_,_|PList],Prop,Default,Value):- !, get_plist_value(PList,Prop,Default,Value).
-get_plist_value([],_Prop,Default,Default).
+get_plist_value([Prop,Value|_],Prop,Value):-!.
+get_plist_value([_,_|PList],Prop,Value):- !, get_plist_value(PList,Prop,Value).
+get_plist_value(PList,Prop,_Default,Value):- get_plist_value(PList,Prop,Value),!.
+get_plist_value(_,_Prop,Default,Default).
+
 
 set_plist_value(Old,[Prop|CDR],Prop,Value):- !,arg(1,CDR,Old),nb_setarg(1,CDR,Value),!.
 set_plist_value(Old,[_,_,Next|PList],Prop,Value):- !, set_plist_value(Old,[Next|PList],Prop,Value).
 %set_plist_value(Old,[Next|PList],Prop,Value):-
   
 cl_symbol_plist(Symbol,Value):- assertion(is_symbolp(Symbol)),get_opv(Symbol,plist,Value)->true;Value=[].
-
 
 
 

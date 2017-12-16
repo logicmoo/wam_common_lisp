@@ -36,6 +36,8 @@ is_consp(Obj):- nonvar(Obj),Obj=[_|_].
 
 %:- dynamic(op_replacement/2).
 wl:op_replacement(first,cl_car).
+f_ext_pf_car(List, Result):-cl_car(List, Result).
+cl_first(List, Result):-cl_car(List, Result).
 cl_car(List, Result):- 
   (List = [Result|_] -> true;
   (List==[] -> Result=[];
@@ -43,17 +45,23 @@ cl_car(List, Result):-
 		throw(ErrNo)))).
 
 wl:op_replacement(rest,cl_cdr).
+wl:op_replacement(ext_pf_cdr,cl_cdr).
+f_ext_pf_cdr(List, Result):-cl_cdr(List, Result).
+f_u_pf_cdr(List, Result):-cl_cdr(List, Result).
 cl_cdr(List, Result):- List==[]->Result=[];
 	once( (	List = [_|Result]
 	    ;	error(rest_not_cons, ErrNo, _),
 		throw(ErrNo)	)).
 
+f_u_pf_cddr(A,C):-f_u_pf_cdr(A,B),f_u_pf_cdr(B,C).
 
 wl:op_replacement(setcar,cl_rplaca).
+wl:init_args(exact_only,cl_rplaca).
 cl_rplaca(Cons,Obj,Cons):- nb_setarg(1,Cons,Obj).
 f_sys_set_car(A,B,C):-cl_rplaca(A,B,C).
 
-wl:op_replacement(setcdr,cl_rplacd).
+%wl:op_replacement(setcdr,cl_rplacd).
+wl:init_args(exact_only,cl_rplacd).
 cl_rplacd(Cons,Obj,Cons):- nb_setarg(2,Cons,Obj).
 f_sys_set_cdr(A,B,C):-cl_rplacd(A,B,C).
 
@@ -74,9 +82,31 @@ wl:init_args(0,cl_list).
 cl_list(List,List).
 
 
+
+
+%rassoc item alist &key key test test-not => entry
+wl:init_args(2,cl_rassoc).
+cl_rassoc(Item,AList,Options,RetVal):- 
+  get_test_pred(Options,EqlPred),
+  get_identiy_pred(Options,kw_key,Ident),  
+  member([K|V],AList),call(EqlPred,Item,V,R)->R\==[],!,
+  call(Ident,[K|V],RetVal).
+cl_rassoc(_,_,_,[]).
+
+wl:init_args(2,cl_assoc).
+cl_assoc(Item,AList,Options,RetVal):- 
+  
+  get_test_pred(Options,EqlPred),
+  get_identiy_pred(Options,kw_key,Ident),  
+  member([K|V],AList),call(EqlPred,Item,K,R)->R\==[],!,
+  call(Ident,[K|V],RetVal).
+cl_assoc(_,_,_,[]).
+
 % assoc item alist
+  /*
 cl_assoc(Key,List,KV):- member(KV,List),KV=[Key|_],!.
 cl_assoc(_Key,_List,[]).
+*/
 
 cl_lisp_not(Boolean, Result):-
 		Boolean = []
@@ -98,6 +128,7 @@ cl_and(Bool1, Bool2, Result):-
 
 */
 cl_second(List,R):- List=[_,R|_]->true;R=[].
+f_ext_pf_cadr(List,R):- List=[_,R|_]->true;R=[].
 cl_cadr(List,R):- List=[_,R|_]->true;R=[].
 
 
@@ -340,13 +371,79 @@ make_accessor(cddddr).
 (cdddar x)      (cdr (cdr (cdr (car x))))        
 (cddddr x)      (cdr (cdr (cdr (cdr x))))  
 
+./xabcl/assoc.lisp:(defun rassoc-if-not (predicate alist &key key)
+./nonwamcl/rcyc/cynd/sublisp-cl.lisp:(define-caller-pattern rassoc-if-not (fn form &key pbody) :lisp)
+./nonwamcl/rcyc/cycl/list-utilities.lisp:(define rassoc-if-not (predicate alist)
+./nonwamcl/ccl/lib/lists.lisp:(defun rassoc-if-not (predicate alist &key key)
+./nonwamcl/ccl/lib/.svn/text-base/lists.lisp.svn-base:(defun rassoc-if-not (predicate alist &key key)
+./nonwamcl/sbcl/src/code/list.lisp:(defun rassoc-if-not (predicate alist &key key)
+./nonwamcl/eclipse-lisp/lisp/alist.lisp:(defun RASSOC-IF-NOT (predicate a-list &key key)
+./nonwamcl/com-informatimago/common-lisp/lisp/cl-definition.lisp:(declare-function RASSOC-IF-NOT ())
+./nonwamcl/SICL/Code/Cons/rassoc-if-not-defun.lisp:(defun rassoc-if-not (predicate alist &key key)
+./nonwamcl/SICL/Code/Cons-high/cons-high.lisp:(defun rassoc-if-not (predicate alist &key key)
+./nonwamcl/t/reference/lisp_8500/init5000.lisp:  (defun rassoc-if-not (predicate alist &rest rest)
+./nonwamcl/t/reference/lisp_8500/init5000lite.lisp:  (defun rassoc-if-not (predicate alist &rest rest)
+./nonwamcl/t/reference/lisp_8500/init500.lisp:  (defun rassoc-if-not (predicate alist &rest rest)
+./nonwamcl/t/reference/lisp_8500/core800.lisp:  (defun rassoc-if-not (predicate alist &rest rest)
+./nonwamcl/slime/xref.lisp:(define-caller-pattern rassoc-if-not (fn form &key (:star form)) :lisp)
+./nonwamcl/com-informatimago_common-lisp_lisp/cl-definition.lisp:(declare-function RASSOC-IF-NOT ())
+./nonwamcl/dwim.hu/hu.dwim.delico/source/interpreter/common-lisp-cc.lisp:(redefun/cc rassoc-if-not (predicate alist &key key)
+./nonwamcl/ecl-mirror/src/cmp/proclamations.lsp:(proclamation rassoc-if-not (function-designator association-list &key) t)
+./nonwamcl/ecl-mirror/src/lsp/listlib.lsp:(defun rassoc-if-not (test alist &key key)
+./xlisp500/wam-cl-init2.lisp:  (defun rassoc-if-not (predicate alist &rest rest)
+./emacs-cl/cl-conses.el:(cl:defun RASSOC-IF-NOT (predicate alist &KEY KEY)
+./reference/pjb-cl-definition.lisp:(declare-function RASSOC-IF-NOT ())
+./reference/xref-patterns.lisp:(data-assrt :define-caller-pattern rassoc-if-not (fn form &key (:star form)) :lisp)
+
 
 symbol_info(Sym,P,function,O),symbol_info(Sym,P,function_type,FT),symbol_info(Sym,P,name,Name),
   format('~N% ~w (~w ~w)~n~q(A,Result):- ...\n\n',[Name,FT,P, O]),nl,fail.
 
-*/      
-
-
-
+*/  
 :- fixup_exports.
+
+end_of_file.
+
+Warning: cl_minusp/2, which is referenced by
+Warning:        1-st clause of f_u_yfor/4: 1-st clause of f_u_yfor/4
+
+
+
+Warning: cl_acons/4, which is referenced by
+Warning:        1-st clause of f_u_record_in_loop_alist/3: 1-st clause of f_u_record_in_loop_alist/3
+Warning: cl_char/3, which is referenced by
+Warning:        1-st clause of f_u_string_head/2: 1-st clause of f_u_string_head/2
+Warning: cl_fifth/2, which is referenced by
+Warning:        1-st clause of f_u_yfor/4: 1-st clause of f_u_yfor/4
+Warning: cl_fourth/2, which is referenced by
+Warning:        1-st clause of f_u_decr/5: 1-st clause of f_u_decr/5
+Warning:        1-st clause of f_u_incr/5: 1-st clause of f_u_incr/5
+Warning: cl_nsublis/3, which is referenced by
+Warning:        1-st clause of f_u_substitute_loop_return/3: 1-st clause of f_u_substitute_loop_return/3
+Warning: cl_numberp/2, which is referenced by
+Warning:        1-st clause of f_u_decr/5: 1-st clause of f_u_decr/5
+Warning:        1-st clause of f_u_incr/5: 1-st clause of f_u_incr/5
+Warning: cl_rassoc/3, which is referenced by
+Warning:        1-st clause of f_u_add_element_to_end_of_loop_alist/3: 1-st clause of f_u_add_element_to_end_of_loop_alist/3
+Warning:        1-st clause of f_u_add_element_to_loop_alist/3: 1-st clause of f_u_add_element_to_loop_alist/3
+Warning:        1-st clause of f_u_fetch_new_iteration_variable/1: 1-st clause of f_u_fetch_new_iteration_variable/1
+Warning:        1-st clause of f_u_fetch_old_iteration_variable/1: 1-st clause of f_u_fetch_old_iteration_variable/1
+Warning:        1-st clause of f_u_iteration_variable_exists_p/1: 1-st clause of f_u_iteration_variable_exists_p/1
+Warning:        1-st clause of f_u_substitute_iteration_variable/2: 1-st clause of f_u_substitute_iteration_variable/2
+Warning:        1-st clause of f_u_yloop/2: 1-st clause of f_u_yloop/2
+Warning: cl_remove/3, which is referenced by
+Warning:        1-st clause of f_u_substitute_iteration_variable/2: 1-st clause of f_u_substitute_iteration_variable/2
+Warning: cl_subst/4, which is referenced by
+Warning:        1-st clause of f_u_define_and_rename_loop_locals/5: 1-st clause of f_u_define_and_rename_loop_locals/5
+Warning:        1-st clause of f_u_substitute_iteration_variable/2: 1-st clause of f_u_substitute_iteration_variable/2
+Warning: cl_third/2, which is referenced by
+Warning:        1-st clause of f_u_yfor/4: 1-st clause of f_u_yfor/4
+Warning: f_u_add_elements_to_clause/4, which is referenced by
+Warning:        1-st clause of f_u_yfor/4: 1-st clause of f_u_yfor/4
+Warning: f_u_result/2, which is referenced by
+Warning:        1-st clause of f_u_maximize/2: 1-st clause of f_u_maximize/2
+Warning: f_u_ydo/3, which is referenced by
+Warning:        1-st clause of f_u_walkcdr/3: 1-st clause of f_u_walkcdr/3
+Warning: f_u_yloop/4, which is referenced by
+Warning:        1-st clause of f_u_walkcdr/3: 1-st clause of f_u_walkcdr/3
 

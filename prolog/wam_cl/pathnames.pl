@@ -24,7 +24,8 @@ cl_make_pathname(I,O):- cl_make_instance([claz_pathname|I],O).
 wl:init_args(1,cl_compile_file_pathname).
 cl_compile_file_pathname(OSFile,Keys,PLFileOut):-
    F = kw_output_file,
-   kw_obtain_value_else_p(Keys,F,sys_output_file, 
+    env_current(Env),
+   kw_obtain_value_else_p(Env,Keys,F,sys_output_file, 
      PLFile, pl_compiled_filename(OSFile,PLFile), _Present),
    to_lisp_pathname(PLFile,PLFileOut).
 
@@ -53,6 +54,7 @@ pl_compiled_filename0(File,PL):- get_var(sys_xx_compile_file_type_xx,Ext),
 
 
 to_prolog_pathname(Cmp,Out):- compound(Cmp),Cmp='$OBJ'(claz_pathname,S),!,always(to_prolog_pathname(S,Out)).
+to_prolog_pathname(Ref,Ref):- atom(Ref),!.
 to_prolog_pathname(Ref,O):- is_pathnamep(Ref),get_opv(Ref,name,V),!,always(show_call_trace(to_prolog_pathname(V,O))).
 to_prolog_pathname(Str,O):- is_stringp(Str),!,string_to_prolog_atom(Str,O).
 to_prolog_pathname(Obj,PL):- string_to_prolog_atom(Obj,PL).
@@ -102,8 +104,8 @@ string_to_prolog_atom(TXT,A):- to_prolog_string_anyways(TXT,T),!,always((text_to
 %string_to_prolog_atom(TXT,A):- always((text_to_string(TXT,S),atom_string(A,S))),!.
 
 with_fstem(Path,File,Found):-   
-   notrace(check_file_types(SearchTypes)),!,
-   notrace(found_strem(Path,File,[''|SearchTypes],Found)),!.
+   check_file_types(SearchTypes),!,
+   found_strem(Path,File,[''|SearchTypes],Found),!.
 
 found_strem(Path0,File0,SearchTypes,Found):- 
    to_prolog_pathname(Path0,Path),!, to_prolog_pathname(File0,File),    !,

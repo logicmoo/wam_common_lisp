@@ -26,7 +26,7 @@
              (eq (car name) 'setf)))
 */
 % asserting... u
-wl:arglist_info(f_sys_setf_function_name_p, [sys_name], [Name_Param], arginfo{all:[sys_name], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_name], opt:0, req:[sys_name], rest:0, whole:0}).
+wl:arglist_info(f_sys_setf_function_name_p, [sys_name], [_Name_Param], arginfo{all:[sys_name], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_name], opt:0, req:[sys_name], rest:0, whole:0}).
 % asserting... u
 wl:init_args(exact_only, f_sys_setf_function_name_p).
 % asserting... u
