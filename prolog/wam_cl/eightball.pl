@@ -125,7 +125,20 @@ is_user_output:- current_output(O),stream_property(CO,alias(user_output)),!,CO==
 both_outputs(G):-
   (is_user_output -> G ; (with_output_to(user_output,G),G)).
 
-asserta_tracked(_Tracker,G):- asserta_new(G).
+assert_lsp(G):- assert_lsp(u,G).
+% assert_lsp(Symbol,G)
+assert_lsp(_,G):-  notrace((copy_term_nat(G,GG),assert_local(GG))).
+assert_local(user:G):-!,assert_local(G).
+assert_local(user:G:-B):-!,assert_local(G:-B).
+assert_local(G:-B):- B==true,!,assert_local(G).
+assert_local(G):- assert_local0(G).
+
+assert_local0(G):- \+ \+ (clause_asserted_local(G,_)),!.
+assert_local0(G):- doall((clause_asserted_local(G,E),erase(E),fail)),!,user:asserta(G),!.
+
+clause_asserted_local((H:-_),R):-!, clause(H,_,R).
+clause_asserted_local(H,R):- clause(H,true,R).
+
 
 colormsg1(Msg,Args):- mesg_color(Msg,Ctrl),!,ansicall_maybe(Ctrl,format(Msg,Args)).
 %colormsg1(Msg):- writeq(Msg),nl,nl,!. %notrace(colormsg11(Msg)).
@@ -142,15 +155,17 @@ dbmsg_real(X):- notrace(both_outputs(dbmsg0(X))),!.
 in_comment(X):- notrace(setup_call_cleanup(write('/* '),(X),writeln(' */'))).
 
 % is_assert_op(_,_):-!,fail.
-is_assert_op(A,_,_):- \+ compound(A),!,fail.
-is_assert_op(M:I,W,M:O):- !, is_assert_op(I,W,O).
-is_assert_op(asserta_tracked(W,P),W,P).
-is_assert_op(assertz(P),u,P).
-is_assert_op(asserta(P),u,P).
-is_assert_op(assert_if_new(P),u,P).
-is_assert_op(asserta_if_new(P),u,P).
-is_assert_op(asserta_new(P),u,P).
-is_assert_op(assert(P),u,P).
+is_assert_op(A,B,C):- notrace(is_assert_op0(A,B,C)),!.
+is_assert_op0(A,_,_):- \+ compound(A),!,fail.
+is_assert_op0(M:I,W,M:O):- !, is_assert_op0(I,W,O).
+is_assert_op0(assert_lsp(W,P),W,P).
+is_assert_op0(assertz(P),u,P).
+is_assert_op0(asserta(P),u,P).
+is_assert_op0(assert_lsp(P),u,P).
+is_assert_op0(asserta_if_new(P),u,P).
+is_assert_op0(assert_if_new(P),u,P).
+is_assert_op0(asserta_new(P),u,P).
+is_assert_op0(assert(P),u,P).
 
 fmt99(O):- make_pretty(O,P),fmt999(P),!.
 
@@ -197,11 +212,11 @@ dbmsg_assert0(Where,user:H :- Body):- !,dbmsg_assert0(Where,(H :- Body)),!.
 %dbmsg_assert0(Where,M:Body:- (true,[])):-!,colormsg1("\n% asserting fact...\n"),!,colormsg1(M:Body),!.
 dbmsg_assert0(Where,(Head:-Body)):- Body==true,!, dbmsg_assert0(Where,(Head)).
 dbmsg_assert0(Where,(Head:-Body)):- !, colormsg1("\n% asserting... ~w ",[Where]),!,colormsg1(Head:-Body),!,
-   asserta_if_new(Head:-Body),
-   asserta_if_new(pass_clause(Where,Head,Body)).
+   assert_lsp(Head:-Body),
+   assert_lsp(pass_clause(Where,Head,Body)),!.
 dbmsg_assert0(Where,Head):- !, colormsg1("\n% asserting1... ~w ",[Where]),!,fmt99(Head),!,
-   asserta_if_new(Head),
-   asserta_if_new(pass_clause(Where,Head,true)).
+   assert_lsp(Head),
+   assert_lsp(pass_clause(Where,Head,true)),!.
    
 /*
 dbmsg_assert(Where,Body):-  
@@ -209,7 +224,7 @@ dbmsg_assert(Where,Body):-
   (Body==Cleaned-> true;
    (colormsg1("\n% cleanup... ~w ",[Where]),!,colormsg1(Cleaned)),
    (colormsg1("\n% asserting... ~w ",[Where]),!,colormsg1(Body))),!,
-    asserta_if_new(Body),!.
+    assert_lsp(Body),!.
 */
 
 

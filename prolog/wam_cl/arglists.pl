@@ -390,8 +390,8 @@ expand_function_head(Ctx,Env,[FN | FormalParms],Head,ZippedArgEnv, Result,HeadDe
    (eval_uses_exact(FN) ; \+ (member(Mode,FormalParms), \+ simple_atom_var(Mode))),!,
    %debug_var('NilRestNKeys',RestNKeys), 
        function_head_params(Ctx,Env,FormalParms,ZippedArgEnv,_RestNKeys,Whole,RequiredArgs,ArgInfo,_Names,_PVars,HeadCode),
-               HeadDefCode = (assert_if_new(wl:arglist_info(FN,FormalParms,RequiredArgs,ArgInfo)),!,
-                 assert_if_new(wl:init_args(exact_only,FN))),
+               HeadDefCode = (assert_lsp(wl:arglist_info(FN,FormalParms,RequiredArgs,ArgInfo)),!,
+                 assert_lsp(wl:init_args(exact_only,FN))),
                always(HeadDefCode),
        Whole = RequiredArgs,            
        append(RequiredArgs, [Result], HeadArgs),
@@ -404,8 +404,8 @@ expand_function_head(Ctx,EnvIO,[FN | FormalParms],Head,ZippedArgEnv, Result,Head
    debug_var('PBRestNKeys',RestNKeys),
    always((function_head_params(Ctx,EnvIO,FormalParms,ZippedArgEnv,RestNKeys,Whole,RequiredArgs,ArgInfo,_Names,_PVars,
      HeadCodeIgnored), slow_trace,
-               HeadDefCode = (assert_if_new(wl:arglist_info(FN,FormalParms,RequiredArgs,ArgInfo)),
-                assert_if_new(wl:init_args(bind_parameters,FN))),
+               HeadDefCode = (assert_lsp(wl:arglist_info(FN,FormalParms,RequiredArgs,ArgInfo)),
+                assert_lsp(wl:init_args(bind_parameters,FN))),
                always(HeadDefCode),   
    debug_var('BinderCode',BindCode),
    debug_var('Whole',Whole), 
@@ -417,14 +417,14 @@ expand_function_head(Ctx,EnvIO,[FN | FormalParms],Head,ZippedArgEnv, Result,Head
    Head =.. [FN , Whole, Result ])).
 
 % align_args_local
-expand_function_head(Ctx,EnvIO,[FN | FormalParms],Head,ZippedArgEnv, Result,(HeadDefCode,assert_if_new(Used)),
+expand_function_head(Ctx,EnvIO,[FN | FormalParms],Head,ZippedArgEnv, Result,(HeadDefCode,assert_lsp(Used)),
   HeadCodeOut):-
    debug_var('RestNKeys',RestNKeys),
    always((function_head_params(Ctx,EnvIO,FormalParms,ZippedArgEnv,RestNKeys,Whole,RequiredArgs,ArgInfo,_Names,_PVars,HeadCode),
-   HeadDefCode = (assert_if_new(wl:arglist_info(FN,FormalParms,RequiredArgs,ArgInfo))),
+   HeadDefCode = (assert_lsp(wl:arglist_info(FN,FormalParms,RequiredArgs,ArgInfo))),
    always(HeadDefCode),
    align_args_local(FN,RequiredArgs,RestNKeys,Whole,Result,LB,ArgInfo,HeadArgs,Used),!,  
-   assert_if_new(Used:-true),
+   assert_lsp(Used:-true),
    HeadCodeOut = (LB,HeadCode),   
    Head =.. [FN | HeadArgs])).
 

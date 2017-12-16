@@ -41,7 +41,7 @@ cl_use_package(Package,CurrentPackage, R):-
   CurrentPackage0\==CurrentPackage,!,
   cl_use_package(Package,CurrentPackage0, R).
 cl_use_package(Package,CurrentPackage, t):- 
-   asserta_if_new(package_use_list(CurrentPackage,Package)),
+   assert_lsp(package_use_list(CurrentPackage,Package)),
    dmsg(todo(check_for+package_symbolconflicts(package_use_list(CurrentPackage,Package)))).
 
  
@@ -111,19 +111,19 @@ cl_import(Symbol,Pack,t):-
    package_import_symbol_step2(Package,Symbol,String,OldSymbol,IntExt).
 
 package_import_symbol_step2(Package,Symbol,String,_OldSymbol,'$missing'):-
-   assert_if_new(package:package_internal_symbols(Package,String,Symbol)).
+   assert_lsp(package:package_internal_symbols(Package,String,Symbol)).
 package_import_symbol_step2(_Package,Symbol,_String,OldSymbol,_IntExt):- Symbol == OldSymbol,!.
 package_import_symbol_step2(Package,Symbol,String,OldSymbol,kw_iherited):-
-   assert_if_new(package:package_shadowing_symbols(Package,OldSymbol)),
-   assert_if_new(package:package_internal_symbols(Package,String,Symbol)).
+   assert_lsp(package:package_shadowing_symbols(Package,OldSymbol)),
+   assert_lsp(package:package_internal_symbols(Package,String,Symbol)).
 package_import_symbol_step2(Package,Symbol,String,OldSymbol,kw_external):-
    retract(package:package_external_symbols(Package,String,OldSymbol)),
-   assert_if_new(package:package_shadowing_symbols(Package,OldSymbol)),
-   assert_if_new(package:package_internal_symbols(Package,String,Symbol)).
+   assert_lsp(package:package_shadowing_symbols(Package,OldSymbol)),
+   assert_lsp(package:package_internal_symbols(Package,String,Symbol)).
 package_import_symbol_step2(Package,Symbol,String,OldSymbol,kw_internal):-
    retract(package:package_internal_symbols(Package,String,OldSymbol)),
-   assert_if_new(package:package_shadowing_symbols(Package,OldSymbol)),
-   assert_if_new(package:package_internal_symbols(Package,String,Symbol)).
+   assert_lsp(package:package_shadowing_symbols(Package,OldSymbol)),
+   assert_lsp(package:package_internal_symbols(Package,String,Symbol)).
 
 
 
@@ -136,19 +136,19 @@ cl_export(Symbol,Pack,t):-
    package_export_symbol_step2(Package,Symbol,String,OldSymbol,IntExt).
 
 package_export_symbol_step2(Package,Symbol,String,_OldSymbol,'$missing'):-
-   assert_if_new(package:package_external_symbols(Package,String,Symbol)).
+   assert_lsp(package:package_external_symbols(Package,String,Symbol)).
 package_export_symbol_step2(_Package,Symbol,_String,OldSymbol,kw_exported):- Symbol == OldSymbol,!.
 package_export_symbol_step2(Package,Symbol,String,OldSymbol,kw_inheritied):-
-   assert_if_new(package:package_shadowing_symbols(Package,OldSymbol)),
-   assert_if_new(package:package_external_symbols(Package,String,Symbol)).
+   assert_lsp(package:package_shadowing_symbols(Package,OldSymbol)),
+   assert_lsp(package:package_external_symbols(Package,String,Symbol)).
 package_export_symbol_step2(Package,Symbol,String,OldSymbol,kw_external):-
    retract(package:package_external_symbols(Package,String,OldSymbol)),
-   assert_if_new(package:package_shadowing_symbols(Package,OldSymbol)),
-   assert_if_new(package:package_external_symbols(Package,String,Symbol)).
+   assert_lsp(package:package_shadowing_symbols(Package,OldSymbol)),
+   assert_lsp(package:package_external_symbols(Package,String,Symbol)).
 package_export_symbol_step2(Package,Symbol,String,OldSymbol,kw_internal):-
    retract(package:package_internal_symbols(Package,String,OldSymbol)),
-   assert_if_new(package:package_shadowing_symbols(Package,OldSymbol)),
-   assert_if_new(package:package_external_symbols(Package,String,Symbol)).
+   assert_lsp(package:package_shadowing_symbols(Package,OldSymbol)),
+   assert_lsp(package:package_external_symbols(Package,String,Symbol)).
 
 
 cl_unexport(Symbol,Result):- reading_package(Package),cl_unexport(Symbol,Package,Result).
@@ -163,7 +163,7 @@ package_unexport_symbol_step2(_Package,Symbol,_String,OldSymbol,kw_internal):- O
 package_unexport_symbol_step2(_Package,_Symbol,_String,_OldSymbol,'$missing'):-!.
 package_unexport_symbol_step2(Package,Symbol,String,OldSymbol,_):-
    retract(package:package_external_symbols(Package,String,OldSymbol)) -> 
-     assert_if_new(package:package_external_symbols(Package,String,Symbol));
+     assert_lsp(package:package_external_symbols(Package,String,Symbol));
      true.
 
 
@@ -181,7 +181,7 @@ package_shadow_symbol_step2(_Package,_String,_OldSymbol,kw_internal).
 package_shadow_symbol_step2( Package,String,_OldSymbol,'$missing'):-
    make_fresh_internal_symbol(Package,String,_Symbol).
 package_shadow_symbol_step2(Package,String,OldSymbol,kw_inherited):-
-   assert_if_new(package:package_shadowing_symbols(Package,OldSymbol)),
+   assert_lsp(package:package_shadowing_symbols(Package,OldSymbol)),
    make_fresh_internal_symbol(Package,String,_Symbol).
 
 
@@ -190,7 +190,7 @@ make_fresh_internal_symbol(pkg_kw,String,Symbol):- !, create_keyword(String,Symb
 make_fresh_internal_symbol(Package,String,Symbol):- 
    ignore(symbol_case_name(String,Package,Symbol)),
    create_symbol(String,Package,Symbol),
-   assert_if_new(package:package_internal_symbols(Package,String,Symbol)).
+   assert_lsp(package:package_internal_symbols(Package,String,Symbol)).
 
 
 

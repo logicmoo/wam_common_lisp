@@ -45,11 +45,7 @@ compound_starts_with(More,_):- \+ compound(More),!,fail.
 compound_starts_with(A,A):-!.
 compound_starts_with((A,_),B):- compound(A),A=B.
 
-skip_type_checks(asserta(_)).
-skip_type_checks(assert_if_new(_)).
-skip_type_checks(asserta_tracked(_,_)).
-skip_type_checks(assertz(_)).
-skip_type_checks(assert(_)).
+skip_type_checks(X):-is_assert_op(X,_,_).
 
 add_type_checks(_Ctx,Some,Some):- \+ compound(Some),!.
 add_type_checks(_Ctx,Some,Some):- skip_type_checks(Some),!.

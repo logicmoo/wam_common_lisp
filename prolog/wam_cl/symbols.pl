@@ -116,7 +116,7 @@ create_keyword(Name,Symbol):- atom_concat_or_rtrace(':',Make,Name),!,create_keyw
 create_keyword(Name,Symbol):- string_upper(Name,String),
    prologcase_name(String,Lower),
    atom_concat_or_rtrace('kw_',Lower,Symbol),
-   assert_if_new(package:package_external_symbols(pkg_kw,String,Symbol)).
+   assert_lsp(package:package_external_symbols(pkg_kw,String,Symbol)).
 
 
 

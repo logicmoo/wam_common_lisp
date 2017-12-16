@@ -39,6 +39,8 @@ body_cleanup_keep_debug_vars_fuller(Ctx,CodeSt,Code5a):-!,
 
 %body_cleanup_full(Ctx,CodeSt,CodeOutNow):- body_cleanup_keep_debug_vars_fuller(Ctx,CodeSt,CodeOutNow),!.
 
+body_cleanup_full(_Ctx,CodeSt,CodeOutNow):- var(CodeSt),!,CodeOutNow=CodeSt.
+%body_cleanup_full(Ctx,:- CodeSt,:- CodeOutNow):-!,body_cleanup_full(Ctx,CodeSt,CodeOutNow).
 body_cleanup_full(Ctx,CodeSt,CodeOutNow):- 
  always((   
   %show_ctx_info(Ctx),
@@ -74,21 +76,20 @@ fast_get_sets(Ctx,F,(C1,C2),Joined):- conjoinment(C1,C2,C3),C3\==(C1,C2),!,fast_
 fast_get_sets(Ctx,_F,C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(fast_get_sets(Ctx,F),C1O,C2O),C2=..[F|C2O].
 fast_get_sets(_Ctx,_,Code5,Code5).
 
-non_compound_code(NC):- \+ callable(NC),!.
-non_compound_code(NC):- \+ compound(NC),!.
-non_compound_code(NC):- is_dict(NC),!.
-non_compound_code(NC):- is_self_evaluating_object(NC),!.
+non_compound_code(NC):-notrace(non_compound_code0(NC)).
+non_compound_code0(NC):- \+ callable(NC),!.
+non_compound_code0(NC):- \+ compound(NC),!.
+non_compound_code0(NC):- is_dict(NC),!.
+non_compound_code0(NC):- is_self_evaluating_object(NC),!.
 
-skip_optimize(Var):-var(Var),!.
 skip_optimize(NC):- non_compound_code(NC),!.
-skip_optimize(NC):- is_dict(NC),!.
-skip_optimize(NC):- is_self_evaluating_object(NC),!.
-skip_optimize([_|_]):-!.
-skip_optimize(_:P):-!,skip_optimize(P).
-skip_optimize(P):- functor(P,F,_),atom_concat_or_rtrace('$',_,F).
-skip_optimize(retractall(_)).
-skip_optimize(retract(_)).
-skip_optimize(erase(_)).
+skip_optimize(NC):-notrace(skip_optimize0(NC)).
+skip_optimize0([_|_]):-!.
+skip_optimize0(_:P):-!,skip_optimize(P).
+skip_optimize0(P):- functor(P,F,_),atom_concat_or_rtrace('$',_,F).
+skip_optimize0(retractall(_)).
+skip_optimize0(retract(_)).
+skip_optimize0(erase(_)).
 
 
 always_true(G):- \+ ground(G),fail.
@@ -101,7 +102,6 @@ functor_arg_is_body(F,_):- atom_concat_or_rtrace(assert,_,F).
 functor_arg_is_body(((:-)),1).
 
 %oper_mize(_Whole,_Ctx,_,Code,Code):-!.
-oper_mize(_Whole,_Ctx,_,Code,Out):- non_compound_code(Code),!,Out=Code.
 oper_mize(_Whole,_Ctx,_,Code,Out):- skip_optimize(Code),Out=Code.
 %oper_mize(_Whole,Ctx,F,(:-C1),(:-C2)):-!, oper_mize(C1,Ctx,F,C1,C2).
 
@@ -317,7 +317,7 @@ mize_body2(_Ctx,_F,InOut,InOut).
 mize_body_2e(_Ctx,_,C1,C1):- non_compound_code(C1),!.
 mize_body_2e(_,_,In,ITE):- structure_applies(In,(ITE,R=V)), var(R),var(V),ifthenelse(ITE),R=V.
 %mize_body_2e(_Ctx,_,(S1=V,R=S2,B),(R=V,B)):- trace, var(S1),S1==S2.
-mize_body_2e(_Ctx,_,(S1=V,R=S2),(R=V)):- var(S1),S1==S2,(var(R);var(V)),S2='$error'.
+mize_body_2e(_Ctx,_,(S1=V,R=S2),(R=V)):- var(S1),S1==S2,(var(R);var(V)),S2='$error_this_was_eliminated'.
 mize_body_2e(_Ctx,_,t_or_nil(G, R),G):- R==t.
 mize_body_2e(_Ctx,_,t_or_nil(G, R),\+ G):- R==[].
 mize_body_2e(_Ctx,_,(t_or_nil(G, R),(R \==[]-> B ; C)),(G->B;C)):- var(R).
@@ -378,33 +378,24 @@ inline_operation(Never,Ctx,FF,(MH:-C1),(MH:-C2)):-
    inline_body([F/A|Never],Ctx,FF,C1,C2).
 
 
-inline_operation(Never,Ctx,FF,(asserta(MH:-C1)),Wrapper):- 
-   strip_module(MH,_,H),
-   functor(H,F,A),
-   %tabling:rename_term(H,HH),  
-   %wdmsg(Wrapper),
-   %always(ensure_tabled(M,H)),
-   inline_body([F/A|Never],Ctx,FF,C1,C2),
-   Wrapper = asserta(MH :- C2).
+inline_operation(Never,Ctx,FF,A,Wrapper):-
+    is_assert_op(A,Where,MH:-C1), 
+    strip_module(MH,_,H),
+    functor(H,F,A),
+    inline_body([F/A|Never],Ctx,FF,C1,C2),
+    Wrapper = assert_lsp(Where,(MH :- C2)).
 
-inline_operation(Never,Ctx,FF,(asserta_tracked(P,MH:-C1)),Wrapper):- 
-   strip_module(MH,_,H),
-   functor(H,F,A),
-   %tabling:rename_term(H,HH),  
-   %wdmsg(Wrapper),
-   %always(ensure_tabled(M,H)),
-   inline_body([F/A|Never],Ctx,FF,C1,C2),
-   Wrapper = asserta_tracked(P,MH :- C2).
-
-
-% asserta_tracked/ (:- / 1)
+% assert_lsp/ (:- / 1)
 inline_operation(Never,Ctx,FF,PAB,Conjs):- PAB=..[F,C1|Rest],
     functor(PAB,F,A),functor_arg_is_body(F,A),!,
     inline_operation(Never,Ctx,FF,C1,C2),
     do_conjs(F,C2,Rest,Conjs).
 
+%inline_operation(_Never,_Ctx,_,C1,C1):-!.
+inline_operation(Never,Ctx,FF,(:-C1),(:-C2)):-!,
+   inline_body(Never,Ctx,FF,C1,C2),!.
 inline_operation(_Never,_Ctx,_,C1,C1):-!.
-inline_operation(_,_,_,C1,C1).
+
 
 
 progress_g(G):- copy_term(G,GG),del_attrs_of(GG,dif),GG.
@@ -413,7 +404,7 @@ ensure_tabled(M,H):-
  M:(
   (use_module(library(tabling))),
   (multifile('$tabled'/1)),
-  %(dynamic('$tabled'/1)),asserta_tracked(M:'$tabled'(H)),
+  %(dynamic('$tabled'/1)),assert_lsp(M:'$tabled'(H)),
   (multifile('$table_mode'/3)),
   (multifile('$table_update'/4)),
   
@@ -434,12 +425,13 @@ stay_all_different_vars([X|Vars]):- maplist(dif(X),Vars),stay_all_different_vars
 
 %inline_body(_,_,_,C1,C1).
 inline_body(_Never,_Ctx,_,C1,C1):- var(C1),!.
-inline_body(_Never,_Ctx,_,Code,Out):- \+ \+  skip_optimize(Code),!,Out=Code.
-%inline_body(Never,_Ctx,_,Code,Out):- compound(Code),functor(Code,F,N),member(F/N,Never),!,Out=Code.
-inline_body(Never,Ctx,FT,(M:Code:-Body),(M:Code:-Out)):- compound(Code),functor(Code,F,A),!,inline_body([F/A|Never],Ctx,FT,Body,Out).
+inline_body(Never,Ctx,FT,(:-Body),(:-Out)):- !, inline_body(Never,Ctx,FT,Body,Out).
 inline_body(Never,Ctx,FT,(A,B),(AA,BB)):-!,inline_body(Never,Ctx,FT,A,AA),inline_body(Never,Ctx,FT,B,BB).
 inline_body(Never,Ctx,FT,(A;B),(AA;BB)):-!,inline_body(Never,Ctx,FT,A,AA),inline_body(Never,Ctx,FT,B,BB).
 inline_body(Never,Ctx,FT,(A->B),(AA->BB)):-!,inline_body(Never,Ctx,FT,A,AA),inline_body(Never,Ctx,FT,B,BB).
+inline_body(_Never,_Ctx,_,Code,Out):- \+ \+  skip_optimize(Code),!,Out=Code.
+%inline_body(Never,_Ctx,_,Code,Out):- compound(Code),functor(Code,F,N),member(F/N,Never),!,Out=Code.
+inline_body(Never,Ctx,FT,(M:Code:-Body),(M:Code:-Out)):- compound(Code),functor(Code,F,A),!,inline_body([F/A|Never],Ctx,FT,Body,Out).
 
 inline_body(_Never,_Ctx,_,In,Out):- stay_all_different(In),simple_inline(In,Out),!.
 

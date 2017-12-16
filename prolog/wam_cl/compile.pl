@@ -30,7 +30,7 @@ lisp_compiled_eval(SExpression):-
 lisp_compiled_eval(SExpression,Result):-
   lquietly(as_sexp_interned(SExpression,Expression)),
   %dbmsg(lisp_compiled_eval(Expression)),
-  always(lisp_compile(Result,Expression,Code)),
+  always(lisp_compile(Result,Expression,Code)),  
   % dbmsg_cmt((lisp_compiled_eval(Expression):- Code)),
   (always((Code))),!.
 
@@ -57,6 +57,7 @@ lisp_compile(Env,Result,Expression,Body):-
 lisp_compile(Ctx,Env,Result,SExpression,Body):-
    quietly(as_sexp(SExpression,Expression)),
    always(compile_forms(Ctx,Env,Result,[Expression],Body)).
+   
 
 
 compile_forms(Ctx,Env,Result,FunctionBody,Code):-

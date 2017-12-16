@@ -40,12 +40,26 @@ compile_body_go_tagbody(_Ctx,Env,Result,[go,Label,TB], Code):- compute_new_addre
 compile_body_go_tagbody(_Ctx,Env,Result,[go,Label], Code):- local_override(tagbody_scope,TB),compute_new_address(TB,Label,Pred), debug_var("_GORES",Result),debug_var("GoEnv",Env),create_jump(TB,Label,Pred,Env,Code).
 
 
-add_context_code(_Ctx,Assertion):- user:asserta_if_new(Assertion),dbmsg_assert(u,(Assertion)),!.
-add_context_code(_Ctx,Assertion):- user:asserta_if_new(Assertion),dbmsg(:-asserta_if_new(Assertion)),!.
+add_context_code(_Ctx,Assertion):- !,dbmsg_real(:-assert_lsp(Assertion)).
+/*
+add_context_code(_Ctx,Assertion):- assert_lsp(Assertion),dbmsg(:-assert_lsp(Assertion)),!.
 add_context_code(Ctx,Assertion):- 
   always((
   (nb_current_value(Ctx,symbol,Symbol);(toplevel=Symbol)),
-  user:asserta_tracked(Symbol,Assertion),dbmsg_real(:-asserta_tracked(Symbol,Assertion)))),!.
+  user:assert_lsp(Symbol,Assertion),dbmsg_real(:-assert_lsp(Symbol,Assertion)))),!.*/
+
+compile_body_go_tagbody(Ctx,Env,[],[tagbody,Symbol| InstrSAll], Code):- 
+  atom(Symbol),
+  append(InstrS,[[go,Symbol]],InstrSAll),  
+  \+ contains_var(Symbol,InstrS),
+  \+ contains_var(go,InstrS),
+  gensym(addr_tagbody_,TB),gensym(addr_enter_,Label),
+  compile_tagbody(Ctx,Env,TB,[[go,Label],Label|InstrS],Clauses),
+  compute_new_address(TB,Label,Pred),
+  debug_var("TBEnv",Env),
+  create_jump(TB,Label,Pred,Env,Code),
+  maplist(add_context_code(Ctx),Clauses).
+
 % TAGBODY
 compile_body_go_tagbody(Ctx,Env,[],[tagbody| InstrS], Code):- 
   gensym(addr_tagbody_,TB),gensym(addr_enter_,Label),
@@ -54,7 +68,7 @@ compile_body_go_tagbody(Ctx,Env,[],[tagbody| InstrS], Code):-
   debug_var("TBEnv",Env),
   create_jump(TB,Label,Pred,Env,Code),
   maplist(add_context_code(Ctx),Clauses).
-
+ 
 compile_tagbody(Ctx,Env,TB,InstrS,Clauses):-
  locally(local_override(tagbody_scope,TB),
  must_det_l((

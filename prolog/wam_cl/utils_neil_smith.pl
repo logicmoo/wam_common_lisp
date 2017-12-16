@@ -73,11 +73,8 @@ asserts_to_prolog_code((A,B),PrologCode):-!,
         asserts_to_prolog_code(A,AA),
         asserts_to_prolog_code(B,BB),
         append(AA,BB,PrologCode).
-asserts_to_prolog_code(:-asserta_tracked(_T,A),[A]).
-asserts_to_prolog_code(:-assert(A),[A]).
-asserts_to_prolog_code(:-asserta(A),[A]).
-asserts_to_prolog_code(:-assert_if_new(A),[A]).
-asserts_to_prolog_code(:-assertz(A),[A]).
+
+asserts_to_prolog_code(A,[AA]):- is_assert_op(A,_Where,AA),!.
 asserts_to_prolog_code(:-A, AA):-!,asserts_to_prolog_code(A,AA).
 asserts_to_prolog_code(A, [:-A]).
 

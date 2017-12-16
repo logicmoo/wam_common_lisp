@@ -1,0 +1,67 @@
+
+/*
+:- if(current_prolog_flag(debug,false)).
+:- set_prolog_flag(verbose_autoload,false).
+:- set_prolog_flag(verbose,silent).
+:- set_prolog_flag(verbose_load,silent).
+:- endif.
+*/
+
+:- '$hide'('$toplevel':restore_debug).
+:- '$hide'('$toplevel':save_debug).
+:- '$hide'('$toplevel':residue_vars/2).
+:- '$hide'('system':deterministic/1).
+:- '$hide'(toplevel_call/2).
+:- '$hide'('$toplevel':'$query_loop'/0).
+  %[5] [$toplevel] '$execute_goal2'(user:trace, [])
+  %[3] [$toplevel] '$query_loop'
+  %[2] [$toplevel] '$runtoplevel'
+
+:- use_module(library(prolog_pack)).
+%:- if( \+ prolog_pack:current_pack(logicmoo_base)).
+:- multifile(user:file_search_path/2).
+:-   dynamic(user:file_search_path/2).
+
+dir_from(Rel,Y):-
+    ((getenv('LOGICMOO_WS',Dir);
+     prolog_load_context(directory,Dir);
+     '~/logicmoo_workspace'=Dir;
+     '/home/dmiles/logicmoo_workspace'=Dir)),
+    absolute_file_name(Rel,Y,[relative_to(Dir),file_type(directory),file_errors(fail)]),
+    exists_directory(Y),!.
+
+add_pack_path(Rel):- 
+   dir_from(Rel,Y),
+   (( \+ user:file_search_path(pack,Y)) ->asserta(user:file_search_path(pack,Y));true).
+
+:- add_pack_path(packs_sys).
+:- add_pack_path(packs_usr).
+:- add_pack_path(packs_web).
+:- add_pack_path(packs_xtra).
+
+:- initialization(attach_packs,now).
+
+/*
+:- if(current_prolog_flag(debug,false)).
+:- set_prolog_flag(verbose_autoload,false).
+:- set_prolog_flag(verbose,silent).
+:- set_prolog_flag(verbose_load,silent).
+:- endif.
+*/
+
+:- pack_list_installed.
+%:- endif.
+
+
+:- if(exists_source(library(editline))).
+:- use_module(library(editline)).
+:- else.
+:- if(exists_source(library(readline))).
+:- use_module(library(readline)).
+:- endif.
+:- endif.
+setup_hist0:-  '$toplevel':setup_history.
+:- setup_hist0.
+
+
+

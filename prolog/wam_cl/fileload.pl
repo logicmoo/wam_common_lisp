@@ -224,13 +224,7 @@ grovel_time_called(set_opv).
 
 lisp_grovel(PrologCode):- ( \+ compound(PrologCode); \+ callable(PrologCode)),!.
 lisp_grovel((A,B)):-!, lisp_grovel(A),lisp_grovel(B).
-lisp_grovel(asserta_tracked(T,PrologCode)):- !, lisp_grovel_assert(T,PrologCode).
-lisp_grovel(assertz(PrologCode)):- !, lisp_grovel_assert(PrologCode).
-lisp_grovel(asserta(PrologCode)):- !, lisp_grovel_assert(PrologCode).
-lisp_grovel(asserta_if_new(PrologCode)):- !, lisp_grovel_assert(PrologCode).
-lisp_grovel(asserta_new(PrologCode)):- !, lisp_grovel_assert(PrologCode).
-lisp_grovel(assert_if_new(PrologCode)):- !, lisp_grovel_assert(PrologCode).
-lisp_grovel(assert(PrologCode)):- !, lisp_grovel_assert(PrologCode).
+lisp_grovel(A):- is_assert_op(A,Where,AA),!,lisp_grovel_assert(Where,AA).
 lisp_grovel(PAB):- PAB=..[F,A|_],grovel_time_called(F),!,(var(A)-> true;call(PAB)),!.
 %lisp_grovel(PAB):- grovel_time_called(PAB)->always(PAB);true.
 lisp_grovel(cl_load(File,Keys,Load_Ret)):- !, cl_compile_file(File,Keys,Load_Ret).
@@ -239,7 +233,7 @@ lisp_grovel(_).
 
 lisp_grovel_assert(T,MP):- compound(MP),strip_module(MP,_,P),functor(P,F,_),
   arg(_, v(doc_string,macro_lambda,function_lambda,lambda_def,arglist_info),F),!,
-  show_call_trace(asserta_tracked(T,MP)).
+  show_call_trace(assert_lsp(T,MP)).
 lisp_grovel_assert(_,_).
 lisp_grovel_assert(T):-lisp_grovel_assert(u,T),!.
    %*compile-file-truename*

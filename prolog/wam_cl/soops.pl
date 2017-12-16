@@ -226,11 +226,11 @@ make_default_constructor(Kind,Code):-
  find_function_or_macro_name(_,_,Sym,3,Function), 
  Head=..[Function,List,Obj],
  Body=..[cl_make_instance,[Kind|List],Obj],
- Code = (assertz(wl:init_args(0,Function)),
+ Code = (assert_lsp(wl:init_args(0,Function)),
          set_opv(Function,classof,claz_compiled_function),
          set_opv(Sym,compile_as,kw_function),
          set_opv(Sym,function,Function),
-         assertz(user:(Head:-Body))))).
+         assert_lsp(user:(Head:-Body))))).
  
 
 maybe_add_get_set_functions(Kind,ConcatName,Keyword,ZLOT):- 
@@ -527,8 +527,8 @@ add_opv_new_i(Obj,Prop,Val):-  fail,
    get_obj_pred(Obj,Prop,Pred),
    modulize(call(Pred,Obj,Val),OPred),
    predicate_property(OPred,dynamic),
-   assert_if_new(OPred),!.
-%add_opv_new_i(Obj,Prop,Value):-show_call_trace(assert_if_new(soops:o_p_v(Obj,Prop,Value))).
+   assert_lsp(OPred),!.
+%add_opv_new_i(Obj,Prop,Value):-show_call_trace(assert_lsp(soops:o_p_v(Obj,Prop,Value))).
 
 %delete_opvalues(Obj,Key):- Key == value, nb_delete(Obj),fail.
 delete_opvalues(Obj,Key):- 
@@ -660,10 +660,10 @@ get_opv_else(Obj,Prop,Value,Else):- get_opv(Obj,Prop,Value)*->true;Else.
 decl_mapped_opv(_,_):-!.
 decl_mapped_opv(Kind,Maps):- is_list(Maps),!,maplist(decl_mapped_opv(Kind),Maps).
 decl_mapped_opv(Kind,KW=Pred):- un_kw(KW,Prop),
-  show_call_trace(assert_if_new(type_attribute_pred_dyn(Kind,Prop,Pred))),
+  show_call_trace(assert_lsp(type_attribute_pred_dyn(Kind,Prop,Pred))),
   modulize(call(Pred,Obj,Val),OPred),
   forall(OPred,add_opv_new(Obj,Prop,Val)),
-  nop(asserta_tracked((OPred:- (is_kind(Obj,Kind),(fail->!;true),get_opv(Obj,Prop,Val))))).
+  nop(assert_lsp((OPred:- (is_kind(Obj,Kind),(fail->!;true),get_opv(Obj,Prop,Val))))).
 
 is_kind(O,_K):- nonvar(O).
 
@@ -711,7 +711,7 @@ load_si:-
     read_term(Stream,Value,[]),
     (Value==end_of_file->!;
       (load_si_value(Value),fail)).
-load_si_value(Value):- assert_if_new(Value).
+load_si_value(Value):- assert_lsp(Value).
 
 process_si:- 
    ensure_loaded(package),

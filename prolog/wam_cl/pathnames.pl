@@ -106,11 +106,11 @@ pl_probe_file(In,M):- stream_property(_,file_name(FD)),once((with_fstem(FD,In,M)
 
 set_default_path_early:-
    working_directory(X,X),
-   assert(wl:interned_eval(call((to_lisp_pathname(X,Path),
+   assertz(wl:interned_eval(call((to_lisp_pathname(X,Path),
      set_opv(sym('cl:*default-pathname-defaults*'),value,Path))))).
 
-:- assert(wl:interned_eval(call((to_lisp_pathname("",Path),
-     set_opv(sym('cl:*default-pathname-defaults*'),value,Path))))).
+wl:interned_eval(call((to_lisp_pathname("",Path),
+     set_opv(sym('cl:*default-pathname-defaults*'),value,Path)))).
 
 
 % Uses Symbol value: *SOURCE-FILE-TYPES*

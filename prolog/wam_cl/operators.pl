@@ -69,8 +69,8 @@ compile_decls(Ctx,Env,Result,[LABELS,[MACROLET|MORE]|Progn], CompileBody):- memb
     CompileBody = (CompileBody0,CompileBody1).
 
 
-compile_decls(_Ctx,_Env,Symbol,[Fun,Symbol,A2|AMORE],assertz(P)):- notrace(is_def_at_least_two_args(Fun)),\+ is_fboundp(Fun),!,P=..[Fun,Symbol,A2,AMORE].
-compile_decls(_Ctx,_Env,Symbol,[Fun0,Symbol,A2|AMORE],assertz(P)):- notrace((is_def_at_least_two_args(Fun),same_symbol(Fun,Fun0))),\+ is_fboundp(Fun),!,P=..[Fun,Symbol,A2,AMORE].
+compile_decls(_Ctx,_Env,Symbol,[Fun,Symbol,A2|AMORE],assert_lsp(P)):- notrace(is_def_at_least_two_args(Fun)),\+ is_fboundp(Fun),!,P=..[Fun,Symbol,A2,AMORE].
+compile_decls(_Ctx,_Env,Symbol,[Fun0,Symbol,A2|AMORE],assert_lsp(P)):- notrace((is_def_at_least_two_args(Fun),same_symbol(Fun,Fun0))),\+ is_fboundp(Fun),!,P=..[Fun,Symbol,A2,AMORE].
 
 
 is_def_at_least_two_args(defgeneric).
@@ -132,8 +132,8 @@ compile_macro(Ctx,CallEnv,Macro,[Name0,FormalParms|FunctionBody0], CompileBody):
  CompileBody = (
    DocCode,
    HeadDefCode,
-   asserta(wl:lambda_def(defmacro,(Name0),Macro, FormalParms, [progn | FunctionBody])),
-   asserta((user:FunctionHead  :- 
+   assert_lsp(wl:lambda_def(defmacro,(Name0),Macro, FormalParms, [progn | FunctionBody])),
+   assert_lsp((user:FunctionHead  :- 
     (BodyCode, 
        cl_eval(MResult,FResult)))),
    % nop((user:RNewMacroHead  :- BodyCode)),
@@ -170,8 +170,8 @@ compile_function(Ctx,Env,Function,[Name,FormalParms|FunctionBody0], CompileBody)
  CompileBody = (
    DocCode,
    HeadDefCode,
-   asserta(wl:lambda_def(defun,(Name),Function, FormalParms, FunctionBody)),
-   asserta_new((user:Head  :- BodyCode)),
+   assert_lsp(wl:lambda_def(defun,(Name),Function, FormalParms, FunctionBody)),
+   assert_lsp((user:Head  :- BodyCode)),
    set_opv(Function,classof,claz_compiled_function),
    set_opv(Symbol,compile_as,kw_function),
    set_opv(Symbol,function,Function)),
