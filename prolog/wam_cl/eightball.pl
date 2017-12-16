@@ -174,7 +174,8 @@ dbmsg_assert(Where,user:(HBody)):- !,dbmsg_assert(Where,(HBody)).
 dbmsg_assert(Where,user:H :- Body):- !,dbmsg_assert(Where,(H :- Body)),!.
 %dbmsg_assert(Where,M:Body:- (true,[])):-!,colormsg1("\n% asserting fact...\n"),!,colormsg1(M:Body),!.
 dbmsg_assert(Where,Body):- colormsg1("\n% asserting... ~w ",[Where]),!,colormsg1(Body),!,
- body_cleanup(_,Body,Cleaned),
+ asserta_if_new(Body),
+ body_cleanup(_,Body,Cleaned), 
  (Body==Cleaned-> true;
  (colormsg1("\n% cleanup... ~w ",[Where]),!,colormsg1(Cleaned))),!.
 

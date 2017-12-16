@@ -78,8 +78,12 @@ apply_c(EnvIn,X, _, R):- ignore(R=[]),
 compile_funop(Ctx,Env,Result,LispCode,CompileBody):-
   %fail, %DISABLED
   macroexpand_1_or_fail(LispCode,[],CompileBody0Result),
+  dmsg(macroexpand:-LispCode),
+  dmsg(into:-CompileBody0Result),
   must_compile_body(Ctx,Env,Result,CompileBody0Result, CompileBody),
-  dmsg(macroexpanded(LispCode)).
+  dmsg(code:-CompileBody),
+  !.
+  
 
 
 macroexpand_all(LispCode,MacroEnv,Result):-

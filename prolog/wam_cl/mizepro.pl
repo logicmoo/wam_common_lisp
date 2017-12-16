@@ -49,8 +49,8 @@ body_cleanup_full(Ctx,CodeSt,CodeOutNow):-
    body_cleanup_keep_debug_vars1(Ctx,Code0,Code2),
    body_cleanup_keep_debug_vars1(Ctx,Code2,Code3),
    env_mize(Ctx,',',Code3,Code4),
-   inline_operation([],Ctx,',',Code4,Code5ab),
-   inline_body([],Ctx,',',Code5ab,Code5a),   
+   %inline_operation([],Ctx,',',Code4,Code5ab),
+   inline_body([],Ctx,',',Code4,Code5a),   
    fast_get_sets(Ctx,',',Code5a,Code5),
    
    del_attrs_of(Code5,rwstate),
@@ -438,18 +438,25 @@ inline_body(_Never,_Ctx,_,Code,Out):- \+ \+  skip_optimize(Code),!,Out=Code.
 %inline_body(Never,Ctx,F,(C1,C2),CodeJoined):-!,inline_body(Never,Ctx,F,C1,C1O),inline_body(Never,Ctx,F,C2,C2O),conjoin_0(C1O,C2O,CodeJoined).
 %inline_body(Never,_Ctx,_,Code,Out):- compound(Code),functor(Code,F,N),member(F/N,Never),!,Out=Code.
 inline_body(Never,Ctx,FT,(M:Code:-Body),(M:Code:-Out)):- compound(Code),functor(Code,F,A),!,inline_body([F/A|Never],Ctx,FT,Body,Out).
-inline_body(Never,Ctx,FT,(Code:-Body),(Code:-Out)):- compound(Code),functor(Code,F,A),!,inline_body([F/A|Never],Ctx,FT,Body,Out).
+inline_body(Never,Ctx,FT,(A,B),(AA,BB)):-!,inline_body(Never,Ctx,FT,A,AA),inline_body(Never,Ctx,FT,B,BB).
+inline_body(Never,Ctx,FT,(A;B),(AA;BB)):-!,inline_body(Never,Ctx,FT,A,AA),inline_body(Never,Ctx,FT,B,BB).
+inline_body(Never,Ctx,FT,(A->B),(AA->BB)):-!,inline_body(Never,Ctx,FT,A,AA),inline_body(Never,Ctx,FT,B,BB).
 
+inline_body(_Never,_Ctx,_,In,Out):- stay_all_different(In),simple_inline(In,Out),!.
 
-inline_body(_Never,_Ctx,_,In,Out):- simple_inline(In,Out).
-inline_body(Never,Ctx,F,C1,Out):- stay_all_different(C1),maybe_inline(C1),get_inlined(C1,MID),!,
-  progress_g(dmsg(inlined(C1):-MID)),!,stay_all_different(MID),inline_body(Never,Ctx,F,MID,Out).
+inline_body(Never,Ctx,F,C1,Out):- 
+  maybe_inline(C1),
+  stay_all_different(C1),  
+  get_inlined(C1,MID),functor(C1,F,A),
+  progress_g(dmsg(inlined(C1):-MID)),!,
+  inline_body([F/A|Never],Ctx,F,MID,Out).
 inline_body(_Never,_Ctx,_,C1,C1):- non_compound_code(C1),!.
 inline_body(Never,Ctx,_F,C1,C2):- compound_name_arguments(C1,F,C1O),
   must_maplist(inline_body(Never,Ctx,F),C1O,C2O),!,C2=..[F|C2O].
-%inline_body(_Never,_Ctx,_F,C1,C1):-!.
+inline_body(_Never,_Ctx,_F,C1,C1):-!.
 
 simple_inline(In,_Out):- \+ compound(In),!,fail.
+simple_inline(cl_list(A,B),B=A).
 simple_inline(cl_cdr(I,O),(I==[]->O=[];I=[_|O])).
 simple_inline(cl_car(I,O),(I==[]->O=[];I=[O|_])).
 list_to_disj([C1],(C1O)):-!, list_to_disj(C1,C1O).
@@ -466,28 +473,29 @@ never_inline(P):- predicate_property(P,number_of_clauses(N)),N==0.
 never_inline(P):- compound(P),functor(P,F,A),never_inline_fa(F,A).
 never_inline_fa(set_place,_).
 never_inline_fa(F,_):- atom_concat_or_rtrace(_,' tabled',F).
-never_inline_fa(F,_):- atom_concat_or_rtrace('cl_',_,F).
 never_inline_fa(start_tabling,_).
 never_inline_fa(get_var,_).
 never_inline_fa(f_sys_set_symbol_value,_).
 never_inline_fa(get_opv,_).
 never_inline_fa(member,_).
 never_inline_fa(as_rest,_).
-never_inline_fa(t_or_nil,_).
+%never_inline_fa(t_or_nil,_).
 
-%always_inline(P):- never_inline(P),!,fail.
+always_inline(P):- never_inline(P),!,fail.
 always_inline(P):- \+ callable(P),!,fail.
 always_inline(P):- predicate_property(P,foreign),!,fail.
 always_inline(P):- predicate_property(P,imported_from(system)),!,fail.
-always_inline(P):- compound(P),functor(P,F,A),always_inline_fa(F,A).
 always_inline(P):- clause(P,B),B=t_or_nil(_,_),!.
 always_inline(P):- clause(P,B),B=is(_,_),!.
+always_inline(P):- compound(P),functor(P,F,A),always_inline_fa(F,A).
 
 always_inline_fa(F,1):- atom_concat_or_rtrace('addr_tagbody_',M,F),atom_contains(M,'_addr_enter_').
+always_inline_fa(F,1):- atom_concat_or_rtrace('addr_tagbody_',_,F), functor(P,F,1), \+ clause_calls_self(P).
 always_inline_fa(F,_):- atom_concat_or_rtrace(_,'expand1',F).
 always_inline_fa(F,_):- atom_concat_or_rtrace('cl_c',M,F),atom_concat_or_rtrace(_,'ar',M).
 always_inline_fa(F,_):- atom_concat_or_rtrace('cl_c',M,F),atom_concat_or_rtrace(_,'dr',M).
 
+maybe_inline(C1):- never_inline(C1),!,fail.
 
 maybe_inline(C1):- always_inline(C1),
   predicate_property(C1,interpreted),
@@ -496,7 +504,8 @@ maybe_inline(C1):- always_inline(C1),
   lisp_compiler_option(safe(inline),true),
   !.
 
-maybe_inline(C1):- \+ never_inline(C1), 
+maybe_inline(C1):- 
+ \+ (functor(C1,F,_),atom_concat_or_rtrace('cl_',_,F)),
   predicate_property(C1,interpreted),
   predicate_property(C1,number_of_clauses(1)),
   \+ clause_has_cuts(C1),
@@ -505,6 +514,7 @@ maybe_inline(C1):- \+ never_inline(C1),
 
 
 clause_has_cuts(P):- clause(P,I),contains_var(!,I).
+clause_calls_self(P):- clause(P,I),functor(P,F,A),functor(C,F,A),contains_term(E,I),compound(E),E=C.
 
 :- fixup_exports.
 

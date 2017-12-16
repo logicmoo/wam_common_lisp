@@ -25,7 +25,7 @@ wl:init_args(1,cl_compile_file_pathname).
 cl_compile_file_pathname(OSFile,Keys,PLFileOut):-
    F = kw_output_file,
     env_current(Env),
-   kw_obtain_value_else_p(Env,Keys,F,sys_output_file, 
+   get_kw(Env,Keys,F,sys_output_file, 
      PLFile, pl_compiled_filename(OSFile,PLFile), _Present),
    to_lisp_pathname(PLFile,PLFileOut).
 

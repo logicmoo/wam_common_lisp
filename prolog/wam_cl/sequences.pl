@@ -82,7 +82,12 @@ wl:init_args(0,cl_list).
 cl_list(List,List).
 
 
-
+cl_copy_alist([H|T],[HH|TT]):- !, assertion(nonvar(H)),
+  pl_copy_1assoc(H,HH),
+  cl_copy_alist(T,TT).
+cl_copy_alist(T,T).
+pl_copy_1assoc([H|T],[H|T]).
+pl_copy_1assoc(HT,HT).
 
 %rassoc item alist &key key test test-not => entry
 wl:init_args(2,cl_rassoc).

@@ -461,13 +461,14 @@ sym_or_num('$COMPLEX'(L)) --> `#C(`,!, swhite, sexpr_list(L), swhite.
 %sym_or_num((E)) --> unsigned_number(S),{number_string(E,S)}.
 sym_or_num(('1+')) --> `1+`,swhite,!.
 sym_or_num(('1-')) --> `1-`,swhite,!.
-sym_or_num((E)) --> lnumber(E),swhite,!.
 %sym_or_num((E)) --> unsigned_number(S),{number_string(E,S)}.
 sym_or_num(('#+')) --> `#+`,swhite,!.
 sym_or_num(('#-')) --> `#-`,swhite,!.
 sym_or_num(('-#+')) --> `-#+`,swhite,!.
-sym_or_num(E) --> rsymbol_maybe(``,E),!.
+sym_or_num(E) --> dcg_and2(rsymbol_maybe(``,E), \+ lnumber(_)),!.
+sym_or_num((E)) --> lnumber(E),swhite,!.
 sym_or_num('#'(E)) --> [C],{name(E,[C])}.
+
 
 sblank --> [C], {var(C)},!.
 sblank --> line_comment(S,I,CP),{assert(t_l:s_reader_info('$COMMENT'(S,I,CP)))},!, swhite.
@@ -589,7 +590,9 @@ string_vector([]) --> [], !.
 lnumber(N)--> swhite, lnumber0(N), swhite. % (peek_symbol_breaker;[]).
 
 oneof_ci(OneOf,[C])--> {member(C,OneOf)},ci([C]). 
-dcg_and2(DCG1,DCG2,S,E) :- phrase(DCG1,S,E),phrase(DCG2,S,E).
+dcg_and2(DCG1,DCG2,S,E) :- dcg_phrase(DCG1,S,E),dcg_phrase(DCG2,S,E).
+dcg_phrase(\+ DCG1,S,E):- !, \+ phrase(DCG1,S,E).
+dcg_phrase(DCG1,S,E):- phrase(DCG1,S,E).
 
 enumber(N)--> lnumber(L),!,{to_untyped(L,N)}.
 
