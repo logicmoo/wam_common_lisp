@@ -18,14 +18,44 @@
 
 :- include('header').
 
-:- discontiguous(compile_body_go_tagbody/5).
+
 
 shared_lisp_compiler:plugin_expand_progbody(Ctx,Env,Result,InstrS,_PreviousResult,Code):- 
-  compile_body_h(Ctx,Env,Result,InstrS,Code),!.
+           compile_body_select_tagbody(Ctx,Env,Result,InstrS,Code),!.
 
-/*shared_lisp_compiler:plugin_expand_progbody(Ctx,Env,Result,InstrS,_PreviousResult,Code):- 
-  compile_body_go_tagbody(Ctx,Env,Result,InstrS,Code),!.*/
+compile_body_select_tagbody(_Ctx,_Env,Result,[label, Tag|_], push_label(Tag) ):- debug_var("_LABELRES",Result).
+compile_body_select_tagbody(_Ctx,_Env,Result,[u_label, Tag|_], push_label(Tag) ):- debug_var("_LABELRES",Result).
+compile_body_select_tagbody(_Ctx,Env,Result,[go, Tag], goto(Tag,Env) ):- debug_var("_GORES",Result),debug_var("GoEnv",Env).
+%compile_body_select_tagbody(_Ctx,Env,Result,[go,Label,TB,Pred],  Code ):- create_goto(TB,Label,Pred,Env,Code),!, debug_var("_GoThree",Result).
+%compile_body_select_tagbody(_Ctx,Env,Result,[go,Label,TB|_],  Code ):- create_goto(TB,Label,_Pred,Env,Code),!, debug_var("_GoTwo",Result).
+%compile_body_select_tagbody(_Ctx,Env,Result,[go,Label,TB], Code):- compute_new_address(TB,Label,Pred), debug_var("_GORES",Result),debug_var("GoEnv",Env),create_jump(TB,Label,Pred,Env,Code).
+%compile_body_select_tagbody(_Ctx,Env,Result,[go,Label], Code):- local_override(tagbody_scope,TB),compute_new_address(TB,Label,Pred), debug_var("_GORES",Result),debug_var("GoEnv",Env),create_goto(TB,Label,Pred,Env,Code).
 
+%compile_body_select_tagbody(Ctx,Env,Result,go(Tag), Body ):- !,compile_body_select_tagbody(Ctx,Env,Result,[go, Tag],Body).
+compile_body_select_tagbody(Ctx,Env,[],[tagbody| InstrS], Code):- debug_var("_TBResult",Result),!,  
+   gensym(addr_tagbody_,TB),
+   always(get_go_points(TB,InstrS,Gos)),
+   always(get_tags(TB,Env,InstrS,Gos,Addrs)), 
+   % check_missing_gos(Gos),   
+   compile_addrs(TB,Ctx,Env,Result,Addrs),
+   compile_tagbodys(TB,Ctx,Env,Result,InstrS,CInstrS),
+   copy_term(Addrs,Addrs2),
+   Code = call_addr_block(Env,CInstrS,Addrs2).
+
+push_label(_).
+goto(Tag,Env):- notrace(throw(goto(Tag,Env))).
+call_addr_block(EnvCatch,Start,Addrs):-
+  catch(Start,
+      goto(Tag,EnvCatch),
+           ((always(member(addr(_Pred, Tag,_,NewEnv,NewCode),Addrs))->!;throw(goto(Tag,EnvCatch))),
+           copy_term(NewEnv:NewCode,NewEnvCopy:NewCodeCopy),
+           NewEnvCopy = EnvCatch,
+           call_addr_block(EnvCatch,NewCodeCopy,Addrs))).
+
+
+
+:- discontiguous(compile_body_go_tagbody/5).
+% shared_lisp_compiler:plugin_expand_progbody(Ctx,Env,Result,InstrS,_PreviousResult,Code):-  compile_body_go_tagbody(Ctx,Env,Result,InstrS,Code),!.
 
 push_label(_,_,_).
 % @IDEA we might use labels later 
@@ -50,7 +80,7 @@ add_context_code(Ctx,Assertion):-
   always((
   (nb_current_value(Ctx,symbol,Symbol);(toplevel=Symbol)),
   user:assert_lsp(Symbol,Assertion),dbmsg_real(:-assert_lsp(Symbol,Assertion)))),!.*/
-
+/*
 compile_body_go_tagbody(Ctx,Env,[],[tagbody,Symbol| InstrSAll], Code):- 
   atom(Symbol),
   append(InstrS,[[go,Symbol]],InstrSAll),  
@@ -62,6 +92,7 @@ compile_body_go_tagbody(Ctx,Env,[],[tagbody,Symbol| InstrSAll], Code):-
   debug_var("TBEnv",Env),
   create_jump(TB,Label,Pred,Env,Code),
   maplist(add_context_code(Ctx),Clauses).
+*/
 
 % TAGBODY
 compile_body_go_tagbody(Ctx,Env,[],[tagbody| InstrS], Code):- 
