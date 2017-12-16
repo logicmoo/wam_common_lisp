@@ -72,6 +72,7 @@ compile_decls(Ctx,Env,Result,[LABELS,[MACROLET|MORE]|Progn], CompileBody):- memb
 compile_decls(_Ctx,_Env,Symbol,[Fun,Symbol,A2|AMORE],assertz(P)):- notrace(is_def_at_least_two_args(Fun)),\+ is_fboundp(Fun),!,P=..[Fun,Symbol,A2,AMORE].
 compile_decls(_Ctx,_Env,Symbol,[Fun0,Symbol,A2|AMORE],assertz(P)):- notrace((is_def_at_least_two_args(Fun),same_symbol(Fun,Fun0))),\+ is_fboundp(Fun),!,P=..[Fun,Symbol,A2,AMORE].
 
+
 is_def_at_least_two_args(defgeneric).
 is_def_at_least_two_args(define_compiler_macro).
 is_def_at_least_two_args(define_method_combination).
@@ -85,6 +86,24 @@ combine_setfs(Name0,Name):-atom(Name0),!,Name0=Name.
 combine_setfs(Name0,Name):-atomic_list_concat(['f_combined'|Name0],'__',Name).
 
 
+wl:init_args(1,cl_labels).
+cl_labels(Inits,Progn,Result):-
+  reenter_lisp(Ctx,Env),
+  compile_decls(Ctx,Env,Result,[labels,Inits|Progn],Code),
+  always(Code).  
+
+wl:init_args(1,cl_macrolet).
+cl_macrolet(Inits,Progn,Result):-
+  reenter_lisp(Ctx,Env),
+  compile_decls(Ctx,Env,Result,[macrolet,Inits|Progn],Code),
+  always(Code).  
+
+
+wl:init_args(1,cl_flet).
+cl_flet(Inits,Progn,Result):-
+  reenter_lisp(Ctx,Env),
+  compile_decls(Ctx,Env,Result,[flet,Inits|Progn],Code),
+  always(Code).  
 
 wl:init_args(2,cl_defmacro).
 cl_defmacro(Name,FormalParms,FunctionBody,Result):-
@@ -113,7 +132,7 @@ compile_macro(Ctx,CallEnv,Macro,[Name0,FormalParms|FunctionBody0], CompileBody):
  CompileBody = (
    DocCode,
    HeadDefCode,
-   asserta(wl:lambda_def(defmacro,(Name0),Macro, FormalParms, [progn | FunctionBody]):-true),
+   asserta(wl:lambda_def(defmacro,(Name0),Macro, FormalParms, [progn | FunctionBody])),
    asserta((user:FunctionHead  :- 
     (BodyCode, 
        cl_eval(MResult,FResult)))),
@@ -151,7 +170,7 @@ compile_function(Ctx,Env,Function,[Name,FormalParms|FunctionBody0], CompileBody)
  CompileBody = (
    DocCode,
    HeadDefCode,
-   asserta(wl:lambda_def(defun,(Name),Function, FormalParms, FunctionBody):-true),
+   asserta(wl:lambda_def(defun,(Name),Function, FormalParms, FunctionBody)),
    asserta_new((user:Head  :- BodyCode)),
    set_opv(Function,classof,claz_compiled_function),
    set_opv(Symbol,compile_as,kw_function),

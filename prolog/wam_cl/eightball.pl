@@ -135,8 +135,8 @@ colormsg1(Msg):- mesg_color(Msg,Ctrl),!,ansicall_maybe(Ctrl,fmt99(Msg)).
 ansicall_maybe(_Ctrl,Cmd):- current_output(O), \+ stream_property(O,tty(true)),!,call(Cmd).
 ansicall_maybe(Ctrl,Cmd):- always(shrink_lisp_strings(Cmd,Cmd0)),!,call(ansicall(Ctrl,Cmd0)).
 
-dbmsg_cmt(Var):- shrink_lisp_strings(Var,O), wdmsg(O).
 dbmsg(X):- dbmsg_cmt(X).
+dbmsg_cmt(Var):- shrink_lisp_strings(Var,O), wdmsg(O).
 dbmsg_real(X):- notrace(both_outputs(dbmsg0(X))),!.
 
 in_comment(X):- notrace(setup_call_cleanup(write('/* '),(X),writeln(' */'))).
@@ -152,8 +152,29 @@ is_assert_op(asserta_if_new(P),u,P).
 is_assert_op(asserta_new(P),u,P).
 is_assert_op(assert(P),u,P).
 
-fmt99(O):- make_pretty(O,P),fmt9(P).
+fmt99(O):- make_pretty(O,P),fmt999(P),!.
+
+fmt999(P):- \+ compound(P),!,fmt9(P).
+fmt999((:- M:P)):-
+  with_output_to(string(A),fmt9(:-P)),
+  trim_off(':-',A,B),
+  format('~N:- ~q:~s~n',[M,B]).
+fmt999((M:H :- B)):- P= (M:H :- B),
+  with_output_to(string(A),fmt9(:-P)),
+  trim_off(':-',A,B),
+  format('~N:- ~q:~s~n',[M,B]).
+fmt999(M:P):- functor(P,':-',_),!,fmt9(M:P).
+fmt999(M:P):- with_output_to(string(A),fmt9(:-P)),
+  trim_off(':-',A,B),
+  format('~N~q:~s~n',[M,B]).
+fmt999(P):- functor(P,':-',_),!,fmt9(P).
+fmt999(P):- with_output_to(string(A),fmt9(:-P)),
+  trim_off(':-',A,B),
+  format('~N~s~n',[B]).
+fmt999(P):- fmt9(P),nl.
 % notrace((dbmsg0(Var))).
+trim_off(W,A,B):- string_concat(W,B,A).
+trim_off(_,A,A).
 
 dbmsg0(Var):- var(Var),!,in_comment(colormsg1(dbmsg_var(Var))).
 dbmsg0(Str):- string(Str),!,in_comment(colormsg1(Str)).
@@ -161,23 +182,35 @@ dbmsg0(Str):- string(Str),!,in_comment(colormsg1(Str)).
 dbmsg0(:-((B,A))):-  is_assert_op(A,Where,AA), !,dbmsg0(:- B),dbmsg_assert(Where, AA).
 dbmsg0(:-((A,B))):-  is_assert_op(A,Where,AA), !,dbmsg_assert(Where, AA),dbmsg0(:- B).
 dbmsg0(:- A):- is_assert_op(A,Where,AA),!,dbmsg_assert(Where,AA).
+dbmsg0(comment(X)):-!, shrink_lisp_strings(X,X0), in_comment(fmt99(X0)).
+dbmsg0(N=V):- !, shrink_lisp_strings(N=V,X0),  in_comment(fmt99(X0)).
 dbmsg0(A):- is_assert_op(A,Where,AA),!,dbmsg_assert(Where,AA).
+dbmsg0(:- X):- X==true,!.
+dbmsg0(:- X):- colormsg1(:- X),!.
+dbmsg0(X):- colormsg1(:- X),!.
 
-dbmsg0(comment(X)):- shrink_lisp_strings(X,X0), in_comment(fmt99(X0)).
-dbmsg0(N=V):- shrink_lisp_strings(N=V,X0),  in_comment(fmt99(X0)).
-%dbmsg0(:- Body):- !,colormsg1(:- Body),!.
-dbmsg0(X):- colormsg1(X),!.
-% dbmsg(:- Body):- !, dmsg(:- Body).
+dbmsg_assert(Where,X):- notrace((dbmsg_assert0(Where,X))),!.
 
-dbmsg_assert(Where,(A,B)):- !,dbmsg_assert(Where,A),dbmsg_assert(Where,B).
-dbmsg_assert(Where,user:(HBody)):- !,dbmsg_assert(Where,(HBody)).
-dbmsg_assert(Where,user:H :- Body):- !,dbmsg_assert(Where,(H :- Body)),!.
-%dbmsg_assert(Where,M:Body:- (true,[])):-!,colormsg1("\n% asserting fact...\n"),!,colormsg1(M:Body),!.
-dbmsg_assert(Where,Body):- colormsg1("\n% asserting... ~w ",[Where]),!,colormsg1(Body),!,
- asserta_if_new(Body),
- body_cleanup(_,Body,Cleaned), 
- (Body==Cleaned-> true;
- (colormsg1("\n% cleanup... ~w ",[Where]),!,colormsg1(Cleaned))),!.
+dbmsg_assert0(Where,(A,B)):- !,dbmsg_assert0(Where,A),dbmsg_assert0(Where,B).
+dbmsg_assert0(Where,user:(HBody)):- !,dbmsg_assert0(Where,(HBody)).
+dbmsg_assert0(Where,user:H :- Body):- !,dbmsg_assert0(Where,(H :- Body)),!.
+%dbmsg_assert0(Where,M:Body:- (true,[])):-!,colormsg1("\n% asserting fact...\n"),!,colormsg1(M:Body),!.
+dbmsg_assert0(Where,(Head:-Body)):- Body==true,!, dbmsg_assert0(Where,(Head)).
+dbmsg_assert0(Where,(Head:-Body)):- !, colormsg1("\n% asserting... ~w ",[Where]),!,colormsg1(Head:-Body),!,
+   asserta_if_new(Head:-Body),
+   asserta_if_new(pass_clause(Where,Head,Body)).
+dbmsg_assert0(Where,Head):- !, colormsg1("\n% asserting1... ~w ",[Where]),!,fmt99(Head),!,
+   asserta_if_new(Head),
+   asserta_if_new(pass_clause(Where,Head,true)).
+   
+/*
+dbmsg_assert(Where,Body):-  
+  body_cleanup(_,Body,Cleaned), !,
+  (Body==Cleaned-> true;
+   (colormsg1("\n% cleanup... ~w ",[Where]),!,colormsg1(Cleaned)),
+   (colormsg1("\n% asserting... ~w ",[Where]),!,colormsg1(Body))),!,
+    asserta_if_new(Body),!.
+*/
 
 
 :- dynamic(lisp_compiler_option/2).

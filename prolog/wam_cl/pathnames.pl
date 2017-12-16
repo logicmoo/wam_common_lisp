@@ -31,6 +31,26 @@ cl_compile_file_pathname(OSFile,Keys,PLFileOut):-
 
 
 /*
+
+
+i can understand it might be important ideology to follow this when discussing an implementation of common lisp in common lisp
+but such constraints would only limit the implementation of common lisp in other languages
+sorry "we cannot implement prototype based inheritance since common lisp does not contain such terminology"
+ or that style of inheritance.. therefore an implementation cannot cannot be discussed
+
+Sounds to me like "i do not understand prototype based inheritance, yet i understand common lisp, therefore you may not use it in your impl"
+
+also sticking to only terminology of CL would only force me to deal with pedantic people whom are willfully ignorant
+instead of other polymaths who program in at least 5 languages a week
+
+after 35 years of coding interpretors and compilers for several languages, I am just too stuck in my ways, 
+also I am not going to talk down to anyone (not you)..  i am going to treat you like you know just as much as i do about things..
+ if my explaination leads to more questions then i expect to have to answer those questions as well
+if you do not want to become a contributor, i cannot force you to 
+it would also limit the implementation of other languages in common lisp 
+if you think i am incapable of being helped. please put me on ignore 
+I suppose people will stop using UABCL due to my literary skills
+
 *COMPILE-FILE-TRUENAME*
 *COMPILE-FILE-PATHNAME*
 *COMPILE-FILE-ZIP*
@@ -44,7 +64,8 @@ pl_compiled_filename(OSFile,PLFile):-
    cl_truename(OSFile,TrueOSFile),
    to_prolog_pathname(TrueOSFile,OSFileAtom),
    cl_symbol_value(sys_xx_compile_file_type_xx,StrExt),to_prolog_string(StrExt,Ext),
-   file_name_extension(BaseName,_Was,OSFileAtom),file_name_extension(BaseName,Ext,PLFile).
+   %file_name_extension(BaseName,_Was,OSFileAtom),file_name_extension(BaseName,Ext,PLFile).
+   file_name_extension(OSFileAtom,Ext,PLFile).
 pl_compiled_filename(Obj,PL):- to_prolog_string(Obj,M),pl_compiled_filename0(M,PL).
 
 pl_compiled_filename0(Obj,PL):- compound(Obj),arg(2,Obj,From),string(From),

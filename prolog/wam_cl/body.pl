@@ -305,7 +305,7 @@ if_op_1_then_test(OP,PRED):-
   find_lisp_function(OP,1,FUN),
   is_defined(FUN,2),   
   PFUN=..[FUN,A1,RET],
-  clause(PFUN,t_or_nil(PPRED,Ret)),
+  clause_interface(PFUN,t_or_nil(PPRED,Ret)),
   PPRED=..[PRED,AA1],
   RET==Ret,AA1==A1.
 compile_test_body(Ctx,Env,Unused,[OP,Arg1],Arg1Body,PredBody):- if_op_1_then_test(OP,Pred),   
@@ -318,7 +318,7 @@ if_oper_then_test(OP,A1,PredBody):-
   find_lisp_function(OP,1,FUN),
   is_defined(FUN,2),   
   PFUN=..[FUN,A1,RET],
-  clause(PFUN,t_or_nil(PredBody,Ret)),
+  clause_interface(PFUN,t_or_nil(PredBody,Ret)),
   RET==Ret.
 compile_test_body(Ctx,Env,Unused,[OP,Arg1],Arg1Body,PredBody):- if_oper_then_test(OP,Arg1Result,PredBody),   
    must_compile_body(Ctx,Env,Arg1Result,Arg1,Arg1Body),
@@ -331,7 +331,7 @@ if_op_2_then_test(OP,PRED):-
   find_lisp_function(OP,2,FUN),
   is_defined(FUN,3),   
   PFUN=..[FUN,A1,A2,RET],
-  clause(PFUN,t_or_nil(PPRED,Ret)),
+  clause_interface(PFUN,t_or_nil(PPRED,Ret)),
   PPRED=..[PRED,AA1,AA2],
   RET==Ret,AA1==A1,AA2==A2.
 %cl_eq(A,B,Ret):- t_or_nil( is_eq(A,B) , Ret).

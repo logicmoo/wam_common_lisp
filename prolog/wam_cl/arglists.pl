@@ -268,7 +268,7 @@ ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,aux,[[F,InitForm]|FormalParms],Par
    PCode = (InitCode,Code).
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,aux,[F|FormalParms],Params,Names,PVars,Code):-!, 
    enforce_atomic(F),   
-   ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,aux,[[F,[],[]]|FormalParms],Params,Names,PVars,Code).
+   ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,aux,[[F,[]]|FormalParms],Params,Names,PVars,Code).
 
 % Parsing &key(s)
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,[ [F,InitForm,KWPName]|FormalParms],Params,[F,KWPName|Names],[V,PresentP|PVars],PCode):- !,
@@ -390,8 +390,8 @@ expand_function_head(Ctx,Env,[FN | FormalParms],Head,ZippedArgEnv, Result,HeadDe
    (eval_uses_exact(FN) ; \+ (member(Mode,FormalParms), \+ simple_atom_var(Mode))),!,
    %debug_var('NilRestNKeys',RestNKeys), 
        function_head_params(Ctx,Env,FormalParms,ZippedArgEnv,_RestNKeys,Whole,RequiredArgs,ArgInfo,_Names,_PVars,HeadCode),
-               HeadDefCode = (assert_if_new(wl:arglist_info(FN,FormalParms,RequiredArgs,ArgInfo):-true),!,
-                 assert_if_new(wl:init_args(exact_only,FN):-true)),
+               HeadDefCode = (assert_if_new(wl:arglist_info(FN,FormalParms,RequiredArgs,ArgInfo)),!,
+                 assert_if_new(wl:init_args(exact_only,FN))),
                always(HeadDefCode),
        Whole = RequiredArgs,            
        append(RequiredArgs, [Result], HeadArgs),
@@ -404,8 +404,8 @@ expand_function_head(Ctx,EnvIO,[FN | FormalParms],Head,ZippedArgEnv, Result,Head
    debug_var('PBRestNKeys',RestNKeys),
    always((function_head_params(Ctx,EnvIO,FormalParms,ZippedArgEnv,RestNKeys,Whole,RequiredArgs,ArgInfo,_Names,_PVars,
      HeadCodeIgnored), slow_trace,
-               HeadDefCode = (assert_if_new(wl:arglist_info(FN,FormalParms,RequiredArgs,ArgInfo):-true),
-                assert_if_new(wl:init_args(bind_parameters,FN):-true)),
+               HeadDefCode = (assert_if_new(wl:arglist_info(FN,FormalParms,RequiredArgs,ArgInfo)),
+                assert_if_new(wl:init_args(bind_parameters,FN))),
                always(HeadDefCode),   
    debug_var('BinderCode',BindCode),
    debug_var('Whole',Whole), 
@@ -421,7 +421,7 @@ expand_function_head(Ctx,EnvIO,[FN | FormalParms],Head,ZippedArgEnv, Result,(Hea
   HeadCodeOut):-
    debug_var('RestNKeys',RestNKeys),
    always((function_head_params(Ctx,EnvIO,FormalParms,ZippedArgEnv,RestNKeys,Whole,RequiredArgs,ArgInfo,_Names,_PVars,HeadCode),
-   HeadDefCode = (assert_if_new(wl:arglist_info(FN,FormalParms,RequiredArgs,ArgInfo):-true)),
+   HeadDefCode = (assert_if_new(wl:arglist_info(FN,FormalParms,RequiredArgs,ArgInfo))),
    always(HeadDefCode),
    align_args_local(FN,RequiredArgs,RestNKeys,Whole,Result,LB,ArgInfo,HeadArgs,Used),!,  
    assert_if_new(Used:-true),
@@ -554,7 +554,7 @@ bind_parameters(Env,RestNKeys,'&optional',[NDM|FormalParms],[Value|Params],Code)
 % Parsing aux(s)
 bind_parameters(Env,RestNKeys,'&aux',[NDM|FormalParms],Params,(Code1,Code)):- 
   make_bind_value_missing(NDM,Env,Code1),
-  bind_parameters(Env,RestNKeys,'&optional',FormalParms,Params,Code).
+  bind_parameters(Env,RestNKeys,'&aux',FormalParms,Params,Code).
 
 % Parsing &allow-other-keys
 bind_parameters(Env,RestNKeys,_,['&allow_other_keys'|FormalParms],Params,Code):- !,

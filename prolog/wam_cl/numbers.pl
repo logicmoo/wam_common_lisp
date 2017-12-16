@@ -18,7 +18,29 @@
 
 
 grovel_math:-
-  ignore((((((clause(arithmetic:eval(P,_,_),_),nonvar(P)),(functor(P,F,A),always(define_cl_math(F,A)))))),fail)).
+  doall((((((clause(arithmetic:eval(P,_,_),_),nonvar(P)),(functor(P,F,A),always(define_cl_math(F,A)))))),fail)),
+  grovel_preds(_).
+
+grovel_preds(M):-
+ %module_property(M,file(File)),
+ 
+ doall((
+  source_file(M:P,_File),
+  %current_predicate(_,M:P), \+ predicate_property(M:P,imported_from(_)),
+  %predicate_property(M:P,module(M)),
+  functor(P,F,A),
+  once(forall(clause(wl:grovel_pred(M,F,A),B),call(B))),
+  fail)).
+
+wl:grovel_pred(M,F,1):-
+  atom(F),atom(M),
+  atom_concat('is_',R,F),atom_concat(_,'p',R),
+  doall(((get_opv_iii(_Sym,function,SF),
+  (atom(SF),atom_concat(Prefix,R,SF),
+   \+ atomic_list_concat([_,_,_|_],'_',Prefix),
+   Head=..[SF,N,RetVal],
+   PBody=..[F,N],
+   show_call_trace(assert_if_new(M:Head :- t_or_nil(M:PBody,RetVal))))),fail)).
 
 wl:interned_eval(call(grovel_math)).
 
@@ -51,15 +73,15 @@ is_numberp('$COMPLEX'(_,_)).
 is_numberp('$EXP'(_,_,_)).
 is_numberp(P):- number(P).
 
+is_integerp(P):- integer(P)-> true; is_integerp(P).
+is_bignump(P):- compound(P),arg(1,P,Type),!,Type==claz_bignum,(functor(P,'$NUMBER',_);functor(P,'$EXP',_)).
+
 is_oddp(N):- 1 is N div 2.
 is_evenp(N):- 0 is N div 2.
 
-cl_oddp(N,R):- t_or_nil(is_oddp(N),R).
-cl_evenp(N,R):- t_or_nil(is_evenp(N),R).
-
-cl_minusp(N,R):- t_or_nil(N<0,R).
-cl_plusp(N,R):- t_or_nil(N>0,R).
-cl_zerop(N,R):- t_or_nil(N=:=0,R).
+is_minusp(N):- N<0.
+is_plusp(N):- N>0.
+is_zerop(N):- N=:=0.
 
 
 % Lisp Comparison Predicates

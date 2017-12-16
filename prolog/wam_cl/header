@@ -44,9 +44,12 @@
 :- dynamic(tst:is_local_test/2).
 :- multifile(tst:is_local_test/2).
 :- discontiguous(tst:is_local_test/2).
+
+
 :- dynamic(tst:is_local_test/3).
 :- multifile(tst:is_local_test/3).
 :- discontiguous(tst:is_local_test/3).
+
 :- dynamic(shared_lisp_compiler:plugin_expand_function_body/5).
 :- multifile(shared_lisp_compiler:plugin_expand_function_body/5).
 :- discontiguous(shared_lisp_compiler:plugin_expand_function_body/5).
@@ -71,14 +74,17 @@
 :- dynamic(wl:interned_eval/1).
 :- discontiguous(wl:interned_eval/1).
 
-:- multifile(wl:wam_cl_setup/1).
-:- dynamic(wl:wam_cl_setup/1).
-:- discontiguous(wl:wam_cl_setup/1).
-
-
 :- multifile(wl:type_checked/1).
 :- dynamic(wl:type_checked/1).
 :- discontiguous(wl:type_checked/1).
+
+:- dynamic(wl:pass_clause/3).
+:- multifile(wl:pass_clause/3).
+:- discontiguous(wl:pass_clause/3).
+
+:- dynamic(wl:grovel_pred/3).
+:- multifile(wl:grovel_pred/3).
+:- discontiguous(wl:grovel_pred/3).
 
 
 :- multifile(wl:coercion/3).

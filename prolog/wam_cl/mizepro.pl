@@ -47,7 +47,7 @@ body_cleanup_full(Ctx,CodeSt,CodeOutNow):-
    del_attrs_of(CodeIn,freeze),
    inline_operation([],Ctx,',',CodeIn,Code0),
    body_cleanup_keep_debug_vars1(Ctx,Code0,Code2),
-   body_cleanup_keep_debug_vars1(Ctx,Code2,Code3),
+   body_cleanup_keep_debug_vars1(Ctx,Code2,Code3),   
    env_mize(Ctx,',',Code3,Code4),
    %inline_operation([],Ctx,',',Code4,Code5ab),
    inline_body([],Ctx,',',Code4,Code5a),   
@@ -62,8 +62,10 @@ body_cleanup_full(Ctx,CodeSt,CodeOutNow):-
 add_type_checks_maybe(_,IO,IO).
 
 
-body_cleanup_keep_debug_vars1(Ctx,Code0,CodeOut):-
- must_det_l((oper_mize(Code0,Ctx,',',Code0,Code1), mize_body(Ctx,',',Code1,CodeOut))).
+body_cleanup_keep_debug_vars1(Ctx,Code0,CodeOutOut):-
+ must_det_l((oper_mize(Code0,Ctx,',',Code0,Code1), mize_body(Ctx,',',Code1,CodeOut),
+   sanitize_true(Ctx,CodeOut,CodeOutOut1),
+   fast_get_sets(Ctx,'',CodeOutOut1,CodeOutOut))).
 
 
 fast_get_sets(_Ctx,_,Code5,Code5):- \+ compound(Code5),!.
@@ -433,9 +435,6 @@ stay_all_different_vars([X|Vars]):- maplist(dif(X),Vars),stay_all_different_vars
 %inline_body(_,_,_,C1,C1).
 inline_body(_Never,_Ctx,_,C1,C1):- var(C1),!.
 inline_body(_Never,_Ctx,_,Code,Out):- \+ \+  skip_optimize(Code),!,Out=Code.
-%inline_body(Never,Ctx,F,(C1,C2,C4),C5):- conjoinment(C1,C2,C3),!,inline_body(Never,Ctx,F,(C3,C4),C5).
-%inline_body(Never,Ctx,F,(C1,C2),Joined):- conjoinment(C1,C2,C3),!,inline_body(Never,Ctx,F,C3,Joined).
-%inline_body(Never,Ctx,F,(C1,C2),CodeJoined):-!,inline_body(Never,Ctx,F,C1,C1O),inline_body(Never,Ctx,F,C2,C2O),conjoin_0(C1O,C2O,CodeJoined).
 %inline_body(Never,_Ctx,_,Code,Out):- compound(Code),functor(Code,F,N),member(F/N,Never),!,Out=Code.
 inline_body(Never,Ctx,FT,(M:Code:-Body),(M:Code:-Out)):- compound(Code),functor(Code,F,A),!,inline_body([F/A|Never],Ctx,FT,Body,Out).
 inline_body(Never,Ctx,FT,(A,B),(AA,BB)):-!,inline_body(Never,Ctx,FT,A,AA),inline_body(Never,Ctx,FT,B,BB).
@@ -449,7 +448,8 @@ inline_body(Never,Ctx,F,C1,Out):-
   stay_all_different(C1),  
   get_inlined(C1,MID),functor(C1,F,A),
   progress_g(dmsg(inlined(C1):-MID)),!,
-  inline_body([F/A|Never],Ctx,F,MID,Out).
+  sanitize_true(Ctx,MID,MID2),
+  inline_body([F/A|Never],Ctx,F,MID2,Out).
 inline_body(_Never,_Ctx,_,C1,C1):- non_compound_code(C1),!.
 inline_body(Never,Ctx,_F,C1,C2):- compound_name_arguments(C1,F,C1O),
   must_maplist(inline_body(Never,Ctx,F),C1O,C2O),!,C2=..[F|C2O].
@@ -457,14 +457,14 @@ inline_body(_Never,_Ctx,_F,C1,C1):-!.
 
 simple_inline(In,_Out):- \+ compound(In),!,fail.
 simple_inline(cl_list(A,B),B=A).
-simple_inline(cl_cdr(I,O),(I==[]->O=[];I=[_|O])).
-simple_inline(cl_car(I,O),(I==[]->O=[];I=[O|_])).
+simple_inline(cl_cdr(I,O),(I==[]->O=[];I=[_|O])):- lisp_compiler_option(debug,0).
+simple_inline(cl_car(I,O),(I==[]->O=[];I=[O|_])):- lisp_compiler_option(debug,0).
 list_to_disj([C1],(C1O)):-!, list_to_disj(C1,C1O).
 list_to_disj([C1,C2],(C1O;C2O)):-!, list_to_disj(C1,C1O),list_to_disj(C2,C2O).
 list_to_disj([C1|C2],(C1O;C2O)):-!, list_to_disj(C1,C1O),list_to_disj(C2,C2O).
 list_to_disj(C1,C1).
 
-get_inlined(P,Out):- bagof(I,clause(P,I),DisjL),list_to_disj(DisjL,Out),!.
+get_inlined(P,Out):- bagof(I,clause_interface(P,I),DisjL),list_to_disj(DisjL,Out),!.
 
 never_inline(P):- \+ callable(P),!.
 never_inline(P):- predicate_property(P,foreign).
@@ -485,8 +485,8 @@ always_inline(P):- never_inline(P),!,fail.
 always_inline(P):- \+ callable(P),!,fail.
 always_inline(P):- predicate_property(P,foreign),!,fail.
 always_inline(P):- predicate_property(P,imported_from(system)),!,fail.
-always_inline(P):- clause(P,B),B=t_or_nil(_,_),!.
-always_inline(P):- clause(P,B),B=is(_,_),!.
+always_inline(P):- clause_interface(P,B),B=t_or_nil(_,_),!.
+always_inline(P):- clause_interface(P,B),B=is(_,_),!.
 always_inline(P):- compound(P),functor(P,F,A),always_inline_fa(F,A).
 
 always_inline_fa(F,1):- atom_concat_or_rtrace('addr_tagbody_',M,F),atom_contains(M,'_addr_enter_').
@@ -513,8 +513,11 @@ maybe_inline(C1):-
   !.
 
 
-clause_has_cuts(P):- clause(P,I),contains_var(!,I).
-clause_calls_self(P):- clause(P,I),functor(P,F,A),functor(C,F,A),contains_term(E,I),compound(E),E=C.
+clause_has_cuts(P):- clause_interface(P,I),contains_var(!,I).
+clause_calls_self(P):- clause_interface(P,I),functor(P,F,A),functor(C,F,A),contains_term(E,I),compound(E),E=C.
+
+clause_interface(P,I):-clause(P,I).
+clause_interface(P,I):- wl:pass_clause(_,P,I).
 
 :- fixup_exports.
 

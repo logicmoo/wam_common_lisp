@@ -26,7 +26,7 @@ lisp_env_eval(Expression, Env, Result):-
 
 function(X,function(X)).
 closure(ClosureEnvironment,ClosureResult,FormalParams,ClosureBody,ActualParams,ClosureResult):-
-  must_bind_parameters(ClosureEnvironment,FormalParams, ActualParams,_EnvOut,BinderCode),
+  must_bind_parameters(ClosureEnvironment,_RestNKeys,FormalParams, ActualParams,_EnvOut,BinderCode),
   always(user:BinderCode),
   always(user:ClosureBody).
 
@@ -41,7 +41,7 @@ cl_funcall(ProcedureName,Args,Result):- env_current(Env),apply_c(Env,ProcedureNa
 apply_c(_EnvIns,function, [A],[function,A]).
 apply_c(EnvIn,[lambda, FormalParams, Body], ActualParams, Result):-
 	!,
-	must_bind_parameters(EnvIn,FormalParams, ActualParams,EnvOut,BinderCode),!,
+	must_bind_parameters(EnvIn,_RestNKeys,FormalParams, ActualParams,EnvOut,BinderCode),!,
         always(BinderCode),
 	lisp_env_eval(Body, EnvOut, Result),
 	!.
@@ -50,7 +50,7 @@ apply_c(EnvIn,closure(ClosureEnvironment,ClosureResult,FormalParams,ClosureBody)
     
 apply_c(EnvIn,ProcedureName, ActualParams, Result):-
 	get_lambda_def(defmacro,ProcedureName,FormalParams, LambdaExpression),!,
-	must_bind_parameters(EnvIn,FormalParams, ActualParams, Env,BinderCode),
+	must_bind_parameters(EnvIn,_RestNKeys,FormalParams, ActualParams, Env,BinderCode),
         always(BinderCode),
         lisp_env_eval(LambdaExpression, Env, Result),
 	!.
@@ -96,7 +96,7 @@ get_macro_function(Ctx,Env,Procedure, Arguments,MResult,FnResult,CallBody):-
    find_function_or_macro_name(Ctx,Env,Procedure,ArgsLen, ProposedName),!,
    align_args_or_fallback(Procedure,ProposedName,Arguments,FnResult,ArgsPlusResult),
    ExpandedFunction =.. [ ProposedName | ArgsPlusResult],
-   clause(ExpandedFunction,Conj),
+   clause_interface(ExpandedFunction,Conj),
    unify_conj(Conj,(CallBody,cl_eval(MResult, FnResult))).
 
 unify_conj(Conj,To):- nonvar(Conj),Conj=To,!.
@@ -114,7 +114,7 @@ macroexpand_1_or_fail([Procedure|Arguments],MacroEnv,CompileBody0Result):- nonva
    get_lambda_def(defmacro,Procedure, FormalParams, LambdaExpression),!,
    always((debug_var('EnvThru',EnvThru),debug_var('NewEnv',NewEnv),
    debug_var('Env',Env),debug_var('NextEnv',NextEnv),debug_var('CommaResult',CommaResult),
-   must_bind_parameters(NewEnv, FormalParams, Arguments,EnvThru,BindCode),!,
+   must_bind_parameters(NewEnv, _RestNKeys, FormalParams, Arguments,EnvThru,BindCode),!,
    append(_,[],NewEnv),!,
    NextEnv = [NewEnv|Env],  
    always(BindCode),

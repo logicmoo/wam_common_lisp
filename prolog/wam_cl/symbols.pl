@@ -30,11 +30,14 @@ f_sys_set_symbol_value(Var,Val):- set_opv(Var,value,Val).
 cl_set(Var,Val,Val):- rtrace(set_opv(Var,value,Val)).
 
 
+/*
+ deduced now
 cl_boundp(Symbol,TF):-  t_or_nil(is_boundp(Symbol),TF).
 cl_constantp(Symbol,TF):- t_or_nil(is_constantp(Symbol),TF).
 cl_fboundp(Symbol,TF):-  t_or_nil(is_fboundp(Symbol),TF).
 cl_keywordp(Symbol,TF):-  t_or_nil(is_keywordp(Symbol),TF).
 cl_symbolp(Symbol,TF):-  t_or_nil(is_symbolp(Symbol),TF).
+*/
 
 cl_gensym(Symbol):- cl_gensym("G",Symbol).
 cl_gensym(Integer,Symbol):- integer(Integer),!,atom_concat('G',Integer,SymbolName),cl_make_symbol(SymbolName,Symbol).

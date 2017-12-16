@@ -35,7 +35,8 @@ is_stringp(X):-var(X),!,fail.
 %is_stringp(X):- string(X),nop(dmsg(is_stringp(X))).
 is_stringp('$ARRAY'([_N],claz_base_character,List)):- nonvar(List).
 
-cl_stringp(A, R):- t_or_nil(is_stringp(A),R).
+% deduced now
+%cl_stringp(A, R):- t_or_nil(is_stringp(A),R).
 
 cl_string(O,S):- to_prolog_string(O,PLS),to_lisp_string(PLS,S).
 
