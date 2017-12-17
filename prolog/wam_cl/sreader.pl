@@ -41,7 +41,14 @@
 
 :- thread_local(t_l:s_reader_info/1).
 
+
+%quietly_sreader(G):- quietly(G).
+quietly_sreader(G):- call(G).
+
+notrace_catch_fail(G):- !, call(G).
 notrace_catch_fail(G):- notrace(catch(G,_,fail)),!.
+
+notrace_catch_fail(G,_E,_C):- !, call(G).
 notrace_catch_fail(G,E,C):- notrace(catch(G,E,C)),!.
 %% with_lisp_translation( +FileOrStream, :Pred1) is det.
 %
@@ -64,7 +71,7 @@ with_rest_info(Pred1):-
  forall(clause(t_l:s_reader_info(O2),_,Ref),
   (must_det(call(Pred1,O2)),erase(Ref))).
 
-parse_sexpr_untyped(I,O):- quietly(parse_sexpr(I,M)),!,quietly(to_untyped(M,O)),!.
+parse_sexpr_untyped(I,O):- quietly_sreader((parse_sexpr(I,M))),!,quietly_sreader((to_untyped(M,O))),!.
 
 read_pending_whitespace(In):- repeat, peek_char(In,Code),
    (( \+ char_type(Code,space), \+ char_type(Code,white))-> ! ; (get_char(In,_),fail)),!.
@@ -131,7 +138,7 @@ lazy_forgotten(In,UnUsed,UnUsed):-
 tstl(I):- with_lisp_translation(I,writeqnl).
 
 supports_seek(In):- notrace_catch_fail(stream_property(In,reposition(true))).
-% supports_seek(In):- quietly(( notrace_catch_fail((notrace_catch_fail((seek(In, 1, current, _),seek(In, -1, current, _)),error(permission_error(reposition, stream, _), _Ctx),fail)),error(_,_),true))).
+% supports_seek(In):- quietly_sreader(( notrace_catch_fail((notrace_catch_fail((seek(In, 1, current, _),seek(In, -1, current, _)),error(permission_error(reposition, stream, _), _Ctx),fail)),error(_,_),true))).
 
 phrase_from_stream_eof(Grammar, _):- Grammar=end_of_file,!.
 phrase_from_stream_eof(Grammar, _):- term_variables(Grammar,[end_of_file]),!.
@@ -211,7 +218,7 @@ parse_sexpr(atom(String), Expr) :- !,txt_to_codes(String,Codes),!,parse_sexpr_as
 parse_sexpr(text(String), Expr) :- !,txt_to_codes(String,Codes),!,parse_sexpr_ascii(Codes, Expr).
 parse_sexpr((String), Expr) :- string(String),!, txt_to_codes(String,Codes),!,parse_sexpr_ascii(Codes, Expr).
 parse_sexpr([E|List], Expr) :- !, parse_sexpr_ascii([E|List], Expr),!.
-parse_sexpr(Other, Expr) :- maybe_notrace((l_open_input(Other,In),Other\=@=In)),!,parse_sexpr(In, Expr).
+parse_sexpr(Other, Expr) :- quietly_sreader((l_open_input(Other,In),Other\=@=In)),!,parse_sexpr(In, Expr).
 
 :- export(txt_to_codes/2).
 txt_to_codes(AttVar,AttVarO):-attvar(AttVar),!,AttVarO=AttVar.
@@ -408,7 +415,7 @@ sexpr(['#'(backquote),E])         --> [96] , !, swhite, sexpr(E).
 sexpr(['#BQ-COMMA-ELIPSE',E]) --> `,@`, !, swhite, sexpr(E).
 sexpr(['#COMMA',E])            --> `,`, !, swhite, sexpr(E).
 sexpr('$OBJ'(claz_bracket_vector,V))                 --> `[`, sexpr_vector(V,`]`),!, swhite.
-sexpr('#'(A))              --> `|`, !, read_string_until(S,`|`), swhite,{maybe_notrace(atom_string(A,S))}.
+sexpr('#'(A))              --> `|`, !, read_string_until(S,`|`), swhite,{quietly_sreader(((atom_string(A,S))))}.
 
 % maybe this is KIF
 sexpr('?'(E))              --> `?`, sexpr_dcgPeek(([C],{sym_char(C)})),!, rsymbol(`?`,E), swhite.
@@ -545,7 +552,7 @@ sexpr_rest(E) --> `.`, [C], {\+ sym_char(C)}, !, sexpr(E,C), !, `)`.
 sexpr_rest(E) --> `@`, rsymbol(`?`,E), `)`.
 sexpr_rest([Car|Cdr]) --> sexpr(Car), !, sexpr_rest(Cdr).
 
-sexpr_vector(O,End) --> sexpr_vector0(IO,End),!,always(O=IO).
+sexpr_vector(O,End) --> sexpr_vector0(IO,End),!,{always(O=IO)}.
 
 sexpr_vector0(X) --> one_blank,!,sexpr_vector0(X).
 sexpr_vector0([],End) --> End, !.
@@ -698,13 +705,14 @@ as_keyword(C,C).
 % Converted To Untyped.
 %
 to_untyped(S,S):- var(S),!.
+to_untyped(S,S):- var(S),!.
 to_untyped([],[]):-!.
 to_untyped('#-'(C,I),'#-'(K,O)):- as_keyword(C,K),!,to_untyped(I,O),!.
 to_untyped('#+'(C,I),'#+'(K,O)):- as_keyword(C,K),!,to_untyped(I,O),!.
 to_untyped('?'(S),_):- S=='??',!.
 % to_untyped('?'(S),'$VAR'('_')):- S=='??',!.
 % to_untyped(VAR,NameU):-atom(VAR),atom_concat_or_rtrace('#$',NameU,VAR),!.
-to_untyped(VAR,NameU):-atom(VAR),(atom_concat_or_rtrace(N,'.',VAR)->true;N=VAR),notrace(notrace_catch_fail(atom_number(N,NameU))),!.
+to_untyped(VAR,NameU):-atom(VAR),(atom_concat_or_rtrace(N,'.',VAR)->true;N=VAR),(notrace_catch_fail(atom_number(N,NameU))),!.
 %to_untyped(S,s(L)):- string(S),atom_contains(S,' '),atomic_list_concat(['(',S,')'],O),parse_sexpr_string(O,L),!.
 to_untyped(S,S):- string(S),!.
 to_untyped(S,S):- number(S),!.
@@ -713,7 +721,7 @@ to_untyped(Var,'$VAR'(Name)):-svar(Var,Name),!.
 to_untyped(Atom,Atom):- \+ compound(Atom),!.
 to_untyped('@'(Var),'$VAR'(Name)):-svar_fixvarname(Var,Name),!.
 to_untyped('#'(S),O):- !, (nonvar(S)->to_untyped(S,O) ; O='#'(S)).
-to_untyped('#\\'(S),C):-!,to_untyped('#\\'(S),C),!.
+to_untyped('$CHAR'(S),C):-!,to_untyped('#\\'(S),C),!.
 to_untyped('#\\'(S),C):-to_char(S,C),!.
 to_untyped('#\\'(S),'#\\'(S)):-!.
 to_untyped('$OBJ'([FUN, F]),O):- atom(FUN),!,to_untyped('$OBJ'(FUN, F),O).
@@ -724,9 +732,9 @@ to_untyped('$OBJ'(Ungly,S),O):-to_untyped(S,SO),!,O=..[Ungly,SO].
 to_untyped('$NUMBER'(S),O):-nonvar(S),to_number(S,O),to_untyped(S,O),!.
 to_untyped('$NUMBER'(S),'$NUMBER'(claz_short_float,S)):- float(S),!.
 to_untyped('$NUMBER'(S),'$NUMBER'(claz_bignum,S)).
-to_untyped('$EXP'(I,'E',E),N):- notrace(notrace_catch_fail(N is 0.0 + ((I * 10^E)))),!.
-to_untyped('$EXP'(I,claz_single_float,E),N):- notrace(notrace_catch_fail(N is 0.0 + ((I * 10^E)))),!.
-to_untyped('$EXP'(I,T,E),'$NUMBER'(T,N)):- notrace(notrace_catch_fail(N is (I * 10^E))),!.
+to_untyped('$EXP'(I,'E',E),N):- (notrace_catch_fail(N is 0.0 + ((I * 10^E)))),!.
+to_untyped('$EXP'(I,claz_single_float,E),N):- (notrace_catch_fail(N is 0.0 + ((I * 10^E)))),!.
+to_untyped('$EXP'(I,T,E),'$NUMBER'(T,N)):- (notrace_catch_fail(N is (I * 10^E))),!.
 to_untyped('$EXP'(I,T,E),'$EXP'(I,T,E)):-!.
 
 % to_untyped([[]],[]):-!.
@@ -919,7 +927,7 @@ ok_varname_or_int(Name):- number(Name).
 % Ok Varname.
 %
 ok_var_name(Name):- 
-  quietly(( atom(Name),atom_codes(Name,[C|_List]),char_type(C,prolog_var_start),
+  quietly_sreader(( atom(Name),atom_codes(Name,[C|_List]),char_type(C,prolog_var_start),
       read_term_from_atom(Name,Term,[syntax_errors(fail),variable_names(Vs)]),!,var(Term),Vs=[RName=RVAR],!,RVAR==Term,RName==Name)).
 
 %:- export(ok_codes_in_varname/1).
@@ -937,7 +945,7 @@ ok_var_name(Name):-
 %
 % Atom Upper.
 %
-atom_upper(A,U):-string_upper(A,S),maybe_notrace(atom_string(U,S)).
+atom_upper(A,U):-string_upper(A,S),quietly_sreader(((atom_string(U,S)))).
 
 
 %= 	 	 
@@ -964,7 +972,7 @@ lisp_read_from_stream(Input,Forms):-
 %
 lisp_read(Input,Forms):- 
     lisp_read_typed(Input, Forms0),!,
-    quietly(always(to_untyped(Forms0,Forms))).
+    quietly_sreader((always(to_untyped(Forms0,Forms)))).
 
 
 
@@ -1105,7 +1113,7 @@ process_rff(CU,OnFirst,OnRetry,OnSuccess,OnFailure):-
 %
 fixvars(P,_,[],P):-!.
 fixvars(P,N,[V|VARS],PO):-  
-     maybe_notrace(atom_string(Name,V)),
+     quietly_sreader((atom_string(Name,V))),
      svar_fixvarname(Name,NB),Var = '$VAR'(NB),
      subst(P,'$VAR'(N),Var,PM0),
      subst(PM0,'$VAR'(Name),Var,PM),
@@ -1334,7 +1342,7 @@ input_to_forms_debug(String,Decoder):-input_to_forms(String,Wff,Vs),
 %
 input_to_forms(Codes,FormsOut,Vars):- 
   b_setval('$variable_names',[])-> 
-  quietly(input_to_forms0(Codes,FormsOut,Vars)) ->
+  quietly_sreader((input_to_forms0(Codes,FormsOut,Vars))) ->
   nop(set_variable_names_safe(Vars)).
   
 is_variable_names_safe(Vars):- var(Vars),!.

@@ -89,6 +89,11 @@ cl_copy_alist(T,T).
 pl_copy_1assoc([H|T],[H|T]).
 pl_copy_1assoc(HT,HT).
 
+% asserting1... u
+wl: init_args(exact_only, cl_acons).
+cl_acons(Key_Param, Datum_Param, Alist_Param, [[Key_Param|Datum_Param]|Alist_Param]).
+
+
 %rassoc item alist &key key test test-not => entry
 wl:init_args(2,cl_rassoc).
 cl_rassoc(Item,AList,Options,RetVal):- 
@@ -263,6 +268,24 @@ is_eq(X,Y):- same_term(X,Y).
 % is_eq(X,Y):- X==Y, (\+ compound(X)-> true ; \+ \+ ((gensym(cookie,Cook),setarg(1,X,Cook),X==Y))).
 is_equal(X,Y):- (X=@=Y->true;is_eql(X,Y)).
 is_equalp(X,Y):- is_equal(X,Y)->true;((f_u_to_pvs(X,XX),f_u_to_pvs(Y,YY), XX=@=YY)-> true ; ( \+ X\=Y)).
+
+
+cl_remove('$ARRAY'([S],Type,A),B,'$ARRAY'([Sm1],Type,C)):-pl_remove(-1,is_equal,A,B,C,Did),(number(S)->Sm1 is S-Did ; Sm1=S).
+cl_remove(A,B,C):- pl_remove(-1,is_equal,A,B,C,_Did).
+
+pl_remove(_Tst,0, X, _, X, 0).
+pl_remove(_Tst,_,[], _, [],0).
+pl_remove(Tst,May,[Elem|Tail], Del, Result,Done2) :-
+    ( call(Tst,Elem,Del) ->  (May2 is May-1, pl_remove(Tst,May2,Tail, Del, Result,Done),Done2 is Done+1)
+    ; ( Result = [Elem|Rest],pl_remove(Tst,May,Tail,Del,Rest,Done2))).
+
+%cl_subst('$ARRAY'([S],Type,A),B,C,'$ARRAY'([Sm1],Type,R)):-pl_subst(C,B,A,R),(number(S)->Sm1 is S-Did ; Sm1=S).
+cl_subst(A,B,C,R):-pl_subst(C,B,A,R).
+
+pl_subst( Var, VarS,SUB,SUB ) :- Var==VarS,!.
+pl_subst([H|T],B,A,[HH|TT]):- !,pl_subst(H,B,A,HH),pl_subst(T,B,A,TT).
+pl_subst( Var, _,_,Var ).
+
 
 personal_props(sname).
 personal_props(ref).

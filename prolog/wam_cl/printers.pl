@@ -48,7 +48,7 @@ sexpr1(['#BQ-COMMA-ELIPSE',X])--> [',@'],sexpr1(X).
 sexpr1([X|Y]) --> ['('],  sexpr1(X), lisplist(Y,')').
 sexpr1([function,Expression]) --> ['#'''], !, sexpr1(Expression).
 sexpr1(function(Expression)) --> ['#'''], !, sexpr1(Expression).
-sexpr1('#\\'(X)) --> {format(atom(NN),'#\\~w',[X])},!,[NN].
+sexpr1('#\\'(X)) --> {format(atom(NN),'#\\~w ',[X])},!,[NN].
 sexpr1('$STRING'(X)) --> {format(atom(NN),'~q',[X])},!,[NN].
 sexpr1('$COMPLEX'(R,I)) --> ['#C('],sexpr1(R),sexpr1(I),[')'].
 sexpr1('$RATIO'(R,I)) --> [''],sexpr1(R),['/'],sexpr1(I),[''].
@@ -67,7 +67,7 @@ sexpr1('$OBJ'([T|X])) --> sexpr1('$OBJ'(T,X)).
 sexpr1('$OBJ'(T,X)) --> {T==claz_prolog,with_output_to(atom(SPClosure),fmt9(X)),trim_full_stop(SPClosure,TSPClosure)}, 
   ['{',TSPClosure,'}.'], !.
 sexpr1('$OBJ'(T,X)) --> {T==claz_function},['#\''],sexpr1(X).
-sexpr1('$OBJ'(T,X)) --> {T==claz_vector},['#'],sexpr1(X).
+sexpr1('$OBJ'(T,X)) --> {T==claz_vector},['#('],lisplist(X,')').
 sexpr1('$OBJ'(T,X)) --> {T==claz_pathname},['#P'],sexpr1(X).
 sexpr1('$OBJ'(T,X)) --> ['#S'],{is_list(X),is_structure_class(T),claz_to_symbol(T,TP)},sexpr1(TP),sexpr1(X).
 sexpr1('$OBJ'(claz_package,X)) -->  !,sexpr1(X).

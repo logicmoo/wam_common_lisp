@@ -264,7 +264,8 @@ set_prompt_from_package:-
 read_eval_print(Result):-		% dodgy use of cuts to force a single evaluation
         set_prompt_from_package,
 
-        lquietly(show_uncaught_or_fail(read_no_parse(Expression))),!,
+        %lquietly
+        (show_uncaught_or_fail(read_no_parse(Expression))),!,
         lquietly(show_uncaught_or_fail(lisp_add_history(Expression))),!,
         nb_linkval('$mv_return',[Result]),
         show_uncaught_or_fail(eval_at_repl(Expression,Result)),!,

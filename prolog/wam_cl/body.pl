@@ -122,6 +122,10 @@ compile_body(Ctx,Env,Result,Var, Code):- is_ftVar(Var), !, % NEVER SEEN
   debug_var("EVAL",Var),
   must_compile_body(Ctx,Env,Result,[eval,Var], Code).
 
+compile_body(_Ctx,_Env,Result,[eval,Var], cl_eval(Var,Result)):- \+ is_list(Var), !. 
+compile_body(_Ctx,_Env,Result,[eval,[A|Var]], cl_eval([A|Var],Result)):- \+ atom(A), !. % NEVER SEEN
+compile_body(_Ctx,_Env,Result,[eval,Var], cl_eval(Var,Result)):- !.
+
 % Lazy Reader
 compile_body(Ctx,Env,Result, 's'(Str),  Body):-
   parse_sexpr_untyped(string(Str),Expression),!,
@@ -161,10 +165,6 @@ compile_body(_Cx,_Ev,SelfEval,SelfEval,true):- notrace(is_self_evaluating_object
 %atom_number_exta(Atom,Value):- atom_concat_or_rtrace('-.',R,Atom),atom_concat_or_rtrace('-0.',R,NAtom),!,atom_number(NAtom,Value).
 %atom_number_exta(Atom,Value):- atom_concat_or_rtrace('.',R,Atom),atom_concat_or_rtrace('0.',R,NAtom),!,atom_number(NAtom,Value).
 
-
-% symbols
-compile_body(Ctx,Env,Value,Atom, Body):- atom(Atom),!,
-  always(assign:compile_symbol_getter(Ctx,Env,Value, Atom, Body)).
 
 % QUOTE
 compile_body(_Cx,_Ev,Item,[quote, Item],  true):- !.
@@ -668,10 +668,9 @@ compile_body(Ctx,Env,Result,[ext_xor,Form1,Form2],Code):-
   Code = (Code1,Code2,Code3).
 
 
-
-
-compile_body(Ctx,Env,Result,BodyForms, Body):- atom(BodyForms),!,
-   always(compile_assigns(Ctx,Env,Result,BodyForms, Body)),!.
+% symbols
+compile_body(Ctx,Env,Value, Atom,      Body):- atom(Atom), always(compile_symbol_getter(Ctx,Env,Value, Atom, Body)).
+compile_body(Ctx,Env,Result,BodyForms, Body):- atom(BodyForms),!,always(compile_assigns(Ctx,Env,Result,BodyForms, Body)),!.
 
 % SETQ - PSET
 compile_body(Ctx,Env,Result,BodyForms, Body):- compile_assigns(Ctx,Env,Result,BodyForms, Body),!.

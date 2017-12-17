@@ -151,22 +151,22 @@ expand_arguments_maybe_macro(Ctx,CallEnv,FN,0,FunctionArgs,ArgBody, Args):-
 compile_funop(Ctx,Env,Result,[Op | FunctionArgs], Body):- nonvar(Op),wl:op_replacement(Op,Op2), !,
   must_compile_body(Ctx,Env,Result,[Op2 | FunctionArgs],Body).
 
-% progn mismatch?
-compile_funop(Ctx,Env,Result,[FN ], Body):- is_list(FN),!,
-  trace,must_compile_body(Ctx,Env,Result,FN,Body).
+compile_funop(Ctx,Env,Result,[FN | FunctionArgs], Body):- \+ compound(FunctionArgs),
+   show_call(must_compile_body(Ctx,Env,Result,[eval,[cons,[quote,FN], FunctionArgs]],Body)).
 
-compile_funop(Ctx,Env,Result,[FN , A| FunctionArgs], Body):- is_list(FN),!,
-  must_compile_body(Ctx,Env,Result,[funcall,FN, A | FunctionArgs],Body).
-
-compile_funop(Ctx,Env,Result,[FN | FunctionArgs], Body):- \+ atom(FN),!,
-  dumpST,trace,must_compile_body(Ctx,Env,Result,[funcall_obj,FN | FunctionArgs],Body).
-
-
-compile_funop(Ctx,CallEnv,Result,[FN | FunctionArgs], Body):- nonvar(FN),
+compile_funop(Ctx,CallEnv,Result,[FN | FunctionArgs], Body):- nonvar(FN),atom(FN),!,
       expand_arguments_maybe_macro(Ctx,CallEnv,FN,0,FunctionArgs,ArgBody, Args),
       %debug_var([FN,'_Ret'],Result),      
       find_function_or_macro(Ctx,CallEnv,FN,Args,Result,ExpandedFunction),      
       Body = (ArgBody,ExpandedFunction).
+
+% progn mismatch?
+compile_funop(Ctx,Env,Result,[FN ], Body):- is_list(FN),!,
+  trace,must_compile_body(Ctx,Env,Result,FN,Body).
+
+compile_funop(Ctx,Env,Result,[FN | FunctionArgs], Body):- 
+   show_call(must_compile_body(Ctx,Env,Result,[eval,[FN| FunctionArgs]],Body)).
+
 
 
 % FUNCTION APPLY
