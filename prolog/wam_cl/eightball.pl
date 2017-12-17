@@ -52,6 +52,7 @@ true_or_die(Goal):-functor(Goal,_,A),arg(A,Goal,Ret),always((Goal,Ret\==[])).
 lquietly(G):- quietly(G).
 
 % Must always succeed (or else there is a bug in the lisp impl!)
+always(G):- notrace(tracing),!,G,!.
 always((A->B;C)):- !, (on_x_rtrace(user:A) -> always(B);always(C)),!.
 always((A,!,B)):-!,always(A),!,always(B).
 always((A,B)):-!,always(A),always(B).

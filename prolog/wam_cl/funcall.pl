@@ -26,7 +26,10 @@ lisp_env_eval(Expression, Env, Result):-
 
 function(X,function(X)).
 closure(ClosureEnvironment,ClosureResult,FormalParams,ClosureBody,ActualParams,ClosureResult):-
-  must_bind_parameters(ClosureEnvironment,_RestNKeys,FormalParams, ActualParams,_EnvOut,BinderCode),
+  M = closure(ClosureEnvironment,ClosureResult,FormalParams,ClosureBody,ActualParams,ClosureResult),
+  del_attrs_of(M,dif),
+  del_attrs_of(M,vn),
+  arglists:must_bind_parameters(ClosureEnvironment,_RestNKeys,FormalParams, ActualParams,_EnvOut, BinderCode),
   always(user:BinderCode),
   always(user:ClosureBody).
 
@@ -154,13 +157,16 @@ compile_funop(Ctx,Env,Result,[Op | FunctionArgs], Body):- nonvar(Op),wl:op_repla
 compile_funop(Ctx,Env,Result,[eval , Form],(FormBody,cl_eval(ResultForm,Result))):-!,
    must_compile_body(Ctx,Env,ResultForm,Form,FormBody).
 
-compile_funop(Ctx,CallEnv,Result,[FN | FunctionArgs], Body):- is_list(FunctionArgs), is_lisp_funcallable(FN),!,
+compile_funop(_Ctx,Env,Result,[FN | FunctionArgs], cl_env_eval(Env,[eval,[cons,[quote,FN], FunctionArgs]],Result)):- 
+  \+ is_list(FunctionArgs),!.
+
+compile_funop(Ctx,CallEnv,Result,[FN | FunctionArgs], Body):- is_lisp_funcallable(FN),!,
       expand_arguments_maybe_macro(Ctx,CallEnv,FN,0,FunctionArgs,ArgBody, Args),
       %debug_var([FN,'_Ret'],Result),      
       find_function_or_macro(Ctx,CallEnv,FN,Args,Result,ExpandedFunction),      
       Body = (ArgBody,ExpandedFunction).
 
-compile_funop(_Ctx,Env,Result,[FN | FunctionArgs], cl_env_eval(Env,[eval,[cons,[quote,FN], FunctionArgs]],Result)):- !.
+compile_funop(_Ctx,Env,Result,[FN | FunctionArgs], cl_env_eval(Env,[eval,[cons,[quote,FN], FunctionArgs]],Result)).
 
    
 /*

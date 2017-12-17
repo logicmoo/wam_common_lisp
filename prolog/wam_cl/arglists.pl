@@ -371,17 +371,14 @@ align_args_local(FN,RequiredArgs,RestNKeys,Whole,Result,LB,ArgInfo,HeadArgs,wl:i
  append(RequiredArgs,[RestNKeys,Result],HeadArgs),!.
 
 
-% eval_uses_exact
-expand_function_head(Ctx,Env,[Fn,A|Rest],Head,ZippedArgEnv,Result,HeadDefCode,HeadCode):- atom(Rest),!,
-      expand_function_head(Ctx,Env,[Fn,A,'&rest',Rest],Head,ZippedArgEnv,Result,HeadDefCode,HeadCode),!.
-expand_function_head(Ctx,Env,[Fn,A,B|Rest],Head,ZippedArgEnv,Result,HeadDefCode,HeadCode):- atom(Rest),!,
-      expand_function_head(Ctx,Env,[Fn,A,B,'&rest',Rest],Head,ZippedArgEnv,Result,HeadDefCode,HeadCode),!.
-expand_function_head(Ctx,Env,[Fn,A,B,C|Rest],Head,ZippedArgEnv,Result,HeadDefCode,HeadCode):- atom(Rest),!,
-      expand_function_head(Ctx,Env,[Fn,A,B,C,'&rest',Rest],Head,ZippedArgEnv,Result,HeadDefCode,HeadCode),!.
+% Dotted Head
+expand_function_head(Ctx,Env,[F|Whole],Head,ZippedArgEnv,Result,HeadDefCode,HeadCode):- 
+   append(Req,Rest,Whole),Rest\==[],\+ Rest=[_|_], 
+   append(Req,['&rest',Rest],NewWhole),!,
+   expand_function_head(Ctx,Env,[F|NewWhole],Head,ZippedArgEnv,Result,HeadDefCode,HeadCode).
 
 % eval Odd Head
-expand_function_head(Ctx,Env,FN, Head, ZippedArgEnv, Result,HeadDefCode,HeadCode):- 
-  \+ is_list(FN),!,
+expand_function_head(Ctx,Env,FN, Head, ZippedArgEnv, Result,HeadDefCode,HeadCode):- \+ is_list(FN),!,
   expand_function_head(Ctx,Env,[FN], Head, ZippedArgEnv, Result,HeadDefCode,HeadCode).
 
 
@@ -509,9 +506,9 @@ correct_formal_params_destructuring([A, B|R],[A, B, '&rest',R]):- simple_atom_va
 correct_formal_params_destructuring([A|R],[A,'&rest',R]):- simple_atom_var(A),simple_atom_var(R),!.
 correct_formal_params_destructuring(AA,AA).
 
-must_bind_parameters(EnvIO,RestNKeys,FormalParms0,Params,EnvIO,Code):- 
-  correct_formal_params(FormalParms0,FormalParms),
-  always(bind_each_param(EnvIO,RestNKeys,FormalParms,Params,Code)).
+must_bind_parameters(EnvIO,RestNKeys,FormalParms0,Params,EnvIO,Code):-
+  always(((correct_formal_params(FormalParms0,FormalParms),
+   bind_each_param(EnvIO,RestNKeys,FormalParms,Params,Code)))),!.
 
 bind_each_param(Env,RestNKeys, FormalParms, Arguments,BindCode):-
   % append_open_list(Env,bind),
@@ -522,7 +519,7 @@ append_open_list(Env,Value):- append(_,[Value|_],Env),!.
 append_open_list(EnvList,Value):- member(Env,EnvList),append(_,[Value|_],Env),!.
 append_open_list(ClosedList,Value):- ClosedList = [_Env|List], setarg(2,ClosedList,[Value|List]).
 
-bind_parameters(_Env,_Mode, [], _, true):-!.
+bind_parameters(_Env,_RestNKeys,_Mode, [], _, true):-!.
 
 % Switch mode &optional, &key or &aux mode
 bind_parameters(Env,RestNKeys,_,[Mode|FormalParms],Params,Code):- 
@@ -539,7 +536,7 @@ bind_parameters(Env,RestNKeys,_,['&environment',Var|FormalParms],Params,(make_bi
   bind_parameters(Env,RestNKeys,'&rest',FormalParms,Params,Code).
 
 % Parsing required(s)
-bind_parameters(Env,RestNKeys,'required',[Var|FormalParms],In,Code):- !, must_or(In=[Value|Params],throw(args_underflow)),
+bind_parameters(Env,RestNKeys,'required',[Var|FormalParms],In,Code):-  must_or(In=[Value|Params],throw(args_underflow)),
   enforce_atomic(Var),make_bind_value(Var,Value,Env),
   bind_parameters(Env,RestNKeys,'required',FormalParms,Params,Code).
 

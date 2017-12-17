@@ -154,11 +154,11 @@ compile_macro(_Prepend,Ctx,CallEnv,Macro,[Name0,FormalParms|FunctionBody0], Comp
    MacroHead=[Macro|FormalParms],
    FunDef = (set_opv(Macro,classof,claz_macro),set_opv(Symbol,compile_as,kw_operator),set_opv(Symbol,function,Macro)),
    FunDef,
-   within_labels_context(Symbol, make_mcompiled(Ctx,CallEnv,MResult,Symbol,MacroHead,FunctionBody,
-     NewMacroHead,HeadDefCode,BodyCode,Fun)),
-   %NewMacroHead=..[M|ARGS],RNewMacroHead=..[MM|ARGS], atom_concat_or_rtrace(M,'_mexpand1',MM),   
-   %get_alphas(Ctx,Alphas),
-   debug_var('FnResult',FResult),debug_var('Fun',Fun),
+   debug_var("CallEnv",RealCallEnv),debug_var('MFResult',MResult),
+   within_labels_context(Symbol, make_compiled(Ctx,RealCallEnv,MResult,Symbol,MacroHead,FunctionBody,
+     NewMacroHead,HeadDefCode,BodyCode)),
+   %NewMacroHead=..[M|ARGS],RNewMacroHead=..[MM|ARGS], atom_concat_or_rtrace(M,'_mexpand1',MM), %get_alphas(Ctx,Alphas),
+   debug_var('FnResult',FResult),
    subst(NewMacroHead,MResult,FResult,FunctionHead),
    
  CompileBody = (
@@ -186,37 +186,24 @@ compile_function(_Prepend,Ctx,Env,Function,[Name,FormalParms|FunctionBody0], Com
    always(find_function_or_macro_name(Ctx,Env,Symbol,_Len, Function)),
    always(maybe_get_docs(function,Function,FunctionBody0,FunctionBody,DocCode)),
    FunctionHead=[Function|FormalParms],
-   within_labels_context(Symbol, make_compiled(Ctx,Env,MResult,Symbol,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode)),
+   debug_var("Env",CallEnv),
+   within_labels_context(Symbol,
+     make_compiled(Ctx,CallEnv,MResult,Symbol,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode)),
  CompileBody = (
    DocCode,
    HeadDefCode,
    assert_lsp(wl:lambda_def(defun,(Name),Function, FormalParms, FunctionBody)),
    assert_lsp((user:Head  :- BodyCode)),
-   set_opv(Function,classof,claz_compiled_function),
-   set_opv(Symbol,compile_as,kw_function),
-   set_opv(Symbol,function,Function)),
-   debug_var('MResult',MResult).
+   set_opv(Function,classof,claz_compiled_function),set_opv(Symbol,compile_as,kw_function),set_opv(Symbol,function,Function)),
+ debug_var('MResult',MResult).
 
-make_compiled(Ctx,_UnusedEnv,FResult,Symbol,FunctionHead,FunctionBody,Head,HeadDefCode,(BodyCode)):-
+make_compiled(Ctx,CallEnv,FResult,Symbol,FunctionHead,FunctionBody,Head,HeadDefCode,(BodyCode)):-
    always(( expand_function_head(Ctx,CallEnv,FunctionHead, Head, HeadEnv, FResult,HeadDefCode,HeadCode),
-    debug_var("CallEnv",CallEnv),debug_var('FResult',FResult),
-    compile_body(Ctx,CallEnv,FResult,[block,Symbol|FunctionBody],Body0),
+   compile_body(Ctx,CallEnv,FResult,[block,Symbol|FunctionBody],Body0),
     show_ctx_info(Ctx),
     (((var(FResult)))
     -> body_cleanup_keep_debug_vars(Ctx,((CallEnv=HeadEnv,HeadCode,Body0)),BodyCode)
      ; (body_cleanup_no_optimize(Ctx,((CallEnv=HeadEnv,HeadCode,Body0,FResult=FResult)),BodyCode))))).
-
-make_mcompiled(Ctx,_UnusedEnv,CResult,Symbol,FunctionHead,FunctionBody,Head,HeadDefCode,(BodyCode),Fun):-
-    always(((expand_function_head(Ctx,CallEnv,FunctionHead, Head, HeadEnv, CResult,HeadDefCode,HeadCode)),
-    debug_var("CallEnv",CallEnv),debug_var('CResult',CResult),debug_var('MResult',MResult),
-    compile_body(Ctx,CallEnv,MResult,[block,Symbol|FunctionBody],Body0),
-    show_ctx_info(Ctx),
-   ((fail,sub_term(Sub,Body0),compound(Sub),(Sub= (Body=Var)),var(Var),Var==MResult, is_list(Body))->
-     (lisp_compile(CResult,Body,BodyCode0),
-      subst(Body0,Sub,BodyCode0,BodyCode),Fun=t);
-    (((var(MResult)))
-    -> (MResult=CResult,body_cleanup_keep_debug_vars(Ctx,((CallEnv=HeadEnv,HeadCode,Body0)),BodyCode))
-     ; (MResult=CResult,body_cleanup_no_optimize(Ctx,((CallEnv=HeadEnv,HeadCode,Body0,MResult=CResult)),BodyCode)))))).
 
 
 

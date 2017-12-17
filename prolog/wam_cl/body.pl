@@ -478,7 +478,14 @@ compile_body(Ctx,Env,Result,[lambda,LambdaArgs|LambdaBody], Body):-
    debug_var('ClosureEnvironment',ClosureEnvironment),
    Body =
      (Result = closure([ClosureEnvironment|Env],ClosureResult,LambdaArgs,ClosureBody)).
-   
+
+% ((lambda ...) ...)
+compile_body(Ctx,_Env,Result,[POrSTerm|ARGS],Body):- 
+   p_or_s(POrSTerm,lambda,[LambdaArgs|LambdaBody]),
+   must_compile_closure_body(Ctx,ClosureEnvironment,ClosureResult,[progn|LambdaBody],  ClosureBody),
+    ClosureResult = Result,debug_var('ClosureEnv',ClosureEnvironment),debug_var('ClosureResult',Result),
+   Body = closure(ClosureEnvironment,ClosureResult,LambdaArgs,ClosureBody,ARGS,Result).
+
 
 % (function .)
 compile_body(_Cx,_Ev,function(Function),POrSTerm, true):- p_or_s(POrSTerm,function,[Function]).
