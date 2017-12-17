@@ -42,14 +42,15 @@
 :- thread_local(t_l:s_reader_info/1).
 
 
-%quietly_sreader(G):- quietly(G).
-quietly_sreader(G):- call(G).
+quietly_sreader(G):- quietly(G).
+%quietly_sreader(G):- call(G).
 
-notrace_catch_fail(G):- !, call(G).
+%notrace_catch_fail(G):- !, call(G).
 notrace_catch_fail(G):- notrace(catch(G,_,fail)),!.
 
-notrace_catch_fail(G,_E,_C):- !, call(G).
+%notrace_catch_fail(G,_E,_C):- !, call(G).
 notrace_catch_fail(G,E,C):- notrace(catch(G,E,C)),!.
+
 %% with_lisp_translation( +FileOrStream, :Pred1) is det.
 %
 % With File or Stream read all S-expressions submitting each to Pred1
@@ -425,6 +426,7 @@ sexpr('$STRING'(S))             --> s_string(S).
 
 /******** BEGIN HASH ************/
 
+sexpr('#\\'(35))                 --> `#\\#`, swhite.
 sexpr(E)                      --> `#`,read_dispatch(E),!.
 
 sexpr('#\\'(C))                 --> `#\\`,ci(`u`),remove_optional_char(`+`),dcg_basics:xinteger(C),!.
@@ -439,7 +441,7 @@ sexpr('$COMPLEX'(R,I)) --> (`#`,ci(`c`),`(`),!,  lnumber(R),lnumber(I),`)`.
 sexpr(function(E))                 --> `#\'`, sexpr(E), !. %, swhite.
 sexpr('$OBJ'(claz_vector,V))                 --> `#(`, !, sexpr_vector(V,`)`),!, swhite,!.
 
-sexpr(Number) --> `#`,integer(Radix),ci(`r`),!,radix_number(Radix,Number0),extend_radix(Radix,Number0,Number).
+sexpr(Number) --> `#`,integer(Radix),ci(`r`),!,signed_radix_2(Radix,Number0),extend_radix(Radix,Number0,Number).
 sexpr('$ARRAY'(Dims,V)) --> `#`,integer(Dims),ci(`a`),!,sexpr(V).
 sexpr(V)                    --> `#.`, !,sexpr(C),{to_untyped(C,UTC),reader_intern_symbols(UTC,M),lisp_compiled_eval(M,V)}.
 sexpr('#'(E))              --> `#:`, !, rsymbol(`#:`,E), swhite.
@@ -727,8 +729,11 @@ to_untyped('#\\'(S),'#\\'(S)):-!.
 to_untyped('$OBJ'([FUN, F]),O):- atom(FUN),!,to_untyped('$OBJ'(FUN, F),O).
 to_untyped('$OBJ'([FUN| F]),O):- atom(FUN),!,to_untyped('$OBJ'(FUN, F),O).
 to_untyped('$OBJ'(S),'$OBJ'(O)):-to_untyped(S,O),!.
+to_untyped('$OBJ'(Ungly,S),'$OBJ'(Type,O)):- text_to_string_safe(Ungly,Str),string_to_atom(Str,Type),to_untyped(S,O),!.
 to_untyped('$OBJ'(Ungly,S),'$OBJ'(Ungly,O)):-to_untyped(S,O),!.
 to_untyped('$OBJ'(Ungly,S),O):-to_untyped(S,SO),!,O=..[Ungly,SO].
+to_untyped('$COMPLEX'(N0,D0),N):- to_untyped(D0,D), notrace_catch_fail(( 0 =:= D)),to_untyped(N0,N).
+to_untyped('$RATIO'(N0,D0),V):- to_untyped(N0,N),to_untyped(D0,D), notrace_catch_fail(( 0 is N mod D, V is N div D)).
 to_untyped('$NUMBER'(S),O):-nonvar(S),to_number(S,O),to_untyped(S,O),!.
 to_untyped('$NUMBER'(S),'$NUMBER'(claz_short_float,S)):- float(S),!.
 to_untyped('$NUMBER'(S),'$NUMBER'(claz_bignum,S)).
@@ -756,12 +761,20 @@ to_number(S,S):-number(S),!.
 to_number(S,N):- text_to_string_safe(S,Str),number_string(N,Str),!.
 
 to_char(S,'#\\'(S)):- var(S),!.
-to_char(S,C):- atom(S),name(S,[N]),!,to_char(N,C).
-to_char(N,'#\\'(S)):- integer(N),(char_type(N,alnum)->name(S,[N]);S=N),!.
 to_char('#'(S),C):- !, to_char(S,C).
 to_char('#\\'(S),C):- !, to_char(S,C).
+to_char(S,C):- atom(S),name(S,[N]),!,to_char(N,C).
+to_char(N,'#\\'(S)):- integer(N),!,char_code_to_char(N,S),!.
 to_char(N,C):- text_to_string_safe(N,Str),char_code_from_name(Str,Code),to_char(Code,C),!.
-to_char(C,'#\\'(C)).
+to_char(N,'#\\'(S)):- to_number(N,NC),!,char_code_to_char(NC,S),!.
+
+char_code_to_char(N,S):- char_type(N,alnum),name(S,[N]).
+char_code_to_char(32,' ').
+char_code_to_char(N,N):- \+ char_type(N,graph).
+char_code_to_char(N,N):- char_type(N,white).
+char_code_to_char(N,S):- name(S,[N]).
+
+
 
 char_code_from_name(Str,Code):-find_from_name(Str,Code),!.
 char_code_from_name(Str,Code):-text_upper(Str,StrU),find_from_name2(StrU,Code).
@@ -782,13 +795,16 @@ find_from_name2(Str,Code):-lisp_code_name_extra(Code,Chars),text_upper(Chars,Str
 text_upper(T,U):-text_to_string_safe(T,S),string_upper(S,U).
 
 lisp_code_name_extra(0,`Null`).
+lisp_code_name_extra(1,`Soh`).
 lisp_code_name_extra(7,`Bell`).
-lisp_code_name_extra(27,`Escape`).
-lisp_code_name_extra(13,`Ret`).
+lisp_code_name_extra(7,`bell`).
+lisp_code_name_extra(8,`BCKSPC`).
+lisp_code_name_extra(10,`Newline`).
 lisp_code_name_extra(10,`LF`).
 lisp_code_name_extra(10,`Linefeed`).
-lisp_code_name_extra(8,`BCKSPC`).
-lisp_code_name_extra(7,`bell`).
+lisp_code_name_extra(27,`Escape`).
+lisp_code_name_extra(32,`Space`).
+lisp_code_name_extra(13,`Ret`).
 
 % @TODO undo this temp speedup
 :- set_prolog_flag(all_lisp_char_names,false).

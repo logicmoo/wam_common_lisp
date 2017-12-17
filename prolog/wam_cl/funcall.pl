@@ -151,23 +151,30 @@ expand_arguments_maybe_macro(Ctx,CallEnv,FN,0,FunctionArgs,ArgBody, Args):-
 compile_funop(Ctx,Env,Result,[Op | FunctionArgs], Body):- nonvar(Op),wl:op_replacement(Op,Op2), !,
   must_compile_body(Ctx,Env,Result,[Op2 | FunctionArgs],Body).
 
-compile_funop(Ctx,Env,Result,[FN | FunctionArgs], Body):- \+ compound(FunctionArgs),
-   show_call(must_compile_body(Ctx,Env,Result,[eval,[cons,[quote,FN], FunctionArgs]],Body)).
+compile_funop(Ctx,Env,Result,[eval , Form],(FormBody,cl_eval(ResultForm,Result))):-!,
+   must_compile_body(Ctx,Env,ResultForm,Form,FormBody).
 
-compile_funop(Ctx,CallEnv,Result,[FN | FunctionArgs], Body):- nonvar(FN),atom(FN),!,
+compile_funop(Ctx,CallEnv,Result,[FN | FunctionArgs], Body):- is_list(FunctionArgs), is_lisp_funcallable(FN),!,
       expand_arguments_maybe_macro(Ctx,CallEnv,FN,0,FunctionArgs,ArgBody, Args),
       %debug_var([FN,'_Ret'],Result),      
       find_function_or_macro(Ctx,CallEnv,FN,Args,Result,ExpandedFunction),      
       Body = (ArgBody,ExpandedFunction).
 
+compile_funop(_Ctx,Env,Result,[FN | FunctionArgs], cl_env_eval(Env,[eval,[cons,[quote,FN], FunctionArgs]],Result)):- !.
+
+   
+/*
 % progn mismatch?
 compile_funop(Ctx,Env,Result,[FN ], Body):- is_list(FN),!,
   trace,must_compile_body(Ctx,Env,Result,FN,Body).
 
 compile_funop(Ctx,Env,Result,[FN | FunctionArgs], Body):- 
    show_call(must_compile_body(Ctx,Env,Result,[eval,[FN| FunctionArgs]],Body)).
+*/
 
-
+is_lisp_funcallable(Atom):-atom(Atom),!.
+is_lisp_funcallable(P):- compound(P),functor(P,F,A),is_lisp_funcallable(F,A).
+is_lisp_funcallable(closure,_).
 
 % FUNCTION APPLY
 %compile_body(Ctx,Env,Result,['apply',Function|ARGS], Body):- atom(Function)

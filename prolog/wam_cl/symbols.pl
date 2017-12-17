@@ -59,8 +59,10 @@ is_symbolp(Symbol):- is_keywordp(Symbol);get_opv(Symbol,classof,claz_symbol).
 
 
 cl_find_symbol(String,Result):- reading_package(Package)->cl_find_symbol(String,Package,Result).
-cl_find_symbol(String,Pack,Result):-  find_package_or_die(Pack,Package),
-  package_find_symbol(String,Package,Symbol,IntExt),push_values([Symbol,IntExt],Result),!.
+cl_find_symbol(String,Pack,Result):-  
+  find_package_or_die(Pack,Package),
+  package_find_symbol(String,Package,Symbol,IntExt),
+  push_values([Symbol,IntExt],Result),!.
 cl_find_symbol(_Var,_P,Result):- push_values([[],[]],Result).
 
 
@@ -68,11 +70,12 @@ cl_intern(Symbol,Result):- reading_package(Package),cl_intern(Symbol,Package,Res
 % cl_intern(Symbol,Package,Result):- \+ is_keywordp(Symbol),is_symbolp(Symbol),!,cl_intern_symbol(Symbol,Package,Result).
 cl_intern(Name,Pack,Result):-
   find_package_or_die(Pack,Package),
-  text_to_string(Name,String),
+  to_prolog_string(Name,String),
   intern_symbol(String,Package,Symbol,IntExt),
   push_values([Symbol,IntExt],Result),!.
 
 
+intern_symbol(String,Package,Symbol,IntExt):- to_prolog_string_if_needed(String,PlString),!,intern_symbol(PlString,Package,Symbol,IntExt).
 intern_symbol(String,Package,Symbol,IntExt):- package_find_symbol(String,Package,Symbol,IntExt),!.
 intern_symbol(String,Package,Symbol,IntExt):- 
    make_fresh_internal_symbol(Package,String,Symbol),
@@ -84,34 +87,39 @@ cl_unintern(Symbol,t):-
    (Package\==[]-> package_unintern_symbol(Package,Symbol) ; true),
    set_opv(Symbol,package,[]),
    delete_obj(Symbol).
+cl_unintern(String,Package,Symbol,IntExt):- package_find_symbol(String,Package,Symbol,IntExt),!,
+           unintern_symbol(String,Package,Symbol,IntExt).
 
-
-
-cl_unintern(String,Package,Symbol,IntExt):- package_find_symbol(String,Package,Symbol,IntExt),!.
 unintern_symbol(String,Package,Symbol,IntExt):- 
    make_fresh_uninternal_symbol(Package,String,Symbol),
    always((package_find_symbol(String,Package,FoundSymbol,IntExt),FoundSymbol==Symbol)).
 
 
 (wl:init_args(exact_only,cl_make_symbol)).
+
+cl_make_symbol(String,Symbol):- to_prolog_string_if_needed(String,PlString),!,cl_make_symbol(PlString,Symbol).
 cl_make_symbol(SymbolName,Symbol):- 
    prologcase_name(SymbolName,ProposedName),
    gensym(ProposedName,Symbol),
    create_symbol(SymbolName,[],Symbol).
 
+cl_make_symbol(String,Package,Symbol):- to_prolog_string_if_needed(String,PlString),!,cl_make_symbol(PlString,Package,Symbol).
 cl_make_symbol(SymbolName,Package,Symbol):- 
    prologcase_name(SymbolName,ProposedName),
    gensym(ProposedName,Symbol),
    create_symbol(SymbolName,Package,Symbol).
 
 
+
 create_symbol(String,pkg_kw,Symbol):-!,create_keyword(String,Symbol).
+create_symbol(String,Package,Symbol):- to_prolog_string_if_needed(String,PlString),!,create_symbol(PlString,Package,Symbol).
 create_symbol(String,Package,Symbol):-
-   text_to_string(String,Name),
+   to_prolog_string(String,Name),
    set_opv(Symbol,classof,claz_symbol),
    set_opv(Symbol,name,Name),
    set_opv(Symbol,package,Package),!.
 
+create_keyword(String,Symbol):- to_prolog_string_if_needed(String,PlString),!,create_keyword(PlString,Symbol).
 create_keyword(Name,Symbol):- atom_concat_or_rtrace(':',Make,Name),!,create_keyword(Make,Symbol).
 create_keyword(Name,Symbol):- string_upper(Name,String),
    prologcase_name(String,Lower),

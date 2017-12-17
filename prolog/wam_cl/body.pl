@@ -40,8 +40,9 @@ must_compile_body(Ctx,Env,ResultO,LispCode, BodyO):-
   %maybe_debug_var('_LispCode',LispCode),
   maybe_debug_var('_rBody',Body))),
   resolve_reader_macros(LispCode,Forms),!,
-  always((compile_body(Ctx,Env,Result,Forms, Body),nonvar(Body))),
-  ((Body==true,fail) -> BodyO=(ResultO=Result) ; ResultO=Result,BodyO=Body),
+  always((compile_body(Ctx,Env,Result,Forms, Body9)->nonvar(Body9))),
+  body_cleanup_no_optimize(Ctx,Body9,Body),
+  ((Body==true,fail) -> BodyO=(ResultO=Result) ; (ResultO=Result,BodyO=Body)),
   % nb_current('$compiler_PreviousResult',THE),setarg(1,THE,Result),
   !.
 

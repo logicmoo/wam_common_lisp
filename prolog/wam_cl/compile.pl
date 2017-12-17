@@ -68,21 +68,6 @@ compile_forms(Ctx,Env,Result,FunctionBody,Code):-
    nb_linkval('$compiler_PreviousResult',the(Var)).
 
 
-:- nb_setval('$labels_suffix','').
-suffix_by_context(Atom,SuffixAtom):- nb_current('$labels_suffix',Suffix),atom_concat_or_rtrace(Atom,Suffix,SuffixAtom).
-suffixed_atom_concat(L,R,LRS):- atom_concat_or_rtrace(L,R,LR),suffix_by_context(LR,LRS).
-push_labels_context(Atom):- suffix_by_context(Atom,SuffixAtom),b_setval('$labels_suffix',SuffixAtom).
-within_labels_context(Label,G):- nb_current('$labels_suffix',Suffix),
-   setup_call_cleanup(b_setval('$labels_suffix',Label),G,b_setval('$labels_suffix',Suffix)).
-gensym_in_labels(Stem,GenSym):- suffix_by_context(Stem,SuffixStem),gensym(SuffixStem,GenSym).
-  
-
-show_ctx_info(Ctx):- term_attvars(Ctx,CtxVars),maplist(del_attr_rev2(freeze),CtxVars),show_ctx_info2(Ctx).
-show_ctx_info2(Ctx):- ignore((get_attr(Ctx,tracker,Ctx0),in_comment(show_ctx_info3(Ctx0)))).
-show_ctx_info3(Ctx):- is_rbtree(Ctx),!,forall(rb_in(Key, Value, Ctx),fmt9(Key=Value)).
-show_ctx_info3(Ctx):- fmt9(ctx=Ctx).
-     
-
 % same_symbol(OP1,OP2):-!, OP1=OP2.
 same_symbol(OP1,OP2):- quietly(same_symbol0(OP1,OP2)).
 

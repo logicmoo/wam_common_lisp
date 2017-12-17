@@ -177,11 +177,9 @@
     `(let ((,iteration-variable nil)
            (,iteration-expression nil) )
        ,(record-in-loop-alist `(,variable ,iteration-variable) 'iteration-variable)
-       #| 
-        #+ignore
-           (format t "~% yfor variable is: ~a ~% and it is ~a to in"
+       #+ignore(format t "~% yfor variable is: ~a ~% and it is ~a to in"
                        (intern (symbol-name what-to-do))
-                (eq 'in (intern (symbol-name what-to-do)))) |#
+                (eq 'in (intern (symbol-name what-to-do))))
        ,(case (intern (symbol-name what-to-do))
           (in
             (record-in-loop-alist `(endp ,iteration-expression) 'end-test)
@@ -485,3 +483,4 @@
         (t (list a b))))
 
 ;;; *EOF*
+

@@ -96,14 +96,17 @@ package_find_symbol_or_missing(String,Package,OldSymbol,IntExt):- package_find_s
 package_find_symbol_or_missing(_String,_Package,_NoSymbol,'$missing').
 
 %package_find_symbol(String,_,Symbol,kw_external):- atom_concat_or_rtrace(':',KWName,String),!,atom_concat_or_rtrace('kw_',KWName,SymbolCI),prologcase_name(SymbolCI,Symbol).
+
+package_find_symbol(String,Package,Symbol,Found):- to_prolog_string_if_needed(String,PlString),!,package_find_symbol(PlString,Package,Symbol,Found).
 package_find_symbol(String,Package,Symbol,kw_external):- package_external_symbols(Package,String,Symbol),!.
 package_find_symbol(String,Package,Symbol,kw_internal):- package_internal_symbols(Package,String,Symbol),!.
 package_find_symbol(String,PW,Symbol,kw_inherited):-  package_use_list(PW,Package),package_external_symbols(Package,String,Symbol),!.
-package_find_symbol(String,Package,Symbol,Found):-  to_prolog_string_if_needed(String,PlString),!,package_find_symbol(PlString,Package,Symbol,Found).
+%package_find_symbol(String,Package,Symbol,Found):-  to_prolog_string_if_needed(String,PlString),!,package_find_symbol(PlString,Package,Symbol,Found).
 
 % @TODO Add symbol shadowing 
 cl_import(Symbol,Result):- reading_package(Package),cl_import(Symbol,Package,Result).
 cl_import(List,Pack,t):- is_list(List),maplist([Symbol]>>cl_import(Symbol,Pack,_),List).
+cl_import(String,Package,R):- to_prolog_string_if_needed(String,PlString),!,cl_import(PlString,Package,R).
 cl_import(Symbol,Pack,t):- 
    find_package_or_die(Pack,Package),
    pl_symbol_name(Symbol,String),

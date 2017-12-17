@@ -71,7 +71,8 @@ compile_assigns(Ctx,Env,Result,[Getf, Var| ValuesForms], Body):- is_place_op(Get
 
 compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, StringL], (Code,Body)):- 
         is_stringp(StringL),to_prolog_string(StringL,String),is_def_maybe_docs(SetQ),
-        Code = assert_lsp(Var,doc:doc_string(Var,_Package,variable,String)),
+        (atom(Var)->cl_symbol_package(Var,Package);reading_package(Package)),
+        Code = assert_lsp(Var,doc:doc_string(Var,Package,variable,String)),
 	!, compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm], Body).
 
 

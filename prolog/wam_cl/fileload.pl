@@ -19,6 +19,7 @@
 :- include('header').
 
 cddd:- cd('/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/daydreamer/').
+cdkm:- cd('/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/km/').
 
 
 lci :- with_lisp_translation(file('ci2.data'),print_term).
@@ -35,6 +36,10 @@ dd2:- cddd,cl_load('dd.cl',_).
 tdd:- cl_compile_file('../../t/daydreamer/*.cl',_).
 tdd1:- cl_compile_file('../../t/daydreamer/*.cl',_).
 tdd2:- cl_load('../../t/daydreamer/*.cl',_).
+
+
+km:- cdkm, cl_compile("km",_).
+km1:- cdkm, cl_load("km",_).
 
 cl_compile_file_mask(Mask,keys(Keys),TF):- 
    with_each_file(do_compile_1file(Keys,TF),Mask).

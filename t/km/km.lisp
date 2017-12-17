@@ -299,7 +299,7 @@ The variable *km-package* is set to the KM package name that KM is in.
 (eval-when (:compile-toplevel :load-toplevel :execute)
    (import 'ccl:neq))
 
-#+abcl
+#+(or abcl wam-cl)
  (defpackage "COMMON-LISP-USER" (:nicknames "U" "USER" "CL-USER"))
 
 ;;; KM package is now the current package
