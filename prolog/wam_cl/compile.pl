@@ -124,12 +124,12 @@ f_sys_memq(E,L,R):- t_or_nil((member(Q,L),Q==E),R).
 
 
 must_compile_progn(Ctx,Env,Result,FormsIn, PreviousResult, Body):-
-  quietly((maybe_debug_var('_rCtx',Ctx),
-  maybe_debug_var('_rEnv',Env),
+  %quietly((maybe_debug_var('_rCtx',Ctx),
+  %maybe_debug_var('_rEnv',Env),
   %maybe_debug_var('_rResult',Result),
   %maybe_debug_var('_rPrevRes',PreviousResult),
-  maybe_debug_var('_rForms',Forms),
-  maybe_debug_var('_rBody',Body))),
+ % maybe_debug_var('_rForms',Forms),
+  %maybe_debug_var('_rBody',Body))),
   lquietly(resolve_reader_macros(FormsIn,Forms)),!,
    always(((compile_progn(Ctx,Env,Result,Forms,PreviousResult,Body0),nonvar(Body0)))),
    lquietly((sanitize_true(Ctx,Body0,Body))).

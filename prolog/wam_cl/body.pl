@@ -34,11 +34,11 @@ preserved_var:attr_unify_hook(_,_):- fail.
 must_compile_body(_Ctx,_Env,ResultO,LispCode, Body):- var(LispCode), get_attr(LispCode,preserved_var,t),!,true=Body,
    ResultO = LispCode.
 must_compile_body(Ctx,Env,ResultO,LispCode, BodyO):-
-  notrace((maybe_debug_var('_rCtx',Ctx),
+  %notrace((maybe_debug_var('_rCtx',Ctx),
   %maybe_debug_var('_rEnv',Env),
   %maybe_debug_var('_rResult',Result),
   %maybe_debug_var('_LispCode',LispCode),
-  maybe_debug_var('_rBody',Body))),
+  %maybe_debug_var('_rBody',Body))),
   resolve_reader_macros(LispCode,Forms),!,
   always((compile_body(Ctx,Env,Result,Forms, Body9)->nonvar(Body9))),
   body_cleanup_no_optimize(Ctx,Body9,Body),

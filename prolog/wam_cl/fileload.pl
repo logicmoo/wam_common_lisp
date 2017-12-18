@@ -245,7 +245,7 @@ lisp_grovel_assert(_,_).
 lisp_grovel_assert(T):-lisp_grovel_assert(u,T),!.
    %*compile-file-truename*
 
-cl_load(L):- cl_load(L,[],t).
+cl_load(L):- cl_load(L,_).
 cl_load(L,T):- cl_load(L,[],T).
 (wl:init_args(1,cl_load)).
 cl_load(L,Keys,T):- to_prolog_string_if_needed(L,Loc)->L\==Loc,!,cl_load(Loc,Keys,T).
@@ -309,7 +309,7 @@ with_each_file(How,File):- compound(File),!,absolute_file_name(File,Abs),file_di
 with_each_file(How,File):- exists_file(File),!,with1file(How,File).
 with_each_file(How,FDir):- exists_directory(FDir),with_directory(How,FDir),!.
 with_each_file(How,Mask):- expand_file_name(Mask,List),List\==[Mask],!,with_flist(How,List).
-with_each_file(How,File):- stream_property(_,file_name(FD)),with_fstem(FD,File,Found),!,with1file(How,Found).
+with_each_file(How,File):- path_probe(FD),with_fstem(FD,File,Found),!,with1file(How,Found).
 with_each_file(How,FDir):- exists_directory(FDir),!,with_directory(How,FDir),!.
 with_each_file(How,File):- working_directory(CD,CD),with_fstem(CD,File,Found),!,with1file(How,Found).
 
