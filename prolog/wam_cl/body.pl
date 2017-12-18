@@ -41,6 +41,14 @@ must_compile_body(Ctx,Env,ResultO,LispCode, BodyO):-
   %maybe_debug_var('_rBody',Body))),
   resolve_reader_macros(LispCode,Forms),!,
   always((compile_body(Ctx,Env,Result,Forms, Body9)->nonvar(Body9))),
+  must_compile_body_pt2(Ctx,Env,Result,ResultO,Forms, Body9,BodyO).
+
+ensure_assignment(X=Y,true):- X=Y,!.
+ensure_assignment(X=Y,reset_mv):- X=Y,!.
+ensure_assignment(G,G).
+
+must_compile_body_pt2(_Ctx,_Env,Result,ResultO, _Forms, true,Body):- ensure_assignment(Result=ResultO,Body),!.
+must_compile_body_pt2(Ctx,_Env,Result,ResultO,_Forms, Body9,BodyO):-
   body_cleanup_no_optimize(Ctx,Body9,Body),
   ((Body==true,fail) -> BodyO=(ResultO=Result) ; (ResultO=Result,BodyO=Body)),
   % nb_current('$compiler_PreviousResult',THE),setarg(1,THE,Result),
@@ -137,7 +145,10 @@ compile_body(Ctx,Env,Result,InstrS,Code):-
   shared_lisp_compiler:plugin_expand_progbody(Ctx,Env,Result,InstrS,_PreviousResult,Code),!.
 
 % PROGN
-compile_body(Ctx,Env,Result,[progn|Forms], Body):- !, must_compile_progn(Ctx,Env,Result,Forms,[],Body).
+compile_body(Ctx,Env,Result,[progn,Forms], Body):- !, compile_forms(Ctx,Env,Result,[Forms],Body).
+compile_body(Ctx,Env,Result,[progn|Forms], Body):- !, compile_forms(Ctx,Env,Result,Forms,Body).
+% Messed Progn?
+compile_body(Ctx,Env,Result,[Form|MORE], Code):- is_list(Form), !,compile_forms(Ctx,Env,Result,[Form|MORE], Code).
 
 % SOURCE TRANSFORMATIONS
 compile_body(Ctx,Env,Result,[M|MACROLEFT], Code):- atom(M),
@@ -154,7 +165,8 @@ compile_body(_Cx,_Ev, [],nil,true):- !.
 
 compile_body(_Ctx,_Env,Result,'$S'([Type|Args]),create_struct([Type|Args],Result)).
 
-compile_body(_Cx,_Ev,SelfEval,SelfEval,true):- notrace(is_self_evaluating_object(SelfEval)),!.
+compile_body(_Cx,_Ev,Result,SelfEval,Body):- notrace(is_self_evaluating_object(SelfEval)),!,
+  ensure_assignment(Result=SelfEval,Body).
 
 % numbers
 %compile_body(_Ctx,_Env,Value,Atom,true):- atom(Atom),atom_number_exta(Atom,Value),!.
@@ -440,8 +452,8 @@ typecases_to_conds(SOf,V,[[Item|Tail]|Tail2], [[['typep',V,[quote,Item]],[progn|
 % COND
 compile_body(_Cx,_Ev,Result,[cond ], Result=[]):- !.
 compile_body(_Cx,_Ev,Result,[cond,[] ], Result=[]):- !.
-compile_body(Ctx,Env,Result,[cond, [t|Progn]|_], (Body)):-   
-  must_compile_progn(Ctx,Env,Result, Progn,[], Body).
+compile_body(Ctx,Env,Result,[cond, [t|Progn]|_], Body):-   
+  compile_forms(Ctx,Env,Result, Progn, Body).
 compile_body(Ctx,Env,Result,[cond, [Test|ResultForms] |Clauses], Body):- 
   compile_body(Ctx,Env,Result,[if,Test,[progn|ResultForms],[cond |Clauses]], Body).
 
@@ -523,7 +535,7 @@ compile_body(Ctx,Env,Result,[compile|Forms], Body):- !,
 compile_body(Ctx,Env,Result,[progv,VarsForm,ValuesForm|FormS],Code):- !,
    must_compile_body(Ctx,Env,VarsRs,VarsForm,Body1),
    must_compile_body(Ctx,Env,ValuesRs,ValuesForm,Body2),
-   must_compile_progn(Ctx,Env,Result,FormS,[],BodyS),
+   compile_forms(Ctx,Env,Result,FormS,BodyS),
    Code = (Body1, Body2 , maplist(bind_dynamic_value(Env),VarsRs,ValuesRs), BodyS).
 
 normalize_let([],[]).
@@ -611,14 +623,14 @@ compile_body(_Ctx,Env,[],['#setqFromValues',Vars], setq_from_values(Env,Vars)):-
 
 setq_from_values(Env,Vars):- nb_current('$mv_return',Values),setq_from_values_each(Env,Vars,Values).
 
-setq_from_values_each(_Env,_,[]):- lisp_dump_break,!.
+setq_from_values_each(_Env,_,[]):- !. %lisp_dump_break,!.
 setq_from_values_each(_Env,[],_):-!.
-setq_from_values_each(Env,[Var|Vars],[Val|Values]):-
-   set_var(Env,Var,Val),
+setq_from_values_each(Env,[Var|Vars],[Value|Values]):-
+   set_var(Env,Var,Value),
    setq_from_values_each(Env,Vars,Values).
 
 %  env_current(Env),
-  %set_var(Env,Var,Val).
+  %set_var(Env,Var,Value).
 
 %   zip_with(Xs, Ys, Pred, Zs)
 %   is true if Pred(X, Y, Z) is true for all X, Y, Z.

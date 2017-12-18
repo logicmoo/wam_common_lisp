@@ -75,7 +75,7 @@ compile_decls(Ctx,Env,Symbol,[defun,Symbol,FormalParms|FunctionBody], CompileBod
 
 % Empty FLET/MACROLET/LABELS
 compile_decls(Ctx,Env,Result,[FLET,[]|Progn], CompileBody):-  member(FLET,[flet,macrolet,labels]),!,
-   compile_body(Ctx,Env,Result,[progn|Progn], CompileBody).   
+   compile_forms(Ctx,Env,Result,Progn, CompileBody).   
 
 % LABELS
 compile_decls(Ctx,Env,Result,[labels,[DEFN|MORE]|Progn], CompileBody):- 
@@ -83,7 +83,7 @@ compile_decls(Ctx,Env,Result,[labels,[DEFN|MORE]|Progn], CompileBody):-
     push_search_first(Ctx,Gensym),    
     must_maplist(define_each(Ctx,Env,flet,Gensym),[DEFN|MORE],_News,Decls),
     maplist(always,Decls),    
-    compile_body(Ctx,Env,Result,[progn|Progn], CompileBody).
+    compile_forms(Ctx,Env,Result,Progn, CompileBody).   
 
 % FLET/MACROLET
 compile_decls(Ctx,Env,Result,[FLET,[DEFN|MORE]|Progn], CompileBody):- member(FLET,[flet,macrolet]),
@@ -91,7 +91,7 @@ compile_decls(Ctx,Env,Result,[FLET,[DEFN|MORE]|Progn], CompileBody):- member(FLE
     push_search_first(Ctx,Gensym),    
     must_maplist(define_each(Ctx,Env,FLET,Gensym),[DEFN|MORE],News,Decls),
     maplist(always,Decls),    
-    compile_body(Ctx,Env,Result,[progn|Progn], CompileBody),
+    compile_forms(Ctx,Env,Result,Progn, CompileBody),
     must_maplist(undefine_each(Ctx,Env,FLET,Gensym),[DEFN|MORE],News,Decls).
      
 define_each(Ctx,Env,flet,Gensym,DEFN,New,CompileBody)  :- compile_function(Gensym,Ctx,Env,New,DEFN,CompileBody).
@@ -101,8 +101,8 @@ undefine_each(Ctx,Env,flet,Gensym,DEFN,New,CompileBody)  :- wdmsg(uncompile_func
 undefine_each(Ctx,Env,macrolet,Gensym,DEFN,New,CompileBody):-wdmsg(uncompile_macro(Gensym,Ctx,Env,New,DEFN,CompileBody)).
 
 
-compile_decls(_Ctx,_Env,Symbol,[Fun,Symbol,A2|AMORE],assert_lsp(P)):- notrace(is_def_at_least_two_args(Fun)),\+ is_fboundp(Fun),!,P=..[Fun,Symbol,A2,AMORE].
-compile_decls(_Ctx,_Env,Symbol,[Fun0,Symbol,A2|AMORE],assert_lsp(P)):- notrace((is_def_at_least_two_args(Fun),same_symbol(Fun,Fun0))),\+ is_fboundp(Fun),!,P=..[Fun,Symbol,A2,AMORE].
+compile_decls(_Ctx,_Env,Symbol,[Fun,Symbol,A2|AMORE],assert_lsp(Symbol,P)):- notrace(is_def_at_least_two_args(Fun)),\+ is_fboundp(Fun),!,P=..[Fun,Symbol,A2,AMORE].
+compile_decls(_Ctx,_Env,Symbol,[Fun0,Symbol,A2|AMORE],assert_lsp(Symbol,P)):- notrace((is_def_at_least_two_args(Fun),same_symbol(Fun,Fun0))),\+ is_fboundp(Fun),!,P=..[Fun,Symbol,A2,AMORE].
 
 
 is_def_at_least_two_args(defgeneric).
@@ -115,7 +115,8 @@ is_def_at_least_two_args(deftype).
 is_def_at_least_two_args(symbol_macrolet).
 
 combine_setfs(Name0,Name):-atom(Name0),!,Name0=Name.
-combine_setfs(Name0,Name):-atomic_list_concat(['f_combined'|Name0],'__',Name).
+combine_setfs([setf,Name],Combined):- atomic_list_concat([setf,Name],'_',Combined).
+combine_setfs([setf,Name],Combined):- atomic_list_concat([setf,Name],'_',Combined).
 
 
 wl:init_args(1,cl_labels).
