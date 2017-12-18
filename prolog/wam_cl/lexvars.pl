@@ -108,7 +108,7 @@ compile_each(_Ctx,_Env,[],[],true).
 compile_each(Ctx,Env,[VarR|Result],[Var|Eval],Code):-
   compile_body(Ctx,Env,VarR,Var,Code0),
   compile_each(Ctx,Env,Result,Eval,Code1),
-  conjoin_0(Code0,Code1,Code).
+  conjoin_0(Ctx,Code0,Code1,Code).
 
 rwstate:attr_unify_hook(_,_):-!,fail.
 rwstate:attr_unify_hook(_,V):-always(var(V)),fail.
@@ -143,6 +143,7 @@ symbol_value0(Env,[Place,Obj],Result):- trace, set_place(Env,getf,[Place,Obj],[]
 
 symbol_value_error(_Env,Var,_Result):- lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Var).
 
+reset_mv:- b_getval('$mv_return',[V1,_V2|_])->b_setval('$mv_return',[V1]);true.
 
 push_values([V1|Push],V1):- always(nonvar(Push)),nb_setval('$mv_return',[V1|Push]).
 
