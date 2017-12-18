@@ -71,7 +71,7 @@ print_clause_plain(I):-
   current_prolog_flag(color_term, Was),
   make_pretty(I,O),
     setup_call_cleanup(set_prolog_flag(color_term, false),
-     fmt99(O),
+     fmt9(O),
      set_prolog_flag(color_term, Was)).
   
 % print_clause_plain(C):- portray_clause_w_vars(O).
@@ -80,7 +80,7 @@ print_clause_plain(I):-
 may_debug_var(_,_,V):- nonvar(V),!.
 may_debug_var(_,_,V):- variable_name(V,_),!.
 may_debug_var(L,_,_):- upcase_atom(L,L),!.
-may_debug_var(L,R,V):- atom_concat('cl_',LL,L),may_debug_var(LL,R,V).
+may_debug_var(L,R,V):- atom(L),atom_concat('cl_',LL,L),may_debug_var(LL,R,V).
 may_debug_var(L,R,V):- atomic_list_concat([_A1,A2,A3|AS],'_',L),atomic_list_concat([A2,A3|AS],'_',LL),may_debug_var(LL,R,V).
 may_debug_var(L,R,V):- debug_var([L,R],V).
 
@@ -108,16 +108,27 @@ pretty2(H):-
  always((functor(H,F,A),
    H=..[F,P1|ARGS],   
    (A>1 -> may_debug_var(F,'_Param',P1) ; true),
-   must_maplist_det(pretty2,[P1|ARGS]))),!. % ,HH=..[F,P1|ARGSO].
+   must_maplist_det(pretty2,[P1|ARGS]))),!. 
 
-pretty3(H):- \+ compound(H),!. % may_debug_var(F,'_Call',H).
-pretty3([H | B]):- pretty3(H),pretty3(B),may_debug_var('CAR',H),may_debug_var('CDR',B).
-pretty3(H):-  
+pretty3(H):-pretty4(H),pretty5(H).
+
+pretty4(H):- \+ compound(H),!. % may_debug_var(F,'_Call',H).
+pretty4(H):-  
+ ignore(((functor(H,F,_),
+  wl:init_args(N,F),integer(N),
+   A is N + 1,   
+   arg(A,H,R),may_debug_var('KeysNRest',R)))),
+   H=..[F,P1|ARGS],  
+   must_maplist_det(pretty4,[P1|ARGS]),!. 
+
+pretty5(H):- \+ compound(H),!. % may_debug_var(F,'_Call',H).
+pretty5([H | B]):- pretty5(H),pretty5(B),may_debug_var('CAR',H),may_debug_var('CDR',B).
+pretty5(H):-  
  always((functor(H,F,A),
    H=..[F,P1|ARGS],   
    arg(A,H,R),may_debug_var(F,'_Ret',R),   
    nop(may_debug_var(F,'_Param',P1)),
-   must_maplist_det(pretty3,[P1|ARGS]))),!. % ,HH=..[F,P1|ARGSO].
+   must_maplist_det(pretty5,[P1|ARGS]))),!. 
 
 
 :- fixup_exports.

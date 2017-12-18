@@ -260,6 +260,12 @@ package_nicknames(pkg_profiler, "PROF").
 
 :- decl_mapped_opv(claz_package,[nicknames=package_nicknames]).
 
+package_use_list(pkg_user, pkg_cl).
+package_use_list(pkg_user, pkg_custom).
+package_use_list(pkg_user, pkg_clos).
+package_use_list(pkg_user, pkg_ext).
+package_use_list(pkg_user, pkg_prolog).
+package_use_list(pkg_user, pkg_sys).
 
 package_use_list(pkg_cl, pkg_ext).
 package_use_list(pkg_cl, pkg_prolog).
@@ -288,12 +294,6 @@ package_use_list(pkg_sys, pkg_cl).
 package_use_list(pkg_sys, pkg_ext).
 package_use_list(pkg_sys, pkg_prolog).
 
-package_use_list(pkg_user, pkg_cl).
-package_use_list(pkg_user, pkg_clos).
-package_use_list(pkg_user, pkg_ext).
-package_use_list(pkg_user, pkg_prolog).
-package_use_list(pkg_user, pkg_sys).
-package_use_list(pkg_user, pkg_custom).
 
 package_use_list(pkg_tl, pkg_cl).
 package_use_list(pkg_tl, pkg_ext).

@@ -151,6 +151,10 @@ expand_arguments_maybe_macro(Ctx,CallEnv,FN,0,FunctionArgs,ArgBody, Args):-
   expand_arguments(Ctx,CallEnv,FN,0,FunctionArgs,ArgBody, Args).
 
 
+compile_funop(Ctx,Env,Result,[apply,function(Op) | FunctionArgs], Body):-!,
+  compile_funop(Ctx,Env,Result,[Op | FunctionArgs], Body).
+
+ 
 compile_funop(Ctx,Env,Result,[Op | FunctionArgs], Body):- nonvar(Op),wl:op_replacement(Op,Op2), !,
   must_compile_body(Ctx,Env,Result,[Op2 | FunctionArgs],Body).
 

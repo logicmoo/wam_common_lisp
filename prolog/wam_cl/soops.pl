@@ -230,7 +230,7 @@ make_default_constructor(Kind,Code):-
          set_opv(Function,classof,claz_compiled_function),
          set_opv(Sym,compile_as,kw_function),
          set_opv(Sym,function,Function),
-         assert_lsp(user:(Head:-Body))))).
+         assert_lsp((user:Head:-Body))))).
  
 
 maybe_add_get_set_functions(Kind,ConcatName,Keyword,ZLOT):- 

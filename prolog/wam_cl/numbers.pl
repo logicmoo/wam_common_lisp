@@ -34,7 +34,7 @@ grovel_preds(M):-
 
 wl:grovel_pred(M,F,1):-
   atom(F),atom(M),
-  atom_concat('is_',R,F),atom_concat(_,'p',R),
+  atom_concat_or_rtrace('is_',R,F),atom_concat(_,'p',R),
   doall(((get_opv_iii(_Sym,function,SF),
   (atom(SF),atom_concat(Prefix,R,SF),
    \+ atomic_list_concat([_,_,_|_],'_',Prefix),
@@ -46,6 +46,8 @@ wl:interned_eval(call(grovel_math)).
 
 
 % define_cl_math(F,0):- atom_concat_or_rtrace('cl_',F,CLN), P=..[CLN,X],FP=..[F], assertz(P:- X is FP).
+
+define_cl_math(max,_):-!.
 define_cl_math(F,1):- atom_concat_or_rtrace('cl_',F,CLN), P=..[CLN,X,R],FP=..[F,X],
   (is_defined(CLN,2)-> true ; always(assert_lsp(P:- R is FP))).
 define_cl_math(F,2):- atom_concat_or_rtrace('cl_',F,CLN), P=..[CLN,X,Y,R],FP=..[F,X,Y],
@@ -115,7 +117,86 @@ cl_exp(N,Ret):- Ret is exp(N).
 cl_expt(N1,N2,Ret):- Ret is (N1 ^ N2).
 
 
-%cl_floor(X,Y):- Y is floor(X).
+
+
+% asserting1... u
+wl: lambda_def(defun,Sym,Cl_Sym,[u_x, c38_optional, [u_y, 1]],[[truncate,Sym, [/, u_x, u_y]]]):-
+  var_or_atom(Cl_Sym),tround(Sym),atom_concat_or_rtrace('cl_',Sym,Cl_Sym).
+
+
+de_ratio('$RATIO'(N,D),N,D):-!.
+de_ratio(N,N,1).
+re_ratio(Rem,1,Rem).
+re_ratio(0,_,0).
+re_ratio(Rem,Y,'$RATIO'(Rem,Y)).
+
+wl: init_args(1,Sym):-tround(Sym).
+tround(Sym):- tround0(Sym).
+tround(FSym):- var_or_atom(FSym),tround0(Sym),atom_concat_or_rtrace('f',Sym,FSym).
+
+var_or_atom(FSym):- var(FSym)->true;atom(FSym).
+
+tround0(round).
+tround0(floor).
+tround0(ceiling).
+tround0(truncate).
+
+% asserting... u
+cl_ceiling(X, RestNKeys, MResult):- pl_truncate(ceiling,X, RestNKeys, MResult).
+cl_floor(X, RestNKeys, MResult):- pl_truncate(floor,X, RestNKeys, MResult).
+cl_truncate(X, RestNKeys, MResult):- pl_truncate(truncate,X, RestNKeys, MResult).
+cl_round(X, RestNKeys, MResult):- pl_truncate(round,X, RestNKeys, MResult).
+pl_truncate(_Type, X, RestNKeys, MResult):- 
+     nth_value(RestNKeys,1,Y,1),
+     de_ratio(X,X0,Xd),
+     de_ratio(Y,Y0,Yd),
+     XX is X0 * Yd,
+     YY is Y0 * Xd,
+     DD is Yd * Xd,
+     Whole  is XX div YY,
+     Rement is XX mod YY,
+     re_ratio(Rement,DD,RatRem),!,
+     push_values([Whole,RatRem],MResult).
+
+% asserting... u
+cl_ftruncate(X, RestNKeys, MResult):- pl_ftruncate(truncate,X, RestNKeys, MResult).
+cl_fceiling(X, RestNKeys, MResult):- pl_ftruncate(ceiling,X, RestNKeys, MResult).
+cl_ffloor(X, RestNKeys, MResult):- pl_ftruncate(floor,X, RestNKeys, MResult).
+cl_fround(X, RestNKeys, MResult):- pl_ftruncate(round,X, RestNKeys, MResult).
+pl_ftruncate(_Type,X, RestNKeys, MResult):- 
+     nth_value(RestNKeys,1,Y,1),
+     de_ratio(X,X0,Xd),
+     de_ratio(Y,Y0,Yd),
+     XX is X0 * Yd,
+     YY is Y0 * Xd,
+     DD is Yd * Xd,
+     Whole  is (XX div YY)*1.0,
+     Rement is (XX mod YY)*1.0,
+     re_ratio(Rement,DD,RatRem),!,
+     push_values([Whole,RatRem],MResult).
+
+/*
+;;; If the numbers do not divide exactly and the result of (/ number divisor)
+;;; would be negative then decrement the quotient and augment the remainder by
+;;; the divisor.
+;;;
+*/
+wl:interned_eval(
+'(defun floor (number &optional divisor)
+  "Return the greatest integer not greater than number, or number/divisor.
+  The second returned value is (mod number divisor)."
+  (if (null divisor)(setq divisor 1))
+  (multiple-value-bind (tru rem) (truncate number divisor)
+    (if (and (not (zerop rem))
+             (if (minusp divisor)
+               (plusp number)
+               (minusp number)))
+      (if (called-for-mv-p)
+        (values (1- tru) (+ rem divisor))
+        (1- tru))
+      (values tru rem))))').
+
+%cl_truncate(X,Y):- Y is floor(X).
 %cl_log(X,Y):- Y is log(X).
 
 
