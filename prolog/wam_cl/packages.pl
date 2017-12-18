@@ -293,6 +293,7 @@ package_use_list(pkg_user, pkg_clos).
 package_use_list(pkg_user, pkg_ext).
 package_use_list(pkg_user, pkg_prolog).
 package_use_list(pkg_user, pkg_sys).
+package_use_list(pkg_user, pkg_custom).
 
 package_use_list(pkg_tl, pkg_cl).
 package_use_list(pkg_tl, pkg_ext).

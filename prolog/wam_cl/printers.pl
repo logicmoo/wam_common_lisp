@@ -29,13 +29,13 @@ lisp_chars_to_pl_string(Str,Str):- string(Str),!.
 lisp_chars_to_pl_string(Str,SS):- \+ is_list(Str),!,always((atom_chars(Str,Codes),text_to_string(Codes,SS))).
 lisp_chars_to_pl_string(List,SS):- notrace((must_maplist(to_prolog_char,List,Codes),!,text_to_string(Codes,SS))).
 
-shrink_lisp_strings(Str,PStr):- \+ compound(Str),!,Str=PStr.
+shrink_lisp_strings(Str,PStr):- \+ compound(Str),Str=PStr,!.
 %shrink_lisp_strings(Str,PStr):- is_stringp(Str),!,to_prolog_string(Str,PStr).
-shrink_lisp_strings([A|Str],PStr):- is_list(Str),maplist(is_characterp_lisp,[A|Str]),!,lisp_chars_to_pl_string([A|Str],PStr).
+shrink_lisp_strings([A|Str],PStr):- is_list(Str),maplist(is_characterp_lisp,[A|Str]),always(lisp_chars_to_pl_string([A|Str],PStr)),!.
 shrink_lisp_strings(C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(shrink_lisp_strings,C1O,C2O),
   compound_name_arguments(C2,F,C2O). %%$C2=..[F|C2O].
 
-is_characterp_lisp(X):- compound(X),X='#\\'(_),is_characterp(X).
+is_characterp_lisp(X):- compound(X),X='#\\'(_). %,is_characterp(X).
 
 sexpr1(X) --> {is_ftVar(X),(get_var_name(X,N)->format(atom(NN),'~w',[N]);format(atom(NN),'~w',[X]))},!,[NN].
 sexpr1(Str)--> {is_stringp(Str),to_prolog_string(Str,PStr)},!,[PStr].
@@ -88,7 +88,7 @@ wl:init_args(0,cl_format).
 cl_format([Stream,Fmt],t):- !, cl_print(cl_format(Stream,Fmt),_).
 cl_format([Stream,Fmt|ArgS],t):-cl_print(cl_format(Stream,Fmt,ArgS),_).
 
-cl_prin1(X,X):-copy_term(X,Y),writeExpression(Y),nl.
+cl_prin1(X,X):-copy_term(X,Y),writeExpression(Y).
 cl_princ(X,X):-is_stringp(X),!,to_prolog_string(X,S),write(S).
 cl_princ(X,X):-copy_term(X,Y),writeExpression(Y),nl.
 cl_print(X,X):-cl_prin1(X,X),nl.

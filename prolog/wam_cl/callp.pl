@@ -111,6 +111,17 @@ do_interned_eval(G):-
 
 %locally_let(_,G):- !, G.
 
+locally_bind(Env,N,V,G):- 
+   Binding=bv(N,Was),
+   \+ \+ ((
+   append_open_list(Env,Binding),
+   nb_setarg(2,Binding,V))),
+   call_cleanup(call(G),
+     nb_setarg(2,Binding,Was)).
+
+
+locally_set(N,V,B):- locally_let(N=V,B).
+
 locally_let([N=V|More],G):- castify(V,Value),V\==Value,!,locally_let([N=Value|More],G).
 locally_let([N=V|More],G):- castify(N,Symbol),N\==Symbol,!,locally_let([Symbol=V|More],G).
 locally_let(N=V,G):-!,locally_let([N=V],G).

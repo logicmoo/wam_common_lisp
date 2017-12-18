@@ -597,7 +597,7 @@ string_vector([]) --> [], !.
 
 % . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-lnumber(N)--> swhite, lnumber0(N), swhite. % (peek_symbol_breaker;[]).
+lnumber(N)-->  lnumber0(N). % (peek_symbol_breaker;[]).
 
 oneof_ci(OneOf,[C])--> {member(C,OneOf)},ci([C]). 
 dcg_and2(DCG1,DCG2,S,E) :- dcg_phrase(DCG1,S,E),dcg_phrase(DCG2,S,E).

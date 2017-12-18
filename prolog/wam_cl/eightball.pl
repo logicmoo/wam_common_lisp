@@ -42,7 +42,7 @@ slow_trace:- nortrace.
 on_x_rtrace(G):- catch(G,E,(dbmsg(E),rtrace(G),break)).
 atom_concat_or_rtrace(X,Y,Z):- tracing->atom_concat(X,Y,Z);catch(atom_concat(X,Y,Z),_,break).
 
-%lisp_dump_break:- both_outputs(dumpST),!,throw(lisp_dump_break).
+lisp_dump_break:- both_outputs(dumpST),!,throw(lisp_dump_break).
 %lisp_dump_break:- trace,throw(lisp_dump_break).
 lisp_dump_break:- lisp_dumpST,break.
 lisp_dumpST:- both_outputs(dumpST).
@@ -195,8 +195,10 @@ trim_off(_,A,A).
 dbmsg0(Var):- var(Var),!,in_comment(colormsg1(dbmsg_var(Var))).
 dbmsg0(Str):- string(Str),!,in_comment(colormsg1(Str)).
 % dbmsg0(StringL):- to_prolog_string_if_needed(StringL,String),!,dbmsg0(String).
+dbmsg0(:-((B,A,C))):-  is_assert_op(A,Where,AA), !,dbmsg0(:- B),dbmsg_assert(Where, AA),dbmsg0(:- C).
 dbmsg0(:-((B,A))):-  is_assert_op(A,Where,AA), !,dbmsg0(:- B),dbmsg_assert(Where, AA).
 dbmsg0(:-((A,B))):-  is_assert_op(A,Where,AA), !,dbmsg_assert(Where, AA),dbmsg0(:- B).
+dbmsg0(:-((A,B,C))):-  is_assert_op(A,Where,AA), !,dbmsg_assert(Where, AA),dbmsg0(:- B),dbmsg0(:- C).
 dbmsg0(:- A):- is_assert_op(A,Where,AA),!,dbmsg_assert(Where,AA).
 dbmsg0(comment(X)):-!, shrink_lisp_strings(X,X0), in_comment(fmt99(X0)).
 dbmsg0(N=V):- !, shrink_lisp_strings(N=V,X0),  in_comment(fmt99(X0)).
@@ -212,13 +214,16 @@ dbmsg_assert0(Where,user:(HBody)):- !,dbmsg_assert0(Where,(HBody)).
 dbmsg_assert0(Where,user:H :- Body):- !,dbmsg_assert0(Where,(H :- Body)),!.
 %dbmsg_assert0(Where,M:Body:- (true,[])):-!,colormsg1("\n% asserting fact...\n"),!,colormsg1(M:Body),!.
 dbmsg_assert0(Where,(Head:-Body)):- Body==true,!, dbmsg_assert0(Where,(Head)).
-dbmsg_assert0(Where,(Head:-Body)):- !, colormsg1("\n% asserting... ~w ",[Where]),!,colormsg1(Head:-Body),!,
+dbmsg_assert0(Where,(Head:-Body)):- !, pre_annotation(Where),!,colormsg1(Head:-Body),!,
    assert_lsp(Head:-Body),
    assert_lsp(pass_clause(Where,Head,Body)),!.
-dbmsg_assert0(Where,Head):- !, colormsg1("\n% asserting1... ~w ",[Where]),!,fmt99(Head),!,
+dbmsg_assert0(Where,Head):- !, pre_annotation(Where),!,fmt99(Head),!,
    assert_lsp(Head),
    assert_lsp(pass_clause(Where,Head,true)),!.
    
+pre_annotation(Where):- where_where(Where,Where1),colormsg1("\n% annotating ~w ",[Where1]).
+where_where(Where,Atom):- locally_let(sym('cl:*package*')=pkg_kw,with_output_to(atom(Atom),cl_prin1(Where,_))),!.
+where_where(Where,Where).
 /*
 dbmsg_assert(Where,Body):-  
   body_cleanup(_,Body,Cleaned), !,

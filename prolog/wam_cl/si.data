@@ -13123,6 +13123,11 @@ o_p_v(ext_xx_lisp_home_xx,declared_as,defparameter).
 o_p_v(ext_xx_lisp_home_xx,name,"*LISP-HOME*").
 o_p_v(ext_xx_lisp_home_xx,package,pkg_ext).
 o_p_v(ext_xx_lisp_home_xx,value,'$OBJ'(claz_pathname,"jar:file:/home/dmiles/logicmoo_workspace/packs_usr/armedbear_abcl/dist/abcl.jar!/org/armedbear/lisp/")).
+o_p_v(ext_xx_file_search_xx,classof,claz_symbol).
+o_p_v(ext_xx_file_search_xx,declared_as,defparameter).
+o_p_v(ext_xx_file_search_xx,name,"*FILE-SEARCH*").
+o_p_v(ext_xx_file_search_xx,package,pkg_ext).
+o_p_v(ext_xx_file_search_xx,value,["/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t","/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/daydreamer"]).
 o_p_v(ext_xx_load_truename_fasl_xx,classof,claz_symbol).
 o_p_v(ext_xx_load_truename_fasl_xx,declared_as,defparameter).
 o_p_v(ext_xx_load_truename_fasl_xx,name,"*LOAD-TRUENAME-FASL*").

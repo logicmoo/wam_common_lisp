@@ -69,7 +69,7 @@ pl_compiled_filename0(File,PL):- get_var(sys_xx_compile_file_type_xx,Ext),
 
 
 to_prolog_pathname(Cmp,Out):- compound(Cmp),Cmp='$OBJ'(claz_pathname,S),!,always(to_prolog_pathname(S,Out)).
-to_prolog_pathname(Ref,Ref):- atom(Ref),!.
+to_prolog_pathname(Ref,Value):- atom(Ref),!,((is_symbolp(Ref),is_boundp(Ref),symbol_value(Ref,PValue))->to_prolog_pathname(PValue,Value);Ref=Value).
 to_prolog_pathname(Ref,O):- is_pathnamep(Ref),get_opv(Ref,name,V),!,always(show_call_trace(to_prolog_pathname(V,O))).
 to_prolog_pathname(Str,O):- is_stringp(Str),!,string_to_prolog_atom(Str,O).
 to_prolog_pathname(Obj,PL):- string_to_prolog_atom(Obj,PL).
@@ -94,14 +94,21 @@ nil_lastvar(G):- functor(G,_,A),arg(A,G,[]).
 or_die(G):- G ->true;throw(die(G)).
 or_nil(G):- G ->true;nil_lastvar(G).
 
-pl_probe_file(In,M):- cl_symbol_value(xx_default_pathname_defaults_xx,Str),always((to_prolog_pathname(Str,Path))),Path\=='',!, with_fstem(Str,In,M).
-pl_probe_file(In,M):- with_fstem(".",In,M),!.
-pl_probe_file(In,M):- stream_property(_,file_name(FD)),once((with_fstem(FD,In,M))).
+path_probe(Dir):- cl_symbol_value(xx_default_pathname_defaults_xx,Str),to_prolog_pathname(Str,Path),(Path\==''-> Dir=Path;Dir='.').
+path_probe(Path):-cl_symbol_value(ext_xx_file_search_xx,Str),(member(E,Str)*->to_prolog_pathname(E,Path);Path='.').
+path_probe(Str):- cl_symbol_value(ext_xx_lisp_home_xx,Str),to_prolog_pathname(Str,Path),Path\==''.
+path_probe(FD):- stream_property(_,file_name(FD)).
+
+pl_probe_file(In,M):- path_probe(FD),once((with_fstem(FD,In,M))),!.
 
 set_default_path_early:-
    working_directory(X,X),
    assertz(wl:interned_eval(call((to_lisp_pathname(X,Path),
      set_opv(sym('cl:*default-pathname-defaults*'),value,Path))))).
+
+:- prolog_load_context(directory,X),
+   assertz(wl:interned_eval(call((to_lisp_pathname(X,Path),
+     set_opv(sym('ext:*LISP-HOME*'),value,Path))))).
 
 wl:interned_eval(call((to_lisp_pathname("",Path),
      set_opv(sym('cl:*default-pathname-defaults*'),value,Path)))).
