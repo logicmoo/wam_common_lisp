@@ -18,7 +18,6 @@
 :- module(body, []).
 :- set_module(class(library)).
 :- include('header').
-:- set_module(class(library)).
 :- ensure_loaded(utils_for_swi).
 
 must_compile_closure_body(Ctx,Env,Result,Function, Body):-
@@ -562,15 +561,6 @@ compile_body(Ctx,Env,Result,[progv,VarsForm,ValuesForm|FormS],Code):- !,
    compile_forms(Ctx,Env,Result,FormS,BodyS),
    Code = (Body1, Body2 , maplist(bind_dynamic_value(Env),VarsRs,ValuesRs), BodyS).
 
-normalize_let([],[]).
-normalize_let([Decl|NewBindingsIn],[Norm|NewBindings]):-
-  always(normalize_let1(Decl,Norm)),!,
-  normalize_let(NewBindingsIn,NewBindings).
-
-
-normalize_let1([bind, Variable, Form],[bind, Variable, Form]).
-normalize_let1([Variable, Form],[bind, Variable, Form]).
-normalize_let1( Variable,[bind, Variable, []]).
 
 compile_body(_Ctx,_Env,_Result,[OP|R], _Body):- var(OP),!,trace_or_throw(c_b([OP|R])).
 
@@ -586,63 +576,26 @@ slot_object_lets(Obj,[S|Slots],[[S,['slot_value',Obj,[quote,S]]]|Lets]):-
   slot_object_lets(Obj,Slots,Lets).
 
 % LET
-compile_body(Ctx,Env,Result,[OP, NewBindingsIn| BodyForms], Body):- (var(OP)-> throw(var(OP)) ; OP==let),!,
-   always(is_list(NewBindingsIn)),!,
+compile_body(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body):- assertion(is_list(NewBindingsIn)),!,
  always(compile_let(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body)).
 
-
-compile_let(Ctx,Env,Result,[let, []| BodyForms], Body):- !, compile_forms(Ctx,Env,Result, BodyForms, Body).
-compile_let(Ctx,Env,Result,[let| NewBindingsInBodyForms], Body):- 
-  compile_let2(Ctx,Env,Result,[let| NewBindingsInBodyForms], Body),!.
-% bind_special(Bind1,Body)
-
-compile_let1(Ctx,Env,Result,[let, [Bind1|NewBindingsIn]| BodyForms], Call):- 
-  maybe_bind_special(Ctx,Env,Bind1,Body,Call),!,
-  compile_let(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body).
-compile_let1(Ctx,Env,Result,[let, [Bind1|NewBindingsIn]| BodyForms], Call):- 
-  maybe_bind_local(Ctx,Env,Bind1,Body,Call),!,
-  compile_let(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body).
-compile_let1(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body):- 
-  compile_let2(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body).
-
-compile_let2(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body):- !, % reset_mv?
-     always(normalize_let(NewBindingsIn,NewBindings)),!,
-	zip_with(Variables, ValueForms, [Variable, Form, [bind, Variable, Form]]^true, NewBindings),
-	always(expand_arguments(Ctx,Env,'funcall',1,ValueForms, ValueBody, Values)),
-        freeze(Var,ignore((var(Value),debug_var('_Init',Var,Value)))),
-        freeze(Var,ignore(((var(Value),add_tracked_var(Ctx,Var,Value))))),
-        zip_with(Variables, Values, [Var, Value, BV]^make_bv_maybe(Var,Value,BV),Bindings),
-        add_alphas(Ctx,Variables),
-        debug_var("LEnv",BindingsEnvironment),
-        ignore((member(VarN,[Variable,Var]),atom(VarN),var(Value),debug_var([VarN,'_Let'],Value),fail)),        
-	compile_forms(Ctx,BindingsEnvironment,Result,BodyForms, BodyFormsBody),
-         Body = ( ValueBody,BindingsEnvironment=[Bindings|Env], BodyFormsBody ).
-
-
-is_sboundp(Var):- atom(Var),!,get_opv_i(Var,value,_).
-
-%maybe_bind_special(_Ctx,_Env,Var,Body,locally_let(Var=[],Body)):- is_sboundp(Var),!.
-maybe_bind_special(Ctx,Env,Var,Body,Out):- is_sboundp(Var),!,maybe_bind_special(Ctx,Env,[Var,[]],Body,Out).
-maybe_bind_special(Ctx,Env,[Var,ValueForm|_],Body,(ValueBody,locally_set(Var,Value,Body))):- 
-  debug_var([Var,'_SLet'],Value),
-  is_sboundp(Var),!,must_compile_body(Ctx,Env,Value,ValueForm,ValueBody).
-
-maybe_bind_local(Ctx,Env,Var,Body,Out):- atom(Var),!,maybe_bind_local(Ctx,Env,[Var,[]],Body,Out).
-maybe_bind_local(Ctx,Env,[Var,ValueForm|_],Body,(ValueBody,locally_bind(Env,Var,Value,Body))):- 
-    %debug_var("LEnv",BindingsEnvironment),
-    debug_var([Var,'_Let'],Value),
-    must_compile_body(Ctx,Env,Value,ValueForm,ValueBody).
-
-
-is_setf_bound(Var):- \+ compound(Var),!,is_sboundp(Var).
-is_setf_bound(Var):- arg(1,Var,E),!,is_setf_bound(E).
-
-%make_bv_maybe(Var,Value,sv(Var,Value)):- is_setf_bound(Var),!.
-make_bv_maybe(Var,Value,bv(Var,Value)).
 % LET*
-compile_body(Ctx,Env,Result,[OP, []| BodyForms], Body):- same_symbol(OP,'let*'), !, must_compile_body(Ctx,Env,Result,[progn| BodyForms], Body).
+compile_body(Ctx,Env,Result,[OP, []| BodyForms], Body):- same_symbol(OP,'let*'), !, 
+  must_compile_body(Ctx,Env,Result,[progn| BodyForms], Body).
 compile_body(Ctx,Env,Result,[OP, [Binding1|NewBindings]| BodyForms], Body):- same_symbol(OP,'let*'),
    always(compile_let(Ctx,Env,Result,['let', [Binding1],[progn, [OP, NewBindings| BodyForms]]], Body)).
+
+
+% EXT:LETF
+compile_body(Ctx,Env,Result,[ext_letf, NewBindingsIn| BodyForms], Body):- assertion(is_list(NewBindingsIn)),!,
+ always(compile_let(Ctx,Env,Result,[ext_letf, NewBindingsIn| BodyForms], Body)).
+
+% EXT:LETF*
+compile_body(Ctx,Env,Result,[OP, []| BodyForms], Body):- same_symbol(OP,'ext_letf*'), !, 
+  must_compile_body(Ctx,Env,Result,[progn| BodyForms], Body).
+compile_body(Ctx,Env,Result,[OP, [Binding1|NewBindings]| BodyForms], Body):- same_symbol(OP,'ext_letf*'),
+   always(compile_let(Ctx,Env,Result,['ext_letf', [Binding1],[progn, [OP, NewBindings| BodyForms]]], Body)).
+
 
 % VALUES (r1 . rest )
 compile_body(Ctx,Env,Result,['values',R1|EvalList], (ArgBody,Body)):-!,
@@ -779,7 +732,6 @@ compile_body(Ctx,Env,Result,BodyForms, Body):- compile_setfs(Ctx,Env,Result,Body
 % FUNCALL,EVAL,APPLY, RestOf
 compile_body(Ctx,Env,Result,BodyForms, Body):- always(compile_funop(Ctx,Env,Result,BodyForms, Body)),!.
 
+
 :- fixup_exports.
-
-
 
