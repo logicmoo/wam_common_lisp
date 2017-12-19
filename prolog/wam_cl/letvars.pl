@@ -1,0 +1,129 @@
+/*******************************************************************
+ *
+ * A Common Lisp compiler/interpretor, written in Prolog
+ *
+ * (lisp_compiler.pl)
+ *
+ *
+ * Douglas'' Notes:
+ *
+ * (c) Douglas Miles, 2017
+ *
+ * The program is a *HUGE* common-lisp compiler/interpreter. It is written for YAP/SWI-Prolog .
+ *
+ * Changes since 2001:
+ *
+ *
+ *******************************************************************/
+:- module(l3ts, []).
+:- set_module(class(library)).
+:- include('header').
+
+
+
+normalize_let1([Variable, Form],[bind, Variable, Form]).
+normalize_let1([bind, Variable, Form],[bind, Variable, Form]).
+normalize_let1( Variable,[bind, Variable, []]).
+
+
+%  (LET  () .... )
+compile_let(Ctx,Env,Result,[_LET, []| BodyForms], Body):- !, compile_forms(Ctx,Env,Result, BodyForms, Body).
+
+%  (LET ((*package* (find-package :keyword))) *package*)
+% compile_let(LET,Ctx,Env,Result,[let, [[Var,VarInit]]| BodyForms], Body):- ...
+
+%  (LET  (....) .... )
+compile_let(Ctx,Env,Result,[LET, NewBindingsIn| BodyForms], Body):- !,
+  always((
+      debug_var("LEnv",BindingsEnvironment),
+      debug_var('LetResult',Result),
+
+        freeze(Var,ignore((var(Value),debug_var('_Init',Var,Value)))),
+        freeze(Var,ignore((var(Value),add_tracked_var(Ctx,Var,Value)))),
+        
+        must_maplist(normalize_let1,NewBindingsIn,NewBindings),
+	zip_with(Variables, ValueForms, [Variable, Form, [bind, Variable, Form]]^true, NewBindings),
+	expand_arguments(Ctx,Env,'funcall',1,ValueForms, VarInitCode, Values),
+
+        zip_with(Variables, Values, [Var, Value, BV]^make_letvar(LET,Var,Value,BV),Bindings),
+        add_alphas(Ctx,Variables),        
+        rescue_special_bindings(Bindings,LocalBindings,SpecialBindings),
+
+        ignore((member(VarN,[Variable,Var]),atom(VarN),var(Value),debug_var([VarN,'_Let'],Value),fail)),        
+	compile_forms(Ctx,BindingsEnvironment,BResult,BodyForms, BodyFormsBody),
+        let_body(Env,BindingsEnvironment,LocalBindings,SpecialBindings,BodyFormsBody,MaybeSpecialBody),
+         Body = (VarInitCode, MaybeSpecialBody,Result=BResult))).
+
+% No Locals
+let_body(Env,BindingsEnvironment,[],SpecialBindings,BodyFormsBody,MaybeSpecialBody):-!,
+  Env=BindingsEnvironment,
+    debug_var("LEnv",BindingsEnvironment),
+  maybe_specials_in_body(SpecialBindings,BodyFormsBody,MaybeSpecialBody).
+
+% Some Locals
+let_body(Env,BindingsEnvironment,LocalBindings,SpecialBindings,BodyFormsBody,
+                        (BindingsEnvironment=[LocalBindings|Env], MaybeSpecialBody)):-!,
+  debug_var("LEnv",BindingsEnvironment),
+  %nb_set_last_tail(LocalBindings,Env),
+  maybe_specials_in_body(SpecialBindings,BodyFormsBody,MaybeSpecialBody).
+
+% No Specials
+maybe_specials_in_body([],BodyFormsBody,BodyFormsBody).
+% Some Specials
+maybe_specials_in_body(SpecialBindings,BodyFormsBody,SpecialBody):-
+   SpecialBody = (
+       maplist(save_special,SpecialBindings), 
+       BodyFormsBody,
+       maplist(restore_special,SpecialBindings)).
+% Some SAFE specials
+maybe_specials_in_body(SpecialBindings,BodyFormsBody,SpecialBody):-
+   SpecialBody = 
+       setup_call_cleanup(maplist(save_special,SpecialBindings), 
+       BodyFormsBody,
+       maplist(restore_special,SpecialBindings)).
+
+is_special_var(Var):- atom(Var),!,get_opv_i(Var,value,_).
+
+make_letvar(ext_letf,Place,Value,place(Place,Value,_OldValue)):- is_list(Place).
+make_letvar(_,Var,Value,sv(Var,Value,value,_OldValue)):- is_special_var(Var),!.
+make_letvar(_,Var,Value,bv(Var,Value)).
+
+rescue_special_bindings(Var,Var,[]):- var(Var),!.
+rescue_special_bindings([],[],[]).
+rescue_special_bindings([bv(N,V)|Bindings],[bv(N,V)|LocalBindings],SpecialBindings):- !,
+  rescue_special_bindings(Bindings,LocalBindings,SpecialBindings).
+rescue_special_bindings([Else|Bindings],LocalBindings,[Else|SpecialBindings]):-
+  rescue_special_bindings(Bindings,LocalBindings,SpecialBindings).
+
+save_special(sv(N,New,Prop,Old)):- get_opv(N,Prop,Old),set_opv(N,Prop,New).
+save_special(place(Place,New,Old)):- get_place(Place,Old),set_place(Place,New).
+
+restore_special(sv(N,_,Prop,Old)):- set_opv(N,Prop,Old).
+restore_special(place(Place,_New,Old)):- set_place(Place,Old).
+
+
+/*
+compile_let_9(Ctx,Env,Result,[let, [Bind1|NewBindingsIn]| BodyForms], Call):- 
+  maybe_bind_special(Ctx,Env,Bind1,Body,Call),!,
+  compile_let(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body).
+compile_let_9(Ctx,Env,Result,[let, [Bind1|NewBindingsIn]| BodyForms], Call):- 
+  maybe_bind_local(Ctx,Env,Bind1,Body,Call),!,
+  compile_let(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body).
+compile_let_9(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body):- 
+  compile_let(LET,Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body).
+
+%maybe_bind_special(_Ctx,_Env,Var,Body,locally_let(Var=[],Body)):- is_sboundp(Var),!.
+maybe_bind_special(Ctx,Env,Var,Body,Out):- is_sboundp(Var),!,maybe_bind_special(Ctx,Env,[Var,[]],Body,Out).
+maybe_bind_special(Ctx,Env,[Var,ValueForm|_],Body,(VarInitCode,locally_set(Var,Value,Body))):- 
+  debug_var([Var,'_SLet'],Value),
+  is_sboundp(Var),!,must_compile_body(Ctx,Env,Value,ValueForm,VarInitCode).
+
+maybe_bind_local(Ctx,Env,Var,Body,Out):- atom(Var),!,maybe_bind_local(Ctx,Env,[Var,[]],Body,Out).
+maybe_bind_local(Ctx,Env,[Var,ValueForm|_],Body,(VarInitCode,locally_bind(Env,Var,Value,Body))):- 
+    %debug_var("LEnv",BindingsEnvironment),
+    debug_var([Var,'_Let'],Value),
+    must_compile_body(Ctx,Env,Value,ValueForm,VarInitCode).
+*/
+
+:- fixup_exports.
+
