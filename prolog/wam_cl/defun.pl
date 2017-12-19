@@ -36,8 +36,7 @@ compile_defun_ops(Ctx,Env,Result,[defun,Symbol,FormalParms|FunctionBody], (Code,
 wl:init_args(1,cl_flet).
 cl_flet(Inits,Progn,Result):- reenter_lisp(Ctx,Env), compile_defun_ops(Ctx,Env,Result,[flet,Inits|Progn],Code), always(Code).  
 compile_defun_ops(Ctx,Env,Result,[flet,FLETS|Progn], CompileBody):- 
-    get_label_suffix(Ctx,Gensym),
-    must_maplist(define_each(Ctx,Env,flet,Gensym),FLETS,News,Decls),
+    must_maplist(define_each(Ctx,Env,flet),FLETS,News,Decls),
     maplist(always,Decls),
     compile_forms(Ctx,Env,Result,Progn, CompileBody),
     maplist(remove_symbol_fbounds(Ctx),News).
@@ -46,16 +45,16 @@ compile_defun_ops(Ctx,Env,Result,[flet,FLETS|Progn], CompileBody):-
 wl:init_args(1,cl_labels).
 cl_labels(Inits,Progn,Result):- reenter_lisp(Ctx,Env),compile_defun_ops(Ctx,Env,Result,[labels,Inits|Progn],Code),always(Code).  
 compile_defun_ops(Ctx,Env,Result,[labels,LABELS|Progn], CompileBody):- 
-    %gensym(labels,Gensym),
-    get_label_suffix(Ctx,Gensym),
-    must_maplist(define_each(Ctx,Env,labels,Gensym),LABELS,_News,Decls),
+    must_maplist(define_each(Ctx,Env,labels),LABELS,_News,Decls),
     maplist(always,Decls),    
     compile_forms(Ctx,Env,Result,Progn, CompileBody).   
 
 
-define_each(Ctx,Env,_LabelsOrFLET,_Gensym,DEFN,Sym,CompileBody)  :- 
-   compile_function(Ctx,Env,DEFN,Sym,Function,CompileBody),
-   add_symbol_fbounds(Ctx,Sym,kw_function,Function),
+define_each(Ctx,Env,_LabelsOrFLET,[Symbol|DEFN],Sym,CompileBody)  :-    
+   (always(find_function_or_macro_name(Ctx,Env,Symbol,_Len, Function)),suffix_by_context(Ctx,Function,CtxFunction)),
+   gensym(CtxFunction,UniqueCtxFunction),
+   compile_function(Ctx,Env,[Symbol|DEFN],Sym,UniqueCtxFunction,CompileBody),
+   add_symbol_fbounds(Ctx,Sym,kw_function,UniqueCtxFunction),
    always(CompileBody),
    dbmsg_real(CompileBody).
 
@@ -67,11 +66,14 @@ varuse:attr_unify_hook(_,Other):- var(Other).
 
 
 compile_function(Ctx,Env,[Symbol,FormalParms|FunctionBody0],Symbol,CtxFunction,CompileBodyOpt):-
-   always(find_function_or_macro_name(Ctx,Env,Symbol,_Len, Function)),
-   suffix_by_context(Ctx,Function,CtxFunction),
-   within_labels_context(Ctx,Symbol,((
+
+   (var(CtxFunction) -> (always(find_function_or_macro_name(Ctx,Env,Symbol,_Len, Function)),suffix_by_context(Ctx,Function,CtxFunction)); 
+     true),
+
+   LabelSymbol = '', % LabelSymbol =Symbol 
+   within_labels_context(Ctx,LabelSymbol,((
    always(maybe_get_docs(function,Symbol,FunctionBody0,FunctionBody,DocCode)),
-   %FunctionHead=[Function|FormalParms],
+   
    debug_var("Env",CallEnv),
    debug_var('FnResult',Result),   
      (expand_function_head(Ctx,CallEnv,Symbol,FormalParms,_Whole, HeadParms,_HeadEnv, HeadDefCode,HeadCode),

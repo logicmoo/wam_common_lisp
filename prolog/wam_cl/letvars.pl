@@ -34,7 +34,14 @@ compile_let(Ctx,Env,Result,[let, [[Var,VarInit]]| BodyForms], (VarInitCode,local
  is_special_var(Var),!,
  must_compile_body(Ctx,Env,Value,VarInit,VarInitCode),
   compile_forms(Ctx,Env,Result,BodyForms,BodyCode).
-  
+
+%  (LET ((local 1)) local)
+compile_let(Ctx,Env,Result,[let, [[Var,VarInit]]| BodyForms], (VarInitCode,locally_bind(Env,Var,Value,BodyCode))):- fail,
+ atom(Var),
+ must_compile_body(Ctx,Env,Value,VarInit,VarInitCode),
+  compile_forms(Ctx,Env,Result,BodyForms,BodyCode).
+
+
 %  (LET  (....) .... )
 compile_let(Ctx,Env,Result,[LET, NewBindingsIn| BodyForms], Body):- !,
   always((
@@ -51,7 +58,7 @@ compile_let(Ctx,Env,Result,[LET, NewBindingsIn| BodyForms], Body):- !,
         zip_with(Variables, Values, [Var, Value, BV]^make_letvar(LET,Var,Value,BV),Bindings),
 
         % rescue out special bindings
-        partition(=(bv(_,_)),Bindings,LocalBindings,SpecialBindings),  
+        partition(is_bv2,Bindings,LocalBindings,SpecialBindings),  
 
         ignore((member(VarN,[Variable,Var]),atom(VarN),var(Value),debug_var([VarN,'_Let'],Value),fail)),        
         compile_forms(Ctx,BindingsEnvironment,BResult,BodyForms, BodyFormsBody),
@@ -59,6 +66,7 @@ compile_let(Ctx,Env,Result,[LET, NewBindingsIn| BodyForms], Body):- !,
         let_body(Env,BindingsEnvironment,LocalBindings,SpecialBindings,BodyFormsBody,MaybeSpecialBody),
          Body = (VarInitCode, MaybeSpecialBody,Result=BResult))).
 
+is_bv2(BV):- \+ \+ BV=bv(_,_).
 % No Locals
 let_body(Env,BindingsEnvironment,[],SpecialBindings,BodyFormsBody,MaybeSpecialBody):-!,
   Env=BindingsEnvironment, debug_var("LEnv",BindingsEnvironment),
@@ -85,18 +93,16 @@ is_special_var(Var):- atom(Var),!,get_opv_i(Var,value,_).
 make_letvar(ext_letf,Place,Value,place(Place,Value,_OldValue)):- is_list(Place).
 make_letvar(_,Var,Value,sv(Var,Value,value,_OldValue)):- is_special_var(Var),!.
 make_letvar(_,Var,Value,bv(Var,Value)).
+%make_letvar(_,Var,Value,vv(Var,Value)).
 
-/*
-rescue_special_bindings(Var,Var,[]):- var(Var),!.
-rescue_special_bindings([],[],[]).
-rescue_special_bindings([bv(Var,V)|Bindings],[bv(Var,V)|LocalBindings],SpecialBindings):- !,
-  rescue_special_bindings(Bindings,LocalBindings,SpecialBindings).
-rescue_special_bindings([Else|Bindings],LocalBindings,[Else|SpecialBindings]):-
-  rescue_special_bindings(Bindings,LocalBindings,SpecialBindings).
-*/
+
+  % maybe_bind_local(Ctx,Env,[Var,ValueForm|_],Body,(VarInitCode,locally_bind(Env,Var,Value,Body))):- 
+
+%save_special(vv(_,_)).
 save_special(sv(Var,New,Prop,Old)):- get_opv(Var,Prop,Old),set_opv(Var,Prop,New).
 save_special(place(Place,New,Old)):- get_place(Place,Old),set_place(Place,New).
 
+%restore_special(vv(_,_)).
 restore_special(sv(Var,_,Prop,Old)):- set_opv(Var,Prop,Old).
 restore_special(place(Place,_New,Old)):- set_place(Place,Old).
 

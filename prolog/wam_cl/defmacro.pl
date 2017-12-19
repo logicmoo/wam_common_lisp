@@ -29,30 +29,34 @@ compile_macro_ops(Ctx,Env,Result,[defmacro,Symbol,FormalParms|FunctionBody], (Co
   FunDef = (set_opv(Function,classof,claz_macro),set_opv(Symbol,compile_as,kw_operator),set_opv(Symbol,function,Function)),   
   always((FunDef,Code)).  
 
-:- _ = "(macrolet ((temp1 (n) `(+ ,n ,n) ) )(macrolet ((temp1 (n) `(+ 2 (temp1 ,n) ) ) )(temp1 2) ) )".
 % MACROLET
 wl:init_args(1,cl_macrolet).
-cl_macrolet(Inits,Progn,Result):- reenter_lisp(Ctx,Env),compile_macro_ops(Ctx,Env,Result,[macrolet,Inits|Progn],Code),always(Code).  
-compile_macro_ops(Ctx,Env,Result,[macrolet,MACROLETS|Progn], (maplist(always,Decls),CompileBody)):- 
-    get_label_suffix(Ctx,Gensym),
-    must_maplist(define_each_macro(Ctx,Env,flet,Gensym),MACROLETS,News,Decls),
+cl_macrolet(Inits,Progn,Result):- reenter_lisp(Ctx,Env), compile_macro_ops(Ctx,Env,Result,[macrolet,Inits|Progn],Code), always(Code).  
+compile_macro_ops(Ctx,Env,Result,[macrolet,MACROLETS|Progn], CompileBody):- 
+    must_maplist(define_each_macro(Ctx,Env,macrolet),MACROLETS,News,Decls),
     maplist(always,Decls),
     compile_forms(Ctx,Env,Result,Progn, CompileBody),
     maplist(remove_symbol_fbounds(Ctx),News).
 
-define_each_macro(Ctx,Env,_MLabelsOrMACROLET,_Gensym,DEFN,Sym,CompileBody)  :- 
-   compile_macro(Ctx,Env,DEFN,Sym,Function,CompileBody),
-   add_symbol_fbounds(Ctx,Sym,kw_operator,Function),
+
+define_each_macro(Ctx,Env,_LabelsOrFLET,[Symbol|DEFN],Sym,CompileBody)  :-    
+   (always(find_function_or_macro_name(Ctx,Env,Symbol,_Len, Function)),suffix_by_context(Ctx,Function,Macro)),
+   gensym(Macro,UniqueCtxFunction),
+   compile_macro(Ctx,Env,[Symbol|DEFN],Sym,UniqueCtxFunction,CompileBody),
+   add_symbol_fbounds(Ctx,Sym,kw_function,UniqueCtxFunction),
    always(CompileBody),
    dbmsg_real(CompileBody).
 
 
 compile_macro(Ctx,Env,[Symbol,FormalParms|FunctionBody0],Symbol,Macro, CompileBody):-
    maybe_get_docs(function,Symbol,FunctionBody0,FunctionBody,DocCode),
-   find_function_or_macro_name(Ctx,Env,Symbol,_Len, MacroN),
-   suffix_by_context(Ctx,MacroN,Macro),
-   debug_var('MFResult',MFResult),debug_var('FnResult',FResult),
- within_labels_context(Ctx,Symbol,((
+
+   (var(Macro) -> (always(find_function_or_macro_name(Ctx,Env,Symbol,_Len, Function)),suffix_by_context(Ctx,Function,Macro)); 
+     true),
+
+   LabelSymbol = '', % LabelSymbol =Symbol 
+      debug_var('MFResult',MFResult),debug_var('FnResult',FResult),
+ within_labels_context(Ctx,LabelSymbol,((
    expand_function_head(Ctx,Env,Symbol,FormalParms,_Whole, HeadParms,_HeadEnv, HeadDefCode,HeadCode),
    append([Macro|HeadParms],[FResult],HeadV),
    CallableHead =.. HeadV,
