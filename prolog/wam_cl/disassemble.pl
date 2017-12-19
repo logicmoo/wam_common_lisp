@@ -15,53 +15,74 @@
 :- module(dasm, []).
 
 
-cl_disassemble(function(Symbol), Code):- !, cl_disassemble((Symbol), Code).
-cl_disassemble(Obj, Code):- get_opv(Obj,function,Obj2),!,cl_disassemble(Obj2, Code).
-cl_disassemble(StringL,Code):- to_prolog_string_if_needed(StringL,String),!,cl_disassemble(String,Code).
-cl_disassemble(Function, Code):- string(Function),downcase_atom(Function,DC),!,cl_disassemble(DC, Code).
+%cl_disassemble(Function, Code):- string(Function),downcase_atom(Function,DC),!,cl_disassemble(DC, Code).
+cl_disassemble(function(Symbol), Code):- !, cl_disassemble(Symbol, Code).
+cl_disassemble([quote,Symbol], Code):- !, cl_disassemble(Symbol, Code).
+cl_disassemble(StringL,Code):- \+ string(StringL),is_stringp(StringL),to_prolog_string_if_needed(StringL,String),!,cl_disassemble(String,Code).
 cl_disassemble(Function, Prolog):- 
   writeln('#| DISASSEMBLY FOR':Function),
    make_holder(Holder),
-   reassembed_clauses(Holder,Function),
+   print_related_clauses(Holder,_Module,Function),
   nb_holder_value(Holder,ListOut),
   Prolog = '$OBJ'(claz_prolog,ListOut),
   nop(ListOut==[]-> xlisting(Function) ; true),
   writeln('|#').
 
-reassembed_clauses(Holder,Function):- 
-   ignore(((
-   (current_predicate(Module:Function/Arity),                                 
-    functor(P,Function,Arity),print_reassembed_clause(Holder,Module,P))),
-   !, % unless all?
-   fail)).
 
-clauses_related(Module,P,Module:P,B,PrintKeyRef):- clause(Module:P,B,PrintKeyRef).
-clauses_related(W,P,H,B,PrintKeyRef):-
-   H= W:lambda_def(_DefType,H1,H2,_Args,_Body),
-   clause(H,B,PrintKeyRef),
+clauses_related(M,Obj,H,B,PrintKeyRef):- nonvar(Obj), get_opv(Obj,function,Obj2),clauses_related(M,Obj2,H,B,PrintKeyRef).
+clauses_related(_,P,H,B,PrintKeyRef):-
+   H= wl:lambda_def(_DefType,H1,H2,_Args,_Body),
+   clause_interface(H,B,PrintKeyRef),
   (related_functor(P,H1);related_functor(P,H2)).
 clauses_related(_,P,H,B,PrintKeyRef):-
-   H= wl:arglist_info(H1,H2,_,_,_),
-   clause(H,B,PrintKeyRef),
+   H= wl:arglist_info(H1,H2,_,_),
+   clause_interface(H,B,PrintKeyRef),
   (related_functor(P,H1);related_functor(P,H2)).
+clauses_related(_,P,H,B,PrintKeyRef):-
+   H= wl:init_args(_,H1),
+   clause_interface(H,B,PrintKeyRef),
+  (related_functor(P,H1)).
+clauses_related(Module,P,Module:H,B,PrintKeyRef):- 
+  current_module(Module),
+  current_predicate(_,Module:H),
+  \+ predicate_property(Module:H,imported_from(_)),
+  \+ predicate_property(Module:H,foreign),  
+  clause_interface(Module:H,B,PrintKeyRef),
+  related_functor(P,H).
+
 
 related_functor(P,Q):- to_related_functor(P,PP),to_related_functor(Q,QQ),QQ=PP,!.
-to_related_functor(P,_):- var(P),!,fail.
-to_related_functor(P,P):- \+ compound(P),!.
-to_related_functor(P,PP):- P=..[F,A],!,(to_related_functor(F,PP);to_related_functor(A,PP)).
-to_related_functor(P,PP):- P=..[_,A,B|_Rest],(to_related_functor(A,PP);to_related_functor(B,PP)).
+%to_related_functor(P,_):- \+ callable(P),!,fail.
+to_related_functor(P,PP):- string(P),atom_string(A,P),!,to_related_functor(A,PP).
+to_related_functor(P,PP):- \+ compound(P),!,to_related_functor_each(P,PP).
+to_related_functor(P,PP):- compound_name_arguments(P,F,[A,B,C|_]),!,
+  (to_related_functor_each(F,PP);to_related_functor(A,PP);to_related_functor(B,PP);to_related_functor(C,PP)).
+to_related_functor(P,PP):- compound_name_arguments(P,F,[]),!,(to_related_functor_each(F,PP)).
+to_related_functor(P,PP):- compound_name_arguments(P,F,[A]),!,(to_related_functor_each(F,PP);to_related_functor(A,PP)).
+to_related_functor(P,PP):- compound_name_arguments(P,F,[A,B]),!,(to_related_functor_each(F,PP);to_related_functor(A,PP);to_related_functor(B,PP)).
 
-print_reassembed_clause(ExceptFor,Module,P):-
-   \+ predicate_property(Module:P,foriegn),
-   clauses_related(Module,P,H,B,PrintKeyRef),
-   %\+ predicate_property(Module:P,imported_from(_)),
+
+
+to_related_functor_each(P,_):- \+ atom(P),!,fail.
+to_related_functor_each(P,PP):- to_related_functor_each1(P,PP).
+to_related_functor_each(P,PP):- to_related_functor_each1(P,PPP),to_related_functor_each0(PPP,PP).
+
+to_related_functor_each1(P,P).
+to_related_functor_each1(P,PP):- downcase_atom(P,PP),PP\==P.
+
+to_related_functor_each0(P,PP):-atom_concat('f_',PP,P).
+to_related_functor_each0(P,PP):-atom_concat('u_',PP,P).
+to_related_functor_each0(P,PP):-atom_concat('cl_',PP,P).
+
+print_related_clauses(ExceptFor,_OModule,P):-
+ ignore((
+   no_repeats(clauses_related(_Module,P,H,B,PrintKeyRef)),
    PC = (H :- B),   
    nb_holder_value(ExceptFor,Printed),
    \+ member(PrintKeyRef,Printed),
    nb_holder_append(ExceptFor,PrintKeyRef),
-   print_clause_plain(PC),
-   ignore((sub_term(Sub,B),compound(Sub),functor(Sub,F,1),(atom_contains(F,addr);maybe_inline(Sub)),
-           print_reassembed_clause(ExceptFor,Module,Sub),fail)).
+   once(print_clause_plain(PC)),
+   fail)).
 
 
 make_pretty(I,O):- is_user_output,!,shrink_lisp_strings(I,O), pretty1(O),pretty2(O),pretty3(O).

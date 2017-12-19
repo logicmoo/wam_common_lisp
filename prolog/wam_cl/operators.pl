@@ -22,7 +22,7 @@
 :- ensure_loaded(utils_for_swi).
 
 
-cl_special_operator_p(Obj,RetVal):- t_or_nil(is_lisp_operator(Obj),RetVal).
+cl_special_operator_p(Obj,RetVal):- t_or_nil(is_lisp_operator(_,Obj),RetVal).
 
 cl_functionp(Obj,RetVal):- t_or_nil(is_functionp(Obj),RetVal).
 is_functionp(X):- \+ atom(X),!,fail.
@@ -51,7 +51,19 @@ within_labels_context(_Ctx,Label,G):- nb_current('$labels_suffix',Suffix),
 gensym_in_labels(Ctx,Stem,GenSym):- suffix_by_context(Ctx,Stem,SuffixStem),gensym(SuffixStem,GenSym).
 
 get_label_suffix(_Ctx,Suffix):-nb_current('$labels_suffix',Suffix).
-  
+
+
+remove_symbol_fbounds(Ctx,Sym):-
+  get_attr(Ctx,tracker,Ctx0), rb_delete(Ctx0,fbound(Sym),Ctx1),
+  put_attr(Ctx,tracker,Ctx1).
+
+get_symbol_fbounds(Ctx,Sym,BoundType,ProposedName):-
+  get_attr(Ctx,tracker,Ctx0), rb_in(fbound(Sym),bound_type(BoundType,ProposedName), Ctx0).
+
+add_symbol_fbounds(Ctx,Sym,BoundType,ProposedName):-
+   get_attr(Ctx,tracker,Ctx0), rb_insert(Ctx0,fbound(Sym),bound_type(BoundType,ProposedName),Ctx1),
+   put_attr(Ctx,tracker,Ctx1).
+   
 
 show_ctx_info(Ctx):- term_attvars(Ctx,CtxVars),maplist(del_attr_rev2(freeze),CtxVars),show_ctx_info2(Ctx).
 show_ctx_info2(Ctx):- ignore((get_attr(Ctx,tracker,Ctx0),in_comment(show_ctx_info3(Ctx0)))).
@@ -96,6 +108,8 @@ get_each_search_suffix(Ctx,Each):-
    append(_,EachList,List),atomic_list_concat(EachList,'_',Each)))->true;Each=''.
 
 
+find_function_or_macro_name(Ctx,_Env,FN, _Len, ProposedName):-
+   get_symbol_fbounds(Ctx,FN,_,ProposedName),!.
 find_function_or_macro_name(Ctx,Env,FN, Len, ProposedName):- 
    get_each_search_suffix(Ctx,Each),atom_concat_suffix(FN,Each,EachFN),
    exists_function_or_macro_name(Ctx,Env,EachFN,Len, ProposedName),!.
@@ -237,7 +251,8 @@ guess_prolog_functor(P,F,A):- functor(P,F,A).
 currently_visible_package(P):- reading_package(Package),
   (P=Package;package_use_list(Package,P)).
 
-is_lisp_operator(G):- notrace(lisp_operator(G)).
+is_lisp_operator(Ctx,Sym):- get_symbol_fbounds(Ctx,Sym,kw_operator,_).
+is_lisp_operator(_,G):- notrace(lisp_operator(G)).
 
 
 lisp_operator(defpackage).

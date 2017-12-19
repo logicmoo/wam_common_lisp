@@ -239,7 +239,7 @@ lisp_grovel(cl_load(File,Keys,Load_Ret)):- !, cl_compile_file(File,Keys,Load_Ret
 lisp_grovel(_).
 
 lisp_grovel_assert(T,MP):- compound(MP),strip_module(MP,_,P),functor(P,F,_),
-  arg(_, v(doc_string,macro_lambda,function_lambda,lambda_def,arglist_info),F),!,
+  arg(_, v(doc_string,macro_lambda,function_lambda,init_args,lambda_def,arglist_info),F),!,
   show_call_trace(assert_lsp(T,MP)).
 lisp_grovel_assert(_,_).
 lisp_grovel_assert(T):-lisp_grovel_assert(u,T),!.

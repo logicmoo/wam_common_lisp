@@ -34,7 +34,7 @@ compile_funop(Ctx,Env,Result,[function(Op) | FunctionArgs], Body):- nonvar(Op),!
 
 % Use a previous DEFMACRO
 compile_funop(Ctx,Env,Result,LispCode,CompileBody):-
-  %fail, %DISABLED
+  fail, %DISABLED
   macroexpand_1_or_fail(LispCode,[],CompileBody0Result),
   dmsg(macroexpand:-LispCode),
   dmsg(into:-CompileBody0Result),

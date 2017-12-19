@@ -491,7 +491,7 @@ bind_formal_old([FormalParam|FormalParms], [ActualParam|ActualParams],
 
 % The idea here is that FN/ArgNum may need evaluated or may have its own special evaluator 
 expand_arguments(_Ctx,_Env,_FunctionName,_ArgNum,[], true, []):-!.
-expand_arguments(_Ctx,_Env,FN,_, Args, true, ArgsO):- is_lisp_operator(FN),!,Args=ArgsO.
+expand_arguments(Ctx,_Env,FN,_, Args, true, ArgsO):- is_lisp_operator(Ctx,FN),!,Args=ArgsO.
 
 expand_arguments(Ctx,Env,FN,ArgNum,[Arg|Args], Body, [Result|Results]):-!,
        must_compile_body(Ctx,Env,Result,Arg, ArgBody),

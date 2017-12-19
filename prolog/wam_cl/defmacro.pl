@@ -22,49 +22,46 @@
 
 % DEFMACRO
 wl:init_args(2,cl_defmacro).
-cl_defmacro(Symbol,FormalParms,FunctionBody,Symbol):-
-  reenter_lisp(Ctx,Env),  
-  compile_macro(Ctx,Env,[Symbol,FormalParms|FunctionBody],Macro, Code),
-   FunDef = (set_opv(Macro,classof,claz_macro),set_opv(Symbol,compile_as,kw_operator),set_opv(Symbol,function,Macro)),   
-  always((FunDef,Code)).
-
-compile_macro_ops(_Ctx,_Env,Return,[defmacro,Symbol,FormalParms|FunctionBody], cl_defmacro(Symbol,FormalParms,FunctionBody,Return)):-
-   cl_defmacro(Symbol,FormalParms,FunctionBody,_ReturnLocal).
+cl_defmacro(Symbol,FormalParms,FunctionBody,Return):- reenter_lisp(Ctx,Env),compile_macro_ops(Ctx,Env,Return,[defmacro,Symbol,FormalParms|FunctionBody],Code),dbmsg_real(Code).
+compile_macro_ops(Ctx,Env,Result,[defmacro,Symbol,FormalParms|FunctionBody], (Code,FunDef,Result=Symbol)):-
+  compile_macro(Ctx,Env,[Symbol,FormalParms|FunctionBody],_Sym,Function,Code),
+  debug_var('DefMacroResult',Result),
+  FunDef = (set_opv(Function,classof,claz_macro),set_opv(Symbol,compile_as,kw_operator),set_opv(Symbol,function,Function)),   
+  always((FunDef,Code)).  
 
 :- _ = "(macrolet ((temp1 (n) `(+ ,n ,n) ) )(macrolet ((temp1 (n) `(+ 2 (temp1 ,n) ) ) )(temp1 2) ) )".
 % MACROLET
 wl:init_args(1,cl_macrolet).
-cl_macrolet(Inits,Progn,Result):-
-  reenter_lisp(Ctx,Env),
-  compile_macro_ops(Ctx,Env,Result,[macrolet,Inits|Progn],Code),
-  always(Code).  
-     
+cl_macrolet(Inits,Progn,Result):- reenter_lisp(Ctx,Env),compile_macro_ops(Ctx,Env,Result,[macrolet,Inits|Progn],Code),always(Code).  
 compile_macro_ops(Ctx,Env,Result,[macrolet,MACROLETS|Progn], (maplist(always,Decls),CompileBody)):- 
-    gensym(macrolet,Gensym),
-    within_labels_context(Ctx,Gensym,
-     ((must_maplist(define_macro(Ctx,Env),MACROLETS,_MacroNames,Decls), 
-       compile_forms(Ctx,Env,Result,Progn, CompileBody)))).
-    
+    get_label_suffix(Ctx,Gensym),
+    must_maplist(define_each_macro(Ctx,Env,flet,Gensym),MACROLETS,News,Decls),
+    maplist(always,Decls),
+    compile_forms(Ctx,Env,Result,Progn, CompileBody),
+    maplist(remove_symbol_fbounds(Ctx),News).
 
-define_macro(Ctx,Env,DEFN,MacroName,CompileBody):-
-  compile_macro(Ctx,Env,MacroName,DEFN,CompileBody),
-  always(CompileBody),
-  dbmsg_real(CompileBody).
+define_each_macro(Ctx,Env,_MLabelsOrMACROLET,_Gensym,DEFN,Sym,CompileBody)  :- 
+   compile_macro(Ctx,Env,DEFN,Sym,Function,CompileBody),
+   add_symbol_fbounds(Ctx,Sym,kw_operator,Function),
+   always(CompileBody),
+   dbmsg_real(CompileBody).
 
-compile_macro(Ctx,CallEnv,Macro,[Symbol,FormalParms|FunctionBody0], CompileBody):-
+
+compile_macro(Ctx,Env,[Symbol,FormalParms|FunctionBody0],Symbol,Macro, CompileBody):-
    maybe_get_docs(function,Symbol,FunctionBody0,FunctionBody,DocCode),
-   find_function_or_macro_name(Ctx,CallEnv,Symbol,_Len, Macro),
+   find_function_or_macro_name(Ctx,Env,Symbol,_Len, MacroN),
+   suffix_by_context(Ctx,MacroN,Macro),
    debug_var('MFResult',MFResult),debug_var('FnResult',FResult),
  within_labels_context(Ctx,Symbol,((
-   expand_function_head(Ctx,CallEnv,Symbol,FormalParms,_Whole, HeadParms,_HeadEnv, HeadDefCode,HeadCode),
+   expand_function_head(Ctx,Env,Symbol,FormalParms,_Whole, HeadParms,_HeadEnv, HeadDefCode,HeadCode),
    append([Macro|HeadParms],[FResult],HeadV),
    CallableHead =.. HeadV,
-   must_compile_body(Ctx,CallEnv,MFResult,[block,Symbol|FunctionBody],MFBody),   
+   must_compile_body(Ctx,Env,MFResult,[block,Symbol|FunctionBody],MFBody),   
    body_cleanup_keep_debug_vars(Ctx,((CallableHead  :- ((HeadCode,MFBody), cl_eval(MFResult,FResult)))),MacroAssert),
    body_cleanup_keep_debug_vars(Ctx,((DocCode,
    assert_lsp(Symbol,wl:lambda_def(defmacro,(Symbol),Macro, FormalParms, [progn | FunctionBody])),
    HeadDefCode,
-   assert_lsp(Symbol,MacroAssert)),CompileBody))))).
+   assert_lsp(Symbol,MacroAssert))),CompileBody)))).
 
 
 % macroexpand-1
@@ -121,9 +118,9 @@ macroexpand_1_or_fail([Procedure|Arguments],MacroEnv,CompileBody0Result):- nonva
 
 
 % Operator
-expand_arguments_maybe_macro(_Ctx,_CallEnv,FN,_N,FunctionArgs,true, FunctionArgs):- is_lisp_operator(FN),!.
-expand_arguments_maybe_macro(Ctx,CallEnv,FN,0,FunctionArgs,ArgBody, Args):-
-  expand_arguments(Ctx,CallEnv,FN,0,FunctionArgs,ArgBody, Args).
+expand_arguments_maybe_macro(Ctx,_CallEnv,FN,_N,FunctionArgs,true, FunctionArgs):- is_lisp_operator(Ctx,FN),!.
+expand_arguments_maybe_macro(Ctx,Env,FN,0,FunctionArgs,ArgBody, Args):-
+  expand_arguments(Ctx,Env,FN,0,FunctionArgs,ArgBody, Args).
 
 
 :- fixup_exports.
