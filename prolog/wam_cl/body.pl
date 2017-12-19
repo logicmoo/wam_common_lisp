@@ -140,6 +140,17 @@ compile_body(Ctx,Env,Result, 's'(Str),  Body):-
   parse_sexpr_untyped(string(Str),Expression),!,
   must_compile_body(Ctx,Env,Result, Expression,  Body).
 
+
+% Use a previous DEFMACRO
+compile_body(Ctx,Env,Result,LispCode,CompileBody):-
+  fail, %DISABLED
+  macroexpand_1_or_fail(LispCode,[],CompileBody0Result),
+  dmsg(macroexpand:-LispCode),
+  dmsg(into:-CompileBody0Result),
+  must_compile_body(Ctx,Env,Result,CompileBody0Result, CompileBody),
+  dmsg(code:-CompileBody),
+  !.
+
 % Compiler Plugin
 compile_body(Ctx,Env,Result,InstrS,Code):-
   shared_lisp_compiler:plugin_expand_progbody(Ctx,Env,Result,InstrS,_PreviousResult,Code),!.
@@ -147,8 +158,6 @@ compile_body(Ctx,Env,Result,InstrS,Code):-
 % PROGN
 compile_body(Ctx,Env,Result,[progn,Forms], Body):- !, compile_forms(Ctx,Env,Result,[Forms],Body).
 compile_body(Ctx,Env,Result,[progn|Forms], Body):- !, compile_forms(Ctx,Env,Result,Forms,Body).
-% Messed Progn?
-compile_body(Ctx,Env,Result,[Form|MORE], Code):- is_list(Form), !,compile_forms(Ctx,Env,Result,[Form|MORE], Code).
 
 % SOURCE TRANSFORMATIONS
 compile_body(Ctx,Env,Result,[M|MACROLEFT], Code):- atom(M),
@@ -291,9 +300,36 @@ is_when(X):- get_var(sys_xx_compiler_mode_xx,List),
 wl:interned_eval("(defparameter sys::*compiler-mode* :execute)").
 
 
-compile_body(Ctx,Env,Result, Body, Code):- 
-   compile_decls(Ctx,Env,Result, Body, Code),!.
 
+% DOLIST
+compile_body(Ctx,Env,Result,['dolist'|Rest], Code):- !,
+  always(compile_dolist(Ctx,Env,Result,['dolist'|Rest], Code)).
+
+wl: init_args(1, cl_dolist).
+wl: declared(cl_dolist,inlined).
+cl_dolist(VarList,FormS,Result):-
+   compile_dolist(_Ctx,_Env,Result,['dolist',VarList|FormS], Code),
+   always(Code).
+
+compile_dolist(Ctx,Env,Result,['dolist',[Var,List,RetVar]|FormS], Code):-
+   must_compile_body(Ctx,Env,Result,[let,[[RetVar,RetVar]],['dolist',[Var,List]|FormS],RetVar], Code).
+
+compile_dolist(Ctx,Env,Result,['dolist',[Var,List]|FormS], Code):-
+    must_compile_body(Ctx,Env,ResultL,List,ListBody),
+    must_compile_body(Ctx,Env2,Result,[progn|FormS], Body),
+    debug_var('BV',BV),debug_var('Env2',Env2),debug_var('Ele',X),debug_var('List',ResultL),
+    Code = (ListBody,                                                                         
+      (( BV = bv(Var,X),Env2 = [BV|Env])),
+        forall(member(X,ResultL),
+          (nb_setarg(2,BV,X),
+            Body))).
+
+
+%(the number 1)
+compile_body(Ctx,Env,Result,['the',_Type,Form1],Body):-!,
+  compile_body(Ctx,Env,Result,Form1,Body).
+compile_body(Ctx,Env,Result,['truely_the',_Type,Form1],Body):-!,
+  compile_body(Ctx,Env,Result,Form1,Body).
 
 % EVAL
 compile_body(Ctx,Env,Result,['eval',Form1],
@@ -380,18 +416,6 @@ compile_body(Ctx,Env,Result,[if, Test, IfTrue, IfFalse], Body):-
 				;  	(FalseBody,
 					Result      = FalseResult)	) ).
 
-
-
-% DOLIST
-compile_body(Ctx,Env,Result,['dolist',[Var,List]|FormS], Code):- !,
-    must_compile_body(Ctx,Env,ResultL,List,ListBody),
-    must_compile_body(Ctx,Env2,Result,[progn|FormS], Body),
-    debug_var('BV',BV),debug_var('Env2',Env2),debug_var('Ele',X),debug_var('List',ResultL),
-    Code = (ListBody,
-      (( BV = bv(Var,X),Env2 = [BV|Env])),
-        forall(member(X,ResultL),
-          (nb_setarg(2,BV,X),
-            Body))).
 
 
 %   (case A ((x...) B C...)...)  -->
@@ -568,19 +592,53 @@ compile_body(Ctx,Env,Result,[OP, NewBindingsIn| BodyForms], Body):- (var(OP)-> t
 
 
 compile_let(Ctx,Env,Result,[let, []| BodyForms], Body):- !, compile_forms(Ctx,Env,Result, BodyForms, Body).
-compile_let(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body):- !,
+compile_let(Ctx,Env,Result,[let| NewBindingsInBodyForms], Body):- 
+  compile_let2(Ctx,Env,Result,[let| NewBindingsInBodyForms], Body),!.
+% bind_special(Bind1,Body)
+
+compile_let1(Ctx,Env,Result,[let, [Bind1|NewBindingsIn]| BodyForms], Call):- 
+  maybe_bind_special(Ctx,Env,Bind1,Body,Call),!,
+  compile_let(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body).
+compile_let1(Ctx,Env,Result,[let, [Bind1|NewBindingsIn]| BodyForms], Call):- 
+  maybe_bind_local(Ctx,Env,Bind1,Body,Call),!,
+  compile_let(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body).
+compile_let1(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body):- 
+  compile_let2(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body).
+
+compile_let2(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body):- !, % reset_mv?
      always(normalize_let(NewBindingsIn,NewBindings)),!,
 	zip_with(Variables, ValueForms, [Variable, Form, [bind, Variable, Form]]^true, NewBindings),
 	always(expand_arguments(Ctx,Env,'funcall',1,ValueForms, ValueBody, Values)),
-        freeze(Var,ignore((var(Val),debug_var('_Init',Var,Val)))),
-        freeze(Var,ignore(((var(Val),add_tracked_var(Ctx,Var,Val))))),
-        zip_with(Variables, Values, [Var, Val, bv(Var,Val)]^true,Bindings),
+        freeze(Var,ignore((var(Value),debug_var('_Init',Var,Value)))),
+        freeze(Var,ignore(((var(Value),add_tracked_var(Ctx,Var,Value))))),
+        zip_with(Variables, Values, [Var, Value, BV]^make_bv_maybe(Var,Value,BV),Bindings),
         add_alphas(Ctx,Variables),
         debug_var("LEnv",BindingsEnvironment),
-        ignore((member(VarN,[Variable,Var]),atom(VarN),var(Val),debug_var([VarN,'_Let'],Val))),        
-	must_compile_progn(Ctx,BindingsEnvironment,Result,BodyForms, [], BodyFormsBody),
+        ignore((member(VarN,[Variable,Var]),atom(VarN),var(Value),debug_var([VarN,'_Let'],Value),fail)),        
+	compile_forms(Ctx,BindingsEnvironment,Result,BodyForms, BodyFormsBody),
          Body = ( ValueBody,BindingsEnvironment=[Bindings|Env], BodyFormsBody ).
 
+
+is_sboundp(Var):- atom(Var),!,get_opv_i(Var,value,_).
+
+%maybe_bind_special(_Ctx,_Env,Var,Body,locally_let(Var=[],Body)):- is_sboundp(Var),!.
+maybe_bind_special(Ctx,Env,Var,Body,Out):- is_sboundp(Var),!,maybe_bind_special(Ctx,Env,[Var,[]],Body,Out).
+maybe_bind_special(Ctx,Env,[Var,ValueForm|_],Body,(ValueBody,locally_set(Var,Value,Body))):- 
+  debug_var([Var,'_SLet'],Value),
+  is_sboundp(Var),!,must_compile_body(Ctx,Env,Value,ValueForm,ValueBody).
+
+maybe_bind_local(Ctx,Env,Var,Body,Out):- atom(Var),!,maybe_bind_local(Ctx,Env,[Var,[]],Body,Out).
+maybe_bind_local(Ctx,Env,[Var,ValueForm|_],Body,(ValueBody,locally_bind(Env,Var,Value,Body))):- 
+    %debug_var("LEnv",BindingsEnvironment),
+    debug_var([Var,'_Let'],Value),
+    must_compile_body(Ctx,Env,Value,ValueForm,ValueBody).
+
+
+is_setf_bound(Var):- \+ compound(Var),!,is_sboundp(Var).
+is_setf_bound(Var):- arg(1,Var,E),!,is_setf_bound(E).
+
+%make_bv_maybe(Var,Value,sv(Var,Value)):- is_setf_bound(Var),!.
+make_bv_maybe(Var,Value,bv(Var,Value)).
 % LET*
 compile_body(Ctx,Env,Result,[OP, []| BodyForms], Body):- same_symbol(OP,'let*'), !, must_compile_body(Ctx,Env,Result,[progn| BodyForms], Body).
 compile_body(Ctx,Env,Result,[OP, [Binding1|NewBindings]| BodyForms], Body):- same_symbol(OP,'let*'),
@@ -688,15 +746,38 @@ compile_body(Ctx,Env,Result,[ext_xor,Form1,Form2],Code):-
   Code = (Code1,Code2,Code3).
 
 
+
+% Use a previous DEFMACRO
+compile_body(Ctx,Env,Result,LispCode,CompileBody):-
+  fail, %DISABLED
+  macroexpand_1_or_fail(LispCode,[],CompileBody0Result),
+  dmsg(macroexpand:-LispCode),
+  dmsg(into:-CompileBody0Result),
+  must_compile_body(Ctx,Env,Result,CompileBody0Result, CompileBody),
+  dmsg(code:-CompileBody),
+  !.
+
 % symbols
 compile_body(Ctx,Env,Value, Atom,      Body):- atom(Atom), always(compile_symbol_getter(Ctx,Env,Value, Atom, Body)).
-compile_body(Ctx,Env,Result,BodyForms, Body):- atom(BodyForms),!,always(compile_assigns(Ctx,Env,Result,BodyForms, Body)),!.
+
+%compile_body(Ctx,Env,Result,BodyForms, Body):- atom(BodyForms),!,always(compile_assigns(Ctx,Env,Result,BodyForms, Body)),!.
 
 % SETQ - PSET
 compile_body(Ctx,Env,Result,BodyForms, Body):- compile_assigns(Ctx,Env,Result,BodyForms, Body),!.
 
-compile_body(Ctx,Env,Result,BodyForms, Body):- always(compile_funop(Ctx,Env,Result,BodyForms, Body)),!.
+% DEFMACRO,MACROLET,MACROEXPAND
+compile_body(Ctx,Env,Result,BodyForms, Body):- compile_macro_ops(Ctx,Env,Result,BodyForms, Body),!.
 
+% DEFUN,FSET,LABELS
+compile_body(Ctx,Env,Result,BodyForms, Body):- compile_defun_ops(Ctx,Env,Result,BodyForms, Body),!.
+
+% DEFUN,FSET,LABELS
+compile_body(Ctx,Env,Result,BodyForms, Body):- compile_genericfs(Ctx,Env,Result,BodyForms, Body),!.
+
+compile_body(Ctx,Env,Result,BodyForms, Body):- compile_setfs(Ctx,Env,Result,BodyForms, Body),!.
+
+% FUNCALL,EVAL,APPLY, RestOf
+compile_body(Ctx,Env,Result,BodyForms, Body):- always(compile_funop(Ctx,Env,Result,BodyForms, Body)),!.
 
 :- fixup_exports.
 

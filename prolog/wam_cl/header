@@ -129,6 +129,7 @@
 :- ensure_loaded(proclaim).
 :- ensure_loaded(packages).
 :- ensure_loaded(soops).
+:- ensure_loaded(defmacro).
 :- ensure_loaded(strings).
 :- ensure_loaded(symbols).
 
@@ -143,6 +144,10 @@
 :- ensure_loaded(disassemble).
 :- ensure_loaded(fileload).
 :- ensure_loaded(funcall).
+
+:- ensure_loaded(defun).
+:- ensure_loaded(defgeneric).
+:- ensure_loaded(defsetf).
 :- ensure_loaded(hashtables).
 :- ensure_loaded(interp).
 :- ensure_loaded(lexvars).

@@ -1,4 +1,6 @@
 
+(in-package "EXT")
+
 (defpackage "SYSTEM" (:nicknames "SYS"))
 (defpackage "COMMON-LISP" (:nicknames "CL" "LISP")(:uses "SYSTEM"))
 (defpackage "COMMON-LISP-USER" (:nicknames "U" "USER" "CL-USER") (:uses "COMMON-LISP"))
@@ -10,7 +12,6 @@
         (*default-pathname-defaults* (merge-pathnames "daydreamer/"))) (load "dd")))
 
 
-(in-package "COMMON-LISP-USER")
 (defun show-ascii-art ()
         
 (write-line "  __________    ")

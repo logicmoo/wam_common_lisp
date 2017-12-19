@@ -183,7 +183,8 @@ as_sexp1(NIL,NIL):-NIL==[],!.
 as_sexp1(Stream,Expression):- is_stream(Stream),!,always(parse_sexpr_untyped(Stream,SExpression)),!,
   as_sexp2(SExpression,Expression).
 as_sexp1(s(Str),Expression):- !, always(parse_sexpr_untyped(string(Str),SExpression)),!,as_sexp2(SExpression,Expression).
-as_sexp1(Str,Expression):- notrace(catch(text_to_string(Str,String),_,fail)),!, 
+
+as_sexp1(Str,Expression):- \+((is_list(Str),nth0(0,Str,E),atom(E),name(E,[_]))),  notrace(catch(text_to_string(Str,String),_,fail)),!, 
     always(parse_sexpr_untyped(string(String),SExpression)),!,
     as_sexp2(SExpression,Expression).
 as_sexp1(Str,Expression):- as_sexp2(Str,Expression),!.

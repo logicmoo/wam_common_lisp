@@ -180,10 +180,10 @@ cl_mapcar(_, [[]|_], []).
 
 
 wl:init_args(1,cl_apply).
-cl_apply(closure(Environment,ClosureResult,FormalArgs,Body), Arguments, Result):-!,
+cl_apply(closure(Environment,ClosureResult,FormalArgs,Body), [Arguments], Result):-!,
   closure(Environment,ClosureResult,FormalArgs,Body,Arguments,Result).
 cl_apply(function(FunctionName), Arguments, Result):-!,cl_apply((FunctionName), Arguments, Result).
-cl_apply((FunctionName), Arguments, Result):-!,
+cl_apply((FunctionName), [Arguments], Result):-!,
   lisp_compiled_eval([FunctionName|Arguments],Result).
 
 

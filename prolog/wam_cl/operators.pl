@@ -22,8 +22,6 @@
 :- ensure_loaded(utils_for_swi).
 
 
-:- discontiguous compile_decls/5.
-
 cl_special_operator_p(Obj,RetVal):- t_or_nil(is_lisp_operator(Obj),RetVal).
 
 cl_functionp(Obj,RetVal):- t_or_nil(is_functionp(Obj),RetVal).
@@ -45,13 +43,14 @@ is_functionp(X):- atom(X),current_predicate(X/N),N>0.
 
 
 :- nb_setval('$labels_suffix','').
-suffix_by_context(Atom,SuffixAtom):- nb_current('$labels_suffix',Suffix),atom_concat_or_rtrace(Atom,Suffix,SuffixAtom).
-suffixed_atom_concat(L,R,LRS):- atom_concat_or_rtrace(L,R,LR),suffix_by_context(LR,LRS).
-push_labels_context(Atom):- suffix_by_context(Atom,SuffixAtom),b_setval('$labels_suffix',SuffixAtom).
-within_labels_context(Label,G):- nb_current('$labels_suffix',Suffix),
+suffix_by_context(_Ctx,Atom,SuffixAtom):- nb_current('$labels_suffix',Suffix),atom_concat_suffix(Atom,Suffix,SuffixAtom).
+suffixed_atom_concat(Ctx,L,R,LRS):- atom_concat_or_rtrace(L,R,LR),suffix_by_context(Ctx,LR,LRS).
+push_labels_context(Ctx,Atom):- suffix_by_context(Ctx,Atom,SuffixAtom),b_setval('$labels_suffix',SuffixAtom).
+within_labels_context(_Ctx,Label,G):- nb_current('$labels_suffix',Suffix),
    setup_call_cleanup(b_setval('$labels_suffix',Label),G,b_setval('$labels_suffix',Suffix)).
-gensym_in_labels(Stem,GenSym):- suffix_by_context(Stem,SuffixStem),gensym(SuffixStem,GenSym).
-push_search_first(_Ctx,Atom):- push_labels_context(Atom).
+gensym_in_labels(Ctx,Stem,GenSym):- suffix_by_context(Ctx,Stem,SuffixStem),gensym(SuffixStem,GenSym).
+
+get_label_suffix(_Ctx,Suffix):-nb_current('$labels_suffix',Suffix).
   
 
 show_ctx_info(Ctx):- term_attvars(Ctx,CtxVars),maplist(del_attr_rev2(freeze),CtxVars),show_ctx_info2(Ctx).
@@ -61,151 +60,178 @@ show_ctx_info3(Ctx):- fmt9(ctx=Ctx).
      
 
 
-% DEFMACRO
-compile_decls(Ctx,Env,Symbol,[defmacro,Symbol,FormalParms|FunctionBody0], CompileBody):-
-   within_labels_context('', % TOPEVEL
-     compile_macro('',Ctx,Env,_Function,[Symbol,FormalParms|FunctionBody0], CompileBody)).
-
-
-% DEFUN
-compile_decls(Ctx,Env,Symbol,[defun,Symbol,FormalParms|FunctionBody], CompileBody):-
-   within_labels_context('', % TOPEVEL
-     compile_function('',Ctx,Env,_Function,[Symbol,FormalParms|FunctionBody], CompileBody)).
-    
-
-% Empty FLET/MACROLET/LABELS
-compile_decls(Ctx,Env,Result,[FLET,[]|Progn], CompileBody):-  member(FLET,[flet,macrolet,labels]),!,
-   compile_forms(Ctx,Env,Result,Progn, CompileBody).   
-
-% LABELS
-compile_decls(Ctx,Env,Result,[labels,[DEFN|MORE]|Progn], CompileBody):- 
-    gensym(labels,Gensym),
-    push_search_first(Ctx,Gensym),    
-    must_maplist(define_each(Ctx,Env,flet,Gensym),[DEFN|MORE],_News,Decls),
-    maplist(always,Decls),    
-    compile_forms(Ctx,Env,Result,Progn, CompileBody).   
-
-% FLET/MACROLET
-compile_decls(Ctx,Env,Result,[FLET,[DEFN|MORE]|Progn], CompileBody):- member(FLET,[flet,macrolet]),
-    gensym(FLET,Gensym),
-    push_search_first(Ctx,Gensym),    
-    must_maplist(define_each(Ctx,Env,FLET,Gensym),[DEFN|MORE],News,Decls),
-    maplist(always,Decls),    
-    compile_forms(Ctx,Env,Result,Progn, CompileBody),
-    must_maplist(undefine_each(Ctx,Env,FLET,Gensym),[DEFN|MORE],News,Decls).
-     
-define_each(Ctx,Env,flet,Gensym,DEFN,New,CompileBody)  :- compile_function(Gensym,Ctx,Env,New,DEFN,CompileBody).
-define_each(Ctx,Env,macrolet,Gensym,DEFN,New,CompileBody):-compile_macro(Gensym,Ctx,Env,New,DEFN,CompileBody).
-
-undefine_each(Ctx,Env,flet,Gensym,DEFN,New,CompileBody)  :- wdmsg(uncompile_function(Gensym,Ctx,Env,New,DEFN,CompileBody)).
-undefine_each(Ctx,Env,macrolet,Gensym,DEFN,New,CompileBody):-wdmsg(uncompile_macro(Gensym,Ctx,Env,New,DEFN,CompileBody)).
-
-
-compile_decls(_Ctx,_Env,Symbol,[Fun,Symbol,A2|AMORE],assert_lsp(Symbol,P)):- notrace(is_def_at_least_two_args(Fun)),\+ is_fboundp(Fun),!,P=..[Fun,Symbol,A2,AMORE].
-compile_decls(_Ctx,_Env,Symbol,[Fun0,Symbol,A2|AMORE],assert_lsp(Symbol,P)):- notrace((is_def_at_least_two_args(Fun),same_symbol(Fun,Fun0))),\+ is_fboundp(Fun),!,P=..[Fun,Symbol,A2,AMORE].
-
-
-is_def_at_least_two_args(defgeneric).
-is_def_at_least_two_args(define_compiler_macro).
-is_def_at_least_two_args(define_method_combination).
-is_def_at_least_two_args(define_setf_expander).
-is_def_at_least_two_args(defmethod).
-is_def_at_least_two_args(defsetf).
-is_def_at_least_two_args(deftype).
-is_def_at_least_two_args(symbol_macrolet).
-
-combine_setfs(Name0,Name):-atom(Name0),!,Name0=Name.
-combine_setfs([setf,Name],Combined):- atomic_list_concat([setf,Name],'_',Combined).
-combine_setfs([setf,Name],Combined):- atomic_list_concat([setf,Name],'_',Combined).
-
-
-wl:init_args(1,cl_labels).
-cl_labels(Inits,Progn,Result):-
-  reenter_lisp(Ctx,Env),
-  compile_decls(Ctx,Env,Result,[labels,Inits|Progn],Code),
-  always(Code).  
-
-wl:init_args(1,cl_macrolet).
-cl_macrolet(Inits,Progn,Result):-
-  reenter_lisp(Ctx,Env),
-  compile_decls(Ctx,Env,Result,[macrolet,Inits|Progn],Code),
-  always(Code).  
-
-
-wl:init_args(1,cl_flet).
-cl_flet(Inits,Progn,Result):-
-  reenter_lisp(Ctx,Env),
-  compile_decls(Ctx,Env,Result,[flet,Inits|Progn],Code),
-  always(Code).  
-
-wl:init_args(2,cl_defmacro).
-cl_defmacro(Name,FormalParms,FunctionBody,Result):-
-  reenter_lisp(Ctx,Env),
-  compile_decls(Ctx,Env,Result,[defmacro,Name,FormalParms|FunctionBody],Code),
-  always(Code).  
-  
-
-compile_macro(_Prepend,Ctx,CallEnv,Macro,[Name0,FormalParms|FunctionBody0], CompileBody):-
-   combine_setfs(Name0,Combined),
-   suffix_by_context(Combined,Symbol),
-   always(find_function_or_macro_name(Ctx,CallEnv,Symbol,_Len, Macro)),
-   add_alphas(Ctx,Macro),
-   always(maybe_get_docs(function,Macro,FunctionBody0,FunctionBody,DocCode)),
-   %reader_intern_symbols
-   MacroHead=[Macro|FormalParms],
-   FunDef = (set_opv(Macro,classof,claz_macro),set_opv(Symbol,compile_as,kw_operator),set_opv(Symbol,function,Macro)),
-   FunDef,
-   debug_var("CallEnv",RealCallEnv),debug_var('MFResult',MResult),
-   within_labels_context(Symbol, make_compiled(Ctx,RealCallEnv,MResult,Symbol,MacroHead,FunctionBody,
-     NewMacroHead,HeadDefCode,BodyCode)),
-   %NewMacroHead=..[M|ARGS],RNewMacroHead=..[MM|ARGS], atom_concat_or_rtrace(M,'_mexpand1',MM), %get_alphas(Ctx,Alphas),
-   debug_var('FnResult',FResult),
-   subst(NewMacroHead,MResult,FResult,FunctionHead),
    
- CompileBody = (
-   DocCode,
-   HeadDefCode,
-   assert_lsp(wl:lambda_def(defmacro,(Name0),Macro, FormalParms, [progn | FunctionBody])),
-   assert_lsp((user:FunctionHead  :- 
-    (BodyCode, 
-       cl_eval(MResult,FResult)))),
-   % nop((user:RNewMacroHead  :- BodyCode)),
-   FunDef).
+/*
+% progn mismatch?
+compile_funop(Ctx,Env,Result,[FN ], Body):- is_list(FN),!,
+  trace,must_compile_body(Ctx,Env,Result,FN,Body).
 
-varuse:attr_unify_hook(_,Other):- var(Other).
+compile_funop(Ctx,Env,Result,[FN | FunctionArgs], Body):- 
+   show_call(must_compile_body(Ctx,Env,Result,[eval,[FN| FunctionArgs]],Body)).
+*/
+
+as_lisp_funcallable(Atom,Atom):-atom(Atom),!.
+as_lisp_funcallable(function(P),P).
+as_lisp_funcallable([quote,P],P).
+as_lisp_funcallable(P,P):- compound(P),functor(P,F,A),is_lisp_funcallable(F,A).
+is_lisp_funcallable(closure,_).
+
+% FUNCTION APPLY
+%compile_body(Ctx,Env,Result,['apply',Function|ARGS], Body):- atom(Function)
+% FUNCTION FUNCALL
+% compile_body(Ctx,Env,Result,['funcall',Function|ARGS], Body):- ...
+
+find_lisp_function(FN,ARITY,ProposedName):-
+  find_function_or_macro_name(_Ctx,_Env,FN,ARITY, ProposedName).
+
+make_function_or_macro_call(Ctx,Env,FN,Args,Result,ExpandedFunction):-
+   length(Args,ArgsLen),
+   find_function_or_macro_name(Ctx,Env,FN,ArgsLen, ProposedName),!,
+   align_args_or_fallback(FN,ProposedName,Args,Result,ArgsPlusResult),
+   ExpandedFunction =.. [ ProposedName | ArgsPlusResult].
 
 
-wl:init_args(2,cl_defun).
-cl_defun(Name,FormalParms,FunctionBody,Result):-
-  reenter_lisp(Ctx,Env),
-  compile_decls(Ctx,Env,Result,[defun,Name,FormalParms|FunctionBody],Code),
-  always(Code).
+get_each_search_suffix(Ctx,Each):-
+   ((get_label_suffix(Ctx,Whole),atomic_list_concat(List,'_',Whole),
+   append(_,EachList,List),atomic_list_concat(EachList,'_',Each)))->true;Each=''.
 
-compile_function(_Prepend,Ctx,Env,Function,[Name,FormalParms|FunctionBody0], CompileBody):-
-   combine_setfs(Name,Combined),
-   suffix_by_context(Combined,Symbol),
-   always(find_function_or_macro_name(Ctx,Env,Symbol,_Len, Function)),
-   always(maybe_get_docs(function,Function,FunctionBody0,FunctionBody,DocCode)),
-   FunctionHead=[Function|FormalParms],
-   debug_var("Env",CallEnv),
-   within_labels_context(Symbol,
-     make_compiled(Ctx,CallEnv,MResult,Symbol,FunctionHead,FunctionBody,Head,HeadDefCode,BodyCode)),
- CompileBody = (
-   DocCode,
-   HeadDefCode,
-   assert_lsp(wl:lambda_def(defun,(Name),Function, FormalParms, FunctionBody)),
-   assert_lsp((user:Head  :- BodyCode)),
-   set_opv(Function,classof,claz_compiled_function),set_opv(Symbol,compile_as,kw_function),set_opv(Symbol,function,Function)),
- debug_var('MResult',MResult).
 
-make_compiled(Ctx,CallEnv,FResult,Symbol,FunctionHead,FunctionBody,Head,HeadDefCode,(BodyCode)):-
-   always(( expand_function_head(Ctx,CallEnv,FunctionHead, Head, HeadEnv, FResult,HeadDefCode,HeadCode),
-   compile_body(Ctx,CallEnv,FResult,[block,Symbol|FunctionBody],Body0),
-    show_ctx_info(Ctx),
-    (((var(FResult)))
-    -> body_cleanup_keep_debug_vars(Ctx,((CallEnv=HeadEnv,HeadCode,Body0)),BodyCode)
-     ; (body_cleanup_no_optimize(Ctx,((CallEnv=HeadEnv,HeadCode,Body0,FResult=FResult)),BodyCode))))).
+find_function_or_macro_name(Ctx,Env,FN, Len, ProposedName):- 
+   get_each_search_suffix(Ctx,Each),atom_concat_suffix(FN,Each,EachFN),
+   exists_function_or_macro_name(Ctx,Env,EachFN,Len, ProposedName),!.
+find_function_or_macro_name(Ctx,Env,FN, Len, ProposedName):- 
+   exists_function_or_macro_name(Ctx,Env,FN,Len, ProposedName),!.
+find_function_or_macro_name(Ctx,_Env,FN, _Len, ProposedName):- 
+   generate_function_or_macro_name(Ctx,FN,ProposedName),!.
 
+
+
+
+exists_function_or_macro_name(_Ctx,_Env,FN,_Len, ProposedName):- 
+  get_opv(FN,function,ProposedName),!.
+exists_function_or_macro_name(_Ctx,_Env,FN,ArgLen, ProposedName):-
+  some_defined_function_or_macro(FN,ArgLen,['','cl_','pf_','sf_','mf_','f_'],ProposedName),!.
+exists_function_or_macro_name(_Ctx,_Env,FN,ArgsLen, ProposedName):- upcase_atom(FN,FN),
+    Arity is ArgsLen+1,is_defined(FN,Arity),ProposedName=FN.
+
+
+generate_function_or_macro_name(Ctx,FN,NewProposedName):-
+    maybe_symbol_package(FN,Package),
+    (pl_symbol_name(FN,Name) ->
+      function_case_name(Name,Package,ProposedName);
+      function_case_name(FN,Package,ProposedName)),
+   suffix_by_context(Ctx,ProposedName,NewProposedName),!.
+
+
+
+eval_uses_exact(F):- quietly((premute_names(F,FF),uses_exact0(FF))).
+
+uses_exact0(F):- wl:init_args(exact_only,F),!.
+uses_exact0(FN):-  function_arg_info(FN,ArgInfo),!,
+   ArgInfo.complex==0,ArgInfo.opt==0,ArgInfo.rest==0,ArgInfo.env==0,ArgInfo.whole==0,
+   length(ArgInfo.names,NN),
+   arg_info_count(ArgInfo,req,N),!,
+   N==NN.
+   
+
+function_arg_info(FN,ArgInfo):- wl:arglist_info(FN,_,_,ArgInfo).
+function_arg_info(FN,ArgInfo):- wl:arglist_info(FN,_,_,_,ArgInfo).
+function_arg_info(FN,ArgInfo):- wl:arglist_info(_,FN,_,_,ArgInfo).
+
+
+eval_uses_bind_parameters(F):- quietly((premute_names(F,FF), wl:init_args(bind_parameters,FF))),!.
+
+% eval_uses_exact_and_restkeys(FN,Requireds):- current_predicate(FN/N), Requireds is N-2,Requireds>0.
+
+eval_uses_exact_and_restkeys(F,N):- quietly((premute_names(F,FF), exact_and_restkeys(FF,N))).
+
+exact_and_restkeys(F,N):- wl:init_args(V,F),integer(V),!,V=N.
+exact_and_restkeys(F,1):- is_any_place_op(F),!.
+exact_and_restkeys(F,_):- uses_exact0(F),!,fail.
+exact_and_restkeys(F,N):- function_arg_info(F,ArgInfo),ArgInfo.req=L,ArgInfo.all\==L,!,arg_info_count(ArgInfo,req,N).
+exact_and_restkeys(F,0):- uses_rest_only0(F),!.
+
+arg_info_count(ArgInfo,Prop,N):- 
+  Value=ArgInfo.Prop,
+   (number(Value)->N=Value;
+     (is_list(Value)->length(Value,N);
+       (atom(Value)->N=1;
+         (throw(arg_info_count(ArgInfo,Prop,Value)))))).
+
+premute_names(F,F).
+premute_names(F,FF):- atom_concat_or_rtrace('f_',F,FF).
+premute_names(F,FF):- atom_concat_or_rtrace('cl_',F,FF).
+premute_names(F,FF):- atom_concat_or_rtrace('f_',FF,F).
+premute_names(F,FF):- atom_concat_or_rtrace('cl_',FF,F).
+
+eval_uses_rest_only(F):- quietly((premute_names(F,FF),uses_rest_only0(FF))),!.
+
+uses_rest_only0(F):- wl:init_args(0,F),!.
+uses_rest_only0(F):- function_arg_info(F,ArgInfo),ArgInfo.req==0,ArgInfo.all\==0,!.
+%uses_rest_only0(F):- same_symbol(F,FF),wl:declared(FF,lambda(['&rest'|_])),!.
+
+% Non built-in function expands into an explicit function call
+
+% invoke(r1,r2,r3,RET).
+align_args(FN,ProposedName,Args,Result,ArgsPlusResult):- 
+  (eval_uses_exact(FN);eval_uses_exact(ProposedName)),
+   append(Args, [Result], ArgsPlusResult).
+
+% invoke(r1,r2,[o3,key1,value1],RET).
+align_args(FN,ProposedName,Args,Result,ArgsPlusResult):- 
+  (eval_uses_exact_and_restkeys(FN,N);eval_uses_exact_and_restkeys(ProposedName,N)),
+  always(length(Left,N)),append(Left,Rest,Args),
+  append(Left, [Rest,Result], ArgsPlusResult).
+
+% invoke([r1,r2,r3],RET).
+align_args(FN,ProposedName,Args,Result,[Args,Result]):-
+  (eval_uses_rest_only(FN);eval_uses_rest_only(ProposedName)).
+
+% invoke([r1,r2,r3],RET).
+align_args(FN,ProposedName,Args,Result,[Args,Result]):-
+  (eval_uses_bind_parameters(FN);eval_uses_bind_parameters(ProposedName)).
+
+
+% guess invoke(r1,RET).
+%align_args(_FN,ProposedName,[Arg],Result,[Arg,Result]):- 
+% is_defined(ProposedName,2),is_defined(ProposedName,3).
+
+% guess invoke([r1,r2,r3],RET).
+%align_args(FN,ProposedName,Args,Result,[Args,Result]):- 
+%  only_arity(FN,2);only_arity(ProposedName,2).
+
+  
+% fallback to invoke([r1,r2,r3],RET).
+%align_args(FN, ProposedName,Args,Result,[Args,Result]):- 
+%  (is_lisp_operator(FN) ; is_lisp_operator(ProposedName)),!.
+
+/*
+% guess invoke(r1,r2,r3,RET).
+*/
+align_args_or_fallback(FN,ProposedName,Args,Result,ArgsPlusResult):- align_args(FN,ProposedName,Args,Result,ArgsPlusResult),!.
+align_args_or_fallback(_,_ProposedName,Args,Result,ArgsPlusResult):- append(Args, [Result], ArgsPlusResult).
+
+
+only_arity(ProposedName,N):-
+  is_defined(ProposedName,N),
+  forall((between(0,6,Other),Other\=N),  \+ is_defined(ProposedName,Other)).
+
+is_defined(ProposedName,N):- functor(G,ProposedName,N),current_predicate(_,G).
+
+maybe_symbol_package(Symbol,Package):-  get_opv(Symbol,package,Package),!.
+maybe_symbol_package(_Symbol,Package):- reading_package(Package).
+
+
+some_defined_function_or_macro(FN,ArgLen,[Name|NameS],NewName):-
+   atom_concat_or_rtrace(Name,FN,ProposedPName),   
+   (((ProposedPName = ProposedName; prologcase_name(ProposedPName,ProposedName)),
+    guess_lisp_functor(P,ProposedName,ArgLen),current_predicate(_,P),
+    \+ predicate_property(user:P,imported_from(system)))-> ProposedName=NewName;
+   some_defined_function_or_macro(FN,ArgLen,NameS,NewName)).
+
+guess_lisp_functor(P,F,ArgLen):- (number(ArgLen)->A is ArgLen+1; A= _),!,guess_prolog_functor(P,F,A). 
+guess_prolog_functor(P,F,A):- (var(F);var(A)),!,current_predicate(F/A),functor(P,F,A).
+guess_prolog_functor(P,F,A):- functor(P,F,A).
 
 
 currently_visible_package(P):- reading_package(Package),

@@ -129,6 +129,7 @@ both_outputs(G):-
 assert_lsp(G):- assert_lsp(u,G).
 % assert_lsp(Symbol,G)
 assert_lsp(_,G):-  notrace((copy_term_nat(G,GG),assert_local(GG))).
+
 assert_local(user:G):-!,assert_local(G).
 assert_local(user:G:-B):-!,assert_local(G:-B).
 assert_local(G:-B):- B==true,!,assert_local(G).
@@ -160,15 +161,16 @@ is_assert_op(A,B,C):- notrace(is_assert_op0(A,B,C)),!.
 is_assert_op0(A,_,_):- \+ compound(A),!,fail.
 is_assert_op0(M:I,W,M:O):- !, is_assert_op0(I,W,O).
 is_assert_op0(assert_lsp(W,P),W,P).
+is_assert_op0(assert_lsp(P),u,P).
 is_assert_op0(assertz(P),u,P).
 is_assert_op0(asserta(P),u,P).
-is_assert_op0(assert_lsp(P),u,P).
-is_assert_op0(asserta_if_new(P),u,P).
-is_assert_op0(assert_if_new(P),u,P).
-is_assert_op0(asserta_new(P),u,P).
 is_assert_op0(assert(P),u,P).
+is_assert_op0(asserta_if_new(P),u,P).
+is_assert_op0(asserta_new(P),u,P).
+is_assert_op0(assert_if_new(P),u,P).
 
-fmt99(O):- make_pretty(O,P),fmt999(P),!.
+
+fmt99(O):- always((make_pretty(O,P),fmt999(P))),!.
 
 fmt999(P):- \+ compound(P),!,fmt9(P).
 fmt999((:- M:P)):-
@@ -189,17 +191,14 @@ fmt999(P):- with_output_to(string(A),fmt9(:-P)),
   format('~N~s~n',[B]).
 fmt999(P):- fmt9(P),nl.
 % notrace((dbmsg0(Var))).
-trim_off(W,A,B):- atomic(A), string_concat(W,B,A).
+trim_off(W,A,B):- atomic(A), string_concat(W,B,A),!.
 trim_off(_,A,A).
 
 dbmsg0(Var):- var(Var),!,in_comment(colormsg1(dbmsg_var(Var))).
 dbmsg0(Str):- string(Str),!,in_comment(colormsg1(Str)).
+dbmsg0(:- A):- dbmsg0(A).
+dbmsg0(A):- dbmsg1(A),!.
 % dbmsg0(StringL):- to_prolog_string_if_needed(StringL,String),!,dbmsg0(String).
-dbmsg0(:-((B,A,C))):-  is_assert_op(A,Where,AA), !,dbmsg0(:- B),dbmsg_assert(Where, AA),dbmsg0(:- C).
-dbmsg0(:-((B,A))):-  is_assert_op(A,Where,AA), !,dbmsg0(:- B),dbmsg_assert(Where, AA).
-dbmsg0(:-((A,B))):-  is_assert_op(A,Where,AA), !,dbmsg_assert(Where, AA),dbmsg0(:- B).
-dbmsg0(:-((A,B,C))):-  is_assert_op(A,Where,AA), !,dbmsg_assert(Where, AA),dbmsg0(:- B),dbmsg0(:- C).
-dbmsg0(:- A):- is_assert_op(A,Where,AA),!,dbmsg_assert(Where,AA).
 dbmsg0(comment(X)):-!, shrink_lisp_strings(X,X0), in_comment(fmt99(X0)).
 dbmsg0(N=V):- !, shrink_lisp_strings(N=V,X0),  in_comment(fmt99(X0)).
 dbmsg0(A):- is_assert_op(A,Where,AA),!,dbmsg_assert(Where,AA).
@@ -207,19 +206,25 @@ dbmsg0(:- X):- X==true,!.
 dbmsg0(:- X):- colormsg1(:- X),!.
 dbmsg0(X):- colormsg1(:- X),!.
 
+dbmsg1(((A,B))):-  is_assert_op(A,Where,AA), !,dbmsg_assert(Where, AA),dbmsg0( B).
+dbmsg1(((B,A))):-  is_assert_op(A,Where,AA), !,dbmsg0( B),dbmsg_assert(Where, AA).
+dbmsg1(((B,A,C))):-  is_assert_op(A,Where,AA), !,dbmsg0( B),dbmsg_assert(Where, AA),dbmsg0( C).
+dbmsg1(A):- is_assert_op(A,Where,AA),!,dbmsg_assert(Where,AA).
+
 dbmsg_assert(Where,X):- notrace((dbmsg_assert0(Where,X))),!.
 
 dbmsg_assert0(Where,(A,B)):- !,dbmsg_assert0(Where,A),dbmsg_assert0(Where,B).
 dbmsg_assert0(Where,user:(HBody)):- !,dbmsg_assert0(Where,(HBody)).
-dbmsg_assert0(Where,user:H :- Body):- !,dbmsg_assert0(Where,(H :- Body)),!.
+dbmsg_assert0(Where, (user:H) :- Body):- !,dbmsg_assert0(Where,(H :- Body)),!.
 %dbmsg_assert0(Where,M:Body:- (true,[])):-!,colormsg1("\n% asserting fact...\n"),!,colormsg1(M:Body),!.
 dbmsg_assert0(Where,(Head:-Body)):- Body==true,!, dbmsg_assert0(Where,(Head)).
-dbmsg_assert0(Where,(Head:-Body)):- !, pre_annotation(Where),!,colormsg1(Head:-Body),!,
+
+dbmsg_assert0(Where,(Head:-Body)):- fail,!, always((pre_annotation(Where),colormsg1(Head:-Body),
    assert_lsp(Head:-Body),
-   assert_lsp(pass_clause(Where,Head,Body)),!.
-dbmsg_assert0(Where,Head):- !, pre_annotation(Where),!,fmt99(Head),!,
+   assert_lsp(pass_clause(Where,Head,Body)))),!.
+dbmsg_assert0(Where,Head):- !, always((pre_annotation(Where),!,fmt99(Head),!,
    assert_lsp(Head),
-   assert_lsp(pass_clause(Where,Head,true)),!.
+   assert_lsp(pass_clause(Where,Head,true)))),!.
    
 pre_annotation(Where):- where_where(Where,Where1),colormsg1("\n% annotating ~w ",[Where1]).
 where_where(Where,Atom):- locally_let(sym('cl:*package*')=pkg_kw,with_output_to(atom(Atom),cl_prin1(Where,_))),!.
