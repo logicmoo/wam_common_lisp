@@ -449,7 +449,7 @@ expand_function_head(Ctx,EnvIO,FN,FormalParms, Whole ,HeadParms,ZippedArgEnv, (H
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function_head_params(Ctx,Env,_Symbol,FormalParms,ZippedArgEnv,RestNKeys,Whole,RequiredArgs,ArgInfo,Names,PVars,Code):-!,
+function_head_params(Ctx,Env,_Symbol,FormalParms,ZippedArgEnv,RestNKeys,Whole,RequiredArgs,ArgInfo,Names,PVars,(Env=ZippedArgEnv,Code)):-!,
    debug_var("RestNKeys",RestNKeys),debug_var("Env",Env),debug_var("Whole",Whole),
    debug_var("Code",Code),debug_var("RequiredArgs",RequiredArgs),
    ArgInfo = arginfo{req:0,all:0,sublists:0,opt:0,rest:0,whole:0,body:0,key:0,aux:0,env:0,allow_other_keys:0,names:Names,complex:0},

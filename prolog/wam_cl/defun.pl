@@ -24,15 +24,18 @@
 wl:init_args(2,cl_defun).
 % (DEFUN (SETF CAR) ....)
 cl_defun(Symbol,FormalParms,FunctionBody,Result):- is_setf_op(Symbol,Accessor),!,cl_defsetf(Accessor,[FormalParms|FunctionBody],Result).
-cl_defun(Symbol,FormalParms,FunctionBody,Symbol):-
-  reenter_lisp(Ctx,Env),  
-  compile_function(Ctx,Env,[Symbol,FormalParms|FunctionBody],Function,Code),
-   FunDef = (set_opv(Function,classof,claz_function),set_opv(Symbol,compile_as,kw_function),set_opv(Symbol,function,Function)),   
-  always((FunDef,Code)),
-  dbmsg_real((FunDef,Code)).
+cl_defun(Symbol,FormalParms,FunctionBody,Return):-
+  reenter_lisp(Ctx,Env),
+  compile_defun_ops(Ctx,Env,Return,[defun,Symbol,FormalParms|FunctionBody],Code),
+  dbmsg_real(Code).
 
-compile_defun_ops(_Ctx,_Env,Return,[defun,Symbol,FormalParms|FunctionBody], cl_defun(Symbol,FormalParms,FunctionBody,Return)):-
-   cl_defun(Symbol,FormalParms,FunctionBody,_ReturnLocal).
+    
+
+compile_defun_ops(Ctx,Env,Result,[defun,Symbol,FormalParms|FunctionBody], (Code,FunDef,Result=Symbol)):-
+  compile_function(Ctx,Env,[Symbol,FormalParms|FunctionBody],Function,Code),
+  debug_var('DefunResult',Result),
+  FunDef = (set_opv(Function,classof,claz_function),set_opv(Symbol,compile_as,kw_function),set_opv(Symbol,function,Function)),   
+  always((FunDef,Code)).  
 
 
 % FLET
@@ -83,17 +86,16 @@ compile_function(Ctx,Env,[Symbol,FormalParms|FunctionBody0],Function,CompileBody
    debug_var("Env",CallEnv),
    debug_var('FnResult',Result),   
      (expand_function_head(Ctx,CallEnv,Symbol,FormalParms,_Whole, HeadParms,_HeadEnv, HeadDefCode,HeadCode),
-      must_compile_body(Ctx,CallEnv,Result,[block,Symbol|FunctionBody],BodyCode))),
+      must_compile_body(Ctx,CallEnv,Result,[block,Symbol|FunctionBody],BodyCode))),      
    append([Function|HeadParms],[Result],HeadV),
    CallableHead =.. HeadV,
  CompileBody = (
    DocCode,
    assert_lsp(Symbol,wl:lambda_def(defun,(Symbol),Function, FormalParms, FunctionBody)),
    HeadDefCode,
-   assert_lsp(Symbol,God),
-   set_opv(Function,classof,claz_compiled_function),set_opv(Symbol,compile_as,kw_function),set_opv(Symbol,function,Function)),
- debug_var('Result',Result),
- body_cleanup_keep_debug_vars(Ctx,( (user:CallableHead  :- ((HeadCode, BodyCode)))),God),
+   assert_lsp(Symbol,CallableHead  :-  BodyCodeO)),
+ debug_var('Result',Result), 
+  body_cleanup_keep_debug_vars(Ctx,(HeadCode,BodyCode),BodyCodeO),
   body_cleanup_keep_debug_vars(Ctx,CompileBody,CompileBodyOpt))).
 
 :- fixup_exports.
