@@ -518,7 +518,6 @@ maybe_inline(C1):-
   lisp_compiler_option(inline,true),
   !.
 
-
 clause_has_cuts(P):- clause_interface(P,I),contains_var(!,I).
 clause_calls_self(P):- clause_interface(P,I),functor(P,F,A),functor(C,F,A),contains_term(E,I),compound(E),E=C.
 
@@ -528,5 +527,29 @@ clause_interface(P,I):- wl:pass_clause(_,P,I).
 clause_interface(P,I,R):-clause(P,I,R).
 clause_interface(P,I,R):- wl:pass_clause(R,P,I).
 
+
+
+
+
+
+
+
+
+
+
+
+mize_prolog_code(In,Out):-skip_optimize(In),!,In=Out.
+mize_prolog_code(In,Out):-  
+   clause(mize_prolog_code1(In2,Out2),Body),
+   structure_applies_here(In,In2,Body),!,
+   (In \== Out2 -> mize_prolog_code(Out2,Out);Out=In),!.
+mize_prolog_code(InOut,InOut).
+
+mize_prolog_code1(maplist(_,[]),true).
+mize_prolog_code1(maplist(P,[X]),call(P,X)).
+mize_prolog_code1(call(F,A),Out):- atom(F),Out=..[F,A].
+
 :- fixup_exports.
+
+
 

@@ -30,8 +30,11 @@ normalize_let1( Variable,[bind, Variable, []]).
 compile_let(Ctx,Env,Result,[_LET, []| BodyForms], Body):- !, compile_forms(Ctx,Env,Result, BodyForms, Body).
 
 %  (LET ((*package* (find-package :keyword))) *package*)
-% compile_let(LET,Ctx,Env,Result,[let, [[Var,VarInit]]| BodyForms], Body):- ...
-
+compile_let(Ctx,Env,Result,[let, [[Var,VarInit]]| BodyForms], (VarInitCode,locally_set(Var,Value,BodyCode))):-
+ is_special_var(Var),!,
+ must_compile_body(Ctx,Env,Value,VarInit,VarInitCode),
+  compile_forms(Ctx,Env,Result,BodyForms,BodyCode).
+  
 %  (LET  (....) .... )
 compile_let(Ctx,Env,Result,[LET, NewBindingsIn| BodyForms], Body):- !,
   always((
@@ -46,18 +49,19 @@ compile_let(Ctx,Env,Result,[LET, NewBindingsIn| BodyForms], Body):- !,
 	expand_arguments(Ctx,Env,'funcall',1,ValueForms, VarInitCode, Values),
 
         zip_with(Variables, Values, [Var, Value, BV]^make_letvar(LET,Var,Value,BV),Bindings),
-        add_alphas(Ctx,Variables),        
-        rescue_special_bindings(Bindings,LocalBindings,SpecialBindings),
+
+        % rescue out special bindings
+        partition(=(bv(_,_)),Bindings,LocalBindings,SpecialBindings),  
 
         ignore((member(VarN,[Variable,Var]),atom(VarN),var(Value),debug_var([VarN,'_Let'],Value),fail)),        
-	compile_forms(Ctx,BindingsEnvironment,BResult,BodyForms, BodyFormsBody),
+        compile_forms(Ctx,BindingsEnvironment,BResult,BodyForms, BodyFormsBody),
+        add_alphas(Ctx,Variables),
         let_body(Env,BindingsEnvironment,LocalBindings,SpecialBindings,BodyFormsBody,MaybeSpecialBody),
          Body = (VarInitCode, MaybeSpecialBody,Result=BResult))).
 
 % No Locals
 let_body(Env,BindingsEnvironment,[],SpecialBindings,BodyFormsBody,MaybeSpecialBody):-!,
-  Env=BindingsEnvironment,
-    debug_var("LEnv",BindingsEnvironment),
+  Env=BindingsEnvironment, debug_var("LEnv",BindingsEnvironment),
   maybe_specials_in_body(SpecialBindings,BodyFormsBody,MaybeSpecialBody).
 
 % Some Locals
@@ -71,16 +75,10 @@ let_body(Env,BindingsEnvironment,LocalBindings,SpecialBindings,BodyFormsBody,
 maybe_specials_in_body([],BodyFormsBody,BodyFormsBody).
 % Some Specials
 maybe_specials_in_body(SpecialBindings,BodyFormsBody,SpecialBody):-
-   SpecialBody = (
-       maplist(save_special,SpecialBindings), 
-       BodyFormsBody,
-       maplist(restore_special,SpecialBindings)).
-% Some SAFE specials
-maybe_specials_in_body(SpecialBindings,BodyFormsBody,SpecialBody):-
-   SpecialBody = 
-       setup_call_cleanup(maplist(save_special,SpecialBindings), 
-       BodyFormsBody,
-       maplist(restore_special,SpecialBindings)).
+  mize_prolog_code(maplist(save_special,SpecialBindings),PreCode),
+  mize_prolog_code(maplist(restore_special,SpecialBindings),PostCode),
+   SpecialBody = (PreCode, BodyFormsBody, PostCode). 
+    % Some SAFE specials -> SpecialBody = setup_call_cleanup(PreCode, BodyFormsBody, PostCode).
 
 is_special_var(Var):- atom(Var),!,get_opv_i(Var,value,_).
 
@@ -88,17 +86,18 @@ make_letvar(ext_letf,Place,Value,place(Place,Value,_OldValue)):- is_list(Place).
 make_letvar(_,Var,Value,sv(Var,Value,value,_OldValue)):- is_special_var(Var),!.
 make_letvar(_,Var,Value,bv(Var,Value)).
 
+/*
 rescue_special_bindings(Var,Var,[]):- var(Var),!.
 rescue_special_bindings([],[],[]).
-rescue_special_bindings([bv(N,V)|Bindings],[bv(N,V)|LocalBindings],SpecialBindings):- !,
+rescue_special_bindings([bv(Var,V)|Bindings],[bv(Var,V)|LocalBindings],SpecialBindings):- !,
   rescue_special_bindings(Bindings,LocalBindings,SpecialBindings).
 rescue_special_bindings([Else|Bindings],LocalBindings,[Else|SpecialBindings]):-
   rescue_special_bindings(Bindings,LocalBindings,SpecialBindings).
-
-save_special(sv(N,New,Prop,Old)):- get_opv(N,Prop,Old),set_opv(N,Prop,New).
+*/
+save_special(sv(Var,New,Prop,Old)):- get_opv(Var,Prop,Old),set_opv(Var,Prop,New).
 save_special(place(Place,New,Old)):- get_place(Place,Old),set_place(Place,New).
 
-restore_special(sv(N,_,Prop,Old)):- set_opv(N,Prop,Old).
+restore_special(sv(Var,_,Prop,Old)):- set_opv(Var,Prop,Old).
 restore_special(place(Place,_New,Old)):- set_place(Place,Old).
 
 
