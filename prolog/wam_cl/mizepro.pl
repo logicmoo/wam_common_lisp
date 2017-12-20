@@ -121,9 +121,9 @@ oper_mize(_Whole,Ctx,F,(C1,C2),Joined):-!,
 
 oper_mize(_Whole,Ctx,F,[C1|C2],Joined):-!,oper_mize(C1,Ctx,F,C1,C1O),oper_mize(C2,Ctx,F,C2,C2O),([C1O|C2O] = Joined).
 
-oper_mize(Whole,_Ctx,_,Var1 = Var2, true):- 
+oper_mize(W,_Ctx,_,Var1 = Var2, true):- 
   lisp_compiler_option(elim_vars,true),
-  var(Var1),var(Var2),  occurrences_of_var(Var1,Whole,N)-> N==2.
+  var(Var1),var(Var2),  occurrences_of_var(Var1,W,N)-> N==2.
 
 %oper_mize(_Whole,Ctx,_,C1=C2, true):- var(C1),var(C2),maybe_keep,C1=C2,!.
 
@@ -131,36 +131,36 @@ oper_mize(_Whole,Ctx,FF,PAB,PABO):- PAB=..[F,C1|Rest],functor(PAB,F,A),functor_a
     oper_mize(C1,Ctx,FF,C1,C2),PABO=..[F,C2|Rest].
 
 oper_mize(_Whole,Ctx,FF,(H:-C1),(H:-C2)):- nonvar(H),!,functor(H,F,A), body_mize([F/A],(H:-C1),Ctx,FF,C1,C2).
-oper_mize(Whole,Ctx,F,always(C1),always(C2)):-!,oper_mize(Whole,Ctx,F,(C1),(C2)).
-oper_mize(Whole,Ctx,F,call(C1),call(C2)):-!,oper_mize(Whole,Ctx,F,(C1),(C2)).
-oper_mize(Whole,Ctx,F,C1,C2):- body_mize([],Whole,Ctx,F,C1,C2).
+oper_mize(W,Ctx,F,always(C1),always(C2)):-!,oper_mize(W,Ctx,F,(C1),(C2)).
+oper_mize(W,Ctx,F,call(C1),call(C2)):-!,oper_mize(W,Ctx,F,(C1),(C2)).
+oper_mize(W,Ctx,F,C1,C2):- body_mize([],W,Ctx,F,C1,C2).
 
 body_mize(_Skip,_Whole,_Ctx,_,Code,Out):- skip_optimize(Code),Out=Code.
 body_mize(Skip,_Whole,_Ctx,_,Code,Out):- functor(Code,F,N),member(F/N,Skip),Out=Code.
-%body_mize(_Skip,Whole,_Ctx,_,Var = Ground, true):- var(Var),ground(Ground), trace, occurrences_of_var(Var,Whole,N)-> N==2.
+%body_mize(_Skip,W,_Ctx,_,Var = Ground, true):- var(Var),ground(Ground), trace, occurrences_of_var(Var,W,N)-> N==2.
 body_mize(_Skip,_Whole,_Ctx,_,C1,C1):-!.
-body_mize(Skip,Whole,Ctx,F,(C1,C2),Joined):-!,
-   body_mize(Skip,Whole,Ctx,F,C1,C1O),
-   body_mize(Skip,Whole,Ctx,F,C2,C2O),conjoin_0(Ctx,C1O,C2O,Joined).
+body_mize(Skip,W,Ctx,F,(C1,C2),Joined):-!,
+   body_mize(Skip,W,Ctx,F,C1,C1O),
+   body_mize(Skip,W,Ctx,F,C2,C2O),conjoin_0(Ctx,C1O,C2O,Joined).
 %body_mize(Skip,_Whole,_Ctx,_,C1,Out):- maybe_optimize(C1), get_optimized(C1,Out).
 body_mize(__Skip,_Whole,_Ctx,_,C1,C1):- non_compound_code(C1),!.
-body_mize(Skip,Whole,Ctx,F,call(C1),call(C2)):-!, oper_mize(Skip,Whole,Ctx,F,C1,C2).
-body_mize(Skip,Whole,Ctx,F,(C1,C2),Joined):-!,
-   oper_mize(Skip,Whole,Ctx,F,C1,C1O),
-   oper_mize(Skip,Whole,Ctx,F,C2,C2O),
+body_mize(Skip,W,Ctx,F,call(C1),call(C2)):-!, oper_mize(Skip,W,Ctx,F,C1,C2).
+body_mize(Skip,W,Ctx,F,(C1,C2),Joined):-!,
+   oper_mize(Skip,W,Ctx,F,C1,C1O),
+   oper_mize(Skip,W,Ctx,F,C2,C2O),
    conjoin_0(Ctx,C1O,C2O,Joined).
-body_mize(Skip,Whole,Ctx,F,(C1;C2),(C1O;C2O)):-!,
-   oper_mize(Skip,Whole,Ctx,F,C1,C1O),
-   oper_mize(Skip,Whole,Ctx,F,C2,C2O).
+body_mize(Skip,W,Ctx,F,(C1;C2),(C1O;C2O)):-!,
+   oper_mize(Skip,W,Ctx,F,C1,C1O),
+   oper_mize(Skip,W,Ctx,F,C2,C2O).
 
-/*body_mize(Skip,Whole,Ctx,F,(P1->C1;C2),(P1O->C1O;C2O)):-!,
-   oper_mize(Skip,Whole,Ctx,F,P1,P1O),
+/*body_mize(Skip,W,Ctx,F,(P1->C1;C2),(P1O->C1O;C2O)):-!,
+   oper_mize(Skip,W,Ctx,F,P1,P1O),
    oper_mize(Skip,P1->C1,Ctx,F,C1,C1O),
    oper_mize(Skip,P1->C2,Ctx,F,C2,C2O).
 */
-body_mize(Skip,Whole,Ctx,_F,C1,C2):- 
+body_mize(Skip,W,Ctx,_F,C1,C2):- 
   compound_name_arguments(C1,F,C1ARGS),
-  must_maplist(body_mize(Skip,Whole,Ctx,F),C1ARGS,C2O),
+  must_maplist(body_mize(Skip,W,Ctx,F),C1ARGS,C2O),
   C2=..[F|C2O].
 body_mize(_Skip,_Whole,_Ctx,_,C1,C1):-!.
 
@@ -290,6 +290,7 @@ sub_block_exit_f_a(Addr,_):- atom_contains(Addr,'addr_').
 sub_block_exit_f_a(throw,1).
 sub_block_exit_f_a(catch,3).
 
+
 mize_body_1e(_Ctx,_,C1,C1):- non_compound_code(C1),!.
 mize_body_1e(_Ctx,_,C1,C2):- idiom_replace(C1,C2).
 mize_body_1e(_Ctx,_F,(A=B),true):- A==B,!.
@@ -316,6 +317,9 @@ mize_body_1e(Ctx,_,get_var(Env, Sym, Sym_Get),OUT):-
   (call(Was=Sym_Get)),!.
 %mize_body1(Ctx,_F,C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(mize_body1(Ctx,F),C1O,C2O),C2=..[F|C2O].
 %mize_body1(Ctx,F,C1,C2):- is_list(C1),must_maplist(mize_body1(Ctx,F),C1,C2).
+
+mize_body_1e(_Ctx,_,append([], R, W),R= W):- ignore(R= W).
+mize_body_1e(_Ctx,_,Env=[],true):- Env=[],!.
 mize_body_1e(_Ctx,_,C1,C1):-!.
 
 'O'(Old,New):- New,nop(Old).

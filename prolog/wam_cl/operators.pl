@@ -69,15 +69,6 @@ show_ctx_info3(Ctx):- fmt9(ctx=Ctx).
      
 
 
-   
-/*
-% progn mismatch?
-compile_funop(Ctx,Env,Result,[FN ], Body):- is_list(FN),!,
-  trace,must_compile_body(Ctx,Env,Result,FN,Body).
-
-compile_funop(Ctx,Env,Result,[FN | FunctionArgs], Body):- 
-   show_call(must_compile_body(Ctx,Env,Result,[eval,[FN| FunctionArgs]],Body)).
-*/
 
 as_lisp_funcallable(Atom,Atom):-atom(Atom),!.
 as_lisp_funcallable(function(P),P).

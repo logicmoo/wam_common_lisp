@@ -60,9 +60,20 @@ compile_funop(Ctx,CallEnv,Result,[FN | FunctionArgs], Body):- is_list(FunctionAr
       make_function_or_macro_call(Ctx,CallEnv,FNC,Args,Result,ExpandedFunction),      
       Body = (ArgBody,ExpandedFunction).
 
-compile_funop(_Ctx,_Env,Result,[FN | FunctionArgs],cl_eval([FN|FunctionArgs],Result)):- trace.
+% TODO- HOW DID WE GET HERE?
+compile_funop(_Ctx,_Env,Result,[FN | FunctionArgs],cl_eval([FN|FunctionArgs],Result)). 
 
   
+   
+/*
+% progn mismatch?
+compile_funop(Ctx,Env,Result,[FN ], Body):- is_list(FN),!,
+  trace,must_compile_body(Ctx,Env,Result,FN,Body).
+
+compile_funop(Ctx,Env,Result,[FN | FunctionArgs], Body):- 
+   show_call(must_compile_body(Ctx,Env,Result,[eval,[FN| FunctionArgs]],Body)).
+*/
+
 
 
 

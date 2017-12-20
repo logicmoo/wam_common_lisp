@@ -552,7 +552,7 @@ bind_parameters(Env,RestNKeys,_,['&rest',Var|FormalParms],Params,Code):- !,
   bind_parameters(Env,RestNKeys,'&rest',FormalParms,Params,Code).
 
 % &environment
-bind_parameters(Env,RestNKeys,_,['&environment',Var|FormalParms],Params,(make_bind_value(Var,'$env',Env),Code)):- !,   
+bind_parameters(Env,RestNKeys,_,['&environment',Var|FormalParms],Params,(get_env('$env',Var,Env),Code)):- !,   
   bind_parameters(Env,RestNKeys,'&rest',FormalParms,Params,Code).
 
 % Parsing required(s)

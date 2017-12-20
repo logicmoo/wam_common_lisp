@@ -70,6 +70,9 @@ wl:interned_eval('`sys:prolog').
 wl:interned_eval('`sys:break').
 compile_prolog_call(_Ctx,_Env,Prev,[sys_prolog],Prev, break).
 compile_prolog_call(_Ctx,_Env,Prev,[sys_break],Prev, break).
+compile_prolog_call(_Ctx,_Env,Prev,[break],Prev, break).
+
+cl_break([]):- break.
 
 %compile_body_h(_Ctx,_Env,Result, nop(X),  nop(X)):- !, debug_var("_NopResult",Result).
 compile_prolog_call(Ctx,Env,Result,call_for(Body0,Result),Prev, Body):-!,

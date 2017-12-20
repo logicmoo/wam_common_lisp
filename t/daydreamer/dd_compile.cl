@@ -23,7 +23,7 @@
 |#
 
 (compile-file "dd_cntrl")
-(break)
+;;(break)
 (compile-file "dd_epis")
 ;; #- :abcl (compile-file "dd_gen")
 ;; #+ :wamcl 
@@ -36,7 +36,7 @@
 (compile-file "dd_utils")
 (compile-file "dd_rule1")
 (compile-file "dd_rule2")
-(compile-file "dd_rule2a")
 (compile-file "dd_rule3")
+(compile-file "dd_rule4")
 
 ; End of file.
