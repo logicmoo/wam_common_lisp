@@ -28,8 +28,8 @@ add_tracked_var(Ctx,Atom,Var):-
    sort([Var|Vars],NewVars),
    b_set_dict(vars,Dict,NewVars).
   
-get_var_tracker(Ctx0,Atom,Dict):- get_attr(Ctx0,tracker,Ctx), always(sanity(atom(Atom))),oo_get_attr(Ctx,var_tracker(Atom),Dict),(is_dict(Dict)->true;(trace,oo_get_attr(Ctx,var_tracker(Atom),_SDict))).
-get_var_tracker(Ctx0,Atom,Dict):-  get_attr(Ctx0,tracker,Ctx),Dict=rw{name:Atom,r:0,w:0,p:0,ret:0,u:0,vars:[]},oo_put_attr(Ctx,var_tracker(Atom),Dict),!.
+get_var_tracker(Ctx0,Atom,Dict):- get_tracker(Ctx0,Ctx), always(sanity(atom(Atom))),oo_get_attr(Ctx,var_tracker(Atom),Dict),(is_dict(Dict)->true;(trace,oo_get_attr(Ctx,var_tracker(Atom),_SDict))).
+get_var_tracker(Ctx0,Atom,Dict):-  get_tracker(Ctx0,Ctx),Dict=rw{name:Atom,r:0,w:0,p:0,ret:0,u:0,vars:[]},oo_put_attr(Ctx,var_tracker(Atom),Dict),!.
 
 
 extract_var_atom([_,RVar|_],RVar):-atomic(RVar).
@@ -125,7 +125,7 @@ bind_dynamic_value(Env,Var,Result):- set_var(Env,Var,Result).
 
 get_symbol_value(Env,Obj,Value):- get_var(Env,Obj,Value).
 
-get_var(Var,Value):- env_current(Env), get_var(Env,Var,Value).
+get_var(Var,Value):- current_env(Env), get_var(Env,Var,Value).
 get_var(Env,Var,Value):-
   symbol_value_or(Env,Var,
     symbol_value_error(Env,Var,Value),Value).
@@ -170,6 +170,9 @@ set_symbol_value_last_chance(_Env,Var,_Result):-
   lisp_error_description(atom_does_not_exist, ErrNo, _),throw(ErrNo, Var).
 
 
+cl_defparameter(Var, Result, Result):- 
+   set_opv(Var,declared_as,defparameter),
+   set_var(_Env,Var,Result).
 
 
 env_sym_arg_val(Env,Var,InValue,Value):-

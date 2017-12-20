@@ -24,7 +24,7 @@ cl_make_pathname(I,O):- cl_make_instance([claz_pathname|I],O).
 wl:init_args(1,cl_compile_file_pathname).
 cl_compile_file_pathname(OSFile,Keys,PLFileOut):-
    F = kw_output_file,
-    env_current(Env),
+    current_env(Env),
    get_kw(Env,Keys,F,sys_output_file, 
      PLFile, pl_compiled_filename(OSFile,PLFile), _Present),
    to_lisp_pathname(PLFile,PLFileOut).

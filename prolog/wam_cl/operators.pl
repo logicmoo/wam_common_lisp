@@ -52,21 +52,18 @@ gensym_in_labels(Ctx,Stem,GenSym):- suffix_by_context(Ctx,Stem,SuffixStem),gensy
 
 get_label_suffix(_Ctx,Suffix):-nb_current('$labels_suffix',Suffix).
 
-
 remove_symbol_fbounds(Ctx,Sym):-
-  get_attr(Ctx,tracker,Ctx0), rb_delete(Ctx0,fbound(Sym),Ctx1),
-  put_attr(Ctx,tracker,Ctx1).
+  remove_env_attribute(Ctx,fbound(Sym)).
 
 get_symbol_fbounds(Ctx,Sym,BoundType,ProposedName):-
-  get_attr(Ctx,tracker,Ctx0), rb_in(fbound(Sym),bound_type(BoundType,ProposedName), Ctx0).
+  get_env_attribute(Ctx,fbound(Sym),bound_type(BoundType,ProposedName)).
 
 add_symbol_fbounds(Ctx,Sym,BoundType,ProposedName):-
-   get_attr(Ctx,tracker,Ctx0), rb_insert(Ctx0,fbound(Sym),bound_type(BoundType,ProposedName),Ctx1),
-   put_attr(Ctx,tracker,Ctx1).
+  set_env_attribute(Ctx,fbound(Sym),bound_type(BoundType,ProposedName)).
    
 
 show_ctx_info(Ctx):- term_attvars(Ctx,CtxVars),maplist(del_attr_rev2(freeze),CtxVars),show_ctx_info2(Ctx).
-show_ctx_info2(Ctx):- ignore((get_attr(Ctx,tracker,Ctx0),in_comment(show_ctx_info3(Ctx0)))).
+show_ctx_info2(Ctx):- ignore((get_tracker(Ctx,Ctx0),in_comment(show_ctx_info3(Ctx0)))).
 show_ctx_info3(Ctx):- is_rbtree(Ctx),!,forall(rb_in(Key, Value, Ctx),fmt9(Key=Value)).
 show_ctx_info3(Ctx):- fmt9(ctx=Ctx).
      

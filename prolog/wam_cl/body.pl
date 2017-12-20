@@ -640,7 +640,7 @@ setq_from_values_each(Env,[Var|Vars],[Value|Values]):-
    set_var(Env,Var,Value),
    setq_from_values_each(Env,Vars,Values).
 
-%  env_current(Env),
+%  current_env(Env),
   %set_var(Env,Var,Value).
 
 %   zip_with(Xs, Ys, Pred, Zs)

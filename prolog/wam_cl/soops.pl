@@ -425,7 +425,7 @@ get_type_default(keyword,_,classof,clz_keyword).
 get_type_default(keyword,_,defined_as,defconstant).
 get_type_default(keyword,_,typeof,keyword).
 
-get_opv_iii(Obj,Prop,Value):- has_prop_value_getter(Obj,Prop,Getter),call(Getter,Obj,Prop,Value).
+get_opv_iii(Obj,Prop,Value):- wl:symbol_has_prop_setter(Obj,Prop,Getter),call(Getter,Obj,Prop,Value).
 get_opv_iii(Obj,Prop,Value):- soops:o_p_v(Obj,Prop,Value).
 get_opv_iii(Obj,Prop,Value):- atom(Obj),nb_current(Obj,Ref),nb_current_value(Ref,Prop,Value).
 get_opv_iii(Obj,Prop,Value):- soops:struct_opv(Obj,Prop,Value).
@@ -516,7 +516,7 @@ add_opv_new(Obj,Key,Value):-
   un_kw(Key,Prop),
   add_opv_new_i(Obj,Prop,Value).
 
-add_opv_new_i(Obj,Prop,Value):- nonvar(Obj), has_prop_value_setter(Obj,Prop,Setter),once(call(Setter,Obj,Prop,Value)),fail.
+add_opv_new_i(Obj,Prop,Value):- nonvar(Obj), wl:symbol_has_prop_getter(Obj,Prop,Setter),once(call(Setter,Obj,Prop,Value)),fail.
 %add_opv_new_i(Obj,Prop,Value):- Prop==value, nonvar(Obj),nb_setval(Obj,Value).
 add_opv_new_i(Ref,Prop,Value):- get_ref_object(Ref,Object),!,
    retractall(soops:o_p_v(Ref,Prop,_)),
@@ -558,22 +558,22 @@ modulize(Pred,M:Pred):-predicate_property(Pred,imported_from(M)),!.
 modulize(Pred,M:Pred):-predicate_property(Pred,module(M)),!.
 modulize(Pred,Pred).
 
-:- dynamic(symbol_set_get/3).
-:- multifile(symbol_set_get/3).
-:- dynamic(has_prop_value_setter/3).
-:- multifile(has_prop_value_setter/3).
-:- dynamic(has_prop_value_getter/3).
-:- multifile(has_prop_value_getter/3).
 
-symbol_set_get(sys_xx_stdin_xx,claz_prolog_output_stream,set_input,current_input).
+wl:symbol_has_prop_get_set(sys_xx_stdin_xx,claz_prolog_output_stream,set_input,current_input).
 
-has_prop_value_setter(sys_xx_stdout_xx,value,prolog_direct(set_output/1)).
-has_prop_value_setter(Sym,value,prolog_direct(Setter/1)):- symbol_set_get(Sym,Setter,_Getter).
 
-has_prop_value_getter(sys_xx_stdout_xx,value,prolog_direct(current_output/1)).
-has_prop_value_getter(Sym,value,prolog_direct(Getter/1)):- symbol_set_get(Sym,_Setter,Getter).
-%has_prop_value_setter(sys_xx_stderr_xx,value,prolog_direct(set_error/1)).
-%has_prop_value_getter(sys_xx_stderr_xx,value,prolog_direct(current_error/1)).
+wl:symbol_has_prop_get_set(sys_xx_global_env_var_xx,claz_environment, set_global_env, global_env).
+
+wl:symbol_has_prop_getter(Sym,value,prolog_direct(Setter/1)):- wl:symbol_has_prop_get_set(Sym,_,Setter,_Getter).
+wl:symbol_has_prop_getter(sys_xx_stdout_xx,value,prolog_direct(set_output/1)).
+
+wl:symbol_has_prop_getter(sys_xx_env_var_xx,value,prolog_direct(set_current_env/1)).
+
+wl:symbol_has_prop_setter(sys_xx_env_var_xx,value,prolog_direct(current_env/1)).
+wl:symbol_has_prop_setter(sys_xx_stdout_xx,value,prolog_direct(current_output/1)).
+wl:symbol_has_prop_setter(Sym,value,prolog_direct(Getter/1)):- wl:symbol_has_prop_get_set(Sym,_,_Setter,Getter).
+%wl:symbol_has_prop_getter(sys_xx_stderr_xx,value,prolog_direct(set_error/1)).
+%wl:symbol_has_prop_setter(sys_xx_stderr_xx,value,prolog_direct(current_error/1)).
 
 prolog_direct(Pred/1,_Obj,_Prop,Value):- call(Pred,Value).
 prolog_direct(Pred/2,Obj,_Prop,Value):- call(Pred,Obj,Value).
@@ -582,7 +582,6 @@ prolog_direct(Pred/3,Obj,Prop,Value):- call(Pred,Obj,Prop,Value).
 update_opv(Obj,Prop,Value):- set_opv(Obj,Prop,Value).
 
 set_opv(Obj,Key,Value):- un_kw(Key,Prop),set_opv_i(Obj,Prop,Value).
-set_opv_i(Obj,Prop,Value):- has_prop_value_setter(Obj,Prop,Setter),once(call(Setter,Obj,Prop,Value)).
 set_opv_i(Obj,Prop,Value):- % delete_opvalues(Obj,Prop),
    add_opv_new(Obj,Prop,Value).
 

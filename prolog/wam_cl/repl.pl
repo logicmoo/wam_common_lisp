@@ -79,6 +79,7 @@ prompts(Old1,_Old2):- var(Old1) -> prompt(Old1,Old1) ; prompt(_,Old1).
 classof:attr_unify_hook(A,B):- trace,wdmsg(classof:attr_unify_hook(A,B)),lisp_dump_break. %  break.
 
 code_load_hooks:-
+   reset_env,
   (current_prolog_flag(os_argv,Y)->handle_all_os_program_args(Y)),
   set_prolog_flag(lisp_autointern,true),
    forall(retract(wl:interned_eval(G)),always(do_interned_eval(G))),
@@ -94,7 +95,6 @@ lisp:-
 	prompts(Old1, Old2),
 	prompts('> ', '> '),
 	%tidy_database,
-        el_new(ENV),nb_setval('$env_toplevel',ENV),
         do_before_tpl,
         call_cleanup(repl_loop,
                      (prompt(_, Old),
@@ -246,7 +246,8 @@ handle_program_args('--ansi','-ansi'):- cl_push_new(xx_features_xx,kw_ansi).
 
 tidy_database:-
 	nb_delete('$env_current'),
-        env_current(_Env),
+        nb_delete('$env_global'),
+        current_env(_Env),
 	retractall(lambda(_, _)).
 
 show_uncaught_or_fail((A,B)):-!,show_uncaught_or_fail(A),show_uncaught_or_fail(B).
@@ -359,7 +360,7 @@ eval_at_repl_tracing(Expression,Result):-
    quietly((writeln(==================================================================))),
   timel('EXEC',(offer_rtrace((user:Code)))).
 
-eval(Expression, Result):- env_current(Env), eval(Expression, Env, Result).
+eval(Expression, Result):- current_env(Env), eval(Expression, Env, Result).
 
 eval(Expression, Env, Result):-
    always_catch(maybe_ltrace(lisp_compile(Env,Result,Expression,Code))), 

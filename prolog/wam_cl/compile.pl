@@ -19,9 +19,6 @@
 :- set_module(class(library)).
 :- include('header').
 
-%new_compile_ctx(Ctx):- new_assoc(Ctx)put_attr(Ctx,type,ctx).
-new_compile_ctx(Ctx):- list_to_rbtree([type-ctx],Ctx0),put_attr(Ctx,tracker,Ctx0).
-
 lisp_compiled_eval(SExpression):-
   quietly(as_sexp_interned(SExpression,Expression)),
   lisp_compiled_eval(Expression,Result),
@@ -51,10 +48,11 @@ lisp_compile(Result,SExpression,Body):-
    lisp_compile(Env,Result,SExpression,Body).
 
 lisp_compile(Env,Result,Expression,Body):-
-   new_compile_ctx(Ctx),
+   ensure_env(Ctx),
    always(lisp_compile(Ctx,Env,Result,Expression,Body)).
 
 lisp_compile(Ctx,Env,Result,SExpression,Body):-
+   ensure_env(Ctx),
    quietly(as_sexp(SExpression,Expression)),
    always(compile_forms(Ctx,Env,Result,[Expression],Body)).
    
@@ -111,10 +109,11 @@ reduce_atom(X,XX):- atom_concat_or_rtrace(XX,'_mexpand1',X).
 
 get_value_or_default(Ctx,Name,Value,IfMissing):- oo_get_attr(Ctx,Name,Value)->true;Value=IfMissing.
 
-get_alphas(Ctx,Alphas):- get_attr(Ctx,tracker,Ctx0),get_alphas0(Ctx0,Alphas).
+get_alphas(Ctx,Alphas):- get_tracker(Ctx,Ctx0),get_alphas0(Ctx0,Alphas).
 get_alphas0(Ctx,Alphas):- get_value_or_default(Ctx,alphas,Alphas,[]).
 
-add_alphas(Ctx,Alphas):- always((get_attr(Ctx,tracker,Ctx0),add_alphas0(Ctx0,Alphas))).
+add_alphas(_,_):-!.
+add_alphas(Ctx,Alphas):- always((get_tracker(Ctx,Ctx0),add_alphas0(Ctx0,Alphas))).
 add_alphas0(Ctx,Alpha):- atom(Alpha),!,get_value_or_default(Ctx,alphas,Alphas,[]),oo_put_attr(Ctx,alphas,[Alpha|Alphas]).
 add_alphas0(_Ctx,Alphas):- \+ compound(Alphas),!.
 add_alphas0(Ctx,Alphas):- Alphas=..[_|ARGS],maplist(add_alphas0(Ctx),ARGS).

@@ -151,7 +151,9 @@ method-combination-lambda-list::= (wholevar var*
 reserved_symbols(_Names,_PVars).
 as_rest(_,R,R).
 as_body(_,B,B).
-as_env(_,E,E).
+
+get_env(Local,N,Env):- (get_var(Local,N,Env)->nonvar(Env))->true;
+   (get_local_env(Local,Env)-> true ; (reenter_lisp(_Ctx,Env),set_local_env(Local,Env))).
 
 
 /*kw_is_present(RestNKeys,F,KWP,KWPV):- 
@@ -222,7 +224,7 @@ ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,MODE,['&whole',F|FormalParms],Para
  
 % &environment
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,Mode,['&environment',F|FormalParms],Params,[F|Names],[V|PVars],
- (always(as_env(F,V,Env)),Code)):-  !,
+  (get_env(Env,F,V),Code)):-  !,
   arginfo_append(F,env,ArgInfo),
   arginfo_append(environment,complex,ArgInfo),
   ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,Mode,FormalParms,Params,Names,PVars,Code).
