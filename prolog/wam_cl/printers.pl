@@ -90,23 +90,23 @@ wl:init_args(0,cl_format).
 cl_format([Stream,Fmt],t):- !, cl_print(cl_format(Stream,Fmt),_).
 cl_format([Stream,Fmt|ArgS],t):-cl_print(cl_format(Stream,Fmt,ArgS),_).
 
-cl_prin1(X,X):-copy_term(X,Y),writeExpression(Y).
-cl_princ(X,X):-is_stringp(X),!,to_prolog_string(X,S),write(S).
-cl_princ(X,X):-copy_term(X,Y),writeExpression(Y),nl.
-cl_print(X,X):-cl_prin1(X,X),nl.
+cl_prin1(X,X):- quietly((copy_term(X,Y),writeExpression(Y))).
+cl_princ(X,X):- is_stringp(X),!,to_prolog_string(X,S),write(S).
+cl_princ(X,X):- copy_term(X,Y),writeExpression(Y),nl.
+cl_print(X,X):-quietly((cl_prin1(X,X))),nl.
 cl_terpri(t):-nl.
 cl_write_line(X,Y):-cl_princ(X,Y),nl.
 
 % writeExpression/1 displays a lisp expression
-
-writeExpression(X):- is_ftVar(X),(get_var_name(X,N)->format('~w~w)',[N,X]);format('~w',[X])),!.
-writeExpression([]):- write('NIL').
+writeExpression(X):- notrace(writeExpression0(X)).
+writeExpression0(X):- is_ftVar(X),(get_var_name(X,N)->format('~w~w)',[N,X]);format('~w',[X])),!.
+writeExpression0([]):- write('NIL').
 % writeExpression(quit):- !, write('Terminating WAM-CL'),nl.
-writeExpression('$COMMENT0'([])):- 	writeln(';'),!.
-writeExpression('$COMMENT'(S)):- 	write(';'),writeln(S),!.
-writeExpression('$COMMENT1'(S)):- 	write('#|'),write(S),writeln('|#').
-writeExpression('$COMMENT'(S,_,_)):- 	write('#|'),write(S),writeln('|#').
-writeExpression(Expression):-
+writeExpression0('$COMMENT0'([])):- 	writeln(';'),!.
+writeExpression0('$COMMENT'(S)):- 	write(';'),writeln(S),!.
+writeExpression0('$COMMENT1'(S)):- 	write('#|'),write(S),writeln('|#').
+writeExpression0('$COMMENT'(S,_,_)):- 	write('#|'),write(S),writeln('|#').
+writeExpression0(Expression):-
 	sexpr1(Expression, TokenL, []), !, %	write('  '),
 	writeTokenL(TokenL).
 

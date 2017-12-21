@@ -14,6 +14,15 @@
  *******************************************************************/
 :- module(cl, []).
 :- set_module(class(library)).
+:- set_prolog_flag(backtrace,true).
+:- set_prolog_flag(backtrace_depth,500).
+:- set_prolog_flag(backtrace_goal_depth,30).
+:- set_prolog_flag(backtrace_show_lines,true).
+:- set_prolog_flag(toplevel_print_anon,true).
+:- set_prolog_flag(last_call_optimisation,false).
+:- set_prolog_flag(lisp_verbose,1).
+:- set_prolog_flag(lisp_autointern,true).
+
 :- include('header').
 
 
@@ -86,16 +95,16 @@ primodial_init:-
  set_prolog_flag(wamcl_init_level,1),
  always((
   % allows "PACKAGE:SYM" to be created on demand (could this be an initials a default)
-  set_prolog_flag(lisp_autointern,true),
   ensure_env,
-  current_prolog_flag(os_argv,Y),
-  handle_all_os_program_args(Y),
+  set_prolog_flag(lisp_autointern,true),
+  current_prolog_flag(os_argv,Y),handle_all_os_program_args(Y),
   current_prolog_flag(argv,Y2),handle_all_program_args(Y2),
   do_wamcl_inits)). 
 
 % system sourcefile load hooks
 do_wamcl_inits:- current_prolog_flag(wamcl_init_level,N),N>1,!.
 do_wamcl_inits:-
+  primodial_init,
   set_prolog_flag(wamcl_init_level,2),
   forall(clause(wl:interned_eval(G),Body,R),
     (forall(Body,always(do_interned_eval(G))),
@@ -194,6 +203,15 @@ $ swipl -x wamcl.prc
 
 ').
 
+do_after_load(G):- assertz(wl:interned_eval(call(G))).
+% set if already set
+set_interactive(TF):-
+ (TF -> set_prolog_flag(lisp_repl_goal,repl_loop);
+    set_prolog_flag(lisp_repl_goal,halt)).
+% doesnt set if already set
+imply_interactive(TF):- current_prolog_flag(lisp_repl_goal,_)->true;set_interactive(TF).
+imply_flag(Name,Value):- atom_concat(lisp_,Name,LName), ((current_prolog_flag(LName,N),N\==1)->true;set_prolog_flag(LName,Value)).
+
 :- set_prolog_flag(backtrace,true).
 :- set_prolog_flag(backtrace_depth,500).
 :- set_prolog_flag(backtrace_goal_depth,30).
@@ -201,6 +219,7 @@ $ swipl -x wamcl.prc
 :- set_prolog_flag(toplevel_print_anon,true).
 :- set_prolog_flag(last_call_optimisation,false).
 :- set_prolog_flag(lisp_verbose,1).
+:- set_prolog_flag(lisp_autointern,true).
 
 set_lisp_option(verbose):- 
    set_prolog_flag(verbose_load,full),
@@ -238,18 +257,9 @@ handle_all_program_args(More):- do_after_load(((set_program_args(More)))).
 
 set_program_args(More):- maplist(to_lisp_string,More,List),set_var(ext_xx_args_xx,List).
 
-% set if already set
-set_interactive(TF):-
- (TF -> set_prolog_flag(lisp_repl_goal,repl_loop);
-    set_prolog_flag(lisp_repl_goal,halt)).
-% doesnt set if already set
-imply_interactive(TF):- current_prolog_flag(lisp_repl_goal,_)->true;set_interactive(TF).
-imply_flag(Name,Value):- atom_concat(lisp_,Name,LName), ((current_prolog_flag(LName,N),N\==1)->true;set_prolog_flag(LName,Value)).
 
 
 wl:interned_eval(("(defparameter EXT:*ARGS* ())")).
-
-do_after_load(G):- assertz(wl:interned_eval(call(G))).
 
 handle_1program_arg(N=V):-  handle_program_args(N,_,V),!.
 handle_1program_arg(N=V):-!,handle_program_args(N,_,V).
@@ -284,12 +294,13 @@ tidy_database:-
         reset_env,
         ensure_env(_Env).
 
+% :- '$hide'(show_uncaught_or_fail/1).
 show_uncaught_or_fail((A,B)):-!,show_uncaught_or_fail(A),show_uncaught_or_fail(B).
 show_uncaught_or_fail(G):- quietly(flush_all_output_safe),
   (catch(G,E,quietly((wdmsg(uncaught(E)),rtrace(G),!,fail)))*->true;quietly((wdmsg(failed(G)),!,fail))).
 
 set_prompt_from_package:-
-  lquietly((ignore((get_var(_ReplEnv, xx_package_xx, Package),
+  ((ignore((get_var(_ReplEnv, xx_package_xx, Package),
         short_package_or_hash(Package,Name0),
         (Name0=="U"->Name="CL-USER";Name=Name0),
         always(nonvar(Name)),
@@ -297,10 +308,10 @@ set_prompt_from_package:-
         prompt(_,Prompt))))).
 
 read_eval_print(Result):-		% dodgy use of cuts to force a single evaluation
-        set_prompt_from_package,
+        lquietly(set_prompt_from_package),
 
         %lquietly
-        (show_uncaught_or_fail(read_no_parse(Expression))),!,
+        lquietly(show_uncaught_or_fail(read_no_parse(Expression))),!,
         lquietly(show_uncaught_or_fail(lisp_add_history(Expression))),!,
         nb_linkval('$mv_return',[Result]),
         show_uncaught_or_fail(eval_at_repl(Expression,Result)),!,
@@ -355,15 +366,15 @@ lisp_add_history(Expression):-
 
 % basic EVAL statements for built-in procedures
 eval_at_repl(Var,  R):- quietly(var(Var)),!, R=Var.
-eval_at_repl(Expression, Result):- lquietly(eval_repl_hooks(Expression,Result)),!.
-eval_at_repl(Expression,Result):- notrace((tracing, \+ t_l:rtracing)),notrace,call_cleanup(eval_at_repl_tracing(Expression,Result),trace).
+eval_at_repl(Expression, Result):- eval_repl_hooks(Expression,Result),!.
+eval_at_repl(Expression,Result):- notrace((tracing, \+ t_l:rtracing)),call_cleanup(eval_at_repl_tracing(Expression,Result),trace).
 eval_at_repl(Expression,Result):-
   lquietly(as_sexp(Expression,SExpression)),
   (reader_intern_symbols(SExpression,LExpression)),
-  quietly(dbmsg_cmt(:- lisp_compiled_eval(LExpression))),
+  quietly(lmsg(:- lisp_compiled_eval(LExpression))),
   quietly(debug_var('ReplEnv',Env)),
   timel('COMPILER',always_catch(maybe_ltrace(lisp_compile(Env,Result,LExpression,Code)))),
-  quietly(dbmsg_real(:-Code)),
+  quietly(outmsg(:-Code)),
   (notrace(tracing)-> (user:Code) ; 
    timel('EXEC',always_catch(ignore(always(maybe_ltrace(call(user:Code))))))),!.
 
@@ -376,7 +387,7 @@ eval_at_repl_tracing(Expression,Result):-
    quietly((writeln(==================================================================))),
    quietly((writeln(==================================================================))),
    quietly((writeln(==================================================================))),
-   dbmsg(:- lisp_compiled_eval(LExpression)),
+   lmsg(:- lisp_compiled_eval(LExpression)),
    quietly((writeln(==================================================================))),
    quietly((writeln(==================================================================))),
    quietly((writeln(==================================================================))),
@@ -385,7 +396,7 @@ eval_at_repl_tracing(Expression,Result):-
    quietly((writeln(==================================================================))),
    quietly((writeln(==================================================================))),
    quietly((writeln(==================================================================))),
-   show_call_trace((dbmsg_real(:-Code))),
+   show_call_trace((outmsg(:-Code))),
    quietly((writeln(==================================================================))),
    timel('PREEXEC',(offer_rtrace((user:Code)))),
    quietly((writeln(==================================================================))),
@@ -407,7 +418,7 @@ eval(Expression, Env, Result):-
 read_and_parse(Expr):-  flush_all_output_safe,current_input(In),parse_sexpr_untyped_read(In, Expr).
 read_no_parse(Expr):-  flush_all_output_safe,current_input(In),parse_sexpr_untyped(In, Expr).
 
-flush_all_output_safe:- forall(stream_property(S,mode(write)),quietly(catch(flush_output(S),_,true))).
+flush_all_output_safe:- notrace((forall(stream_property(S,mode(write)),quietly(catch(flush_output(S),_,true))))).
 
 parse_sexpr_untyped_read(In, Expr):- 
   parse_sexpr_untyped(In,ExprS),!,
@@ -420,14 +431,16 @@ eval_repl_hooks(nil,  []):-!.
 eval_repl_hooks(KW, Ret):- atom(KW),atom_concat(':',UC,KW),downcase_atom(UC,DC),atom_concat('kw_',DC,US),!,trace,!,eval_repl_hooks(US,Ret).
 % :cd t
 eval_repl_hooks(KW, Ret):- is_keywordp(KW),to_prolog_string(KW,PStr),name(UC,PStr),downcase_atom(UC,Atom),
-  
+  trace,
   (current_predicate(Atom/2)-> (read_prolog_object(PrologArg),call(Atom,PrologArg,Ret));
-  (current_predicate(Atom/1)-> (trace,read_prolog_object(PrologArg),!,t_or_nil(call(Atom,PrologArg),Ret));
+  (current_predicate(Atom/1)-> (read_prolog_object(PrologArg),!,t_or_nil(call(Atom,PrologArg),Ret));
   (current_predicate(Atom/0)-> (call(Atom))))).
 
 % make.  ls.  pwd. 
-eval_repl_hooks(Atom, R):- atom(Atom),atom_concat_or_rtrace(_,'.',Atom),quietly(catch(read_term_from_atom(Atom,Term,[variable_names(Vs),syntax_errors(true)]),_,fail)),
-  callable(Term),current_predicate(_,Term),b_setval('$variable_names',Vs),t_or_nil((user:call(Term)*->lmsg(Term);(lmsg(no(Term)),fail)),R).
+eval_repl_hooks(Atom, R):- atom(Atom),atom_concat_or_rtrace(_,'.',Atom),
+  quietly(catch(read_term_from_atom(Atom,Term,[variable_names(Vs),syntax_errors(true)]),_,fail)),
+  callable(Term),current_predicate(_,Term),b_setval('$variable_names',Vs),
+  t_or_nil((user:call(Term)*->lmsg(Term);(lmsg(no(Term)),fail)),R).
 
 eval_repl_hooks([debug,A], t):- !,debug(lisp(A)).
 eval_repl_hooks([nodebug,A], t):- !, nodebug(lisp(A)).

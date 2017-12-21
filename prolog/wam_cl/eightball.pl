@@ -35,12 +35,10 @@ di_test:- lisp_compile_to_prolog(pkg_user,
                           ]).
 
 
-show_call_trace(G):- G *-> lmsg(G); (wdmsg(warn(failed(show_call_trace(G)))),fail).
-
 slow_trace:- notrace(tracing),!,stop_rtrace,nortrace,trace.
 slow_trace:- nortrace.
 
-on_x_rtrace(G):- catch(G,E,(dbmsg(E),rtrace(G),break)).
+on_x_rtrace(G):- catch(G,E,(lmsg(E),rtrace(G),break)).
 atom_concat_or_rtrace(X,Y,Z):- tracing->atom_concat(X,Y,Z);catch(atom_concat(X,Y,Z),_,break).
 
 lisp_dump_break:- both_outputs(dumpST),!,throw(lisp_dump_break).
@@ -50,7 +48,8 @@ lisp_dumpST:- both_outputs(dumpST).
 
 true_or_die(Goal):-functor(Goal,_,A),arg(A,Goal,Ret),always((Goal,Ret\==[])).
 
-lquietly(G):- quietly(G).
+:- '$hide'(lquietly/1).
+lquietly(G):- notrace(quietly(G)).
 
 % Must always succeed (or else there is a bug in the lisp impl!)
 always(G):- notrace(tracing),!,G,!.
@@ -112,7 +111,7 @@ gripe_problem0(Problem,G):-
      notrace(( 
      wdmsg((Problem:-G)),
      dumpST,
-     dbmsg((Problem:-G)))),
+     lmsg((Problem:-G)))),
      lisp_dump_break,
      slow_trace,
      ((G)*->(slow_trace,lisp_dump_break);(lmsg(warn(failed_rtrace(G))),notrace,lisp_dump_break,!,fail)).
@@ -151,12 +150,16 @@ colormsg1(Msg):- mesg_color(Msg,Ctrl),!,ansicall_maybe(Ctrl,fmt99(Msg)).
 ansicall_maybe(_Ctrl,Cmd):- current_output(O), \+ stream_property(O,tty(true)),!,call(Cmd).
 ansicall_maybe(Ctrl,Cmd):- always(shrink_lisp_strings(Cmd,Cmd0)),!,call(ansicall(Ctrl,Cmd0)).
 
-lmsg(warn(G)):- !, dmsg(warn(G)).
-lmsg(failed(G)):- !, wdmsg(warn(G)).
-lmsg(G):- current_prolog_flag(lisp_verbose,0)->true; lmsg(G).
-dbmsg(X):- dbmsg_cmt(X).
-dbmsg_cmt(Var):- shrink_lisp_strings(Var,O), lmsg(O).
-dbmsg_real(X):- notrace(both_outputs(dbmsg0(X))),!.
+show_call_trace(G):- G *-> lmsg(G); ((lmsg(failed(show_call_trace(G)))),fail).
+
+is_must_show_msg(C):-compound(C),compound_name_arity(C,N,_),!,is_must_show_msg0(N). is_must_show_msg0(warn). is_must_show_msg0(error). is_must_show_msg0(failed).
+
+lmsg(X):- notrace((shrink_lisp_strings(X,X0), lmsg0(X0))).
+lmsg0(G):- is_must_show_msg(G),!,in_comment(outmsg(G)).
+lmsg0(_):- current_prolog_flag(lisp_verbose,0),!.
+lmsg0(X):- in_comment(outmsg(X)).
+
+outmsg(X):- notrace(both_outputs(dbmsg0(X))),!.
 
 in_comment(X):- notrace(setup_call_cleanup(write('/* '),(X),writeln(' */'))).
 
@@ -203,13 +206,14 @@ dbmsg0(Var):- var(Var),!,in_comment(colormsg1(dbmsg_var(Var))).
 dbmsg0(Str):- string(Str),!,in_comment(colormsg1(Str)).
 dbmsg0(:- A):- dbmsg0(A).
 dbmsg0(A):- dbmsg1(A),!.
+dbmsg0(A):- dbmsg2(A),!.
 % dbmsg0(StringL):- to_prolog_string_if_needed(StringL,String),!,dbmsg0(String).
-dbmsg0(comment(X)):-!, shrink_lisp_strings(X,X0), in_comment(fmt99(X0)).
-dbmsg0(N=V):- !, shrink_lisp_strings(N=V,X0),  in_comment(fmt99(X0)).
-dbmsg0(A):- is_assert_op(A,Where,AA),!,dbmsg_assert(Where,AA).
-dbmsg0(:- X):- X==true,!.
-dbmsg0(:- X):- colormsg1(:- X),!.
-dbmsg0(X):- colormsg1(:- X),!.
+dbmsg2(comment(X)):-!, shrink_lisp_strings(X,X0), in_comment(fmt99(X0)).
+dbmsg2(N=V):- !, shrink_lisp_strings(N=V,X0),  in_comment(fmt99(X0)).
+dbmsg2(A):- is_assert_op(A,Where,AA),!,dbmsg_assert(Where,AA).
+dbmsg2(:- X):- X==true,!.
+dbmsg2(:- X):- colormsg1(:- X),!.
+dbmsg2(X):- colormsg1(:- X),!.
 
 dbmsg1(((A,B))):-  is_assert_op(A,Where,AA), !,dbmsg_assert(Where, AA),dbmsg0( B).
 dbmsg1(((B,A))):-  is_assert_op(A,Where,AA), !,dbmsg0( B),dbmsg_assert(Where, AA).

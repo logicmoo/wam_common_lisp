@@ -99,11 +99,11 @@ ssip_compiler_term_expansion(Symbol,Symbol2,ssip_define(Symbol,Symbol2)):-!.
 % The hook into the compiler
 term_expansion(Symbol==Function,O) :- I= (Symbol==Function),ssip_compiler_term_expansion(Symbol,Function,O),nl,nl,
   flatten([I,O],L),
-  maplist(dbmsg,L),!.
+  maplist(lmsg,L),!.
   % in_cmt(maplist(portray_clause,L)),!.
 term_expansion(I,O) :- lisp_compiler_term_expansion(I,O),I\==O,nl,nl,
   flatten([I,O],L),
-  maplist(dbmsg,L),!.
+  maplist(lmsg,L),!.
 
 
 % Now Prolog can understand them, compile the additional library files

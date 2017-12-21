@@ -63,7 +63,7 @@
 
 % DEFMACRO
 wl:init_args(2,cl_defmacro).
-cl_defmacro(Symbol,FormalParms,MacroBody,Return):- reenter_lisp(Ctx,Env),compile_macro_ops(Ctx,Env,Return,[defmacro,Symbol,FormalParms|MacroBody],Code),dbmsg_real(Code).
+cl_defmacro(Symbol,FormalParms,MacroBody,Return):- reenter_lisp(Ctx,Env),compile_macro_ops(Ctx,Env,Return,[defmacro,Symbol,FormalParms|MacroBody],Code),outmsg(Code).
 compile_macro_ops(Ctx,Env,Result,[defmacro,Symbol,FormalParms|MacroBody], (Code,FunDef,Result=Symbol)):-
   compile_macro(Ctx,Env,[Symbol,FormalParms|MacroBody],_Sym,Macro,Code),
   debug_var('DefMacroResult',Result),
@@ -86,7 +86,7 @@ define_each_macro(Ctx,Env,_MacroLetOrOther,[Symbol|DEFN],Sym,CompileBody)  :-
    compile_macro(Ctx,Env,[Symbol|DEFN],Sym,UniqueMacroName,CompileBody),
    add_symbol_fbounds(Ctx,Sym,kw_operator,UniqueMacroName),
    always(CompileBody),
-   dbmsg_real(CompileBody).
+   outmsg(CompileBody).
 
 
 compile_macro(Ctx,Env,[Symbol,FormalParms|MacroBody0],Symbol,Macro, CompileBody):-
@@ -159,7 +159,7 @@ macroexpand_1_or_fail([Procedure|Arguments],MacroEnv,CompileBody0Result):- nonva
    always(Code),
    must_compile_body(Ctx,NextEnv,CompileBody0Result,CommaResult, MCBR),
    always(MCBR),
-   dbmsg_cmt((macroResult(BindCode,Code,CommaResult,CompileBody0Result))))),!.
+   lmsg((macroResult(BindCode,Code,CommaResult,CompileBody0Result))))),!.
 
 
 % Operator

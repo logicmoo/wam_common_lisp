@@ -87,7 +87,7 @@ compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm], Body):- is_symbol_setter(
 
 % catches an internal error in this compiler 
 compile_symbol_getter(Ctx,Env,Result,Var, Body):- Var==mapcar,!, 
-  dbmsg(compile_symbol_getter(Ctx,Env,Result,Var, Body)), lisp_dump_break.
+  lmsg(compile_symbol_getter(Ctx,Env,Result,Var, Body)), lisp_dump_break.
 
 
 compile_symbol_getter(Ctx,Env,Value, Var, Body):-  always((atom(Var),!,

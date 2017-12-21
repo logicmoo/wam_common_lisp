@@ -222,11 +222,11 @@ lisp_compile_to_prolog(PExpression):-
   write_file_info,
   flush_all_output_safe,
   reading_package(Pkg),
-  dbmsg_real(:- lisp_compile_to_prolog(Pkg,SExpression)),
+  outmsg(:- lisp_compile_to_prolog(Pkg,SExpression)),
   reader_intern_symbols(SExpression,Expression),  
   debug_var('_Ignored',Result))),
   lisp_compile(Result,Expression,PrologCode))),
-  dbmsg_real(:- PrologCode),!,
+  outmsg(:- PrologCode),!,
   lisp_grovel(PrologCode),!.
    
 grovel_time_called(do_when).
@@ -258,8 +258,8 @@ cl_load(L,Keys,T):- to_prolog_string_if_needed(L,Loc)->L\==Loc,!,cl_load(Loc,Key
 %cl_load('$OBJ'(_Pathname,Loc),Keys,T):- !, cl_load(Loc,Keys,T).
 cl_load(File,_Keys,t):- fail,
    % check maybe for fresh
-   pl_compiled_filename(File,PL),exists_file(PL),!,dbmsg(in_comment(ensure_loaded(PL))),!,ensure_loaded(PL).
-%cl_load(File,R):- cl_compile_file(File,t),!,pl_compiled_filename(File,PL),exists_file(PL),!,in_comment(dbmsg(ensure_loaded(PL))),!,ensure_loaded(PL).
+   pl_compiled_filename(File,PL),exists_file(PL),!,lmsg(in_comment(ensure_loaded(PL))),!,ensure_loaded(PL).
+%cl_load(File,R):- cl_compile_file(File,t),!,pl_compiled_filename(File,PL),exists_file(PL),!,in_comment(lmsg(ensure_loaded(PL))),!,ensure_loaded(PL).
 cl_load(File,Keys,t):- 
   with_each_file(load_1file(Keys),File).
 
@@ -276,15 +276,15 @@ lisp_reader_compiled_eval(PExpression):-
   as_sexp(PExpression,SExpression),
   write_file_info,
   reading_package(Pkg),
-  dbmsg(:- lisp_compile_to_prolog(Pkg,SExpression)),
+  lmsg(:- lisp_compile_to_prolog(Pkg,SExpression)),
   reader_intern_symbols(SExpression,Expression),
   process_load_expression(Expression))),!.
 
-process_load_expression(COMMENTP):- is_comment(COMMENTP,_Cmt),!. %,dbmsg(comment(Cmt)).
+process_load_expression(COMMENTP):- is_comment(COMMENTP,_Cmt),!. %,lmsg(comment(Cmt)).
 process_load_expression(Expression):- 
    debug_var('_IgnoredResult',Result),
    always(lisp_compile(Result,Expression,PrologCode)),
-   dbmsg(:- PrologCode),
+   lmsg(:- PrologCode),
    always(PrologCode).
 
 

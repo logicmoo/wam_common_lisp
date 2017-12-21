@@ -22,21 +22,21 @@
 lisp_compiled_eval(SExpression):-
   quietly(as_sexp_interned(SExpression,Expression)),
   lisp_compiled_eval(Expression,Result),
-  dbmsg_cmt(result(Result)).
+  lmsg(result(Result)).
 
 lisp_compiled_eval(SExpression,Result):-
   lquietly(as_sexp_interned(SExpression,Expression)),
-  %dbmsg(lisp_compiled_eval(Expression)),
+  %lmsg(lisp_compiled_eval(Expression)),
   always(lisp_compile(Result,Expression,Code)),  
-  % dbmsg_cmt((lisp_compiled_eval(Expression):- Code)),
+  % lmsg((lisp_compiled_eval(Expression):- Code)),
   (always((Code))),!.
 
-%lisp_compile(SExpression):- source_location(_,_),!,dbmsg((:-lisp_compile(SExpression))).
+%lisp_compile(SExpression):- source_location(_,_),!,lmsg((:-lisp_compile(SExpression))).
 lisp_compile(SExpression):-
   quietly(as_sexp_interned(SExpression,Expression)),
-  dbmsg(:- lisp_compile(Expression)),
+  lmsg(:- lisp_compile(Expression)),
   lisp_compile(Expression,Code),!,
-  dbmsg_real(:- Code).
+  outmsg(:- Code).
 
 lisp_compile(SExpression,Body):-
    quietly(as_sexp_interned(SExpression,Expression)),

@@ -162,7 +162,7 @@ compile_body(Ctx,Env,Result,[OP,Flags|Forms], Code):-  same_symbol(OP,'eval-when
    is_when(kw_eval):- !,is_when(kw_execute).
    is_when(kw_compile):- !,is_when(kw_compile_toplevel).
    is_when(kw_load):- !,is_when(kw_load_toplevel).
-   %is_when(X):- dbmsg(warn(free_pass(is_when(X)))).
+   %is_when(X):- lmsg(warn(free_pass(is_when(X)))).
    is_when(X):- get_var(sys_xx_compiler_mode_xx,List),
      (is_list(List)->memberchk(X,List);X=List).
    % makes  sys_xx_compiler_mode_xx 
