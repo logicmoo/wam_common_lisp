@@ -200,7 +200,7 @@ compiler_macro_left_right(if,[Test, IfTrue], [if, Test, IfTrue ,[]]).
 
 % related compiler macros need to happen before this
 compile_body(Ctx,Env,Result,[CONDIF|Rest], Code):- 
-  compile_dolist(Ctx,Env,Result,[CONDIF|Rest], Code),!.
+  compile_condifs(Ctx,Env,Result,[CONDIF|Rest], Code),!.
 
 % =============================================================================
 % WHILE
