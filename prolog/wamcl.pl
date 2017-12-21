@@ -4,6 +4,4 @@
 
 wamcl:- lisp.
 
-:- initialization(lisp,main).
-
 

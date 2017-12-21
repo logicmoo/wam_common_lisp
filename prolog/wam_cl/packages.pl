@@ -42,7 +42,7 @@ cl_use_package(Package,CurrentPackage, R):-
   cl_use_package(Package,CurrentPackage0, R).
 cl_use_package(Package,CurrentPackage, t):- 
    assert_lsp(package_use_list(CurrentPackage,Package)),
-   lmsg(todo(check_for+package_symbolconflicts(package_use_list(CurrentPackage,Package)))).
+   dbginfo(todo(check_for+package_symbolconflicts(package_use_list(CurrentPackage,Package)))).
 
  
 wl:init_args(1,cl_defpackage).
@@ -64,7 +64,8 @@ cl_make_package(AName,List,Package):-
 cl_find_package(S,Obj):- find_package(S,Package),!,always(as_package_object(Package,Obj)).
 cl_find_package(_,[]).
 
-pl_package_name(S,Name):- find_package(S,Package),get_opv(Package,name,Name).
+pl_package_name(S,Name):- find_package(S,Package),(get_opv(Package,name,Name)->true;package_name(Package,Name)).
+
 cl_package_name(P,N):- pl_package_name(P,S),to_lisp_string(S,N).
 
 find_package(Obj,Res):- to_prolog_string_if_needed(Obj,F),!,find_package(F,Res).
@@ -198,6 +199,27 @@ make_fresh_internal_symbol(Package,String,Symbol):-
 
 
 is_lisp_package(P):- package_name(P,_). 
+
+
+
+
+print_package_or_hash(P):-short_package_or_hash(P,O),write(O).
+   short_package_or_hash(Var,O):- var(Var),!,O=(Var).
+   short_package_or_hash([],O):- !,O=("#").
+   short_package_or_hash(P,O):- pl_package_name(P,Symbol),shorter_name(Symbol,Short),!,O=(Short).
+   short_package_or_hash(P,O):- pl_package_name(P,N),!,O=(N).
+   short_package_or_hash(P,O):- O=(failed_short_package_or_hash(P)).   
+   shorter_name(PN,NN):- package_nicknames(PN,NN),atom_length(PN,B),atom_length(NN,A),A<B.
+   shorter_name("SYSTEM","SYS").
+   shorter_name("COMMON-LISP","CL").
+   %symbol printer might just use 
+   shorter_name("COMMON-LISP-USER","U").
+   %shorter_name("COMMON-LISP-USER","CL-USER").
+   shorter_name("SYSTEM","SYS").
+   shorter_name("SYSTEM","SYS").
+   shorter_name("EXTENSIONS","EXT").
+   shorter_name(S,S).
+
 
 :- dynamic package_name/2.
 :- dynamic package_nicknames/2.

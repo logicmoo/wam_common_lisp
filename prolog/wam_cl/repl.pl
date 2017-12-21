@@ -13,32 +13,25 @@
  *
  *******************************************************************/
 :- module(cl, []).
-:- set_module(class(library)).
-:- set_prolog_flag(backtrace,true).
-:- set_prolog_flag(backtrace_depth,500).
-:- set_prolog_flag(backtrace_goal_depth,30).
-:- set_prolog_flag(backtrace_show_lines,true).
-:- set_prolog_flag(toplevel_print_anon,true).
-:- set_prolog_flag(last_call_optimisation,false).
-:- set_prolog_flag(lisp_verbose,1).
-:- set_prolog_flag(lisp_autointern,true).
+
+:- use_module(init).
 
 :- include('header').
+              
 
+repl:- 
+   lisp_banner,   
+   set_prolog_flag(lisp_autointern,false), % requires  "PACKAGE:SYM" to already externally exists
+   with_prompt_str('> ',
+   ((	repeat,
+        catch(read_eval_print(Result),'$aborted',fail),
+   	quietly(Result == end_of_file)))),!.
 
-:- dynamic 
-	user:named_lambda/2,
-        user:macro_lambda/3,
-        user:function_lambda/4.
-:- multifile 
-	user:named_lambda/2,
-        user:macro_lambda/3,
-        user:function_lambda/4.
 
 
 print_eval_string(Str):-
    str_to_expression(Str, Expression),
-   lmsg(:- print_eval_string(Expression)),
+   userout(:- print_eval_string(Expression)),
    eval_at_repl(Expression, Result),!,
    write_results(Result),
    !.
@@ -51,7 +44,7 @@ eval_string(Str):-
 
 trace_eval_string(Str):-
   str_to_expression(Str, Expression),
-   redo_call_cleanup(trace,eval(Expression, Result),quietly),
+   redo_call_cleanup(trace,eval(Expression, Result),notrace),
      write_results(Result),
      !.
 
@@ -72,245 +65,29 @@ with_input_from_stream(In,Goal):-
    each_call_cleanup(see(In),Goal,seen).
 
 
-% Called after primordial init 
-lisp_banner:- current_prolog_flag(lisp_verbose,0),!.
-lisp_banner:- 
- write('
-__        ___    __  __        ____ _
-\\ \\      / / \\  |  \\/  |      / ___| |
- \\ \\ /\\ / / _ \\ | |\\/| |_____| |   | |
-  \\ V  V / ___ \\| |  | |_____| |___| |___
-   \\_/\\_/_/   \\_\\_|  |_|      \\____|_____|
-'),nl,
-	write('Common Lisp, written in Prolog'),nl.
-
-prompts(Old1,_Old2):- var(Old1) -> prompt(Old1,Old1) ; prompt(_,Old1).
-
-% catch accidental unification that destroys metaclasses
-classof:attr_unify_hook(A,B):- trace,wdmsg(classof:attr_unify_hook(A,B)),lisp_dump_break. %  break.
-
-% primordial inits
-primodial_init:- current_prolog_flag(wamcl_init_level,N),N>0,!.
-primodial_init:- 
- set_prolog_flag(wamcl_init_level,1),
- always((
-  % allows "PACKAGE:SYM" to be created on demand (could this be an initials a default)
-  ensure_env,
-  set_prolog_flag(lisp_autointern,true),
-  current_prolog_flag(os_argv,Y),handle_all_os_program_args(Y),
-  current_prolog_flag(argv,Y2),handle_all_program_args(Y2),
-  do_wamcl_inits)). 
-
-% system sourcefile load hooks
-do_wamcl_inits:- current_prolog_flag(wamcl_init_level,N),N>1,!.
-do_wamcl_inits:-
-  primodial_init,
-  set_prolog_flag(wamcl_init_level,2),
-  forall(clause(wl:interned_eval(G),Body,R),
-    (forall(Body,always(do_interned_eval(G))),
-     erase(R))),  
-  lisp_banner.
-
-
-% program inits
-do_before_tpl:- 
-  primodial_init.
-  
-
-lisp:-
-       prompt(Old, '> '),
-	prompts(Old1, Old2),
-	prompts('> ', '> '),
-        do_before_tpl,
-        % requires  "PACKAGE:SYM" to already externally exists
-        set_prolog_flag(lisp_autointern,false),
-        call_cleanup(repl_loop,
-                     (prompt(_, Old),
-                       prompts(Old1, Old2))),!.
-
-
-repl_loop:- current_prolog_flag(lisp_repl_goal,Else),Else\==repl_loop,!,Else.
-repl_loop:- % lisp_banner,
-	repeat,
-        catch(read_eval_print(Result),'$aborted',fail),
-   	quietly(Result == end_of_file),!.
-
-
-show_help:- writeln('
-WAM-CL (https://github.com/TeamSPoon/wam_common_lisp) is an ANSI Common Lisp implementation.
-Usage:  wamcl [prolog-options] [wamcl-options] [lispfile [argument ...]]
-
-Host Prolog options:
-
--x state         Start from Image state (must be first)
-                 (may be used to debug saved lisp EXEs)
-
--[LGT]size[KMG]  Specify {Local,Global,Trail} limits
-[+/-]tty         Allow tty control
--O               Optimised compilation
---nosignals      Do not modify any signal handling
---nodebug        Omit generation of debug info
---version        Print the Prolog version information
-
-
-
-WAM-CL Options:
-
- -?, --help    - print this help and exit
-
-Lisp Startup actions:
- --ansi        - more ANSI CL compliance  (TODO)
- -p package    - start in the package
- -norc         - do not load the user ~/.wamclrc file   (TODO)
- -lp dir       - add dir to *LOAD-PATHS* (can be repeated)    (TODO)
- -i file       - load initfile (can be repeated)
-
-Compiler actions put WAM-CL into a batch mode:
- -x expressions - execute the expressions (mixed into compiler actions)
- -c [-l] lispfile [-o outputfile] - compile or load a lispfile
-               [--exe outputfile] - make a platform binary
-
-Which are overridden by:
-
-  --repl                Enter the interactive read-eval-print loop when done
-  --load <filename>     File to load 
-  --eval <form>         Form to eval
-
-Default action is an interactive read-eval-print loop.
-
-  --quit, -norepl       Exit with status code (instead) from prevous option processing.
-                        Otherwise, an interactive read-eval-print loop is entered.
-
-   "lispfile"           When "lispfile" is given, it is loaded (via --load)
-
-Remaining arguments are placed in EXT:*ARGS* as strings.
-
-
-Examples:
-
-$PACKDIR/wam_common_lisp/prolog/wam_cl$
-
-# creating your first image
-$ swipl ../wamcl.pl --exe wamcl
-# try it
-$ ./wamcl
-$ ./wamcl -c hello.lisp -o hello.pl --exe hello
-$ ./hello world
-$ swipl -x hello --repl
-$ swipl hello.pl
-$ swipl -x wamcl.prc
-% swipl -x wamcl.prc hello.lisp world
-
-').
-
-do_after_load(G):- assertz(wl:interned_eval(call(G))).
-% set if already set
-set_interactive(TF):-
- (TF -> set_prolog_flag(lisp_repl_goal,repl_loop);
-    set_prolog_flag(lisp_repl_goal,halt)).
-% doesnt set if already set
-imply_interactive(TF):- current_prolog_flag(lisp_repl_goal,_)->true;set_interactive(TF).
-imply_flag(Name,Value):- atom_concat(lisp_,Name,LName), ((current_prolog_flag(LName,N),N\==1)->true;set_prolog_flag(LName,Value)).
-
-:- set_prolog_flag(backtrace,true).
-:- set_prolog_flag(backtrace_depth,500).
-:- set_prolog_flag(backtrace_goal_depth,30).
-:- set_prolog_flag(backtrace_show_lines,true).
-:- set_prolog_flag(toplevel_print_anon,true).
-:- set_prolog_flag(last_call_optimisation,false).
-:- set_prolog_flag(lisp_verbose,1).
-:- set_prolog_flag(lisp_autointern,true).
-
-set_lisp_option(verbose):- 
-   set_prolog_flag(verbose_load,full),
-   set_prolog_flag(verbose,normal),
-   set_prolog_flag(verbose_autoload,true),
-   set_prolog_flag(verbose_file_search,true),
-   set_prolog_flag(lisp_verbose,3).
-
-
-set_lisp_option(quiet):- 
- set_prolog_flag(verbose,silent),
- set_prolog_flag(verbose_autoload,false),
- set_prolog_flag(verbose_load,silent),
- set_prolog_flag(verbose_file_search,false),
- set_prolog_flag(lisp_verbose,0).
-
-set_lisp_option(debug):-
-  set_lisp_option(verbose),
-  set_prolog_flag(debug,true).
-
-set_lisp_option(optimize):- 
-  set_prolog_flag(last_call_optimisation,true).
-
-
-handle_all_os_program_args(ARGV):- 
-  ignore((memberchk('-O',ARGV),set_lisp_option(quiet),set_lisp_option(optimize))),
-  ignore((memberchk('--nodebug',ARGV),set_lisp_option(quiet))),
-  ignore((memberchk('--debug',ARGV),set_lisp_option(debug))).
-  
-
-handle_all_program_args([N,V|More]):- handle_1program_arg(N=V),!,handle_all_program_args(More).
-handle_all_program_args([N|More]):- handle_1program_arg(N),!,handle_all_program_args(More).
-handle_all_program_args([N|More]):- exists_file(N),imply_flag(verbose,0),imply_interactive(false),!,do_after_load(((set_program_args(More),cl_load(N,_)))).
-handle_all_program_args(More):- do_after_load(((set_program_args(More)))).
-
-set_program_args(More):- maplist(to_lisp_string,More,List),set_var(ext_xx_args_xx,List).
-
-
-
-wl:interned_eval(("(defparameter EXT:*ARGS* ())")).
-
-handle_1program_arg(N=V):-  handle_program_args(N,_,V),!.
-handle_1program_arg(N=V):-!,handle_program_args(N,_,V).
-handle_1program_arg(N):- handle_program_args(N,_),!.
-handle_1program_arg(N):- handle_program_args(_,N),!.
-
-:- discontiguous handle_program_args/2. 
-:- discontiguous handle_program_args/3. 
-
-% helpfull
-handle_program_args('--help','-?'):- listing(handle_program_args),show_help,imply_interactive(false).
-handle_program_args('--debug','-debug'):- cl_push_new(xx_features_xx,kw_debugger),set_lisp_option(debug).
-handle_program_args('--package','-p',Package):- do_after_load(cl_inpackage(Package)).
-handle_program_args('--quiet','--silent'):- set_lisp_option(quiet).
-
-% compiler
-handle_program_args('--exe','-o',File):- do_after_load(qsave_program(File)),imply_interactive(false).
-handle_program_args('--compile','-c',File):- do_after_load(cl_compile_file(File,[],_)),imply_interactive(false).
-handle_program_args('--l','-l',File):- do_after_load(cl_load(File,[],_)),imply_interactive(false).
-handle_program_args('--quit','-quit'):- set_interactive(false).
-
-% interactive
-handle_program_args('--load','-i',File):- do_after_load(cl_load(File,[],_)).
-handle_program_args('--eval','-x',Form):- do_after_load(lisp_compiled_eval(Form,_)).
-handle_program_args('--repl','-repl'):- set_interactive(true).
-handle_program_args('--norepl','-norepl'):- set_interactive(false).
-
-% incomplete 
-handle_program_args('--ansi','-ansi'):- cl_push_new(xx_features_xx,kw_ansi).
-
-tidy_database:-
-        reset_env,
-        ensure_env(_Env).
-
 % :- '$hide'(show_uncaught_or_fail/1).
 show_uncaught_or_fail((A,B)):-!,show_uncaught_or_fail(A),show_uncaught_or_fail(B).
 show_uncaught_or_fail(G):- quietly(flush_all_output_safe),
   (catch(G,E,quietly((wdmsg(uncaught(E)),rtrace(G),!,fail)))*->true;quietly((wdmsg(failed(G)),!,fail))).
 
+prompts(Old1,_Old2):- var(Old1) -> prompt(Old1,Old1) ; prompt(_,Old1).
+with_prompt_str(Str,G):- 
+       prompt(Old, Str),
+	prompts(Old1, Old2),
+	prompts(Str,Str),
+        call_cleanup(G,
+                     (prompt(_, Old),
+                       prompts(Old1, Old2))),!.
 set_prompt_from_package:-
-  ((ignore((get_var(_ReplEnv, xx_package_xx, Package),
+  ((ignore((reading_package(Package),
         short_package_or_hash(Package,Name0),
         (Name0=="U"->Name="CL-USER";Name=Name0),
         always(nonvar(Name)),
         atom_concat(Name,'> ',Prompt),
         prompt(_,Prompt))))).
 
-read_eval_print(Result):-		% dodgy use of cuts to force a single evaluation
-        lquietly(set_prompt_from_package),
-
-        %lquietly
+read_eval_print(Result):-
+        ignore(catch(lquietly(set_prompt_from_package),_,true)),
         lquietly(show_uncaught_or_fail(read_no_parse(Expression))),!,
         lquietly(show_uncaught_or_fail(lisp_add_history(Expression))),!,
         nb_linkval('$mv_return',[Result]),
@@ -326,26 +103,7 @@ write_results(Result):-
 writeExtraValues(X):- maplist(writeExpressionEV,X),!.
 writeExpressionEV(X):- writeln(' ;'),writeExpression(X),flush_all_output_safe.
 
-/*
-:- if(exists_source(library(sexpr_reader))).
-:- use_module(library(sexpr_reader)).
-read_and_parse_i(Expr):- current_input(In), parse_sexpr_untyped_read(In, Expr).
-:- endif.
-*/
 
-% read and parse a line of Lisp
-/*
-read_and_parse1(Expression):-
-	read_words(TokenL),
-	(	sexpr1(Expression, TokenL, [])
-	;
-		( write('ERROR!  Could not parse `'),
-		  writeTokenL(TokenL),
-		  write('`'),nl,
-		  Expression = [] )
-	),
-	!.
-*/
 
 lisp_add_history(end_of_file):-!.
 lisp_add_history(_):- prolog_load_context(reload,true),!.
@@ -371,38 +129,32 @@ eval_at_repl(Expression,Result):- notrace((tracing, \+ t_l:rtracing)),call_clean
 eval_at_repl(Expression,Result):-
   lquietly(as_sexp(Expression,SExpression)),
   (reader_intern_symbols(SExpression,LExpression)),
-  quietly(lmsg(:- lisp_compiled_eval(LExpression))),
+  quietly(dbginfo(:- lisp_compiled_eval(LExpression))),
   quietly(debug_var('ReplEnv',Env)),
   timel('COMPILER',always_catch(maybe_ltrace(lisp_compile(Env,Result,LExpression,Code)))),
-  quietly(outmsg(:-Code)),
+  quietly(dbginfo(:-Code)),
   (notrace(tracing)-> (user:Code) ; 
    timel('EXEC',always_catch(ignore(always(maybe_ltrace(call(user:Code))))))),!.
 
+draw_cline :- notrace((writeln(';;; =================================================================='))).
+:- '$hide'(draw_cline/0).
 eval_at_repl_tracing(Expression,Result):-
   lquietly(as_sexp(Expression,SExpression)),
   (reader_intern_symbols(SExpression,LExpression)),
   writeq((reader_intern_symbols(SExpression,LExpression))),nl,
   quietly(debug_var('ReplEnv',Env)),
   %quietly(cls),
-   quietly((writeln(==================================================================))),
-   quietly((writeln(==================================================================))),
-   quietly((writeln(==================================================================))),
-   lmsg(:- lisp_compiled_eval(LExpression)),
-   quietly((writeln(==================================================================))),
-   quietly((writeln(==================================================================))),
-   quietly((writeln(==================================================================))),
+   draw_cline,draw_cline,draw_cline,
+   userout(:- lisp_compiled_eval(LExpression)),
+   draw_cline,draw_cline,draw_cline,
   timel('COMPILE',(offer_rtrace(lisp_compile(Env,Result,LExpression,Code)))),
   % quietly(cls),
-   quietly((writeln(==================================================================))),
-   quietly((writeln(==================================================================))),
-   quietly((writeln(==================================================================))),
-   show_call_trace((outmsg(:-Code))),
-   quietly((writeln(==================================================================))),
-   timel('PREEXEC',(offer_rtrace((user:Code)))),
-   quietly((writeln(==================================================================))),
-   quietly((writeln(==================================================================))),
-   quietly((writeln(==================================================================))),
+   draw_cline,draw_cline,draw_cline,
+   userout(:-Code),
+   draw_cline,timel('PREEXEC',(offer_rtrace((user:Code)))),
+   draw_cline,draw_cline,draw_cline,
   timel('EXEC',(offer_rtrace((user:Code)))).
+
 
 eval(Expression, Result):- current_env(Env), eval(Expression, Env, Result).
 
@@ -411,11 +163,8 @@ eval(Expression, Env, Result):-
    always_catch(ignore(always(maybe_ltrace(call(user:Code))))),!.
 
 
-/*:- if(exists_source(library(sexpr_reader))).
-:- use_module(library(sexpr_reader)).
-:- endif.
-*/
 read_and_parse(Expr):-  flush_all_output_safe,current_input(In),parse_sexpr_untyped_read(In, Expr).
+
 read_no_parse(Expr):-  flush_all_output_safe,current_input(In),parse_sexpr_untyped(In, Expr).
 
 flush_all_output_safe:- notrace((forall(stream_property(S,mode(write)),quietly(catch(flush_output(S),_,true))))).
@@ -428,19 +177,18 @@ parse_sexpr_untyped_read(In, Expr):-
 eval_repl_hooks(V,_):-var(V),!,fail.
 eval_repl_hooks(nil,  []):-!.
 
-eval_repl_hooks(KW, Ret):- atom(KW),atom_concat(':',UC,KW),downcase_atom(UC,DC),atom_concat('kw_',DC,US),!,trace,!,eval_repl_hooks(US,Ret).
+eval_repl_hooks(KW, Ret):- atom(KW),atom_concat(':',UC,KW),downcase_atom(UC,DC),atom_concat('kw_',DC,US),!,eval_repl_hooks(US,Ret).
 % :cd t
 eval_repl_hooks(KW, Ret):- is_keywordp(KW),to_prolog_string(KW,PStr),name(UC,PStr),downcase_atom(UC,Atom),
-  trace,
-  (current_predicate(Atom/2)-> (read_prolog_object(PrologArg),call(Atom,PrologArg,Ret));
+  user:((current_predicate(Atom/2)-> (read_prolog_object(PrologArg),call(Atom,PrologArg,Ret));
   (current_predicate(Atom/1)-> (read_prolog_object(PrologArg),!,t_or_nil(call(Atom,PrologArg),Ret));
-  (current_predicate(Atom/0)-> (call(Atom))))).
+  (current_predicate(Atom/0)-> (call(Atom)))))).
 
 % make.  ls.  pwd. 
 eval_repl_hooks(Atom, R):- atom(Atom),atom_concat_or_rtrace(_,'.',Atom),
   quietly(catch(read_term_from_atom(Atom,Term,[variable_names(Vs),syntax_errors(true)]),_,fail)),
   callable(Term),current_predicate(_,Term),b_setval('$variable_names',Vs),
-  t_or_nil((user:call(Term)*->lmsg(Term);(lmsg(no(Term)),fail)),R).
+  t_or_nil((user:call(Term)*->userout(yes(Term));(userout(no(Term)),fail)),R).
 
 eval_repl_hooks([debug,A], t):- !,debug(lisp(A)).
 eval_repl_hooks([nodebug,A], t):- !, nodebug(lisp(A)).
@@ -486,12 +234,8 @@ lw:- cl_load("wam-cl-params",_).
 
 :- set_prolog_flag(verbose_autoload,false).
 
-:- initialization(primodial_init,restore).
-%:- initialization(primodial_init).
-
-%:- initialization(lisp,program).
 :- initialization(lisp,main).
 
+:- use_module(library(shell)).
 %:- process_si.
 %:- cddd.
-

@@ -173,23 +173,6 @@ print_symbol_from(Symbol,PrintP,SPackage):-
     print_prefixed_symbol(Name,PrintP,SPackage,kw_internal);
     print_prefixed_symbol(Name,PrintP,SPackage,IntExt)).
 
-short_package_or_hash(Var,O):- var(Var),!,O=(Var).
-short_package_or_hash([],O):- !,O=("#").
-short_package_or_hash(P,O):- pl_package_name(P,Symbol),shorter_name(Symbol,Short),!,O=(Short).
-short_package_or_hash(P,O):- pl_package_name(P,N),!,O=(N).
-short_package_or_hash(P,O):- trace,O=(failed_short_package_or_hash(P)).
-
-print_package_or_hash(P):-short_package_or_hash(P,O),write(O).
-
-shorter_name(PN,NN):- package_nicknames(PN,NN),atom_length(PN,B),atom_length(NN,A),A<B.
-shorter_name("SYSTEM","SYS").
-shorter_name("COMMON-LISP","CL").
-%symbol printer might just use 
-shorter_name("COMMON-LISP-USER","U").
-%shorter_name("COMMON-LISP-USER","CL-USER").
-shorter_name("SYSTEM","SYS").
-shorter_name("EXTENSIONS","EXT").
-shorter_name(S,S).
 
 print_prefixed_symbol(Symbol,_WP,pkg_kw,_):- write(':'),write(Symbol).
 print_prefixed_symbol(Symbol,PrintP,SP,_):- SP==PrintP, !,write(Symbol).

@@ -108,11 +108,13 @@ as_prolog_object(PrologArg,PrologArg).
 
 read_prolog_object(Operand):- read(Operand).
 
-do_interned_eval(call(G)):-!,locally_let(xx_package_xx=pkg_prolog,G).
-do_interned_eval(G):- 
-   locally_let(xx_package_xx=pkg_prolog,lisp_compiled_eval(G,_)).   
+do_interned_eval(MG):- strip_module(MG,_,G),G=call(_),!,call_interned_eval(MG).
+do_interned_eval(G):- call_interned_eval(lisp_compiled_eval(G,_)).
 
-%locally_let(_,G):- !, G.
+call_interned_eval(G):- subst_castifies(G,GG),show_call_trace(always(GG)).
+
+% call_interned_eval(M,G):- locally_let(xx_package_xx=pkg_prolog, M:G ).
+
 
 locally_bind(Env,N,V,G):- 
    Binding=bv(N,Was),
@@ -135,9 +137,7 @@ locally_let([N=V|More],G):-
      %once(locally($(N)=V,..)),
      (locally_let(More,G),set_opv(N,value,Was)),
         set_opv(N,value,Was)).
-   
-locally_let([],G):- !, 
-  subst_castifies(G,GG),always(GG).
+locally_let([],G):- !,call_interned_eval(G). 
 
 subst_castifies(G,G):- \+ compound(G),!.
 subst_castifies(G,GG):- castify(G,GG),!.

@@ -54240,7 +54240,8 @@ o_p_v(xx_package_xx,classof,claz_symbol).
 o_p_v(xx_package_xx,declared_as,defparameter).
 o_p_v(xx_package_xx,name,"*PACKAGE*").
 o_p_v(xx_package_xx,package,pkg_cl).
-o_p_v(xx_package_xx,value,'$OBJ'(claz_package,pkg_user)).
+%o_p_v(xx_package_xx,value,'$OBJ'(claz_package,pkg_user)).
+o_p_v(xx_package_xx,value,pkg_sys).
 o_p_v(xx_print_array_xx,classof,claz_symbol).
 o_p_v(xx_print_array_xx,declared_as,defparameter).
 o_p_v(xx_print_array_xx,name,"*PRINT-ARRAY*").

@@ -1,3 +1,6 @@
 
-(print (cons "hello" *ARGS*))
+(defun main () (print (cons "hello" *ARGS*)))
+
+(main)
+
 

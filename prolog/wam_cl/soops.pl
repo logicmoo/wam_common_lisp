@@ -264,9 +264,9 @@ f_clos_class_precedence_list(C,SL):- f_clos_class_direct_superclasses(C,List1),m
    append(List1,List2,List3),list_to_set(List3,SL).
    
 
-to_prolog_string_anyways(I,O):- to_prolog_string(I,O),!.
-to_prolog_string_anyways(I,O):- always(atom_string(I,O)),!.
-  
+% catch accidental unification that destroys metaclasses
+classof:attr_unify_hook(A,B):- trace,wdmsg(classof:attr_unify_hook(A,B)),lisp_dump_break. %  break.
+
 
 maybe_add_kw_function(Kind,L,R,Key,ArgList,LispBody):- 
    (get_struct_opv(Kind,Key, FnName) -> true;
@@ -303,7 +303,7 @@ add_class_keywords(Kind,[Key,Value|KeyWords]):-
    add_class_keywords(Kind,KeyWords).
 
 assert_struct_kw(Kind, Key, Value):- 
-  ignore(( \+ is_keywordp(Key) , lmsg(warn(assert_struct_kw(Kind, Key, Value))))),
+  ignore(( \+ is_keywordp(Key) , dbginfo(warn(assert_struct_kw(Kind, Key, Value))))),
   assert_struct_opv(Kind, Key, Value).
 
 assert_struct_opv(Obj, KW, Value):-
@@ -439,7 +439,7 @@ get_opv_pi(Obj,Prop,Value):- fail, get_obj_prefix(Obj,Prefix),atom_concat_or_rtr
   
 
 set_ref_object(Ref,Object):- quietly(nb_setval(Ref,Object)),!.
-release_ref_object(Ref):- wdmsg(release_ref_object(Ref)),quietly(nb_setval(Ref,[])),!.
+release_ref_object(Ref):- dbginfo(release_ref_object(Ref)),quietly(nb_setval(Ref,[])),!.
 has_ref_object(Ref,Object):- nb_current(Ref,Object),Object\==[].
 get_ref_object(Ref,Object):- has_ref_object(Ref,Object).
 get_ref_object(Ref,Object):- atom(Ref), 
@@ -451,7 +451,7 @@ get_ref_object(Ref,Object):- atom(Ref),
 
 /*
 set_ref_object(Ref,Object):- quietly(nb_set_value(?(Ref),pointer,Object)),!.
-release_ref_object(Ref):- wdmsg(release_ref_object(Ref)),quietly(nb_set_value(?(Ref),pointer,[])),!.
+release_ref_object(Ref):- dbginfo(release_ref_object(Ref)),quietly(nb_set_value(?(Ref),pointer,[])),!.
 has_ref_object(Ref,Object):- nb_current_value(?(Ref),pointer,Object),Object\=[],!.
 get_ref_object(Ref,Object):- nb_current_value(?(Ref),pointer,Object),Object\=[],!.
 get_ref_object(Ref,Object):- 

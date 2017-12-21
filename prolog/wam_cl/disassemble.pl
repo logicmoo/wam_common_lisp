@@ -92,9 +92,12 @@ print_clause_plain(I):-
   current_prolog_flag(color_term, Was),
   make_pretty(I,O),
     setup_call_cleanup(set_prolog_flag(color_term, false),
-     fmt9(O),
+     (nl,lcolormsg1((O))),
      set_prolog_flag(color_term, Was)).
-  
+
+
+lcolormsg1(Msg):- mesg_color(Msg,Ctrl),!,ansicall_maybe(Ctrl,fmt9(Msg)).
+
 % print_clause_plain(C):- portray_clause_w_vars(O).
 
 
@@ -111,8 +114,8 @@ may_debug_var(R,V):- debug_var(R,V).
 
 pretty1(H):- \+ compound(H),!.
 pretty1(as_rest(Name, Rest, _)):- may_debug_var(Name,Rest).
-pretty1(get_var(Env, Name, Val)):- may_debug_var('Env',Env),may_debug_var(Name,Val).
-pretty1(set_var(Env,_Op, Name, Val)):- may_debug_var('Env',Env),may_debug_var(Name,Val).
+pretty1(get_var(Env, Name, Val)):- may_debug_var('GEnv',Env),may_debug_var(Name,Val).
+pretty1(set_var(Env,_Op, Name, Val)):- may_debug_var('SEnv',Env),may_debug_var(Name,Val).
 pretty1(cl_slot_value(_Env, Name, Val)):- may_debug_var(slot,Name,Val).
 pretty1(set_place(_Env, SETF, [Name|_], Val, _)):- is_place_write(SETF), atom(Name),var(Val),debug_var([Name,'_New'],Val).
 pretty1(Env=[List|_]):- compound(List),var(Env),List=[H|_],compound(H),H=bv(_,_), may_debug_var('Env',Env),

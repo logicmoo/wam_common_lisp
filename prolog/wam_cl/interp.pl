@@ -96,7 +96,7 @@ apply_f(_,-,[X,Y],R):-!, R is X - Y.
 apply_f(_,'1+',[X],R):-!, R is X + 1.
 apply_f(_,+,[X,Y],R):-!, R is X + Y.
 apply_f(_,F,ARGS,R):- atom(F),append(ARGS,[R],RARGS),length(RARGS,A),current_predicate(F/A),!,apply(F,RARGS),!.
-apply_f(_,F,ARGS,R):- atom(F),CALL=..[F|ARGS],current_predicate(_,CALL),!,(catch(CALL,E,(dumpST,lmsg(CALL->E),!,fail))->R=t;R=[]).
+apply_f(_,F,ARGS,R):- atom(F),CALL=..[F|ARGS],current_predicate(_,CALL),!,(catch(CALL,E,(dumpST,dbginfo(CALL->E),!,fail))->R=t;R=[]).
 apply_f(Binds,X, _, R):- ignore(R=[]),
         (debugging(lisp(eval))->dumpST;true),
 	write('ERROR!  Cannot apply a procedure description for `'),

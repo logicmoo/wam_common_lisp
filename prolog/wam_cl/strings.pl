@@ -32,7 +32,7 @@ is_characterp(X):-var(X),!,fail.
 is_characterp('#\\'(V)):- nonvar(V).
 
 is_stringp(X):-var(X),!,fail.
-%is_stringp(X):- string(X),nop(lmsg(is_stringp(X))).
+%is_stringp(X):- string(X),nop(dbginfo(is_stringp(X))).
 is_stringp('$ARRAY'([_N],claz_base_character,List)):- nonvar(List).
 
 % deduced now
@@ -49,6 +49,9 @@ to_prolog_string(S,SN):- is_symbolp(S),!,pl_symbol_name(S,S2),to_prolog_string(S
 to_prolog_string('#\\'(Code),Str):- !, (\+ number(Code)->Char=Code;char_code(Char,Code)),text_to_string(Char,Str).
 
 
+to_prolog_string_anyways(I,O):- to_prolog_string(I,O),!.
+to_prolog_string_anyways(I,O):- always(atom_string(I,O)),!.
+
 
 % grabs ugly objects
 %to_prolog_string(S,SN):- atom_concat_or_rtrace(':',S0,S),!,to_prolog_string(S0,SN).% TODO add a warjing that hte keyword was somehow misrepresented
@@ -56,7 +59,7 @@ to_prolog_string('#\\'(Code),Str):- !, (\+ number(Code)->Char=Code;char_code(Cha
 %to_prolog_string(S,SN):- notrace(catch(text_to_string(S,SN),_,fail)),!.
 
 to_lisp_string('$ARRAY'([N],claz_base_character,List),'$ARRAY'([N],claz_base_character,List)):-!.
-to_lisp_string(Text,'$ARRAY'([*],claz_base_character,List)):- always((catch(text_to_string(Text,Str),E,(dumpST,wdmsg(E),fail)),string_chars(Str,Chars),maplist(make_character,Chars,List))).
+to_lisp_string(Text,'$ARRAY'([*],claz_base_character,List)):- always((catch(text_to_string(Text,Str),E,(dumpST,userout(E),fail)),string_chars(Str,Chars),maplist(make_character,Chars,List))).
 
 make_character(I,O):-notrace(make_character0(I,O)).
 make_character0(S,'#\\'(S)):- var(S),!.

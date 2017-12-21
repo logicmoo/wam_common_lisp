@@ -115,7 +115,7 @@ compile_condifs(Ctx,Env,Result,[CASE,VarForm|Clauses], Body):-  member(CASE,[cas
    cases_to_conds(SOf,Key,Clauses,Conds),
    nb_holder_value(SOf,Values),
    (CASE\==case -> (Values==t -> true ; nb_set_last_tail(Conds,[[t,['type_error',Key,[quote,[member|Values]]]]])) ; true),
-   wdmsg(CASE:-Clauses),wdmsg(conds:-Conds),
+   dbginfo(CASE:-Clauses),dbginfo(conds:-Conds),
    (CASE==ccase -> (make_restartable_block(Key,[cond|Conds],LispCode),must_compile_body(Ctx,Env,Result,LispCode, Body0)) ;
      compile_condifs(Ctx,Env,Result,[cond|Conds], Body0)),
    Body = (VarBody,Body0).
@@ -143,7 +143,7 @@ compile_condifs(Ctx,Env,Result,[CASE,VarForm|Clauses], Body):-  member(CASE,[typ
    typecases_to_conds(SOf,Key,Clauses,Conds),
    nb_holder_value(SOf,Values),
    (CASE\==typecase -> (Values==t -> true ; nb_set_last_tail(Conds,[[t,['type_error',Key,[quote,[or|Values]]]]])) ; true),
-   wdmsg(CASE:-Clauses),wdmsg(conds:-Conds),
+   dbginfo(CASE:-Clauses),dbginfo(conds:-Conds),
    (CASE==ctypecase -> (make_restartable_block(Key,[cond|Conds],LispCode),must_compile_body(Ctx,Env,Result,LispCode, Body0)) ;
      compile_condifs(Ctx,Env,Result,[cond|Conds], Body0)),
    Body = (VarBody,Body0).

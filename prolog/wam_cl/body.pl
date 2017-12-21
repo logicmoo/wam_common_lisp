@@ -137,7 +137,7 @@ compile_body(Ctx,Env,Result,[OP,Flag,Form|MORE], Code):- same_symbol(OP,'#-'),!,
 compile_body(Ctx,Env,Result,[OP,Flags,Forms], OutCode):-  same_symbol(OP,'eval-when'), !,
   (is_when(Flags) ->
     (must_compile_body(Ctx,Env,Result,[progn,Forms],Code),OutCode = do_when(Flags,Code,Result));
-    (Result=[],OutCode=wdmsg(skipping([OP,Flags,Forms])))).
+    (Result=[],OutCode=dbginfo(skipping([OP,Flags,Forms])))).
 
    do_when(Flags,Code,Result):- 
       (is_when(Flags) -> locally_let(sym('sys::*compiler-mode*')=sym(':execute'),Code);Result=[]).
@@ -162,11 +162,11 @@ compile_body(Ctx,Env,Result,[OP,Flags|Forms], Code):-  same_symbol(OP,'eval-when
    is_when(kw_eval):- !,is_when(kw_execute).
    is_when(kw_compile):- !,is_when(kw_compile_toplevel).
    is_when(kw_load):- !,is_when(kw_load_toplevel).
-   %is_when(X):- lmsg(warn(free_pass(is_when(X)))).
+   %is_when(X):- dbginfo(warn(free_pass(is_when(X)))).
    is_when(X):- get_var(sys_xx_compiler_mode_xx,List),
      (is_list(List)->memberchk(X,List);X=List).
    % makes  sys_xx_compiler_mode_xx 
-   wl:interned_eval("(defparameter sys::*compiler-mode* :execute)").
+ wl:interned_eval("(defparameter sys::*compiler-mode* :execute)").
    
 
 % =============================================================================
@@ -544,10 +544,10 @@ compile_body(Ctx,Env,Result,[BinOP,Form1,Form2,Form3|FormS],Code):- binop_identi
 compile_body(Ctx,Env,Result,LispCode,CompileBody):-
   % fail, %DISABLED    (NOT)
   macroexpand_1_or_fail(LispCode,[],CompileBody0Result),
-  lmsg(macroexpand:-LispCode),
-  lmsg(into:-CompileBody0Result),
+  dbginfo(macroexpand:-LispCode),
+  dbginfo(into:-CompileBody0Result),
   must_compile_body(Ctx,Env,Result,CompileBody0Result, CompileBody),
-  lmsg(code:-CompileBody),
+  dbginfo(code:-CompileBody),
   !.
 
 % Compiler Plugin

@@ -457,7 +457,7 @@ inline_body(Never,Ctx,F,C1,Out):-
   maybe_inline(C1),
   stay_all_different(C1),  
   get_inlined(C1,MID),functor(C1,F,A),
-  progress_g(lmsg(inlined(C1):-MID)),!,
+  progress_g(dbginfo(inlined(C1):-MID)),!,
   sanitize_true(Ctx,MID,MID2),
   inline_body([F/A|Never],Ctx,F,MID2,Out).
 inline_body(_Never,_Ctx,_,C1,C1):- non_compound_code(C1),!.

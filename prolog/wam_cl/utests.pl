@@ -45,14 +45,14 @@ call_test_compiled(Name,Value):-
   debug_var('Expected',Expected),
   debug_var('OutValue',OutValue),
   ignore(catch((Code,Return=Value),goto(_,OutValue,_),Value=OutValue)),
-  lmsg(Expected=Value).
+  userout(Expected=Value).
 
   
 
 compile_test(Name,Code,Return,Expected):-
    tst:is_local_test(Name,SExpression,Expected),
    as_sexp(SExpression,Expression),
-   lmsg(:- compile_test(Name,Code,Return,Expected)),
+   userout(:- compile_test(Name,Code,Return,Expected)),
    always(writeExpression(Expression)),
    lisp_compile(Return,Expression,Code),
    
@@ -252,9 +252,9 @@ run666(Program, Values) :-
     writeExpression(Last).
 
 see_and_do(Pred2, I,O):-
-  lmsg(seeingFormala(I)),
+  userout(seeingFormala(I)),
   always(call(Pred2,I,O)),
-  lmsg(result(O)).
+  userout(result(O)).
 
 :- set_prolog_flag(double_quotes,string).
 

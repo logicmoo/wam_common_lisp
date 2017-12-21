@@ -42,7 +42,7 @@ wl:grovel_pred(M,F,1):-
    PBody=..[F,N],
    (assert_lsp(user:Head :- t_or_nil(M:PBody,RetVal))))),fail)).
 
-wl:interned_eval(call(grovel_math)).
+wl:interned_eval(call(notrace(grovel_math))).
 
 
 % define_cl_math(F,0):- atom_concat_or_rtrace('cl_',F,CLN), P=..[CLN,X],FP=..[F], assertz(P:- X is FP).

@@ -63,7 +63,7 @@
 
 % DEFMACRO
 wl:init_args(2,cl_defmacro).
-cl_defmacro(Symbol,FormalParms,MacroBody,Return):- reenter_lisp(Ctx,Env),compile_macro_ops(Ctx,Env,Return,[defmacro,Symbol,FormalParms|MacroBody],Code),outmsg(Code).
+cl_defmacro(Symbol,FormalParms,MacroBody,Return):- reenter_lisp(Ctx,Env),compile_macro_ops(Ctx,Env,Return,[defmacro,Symbol,FormalParms|MacroBody],Code),cmpout(Code).
 compile_macro_ops(Ctx,Env,Result,[defmacro,Symbol,FormalParms|MacroBody], (Code,FunDef,Result=Symbol)):-
   compile_macro(Ctx,Env,[Symbol,FormalParms|MacroBody],_Sym,Macro,Code),
   debug_var('DefMacroResult',Result),
@@ -86,7 +86,7 @@ define_each_macro(Ctx,Env,_MacroLetOrOther,[Symbol|DEFN],Sym,CompileBody)  :-
    compile_macro(Ctx,Env,[Symbol|DEFN],Sym,UniqueMacroName,CompileBody),
    add_symbol_fbounds(Ctx,Sym,kw_operator,UniqueMacroName),
    always(CompileBody),
-   outmsg(CompileBody).
+   cmpout(CompileBody).
 
 
 compile_macro(Ctx,Env,[Symbol,FormalParms|MacroBody0],Symbol,Macro, CompileBody):-
@@ -148,7 +148,7 @@ macroexpand_1_or_fail([Procedure|Arguments],MacroEnv,CompileBody0Result):- nonva
    debug_var('MacroEnvArgs',MacroEnv),
    get_lambda_def(defmacro,Procedure, FormalParams, LambdaExpression),!,
    always((debug_var('EnvThru',EnvThru),debug_var('NewEnv',NewEnv),
-   debug_var('Env',Env),debug_var('NextEnv',NextEnv),debug_var('CommaResult',CommaResult),
+   debug_var('MEnv',Env),debug_var('NextEnv',NextEnv),debug_var('CommaResult',CommaResult),
    must_bind_parameters(NewEnv, _RestNKeys, FormalParams, Arguments,EnvThru,BindCode),!,
    append(_,[],NewEnv),!,
    NextEnv = [NewEnv|Env],  
@@ -159,7 +159,7 @@ macroexpand_1_or_fail([Procedure|Arguments],MacroEnv,CompileBody0Result):- nonva
    always(Code),
    must_compile_body(Ctx,NextEnv,CompileBody0Result,CommaResult, MCBR),
    always(MCBR),
-   lmsg((macroResult(BindCode,Code,CommaResult,CompileBody0Result))))),!.
+   dbginfo((macroResult(BindCode,Code,CommaResult,CompileBody0Result))))),!.
 
 
 % Operator

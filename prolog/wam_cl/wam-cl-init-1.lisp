@@ -29,7 +29,7 @@
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defun get-setf-method-inverse (form inverse setf-function)
   (let ((new-var (gensym))

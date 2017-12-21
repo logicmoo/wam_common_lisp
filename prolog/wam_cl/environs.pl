@@ -76,16 +76,12 @@ user:portray(env(_,_)):- writeq(env/2).
 add_to_env(ENV,Name,Value):- update_or_append(nb_setarg,ENV,Name,Value).
 %add_to_env(Name,Value):- global_env(ENV),update_or_prepend(nb_setarg,ENV,Name,Value).
 
-ensure_env(ENV):- notrace(nonvar(ENV)->true;( \+ is_env(ENV)->current_env(ENV);true)).
+global_env(ENV):- b_getval('$env_global',ENV),!.
+toplevel_env(ENV):- b_getval('$env_toplevel',ENV),!.
 
 
 %new_compile_ctx(ENV):- new_assoc(ENV)put_attr(ENV,type,ctx).
 new_compile_ctx(env(ENV,[])):- gensym('iENV_',N), list_to_rbtree([type-ctx(N)],ENV).
-
-
-global_env(ENV):- b_getval('$env_global',ENV),!.
-toplevel_env(ENV):- b_getval('$env_toplevel',ENV),!.
-current_env(ENV):- b_getval('$env_current',ENV),!.
 
 extend_env(ENV):-
   current_env(TL),
@@ -143,6 +139,9 @@ reenter_lisp(ENV,ENV):- notrace(( current_env(ENV),current_env(ENV))).
 
 
 % GlobalBindings
+
+ensure_env(ENV):- (nonvar(ENV)->true;(is_env(ENV)->true;current_env(ENV))).
+current_env(ENV):- ensure_env,nb_current('$env_current',WASENV),!,(is_env(ENV)->WASENV==ENV;WASENV=ENV).
 
 ensure_env :-
   (nb_current('$env_current',_)->true;reset_env).

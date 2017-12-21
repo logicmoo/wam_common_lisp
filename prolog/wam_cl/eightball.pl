@@ -38,7 +38,7 @@ di_test:- lisp_compile_to_prolog(pkg_user,
 slow_trace:- notrace(tracing),!,stop_rtrace,nortrace,trace.
 slow_trace:- nortrace.
 
-on_x_rtrace(G):- catch(G,E,(lmsg(E),rtrace(G),break)).
+on_x_rtrace(G):- catch(G,E,(dbginfo(E),rtrace(G),break)).
 atom_concat_or_rtrace(X,Y,Z):- tracing->atom_concat(X,Y,Z);catch(atom_concat(X,Y,Z),_,break).
 
 lisp_dump_break:- both_outputs(dumpST),!,throw(lisp_dump_break).
@@ -62,9 +62,9 @@ always(quietly(G)):- notrace(tracing),!, always(user:G).
 always(always(G)):-!,always(G).
 always(call(G)):-!,always(G).
 always(G):- notrace(tracing),!,user:G,!.
-always(G):- notrace(tracing),!,( user:G -> true; (lmsg(failed(G)),dumpST,lmsg(failed(G)),trace,slow_trace,G,!,fail)),!.
+always(G):- notrace(tracing),!,( user:G -> true; (dbginfo(failed(G)),dumpST,dbginfo(failed(G)),trace,slow_trace,G,!,fail)),!.
 always(G):- !,nonquietly_must_or_rtrace(user:G),!.
-%always(G):- !,( G-> true; (lmsg(failed(G)),dumpST,lmsg(failed(G)),trace,G,!,fail)),!.
+%always(G):- !,( G-> true; (dbginfo(failed(G)),dumpST,dbginfo(failed(G)),trace,G,!,fail)),!.
 %always(G):- notrace(tracing),!,(G->true;break). % nonquietly_must_or_rtrace(G).
 
 % Must offer_rtrace succeed (or else there is a bug in the lisp impl!)
@@ -78,8 +78,8 @@ offer_rtrace(call(G)):-!,offer_rtrace(G).
 offer_rtrace(G):-slow_trace,trace,maybe_trace(G).
 
 maybe_trace(G):- notrace(tracing)->user:rtrace(G);show_call_trace(user:G).
-/*offer_rtrace(G):- notrace(tracing),!,( G -> true; (lmsg(failed(G)),dumpST,lmsg(failed(G)),break,G,!,fail)),!.
-offer_rtrace(G):- !,( G-> true; (lmsg(failed(G)),dumpST,lmsg(failed(G)),trace,G,!,fail)),!.
+/*offer_rtrace(G):- notrace(tracing),!,( G -> true; (dbginfo(failed(G)),dumpST,dbginfo(failed(G)),break,G,!,fail)),!.
+offer_rtrace(G):- !,( G-> true; (dbginfo(failed(G)),dumpST,dbginfo(failed(G)),trace,G,!,fail)),!.
 %offer_rtrace(G):- notrace(tracing),!,(G->true;break). % nonquietly_must_or_rtrace(G).
 offer_rtrace(G):- nonquietly_must_or_rtrace(G),!.
 */
@@ -90,7 +90,7 @@ certainly((A,B)):-!,certainly(A),certainly(B).
 certainly(G):- notrace(tracing),!,G. % nonquietly_must_or_rtrace(G).
 certainly(G):- nonquietly_must_or_rtrace(G).
 
-always_catch(G):- catch(catch(G,'$aborted',notrace),E,(lmsg(always_uncaught(E)),notrace,!,fail)).
+always_catch(G):- catch(catch(G,'$aborted',notrace),E,(dbginfo(always_uncaught(E)),notrace,!,fail)).
 with_nat_term(G):-
   \+ \+ ((
   (term_attvars(G,Vs),
@@ -109,12 +109,12 @@ nonquietly_must_or_rtrace(G):-
 gripe_problem(Problem,G):- always_catch(gripe_problem0(Problem,(G))).
 gripe_problem0(Problem,G):-
      notrace(( 
-     wdmsg((Problem:-G)),
+     dbginfo((Problem:-G)),
      dumpST,
-     lmsg((Problem:-G)))),
+     dbginfo((Problem:-G)))),
      lisp_dump_break,
      slow_trace,
-     ((G)*->(slow_trace,lisp_dump_break);(lmsg(warn(failed_rtrace(G))),notrace,lisp_dump_break,!,fail)).
+     ((G)*->(slow_trace,lisp_dump_break);(dbginfo(warn(failed_rtrace(G))),notrace,lisp_dump_break,!,fail)).
 
 
 :- meta_predicate(timel(+,:)).
@@ -144,24 +144,34 @@ clause_asserted_local(H,R):- clause(H,true,R).
 
 colormsg1(Msg,Args):- mesg_color(Msg,Ctrl),!,ansicall_maybe(Ctrl,format(Msg,Args)).
 %colormsg1(Msg):- writeq(Msg),nl,nl,!. %notrace(colormsg11(Msg)).
-colormsg1(Msg):- mesg_color(Msg,Ctrl),!,ansicall_maybe(Ctrl,fmt99(Msg)).
+colormsg1(Msg):- mesg_color(Msg,Ctrl),!,ansicall_maybe(Ctrl,fmt9(Msg)).
 
 %ansicall_maybe(_Ctrl,Cmd):- !,nl,nl,portray_clause_w_vars(Cmd),nl,nl,(Cmd),break.
 ansicall_maybe(_Ctrl,Cmd):- current_output(O), \+ stream_property(O,tty(true)),!,call(Cmd).
 ansicall_maybe(Ctrl,Cmd):- always(shrink_lisp_strings(Cmd,Cmd0)),!,call(ansicall(Ctrl,Cmd0)).
 
-show_call_trace(G):- G *-> lmsg(G); ((lmsg(failed(show_call_trace(G)))),fail).
+show_call_trace(G):- set_prolog_flag(lisp_verbose,0),!,G.
+show_call_trace(G):- G *-> dmsg(success(G)); ((dbginfo(failed(show_call_trace(G)))),fail).
+
+% http://htmlpreview.github.io/?https://github.com/bartaz/impress.js/blob/master/index.html#/step-3
 
 is_must_show_msg(C):-compound(C),compound_name_arity(C,N,_),!,is_must_show_msg0(N). is_must_show_msg0(warn). is_must_show_msg0(error). is_must_show_msg0(failed).
 
-lmsg(X):- notrace((shrink_lisp_strings(X,X0), lmsg0(X0))).
-lmsg0(G):- is_must_show_msg(G),!,in_comment(outmsg(G)).
-lmsg0(_):- current_prolog_flag(lisp_verbose,0),!.
-lmsg0(X):- in_comment(outmsg(X)).
 
-outmsg(X):- notrace(both_outputs(dbmsg0(X))),!.
+% User Message (intended to be seen)
+userout(X):- notrace((shrink_lisp_strings(X,X0), (dbmsg0(X0)))).
 
-in_comment(X):- notrace(setup_call_cleanup(write('/* '),(X),writeln(' */'))).
+% Compiler output when writitng files
+cmpout(X):- notrace(both_outputs(dbmsg0(X))),!.
+
+% Lisp Informational Message (depends on verbosity level)
+dbginfo(X):- notrace(lmsg0(X)).
+lmsg0(G):- is_must_show_msg(G),!,userout(G).
+lmsg0(G):- current_prolog_flag(lisp_verbose,0)->true;userout(G).
+
+in_md(X):- current_prolog_flag(lisp_markdown,true),!,notrace(setup_call_cleanup(format('~N(markdowni("~n````prolog~n")).',[]),call(X),format('~N(markdowni("~n````~n")).~n',[]))).
+in_md(G):- G.
+in_comment(X):- quietly(setup_call_cleanup(format('~N/*~n',[]),in_md(X),format('~N*/~n',[]))).
 
 % is_assert_op(_,_):-!,fail.
 is_assert_op(A,B,C):- notrace(is_assert_op0(A,B,C)),!.
@@ -174,6 +184,8 @@ is_assert_op0(asserta(P),u,P).
 is_assert_op0(assert(P),u,P).
 is_assert_op0(asserta_if_new(P),u,P).
 is_assert_op0(asserta_new(P),u,P).
+is_assert_op0(assertz_if_new(P),u,P).
+is_assert_op0(assertz_new(P),u,P).
 is_assert_op0(assert_if_new(P),u,P).
 
 
@@ -204,16 +216,15 @@ trim_off(_,A,A).
 
 dbmsg0(Var):- var(Var),!,in_comment(colormsg1(dbmsg_var(Var))).
 dbmsg0(Str):- string(Str),!,in_comment(colormsg1(Str)).
-dbmsg0(:- A):- dbmsg0(A).
+dbmsg0(:- A):- dbmsg1(A),!.
 dbmsg0(A):- dbmsg1(A),!.
-dbmsg0(A):- dbmsg2(A),!.
 % dbmsg0(StringL):- to_prolog_string_if_needed(StringL,String),!,dbmsg0(String).
-dbmsg2(comment(X)):-!, shrink_lisp_strings(X,X0), in_comment(fmt99(X0)).
-dbmsg2(N=V):- !, shrink_lisp_strings(N=V,X0),  in_comment(fmt99(X0)).
-dbmsg2(A):- is_assert_op(A,Where,AA),!,dbmsg_assert(Where,AA).
-dbmsg2(:- X):- X==true,!.
-dbmsg2(:- X):- colormsg1(:- X),!.
-dbmsg2(X):- colormsg1(:- X),!.
+dbmsg0(comment(X)):-!, shrink_lisp_strings(X,X0), in_comment(fmt99(X0)).
+dbmsg0(N=V):- !, shrink_lisp_strings(N=V,X0),  in_comment(fmt99(X0)).
+dbmsg0(A):- is_assert_op(A,Where,AA),!,dbmsg_assert(Where,AA).
+dbmsg0(:- X):- X==true,!.
+dbmsg0(:- X):- colormsg1(:- X),!.
+dbmsg0(X):- in_comment(colormsg1(:- X)),!.
 
 dbmsg1(((A,B))):-  is_assert_op(A,Where,AA), !,dbmsg_assert(Where, AA),dbmsg0( B).
 dbmsg1(((B,A))):-  is_assert_op(A,Where,AA), !,dbmsg0( B),dbmsg_assert(Where, AA).
@@ -228,14 +239,17 @@ dbmsg_assert0(Where, (user:H) :- Body):- !,dbmsg_assert0(Where,(H :- Body)),!.
 %dbmsg_assert0(Where,M:Body:- (true,[])):-!,colormsg1("\n% asserting fact...\n"),!,colormsg1(M:Body),!.
 dbmsg_assert0(Where,(Head:-Body)):- Body==true,!, dbmsg_assert0(Where,(Head)).
 
-dbmsg_assert0(Where,(Head:-Body)):- fail,!, always((pre_annotation(Where),colormsg1(Head:-Body),
+dbmsg_assert0(Where,(Head:-Body)):- fail,!, always((pre_annotation(Where),in_md(colormsg1(Head:-Body)),
    assert_lsp(Head:-Body),
    assert_lsp(pass_clause(Where,Head,Body)))),!.
-dbmsg_assert0(Where,Head):- !, always((pre_annotation(Where),!,fmt99(Head),!,
+dbmsg_assert0(Where,Head):- !, always((pre_annotation(Where),!,in_md(fmt99(Head)),!,
    assert_lsp(Head),
    assert_lsp(pass_clause(Where,Head,true)))),!.
-   
-pre_annotation(Where):- where_where(Where,Where1),colormsg1("\n% annotating ~w ",[Where1]).
+
+
+
+
+pre_annotation(Where):- where_where(Where,Where1),colormsg1("\n% annotating `~w` ",[Where1]).
 where_where(Where,Atom):- locally_let(sym('cl:*package*')=pkg_kw,with_output_to(atom(Atom),cl_prin1(Where,_))),!.
 where_where(Where,Where).
 /*

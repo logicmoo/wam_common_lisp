@@ -47,7 +47,7 @@ compile_let(Ctx,Env,Result,[LET, NewBindingsIn| BodyForms], Body):- !,
   always((
       debug_var("LEnv",BindingsEnvironment),
       debug_var('LetResult',Result),
-
+   
         freeze(Var,ignore((var(Value),debug_var('_Init',Var,Value)))),
         freeze(Var,ignore((var(Value),add_tracked_var(Ctx,Var,Value)))),
         
@@ -64,7 +64,8 @@ compile_let(Ctx,Env,Result,[LET, NewBindingsIn| BodyForms], Body):- !,
         compile_forms(Ctx,BindingsEnvironment,BResult,BodyForms, BodyFormsBody),
         add_alphas(Ctx,Variables),
         let_body(Env,BindingsEnvironment,LocalBindings,SpecialBindings,BodyFormsBody,MaybeSpecialBody),
-         Body = (VarInitCode, MaybeSpecialBody,Result=BResult))).
+         Body = (VarInitCode, MaybeSpecialBody,G))),
+  ensure_assignment(Result=BResult,G).
 
 is_bv2(BV):- \+ \+ BV=bv(_,_).
 % No Locals

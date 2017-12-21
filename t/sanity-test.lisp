@@ -169,6 +169,8 @@ f_u_fifteen(MResult) :-
 (is eq () (LET ((val 1 )) ))
 
 (is eql 1 (LET ((val 1 ))val ))
+(is eql 'world (LET ((a 'b) )(LET ((a 'world) )
+  (LET ((a 'hello) )(LET ((a a)(*package* (find-package :keyword) ) )(PRINT a) ) )(PRINT a) ) ))
 
 
 ;; 3.1. Review of defstruct

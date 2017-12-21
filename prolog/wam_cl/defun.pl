@@ -25,7 +25,7 @@ wl:init_args(2,cl_defun).
 % (DEFUN (SETF CAR) ....)
 cl_defun(Symbol,FormalParms,FunctionBody,Result):- is_setf_op(Symbol,Accessor),!,cl_defsetf(Accessor,[FormalParms|FunctionBody],Result).
 % DEFUN SYMBOL
-cl_defun(Symbol,FormalParms,FunctionBody,Return):- reenter_lisp(Ctx,Env),compile_defun_ops(Ctx,Env,Return,[defun,Symbol,FormalParms|FunctionBody],Code),outmsg(Code).
+cl_defun(Symbol,FormalParms,FunctionBody,Return):- reenter_lisp(Ctx,Env),compile_defun_ops(Ctx,Env,Return,[defun,Symbol,FormalParms|FunctionBody],Code),cmpout(Code).
 compile_defun_ops(Ctx,Env,Result,[defun,Symbol,FormalParms|FunctionBody], (Code,FunDef,Result=Symbol)):-
   compile_function(Ctx,Env,[Symbol,FormalParms|FunctionBody],_Sym,Function,Code),
   debug_var('DefunResult',Result),
@@ -56,9 +56,9 @@ define_each(Ctx,Env,_LabelsOrFLET,[Symbol|DEFN],Sym,CompileBody)  :-
    compile_function(Ctx,Env,[Symbol|DEFN],Sym,UniqueCtxFunction,CompileBody),
    add_symbol_fbounds(Ctx,Sym,kw_function,UniqueCtxFunction),
    always(CompileBody),
-   outmsg(CompileBody).
+   cmpout(CompileBody).
 
-% undefine_each(Ctx,Env,What,Gensym,DEFN,New,CompileBody)  :- nop(wdmsg(undefine_each(Ctx,Env,What,Gensym,DEFN,New,CompileBody))).
+% undefine_each(Ctx,Env,What,Gensym,DEFN,New,CompileBody)  :- nop(dbginfo(undefine_each(Ctx,Env,What,Gensym,DEFN,New,CompileBody))).
 
 
 

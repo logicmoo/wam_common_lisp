@@ -169,16 +169,17 @@ do_compile_1file(Keys,File0):-
 
 % The Prolog translator is still unfinished and experimental. You can install the package by typing pack_install(transpiler) in the SWI-Prolog console. Now, you can use the translator to convert JavaScript source code into Lua:
 do_compile_1file_to_stream(_Keys,File0,Stream):-
+ always((
   pl_probe_file(File0,File),
-  to_prolog_string(File0,Name),
+  to_prolog_string_anyways(File0,Name),
   get_time(Epoch),format_time(string(EpochS), '%+', Epoch),
   working_directory(PWD,PWD),
   statistics(runtime,[Start,_]),
-  format(Stream,'
-% WAM-CL translated Lisp File (see https://github.com/TeamSPoon/wam_common_lisp/tree/master/prolog/wam_cl )
-% File: ~q (~w)
-% PWD: ~w
-% Start time: ~w
+  format(Stream,'#!/usr/bin/env swipl
+%; WAM-CL translated Lisp File (see https://github.com/TeamSPoon/wam_common_lisp/tree/master/prolog/wam_cl )
+%; File: ~q (~w)
+%; PWD: ~w
+%; Start time: ~w
 
 :-style_check(-discontiguous).
 :-style_check(-singleton).
@@ -189,12 +190,12 @@ do_compile_1file_to_stream(_Keys,File0,Stream):-
   with_each_file(with_each_form(lisp_compile_to_prolog_output(Stream)),File),
    statistics(runtime,[End,_]),
    Total is (End - Start)/1000,
-   format(Stream,'~n~n% Total time: ~w seconds~n~n',[Total]).
+   format(Stream,'~n~n%; Total compilation time: ~w seconds~n~n',[Total]))).
   
 
 lisp_compile_to_prolog_output(Stream,PExpression):- 
   as_sexp(PExpression,Expression),
-  % wdmsg(:- lisp_compile_to_prolog(Pkg,Expression)),
+  % dbginfo(:- lisp_compile_to_prolog(Pkg,Expression)),
   always(with_output_to(Stream,
     lisp_compile_to_prolog(Expression))),!.
 
@@ -222,11 +223,11 @@ lisp_compile_to_prolog(PExpression):-
   write_file_info,
   flush_all_output_safe,
   reading_package(Pkg),
-  outmsg(:- lisp_compile_to_prolog(Pkg,SExpression)),
+  cmpout(:- lisp_compile_to_prolog(Pkg,SExpression)),
   reader_intern_symbols(SExpression,Expression),  
   debug_var('_Ignored',Result))),
   lisp_compile(Result,Expression,PrologCode))),
-  outmsg(:- PrologCode),!,
+  cmpout(:- PrologCode),!,
   lisp_grovel(PrologCode),!.
    
 grovel_time_called(do_when).
@@ -251,6 +252,10 @@ lisp_grovel_assert(_,_).
 lisp_grovel_assert(T):-lisp_grovel_assert(u,T),!.
    %*compile-file-truename*
 
+pl_load(File,_Keys,T):- exists_file(File),file_name_extension(_Base,Ext,File),prolog_file_type(Ext,Type),Type==prolog,!,
+   ensure_loaded(File),T=t.
+pl_load(L,Keys,T):- cl_load(L,Keys,T),!.
+
 cl_load(L):- cl_load(L,_).
 cl_load(L,T):- cl_load(L,[],T).
 (wl:init_args(1,cl_load)).
@@ -258,17 +263,17 @@ cl_load(L,Keys,T):- to_prolog_string_if_needed(L,Loc)->L\==Loc,!,cl_load(Loc,Key
 %cl_load('$OBJ'(_Pathname,Loc),Keys,T):- !, cl_load(Loc,Keys,T).
 cl_load(File,_Keys,t):- fail,
    % check maybe for fresh
-   pl_compiled_filename(File,PL),exists_file(PL),!,lmsg(in_comment(ensure_loaded(PL))),!,ensure_loaded(PL).
-%cl_load(File,R):- cl_compile_file(File,t),!,pl_compiled_filename(File,PL),exists_file(PL),!,in_comment(lmsg(ensure_loaded(PL))),!,ensure_loaded(PL).
+   pl_compiled_filename(File,PL),exists_file(PL),!,dbginfo(in_comment(ensure_loaded(PL))),!,ensure_loaded(PL).
+%cl_load(File,R):- cl_compile_file(File,t),!,pl_compiled_filename(File,PL),exists_file(PL),!,in_comment(dbginfo(ensure_loaded(PL))),!,ensure_loaded(PL).
 cl_load(File,Keys,t):- 
   with_each_file(load_1file(Keys),File).
 
 load_1file(_Keys,File):- 
-     locally_let(
+     always((locally_let(
      [sym('cl:*readtable*')=value(sym('*readtable*')),
       sym('cl:*package*')=value(sym('*package*')),
       sym('sys::*compiler-mode*')=sym(':load-toplevel')], 
-         with_each_form(lisp_reader_compiled_eval,File)).
+         with_each_form(lisp_reader_compiled_eval,File)))).
 
 
 lisp_reader_compiled_eval(PExpression):- 
@@ -276,25 +281,26 @@ lisp_reader_compiled_eval(PExpression):-
   as_sexp(PExpression,SExpression),
   write_file_info,
   reading_package(Pkg),
-  lmsg(:- lisp_compile_to_prolog(Pkg,SExpression)),
+  dbginfo(:- lisp_compile_to_prolog(Pkg,SExpression)),
   reader_intern_symbols(SExpression,Expression),
   process_load_expression(Expression))),!.
 
-process_load_expression(COMMENTP):- is_comment(COMMENTP,_Cmt),!. %,lmsg(comment(Cmt)).
+process_load_expression(COMMENTP):- is_comment(COMMENTP,_Cmt),!. %,dbginfo(comment(Cmt)).
 process_load_expression(Expression):- 
    debug_var('_IgnoredResult',Result),
    always(lisp_compile(Result,Expression,PrologCode)),
-   lmsg(:- PrologCode),
+   dbginfo(:- PrologCode),
    always(PrologCode).
 
 
 with_flist(How,List):- must_maplist(with1file(How),List).
 
+%with1file(How,File):- exists_file(File),file_name_extension(File,Ext,_Base),prolog_file_type(Ext,Type),Type==prolog,!,pl_load(File,[],_).
 with1file(How,File):- always(call(How,File)).
 
 with_each_form(How,File):- local_override(with_forms,What),What\==How,!,with_each_form(What,File).
 with_each_form(How,File):-
-   lmsg(with_lisp_translation(file(File),How)),
+   dbginfo(with_lisp_translation(file(File),How)),
    with_lisp_translation(file(File),How),!.
 
 expand_directory_file_path(FDir,Ext,List):- directory_file_path(FDir,Ext,Mask),expand_file_name(Mask,List),List\==[Mask].

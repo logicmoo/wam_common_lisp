@@ -167,7 +167,7 @@ phrase_from_stream_lazy_part(Grammar, In):-
        length(List,Used),!,
        length(More,UnUsed),!,
        (Offset is Used - UnUsed + Prev),!,
-       % lmsg((Offset is Used - UnUsed + Prev)) ->
+       % dbginfo((Offset is Used - UnUsed + Prev)) ->
        seek(In,Offset,bof,_NewPos))),!.
 
 phrase_from_pending_stream(Grammar, In):-
@@ -1079,21 +1079,21 @@ codelist_to_forms(AsciiCodesList,FormsOut):-
 
 :- export(baseKB:rff/0).
 
-baseKB:rff:-baseKB:rff(wdmsg(n(first)),wdmsg(n(retry)),wdmsg(n(success)),wdmsg(n(failure))).
+baseKB:rff:-baseKB:rff(dbginfo(n(first)),dbginfo(n(retry)),dbginfo(n(success)),dbginfo(n(failure))).
 
 :- export(baseKB:rff/4).
 baseKB:rff(OnFirst,OnRetry,OnSuccess,OnFailure) :- CU = was(never,first),
   call_cleanup((
     process_rff(CU,OnFirst,OnRetry,OnSuccess,OnFailure),
     (nb_setarg(1,CU,first));((nb_setarg(1,CU,second)),!,fail)),
-    (nb_setarg(2,CU,second),process_rff(CU,OnFirst,OnRetry,OnSuccess,OnFailure),wdmsg(cleanup(CU)))),
+    (nb_setarg(2,CU,second),process_rff(CU,OnFirst,OnRetry,OnSuccess,OnFailure),dbginfo(cleanup(CU)))),
   once((
     process_rff(CU,OnFirst,OnRetry,OnSuccess,OnFailure),
     CU \= was(second, _))).
 
 :- export(process_rff/5).
 process_rff(CU,OnFirst,OnRetry,OnSuccess,OnFailure):-
-   wdmsg(next(CU)),
+   dbginfo(next(CU)),
    once(((CU==was(first,first)->OnFirst;true),
    (CU==was(second,first)->OnRetry;true),
    (CU==was(second,second)->OnFailure;true),
@@ -1339,12 +1339,12 @@ current_input_to_forms(FormsOut,Vars):-
     input_to_forms(In, FormsOut,Vars).
 
 
-% input_to_forms_debug(String):- sumo_to_pdkb(String,Wff),wdmsg(Wff),!.
+% input_to_forms_debug(String):- sumo_to_pdkb(String,Wff),dbginfo(Wff),!.
 input_to_forms_debug(String):-input_to_forms(String,Wff,Vs),
-  b_setval('$variable_names',Vs),wdmsg(Wff),!.
+  b_setval('$variable_names',Vs),userout(Wff),!.
 
 input_to_forms_debug(String,Decoder):-input_to_forms(String,Wff,Vs),
-  b_setval('$variable_names',Vs),call(Decoder,Wff,WffO),wdmsg(WffO),!.
+  b_setval('$variable_names',Vs),call(Decoder,Wff,WffO),userout(WffO),!.
 
 :- export(input_to_forms/3).
 

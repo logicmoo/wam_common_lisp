@@ -49,7 +49,7 @@ add_pack_path_rc(Rel):-
 :- endif.
 */
 
-:- if(current_prolog_flag(argv,[])).
+:- if(current_prolog_flag(os_argv,[_])).
 :- pack_list_installed.
 :- endif.
 

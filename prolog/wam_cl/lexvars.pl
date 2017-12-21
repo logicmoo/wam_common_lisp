@@ -78,7 +78,7 @@ compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, StringL], (Code,Body)):-
 
 compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm], Body):- is_symbol_setter(Env,SetQ),
         rw_add(Ctx,Var,w),
-        debug_var('Env',Env),
+        debug_var('AEnv',Env),
         !,	
 	must_compile_body(Ctx,Env,ResultV,ValueForm, ValueBody),
         ((op_return_type(SetQ,RT),RT=name) ->  =(Var,Result) ; =(ResultV,Result)),
@@ -87,14 +87,14 @@ compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm], Body):- is_symbol_setter(
 
 % catches an internal error in this compiler 
 compile_symbol_getter(Ctx,Env,Result,Var, Body):- Var==mapcar,!, 
-  lmsg(compile_symbol_getter(Ctx,Env,Result,Var, Body)), lisp_dump_break.
+  dbginfo(compile_symbol_getter(Ctx,Env,Result,Var, Body)), lisp_dump_break.
 
 
 compile_symbol_getter(Ctx,Env,Value, Var, Body):-  always((atom(Var),!,
         debug_var([Var,'_Get'],Value),
         add_tracked_var(Ctx,Var,Value),
         rw_add(Ctx,Var,r),
-        debug_var('Env',Env),
+        debug_var('_GEnv',Env),
         Body = get_var(Env, Var, Value))).
 
 % compile_place(Ctx,Env,Result,Var,Code).
@@ -135,7 +135,7 @@ symbol_value_or(Env,Var,G,Value):-
  (symbol_value0(Env,Var,Value) -> true ; G).
 
 symbol_value0(Env,Var,Value):-  bvof(bv(Var, Value),_,Env).
-symbol_value0(_Env,Var,_Value):- notrace((nonvar(Var),is_functionp(Var),wdmsg(is_functionp(Var)))),!,lisp_dump_break.
+symbol_value0(_Env,Var,_Value):- notrace((nonvar(Var),is_functionp(Var),dbginfo(is_functionp(Var)))),!,lisp_dump_break.
 symbol_value0(_Env,Var,Result):- get_opv(Var, value, Result),!.
 symbol_value0(_Env,Var,Result):- atom(Var),get_opv(Var,value,Result),!.
 symbol_value0(Env,[Place,Obj],Result):- trace, set_place(Env,getf,[Place,Obj],[],Result).
@@ -219,7 +219,6 @@ is_def_maybe_docs(defvar).
 is_def_maybe_docs(defconstant).
 is_def_maybe_docs(defconst).
 
-is_place_write(P):- is_place_op(P), \+ is_only_read_op(P).
 is_pair_op(setq).
 is_pair_op(psetq).
 
@@ -227,6 +226,22 @@ is_pair_op(setf).
 is_pair_op(psetf).
 
 is_only_read_op(getf).
+
+is_place_write(setf).
+is_place_write(psetf).
+is_place_write(incf).
+is_place_write(decf).
+is_place_write(rotatef).
+is_place_write(shiftf).
+is_place_write(V):- is_place_op_verbatum(V).
+is_place_write(P):- is_place_op(P), \+ is_only_read_op(P).
+
+is_place_op_verbatum(rotatefsdfsdfsdfsdfsdffs).
+%is_place_op_verbatum(rotatef).
+%is_place_op_verbatum(shiftf).
+%is_place_op_verbatum(push).
+%is_place_op_verbatum(pushnew).
+%is_place_op_verbatum(pop).
 
 is_place_op(setf).
 is_place_op(psetf).
@@ -238,12 +253,6 @@ is_any_place_op(P):-is_place_op_verbatum(P).
 is_any_place_op(P):-is_parallel_op(P).
 is_any_place_op(P):-is_place_op(P).
 
-is_place_op_verbatum(rotatefsdfsdfsdfsdfsdffs).
-%is_place_op_verbatum(rotatef).
-%is_place_op_verbatum(shiftf).
-%is_place_op_verbatum(push).
-%is_place_op_verbatum(pushnew).
-%is_place_op_verbatum(pop).
 
 
 is_parallel_op(psetf).

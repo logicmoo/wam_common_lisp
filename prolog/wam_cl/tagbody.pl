@@ -73,13 +73,13 @@ compile_body_go_tagbody(_Ctx,Env,Result,[go,Label,TB], Code):- compute_new_addre
 compile_body_go_tagbody(_Ctx,Env,Result,[go,Label], Code):- local_override(tagbody_scope,TB),compute_new_address(TB,Label,Pred), debug_var("_GORES",Result),debug_var("GoEnv",Env),create_jump(TB,Label,Pred,Env,Code).
 
 
-add_context_code(_Ctx,Assertion):- !,outmsg(:-assert_lsp(Assertion)).
+add_context_code(_Ctx,Assertion):- !,cmpout(:-assert_lsp(Assertion)).
 /*
-add_context_code(_Ctx,Assertion):- assert_lsp(Assertion),lmsg(:-assert_lsp(Assertion)),!.
+add_context_code(_Ctx,Assertion):- assert_lsp(Assertion),dbginfo(:-assert_lsp(Assertion)),!.
 add_context_code(Ctx,Assertion):- 
   always((
   (nb_current_value(Ctx,symbol,Symbol);(toplevel=Symbol)),
-  user:assert_lsp(Symbol,Assertion),outmsg(:-assert_lsp(Symbol,Assertion)))),!.*/
+  user:assert_lsp(Symbol,Assertion),cmpout(:-assert_lsp(Symbol,Assertion)))),!.*/
 /*
 compile_body_go_tagbody(Ctx,Env,[],[tagbody,Symbol| InstrSAll], Code):- 
   atom(Symbol),

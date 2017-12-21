@@ -316,14 +316,14 @@ ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,[F|FormalParms],Params,Names,P
 /*
 tfa:- tfa([ item,list,'&key',key,[test, [function, eql], testp],['test-not', [], notp]]).
 tfa(FormalParms):-
-  lmsg(:-tfa(FormalParms)),
+  dbginfo(:-tfa(FormalParms)),
   debug_var('TFA_ENV',Env),
   new_compile_ctx(Ctx),
   function_head_params(Ctx,Env,FN,FormalParms,ZippedArgEnv,Whole,InitialArgs,ArgInfo,Names,PVars,Code0),
   maplist(debug_var,Names,PVars),
-  lmsg(arginfo(ArgInfo,formal=FormalParms,params=InitialArgs,whole=Whole,names=Names,vars=PVars,zab=ZippedArgEnv)),
+  dbginfo(arginfo(ArgInfo,formal=FormalParms,params=InitialArgs,whole=Whole,names=Names,vars=PVars,zab=ZippedArgEnv)),
   body_cleanup(Ctx,Code0,Code),
-  lmsg(:-Code),!.
+  dbginfo(:-Code),!.
 */
 
 compile_init_opt(Env,ArgInfo,RestNKeys,Var,FinalResult,[InitForm],

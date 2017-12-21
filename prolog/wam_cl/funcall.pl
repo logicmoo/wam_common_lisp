@@ -36,10 +36,10 @@ compile_funop(Ctx,Env,Result,[function(Op) | FunctionArgs], Body):- nonvar(Op),!
 compile_funop(Ctx,Env,Result,LispCode,CompileBody):-
   fail, %DISABLED
   macroexpand_1_or_fail(LispCode,[],CompileBody0Result),
-  lmsg(macroexpand:-LispCode),
-  lmsg(into:-CompileBody0Result),
+  dbginfo(macroexpand:-LispCode),
+  dbginfo(into:-CompileBody0Result),
   must_compile_body(Ctx,Env,Result,CompileBody0Result, CompileBody),
-  lmsg(code:-CompileBody),
+  dbginfo(code:-CompileBody),
   !.
  
 compile_funop(Ctx,Env,Result,[Op | FunctionArgs], Body):- nonvar(Op),wl:op_replacement(Op,Op2), !,
@@ -124,7 +124,7 @@ apply_c(EnvIn, ProcedureName, ActualParams, Result):-
 */
 
 apply_c(_,F,ARGS,R):- atom(F),append(ARGS,[R],RARGS),always(length(RARGS,A)),current_predicate(F/A),!,apply(F,RARGS),!.
-apply_c(_,F,ARGS,R):- atom(F),CALL=..[F|ARGS],current_predicate(_,CALL),!,(catch(CALL,E,(dumpST,lmsg(CALL->E),!,fail))->R=t;R=[]).
+apply_c(_,F,ARGS,R):- atom(F),CALL=..[F|ARGS],current_predicate(_,CALL),!,(catch(CALL,E,(dumpST,dbginfo(CALL->E),!,fail))->R=t;R=[]).
 apply_c(EnvIn,X, _, R):- ignore(R=[]),
         (debugging(lisp(eval))->dumpST;true),
 	write('ERROR!  apply_c apply a procedure description for `'),
