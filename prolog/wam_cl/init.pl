@@ -132,8 +132,8 @@ handle_1program_arg(N):- handle_program_args(_,N),!.
 
 % helpfull
 handle_program_args('--help','-?'):- listing(handle_program_args),show_help,imply_interactive(false).
-handle_program_args('--debug','-debug'):- cl_push_new(xx_features_xx,kw_debugger),set_lisp_option(debug).
-handle_program_args('--package','-p',Package):- do_after_load(cl_inpackage(Package)).
+handle_program_args('--debug','-debug'):- nop(cl_push_new(xx_features_xx,kw_debugger)),set_lisp_option(debug).
+handle_program_args('--package','-p',Package):- do_after_load(cl_in_package(Package)).
 handle_program_args('--quiet','--silent'):- set_lisp_option(quiet).
 
 % compiler
@@ -236,7 +236,7 @@ Lisp Startup actions:
 
 Compiler actions put WAM-CL into a batch mode:
  -x expressions - execute the expressions (mixed into compiler actions)
- -c [-l] lispfile [-o outputfile] - compile or load a lispfile
+ -c [-l] lispfile [--main pkg::symbol] - compile or load a lispfile
                [--exe outputfile] - make a platform binary
 
 Which are overridden by:

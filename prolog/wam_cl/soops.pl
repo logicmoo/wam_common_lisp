@@ -400,7 +400,7 @@ ref:attr_unify_hook(Same,Var):- get_attr(Var,ref,SameO)->Same==SameO;var(Var).
 
 get_opv_maybe_ref(Obj,Prop,Value):- no_repeats((Obj-Prop),get_opv_i(Obj,Prop,Value)).
 
-get_opv_i(Obj,Key,Value):- un_kw(Key,Prop)->get_opv_iref(Obj,Prop,Value).
+get_opv_i(Obj,Key,Value):- quietly((un_kw(Key,Prop)->get_opv_iref(Obj,Prop,Value))).
 
 get_opv_iref(Obj,Prop,Value):- attvar(Obj),!,nonvar(Prop),get_attr(Obj,Prop,Value).
 get_opv_iref(Obj,Prop,Value):- compound(Obj),!,compound_deref(Obj,Real),!,get_opv_ii(Real,Prop,Value).

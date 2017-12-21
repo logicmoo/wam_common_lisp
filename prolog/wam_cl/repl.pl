@@ -17,6 +17,9 @@
 :- use_module(init).
 
 :- include('header').
+ :- meta_predicate maybe_ltrace(0).
+ :- meta_predicate show_uncaught_or_fail(0).
+ :- meta_predicate with_prompt_str(+,0).
               
 
 repl:- 

@@ -36,12 +36,12 @@ di_test:- lisp_compile_to_prolog(pkg_user,
 
 
 slow_trace:- notrace(tracing),!,stop_rtrace,nortrace,trace.
-slow_trace:- nortrace.
+slow_trace:- stop_rtrace,nortrace.
 
 on_x_rtrace(G):- catch(G,E,(dbginfo(E),rtrace(G),break)).
 atom_concat_or_rtrace(X,Y,Z):- tracing->atom_concat(X,Y,Z);catch(atom_concat(X,Y,Z),_,break).
 
-lisp_dump_break:- both_outputs(dumpST),!,throw(lisp_dump_break).
+lisp_dump_break:- both_outputs(dumpST),!,trace,throw(lisp_dump_break).
 %lisp_dump_break:- trace,throw(lisp_dump_break).
 lisp_dump_break:- lisp_dumpST,break.
 lisp_dumpST:- both_outputs(dumpST).
@@ -49,7 +49,7 @@ lisp_dumpST:- both_outputs(dumpST).
 true_or_die(Goal):-functor(Goal,_,A),arg(A,Goal,Ret),always((Goal,Ret\==[])).
 
 :- '$hide'(lquietly/1).
-lquietly(G):- notrace(quietly(G)).
+lquietly(G):- notrace((G)).
 
 % Must always succeed (or else there is a bug in the lisp impl!)
 always(G):- notrace(tracing),!,G,!.
@@ -150,7 +150,9 @@ colormsg1(Msg):- mesg_color(Msg,Ctrl),!,ansicall_maybe(Ctrl,fmt9(Msg)).
 ansicall_maybe(_Ctrl,Cmd):- current_output(O), \+ stream_property(O,tty(true)),!,call(Cmd).
 ansicall_maybe(Ctrl,Cmd):- always(shrink_lisp_strings(Cmd,Cmd0)),!,call(ansicall(Ctrl,Cmd0)).
 
-show_call_trace(G):- set_prolog_flag(lisp_verbose,0),!,G.
+is_verbose :- \+ set_prolog_flag(lisp_verbose,0); \+ current_prolog_flag(debug,false).
+
+show_call_trace(G):- is_verbose,!,G.
 show_call_trace(G):- G *-> dmsg(success(G)); ((dbginfo(failed(show_call_trace(G)))),fail).
 
 % http://htmlpreview.github.io/?https://github.com/bartaz/impress.js/blob/master/index.html#/step-3
@@ -159,15 +161,16 @@ is_must_show_msg(C):-compound(C),compound_name_arity(C,N,_),!,is_must_show_msg0(
 
 
 % User Message (intended to be seen)
-userout(X):- notrace((shrink_lisp_strings(X,X0), (dbmsg0(X0)))).
+userout(X):- notrace((shrink_lisp_strings(X,X0), dbmsg0(X0))).
 
 % Compiler output when writitng files
 cmpout(X):- notrace(both_outputs(dbmsg0(X))),!.
 
 % Lisp Informational Message (depends on verbosity level)
 dbginfo(X):- notrace(lmsg0(X)).
+lmsg0(G):- is_verbose,!,userout(G).
 lmsg0(G):- is_must_show_msg(G),!,userout(G).
-lmsg0(G):- current_prolog_flag(lisp_verbose,0)->true;userout(G).
+lmsg0(_).
 
 in_md(X):- current_prolog_flag(lisp_markdown,true),!,notrace(setup_call_cleanup(format('~N(markdowni("~n````prolog~n")).',[]),call(X),format('~N(markdowni("~n````~n")).~n',[]))).
 in_md(G):- G.
@@ -252,15 +255,6 @@ dbmsg_assert0(Where,Head):- !, always((pre_annotation(Where),!,in_md(fmt99(Head)
 pre_annotation(Where):- where_where(Where,Where1),colormsg1("\n% annotating `~w` ",[Where1]).
 where_where(Where,Atom):- locally_let(sym('cl:*package*')=pkg_kw,with_output_to(atom(Atom),cl_prin1(Where,_))),!.
 where_where(Where,Where).
-/*
-dbmsg_assert(Where,Body):-  
-  body_cleanup(_,Body,Cleaned), !,
-  (Body==Cleaned-> true;
-   (colormsg1("\n% cleanup... ~w ",[Where]),!,colormsg1(Cleaned)),
-   (colormsg1("\n% asserting... ~w ",[Where]),!,colormsg1(Body))),!,
-    assert_lsp(Body),!.
-*/
-
 
 :- dynamic(lisp_compiler_option/2).
 :- dynamic(lisp_compiler_option_local/2).

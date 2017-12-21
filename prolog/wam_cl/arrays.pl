@@ -35,7 +35,7 @@ cl_set_nthcdr(_,[],[]):-!.
 cl_set_nthcdr(0,List,Tail):- nb_setarg(2,List,Tail).
 cl_set_nthcdr(Index,[_|List],Tail):- Next is Index-1,cl_set_nthcdr(Next,List,Tail).
 
-get_identiy_pred(Keys,K,Pred):- 
+get_identity_pred(Keys,K,Pred):- 
   key_value(Keys,K,Value) -> to_function(Value,Pred); Pred = (=).
 
 get_test_pred(Keys,Pred):-
@@ -43,7 +43,7 @@ get_test_pred(Keys,Pred):-
   key_value(Keys,kw_test,Value)  -> to_function(Value,Pred);
   Pred = cl_eql.
 
-%to_function(function(Value),Value).
+to_function(function(ValueI),ValueO):-!,to_function(ValueI,ValueO).
 to_function(Value,Value).
 to_neg_function(Value,not_fn(Neg)):-to_function(Value,Neg).
 not_fn(Value,A):- \+ call(Value,A).

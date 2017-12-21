@@ -104,9 +104,9 @@ compile_macro(Ctx,Env,[Symbol,FormalParms|MacroBody0],Symbol,Macro, CompileBody)
    must_compile_body(Ctx,Env,MFResult,[block,Symbol|MacroBody],MFBody),   
    body_cleanup_keep_debug_vars(Ctx,((CallableHead  :- ((HeadCode,MFBody), cl_eval(MFResult,FResult)))),MacroAssert),
    body_cleanup_keep_debug_vars(Ctx,((DocCode,
-   assert_lsp(Symbol,wl:lambda_def(defmacro,Symbol,Macro, FormalParms, [progn | MacroBody])),
-   HeadDefCode,
-   assert_lsp(Symbol,MacroAssert))),CompileBody)))).
+     assert_lsp(Symbol,wl:lambda_def(defmacro,Symbol,Macro, FormalParms, [progn | MacroBody])),
+     HeadDefCode,
+     assert_lsp(Symbol,MacroAssert))),CompileBody)))).
 
 
 % macroexpand-1

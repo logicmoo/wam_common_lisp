@@ -96,20 +96,21 @@ cl_acons(Key_Param, Datum_Param, Alist_Param, [[Key_Param|Datum_Param]|Alist_Par
 
 %rassoc item alist &key key test test-not => entry
 wl:init_args(2,cl_rassoc).
-cl_rassoc(Item,AList,Options,RetVal):- 
+cl_rassoc(Item,AList,Options,RetVal):-
+ get_identity_pred(Options,kw_key,Ident),
   get_test_pred(Options,EqlPred),
-  get_identiy_pred(Options,kw_key,Ident),  
-  member([K|V],AList),call(EqlPred,Item,V,R)->R\==[],!,
-  call(Ident,[K|V],RetVal).
+  (member([K|V],AList),call(Ident,V,Id),
+    (call(EqlPred,Item,Id,R)->R\==[])),!,
+  RetVal = [K|V].
 cl_rassoc(_,_,_,[]).
 
 wl:init_args(2,cl_assoc).
-cl_assoc(Item,AList,Options,RetVal):- 
-  
+cl_assoc(Item,AList,Options,RetVal):-
+ get_identity_pred(Options,kw_key,Ident),
   get_test_pred(Options,EqlPred),
-  get_identiy_pred(Options,kw_key,Ident),  
-  member([K|V],AList),call(EqlPred,Item,K,R)->R\==[],!,
-  call(Ident,[K|V],RetVal).
+  (member([K|V],AList),call(Ident,K,Id),
+    (call(EqlPred,Item,Id,R)->R\==[])),!,
+  RetVal = [K|V].
 cl_assoc(_,_,_,[]).
 
 % assoc item alist
@@ -260,7 +261,7 @@ cl_eq(A,B,Ret):- t_or_nil( is_eq(A,B) , Ret).
 cl_eql(A,B,Ret):- t_or_nil( is_eql(A,B) , Ret).
 cl_equal(A,B,Ret):- t_or_nil( is_equal(A,B) , Ret).
 cl_equalp(A,B,Ret):- t_or_nil( is_equalp(A,B) , Ret).
-
+equal(A,B,Ret):- t_or_nil( is_equal(A,B) , Ret).
 
 
 is_eql(X,Y):- is_eq(X,Y)->true;cl_type_of(X,T),cl_type_of(Y,T), notrace(catch(X=:=Y,_,fail)).

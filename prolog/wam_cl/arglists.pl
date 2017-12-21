@@ -522,6 +522,7 @@ correct_formal_params_c38([F0|FormalParms0],[F|FormalParms]):-
   correct_formal_params_c38(F0,F),correct_formal_params_c38(FormalParms0,FormalParms).
 correct_formal_params_c38(Mode,Mode).
 
+correct_formal_params_destructuring([A, B, C|R],[A, B, C,'&rest',R]):- simple_atom_var(A),simple_atom_var(B),simple_atom_var(R),!.
 correct_formal_params_destructuring([A, B|R],[A, B, '&rest',R]):- simple_atom_var(A),simple_atom_var(B),simple_atom_var(R),!.
 correct_formal_params_destructuring([A|R],[A,'&rest',R]):- simple_atom_var(A),simple_atom_var(R),!.
 correct_formal_params_destructuring(AA,AA).
@@ -555,6 +556,8 @@ bind_parameters(Env,RestNKeys,_,['&rest',Var|FormalParms],Params,Code):- !,
 bind_parameters(Env,RestNKeys,_,['&environment',Var|FormalParms],Params,(get_env('$env',Var,Env),Code)):- !,   
   bind_parameters(Env,RestNKeys,'&rest',FormalParms,Params,Code).
 
+bind_parameters(Env,_RestNKeys,'required',[Var],Value,true):- nonvar(Value), \+ is_list(Value),
+  enforce_atomic(Var),make_bind_value(Var,Value,Env),!.
 % Parsing required(s)
 bind_parameters(Env,RestNKeys,'required',[Var|FormalParms],In,Code):-  must_or(In=[Value|Params],throw(args_underflow)),
   enforce_atomic(Var),make_bind_value(Var,Value,Env),
