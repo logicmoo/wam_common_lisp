@@ -45,7 +45,7 @@ call_test_compiled(Name,Value):-
   debug_var('Expected',Expected),
   debug_var('OutValue',OutValue),
   ignore(catch((Code,Return=Value),goto(_,OutValue,_),Value=OutValue)),
-  dmsg(Expected=Value).
+  lmsg(Expected=Value).
 
   
 
@@ -252,9 +252,9 @@ run666(Program, Values) :-
     writeExpression(Last).
 
 see_and_do(Pred2, I,O):-
-  dmsg(seeingFormala(I)),
+  lmsg(seeingFormala(I)),
   always(call(Pred2,I,O)),
-  dmsg(result(O)).
+  lmsg(result(O)).
 
 :- set_prolog_flag(double_quotes,string).
 

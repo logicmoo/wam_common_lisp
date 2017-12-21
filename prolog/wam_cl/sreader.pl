@@ -167,7 +167,7 @@ phrase_from_stream_lazy_part(Grammar, In):-
        length(List,Used),!,
        length(More,UnUsed),!,
        (Offset is Used - UnUsed + Prev),!,
-       % dmsg((Offset is Used - UnUsed + Prev)) ->
+       % lmsg((Offset is Used - UnUsed + Prev)) ->
        seek(In,Offset,bof,_NewPos))),!.
 
 phrase_from_pending_stream(Grammar, In):-

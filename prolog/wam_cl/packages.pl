@@ -42,7 +42,7 @@ cl_use_package(Package,CurrentPackage, R):-
   cl_use_package(Package,CurrentPackage0, R).
 cl_use_package(Package,CurrentPackage, t):- 
    assert_lsp(package_use_list(CurrentPackage,Package)),
-   dmsg(todo(check_for+package_symbolconflicts(package_use_list(CurrentPackage,Package)))).
+   lmsg(todo(check_for+package_symbolconflicts(package_use_list(CurrentPackage,Package)))).
 
  
 wl:init_args(1,cl_defpackage).

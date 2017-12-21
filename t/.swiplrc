@@ -49,8 +49,9 @@ add_pack_path_rc(Rel):-
 :- endif.
 */
 
+:- if(current_prolog_flag(argv,[])).
 :- pack_list_installed.
-%:- endif.
+:- endif.
 
 
 :- if(exists_source(library(editline))).

@@ -303,7 +303,7 @@ add_class_keywords(Kind,[Key,Value|KeyWords]):-
    add_class_keywords(Kind,KeyWords).
 
 assert_struct_kw(Kind, Key, Value):- 
-  ignore(( \+ is_keywordp(Key) , dmsg(warn(assert_struct_kw(Kind, Key, Value))))),
+  ignore(( \+ is_keywordp(Key) , lmsg(warn(assert_struct_kw(Kind, Key, Value))))),
   assert_struct_opv(Kind, Key, Value).
 
 assert_struct_opv(Obj, KW, Value):-

@@ -205,16 +205,22 @@ lisp_compile_to_prolog(Pkg,Expression):-
   always(locally_let(xx_package_xx=Pkg,
     always(lisp_compile_to_prolog(Expression)))),!.
 
+write_file_info:- 
+% (is_user_output->write(is_user_output);write(not_user_output)),
+  \+ is_user_output, \+ current_prolog_flag(lisp_verbose,0),!,
+  nl,  
+  write('/*********** '),
+  ignore(notrace_catch_fail((nb_current('$lisp_translation_stream',In),stream_property(In,file_name(File)),write(File)))),
+  ignore(notrace_catch_fail((nb_current('$lisp_translation_line',LineChars),write(:),write(LineChars)))),
+  writeln(' **********************/'),!,
+  flush_all_output_safe.
+write_file_info.
 
 lisp_compile_to_prolog(PExpression):-   
  ((always((
   as_sexp(PExpression,SExpression),  
-  nl,
+  write_file_info,
   flush_all_output_safe,
-  write('/*********** '),
-  ignore(notrace_catch_fail((nb_current('$lisp_translation_stream',In),stream_property(In,file_name(File)),write(File)))),
-  ignore(notrace_catch_fail((nb_current('$lisp_translation_line',LineChars),write(:),write(LineChars)))),
-  writeln(' **********************/'),
   reading_package(Pkg),
   dbmsg_real(:- lisp_compile_to_prolog(Pkg,SExpression)),
   reader_intern_symbols(SExpression,Expression),  
@@ -267,13 +273,8 @@ load_1file(_Keys,File):-
 
 lisp_reader_compiled_eval(PExpression):- 
  always((
-  as_sexp(PExpression,SExpression),  
-  nl,
-  flush_all_output_safe,
-  write('/*********** '),
-  ignore((nb_current('$lisp_translation_stream',In),stream_property(In,file_name(File)),write(File))),
-  ignore((nb_current('$lisp_translation_line',LineChars),write(:),write(LineChars))),
-  writeln(' **********************/'),
+  as_sexp(PExpression,SExpression),
+  write_file_info,
   reading_package(Pkg),
   dbmsg(:- lisp_compile_to_prolog(Pkg,SExpression)),
   reader_intern_symbols(SExpression,Expression),
@@ -293,7 +294,7 @@ with1file(How,File):- always(call(How,File)).
 
 with_each_form(How,File):- local_override(with_forms,What),What\==How,!,with_each_form(What,File).
 with_each_form(How,File):-
-   dmsg(with_lisp_translation(file(File),How)),
+   lmsg(with_lisp_translation(file(File),How)),
    with_lisp_translation(file(File),How),!.
 
 expand_directory_file_path(FDir,Ext,List):- directory_file_path(FDir,Ext,Mask),expand_file_name(Mask,List),List\==[Mask].

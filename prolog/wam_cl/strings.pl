@@ -32,7 +32,7 @@ is_characterp(X):-var(X),!,fail.
 is_characterp('#\\'(V)):- nonvar(V).
 
 is_stringp(X):-var(X),!,fail.
-%is_stringp(X):- string(X),nop(dmsg(is_stringp(X))).
+%is_stringp(X):- string(X),nop(lmsg(is_stringp(X))).
 is_stringp('$ARRAY'([_N],claz_base_character,List)):- nonvar(List).
 
 % deduced now

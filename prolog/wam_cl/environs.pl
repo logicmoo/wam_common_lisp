@@ -144,9 +144,14 @@ reenter_lisp(ENV,ENV):- notrace(( current_env(ENV),current_env(ENV))).
 
 % GlobalBindings
 
+ensure_env :-
+  (nb_current('$env_current',_)->true;reset_env).
 
 reset_env:- 
   always((
+  nb_delete('$env_current'),
+  nb_delete('$env_global'),
+  nb_delete('$env_toplevel'),
   new_compile_ctx(GLOBAL),
   set_env_attribute(GLOBAL,name,'GLOBAL'),
   debug_var('ToplevelEnv',TL),debug_var('GLOBAL',GLOBAL),

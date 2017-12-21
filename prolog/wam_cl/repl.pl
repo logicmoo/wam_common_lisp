@@ -29,7 +29,7 @@
 
 print_eval_string(Str):-
    str_to_expression(Str, Expression),
-   dmsg(:- print_eval_string(Expression)),
+   lmsg(:- print_eval_string(Expression)),
    eval_at_repl(Expression, Result),!,
    write_results(Result),
    !.
@@ -63,6 +63,8 @@ with_input_from_stream(In,Goal):-
    each_call_cleanup(see(In),Goal,seen).
 
 
+% Called after primordial init 
+lisp_banner:- current_prolog_flag(lisp_verbose,0),!.
 lisp_banner:- 
  write('
 __        ___    __  __        ____ _
@@ -75,27 +77,44 @@ __        ___    __  __        ____ _
 
 prompts(Old1,_Old2):- var(Old1) -> prompt(Old1,Old1) ; prompt(_,Old1).
 
-
+% catch accidental unification that destroys metaclasses
 classof:attr_unify_hook(A,B):- trace,wdmsg(classof:attr_unify_hook(A,B)),lisp_dump_break. %  break.
 
-code_load_hooks:-
-   reset_env,
-  (current_prolog_flag(os_argv,Y)->handle_all_os_program_args(Y)),
+% primordial inits
+primodial_init:- current_prolog_flag(wamcl_init_level,N),N>0,!.
+primodial_init:- 
+ set_prolog_flag(wamcl_init_level,1),
+ always((
+  % allows "PACKAGE:SYM" to be created on demand (could this be an initials a default)
   set_prolog_flag(lisp_autointern,true),
-   forall(retract(wl:interned_eval(G)),always(do_interned_eval(G))),
-  set_prolog_flag(lisp_autointern,false).                 
+  ensure_env,
+  current_prolog_flag(os_argv,Y),
+  handle_all_os_program_args(Y),
+  current_prolog_flag(argv,Y2),handle_all_program_args(Y2),
+  do_wamcl_inits)). 
+
+% system sourcefile load hooks
+do_wamcl_inits:- current_prolog_flag(wamcl_init_level,N),N>1,!.
+do_wamcl_inits:-
+  set_prolog_flag(wamcl_init_level,2),
+  forall(clause(wl:interned_eval(G),Body,R),
+    (forall(Body,always(do_interned_eval(G))),
+     erase(R))),  
+  lisp_banner.
 
 
-do_before_tpl:- code_load_hooks,
-  (current_prolog_flag(argv,Y)->handle_all_program_args(Y)).
+% program inits
+do_before_tpl:- 
+  primodial_init.
   
 
 lisp:-
        prompt(Old, '> '),
 	prompts(Old1, Old2),
 	prompts('> ', '> '),
-	%tidy_database,
         do_before_tpl,
+        % requires  "PACKAGE:SYM" to already externally exists
+        set_prolog_flag(lisp_autointern,false),
         call_cleanup(repl_loop,
                      (prompt(_, Old),
                        prompts(Old1, Old2))),!.
@@ -177,21 +196,26 @@ $ swipl -x wamcl.prc
 
 :- set_prolog_flag(backtrace,true).
 :- set_prolog_flag(backtrace_depth,500).
-:- set_prolog_flag(backtrace_goal_depth,10).
+:- set_prolog_flag(backtrace_goal_depth,30).
 :- set_prolog_flag(backtrace_show_lines,true).
 :- set_prolog_flag(toplevel_print_anon,true).
+:- set_prolog_flag(last_call_optimisation,false).
+:- set_prolog_flag(lisp_verbose,1).
 
 set_lisp_option(verbose):- 
    set_prolog_flag(verbose_load,full),
    set_prolog_flag(verbose,normal),
    set_prolog_flag(verbose_autoload,true),
-   set_prolog_flag(verbose_file_search,true).
+   set_prolog_flag(verbose_file_search,true),
+   set_prolog_flag(lisp_verbose,3).
+
 
 set_lisp_option(quiet):- 
  set_prolog_flag(verbose,silent),
  set_prolog_flag(verbose_autoload,false),
  set_prolog_flag(verbose_load,silent),
- set_prolog_flag(verbose_file_search,false).
+ set_prolog_flag(verbose_file_search,false),
+ set_prolog_flag(lisp_verbose,0).
 
 set_lisp_option(debug):-
   set_lisp_option(verbose),
@@ -209,13 +233,23 @@ handle_all_os_program_args(ARGV):-
 
 handle_all_program_args([N,V|More]):- handle_1program_arg(N=V),!,handle_all_program_args(More).
 handle_all_program_args([N|More]):- handle_1program_arg(N),!,handle_all_program_args(More).
-handle_all_program_args(More):- maplist(to_lisp_string,More,List),set_var(ext_xx_args_xx,List).
+handle_all_program_args([N|More]):- exists_file(N),imply_flag(verbose,0),imply_interactive(false),!,do_after_load(((set_program_args(More),cl_load(N,_)))).
+handle_all_program_args(More):- do_after_load(((set_program_args(More)))).
 
+set_program_args(More):- maplist(to_lisp_string,More,List),set_var(ext_xx_args_xx,List).
+
+% set if already set
 set_interactive(TF):-
  (TF -> set_prolog_flag(lisp_repl_goal,repl_loop);
     set_prolog_flag(lisp_repl_goal,halt)).
+% doesnt set if already set
+imply_interactive(TF):- current_prolog_flag(lisp_repl_goal,_)->true;set_interactive(TF).
+imply_flag(Name,Value):- atom_concat(lisp_,Name,LName), ((current_prolog_flag(LName,N),N\==1)->true;set_prolog_flag(LName,Value)).
+
 
 wl:interned_eval(("(defparameter EXT:*ARGS* ())")).
+
+do_after_load(G):- assertz(wl:interned_eval(call(G))).
 
 handle_1program_arg(N=V):-  handle_program_args(N,_,V),!.
 handle_1program_arg(N=V):-!,handle_program_args(N,_,V).
@@ -226,29 +260,29 @@ handle_1program_arg(N):- handle_program_args(_,N),!.
 :- discontiguous handle_program_args/3. 
 
 % helpfull
-handle_program_args('--help','-?'):- listing(handle_program_args),show_help,set_interactive(false).
-handle_program_args('--debug','-debug'):- cl_push_new(xx_features_xx,kw_debugger).
-handle_program_args('--package','-p',Package):- cl_inpackage(Package).
+handle_program_args('--help','-?'):- listing(handle_program_args),show_help,imply_interactive(false).
+handle_program_args('--debug','-debug'):- cl_push_new(xx_features_xx,kw_debugger),set_lisp_option(debug).
+handle_program_args('--package','-p',Package):- do_after_load(cl_inpackage(Package)).
+handle_program_args('--quiet','--silent'):- set_lisp_option(quiet).
 
 % compiler
-handle_program_args('--exe','-o',File):- qsave_program(File),set_interactive(false).
-handle_program_args('--compile','-c',File):- cl_compile_file(File,[],_),set_interactive(false).
-handle_program_args('--l','-l',File):- cl_load(File,[],_),set_interactive(false).
-handle_program_args('--quit','-norepl'):- set_interactive(false).
+handle_program_args('--exe','-o',File):- do_after_load(qsave_program(File)),imply_interactive(false).
+handle_program_args('--compile','-c',File):- do_after_load(cl_compile_file(File,[],_)),imply_interactive(false).
+handle_program_args('--l','-l',File):- do_after_load(cl_load(File,[],_)),imply_interactive(false).
+handle_program_args('--quit','-quit'):- set_interactive(false).
 
 % interactive
-handle_program_args('--load','-i',File):- set_interactive(true), cl_load(File,[],_).
-handle_program_args('--eval','-x',Form):- set_interactive(true), lisp_compiled_eval(Form,_).
+handle_program_args('--load','-i',File):- do_after_load(cl_load(File,[],_)).
+handle_program_args('--eval','-x',Form):- do_after_load(lisp_compiled_eval(Form,_)).
 handle_program_args('--repl','-repl'):- set_interactive(true).
+handle_program_args('--norepl','-norepl'):- set_interactive(false).
 
 % incomplete 
 handle_program_args('--ansi','-ansi'):- cl_push_new(xx_features_xx,kw_ansi).
 
 tidy_database:-
-	nb_delete('$env_current'),
-        nb_delete('$env_global'),
-        current_env(_Env),
-	retractall(lambda(_, _)).
+        reset_env,
+        ensure_env(_Env).
 
 show_uncaught_or_fail((A,B)):-!,show_uncaught_or_fail(A),show_uncaught_or_fail(B).
 show_uncaught_or_fail(G):- quietly(flush_all_output_safe),
@@ -322,7 +356,7 @@ lisp_add_history(Expression):-
 % basic EVAL statements for built-in procedures
 eval_at_repl(Var,  R):- quietly(var(Var)),!, R=Var.
 eval_at_repl(Expression, Result):- lquietly(eval_repl_hooks(Expression,Result)),!.
-eval_at_repl(Expression,Result):- notrace(tracing), !, call_cleanup(eval_at_repl_tracing(Expression,Result),trace).
+eval_at_repl(Expression,Result):- notrace((tracing, \+ t_l:rtracing)),notrace,call_cleanup(eval_at_repl_tracing(Expression,Result),trace).
 eval_at_repl(Expression,Result):-
   lquietly(as_sexp(Expression,SExpression)),
   (reader_intern_symbols(SExpression,LExpression)),
@@ -334,7 +368,6 @@ eval_at_repl(Expression,Result):-
    timel('EXEC',always_catch(ignore(always(maybe_ltrace(call(user:Code))))))),!.
 
 eval_at_repl_tracing(Expression,Result):-
- notrace,
   lquietly(as_sexp(Expression,SExpression)),
   (reader_intern_symbols(SExpression,LExpression)),
   writeq((reader_intern_symbols(SExpression,LExpression))),nl,
@@ -394,7 +427,7 @@ eval_repl_hooks(KW, Ret):- is_keywordp(KW),to_prolog_string(KW,PStr),name(UC,PSt
 
 % make.  ls.  pwd. 
 eval_repl_hooks(Atom, R):- atom(Atom),atom_concat_or_rtrace(_,'.',Atom),quietly(catch(read_term_from_atom(Atom,Term,[variable_names(Vs),syntax_errors(true)]),_,fail)),
-  callable(Term),current_predicate(_,Term),b_setval('$variable_names',Vs),t_or_nil((user:call(Term)*->dmsg(Term);(dmsg(no(Term)),fail)),R).
+  callable(Term),current_predicate(_,Term),b_setval('$variable_names',Vs),t_or_nil((user:call(Term)*->lmsg(Term);(lmsg(no(Term)),fail)),R).
 
 eval_repl_hooks([debug,A], t):- !,debug(lisp(A)).
 eval_repl_hooks([nodebug,A], t):- !, nodebug(lisp(A)).
@@ -439,12 +472,12 @@ lw:- cl_load("wam-cl-params",_).
 :- fixup_exports.
 
 :- set_prolog_flag(verbose_autoload,false).
-%:- initialization(lisp,restore).
-:- initialization(code_load_hooks).
-:- initialization(lisp_banner).
 
+:- initialization(primodial_init,restore).
+%:- initialization(primodial_init).
+
+%:- initialization(lisp,program).
 :- initialization(lisp,main).
-%:- initialization((lisp,prolog),main).
 
 %:- process_si.
 %:- cddd.

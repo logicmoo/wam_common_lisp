@@ -34,7 +34,8 @@ di_test:- lisp_compile_to_prolog(pkg_user,
                             ]
                           ]).
 
-show_call_trace(G):- G *-> wdmsg(G); (wdmsg(warn(failed(show_call_trace(G)))),fail).
+
+show_call_trace(G):- G *-> lmsg(G); (wdmsg(warn(failed(show_call_trace(G)))),fail).
 
 slow_trace:- notrace(tracing),!,stop_rtrace,nortrace,trace.
 slow_trace:- nortrace.
@@ -62,9 +63,9 @@ always(quietly(G)):- notrace(tracing),!, always(user:G).
 always(always(G)):-!,always(G).
 always(call(G)):-!,always(G).
 always(G):- notrace(tracing),!,user:G,!.
-always(G):- notrace(tracing),!,( user:G -> true; (wdmsg(failed(G)),dumpST,wdmsg(failed(G)),trace,slow_trace,G,!,fail)),!.
+always(G):- notrace(tracing),!,( user:G -> true; (lmsg(failed(G)),dumpST,lmsg(failed(G)),trace,slow_trace,G,!,fail)),!.
 always(G):- !,nonquietly_must_or_rtrace(user:G),!.
-%always(G):- !,( G-> true; (wdmsg(failed(G)),dumpST,wdmsg(failed(G)),trace,G,!,fail)),!.
+%always(G):- !,( G-> true; (lmsg(failed(G)),dumpST,lmsg(failed(G)),trace,G,!,fail)),!.
 %always(G):- notrace(tracing),!,(G->true;break). % nonquietly_must_or_rtrace(G).
 
 % Must offer_rtrace succeed (or else there is a bug in the lisp impl!)
@@ -78,8 +79,8 @@ offer_rtrace(call(G)):-!,offer_rtrace(G).
 offer_rtrace(G):-slow_trace,trace,maybe_trace(G).
 
 maybe_trace(G):- notrace(tracing)->user:rtrace(G);show_call_trace(user:G).
-/*offer_rtrace(G):- notrace(tracing),!,( G -> true; (wdmsg(failed(G)),dumpST,wdmsg(failed(G)),break,G,!,fail)),!.
-offer_rtrace(G):- !,( G-> true; (wdmsg(failed(G)),dumpST,wdmsg(failed(G)),trace,G,!,fail)),!.
+/*offer_rtrace(G):- notrace(tracing),!,( G -> true; (lmsg(failed(G)),dumpST,lmsg(failed(G)),break,G,!,fail)),!.
+offer_rtrace(G):- !,( G-> true; (lmsg(failed(G)),dumpST,lmsg(failed(G)),trace,G,!,fail)),!.
 %offer_rtrace(G):- notrace(tracing),!,(G->true;break). % nonquietly_must_or_rtrace(G).
 offer_rtrace(G):- nonquietly_must_or_rtrace(G),!.
 */
@@ -90,7 +91,7 @@ certainly((A,B)):-!,certainly(A),certainly(B).
 certainly(G):- notrace(tracing),!,G. % nonquietly_must_or_rtrace(G).
 certainly(G):- nonquietly_must_or_rtrace(G).
 
-always_catch(G):- catch(catch(G,'$aborted',notrace),E,(wdmsg(always_uncaught(E)),notrace,!,fail)).
+always_catch(G):- catch(catch(G,'$aborted',notrace),E,(lmsg(always_uncaught(E)),notrace,!,fail)).
 with_nat_term(G):-
   \+ \+ ((
   (term_attvars(G,Vs),
@@ -114,14 +115,14 @@ gripe_problem0(Problem,G):-
      dbmsg((Problem:-G)))),
      lisp_dump_break,
      slow_trace,
-     ((G)*->(slow_trace,lisp_dump_break);(wdmsg(failed_rtrace(G)),notrace,lisp_dump_break,!,fail)).
+     ((G)*->(slow_trace,lisp_dump_break);(lmsg(warn(failed_rtrace(G))),notrace,lisp_dump_break,!,fail)).
 
 
 :- meta_predicate(timel(+,:)).
 timel(What,M:X):- notrace(( write('% '),writeln(What))),prolog_statistics:time(M:X).
 
 
-is_user_output:- current_output(O),stream_property(CO,alias(user_output)),!,CO==O.
+is_user_output:- current_output(O),!,(stream_property(O,alias(user_output));stream_property(O,alias(user_error))),!.
 
 both_outputs(G):-
   (is_user_output -> G ; (with_output_to(user_output,G),G)).
@@ -150,8 +151,11 @@ colormsg1(Msg):- mesg_color(Msg,Ctrl),!,ansicall_maybe(Ctrl,fmt99(Msg)).
 ansicall_maybe(_Ctrl,Cmd):- current_output(O), \+ stream_property(O,tty(true)),!,call(Cmd).
 ansicall_maybe(Ctrl,Cmd):- always(shrink_lisp_strings(Cmd,Cmd0)),!,call(ansicall(Ctrl,Cmd0)).
 
+lmsg(warn(G)):- !, dmsg(warn(G)).
+lmsg(failed(G)):- !, wdmsg(warn(G)).
+lmsg(G):- current_prolog_flag(lisp_verbose,0)->true; lmsg(G).
 dbmsg(X):- dbmsg_cmt(X).
-dbmsg_cmt(Var):- shrink_lisp_strings(Var,O), wdmsg(O).
+dbmsg_cmt(Var):- shrink_lisp_strings(Var,O), lmsg(O).
 dbmsg_real(X):- notrace(both_outputs(dbmsg0(X))),!.
 
 in_comment(X):- notrace(setup_call_cleanup(write('/* '),(X),writeln(' */'))).
@@ -193,6 +197,7 @@ fmt999(P):- fmt9(P),nl.
 % notrace((dbmsg0(Var))).
 trim_off(W,A,B):- atomic(A), string_concat(W,B,A),!.
 trim_off(_,A,A).
+
 
 dbmsg0(Var):- var(Var),!,in_comment(colormsg1(dbmsg_var(Var))).
 dbmsg0(Str):- string(Str),!,in_comment(colormsg1(Str)).
