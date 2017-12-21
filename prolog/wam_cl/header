@@ -148,6 +148,7 @@
 :- ensure_loaded(strings).
 :- ensure_loaded(symbols).
 :- ensure_loaded(letvars).
+:- ensure_loaded(condifs).
 
 :- ensure_loaded(arglists).
 :- ensure_loaded(arrays).

@@ -66,6 +66,11 @@ compile_forms(Ctx,Env,Result,FunctionBody,Code):-
    nb_linkval('$compiler_PreviousResult',the(Var)).
 
 
+
+
+p_or_s([F|Args],F0,Args0):-!,F0=F,Args0=Args.
+p_or_s(POrSTerm,F,Args):- POrSTerm=..[F|Args].
+
 % same_symbol(OP1,OP2):-!, OP1=OP2.
 same_symbol(OP1,OP2):- quietly(same_symbol0(OP1,OP2)).
 

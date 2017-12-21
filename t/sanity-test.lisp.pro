@@ -2,7 +2,7 @@
 % WAM-CL translated Lisp File (see https://github.com/TeamSPoon/wam_common_lisp/tree/master/prolog/wam_cl )
 % File: "sanity-test" (/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/sanity-test.lisp)
 % PWD: /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/
-% Start time: Tue Dec 19 20:51:58 2017
+% Start time: Wed Dec 20 13:05:20 2017
 
 :-style_check(-discontiguous).
 :-style_check(-singleton).
@@ -1953,5 +1953,5 @@ f_u_distance_from_origin(Point_Param, FnResult) :-
    cl_slot_value(Eric_Get, u_diet, _Ignored).
 
 
-% Total time: 10.012 seconds
+% Total time: 9.925 seconds
 

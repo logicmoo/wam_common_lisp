@@ -130,5 +130,19 @@ maybe_bind_local(Ctx,Env,[Var,ValueForm|_],Body,(VarInitCode,locally_bind(Env,Va
     must_compile_body(Ctx,Env,Value,ValueForm,VarInitCode).
 */
 
+
+
+%  current_env(Env),
+  %set_var(Env,Var,Value).
+
+%   zip_with(Xs, Ys, Pred, Zs)
+%   is true if Pred(X, Y, Z) is true for all X, Y, Z.
+
+zip_with([], [], _, []).
+zip_with([X|Xs], [Y|Ys], Pred, [Z|Zs]):-
+	lpa_apply(Pred, [X, Y, Z]),
+	zip_with(Xs, Ys, Pred, Zs).
+
+
 :- fixup_exports.
 

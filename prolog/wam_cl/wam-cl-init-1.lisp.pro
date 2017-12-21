@@ -2,7 +2,7 @@
 % WAM-CL translated Lisp File (see https://github.com/TeamSPoon/wam_common_lisp/tree/master/prolog/wam_cl )
 % File: "wam-cl-init-1" (/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp)
 % PWD: /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/
-% Start time: Tue Dec 19 20:51:59 2017
+% Start time: Wed Dec 20 13:05:21 2017
 
 :-style_check(-discontiguous).
 :-style_check(-singleton).
@@ -3738,5 +3738,5 @@ f_sys_pf_set_tenth(X_Param, V_Param, FnResult) :-
 :- cl_defsetf(sys_structure_ref, sys_structure_set, _Ignored7).
 
 
-% Total time: 6.731 seconds
+% Total time: 6.693 seconds
 
