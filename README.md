@@ -274,9 +274,8 @@ CL-USER>
 
 ## Usaage output of --help)
 ````
-WAM-CL (https://github.com/TeamSPoon/wam_common_lisp) is an ANSI Common Lisp implementation.
-
-Usage:  $wamcl [prolog-options] [wamcl-options] [lispfile [argument ...]]
+'WAM-CL (https://github.com/TeamSPoon/wam_common_lisp) is an ANSI Common Lisp implementation.
+Usage:  wamcl [prolog-options] [wamcl-options] [lispfile [argument ...]]
 
 Host Prolog options:
 
@@ -289,6 +288,8 @@ Host Prolog options:
 --nosignals      Do not modify any signal handling
 --nodebug        Omit generation of debug info
 --version        Print the Prolog version information
+
+
 
 WAM-CL Options:
 
@@ -303,13 +304,13 @@ Lisp Startup actions:
 
 Compiler actions put WAM-CL into a batch mode:
  -x expressions - execute the expressions (mixed into compiler actions)
- -c [-l] lispfile [-o outputfile] - compile or load a lispfile
+ -c [-l] lispfile [--main pkg::symbol] - compile or load a lispfile
                [--exe outputfile] - make a platform binary
 
 Which are overridden by:
 
   --repl                Enter the interactive read-eval-print loop when done
-  --load <filename>     File to load
+  --load <filename>     File to load 
   --eval <form>         Form to eval
 
 Default action is an interactive read-eval-print loop.
@@ -324,52 +325,18 @@ Remaining arguments are placed in EXT:*ARGS* as strings.
 
 Examples:
 
-$PACKDIR/wam_common_lisp/prolog/wam_cl$
+$PACKDIR/wam_common_lisp/t$
 
 # creating your first image
-$ swipl ../wamcl.pl --exe wamcl
+$ swipl ../prolog/wamcl.pl --exe wamcl
 # try it
-$ ./wamcl
-$ ./wamcl -c hello.lisp -o hello.pl --exe hello
+$ ./wamcl --repl
+$ swipl ../prolog/wamcl.pl --compile hello.lisp --main sys::main --exe hello
 $ ./hello world
 $ swipl -x hello --repl
 $ swipl hello.pl
 $ swipl -x wamcl.prc
 % swipl -x wamcl.prc hello.lisp world
-
-
-Extended Info:
-
-handle_program_args('--help', -?) :-
-        listing(handle_program_args),
-        show_help,
-        set_interactive(false).
-handle_program_args('--debug', '-debug') :-
-        cl_push_new(xx_features_xx, kw_debugger).
-handle_program_args('--quit', '-norepl') :-
-        set_interactive(false).
-handle_program_args('--repl', '-repl') :-
-        set_interactive(true).
-handle_program_args('--ansi', '-ansi') :-
-        cl_push_new(xx_features_xx, kw_ansi).
-handle_program_args('--package', '-p', A) :-
-        cl_inpackage(A).
-handle_program_args('--exe', '-o', A) :-
-        qsave_program(A),
-        set_interactive(false).
-handle_program_args('--compile', '-c', A) :-
-        cl_compile_file(A, [], _),
-        set_interactive(false).
-handle_program_args('--l', '-l', A) :-
-        cl_load(A, [], _),
-        set_interactive(false).
-handle_program_args('--load', '-i', A) :-
-        set_interactive(true),
-        cl_load(A, [], _).
-handle_program_args('--eval', '-x', A) :-
-        set_interactive(true),
-        lisp_compiled_eval(A, _).
-
 
 ````
 
