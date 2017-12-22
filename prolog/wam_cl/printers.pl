@@ -102,9 +102,9 @@ writeExpression(X):- notrace(writeExpression0(X)).
 writeExpression0(X):- is_ftVar(X),(get_var_name(X,N)->format('~w~w)',[N,X]);format('~w',[X])),!.
 writeExpression0([]):- write('NIL').
 % writeExpression(quit):- !, write('Terminating WAM-CL'),nl.
-writeExpression0('$COMMENT0'([])):- 	writeln(';'),!.
+writeExpression0('$COMMENT'([])):- 	writeln(';'),!.
 writeExpression0('$COMMENT'(S)):- 	write(';'),writeln(S),!.
-writeExpression0('$COMMENT1'(S)):- 	write('#|'),write(S),writeln('|#').
+writeExpression0('$COMMENT'('#'(S))):- 	write('#|'),write(S),writeln('|#').
 writeExpression0('$COMMENT'(S,_,_)):- 	write('#|'),write(S),writeln('|#').
 writeExpression0(Expression):-
 	sexpr1(Expression, TokenL, []), !, %	write('  '),

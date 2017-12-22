@@ -85,6 +85,7 @@ print_related_clauses(ExceptFor,_OModule,P):-
    fail)).
 
 
+make_pretty(I,O):- !,shrink_lisp_strings(I,O), pretty1(O),pretty2(O),pretty3(O).
 make_pretty(I,O):- is_user_output,!,shrink_lisp_strings(I,O), pretty1(O),pretty2(O),pretty3(O).
 make_pretty(I,O):- I=O, pretty1(O),pretty2(O),pretty3(O).
 

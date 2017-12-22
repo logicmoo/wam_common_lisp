@@ -111,7 +111,7 @@ read_prolog_object(Operand):- read(Operand).
 do_interned_eval(MG):- strip_module(MG,_,G),G=call(_),!,call_interned_eval(MG).
 do_interned_eval(G):- call_interned_eval(lisp_compiled_eval(G,_)).
 
-call_interned_eval(G):- subst_castifies(G,GG),show_call_trace(always(GG)).
+call_interned_eval(G):- subst_castifies(G,GG),!,always(GG).
 
 % call_interned_eval(M,G):- locally_let(xx_package_xx=pkg_prolog, M:G ).
 

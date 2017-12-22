@@ -109,72 +109,20 @@ nonquietly_must_or_rtrace(G):-
 gripe_problem(Problem,G):- always_catch(gripe_problem0(Problem,(G))).
 gripe_problem0(Problem,G):-
      notrace(( 
-     dbginfo((Problem:-G)),
+     dbginfo((Problem=G)),
      dumpST,
-     dbginfo((Problem:-G)))),
+     dbginfo((Problem=G)))),
+     nortrace,
+     trace,
      lisp_dump_break,
      slow_trace,
      ((G)*->(slow_trace,lisp_dump_break);(dbginfo(warn(failed_rtrace(G))),notrace,lisp_dump_break,!,fail)).
 
 
 :- meta_predicate(timel(+,:)).
-timel(What,M:X):- notrace(( write('% '),writeln(What))),prolog_statistics:time(M:X).
+timel(_,MG):- wam_cl_option(call_statistics,false),!, call(MG).
+timel(What,M:X):- notrace(( write('## '),write(What))),prolog_statistics:time(M:X).
 
-
-is_user_output:- current_output(O),!,(stream_property(O,alias(user_output));stream_property(O,alias(user_error))),!.
-
-both_outputs(G):-
-  (is_user_output -> G ; (with_output_to(user_output,G),G)).
-
-assert_lsp(G):- assert_lsp(u,G).
-% assert_lsp(Symbol,G)
-assert_lsp(_,G):-  notrace((copy_term_nat(G,GG),assert_local(GG))).
-
-assert_local(user:G):-!,assert_local(G).
-assert_local(user:G:-B):-!,assert_local(G:-B).
-assert_local(G:-B):- B==true,!,assert_local(G).
-assert_local(G):- assert_local0(G).
-
-assert_local0(G):- \+ \+ (clause_asserted_local(G,_)),!.
-assert_local0(G):- doall((clause_asserted_local(G,E),erase(E),fail)),!,user:asserta(G),!.
-
-clause_asserted_local((H:-_),R):-!, clause(H,_,R).
-clause_asserted_local(H,R):- clause(H,true,R).
-
-
-colormsg1(Msg,Args):- mesg_color(Msg,Ctrl),!,ansicall_maybe(Ctrl,format(Msg,Args)).
-%colormsg1(Msg):- writeq(Msg),nl,nl,!. %notrace(colormsg11(Msg)).
-colormsg1(Msg):- mesg_color(Msg,Ctrl),!,ansicall_maybe(Ctrl,fmt9(Msg)).
-
-%ansicall_maybe(_Ctrl,Cmd):- !,nl,nl,portray_clause_w_vars(Cmd),nl,nl,(Cmd),break.
-ansicall_maybe(_Ctrl,Cmd):- current_output(O), \+ stream_property(O,tty(true)),!,call(Cmd).
-ansicall_maybe(Ctrl,Cmd):- always(shrink_lisp_strings(Cmd,Cmd0)),!,call(ansicall(Ctrl,Cmd0)).
-
-is_verbose :- \+ set_prolog_flag(lisp_verbose,0); \+ current_prolog_flag(debug,false).
-
-show_call_trace(G):- is_verbose,!,G.
-show_call_trace(G):- G *-> dmsg(success(G)); ((dbginfo(failed(show_call_trace(G)))),fail).
-
-% http://htmlpreview.github.io/?https://github.com/bartaz/impress.js/blob/master/index.html#/step-3
-
-is_must_show_msg(C):-compound(C),compound_name_arity(C,N,_),!,is_must_show_msg0(N). is_must_show_msg0(warn). is_must_show_msg0(error). is_must_show_msg0(failed).
-
-
-% User Message (intended to be seen)
-userout(X):- notrace((shrink_lisp_strings(X,X0), dbmsg0(X0))).
-
-% Compiler output when writitng files
-cmpout(X):- notrace(both_outputs(dbmsg0(X))),!.
-
-% Lisp Informational Message (depends on verbosity level)
-dbginfo(X):- notrace(lmsg0(X)).
-lmsg0(G):- is_verbose,!,userout(G).
-lmsg0(G):- is_must_show_msg(G),!,userout(G).
-lmsg0(_).
-
-in_md(X):- current_prolog_flag(lisp_markdown,true),!,notrace(setup_call_cleanup(format('~N(markdowni("~n````prolog~n")).',[]),call(X),format('~N(markdowni("~n````~n")).~n',[]))).
-in_md(G):- G.
-in_comment(X):- quietly(setup_call_cleanup(format('~N/*~n',[]),in_md(X),format('~N*/~n',[]))).
 
 % is_assert_op(_,_):-!,fail.
 is_assert_op(A,B,C):- notrace(is_assert_op0(A,B,C)),!.
@@ -192,7 +140,7 @@ is_assert_op0(assertz_new(P),u,P).
 is_assert_op0(assert_if_new(P),u,P).
 
 
-fmt99(O):- always((make_pretty(O,P),fmt999(P))),!.
+fmt99(O):- in_md(prolog,always((make_pretty(O,P),fmt999(P)))),!.
 
 fmt999(P):- \+ compound(P),!,fmt9(P).
 fmt999((:- M:P)):-
@@ -216,61 +164,36 @@ fmt999(P):- fmt9(P),nl.
 trim_off(W,A,B):- atomic(A), string_concat(W,B,A),!.
 trim_off(_,A,A).
 
-
-dbmsg0(Var):- var(Var),!,in_comment(colormsg1(dbmsg_var(Var))).
-dbmsg0(Str):- string(Str),!,in_comment(colormsg1(Str)).
-dbmsg0(:- A):- dbmsg1(A),!.
-dbmsg0(A):- dbmsg1(A),!.
-% dbmsg0(StringL):- to_prolog_string_if_needed(StringL,String),!,dbmsg0(String).
-dbmsg0(comment(X)):-!, shrink_lisp_strings(X,X0), in_comment(fmt99(X0)).
-dbmsg0(N=V):- !, shrink_lisp_strings(N=V,X0),  in_comment(fmt99(X0)).
-dbmsg0(A):- is_assert_op(A,Where,AA),!,dbmsg_assert(Where,AA).
-dbmsg0(:- X):- X==true,!.
-dbmsg0(:- X):- colormsg1(:- X),!.
-dbmsg0(X):- in_comment(colormsg1(:- X)),!.
-
-dbmsg1(((A,B))):-  is_assert_op(A,Where,AA), !,dbmsg_assert(Where, AA),dbmsg0( B).
-dbmsg1(((B,A))):-  is_assert_op(A,Where,AA), !,dbmsg0( B),dbmsg_assert(Where, AA).
-dbmsg1(((B,A,C))):-  is_assert_op(A,Where,AA), !,dbmsg0( B),dbmsg_assert(Where, AA),dbmsg0( C).
-dbmsg1(A):- is_assert_op(A,Where,AA),!,dbmsg_assert(Where,AA).
-
-dbmsg_assert(Where,X):- notrace((dbmsg_assert0(Where,X))),!.
-
-dbmsg_assert0(Where,(A,B)):- !,dbmsg_assert0(Where,A),dbmsg_assert0(Where,B).
-dbmsg_assert0(Where,user:(HBody)):- !,dbmsg_assert0(Where,(HBody)).
-dbmsg_assert0(Where, (user:H) :- Body):- !,dbmsg_assert0(Where,(H :- Body)),!.
-%dbmsg_assert0(Where,M:Body:- (true,[])):-!,colormsg1("\n% asserting fact...\n"),!,colormsg1(M:Body),!.
-dbmsg_assert0(Where,(Head:-Body)):- Body==true,!, dbmsg_assert0(Where,(Head)).
-
-dbmsg_assert0(Where,(Head:-Body)):- fail,!, always((pre_annotation(Where),in_md(colormsg1(Head:-Body)),
-   assert_lsp(Head:-Body),
-   assert_lsp(pass_clause(Where,Head,Body)))),!.
-dbmsg_assert0(Where,Head):- !, always((pre_annotation(Where),!,in_md(fmt99(Head)),!,
-   assert_lsp(Head),
-   assert_lsp(pass_clause(Where,Head,true)))),!.
+assert_lsp(G):- assert_lsp(u,G).
+assert_lsp(_,G):-  notrace((copy_term_nat(G,GG),assert_local(GG))).
+assert_local(user:G):-!,assert_local(G).
+assert_local(user:G:-B):-!,assert_local(G:-B).
+assert_local(G:-B):- B==true,!,assert_local(G).
+assert_local(G):- assert_local0(G).
+assert_local0(G):- \+ \+ (clause_asserted_local(G,_)),!.
+assert_local0(G):- doall((clause_asserted_local(G,E),erase(E),fail)),!,user:asserta(G),!.
+clause_asserted_local((H:-_),R):-!, clause(H,_,R).
+clause_asserted_local(H,R):- clause(H,true,R).
 
 
 
+:- dynamic(wam_cl_option/2).
+:- dynamic(wam_cl_option_local/2).
+wam_cl_option(N,V):- V==true,!,wam_cl_option(N,t).
+wam_cl_option(N,V):- nonvar(N), wam_cl_option_local(N,VV),!,V=VV.
+wam_cl_option(N,V):- var(N), wam_cl_option_local(N,VV),V=VV.
+wam_cl_option(speed,V):- !, (current_prolog_flag(runtime_speed,V)->true;V=1).
+wam_cl_option(safety,V):- !, (current_prolog_flag(runtime_safety,V)->true;V=1).
+wam_cl_option(debug,V):- !, (current_prolog_flag(runtime_debug,V)->true;V=1).
+wam_cl_option(safe(_),t):- !, (wam_cl_option(safety,V),V>0).
+wam_cl_option(_,TF):- wam_cl_option(safety,N),(N<1-> TF=t; TF=[]).
 
-pre_annotation(Where):- where_where(Where,Where1),colormsg1("\n% annotating `~w` ",[Where1]).
-where_where(Where,Atom):- locally_let(sym('cl:*package*')=pkg_kw,with_output_to(atom(Atom),cl_prin1(Where,_))),!.
-where_where(Where,Where).
-
-:- dynamic(lisp_compiler_option/2).
-:- dynamic(lisp_compiler_option_local/2).
-lisp_compiler_option(N,V):- V==true,!,lisp_compiler_option(N,t).
-lisp_compiler_option(N,V):- nonvar(N), lisp_compiler_option_local(N,VV),!,V=VV.
-lisp_compiler_option(N,V):- var(N), lisp_compiler_option_local(N,VV),V=VV.
-lisp_compiler_option(speed,V):- !, (current_prolog_flag(runtime_speed,V)->true;V=1).
-lisp_compiler_option(safety,V):- !, (current_prolog_flag(runtime_safety,V)->true;V=1).
-lisp_compiler_option(debug,V):- !, (current_prolog_flag(runtime_debug,V)->true;V=1).
-lisp_compiler_option(safe(_),t):- !, (lisp_compiler_option(safety,V),V>0).
-lisp_compiler_option(_,TF):- lisp_compiler_option(safety,N),(N<1-> TF=t; TF=[]).
-
-system:goal_expansion(always(G),G) :- lisp_compiler_option(speed,S),S>2.
-system:goal_expansion(certainly(G),G) :- lisp_compiler_option(safety,0).
+system:goal_expansion(always(G),G) :- wam_cl_option(speed,S),S>2.
+system:goal_expansion(certainly(G),G) :- wam_cl_option(safety,0).
 
 :- fixup_exports.
+:- use_module(debugio).
 :- include('header').
 
+wl:interned_eval("(defparameter ext:*markdown* cl:t)").
 

@@ -23,12 +23,13 @@
               
 
 repl:- 
+ in_md(cl,(
    lisp_banner,   
    set_prolog_flag(lisp_autointern,false), % requires  "PACKAGE:SYM" to already externally exists
    with_prompt_str('> ',
    ((	repeat,
         catch(read_eval_print(Result),'$aborted',fail),
-   	quietly(Result == end_of_file)))),!.
+   	quietly(Result == end_of_file)))))),!.
 
 
 
@@ -91,9 +92,11 @@ set_prompt_from_package:-
 
 read_eval_print(Result):-
         ignore(catch(lquietly(set_prompt_from_package),_,true)),
-        lquietly(show_uncaught_or_fail(read_no_parse(Expression))),!,
+        set_md_lang(cl),
+        lquietly(show_uncaught_or_fail(read_no_parse(Expression))),!,        
         lquietly(show_uncaught_or_fail(lisp_add_history(Expression))),!,
         nb_linkval('$mv_return',[Result]),
+        set_md_lang(prolog),
         show_uncaught_or_fail(eval_at_repl(Expression,Result)),!,
         lquietly(show_uncaught_or_fail(write_results(Result))),!.
 	
@@ -166,15 +169,15 @@ eval(Expression, Env, Result):-
    always_catch(ignore(always(maybe_ltrace(call(user:Code))))),!.
 
 
-read_and_parse(Expr):-  flush_all_output_safe,current_input(In),parse_sexpr_untyped_read(In, Expr).
 
-read_no_parse(Expr):-  flush_all_output_safe,current_input(In),parse_sexpr_untyped(In, Expr).
 
 flush_all_output_safe:- notrace((forall(stream_property(S,mode(write)),quietly(catch(flush_output(S),_,true))))).
 
-parse_sexpr_untyped_read(In, Expr):- 
-  parse_sexpr_untyped(In,ExprS),!,
-  as_sexp(ExprS,ExprS1),!,reader_intern_symbols(ExprS1,Expr).
+read_no_parse(Expr):- flush_all_output_safe,current_input(In), read_no_parse(In,Expr).
+read_no_parse(In, ExprO):- parse_sexpr_untyped(In,ExprS),(ExprS='$COMMENT'(_) -> (!,read_no_parse(In, ExprO)); ExprS=ExprO).
+
+read_and_parse(Expr):-  flush_all_output_safe,current_input(In),read_and_parse(In, Expr).
+read_and_parse(In, Expr):- read_no_parse(In, ExprS),as_sexp(ExprS,ExprS1),!,reader_intern_symbols(ExprS1,Expr),!.
 
 
 eval_repl_hooks(V,_):-var(V),!,fail.

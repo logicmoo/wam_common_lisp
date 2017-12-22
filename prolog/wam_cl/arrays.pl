@@ -43,7 +43,7 @@ get_test_pred(Keys,Pred):-
   key_value(Keys,kw_test,Value)  -> to_function(Value,Pred);
   Pred = cl_eql.
 
-to_function(function(ValueI),ValueO):-!,to_function(ValueI,ValueO).
+%to_function(function(ValueI),ValueO):-!,to_function(ValueI,ValueO).
 to_function(Value,Value).
 to_neg_function(Value,not_fn(Neg)):-to_function(Value,Neg).
 not_fn(Value,A):- \+ call(Value,A).

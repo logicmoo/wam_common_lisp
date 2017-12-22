@@ -18,7 +18,7 @@
 ;; not charge a fee for this document or for its distribution.
 |#
 
-#+WAM-CL (prolog-call "cls.")
+; #+WAM-CL (prolog-call "cls.")
 
 (defun mapcar-visualize (func l) (if (null l) () (cons (apply func (list (first l))) (mapcar func (rest l)))))
 

@@ -27,6 +27,9 @@
 :- include('header').
 
 
+:- thread_local(t_l:sreader_options/2).
+kif_ok:- t_l:sreader_options(logicmoo_read_kif,true).
+
 
 :- meta_predicate((with_lisp_translation(+,1),input_to_forms_debug(+,2))).
 :- meta_predicate sexpr_vector(*,//,
@@ -153,7 +156,8 @@ phrase_from_stream_part(Grammar, In) :- phrase_from_stream_part_seekable(Grammar
 
 phrase_from_stream_part_seekable(Grammar, In) :- 
     always(sanity(stream_property(In,reposition(true)))),!,
-    % set_stream(In,buffer_size(16384)),!, % set_stream(In,buffer(full)),
+    %set_stream(In,buffer_size(16384)),!,% 
+    set_stream(In,buffer(full)),
     character_count(In, FailToPosition),!,
     (phrase_from_stream_lazy_part(Grammar, In) -> true ; 
       (seek(In,FailToPosition,bof,_),!,fail)),!.
@@ -258,7 +262,7 @@ parse_sexpr_string(S,Expr):- nb_setval('$maybe_string',t),parse_sexpr(string(S),
 parse_sexpr_stream(S,Expr):- at_end_of_stream(S),!,end_of_file=Expr.
 parse_sexpr_stream(S,Expr):- 
   notrace_catch_fail(
-    phrase_from_stream_part(file_sexpr(Expr),S),
+    phrase_from_stream_part(file_sexpr_with_comments(Expr),S),
     at_end_of_stream(S),
     Expr=end_of_file),!.
 
@@ -266,6 +270,10 @@ parse_sexpr_stream(S,Expr):-
 :- export('//'(file_sexpr,1)).
 :- export('//'(sexpr,1)).
 
+
+comment_expr('$COMMENT'(Expr,I,CP)) --> line_comment(Expr,I,CP),!.
+comment_expr('$COMMENT'('#'(Txt))) --> `#|`, !, read_string_until(S,`|#`), swhite,{text_to_string_safe(S,Txt)}.
+comment_expr('$COMMENT'([])) --> sblank_lines,!.
 comment_expr('$COMMENT'(Expr,I,CP)) --> line_comment(Expr,I,CP),!.
 comment_expr('$COMMENT1'(Txt)) --> `#|`, !, read_string_until(S,`|#`), swhite,{text_to_string_safe(S,Txt)}.
 comment_expr('$COMMENT0'([])) --> sblank_lines,!.
@@ -281,6 +289,22 @@ file_eof --> [X],{ var(X), X = -1},!.
 file_eof --> [X],{ attvar(X), X = -1},!.
 file_eof --> [X],{ attvar(X), X = end_of_file},!.
 
+file_sexpr_with_comments(end_of_file) --> file_eof,!.
+file_sexpr_with_comments(O) --> one_blank,!,file_sexpr_with_comments(O).  % WANT? 
+file_sexpr_with_comments(C)                 --> sexpr_dcgPeek(`#|`),!, comment_expr(C).
+file_sexpr_with_comments(C)                 --> sexpr_dcgPeek(`;`),!, comment_expr(C).
+file_sexpr_with_comments(Out,S,E):- \+ t_l:sreader_options(with_text,true),!,phrase(file_sexpr(Out),S,E),!.
+file_sexpr_with_comments(Out,S,E):- 
+   lazy_list_character_count(StartPos,S,M),
+   file_sexpr(O,M,ME),
+   lazy_list_character_count(EndPos,ME,E),
+   Len is EndPos - StartPos,
+   length(Grabber,Len),!,
+   get_sexpr_with_comments(O,Grabber,Out,M,ME).
+
+get_sexpr_with_comments(O,_,O,_,_):- compound(O),functor(O,'$COMMENT',_),!.
+get_sexpr_with_comments(O,Txt,with_text(O,Str),S,_E):-append(Txt,_,S),text_to_string(Txt,Str).
+%file_sexpr_with_comments(O,with_text(O,Txt),S,E):- copy_until_tail(S,Copy),text_to_string_safe(Copy,Txt),!.
 
 
 file_sexpr(end_of_file) --> file_eof,!.
@@ -288,12 +312,24 @@ file_sexpr(end_of_file) --> file_eof,!.
 file_sexpr(O) --> one_blank,!,file_sexpr(O).
 file_sexpr(C) --> comment_expr(C),!.
 
+
 %   0.0003:   (PICK-UP ANDY IBM-R30 CS-LOUNGE) [0.1000]
 % file_sexpr(planStepLPG(Name,Expr,Value)) --> swhite,sym_or_num(Name),`:`,swhite, sexpr(Expr),swhite, `[`,sym_or_num(Value),`]`,swhite.
 
 % file_sexpr(Term,Left,Right):- eoln(EOL),append(LLeft,[46,EOL|Right],Left),read_term_from_codes(LLeft,Term,[double_quotes(string),syntax_errors(fail)]),!.
 % file_sexpr(Term,Left,Right):- append(LLeft,[46|Right],Left), ( \+ member(46,Right)),read_term_from_codes(LLeft,Term,[double_quotes(string),syntax_errors(fail)]),!.
+/*
+file_sexpr(Expr,S,E):- \+ t_l:sreader_options(with_text,true),!,
+  sexpr(Expr,S,E),!.
 
+file_sexpr(Out,S,E):- 
+   lazy_list_character_count(StartPos,S,M),
+   sexpr(O,M,ME),
+   lazy_list_character_count(EndPos,ME,E),
+   Len is EndPos - StartPos,
+   length(Grabber,Len),
+   get_sexpr_with_comments(O,Grabber,Out,M,ME).
+*/
 file_sexpr(Expr) --> sexpr(Expr),!.
 
 % file_sexpr(Expr,H,T):- lisp_dump_break,rtrace(phrase(file_sexpr(Expr), H,T)).
@@ -419,7 +455,7 @@ sexpr('$OBJ'(claz_bracket_vector,V))                 --> `[`, sexpr_vector(V,`]`
 sexpr('#'(A))              --> `|`, !, read_string_until(S,`|`), swhite,{quietly_sreader(((atom_string(A,S))))}.
 
 % maybe this is KIF
-sexpr('?'(E))              --> `?`, sexpr_dcgPeek(([C],{sym_char(C)})),!, rsymbol(`?`,E), swhite.
+sexpr('?'(E))              --> {kif_ok}, `?`, sexpr_dcgPeek(([C],{sym_char(C)})),!, rsymbol(`?`,E), swhite.
 % @TODO if KIF sexpr('#'(E))              --> `&%`, !, rsymbol(`#$`,E), swhite.
 
 sexpr('$STRING'(S))             --> s_string(S).
@@ -742,6 +778,8 @@ to_untyped('$EXP'(I,claz_single_float,E),N):- (notrace_catch_fail(N is 0.0 + ((I
 to_untyped('$EXP'(I,T,E),'$NUMBER'(T,N)):- (notrace_catch_fail(N is (I * 10^E))),!.
 to_untyped('$EXP'(I,T,E),'$EXP'(I,T,E)):-!.
 
+to_untyped(with_text(I,Txt),with_text(O,Txt)):-to_untyped(I,O),!.
+
 % to_untyped([[]],[]):-!.
 to_untyped('$STR'(Expr),Forms):- (text_to_string_safe(Expr,Forms);to_untyped(Expr,Forms)),!.
 to_untyped('$STRING'(Expr),'$STRING'(Forms)):- (text_to_string_safe(Expr,Forms);to_untyped(Expr,Forms)),!.
@@ -870,6 +908,7 @@ copy_lvars(Term,Vars,NTerm,NVars):-
 %
 % If this is a KIF var, convert to a name for prolog
 %
+svar(_,_):- \+ kif_ok,!,fail.
 svar(SVAR,UP):- nonvar(UP),!,trace_or_throw(nonvar_svar(SVAR,UP)).
 svar(Var,Name):-var(Var),!,always(svar_fixvarname(Var,Name)).
 svar('#'(Name),NameU):-!,svar(Name,NameU),!.
