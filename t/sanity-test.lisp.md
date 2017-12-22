@@ -1,3 +1,4 @@
+```
 root@gitlab:/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl# swipl repl.pl
 Installed packages (38):
 
@@ -40,7 +41,9 @@ i with_thread_local@1.1.118 - Call a Goal with local assertions
 i xlisting@1.1.118          - Selective Interactive Non-Deterministic Tracing
 i xlisting_web@1.1.118      - Manipulate and browse prolog runtime over www
 
-__        ___    __  __        ____ _
+```
+
+```cl__        ___    __  __        ____ _
 \ \      / / \  |  \/  |      / ___| |
  \ \ /\ / / _ \ | |\/| |_____| |   | |
   \ V  V / ___ \| |  | |_____| |___| |___
@@ -48,6 +51,7 @@ __        ___    __  __        ____ _
 
 Common Lisp, written in Prolog
 CL-USER> (compile-file "sanity-test")
+```
 /*
 ```cl
 :- lisp_compiled_eval(
