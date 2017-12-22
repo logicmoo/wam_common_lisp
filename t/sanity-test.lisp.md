@@ -1,4 +1,3 @@
-```
 root@gitlab:/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl# swipl repl.pl
 Installed packages (38):
 
@@ -49,9 +48,6 @@ __        ___    __  __        ____ _
 
 Common Lisp, written in Prolog
 CL-USER> (compile-file "sanity-test")
-
-```
-
 /*
 ```cl
 :- lisp_compiled_eval(
@@ -147,23 +143,23 @@ CL-USER> (compile-file "sanity-test")
                             ]
                           ]).
 
-% annotating... `U::MAPCAR-VISUALIZE`
+##### annotating... `U::MAPCAR-VISUALIZE`
 ```prolog
 wl:lambda_def(defun, u_mapcar_visualize, f_u_mapcar_visualize, [u_func, u_l], [[if, [null, u_l], [], [cons, [apply, u_func, [list, [first, u_l]]], [mapcar, u_func, [rest, u_l]]]]]).
 ```
 
-% annotating... `U::MAPCAR-VISUALIZE`
+##### annotating... `U::MAPCAR-VISUALIZE`
 ```prolog
 wl:arglist_info(u_mapcar_visualize, [u_func, u_l], [Func_Param, L_Param], arginfo{all:[u_func, u_l], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[u_func, u_l], opt:0, req:[u_func, u_l], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `U::MAPCAR-VISUALIZE`
+##### annotating... `U::MAPCAR-VISUALIZE`
 ```prolog
 wl: init_args(exact_only, u_mapcar_visualize).
 
 ```
 
-% ### Compiled:  `U::MAPCAR-VISUALIZE`
+### Compiled:  `U::MAPCAR-VISUALIZE`
 ```prolog
 f_u_mapcar_visualize(Func_Param, L_Param, FnResult) :-
         Env=[bv(u_func, Func_Param), bv(u_l, L_Param)],
@@ -336,23 +332,23 @@ f_u_mapcar_visualize(Func_Param, L_Param, FnResult) :-
                             ]
                           ]).
 
-% annotating... `SYS::DD`
+##### annotating... `SYS::DD`
 ```prolog
 wl:lambda_def(defun, sys_dd, f_sys_dd, [], [[let, [[sys_xx_lisp_file_type_xx, '$ARRAY'([*], claz_base_character, "cl")], [xx_default_pathname_defaults_xx, [merge_pathnames, '$ARRAY'([*], claz_base_character, "daydreamer/")]]], [load, '$ARRAY'([*], claz_base_character, "dd")]]]).
 ```
 
-% annotating... `SYS::DD`
+##### annotating... `SYS::DD`
 ```prolog
 wl:arglist_info(sys_dd, [], [], arginfo{all:0, allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[], opt:0, req:0, rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::DD`
+##### annotating... `SYS::DD`
 ```prolog
 wl: init_args(exact_only, sys_dd).
 
 ```
 
-% ### Compiled:  `SYS::DD`
+### Compiled:  `SYS::DD`
 ```prolog
 f_sys_dd(FnResult) :-
         Env=[],
@@ -417,23 +413,23 @@ f_sys_dd(FnResult) :-
                             ['write-line', '$STRING'("                ")]
                           ]).
 
-% annotating... `SYS::SHOW-ASCII-ART`
+##### annotating... `SYS::SHOW-ASCII-ART`
 ```prolog
 wl:lambda_def(defun, sys_show_ascii_art, f_sys_show_ascii_art, [], [[write_line, '$ARRAY'([*], claz_base_character, "  __________    ")], [write_line, '$ARRAY'([*], claz_base_character, " / ___  ___ \\   ")], [write_line, '$ARRAY'([*], claz_base_character, "/ / @ \\/ @ \\ \\  ")], [write_line, '$ARRAY'([*], claz_base_character, "\\ \\___/\\___/ /\\ ")], [write_line, '$ARRAY'([*], claz_base_character, " \\____\\/____/|| ")], [write_line, '$ARRAY'([*], claz_base_character, " /     /\\\\\\\\\\// ")], [write_line, '$ARRAY'([*], claz_base_character, "|     |\\\\\\\\\\\\   ")], [write_line, '$ARRAY'([*], claz_base_character, " \\      \\\\\\\\\\\\  ")], [write_line, '$ARRAY'([*], claz_base_character, "   \\______/\\\\\\\\ ")], [write_line, '$ARRAY'([*], claz_base_character, "    _||_||_     ")], [write_line, '$ARRAY'([*], claz_base_character, "                ")]]).
 ```
 
-% annotating... `SYS::SHOW-ASCII-ART`
+##### annotating... `SYS::SHOW-ASCII-ART`
 ```prolog
 wl:arglist_info(sys_show_ascii_art, [], [], arginfo{all:0, allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[], opt:0, req:0, rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::SHOW-ASCII-ART`
+##### annotating... `SYS::SHOW-ASCII-ART`
 ```prolog
 wl: init_args(exact_only, sys_show_ascii_art).
 
 ```
 
-% ### Compiled:  `SYS::SHOW-ASCII-ART`
+### Compiled:  `SYS::SHOW-ASCII-ART`
 ```prolog
 f_sys_show_ascii_art(FnResult) :-
         Env=[],
@@ -749,23 +745,23 @@ f_sys_show_ascii_art(FnResult) :-
                             ]
                           ]).
 
-% annotating... `SYS::GET-SETF-METHOD-INVERSE`
+##### annotating... `SYS::GET-SETF-METHOD-INVERSE`
 ```prolog
 wl:lambda_def(defun, sys_get_setf_method_inverse, f_sys_get_setf_method_inverse, [sys_form, sys_inverse, sys_setf_function], [[let, [[sys_new_var, [gensym]], [sys_vars, []], [sys_vals, []]], [dolist, [sys_x, [cdr, sys_form]], [push, [gensym], sys_vars], [push, sys_x, sys_vals]], [setq, sys_vals, [nreverse, sys_vals]], [values, sys_vars, sys_vals, [list, sys_new_var], [if, sys_setf_function, ['#BQ', [['#BQ-COMMA-ELIPSE', sys_inverse], ['#COMMA', sys_new_var], ['#BQ-COMMA-ELIPSE', sys_vars]]], [if, [functionp, [car, sys_inverse]], ['#BQ', [funcall, ['#BQ-COMMA-ELIPSE', sys_inverse], ['#BQ-COMMA-ELIPSE', sys_vars], ['#COMMA', sys_new_var]]], ['#BQ', [['#BQ-COMMA-ELIPSE', sys_inverse], ['#BQ-COMMA-ELIPSE', sys_vars], ['#COMMA', sys_new_var]]]]], ['#BQ', [['#COMMA', [car, sys_form]], ['#BQ-COMMA-ELIPSE', sys_vars]]]]]]).
 ```
 
-% annotating... `SYS::GET-SETF-METHOD-INVERSE`
+##### annotating... `SYS::GET-SETF-METHOD-INVERSE`
 ```prolog
 wl:arglist_info(sys_get_setf_method_inverse, [sys_form, sys_inverse, sys_setf_function], [Form_Param, Inverse_Param, Setf_function_Param], arginfo{all:[sys_form, sys_inverse, sys_setf_function], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_form, sys_inverse, sys_setf_function], opt:0, req:[sys_form, sys_inverse, sys_setf_function], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::GET-SETF-METHOD-INVERSE`
+##### annotating... `SYS::GET-SETF-METHOD-INVERSE`
 ```prolog
 wl: init_args(exact_only, sys_get_setf_method_inverse).
 
 ```
 
-% ### Compiled:  `SYS::GET-SETF-METHOD-INVERSE`
+### Compiled:  `SYS::GET-SETF-METHOD-INVERSE`
 ```prolog
 f_sys_get_setf_method_inverse(Form_Param, Inverse_Param, Setf_function_Param, FnResult) :-
         Env=[bv(sys_form, Form_Param), bv(sys_inverse, Inverse_Param), bv(sys_setf_function, Setf_function_Param)],
@@ -869,23 +865,23 @@ f_sys_get_setf_method_inverse(Form_Param, Inverse_Param, Setf_function_Param, Fn
                             ]
                           ]).
 
-% annotating... `SYS::EXPAND-OR-GET-SETF-INVERSE`
+##### annotating... `SYS::EXPAND-OR-GET-SETF-INVERSE`
 ```prolog
 wl:lambda_def(defun, sys_expand_or_get_setf_inverse, f_sys_expand_or_get_setf_inverse, [sys_form, sys_environment], [[multiple_value_bind, [sys_expansion, sys_expanded], [macroexpand_1, sys_form, sys_environment], [if, sys_expanded, [get_setf_expansion, sys_expansion, sys_environment], [sys_get_setf_method_inverse, sys_form, ['#BQ', [funcall, function([setf, ['#COMMA', [car, sys_form]]])]], t]]]]).
 ```
 
-% annotating... `SYS::EXPAND-OR-GET-SETF-INVERSE`
+##### annotating... `SYS::EXPAND-OR-GET-SETF-INVERSE`
 ```prolog
 wl:arglist_info(sys_expand_or_get_setf_inverse, [sys_form, sys_environment], [Form_Param, Environment_Param], arginfo{all:[sys_form, sys_environment], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_form, sys_environment], opt:0, req:[sys_form, sys_environment], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::EXPAND-OR-GET-SETF-INVERSE`
+##### annotating... `SYS::EXPAND-OR-GET-SETF-INVERSE`
 ```prolog
 wl: init_args(exact_only, sys_expand_or_get_setf_inverse).
 
 ```
 
-% ### Compiled:  `SYS::EXPAND-OR-GET-SETF-INVERSE`
+### Compiled:  `SYS::EXPAND-OR-GET-SETF-INVERSE`
 ```prolog
 f_sys_expand_or_get_setf_inverse(Form_Param, Environment_Param, FnResult) :-
         Env=[bv(sys_form, Form_Param), bv(sys_environment, Environment_Param)],
@@ -1025,23 +1021,23 @@ f_sys_expand_or_get_setf_inverse(Form_Param, Environment_Param, FnResult) :-
                             ]
                           ]).
 
-% annotating... `CL:GET-SETF-EXPANSION`
+##### annotating... `CL:GET-SETF-EXPANSION`
 ```prolog
 wl:lambda_def(defun, get_setf_expansion, cl_get_setf_expansion, [sys_form, c38_optional, sys_environment], [[let, [sys_temp], [cond, [[symbolp, sys_form], [multiple_value_bind, [sys_expansion, sys_expanded], [macroexpand_1, sys_form, sys_environment], [if, sys_expanded, [get_setf_expansion, sys_expansion, sys_environment], [let, [[sys_new_var, [gensym]]], [values, [], [], [list, sys_new_var], ['#BQ', [setq, ['#COMMA', sys_form], ['#COMMA', sys_new_var]]], sys_form]]]]], [[setq, sys_temp, [get, [car, sys_form], [quote, sys_setf_inverse]]], [sys_get_setf_method_inverse, sys_form, ['#BQ', [['#COMMA', sys_temp]]], []]], [[setq, sys_temp, [get, [car, sys_form], [quote, sys_setf_expander]]], [funcall, sys_temp, sys_form, sys_environment]], [t, [sys_expand_or_get_setf_inverse, sys_form, sys_environment]]]]]).
 ```
 
-% annotating... `CL:GET-SETF-EXPANSION`
+##### annotating... `CL:GET-SETF-EXPANSION`
 ```prolog
 wl:arglist_info(get_setf_expansion, [sys_form, c38_optional, sys_environment], [sys_form, sys_environment], arginfo{all:[sys_form, sys_environment], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_form, sys_environment], opt:[sys_environment], req:[sys_form], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `CL:GET-SETF-EXPANSION`
+##### annotating... `CL:GET-SETF-EXPANSION`
 ```prolog
 wl: init_args(1, get_setf_expansion).
 
 ```
 
-% ### Compiled:  `CL:GET-SETF-EXPANSION`
+### Compiled:  `CL:GET-SETF-EXPANSION`
 ```prolog
 cl_get_setf_expansion(Form_Param, RestNKeys, LetResult28) :-
         Env=[bv(sys_form, Form_Param), bv(sys_environment, Environment_Param)],
@@ -1336,23 +1332,23 @@ cl_get_setf_expansion(Form_Param, RestNKeys, LetResult28) :-
                             ]
                           ]).
 
-% annotating... `SYS::ABCL-SETF`
+##### annotating... `SYS::ABCL-SETF`
 ```prolog
 wl:lambda_def(defmacro, sys_abcl_setf, f_sys_abcl_setf, [c38_rest, args, c38_environment, sys_environment], [progn, [let, [[sys_numargs, [length, args]]], [cond, [[=, sys_numargs, 2], [let, [[sys_place, [first, args]], [sys_value_form, [second, args]]], [if, [atom, sys_place], ['#BQ', [setq, ['#COMMA', sys_place], ['#COMMA', sys_value_form]]], [progn, [multiple_value_bind, [sys_dummies, sys_vals, sys_store_vars, sys_setter, sys_getter], [get_setf_expansion, sys_place, sys_environment], [let, [[sys_inverse, [get, [car, sys_place], [quote, sys_setf_inverse]]]], [if, [and, sys_inverse, [eq, sys_inverse, [car, sys_setter]]], [if, [functionp, sys_inverse], ['#BQ', [funcall, ['#COMMA', sys_inverse], ['#BQ-COMMA-ELIPSE', [cdr, sys_place]], ['#COMMA', sys_value_form]]], ['#BQ', [['#COMMA', sys_inverse], ['#BQ-COMMA-ELIPSE', [cdr, sys_place]], ['#COMMA', sys_value_form]]]], [if, [or, [null, sys_store_vars], [cdr, sys_store_vars]], ['#BQ', [let_xx, [['#BQ-COMMA-ELIPSE', [mapcar, function(list), sys_dummies, sys_vals]]], [multiple_value_bind, ['#COMMA', sys_store_vars], ['#COMMA', sys_value_form], ['#COMMA', sys_setter]]]], ['#BQ', [let_xx, [['#BQ-COMMA-ELIPSE', [mapcar, function(list), sys_dummies, sys_vals]], ['#COMMA', [list, [car, sys_store_vars], sys_value_form]]], ['#COMMA', sys_setter]]]]]]]]]]], [[oddp, sys_numargs], [error, '$ARRAY'([*], claz_base_character, "Odd number of arguments to SETF.")]], [t, [do, [[sys_a, args, [cddr, sys_a]], [sys_l, []]], [[null, sys_a], ['#BQ', [progn, ['#BQ-COMMA-ELIPSE', [nreverse, sys_l]]]]], [setq, sys_l, [cons, [list, [quote, setf], [car, sys_a], [cadr, sys_a]], sys_l]]]]]]]).
 ```
 
-% annotating... `SYS::ABCL-SETF`
+##### annotating... `SYS::ABCL-SETF`
 ```prolog
 wl:arglist_info(sys_abcl_setf, [c38_rest, args, c38_environment, sys_environment], [args, sys_environment], arginfo{all:0, allow_other_keys:0, aux:0, body:0, complex:[rest, environment], env:[sys_environment], key:0, names:[args, sys_environment], opt:0, req:0, rest:[args], sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::ABCL-SETF`
+##### annotating... `SYS::ABCL-SETF`
 ```prolog
 wl: init_args(0, sys_abcl_setf).
 
 ```
 
-% ### Compiled:  `SYS::ABCL-SETF`
+### Compiled:  `SYS::ABCL-SETF`
 ```prolog
 f_sys_abcl_setf(Args_Param, FnResult) :-
         TLEnv8=[bv(args, Args_Param), bv(sys_environment, Environment_Param)],
@@ -1541,23 +1537,23 @@ f_sys_abcl_setf(Args_Param, FnResult) :-
                             ]
                           ]).
 
-% annotating... `CL:INCF`
+##### annotating... `CL:INCF`
 ```prolog
 wl:lambda_def(defmacro, incf, cl_incf, [sys_place, c38_optional, [sys_delta, 1]], [progn, ['#BQ', [setf, ['#COMMA', sys_place], [+, ['#COMMA', sys_place], ['#COMMA', sys_delta]]]]]).
 ```
 
-% annotating... `CL:INCF`
+##### annotating... `CL:INCF`
 ```prolog
 wl:arglist_info(incf, [sys_place, c38_optional, [sys_delta, 1]], [sys_place, sys_delta], arginfo{all:[sys_place, sys_delta], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_place, sys_delta], opt:[sys_delta], req:[sys_place], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `CL:INCF`
+##### annotating... `CL:INCF`
 ```prolog
 wl: init_args(1, incf).
 
 ```
 
-% ### Compiled:  `CL:INCF`
+### Compiled:  `CL:INCF`
 ```prolog
 cl_incf(Place_Param, RestNKeys, FnResult) :-
         TLEnv8=[bv(sys_place, Place_Param), bv(sys_delta, Delta_Param)],
@@ -1604,23 +1600,23 @@ cl_incf(Place_Param, RestNKeys, FnResult) :-
                             ]
                           ]).
 
-% annotating... `CL:DECF`
+##### annotating... `CL:DECF`
 ```prolog
 wl:lambda_def(defmacro, decf, cl_decf, [sys_place, c38_optional, [sys_delta, 1]], [progn, ['#BQ', [setf, ['#COMMA', sys_place], [-, ['#COMMA', sys_place], ['#COMMA', sys_delta]]]]]).
 ```
 
-% annotating... `CL:DECF`
+##### annotating... `CL:DECF`
 ```prolog
 wl:arglist_info(decf, [sys_place, c38_optional, [sys_delta, 1]], [sys_place, sys_delta], arginfo{all:[sys_place, sys_delta], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_place, sys_delta], opt:[sys_delta], req:[sys_place], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `CL:DECF`
+##### annotating... `CL:DECF`
 ```prolog
 wl: init_args(1, decf).
 
 ```
 
-% ### Compiled:  `CL:DECF`
+### Compiled:  `CL:DECF`
 ```prolog
 cl_decf(Place_Param, RestNKeys, FnResult) :-
         TLEnv8=[bv(sys_place, Place_Param), bv(sys_delta, Delta_Param)],
@@ -1698,23 +1694,23 @@ cl_decf(Place_Param, RestNKeys, FnResult) :-
                             ]
                           ]).
 
-% annotating... `SYS::%SET-SUBSEQ`
+##### annotating... `SYS::%SET-SUBSEQ`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_subseq, f_sys_pf_set_subseq, [sequence, start, c38_rest, rest], [[let, [[end, []], sys_v], [ecase, [length, rest], [1, [setq, sys_v, [car, rest]]], [2, [setq, end, [car, rest], sys_v, [cadr, rest]]]], [progn, [replace, sequence, sys_v, kw_start1, start, kw_end1, end], sys_v]]]).
 ```
 
-% annotating... `SYS::%SET-SUBSEQ`
+##### annotating... `SYS::%SET-SUBSEQ`
 ```prolog
 wl:arglist_info(sys_pf_set_subseq, [sequence, start, c38_rest, rest], [sequence, start, rest], arginfo{all:[sequence, start], allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[sequence, start, rest], opt:0, req:[sequence, start], rest:[rest], sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-SUBSEQ`
+##### annotating... `SYS::%SET-SUBSEQ`
 ```prolog
 wl: init_args(2, sys_pf_set_subseq).
 
 ```
 
-% ### Compiled:  `SYS::%SET-SUBSEQ`
+### Compiled:  `SYS::%SET-SUBSEQ`
 ```prolog
 f_sys_pf_set_subseq(Sequence_Param, Start_Param, Rest_Param, FnResult) :-
         Env=[bv(sequence, Sequence_Param), bv(start, Start_Param), bv(rest, Rest_Param)],
@@ -1787,23 +1783,23 @@ f_sys_pf_set_subseq(Sequence_Param, Start_Param, Rest_Param, FnResult) :-
                             name
                           ]).
 
-% annotating... `SYS::%DEFINE-SETF-MACRO`
+##### annotating... `SYS::%DEFINE-SETF-MACRO`
 ```prolog
 wl:lambda_def(defun, sys_pf_define_setf_macro, f_sys_pf_define_setf_type_macro, [sys_name, sys_expander, sys_inverse, sys_doc], [[declare, [ignore, sys_doc]], [when, sys_inverse, [sys_put, sys_name, [quote, sys_setf_inverse], sys_inverse]], [when, sys_expander, [sys_put, sys_name, [quote, sys_setf_expander], sys_expander]], sys_name]).
 ```
 
-% annotating... `SYS::%DEFINE-SETF-MACRO`
+##### annotating... `SYS::%DEFINE-SETF-MACRO`
 ```prolog
 wl:arglist_info(sys_pf_define_setf_macro, [sys_name, sys_expander, sys_inverse, sys_doc], [Name_Param, Expander_Param, Inverse_Param, Doc_Param], arginfo{all:[sys_name, sys_expander, sys_inverse, sys_doc], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_name, sys_expander, sys_inverse, sys_doc], opt:0, req:[sys_name, sys_expander, sys_inverse, sys_doc], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%DEFINE-SETF-MACRO`
+##### annotating... `SYS::%DEFINE-SETF-MACRO`
 ```prolog
 wl: init_args(exact_only, sys_pf_define_setf_macro).
 
 ```
 
-% ### Compiled:  `SYS::%DEFINE-SETF-MACRO`
+### Compiled:  `SYS::%DEFINE-SETF-MACRO`
 ```prolog
 f_sys_pf_define_setf_type_macro(Name_Param, Expander_Param, Inverse_Param, Doc_Param, Name_Param) :-
         Env=[bv(sys_doc, Doc_Param)],
@@ -1867,23 +1863,23 @@ f_sys_pf_define_setf_type_macro(Name_Param, Expander_Param, Inverse_Param, Doc_P
                             ]
                           ]).
 
-% annotating... `CL:DEFSETF`
+##### annotating... `CL:DEFSETF`
 ```prolog
 wl:lambda_def(defmacro, defsetf, cl_defsetf, [sys_access_function, sys_update_function], [progn, ['#BQ', [eval_when, [kw_load_toplevel, kw_compile_toplevel, kw_execute], [sys_put, [quote, ['#COMMA', sys_access_function]], [quote, sys_setf_inverse], [quote, ['#COMMA', sys_update_function]]]]]]).
 ```
 
-% annotating... `CL:DEFSETF`
+##### annotating... `CL:DEFSETF`
 ```prolog
 wl:arglist_info(defsetf, [sys_access_function, sys_update_function], [Access_function_Param, Update_function_Param], arginfo{all:[sys_access_function, sys_update_function], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_access_function, sys_update_function], opt:0, req:[sys_access_function, sys_update_function], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `CL:DEFSETF`
+##### annotating... `CL:DEFSETF`
 ```prolog
 wl: init_args(exact_only, defsetf).
 
 ```
 
-% ### Compiled:  `CL:DEFSETF`
+### Compiled:  `CL:DEFSETF`
 ```prolog
 cl_defsetf(Access_function_Param, Update_function_Param, FnResult) :-
         [eval_when, [kw_load_toplevel, kw_compile_toplevel, kw_execute], [sys_put, [quote, Access_function_Param], [quote, sys_setf_inverse], [quote, Update_function_Param]]]=MFResult,
@@ -1905,23 +1901,23 @@ cl_defsetf(Access_function_Param, Update_function_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-caar', [x, v], ['set-car', [car, x], v]]).
 
-% annotating... `SYS::%SET-CAAR`
+##### annotating... `SYS::%SET-CAAR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_caar, f_sys_pf_set_caar, [sys_x, sys_v], [[sys_set_car, [car, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CAAR`
+##### annotating... `SYS::%SET-CAAR`
 ```prolog
 wl:arglist_info(sys_pf_set_caar, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CAAR`
+##### annotating... `SYS::%SET-CAAR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_caar).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CAAR`
+### Compiled:  `SYS::%SET-CAAR`
 ```prolog
 f_sys_pf_set_caar(X_Param, V_Param, FnResult) :-
         cl_car(X_Param, Set_car_Param),
@@ -1944,23 +1940,23 @@ f_sys_pf_set_caar(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-cadr', [x, v], ['set-car', [cdr, x], v]]).
 
-% annotating... `SYS::%SET-CADR`
+##### annotating... `SYS::%SET-CADR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_cadr, f_sys_pf_set_cadr, [sys_x, sys_v], [[sys_set_car, [cdr, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CADR`
+##### annotating... `SYS::%SET-CADR`
 ```prolog
 wl:arglist_info(sys_pf_set_cadr, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CADR`
+##### annotating... `SYS::%SET-CADR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_cadr).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CADR`
+### Compiled:  `SYS::%SET-CADR`
 ```prolog
 f_sys_pf_set_cadr(X_Param, V_Param, FnResult) :-
         cl_cdr(X_Param, Set_car_Param),
@@ -1983,23 +1979,23 @@ f_sys_pf_set_cadr(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-cdar', [x, v], ['set-cdr', [car, x], v]]).
 
-% annotating... `SYS::%SET-CDAR`
+##### annotating... `SYS::%SET-CDAR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_cdar, f_sys_pf_set_cdar, [sys_x, sys_v], [[sys_set_cdr, [car, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CDAR`
+##### annotating... `SYS::%SET-CDAR`
 ```prolog
 wl:arglist_info(sys_pf_set_cdar, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CDAR`
+##### annotating... `SYS::%SET-CDAR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_cdar).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CDAR`
+### Compiled:  `SYS::%SET-CDAR`
 ```prolog
 f_sys_pf_set_cdar(X_Param, V_Param, FnResult) :-
         cl_car(X_Param, Set_cdr_Param),
@@ -2022,23 +2018,23 @@ f_sys_pf_set_cdar(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-cddr', [x, v], ['set-cdr', [cdr, x], v]]).
 
-% annotating... `SYS::%SET-CDDR`
+##### annotating... `SYS::%SET-CDDR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_cddr, f_sys_pf_set_cddr, [sys_x, sys_v], [[sys_set_cdr, [cdr, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CDDR`
+##### annotating... `SYS::%SET-CDDR`
 ```prolog
 wl:arglist_info(sys_pf_set_cddr, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CDDR`
+##### annotating... `SYS::%SET-CDDR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_cddr).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CDDR`
+### Compiled:  `SYS::%SET-CDDR`
 ```prolog
 f_sys_pf_set_cddr(X_Param, V_Param, FnResult) :-
         cl_cdr(X_Param, Set_cdr_Param),
@@ -2061,23 +2057,23 @@ f_sys_pf_set_cddr(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-caaar', [x, v], ['set-car', [caar, x], v]]).
 
-% annotating... `SYS::%SET-CAAAR`
+##### annotating... `SYS::%SET-CAAAR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_caaar, f_sys_pf_set_caaar, [sys_x, sys_v], [[sys_set_car, [caar, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CAAAR`
+##### annotating... `SYS::%SET-CAAAR`
 ```prolog
 wl:arglist_info(sys_pf_set_caaar, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CAAAR`
+##### annotating... `SYS::%SET-CAAAR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_caaar).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CAAAR`
+### Compiled:  `SYS::%SET-CAAAR`
 ```prolog
 f_sys_pf_set_caaar(X_Param, V_Param, FnResult) :-
         cl_caar(X_Param, Set_car_Param),
@@ -2100,23 +2096,23 @@ f_sys_pf_set_caaar(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-cadar', [x, v], ['set-car', [cdar, x], v]]).
 
-% annotating... `SYS::%SET-CADAR`
+##### annotating... `SYS::%SET-CADAR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_cadar, f_sys_pf_set_cadar, [sys_x, sys_v], [[sys_set_car, [cdar, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CADAR`
+##### annotating... `SYS::%SET-CADAR`
 ```prolog
 wl:arglist_info(sys_pf_set_cadar, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CADAR`
+##### annotating... `SYS::%SET-CADAR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_cadar).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CADAR`
+### Compiled:  `SYS::%SET-CADAR`
 ```prolog
 f_sys_pf_set_cadar(X_Param, V_Param, FnResult) :-
         cl_cdar(X_Param, Set_car_Param),
@@ -2139,23 +2135,23 @@ f_sys_pf_set_cadar(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-cdaar', [x, v], ['set-cdr', [caar, x], v]]).
 
-% annotating... `SYS::%SET-CDAAR`
+##### annotating... `SYS::%SET-CDAAR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_cdaar, f_sys_pf_set_cdaar, [sys_x, sys_v], [[sys_set_cdr, [caar, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CDAAR`
+##### annotating... `SYS::%SET-CDAAR`
 ```prolog
 wl:arglist_info(sys_pf_set_cdaar, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CDAAR`
+##### annotating... `SYS::%SET-CDAAR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_cdaar).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CDAAR`
+### Compiled:  `SYS::%SET-CDAAR`
 ```prolog
 f_sys_pf_set_cdaar(X_Param, V_Param, FnResult) :-
         cl_caar(X_Param, Set_cdr_Param),
@@ -2178,23 +2174,23 @@ f_sys_pf_set_cdaar(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-cddar', [x, v], ['set-cdr', [cdar, x], v]]).
 
-% annotating... `SYS::%SET-CDDAR`
+##### annotating... `SYS::%SET-CDDAR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_cddar, f_sys_pf_set_cddar, [sys_x, sys_v], [[sys_set_cdr, [cdar, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CDDAR`
+##### annotating... `SYS::%SET-CDDAR`
 ```prolog
 wl:arglist_info(sys_pf_set_cddar, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CDDAR`
+##### annotating... `SYS::%SET-CDDAR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_cddar).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CDDAR`
+### Compiled:  `SYS::%SET-CDDAR`
 ```prolog
 f_sys_pf_set_cddar(X_Param, V_Param, FnResult) :-
         cl_cdar(X_Param, Set_cdr_Param),
@@ -2217,23 +2213,23 @@ f_sys_pf_set_cddar(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-caadr', [x, v], ['set-car', [cadr, x], v]]).
 
-% annotating... `SYS::%SET-CAADR`
+##### annotating... `SYS::%SET-CAADR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_caadr, f_sys_pf_set_caadr, [sys_x, sys_v], [[sys_set_car, [cadr, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CAADR`
+##### annotating... `SYS::%SET-CAADR`
 ```prolog
 wl:arglist_info(sys_pf_set_caadr, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CAADR`
+##### annotating... `SYS::%SET-CAADR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_caadr).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CAADR`
+### Compiled:  `SYS::%SET-CAADR`
 ```prolog
 f_sys_pf_set_caadr(X_Param, V_Param, FnResult) :-
         cl_cadr(X_Param, Set_car_Param),
@@ -2256,23 +2252,23 @@ f_sys_pf_set_caadr(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-caddr', [x, v], ['set-car', [cddr, x], v]]).
 
-% annotating... `SYS::%SET-CADDR`
+##### annotating... `SYS::%SET-CADDR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_caddr, f_sys_pf_set_caddr, [sys_x, sys_v], [[sys_set_car, [cddr, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CADDR`
+##### annotating... `SYS::%SET-CADDR`
 ```prolog
 wl:arglist_info(sys_pf_set_caddr, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CADDR`
+##### annotating... `SYS::%SET-CADDR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_caddr).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CADDR`
+### Compiled:  `SYS::%SET-CADDR`
 ```prolog
 f_sys_pf_set_caddr(X_Param, V_Param, FnResult) :-
         cl_cddr(X_Param, Set_car_Param),
@@ -2295,23 +2291,23 @@ f_sys_pf_set_caddr(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-cdadr', [x, v], ['set-cdr', [cadr, x], v]]).
 
-% annotating... `SYS::%SET-CDADR`
+##### annotating... `SYS::%SET-CDADR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_cdadr, f_sys_pf_set_cdadr, [sys_x, sys_v], [[sys_set_cdr, [cadr, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CDADR`
+##### annotating... `SYS::%SET-CDADR`
 ```prolog
 wl:arglist_info(sys_pf_set_cdadr, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CDADR`
+##### annotating... `SYS::%SET-CDADR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_cdadr).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CDADR`
+### Compiled:  `SYS::%SET-CDADR`
 ```prolog
 f_sys_pf_set_cdadr(X_Param, V_Param, FnResult) :-
         cl_cadr(X_Param, Set_cdr_Param),
@@ -2334,23 +2330,23 @@ f_sys_pf_set_cdadr(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-cdddr', [x, v], ['set-cdr', [cddr, x], v]]).
 
-% annotating... `SYS::%SET-CDDDR`
+##### annotating... `SYS::%SET-CDDDR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_cdddr, f_sys_pf_set_cdddr, [sys_x, sys_v], [[sys_set_cdr, [cddr, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CDDDR`
+##### annotating... `SYS::%SET-CDDDR`
 ```prolog
 wl:arglist_info(sys_pf_set_cdddr, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CDDDR`
+##### annotating... `SYS::%SET-CDDDR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_cdddr).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CDDDR`
+### Compiled:  `SYS::%SET-CDDDR`
 ```prolog
 f_sys_pf_set_cdddr(X_Param, V_Param, FnResult) :-
         cl_cddr(X_Param, Set_cdr_Param),
@@ -2373,23 +2369,23 @@ f_sys_pf_set_cdddr(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-caaaar', [x, v], ['set-car', [caaar, x], v]]).
 
-% annotating... `SYS::%SET-CAAAAR`
+##### annotating... `SYS::%SET-CAAAAR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_caaaar, f_sys_pf_set_caaaar, [sys_x, sys_v], [[sys_set_car, [caaar, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CAAAAR`
+##### annotating... `SYS::%SET-CAAAAR`
 ```prolog
 wl:arglist_info(sys_pf_set_caaaar, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CAAAAR`
+##### annotating... `SYS::%SET-CAAAAR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_caaaar).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CAAAAR`
+### Compiled:  `SYS::%SET-CAAAAR`
 ```prolog
 f_sys_pf_set_caaaar(X_Param, V_Param, FnResult) :-
         cl_caaar(X_Param, Set_car_Param),
@@ -2412,23 +2408,23 @@ f_sys_pf_set_caaaar(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-cadaar', [x, v], ['set-car', [cdaar, x], v]]).
 
-% annotating... `SYS::%SET-CADAAR`
+##### annotating... `SYS::%SET-CADAAR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_cadaar, f_sys_pf_set_cadaar, [sys_x, sys_v], [[sys_set_car, [cdaar, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CADAAR`
+##### annotating... `SYS::%SET-CADAAR`
 ```prolog
 wl:arglist_info(sys_pf_set_cadaar, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CADAAR`
+##### annotating... `SYS::%SET-CADAAR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_cadaar).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CADAAR`
+### Compiled:  `SYS::%SET-CADAAR`
 ```prolog
 f_sys_pf_set_cadaar(X_Param, V_Param, FnResult) :-
         cl_cdaar(X_Param, Set_car_Param),
@@ -2451,23 +2447,23 @@ f_sys_pf_set_cadaar(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-cdaaar', [x, v], ['set-cdr', [caaar, x], v]]).
 
-% annotating... `SYS::%SET-CDAAAR`
+##### annotating... `SYS::%SET-CDAAAR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_cdaaar, f_sys_pf_set_cdaaar, [sys_x, sys_v], [[sys_set_cdr, [caaar, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CDAAAR`
+##### annotating... `SYS::%SET-CDAAAR`
 ```prolog
 wl:arglist_info(sys_pf_set_cdaaar, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CDAAAR`
+##### annotating... `SYS::%SET-CDAAAR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_cdaaar).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CDAAAR`
+### Compiled:  `SYS::%SET-CDAAAR`
 ```prolog
 f_sys_pf_set_cdaaar(X_Param, V_Param, FnResult) :-
         cl_caaar(X_Param, Set_cdr_Param),
@@ -2490,23 +2486,23 @@ f_sys_pf_set_cdaaar(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-cddaar', [x, v], ['set-cdr', [cdaar, x], v]]).
 
-% annotating... `SYS::%SET-CDDAAR`
+##### annotating... `SYS::%SET-CDDAAR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_cddaar, f_sys_pf_set_cddaar, [sys_x, sys_v], [[sys_set_cdr, [cdaar, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CDDAAR`
+##### annotating... `SYS::%SET-CDDAAR`
 ```prolog
 wl:arglist_info(sys_pf_set_cddaar, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CDDAAR`
+##### annotating... `SYS::%SET-CDDAAR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_cddaar).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CDDAAR`
+### Compiled:  `SYS::%SET-CDDAAR`
 ```prolog
 f_sys_pf_set_cddaar(X_Param, V_Param, FnResult) :-
         cl_cdaar(X_Param, Set_cdr_Param),
@@ -2529,23 +2525,23 @@ f_sys_pf_set_cddaar(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-caadar', [x, v], ['set-car', [cadar, x], v]]).
 
-% annotating... `SYS::%SET-CAADAR`
+##### annotating... `SYS::%SET-CAADAR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_caadar, f_sys_pf_set_caadar, [sys_x, sys_v], [[sys_set_car, [cadar, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CAADAR`
+##### annotating... `SYS::%SET-CAADAR`
 ```prolog
 wl:arglist_info(sys_pf_set_caadar, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CAADAR`
+##### annotating... `SYS::%SET-CAADAR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_caadar).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CAADAR`
+### Compiled:  `SYS::%SET-CAADAR`
 ```prolog
 f_sys_pf_set_caadar(X_Param, V_Param, FnResult) :-
         cl_cadar(X_Param, Set_car_Param),
@@ -2568,23 +2564,23 @@ f_sys_pf_set_caadar(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-caddar', [x, v], ['set-car', [cddar, x], v]]).
 
-% annotating... `SYS::%SET-CADDAR`
+##### annotating... `SYS::%SET-CADDAR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_caddar, f_sys_pf_set_caddar, [sys_x, sys_v], [[sys_set_car, [cddar, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CADDAR`
+##### annotating... `SYS::%SET-CADDAR`
 ```prolog
 wl:arglist_info(sys_pf_set_caddar, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CADDAR`
+##### annotating... `SYS::%SET-CADDAR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_caddar).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CADDAR`
+### Compiled:  `SYS::%SET-CADDAR`
 ```prolog
 f_sys_pf_set_caddar(X_Param, V_Param, FnResult) :-
         cl_cddar(X_Param, Set_car_Param),
@@ -2607,23 +2603,23 @@ f_sys_pf_set_caddar(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-cdadar', [x, v], ['set-cdr', [cadar, x], v]]).
 
-% annotating... `SYS::%SET-CDADAR`
+##### annotating... `SYS::%SET-CDADAR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_cdadar, f_sys_pf_set_cdadar, [sys_x, sys_v], [[sys_set_cdr, [cadar, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CDADAR`
+##### annotating... `SYS::%SET-CDADAR`
 ```prolog
 wl:arglist_info(sys_pf_set_cdadar, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CDADAR`
+##### annotating... `SYS::%SET-CDADAR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_cdadar).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CDADAR`
+### Compiled:  `SYS::%SET-CDADAR`
 ```prolog
 f_sys_pf_set_cdadar(X_Param, V_Param, FnResult) :-
         cl_cadar(X_Param, Set_cdr_Param),
@@ -2646,23 +2642,23 @@ f_sys_pf_set_cdadar(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-cdddar', [x, v], ['set-cdr', [cddar, x], v]]).
 
-% annotating... `SYS::%SET-CDDDAR`
+##### annotating... `SYS::%SET-CDDDAR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_cdddar, f_sys_pf_set_cdddar, [sys_x, sys_v], [[sys_set_cdr, [cddar, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CDDDAR`
+##### annotating... `SYS::%SET-CDDDAR`
 ```prolog
 wl:arglist_info(sys_pf_set_cdddar, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CDDDAR`
+##### annotating... `SYS::%SET-CDDDAR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_cdddar).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CDDDAR`
+### Compiled:  `SYS::%SET-CDDDAR`
 ```prolog
 f_sys_pf_set_cdddar(X_Param, V_Param, FnResult) :-
         cl_cddar(X_Param, Set_cdr_Param),
@@ -2685,23 +2681,23 @@ f_sys_pf_set_cdddar(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-caaadr', [x, v], ['set-car', [caadr, x], v]]).
 
-% annotating... `SYS::%SET-CAAADR`
+##### annotating... `SYS::%SET-CAAADR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_caaadr, f_sys_pf_set_caaadr, [sys_x, sys_v], [[sys_set_car, [caadr, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CAAADR`
+##### annotating... `SYS::%SET-CAAADR`
 ```prolog
 wl:arglist_info(sys_pf_set_caaadr, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CAAADR`
+##### annotating... `SYS::%SET-CAAADR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_caaadr).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CAAADR`
+### Compiled:  `SYS::%SET-CAAADR`
 ```prolog
 f_sys_pf_set_caaadr(X_Param, V_Param, FnResult) :-
         cl_caadr(X_Param, Set_car_Param),
@@ -2724,23 +2720,23 @@ f_sys_pf_set_caaadr(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-cadadr', [x, v], ['set-car', [cdadr, x], v]]).
 
-% annotating... `SYS::%SET-CADADR`
+##### annotating... `SYS::%SET-CADADR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_cadadr, f_sys_pf_set_cadadr, [sys_x, sys_v], [[sys_set_car, [cdadr, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CADADR`
+##### annotating... `SYS::%SET-CADADR`
 ```prolog
 wl:arglist_info(sys_pf_set_cadadr, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CADADR`
+##### annotating... `SYS::%SET-CADADR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_cadadr).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CADADR`
+### Compiled:  `SYS::%SET-CADADR`
 ```prolog
 f_sys_pf_set_cadadr(X_Param, V_Param, FnResult) :-
         cl_cdadr(X_Param, Set_car_Param),
@@ -2763,23 +2759,23 @@ f_sys_pf_set_cadadr(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-cdaadr', [x, v], ['set-cdr', [caadr, x], v]]).
 
-% annotating... `SYS::%SET-CDAADR`
+##### annotating... `SYS::%SET-CDAADR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_cdaadr, f_sys_pf_set_cdaadr, [sys_x, sys_v], [[sys_set_cdr, [caadr, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CDAADR`
+##### annotating... `SYS::%SET-CDAADR`
 ```prolog
 wl:arglist_info(sys_pf_set_cdaadr, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CDAADR`
+##### annotating... `SYS::%SET-CDAADR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_cdaadr).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CDAADR`
+### Compiled:  `SYS::%SET-CDAADR`
 ```prolog
 f_sys_pf_set_cdaadr(X_Param, V_Param, FnResult) :-
         cl_caadr(X_Param, Set_cdr_Param),
@@ -2802,23 +2798,23 @@ f_sys_pf_set_cdaadr(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-cddadr', [x, v], ['set-cdr', [cdadr, x], v]]).
 
-% annotating... `SYS::%SET-CDDADR`
+##### annotating... `SYS::%SET-CDDADR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_cddadr, f_sys_pf_set_cddadr, [sys_x, sys_v], [[sys_set_cdr, [cdadr, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CDDADR`
+##### annotating... `SYS::%SET-CDDADR`
 ```prolog
 wl:arglist_info(sys_pf_set_cddadr, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CDDADR`
+##### annotating... `SYS::%SET-CDDADR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_cddadr).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CDDADR`
+### Compiled:  `SYS::%SET-CDDADR`
 ```prolog
 f_sys_pf_set_cddadr(X_Param, V_Param, FnResult) :-
         cl_cdadr(X_Param, Set_cdr_Param),
@@ -2841,23 +2837,23 @@ f_sys_pf_set_cddadr(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-caaddr', [x, v], ['set-car', [caddr, x], v]]).
 
-% annotating... `SYS::%SET-CAADDR`
+##### annotating... `SYS::%SET-CAADDR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_caaddr, f_sys_pf_set_caaddr, [sys_x, sys_v], [[sys_set_car, [caddr, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CAADDR`
+##### annotating... `SYS::%SET-CAADDR`
 ```prolog
 wl:arglist_info(sys_pf_set_caaddr, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CAADDR`
+##### annotating... `SYS::%SET-CAADDR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_caaddr).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CAADDR`
+### Compiled:  `SYS::%SET-CAADDR`
 ```prolog
 f_sys_pf_set_caaddr(X_Param, V_Param, FnResult) :-
         cl_caddr(X_Param, Set_car_Param),
@@ -2880,23 +2876,23 @@ f_sys_pf_set_caaddr(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-cadddr', [x, v], ['set-car', [cdddr, x], v]]).
 
-% annotating... `SYS::%SET-CADDDR`
+##### annotating... `SYS::%SET-CADDDR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_cadddr, f_sys_pf_set_cadddr, [sys_x, sys_v], [[sys_set_car, [cdddr, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CADDDR`
+##### annotating... `SYS::%SET-CADDDR`
 ```prolog
 wl:arglist_info(sys_pf_set_cadddr, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CADDDR`
+##### annotating... `SYS::%SET-CADDDR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_cadddr).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CADDDR`
+### Compiled:  `SYS::%SET-CADDDR`
 ```prolog
 f_sys_pf_set_cadddr(X_Param, V_Param, FnResult) :-
         cl_cdddr(X_Param, Set_car_Param),
@@ -2919,23 +2915,23 @@ f_sys_pf_set_cadddr(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-cdaddr', [x, v], ['set-cdr', [caddr, x], v]]).
 
-% annotating... `SYS::%SET-CDADDR`
+##### annotating... `SYS::%SET-CDADDR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_cdaddr, f_sys_pf_set_cdaddr, [sys_x, sys_v], [[sys_set_cdr, [caddr, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CDADDR`
+##### annotating... `SYS::%SET-CDADDR`
 ```prolog
 wl:arglist_info(sys_pf_set_cdaddr, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CDADDR`
+##### annotating... `SYS::%SET-CDADDR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_cdaddr).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CDADDR`
+### Compiled:  `SYS::%SET-CDADDR`
 ```prolog
 f_sys_pf_set_cdaddr(X_Param, V_Param, FnResult) :-
         cl_caddr(X_Param, Set_cdr_Param),
@@ -2959,23 +2955,23 @@ f_sys_pf_set_cdaddr(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-cddddr', [x, v], ['set-cdr', [cdddr, x], v]]).
 
-% annotating... `SYS::%SET-CDDDDR`
+##### annotating... `SYS::%SET-CDDDDR`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_cddddr, f_sys_pf_set_cddddr, [sys_x, sys_v], [[sys_set_cdr, [cdddr, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-CDDDDR`
+##### annotating... `SYS::%SET-CDDDDR`
 ```prolog
 wl:arglist_info(sys_pf_set_cddddr, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-CDDDDR`
+##### annotating... `SYS::%SET-CDDDDR`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_cddddr).
 
 ```
 
-% ### Compiled:  `SYS::%SET-CDDDDR`
+### Compiled:  `SYS::%SET-CDDDDR`
 ```prolog
 f_sys_pf_set_cddddr(X_Param, V_Param, FnResult) :-
         cl_cdddr(X_Param, Set_cdr_Param),
@@ -3305,23 +3301,23 @@ f_sys_pf_set_cddddr(X_Param, V_Param, FnResult) :-
 :- lisp_compile_to_prolog(pkg_sys,
                           [defun, '%set-fifth', [x, v], ['set-car', [cddddr, x], v]]).
 
-% annotating... `SYS::%SET-FIFTH`
+##### annotating... `SYS::%SET-FIFTH`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_fifth, f_sys_pf_set_fifth, [sys_x, sys_v], [[sys_set_car, [cddddr, sys_x], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-FIFTH`
+##### annotating... `SYS::%SET-FIFTH`
 ```prolog
 wl:arglist_info(sys_pf_set_fifth, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-FIFTH`
+##### annotating... `SYS::%SET-FIFTH`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_fifth).
 
 ```
 
-% ### Compiled:  `SYS::%SET-FIFTH`
+### Compiled:  `SYS::%SET-FIFTH`
 ```prolog
 f_sys_pf_set_fifth(X_Param, V_Param, FnResult) :-
         cl_cddddr(X_Param, Set_car_Param),
@@ -3358,23 +3354,23 @@ f_sys_pf_set_fifth(X_Param, V_Param, FnResult) :-
                             ['set-car', [cdr, [cddddr, x]], v]
                           ]).
 
-% annotating... `SYS::%SET-SIXTH`
+##### annotating... `SYS::%SET-SIXTH`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_sixth, f_sys_pf_set_sixth, [sys_x, sys_v], [[sys_set_car, [cdr, [cddddr, sys_x]], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-SIXTH`
+##### annotating... `SYS::%SET-SIXTH`
 ```prolog
 wl:arglist_info(sys_pf_set_sixth, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-SIXTH`
+##### annotating... `SYS::%SET-SIXTH`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_sixth).
 
 ```
 
-% ### Compiled:  `SYS::%SET-SIXTH`
+### Compiled:  `SYS::%SET-SIXTH`
 ```prolog
 f_sys_pf_set_sixth(X_Param, V_Param, FnResult) :-
         cl_cddddr(X_Param, Cdr_Param),
@@ -3412,23 +3408,23 @@ f_sys_pf_set_sixth(X_Param, V_Param, FnResult) :-
                             ['set-car', [cddr, [cddddr, x]], v]
                           ]).
 
-% annotating... `SYS::%SET-SEVENTH`
+##### annotating... `SYS::%SET-SEVENTH`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_seventh, f_sys_pf_set_seventh, [sys_x, sys_v], [[sys_set_car, [cddr, [cddddr, sys_x]], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-SEVENTH`
+##### annotating... `SYS::%SET-SEVENTH`
 ```prolog
 wl:arglist_info(sys_pf_set_seventh, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-SEVENTH`
+##### annotating... `SYS::%SET-SEVENTH`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_seventh).
 
 ```
 
-% ### Compiled:  `SYS::%SET-SEVENTH`
+### Compiled:  `SYS::%SET-SEVENTH`
 ```prolog
 f_sys_pf_set_seventh(X_Param, V_Param, FnResult) :-
         cl_cddddr(X_Param, Cddr_Param),
@@ -3466,23 +3462,23 @@ f_sys_pf_set_seventh(X_Param, V_Param, FnResult) :-
                             ['set-car', [cdddr, [cddddr, x]], v]
                           ]).
 
-% annotating... `SYS::%SET-EIGHTH`
+##### annotating... `SYS::%SET-EIGHTH`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_eighth, f_sys_pf_set_eighth, [sys_x, sys_v], [[sys_set_car, [cdddr, [cddddr, sys_x]], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-EIGHTH`
+##### annotating... `SYS::%SET-EIGHTH`
 ```prolog
 wl:arglist_info(sys_pf_set_eighth, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-EIGHTH`
+##### annotating... `SYS::%SET-EIGHTH`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_eighth).
 
 ```
 
-% ### Compiled:  `SYS::%SET-EIGHTH`
+### Compiled:  `SYS::%SET-EIGHTH`
 ```prolog
 f_sys_pf_set_eighth(X_Param, V_Param, FnResult) :-
         cl_cddddr(X_Param, Cdddr_Param),
@@ -3520,23 +3516,23 @@ f_sys_pf_set_eighth(X_Param, V_Param, FnResult) :-
                             ['set-car', [cddddr, [cddddr, x]], v]
                           ]).
 
-% annotating... `SYS::%SET-NINTH`
+##### annotating... `SYS::%SET-NINTH`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_ninth, f_sys_pf_set_ninth, [sys_x, sys_v], [[sys_set_car, [cddddr, [cddddr, sys_x]], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-NINTH`
+##### annotating... `SYS::%SET-NINTH`
 ```prolog
 wl:arglist_info(sys_pf_set_ninth, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-NINTH`
+##### annotating... `SYS::%SET-NINTH`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_ninth).
 
 ```
 
-% ### Compiled:  `SYS::%SET-NINTH`
+### Compiled:  `SYS::%SET-NINTH`
 ```prolog
 f_sys_pf_set_ninth(X_Param, V_Param, FnResult) :-
         cl_cddddr(X_Param, Cddddr_Param),
@@ -3574,23 +3570,23 @@ f_sys_pf_set_ninth(X_Param, V_Param, FnResult) :-
                             ['set-car', [cdr, [cddddr, [cddddr, x]]], v]
                           ]).
 
-% annotating... `SYS::%SET-TENTH`
+##### annotating... `SYS::%SET-TENTH`
 ```prolog
 wl:lambda_def(defun, sys_pf_set_tenth, f_sys_pf_set_tenth, [sys_x, sys_v], [[sys_set_car, [cdr, [cddddr, [cddddr, sys_x]]], sys_v]]).
 ```
 
-% annotating... `SYS::%SET-TENTH`
+##### annotating... `SYS::%SET-TENTH`
 ```prolog
 wl:arglist_info(sys_pf_set_tenth, [sys_x, sys_v], [X_Param, V_Param], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `SYS::%SET-TENTH`
+##### annotating... `SYS::%SET-TENTH`
 ```prolog
 wl: init_args(exact_only, sys_pf_set_tenth).
 
 ```
 
-% ### Compiled:  `SYS::%SET-TENTH`
+### Compiled:  `SYS::%SET-TENTH`
 ```prolog
 f_sys_pf_set_tenth(X_Param, V_Param, FnResult) :-
         cl_cddddr(X_Param, Cddddr_Param),
@@ -3943,23 +3939,23 @@ f_sys_pf_set_tenth(X_Param, V_Param, FnResult) :-
                             ]
                           ]).
 
-% annotating... `U::IS`
+##### annotating... `U::IS`
 ```prolog
 wl:lambda_def(defmacro, u_is, f_u_is, [u_eqf, u_expected, u_actual], [progn, [let, [[u_a, [gensym, '$ARRAY'([*], claz_base_character, "a")]], [u_b, [gensym, '$ARRAY'([*], claz_base_character, "b")]]], ['#BQ', [let, [[['#COMMA', u_a], ['#COMMA', u_expected]], [['#COMMA', u_b], ['#COMMA', u_actual]]], [if, [['#COMMA', u_eqf], ['#COMMA', u_a], ['#COMMA', u_b]], [format, t, '$ARRAY'([*], claz_base_character, "OK: ~a is ~a to ~a~%"), [quote, ['#COMMA', u_expected]], [quote, ['#COMMA', u_eqf]], [quote, ['#COMMA', u_actual]]], [progn, [format, t, '$ARRAY'([*], claz_base_character, "FAILED: when matching ~a and ~a~%"), ['#COMMA', u_a], ['#COMMA', u_b]], [sys_prolog_inline, '$ARRAY'([*], claz_base_character, "trace")]]]]]]]).
 ```
 
-% annotating... `U::IS`
+##### annotating... `U::IS`
 ```prolog
 wl:arglist_info(u_is, [u_eqf, u_expected, u_actual], [Eqf_Param, Expected_Param, Actual_Param], arginfo{all:[u_eqf, u_expected, u_actual], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[u_eqf, u_expected, u_actual], opt:0, req:[u_eqf, u_expected, u_actual], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `U::IS`
+##### annotating... `U::IS`
 ```prolog
 wl: init_args(exact_only, u_is).
 
 ```
 
-% ### Compiled:  `U::IS`
+### Compiled:  `U::IS`
 ```prolog
 f_u_is(Eqf_Param, Expected_Param, Actual_Param, FnResult) :-
         TLEnv=[bv(u_eqf, Eqf_Param), bv(u_expected, Expected_Param), bv(u_actual, Actual_Param)],
@@ -4356,23 +4352,23 @@ f_u_is(Eqf_Param, Expected_Param, Actual_Param, FnResult) :-
                             [if, [>, n, 1], [+, [fib, [-, n, 1]], [fib, [-, n, 2]]], 1]
                           ]).
 
-% annotating... `U::FIB`
+##### annotating... `U::FIB`
 ```prolog
 wl:lambda_def(defun, u_fib, f_u_fib, [n], [[if, [>, n, 1], [+, [u_fib, [-, n, 1]], [u_fib, [-, n, 2]]], 1]]).
 ```
 
-% annotating... `U::FIB`
+##### annotating... `U::FIB`
 ```prolog
 wl:arglist_info(u_fib, [n], [N_Param], arginfo{all:[n], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[n], opt:0, req:[n], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `U::FIB`
+##### annotating... `U::FIB`
 ```prolog
 wl: init_args(exact_only, u_fib).
 
 ```
 
-% ### Compiled:  `U::FIB`
+### Compiled:  `U::FIB`
 ```prolog
 f_u_fib(N_Param, FnResult) :-
         (   N_Param>1
@@ -4453,23 +4449,23 @@ f_u_fib(N_Param, FnResult) :-
                             [if, [=, 0, r], [list, 0], [cons, r, [accum, [-, r, 1]]]]
                           ]).
 
-% annotating... `U::ACCUM`
+##### annotating... `U::ACCUM`
 ```prolog
 wl:lambda_def(defun, u_accum, f_u_accum, [u_r], [[if, [=, 0, u_r], [list, 0], [cons, u_r, [u_accum, [-, u_r, 1]]]]]).
 ```
 
-% annotating... `U::ACCUM`
+##### annotating... `U::ACCUM`
 ```prolog
 wl:arglist_info(u_accum, [u_r], [R_Param], arginfo{all:[u_r], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[u_r], opt:0, req:[u_r], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `U::ACCUM`
+##### annotating... `U::ACCUM`
 ```prolog
 wl: init_args(exact_only, u_accum).
 
 ```
 
-% ### Compiled:  `U::ACCUM`
+### Compiled:  `U::ACCUM`
 ```prolog
 f_u_accum(R_Param, FnResult) :-
         (   0=:=R_Param
@@ -4571,23 +4567,23 @@ f_u_accum(A, G) :-
                             ['#BQ', [defun, ['#COMMA', name], [], 1]]
                           ]).
 
-% annotating... `U::DEFWRAP`
+##### annotating... `U::DEFWRAP`
 ```prolog
 wl:lambda_def(defmacro, u_defwrap, f_u_defwrap, [sys_name], [progn, ['#BQ', [defun, ['#COMMA', sys_name], [], 1]]]).
 ```
 
-% annotating... `U::DEFWRAP`
+##### annotating... `U::DEFWRAP`
 ```prolog
 wl:arglist_info(u_defwrap, [sys_name], [Name_Param], arginfo{all:[sys_name], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_name], opt:0, req:[sys_name], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `U::DEFWRAP`
+##### annotating... `U::DEFWRAP`
 ```prolog
 wl: init_args(exact_only, u_defwrap).
 
 ```
 
-% ### Compiled:  `U::DEFWRAP`
+### Compiled:  `U::DEFWRAP`
 ```prolog
 f_u_defwrap(Name_Param, FnResult) :-
         [defun, Name_Param, [], 1]=MFResult,
@@ -4613,23 +4609,23 @@ f_u_defwrap(Name_Param, FnResult) :-
 */
 :- lisp_compile_to_prolog(pkg_user, [defwrap, foo]).
 
-% annotating... `U::FOO`
+##### annotating... `U::FOO`
 ```prolog
 wl:lambda_def(defun, u_foo, f_u_foo, [], [1]).
 ```
 
-% annotating... `U::FOO`
+##### annotating... `U::FOO`
 ```prolog
 wl:arglist_info(u_foo, [], [], arginfo{all:0, allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[], opt:0, req:0, rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `U::FOO`
+##### annotating... `U::FOO`
 ```prolog
 wl: init_args(exact_only, u_foo).
 
 ```
 
-% ### Compiled:  `U::FOO`
+### Compiled:  `U::FOO`
 ```prolog
 f_u_foo(FnResult) :-
         Env=[],
@@ -4778,23 +4774,23 @@ f_u_foo(FnResult) :-
                             ]
                           ]).
 
-% annotating... `U::FIFTEEN`
+##### annotating... `U::FIFTEEN`
 ```prolog
 wl:lambda_def(defun, u_fifteen, f_u_fifteen, [], [[let, [u_val], [tagbody, [setq, u_val, 1], [go, u_point_a], [incf, u_val, 16], u_point_c, [incf, u_val, 4], [go, u_point_b], [incf, u_val, 32], u_point_a, u_point_u, [incf, u_val, 2], [go, u_point_c], [incf, u_val, 64], u_point_b, [incf, u_val, 8]], u_val]]).
 ```
 
-% annotating... `U::FIFTEEN`
+##### annotating... `U::FIFTEEN`
 ```prolog
 wl:arglist_info(u_fifteen, [], [], arginfo{all:0, allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[], opt:0, req:0, rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `U::FIFTEEN`
+##### annotating... `U::FIFTEEN`
 ```prolog
 wl: init_args(exact_only, u_fifteen).
 
 ```
 
-% ### Compiled:  `U::FIFTEEN`
+### Compiled:  `U::FIFTEEN`
 ```prolog
 f_u_fifteen(FnResult) :-
         Env=[],
@@ -4974,23 +4970,23 @@ f_u_fifteen(MResult) :-
                             ]
                           ]).
 
-% annotating... `U::DO-FOUR`
+##### annotating... `U::DO-FOUR`
 ```prolog
 wl:lambda_def(defun, u_do_four, f_u_do_four, [], [[do, [[u_temp_one, 1, ['1+', u_temp_one]], [u_temp_two, 0, ['1-', u_temp_two]]], [[>, [-, u_temp_one, u_temp_two], 5], u_temp_one], []]]).
 ```
 
-% annotating... `U::DO-FOUR`
+##### annotating... `U::DO-FOUR`
 ```prolog
 wl:arglist_info(u_do_four, [], [], arginfo{all:0, allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[], opt:0, req:0, rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `U::DO-FOUR`
+##### annotating... `U::DO-FOUR`
 ```prolog
 wl: init_args(exact_only, u_do_four).
 
 ```
 
-% ### Compiled:  `U::DO-FOUR`
+### Compiled:  `U::DO-FOUR`
 ```prolog
 f_u_do_four(FnResult) :-
         Env=[],
@@ -5081,23 +5077,23 @@ f_u_do_four(FnResult) :-
                             ]
                           ]).
 
-% annotating... `U::STRING_L`
+##### annotating... `U::STRING_L`
 ```prolog
 wl:lambda_def(defun, u_string_l, f_u_string_l, [u_x], [[cond, [[stringp, u_x], u_x], [[symbolp, u_x], [symbol_name, u_x]], [t, [error, '$ARRAY'([*], claz_base_character, "type error")]]]]).
 ```
 
-% annotating... `U::STRING_L`
+##### annotating... `U::STRING_L`
 ```prolog
 wl:arglist_info(u_string_l, [u_x], [X_Get24], arginfo{all:[u_x], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[u_x], opt:0, req:[u_x], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `U::STRING_L`
+##### annotating... `U::STRING_L`
 ```prolog
 wl: init_args(exact_only, u_string_l).
 
 ```
 
-% ### Compiled:  `U::STRING_L`
+### Compiled:  `U::STRING_L`
 ```prolog
 f_u_string_l(X_Get24, ElseResult28) :-
         (   is_stringp(X_Get24)
@@ -5496,23 +5492,23 @@ f_u_string_l(X_Get24, ElseResult28) :-
                             ]
                           ]).
 
-% annotating... `U::DISTANCE-FROM-ORIGIN`
+##### annotating... `U::DISTANCE-FROM-ORIGIN`
 ```prolog
 wl:lambda_def(defun, u_distance_from_origin, f_u_distance_from_origin, [u_point], [[let_xx, [[u_x, [u_point_x, u_point]], [u_y, [u_point_y, u_point]], [u_z, [u_point_z, u_point]]], [sqrt, [+, [*, u_x, u_x], [*, u_y, u_y], [*, u_z, u_z]]]]]).
 ```
 
-% annotating... `U::DISTANCE-FROM-ORIGIN`
+##### annotating... `U::DISTANCE-FROM-ORIGIN`
 ```prolog
 wl:arglist_info(u_distance_from_origin, [u_point], [Point_Param], arginfo{all:[u_point], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[u_point], opt:0, req:[u_point], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `U::DISTANCE-FROM-ORIGIN`
+##### annotating... `U::DISTANCE-FROM-ORIGIN`
 ```prolog
 wl: init_args(exact_only, u_distance_from_origin).
 
 ```
 
-% ### Compiled:  `U::DISTANCE-FROM-ORIGIN`
+### Compiled:  `U::DISTANCE-FROM-ORIGIN`
 ```prolog
 f_u_distance_from_origin(Point_Param, FnResult) :-
         Env=[bv(u_point, Point_Param)],
@@ -5557,23 +5553,23 @@ f_u_distance_from_origin(Point_Param, FnResult) :-
                             [setf, ['point-y', point], [-, ['point-y', point]]]
                           ]).
 
-% annotating... `U::REFLECT-IN-Y-AXIS`
+##### annotating... `U::REFLECT-IN-Y-AXIS`
 ```prolog
 wl:lambda_def(defun, u_reflect_in_y_axis, f_u_reflect_in_y_axis, [u_point], [[setf, [u_point_y, u_point], [-, [u_point_y, u_point]]]]).
 ```
 
-% annotating... `U::REFLECT-IN-Y-AXIS`
+##### annotating... `U::REFLECT-IN-Y-AXIS`
 ```prolog
 wl:arglist_info(u_reflect_in_y_axis, [u_point], [Point_Param], arginfo{all:[u_point], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[u_point], opt:0, req:[u_point], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `U::REFLECT-IN-Y-AXIS`
+##### annotating... `U::REFLECT-IN-Y-AXIS`
 ```prolog
 wl: init_args(exact_only, u_reflect_in_y_axis).
 
 ```
 
-% ### Compiled:  `U::REFLECT-IN-Y-AXIS`
+### Compiled:  `U::REFLECT-IN-Y-AXIS`
 ```prolog
 f_u_reflect_in_y_axis(Point_Param, FnResult) :-
         Env=[bv(u_point, Point_Param)],
@@ -6067,23 +6063,23 @@ f_u_reflect_in_y_axis(Point_Param, FnResult) :-
                             ]
                           ]).
 
-% annotating... `U::SET-POINT-VALUES`
+##### annotating... `U::SET-POINT-VALUES`
 ```prolog
 wl:lambda_def(defun, u_set_point_values, f_u_set_point_values, [u_point, u_x, u_y, u_z], [[setf, [slot_value, u_point, [quote, u_x]], u_x, [slot_value, u_point, [quote, u_y]], u_y, [slot_value, u_point, [quote, u_z]], u_z]]).
 ```
 
-% annotating... `U::SET-POINT-VALUES`
+##### annotating... `U::SET-POINT-VALUES`
 ```prolog
 wl:arglist_info(u_set_point_values, [u_point, u_x, u_y, u_z], [Point_Param, X_Param, Y_Param, Z_Param], arginfo{all:[u_point, u_x, u_y, u_z], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[u_point, u_x, u_y, u_z], opt:0, req:[u_point, u_x, u_y, u_z], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `U::SET-POINT-VALUES`
+##### annotating... `U::SET-POINT-VALUES`
 ```prolog
 wl: init_args(exact_only, u_set_point_values).
 
 ```
 
-% ### Compiled:  `U::SET-POINT-VALUES`
+### Compiled:  `U::SET-POINT-VALUES`
 ```prolog
 f_u_set_point_values(Point_Param, X_Param, Y_Param, Z_Param, FnResult) :-
         Env=[bv(u_point, Point_Param), bv(u_x, X_Param), bv(u_y, Y_Param), bv(u_z, Z_Param)],
@@ -6132,23 +6128,23 @@ f_u_set_point_values(Point_Param, X_Param, Y_Param, Z_Param, FnResult) :-
                             ]
                           ]).
 
-% annotating... `U::DISTANCE-FROM-ORIGIN`
+##### annotating... `U::DISTANCE-FROM-ORIGIN`
 ```prolog
 wl:lambda_def(defun, u_distance_from_origin, f_u_distance_from_origin, [u_point], [[with_slots, [u_x, u_y, u_z], u_point, [sqrt, [+, [*, u_x, u_x], [*, u_y, u_y], [*, u_z, u_z]]]]]).
 ```
 
-% annotating... `U::DISTANCE-FROM-ORIGIN`
+##### annotating... `U::DISTANCE-FROM-ORIGIN`
 ```prolog
 wl:arglist_info(u_distance_from_origin, [u_point], [Point_Param], arginfo{all:[u_point], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[u_point], opt:0, req:[u_point], rest:0, sublists:0, whole:0}).
 ```
 
-% annotating... `U::DISTANCE-FROM-ORIGIN`
+##### annotating... `U::DISTANCE-FROM-ORIGIN`
 ```prolog
 wl: init_args(exact_only, u_distance_from_origin).
 
 ```
 
-% ### Compiled:  `U::DISTANCE-FROM-ORIGIN`
+### Compiled:  `U::DISTANCE-FROM-ORIGIN`
 ```prolog
 f_u_distance_from_origin(Point_Param, FnResult) :-
         Env=[bv(u_point, Point_Param)],
@@ -6870,7 +6866,6 @@ f_u_distance_from_origin(Point_Param, FnResult) :-
 ```cl
 (slot-value Eric 'diet)
 
-```
 */
 :- lisp_compile_to_prolog(pkg_user, ['slot-value', 'Eric', [quote, diet]]).
 :- get_var(TLEnv, u_eric, Eric_Get),
@@ -6878,3 +6873,5 @@ f_u_distance_from_origin(Point_Param, FnResult) :-
 % 72,011,855 inferences, 13.345 CPU in 13.384 seconds (100% CPU, 5396346 Lips)
 #P"/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/sanity-test.lisp"
 CL-USER>
+```
+
