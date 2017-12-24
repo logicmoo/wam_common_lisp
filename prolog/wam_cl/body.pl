@@ -73,6 +73,8 @@ make_restartable_block(Place,CodeWithPlace,LispCode):-
 % ===============================================================
 % Prolog vars
 compile_body(_Ctx,_Env,Result,Var, true):- Result == Var,!.
+compile_body(_Ctx,_Env,ResultO,LispCode, Body):- var(LispCode), get_attr(LispCode,preserved_var,t),!,true=Body,
+   ResultO = LispCode.
 compile_body(_Ctx,_Env,Result,Var, true):- attvar(Var),!, Result = Var.
 compile_body(_Ctx,_Env,Result,Var, true):- is_ftVar(Var), !,dumpST,trace, Result = Var.
 compile_body(Ctx,Env,Result,Var, Code):- is_ftVar(Var), !, % NEVER SEEN
@@ -490,7 +492,7 @@ compile_body(Ctx,Env,Result,POrSTerm, Pre):- p_or_s(POrSTerm,function,[Symbol]),
 % ((function .) ...)
 compile_body(Ctx,Env,Result,[POrSTerm|ARGS],(Pre,Body)):- p_or_s(POrSTerm,function,[Symbol]),
   find_operator_else_function(Ctx,Env,Symbol,FResult,Pre),
-  compile_body(Ctx,Env,Result,[FResult|ARGS],Body).
+  must_compile_body(Ctx,Env,Result,[FResult|ARGS],Body).
 
 % (closure ...)
 compile_body(_Ctx,_Env,Result,POrSTerm,Body):- 
@@ -525,10 +527,10 @@ compile_body(Ctx,Env,Result,[BinOP,Form1,Form2,Form3|FormS],Code):- fail, binop_
   
 % BinOP-3+
 compile_body(Ctx,Env,Result,[BinOP,Form1,Form2,Form3|FormS],Code):- binop_identity(BinOP,_Identity),
-  compile_body(Ctx,Env,Result1,[BinOP,Form1,Form2],Code1),
+  must_compile_body(Ctx,Env,Result1,[BinOP,Form1,Form2],Code1),
   %rw_add(Ctx,Result1,w),
   freeze(Result1,var(Result1)),
-  compile_body(Ctx,Env,Result,[BinOP,Result1,Form3|FormS],Code2),
+  must_compile_body(Ctx,Env,Result,[BinOP,Result1,Form3|FormS],Code2),
   Code = (Code1,Code2).
 
 

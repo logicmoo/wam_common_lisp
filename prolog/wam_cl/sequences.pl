@@ -35,7 +35,7 @@ prims:cl_exact.
 is_consp(Obj):- nonvar(Obj),Obj=[_|_].
 
 %:- dynamic(op_replacement/2).
-wl:op_replacement(first,cl_car).
+wl:op_replacement(first,car).
 f_ext_pf_car(List, Result):-cl_car(List, Result).
 cl_first(List, Result):-cl_car(List, Result).
 cl_car(List, Result):- 
@@ -44,8 +44,8 @@ cl_car(List, Result):-
   (	error(first_not_cons, ErrNo, _),
 		throw(ErrNo)))).
 
-wl:op_replacement(rest,cl_cdr).
-wl:op_replacement(ext_pf_cdr,cl_cdr).
+wl:op_replacement(rest,cdr).
+wl:op_replacement(ext_pf_cdr,cdr).
 f_ext_pf_cdr(List, Result):-cl_cdr(List, Result).
 f_u_pf_cdr(List, Result):-cl_cdr(List, Result).
 cl_cdr(List, Result):- List==[]->Result=[];
@@ -317,7 +317,81 @@ show_special:-
 	;	writef('No special variables\n').
 
 
+/*
+ensure_cl_contains([
+       caaar,
+       caadr,
+       caar,
+       cadar,
+       caddr,
+       cdaar,
+       cdadr,
+       cdar,
+       cddar,
+       cddddr,
+       cdddr,
+       cddr]).
+*/
+cl_cddr(X, Cdr_Ret) :-
+  cl_cdr(X, Cdr_Param),
+  cl_cdr(Cdr_Param, Cdr_Ret).
 
+cl_cdar(X, Cdr_Ret) :-
+  cl_car(X, Cdr_Param),
+  cl_cdr(Cdr_Param, Cdr_Ret).
+
+cl_caar(X, Cdr_Ret) :-
+  cl_car(X, Cdr_Param),
+  cl_car(Cdr_Param, Cdr_Ret).
+
+cl_caaar(X, Cdr_Ret) :-
+  cl_car(X, Y),
+  cl_car(Y, Z),
+  cl_car(Z, Cdr_Ret).
+
+cl_cdaar(X, Cdr_Ret) :-
+  cl_car(X, Y),
+  cl_car(Y, Z),
+  cl_cdr(Z, Cdr_Ret).
+
+cl_cadar(X, Cdr_Ret) :-
+  cl_car(X, Y),
+  cl_cdr(Y, Z),
+  cl_car(Z, Cdr_Ret).
+
+cl_cdadr(X, Cdr_Ret) :-
+  cl_cdr(X, Y),
+  cl_car(Y, Z),
+  cl_cdr(Z, Cdr_Ret).
+
+cl_caadr(X, Cdr_Ret) :-
+  cl_cdr(X, Y),
+  cl_car(Y, Z),
+  cl_car(Z, Cdr_Ret).
+
+cl_caddr(X, Cdr_Ret) :-
+  cl_cdr(X, Y),
+  cl_cdr(Y, Z),
+  cl_car(Z, Cdr_Ret).
+
+cl_cdddr(X, Cdr_Ret) :-
+  cl_cdr(X, Y),
+  cl_cdr(Y, Z),
+  cl_cdr(Z, Cdr_Ret).
+
+cl_cddar(X, Cdr_Ret) :-
+  cl_car(X, Y),
+  cl_cdr(Y, Z),
+  cl_cdr(Z, Cdr_Ret).
+
+cl_cddddr(W, Cdr_Ret) :-
+  cl_cdr(W, X),
+  cl_cdr(X, Y),
+  cl_cdr(Y, Z),
+  cl_cdr(Z, Cdr_Ret).
+
+
+/*
 make_accessor(cadr).
 
 make_accessor(cdar).
@@ -371,7 +445,7 @@ make_accessor(cddadr).
 make_accessor(cdddar).
 
 make_accessor(cddddr).
-
+*/
 /*
 (caar x)        (car (car x))                    
 (cadr x)        (car (cdr x))                    
@@ -435,26 +509,26 @@ symbol_info(Sym,P,function,O),symbol_info(Sym,P,function_type,FT),symbol_info(Sy
 
 end_of_file.
 
-Warning: cl_minusp/2, which is referenced by
+remap(minusp,2).
 Warning:        1-st clause of f_u_yfor/4: 1-st clause of f_u_yfor/4
 
 
 
-Warning: cl_acons/4, which is referenced by
+remap(acons/4, which is referenced by
 Warning:        1-st clause of f_u_record_in_loop_alist/3: 1-st clause of f_u_record_in_loop_alist/3
-Warning: cl_char/3, which is referenced by
+remap(char/3, which is referenced by
 Warning:        1-st clause of f_u_string_head/2: 1-st clause of f_u_string_head/2
-Warning: cl_fifth/2, which is referenced by
+remap(fifth,2).
 Warning:        1-st clause of f_u_yfor/4: 1-st clause of f_u_yfor/4
-Warning: cl_fourth/2, which is referenced by
+remap(fourth,2).
 Warning:        1-st clause of f_u_decr/5: 1-st clause of f_u_decr/5
 Warning:        1-st clause of f_u_incr/5: 1-st clause of f_u_incr/5
-Warning: cl_nsublis/3, which is referenced by
+remap(nsublis/3, which is referenced by
 Warning:        1-st clause of f_u_substitute_loop_return/3: 1-st clause of f_u_substitute_loop_return/3
-Warning: cl_numberp/2, which is referenced by
+remap(numberp,2).
 Warning:        1-st clause of f_u_decr/5: 1-st clause of f_u_decr/5
 Warning:        1-st clause of f_u_incr/5: 1-st clause of f_u_incr/5
-Warning: cl_rassoc/3, which is referenced by
+remap(rassoc/3, which is referenced by
 Warning:        1-st clause of f_u_add_element_to_end_of_loop_alist/3: 1-st clause of f_u_add_element_to_end_of_loop_alist/3
 Warning:        1-st clause of f_u_add_element_to_loop_alist/3: 1-st clause of f_u_add_element_to_loop_alist/3
 Warning:        1-st clause of f_u_fetch_new_iteration_variable/1: 1-st clause of f_u_fetch_new_iteration_variable/1
@@ -462,19 +536,21 @@ Warning:        1-st clause of f_u_fetch_old_iteration_variable/1: 1-st clause o
 Warning:        1-st clause of f_u_iteration_variable_exists_p/1: 1-st clause of f_u_iteration_variable_exists_p/1
 Warning:        1-st clause of f_u_substitute_iteration_variable/2: 1-st clause of f_u_substitute_iteration_variable/2
 Warning:        1-st clause of f_u_yloop/2: 1-st clause of f_u_yloop/2
-Warning: cl_remove/3, which is referenced by
+remap(remove/3, which is referenced by
 Warning:        1-st clause of f_u_substitute_iteration_variable/2: 1-st clause of f_u_substitute_iteration_variable/2
-Warning: cl_subst/4, which is referenced by
+remap(subst/4, which is referenced by
 Warning:        1-st clause of f_u_define_and_rename_loop_locals/5: 1-st clause of f_u_define_and_rename_loop_locals/5
 Warning:        1-st clause of f_u_substitute_iteration_variable/2: 1-st clause of f_u_substitute_iteration_variable/2
-Warning: cl_third/2, which is referenced by
+remap(third,2).
 Warning:        1-st clause of f_u_yfor/4: 1-st clause of f_u_yfor/4
 Warning: f_u_add_elements_to_clause/4, which is referenced by
 Warning:        1-st clause of f_u_yfor/4: 1-st clause of f_u_yfor/4
-Warning: f_u_result/2, which is referenced by
+Warning: f_u_result,2).
 Warning:        1-st clause of f_u_maximize/2: 1-st clause of f_u_maximize/2
 Warning: f_u_ydo/3, which is referenced by
 Warning:        1-st clause of f_u_walkcdr/3: 1-st clause of f_u_walkcdr/3
 Warning: f_u_yloop/4, which is referenced by
 Warning:        1-st clause of f_u_walkcdr/3: 1-st clause of f_u_walkcdr/3
+
+
 

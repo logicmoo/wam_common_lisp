@@ -54,6 +54,17 @@ compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, Atom2| Rest], Body):- is_p
 compile_assigns(Ctx,Env,Result,[Defvar, Var], Body):- is_def_nil(Defvar),!,
   compile_assigns(Ctx,Env,Result,[Defvar, Var , nil],Body).
 
+/* TODO CONFIRM WE ARE SETTING SYMBOLS honoring SYMBOL-MACROs  */
+compile_assigns(Ctx,Env,Result,[setf, LVar, ValuesForms], Code):- atom(LVar),
+     lookup_symbol_macro(Ctx,Env,LVar,SET), % rw_add(Ctx,LVar,r),    
+     must_compile_body(Ctx,Env,Result,[setf, SET, ValuesForms],Code).
+
+compile_assigns(Ctx,Env,Result,[setf, Place, ValuesForms], (Part1,set_var(Env,Place,Result))):- atom(Place),
+     assertion(is_symbolp(Place)),
+     rw_add(Ctx,Place,w),
+     must_compile_body(Ctx,Env,Result,ValuesForms,Part1).
+
+
 compile_assigns(Ctx,Env,Result,[Getf|ValuePlace], Body):- fail, is_place_op_verbatum(Getf),     
         debug_var([Getf,'_R'],Result),
         debug_var([Getf,'_Env'],Env),
@@ -85,13 +96,17 @@ compile_assigns(Ctx,Env,Result,[getf, Place], (Part0,Part4)):-
 get_setf_expander_get_set(Ctx,Env,[OP,LVar|EXTRA],[OP,GET|EXTRA],[INVERSE,GET|EXTRA],  Body):- setf_inverse_op(OP,INVERSE),
    must_compile_body(Ctx,Env,GET,LVar, Body), (var(GET)->put_attr(GET,preserved_var,t); true).
 
-get_setf_expander_get_set(Ctx,Env,LVar,GET,[sys_set_symbol_value,GET], true):- atom(LVar),lookup_symbol_macro(Ctx,Env,LVar,GET),!.
-get_setf_expander_get_set(_,_,LVar,GET,[sys_set_symbol_value,GET], true):- \+ atom(LVar),atom(LVar),LVar=GET.
+%get_setf_expander_get_set(Ctx,Env,LVar,GET,[sys_set_symbol_value,GET], true):- atom(LVar),lookup_symbol_macro(Ctx,Env,LVar,GET),!.
+%get_setf_expander_get_set(_,_,LVar,GET,[set,GET], true):- \+ atom(LVar),atom(LVar),LVar=GET.
+
+f_clos_pf_set_slot_value(Obj,Key,Value,Value):- set_opv(Obj,Key,Value).
 
 lookup_symbol_macro(Ctx,Env,LVar,GET):- get_ctx_env_attribute(Ctx,Env,symbol_macro(LVar),GET).
 
+setf_inverse_op(slot_value,clos_pf_set_slot_value).
 setf_inverse_op(car,rplaca).
 setf_inverse_op(cdr,rplacd).
+setf_inverse_op(G,S):- cl_get(G,sys_setf_inverse,_,S),ground(S).
 setf_inverse_op(Sym,Inverse):- 
    symbol_prefix_and_atom(Sym,FunPkg,Name),
    member(SETPRefix,['setf','set','pf_set']),
@@ -159,7 +174,7 @@ compile_place(Ctx,Env,[Place|VarResult],[Place|VarEval],Code):- compile_each(Ctx
 
 compile_each(_Ctx,_Env,[],[],true).
 compile_each(Ctx,Env,[VarR|Result],[Var|Eval],Code):-
-  compile_body(Ctx,Env,VarR,Var,Code0),
+  must_compile_body(Ctx,Env,VarR,Var,Code0),
   compile_each(Ctx,Env,Result,Eval,Code1),
   conjoin_0(Ctx,Code0,Code1,Code).
                   

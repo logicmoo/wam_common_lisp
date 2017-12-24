@@ -182,6 +182,8 @@ del_attr_rev2(Name,Var):- del_attr(Var,Name).
 del_attrs_of(CodeIn,Name):- term_variables(CodeIn,AttVars),maplist(del_attr_rev2(Name),AttVars).
 
 sanitize_true(_, C1,C2):- non_compound_code(C1),!,C2=C1.
+sanitize_true(_,f_clos_pf_set_slot_value(A,B,C,D),set_opv(A,B,C)):-C=D.
+sanitize_true(_,cl_slot_value(A,B,C),get_opv(A,B,C)).
 sanitize_true(Ctx,(C1,C2),Joined):-!,sanitize_true(Ctx,C1,C1O),sanitize_true(Ctx,C2,C2O),conjoin_0(Ctx,C1O,C2O,Joined).
 sanitize_true(Ctx,(C2 ; CodeC),( C2O ; CodeCCO)):-!,sanitize_true(Ctx,C2,C2O),sanitize_true(Ctx,CodeC,CodeCCO).
 sanitize_true(Ctx,(C2 -> CodeC),( C2O -> CodeCCO)):-!,sanitize_true(Ctx,C2,C2O),sanitize_true(Ctx,CodeC,CodeCCO).
@@ -293,6 +295,7 @@ sub_block_exit_f_a(catch,3).
 
 
 mize_body_1e(_Ctx,_,C1,C1):- non_compound_code(C1),!.
+
 mize_body_1e(_Ctx,_,C1,C2):- idiom_replace(C1,C2).
 mize_body_1e(_Ctx,_F,(A=B),true):- A==B,!.
 mize_body_1e(_Ctx,_F,(A==B),true):- A==B,!.
@@ -468,6 +471,7 @@ inline_body(_Never,_Ctx,_F,C1,C1):-!.
 
 simple_inline(In,_Out):- \+ compound(In),!,fail.
 simple_inline(cl_list(A,B),B=A).
+simple_inline(f_clos_pf_set_slot_value(A,B,C,D),set_opv(A,B,C)):-C=D.
 simple_inline(cl_cdr(I,O),(I==[]->O=[];I=[_|O])):- wam_cl_option(debug,0).
 simple_inline(cl_car(I,O),(I==[]->O=[];I=[O|_])):- wam_cl_option(debug,0).
 list_to_disj([C1],(C1O)):-!, list_to_disj(C1,C1O).
