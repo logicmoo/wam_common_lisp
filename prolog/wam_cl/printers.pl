@@ -42,7 +42,8 @@ is_characterp_lisp(X):- compound(X),X='#\\'(_). %,is_characterp(X).
 sexpr1(X) --> {is_ftVar(X),(get_var_name(X,N)->format(atom(NN),'~w',[N]);format(atom(NN),'~w',[X]))},!,[NN].
 sexpr1(Str)--> {is_stringp(Str),to_prolog_string(Str,PStr)},!,[PStr].
 sexpr1([]) --> !, ['(',')'].
-sexpr1(X)--> {\+compound(X)},!,[X].
+sexpr1(X)--> {atom(X)},!,[X].
+sexpr1(X)--> {\+compound(X),format(atom(NN),'~q',[X])},!,[NN].
 sexpr1(['quote', Expression]) --> [''''], !, sexpr1(Expression).
 sexpr1(['#COMMA',X]) --> [','],sexpr1(X).
 sexpr1(['#BQ',X])--> ['`'],sexpr1(X).

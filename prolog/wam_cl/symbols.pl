@@ -24,7 +24,18 @@ cl_symbol_value(Symbol,Value):- is_keywordp(Symbol)->Symbol=Value;do_or_die(get_
 cl_symbol_function(Symbol,Function):- do_or_die(get_opv(Symbol,function,Function)),!.
 do_or_die(G):- G->true;throw(do_or_die(G)).
 
+wl:interned_eval(("`ext:set-symbol-function")).
+f_ext_set_symbol_function(Symbol,Function):- 
+  as_funcallable(Symbol,Function,Funcallable),
+  set_opv(Symbol,function,Funcallable),
+  set_opv(Symbol,compile_as,kw_function).
 
+symbol_prefix_and_atom(Sym,FunPkg,Name):- 
+   pl_symbol_name(Sym,SName),
+   downcase_atom(SName,Name),
+   atomic_list_concat([FunPkg,Name],'_',Sym).
+
+wl:interned_eval(("`sys:set-symbol-value")).
 f_sys_set_symbol_value(Var,Val,Val):- set_opv(Var,value,Val).
 f_sys_set_symbol_value(Var,Val):- set_opv(Var,value,Val).
 cl_set(Var,Val,Val):- rtrace(set_opv(Var,value,Val)).

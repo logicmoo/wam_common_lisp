@@ -181,7 +181,7 @@ pl_ftruncate(_Type,X, RestNKeys, MResult):-
 ;;; the divisor.
 ;;;
 */
-wl:interned_eval(
+wl:interned_eval_todo(
 '(defun floor (number &optional divisor)
   "Return the greatest integer not greater than number, or number/divisor.
   The second returned value is (mod number divisor)."

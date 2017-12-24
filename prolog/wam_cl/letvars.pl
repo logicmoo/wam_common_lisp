@@ -45,9 +45,10 @@ compile_let(Ctx,Env,Result,[let, [[Var,VarInit]]| BodyForms], (VarInitCode,local
 %  (LET  (....) .... )
 compile_let(Ctx,Env,Result,[LET, NewBindingsIn| BodyForms], Body):- !,
   always((
-      debug_var("LEnv",BindingsEnvironment),
+      debug_var("BEnv",BindingsEnvironment),
       debug_var('LetResult',Result),
-   
+      debug_var("LEnv",CEnv),
+                         
         freeze(Var,ignore((var(Value),debug_var('_Init',Var,Value)))),
         freeze(Var,ignore((var(Value),add_tracked_var(Ctx,Var,Value)))),
         
@@ -60,25 +61,26 @@ compile_let(Ctx,Env,Result,[LET, NewBindingsIn| BodyForms], Body):- !,
         % rescue out special bindings
         partition(is_bv2,Bindings,LocalBindings,SpecialBindings),  
 
-        ignore((member(VarN,[Variable,Var]),atom(VarN),var(Value),debug_var([VarN,'_Let'],Value),fail)),        
-        compile_forms(Ctx,BindingsEnvironment,BResult,BodyForms, BodyFormsBody),
+        ignore((member(VarN,[Variable,Var]),atom(VarN),var(Value),debug_var([VarN,'_Let'],Value),fail)),                
         add_alphas(Ctx,Variables),
         let_body(Env,BindingsEnvironment,LocalBindings,SpecialBindings,BodyFormsBody,MaybeSpecialBody),
-         Body = (VarInitCode, MaybeSpecialBody,G))),
+          make_env_append(Ctx,Env,CEnv,[LocalBindings|Env],EnvAssign),
+          compile_forms(Ctx,CEnv,BResult,BodyForms, BodyFormsBody),          
+         Body = (VarInitCode, EnvAssign, MaybeSpecialBody,G))),
   ensure_assignment(Result=BResult,G).
 
 is_bv2(BV):- \+ \+ BV=bv(_,_).
 % No Locals
-let_body(Env,BindingsEnvironment,[],SpecialBindings,BodyFormsBody,MaybeSpecialBody):-!,
+let_body(Env,BindingsEnvironment,[],SpecialBindings,BodyFormsBody,MaybeSpecialBody):- fail,!,
   Env=BindingsEnvironment, debug_var("LEnv",BindingsEnvironment),
   maybe_specials_in_body(SpecialBindings,BodyFormsBody,MaybeSpecialBody).
 
 % Some Locals
-let_body(Env,BindingsEnvironment,LocalBindings,SpecialBindings,BodyFormsBody,
-                        (BindingsEnvironment=[LocalBindings|Env], MaybeSpecialBody)):-!,
-  debug_var("LEnv",BindingsEnvironment),
+let_body(_Env,_BindingsEnvironment,_LocalBindings,SpecialBindings,BodyFormsBody,(MaybeSpecialBody)):-!,
+  
   %nb_set_last_tail(LocalBindings,Env),
   maybe_specials_in_body(SpecialBindings,BodyFormsBody,MaybeSpecialBody).
+  
 
 % No Specials
 maybe_specials_in_body([],BodyFormsBody,BodyFormsBody).

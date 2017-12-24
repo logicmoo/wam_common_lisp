@@ -31,6 +31,13 @@ compile_funop(Ctx,Env,Result,[function(Op) | FunctionArgs], Body):- nonvar(Op),!
 % Messed Progn?
 % compile_body(Ctx,Env,Result,[Form|MORE], Code):- is_list(Form), !,compile_forms(Ctx,Env,Result,[Form|MORE], Code).
 
+ 
+compile_funop(Ctx,Env,Result,[FN| Args], Code):- var(FN),!,
+      compile_apply(Ctx,Env,FN,Args,Result,Code).
+
+
+% compile_funop(Ctx,Env,Result,[list|Args], Body):- expand_arguments(Ctx,Env,list,1,Args,Result,Body).
+
 
 % Use a previous DEFMACRO
 compile_funop(Ctx,Env,Result,LispCode,CompileBody):-
@@ -39,29 +46,70 @@ compile_funop(Ctx,Env,Result,LispCode,CompileBody):-
   dbginfo(macroexpand:-LispCode),
   dbginfo(into:-CompileBody0Result),
   must_compile_body(Ctx,Env,Result,CompileBody0Result, CompileBody),
-  dbginfo(code:-CompileBody),
   !.
- 
-compile_funop(Ctx,Env,Result,[Op | FunctionArgs], Body):- nonvar(Op),wl:op_replacement(Op,Op2), !,
+
+compile_funop(Ctx,Env,Result,[Op | FunctionArgs], Body):- nonvar(Op), wl:op_replacement(Op,Op2), !,
   must_compile_body(Ctx,Env,Result,[Op2 | FunctionArgs],Body).
 
 compile_funop(Ctx,Env,Result,[eval , Form],(FormBody,cl_eval(ResultForm,Result))):-!,
    must_compile_body(Ctx,Env,ResultForm,Form,FormBody).
 
-compile_funop(Ctx,Env,Result,[funcall, FN| FunctionArgs], Body):- as_lisp_funcallable(FN,FNC),!,
-  must_compile_body(Ctx,Env,Result,[ FNC | FunctionArgs], Body).
+% malformed funcall
+compile_funop(Ctx,Env,Result,[funcall, FN| FunctionArgs], Body):- \+ is_list(FunctionArgs),
+     compile_funop(Ctx,Env,Result,[apply, FN, [list|FunctionArgs]], Body).
 
-compile_funop(Ctx,Env,Result,[apply, FN, FunctionArgs], Body):- is_list(FunctionArgs), as_lisp_funcallable(FN,FNC),!,
-  must_compile_body(Ctx,Env,Result,[ FNC | FunctionArgs], Body).
+% malformed call
+compile_funop(Ctx,Env,Result,[FN| FunctionArgs], Body):- \+ is_list(FunctionArgs),
+     compile_funop(Ctx,Env,Result,[apply, [quote, FN], [list|FunctionArgs]], Body).
 
-compile_funop(Ctx,CallEnv,Result,[FN | FunctionArgs], Body):- is_list(FunctionArgs), as_lisp_funcallable(FN,FNC),!,
-      expand_arguments_maybe_macro(Ctx,CallEnv,FNC,0,FunctionArgs,ArgBody, Args),
-      %debug_var([FN,'_Ret'],Result),      
-      make_function_or_macro_call(Ctx,CallEnv,FNC,Args,Result,ExpandedFunction),      
-      Body = (ArgBody,ExpandedFunction).
+
+compile_funop(Ctx,Env,Result,[funcall, FN| FunctionArgs], Body):- 
+      must_compile_body(Ctx,Env,F,FN,ArgsBody1),
+      var(FN),expand_arguments(Ctx,Env,funcall,2,FunctionArgs,ArgsBody2,Args),
+      compile_apply(Ctx,Env,F,Args,Result,Code),
+      Body = (ArgsBody1,ArgsBody2,Code).
+
+compile_funop(Ctx,Env,Result,[funcall, FN| FunctionArgs], Body):- 
+      must_compile_body(Ctx,Env,F,FN,ArgsBody1),
+      expand_arguments(Ctx,Env,F,1,FunctionArgs,ArgsBody2,Args),
+      compile_apply(Ctx,Env,F,Args,Result,Code),
+      Body = (ArgsBody1,ArgsBody2,Code).
+
+compile_funop(Ctx,Env,Result,[apply, FN, [List,FunctionArg]], Body):- List == list,
+      compile_funop(Ctx,Env,Result,[funcall, FN, FunctionArg], Body).
+
+compile_funop(Ctx,Env,Result,[apply, FN, FunctionArgs], Body):-
+      must_compile_body(Ctx,Env,F,FN,ArgsBody1),
+      must_compile_body(Ctx,Env,Args,FunctionArgs,ArgsBody2),
+      compile_apply(Ctx,Env,F,Args,Result,Code),
+      Body = (ArgsBody1,ArgsBody2,Code).
+
+compile_funop(Ctx,CallEnv,Result,[FN | FunctionArgs], Body):-
+      expand_arguments_maybe_macro(Ctx,CallEnv,FN,0,[FN|FunctionArgs],ArgsBody,[FNC|Args]),
+      compile_apply(Ctx,CallEnv,FNC,Args,Result,ExpandedFunction),
+      Body = (ArgsBody,ExpandedFunction).
 
 % TODO- HOW DID WE GET HERE?
 compile_funop(_Ctx,_Env,Result,[FN | FunctionArgs],cl_eval([FN|FunctionArgs],Result)). 
+
+
+compile_apply_function_or_macro_call(Ctx,Env,FN,Args,Result,ExpandedFunction):-
+   (is_list(Args)->length(Args,ArgsLen);true),
+   foc_operator(Ctx,Env,FN,ArgsLen, ProposedName),!,
+   align_args_or_fallback(FN,ProposedName,Args,Result,ArgsPlusResult),
+   ExpandedFunction =.. [ ProposedName | ArgsPlusResult].
+
+
+compile_apply(_Ctx,_Env,F,Args,Result,cl_apply(F,Args,Result)):- (var(F); \+ is_list(Args)),!.
+
+compile_apply(Ctx,Env,F,Args,Result,ExpandedFunction):- atom(F),
+ compile_apply_function_or_macro_call(Ctx,Env,F,Args,Result,ExpandedFunction),!.
+
+compile_apply(Ctx,Env,function(F),Args,Result,ExpandedFunction):- atom(F),
+ compile_apply_function_or_macro_call(Ctx,Env,F,Args,Result,ExpandedFunction),!.
+
+compile_apply(_Ctx,_Env,F,Args,Result,cl_apply(F,Args,Result)).
+
 
   
    

@@ -55,12 +55,14 @@ cl_cdr(List, Result):- List==[]->Result=[];
 
 f_u_pf_cddr(A,C):-f_u_pf_cdr(A,B),f_u_pf_cdr(B,C).
 
-wl:op_replacement(setcar,cl_rplaca).
+wl:interned_eval(("`cl:rplaca")).
+wl:op_replacement(setcar,rplaca).
 wl:init_args(exact_only,cl_rplaca).
 cl_rplaca(Cons,Obj,Cons):- nb_setarg(1,Cons,Obj).
 f_sys_set_car(A,B,C):-cl_rplaca(A,B,C).
 
-%wl:op_replacement(setcdr,cl_rplacd).
+wl:op_replacement(setcdr,rplacd).
+wl:interned_eval(("`cl:rplacd")).
 wl:init_args(exact_only,cl_rplacd).
 cl_rplacd(Cons,Obj,Cons):- nb_setarg(2,Cons,Obj).
 f_sys_set_cdr(A,B,C):-cl_rplacd(A,B,C).

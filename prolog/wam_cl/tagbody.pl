@@ -19,6 +19,8 @@
 :- include('header').
 
 
+shared_lisp_compiler:plugin_expand_progbody(Ctx,Env,Result,InstrS,_PreviousResult,Code):- 
+           compile_body_go_tagbody(Ctx,Env,Result,InstrS,Code),!.
 
 shared_lisp_compiler:plugin_expand_progbody(Ctx,Env,Result,InstrS,_PreviousResult,Code):- 
            compile_body_select_tagbody(Ctx,Env,Result,InstrS,Code),!.

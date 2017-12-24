@@ -63,6 +63,7 @@ cmpout(X):- in_md(prolog,nononotrace(dbmsg(X))).
 dbmsg(X):- make_pretty(X,X0),both_outputs(dbmsg0(X0)).
 dbmsg0(Var):- var(Var),!,in_comment(colormsg1(dbmsg_var(Var))).
 dbmsg0(Str):- string(Str),!,in_comment(colormsg1(Str)).
+dbmsg0([A|B]):- !,dbmsg0(A),dbmsg0(B).
 dbmsg0(:- A):- dbmsg1((:-),A),!.
 dbmsg0(A):- dbmsg1(call,A),!.
 % dbmsg0(StringL):- to_prolog_string_if_needed(StringL,String),!,dbmsg0(String).

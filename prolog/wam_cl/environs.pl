@@ -81,7 +81,8 @@ toplevel_env(ENV):- b_getval('$env_toplevel',ENV),!.
 
 
 %new_compile_ctx(ENV):- new_assoc(ENV)put_attr(ENV,type,ctx).
-new_compile_ctx(env(ENV,[])):- gensym('iENV_',N), list_to_rbtree([type-ctx(N)],ENV).
+new_compile_ctx([environ=Sym]):-gensym(env_,Sym).
+%new_compile_ctx(env(ENV,[])):- gensym('iENV_',N), list_to_rbtree([type-ctx(N)],ENV).
 
 extend_env(ENV):-
   current_env(TL),
@@ -97,36 +98,72 @@ unextend_env(Parent):-
     set_parent_child(NewParent,Parent))),!.
 unextend_env(ENV):- current_env(ENV).
 
-set_parent_child(TL,ENV):-   
-  ignore(set_env_attribute(ENV,parent,TL)),
+set_parent_child(TL,ENV):- ==(TL,ENV),!.
+set_parent_child(_TL,ENV):-   
+  %ignore(set_env_attribute0(ENV,parent,TL)),
   nb_setval('$env_current',ENV).
 
-
-get_tracker(ENV,Ctx):- var(ENV),!,get_attr(ENV,tracker,Ctx).
-get_tracker(ENV,_):- \+ compound(ENV),!,fail.
+get_tracker(ENV,ENV).
+/*
 get_tracker(ENV,Ctx):- is_rbtree(ENV),!,ENV=Ctx.
+get_tracker(ENV,Ctx):- var(ENV),get_attr(ENV,tracker,Ctx),!.
+get_tracker(ENV,_):- \+ compound(ENV),!,fail.
 get_tracker(ENV,Ctx):- arg(_,ENV,Ctx),is_rbtree(Ctx),!.
 %get_tracker(ENV,Ctx):- arg(_,ENV,ENV2),get_tracker(ENV2,Ctx),!.
-
-set_tracker(ENV,Ctx):- var(ENV),!,put_attr(ENV,tracker,Ctx).
+*/
+set_tracker(ENV,ENV):-!.
+/*set_tracker(ENV,Ctx):- var(ENV),!,put_attr(ENV,tracker,Ctx).
 set_tracker(ENV,Ctx):- compound(ENV),!,
   (((arg(N,ENV,Ctx),is_rbtree(Ctx)))->nb_setarg(N,ENV,Ctx);nb_setarg(1,ENV,Ctx)).
-  
-is_env(ENV):- get_tracker(ENV,Ctx),!, rb_in(type,ctx(_),Ctx).
+*/ 
+%is_env(ENV):- get_tracker(ENV,Ctx),!, rb_in(type,ctx(_),Ctx).
+is_env(ENV):- nonvar(ENV),!.
+is_env(ENV):- notrace((sub_term(Sub,ENV),is_list(Sub))).
 
-get_env_attribute(ENV,Name,Value):-
-  get_tracker(ENV,Ctx), rb_in(Name,Value,Ctx).
+get_ctx_env_attribute(Ctx,Env,Name,Value):- get_env_attribute(Env,Name,Value)->true;get_env_attribute(Ctx,Name,Value).
+   
+get_env_attribute(Env,Name,Value):- notrace(get_env_attribute0(Env,Name,Value)).
+get_env_attribute0(ENV,Name,Value):-fail, get_tracker(ENV,Ctx),rb_in(Name,Value,Ctx).
+get_env_attribute0(Env,Name,Value):-  sub_term(Sub,Env),compound(Sub),Sub= (PName=VValue),Name==PName,Value=VValue,!.
 
-set_env_attribute(ENV,Name,Value):-
-   get_tracker(ENV,Ctx),!,    
-   nb_rb_insert(Ctx,Name,Value),!,
-   %rb_insert(Ctx,Name,Value,Ctx1),
-   %set_tracker(ENV,Ctx1).
+
+set_env_attribute(Env,Name,Value):- notrace(set_env_attribute0(Env,Name,Value)).
+set_env_attribute0(ENV,Name,Value):-fail,
+   get_tracker(ENV,Ctx),!,   nb_rb_insert(Ctx,Name,Value),
+   %rb_insert(Ctx,Name,Value,Ctx1),%set_tracker(ENV,Ctx1),
    !.
+set_env_attribute0(Env,Name,Value):- 
+   sub_term(Sub,Env),compound(Sub),Sub=(PName=_),
+   nonvar(PName),Name=PName,
+   nb_setarg(2,Sub,Value),!.
+set_env_attribute0(Env,Name,Value):- 
+  sub_term(Sub,Env),compound(Sub),Sub=[H|T],
+  nb_setarg(2,Sub,[H|T]),
+  nb_setarg(1,Sub,Name=Value),!.
+set_env_attribute0(Env,Name,Value):- 
+  sub_term(Sub,Env),compound(Sub),
+  Sub=..[F,H,T],
+  SetT=..[F,H,T],
+  nb_setarg(2,Sub,SetT),
+  nb_setarg(1,Sub,Name=Value).
 
-remove_env_attribute(ENV,Name):-
-  get_tracker(ENV,Ctx), rb_delete(Ctx,Name,Ctx1),
+
+
+sub_term_index(Sub,Term,N,T) :-
+        compound(Term),
+        arg(N0, T0, Sub0),
+        ((Sub0=Sub,T0=T,N0=N);sub_n_subterm(Sub,Sub0,N,T)).
+        
+
+remove_env_attribute(ENV,Name):-fail,
+  get_tracker(ENV,Ctx),!,rb_delete(Ctx,Name,Ctx1),
   set_tracker(ENV,Ctx1).
+
+remove_env_attribute(Env,Name):- 
+  sub_term(Sub,Env),compound(Sub),
+   arg(N,Sub,Nil),Nil=(PName=_),
+   nonvar(PName),Name=PName,
+   nb_setarg(N,Sub,[]),!.
 
 
 % current_env(ENV):- nb_current('$env_current',ENV),!.
@@ -135,12 +172,17 @@ remove_env_attribute(ENV,Name):-
 get_local_env(Locals,ENV):- get_var(Locals,'$env',ENV).
 set_local_env(Locals,ENV):- set_var(Locals,'$env',ENV).
 
-reenter_lisp(ENV,ENV):- notrace(( current_env(ENV),current_env(ENV))).
+reenter_lisp(CTX,ENV):- notrace(( ensure_ctx(CTX),ensure_env(ENV))).
 
+make_env_append(_Ctx,_Env,HeadEnv,[A|More],HeadEnv=More):-A==[],!.
+make_env_append(_Ctx,_Env,HeadEnv,[A|List],HeadEnv=[A|More]):- List==[], var(More),!. % ,never_bind(More),!.
+make_env_append(_Ctx,_Env,HeadEnv,[[A|List]|More],HeadEnv=ALL):- is_list(List),append([A|List],More,ALL).
+make_env_append(_Ctx,_Env,HeadEnv,ZippedArgEnv,HeadEnv=ZippedArgEnv):-!.
 
 % GlobalBindings
 
 ensure_env(ENV):- (nonvar(ENV)->true;(is_env(ENV)->true;current_env(ENV))).
+ensure_ctx(ENV):- (nonvar(ENV)->true;(is_env(ENV)->true;b_getval('$env_global',ENV))).
 current_env(ENV):- ensure_env,nb_current('$env_current',WASENV),!,(is_env(ENV)->WASENV==ENV;WASENV=ENV).
 
 ensure_env :-
@@ -152,10 +194,10 @@ reset_env:-
   nb_delete('$env_global'),
   nb_delete('$env_toplevel'),
   new_compile_ctx(GLOBAL),
-  set_env_attribute(GLOBAL,name,'GLOBAL'),
+  set_env_attribute0(GLOBAL,name,'GLOBAL'),
   debug_var('ToplevelEnv',TL),debug_var('GLOBAL',GLOBAL),
   new_compile_ctx(TL),
-  set_env_attribute(TL,name,'TOPLEVEL'),
+  set_env_attribute0(TL,name,'TOPLEVEL'),
   nb_setval('$env_global',GLOBAL),
   nb_setval('$env_topevel',TL),
   nb_setval('$env_current',TL),

@@ -14,6 +14,7 @@
  *******************************************************************/
 :- module(dasm, []).
 
+:- meta_predicate(maplist_not_tail(1,*)).
 
 %cl_disassemble(Function, Code):- string(Function),downcase_atom(Function,DC),!,cl_disassemble(DC, Code).
 cl_disassemble(function(Symbol), Code):- !, cl_disassemble(Symbol, Code).
@@ -85,9 +86,9 @@ print_related_clauses(ExceptFor,_OModule,P):-
    fail)).
 
 
-make_pretty(I,O):- !,shrink_lisp_strings(I,O), pretty1(O),pretty2(O),pretty3(O).
-make_pretty(I,O):- is_user_output,!,shrink_lisp_strings(I,O), pretty1(O),pretty2(O),pretty3(O).
-make_pretty(I,O):- I=O, pretty1(O),pretty2(O),pretty3(O).
+make_pretty(I,O):- !,notrace((shrink_lisp_strings(I,O), pretty1(O),pretty2(O),pretty3(O))).
+%make_pretty(I,O):- is_user_output,!,shrink_lisp_strings(I,O), pretty1(O),pretty2(O),pretty3(O).
+%make_pretty(I,O):- I=O, pretty1(O),pretty2(O),pretty3(O).
 
 print_clause_plain(I):-
   current_prolog_flag(color_term, Was),
@@ -122,22 +123,29 @@ pretty1(set_place(_Env, SETF, [Name|_], Val, _)):- is_place_write(SETF), atom(Na
 pretty1(Env=[List|_]):- compound(List),var(Env),List=[H|_],compound(H),H=bv(_,_), may_debug_var('Env',Env),
   maplist(pretty1,List).
 pretty1(Env=List):- compound(List),var(Env),List=[H|_],compound(H),H=bv(_,_), may_debug_var('Env',Env),
-  maplist(pretty1,List).
+  maplist_not_tail(pretty1,List).
 pretty1(P):- P=..[_,_|List],append(_,[Name, Val|_],List),atom(Name),var(Val),may_debug_var(Name,Val).
 pretty1(debug_var(R,V)):- may_debug_var(R,V).
 pretty1(bv(R,V)):- may_debug_var(R,V).
 pretty1(H):-H=..[_|ARGS],must_maplist_det(pretty1,ARGS).
 
+
+maplist_not_tail(_,ArgS):- var(ArgS),!.
+maplist_not_tail(G,[X|ArgS]):-call(G,X),maplist_not_tail(G,ArgS).
+
 pretty2(H):- \+ compound(H),!. % may_debug_var(F,'_Call',H).
+%pretty2([H|T]):-!,maplist_not_tail(pretty2,[H|T]).
 pretty2(H):-  
  always((functor(H,F,A),
    H=..[F,P1|ARGS],   
    (A>1 -> may_debug_var(F,'_Param',P1) ; true),
    must_maplist_det(pretty2,[P1|ARGS]))),!. 
 
+pretty3(H):- \+ compound(H),!. % may_debug_var(F,'_Call',H).
 pretty3(H):-pretty4(H),pretty5(H).
 
 pretty4(H):- \+ compound(H),!. % may_debug_var(F,'_Call',H).
+%pretty4([H|T]):-!,maplist_not_tail(pretty4,[H|T]).
 pretty4(H):-  
  ignore(((functor(H,F,_),
   wl:init_args(N,F),integer(N),

@@ -69,7 +69,7 @@ lisp_goal_pt2:- repl.
 call_lisp_main(Exit):- 
   get_lisp_main(Name),!,
   reader_intern_symbols(Name,Symbol),
-  find_function_or_macro_name(_Ctx,_Env,Symbol,_Len, Function),
+  find_lisp_function(Symbol,_,Function),
   call(Function,Exit).
 
 main_exit(N):- integer(N),!,halt(N).

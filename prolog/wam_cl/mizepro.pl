@@ -59,6 +59,7 @@ body_cleanup_full(Ctx,CodeSt,CodeOutNow):-
    
    body_cleanup_keep_debug_vars1(Ctx,Code5,CodeOut),
    add_type_checks_maybe(Ctx,CodeOut,CodeOutNow),
+   del_attrs_of(CodeOutNow,preserved_var),
    del_attrs_of(CodeOutNow,dif))).
 
 add_type_checks_maybe(_,IO,IO).
@@ -302,12 +303,12 @@ mize_body_1e(Ctx,F,(C1,C2,C4),C5):- conjoinment(Ctx,C1,C2,C3),!,mize_body_1e(Ctx
 mize_body_1e(Ctx,F,(C1,C2),Joined):- conjoinment(Ctx,C1,C2,C3),!,mize_body_1e(Ctx,F,C3,Joined).
 
 mize_body_1e(Ctx,F,(C1,C2),CodeJoined):-!,mize_body1(Ctx,F,C1,C1O),mize_body1(Ctx,F,C2,C2O),conjoin_0(Ctx,C1O,C2O,CodeJoined).
-mize_body_1e(Ctx,_,get_var(Env, Sym, Sym_Get),OUT):-  
+mize_body_1e(Ctx,_,get_var(Env, Sym, Sym_Get),OUT):- fail, 
   nop(OUT = 'O'(get_var(Env, Sym, Sym_Get),true)),
   OUT = true,
   % wam_cl_option(safe(elim_symbolvalues_vars),true),  
   get_var_tracker(Ctx,Sym,Dict),
-  Dict.w=1,
+  (Dict.w=1 ; (fail,  Dict.p=1,Dict.w=0)),
   % ((Dict.p==1-> ))
   % Dict.u<2,
   %Dict.r>=0,

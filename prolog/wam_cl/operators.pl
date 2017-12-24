@@ -21,8 +21,8 @@
 :- set_module(class(library)).
 :- ensure_loaded(utils_for_swi).
 
-
-cl_special_operator_p(Obj,RetVal):- t_or_nil(is_lisp_operator(_,Obj),RetVal).
+wl:needs_env(cl_special_operator_p).
+cl_special_operator_p(Env,Obj,RetVal):- t_or_nil(is_lisp_operator(_,Env,Obj),RetVal).
 
 cl_functionp(Obj,RetVal):- t_or_nil(is_functionp(Obj),RetVal).
 is_functionp(X):- \+ atom(X),!,fail.
@@ -55,11 +55,13 @@ get_label_suffix(_Ctx,Suffix):-nb_current('$labels_suffix',Suffix).
 remove_symbol_fbounds(Ctx,Sym):-
   remove_env_attribute(Ctx,fbound(Sym)).
 
-get_symbol_fbounds(Ctx,Sym,BoundType,ProposedName):-
-  get_env_attribute(Ctx,fbound(Sym),bound_type(BoundType,ProposedName)).
+get_symbol_fbounds(Ctx,Env,Sym,BoundType,ProposedName):-
+  get_env_attribute(Ctx,fbound(Sym),bound_type(BoundType,ProposedName));
+   get_env_attribute(Env,fbound(Sym),bound_type(BoundType,ProposedName)).
 
-add_symbol_fbounds(Ctx,Sym,BoundType,ProposedName):-
-  set_env_attribute(Ctx,fbound(Sym),bound_type(BoundType,ProposedName)).
+add_symbol_fbounds(Ctx,Env,Name=Value):- 
+  set_env_attribute(Ctx,Name,Value),
+  set_env_attribute(Env,Name,Value).
    
 
 show_ctx_info(Ctx):- term_attvars(Ctx,CtxVars),maplist(del_attr_rev2(freeze),CtxVars),show_ctx_info2(Ctx).
@@ -82,11 +84,11 @@ is_lisp_funcallable(closure,_).
 % compile_body(Ctx,Env,Result,['funcall',Function|ARGS], Body):- ...
 
 find_lisp_function(FN,ARITY,ProposedName):-
-  find_function_or_macro_name(_Ctx,_Env,FN,ARITY, ProposedName).
+  find_operator(_Ctx,_Env,FN,ARITY, ProposedName).
 
 make_function_or_macro_call(Ctx,Env,FN,Args,Result,ExpandedFunction):-
-   length(Args,ArgsLen),
-   find_function_or_macro_name(Ctx,Env,FN,ArgsLen, ProposedName),!,
+   (is_list(Args)->length(Args,ArgsLen);true),
+   foc_operator(Ctx,Env,FN,ArgsLen, ProposedName),!,
    align_args_or_fallback(FN,ProposedName,Args,Result,ArgsPlusResult),
    ExpandedFunction =.. [ ProposedName | ArgsPlusResult].
 
@@ -96,25 +98,81 @@ get_each_search_suffix(Ctx,Each):-
    append(_,EachList,List),atomic_list_concat(EachList,'_',Each)))->true;Each=''.
 
 
-find_function_or_macro_name(Ctx,_Env,FN, _Len, ProposedName):-
-   get_symbol_fbounds(Ctx,FN,_,ProposedName),!.
-find_function_or_macro_name(Ctx,Env,FN, Len, ProposedName):- 
+wl:interned_eval(("`ext:set-symbol-macro-function")).
+f_ext_set_symbol_macro_function(Symbol,FunctionSpec,ResultIsMacro):- 
+  as_symbol_macro(_Ctx,_Env,Symbol,FunctionSpec,ResultIsMacro),
+  set_opv(Symbol,function,ResultIsMacro),
+  set_opv(Symbol,compile_as,kw_operator).
+
+
+as_symbol_macro_function(Ctx,Env,_Symbol,function(MF),ResultIsMacro):-eval(Ctx,Env,function(MF),ResultIsMacro).
+as_symbol_macro_function(Ctx,Env,_Symbol,MF,ResultIsMacro):- \+ is_list(MF),eval(Ctx,Env,MF,ResultIsMacro).
+as_symbol_macro_function(Ctx,Env,Symbol,FormalParmsMacroBody,Macro):- assertion(is_list(FormalParmsMacroBody)),    
+  % debug_var('MFResult',MFResult),debug_var('FnResult',FResult),
+  compile_macro_function(Ctx,Env,Symbol,FormalParmsMacroBody,Macro,HeadParms,EnvAssign,HeadCode,MFBody,MFResult,CompileBody),
+    atom_concat(Macro,'_expander',MF),
+     append([MF|Whole],[MFResult],CallableMFV), CallableMF =.. CallableMFV,     
+    body_cleanup_keep_debug_vars(Ctx,
+      ((CallableMF  :-          
+        ((global_env(Env),whole_head_params(Whole,HeadParms),EnvAssign,HeadCode,MFBody)))),
+        MacroAssert),
+    always((CompileBody,assert_lsp(Symbol,MacroAssert))).
+   
+
+wl:interned_eval(("`ext:set-symbol-macro")).
+f_ext_set_symbol_macro(Symbol,FunctionSpec,ResultIsMacro):- 
+  as_symbol_macro(_Ctx,_Env,Symbol,FunctionSpec,ResultIsMacro),
+  set_opv(Symbol,function,ResultIsMacro),
+  set_opv(Symbol,compile_as,kw_operator).
+
+as_symbol_macro(Ctx,Env,_Symbol,function(MF),ResultIsMacro):-eval(Ctx,Env,function(MF),ResultIsMacro).
+as_symbol_macro(Ctx,Env,_Symbol,MF,ResultIsMacro):- \+ is_list(MF),eval(Ctx,Env,MF,ResultIsMacro).
+as_symbol_macro(Ctx,Env,Symbol,FormalParmsMacroBody,Macro):- assertion(is_list(FormalParmsMacroBody)),    
+  % debug_var('MFResult',MFResult),debug_var('FnResult',FResult),
+  compile_macro_function(Ctx,Env,Symbol,FormalParmsMacroBody,Macro,HeadParms,EnvAssign,HeadCode,MFBody,MFResult,CompileBody),
+     append([Macro|HeadParms],[FResult],CallableHeadV), CallableHead =.. CallableHeadV,   
+     % CallableMF =.. [MF,Whole,Env],
+    body_cleanup_keep_debug_vars(Ctx,
+      ((CallableHead  :- ((global_env(Env),EnvAssign,HeadCode,MFBody), cl_eval(MFResult,FResult)))),
+        MacroAssert),
+    always((CompileBody,assert_lsp(Symbol,MacroAssert))).
+
+
+
+as_funcallable(_Symbol,Function,Funcallable):- is_functionp(Function),!, Function=Funcallable.
+as_funcallable(_Symbol,FunctionSymbol,Funcallable):- atom(FunctionSymbol),find_lisp_function(FunctionSymbol, _Len, Funcallable),!.
+as_funcallable(_Symbol,function(Function),Funcallable):- is_functionp(Function),!, Function=Funcallable.
+as_funcallable(_Symbol,function(FunctionSymbol),Funcallable):- atom(FunctionSymbol),find_lisp_function(FunctionSymbol, _Len, Funcallable),!.
+as_funcallable(Symbol,LAMBDAAndBody,Funcallable):- 
+    compile_function(_Ctx,_Env,[Symbol|LAMBDAAndBody],Symbol,Funcallable,CompileBodyOpt),always(CompileBodyOpt).
+
+
+find_operator(Ctx,Env,FN, Len, ProposedName):- assertion(nonvar(FN)),
    get_each_search_suffix(Ctx,Each),atom_concat_suffix(FN,Each,EachFN),
-   exists_function_or_macro_name(Ctx,Env,EachFN,Len, ProposedName),!.
-find_function_or_macro_name(Ctx,Env,FN, Len, ProposedName):- 
-   exists_function_or_macro_name(Ctx,Env,FN,Len, ProposedName),!.
-find_function_or_macro_name(Ctx,_Env,FN, _Len, ProposedName):- 
-   generate_function_or_macro_name(Ctx,FN,ProposedName),!.
+   existing_operator(Ctx,Env,EachFN,Len, ProposedName),!.
+find_operator(Ctx,Env,FN, Len, ProposedName):- 
+   existing_operator(Ctx,Env,FN,Len, ProposedName),!.
+
+find_operator_else_function(Ctx,Env,Symbol,ProposedName,true):- 
+  find_operator(Ctx,Env,Symbol, _Len, ProposedName),!.
+find_operator_else_function(Ctx,Env,Symbol,ProposedName,Pre):- 
+   Pre = find_operator_or_die(Ctx,Env,Symbol, ProposedName),!.
+find_operator_else_function(_Cxt,_Env,Symbol,function(Symbol),true).
+
+find_operator_or_die(Ctx,Env,Symbol, ProposedName):- nonvar(Symbol), find_operator(Ctx,Env,Symbol, _Len, ProposedName),!.
+find_operator_or_die(_Ctx,_Env,Symbol, function(Symbol)).
+
+
+foc_operator(Ctx,Env,FN, Len, ProposedName):-  find_operator(Ctx,Env,FN, Len, ProposedName).
+foc_operator(Ctx,_Env,FN, _Len, ProposedName):- generate_function_or_macro_name(Ctx,FN,ProposedName),!.
 
 
 
-
-exists_function_or_macro_name(_Ctx,_Env,FN,_Len, ProposedName):- 
-  get_opv(FN,function,ProposedName),!.
-exists_function_or_macro_name(_Ctx,_Env,FN,ArgLen, ProposedName):-
-  some_defined_function_or_macro(FN,ArgLen,['','cl_','pf_','sf_','mf_','f_'],ProposedName),!.
-exists_function_or_macro_name(_Ctx,_Env,FN,ArgsLen, ProposedName):- upcase_atom(FN,FN),
-    Arity is ArgsLen+1,is_defined(FN,Arity),ProposedName=FN.
+existing_operator(Ctx,Env,FN, _Len, ProposedName):-  show_success(get_symbol_fbounds(Ctx,Env,FN,_Type,ProposedName)),!.
+existing_operator(_Ctx,_Env,FN,_Len, ProposedName):- get_opv(FN,function,ProposedName),!.
+existing_operator(_Ctx,_Env,FN,ArgsLen, ProposedName):- atom(FN),upcase_atom(FN,FN),
+  (number(ArgsLen)-> Arity is ArgsLen+1; between(1,5,Arity)),is_defined(FN,Arity),ProposedName=FN.
+%existing_operator(_Ctx,_Env,FN,ArgLen, ProposedName):-some_defined_function_or_macro(FN,ArgLen,['cl_','pf_','sf_','mf_','f_'],ProposedName),!.
 
 
 generate_function_or_macro_name(Ctx,FN,NewProposedName):-
@@ -239,8 +297,8 @@ guess_prolog_functor(P,F,A):- functor(P,F,A).
 currently_visible_package(P):- reading_package(Package),
   (P=Package;package_use_list(Package,P)).
 
-is_lisp_operator(Ctx,Sym):- get_symbol_fbounds(Ctx,Sym,kw_operator,_).
-is_lisp_operator(_,G):- notrace(lisp_operator(G)).
+is_lisp_operator(Ctx,Env,Sym):- get_symbol_fbounds(Ctx,Env,Sym,kw_operator,_).
+is_lisp_operator(_,_,G):- notrace(lisp_operator(G)).
 
 
 lisp_operator(defpackage).

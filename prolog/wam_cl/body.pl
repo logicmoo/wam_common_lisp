@@ -32,6 +32,10 @@ preserved_var:attr_unify_hook(_,_):- fail.
 
 must_compile_body(_Ctx,_Env,ResultO,LispCode, Body):- var(LispCode), get_attr(LispCode,preserved_var,t),!,true=Body,
    ResultO = LispCode.
+must_compile_body(_Ctx,_Env,ResultO,LispCode, Body):- var(LispCode), !,true=Body,
+   ResultO = LispCode.
+
+
 must_compile_body(Ctx,Env,ResultO,LispCode, BodyO):-
   %notrace((maybe_debug_var('_rCtx',Ctx),
   %maybe_debug_var('_rEnv',Env),
@@ -327,24 +331,14 @@ compiler_macro_left_right(prog,[Vars|Forms], [block,[],[let,Vars,[tagbody|Forms]
 
 
 % =============================================================================
-% = LET/FLET = 
+% = LET/EXT:LETF = 
 % =============================================================================
-% LET
-compile_body(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body):- assertion(is_list(NewBindingsIn)),!,
- always(compile_let(Ctx,Env,Result,[let, NewBindingsIn| BodyForms], Body)).
-% LET*
-compile_body(Ctx,Env,Result,[OP, []| BodyForms], Body):- same_symbol(OP,'let*'), !, 
-  must_compile_body(Ctx,Env,Result,[progn| BodyForms], Body).
-compile_body(Ctx,Env,Result,[OP, [Binding1|NewBindings]| BodyForms], Body):- same_symbol(OP,'let*'),
-   always(compile_let(Ctx,Env,Result,['let', [Binding1],[progn, [OP, NewBindings| BodyForms]]], Body)).
-% EXT:LETF
-compile_body(Ctx,Env,Result,[ext_letf, NewBindingsIn| BodyForms], Body):- assertion(is_list(NewBindingsIn)),!,
- always(compile_let(Ctx,Env,Result,[ext_letf, NewBindingsIn| BodyForms], Body)).
-% EXT:LETF*
-compile_body(Ctx,Env,Result,[OP, []| BodyForms], Body):- same_symbol(OP,'ext_letf*'), !, 
-  must_compile_body(Ctx,Env,Result,[progn| BodyForms], Body).
-compile_body(Ctx,Env,Result,[OP, [Binding1|NewBindings]| BodyForms], Body):- same_symbol(OP,'ext_letf*'),
-   always(compile_let(Ctx,Env,Result,['ext_letf', [Binding1],[progn, [OP, NewBindings| BodyForms]]], Body)).
+%compile_body(Ctx,Env,Result,[OP, []| BodyForms], Body):- memberchk(OP,ext_letf_xx,ext_letf,let,let_xx),
+%  must_compile_body(Ctx,Env,Result,[progn| BodyForms], Body).
+
+compile_body(Ctx,Env,Result,[OP, NewBindingsIn| BodyForms], Body):- memberchk(OP,[ext_letf_xx,ext_letf,let,let_xx]), 
+  assertion(is_list(NewBindingsIn)),!,
+  always(compile_let(Ctx,Env,Result,[OP, NewBindingsIn| BodyForms], Body)).
 
 % =============================================================================
 % = WITH SLOTS = 
@@ -490,11 +484,13 @@ compile_body(Ctx,_Env,Result,[POrSTerm|ARGS],Body):-
 
 
 % (function .)
-compile_body(_Cx,_Ev,function(Function),POrSTerm, true):- p_or_s(POrSTerm,function,[Function]).
-% ((function .) ...)
-compile_body(Ctx,Env,Result,[POrSTerm|ARGS],Body):- p_or_s(POrSTerm,function,[Function]),
-  compile_body(Ctx,Env,Result,[Function|ARGS],Body).
+compile_body(Ctx,Env,Result,POrSTerm, Pre):- p_or_s(POrSTerm,function,[Symbol]),
+  find_operator_else_function(Ctx,Env,Symbol,Result,Pre).
 
+% ((function .) ...)
+compile_body(Ctx,Env,Result,[POrSTerm|ARGS],(Pre,Body)):- p_or_s(POrSTerm,function,[Symbol]),
+  find_operator_else_function(Ctx,Env,Symbol,FResult,Pre),
+  compile_body(Ctx,Env,Result,[FResult|ARGS],Body).
 
 % (closure ...)
 compile_body(_Ctx,_Env,Result,POrSTerm,Body):- 
@@ -546,7 +542,6 @@ compile_body(Ctx,Env,Result,LispCode,CompileBody):-
   macroexpand_1_or_fail(LispCode,[],CompileBody0Result),
   dbginfo(macroexpand=LispCode),dbginfo(into=CompileBody0Result),
   must_compile_body(Ctx,Env,Result,CompileBody0Result, CompileBody),
-  dbginfo(code:-CompileBody),
   !.
 
 % Compiler Plugin

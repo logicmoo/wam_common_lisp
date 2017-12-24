@@ -223,7 +223,7 @@ make_default_constructor(Kind,Code):-
  get_struct_opv(Kind,symbolname,Name),to_prolog_string_anyways(Name,SName),
  atom_concat_or_rtrace("MAKE-",SName,FnName),
  reader_intern_symbols(FnName,Sym),
- find_function_or_macro_name(_,_,Sym,3,Function), 
+ foc_operator(_,_,Sym,3,Function), 
  Head=..[Function,List,Obj],
  Body=..[cl_make_instance,[Kind|List],Obj],
  Code = (assert_lsp(wl:init_args(0,Function)),
@@ -559,18 +559,12 @@ modulize(Pred,M:Pred):-predicate_property(Pred,module(M)),!.
 modulize(Pred,Pred).
 
 
-wl:symbol_has_prop_get_set(sys_xx_stdin_xx,claz_prolog_output_stream,set_input,current_input).
-
-
 wl:symbol_has_prop_get_set(sys_xx_global_env_var_xx,claz_environment, set_global_env, global_env).
 
 wl:symbol_has_prop_getter(Sym,value,prolog_direct(Setter/1)):- wl:symbol_has_prop_get_set(Sym,_,Setter,_Getter).
-wl:symbol_has_prop_getter(sys_xx_stdout_xx,value,prolog_direct(set_output/1)).
-
 wl:symbol_has_prop_getter(sys_xx_env_var_xx,value,prolog_direct(set_current_env/1)).
 
 wl:symbol_has_prop_setter(sys_xx_env_var_xx,value,prolog_direct(current_env/1)).
-wl:symbol_has_prop_setter(sys_xx_stdout_xx,value,prolog_direct(current_output/1)).
 wl:symbol_has_prop_setter(Sym,value,prolog_direct(Getter/1)):- wl:symbol_has_prop_get_set(Sym,_,_Setter,Getter).
 %wl:symbol_has_prop_getter(sys_xx_stderr_xx,value,prolog_direct(set_error/1)).
 %wl:symbol_has_prop_setter(sys_xx_stderr_xx,value,prolog_direct(current_error/1)).

@@ -27,13 +27,16 @@ add_tracked_var(Ctx,Atom,Var):-
    Vars=Dict.vars,
    sort([Var|Vars],NewVars),
    b_set_dict(vars,Dict,NewVars).
-  
-get_var_tracker(Ctx0,Atom,Dict):- get_tracker(Ctx0,Ctx), always(sanity(atom(Atom))),oo_get_attr(Ctx,var_tracker(Atom),Dict),(is_dict(Dict)->true;(trace,oo_get_attr(Ctx,var_tracker(Atom),_SDict))).
-get_var_tracker(Ctx0,Atom,Dict):-  get_tracker(Ctx0,Ctx),Dict=rw{name:Atom,r:0,w:0,p:0,ret:0,u:0,vars:[]},oo_put_attr(Ctx,var_tracker(Atom),Dict),!.
+
+%get_var_tracker(_,Atom,rw{name:Atom,r:0,w:0,p:0,ret:0,u:0,vars:[]}):-!. % mockup
+get_var_tracker(Ctx0,Atom,Dict):- get_tracker(Ctx0,Ctx), always(sanity(atom(Atom))),get_env_attribute(Ctx,var_tracker(Atom),Dict),(is_dict(Dict)->true;(trace,oo_get_attr(Ctx,var_tracker(Atom),_SDict))).
+get_var_tracker(Ctx0,Atom,Dict):- get_tracker(Ctx0,Ctx),Dict=rw{name:Atom,r:0,w:0,p:0,ret:0,u:0,vars:[]},set_env_attribute(Ctx,var_tracker(Atom),Dict),!.
 
 
 extract_var_atom([_,RVar|_],RVar):-atomic(RVar).
 extract_var_atom(Var,Var).
+
+:- discontiguous compile_assigns/5.
 
 compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, Atom2| Rest], Body):- is_parallel_op(SetQ),!, 
    pairify([Var, ValueForm, Atom2| Rest],Atoms,Forms),
@@ -51,13 +54,63 @@ compile_assigns(Ctx,Env,Result,[SetQ, Var, ValueForm, Atom2| Rest], Body):- is_p
 compile_assigns(Ctx,Env,Result,[Defvar, Var], Body):- is_def_nil(Defvar),!,
   compile_assigns(Ctx,Env,Result,[Defvar, Var , nil],Body).
 
-compile_assigns(Ctx,Env,Result,[Getf|ValuePlace], Body):- is_place_op_verbatum(Getf),     
+compile_assigns(Ctx,Env,Result,[Getf|ValuePlace], Body):- fail, is_place_op_verbatum(Getf),     
         debug_var([Getf,'_R'],Result),
         debug_var([Getf,'_Env'],Env),
         place_extract(ValuePlace,Value,Place),
         extract_var_atom(Place,RVar),
         (is_only_read_op(Getf)->rw_add(Ctx,RVar,r);rw_add(Ctx,RVar,w)),
         Body = (set_place(Env,Getf, Place, Value, Result)).
+
+
+portray(List):- notrace((nonvar(List),List=[_,_],sub_term(E,List),ground(E),E = ((environ=W)),write(environment(W)))).
+
+
+compile_assigns(Ctx,Env,Result,[Setf, Place|ValuesForms], (Part0,Body)):- is_place_write(Setf),
+     get_setf_expander_get_set(Ctx,Env,Place,GET,SET,Part0),
+     make_place_op(Ctx,Env,Result,Setf,GET,ValuesForms,SET,Body).
+
+compile_assigns(Ctx,Env,Result,[setf, Place, ValuesForms], (Part0,Part1,Part4)):- \+ atom(Place),
+     get_setf_expander_get_set(Ctx,Env,Place,_,SET,Part0),     
+     must_compile_body(Ctx,Env,New,ValuesForms,Part1),
+     append(SET,[New],LispOp),
+     must_compile_body(Ctx,Env,Result,LispOp,Part4).
+
+compile_assigns(Ctx,Env,Result,[getf, Place], (Part0,Part4)):- 
+     get_setf_expander_get_set(Ctx,Env,Place,GET,_SET,Part0),     
+     must_compile_body(Ctx,Env,Result,GET,Part4).
+
+
+% get_setf_expander_get_set(_Ctx,_Env,[car,Var],[car,Var],[set_car,Var],  true):- atom(Var),!.
+get_setf_expander_get_set(Ctx,Env,[OP,LVar|EXTRA],[OP,GET|EXTRA],[INVERSE,GET|EXTRA],  Body):- setf_inverse_op(OP,INVERSE),
+   must_compile_body(Ctx,Env,GET,LVar, Body), (var(GET)->put_attr(GET,preserved_var,t); true).
+
+get_setf_expander_get_set(Ctx,Env,LVar,GET,[sys_set_symbol_value,GET], true):- atom(LVar),lookup_symbol_macro(Ctx,Env,LVar,GET),!.
+get_setf_expander_get_set(_,_,LVar,GET,[sys_set_symbol_value,GET], true):- \+ atom(LVar),atom(LVar),LVar=GET.
+
+lookup_symbol_macro(Ctx,Env,LVar,GET):- get_ctx_env_attribute(Ctx,Env,symbol_macro(LVar),GET).
+
+setf_inverse_op(car,rplaca).
+setf_inverse_op(cdr,rplacd).
+setf_inverse_op(Sym,Inverse):- 
+   symbol_prefix_and_atom(Sym,FunPkg,Name),
+   member(SETPRefix,['setf','set','pf_set']),
+   atomic_list_concat([FunPkg,SETPRefix,Name],'_',Inverse),
+   find_lisp_function(Inverse,_Arity,_Fn).
+
+
+%  (defun p () (incf (car p)))
+% (defmacro incf (place &optional (delta 1))`(setf ,place (+ ,place ,delta)))
+make_place_op(Ctx,Env,Result,incf,GET,LV,SET,Body) :- 
+ always((
+   value_or(LV,Value,1),!,
+   must_compile_body(Ctx,Env,ValueR,Value,Part1),
+   must_compile_body(Ctx,Env,Old,GET,Part2),
+   Part3 = (New is Old+ ValueR),
+   append(SET,[New],LispOp),
+   must_compile_body(Ctx,Env,Result,LispOp,Part4),
+   Body = (Part1,Part2,Part3,Part4))).
+
 
 compile_assigns(Ctx,Env,Result,[Getf, Var| ValuesForms], Body):- is_place_op(Getf),     
 	must_maplist(expand_ctx_env_forms(Ctx,Env),ValuesForms, ValuesBody,ResultVs),
@@ -94,7 +147,7 @@ compile_symbol_getter(Ctx,Env,Value, Var, Body):-  always((atom(Var),!,
         debug_var([Var,'_Get'],Value),
         add_tracked_var(Ctx,Var,Value),
         rw_add(Ctx,Var,r),
-        debug_var('_GEnv',Env),
+        %debug_var('_GEnv',Env),
         Body = get_var(Env, Var, Value))).
 
 % compile_place(Ctx,Env,Result,Var,Code).
@@ -109,9 +162,14 @@ compile_each(Ctx,Env,[VarR|Result],[Var|Eval],Code):-
   compile_body(Ctx,Env,VarR,Var,Code0),
   compile_each(Ctx,Env,Result,Eval,Code1),
   conjoin_0(Ctx,Code0,Code1,Code).
+                  
+%rwstate:attr_unify_hook(_,_):-!,fail.
+%rwstate:attr_unify_hook(_,V):-always(var(V)),fail.
+nonplainvar(V):- nonvar(V);attvar_non_vn(V).
+attvar_non_vn(V):- attvar(V),get_attr(V,searchvar,_),!.
+attvar_non_vn(V):- attvar(V),copy_term(V,VV),del_attr(VV,vn),del_attr(VV,rwstate),del_attr(VV,varuse),
+  (get_attrs(VV,[]);\+attvar(VV)).
 
-rwstate:attr_unify_hook(_,_):-!,fail.
-rwstate:attr_unify_hook(_,V):-always(var(V)),fail.
 
 
 extract_variable_value([Val|Vals], FoundVal, Hole):-
@@ -152,10 +210,11 @@ bvof(E,M,T):-E=T,!,M=T.
 bvof(E,M,[L|L2]):- ((nonvar(L),bvof(E,M,L))->true;(nonvar(L2),bvof(E,M,L2))).
 
 
-set_var(Var,Val):- ensure_env(Env),!,set_var(Env,Var,Val).
+set_var(Var,Val):- % ensure_env(Env),!,
+       set_var(_Env,Var,Val).
 
 set_var(Env,Var,Result):-var(Result),!,get_var(Env,Var,Result).
-set_var(Env,Var,Result):- ensure_env(Env),!,
+set_var(Env,Var,Result):- % ensure_env(Env),!,
      (bvof(bv(Var,_),BV,Env)
       -> nb_setarg(2,BV,Result)
       ;	( 
@@ -237,17 +296,17 @@ is_place_write(V):- is_place_op_verbatum(V).
 is_place_write(P):- is_place_op(P), \+ is_only_read_op(P).
 
 is_place_op_verbatum(rotatefsdfsdfsdfsdfsdffs).
-%is_place_op_verbatum(rotatef).
-%is_place_op_verbatum(shiftf).
-%is_place_op_verbatum(push).
-%is_place_op_verbatum(pushnew).
-%is_place_op_verbatum(pop).
 
 is_place_op(setf).
 is_place_op(psetf).
 is_place_op(getf).
 is_place_op(incf).
 is_place_op(decf).
+is_place_op(rotatef).
+is_place_op(shiftf).
+is_place_op(push).
+is_place_op(pushnew).
+is_place_op(pop).
 
 is_any_place_op(P):-is_place_op_verbatum(P).
 is_any_place_op(P):-is_parallel_op(P).

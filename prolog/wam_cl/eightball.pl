@@ -41,6 +41,11 @@ slow_trace:- stop_rtrace,nortrace.
 on_x_rtrace(G):- catch(G,E,(dbginfo(E),rtrace(G),break)).
 atom_concat_or_rtrace(X,Y,Z):- tracing->atom_concat(X,Y,Z);catch(atom_concat(X,Y,Z),_,break).
 
+
+bind_breaks(More):- put_attr(More,bind_breaks,break).
+:- meta_predicate bind_breaks:attr_unify_hook(0,*).
+bind_breaks:attr_unify_hook(G,_):-G.
+
 lisp_dump_break:- both_outputs(dumpST),!,trace,throw(lisp_dump_break).
 %lisp_dump_break:- trace,throw(lisp_dump_break).
 lisp_dump_break:- lisp_dumpST,break.
@@ -52,10 +57,11 @@ true_or_die(Goal):-functor(Goal,_,A),arg(A,Goal,Ret),always((Goal,Ret\==[])).
 lquietly(G):- notrace((G)).
 
 % Must always succeed (or else there is a bug in the lisp impl!)
-always(G):- notrace(tracing),!,G,!.
+always([A|B]):-!,always(A),always(B).
 always((A->B;C)):- !, (on_x_rtrace(user:A) -> always(B);always(C)),!.
 always((A,!,B)):-!,always(A),!,always(B).
 always((A,B)):-!,always(A),always(B).
+always([]):-!.
 always(notrace(G)):- notrace(tracing),!, must(quietly(user:G)),!.
 always(notrace(G)):- !, quietly_must_or_rtrace(G).
 always(quietly(G)):- notrace(tracing),!, always(user:G).

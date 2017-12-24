@@ -105,7 +105,7 @@
         (setq l (cons (list 'setf (car a) (cadr a)) l)))))))
 
 ;;; Redefined in define-modify-macro.lisp.
-(defmacro incf (place &optional (delta 1))
+(defmacro hide-incf (place &optional (delta 1))
   `(setf ,place (+ ,place ,delta)))
 
 ;;; Redefined in define-modify-macro.lisp.

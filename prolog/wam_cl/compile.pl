@@ -44,21 +44,20 @@ lisp_compile(SExpression,Body):-
    lisp_compile(Result,Expression,Body).
 
 lisp_compile(Result,SExpression,Body):-
-   debug_var('TLEnv',Env),
-   lisp_compile(Env,Result,SExpression,Body).
+   %debug_var('TLEnv',Env),
+   lisp_compile(_Env,Result,SExpression,Body).
 
 lisp_compile(Env,Result,Expression,Body):-
-   ensure_env(Ctx),
-   always(lisp_compile(Ctx,Env,Result,Expression,Body)).
+   always(lisp_compile(_Ctx,Env,Result,Expression,(Body))).
 
 lisp_compile(Ctx,Env,Result,SExpression,Body):-
-   ensure_env(Ctx),
    quietly(as_sexp(SExpression,Expression)),
    always(compile_forms(Ctx,Env,Result,[Expression],Body)).
    
 
 
 compile_forms(Ctx,Env,Result,FunctionBody,Code):-
+   ensure_ctx(Ctx),%ensure_env(Env),
    must_compile_progn(Ctx,Env,Result,FunctionBody, [], Body),!,
    body_cleanup_keep_debug_vars(Ctx,Body,Code).
 
