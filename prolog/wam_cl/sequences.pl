@@ -391,6 +391,38 @@ cl_cddddr(W, Cdr_Ret) :-
   cl_cdr(Z, Cdr_Ret).
 
 
+wl:interned_eval_e(
+"(defmacro pushnew (obj place)
+  (let ((sym (gensym)))
+    `(let ((,sym ,obj))
+       (unless (member ,sym ,place)
+         (push ,sym ,place)))))").
+
+
+%(wl:init_args(2,cl_pushnew)).
+%cl_pushnew(Element, Place, FnResult) :-
+
+wl:interned_eval_e(
+'(defmacro my-push (element place)
+   (let ((el-sym  (gensym))
+         (new-sym (gensym "NEW")))
+     `(let* ((,el-sym  ,element)
+             (,new-sym (cons ,el-sym ,place)))
+        (setf ,place ,new-sym)))))').
+
+cl_push(Element, Place, FnResult) :-
+        global_env(ReplEnv),
+        Env=[bv(u_element, Element), bv(u_place, Place)|ReplEnv],
+        cl_gensym(El_sym_Init),
+        cl_gensym('$ARRAY'([*], claz_base_character, "NEW"), New_sym_Init),
+        LEnv=[bv(u_el_sym, El_sym_Init), bv(u_new_sym, New_sym_Init)|Env],
+        get_var(LEnv, u_el_sym, El_sym_Get12),
+        get_var(LEnv, u_element, Element_Get),
+        get_var(LEnv, u_new_sym, New_sym_Get15),
+        get_var(LEnv, u_place, Place_Get14),
+        [let_xx, [[El_sym_Get12, Element_Get], [New_sym_Get15, [cons, El_sym_Get12, Place_Get14]]], [setf, Place_Get14, New_sym_Get15]]=MFResult,
+        cl_eval(MFResult, FnResult).
+
 /*
 make_accessor(cadr).
 

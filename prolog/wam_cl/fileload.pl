@@ -234,7 +234,7 @@ grovel_time_called(do_when).
 grovel_time_called(cl_in_package).
 grovel_time_called(cl_use_package).
 grovel_time_called(cl_defpackage).
-grovel_time_called(CL_DEF):- atom_contains(CL_DEF,'_def').
+grovel_time_called(CL_DEF):- atom(CL_DEF),atom_contains(CL_DEF,'_def').
 grovel_time_called(set_opv).
 %grovel_time_called(sys_trace).
 

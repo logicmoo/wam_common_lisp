@@ -540,7 +540,7 @@ compile_body(Ctx,Env,Result,[BinOP,Form1,Form2,Form3|FormS],Code):- binop_identi
 
 % Use a previous DEFMACRO
 compile_body(Ctx,Env,Result,LispCode,CompileBody):-
-  % fail, %DISABLED    (NOT)
+  fail, %DISABLED    (NOT)
   macroexpand_1_or_fail(LispCode,[],CompileBody0Result),
   dbginfo(macroexpand=LispCode),dbginfo(into=CompileBody0Result),
   must_compile_body(Ctx,Env,Result,CompileBody0Result, CompileBody),

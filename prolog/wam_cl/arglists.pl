@@ -284,7 +284,7 @@ ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,optional,[F|FormalParms],Params,Na
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,aux,[[F,InitForm]|FormalParms],Params,[F|Names],[V|PVars],PCode):- !,
    enforce_atomic(F),   
    arginfo_append(F,aux,ArgInfo),
-   compile_aux_or_key(Env,F,V,[InitForm],InitCode),
+   compile_aux_or_key(Env,F,V,[InitForm],InitCode),   
    ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,aux,FormalParms,Params,Names,PVars,Code),
    PCode = (InitCode,Code).
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,aux,[F|FormalParms],Params,Names,PVars,Code):-!, 
@@ -295,15 +295,21 @@ ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,aux,[F|FormalParms],Params,Names,P
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,[ [F,InitForm,KWPName]|FormalParms],Params,[F,KWPName|Names],[V,PresentP|PVars],PCode):- !,
    enforce_atomic(F),   
    arginfo_append(F,key,ArgInfo),
-   compile_aux_or_key(Env,F,V,[InitForm],InitCode),   
+   %compile_aux_or_key(Env,F,V,[InitForm],InitCode),   
+   lisp_compile(Env,Else,InitForm,InitCode),
+   body_cleanup_keep_debug_vars(Ctx,(InitCode,Else=V),InitElse),
    ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,FormalParms,Params,Names,PVars,MoreCode),
-   PCode = (get_kw(Env,RestNKeys,F,F,V,InitCode,PresentP),MoreCode).
+   debug_var([F,'_Present'],PresentP),
+   PCode = (get_kw(Env,RestNKeys,F,F,V,InitElse,PresentP),MoreCode).
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,[ [[KW,F],InitForm]|FormalParms],Params,[F|Names],[V|PVars],PCode):- !,
    enforce_atomic(F),   
    arginfo_append(F,key,ArgInfo),
-   compile_aux_or_key(Env,F,V,[InitForm],InitCode),
+   %compile_aux_or_key(Env,F,V,[InitForm],InitCode),
+   lisp_compile(Env,Else,InitForm,InitCode),
+   body_cleanup_keep_debug_vars(Ctx,(InitCode,Else=V),InitElse),
    ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,FormalParms,Params,Names,PVars,Code),
-   PCode =(get_kw(Env,RestNKeys,KW,F,V,InitCode,_PresentP),Code).
+   debug_var([F,'_P'],PresentP),
+   PCode =(get_kw(Env,RestNKeys,KW,F,V,InitElse,PresentP),Code).
 
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,[[F,InitForm]|FormalParms],Params,Names,PVars,Code):- !, 
    enforce_atomic(F), % loops  back

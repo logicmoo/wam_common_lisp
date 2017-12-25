@@ -140,8 +140,8 @@ str_to_expression(Str, Expression):- lisp_add_history(Str),parse_sexpr_interned(
 str_to_expression(Str, Expression):- with_input_from_string(Str,read_and_parse(Expression)),!.
 
 remove_comments(IO,IO):- \+ compound(IO),!.
+remove_comments([I|II],[O|OO]):-!,remove_comments(I,O),!,remove_comments(II,OO).
 remove_comments([I|II],O):- is_comment(I,_),!,remove_comments(II,O).
-remove_comments([I|II],[O|OO]):-remove_comments(I,O),!,remove_comments(II,OO).
 remove_comments(IO,IO).
 
 

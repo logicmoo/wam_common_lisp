@@ -21,7 +21,7 @@
 :- set_module(class(library)).
 :- ensure_loaded(utils_for_swi).
 
-wl:needs_env(cl_special_operator_p).
+wl:declared(cl_special_operator_p,needs_env).
 cl_special_operator_p(Env,Obj,RetVal):- t_or_nil(is_lisp_operator(_,Env,Obj),RetVal).
 
 cl_functionp(Obj,RetVal):- t_or_nil(is_functionp(Obj),RetVal).
@@ -302,6 +302,7 @@ is_lisp_operator(_,_,G):- notrace(lisp_operator(G)).
 
 
 lisp_operator(defpackage).
+lisp_operator(Sym):- wl:declared(Sym,kw_operator).
 lisp_operator(if).
 lisp_operator('data-assrt').
 lisp_operator('define-caller-pattern').

@@ -18,12 +18,11 @@
 
 :- include('header').
 
+% fast
+% shared_lisp_compiler:plugin_expand_progbody(Ctx,Env,Result,InstrS,_PreviousResult,Code):- compile_body_go_tagbody(Ctx,Env,Result,InstrS,Code),!.
 
-shared_lisp_compiler:plugin_expand_progbody(Ctx,Env,Result,InstrS,_PreviousResult,Code):- 
-           compile_body_go_tagbody(Ctx,Env,Result,InstrS,Code),!.
-
-shared_lisp_compiler:plugin_expand_progbody(Ctx,Env,Result,InstrS,_PreviousResult,Code):- 
-           compile_body_select_tagbody(Ctx,Env,Result,InstrS,Code),!.
+% but easy
+shared_lisp_compiler:plugin_expand_progbody(Ctx,Env,Result,InstrS,_PreviousResult,Code):- compile_body_select_tagbody(Ctx,Env,Result,InstrS,Code),!.
 
 compile_body_select_tagbody(_Ctx,_Env,Result,[label, Tag|_], push_label(Tag) ):- debug_var("_LABELRES",Result).
 compile_body_select_tagbody(_Ctx,_Env,Result,[u_label, Tag|_], push_label(Tag) ):- debug_var("_LABELRES",Result).

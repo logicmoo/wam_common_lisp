@@ -47,7 +47,50 @@ wl:interned_eval(call(notrace(grovel_math))).
 
 % define_cl_math(F,0):- atom_concat_or_rtrace('cl_',F,CLN), P=..[CLN,X],FP=..[F], assertz(P:- X is FP).
 
+
+/*
+(defun my-max (real &rest reals) (dolist (r reals real)(when (> r real) (setq real r)))) 
+==>
+cl_my_max(Real, RestNKeys, FnResult) :-
+        nop(global_env(ReplEnv)),
+        GEnv=[[[bv(real, Real), bv(u_reals, RestNKeys)]|ReplEnv]|ReplEnv],
+        get_var(GEnv, real, Real_Get),
+        LEnv=[bv(real, Real_Get)|GEnv],
+        get_var(LEnv, u_reals, Reals_Get),
+        BV=bv(u_r, Ele),
+        AEnv=[BV|LEnv],
+        forall(member(Ele, Reals_Get),
+               ( nb_setarg(2, BV, Ele),
+                 get_var(AEnv, real, Real_Get12),
+                 get_var(AEnv, u_r, R_Get),
+                 (   Real_Get12>R_Get
+                 ->  get_var(AEnv, u_r, R_Get18),
+                     set_var(AEnv, real, R_Get18),
+                     _2740=R_Get18
+                 ;   _2740=[]
+                 )
+               )),
+        get_var(LEnv, real, Real_Get24),
+        Real_Get24=FnResult.
+*/
+wl: init_args(1,cl_max).
+cl_max(Real,Reals,Out):-  
+   (Reals=[R|DoList] ->
+    ( R > Real -> 
+       cl_max(R,DoList,Out);
+        cl_max(Real,DoList,Out));
+    Out=Real).
+
+wl: init_args(1,cl_min).
+cl_min(Real,Reals,Out):-  
+   Reals=[R|DoList] ->
+    ( R < Real -> 
+       cl_min(R,DoList,Out);
+        cl_min(Real,DoList,Out));
+    Out=Real.
+
 define_cl_math(max,_):-!.
+define_cl_math(min,_):-!.
 define_cl_math(F,1):- atom_concat_or_rtrace('cl_',F,CLN), P=..[CLN,X,R],FP=..[F,X],
   (is_defined(CLN,2)-> true ; always(assert_lsp(P:- R is FP))).
 define_cl_math(F,2):- atom_concat_or_rtrace('cl_',F,CLN), P=..[CLN,X,Y,R],FP=..[F,X,Y],
@@ -74,7 +117,7 @@ is_numberp('$COMPLEX'(_,_)).
 is_numberp('$EXP'(_,_,_)).
 is_numberp(P):- number(P).
 
-is_integerp(P):- integer(P)-> true; is_integerp(P).
+is_integerp(P):- integer(P).
 is_bignump(P):- compound(P),arg(1,P,Type),!,Type==claz_bignum,(functor(P,'$NUMBER',_);functor(P,'$EXP',_)).
 
 is_oddp(N):- 1 is N div 2.

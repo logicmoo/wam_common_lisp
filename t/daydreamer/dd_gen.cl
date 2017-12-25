@@ -325,7 +325,7 @@
      (gen-subgoals goal stream switches context bp t)
      *me-ob*))
 
-(defun genable-subgoals (goal context belief-path)
+(rtrace (defun genable-subgoals (goal context belief-path)
   (let ((links (get-links-relative goal *intends-ob*
                                    context belief-path))
         (rule nil)
@@ -349,7 +349,7 @@
                              (list (ob$get link 'linked-to))))))
           (yresult result)))
         nil)))
-
+)
 (defun gen-subgoals (con stream switches context bp top?)
   (let ((subgoals (genable-subgoals con context bp))
         (subj nil))

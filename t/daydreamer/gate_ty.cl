@@ -14,6 +14,8 @@
 ;
 ;*******************************************************************************
 
+(rtrace)
+
 (ob$decl-inverses 'isa 'isa-of)
 ;(ob$decl-inverses 'type 'type-of)
 

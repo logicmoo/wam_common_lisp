@@ -94,6 +94,25 @@ nil_lastvar(G):- functor(G,_,A),arg(A,G,[]).
 or_die(G):- G ->true;throw(die(G)).
 or_nil(G):- G ->true;nil_lastvar(G).
 
+wl:interned_eval_e(
+'(defmacro my-push (element place)
+   (let ((el-sym  (gensym))
+         (new-sym (gensym "NEW")))
+     `(let* ((,el-sym  ,element)
+             (,new-sym (cons ,el-sym ,place)))
+        (setq ,place ,new-sym)))))').
+
+wl:interned_eval_e(
+"(defmacro pushnew (obj place)
+  (let ((sym (gensym)))
+    `(let ((,sym ,obj))
+       (unless (member ,sym ,place)
+         (push ,sym ,place)))))").
+
+
+
+wl:interned_eval_e('(cl:pushnew "/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/reference/ecl/src/lsp/" ext:*file-search*)').
+
 path_probe(Dir):- cl_symbol_value(xx_default_pathname_defaults_xx,Str),to_prolog_pathname(Str,Path),(Path\==''-> Dir=Path;Dir='.').
 path_probe(Path):-cl_symbol_value(ext_xx_file_search_xx,Str),(member(E,Str)*->to_prolog_pathname(E,Path);Path='.').
 path_probe(Str):- cl_symbol_value(ext_xx_lisp_home_xx,Str),to_prolog_pathname(Str,Path),Path\==''.
