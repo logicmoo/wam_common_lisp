@@ -67,7 +67,7 @@ push_list_prepend(O,Env,Name,Value):- Env=[H|T],ct(O,2,Env,[H|T]),ct(O,1,Env,bv(
 
 
 user:portray(environment{name:N, tracker:_}):-!,writeq(N).
-user:portray(X):- is_rbtree(X),!,writeq(is_rbtree).
+% user:portray(X):- is_rbtree(X),!,writeq(is_rbtree).
 user:portray(env(RB,_)):- get_env_attribute(RB,name,Value),!, writeq(Value).
 user:portray(env(_,_)):- writeq(env/2).
 
@@ -127,7 +127,8 @@ get_env_attribute0(ENV,Name,Value):-fail, get_tracker(ENV,Ctx),rb_in(Name,Valu
 get_env_attribute0(Env,Name,Value):-  sub_term(Sub,Env),compound(Sub),Sub= (PName=VValue),Name==PName,Value=VValue,!.
 
 
-set_env_attribute(Env,Name,Value):- notrace(set_env_attribute0(Env,Name,Value)).
+set_env_attribute(Env,Name,Value):- quietly(always(set_env_attribute0(Env,Name,Value))).
+set_env_attribute0(ENV,_Name,_Value):- var(ENV),!.
 set_env_attribute0(ENV,Name,Value):-fail,
    get_tracker(ENV,Ctx),!,   nb_rb_insert(Ctx,Name,Value),
    %rb_insert(Ctx,Name,Value,Ctx1),%set_tracker(ENV,Ctx1),

@@ -25,10 +25,11 @@ wl:declared(cl_special_operator_p,needs_env).
 cl_special_operator_p(Env,Obj,RetVal):- t_or_nil(is_lisp_operator(_,Env,Obj),RetVal).
 
 cl_functionp(Obj,RetVal):- t_or_nil(is_functionp(Obj),RetVal).
-is_functionp(X):- \+ atom(X),!,fail.
-is_functionp(X):- atom_concat_or_rtrace('f_',_,X),!.
-is_functionp(X):- atom_concat_or_rtrace('cl_',_,X),!.
-is_functionp(X):- atom(X),current_predicate(X/N),N>0. 
+
+is_functionp(X):-  atom(X),is_functionp0(X),!.
+is_functionp0(X):- atom_concat_or_rtrace('f_',_,X),!.
+is_functionp0(X):- atom_concat_or_rtrace('cl_',_,X),!.
+is_functionp0(X):- current_predicate(X/N),N>0. 
 
 
 % DEFSETF (short form)
@@ -60,8 +61,8 @@ get_symbol_fbounds(Ctx,Env,Sym,BoundType,ProposedName):-
    get_env_attribute(Env,fbound(Sym),bound_type(BoundType,ProposedName)).
 
 add_symbol_fbounds(Ctx,Env,Name=Value):- 
-  set_env_attribute(Ctx,Name,Value),
-  set_env_attribute(Env,Name,Value).
+  always((set_env_attribute(Ctx,Name,Value),
+  set_env_attribute(Env,Name,Value))).
    
 
 show_ctx_info(Ctx):- term_attvars(Ctx,CtxVars),maplist(del_attr_rev2(freeze),CtxVars),show_ctx_info2(Ctx).
@@ -69,7 +70,6 @@ show_ctx_info2(Ctx):- ignore((get_tracker(Ctx,Ctx0),in_comment(show_ctx_info3(Ct
 show_ctx_info3(Ctx):- is_rbtree(Ctx),!,forall(rb_in(Key, Value, Ctx),fmt9(Key=Value)).
 show_ctx_info3(Ctx):- fmt9(ctx=Ctx).
      
-
 
 
 as_lisp_funcallable(Atom,Atom):-atom(Atom),!.
@@ -162,6 +162,8 @@ find_operator_else_function(_Cxt,_Env,Symbol,function(Symbol),true).
 find_operator_or_die(Ctx,Env,Symbol, ProposedName):- nonvar(Symbol), find_operator(Ctx,Env,Symbol, _Len, ProposedName),!.
 find_operator_or_die(_Ctx,_Env,Symbol, function(Symbol)).
 
+
+f_sys_coerce_to_function(FN,ProposedName):- find_lisp_function(FN,_ARITY,ProposedName).
 
 foc_operator(Ctx,Env,FN, Len, ProposedName):-  find_operator(Ctx,Env,FN, Len, ProposedName).
 foc_operator(Ctx,_Env,FN, _Len, ProposedName):- generate_function_or_macro_name(Ctx,FN,ProposedName),!.

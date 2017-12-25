@@ -240,7 +240,7 @@ lw:- cl_load("wam-cl-params",_).
 
 :- set_prolog_flag(verbose_autoload,false).
 
-:- initialization(lisp,main).
+:- initialization((lisp),main).
 
 :- use_module(library(shell)).
 %:- process_si.

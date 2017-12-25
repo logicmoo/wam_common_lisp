@@ -79,6 +79,10 @@
 :- dynamic(wl:op_replacement/2).
 :- discontiguous(wl:op_replacement/2).
 
+:- multifile(wl:setf_inverse/2).
+:- dynamic(wl:setf_inverse/2).
+:- discontiguous(wl:setf_inverse/2).
+
 :- multifile(wl:declared/2).
 :- dynamic(wl:declared/2).
 :- discontiguous(wl:declared/2).

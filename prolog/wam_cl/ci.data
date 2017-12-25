@@ -3236,84 +3236,6 @@ struct_opv(claz_hash_table(claz_string,claz_package),classof,claz_built_in_class
 struct_opv(claz_hash_table(claz_string,claz_symbol),classof,claz_built_in_class).
 struct_opv(claz_hash_table(claz_t,claz_t),classof,claz_built_in_class).
 struct_opv(claz_hash_table(claz_t,claz_t),include,claz_hash_table).
-struct_opv(claz_hash_table,classof,claz_built_in_class).
-struct_opv(claz_hash_table,classof,claz_structure_class).
-struct_opv(claz_hash_table,include,claz_hash_table(claz_t,claz_t)).
-struct_opv(claz_hash_table,include,claz_structure_object).
-struct_opv(claz_hash_table,include,claz_t).
-struct_opv(claz_hash_table,name,"BUCKETS",zlot_hash_table_buckets).
-struct_opv(claz_hash_table,name,"CACHE",zlot_hash_table_cache).
-struct_opv(claz_hash_table,name,"COMPARATOR",zlot_hash_table_comparator).
-struct_opv(claz_hash_table,name,"COUNT",zlot_hash_table_count).
-struct_opv(claz_hash_table,name,"HASH-FUN",zlot_hash_table_hash_fun).
-struct_opv(claz_hash_table,name,"HASH-VECTOR",zlot_hash_table_hash_vector).
-struct_opv(claz_hash_table,name,"INDEX-VECTOR",zlot_hash_table_index_vector).
-struct_opv(claz_hash_table,name,"LOCK",zlot_hash_table_lock).
-struct_opv(claz_hash_table,name,"NEEDS-REHASH-P",zlot_hash_table_needs_rehash_p).
-struct_opv(claz_hash_table,name,"NEXT-FREE-KV",zlot_hash_table_next_free_kv).
-struct_opv(claz_hash_table,name,"NEXT-VECTOR",zlot_hash_table_next_vector).
-struct_opv(claz_hash_table,name,"NEXT-WEAK-HASH-TABLE",zlot_hash_table_next_weak_hash_table).
-struct_opv(claz_hash_table,name,"NUMBER-ENTRIES",zlot_hash_table_number_entries).
-struct_opv(claz_hash_table,name,"REHASH-SIZE",zlot_hash_table_rehash_size).
-struct_opv(claz_hash_table,name,"REHASH-THRESHOLD",zlot_hash_table_rehash_threshold).
-struct_opv(claz_hash_table,name,"REHASH-TRIGGER",zlot_hash_table_rehash_trigger).
-struct_opv(claz_hash_table,name,"SYNCHRONIZED-P",zlot_hash_table_synchronized_p).
-struct_opv(claz_hash_table,name,"TABLE",zlot_hash_table_table).
-struct_opv(claz_hash_table,name,"TEST",zlot_hash_table_test).
-struct_opv(claz_hash_table,name,"TEST-FUN",zlot_hash_table_test_fun).
-struct_opv(claz_hash_table,name,"THRESHOLD",zlot_hash_table_threshold).
-struct_opv(claz_hash_table,name,"WEAKNESS",zlot_hash_table_weakness).
-struct_opv(claz_hash_table,prototype,'$S'([hash_table,kw_test,ext_fasthash_eq,kw_warn_if_needs_rehash_after_gc,t])).
-struct_opv(claz_hash_table,read_only,t,zlot_hash_table_comparator).
-struct_opv(claz_hash_table,read_only,t,zlot_hash_table_lock).
-struct_opv(claz_hash_table,read_only,t,zlot_hash_table_rehash_size).
-struct_opv(claz_hash_table,read_only,t,zlot_hash_table_rehash_threshold).
-struct_opv(claz_hash_table,slot,buckets,zlot_hash_table_buckets).
-struct_opv(claz_hash_table,slot,cache,zlot_hash_table_cache).
-struct_opv(claz_hash_table,slot,comparator,zlot_hash_table_comparator).
-struct_opv(claz_hash_table,slot,count,zlot_hash_table_count).
-struct_opv(claz_hash_table,slot,hash_fun,zlot_hash_table_hash_fun).
-struct_opv(claz_hash_table,slot,hash_vector,zlot_hash_table_hash_vector).
-struct_opv(claz_hash_table,slot,index_vector,zlot_hash_table_index_vector).
-struct_opv(claz_hash_table,slot,lock,zlot_hash_table_lock).
-struct_opv(claz_hash_table,slot,needs_rehash_p,zlot_hash_table_needs_rehash_p).
-struct_opv(claz_hash_table,slot,next_free_kv,zlot_hash_table_next_free_kv).
-struct_opv(claz_hash_table,slot,next_vector,zlot_hash_table_next_vector).
-struct_opv(claz_hash_table,slot,next_weak_hash_table,zlot_hash_table_next_weak_hash_table).
-struct_opv(claz_hash_table,slot,number_entries,zlot_hash_table_number_entries).
-struct_opv(claz_hash_table,slot,rehash_size,zlot_hash_table_rehash_size).
-struct_opv(claz_hash_table,slot,rehash_threshold,zlot_hash_table_rehash_threshold).
-struct_opv(claz_hash_table,slot,rehash_trigger,zlot_hash_table_rehash_trigger).
-struct_opv(claz_hash_table,slot,synchronized_p,zlot_hash_table_synchronized_p).
-struct_opv(claz_hash_table,slot,table,zlot_hash_table_table).
-struct_opv(claz_hash_table,slot,test,zlot_hash_table_test).
-struct_opv(claz_hash_table,slot,test_fun,zlot_hash_table_test_fun).
-struct_opv(claz_hash_table,slot,threshold,zlot_hash_table_threshold).
-struct_opv(claz_hash_table,slot,weakness,zlot_hash_table_weakness).
-struct_opv(claz_hash_table,super_priority,[claz_structure_object,claz_sys_slot_object,claz_t]).
-struct_opv(claz_hash_table,super_priority,[claz_t]).
-struct_opv(claz_hash_table,symbolname,hash_table).
-struct_opv(claz_hash_table,type,hash_table_comparator,zlot_hash_table_comparator).
-struct_opv(claz_hash_table,type,integer,zlot_hash_table_count).
-struct_opv(claz_hash_table,type,integer,zlot_hash_table_rehash_size).
-struct_opv(claz_hash_table,type,integer,zlot_hash_table_threshold).
-struct_opv(claz_hash_table,type,j_reentrant_lock,zlot_hash_table_lock).
-struct_opv(claz_hash_table,type,number,zlot_hash_table_rehash_threshold).
-struct_opv(claz_hash_table,type,simple_vector(claz_hash_table_hash_entry),zlot_hash_table_buckets).
-struct_opv(claz_hash_table_comparator,classof,claz_built_in_class).
-struct_opv(claz_hash_table_hash_entry,classof,claz_built_in_class).
-struct_opv(claz_hash_table_hash_entry,name,"HASH",zlot_hash_table_hash_entry_hash).
-struct_opv(claz_hash_table_hash_entry,name,"KEY",zlot_hash_table_hash_entry_key).
-struct_opv(claz_hash_table_hash_entry,name,"NEXT",zlot_hash_table_hash_entry_next).
-struct_opv(claz_hash_table_hash_entry,name,"VALUE",zlot_hash_table_hash_entry_value).
-struct_opv(claz_hash_table_hash_entry,slot,hash,zlot_hash_table_hash_entry_hash).
-struct_opv(claz_hash_table_hash_entry,slot,key,zlot_hash_table_hash_entry_key).
-struct_opv(claz_hash_table_hash_entry,slot,next,zlot_hash_table_hash_entry_next).
-struct_opv(claz_hash_table_hash_entry,slot,value,zlot_hash_table_hash_entry_value).
-struct_opv(claz_hash_table_hash_entry,type,hash_table_hash_entry,zlot_hash_table_hash_entry_next).
-struct_opv(claz_hash_table_hash_entry,type,integer,zlot_hash_table_hash_entry_hash).
-struct_opv(claz_hash_table_hash_entry,type,t,zlot_hash_table_hash_entry_key).
-struct_opv(claz_hash_table_hash_entry,type,t,zlot_hash_table_hash_entry_value).
 struct_opv(claz_i18n_locale_conv,classof,claz_clos_structure_class).
 struct_opv(claz_i18n_locale_conv,include,claz_structure_object).
 struct_opv(claz_i18n_locale_conv,initargs,[kw_currency_symbol],zlot_i18n_locale_conv_currency_symbol).
@@ -10593,3 +10515,52 @@ struct_opv(claz_zero_rank_array,slot,element_type,zlot_zero_rank_array_element_t
 struct_opv(claz_zero_rank_array,type,boolean,zlot_zero_rank_array_adjustable).
 struct_opv(claz_zero_rank_array,type,t,zlot_zero_rank_array_data).
 struct_opv(claz_zero_rank_array,type,t,zlot_zero_rank_array_element_type).
+
+struct_opv(claz_hash_table, symbolname, hash_table).
+struct_opv(claz_hash_table, classof,claz_built_in_class).
+struct_opv(claz_hash_table, classof, claz_standard_class).
+
+struct_opv(claz_hash_table, slot, test, zlot_hash_table_test).
+struct_opv(claz_hash_table, keyword, kw_test, zlot_hash_table_test).
+struct_opv(claz_hash_table, ordinal, 1, zlot_hash_table_test).
+struct_opv(claz_hash_table, initform, [quote, eql], zlot_hash_table_test).
+struct_opv(claz_hash_table, slot, u_size, zlot_hash_table_size).
+struct_opv(claz_hash_table, keyword, kw_size, zlot_hash_table_size).
+struct_opv(claz_hash_table, ordinal, 2, zlot_hash_table_size).
+struct_opv(claz_hash_table, initform, 11, zlot_hash_table_size).
+struct_opv(claz_hash_table, slot, u_rehash_size, zlot_hash_table_rehash_size).
+struct_opv(claz_hash_table, keyword, kw_rehash_size, zlot_hash_table_rehash_size).
+struct_opv(claz_hash_table, ordinal, 3, zlot_hash_table_rehash_size).
+struct_opv(claz_hash_table, initform, 1.5, zlot_hash_table_rehash_size).
+struct_opv(claz_hash_table, slot, u_rehash_threshold, zlot_hash_table_rehash_threshold).
+struct_opv(claz_hash_table, keyword, kw_rehash_threshold, zlot_hash_table_rehash_threshold).
+struct_opv(claz_hash_table, ordinal, 4, zlot_hash_table_rehash_threshold).
+struct_opv(claz_hash_table, initform, 0.75, zlot_hash_table_rehash_threshold).
+struct_opv(claz_hash_table, slot, u_weakness, zlot_hash_table_weakness).
+struct_opv(claz_hash_table, keyword, kw_weakness, zlot_hash_table_weakness).
+struct_opv(claz_hash_table, ordinal, 5, zlot_hash_table_weakness).
+struct_opv(claz_hash_table, initform, [], zlot_hash_table_weakness).
+struct_opv(claz_hash_table, slot, u_lock, zlot_hash_table_lock).
+struct_opv(claz_hash_table, keyword, kw_lock, zlot_hash_table_lock).
+struct_opv(claz_hash_table, ordinal, 6, zlot_hash_table_lock).
+struct_opv(claz_hash_table, initform, [], zlot_hash_table_lock).
+struct_opv(claz_hash_table, conc_name, "HASH-TABLE-").
+struct_opv(claz_hash_table, setter_fn, u_setf_hash_table_test, zlot_hash_table_test).
+struct_opv(claz_hash_table, accessor, hash_table_test, zlot_hash_table_test).
+struct_opv(claz_hash_table, setter_fn, u_setf_hash_table_size, zlot_hash_table_size).
+struct_opv(claz_hash_table, accessor, hash_table_size, zlot_hash_table_size).
+struct_opv(claz_hash_table, setter_fn, u_setf_hash_table_rehash_size, zlot_hash_table_rehash_size).
+struct_opv(claz_hash_table, accessor, hash_table_rehash_size, zlot_hash_table_rehash_size).
+struct_opv(claz_hash_table, setter_fn, u_setf_hash_table_rehash_threshold, zlot_hash_table_rehash_threshold).
+struct_opv(claz_hash_table, accessor, hash_table_rehash_threshold, zlot_hash_table_rehash_threshold).
+struct_opv(claz_hash_table, setter_fn, u_setf_hash_table_weakness, zlot_hash_table_weakness).
+struct_opv(claz_hash_table, accessor, sys_hash_table_weakness, zlot_hash_table_weakness).
+struct_opv(claz_hash_table, setter_fn, u_setf_hash_table_lock, zlot_hash_table_lock).
+struct_opv(claz_hash_table, accessor, u_hash_table_lock, zlot_hash_table_lock).
+struct_opv(claz_hash_table, slot, u_data, zlot_hash_table_data).
+struct_opv(claz_hash_table, keyword, kw_data, zlot_hash_table_data).
+struct_opv(claz_hash_table, ordinal, 7, zlot_hash_table_data).
+struct_opv(claz_hash_table, initform, [], zlot_hash_table_data).
+struct_opv(claz_hash_table, setter_fn, u_setf_hash_table_data, zlot_hash_table_data).
+struct_opv(claz_hash_table, accessor, u_hash_table_data, zlot_hash_table_data).
+

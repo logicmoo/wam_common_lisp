@@ -31,23 +31,24 @@ xlisting_config:xlisting_always(G):- G=soops:_, current_predicate(_,G),
   \+ predicate_property(G,imported_from(_)).
 
 new_cl_fixnum(Init,Obj):-
-  create_instance(claz_fixnum,[Init],Obj),!.
+  create_object(claz_fixnum,[Init],Obj),!.
 
 
 create_struct1(Kind,[Value],Value):- data_record(Kind,[_]),!.
-create_struct1(Kind,ARGS,Obj):-create_instance(Kind,ARGS,Obj),!.
+create_struct1(Kind,ARGS,Obj):-create_object(Kind,ARGS,Obj),!.
 create_struct1(_Type,Value,Value).
 
-cl_make_instance([Name|Slots],Obj):- always(create_instance(Name,Slots,Obj)).
+% standard object
+cl_make_instance([Name|Slots],Obj):- always(create_object(Name,Slots,Obj)).
 
-create_struct(X,Y):-create_instance(X,Y).
-create_struct(X,Y,Z):-create_instance(X,Y,Z).
+create_struct(X,Y):-create_object(X,Y).
+create_struct(X,Y,Z):-create_object(X,Y,Z).
 
-create_instance([Name|Slots],Obj):- !,create_instance(Name,Slots,Obj).
-create_instance(TypeARGS,Obj):- compound(TypeARGS),!,compound_name_arguments(TypeARGS,Kind,ARGS),
-  create_instance(Kind,ARGS,Obj),!.
-create_instance(Kind,Obj):- create_instance(Kind,[],Obj),!.
-create_instance(Kind,Attrs,Obj):- 
+create_object([Name|Slots],Obj):- !,create_object(Name,Slots,Obj).
+create_object(TypeARGS,Obj):- compound(TypeARGS),!,compound_name_arguments(TypeARGS,Kind,ARGS),
+  create_object(Kind,ARGS,Obj),!.
+create_object(Kind,Obj):- create_object(Kind,[],Obj),!.
+create_object(Kind,Attrs,Obj):- 
   gensym('znst_',Name), 
   new_unnamed_opv(Kind,Name,Attrs,Obj).
 
@@ -65,7 +66,7 @@ new_unnamed_opv(SKind,Name,Attrs,Obj):-
   add_opv_new(Obj,classof,Kind),
   ensure_opv_type_inited(Kind),  
   construct_opv(Obj,Kind),
-  init_slot_props(Kind,1,Obj,Attrs),
+  always(init_slot_props(Kind,1,Obj,Attrs)),
   call_init_slot_props(Kind,Obj))).
   %maplist(add_missing_opv(Obj,Kind),Attrs).
 
@@ -79,24 +80,37 @@ init_struct_opv(Kind,Obj,Name,SlotInfo):-
 
 when_must(True,Then):- True->always(Then);true.
 
-init_slot_props(_,_,_,[]).
-init_slot_props(Kind,Ord,Obj,[Key,Value|Props]):- is_keywordp(Key),
+init_slot_props(Kind,Ord,Obj,PProps):-init_slot_props_kv(Kind,Ord,Obj,PProps),!.
+init_slot_props(Kind,Ord,Obj,PProps):-init_slot_props_iv(Kind,Ord,Obj,PProps),!.
+
+
+init_slot_props_iv(_,_N,_Obj,[]):-!.
+init_slot_props_iv(Kind,N,Obj,[Value|Props]):-
+  add_i_opv(Kind,Obj,N,Value), N2 is N + 1,
+  init_slot_props_kv(Kind,N2,Obj,Props).
+
+add_i_opv(Kind,Obj,N,Value):- get_struct_opv(Kind,ordinal,N,SlotInfo),
+  get_struct_opv(Kind,slot,Key,SlotInfo),
+   add_opv(Obj,Key,Value).
+
+init_slot_props_kv(_,_,_,[]).
+init_slot_props_kv(Kind,Ord,Obj,[Key,Value|Props]):- is_keywordp(Key),
   (type_slot_number(Kind,Key,SOrd)->Ord2 is SOrd+1;Ord2 is Ord+1),
   add_kw_opv(Obj,Key,Value),  
-  init_slot_props(Kind,Ord2,Obj,Props).
-init_slot_props(Kind,Ord,Obj,[[Key|List]|Props]):- 
+  init_slot_props_kv(Kind,Ord2,Obj,Props).
+init_slot_props_kv(Kind,Ord,Obj,[[Key|List]|Props]):- 
    is_keywordp(Key),!,maplist(add_kw_opv(Obj,Key),List),
   (type_slot_number(Kind,Key,SOrd)->Ord2 is SOrd+1;Ord2 is Ord+1),
-   init_slot_props(Kind,Ord2,Obj,Props).
-init_slot_props(Kind,Ord,Obj,[KV|Props]):- get_kv(KV,Key,Value),
+   init_slot_props_kv(Kind,Ord2,Obj,Props).
+init_slot_props_kv(Kind,Ord,Obj,[KV|Props]):- get_kv(KV,Key,Value),
   (type_slot_number(Kind,Key,SOrd)->Ord2 is SOrd+1;Ord2 is Ord+1),
   add_kw_opv(Obj,Key,Value),  
-  init_slot_props(Kind,Ord2,Obj,Props).
-init_slot_props(Kind,Ord,Obj,[Value|Props]):-
+  init_slot_props_kv(Kind,Ord2,Obj,Props).
+init_slot_props_kv(Kind,Ord,Obj,[Value|Props]):-
   always(type_slot_number(Kind,Key,Ord)),
   add_kw_opv(Obj,Key,Value),
   Ord2 is Ord+1,
-  init_slot_props(Kind,Ord2,Obj,Props).
+  init_slot_props_kv(Kind,Ord2,Obj,Props).
 
 
 type_slot_number(Kind,Key,Ordinal):-
@@ -419,13 +433,14 @@ get_opv_else(Sym,Prop,Value):- nonvar(Sym),is_keywordp(Sym),!,get_type_default(k
 get_opv_else(Obj,Prop,Value):- nonvar(Obj),nonvar(Prop),notrace((Prop\==classof,Prop\==typeof,Prop\==value,Prop\==conc_name)),get_opv_pi(Obj,Prop,Value).
 get_opv_else(Obj,typeof,Symbol):- get_opv_iii(Obj,classof,Value),claz_to_symbol(Value,Symbol).
 
+
 get_type_default(keyword,Name,name,Out):- atom(Name), string_concat(kw_,Str,Name),string_upper(Str,Out).
 get_type_default(keyword,_,package,pkg_keyword).
 get_type_default(keyword,_,classof,clz_keyword).
 get_type_default(keyword,_,defined_as,defconstant).
 get_type_default(keyword,_,typeof,keyword).
 
-get_opv_iii(Obj,Prop,Value):- wl:symbol_has_prop_setter(Obj,Prop,Getter),call(Getter,Obj,Prop,Value).
+get_opv_iii(Obj,Prop,Value):- nonvar(Obj),wl:symbol_has_prop_getter(Obj,Prop,Getter),call(Getter,Obj,Prop,Value).
 get_opv_iii(Obj,Prop,Value):- soops:o_p_v(Obj,Prop,Value).
 get_opv_iii(Obj,Prop,Value):- atom(Obj),nb_current(Obj,Ref),nb_current_value(Ref,Prop,Value).
 get_opv_iii(Obj,Prop,Value):- soops:struct_opv(Obj,Prop,Value).
@@ -433,7 +448,9 @@ get_opv_iii(Obj,Prop,Value):- soops:struct_opv(Obj,Prop,Value).
 compound_deref(C,_):- \+ compound(C),!,fail.
 compound_deref('$OBJ'(claz_reference,B),B):- atom(B).
 
-get_opv_pi(Obj,Prop,Value):- get_obj_pred(Obj,Prop,Pred), call(Pred,Obj,Value).
+get_opv_pi(Obj,Prop,Value):- 
+  get_obj_pred(Obj,Prop,Pred), 
+        call(Pred,Obj,Value).
 get_opv_pi(Obj,Prop,Value):- fail, get_obj_prefix(Obj,Prefix),atom_concat_or_rtrace(Prefix,DashKey,Prop),atom_concat_or_rtrace('_',Key,DashKey),!,
   get_opv_i(Obj,Key,Value).
   
@@ -516,7 +533,7 @@ add_opv_new(Obj,Key,Value):-
   un_kw(Key,Prop),
   add_opv_new_i(Obj,Prop,Value).
 
-add_opv_new_i(Obj,Prop,Value):- nonvar(Obj), wl:symbol_has_prop_getter(Obj,Prop,Setter),once(call(Setter,Obj,Prop,Value)),fail.
+add_opv_new_i(Obj,Prop,Value):- nonvar(Obj), wl:symbol_has_prop_setter(Obj,Prop,Setter),once(call(Setter,Obj,Prop,Value)),fail.
 %add_opv_new_i(Obj,Prop,Value):- Prop==value, nonvar(Obj),nb_setval(Obj,Value).
 add_opv_new_i(Ref,Prop,Value):- get_ref_object(Ref,Object),!,
    retractall(soops:o_p_v(Ref,Prop,_)),
@@ -559,13 +576,11 @@ modulize(Pred,M:Pred):-predicate_property(Pred,module(M)),!.
 modulize(Pred,Pred).
 
 
-wl:symbol_has_prop_get_set(sys_xx_global_env_var_xx,claz_environment, set_global_env, global_env).
+wl:symbol_has_prop_set_get(sys_xx_global_env_var_xx,claz_environment, set_global_env, global_env).
+wl:symbol_has_prop_set_get(sys_xx_env_var_xx,claz_environment, set_current_env, current_env).
 
-wl:symbol_has_prop_getter(Sym,value,prolog_direct(Setter/1)):- wl:symbol_has_prop_get_set(Sym,_,Setter,_Getter).
-wl:symbol_has_prop_getter(sys_xx_env_var_xx,value,prolog_direct(set_current_env/1)).
-
-wl:symbol_has_prop_setter(sys_xx_env_var_xx,value,prolog_direct(current_env/1)).
-wl:symbol_has_prop_setter(Sym,value,prolog_direct(Getter/1)):- wl:symbol_has_prop_get_set(Sym,_,_Setter,Getter).
+wl:symbol_has_prop_getter(Sym,value,prolog_direct(Getter/1)):- wl:symbol_has_prop_set_get(Sym,_,_Setter,Getter).
+wl:symbol_has_prop_setter(Sym,value,prolog_direct(Setter/1)):- wl:symbol_has_prop_set_get(Sym,_,Setter,_Getter).
 %wl:symbol_has_prop_getter(sys_xx_stderr_xx,value,prolog_direct(set_error/1)).
 %wl:symbol_has_prop_setter(sys_xx_stderr_xx,value,prolog_direct(current_error/1)).
 
@@ -576,7 +591,9 @@ prolog_direct(Pred/3,Obj,Prop,Value):- call(Pred,Obj,Prop,Value).
 update_opv(Obj,Prop,Value):- set_opv(Obj,Prop,Value).
 
 set_opv(Obj,Key,Value):- un_kw(Key,Prop),set_opv_i(Obj,Prop,Value).
-set_opv_i(Obj,Prop,Value):- % delete_opvalues(Obj,Prop),
+set_opv_i(Obj,Prop,Value):- wl:symbol_has_prop_setter(Obj,Prop,Setter),!,call(Setter,Obj,Prop,Value).
+set_opv_i(Obj,Prop,Value):- 
+   % delete_opvalues(Obj,Prop),
    add_opv_new(Obj,Prop,Value).
 
 :- dynamic(is_obj_type/1).

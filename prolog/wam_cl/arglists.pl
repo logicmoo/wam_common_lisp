@@ -236,18 +236,26 @@ ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,Mode,['&environment'],Params,Names
 
 
 % Parsing required(s)  (defmacro dolist ((var listform &optional resultform) &body body) ... )
-ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,required,[F|FormalParms],[List|Params],Names12,PVars12,(Code2,Code)):-  
+ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,required,[F|FormalParms],[List|Params],Names12,PVars12,
+  (Code2,Code)):-  
+  %debug_var('Destructure',List),
+  %List = [H|T],List = [H|T],
+  %debug_var('H',List),
+  Whole2 = List,
   is_list(F),!,
   SubFormal = F,
-  List = [_H|_T],
-  Whole2 = List,
+
   %HeadParms=Whole,
- 
-  %function_head_params(Ctx,Env,FN,SubFormal,_ZippedArgEnv,_RestNKeys2,Whole2,_RequiredArgs2,ArgInfo,_Names2,_PVars2,Code2),  
-  ordinary_args(Ctx,Env,ArgInfo,RestNKeys2,Whole2,required,SubFormal,_SubReqParams,Names2,PVars2,Code2),append(Names,Names2,Names12),append(PVars,PVars2,PVars12),debug_var('SubRestNKeys',RestNKeys2),
+  debug_var('SubEnv',Env),
+  ArgInfo2 = arginfo{req:0,all:0,sublists:0,opt:0,rest:0,whole:0,body:0,key:0,aux:0,env:0,allow_other_keys:0,names:Names,complex:0},
+  %function_head_params(Ctx,Env,_,SubFormal,_ZippedArgEnv,_RestNKeys2,Whole2,_RequiredArgs2,ArgInfo2,Names2,PVars2,Code2),  
+  enter_ordinary_args(Ctx,Env,ArgInfo2,RestNKeys2,Whole2,required,SubFormal,SubReqParams,Names2,PVars2,Code2),  
+  %debug_var('SubRestNKeys',RestNKeys2),
   %expand_function_head(Ctx,Env,subSymbol,SubFormal,Whole2,_Head2,_ZippedArgEnv,_Result,_HeadDefCode,Code2),Names=Names12,PVars=PVars12,
   %make_compiled(Ctx,Env,_MResult,_Symbol,SubFormal,Whole2,_HeadParms,_HeadDefCode,Code2),Names=Names12,PVars=PVars12,
-  ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,required,FormalParms,Params,Names,PVars,Code),!.
+  ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,required,FormalParms,Params,Names,PVars,Code),!,
+  append(Names,Names2,Names12),append(PVars,PVars2,PVars12),
+  append(SubReqParams,RestNKeys2,List).
   
 
 

@@ -18,7 +18,7 @@
 
 cl_class_of(Obj,Class):- i_class(Obj,Class),!.
 
-:- use_module(library('dialect/sicstus/arrays')).
+:- user:use_module(library('dialect/sicstus/arrays'),[is_array/1]).
 % :- use_module(library('dialect/sicstus')).
 % Numbers, pathnames, and arrays are examples of self-evaluating objects.
 is_self_evaluating_object(X):- var(X),!.

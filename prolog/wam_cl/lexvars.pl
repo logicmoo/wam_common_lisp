@@ -92,8 +92,13 @@ compile_assigns(Ctx,Env,Result,[getf, Place], (Part0,Part4)):-
      must_compile_body(Ctx,Env,Result,GET,Part4).
 
 
+% %  (LET ((a 0)(v (VECTOR 0 1 2 3 4 5))) (INCF (AREF (INCF a))) v)
+
+% %  (LET ((a 0)(v (VECTOR 0 1 2 3 4 5))) (INCF (AREF (INCF a))) v)
+
 % get_setf_expander_get_set(_Ctx,_Env,[car,Var],[car,Var],[set_car,Var],  true):- atom(Var),!.
-get_setf_expander_get_set(Ctx,Env,[OP,LVar|EXTRA],[OP,GET|EXTRA],[INVERSE,GET|EXTRA],  Body):- setf_inverse_op(OP,INVERSE),
+get_setf_expander_get_set(Ctx,Env,[OP,LVar|EXTRA],[OP,GET|EXTRA],[INVERSE,GET|EXTRA],  Body):- 
+ setf_inverse_op(OP,INVERSE),
    must_compile_body(Ctx,Env,GET,LVar, Body), (var(GET)->put_attr(GET,preserved_var,t); true).
 
 %get_setf_expander_get_set(Ctx,Env,LVar,GET,[sys_set_symbol_value,GET], true):- atom(LVar),lookup_symbol_macro(Ctx,Env,LVar,GET),!.
@@ -103,9 +108,11 @@ f_clos_pf_set_slot_value(Obj,Key,Value,Value):- set_opv(Obj,Key,Value).
 
 lookup_symbol_macro(Ctx,Env,LVar,GET):- get_ctx_env_attribute(Ctx,Env,symbol_macro(LVar),GET).
 
-setf_inverse_op(slot_value,clos_pf_set_slot_value).
-setf_inverse_op(car,rplaca).
-setf_inverse_op(cdr,rplacd).
+wl:setf_inverse(slot_value,clos_pf_set_slot_value).
+wl:setf_inverse(car,rplaca).
+wl:setf_inverse(cdr,rplacd).
+
+setf_inverse_op(Sym,Inverse):- wl:setf_inverse(Sym,Inverse).
 setf_inverse_op(G,S):- cl_get(G,sys_setf_inverse,_,S),ground(S).
 setf_inverse_op(Sym,Inverse):- 
    symbol_prefix_and_atom(Sym,FunPkg,Name),

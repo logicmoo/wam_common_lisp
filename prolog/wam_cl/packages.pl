@@ -68,11 +68,11 @@ pl_package_name(S,Name):- find_package(S,Package),(get_opv(Package,name,Name)->t
 
 cl_package_name(P,N):- pl_package_name(P,S),to_lisp_string(S,N).
 
-find_package(Obj,Res):- to_prolog_string_if_needed(Obj,F),!,find_package(F,Res).
-find_package('$OBJ'(claz_package,UP),Package):-find_package(UP,Package).
 find_package(S,S):- is_lisp_package(S),!.
+find_package('$OBJ'(claz_package,UP),Package):-find_package(UP,Package),!.
+find_package(Obj,Res):- to_prolog_string_if_needed(Obj,F),!,find_package(F,Res).
 find_package(S,Package):- 
-  as_string_upper(S,SN),
+  as_string_upper(S,SN),!,
   (package_name(Package,SN) ; get_opv_i(Package,nicknames,SN)),!.
 
 find_package_or_die(L,T):- to_prolog_string_if_needed(L,Loc),!,find_package_or_die(Loc,T).
@@ -271,6 +271,7 @@ package_nicknames(pkg_ext, "EXT").
 package_nicknames(pkg_prolog, "P").
 package_nicknames(pkg_prolog, "INT").
 package_nicknames(pkg_sys, "SYS").
+package_nicknames(pkg_sys, "SI").
 package_nicknames(pkg_sys, "WAM-CL").
 package_nicknames(pkg_os, "OS").
 package_nicknames(pkg_clos, "MOP").

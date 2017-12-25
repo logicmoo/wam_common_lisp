@@ -371,7 +371,8 @@ cl_dolist(VarList,FormS,Result):-
    always(Code).
    
    compile_dolist(Ctx,Env,Result,['dolist',[Var,List,RetVar]|FormS], Code):-
-      must_compile_body(Ctx,Env,Result,[let,[[RetVar,RetVar]],['dolist',[Var,List]|FormS],RetVar], Code).
+      debug_var('DoRetVar',RetVar),
+      must_compile_body(Ctx,Env,Result,[let,[RetVar],['dolist',[Var,List]|FormS],RetVar], Code).
    
    compile_dolist(Ctx,Env,Result,['dolist',[Var,List]|FormS], Code):-
        must_compile_body(Ctx,Env,ResultL,List,ListBody),

@@ -84,6 +84,7 @@ wl:init_args(0,cl_list).
 cl_list(List,List).
 
 
+
 cl_copy_alist([H|T],[HH|TT]):- !, assertion(nonvar(H)),
   pl_copy_1assoc(H,HH),
   cl_copy_alist(T,TT).
@@ -95,6 +96,12 @@ pl_copy_1assoc(HT,HT).
 wl: init_args(exact_only, cl_acons).
 cl_acons(Key_Param, Datum_Param, Alist_Param, [[Key_Param|Datum_Param]|Alist_Param]).
 
+wl:interned_eval((
+"(defconstant +upgraded-array-element-types+ 
+   '(NIL BASE-CHAR CHARACTER BIT EXT:BYTE8 EXT:INTEGER8 EXT:BYTE16 EXT:INTEGER16
+ EXT:BYTE32 EXT:INTEGER32 EXT:BYTE64 EXT:INTEGER64 SINGLE-FLOAT DOUBLE-FLOAT T))")).
+
+wl:interned_eval(("`SYS:MAKE-VECTOR")).
 
 %rassoc item alist &key key test test-not => entry
 wl:init_args(2,cl_rassoc).
@@ -585,4 +592,65 @@ Warning: f_u_yloop/4, which is referenced by
 Warning:        1-st clause of f_u_walkcdr/3: 1-st clause of f_u_walkcdr/3
 
 
+
+
+Warning: cl_array_element_type/2, which is referenced by
+Warning:        1-st clause of f_sys_coerce_to_vector/5: 1-st clause of f_sys_coerce_to_vector/5
+Warning: cl_array_has_fill_pointer_p/2, which is referenced by
+Warning:        1-st clause of cl_map_into/4: 1-st clause of cl_map_into/4
+Warning: cl_check_type/4, which is referenced by
+Warning:        1-st clause of f_sys_coerce_to_vector/5: 1-st clause of f_sys_coerce_to_vector/5
+Warning: cl_list_xx/3, which is referenced by
+Warning:        1-st clause of cl_map/5: 1-st clause of cl_map/5
+Warning: cl_make_list/4, which is referenced by
+Warning:        1-st clause of cl_make_sequence/4: 1-st clause of cl_make_sequence/4
+Warning: cl_member/7, which is referenced by
+Warning:        1-st clause of cl_member_if/4: 1-st clause of cl_member_if/4
+Warning:        1-st clause of cl_member_if_not/4: 1-st clause of cl_member_if_not/4
+Warning: cl_nsubst/8, which is referenced by
+Warning:        1-st clause of cl_nsubst_if/5: 1-st clause of cl_nsubst_if/5
+Warning:        1-st clause of cl_nsubst_if_not/5: 1-st clause of cl_nsubst_if_not/5
+Warning: cl_reduce/7, which is referenced by
+Warning:        1-st clause of cl_map/5: 1-st clause of cl_map/5
+Warning: cl_subst/8, which is referenced by
+Warning:        1-st clause of cl_subst_if/5: 1-st clause of cl_subst_if/5
+Warning:        1-st clause of cl_subst_if_not/5: 1-st clause of cl_subst_if_not/5
+Warning: cl_subtypep/3, which is referenced by
+Warning:        1-st clause of cl_make_sequence/4: 1-st clause of cl_make_sequence/4
+Warning: cl_type_error/3, which is referenced by
+Warning:        1-st clause of f_sys_pf_set_subseq/4: 1-st clause of f_sys_pf_set_subseq/4
+Warning: f_ext_truly_the/3, which is referenced by
+Warning:        1-st clause of f_sys_make_seq_iterator/3: 1-st clause of f_sys_make_seq_iterator/3
+Warning:        1-st clause of f_sys_seq_iterator_next/3: 1-st clause of f_sys_seq_iterator_next/3
+Warning:        1-st clause of f_sys_seq_iterator_ref/3: 1-st clause of f_sys_seq_iterator_ref/3
+Warning:        1-st clause of f_sys_seq_iterator_set/4: 1-st clause of f_sys_seq_iterator_set/4
+Warning: f_sys_closest_sequence_type/2, which is referenced by
+Warning:        1-st clause of cl_make_sequence/4: 1-st clause of cl_make_sequence/4
+Warning: f_sys_do_sequences/3, which is referenced by
+Warning:        1-st clause of cl_every/4: 1-st clause of cl_every/4
+Warning:        1-st clause of cl_map/5: 1-st clause of cl_map/5
+Warning:        1-st clause of cl_some/4: 1-st clause of cl_some/4
+Warning: f_sys_elt_list/4, which is referenced by
+Warning:        1-st clause of cl_every/4: 1-st clause of cl_every/4
+Warning:        1-st clause of cl_map/5: 1-st clause of cl_map/5
+Warning:        1-st clause of cl_some/4: 1-st clause of cl_some/4
+Warning: f_sys_fill_array_with_elt/5, which is referenced by
+Warning:        1-st clause of cl_make_sequence/4: 1-st clause of cl_make_sequence/4
+Warning: f_sys_fixnump/2, which is referenced by
+Warning:        1-st clause of f_sys_make_seq_iterator/3: 1-st clause of f_sys_make_seq_iterator/3
+Warning:        1-st clause of f_sys_seq_iterator_next/3: 1-st clause of f_sys_seq_iterator_next/3
+Warning:        1-st clause of f_sys_seq_iterator_ref/3: 1-st clause of f_sys_seq_iterator_ref/3
+Warning:        1-st clause of f_sys_seq_iterator_set/4: 1-st clause of f_sys_seq_iterator_set/4
+Warning: f_sys_make_vector/7, which is referenced by
+Warning:        1-st clause of cl_make_sequence/4: 1-st clause of cl_make_sequence/4
+Warning:        1-st clause of f_sys_coerce_to_vector/5: 1-st clause of f_sys_coerce_to_vector/5
+Warning: f_sys_pf_set_fill_pointer/3, which is referenced by
+Warning:        1-st clause of cl_map_into/4: 1-st clause of cl_map_into/4
+Warning: f_sys_reckless/2, which is referenced by
+Warning:        1-st clause of cl_every/4: 1-st clause of cl_every/4
+Warning:        1-st clause of cl_some/4: 1-st clause of cl_some/4
+Warning: f_sys_signal_type_error/3, which is referenced by
+Warning:        1-st clause of f_sys_error_not_a_sequence/2: 1-st clause of f_sys_error_not_a_sequence/2
+Warning: f_sys_simple_array_p/2, which is referenced by
+Warning:        1-st clause of f_sys_coerce_to_vector/5: 1-st clause of f_sys_coerce_to_vector/5
 

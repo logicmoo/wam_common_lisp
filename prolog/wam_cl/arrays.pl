@@ -64,11 +64,13 @@ get_array_data(Obj,List):- get_opv(Obj,data,List),!.
 get_array_data(Obj,List):- get_opv(Obj,array,Obj2),!,get_array_data(Obj2,List).
 
 
+
+
 wl:init_args(0,cl_make_array).
 cl_make_array(Dims,RetVal):- e1_as_list(Dims,DimsL),
- create_instance(claz_array,[dims=DimsL],RetVal).
+ create_object(claz_array,[dims=DimsL],RetVal).
 cl_make_array(Dims,Keys,RetVal):- e1_as_list(Dims,DimsL),
- create_instance(claz_array,[dims=DimsL|Keys],RetVal).
+ create_object(claz_array,[dims=DimsL|Keys],RetVal).
 
 wl:init_args(0,cl_vector).
 cl_vector(Elements,RetVal):-

@@ -33,7 +33,7 @@
 
 (defun make-hash-table (&key (test 'eql) (size 11) (rehash-size 1.5)
                              (rehash-threshold 0.75)
-                             (weakness nil))
+                             (weakness nil) (lock nil))
   (setf test (coerce-to-function test))
   (unless (and (integerp size) (>= size 0))
     (error 'type-error :datum size :expected-type '(integer 0)))

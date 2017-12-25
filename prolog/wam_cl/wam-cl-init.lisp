@@ -34,6 +34,10 @@
 
 (in-package "SYSTEM")
 
+(defmacro make-hash-table (&rest all) `(make-instance 'hash-table ,@all))
+
+
+#|
 (defun make-hash-table (&key (test 'eql) (size 11) (rehash-size 1.5)
                              (rehash-threshold 0.75)
                              (weakness nil))
@@ -48,11 +52,11 @@
         (if (not (typep weakness weakness-types))
             (error 'type-error :datum weakness 
                    :expected-type weakness-types)
-            (%make-weak-hash-table test size rehash-size 
+            (make-instance 'weak-hash-table test size rehash-size 
                                    rehash-threshold weakness))
-	(%make-hash-table test size 
+	(make-instance 'hash-table test size 
                           rehash-size rehash-threshold))))
-
+|#
     
   
 

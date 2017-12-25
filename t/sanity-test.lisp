@@ -22,7 +22,8 @@
 
 (defun mapcar-visualize (func l) (if (null l) () (cons (apply func (list (first l))) (mapcar func (rest l)))))
 
-(load "../prolog/wam_cl/wam-cl-init")
+'(load "../prolog/wam_cl/wam-cl-init")
+(load "wam-cl-init")
 
 (in-package "CL-USER")
 
