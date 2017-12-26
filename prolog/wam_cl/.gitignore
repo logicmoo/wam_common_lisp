@@ -1,5 +1,5 @@
-sbcl/
-*-old/
 */
 *.trans.pl
+*.pro
+
 

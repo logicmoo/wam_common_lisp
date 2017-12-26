@@ -2,6 +2,9 @@ bin
 target
 obj
 
+*.pro
+
+
 # qtcreator
 *.user
 
@@ -17,7 +20,9 @@ build
 *.nib
 *.swp
 *.o
-sbcl/
-*-old/
+*~
+*k
+*/
 *.trans.pl
+*
 
