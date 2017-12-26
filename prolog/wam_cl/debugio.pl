@@ -88,6 +88,7 @@ dbmsg_assert(Where,user:(HBody)):- !,dbmsg_assert(Where,(HBody)).
 dbmsg_assert(Where, (user:H) :- Body):- !,dbmsg_assert(Where,(H :- Body)),!.
 dbmsg_assert(Where,(Head:-Body)):- Body==true,!, dbmsg_assert(Where,(Head)).
 dbmsg_assert(Where,(Head:-Body)):- set_md_lang([]),!, always((in_comment(pre_annotation("### Compiled: ",Where)),
+   del_attrs_of((Head:-Body),rwstate),
    set_md_lang(prolog),in_md(prolog,colormsg1(Head:-Body)),assert_lsp(Head:-Body))).
 dbmsg_assert(Where,Head):- strip_module(Head,_,P),functor(P,F,_),arg(_,v(arglist_info,lambda_def),F),!, 
    always((nop(pre_annotation("#### annotating...",Where)),!,in_md(prolog,fmt9(Head)),!,assert_lsp(Head))).

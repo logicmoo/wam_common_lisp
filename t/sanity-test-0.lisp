@@ -1,121 +1,176 @@
-
-(- #-:allegro 1 #+:allegro -1 0 1)
-
-
-#| 
-
-(- #-:allegro 1 #+:allegro die:a 0 1)
-
-
-Function MACROEXPAND, MACROEXPAND-1
-Syntax:
-
-macroexpand form &optional env  ;;  expansion, expanded-p
-
-macroexpand-1 form &optional env  ;;  expansion, expanded-p
-
-Arguments and Values:
-
-form---a form.
-
-env---an environment object. The default is nil.
-
-expansion---a form.
-
-expanded-p---a generalized boolean.
-
-Description:
-
-macroexpand and macroexpand-1 expand macros.
-
-If form is a macro form, then macroexpand-1 expands the macro form call once.
-
-macroexpand repeatedly expands form until it is no longer a macro form. In effect, macroexpand calls macroexpand-1 repeatedly until the secondary value it returns is nil.
-
-If form is a macro form, then the expansion is a macro expansion and expanded-p is true. Otherwise, the expansion is the given form and expanded-p is false.
-
-Macro expansion is carried out as follows. Once macroexpand-1 has determined that the form is a macro form, it obtains an appropriate expansion function for the macro or symbol macro. The value of *macroexpand-hook* is coerced to a function and then called as a function of three arguments: the expansion function, the form, and the env. The value returned from this call is taken to be the expansion of the form.
-
-In addition to macro definitions in the global environment, any local macro definitions established within env by macrolet or symbol-macrolet are considered. If only form is supplied as an argument, then the environment is effectively null, and only global macro definitions as established by defmacro are considered. Macro definitions are shadowed by local function definitions.
-
-Examples:
+#|
+;; $Id: examples.lisp,v 1.1 2003/10/21 17:30:56 nhabedi Exp $
+;;                          EXAMPLES.LISP
+;;           Nick Levine, Ravenbrook Limited, 2003-08-14
+;; 
+;; These are the examples I expect to use in the tutorial on CLOS
+;; at the International Lisp Conference 2003.
+;; 
+;; This document is mainly for my operational convenience. You might
+;; want to raid fragments to help you get started when building CLOS
+;; into your Common Lisp applications. Nothing useful will happen if
+;; you try to cl:load this document into a lisp image.
+;;
+;; This document is provided "as is", without any express or implied
+;; warranty.  In no event will the author be held liable for any
+;; damages arising from the use of this document.  You may make and
+;; distribute verbatim copies of this document provided that you do
+;; not charge a fee for this document or for its distribution.
 |#
 
- (defmacro alpha (x y) `(beta ,x ,y))  ;;   ALPHA
- (defmacro beta (x y) `(gamma ,x ,y))  ;;   BETA
- (defmacro delta (x y) `(gamma ,x ,y))  ;;   EPSILON
- (defmacro expand (form &environment env)
-   (multiple-value-bind (expansion expanded-p)
-       (macroexpand form env)
-     `(values ',expansion ',expanded-p)))  ;;   EXPAND
- (defmacro expand-1 (form &environment env)
-   (multiple-value-bind (expansion expanded-p)
-       (macroexpand-1 form env)
-     `(values ',expansion ',expanded-p)))  ;;   EXPAND-1
+; #+WAM-CL (prolog-call "cls.")
+
+(defun mapcar-visualize (func l) (if (null l) () (cons (apply func (list (first l))) (mapcar func (rest l)))))
+
+'(load "../prolog/wam_cl/wam-cl-init")
+'(load "wam-cl-init")
+
+(in-package "CL-USER")
 
 
-(prolog-call "lisp")
 
-'(list 
-;; Simple examples involving just the global environment
- (macroexpand-1 '(alpha a b))  ;;   (BETA A B), true
- (expand-1 (alpha a b))  ;;   (BETA A B), true
- (macroexpand '(alpha a b))  ;;   (GAMMA A B), true
- (expand (alpha a b))  ;;   (GAMMA A B), true
- (macroexpand-1 'not-a-macro)  ;;   NOT-A-MACRO, false
- (expand-1 not-a-macro)  ;;   NOT-A-MACRO, false
- (macroexpand '(not-a-macro a b))  ;;   (NOT-A-MACRO A B), false
- (expand (not-a-macro a b))  ;;   (NOT-A-MACRO A B), false
-
-;; Examples involving lexical environments
- (macrolet ((alpha (x y) `(delta ,x ,y)))
-   (macroexpand-1 '(alpha a b)))  ;;   (BETA A B), true
- (macrolet ((alpha (x y) `(delta ,x ,y)))
-   (expand-1 (alpha a b)))  ;;   (DELTA A B), true
- (macrolet ((alpha (x y) `(delta ,x ,y)))
-   (macroexpand '(alpha a b)))  ;;   (GAMMA A B), true
- (macrolet ((alpha (x y) `(delta ,x ,y)))
-   (expand (alpha a b)))  ;;   (GAMMA A B), true
- (macrolet ((beta (x y) `(epsilon ,x ,y)))
-   (expand (alpha a b)))  ;;   (EPSILON A B), true
- (let ((x (list 1 2 3)))
-   (symbol-macrolet ((a (first x)))
-     (expand a)))  ;;   (FIRST X), true
- (let ((x (list 1 2 3)))
-   (symbol-macrolet ((a (first x)))
-     (macroexpand 'a)))  ;;   A, false
- (symbol-macrolet ((b (alpha x y)))
-   (expand-1 b))  ;;   (ALPHA X Y), true
- (symbol-macrolet ((b (alpha x y)))
-   (expand b))  ;;   (GAMMA X Y), true
- (symbol-macrolet ((b (alpha x y))
-                   (a b))
-   (expand-1 a))  ;;   B, true
- (symbol-macrolet ((b (alpha x y))
-                   (a b))
-   (expand a))  ;;   (GAMMA X Y), true
-
-;; Examples of shadowing behavior
- (flet ((beta (x y) (+ x y)))
-   (expand (alpha a b)))  ;;   (BETA A B), true
- (macrolet ((alpha (x y) `(delta ,x ,y)))
-   (flet ((alpha (x y) (+ x y)))
-     (expand (alpha a b))))  ;;   (ALPHA A B), false
- (let ((x (list 1 2 3)))
-   (symbol-macrolet ((a (first x)))
-     (let ((a x))
-       (expand a))))  ;;   A, false
-
-)
+;; Test macro
+(defmacro is (eqf expected actual)
+  (let ((a (gensym "a")) (b (gensym "b")))
+    `(let ((,a ,expected) (,b ,actual))
+       (if (,eqf ,a ,b)
+         (format t "OK: ~a is ~a to ~a~%" ',expected ',eqf ',actual)
+         (progn
+           (format t "FAILED: when matching ~a and ~a~%" ,a ,b)
+	   #+WAM-CL (prolog-inline "trace")
+	   #+CLISP (BREAK)
+	   #+CLISP (quit 1))
+         ))))
 
 
- (defun foo (x flag)
-   (macrolet ((fudge (z)
-                 ;The parameters x and flag are not accessible
-                 ; at this point; a reference to flag would be to
-                 ; the global variable of that name.
-                 ` (if flag (* ,z ,z) ,z)))
-    ;The parameters x and flag are accessible here.
-     (+ x
-        (fudge x)
-        (fudge (+ x 1)))))
+(write-line "Running smoke test!")
+
+; (progn (prolog-inline "rtrace") (is eq 1 1))
+(is eq 1 1)
+(is equal (list 1 'a 'b) (cons 1 '(a b)))
+
+(is eq 2 (if nil 1 2))
+
+(is eq t (keywordp :k))
+
+(is eq 10 (if t 10 20))
+
+(is eq t (stringp "abc"))
+
+;;  "FAI "this has ben fix" LED: when matching ~a and ~a~%", ['$CHAR'(b), '$CHAR'(c)], "bc", t).
+(is equal (subseq "abc" 1) "bc")
+
+(is eq 1 (if t 1 2))
+(is eq 2 (if nil 1 2))
+
+(defun fib (n)
+  (if (> n 1)
+    (+ (fib (- n 1))
+       (fib (- n 2)))
+    1))
+
+(disassemble #'fib)
+
+
+(is eql 89 (fib 10))
+
+
+
+(defun accum (r) (if (= 0 r) (list 0) (cons r (accum (- r 1)))))
+
+(disassemble #'accum)
+#| DISASSEMBLY FOR:f_u_accum
+:- dynamic f_u_accum/2.
+
+f_u_accum(A, G) :-
+	(   0=:=A
+	->  G=[0]
+	;   C is A - 1,
+	    f_u_accum(C, D),
+	    G=[A|D]
+	).
+
+|#
+(is equal (list 4 3 2 1 0) (accum 4))
+
+(defmacro defwrap (name) `(defun ,name () 1))
+;;; :- ensure_loaded('sanity-test.lisp.trans.pl').
+(defwrap foo)
+(is eq 1 (foo))
+(is equal (macroexpand-1 '(defwrap foo)) '(defun foo nil 1))
+
+(write-line "PASSED")
+
+(defun fifteen ()
+  (let (val)
+    (tagbody
+      (setq val 1)
+      (go point-a)
+      (incf val 16)
+     point-c
+      (incf val 04)
+      (go point-b)
+      (incf val 32)
+     point-a
+     point-u ;; unused
+      (incf val 02)
+      (go point-c)
+      (incf val 64)
+     point-b
+      (incf val 08))
+    val))
+
+(disassemble #'fifteen)
+
+#|
+
+/* this first one should get deleted since its inlined away in f_u_fifteen */
+
+addr_tagbody_1_addr_enter_1(Env10) :-
+        symbol_setter(Env10, setq, u_val, 1),
+        addr_tagbody_1_u_point_a(Env10).
+addr_tagbody_1_u_point_c(Incf_Env) :-
+        place_op(Incf_Env, incf, [value, u_val], [4], Incf_R),
+        addr_tagbody_1_u_point_b(Incf_Env).
+addr_tagbody_1_u_point_a(Incf_Env19) :-
+        place_op(Incf_Env19, incf, [value, u_val], [2], Incf_R18),
+        addr_tagbody_1_u_point_c(Incf_Env19).
+addr_tagbody_1_u_point_u(Incf_Env23) :-
+        place_op(Incf_Env23, incf, [value, u_val], [2], Incf_R22),
+        addr_tagbody_1_u_point_c(Incf_Env23).
+addr_tagbody_1_u_point_b(Incf_Env27) :-
+        place_op(Incf_Env27, incf, [value, u_val], [8], _GORES15).
+
+f_u_fifteen(MResult) :-
+        Env=[],
+        catch(( TBEnv=[[bv(u_val, [])]|Env],
+                symbol_setter(TBEnv, setq, u_val, 1),
+                addr_tagbody_1_u_point_a(TBEnv),
+                symbol_value(TBEnv, u_val, U_val_Get),
+                U_val_Get=MResult
+              ),
+              block_exit(u_fifteen, MResult),
+              true).
+
+|#
+
+(is eq 15 (fifteen))
+
+(defun do-four () (DO ((temp-one 1 (1+ temp-one) )(temp-two 0 (1- temp-two) ) )((> (- temp-one temp-two) 5) temp-one)() ))
+
+(is = 4  (do-four))
+
+(is eq 'string_l (DEFUN string_l (x )(COND ((STRINGP x )x )((SYMBOLP x )(symbol-name x ))(T (ERROR "type error" )))))
+
+(is eq () (TAGBODY 1 (PRINT "hi" )))
+
+(is eq () (TAGBODY a (PRINT "hi" )))
+
+(is eq () (LET ((val 1 ))NIL ))
+(is eq () (LET ((val 1 )) ))
+
+(is eql 1 (LET ((val 1 ))val ))
+(is eql 'world (LET ((a 'b) )(LET ((a 'world) )
+  (LET ((a 'hello) )(LET ((a a)(*package* (find-package :keyword) ) )(PRINT a) ) )(PRINT a) ) ))
+
+

@@ -375,6 +375,8 @@ symbol_case_name(String,Package,ProposedName):-
   package_symbol_prefix(Package,Prefix),!,
   atom_concat_if_new(Prefix,String,CasePN),prologcase_name(CasePN,ProposedName),!.
 
+function_case_name(String,Package,ProposedName):- is_list(String),notrace(catch(atomic_list_concat(String,'_',NewName),_,fail)),!,
+  function_case_name(NewName,Package,ProposedName).
 function_case_name(String,Package,ProposedName):- 
   package_function_prefix(Package,Prefix),!,
   atom_concat_if_new(Prefix,String,CasePN),prologcase_name(CasePN,ProposedName),!.

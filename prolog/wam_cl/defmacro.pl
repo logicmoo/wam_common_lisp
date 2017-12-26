@@ -112,7 +112,7 @@ compile_macro_function(Ctx,Env,Symbol,[FormalParms|MacroBody0],Macro,HeadParms,E
    body_cleanup_keep_debug_vars(Ctx,((DocCode,
      assert_lsp(Symbol,wl:lambda_def(defmacro,Symbol,Macro, FormalParms, [progn | MacroBody])),HeadDefCode)),CompileBody)))).
 
-
+ 
 % macroexpand-1
 wl:init_args(0,cl_macroexpand).
 cl_macroexpand_1([LispCode|Optionals],Result):- 
@@ -144,6 +144,10 @@ unify_conj(Conj,To):- nonplainvar(Conj),Conj=To,!.
 unify_conj((CA,(CB,CC)),(A,B)):- var(A),nonplainvar(B),!, unify_conj(((CA,CB),CC),(A,B)).
 unify_conj((CA,(CB,CC)), AB):- unify_conj(((CA,CB),CC),AB).
 
+wl:declared(u_is,interpret).
+ 
+
+macroexpand_1_or_fail([Procedure|_],_,_):- wl:declared(Procedure,interpret),!,fail.
 
 macroexpand_1_or_fail([Procedure|Arguments],MacroEnv,MResult):- nonplainvar(Procedure),   
    get_macro_function(_Ctx,MacroEnv,Procedure, Arguments, MResult, _FnResult, CallBody),!,always(CallBody),!.

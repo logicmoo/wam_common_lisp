@@ -102,8 +102,8 @@ cl_with_hash_table_iterator([Name, Hash_table], RestNKeys, FnResult) :-
         get_var(LEnv, sys_name, Name_Get),
         get_var(LEnv, u_body, Body_Get),
         get_var(LEnv, u_iter, Iter_Get13),
-        MFResult = [let, [[Iter_Get13, [u_hash_table_iterator_function, Hash_table_Get]]], [
-             macrolet, [[Name_Get, [], [quote, [funcall, Iter_Get13]]]]
+        MFResult = [let, [[Iter_Get13, [u_hash_table_iterator_function, Hash_table_Get]]], 
+         [macrolet, [[Name_Get, [], [quote, [funcall, Iter_Get13]]]]
                |Body_Get]],
         cl_eval(MFResult, FnResult).
 
