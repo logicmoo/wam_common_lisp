@@ -22,26 +22,9 @@
 
 (defun mapcar-visualize (func l) (if (null l) () (cons (apply func (list (first l))) (mapcar func (rest l)))))
 
-'(load "../prolog/wam_cl/wam-cl-init")
-'(load "wam-cl-init")
-
 (in-package "CL-USER")
 
-
-
-;; Test macro
-(defmacro is (eqf expected actual)
-  (let ((a (gensym "a")) (b (gensym "b")))
-    `(let ((,a ,expected) (,b ,actual))
-       (if (,eqf ,a ,b)
-         (format t "OK: ~a is ~a to ~a~%" ',expected ',eqf ',actual)
-         (progn
-           (format t "FAILED: when matching ~a and ~a~%" ,a ,b)
-	   #+WAM-CL (prolog-inline "trace")
-	   #+CLISP (BREAK)
-	   #+CLISP (quit 1))
-         ))))
-
+(require 'sanity-util).
 
 (write-line "Running smoke test!")
 

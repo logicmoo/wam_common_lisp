@@ -16,6 +16,18 @@
 :- set_module(class(library)).
 :- include('header').
 
+debug_optimize(Msg):- wdmsg(Msg).
+allowed_level(X):- X =< 2.
+/*
+
+0 = dont trust any
+1 = (probably) very safe ones
+2 = under review
+3 = experimental ones
+
+*/
+
+
 body_cleanup(Ctx,CodeIn,CodeOut):- quietly(body_cleanup_full(Ctx,CodeIn,CodeOut)).
 
 body_cleanup_keep_debug_vars(Ctx,CodeIn,CodeOut):- quietly(body_cleanup_full(Ctx,CodeIn,CodeOut)),!.
@@ -77,12 +89,11 @@ fast_get_sets(Ctx,F,(C1,C2),Joined):- conjoinment(Ctx,C1,C2,C3),C3\==(C1,C2),!,f
 fast_get_sets(Ctx,_F,C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(fast_get_sets(Ctx,F),C1O,C2O),C2=..[F|C2O].
 fast_get_sets(_Ctx,_,Code5,Code5).
 
-non_compound_code(NC):- \+ callable(NC),!.
 non_compound_code(NC):- notrace(non_compound_code1(NC)),!.
-non_compound_code(NC):- is_self_evaluating_object(NC),!.
+non_compound_code1(NC):- \+ callable(NC),!.
 non_compound_code1(NC):- \+ compound(NC).
-non_compound_code1(NC):- is_list(NC).
-non_compound_code1(_=_).
+%non_compound_code1(NC):- is_list(NC).
+non_compound_code1(NC):- is_self_evaluating_object(NC),!.
 non_compound_code1(NC):- is_dict(NC).
 
 skip_optimize(NC):- non_compound_code(NC),!.
@@ -171,11 +182,11 @@ maybe_optimize(_).
 
 properly_protect(_, C1,C2):- non_compound_code(C1),!,C2=C1.
 properly_protect(_, X=Y,X=Y):-!.
-properly_protect(_Ctx,P,P):- predicate_property(P,foreign),!,stay_all_different(P).
-properly_protect(_Ctx,P,P):- \+ predicate_property(P,imported_from(system)),!,stay_all_different(P).
-properly_protect(Ctx,(C1:-C2),(C1O:-C2O)):-!,properly_protect(Ctx,C1,C1O),properly_protect(Ctx,C2,C2O).
-properly_protect(Ctx,(C1,C2),Joined):-!,properly_protect(Ctx,C1,C1O),properly_protect(Ctx,C2,C2O),conjoin_0(Ctx,C1O,C2O,Joined).
-properly_protect(Ctx,(C1 -> C2 ; CodeC),(C1O -> C2O ; CodeCCO)):-!,properly_protect(Ctx,C1,C1O),properly_protect(Ctx,C2,C2O),properly_protect(Ctx,CodeC,CodeCCO).
+properly_protect(_Ctx,P,P):- predicate_property(P,foreign),stay_all_different(P),!.
+%properly_protect(_Ctx,P,P):- \+ predicate_property(P,imported_from(system)),!,stay_all_different(P).
+properly_protect(Ctx,(C1,C2),Joined):-!,properly_protect(Ctx,C1,C1O),properly_protect(Ctx,C2,C2O),conjoin_0(Ctx,C1O,C2O,Joined),!.
+properly_protect(_Ctx,(C1:-C2),(C1:-C2)):-stay_all_different(C1),!.
+%properly_protect(Ctx,(C1 -> C2 ; CodeC),(C1O -> C2O ; CodeCCO)):-!,properly_protect(Ctx,C1,C1O),properly_protect(Ctx,C2,C2O),properly_protect(Ctx,CodeC,CodeCCO).
 properly_protect(Ctx,C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(properly_protect(Ctx),C1O,C2O),C2=..[F|C2O].
 
 del_attr_rev2(Name,Var):- del_attr(Var,Name).
@@ -297,9 +308,9 @@ sub_block_exit_f_a(catch,3).
 mize_body_1e(_Ctx,_,C1,C1):- non_compound_code(C1),!.
 
 mize_body_1e(_Ctx,_,C1,C2):- idiom_replace(C1,C2).
-mize_body_1e(_Ctx,_F,(A=B),true):- A==B,!.
-mize_body_1e(_Ctx,_F,(A==B),true):- A==B,!.
-mize_body_1e(_Ctx,_,cl_list(G, R),R=G).
+mize_body_1e(_Ctx,_F,(A=B),true):- A==B,allowed_level(1),!.
+mize_body_1e(_Ctx,_F,(A==B),true):- A==B,allowed_level(1),!.
+mize_body_1e(_Ctx,_,cl_list(G, R),R=G):- allowed_level(1),!.
 mize_body_1e(_Ctx,_,C1,L=[R]):- structure_applies(C1 , (L=[R, []])). % wam_cl_option(elim_vars,true).
 
 mize_body_1e(Ctx,F,(C1,C2,C4),C5):- conjoinment(Ctx,C1,C2,C3),!,mize_body_1e(Ctx,F,(C3,C4),C5).
@@ -315,7 +326,8 @@ mize_body_1e(Ctx,_,get_var(Env, Sym, Sym_Get),OUT):-
   % ((Dict.p==1-> ))
   % Dict.u<2,
   %Dict.r>=0,
-   wdmsg(mize_body_1e:- Dict),
+  debug_optimize(mize_body_1e:- Dict),
+  allowed_level(2),
   % rw_add(Ctx,Sym,u),
   Dict.vars=[Was|_],
   Was\==Sym_Get,
@@ -323,8 +335,8 @@ mize_body_1e(Ctx,_,get_var(Env, Sym, Sym_Get),OUT):-
 %mize_body1(Ctx,_F,C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(mize_body1(Ctx,F),C1O,C2O),C2=..[F|C2O].
 %mize_body1(Ctx,F,C1,C2):- is_list(C1),must_maplist(mize_body1(Ctx,F),C1,C2).
 
-mize_body_1e(_Ctx,_,append([], R, W),R= W):- ignore(R= W).
-mize_body_1e(_Ctx,_,Env=[],true):- Env=[],!.
+mize_body_1e(_Ctx,_,append([], R, W),R= W):- ignore(R= W),allowed_level(1),!.
+mize_body_1e(_Ctx,_,Env=[],true):- Env=[],!,allowed_level(2),!.
 mize_body_1e(_Ctx,_,C1,C1):-!.
 
 'O'(Old,New):- New,nop(Old).
@@ -338,13 +350,13 @@ mize_body2(_Ctx,_F,InOut,InOut).
 
   
 mize_body_2e(_Ctx,_,C1,C1):- non_compound_code(C1),!.
-mize_body_2e(_,_,In,ITE):- structure_applies(In,(ITE,R=V)), var(R),var(V),ifthenelse(ITE),R=V.
+mize_body_2e(_,_,In,ITE):- structure_applies(In,(ITE,R=V)), var(R),var(V),ifthenelse(ITE),R=V,allowed_level(1).
 %mize_body_2e(_Ctx,_,(S1=V,R=S2,B),(R=V,B)):- trace, var(S1),S1==S2.
-mize_body_2e(_Ctx,_,(S1=V,R=S2),(R=V)):- var(S1),S1==S2,(var(R);var(V)),S2='$error_this_was_eliminated'.
-mize_body_2e(_Ctx,_,t_or_nil(G, R),G):- R==t.
-mize_body_2e(_Ctx,_,t_or_nil(G, R),\+ G):- R==[].
-mize_body_2e(_Ctx,_,(t_or_nil(G, R),(R \==[]-> B ; C)),(G->B;C)):- var(R).
-mize_body_2e(_Ctx,_,(t_or_nil(G, R),(R \==[])),G):- var(R).
+mize_body_2e(_Ctx,_,(S1=V,R=S2),(R=V)):- var(S1),S1==S2,(var(R);var(V)),S2='$error_this_was_eliminated',allowed_level(2).
+mize_body_2e(_Ctx,_,t_or_nil(G, R),G):- R==t,allowed_level(1).
+mize_body_2e(_Ctx,_,t_or_nil(G, R),\+ G):- R==[],allowed_level(1).
+mize_body_2e(_Ctx,_,(t_or_nil(G, R),(R \==[]-> B ; C)),(G->B;C)):- var(R),allowed_level(1).
+mize_body_2e(_Ctx,_,(t_or_nil(G, R),(R \==[])),G):- var(R),allowed_level(1).
 mize_body_2e(_Ctx,_,catch(G,block_exit(Label,Result),true),G):- nonvar(Label),var(Result),Label\==[],no_block_exists(G).
 
 mize_body_2e(_Ctx,_,(PARG,A=B), PARG):- wam_cl_option(elim_xvars,true),compound(PARG),functor(PARG,_,Ar),arg(Ar,PARG,PP),(A==PP;B==PP),!,A=B.
@@ -355,7 +367,7 @@ mize_body_2e(_Ctx,_,Var is Ground,Var = Result):- wam_cl_option(elim_vars,true),
 mize_body_2e(Ctx,_F,C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(mize_body2(Ctx,F),C1O,C2O),C2=..[F|C2O].
 mize_body_2e(_Ctx,_,C1,C1):-!.
 
-mize_body3(_Ctx,_,C1,C1):- var(C1),del_attr(C1,rwstate).
+%mize_body3(_Ctx,_,C1,C1):- var(C1),del_attr(C1,rwstate).
 mize_body3(_Ctx,_,C1=C2, true):- var(C1),var(C2),wam_cl_option(elim_vars,true),C1==C2,!.
 mize_body3(_Ctx,_,C1,C1):- non_compound_code(C1),!.
 
@@ -441,9 +453,10 @@ do_conjs2(F,(C1,C2),Rest,Conjs):- !, do_conjs(F,C1,Rest,P1),do_conjs(F,C2,Rest,P
 do_conjs2(F,C2,Rest,Conjs):- Conjs=..[F,C2|Rest].
 
 stay_all_different(Out):- term_variables(Out,Vars),
-  stay_all_different_vars(Vars).
+  stay_all_different_vars(Vars),!.
 
 stay_all_different_vars([]).
+stay_all_different_vars([_]).
 stay_all_different_vars([X|Vars]):- maplist(dif(X),Vars),stay_all_different_vars(Vars).
 
 %inline_body(_,_,_,C1,C1).

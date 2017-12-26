@@ -1,4 +1,6 @@
 
+(require 'sanity-util).
+
 ;; 3.1. Review of defstruct
 
 (progn #+WAM-CL (prolog-inline "nop(trace)")(is eq 'point (defstruct point x y z)))
@@ -78,5 +80,5 @@
 (DISASSEMBLE #'distance-from-origin)
 
 
-(distance-from-origin my-point)
+'(distance-from-origin my-point)
 

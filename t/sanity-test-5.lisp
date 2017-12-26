@@ -108,8 +108,7 @@ Examples:
 
 )
 
-
- (defun foo (x flag)
+ (defun foo2 (x flag)
    (macrolet ((fudge (z)
                  ;The parameters x and flag are not accessible
                  ; at this point; a reference to flag would be to
