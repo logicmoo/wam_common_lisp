@@ -129,6 +129,7 @@ symbol_value0(Env,[Place,Obj],Result):- trace, set_place(Env,getf,[Place,Obj],[]
 
 
 symbol_value_error(_Env,Var,_Result):- lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Var).
+throw(X,Y):- writeln(throw(X,Y)),lisp_dump_break,throw(lpa_throw(X,Y)).
 
 reset_mv:- b_getval('$mv_return',[V1,_V2|_])->b_setval('$mv_return',[V1]);true.
 
@@ -304,6 +305,42 @@ zip_with([X|Xs], [Y|Ys], Pred, [Z|Zs]):-
 	lpa_apply(Pred, [X, Y, Z]),
 	zip_with(Xs, Ys, Pred, Zs).
 
+
+%   lpa_apply(Pred, Args)
+%   is the key to this whole module.  It is basically a variant of call/1
+%   (see the Dec-10 Prolog V3.43 manual) where some of the arguments may
+%   be already in the Pred, and the rest are passed in the list of Args.
+%   Thus lpa_apply(foo, [X,Y]) is the same as call(foo(X,Y)),
+%   and lpa_apply(foo(X), [Y]) is also the same as call(foo(X,Y)).
+%   BEWARE: any goal given to lpa_apply is handed off to call/1, which is the
+%   Prolog *interpreter*, so if you want to lpa_apply compiled predicates you
+%   MUST have :- public declarations for them.  The ability to pass goals
+%   around with some of their (initial) arguments already filled in is
+%   what makes lpa_apply/2 so useful.  Don't bother compiling anything that
+%   uses lpa_apply heavily, the compiler won't be able to help much.  LISP
+%   has the same problem.  Later Prolog systems may have a simpler link
+%   between compiled and interpreted code, or may fuse compilation and
+%   interpretation, so lpa_apply/2 may come back into its own.  At the moment,
+%   lpa_apply and the routines based on it are not well thought of.
+
+:- if(\+ current_predicate(lpa_apply/1)).
+lpa_apply(Pred):-
+        lpa_apply(Pred, []).
+
+lpa_apply(Pred, Args) :-
+        (       atom(Pred)
+        ->      Goal =.. [Pred|Args]
+        ;       Pred = complement(Term)
+        ->      Goal = complement(Term, Args)
+        ;       Pred = FormalArgs ^ Term
+        ->      copy_term(FormalArgs ^ Term, Args ^ Goal)
+        ;       Pred =.. OldList,
+                append(OldList, Args, NewList),
+                Goal =.. NewList        ),
+        !,
+        call(call,Goal).
+
+:- endif.
 
 
 :- fixup_exports.

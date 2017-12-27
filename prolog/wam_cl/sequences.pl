@@ -48,7 +48,7 @@ apply_as_pred(EqlPred,X):-call(EqlPred,X,R)->R\==[].
 
 % Maybe move to funcall 
 function(cl_funcall,Pred,Y,Result):- !, function(Pred,Y,Result).
-function(Pred,X,Y,Result):- trace,wdmsg(function(Pred,X,Y,Result)).
+function(Pred,X,Y,Result):- cl_apply(Pred,[X,Y],Result).
 function(X,function(X)).
 % used by call_as_ident/3
 function([],X,X):-!.

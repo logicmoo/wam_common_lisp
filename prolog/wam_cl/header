@@ -176,7 +176,7 @@
 :- ensure_loaded(mizepro).
 :- ensure_loaded(namestrings).
 :- ensure_loaded(numbers).
-:- ensure_loaded(operators).
+:- ensure_loaded(operatorfns).
 :- ensure_loaded(pathnames).
 :- ensure_loaded(places).
 :- ensure_loaded(printers).

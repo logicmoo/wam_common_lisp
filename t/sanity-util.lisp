@@ -18,6 +18,8 @@
 ;; not charge a fee for this document or for its distribution.
 |#
 
+(provide "sanity-util")
+
 ;; Test macro
 (defmacro is (eqf expected actual)
   (let ((a (gensym "a")) (b (gensym "b")))
