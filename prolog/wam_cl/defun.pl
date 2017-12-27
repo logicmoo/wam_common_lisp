@@ -39,7 +39,7 @@ cl_flet(Inits,Progn,Result):- reenter_lisp(Ctx,Env), compile_defun_ops(Ctx,Env,R
 compile_defun_ops(Ctx,Env,Result,[flet,FLETS|Progn], (CompileBody)):- 
     must_maplist(define_each(Ctx,Env,flet),FLETS,FBOUNDS,Decls),
     always(Decls),
-    compile_forms([FBOUNDS|Ctx],[FBOUNDS|Env],Result,Progn, CompileBody),!.    
+    must_compile_progn([FBOUNDS|Ctx],[FBOUNDS|Env],Result,Progn, CompileBody),!.    
 
 % LABELS
 wl:init_args(1,cl_labels).
@@ -47,7 +47,7 @@ cl_labels(Inits,Progn,Result):- reenter_lisp(Ctx,Env),compile_defun_ops(Ctx,Env,
 compile_defun_ops(Ctx,Env,Result,[labels,LABELS|Progn], (must_maplist(must_det_l,Decls),CompileBody)):- 
     must_maplist(define_each(Ctx,Env,labels),LABELS,FBOUNDS,Decls),
     must_maplist(add_symbol_fbounds(Ctx,Env),FBOUNDS),
-    compile_forms(Ctx,Env,Result,Progn, CompileBody).   
+    must_compile_progn(Ctx,Env,Result,Progn, CompileBody).   
 
 % wl:needs_env(cl_special_operator_p).
 define_each(Ctx,Env,_LabelsOrFLET,[Symbol|DEFN],(fbound(Sym)=bound_type(kw_function,UniqueCtxFunction)),CompileBody)  :-    

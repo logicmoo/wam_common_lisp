@@ -252,7 +252,7 @@ compile_tagbodys(TB,Ctx,Env,Result,[enter(_)|InstrS],BInstrS):- !,
 compile_tagbodys(TB,Ctx,Env,Result,InstrS,BInstrS):-
    maplist(label_atoms(TB),InstrS,TInstrS),
    trim_tagbody(TInstrS,CInstrS),
-   compile_forms(Ctx,Env,Result,CInstrS,BInstrS).
+   must_compile_progn(Ctx,Env,Result,CInstrS,BInstrS).
 
 label_atoms(Instr,[label,Label]):- is_label(Instr,Label),!.
 label_atoms(TB,Label,[label,Label,TB]):-atomic(Label),!.

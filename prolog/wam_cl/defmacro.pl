@@ -76,7 +76,7 @@ cl_macrolet(Inits,Progn,Result):- reenter_lisp(Ctx,Env), compile_macro_ops(Ctx,E
 
 compile_macro_ops(Ctx,Env,Result,[macrolet,MACROLETS|Progn], (maplist(always,Decls),CompileBody)):- 
     must_maplist(define_each_macro(Ctx,Env,macrolet),MACROLETS,FBOUNDS,Decls),    
-    compile_forms([FBOUNDS|Ctx],[FBOUNDS|Env],Result,Progn, CompileBody).
+    must_compile_progn([FBOUNDS|Ctx],[FBOUNDS|Env],Result,Progn, CompileBody).
     
 
 

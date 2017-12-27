@@ -155,12 +155,13 @@ find_operator(Ctx,Env,FN, Len, ProposedName):-
 
 find_operator_else_function(Ctx,Env,Symbol,ProposedName,true):- 
   find_operator(Ctx,Env,Symbol, _Len, ProposedName),!.
-find_operator_else_function(Ctx,Env,Symbol,ProposedName,Pre):- 
-   Pre = find_operator_or_die(Ctx,Env,Symbol, ProposedName),!.
+find_operator_else_function(_Ctx,Env,Symbol,ProposedName,Pre):- 
+   Pre = find_operator_or_die(Env,Symbol, ProposedName),!.
 find_operator_else_function(_Cxt,_Env,Symbol,function(Symbol),true).
 
-find_operator_or_die(Ctx,Env,Symbol, ProposedName):- nonvar(Symbol), find_operator(Ctx,Env,Symbol, _Len, ProposedName),!.
-find_operator_or_die(_Ctx,_Env,Symbol, function(Symbol)).
+find_operator_or_die(Env,Symbol, ProposedName):- nonvar(Symbol), find_operator(Env,Env,Symbol, _Len, ProposedName),!.
+find_operator_or_die(_Env,Symbol, function(Symbol)).
+
 
 
 f_sys_coerce_to_function(FN,ProposedName):- find_lisp_function(FN,_ARITY,ProposedName).

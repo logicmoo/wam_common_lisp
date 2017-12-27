@@ -163,7 +163,7 @@ typecases_to_conds(SOf,V,[[Item|Tail]|Tail2], [[['typep',V,[quote,Item]],[progn|
 compile_condifs(_Cx,_Ev,Result,[cond ], Result=[]):- !.
 compile_condifs(_Cx,_Ev,Result,[cond,[] ], Result=[]):- !.
 compile_condifs(Ctx,Env,Result,[cond, [t|Progn]|_], Body):-   
-  compile_forms(Ctx,Env,Result, Progn, Body).
+  must_compile_progn(Ctx,Env,Result, Progn, Body).
 compile_condifs(Ctx,Env,Result,[cond, [Test|ResultForms] |Clauses], Body):- 
   compile_condifs(Ctx,Env,Result,[if,Test,[progn|ResultForms],[cond |Clauses]], Body).
 

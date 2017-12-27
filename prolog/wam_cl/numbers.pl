@@ -120,8 +120,8 @@ is_numberp(P):- number(P).
 is_integerp(P):- integer(P).
 is_bignump(P):- compound(P),arg(1,P,Type),!,Type==claz_bignum,(functor(P,'$NUMBER',_);functor(P,'$EXP',_)).
 
-is_oddp(N):- 1 is N div 2.
-is_evenp(N):- 0 is N div 2.
+is_oddp(N):- 1 is N rem 2.
+is_evenp(N):- 0 is N rem 2.
 
 is_minusp(N):- N<0.
 is_plusp(N):- N>0.

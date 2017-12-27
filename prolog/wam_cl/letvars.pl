@@ -20,26 +20,25 @@
 :- include('header').
 
 
-
 normalize_let1([Variable, Form],[bind, Variable, Form]).
 normalize_let1([bind, Variable, Form],[bind, Variable, Form]).
 normalize_let1( Variable,[bind, Variable, []]).
 
 
 %  (LET  () .... )
-compile_let(Ctx,Env,Result,[_LET, []| BodyForms], Body):- !, compile_forms(Ctx,Env,Result, BodyForms, Body).
+compile_let(Ctx,Env,Result,[_LET, []| BodyForms], Body):- !, must_compile_progn(Ctx,Env,Result, BodyForms, Body).
 
 %  (LET ((*package* (find-package :keyword))) *package*)
 compile_let(Ctx,Env,Result,[let, [[Var,VarInit]]| BodyForms], (VarInitCode,locally_set(Var,Value,BodyCode))):-
  is_special_var(Var),!,
  must_compile_body(Ctx,Env,Value,VarInit,VarInitCode),
-  compile_forms(Ctx,Env,Result,BodyForms,BodyCode).
+  must_compile_progn(Ctx,Env,Result,BodyForms,BodyCode).
 
 %  (LET ((local 1)) local)
 compile_let(Ctx,Env,Result,[let, [[Var,VarInit]]| BodyForms], (VarInitCode,locally_bind(Env,Var,Value,BodyCode))):- fail,
  atom(Var),
  must_compile_body(Ctx,Env,Value,VarInit,VarInitCode),
-  compile_forms(Ctx,Env,Result,BodyForms,BodyCode).
+  must_compile_progn(Ctx,Env,Result,BodyForms,BodyCode).
 
 
 %  (LET  (....) .... )
@@ -65,7 +64,7 @@ compile_let(Ctx,Env,Result,[LET, NewBindingsIn| BodyForms], Body):- !,
         add_alphas(Ctx,Variables),
         let_body(Env,BindingsEnvironment,LocalBindings,SpecialBindings,BodyFormsBody,MaybeSpecialBody),
           make_env_append(Ctx,Env,CEnv,[LocalBindings|Env],EnvAssign),
-          compile_forms(Ctx,CEnv,BResult,BodyForms, BodyFormsBody),          
+          must_compile_progn(Ctx,CEnv,BResult,BodyForms, BodyFormsBody),          
          Body = (VarInitCode, EnvAssign, MaybeSpecialBody,G))),
   ensure_assignment(Result=BResult,G).
 
@@ -145,6 +144,34 @@ zip_with([], [], _, []).
 zip_with([X|Xs], [Y|Ys], Pred, [Z|Zs]):-
 	lpa_apply(Pred, [X, Y, Z]),
 	zip_with(Xs, Ys, Pred, Zs).
+
+
+% local symbol?
+rw_add(Ctx,Var,RW):- atom(Var),!,  get_var_tracker(Ctx,Var,Dict),arginfo_incr(RW,Dict).
+rw_add(_Ctx,_Var,_RW).
+
+% actual var
+add_tracked_var(Ctx,Atom,Var):-
+   get_var_tracker(Ctx,Atom,Dict),
+   Vars=Dict.vars,
+   sort([Var|Vars],NewVars),
+   b_set_dict(vars,Dict,NewVars).
+
+%get_var_tracker(_,Atom,rw{name:Atom,r:0,w:0,p:0,ret:0,u:0,vars:[]}):-!. % mockup
+get_var_tracker(Ctx0,Atom,Dict):- get_tracker(Ctx0,Ctx), always(sanity(atom(Atom))),get_env_attribute(Ctx,var_tracker(Atom),Dict),(is_dict(Dict)->true;(trace,oo_get_attr(Ctx,var_tracker(Atom),_SDict))).
+get_var_tracker(Ctx0,Atom,Dict):- get_tracker(Ctx0,Ctx),Dict=rw{name:Atom,r:0,w:0,p:0,ret:0,u:0,vars:[]},set_env_attribute(Ctx,var_tracker(Atom),Dict),!.
+
+
+extract_var_atom([_,RVar|_],RVar):-atomic(RVar).
+extract_var_atom(Var,Var).
+
+                  
+%rwstate:attr_unify_hook(_,_):-!,fail.
+%rwstate:attr_unify_hook(_,V):-always(var(V)),fail.
+nonplainvar(V):- nonvar(V);attvar_non_vn(V).
+attvar_non_vn(V):- attvar(V),get_attr(V,searchvar,_),!.
+attvar_non_vn(V):- attvar(V),copy_term(V,VV),del_attr(VV,vn),del_attr(VV,rwstate),del_attr(VV,varuse),
+  (get_attrs(VV,[]);\+attvar(VV)).
 
 
 :- fixup_exports.

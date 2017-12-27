@@ -204,5 +204,20 @@ reset_env:-
   nb_setval('$env_current',TL),
   set_parent_child(GLOBAL,TL))).
 
+
+
+get_value_or_default(Ctx,Name,Value,IfMissing):- oo_get_attr(Ctx,Name,Value)->true;Value=IfMissing.
+
+
+get_alphas(Ctx,Alphas):- get_tracker(Ctx,Ctx0),get_alphas0(Ctx0,Alphas).
+get_alphas0(Ctx,Alphas):- get_value_or_default(Ctx,alphas,Alphas,[]).
+
+add_alphas(_,_):-!.
+add_alphas(Ctx,Alphas):- always((get_tracker(Ctx,Ctx0),add_alphas0(Ctx0,Alphas))).
+add_alphas0(Ctx,Alpha):- atom(Alpha),!,get_value_or_default(Ctx,alphas,Alphas,[]),oo_put_attr(Ctx,alphas,[Alpha|Alphas]).
+add_alphas0(_Ctx,Alphas):- \+ compound(Alphas),!.
+add_alphas0(Ctx,Alphas):- Alphas=..[_|ARGS],maplist(add_alphas0(Ctx),ARGS).
+
+
 :- fixup_exports.
 

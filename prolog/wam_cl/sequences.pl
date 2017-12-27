@@ -18,13 +18,12 @@
  * The program is a *HUGE* common-lisp compiler/interpreter. It is written for YAP/SWI-Prolog .
  *
  *******************************************************************/
-:- module(prims,[]).
+:- module(s3q,[]).
 
 :- set_module(class(library)).
 
 :- include('header').
 
-prims:cl_exact.
 
 %module(_,_).
 
@@ -32,137 +31,161 @@ prims:cl_exact.
 :- ensure_loaded(library(lists)).
 
 
-is_consp(Obj):- nonvar(Obj),Obj=[_|_].
 
-%:- dynamic(op_replacement/2).
-wl:op_replacement(first,car).
-f_ext_pf_car(List, Result):-cl_car(List, Result).
-cl_first(List, Result):-cl_car(List, Result).
-cl_car(List, Result):- 
-  (List = [Result|_] -> true;
-  (List==[] -> Result=[];
-  (	error(first_not_cons, ErrNo, _),
-		throw(ErrNo)))).
-
-wl:op_replacement(rest,cdr).
-wl:op_replacement(ext_pf_cdr,cdr).
-f_ext_pf_cdr(List, Result):-cl_cdr(List, Result).
-f_u_pf_cdr(List, Result):-cl_cdr(List, Result).
-cl_cdr(List, Result):- List==[]->Result=[];
-	once( (	List = [_|Result]
-	    ;	error(rest_not_cons, ErrNo, _),
-		throw(ErrNo)	)).
-
-f_u_pf_cddr(A,C):-f_u_pf_cdr(A,B),f_u_pf_cdr(B,C).
-
-wl:interned_eval(("`cl:rplaca")).
-wl:op_replacement(setcar,rplaca).
-wl:init_args(exact_only,cl_rplaca).
-cl_rplaca(Cons,Obj,Cons):- nb_setarg(1,Cons,Obj).
-f_sys_set_car(A,B,C):-cl_rplaca(A,B,C).
-
-wl:op_replacement(setcdr,rplacd).
-wl:interned_eval(("`cl:rplacd")).
-wl:init_args(exact_only,cl_rplacd).
-cl_rplacd(Cons,Obj,Cons):- nb_setarg(2,Cons,Obj).
-f_sys_set_cdr(A,B,C):-cl_rplacd(A,B,C).
+f_sys_memq(E,L,R):- t_or_nil((member(Q,L),Q==E),R).
 
 
-wl:declared(cl_cons,inline(cons)).
-cl_cons(Item,
- List, Result):-
-	Result = [Item|List].
+xform_with_ident([],_Ident,[]).
+xform_with_ident([Y0|YR0],Ident,[Y|YR]):-
+   call_as_ident(Ident,Y0,Y),
+   xform_with_ident(YR0,Ident,YR).
 
-cl_append(A,B,R):- append(A,B,R),!.
+call_as_ident(Pred,X,Result):- function(Pred,X,Result).
 
-wl:declared(cl_error,inline(error)).
-wl:init_args(0,cl_error).
-cl_error(Args,Res):- cl_format([t|Args],Res),throw(cl_error(Args,Res)).
+apply_as_pred(EqlPred,X,Y,Z):-call(EqlPred,X,Y,Z,R)->R\==[].
+apply_as_pred(EqlPred,X,Y):-call(EqlPred,X,Y,R)->R\==[].
+apply_as_pred(EqlPred,X):-call(EqlPred,X,R)->R\==[].
 
-wl:declared(cl_list,inline(list)).
-wl:init_args(0,cl_list).
-cl_list(List,List).
-
-
-
-cl_copy_alist([H|T],[HH|TT]):- !, assertion(nonvar(H)),
-  pl_copy_1assoc(H,HH),
-  cl_copy_alist(T,TT).
-cl_copy_alist(T,T).
-pl_copy_1assoc([H|T],[H|T]).
-pl_copy_1assoc(HT,HT).
-
-% asserting1... u
-wl: init_args(exact_only, cl_acons).
-cl_acons(Key_Param, Datum_Param, Alist_Param, [[Key_Param|Datum_Param]|Alist_Param]).
-
-wl:interned_eval((
-"(defconstant +upgraded-array-element-types+ 
-   '(NIL BASE-CHAR CHARACTER BIT EXT:BYTE8 EXT:INTEGER8 EXT:BYTE16 EXT:INTEGER16
- EXT:BYTE32 EXT:INTEGER32 EXT:BYTE64 EXT:INTEGER64 SINGLE-FLOAT DOUBLE-FLOAT T))")).
-
-wl:interned_eval(("`SYS:MAKE-VECTOR")).
-
-%rassoc item alist &key key test test-not => entry
-wl:init_args(2,cl_rassoc).
-cl_rassoc(Item,AList,Options,RetVal):-
- get_identity_pred(Options,kw_key,Ident),
-  get_test_pred(Options,EqlPred),
-  (member([K|V],AList),call(Ident,V,Id),
-    (call(EqlPred,Item,Id,R)->R\==[])),!,
-  RetVal = [K|V].
-cl_rassoc(_,_,_,[]).
-
-wl:init_args(2,cl_assoc).
-cl_assoc(Item,AList,Options,RetVal):-
- get_identity_pred(Options,kw_key,Ident),
-  get_test_pred(Options,EqlPred),
-  (member([K|V],AList),call(Ident,K,Id),
-    (call(EqlPred,Item,Id,R)->R\==[])),!,
-  RetVal = [K|V].
-cl_assoc(_,_,_,[]).
-
-% assoc item alist
-  /*
-cl_assoc(Key,List,KV):- member(KV,List),KV=[Key|_],!.
-cl_assoc(_Key,_List,[]).
-*/
-
-cl_lisp_not(Boolean, Result):-
-		Boolean = []
-	->	Result = t
-	;	Result = [].
+% Maybe move to funcall 
+function(cl_funcall,Pred,Y,Result):- !, function(Pred,Y,Result).
+function(Pred,X,Y,Result):- trace,wdmsg(function(Pred,X,Y,Result)).
+function(X,function(X)).
+% used by call_as_ident/3
+function([],X,X):-!.
+function(Pred,X,Result):- call(Pred,X,Result),!.
 
 
-/*
-Wrongness
-cl_or(Bool1, Bool2, Result):-
-		once( (Bool1 \= [] ; Bool2 \= []))
-	->	Result = t
-	;	Result = [].
+range_1(X,Keys,XR,Start1):-
+  key_value(Keys,kw_start,Start1,0),
+  key_value(Keys,kw_end,End1,[]),
+  range_subseq(X,Start1,End1,XR).   
 
-cl_and(Bool1, Bool2, Result):-
-		(Bool1 \= [] , Bool2 \= [])
-	->	Result = t
-	;	Result = [].
+range_1_and_2(X,Y,[],X,Y,0):-!.
+range_1_and_2(X,Y,Keys,XR,YR,Start1):-
+   key_value(Keys,kw_start1,Start1,0),key_value(Keys,kw_end1,End1,[]),
+   key_value(Keys,kw_start2,Start2,0),key_value(Keys,kw_end2,End2,[]),
+   range_subseq(X,Start1,End1,XR),
+   range_subseq(Y,Start2,End2,YR).
 
-*/
-cl_second(List,R):- List=[_,R|_]->true;R=[].
-f_ext_pf_cadr(List,R):- List=[_,R|_]->true;R=[].
-cl_cadr(List,R):- List=[_,R|_]->true;R=[].
+range_1_and_2_len(X,Y,[],X,Y,-1):-!.
+range_1_and_2_len(X,Y,Keys,XR,YR,Length):-
+   key_value(Keys,start1,Start1,0),key_value(Keys,end1,End1,9999999999999),
+   key_value(Keys,start2,Start2,0),key_value(Keys,end2,End2,9999999999999),
+   subseqence_from(X,Start1,XR),
+   subseqence_from(Y,Start2,YR),
+   Length is min(End1-Start1,End2-Start2).
+
+
+% Maybe move to arglists
+% key_value(Keys,Name,Value,Default).
+key_value(Keys,Name,Value):- is_dict(Keys),!,Keys.Name=Value,!.
+key_value(Keys,Name,Value):- get_plist_value(Keys,Name,Value).
+key_value(Keys,Name,Value,_Default):- key_value(Keys,Name,Value),!.
+key_value(_Keys,_Name,Default,Default).
+
+
+range_subseq(X,0,[],X):-!.
+range_subseq(X,N,[],XR):- !, subseqence_from(X,N,XR).
+range_subseq(X,0,N,XR):-!, subseqence_until(X,N,XR).
+range_subseq(X,Start,End,XR):-!, subseqence_from(X,Start,XM),NewEnd is End - Start,subseqence_until(XM,NewEnd,XR).
+
+subseqence_from(X,0,X):-!.
+subseqence_from([_|X],N,XR):- N2 is N -1, subseqence_from(X,N2,XR).
+
+subseqence_until(_,0,[]):-!.
+subseqence_until([X|XX],N,[X|XR]):-  N2 is N -1,subseqence_until(XX,N2,XR).
+
+% Like append/3 by enumerates in reverse
+append_r([H|T], L, [H|R]) :-
+    append_r(T, L, R).
+append_r([], L, L).
+
+% #'MEMBER
+wl:init_args(2, cl_member).
+cl_member(Item,List,Keys,RetVal):-
+ get_identity_pred(Keys,kw_key,Ident),
+ get_test_pred(Keys,EqlPred),
+ key_value(Keys,kw_from_end,FromEnd1,[]),
+ range_1(List,Keys,RList,_Start1),
+ ((FromEnd1==[]->append(_,[V|Rest],RList); append_r(_,[V|Rest],RList))),
+ call_as_ident(Ident,V,Id),apply_as_pred(EqlPred,Item,Id),!,
+  RetVal = [V|Rest].
+cl_member(_,_,_,[]).
+
+% #'MEMBER-IF
+wl:init_args(2, cl_member_if).
+cl_member_if(E,Seq,Keys,Result):- cl_member(E,Seq,[kw_test,cl_funcall|Keys],Result).  
+
+% #'MEMBER-IF-NOT
+wl:init_args(2, cl_member_if_not).
+cl_member_if_not(E,Seq,Keys,Result):- cl_member(E,Seq,[kw_test_not,cl_funcall|Keys],Result).
+
+wl:init_args(2, cl_find).
+cl_find(E,Seq,Keys,Result):-
+   cl_member(E,Seq,Keys,MemberResult),
+   cl_car(MemberResult,Result).
+
+wl:init_args(2, cl_find_if).
+cl_find_if(E,Seq,Keys,Result):- cl_find(E,Seq,[kw_test,cl_funcall|Keys],Result).  
+
+wl:init_args(2, cl_find_if_not).
+cl_find_if_not(E,Seq,Keys,Result):- cl_find(E,Seq,[kw_test_not,cl_funcall|Keys],Result).
+
+
+% #'SEARCH  - http://www.lispworks.com/documentation/HyperSpec/Body/f_search.htm
+wl:init_args(2, cl_search).
+cl_search(X,Y,Keys,RetVal):-
+ get_identity_pred(Keys,kw_key,Ident),
+ get_test_pred(Keys,EqlPred),
+ range_1_and_2(X,Y,Keys,XR0,YR0,OffsetReturn),
+ xform_with_ident(YR0,Ident,[YV|YRest]), 
+ xform_with_ident(XR0,Ident,XR),
+ length(YR0,Len),length([XV|XRest],Len), 
+ key_value(Keys,kw_from_end,FromEnd1,[]),
+ append(XRest,_,Rest),
+ ((FromEnd1==[]->append(LeftOffset,[XV|Rest],XR); append_r(LeftOffset,[XV|Rest],XR))),
+ apply_as_pred(EqlPred,YV,XV),
+ maplist(apply_as_pred(EqlPred),XRest,YRest),!,
+ length(LeftOffset,N),
+ RetVal is N + OffsetReturn. 
+cl_search(_,_,_,[]).
 
 
 
 
+% #'POSITION   - http://www.lispworks.com/documentation/HyperSpec/Body/f_pos_p.htm
+wl:init_args(2, cl_position).
+cl_position(Item,List,Keys,RetVal):-
+ get_identity_pred(Keys,kw_key,Ident),
+ get_test_pred(Keys,EqlPred),
+ key_value(Keys,kw_from_end,FromEnd1,[]),
+ range_1(List,Keys,RList,OffsetReturn),
+ ((FromEnd1==[]->append(LeftOffset,[V|_Rest],RList); append_r(LeftOffset,[V|_Rest],RList))),
+ call_as_ident(Ident,V,Id),apply_as_pred(EqlPred,Item,Id),!,
+ length(LeftOffset,N),
+ RetVal is N + OffsetReturn. 
+cl_position(_,_,_,[]).
+
+% #'POSITION-IF
+wl:init_args(2, cl_position_if).
+cl_position_if(E,Seq,Keys,Result):- cl_position(E,Seq,[kw_test,cl_funcall|Keys],Result).  
+
+% #'POSITION-IF-NOT
+wl:init_args(2, cl_position_if_not).
+cl_position_if_not(E,Seq,Keys,Result):- cl_position(E,Seq,[kw_test_not,cl_funcall|Keys],Result).
+
+
+% #'REVERSE
 cl_reverse(Xs, Ys) :-
     lists:reverse(Xs, [], Ys, Ys).
 
+% #'NREVERSE
 cl_nreverse(Xs, Ys) :-
     lists:reverse(Xs, [], Ys, Ys).
 
 
 
-% string=
+% #'replace
 (wl:init_args(2,cl_replace)).
 cl_replace(X,Y,Keys,XR):-
    range_1_and_2_len(X,Y,Keys,XR,YR,Count),
@@ -173,14 +196,6 @@ replace_each(_,[],_):-!.
 replace_each(_,_,[]):-!.
 replace_each(Count,XR,[Y|YR]):- nb_setarg(1,XR,Y),arg(2,XR,XT),Count2 is Count-1,replace_each(Count2,XT,YR).
    
-range_1_and_2_len(X,Y,[],X,Y,-1):-!.
-range_1_and_2_len(X,Y,Keys,XR,YR,Length):-
-   key_value(Keys,start1,Start1,0),key_value(Keys,end1,End1,9999999999999),
-   key_value(Keys,start2,Start2,0),key_value(Keys,end2,End2,9999999999999),
-   subseqence_from(X,Start1,XR),
-   subseqence_from(Y,Start2,YR),
-   Length is min(End1-Start1,End2-Start2).
-
 
 wl:init_args(1,cl_mapcar).
 cl_mapcar(P, [[H|T]], [RH|RT]) :- !, cl_apply(P, [H], RH),cl_mapcar(P, [T], RT).
@@ -188,28 +203,6 @@ cl_mapcar(P, [[H|T],[H2|T2]], [RH|RT]) :- !, cl_apply(P, [H,H2], RH),cl_mapcar(P
 cl_mapcar(P, [[H|T],[H2|T2],[H3|T3]], [RH|RT]) :- !, cl_apply(P, [H,H2,H3], RH),cl_mapcar(P, [T,T2,T3], RT).
 cl_mapcar(_, [[]|_], []).
 
-
-wl:init_args(1,cl_apply).
-cl_apply(closure(Environment,ClosureResult,FormalArgs,Body), [Arguments], Result):-!,
-  closure(Environment,ClosureResult,FormalArgs,Body,Arguments,Result).
-cl_apply(function(FunctionName), Arguments, Result):-!,cl_apply((FunctionName), Arguments, Result).
-cl_apply((FunctionName), [Arguments], Result):-!,
-  lisp_compiled_eval([FunctionName|Arguments],Result).
-
-
-lisp_call(Function, Result):-
-	apply(Function, [Result]).
-
-
-% negation can be over existence,  future possiblity or past existence, we say there exists some truth in which  
-
-
-t_or_nil(G,Ret):- G->Ret=t;Ret=[].
-
-cl_not(Obj,Ret):- t_or_nil(Obj == [] , Ret).
-cl_null(Obj,Ret):- t_or_nil(Obj == [] , Ret).
-cl_atom(Obj,Ret):-  t_or_nil( Obj\=[_|_] , Ret).
-cl_consp(Obj,RetVal):- t_or_nil(is_consp(Obj),RetVal).
 
 (wl:init_args(0,cl_nconc)).
 cl_nconc([L1,L2],Ret):- !, append(L1,L2,Ret).
@@ -224,60 +217,6 @@ cl_copy_list([M|List],[M|Copy]):-cl_copy_list(List,Copy).
 wl:type_checked(cl_length(claz_cons,integer)).
 cl_length(Sequence,Len):- always(length(Sequence,Len)).
 
-
-(wl:init_args(1,cl_last)).
-cl_last(List,[],Tail):-  !, cl_last_1(List,Tail).
-cl_last(List,[N],Ret):- 
-  (N=1 -> cl_last_1(List,Ret);
-  (N=0 -> cl_last_0(List,Ret);
- (( always(length([R|RightM1],N)),
-  [R|RightM1]=Right,
-  (append(_,Right,List)->Ret=Right;
-  (append(_,List,Right)->Ret=List;
-  ((cl_last_1(List,R1),   
-    append(RightM1,R1,Ret),
-      append(_,Ret,List))->true;Ret=List))))))).
-
-cl_last_0([_|List],R):- !, cl_last_0(List,R).
-cl_last_0(A,A).
-cl_last_1([A],[A]):-!.
-cl_last_1([_,H|List],R):- !, cl_last_1([H|List],R).
-cl_last_1([A|R],[A|R]):-!.
-cl_last_1(_,[]).
-
-/*
- (last nil) =>  NIL
- (last '(1 2 3)) =>  (3)
- (last '(1 2 . 3)) =>  (2 . 3)
- (setq x (list 'a 'b 'c 'd)) =>  (A B C D)
- (last x) =>  (D)
- (rplacd (last x) (list 'e 'f)) x =>  (A B C D E F)
- (last x) =>  (F)
-
- (last '(a b c))   =>  (C)
-
- (last '(a b c) 0) =>  ()
- (last '(a b c) 1) =>  (C)
- (last '(a b c) 2) =>  (B C)
- (last '(a b c) 3) =>  (A B C)
- (last '(a b c) 4) =>  (A B C)
-
- (last '(a . b) 0) =>  B
- (last '(a . b) 1) =>  (A . B)
- (last '(a . b) 2) =>  (A . B)
-*/
-cl_eq(A,B,Ret):- t_or_nil( is_eq(A,B) , Ret).
-cl_eql(A,B,Ret):- t_or_nil( is_eql(A,B) , Ret).
-cl_equal(A,B,Ret):- t_or_nil( is_equal(A,B) , Ret).
-cl_equalp(A,B,Ret):- t_or_nil( is_equalp(A,B) , Ret).
-equal(A,B,Ret):- t_or_nil( is_equal(A,B) , Ret).
-
-
-is_eql(X,Y):- is_eq(X,Y)->true;cl_type_of(X,T),cl_type_of(Y,T), notrace(catch(X=:=Y,_,fail)).
-is_eq(X,Y):- same_term(X,Y).
-% is_eq(X,Y):- X==Y, (\+ compound(X)-> true ; \+ \+ ((gensym(cookie,Cook),setarg(1,X,Cook),X==Y))).
-is_equal(X,Y):- (X=@=Y->true;is_eql(X,Y)).
-is_equalp(X,Y):- is_equal(X,Y)->true;((f_u_to_pvs(X,XX),f_u_to_pvs(Y,YY), XX=@=YY)-> true ; ( \+ X\=Y)).
 
 
 cl_remove('$ARRAY'([S],Type,A),B,'$ARRAY'([Sm1],Type,C)):-pl_remove(-1,is_equal,A,B,C,Did),(number(S)->Sm1 is S-Did ; Sm1=S).
@@ -296,361 +235,9 @@ pl_subst( Var, VarS,SUB,SUB ) :- Var==VarS,!.
 pl_subst([H|T],B,A,[HH|TT]):- !,pl_subst(H,B,A,HH),pl_subst(T,B,A,TT).
 pl_subst( Var, _,_,Var ).
 
-
-personal_props(sname).
-personal_props(ref).
-personal_props(classof).
-personal_props(instance).
-f_u_to_pvs(X,[float|XX]):- notrace(catch(XX is (1.0 * X),_,fail)),!.
-f_u_to_pvs(X,XX):- findall([P|V],((get_opv_ii(X,P,V),\+ personal_props(P))),List),
-  List\==[],sort(List,XX),!.
-f_u_to_pvs(X,[str|XX]):- format(string(S),'~w',[X]),string_upper(S,XX),!.
-
-
-
-f_ext_quit(ExitCode,Ret):- trace,t_or_nil(halt(ExitCode),Ret).
-
-
-is_special_var_c(_,_):-!,fail.
-sym_arg_val_envc(N,A,B,_) :- is_special_var_c(N,B) -> true ; A = B.
-
-
-
-
-show_special:-
-		setof(Package:Var=Type:Value, symp:symbol_info(Var, Package, Type, Value), SVs)
-	->	writef('Variable \tValue\n\n'),
-		every(SVs, [(Var2 = Value2)]^(writef('%t :\t%t\n',[Var2, Value2])))
-	;	writef('No special variables\n').
-
-
-/*
-ensure_cl_contains([
-       caaar,
-       caadr,
-       caar,
-       cadar,
-       caddr,
-       cdaar,
-       cdadr,
-       cdar,
-       cddar,
-       cddddr,
-       cdddr,
-       cddr]).
-*/
-cl_cddr(X, Cdr_Ret) :-
-  cl_cdr(X, Cdr_Param),
-  cl_cdr(Cdr_Param, Cdr_Ret).
-
-cl_cdar(X, Cdr_Ret) :-
-  cl_car(X, Cdr_Param),
-  cl_cdr(Cdr_Param, Cdr_Ret).
-
-cl_caar(X, Cdr_Ret) :-
-  cl_car(X, Cdr_Param),
-  cl_car(Cdr_Param, Cdr_Ret).
-
-cl_caaar(X, Cdr_Ret) :-
-  cl_car(X, Y),
-  cl_car(Y, Z),
-  cl_car(Z, Cdr_Ret).
-
-cl_cdaar(X, Cdr_Ret) :-
-  cl_car(X, Y),
-  cl_car(Y, Z),
-  cl_cdr(Z, Cdr_Ret).
-
-cl_cadar(X, Cdr_Ret) :-
-  cl_car(X, Y),
-  cl_cdr(Y, Z),
-  cl_car(Z, Cdr_Ret).
-
-cl_cdadr(X, Cdr_Ret) :-
-  cl_cdr(X, Y),
-  cl_car(Y, Z),
-  cl_cdr(Z, Cdr_Ret).
-
-cl_caadr(X, Cdr_Ret) :-
-  cl_cdr(X, Y),
-  cl_car(Y, Z),
-  cl_car(Z, Cdr_Ret).
-
-cl_caddr(X, Cdr_Ret) :-
-  cl_cdr(X, Y),
-  cl_cdr(Y, Z),
-  cl_car(Z, Cdr_Ret).
-
-cl_cdddr(X, Cdr_Ret) :-
-  cl_cdr(X, Y),
-  cl_cdr(Y, Z),
-  cl_cdr(Z, Cdr_Ret).
-
-cl_cddar(X, Cdr_Ret) :-
-  cl_car(X, Y),
-  cl_cdr(Y, Z),
-  cl_cdr(Z, Cdr_Ret).
-
-cl_cddddr(W, Cdr_Ret) :-
-  cl_cdr(W, X),
-  cl_cdr(X, Y),
-  cl_cdr(Y, Z),
-  cl_cdr(Z, Cdr_Ret).
-
-
-wl:interned_eval_e(
-"(defmacro pushnew (obj place)
-  (let ((sym (gensym)))
-    `(let ((,sym ,obj))
-       (unless (member ,sym ,place)
-         (push ,sym ,place)))))").
-
-
-%(wl:init_args(2,cl_pushnew)).
-%cl_pushnew(Element, Place, FnResult) :-
-
-wl:interned_eval_e(
-'(defmacro my-push (element place)
-   (let ((el-sym  (gensym))
-         (new-sym (gensym "NEW")))
-     `(let* ((,el-sym  ,element)
-             (,new-sym (cons ,el-sym ,place)))
-        (setf ,place ,new-sym)))))').
-
-cl_push(Element, Place, FnResult) :-
-        global_env(ReplEnv),
-        Env=[bv(u_element, Element), bv(u_place, Place)|ReplEnv],
-        cl_gensym(El_sym_Init),
-        cl_gensym('$ARRAY'([*], claz_base_character, "NEW"), New_sym_Init),
-        LEnv=[bv(u_el_sym, El_sym_Init), bv(u_new_sym, New_sym_Init)|Env],
-        get_var(LEnv, u_el_sym, El_sym_Get12),
-        get_var(LEnv, u_element, Element_Get),
-        get_var(LEnv, u_new_sym, New_sym_Get15),
-        get_var(LEnv, u_place, Place_Get14),
-        [let_xx, [[El_sym_Get12, Element_Get], [New_sym_Get15, [cons, El_sym_Get12, Place_Get14]]], [setf, Place_Get14, New_sym_Get15]]=MFResult,
-        cl_eval(MFResult, FnResult).
-
-/*
-make_accessor(cadr).
-
-make_accessor(cdar).
-
-make_accessor(cddr).
-
-make_accessor(caaar).
-
-make_accessor(caadr).
-
-make_accessor(cadar).
-
-make_accessor(caddr).
-
-make_accessor(cdaar).
-
-make_accessor(cdadr).
-
-make_accessor(cddar).
-
-make_accessor(cdddr).
-
-make_accessor(caaaar).
-
-make_accessor(caaadr).
-
-make_accessor(caadar).
-
-make_accessor(caaddr).
-
-make_accessor(cadaar).
-
-make_accessor(cadadr).
-
-make_accessor(caddar).
-
-make_accessor(cadddr).
-
-make_accessor(cdaaar).
-
-make_accessor(cdaadr).
-
-make_accessor(cdadar).
-
-make_accessor(cdaddr).
-
-make_accessor(cddaar).
-
-make_accessor(cddadr).
-
-make_accessor(cdddar).
-
-make_accessor(cddddr).
-*/
-/*
-(caar x)        (car (car x))                    
-(cadr x)        (car (cdr x))                    
-(cdar x)        (cdr (car x))                    
-(cddr x)        (cdr (cdr x))                    
-(caaar x)       (car (car (car x)))              
-(caadr x)       (car (car (cdr x)))              
-(cadar x)       (car (cdr (car x)))              
-(caddr x)       (car (cdr (cdr x)))              
-(cdaar x)       (cdr (car (car x)))              
-(cdadr x)       (cdr (car (cdr x)))              
-(cddar x)       (cdr (cdr (car x)))              
-(cdddr x)       (cdr (cdr (cdr x)))              
-(caaaar x)      (car (car (car (car x))))        
-(caaadr x)      (car (car (car (cdr x))))        
-(caadar x)      (car (car (cdr (car x))))        
-(caaddr x)      (car (car (cdr (cdr x))))        
-(cadaar x)      (car (cdr (car (car x))))        
-(cadadr x)      (car (cdr (car (cdr x))))        
-(caddar x)      (car (cdr (cdr (car x))))        
-(cadddr x)      (car (cdr (cdr (cdr x))))        
-(cdaaar x)      (cdr (car (car (car x))))        
-(cdaadr x)      (cdr (car (car (cdr x))))        
-(cdadar x)      (cdr (car (cdr (car x))))        
-(cdaddr x)      (cdr (car (cdr (cdr x))))        
-(cddaar x)      (cdr (cdr (car (car x))))        
-(cddadr x)      (cdr (cdr (car (cdr x))))        
-(cdddar x)      (cdr (cdr (cdr (car x))))        
-(cddddr x)      (cdr (cdr (cdr (cdr x))))  
-
-./xabcl/assoc.lisp:(defun rassoc-if-not (predicate alist &key key)
-./nonwamcl/rcyc/cynd/sublisp-cl.lisp:(define-caller-pattern rassoc-if-not (fn form &key pbody) :lisp)
-./nonwamcl/rcyc/cycl/list-utilities.lisp:(define rassoc-if-not (predicate alist)
-./nonwamcl/ccl/lib/lists.lisp:(defun rassoc-if-not (predicate alist &key key)
-./nonwamcl/ccl/lib/.svn/text-base/lists.lisp.svn-base:(defun rassoc-if-not (predicate alist &key key)
-./nonwamcl/sbcl/src/code/list.lisp:(defun rassoc-if-not (predicate alist &key key)
-./nonwamcl/eclipse-lisp/lisp/alist.lisp:(defun RASSOC-IF-NOT (predicate a-list &key key)
-./nonwamcl/com-informatimago/common-lisp/lisp/cl-definition.lisp:(declare-function RASSOC-IF-NOT ())
-./nonwamcl/SICL/Code/Cons/rassoc-if-not-defun.lisp:(defun rassoc-if-not (predicate alist &key key)
-./nonwamcl/SICL/Code/Cons-high/cons-high.lisp:(defun rassoc-if-not (predicate alist &key key)
-./nonwamcl/t/reference/lisp_8500/init5000.lisp:  (defun rassoc-if-not (predicate alist &rest rest)
-./nonwamcl/t/reference/lisp_8500/init5000lite.lisp:  (defun rassoc-if-not (predicate alist &rest rest)
-./nonwamcl/t/reference/lisp_8500/init500.lisp:  (defun rassoc-if-not (predicate alist &rest rest)
-./nonwamcl/t/reference/lisp_8500/core800.lisp:  (defun rassoc-if-not (predicate alist &rest rest)
-./nonwamcl/slime/xref.lisp:(define-caller-pattern rassoc-if-not (fn form &key (:star form)) :lisp)
-./nonwamcl/com-informatimago_common-lisp_lisp/cl-definition.lisp:(declare-function RASSOC-IF-NOT ())
-./nonwamcl/dwim.hu/hu.dwim.delico/source/interpreter/common-lisp-cc.lisp:(redefun/cc rassoc-if-not (predicate alist &key key)
-./nonwamcl/ecl-mirror/src/cmp/proclamations.lsp:(proclamation rassoc-if-not (function-designator association-list &key) t)
-./nonwamcl/ecl-mirror/src/lsp/listlib.lsp:(defun rassoc-if-not (test alist &key key)
-./xlisp500/wam-cl-init2.lisp:  (defun rassoc-if-not (predicate alist &rest rest)
-./emacs-cl/cl-conses.el:(cl:defun RASSOC-IF-NOT (predicate alist &KEY KEY)
-./reference/pjb-cl-definition.lisp:(declare-function RASSOC-IF-NOT ())
-./reference/xref-patterns.lisp:(data-assrt :define-caller-pattern rassoc-if-not (fn form &key (:star form)) :lisp)
-
-
-symbol_info(Sym,P,function,O),symbol_info(Sym,P,function_type,FT),symbol_info(Sym,P,name,Name),
-  format('~N% ~w (~w ~w)~n~q(A,Result):- ...\n\n',[Name,FT,P, O]),nl,fail.
-
-*/  
 :- fixup_exports.
 
+      
 end_of_file.
 
-remap(minusp,2).
-Warning:        1-st clause of f_u_yfor/4: 1-st clause of f_u_yfor/4
-
-
-
-remap(acons/4, which is referenced by
-Warning:        1-st clause of f_u_record_in_loop_alist/3: 1-st clause of f_u_record_in_loop_alist/3
-remap(char/3, which is referenced by
-Warning:        1-st clause of f_u_string_head/2: 1-st clause of f_u_string_head/2
-remap(fifth,2).
-Warning:        1-st clause of f_u_yfor/4: 1-st clause of f_u_yfor/4
-remap(fourth,2).
-Warning:        1-st clause of f_u_decr/5: 1-st clause of f_u_decr/5
-Warning:        1-st clause of f_u_incr/5: 1-st clause of f_u_incr/5
-remap(nsublis/3, which is referenced by
-Warning:        1-st clause of f_u_substitute_loop_return/3: 1-st clause of f_u_substitute_loop_return/3
-remap(numberp,2).
-Warning:        1-st clause of f_u_decr/5: 1-st clause of f_u_decr/5
-Warning:        1-st clause of f_u_incr/5: 1-st clause of f_u_incr/5
-remap(rassoc/3, which is referenced by
-Warning:        1-st clause of f_u_add_element_to_end_of_loop_alist/3: 1-st clause of f_u_add_element_to_end_of_loop_alist/3
-Warning:        1-st clause of f_u_add_element_to_loop_alist/3: 1-st clause of f_u_add_element_to_loop_alist/3
-Warning:        1-st clause of f_u_fetch_new_iteration_variable/1: 1-st clause of f_u_fetch_new_iteration_variable/1
-Warning:        1-st clause of f_u_fetch_old_iteration_variable/1: 1-st clause of f_u_fetch_old_iteration_variable/1
-Warning:        1-st clause of f_u_iteration_variable_exists_p/1: 1-st clause of f_u_iteration_variable_exists_p/1
-Warning:        1-st clause of f_u_substitute_iteration_variable/2: 1-st clause of f_u_substitute_iteration_variable/2
-Warning:        1-st clause of f_u_yloop/2: 1-st clause of f_u_yloop/2
-remap(remove/3, which is referenced by
-Warning:        1-st clause of f_u_substitute_iteration_variable/2: 1-st clause of f_u_substitute_iteration_variable/2
-remap(subst/4, which is referenced by
-Warning:        1-st clause of f_u_define_and_rename_loop_locals/5: 1-st clause of f_u_define_and_rename_loop_locals/5
-Warning:        1-st clause of f_u_substitute_iteration_variable/2: 1-st clause of f_u_substitute_iteration_variable/2
-remap(third,2).
-Warning:        1-st clause of f_u_yfor/4: 1-st clause of f_u_yfor/4
-Warning: f_u_add_elements_to_clause/4, which is referenced by
-Warning:        1-st clause of f_u_yfor/4: 1-st clause of f_u_yfor/4
-Warning: f_u_result,2).
-Warning:        1-st clause of f_u_maximize/2: 1-st clause of f_u_maximize/2
-Warning: f_u_ydo/3, which is referenced by
-Warning:        1-st clause of f_u_walkcdr/3: 1-st clause of f_u_walkcdr/3
-Warning: f_u_yloop/4, which is referenced by
-Warning:        1-st clause of f_u_walkcdr/3: 1-st clause of f_u_walkcdr/3
-
-
-
-
-Warning: cl_array_element_type/2, which is referenced by
-Warning:        1-st clause of f_sys_coerce_to_vector/5: 1-st clause of f_sys_coerce_to_vector/5
-Warning: cl_array_has_fill_pointer_p/2, which is referenced by
-Warning:        1-st clause of cl_map_into/4: 1-st clause of cl_map_into/4
-Warning: cl_check_type/4, which is referenced by
-Warning:        1-st clause of f_sys_coerce_to_vector/5: 1-st clause of f_sys_coerce_to_vector/5
-Warning: cl_list_xx/3, which is referenced by
-Warning:        1-st clause of cl_map/5: 1-st clause of cl_map/5
-Warning: cl_make_list/4, which is referenced by
-Warning:        1-st clause of cl_make_sequence/4: 1-st clause of cl_make_sequence/4
-Warning: cl_member/7, which is referenced by
-Warning:        1-st clause of cl_member_if/4: 1-st clause of cl_member_if/4
-Warning:        1-st clause of cl_member_if_not/4: 1-st clause of cl_member_if_not/4
-Warning: cl_nsubst/8, which is referenced by
-Warning:        1-st clause of cl_nsubst_if/5: 1-st clause of cl_nsubst_if/5
-Warning:        1-st clause of cl_nsubst_if_not/5: 1-st clause of cl_nsubst_if_not/5
-Warning: cl_reduce/7, which is referenced by
-Warning:        1-st clause of cl_map/5: 1-st clause of cl_map/5
-Warning: cl_subst/8, which is referenced by
-Warning:        1-st clause of cl_subst_if/5: 1-st clause of cl_subst_if/5
-Warning:        1-st clause of cl_subst_if_not/5: 1-st clause of cl_subst_if_not/5
-Warning: cl_subtypep/3, which is referenced by
-Warning:        1-st clause of cl_make_sequence/4: 1-st clause of cl_make_sequence/4
-Warning: cl_type_error/3, which is referenced by
-Warning:        1-st clause of f_sys_pf_set_subseq/4: 1-st clause of f_sys_pf_set_subseq/4
-Warning: f_ext_truly_the/3, which is referenced by
-Warning:        1-st clause of f_sys_make_seq_iterator/3: 1-st clause of f_sys_make_seq_iterator/3
-Warning:        1-st clause of f_sys_seq_iterator_next/3: 1-st clause of f_sys_seq_iterator_next/3
-Warning:        1-st clause of f_sys_seq_iterator_ref/3: 1-st clause of f_sys_seq_iterator_ref/3
-Warning:        1-st clause of f_sys_seq_iterator_set/4: 1-st clause of f_sys_seq_iterator_set/4
-Warning: f_sys_closest_sequence_type/2, which is referenced by
-Warning:        1-st clause of cl_make_sequence/4: 1-st clause of cl_make_sequence/4
-Warning: f_sys_do_sequences/3, which is referenced by
-Warning:        1-st clause of cl_every/4: 1-st clause of cl_every/4
-Warning:        1-st clause of cl_map/5: 1-st clause of cl_map/5
-Warning:        1-st clause of cl_some/4: 1-st clause of cl_some/4
-Warning: f_sys_elt_list/4, which is referenced by
-Warning:        1-st clause of cl_every/4: 1-st clause of cl_every/4
-Warning:        1-st clause of cl_map/5: 1-st clause of cl_map/5
-Warning:        1-st clause of cl_some/4: 1-st clause of cl_some/4
-Warning: f_sys_fill_array_with_elt/5, which is referenced by
-Warning:        1-st clause of cl_make_sequence/4: 1-st clause of cl_make_sequence/4
-Warning: f_sys_fixnump/2, which is referenced by
-Warning:        1-st clause of f_sys_make_seq_iterator/3: 1-st clause of f_sys_make_seq_iterator/3
-Warning:        1-st clause of f_sys_seq_iterator_next/3: 1-st clause of f_sys_seq_iterator_next/3
-Warning:        1-st clause of f_sys_seq_iterator_ref/3: 1-st clause of f_sys_seq_iterator_ref/3
-Warning:        1-st clause of f_sys_seq_iterator_set/4: 1-st clause of f_sys_seq_iterator_set/4
-Warning: f_sys_make_vector/7, which is referenced by
-Warning:        1-st clause of cl_make_sequence/4: 1-st clause of cl_make_sequence/4
-Warning:        1-st clause of f_sys_coerce_to_vector/5: 1-st clause of f_sys_coerce_to_vector/5
-Warning: f_sys_pf_set_fill_pointer/3, which is referenced by
-Warning:        1-st clause of cl_map_into/4: 1-st clause of cl_map_into/4
-Warning: f_sys_reckless/2, which is referenced by
-Warning:        1-st clause of cl_every/4: 1-st clause of cl_every/4
-Warning:        1-st clause of cl_some/4: 1-st clause of cl_some/4
-Warning: f_sys_signal_type_error/3, which is referenced by
-Warning:        1-st clause of f_sys_error_not_a_sequence/2: 1-st clause of f_sys_error_not_a_sequence/2
-Warning: f_sys_simple_array_p/2, which is referenced by
-Warning:        1-st clause of f_sys_coerce_to_vector/5: 1-st clause of f_sys_coerce_to_vector/5
 

@@ -20,6 +20,24 @@
 
 
 
+cl_eval(Form,Result):- lisp_compile(Result,Form,Body),always(Body).
+
+wl:init_args(1,cl_funcall).
+cl_funcall(function(F),More,R):-!,cl_funcall(F,More,R).
+cl_funcall(ProcedureName,Args,Result):- cl_apply(ProcedureName, [Args], Result).
+% cl_funcall([F|More],R):- append([More],[R],ARGS), lpa_apply(F,ARGS).
+
+
+
+wl:init_args(1,cl_apply).
+cl_apply(closure(Environment,ClosureResult,FormalArgs,Body), [Arguments], Result):-!,
+  closure(Environment,ClosureResult,FormalArgs,Body,Arguments,Result).
+cl_apply(function(FunctionName), Arguments, Result):-!,cl_apply((FunctionName), Arguments, Result).
+cl_apply((FunctionName), [Arguments], Result):-!,
+  lisp_compiled_eval([FunctionName|Arguments],Result).
+
+
+
 :- discontiguous(compile_funop/5).
 
 compile_funop(Ctx,Env,Result,[function(Op) | FunctionArgs], Body):- nonvar(Op),!,
@@ -29,7 +47,7 @@ compile_funop(Ctx,Env,Result,[function(Op) | FunctionArgs], Body):- nonvar(Op),!
 %  must_compile_body(Ctx,Env,Result,[Op | FunctionArgs], Body).
 
 % Messed Progn?
-% compile_body(Ctx,Env,Result,[Form|MORE], Code):- is_list(Form), !,compile_forms(Ctx,Env,Result,[Form|MORE], Code).
+% compile_body(Ctx,Env,Result,[Form|MORE], Code):- is_list(Form), !,must_compile_progn(Ctx,Env,Result,[Form|MORE], Code).
 
  
 compile_funop(Ctx,Env,Result,[FN| Args], Code):- var(FN),!,
@@ -132,7 +150,6 @@ lisp_env_eval(Env, Expression, Result):-
   lisp_compile(Env,Result,Expression,Body),
   user:always(Body).
 
-function(X,function(X)).
 closure(ClosureEnvironment,ClosureResult,FormalParams,ClosureBody,ActualParams,ClosureResult):-
   M = closure(ClosureEnvironment,ClosureResult,FormalParams,ClosureBody,ActualParams,ClosureResult),
   del_attrs_of(M,dif),
@@ -140,14 +157,6 @@ closure(ClosureEnvironment,ClosureResult,FormalParams,ClosureBody,ActualParams,C
   arglists:must_bind_parameters(ClosureEnvironment,_RestNKeys,FormalParams, ActualParams,_EnvOut, BinderCode),
   always(user:BinderCode),
   always(user:ClosureBody).
-
-cl_eval(Form,Result):- lisp_compile(Result,Form,Body),always(Body).
-
-wl:init_args(1,cl_funcall).
-cl_funcall(function(F),More,R):-!,cl_funcall(F,More,R).
-cl_funcall(ProcedureName,Args,Result):- cl_apply(ProcedureName, [Args], Result).
-% cl_funcall([F|More],R):- append([More],[R],ARGS), lpa_apply(F,ARGS).
-
 
 apply_c(_EnvIns,function, [A],[function,A]).
 apply_c(EnvIn,[lambda, FormalParams, Body], ActualParams, Result):-

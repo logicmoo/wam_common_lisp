@@ -155,11 +155,15 @@
 :- ensure_loaded(condifs).
 :- ensure_loaded(readers).
 
+:- ensure_loaded(equality).
+:- ensure_loaded(conses).
+
+
 :- ensure_loaded(arglists).
 :- ensure_loaded(arrays).
 :- ensure_loaded(backquote).
 :- ensure_loaded(body).
-:- ensure_loaded(callp).
+:- ensure_loaded(prologfns).
 :- ensure_loaded(compile).
 :- ensure_loaded(conditions).
 :- ensure_loaded(describe).
@@ -169,7 +173,6 @@
 
 :- ensure_loaded(defun).
 :- ensure_loaded(defgeneric).
-:- ensure_loaded(defsetf).
 :- ensure_loaded(hashtables).
 :- ensure_loaded(interp).
 :- ensure_loaded(lexvars).

@@ -331,7 +331,6 @@ with_each_file(How,File):- working_directory(CD,CD),with_fstem(CD,File,Found),!,
 
 
 
-
 %cl:require( :tables "tables.lisp")
 % asserting... u
 wl:arglist_info(cl_require, [sys_name, c38_optional, u_pathnames], [_Name_Param], arginfo{all:[sys_name, u_pathnames], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_name, u_pathnames], opt:[u_pathnames], req:[sys_name], rest:0, whole:0}).
@@ -346,7 +345,7 @@ cl_require(Name_Param, RestNKeys, FResult) :-
         cl_string(Name_Param, String_Init),
         LEnv=[[bv(string, String_Init)]|Env],
         get_var(LEnv, xx_modules_xx, Xx_modules_xx_Get),
-        cl_find(string, Xx_modules_xx_Get, kw_test, function(string_c61), IFTEST),
+        cl_find(String_Init, Xx_modules_xx_Get, [kw_test, function(string_c61)], IFTEST),
         (   IFTEST\==[]
         ->  FResult=[]
         ;   get_var(LEnv, u_pathnames, Pathnames_Get),

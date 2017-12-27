@@ -382,7 +382,19 @@ f_sys_get_iprops(Obj,Result):- findall([Prop|Value],get_opv(Obj,Prop,Value),Resu
 (wl:init_args(exact_only,f_sys_get_opv)).
 wl:interned_eval('`sys:get-opv').
 f_sys_get_opv(Obj,Prop,Value):- get_opv(Obj,Prop,Value).
-	
+
+f_u_to_pvs(X,[float|XX]):- notrace(catch(XX is (1.0 * X),_,fail)),!.
+f_u_to_pvs(X,XX):- findall([P|V],((get_opv_ii(X,P,V),\+ personal_props(P))),List),
+  List\==[],sort(List,XX),!.
+f_u_to_pvs(X,[str|XX]):- format(string(S),'~w',[X]),string_upper(S,XX),!.
+
+   personal_props(sname).
+   personal_props(ref).
+   personal_props(classof).
+   personal_props(instance).
+
+
+
 add_opv_maybe(Obj,Prop,_):- get_opv_i(Obj,Prop,_),!.
 add_opv_maybe(Obj,Prop,Value):- add_opv_new(Obj,Prop,Value),!.
 

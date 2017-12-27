@@ -214,32 +214,6 @@ cl_char(String,Index,Char):-cl_aref(String,[Index],Char).
 
 
 
-range_1_and_2(X,Y,[],X,Y,0):-!.
-range_1_and_2(X,Y,Keys,XR,YR,Start1):-
-   key_value(Keys,start1,Start1,0),key_value(Keys,end1,End1,[]),
-   key_value(Keys,start2,Start2,0),key_value(Keys,end2,End2,[]),
-   range_subseq(X,Start1,End1,XR),
-   range_subseq(Y,Start2,End2,YR).
-
-% key_value(Keys,Name,Value,Default).
-key_value(Keys,Name,Value):- is_dict(Keys),!,Keys.Name=Value,!.
-key_value(Keys,Name,Value):- get_plist_value(Keys,Name,Value).
-key_value(Keys,Name,Value,_Default):- key_value(Keys,Name,Value),!.
-key_value(_Keys,_Name,Default,Default).
-
-range_subseq(X,0,[],X):-!.
-range_subseq(X,N,[],XR):- !, subseqence_from(X,N,XR).
-range_subseq(X,0,N,XR):-!, subseqence_until(X,N,XR).
-range_subseq(X,Start,End,XR):-!, subseqence_from(X,Start,XM),NewEnd is End - Start,subseqence_until(XM,NewEnd,XR).
-
-subseqence_from(X,0,X):-!.
-subseqence_from([_|X],N,XR):- N2 is N -1, subseqence_from(X,N2,XR).
-
-subseqence_until(_,0,[]):-!.
-subseqence_until([X|XX],N,[X|XR]):-  N2 is N -1,subseqence_from(XX,N2,XR).
-
-
-
 
 :- fixup_exports.
 
