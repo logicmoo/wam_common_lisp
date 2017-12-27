@@ -71,7 +71,7 @@ compile_function(Ctx,Env,[Symbol,FormalParms|FunctionBody0],Symbol,CtxFunction,C
    
    debug_var("Env",Env),
    debug_var('FnResult',Result),   
-     (expand_function_head(Ctx,Env,Symbol,CtxFunction,FormalParms,_Whole, HeadParms,ZippedArgEnv,_ArgInfo, HeadDefCode,HeadCode),
+     (expand_function_head_macro(Ctx,Env,Symbol,CtxFunction,FormalParms,_Whole, HeadParms,ZippedArgEnv,_ArgInfo, HeadDefCode,HeadCode),
       must_compile_body(Ctx,HeadEnv,Result,[block,Symbol|FunctionBody],BodyCode))),      
    append([CtxFunction|HeadParms],[Result],HeadV),
    CallableHead =.. HeadV,
@@ -80,7 +80,7 @@ compile_function(Ctx,Env,[Symbol,FormalParms|FunctionBody0],Symbol,CtxFunction,C
    DocCode,
    assert_lsp(Symbol,wl:lambda_def(defun,Symbol,CtxFunction, FormalParms, FunctionBody)),
    HeadDefCode,
-   assert_lsp(Symbol,CallableHead  :- (nop(global_env(Env)),EnvAssign,  BodyCodeO))),
+   assert_lsp(Symbol,CallableHead  :- (EnvAssign,  BodyCodeO))),
  debug_var('Result',Result), 
   body_cleanup_keep_debug_vars(Ctx,(HeadCode,BodyCode),BodyCodeO),
   body_cleanup_keep_debug_vars(Ctx,CompileBody,CompileBodyOpt))).

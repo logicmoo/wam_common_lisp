@@ -400,7 +400,8 @@ expand_function_head_macro(Ctx,Env,Symbol,Macro,FormalParms,Whole, HeadParms,Zip
   (ArgInfo.env==0 -> 
     ((HeadCode=(global_env(Env),HeadCode0),HeadDefCode=HeadDefCode0,HeadParms=HeadParms0)) 
     ; 
-    (HeadCode0=HeadCode,HeadDefCode=(assert_lsp(Symbol,wl:declared(Macro,env_arg1)),HeadDefCode0), HeadParms=[Env|HeadParms0])).
+    (HeadCode=(parent_env(Env),HeadCode0),HeadDefCode=(assert_lsp(Symbol,wl:declared(Macro,env_arg1)),HeadDefCode0), 
+       HeadParms=HeadParms0)).
     
 
 % Dotted HeadParms

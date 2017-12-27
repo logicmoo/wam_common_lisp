@@ -104,7 +104,7 @@ append_r([], L, L).
 wl:init_args(2, cl_member).
 cl_member(Item,List,Keys,RetVal):-
  get_identity_pred(Keys,kw_key,Ident),
- get_test_pred(Keys,EqlPred),
+ get_test_pred(cl_eql,Keys,EqlPred),
  key_value(Keys,kw_from_end,FromEnd1,[]),
  range_1(List,Keys,RList,_Start1),
  ((FromEnd1==[]->append(_,[V|Rest],RList); append_r(_,[V|Rest],RList))),
@@ -136,7 +136,7 @@ cl_find_if_not(E,Seq,Keys,Result):- cl_find(E,Seq,[kw_test_not,cl_funcall|Keys],
 wl:init_args(2, cl_search).
 cl_search(X,Y,Keys,RetVal):-
  get_identity_pred(Keys,kw_key,Ident),
- get_test_pred(Keys,EqlPred),
+ get_test_pred(cl_eql,Keys,EqlPred),
  range_1_and_2(X,Y,Keys,XR0,YR0,OffsetReturn),
  xform_with_ident(YR0,Ident,[YV|YRest]), 
  xform_with_ident(XR0,Ident,XR),
@@ -157,7 +157,7 @@ cl_search(_,_,_,[]).
 wl:init_args(2, cl_position).
 cl_position(Item,List,Keys,RetVal):-
  get_identity_pred(Keys,kw_key,Ident),
- get_test_pred(Keys,EqlPred),
+ get_test_pred(cl_eql,Keys,EqlPred),
  key_value(Keys,kw_from_end,FromEnd1,[]),
  range_1(List,Keys,RList,OffsetReturn),
  ((FromEnd1==[]->append(LeftOffset,[V|_Rest],RList); append_r(LeftOffset,[V|_Rest],RList))),

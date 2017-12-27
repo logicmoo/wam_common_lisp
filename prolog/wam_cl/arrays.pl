@@ -38,10 +38,10 @@ cl_set_nthcdr(Index,[_|List],Tail):- Next is Index-1,cl_set_nthcdr(Next,List,Tai
 get_identity_pred(Keys,K,Pred):- 
   key_value(Keys,K,Value) -> to_function(Value,Pred); Pred = (=).
 
-get_test_pred(Keys,Pred):-
+get_test_pred(IfMissing,Keys,Pred):-
   key_value(Keys,kw_test_not,Value) -> to_neg_function(Value,Pred);
   key_value(Keys,kw_test,Value)  -> to_function(Value,Pred);
-  Pred = cl_eql.
+  Pred = IfMissing.
 
 %to_function(function(ValueI),ValueO):-!,to_function(ValueI,ValueO).
 to_function(Value,Call):-find_operator_or_die(_Env,Value,Call).

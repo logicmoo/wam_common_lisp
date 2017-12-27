@@ -216,7 +216,7 @@ compile_body(Ctx,Env,Result,['#BQ-COMMA-ELIPSE',Form], (Code,cl_eval(CommaResult
 % Conditonal  evaluation/compilation
 % =============================================================================
 
-compile_body(_Ctx,_Env,[],COMMENT,true):- is_comment(COMMENT,_),!.
+compile_body(_Ctx,_Env,[],COMMENT,nop(COMMENT)):- is_comment(COMMENT,_),!.
 
 % #+
 compile_body(Ctx,Env,Result,[OP,Flag,Form|MORE], Code):- same_symbol(OP,'#+'),!, 

@@ -106,7 +106,7 @@ wl:interned_eval(("`SYS:MAKE-VECTOR")).
 wl:init_args(2,cl_rassoc).
 cl_rassoc(Item,AList,Options,RetVal):-
  get_identity_pred(Options,kw_key,Ident),
-  get_test_pred(Options,EqlPred),
+  get_test_pred(cl_eql,Options,EqlPred),
   (member([K|V],AList),call(Ident,V,Id),
     (call(EqlPred,Item,Id,R)->R\==[])),!,
   RetVal = [K|V].
@@ -115,7 +115,7 @@ cl_rassoc(_,_,_,[]).
 wl:init_args(2,cl_assoc).
 cl_assoc(Item,AList,Options,RetVal):-
  get_identity_pred(Options,kw_key,Ident),
-  get_test_pred(Options,EqlPred),
+  get_test_pred(cl_eql,Options,EqlPred),
   (member([K|V],AList),call(Ident,K,Id),
     (call(EqlPred,Item,Id,R)->R\==[])),!,
   RetVal = [K|V].
