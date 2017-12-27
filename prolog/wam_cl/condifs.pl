@@ -18,7 +18,6 @@
 :- module(c0ndif, []).
 :- set_module(class(library)).
 :- include('header').
-:- ensure_loaded(utils_for_swi).
 
 
 :- discontiguous(compile_condifs/5).

@@ -15,7 +15,6 @@
 :- module(places, []).
 :- set_module(class(library)).
 :- include('header').
-:- ensure_loaded((utils_for_swi)).
 
 
 % get_setf_expander_get_set(_Ctx,_Env,[car,Var],[car,Var],[set_car,Var],  true):- atom(Var),!.
@@ -140,7 +139,7 @@ compile_accessors(Ctx,Env,Result,[setf, LVar, ValuesForms], Code):- atom(LVar),
      lookup_symbol_macro(Ctx,Env,LVar,SET), % rw_add(Ctx,LVar,r),    
      must_compile_body(Ctx,Env,Result,[setf, SET, ValuesForms],Code).
 
-compile_accessors(Ctx,Env,Result,[setf, Place, ValuesForms], (Part1,set_var(Env,Place,Result))):- atom(Place),
+compile_accessors(Ctx,Env,Result,[setf, Place, ValuesForms], (Part1, set_var(Env,Place,Result))):- atom(Place),
      assertion(is_symbolp(Place)),
      rw_add(Ctx,Place,w),
      must_compile_body(Ctx,Env,Result,ValuesForms,Part1).
@@ -173,6 +172,11 @@ compile_accessors(Ctx,Env,Result,[getf, Place], (Part0,Part4)):-
      must_compile_body(Ctx,Env,Result,GET,Part4).
 
 
+
+extract_var_atom([_,RVar|_],RVar):-atomic(RVar).
+extract_var_atom(Var,Var).
+                  
+
 % %  (LET ((a 0)(v (VECTOR 0 1 2 3 4 5))) (INCF (AREF (INCF a))) v)
 
 % %  (LET ((a 0)(v (VECTOR 0 1 2 3 4 5))) (INCF (AREF (INCF a))) v)
@@ -186,22 +190,6 @@ compile_accessors(Ctx,Env,Result,[Getf, Var| ValuesForms], Body):- is_place_op(G
         compile_place(Ctx,Env,UsedVar,Var,Code),
         (Var\==RVar -> rw_add(Ctx,RVar,r) ; (is_only_read_op(Getf)->rw_add(Ctx,RVar,r);rw_add(Ctx,RVar,w))),
         Body = (BodyS,Code,set_place(Env,Getf, UsedVar, ResultVs,Result)).
-
-compile_accessors(Ctx,Env,Result,[SetQ, Var, ValueForm, StringL], (Code,Body)):- 
-        is_stringp(StringL),to_prolog_string(StringL,String),is_def_maybe_docs(SetQ),
-        (atom(Var)->cl_symbol_package(Var,Package);reading_package(Package)),
-        Code = assert_lsp(Var,doc:doc_string(Var,Package,variable,String)),
-	!, compile_accessors(Ctx,Env,Result,[SetQ, Var, ValueForm], Body).
-
-
-compile_accessors(Ctx,Env,Result,[SetQ, Var, ValueForm], Body):- is_symbol_setter(Env,SetQ),
-        rw_add(Ctx,Var,w),
-        debug_var('AEnv',Env),
-        !,	
-	must_compile_body(Ctx,Env,ResultV,ValueForm, ValueBody),
-        ((op_return_type(SetQ,RT),RT=name) ->  =(Var,Result) ; =(ResultV,Result)),
-        Body = (ValueBody, set_var(Env,SetQ, Var, ResultV)).
-
 
 % compile_place(Ctx,Env,Result,Var,Code).
 compile_place(_Ctx,_Env,[value,Var],Var,true):- \+ is_list(Var),!.

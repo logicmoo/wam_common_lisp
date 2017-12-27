@@ -68,7 +68,7 @@ shared_lisp_compiler:plugin_expand_progbody(Ctx,Env,Result,InstrS,_PreviousResul
             _rPrevRes115=Print_Ret
         ;   cl_print(U_temp_var_Get, Print_Ret46),
             '1+'(U_temp_var_Get, D1_c43_Ret),
-            set_var(BlockExitEnv, psetq, u_temp_var, D1_c43_Ret),
+            set_var(BlockExitEnv, u_temp_var, D1_c43_Ret),
             fail,
             _rPrevRes115=_GORES
         ).

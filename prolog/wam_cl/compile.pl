@@ -160,6 +160,7 @@ must_compile_body_pt2(Ctx,_Env,Result,ResultO,_Forms, Body9,BodyO):-
   % nb_current('$compiler_PreviousResult',THE),setarg(1,THE,Result),
   !.
 
+:- discontiguous(compile_body/5).
 % Prolog vars
 compile_body(_Ctx,_Env,Result,Var, true):- Result == Var,!.
 compile_body(_Ctx,_Env,ResultO,LispCode, Body):- var(LispCode), get_attr(LispCode,preserved_var,t),!,true=Body,
@@ -304,16 +305,18 @@ compile_body(Ctx,Env,Result,BodyForms, Body):- compile_defun_ops(Ctx,Env,Result,
 compile_body(Ctx,Env,Result,BodyForms, Body):- compile_genericfs(Ctx,Env,Result,BodyForms, Body),!.
 
 
-% symbols
+% symbols (TODO need to resolve symbol-macros)
 compile_body(Ctx,Env,Value, Atom,      Body):- atom(Atom), always(compile_symbol_getter(Ctx,Env,Value, Atom, Body)).
 
-%compile_body(Ctx,Env,Result,BodyForms, Body):- atom(BodyForms),!,always(compile_accessors(Ctx,Env,Result,BodyForms, Body)),!.
+% SETQ - PSETQ
+compile_body(Ctx,Env,Result,BodyForms, Body):- compile_symbol_setter(Ctx,Env,Result,BodyForms, Body),!.
 
 % SETF - PSETF
 compile_body(Ctx,Env,Result,BodyForms, Body):- compile_setfs(Ctx,Env,Result,BodyForms, Body),!.
 
-% SETQ - PSET
+% GETF - PUSHNEW
 compile_body(Ctx,Env,Result,BodyForms, Body):- compile_accessors(Ctx,Env,Result,BodyForms, Body),!.
+
 
 % FUNCALL,EVAL,APPLY, RestOf
 compile_body(Ctx,Env,Result,BodyForms, Body):- always(compile_funop(Ctx,Env,Result,BodyForms, Body)),!.

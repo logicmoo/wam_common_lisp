@@ -455,7 +455,7 @@ USER>
 
 
  addr_tagbody_1_addr_enter_1(ENV) :-
-       set_var(ENV, setq, u_val, 1),
+       set_var(ENV, u_val, 1),
        addr_tagbody_1_u_point_a(ENV).
 
  addr_tagbody_1_u_point_c(ENV) :-

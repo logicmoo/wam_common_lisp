@@ -44,8 +44,6 @@
 :- use_module(library(logicmoo_util_terms)).
 :- use_module(library(logicmoo_util_common)).
 :- user:use_module(library(globals_api)).
-%:- use_module(utils_list).
-:- use_module(utils_higher_order).
 :- use_module(library(dmsg)).
 
 
@@ -151,11 +149,11 @@
 :- ensure_loaded(defmacro).
 :- ensure_loaded(strings).
 :- ensure_loaded(symbols).
-:- ensure_loaded(letvars).
+:- ensure_loaded(lexvars).
 :- ensure_loaded(condifs).
 :- ensure_loaded(readers).
 
-:- ensure_loaded(equality).
+:- ensure_loaded(primitives).
 :- ensure_loaded(conses).
 
 
@@ -175,7 +173,6 @@
 :- ensure_loaded(defgeneric).
 :- ensure_loaded(hashtables).
 :- ensure_loaded(interp).
-:- ensure_loaded(lexvars).
 :- ensure_loaded(mizepro).
 :- ensure_loaded(namestrings).
 :- ensure_loaded(numbers).
@@ -202,4 +199,6 @@
 :- ensure_loaded(utils_set).
 :- ensure_loaded(utils_shortest_paths).
 :- ensure_loaded(utils_writef).
+%:- use_module(utils_list).
+:- use_module(utils_higher_order).
 */

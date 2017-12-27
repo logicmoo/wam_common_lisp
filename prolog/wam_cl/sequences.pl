@@ -27,7 +27,7 @@
 
 %module(_,_).
 
-:- ensure_loaded((utils_writef)).
+%:- ensure_loaded((utils_writef)).
 :- ensure_loaded(library(lists)).
 
 

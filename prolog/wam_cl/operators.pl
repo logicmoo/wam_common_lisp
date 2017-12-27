@@ -19,7 +19,6 @@
 :- set_module(class(library)).
 :- include('header').
 :- set_module(class(library)).
-:- ensure_loaded(utils_for_swi).
 
 wl:declared(cl_special_operator_p,needs_env).
 cl_special_operator_p(Env,Obj,RetVal):- t_or_nil(is_lisp_operator(_,Env,Obj),RetVal).
