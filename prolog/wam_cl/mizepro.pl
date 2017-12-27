@@ -17,7 +17,7 @@
 :- include('header').
 
 debug_optimize(Msg):- wdmsg(Msg).
-allowed_level(X):- X =< 2.
+allowed_level(X):- X =< 1.
 /*
 
 0 = dont trust any

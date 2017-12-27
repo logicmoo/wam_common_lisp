@@ -71,7 +71,7 @@ compile_function(Ctx,Env,[Symbol,FormalParms|FunctionBody0],Symbol,CtxFunction,C
    
    debug_var("Env",Env),
    debug_var('FnResult',Result),   
-     (expand_function_head(Ctx,Env,Symbol,CtxFunction,FormalParms,_Whole, HeadParms,ZippedArgEnv, HeadDefCode,HeadCode),
+     (expand_function_head(Ctx,Env,Symbol,CtxFunction,FormalParms,_Whole, HeadParms,ZippedArgEnv,_ArgInfo, HeadDefCode,HeadCode),
       must_compile_body(Ctx,HeadEnv,Result,[block,Symbol|FunctionBody],BodyCode))),      
    append([CtxFunction|HeadParms],[Result],HeadV),
    CallableHead =.. HeadV,

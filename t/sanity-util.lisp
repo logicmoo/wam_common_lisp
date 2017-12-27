@@ -18,7 +18,7 @@
 ;; not charge a fee for this document or for its distribution.
 |#
 
-(provide "sanity-util")
+'(provide "sanity-util")
 
 ;; Test macro
 (defmacro is (eqf expected actual)

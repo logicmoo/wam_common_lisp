@@ -59,12 +59,17 @@ deflexical(Env,psetq, Var, Result):- !, set_var(Env,Var,Result).
 
 
 
+
 op_return_type(Op,name):- is_def_nil(Op).
 op_return_type(defconstant,name).
 op_return_type(defconst,name).
 
 is_def_nil(defparameter).
 is_def_nil(defvar).
+
+is_symbol_setter(_Env,OP):- is_pair_op(OP).
+is_symbol_setter(_Env,OP):- is_parallel_op(OP).
+is_symbol_setter(_Env,OP):- is_def_maybe_docs(OP).
 
 is_def_maybe_docs(defparameter).
 is_def_maybe_docs(defvar).
@@ -88,17 +93,16 @@ compile_symbol_setter(Ctx,Env,Result,[SetQ, Var, ValueForm, StringL], (Code,Body
         is_stringp(StringL),to_prolog_string(StringL,String),is_def_maybe_docs(SetQ),
         (atom(Var)->cl_symbol_package(Var,Package);reading_package(Package)),
         Code = assert_lsp(Var,doc:doc_string(Var,Package,variable,String)),
-	!, compile_symbol_setter(Ctx,Env,Result,[SetQ, Var, ValueForm], Body).
+	!, must_compile_body(Ctx,Env,Result,[SetQ, Var, ValueForm], Body).
 
 
-compile_symbol_setter(Ctx,Env,Result,[SetQ, Var, ValueForm], Body):- is_symbol_setter(Env,SetQ),
+compile_symbol_setter(Ctx,Env,Result,[SetQ, Var, ValueForm], Body):- \+ is_place_op(SetQ), is_symbol_setter(Env,SetQ),atom(Var),
         rw_add(Ctx,Var,w),
         debug_var('AEnv',Env),
         !,	
 	must_compile_body(Ctx,Env,ResultV,ValueForm, ValueBody),
         ((op_return_type(SetQ,RT),RT=name) ->  =(Var,Result) ; =(ResultV,Result)),
         Body = (ValueBody, set_var(Env, Var, ResultV)).
-
 
 
 extract_variable_value([Val|Vals], FoundVal, Hole):-
@@ -131,9 +135,6 @@ symbol_value0(Env,[Place,Obj],Result):- trace, set_place(Env,getf,[Place,Obj],[]
 symbol_value_error(_Env,Var,_Result):- lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Var).
 throw(X,Y):- writeln(throw(X,Y)),lisp_dump_break,throw(lpa_throw(X,Y)).
 
-reset_mv:- b_getval('$mv_return',[V1,_V2|_])->b_setval('$mv_return',[V1]);true.
-
-push_values([V1|Push],V1):- always(nonvar(Push)),nb_setval('$mv_return',[V1|Push]).
 
 bvof(_,_,T):- notrace(((var(T);T==[tl]))),!,fail.
 bvof(E,M,T):-E=T,!,M=T.

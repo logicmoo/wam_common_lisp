@@ -94,7 +94,7 @@ compile_macro(Ctx,Env,[Symbol|FormalParmsMacroBody],Symbol,Macro, (CompileBody,a
     append([Macro|HeadParms],[FResult],CallableHeadV), CallableHead =.. CallableHeadV,   
     % CallableMF =.. [MF,Whole,Env],
    body_cleanup_keep_debug_vars(Ctx,
-     ((CallableHead  :- ((global_env(Env),EnvAssign,HeadCode,MFBody), cl_eval(MFResult,FResult)))),
+     ((CallableHead  :- ((nop(defmacro),EnvAssign,HeadCode,MFBody), cl_eval(MFResult,FResult)))),
        MacroAssert).
    
 
@@ -106,7 +106,7 @@ compile_macro_function(Ctx,Env,Symbol,[FormalParms|MacroBody0],Macro,HeadParms,E
 
    LabelSymbol = '', % LabelSymbol =Symbol       
  within_labels_context(Ctx,LabelSymbol,((
-   expand_function_head(Ctx,Env,Symbol,Macro,FormalParms,_Whole, HeadParms,ZippedArgEnv, HeadDefCode,HeadCode),   
+   expand_function_head_macro(Ctx,Env,Symbol,Macro,FormalParms,_Whole, HeadParms,ZippedArgEnv,_ArgInfo, HeadDefCode,HeadCode),   
    make_env_append(Ctx,Env,HeadEnv,ZippedArgEnv,EnvAssign),
    must_compile_body(Ctx,HeadEnv,MFResult,[block,Symbol|MacroBody],MFBody), 
    body_cleanup_keep_debug_vars(Ctx,((DocCode,
@@ -173,7 +173,7 @@ macroexpand_1_or_fail([Procedure|Arguments],MacroEnv,CompileBody0Result):- nonpl
 % Operator
 expand_arguments_maybe_macro(Ctx,Env,FN,_N,MacroArgs,true, MacroArgs):- nonplainvar(FN), is_lisp_operator(Ctx,Env,FN),!.
 expand_arguments_maybe_macro(Ctx,Env,FN,N,MacroArgs,ArgBody, Args):-
-  expand_arguments(Ctx,Env,FN,N,MacroArgs,ArgBody, Args).
+  expand_arguments(Ctx,Env,FN,N,MacroArgs,ArgBody, Args),!.
 
 
 :- fixup_exports.

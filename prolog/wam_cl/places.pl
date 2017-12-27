@@ -59,28 +59,20 @@ make_place_op(Ctx,Env,Result,incf,GET,LV,SET,Body) :-
 is_setf_op([setf|Accessor],Accessor):- nonvar(Accessor).
 
 
-is_symbol_setter(_Env,OP):- is_pair_op(OP).
-is_symbol_setter(_Env,OP):- is_parallel_op(OP).
-is_symbol_setter(_Env,OP):- is_def_maybe_docs(OP).
+not_place_op(setq).
+not_place_op(psetq).
+
+is_parallel_op(psetf).
+is_parallel_op(psetq).
 
 is_pair_op(setq).
 is_pair_op(psetq).
-
 is_pair_op(setf).
 is_pair_op(psetf).
 
 is_only_read_op(getf).
 
-is_place_write(setf).
-is_place_write(psetf).
-is_place_write(incf).
-is_place_write(decf).
-is_place_write(rotatef).
-is_place_write(shiftf).
-is_place_write(V):- is_place_op_verbatum(V).
 is_place_write(P):- is_place_op(P), \+ is_only_read_op(P).
-
-is_place_op_verbatum(rotatefsdfsdfsdfsdfsdffs).
 
 is_place_op(setf).
 is_place_op(psetf).
@@ -93,14 +85,8 @@ is_place_op(push).
 is_place_op(pushnew).
 is_place_op(pop).
 
-is_any_place_op(P):-is_place_op_verbatum(P).
-is_any_place_op(P):-is_parallel_op(P).
-is_any_place_op(P):-is_place_op(P).
 
 
-
-is_parallel_op(psetf).
-is_parallel_op(psetq).
 
 pairify([],[],[]).
 pairify([Var, ValueForm | Rest],[Var | Atoms],[ValueForm | Forms]):-

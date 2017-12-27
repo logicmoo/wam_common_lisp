@@ -113,7 +113,7 @@ as_symbol_macro_function(Ctx,Env,Symbol,FormalParmsMacroBody,Macro):- assertion(
      append([MF|Whole],[MFResult],CallableMFV), CallableMF =.. CallableMFV,     
     body_cleanup_keep_debug_vars(Ctx,
       ((CallableMF  :-          
-        ((global_env(Env),whole_head_params(Whole,HeadParms),EnvAssign,HeadCode,MFBody)))),
+        ((global_env(Env),nop(as_symbol_macro_function),whole_head_params(Whole,HeadParms),EnvAssign,HeadCode,MFBody)))),
         MacroAssert),
     always((CompileBody,assert_lsp(Symbol,MacroAssert))).
    
@@ -132,7 +132,7 @@ as_symbol_macro(Ctx,Env,Symbol,FormalParmsMacroBody,Macro):- assertion(is_list(F
      append([Macro|HeadParms],[FResult],CallableHeadV), CallableHead =.. CallableHeadV,   
      % CallableMF =.. [MF,Whole,Env],
     body_cleanup_keep_debug_vars(Ctx,
-      ((CallableHead  :- ((global_env(Env),EnvAssign,HeadCode,MFBody), cl_eval(MFResult,FResult)))),
+      ((CallableHead  :- ((global_env(Env),nop(as_symbol_macro),EnvAssign,HeadCode,MFBody), cl_eval(MFResult,FResult)))),
         MacroAssert),
     always((CompileBody,assert_lsp(Symbol,MacroAssert))).
 
@@ -208,7 +208,6 @@ eval_uses_bind_parameters(F):- quietly((premute_names(F,FF), wl:init_args(bind_p
 eval_uses_exact_and_restkeys(F,N):- quietly((premute_names(F,FF), exact_and_restkeys(FF,N))).
 
 exact_and_restkeys(F,N):- wl:init_args(V,F),integer(V),!,V=N.
-exact_and_restkeys(F,1):- is_any_place_op(F),!.
 exact_and_restkeys(F,_):- uses_exact0(F),!,fail.
 exact_and_restkeys(F,N):- function_arg_info(F,ArgInfo),ArgInfo.req=L,ArgInfo.all\==L,!,arg_info_count(ArgInfo,req,N).
 exact_and_restkeys(F,0):- uses_rest_only0(F),!.

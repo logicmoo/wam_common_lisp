@@ -174,11 +174,25 @@ get_local_env(Locals,ENV):- get_var(Locals,'$env',ENV).
 set_local_env(Locals,ENV):- set_var(Locals,'$env',ENV).
 
 reenter_lisp(CTX,ENV):- notrace(( ensure_ctx(CTX),ensure_env(ENV))).
-
+/*
 make_env_append(_Ctx,_Env,HeadEnv,[A|More],HeadEnv=More):-A==[],!.
 make_env_append(_Ctx,_Env,HeadEnv,[A|List],HeadEnv=[A|More]):- List==[], var(More),!. % ,never_bind(More),!.
 make_env_append(_Ctx,_Env,HeadEnv,[[A|List]|More],HeadEnv=ALL):- is_list(List),append([A|List],More,ALL).
 make_env_append(_Ctx,_Env,HeadEnv,ZippedArgEnv,HeadEnv=ZippedArgEnv):-!.
+*/
+make_env_append(Ctx,Env,HeadEnv,More,HeadEnv=ALL):- 
+   env_append(Ctx,Env,More,MALL),
+   env_append(Ctx,Env,MALL,ALL),!.
+
+env_append(_Ctx,_Env,More,ALL):-var(More),!,ALL=More.
+env_append(_Ctx,_Env,[VAR|Rest],Rest):-VAR==Rest,!.
+env_append(Ctx,Env,[[A|List]|More],Next):- is_list(A),List==[],append(A,Right,Next),env_append(Ctx,Env,More,ALL),ALL=Right,!.
+env_append(Ctx,Env,[A|More],ALL):-A==[],!,env_append(Ctx,Env,More,ALL).
+env_append(Ctx,Env,[[A|List]|More],[A|ALL]):- nonvar(A),env_append(Ctx,Env,[List|More],ALL).
+env_append(Ctx,Env,[NONVAR|Rest],[A|ALL]):-nonvar(NONVAR),NONVAR=[A|List],!,env_append(Ctx,Env,[List|Rest],ALL).
+%env_append(_Ctx,_Env,[A|List],[A|More]):- List==[], var(More),!. % ,never_bind(More),!.
+env_append(_Ctx,_Env,[[A|List]|More],[[A|List]|More]):- List==More,!.
+env_append(_Ctx,_Env,ZippedArgEnv,ZippedArgEnv):-!.
 
 % GlobalBindings
 

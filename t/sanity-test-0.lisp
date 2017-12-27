@@ -24,7 +24,8 @@
 
 (in-package "CL-USER")
 
-(require 'sanity-util).
+(load "sanity-util")
+'(require 'sanity-util)
 
 (write-line "Running smoke test!")
 
@@ -33,6 +34,9 @@
 (is equal (list 1 'a 'b) (cons 1 '(a b)))
 
 (is eq 2 (if nil 1 2))
+
+(is eq t (= 1.0 1))
+(is eq nil (equal 1.0 1))
 
 (is eq t (keywordp :k))
 
