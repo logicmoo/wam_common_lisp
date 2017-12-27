@@ -302,18 +302,17 @@ ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,aux,[F|FormalParms],Params,Names,P
 
 % Parsing &key(s)
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,[ [F,InitForm,Present]|FormalParms],Params,[F,Present|Names],[V,PresentP|PVars],PCode):- !,
-   enforce_atomic(F),   
-   arginfo_append(F,key,ArgInfo),
-   %compile_aux_or_key(Env,F,V,[InitForm],InitCode),   
+   enforce_atomic(F),         
+   to_kw(F,KW),
+   arginfo_append(KW,key,ArgInfo),
    lisp_compile(Env,Else,InitForm,InitCode),
    body_cleanup_keep_debug_vars(Ctx,(InitCode,Else=V),InitElse),
    ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,FormalParms,Params,Names,PVars,MoreCode),
    debug_var([F,'_Present'],PresentP),   
-   PCode = (get_kw(Env,RestNKeys,F,F,V,InitElse,PresentP),MoreCode).
+   PCode = (get_kw(Env,RestNKeys,KW,F,V,InitElse,PresentP),MoreCode).
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,[ [[KW,F],InitForm]|FormalParms],Params,[F|Names],[V|PVars],PCode):- !,
    enforce_atomic(F),   
-   arginfo_append(F,key,ArgInfo),   
-   %compile_aux_or_key(Env,F,V,[InitForm],InitCode),
+   arginfo_append(KW,key,ArgInfo)
    lisp_compile(Env,Else,InitForm,InitCode),
    body_cleanup_keep_debug_vars(Ctx,(InitCode,Else=V),InitElse),
    ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,FormalParms,Params,Names,PVars,Code),
@@ -400,8 +399,8 @@ expand_function_head_macro(Ctx,Env,Symbol,Macro,FormalParms,Whole, HeadParms,Zip
   (ArgInfo.env==0 -> 
     ((HeadCode=(global_env(Env),HeadCode0),HeadDefCode=HeadDefCode0,HeadParms=HeadParms0)) 
     ; 
-    (HeadCode=(parent_env(Env),HeadCode0),HeadDefCode=(assert_lsp(Symbol,wl:declared(Macro,env_arg1)),HeadDefCode0), 
-       HeadParms=HeadParms0)).
+    ((HeadCode=(parent_env(Env),HeadCode0),HeadDefCode=(assert_lsp(Symbol,wl:declared(Macro,env_arg1)),HeadDefCode0), 
+       HeadParms=HeadParms0))).
     
 
 % Dotted HeadParms
