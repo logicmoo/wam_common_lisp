@@ -8974,7 +8974,7 @@ f_sys_designator_string(Designator, ElseResult20) :-
 :- get_var(AEnv, sys_xx_packages_xx, Xx_packages_xx_Get),
    cl_cdr(Xx_packages_xx_Get, Car_Param),
    cl_car(Car_Param, Xx_package_xx),
-   set_var(AEnv, defvar, xx_package_xx, Xx_package_xx).
+   fsdfdf set_var(AEnv, defvar, xx_package_xx, Xx_package_xx).
 /*
 (defun list-all-packages ()
   (copy-list *packages*))
