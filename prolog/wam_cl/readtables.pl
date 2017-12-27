@@ -174,7 +174,7 @@ resolve_inlines([I|II],[O|OO]):-resolve_inlines(I,O),!,resolve_inlines(II,OO).
 resolve_inlines(IO,IO).
 
 
-as_sexp(I,O):- as_sexp1(I,M),resolve_reader_macros(M,M2),remove_comments(M2,O).
+as_sexp(I,O):- as_sexp1(I,M),!,resolve_reader_macros(M,M2),!,remove_comments(M2,O),!.
 as_sexp_interned(I,OO):- is_list(I),!,I=OO.
 as_sexp_interned(I,OO):- as_sexp(I,O),!,reader_intern_symbols(O,OO).
 
@@ -183,8 +183,11 @@ as_sexp1(NIL,NIL):-NIL==[],!.
 as_sexp1(Stream,Expression):- is_stream(Stream),!,always(parse_sexpr_untyped(Stream,SExpression)),!,
   as_sexp2(SExpression,Expression).
 as_sexp1(s(Str),Expression):- !, always(parse_sexpr_untyped(string(Str),SExpression)),!,as_sexp2(SExpression,Expression).
-
-as_sexp1(Str,Expression):- \+((is_list(Str),nth0(0,Str,E),atom(E),name(E,[_]))),  notrace(catch(text_to_string(Str,String),_,fail)),!, 
+as_sexp1((Str),Expression):- string(Str),!, always(parse_sexpr_untyped(string(Str),SExpression)),!,as_sexp2(SExpression,Expression).
+as_sexp1((Str),Expression):- atom(Str),name(Str,List), member(E,List),\+ char_type(E,alpha),
+   parse_sexpr_untyped(string(Str),SExpression),as_sexp2(SExpression,Expression),!.
+as_sexp1(Str,Expression):- fail, \+ ((is_list(Str),nth0(0,Str,E),atom(E),name(E,[_]))),
+    notrace(catch(text_to_string(Str,String),_,fail)),!, 
     always(parse_sexpr_untyped(string(String),SExpression)),!,
     as_sexp2(SExpression,Expression).
 as_sexp1(Str,Expression):- as_sexp2(Str,Expression),!.

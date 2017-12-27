@@ -54,5 +54,7 @@ user:f_u_distance_from_origin(Point, From_origin_Ret) :-
         Sqrt_Ret=From_origin_Ret.
 
 |#
+
 (defun a () 1)
+
 
