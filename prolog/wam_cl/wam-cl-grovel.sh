@@ -1,9 +1,9 @@
 
 
 cpgrovel () {
-   echo -e "\n\n\;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1\n;;;; BEGIN FILE $1\n;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2"
-   cat "$1"
-   echo -e ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;3\n;;;; END FILE $1\n;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;4n\n\n\n\n\n\n\n\n\n\n;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;4n\n\n\n\n\n\n\n\n\n\n;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;4n\n\n\n\n\n\n\n\n\n\n;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;4n\n\n\n\n\n\n\n\n\n"
+   echo -e "\n\n\;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1\n;;;; BEGIN FILE $1\n;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;2" >> "wam-cl-grovel-$2.lsp"
+   cat "$1" >> "wam-cl-grovel-$2.lsp"
+   echo -e ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;3\n;;;; END FILE $1\n;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;4n\n\n\n\n\n\n\n\n\n\n;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;4n\n\n\n\n\n\n\n\n\n\n;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;4n\n\n\n\n\n\n\n\n\n\n;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;4n\n\n\n\n\n\n\n\n\n" >> "wam-cl-grovel-$2.lsp"
 }
 
 export cpgrovel
@@ -309,4 +309,168 @@ cpgrovel ./reference/sbcl/make-host-1.lisp sbcl
 cpgrovel ./reference/sbcl/make-host-2.lisp sbcl
 cpgrovel ./reference/sbcl/make-target-2-load.lisp sbcl
 
+
+
+cpgrovel ./reference/ccl/jfli/jni-lw.lisp ccljfli
+cpgrovel ./reference/ccl/jfli/jfli.lisp ccljfli
+cpgrovel ./reference/ccl/jfli/jfli-lw.lisp ccljfli
+
+
 '
+
+
+cpgrovel ./reference/ccl/level-0/nfasload.lisp ccllvl0
+cpgrovel ./reference/ccl/level-0/l0-cfm-support.lisp ccllvl0
+cpgrovel ./reference/ccl/level-0/l0-int.lisp ccllvl0
+cpgrovel ./reference/ccl/level-0/l0-bignum32.lisp ccllvl0
+cpgrovel ./reference/ccl/level-0/l0-def.lisp ccllvl0
+cpgrovel ./reference/ccl/level-0/l0-complex.lisp ccllvl0
+cpgrovel ./reference/ccl/level-0/l0-io.lisp ccllvl0
+cpgrovel ./reference/ccl/level-0/l0-utils.lisp ccllvl0
+cpgrovel ./reference/ccl/level-0/l0-aprims.lisp ccllvl0
+cpgrovel ./reference/ccl/level-0/l0-error.lisp ccllvl0
+cpgrovel ./reference/ccl/level-0/l0-numbers.lisp ccllvl0
+cpgrovel ./reference/ccl/level-0/l0-symbol.lisp ccllvl0
+cpgrovel ./reference/ccl/level-0/l0-hash.lisp ccllvl0
+cpgrovel ./reference/ccl/level-0/l0-float.lisp ccllvl0
+cpgrovel ./reference/ccl/level-0/l0-pred.lisp ccllvl0
+cpgrovel ./reference/ccl/level-0/l0-array.lisp ccllvl0
+cpgrovel ./reference/ccl/level-0/l0-misc.lisp ccllvl0
+cpgrovel ./reference/ccl/level-0/l0-init.lisp ccllvl0
+cpgrovel ./reference/ccl/level-0/l0-bignum64.lisp ccllvl0
+
+cpgrovel ./reference/ccl/level-1/level-1.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/arm-trap-support.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-dcode.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-numbers.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-boot-1.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-application.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/x86-error-signal.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-init.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-reader.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-readloop.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/linux-files.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-boot-2.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-format.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-files.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-streams.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-error-signal.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-boot-lds.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/x86-callback-support.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-processes.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-cl-package.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-callbacks.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-readloop-lds.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/arm-threads-utils.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/version.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-error-system.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-typesys.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/ppc-trap-support.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/ppc-callback-support.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-io.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-unicode.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/x86-threads-utils.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/arm-callback-support.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-boot-3.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-sort.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-aprims.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-sysio.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/ppc-error-signal.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-lisp-threads.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-events.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-pathnames.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/arm-error-signal.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-symhash.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-utils.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-clos-boot.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/x86-trap-support.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-clos.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/sysutils.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/l1-sockets.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/runtime.lisp ccllvl1
+cpgrovel ./reference/ccl/level-1/ppc-threads-utils.lisp ccllvl1
+
+
+cpgrovel ./reference/ccl/lib/setf.lisp ccllib
+cpgrovel ./reference/ccl/lib/sequences.lisp ccllib
+cpgrovel ./reference/ccl/lib/setf-runtime.lisp ccllib
+cpgrovel ./reference/ccl/lib/macros.lisp ccllib
+cpgrovel ./reference/ccl/lib/mcl-compat.lisp ccllib
+cpgrovel ./reference/ccl/lib/misc.lisp ccllib
+
+cpgrovel ./reference/ccl/lib/number-macros.lisp ccllib
+cpgrovel ./reference/ccl/lib/apropos.lisp ccllib
+cpgrovel ./reference/ccl/lib/defstruct-macros.lisp ccllib
+cpgrovel ./reference/ccl/lib/method-combination.lisp ccllib
+cpgrovel ./reference/ccl/lib/defstruct.lisp ccllib
+cpgrovel ./reference/ccl/lib/chars.lisp ccllib
+cpgrovel ./reference/ccl/lib/pprint.lisp ccllib
+cpgrovel ./reference/ccl/lib/prepare-mcl-environment.lisp ccllib
+cpgrovel ./reference/ccl/lib/level-2.lisp ccllib
+cpgrovel ./reference/ccl/lib/numbers.lisp ccllib
+cpgrovel ./reference/ccl/lib/pathnames.lisp ccllib
+cpgrovel ./reference/ccl/lib/print-db.lisp ccllib
+cpgrovel ./reference/ccl/lib/read.lisp ccllib
+cpgrovel ./reference/ccl/lib/sort.lisp ccllib
+cpgrovel ./reference/ccl/lib/source-files.lisp ccllib
+cpgrovel ./reference/ccl/lib/streams.lisp ccllib
+
+
+cpgrovel ./reference/ccl/lib/arglist.lisp ccllib
+cpgrovel ./reference/ccl/lib/backquote.lisp ccllib
+cpgrovel ./reference/ccl/lib/backtrace-lds.lisp ccllib
+cpgrovel ./reference/ccl/lib/backtrace.lisp ccllib
+cpgrovel ./reference/ccl/lib/case-error.lisp ccllib
+cpgrovel ./reference/ccl/lib/ccl-export-syms.lisp ccllib
+cpgrovel ./reference/ccl/lib/compile-ccl.lisp ccllib
+cpgrovel ./reference/ccl/lib/db-io.lisp ccllib
+cpgrovel ./reference/ccl/lib/defstruct-lds.lisp ccllib
+cpgrovel ./reference/ccl/lib/describe.lisp ccllib
+cpgrovel ./reference/ccl/lib/encapsulate.lisp ccllib
+cpgrovel ./reference/ccl/lib/foreign-types.lisp ccllib
+cpgrovel ./reference/ccl/lib/format.lisp ccllib
+cpgrovel ./reference/ccl/lib/hash.lisp ccllib
+cpgrovel ./reference/ccl/lib/lists.lisp ccllib
+cpgrovel ./reference/ccl/lib/nfcomp.lisp ccllib
+cpgrovel ./reference/ccl/lib/number-case-macro.lisp ccllib
+cpgrovel ./reference/ccl/lib/swink.lisp ccllib
+cpgrovel ./reference/ccl/lib/systems.lisp ccllib
+cpgrovel ./reference/ccl/lib/time.lisp ccllib
+cpgrovel ./reference/ccl/lib/xref.lisp ccllib
+cpgrovel ./reference/ccl/lib/distrib-inits.lisp ccllib
+cpgrovel ./reference/ccl/lib/dumplisp.lisp ccllib
+cpgrovel ./reference/ccl/lib/arrays-fry.lisp ccllib
+cpgrovel ./reference/ccl/lib/edit-callers.lisp ccllib
+cpgrovel ./reference/ccl/lib/late-clos.lisp ccllib
+
+
+cpgrovel ./reference/ccl/library/remote-lisp.lisp cclxtra
+cpgrovel ./reference/ccl/library/macptr-termination.lisp cclxtra
+cpgrovel ./reference/ccl/library/core-files.lisp cclxtra
+cpgrovel ./reference/ccl/library/chud-metering.lisp cclxtra
+cpgrovel ./reference/ccl/library/mac-file-io.lisp cclxtra
+cpgrovel ./reference/ccl/library/leaks.lisp cclxtra
+cpgrovel ./reference/ccl/library/sequence-utils.lisp cclxtra
+cpgrovel ./reference/ccl/library/intel-io.lisp cclxtra
+cpgrovel ./reference/ccl/library/mach-o.lisp cclxtra
+cpgrovel ./reference/ccl/library/pty.lisp cclxtra
+cpgrovel ./reference/ccl/library/dominance.lisp cclxtra
+cpgrovel ./reference/ccl/library/elf.lisp cclxtra
+cpgrovel ./reference/ccl/library/sockets.lisp cclxtra
+cpgrovel ./reference/ccl/library/jni.lisp cclxtra
+cpgrovel ./reference/ccl/library/cover.lisp cclxtra
+cpgrovel ./reference/ccl/library/parse-ffi.lisp cclxtra
+cpgrovel ./reference/ccl/library/pascal-strings.lisp cclxtra
+cpgrovel ./reference/ccl/library/serial-streams.lisp cclxtra
+cpgrovel ./reference/ccl/library/splay-tree.lisp cclxtra
+cpgrovel ./reference/ccl/library/lisp-package.lisp cclxtra
+cpgrovel ./reference/ccl/library/loop.lisp cclxtra
+cpgrovel ./reference/ccl/library/sharp-comma.lisp cclxtra
+cpgrovel ./reference/ccl/library/cn-encode.lisp cclxtra
+cpgrovel ./reference/ccl/library/mach-o-symbols.lisp cclxtra
+cpgrovel ./reference/ccl/library/swank-loader.lisp cclxtra
+cpgrovel ./reference/ccl/library/lispequ.lisp cclxtra
+cpgrovel ./reference/ccl/library/jp-encode.lisp cclxtra
+cpgrovel ./reference/ccl/library/openmcl-gtk-support.lisp cclxtra
+cpgrovel ./reference/ccl/tools/asdf.lisp cclxtra
+cpgrovel ./reference/ccl/tools/defsystem.lisp cclxtra
