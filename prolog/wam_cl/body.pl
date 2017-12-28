@@ -256,7 +256,7 @@ compile_body_form(_Ctx,_Env,[],['values'], nb_setval('$mv_return',[])):-!.
 
 :- nb_setval('$mv_return',[]).
 reset_mv:- b_getval('$mv_return',[V1,_V2|_])->b_setval('$mv_return',[V1]);true.
-push_values([V1|Push],V1):- always(nonvar(Push)),nb_setval('$mv_return',[V1|Push]).
+cl_values_list([V1|Push],V1):- always(nonvar(Push)),nb_setval('$mv_return',[V1|Push]).
 
 
 % Macro MULTIPLE-VALUE-BIND

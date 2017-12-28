@@ -144,8 +144,8 @@ compile_body_block_in_throw(Ctx,Env,ThrowResult,[RETURN_FROM,Tag,ValueForm],(Val
    debug_var('RetResult',ValueResult),
    debug_var('ThrowResult',ThrowResult),
    must_compile_body(Ctx,Env,ValueResult,ValueForm,ValueFormCode),
-   %suffixed_atom_concat(Ctx,block_ret_,Tag,Var),
-   %suffixed_atom_concat(Ctx,block_exit_,Tag,ExitTag),
+   %suffixed_atom_concat_tagname(Ctx,block_ret_,Tag,Var),
+   %suffixed_atom_concat_tagname(Ctx,block_exit_,Tag,ExitTag),
   % compile_body(Ctx,Env,GoResult,[progn,[setq,Var,ValueResult],[go,ExitTag]], Code ).
    debug_var('BlockExitEnv',Env),
    Code = (throw(block_exit(Tag,ValueResult))).
@@ -154,13 +154,17 @@ compile_body_block_in_throw(Ctx,Env,Result,[block,BlockTag|InstrS],
   catch((Code,ResultExit=Result),block_exit(BlockTag,Result),true)):-  % always(is_symbolp(BlockTag)),
       (must_compile_body(Ctx,Env,ResultExit,[progn|InstrS],Code)).
 
+suffixed_atom_concat_tagname(Ctx,Prefix,Tag,Var):-
+  format(atom(TagName),'~w',[Tag]),
+  suffixed_atom_concat(Ctx,Prefix,TagName,Var).
+
 
 compile_body_block_in_tb(Ctx,Env,GoResult,[RETURN_FROM,Tag,ValueForm],(ValueFormCode, Code) ):- 
    same_symbol(RETURN_FROM,'return-from'), 
    debug_var('GoBlockResult',GoResult),
-   must_compile_body(Ctx,Env,ValueResult,ValueForm,ValueFormCode),
-   suffixed_atom_concat(Ctx,block_ret_,Tag,Var),
-   suffixed_atom_concat(Ctx,block_exit_,Tag,ExitTag),
+   must_compile_body(Ctx,Env,ValueResult,ValueForm,ValueFormCode),   
+   suffixed_atom_concat_tagname(Ctx,block_ret_,Tag,Var),
+   suffixed_atom_concat_tagname(Ctx,block_exit_,Tag,ExitTag),
   % compile_body(Ctx,Env,GoResult,[progn,[setq,Var,ValueResult],[go,ExitTag]], Code ).
    debug_var('BlockExitEnv',Env),
    Code = (set_var(Env,Var,ValueResult),always(ExitTag,Env),clean_escape(_)).
@@ -170,8 +174,8 @@ compile_body_block_in_tb(Ctx,Env,Result,[block,BlockTag|InstrS], Code):- always(
   suffix_by_context(Ctx,BlockTag,Tag),
   gensym('_labels',Suffix),
   always(within_labels_context(Ctx,Suffix,
-  ((suffixed_atom_concat(Ctx,block_ret_,Tag,Var),
-    suffixed_atom_concat(Ctx,block_exit_,Tag,ExitTag), 
+  ((suffixed_atom_concat_tagname(Ctx,block_ret_,Tag,Var),
+    suffixed_atom_concat_tagname(Ctx,block_exit_,Tag,ExitTag), 
     BLOCK = 
       [let,[Var],[tagbody,[setq,Var,[progn|InstrS]],ExitTag],Var], 
      (must_compile_body(Ctx,Env,Result,BLOCK,Code)))))),!.

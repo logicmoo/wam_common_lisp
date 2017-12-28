@@ -18,9 +18,11 @@
 
 
 % get_setf_expander_get_set(_Ctx,_Env,[car,Var],[car,Var],[set_car,Var],  true):- atom(Var),!.
-get_setf_expander_get_set(Ctx,Env,[OP,LVar|EXTRA],[OP,GET|EXTRA],[INVERSE,GET|EXTRA],  Body):- 
- setf_inverse_op(OP,INVERSE),
-   must_compile_body(Ctx,Env,GET,LVar, Body), (var(GET)->put_attr(GET,preserved_var,t); true).
+get_setf_expander_get_set(Ctx,Env,[OP,LVar|EXTRA],[OP,GET|EXTRA],[INVERSE,GET|EXTRA], (Code1, Body)):- 
+ compile_apply(Ctx,Env,OP,[LVar|EXTRA],Result,ExpandedFunction),
+ ExpandedFunction=..[_FN|ARGS],append([VAR|PARAMS],[Result],ARGS),
+ show_call_trace((compile_each(Ctx,Env,PARAMS,CPARAMS,Code1),append([VAR|CPARAMS],[_VAL,Result],_SETFARGS), setf_inverse_op(OP,INVERSE))),
+ must_compile_body(Ctx,Env,GET,LVar, Body), (var(GET)->put_attr(GET,preserved_var,t); true).
 
 %get_setf_expander_get_set(Ctx,Env,LVar,GET,[sys_set_symbol_value,GET], true):- atom(LVar),lookup_symbol_macro(Ctx,Env,LVar,GET),!.
 %get_setf_expander_get_set(_,_,LVar,GET,[set,GET], true):- \+ atom(LVar),atom(LVar),LVar=GET.
@@ -29,21 +31,25 @@ f_clos_pf_set_slot_value(Obj,Key,Value,Value):- set_opv(Obj,Key,Value).
 
 lookup_symbol_macro(Ctx,Env,LVar,GET):- get_ctx_env_attribute(Ctx,Env,symbol_macro(LVar),GET).
 
+wl:init_args(1,cl_array_row_major_index).
+wl:init_args(exact_only,cl_row_major_aref).
+
 wl:setf_inverse(slot_value,clos_pf_set_slot_value).
 wl:setf_inverse(car,rplaca).
 wl:setf_inverse(cdr,rplacd).
 
 setf_inverse_op(Sym,Inverse):- wl:setf_inverse(Sym,Inverse).
-setf_inverse_op(G,S):- cl_get(G,sys_setf_inverse,_,S),ground(S).
+setf_inverse_op(G,S):- cl_get(G,sys_setf_inverse,[],S),ground(S).
 setf_inverse_op(Sym,Inverse):- 
    symbol_prefix_and_atom(Sym,FunPkg,Name),
    member(SETPRefix,['setf','set','pf_set']),
    atomic_list_concat([FunPkg,SETPRefix,Name],'_',Inverse),
    find_lisp_function(Inverse,_Arity,_Fn).
+setf_inverse_op(Sym,Combined):- 
+   combine_setfs([setf,Sym],Combined).
+   
 
 
-%  (defun p () (incf (car p)))
-% (defmacro incf (place &optional (delta 1))`(setf ,place (+ ,place ,delta)))
 make_place_op(Ctx,Env,Result,incf,GET,LV,SET,Body) :- 
  always((
    value_or(LV,Value,1),!,
@@ -79,12 +85,23 @@ is_place_op(psetf).
 is_place_op(getf).
 is_place_op(incf).
 is_place_op(decf).
+/*
 is_place_op(rotatef).
 is_place_op(shiftf).
+
+
+(defmacro rotatef (&rest args)
+  `(psetf ,@(mapcan #'list
+                    args
+                    (append (cdr args) 
+                            (list (car args))))))
+
+
+not place ops but now Macros
 is_place_op(push).
 is_place_op(pushnew).
 is_place_op(pop).
-
+*/
 
 
 
@@ -94,9 +111,12 @@ pairify([Var, ValueForm | Rest],[Var | Atoms],[ValueForm | Forms]):-
 
 wl:init_args(2,X):- at_least_two_args(X).
 
+
 combine_setfs(Name0,Name):-atom(Name0),!,Name0=Name.
-combine_setfs([setf,Name],Combined):- atomic_list_concat([setf,Name],'_',Combined).
-combine_setfs([setf,Name],Combined):- atomic_list_concat([setf,Name],'_',Combined).
+combine_setfs([setf,Name],Combined):- cl_symbol_package(Name,Pkg),pl_symbol_name(Name,Str),string_concat("SETF-",Str,SETF_STR),
+  string_upper(SETF_STR,UPPER_SETF_STR),
+  cl_intern(UPPER_SETF_STR,Pkg,Combined).
+%combine_setfs([setf,Name],Combined):- atomic_list_concat([setf,Name],'_',Combined).
 
 
 compile_setfs(_Ctx,_Env,Symbol,[Function,Symbol,A2|AMORE],assert_lsp(Symbol,P)):- notrace(at_least_two_args(Function)),\+ is_fboundp(Function),!,P=..[Function,Symbol,A2,AMORE].
@@ -145,7 +165,7 @@ portray(List):- notrace((nonvar(List),List=[_,_],sub_term(E,List),ground(E),E = 
 
 compile_accessors(Ctx,Env,Result,[Setf, Place|ValuesForms], (Part0,Body)):- is_place_write(Setf),
      get_setf_expander_get_set(Ctx,Env,Place,GET,SET,Part0),
-     make_place_op(Ctx,Env,Result,Setf,GET,ValuesForms,SET,Body).
+     make_place_op(Ctx,Env,Result,Setf,GET,ValuesForms,SET,Body),!.
 
 compile_accessors(Ctx,Env,Result,[setf, Place, ValuesForms], (Part0,Part1,Part4)):- \+ atom(Place),
      get_setf_expander_get_set(Ctx,Env,Place,_,SET,Part0),     

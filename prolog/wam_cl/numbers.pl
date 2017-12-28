@@ -190,7 +190,7 @@ cl_floor(X, RestNKeys, MResult):- pl_truncate(floor,X, RestNKeys, MResult).
 cl_truncate(X, RestNKeys, MResult):- pl_truncate(truncate,X, RestNKeys, MResult).
 cl_round(X, RestNKeys, MResult):- pl_truncate(round,X, RestNKeys, MResult).
 pl_truncate(_Type, X, RestNKeys, MResult):- 
-     nth_value(RestNKeys,1,Y,1),
+     nth_param(RestNKeys,1,Y,1),
      de_ratio(X,X0,Xd),
      de_ratio(Y,Y0,Yd),
      XX is X0 * Yd,
@@ -199,7 +199,7 @@ pl_truncate(_Type, X, RestNKeys, MResult):-
      Whole  is XX div YY,
      Rement is XX mod YY,
      re_ratio(Rement,DD,RatRem),!,
-     push_values([Whole,RatRem],MResult).
+     cl_values_list([Whole,RatRem],MResult).
 
 % asserting... u
 cl_ftruncate(X, RestNKeys, MResult):- pl_ftruncate(truncate,X, RestNKeys, MResult).
@@ -207,7 +207,7 @@ cl_fceiling(X, RestNKeys, MResult):- pl_ftruncate(ceiling,X, RestNKeys, MResult)
 cl_ffloor(X, RestNKeys, MResult):- pl_ftruncate(floor,X, RestNKeys, MResult).
 cl_fround(X, RestNKeys, MResult):- pl_ftruncate(round,X, RestNKeys, MResult).
 pl_ftruncate(_Type,X, RestNKeys, MResult):- 
-     nth_value(RestNKeys,1,Y,1),
+     nth_param(RestNKeys,1,Y,1),
      de_ratio(X,X0,Xd),
      de_ratio(Y,Y0,Yd),
      XX is X0 * Yd,
@@ -216,7 +216,7 @@ pl_ftruncate(_Type,X, RestNKeys, MResult):-
      Whole  is (XX div YY)*1.0,
      Rement is (XX mod YY)*1.0,
      re_ratio(Rement,DD,RatRem),!,
-     push_values([Whole,RatRem],MResult).
+     cl_values_list([Whole,RatRem],MResult).
 
 /*
 ;;; If the numbers do not divide exactly and the result of (/ number divisor)

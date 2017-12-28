@@ -165,63 +165,69 @@ ensure_cl_contains([
        cdddr,
        cddr]).
 */
-cl_cddr(X, Cdr_Ret) :-
+cl_cddr(X, Ref) :-
   cl_cdr(X, Cdr_Param),
-  cl_cdr(Cdr_Param, Cdr_Ret).
+  cl_cdr(Cdr_Param, Ref).
 
-cl_cdar(X, Cdr_Ret) :-
+cl_cdar(X, Ref) :-
   cl_car(X, Cdr_Param),
-  cl_cdr(Cdr_Param, Cdr_Ret).
+  cl_cdr(Cdr_Param, Ref).
 
-cl_caar(X, Cdr_Ret) :-
+cl_caar(X, Ref) :-
   cl_car(X, Cdr_Param),
-  cl_car(Cdr_Param, Cdr_Ret).
+  cl_car(Cdr_Param, Ref).
 
-cl_caaar(X, Cdr_Ret) :-
+cl_caaar(X, Ref) :-
   cl_car(X, Y),
   cl_car(Y, Z),
-  cl_car(Z, Cdr_Ret).
+  cl_car(Z, Ref).
 
-cl_cdaar(X, Cdr_Ret) :-
+cl_cdaar(X, Ref) :-
   cl_car(X, Y),
   cl_car(Y, Z),
-  cl_cdr(Z, Cdr_Ret).
+  cl_cdr(Z, Ref).
 
-cl_cadar(X, Cdr_Ret) :-
+cl_cadar(X, Ref) :-
   cl_car(X, Y),
   cl_cdr(Y, Z),
-  cl_car(Z, Cdr_Ret).
+  cl_car(Z, Ref).
 
-cl_cdadr(X, Cdr_Ret) :-
+cl_cdadr(X, Ref) :-
   cl_cdr(X, Y),
   cl_car(Y, Z),
-  cl_cdr(Z, Cdr_Ret).
+  cl_cdr(Z, Ref).
 
-cl_caadr(X, Cdr_Ret) :-
+cl_caadr(X, Ref) :-
   cl_cdr(X, Y),
   cl_car(Y, Z),
-  cl_car(Z, Cdr_Ret).
+  cl_car(Z, Ref).
 
-cl_caddr(X, Cdr_Ret) :-
+cl_caddr(X, Ref) :-
   cl_cdr(X, Y),
   cl_cdr(Y, Z),
-  cl_car(Z, Cdr_Ret).
+  cl_car(Z, Ref).
 
-cl_cdddr(X, Cdr_Ret) :-
+cl_cdddr(X, Ref) :-
   cl_cdr(X, Y),
   cl_cdr(Y, Z),
-  cl_cdr(Z, Cdr_Ret).
+  cl_cdr(Z, Ref).
 
-cl_cddar(X, Cdr_Ret) :-
+cl_cddar(X, Ref) :-
   cl_car(X, Y),
   cl_cdr(Y, Z),
-  cl_cdr(Z, Cdr_Ret).
+  cl_cdr(Z, Ref).
 
-cl_cddddr(W, Cdr_Ret) :-
+cl_cddddr(W, Ref) :-
   cl_cdr(W, X),
   cl_cdr(X, Y),
   cl_cdr(Y, Z),
-  cl_cdr(Z, Cdr_Ret).
+  cl_cdr(Z, Ref).
+
+cl_caaadr(W, Ref) :-
+  cl_cdr(W, X),
+  cl_car(X, Y),
+  cl_car(Y, Z),
+  cl_car(Z, Ref).
 
 :- fixup_exports.
 
@@ -229,3 +235,141 @@ cl_cddddr(W, Cdr_Ret) :-
 end_of_file.
 
 
+/*
+
+Warning: cl_array_element_type/2, which is referenced by
+Warning:        1-st clause of f_sys_coerce_to_vector/5: 1-st clause of f_sys_coerce_to_vector/5
+Warning:        1-st clause of f_sys_seq_result1/4: 1-st clause of f_sys_seq_result1/4
+Warning: cl_array_has_fill_pointer_p/2, which is referenced by
+Warning:        1-st clause of cl_map_into/4: 1-st clause of cl_map_into/4
+Warning: cl_caaadr/2, which is referenced by
+Warning:        1-st clause of f_sys_seq_ref1/3: 1-st clause of f_sys_seq_ref1/3
+Warning: cl_char_code/2, which is referenced by
+Warning:        1-st clause of cl_alpha_char_p/2: 1-st clause of cl_alpha_char_p/2
+Warning:        1-st clause of cl_alphanumericp/2: 1-st clause of cl_alphanumericp/2
+Warning:        1-st clause of cl_char_downcase/2: 1-st clause of cl_char_downcase/2
+Warning:        1-st clause of cl_char_int/2: 1-st clause of cl_char_int/2
+Warning:        1-st clause of cl_char_name/2: 1-st clause of cl_char_name/2
+Warning:        1-st clause of cl_char_upcase/2: 1-st clause of cl_char_upcase/2
+Warning:        1-st clause of cl_digit_char_p/3: 1-st clause of cl_digit_char_p/3
+Warning:        1-st clause of cl_lower_case_p/2: 1-st clause of cl_lower_case_p/2
+Warning:        1-st clause of cl_name_char/2: 1-st clause of cl_name_char/2
+Warning:        1-st clause of cl_standard_char_p/2: 1-st clause of cl_standard_char_p/2
+Warning:        1-st clause of cl_upper_case_p/2: 1-st clause of cl_upper_case_p/2
+Warning: cl_code_char/2, which is referenced by
+Warning:        1-st clause of cl_char_downcase/2: 1-st clause of cl_char_downcase/2
+Warning:        1-st clause of cl_char_upcase/2: 1-st clause of cl_char_upcase/2
+Warning:        1-st clause of cl_digit_char/3: 1-st clause of cl_digit_char/3
+Warning:        1-st clause of cl_name_char/2: 1-st clause of cl_name_char/2
+Warning:        1-st clause of f_sys_integer_string/3: 1-st clause of f_sys_integer_string/3
+Warning: cl_fmakunbound/2, which is referenced by
+Warning:        1-st clause of f_sys_ansi_loop/2: 1-st clause of f_sys_ansi_loop/2
+Warning: cl_function/2, which is referenced by
+Warning:        1-st clause of cl_map/5: 1-st clause of cl_map/5
+Warning: cl_invoke_debugger/2, which is referenced by
+Warning:        1-st clause of cl_signal/3: 1-st clause of cl_signal/3
+Warning: cl_list_xx/3, which is referenced by
+Warning:        1-st clause of cl_map/5: 1-st clause of cl_map/5
+Warning: cl_make_condition/3, which is referenced by
+Warning:        1-st clause of f_sys_designator_condition/4: 1-st clause of f_sys_designator_condition/4
+Warning: cl_make_condition/6, which is referenced by
+Warning:        1-st clause of f_sys_designator_condition/4: 1-st clause of f_sys_designator_condition/4
+Warning: cl_make_list/4, which is referenced by
+Warning:        1-st clause of cl_make_sequence/4: 1-st clause of cl_make_sequence/4
+Warning: cl_merge_pathnames/2, which is referenced by
+Warning:        1-st clause of f_sys_dd/1: 1-st clause of f_sys_dd/1
+Warning: cl_nsubst/8, which is referenced by
+Warning:        1-st clause of cl_nsubst_if/5: 1-st clause of cl_nsubst_if/5
+Warning:        1-st clause of cl_nsubst_if_not/5: 1-st clause of cl_nsubst_if_not/5
+Warning: cl_parse_integer/4, which is referenced by
+Warning:        1-st clause of cl_name_char/2: 1-st clause of cl_name_char/2
+Warning: cl_predicate/2, which is referenced by
+Warning:        1-st clause of cl_every/4: 1-st clause of cl_every/4
+Warning:        1-st clause of cl_some/4: 1-st clause of cl_some/4
+Warning: cl_reduce/7, which is referenced by
+Warning:        1-st clause of cl_map/5: 1-st clause of cl_map/5
+Warning: cl_remf/3, which is referenced by
+Warning:        1-st clause of cl_remprop/3: 1-st clause of cl_remprop/3
+Warning: cl_restart_case/3, which is referenced by
+Warning:        1-st clause of cl_warn/3: 1-st clause of cl_warn/3
+Warning: cl_restart_name/2, which is referenced by
+Warning:        1-st clause of cl_find_restart/3: 1-st clause of cl_find_restart/3
+Warning:        1-st clause of f_sys_designator_restart/2: 1-st clause of f_sys_designator_restart/2
+Warning: cl_subst/8, which is referenced by
+Warning:        1-st clause of cl_subst_if/5: 1-st clause of cl_subst_if/5
+Warning:        1-st clause of cl_subst_if_not/5: 1-st clause of cl_subst_if_not/5
+Warning: cl_subtypep/3, which is referenced by
+Warning:        1-st clause of cl_make_sequence/4: 1-st clause of cl_make_sequence/4
+Warning: cl_type_error/3, which is referenced by
+Warning:        1-st clause of f_sys_pf_set_subseq/4: 1-st clause of f_sys_pf_set_subseq/4
+Warning: cl_values/2, which is referenced by
+Warning:        1-st clause of cl_values_list/2: 1-st clause of cl_values_list/2
+Warning: cl_with_simple_restart/3, which is referenced by
+Warning:        1-st clause of cl_break/2: 1-st clause of cl_break/2
+Warning: f_ext_neq/3, which is referenced by
+Warning:        1-st clause of f_sys_compiler_macroexpand_1/3: 1-st clause of f_sys_compiler_macroexpand_1/3
+Warning: f_sys_all_car/2, which is referenced by
+Warning:        1-st clause of f_sys_all_car1/2: 1-st clause of f_sys_all_car1/2
+Warning: f_sys_all_cdr/2, which is referenced by
+Warning:        1-st clause of f_sys_all_cdr1/2: 1-st clause of f_sys_all_cdr1/2
+Warning: f_sys_c43/2, which is referenced by
+Warning:        1-st clause of cl_concatenate/3: 1-st clause of cl_concatenate/3
+Warning: f_sys_c60/4, which is referenced by
+Warning:        1-st clause of cl_alpha_char_p/2: 1-st clause of cl_alpha_char_p/2
+Warning:        1-st clause of cl_alphanumericp/2: 1-st clause of cl_alphanumericp/2
+Warning:        1-st clause of cl_char_downcase/2: 1-st clause of cl_char_downcase/2
+Warning:        1-st clause of cl_char_upcase/2: 1-st clause of cl_char_upcase/2
+Warning:        1-st clause of cl_digit_char_p/3: 1-st clause of cl_digit_char_p/3
+Warning:        1-st clause of cl_lower_case_p/2: 1-st clause of cl_lower_case_p/2
+Warning:        1-st clause of cl_standard_char_p/2: 1-st clause of cl_standard_char_p/2
+Warning:        1-st clause of cl_upper_case_p/2: 1-st clause of cl_upper_case_p/2
+Warning: f_sys_c60_c61/2, which is referenced by
+Warning:        1-st clause of cl_char_c60_c61/2: 1-st clause of cl_char_c60_c61/2
+Warning: f_sys_closest_sequence_type/2, which is referenced by
+Warning:        1-st clause of cl_make_sequence/4: 1-st clause of cl_make_sequence/4
+Warning: f_sys_conc_string/3, which is referenced by
+Warning:        1-st clause of cl_char_name/2: 1-st clause of cl_char_name/2
+Warning: f_sys_do_sequences/3, which is referenced by
+Warning:        1-st clause of cl_every/4: 1-st clause of cl_every/4
+Warning:        1-st clause of cl_map/5: 1-st clause of cl_map/5
+Warning:        1-st clause of cl_some/4: 1-st clause of cl_some/4
+Warning: f_sys_elt_list/4, which is referenced by
+Warning:        1-st clause of cl_every/4: 1-st clause of cl_every/4
+Warning:        1-st clause of cl_map/5: 1-st clause of cl_map/5
+Warning:        1-st clause of cl_some/4: 1-st clause of cl_some/4
+Warning: f_sys_fdefinition_block_name/2, which is referenced by
+Warning:        1-st clause of cl_define_compiler_type_macro/4: 1-st clause of cl_define_compiler_type_macro/4
+Warning: f_sys_fill_array_with_elt/5, which is referenced by
+Warning:        1-st clause of cl_make_sequence/4: 1-st clause of cl_make_sequence/4
+Warning: f_sys_fixnump/2, which is referenced by
+Warning:        1-st clause of f_sys_make_seq_iterator/3: 1-st clause of f_sys_make_seq_iterator/3
+Warning:        1-st clause of f_sys_seq_iterator_next/3: 1-st clause of f_sys_seq_iterator_next/3
+Warning:        1-st clause of f_sys_seq_iterator_ref/3: 1-st clause of f_sys_seq_iterator_ref/3
+Warning:        1-st clause of f_sys_seq_iterator_set/4: 1-st clause of f_sys_seq_iterator_set/4
+Warning: f_sys_gethash1/3, which is referenced by
+Warning:        1-st clause of cl_compiler_macro_function/3: 1-st clause of cl_compiler_macro_function/3
+Warning: f_sys_imakunbound/3, which is referenced by
+Warning:        1-st clause of cl_makunbound/2: 1-st clause of cl_makunbound/2
+Warning: f_sys_make_vector/7, which is referenced by
+Warning:        1-st clause of cl_make_sequence/4: 1-st clause of cl_make_sequence/4
+Warning:        1-st clause of f_sys_coerce_to_vector/5: 1-st clause of f_sys_coerce_to_vector/5
+Warning: f_sys_parse_deftype_macro/10, which is referenced by
+Warning:        1-st clause of cl_define_compiler_type_macro/4: 1-st clause of cl_define_compiler_type_macro/4
+Warning: f_sys_pf_set_fill_pointer/3, which is referenced by
+Warning:        1-st clause of cl_map_into/4: 1-st clause of cl_map_into/4
+Warning: f_sys_reckless/2, which is referenced by
+Warning:        1-st clause of cl_every/4: 1-st clause of cl_every/4
+Warning:        1-st clause of cl_some/4: 1-st clause of cl_some/4
+Warning: f_sys_recur1/2, which is referenced by
+Warning:        1-st clause of cl_case/3: 1-st clause of cl_case/3
+Warning: f_sys_recur11/3, which is referenced by
+Warning:        1-st clause of f_sys_integer_string/3: 1-st clause of f_sys_integer_string/3
+Warning: f_sys_restart_interactive_function/2, which is referenced by
+Warning:        1-st clause of cl_invoke_restart_interactively/2: 1-st clause of cl_invoke_restart_interactively/2
+Warning: f_sys_restartp/2, which is referenced by
+Warning:        1-st clause of f_sys_designator_restart/2: 1-st clause of f_sys_designator_restart/2
+Warning: f_sys_signal_type_error/3, which is referenced by
+Warning:        1-st clause of f_sys_error_not_a_sequence/2: 1-st clause of f_sys_error_not_a_sequence/2
+Warning: f_sys_simple_atrue.
+
+*/

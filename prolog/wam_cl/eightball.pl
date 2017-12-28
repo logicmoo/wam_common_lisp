@@ -99,7 +99,8 @@ nonquietly_must_or_rtrace(G):- dinterp(user,_ ,  G, 0 ).
 lquietly(G):- quietly((G)).
 
 % Must always succeed (or else there is a bug in the lisp impl!)
-always([A]):-!,always(A).
+always(Var):- var(Var),!,throw(var_always(Var)).
+always([]):-!.
 always([A|B]):-!,always(A),always(B).
 always((A->B;C)):- !, (on_x_rtrace(user:A) -> always(B);always(C)).
 always((A,!,B)):-!,always(A),!,always(B).
@@ -141,6 +142,7 @@ dinterp(_,C,!,_):-!,(nonvar(C)->true;C=!).
 dinterp(M,_,G,_):- notrace((\+ compound(G))),!,M:G.
 dinterp(M,C,G,L):- notrace((G=..[call,F|ARGS],atom(F),Call2=..[F|ARGS])),!,dinterp(M,C,Call2,L).
 
+dinterp(M,_,G,_):- true, !,M:call(G).
 %dinterp(M,_, G,L):-L > -1,!,nonquietly_must_or_rtrace0(M:G).
 
 dinterp(M,_,G,_):- quietly(just_call(M,G)),!,M:call(G).

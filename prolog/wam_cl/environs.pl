@@ -76,7 +76,8 @@ user:portray(env(_,_)):- writeq(env/2).
 add_to_env(ENV,Name,Value):- update_or_append(nb_setarg,ENV,Name,Value).
 %add_to_env(Name,Value):- global_env(ENV),update_or_prepend(nb_setarg,ENV,Name,Value).
 
-global_env(ENV):- b_getval('$env_global',ENV),!.
+global_env(ENV):- ignore(b_getval('$env_global',ENV)),!.
+parent_env(ENV):- ignore(b_getval('$env_current',ENV)),!.
 toplevel_env(ENV):- b_getval('$env_toplevel',ENV),!.
 
 

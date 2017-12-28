@@ -230,7 +230,7 @@ ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,MODE,['&whole',F|FormalParms],Para
  
 % &environment
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,Mode,['&environment',F|FormalParms],Params,[F|Names],[V|PVars],
-  (get_env(Env,F,V),Code)):-  !,
+  (parent_env(V),Code)):-  !,
   arginfo_append(F,env,ArgInfo),
   arginfo_append(environment,complex,ArgInfo),
   ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,Mode,FormalParms,Params,Names,PVars,Code).
@@ -312,7 +312,7 @@ ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,[ [F,InitForm,Present]|FormalP
    PCode = (get_kw(Env,RestNKeys,KW,F,V,InitElse,PresentP),MoreCode).
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,[ [[KW,F],InitForm]|FormalParms],Params,[F|Names],[V|PVars],PCode):- !,
    enforce_atomic(F),   
-   arginfo_append(KW,key,ArgInfo)
+   arginfo_append(KW,key,ArgInfo),
    lisp_compile(Env,Else,InitForm,InitCode),
    body_cleanup_keep_debug_vars(Ctx,(InitCode,Else=V),InitElse),
    ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,FormalParms,Params,Names,PVars,Code),
@@ -368,7 +368,7 @@ align_args_local(FN,RequiredArgs,RestNKeys,Whole,LB,_ArgInfo,PARAMS,wl:init_args
   PARAMS = [Whole].
 
 % invoke([r1,r2,r3],RET).
-align_args_local(FN,RequiredArgs,RestNKeys,Whole,LB,_ArgInfo,PARAMS,wl:init_args(rest_only,FN)):-
+align_args_local(FN,RequiredArgs,RestNKeys,Whole,LB,_ArgInfo,PARAMS,wl:init_args(0,FN)):-
   eval_uses_rest_only(FN),!,
   LB = append(RequiredArgs,RestNKeys,Whole),
   PARAMS = [Whole].   
@@ -399,7 +399,7 @@ expand_function_head_macro(Ctx,Env,Symbol,Macro,FormalParms,Whole, HeadParms,Zip
   (ArgInfo.env==0 -> 
     ((HeadCode=(global_env(Env),HeadCode0),HeadDefCode=HeadDefCode0,HeadParms=HeadParms0)) 
     ; 
-    ((HeadCode=(parent_env(Env),HeadCode0),HeadDefCode=(assert_lsp(Symbol,wl:declared(Macro,env_arg1)),HeadDefCode0), 
+    ((HeadCode=(global_env(Env),HeadCode0),HeadDefCode=(assert_lsp(Symbol,wl:declared(Macro,env_arg1)),HeadDefCode0), 
        HeadParms=HeadParms0))).
     
 

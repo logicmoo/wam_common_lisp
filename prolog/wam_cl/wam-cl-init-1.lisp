@@ -1,3 +1,167 @@
+;;; #+BUILTIN Means to ignore since it should already be defined
+;;; #+WAM-CL Means we want it
+;;; #+LISP500 Means probably we dont want it
+;;; #+ALT Alternative definition
+;;; #+ABCL From ABCL
+;;; #+SBCL From SBCL
+;;; #+SICL From SICL
+;;; #+SICL From SICL
+
+
+(defmacro apropos-defmacro (name ll &rest body)
+   `(putprop ',name 'apropos-defmacro '(defmacro ,name ,ll ,@body)))
+
+(defmacro apropos-defun (name ll &rest body)
+   `(putprop ',name 'apropos-defun '(defun ,name ,ll ,@body)))
+
+
+;;; define-modify-macro.lisp
+;;;
+;;; Copyright (C) 2003-2005 Peter Graves
+;;; $Id$
+;;;
+;;; This program is free software; you can redistribute it and/or
+;;; modify it under the terms of the GNU General Public License
+;;; as published by the Free Software Foundation; either version 2
+;;; of the License, or (at your option) any later version.
+;;;
+;;; This program is distributed in the hope that it will be useful,
+;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;; GNU General Public License for more details.
+;;;
+;;; You should have received a copy of the GNU General Public License
+;;; along with this program; if not, write to the Free Software
+;;; Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+;;;
+;;; As a special exception, the copyright holders of this library give you
+;;; permission to link this library with independent modules to produce an
+;;; executable, regardless of the license terms of these independent
+;;; modules, and to copy and distribute the resulting executable under
+;;; terms of your choice, provided that you also meet, for each linked
+;;; independent module, the terms and conditions of the license of that
+;;; module.  An independent module is a module which is not derived from
+;;; or based on this library.  If you modify this library, you may extend
+;;; this exception to your version of the library, but you are not
+;;; obligated to do so.  If you do not wish to do so, delete this
+;;; exception statement from your version.
+
+;;; Adapted from SBCL.
+
+(in-package #:system)
+
+;; FIXME See section 5.1.3.
+#+(or (and ABCL ALT) WAM-CL)
+(defmacro define-modify-macro (name lambda-list function &optional doc-string)
+  "Creates a new read-modify-write macro like PUSH or INCF."
+  (let ((other-args nil)
+	(rest-arg nil)
+	(env (gensym))
+	(reference (gensym)))
+    ;; Parse out the variable names and &REST arg from the lambda list.
+    (do ((ll lambda-list (cdr ll))
+	 (arg nil))
+	((null ll))
+      (setq arg (car ll))
+      (cond ((eq arg '&optional))
+	    ((eq arg '&rest)
+	     (if (symbolp (cadr ll))
+		 (setq rest-arg (cadr ll))
+		 (error "Non-symbol &REST arg in definition of ~S." name))
+	     (if (null (cddr ll))
+		 (return nil)
+		 (error "Illegal stuff after &REST argument in DEFINE-MODIFY-MACRO.")))
+	    ((memq arg '(&key &allow-other-keys &aux))
+	     (error "~S not allowed in DEFINE-MODIFY-MACRO lambda list." arg))
+	    ((symbolp arg)
+	     (push arg other-args))
+	    ((and (listp arg) (symbolp (car arg)))
+	     (push (car arg) other-args))
+	    (t (error "Illegal stuff in DEFINE-MODIFY-MACRO lambda list."))))
+    (setq other-args (nreverse other-args))
+    `(eval-when (:compile-toplevel :load-toplevel :execute)
+      (defmacro ,name (,reference ,@lambda-list &environment ,env)
+        ,doc-string
+        (multiple-value-bind (dummies vals newval setter getter)
+            (get-setf-expansion ,reference ,env)
+          (do ((d dummies (cdr d))
+               (v vals (cdr v))
+               (let-list nil (cons (list (car d) (car v)) let-list)))
+              ((null d)
+               (push (list (car newval)
+                           ,(if rest-arg
+                                `(list* ',function getter ,@other-args ,rest-arg)
+                                `(list ',function getter ,@other-args)))
+                     let-list)
+               `(let* ,(nreverse let-list)
+                 ,setter))))))))
+
+#+ALT #+ABCL
+(define-modify-macro incf-complex (&optional (delta 1)) +
+  "The first argument is some location holding a number.  This number is
+   incremented by the second argument, DELTA, which defaults to 1.")
+
+#+ALT #+ABCL
+(define-modify-macro decf-complex (&optional (delta 1)) -
+  "The first argument is some location holding a number.  This number is
+   decremented by the second argument, DELTA, which defaults to 1.")
+
+#+ALT #+ABCL
+(defmacro incf (place &optional (delta 1))
+  (cond ((symbolp place)
+         (cond ((constantp delta)
+                `(setq ,place (+ ,place ,delta)))
+               (t
+                ;; See section 5.1.3.
+                (let ((temp (gensym)))
+                  `(let ((,temp ,delta))
+                     (setq ,place (+ ,place ,temp)))))))
+        ((and (consp place) (eq (car place) 'THE))
+         (let ((res (gensym)))
+           `(let ((,res (the ,(second place) (+ ,place ,delta))))
+              (setf ,(third place) ,res))))
+        (t
+         `(incf-complex ,place ,delta))))
+
+#+WAM-CL
+(defmacro incf (place &optional (delta 1) &environment env)
+  "The first argument is some location holding a number.  This number is
+incremented by the second argument, DELTA, which defaults to 1."
+  (if (and (symbolp (setq place (%symbol-macroexpand place env)))
+           (or (constantp delta)
+               (and (symbolp delta)
+                    (not (nth-value 1 (%symbol-macroexpand delta env))))))
+    `(setq ,place (+ ,place ,delta))
+    (multiple-value-bind (dummies vals newval setter getter)
+        (get-setf-method place env)
+      (let ((d (gensym)))
+        `(let* (,@(mapcar #'list dummies vals)
+                (,d ,delta)
+                (,(car newval) (+ ,getter ,d)))
+           ,setter)))))
+
+
+#+WAM-CL
+(defmacro decf (place &optional (delta 1))
+  `(incf ,place (- 0 ,delta)))
+
+#+ALT #+ABCL
+(defmacro decf (place &optional (delta 1))
+  (cond ((symbolp place)
+         (cond ((constantp delta)
+                `(setq ,place (- ,place ,delta)))
+               (t
+                ;; See section 5.1.3.
+                (let ((temp (gensym)))
+                  `(let ((,temp ,delta))
+                     (setq ,place (- ,place ,temp)))))))
+        ((and (consp place) (eq (car place) 'THE))
+         (let ((res (gensym)))
+           `(let ((,res (the ,(second place) (- ,place ,delta))))
+              (setf ,(third place) ,res))))
+        (t
+         `(decf-complex ,place ,delta))))
+
 ;;; setf.lisp
 ;;;
 ;;; Copyright (C) 2003-2006 Peter Graves
@@ -31,6 +195,7 @@
 
 (in-package "SYSTEM")
 
+#+(or ABCL WAM-CL)
 (defun get-setf-method-inverse (form inverse setf-function)
   (let ((new-var (gensym))
         (vars nil)
@@ -49,6 +214,7 @@
 
 ;;; If a macro, expand one level and try again.  If not, go for the
 ;;; SETF function.
+#+(or ABCL WAM-CL)
 (defun expand-or-get-setf-inverse (form environment)
   (multiple-value-bind (expansion expanded)
       (macroexpand-1 form environment)
@@ -57,6 +223,7 @@
         (get-setf-method-inverse form `(funcall #'(setf ,(car form)))
                                  t))))
 
+#+(or ABCL WAM-CL)
 (defun get-setf-expansion (form &optional environment)
   (let (temp)
     (cond ((symbolp form)
@@ -74,7 +241,8 @@
           (t
            (expand-or-get-setf-inverse form environment)))))
 
-(defmacro abcl-setf (&rest args &environment environment)
+#+(or ABCL WAM-CL)
+(defmacro setf (&rest args &environment environment)
   (let ((numargs (length args)))
     (cond
      ((= numargs 2)
@@ -104,17 +272,11 @@
           ((null a) `(progn ,@(nreverse l)))
         (setq l (cons (list 'setf (car a) (cadr a)) l)))))))
 
-;;; Redefined in define-modify-macro.lisp.
-(defmacro incf (place &optional (delta 1))
-  `(setf ,place (+ ,place ,delta)))
-
-;;; Redefined in define-modify-macro.lisp.
-(defmacro decf (place &optional (delta 1))
-  `(setf ,place (- ,place ,delta)))
 
 ;; (defsetf subseq (sequence start &optional (end nil)) (v)
 ;;   `(progn (replace ,sequence ,v :start1 ,start :end1 ,end)
 ;;      ,v))
+#+(or ABCL WAM-CL)
 (defun %set-subseq (sequence start &rest rest)
   (let ((end nil) v)
     (ecase (length rest)
@@ -127,17 +289,23 @@
       (replace sequence v :start1 start :end1 end)
       v)))
 
+#+(or ABCL WAM-CL)
 (defun %define-setf-macro (name expander inverse doc)
   (declare (ignore doc)) ; FIXME
   (when inverse
-    (put name 'setf-inverse inverse))
+    (put-sysprop name 'setf-inverse inverse))
   (when expander
-    (put name 'setf-expander expander))
+    (put-sysprop name 'setf-expander expander))
   name)
 
+
+#+(or ABCL WAM-CL)
 (defmacro defsetf (access-function update-function)
   `(eval-when (:load-toplevel :compile-toplevel :execute)
-     (put ',access-function 'setf-inverse ',update-function)))
+     (put-sysprop ',access-function 'setf-inverse ',update-function)))
+
+
+#+(or ABCL WAM-CL) (flet () ;; FLET BEGIN
 
 (defun %set-caar (x v) (set-car (car x) v))
 (defun %set-cadr (x v) (set-car (cdr x) v))
@@ -239,6 +407,9 @@
 
 (defsetf structure-ref structure-set)
 
+) ;; FLET END
+
+
 ;;;; -*- Mode: Lisp; Syntax: Common-Lisp; indent-tabs-mode: nil; Package: SYSTEM -*-
 ;;;; vim: set filetype=lisp tabstop=8 shiftwidth=2 expandtab:
 
@@ -262,10 +433,13 @@
 (eval-when (:execute)
   (load (merge-pathnames "seqmacros.lsp" *load-truename*)))
 
+
+#+(or WAM-CL ECL) 
 (defun error-not-a-sequence (value)
   ; (declare (c-local))
   (signal-type-error value 'sequence))
 
+#+(or WAM-CL ECL) 
 (defun error-sequence-index (sequence index)
   ; (declare (c-local))
   (error 'simple-type-error
@@ -274,6 +448,7 @@
          :format-control "Not a valid index ~A into sequence ~A"
          :format-arguments (list index sequence)))
 
+#+(or WAM-CL ECL) 
 (defun error-sequence-type (type)
   ; (declare (c-local))
   (error 'simple-type-error
@@ -282,6 +457,7 @@
          :format-control "~S does not specify a sequence type"
          :format-arguments (list type)))
 
+#+(or WAM-CL ECL) 
 (defun error-sequence-length (object type size)
   ; (declare (c-local))
   (error 'simple-type-error
@@ -292,6 +468,7 @@
          :datum object))
 
 				 
+#+(or WAM-CL ECL) 
 (defun make-sequence (type size &key (initial-element nil iesp) &aux sequence)
   "Args: (type length &key initial-element)
 Creates and returns a sequence of the given TYPE and LENGTH.  If INITIAL-
@@ -314,6 +491,7 @@ default value of INITIAL-ELEMENT depends on TYPE."
              (error-sequence-length sequence type size))))
     sequence))
 
+#+(or WAM-CL ECL) 
 (defun make-seq-iterator (sequence &optional (start 0))
   (declare (optimize (safety 0)))
   (cond ((fixnump start)
@@ -338,6 +516,9 @@ default value of INITIAL-ELEMENT depends on TYPE."
 
 
 #|
+TODO PORT
+
+#+(or WAM-CL ECL) 
 (defun closest-sequence-type (type)
   (let (elt-type length name args)
     (cond ((consp type)
@@ -408,18 +589,21 @@ default value of INITIAL-ELEMENT depends on TYPE."
     (values elt-type length)))
 |#
 
+#+(or WAM-CL ECL) 
 (defun seq-iterator-ref (sequence iterator)
   (declare (optimize (safety 0)))
   (if (fixnump iterator)
       (aref (truly-the vector sequence) iterator)
       (car (truly-the cons iterator))))
 
+#+(or WAM-CL ECL) 
 (defun seq-iterator-set (sequence iterator value)
   (declare (optimize (safety 0)))
   (if (fixnump iterator)
       (setf (aref (truly-the vector sequence) iterator) value)
       (setf (car (truly-the cons iterator)) value)))
 
+#+(or WAM-CL ECL) 
 (defun seq-iterator-next (sequence iterator)
   (declare (optimize (safety 0)))
   (cond ((fixnump iterator)
@@ -435,6 +619,7 @@ default value of INITIAL-ELEMENT depends on TYPE."
            (error-not-a-sequence iterator))
          iterator)))
 
+#+(or WAM-CL ECL) 
 (defun seq-iterator-list-pop (values-list seq-list iterator-list)
   (declare (optimize (safety 0)))
   (do* ((it-list iterator-list)
@@ -461,6 +646,7 @@ default value of INITIAL-ELEMENT depends on TYPE."
             it-list (cons-cdr it-list)
             seq-list (cons-cdr seq-list)))))
 
+#+(or WAM-CL ECL) 
 (defun coerce-to-list (object)
   (if (listp object)
       object
@@ -469,6 +655,7 @@ default value of INITIAL-ELEMENT depends on TYPE."
           ((null it) (nreverse output))
         (push (seq-iterator-ref object it) output))))
 
+#+(or WAM-CL ECL) 
 (defun coerce-to-vector (object elt-type length simple-array-p)
   (let ((output object))
     (unless (and (vectorp object)
@@ -487,6 +674,7 @@ default value of INITIAL-ELEMENT depends on TYPE."
         (check-type output `(vector ,elt-type (,length)) "coerced object")))
     output))
 
+#+(or WAM-CL ECL) 
 (defun concatenate (result-type &rest sequences)
   "Args: (type &rest sequences)
 Returns a new sequence of the specified type, consisting of all elements of
@@ -503,6 +691,7 @@ SEQUENCEs."
       (setq i (seq-iterator-next output i)))))
 
 
+#+(or WAM-CL ECL) 
 (defun map (result-type function sequence &rest more-sequences)
   "Args: (type function sequence &rest more-sequences)
 Creates and returns a sequence of TYPE with K elements, with the N-th element
@@ -526,6 +715,7 @@ SEQUENCEs, where K is the minimum length of the given SEQUENCEs."
           (seq-iterator-set output it value)
           (setf it (seq-iterator-next output it)))))))
 
+#+(or WAM-CL ECL) 
 (defun some (predicate sequence &rest more-sequences)
   "Args: (predicate sequence &rest more-sequences)
 Returns T if at least one of the elements in SEQUENCEs satisfies PREDICATE;
@@ -535,6 +725,7 @@ NIL otherwise."
      (let ((x (apply predicate elt-list)))
        (when x (return x))))))
 
+#+(or WAM-CL ECL) 
 (defun every (predicate sequence &rest more-sequences)
   "Args: (predicate sequence &rest more-sequences)
 Returns T if every elements of SEQUENCEs satisfy PREDICATE; NIL otherwise."
@@ -543,7 +734,9 @@ Returns T if every elements of SEQUENCEs satisfy PREDICATE; NIL otherwise."
      (unless (apply predicate elt-list)
        (return nil)))))
 
-#|
+
+
+#-WAM-CL #+ECL
 (def-seq-bool-parser notany
   "Args: (predicate sequence &rest more-sequences)
 Returns T if none of the elements in SEQUENCEs satisfies PREDICATE; NIL
@@ -551,14 +744,15 @@ otherwise."
   (when that-value (return nil))
   t)
 
+#-WAM-CL #+ECL
 (def-seq-bool-parser notevery
   "Args: (predicate sequence &rest more-sequences)
 Returns T if at least one of the elements in SEQUENCEs does not satisfy
 PREDICATE; NIL otherwise."
   (unless that-value (return t))
   nil)
-|#
-
+ 
+#+(or WAM-CL ECL) 
 (defun every* (predicate &rest sequences)
   "Args: (predicate sequence &rest more-sequences)
 Returns T if every elements of SEQUENCEs satisfy PREDICATE and all sequences
@@ -566,20 +760,21 @@ have the same length; NIL otherwise."
   (and (apply #'= (mapcar #'length sequences))
        (apply #'every predicate sequences)))
 
-
+#+(or WAM-CL ECL) 
 (defun notany (predicate sequence &rest more-sequences)
   "Args: (predicate sequence &rest more-sequences)
 Returns T if none of the elements in SEQUENCEs satisfies PREDICATE; NIL
 otherwise."
   (not (apply #'some predicate sequence more-sequences)))
 
-
+#+(or WAM-CL ECL) 
 (defun notevery (predicate sequence &rest more-sequences)
   "Args: (predicate sequence &rest more-sequences)
 Returns T if at least one of the elements in SEQUENCEs does not satisfy
 PREDICATE; NIL otherwise."
   (not (apply #'every predicate sequence more-sequences)))
 
+#+(or WAM-CL ECL) 
 (defun map-into (result-sequence function &rest sequences)
 "Fills the output sequence with the values returned by applying FUNCTION to the
 elements of the given sequences. The i-th element of RESULT-SEQUENCE is the output
@@ -608,6 +803,7 @@ stops when it reaches the end of one of the given sequences."
         (rplaca i (seq-iterator-next (car s) (car i))))
       (seq-iterator-set result-sequence ir (apply function val)))))
 
+
 ;;;; -*- Mode: Lisp; Syntax: Common-Lisp; indent-tabs-mode: nil; Package: SYSTEM -*-
 ;;;; vim: set filetype=lisp tabstop=8 shiftwidth=2 expandtab:
 
@@ -625,6 +821,8 @@ stops when it reaches the end of one of the given sequences."
 
 (in-package "SYSTEM")
 
+
+#+(or WAM-CL ECL)
 (defun union (list1 list2 &key test test-not key)
   "Args: (list1 list2 &key (key #'identity) (test #'eql) test-not)
 Returns, as a list, the union of elements in LIST1 and in LIST2."
@@ -640,6 +838,8 @@ Returns, as a list, the union of elements in LIST1 and in LIST2."
           (progn (setq first (cons (car x) nil))
                  (setq last first))))))
 
+
+#+(or WAM-CL ECL) 
 (defun nunion (list1 list2 &key test test-not key)
   "Args: (list1 list2 &key (key #'identity) (test #'eql) test-not)
 Destructive UNION.  Both LIST1 and LIST2 may be destroyed."
@@ -654,6 +854,8 @@ Destructive UNION.  Both LIST1 and LIST2 may be destroyed."
           (setq first x))
       (setq last x))))
 
+
+#+(or WAM-CL ECL) 
 (defun intersection (list1 list2 &key test test-not key)
   "Args: (list1 list2 &key (key #'identity) (test #'eql) test-not)
 Returns a list consisting of those objects that are elements of both LIST1 and
@@ -665,6 +867,8 @@ LIST2."
     (when (member1 (car x) list2 test test-not key)
         (push (car x) ans))))
 
+
+#+(or WAM-CL ECL) 
 (defun nintersection (list1 list2 &key test test-not key)
   "Args: (list1 list2 &key (key #'identity) (test #'eql) test-not)
 Destructive INTERSECTION.  Only LIST1 may be destroyed."
@@ -679,6 +883,8 @@ Destructive INTERSECTION.  Only LIST1 may be destroyed."
           (setq first x))
       (setq last x))))
 
+
+#+(or WAM-CL ECL) 
 (defun set-difference (list1 list2 &key test test-not key)
   "Args: (list1 list2 &key (key #'identity) (test #'eql) test-not)
 Returns, as a list, those elements of LIST1 that are not elements of LIST2."
@@ -688,6 +894,8 @@ Returns, as a list, those elements of LIST1 that are not elements of LIST2."
     (unless (member1 (car x) list2 test test-not key)
       (push (car x) ans))))
 
+
+#+(or WAM-CL ECL) 
 (defun nset-difference (list1 list2 &key test test-not key)
   "Args: (list1 list2 &key (key #'identity) (test #'eql) test-not)
 Destructive SET-DIFFERENCE.  Only LIST1 may be destroyed."
@@ -702,10 +910,14 @@ Destructive SET-DIFFERENCE.  Only LIST1 may be destroyed."
           (setq first x))
       (setq last x))))
 
+
+#+(or WAM-CL ECL) 
 (defun swap-args (f)
   ; (declare (c-local))
   (and f #'(lambda (x y) (funcall f y x))))
 
+
+#+(or WAM-CL ECL) 
 (defun set-exclusive-or (list1 list2 &key test test-not key)
   "Args: (list1 list2 &key (key #'identity) (test #'eql) test-not)
 Returns, as a list, those elements of LIST1 that are not elements of LIST2 and
@@ -713,12 +925,16 @@ those elements of LIST2 that are not elements of LIST1."
   (nconc (set-difference list1 list2 :test test :test-not test-not :key key)
          (set-difference list2 list1 :test (swap-args test) :test-not (swap-args test-not) :key key)))
 
+
+#+(or WAM-CL ECL) 
 (defun nset-exclusive-or (list1 list2 &key test test-not key)
   "Args: (list1 list2 &key (key #'identity) (test #'eql) test-not)
 Destructive SET-EXCLUSIVE-OR.  Both LIST1 and LIST2 may be destroyed."
   (nconc (set-difference list1 list2 :test test :test-not test-not :key key)
          (nset-difference list2 list1 :test (swap-args test) :test-not (swap-args test-not) :key key)))
 
+
+#+(or WAM-CL ECL) 
 (defun subsetp (list1 list2 &key test test-not key)
   "Args: (list1 list2 &key (key #'identity) (test #'eql) test-not)
 Returns T if every element of LIST1 is also an element of LIST2.  Returns NIL
@@ -728,51 +944,74 @@ otherwise."
     (unless (member1 (car l) list2 test test-not key)
       (return nil))))
 
+
+#+(or WAM-CL ECL) 
 (defun rassoc-if (test alist &key key)
   "Returns the first pair in ALIST whose cdr satisfies TEST. Returns NIL if no
 such pair exists."
   (rassoc test alist :test #'funcall :key key))
+
+#+(or WAM-CL ECL) 
 (defun rassoc-if-not (test alist &key key)
   "Returns the first pair in ALIST whose cdr does not satisfy TEST.  Returns NIL
 if no such pair exists."
   (rassoc test alist :test-not #'funcall :key key))
 
+
+#+(or WAM-CL ECL) 
 (defun assoc-if (test alist &key key)
   "Returns the first pair in ALIST whose car satisfies TEST.  Returns NIL if no
 such pair exists."
   (assoc test alist :test #'funcall :key key))
+
+#+(or WAM-CL ECL) 
 (defun assoc-if-not (test alist &key key)
   "Returns the first pair in ALIST whose car does not satisfy TEST.  Returns NIL
 if no such pair exists."
   (assoc test alist :test-not #'funcall :key key))
 
+
+#+(or WAM-CL ECL) 
 (defun member-if (test list &key key)
   "Searches LIST for an element that satisfies TEST.  If found, returns the
 sublist of LIST that begins with the element.  If not found, returns NIL."
   (member test list :test #'funcall :key key))
+
+#+(or WAM-CL ECL) 
 (defun member-if-not (test list &key key)
   "Searches LIST for an element that does not satisfy TEST.  If found, returns
 the sublist of LIST that begins with the element.  If not found, returns NIL."
   (member test list :test-not #'funcall :key key))
 
+
+#+(or WAM-CL ECL) 
 (defun subst-if (new test tree &key key)
   "Substitutes NEW for subtrees of TREE that satisfy TEST and returns the result.
 The original TREE is not destroyed."
   (subst new test tree :test #'funcall :key key))
+
+#+(or WAM-CL ECL) 
 (defun subst-if-not (new test tree &key key)
   "Substitutes NEW for subtrees of TREE that do not satisfy TEST and returns the
 result.  The original TREE is not destroyed."
   (subst new test tree :test-not #'funcall :key key))
 
+
+#+(or WAM-CL ECL) 
 (defun nsubst-if (new test tree &key key)
   "Destructive SUBST-IF. TREE may be modified."
   (nsubst new test tree :test #'funcall :key key))
+
+#+(or WAM-CL ECL) 
 (defun nsubst-if-not (new test tree &key key)
   "Destructive SUBST-IF-NOT. TREE may be modified."
   (nsubst new test tree :test-not #'funcall :key key))
 
 
-#|
+
+
+#+BUILTIN 
+#+(or WAM-CL ECL) 
 (funcall #'(setf macro-function)
 	 #'(lambda (name lambda-list &rest body)
 	     (list 'progn
@@ -782,8 +1021,10 @@ result.  The original TREE is not destroyed."
 			 (list 'quote name))
 		   (list 'quote name)))
 	 'defmacro)
-|#
 
+
+
+#+(or WAM-CL ECL) 
 (defmacro defun500 (name lambda-list &rest body)
   (list 'progn
 	(list 'funcall '#'(setf fdefinition)
@@ -796,11 +1037,17 @@ result.  The original TREE is not destroyed."
 	      (list 'quote name))
 	(list 'quote name)))
 
+#+(or WAM-CL ECL) 
+#+BUILTIN
 (defmacro setf (place new-value)
   (if (consp place)
       (cons 'funcall (cons (list 'function (list 'setf (car place)))
 			   (cons new-value (cdr place))))
       (list 'setq place new-value)))
+
+
+#+WAM-CL
+#+(or WAM-CL ECL) 
 (defun append (&rest lists)
   (if (cdr lists)
       (let ((list (car lists))
@@ -821,14 +1068,24 @@ result.  The original TREE is not destroyed."
 	    (apply #'append (cdr lists))))
       (car lists)))
 
+
+#+(or WAM-CL ECL) 
 (defparameter *type-expanders* nil)
+
+#+(or WAM-CL ECL) 
 (defconstant call-arguments-limit 65536)
+
+#+(or WAM-CL ECL) 
 (defconstant lambda-parameters-limit 65536)
+
+#+(or WAM-CL ECL) 
 (defconstant multiple-values-limit 65536)
+
+#+(or WAM-CL ECL)
 (defconstant lambda-list-keywords
   '(&allow-other-keys &aux &body &environment &key &optional &rest &whole))
 
-(defmacro psetq (&rest rest)
+(apropos-defmacro psetq (&rest rest)
   (let ((inits nil)
 	(sets nil)
 	(list rest))
@@ -849,19 +1106,25 @@ result.  The original TREE is not destroyed."
 	 (go start)))
     `(let ,(reverse inits)
       (setq ,@sets ,@rest))))
-(defmacro return (&optional result)
+
+
+(apropos-defmacro return (&optional result)
   `(return-from nil ,result))
-(defmacro when (test-form &rest forms)
+
+(apropos-defmacro when (test-form &rest forms)
   `(if ,test-form (progn ,@forms)))
-(defmacro unless (test-form &rest forms)
+
+(apropos-defmacro unless (test-form &rest forms)
   `(if (not ,test-form) (progn ,@forms)))
-(defmacro and (&rest forms)
+
+(apropos-defmacro and (&rest forms)
   (if forms
       (if (cdr forms)
 	  `(when ,(car forms) (and ,@(cdr forms)))
 	(car forms))
     `t))
-(defmacro or (&rest forms)
+
+(apropos-defmacro or (&rest forms)
   (if forms
       (if (cdr forms)
 	  (let ((temp (gensym)))
@@ -871,7 +1134,8 @@ result.  The original TREE is not destroyed."
 		(or ,@(cdr forms)))))
 	(car forms))
     `nil))
-(defmacro cond (&rest clauses)
+
+(apropos-defmacro cond (&rest clauses)
   (when clauses
     (if (cdar clauses)
 	`(if ,(caar clauses)
@@ -881,7 +1145,7 @@ result.  The original TREE is not destroyed."
 	     (cond ,@(cdr clauses))))))
 
 
-(defmacro case (keyform &rest clauses)
+(apropos-defmacro case (keyform &rest clauses)
   (let ((temp (gensym)))
     (labels ((recur (clauses)
 	       (when clauses
@@ -896,7 +1160,7 @@ result.  The original TREE is not destroyed."
 	,(recur clauses)))))
 
 
-(defmacro ecase (keyform &rest clauses)
+(apropos-defmacro ecase (keyform &rest clauses)
   (let ((temp (gensym)))
     `(let ((,temp ,keyform))
       (case ,temp ,@clauses
@@ -907,43 +1171,43 @@ result.  The original TREE is not destroyed."
 							     (list (car x))))
 						     clauses)))))))
 
-(defmacro multiple-value-bind (vars values-form &rest forms)
+(apropos-defmacromultiple-value-bind (vars values-form &rest forms)
   `(multiple-value-call #'(lambda (&optional ,@vars &rest ,(gensym))
 			    ,@forms)
                         ,values-form))
-(defmacro multiple-value-list (form)
+
+(apropos-defmacro multiple-value-list (form)
   `(multiple-value-call #'list ,form))
-(defun values-list (list)
-  (apply #'values list))
+
+(apropos-defun values-list (list) (apply #'values list))
+
+#+(or WAM-CL LISP500)
 (defmacro nth-value (n form)
   `(nth ,n (multiple-value-list ,form)))
-(defmacro prog (inits &rest forms)
+
+(apropos-defmacro prog (inits &rest forms)
   `(block nil
     (let ,inits
       (tagbody ,@forms))))
-(defmacro prog* (inits &rest forms)
+(apropos-defmacro prog* (inits &rest forms)
   `(block nil
     (let* ,inits
       (tagbody ,@forms))))
-(defmacro prog1 (first-form &rest forms)
+(apropos-defmacro prog1 (first-form &rest forms)
   (let ((temp (gensym)))
     `(let ((,temp ,first-form))
       ,@forms
       ,temp)))
-(defmacro prog2 (first-form second-form &rest forms)
+(apropos-defmacro prog2 (first-form second-form &rest forms)
   (let ((temp (gensym)))
     `(progn
       ,first-form
       (let ((,temp ,second-form))
 	,@forms
 	,temp))))
-(defun eql (a b)
-  (or (eq a b)
-      (and (= (ldb '(2 . 0) (ival a)) 3)
-	   (= (ldb '(2 . 0) (ival b)) 3)
-	   (= (jref a 1) 84)
-	   (= (jref b 1) 84)
-	   (= a b))))
+
+#+BUILTIN
+#+(or WAM-CL LISP500)
 (defun equal (a b)
   (or (eql a b)
       (cond
@@ -958,15 +1222,20 @@ result.  The original TREE is not destroyed."
 			       (dotimes (i (length a) t)
 				 (when (/= (aref a i) (aref b i))
 				   (return))))))))
+
+#+(or WAM-CL LISP500)
 (defun identity (object) object)
+
+#+(or WAM-CL LISP500)
 (defun complement (function)
   #'(lambda (&rest rest) (not (apply function rest))))
+
+#+(or WAM-CL LISP500)
 (defun constantly (value) #'(lambda (&rest rest) value))
 
-#|
 
 
-(defmacro dotimes ((var count-form &optional result-form) &rest forms)
+(apropos-defmacro dotimes ((var count-form &optional result-form) &rest forms)
   (let ((start (gensym))
 	(count (gensym)))
     `(block nil
@@ -982,7 +1251,7 @@ result.  The original TREE is not destroyed."
 
 
 
-(defmacro do (vars (end-test-form &rest result-forms) &rest forms)
+(apropos-defmacro do (vars (end-test-form &rest result-forms) &rest forms)
   (let ((start (gensym))
 	(inits nil)
 	(steps nil))
@@ -1000,7 +1269,7 @@ result.  The original TREE is not destroyed."
 	       (push (car var) steps)
 	       (push (caddr var) steps)))
 	 (go ,start))))))
-(defmacro do* (vars (end-test-form &rest result-forms) &rest forms)
+(apropos-defmacro do* (vars (end-test-form &rest result-forms) &rest forms)
   (let ((start (gensym))
 	(inits nil)
 	(steps nil))
@@ -1021,7 +1290,7 @@ result.  The original TREE is not destroyed."
 
 
 
-(defmacro dolist ((var list-form &optional result-form) &rest forms)
+(apropos-defmacro dolist ((var list-form &optional result-form) &rest forms)
   (let ((start (gensym))
 	(list (gensym)))
     `(block nil
@@ -1037,8 +1306,11 @@ result.  The original TREE is not destroyed."
 	   ,@forms
 	   (go ,start))))))
 
-|#
 
+
+
+
+#+(or WAM-CL LISP500) 
 (defmacro check-type (place typespec &optional string)
   `(tagbody
     start
@@ -1048,6 +1320,9 @@ result.  The original TREE is not destroyed."
 	(store-value (value)
 	  (setf ,place value)))
       (go start))))
+
+
+#+(or WAM-CL LISP500)
 (defun designator-condition (default-type datum arguments)
   (if (symbolp datum)
       (apply #'make-condition datum arguments)
@@ -1056,21 +1331,29 @@ result.  The original TREE is not destroyed."
 			  :format-control datum
 			  :format-arguments arguments)
 	  datum)))
+
+#+(or WAM-CL LISP500) 
 (defun error (datum &rest arguments)
   (let ((condition (designator-condition 'simple-error datum arguments)))
     (when (typep condition *break-on-signals*)
       (invoke-debugger condition))
     (invoke-handler condition)
     (invoke-debugger condition)))
+
+#+(or WAM-CL LISP500) 
 (defun cerror (continue-format-control datum &rest arguments)
   `(with-simple-restart (continue continue-format-control)
     (apply #'error datum arguments)))
+
+#+(or WAM-CL LISP500) 
 (defun signal (datum &rest arguments)
   (let ((condition (designator-condition 'simple-condition datum arguments)))
     (when (typep condition *break-on-signals*)
       (invoke-debugger condition))
     (invoke-handler condition)
     nil))
+
+#+(or WAM-CL LISP500) 
 (defun warn (datum &rest arguments)
   (restart-case
       (let ((warning (if (symbolp datum)
@@ -1082,7 +1365,9 @@ result.  The original TREE is not destroyed."
   nil)
 
 
-'(defun invoke-debugger (condition)
+
+#+(or WAM-CL LISP500) 
+(defun invoke-debugger (condition)
   (let ((debugger-hook *debugger-hook*)
 	(*debugger-hook* nil))
     (when debugger-hook
@@ -1148,6 +1433,8 @@ result.  The original TREE is not destroyed."
 
 
 
+
+#+(or WAM-CL LISP500) 
 (defun break (&optional format-control &rest format-arguments)
   (with-simple-restart (continue "Return from BREAK.")
     (let ((*debugger-hook* nil))
@@ -1156,16 +1443,27 @@ result.  The original TREE is not destroyed."
 				       :format-arguments format-arguments))))
   nil)
 
+
+
+#+(or WAM-CL LISP500) 
 (defparameter *debugger-hook* nil)
+
+#+(or WAM-CL LISP500) 
 (defparameter *break-on-signals* nil)
+
+#+(or WAM-CL LISP500) 
 (defparameter *handlers* nil)
+
+#+(or WAM-CL LISP500) 
 (defun invoke-handler (condition)
   (dolist (handler *handlers*)
     (when (typep condition (car handler))
       (setq *handlers* (caddr handler))
       (funcall (cadr handler) condition))))
 
-'(defmacro handler-bind (bindings &rest forms)
+
+#+(or WAM-CL LISP500) 
+(defmacro handler-bind (bindings &rest forms)
   (let ((form '*handlers*)
 	(handlers (gensym)))
     (dolist (binding (reverse bindings))
@@ -1174,7 +1472,9 @@ result.  The original TREE is not destroyed."
     `(let ((handlers *handlers*)
 	   (*handlers* ,form))
       ,@forms)))
-'(defmacro handler-case (expression &rest clauses)
+
+#+(or WAM-CL LISP500) 
+(defmacro handler-case (expression &rest clauses)
   (let ((tag (gensym))
 	(bindings nil))
     `(handler-bind
@@ -1186,15 +1486,23 @@ result.  The original TREE is not destroyed."
 				(return-from tag (progn ,@forms))))
 		 bindings)))
       ,expression)))
+
+#+(or WAM-CL LISP500) 
 (defmacro ignore-errors (&rest forms)
   `(handler-case (progn ,@forms)
     (error (condition) (values nil condition))))
+
+#+(or WAM-CL LISP500) 
 (defparameter *restarts* nil)
+
+#+(or WAM-CL LISP500) 
 (defun compute-restarts (&optional condition)
   "FIXME restarts associated with conditions"
   (if condition
       *restarts*
       *restarts*))
+
+#+(or WAM-CL LISP500) 
 (defun find-restart (identifier &optional condition)
   (dolist (restart *restarts*)
     (when (eq restart identifier)
@@ -1203,6 +1511,8 @@ result.  The original TREE is not destroyed."
       (return restart))))
 
 
+
+#+(or WAM-CL LISP500) 
 (defun designator-restart (designator)
   (if (restartp designator)
       designator
@@ -1211,13 +1521,19 @@ result.  The original TREE is not destroyed."
 	(when (eq (restart-name restart) designator)
 	  (return restart)))))
 
+
+#+(or WAM-CL LISP500) 
 (defun invoke-restart (restart &rest arguments)
   (setq restart (designator-restart restart))
   (apply (restart-function restart) arguments))
+
+#+(or WAM-CL LISP500) 
 (defun invoke-restart-interactively (restart)
   (setq restart (designator-restart restart))
   (apply (restart-function restart)
 	 (funcall (restart-interactive-function restart))))
+
+#+(or WAM-CL LISP500) 
 (defmacro restart-bind (restart-bindings &rest forms)
   (let ((form '*restarts*))
     (dolist (binding (reverse restart-bindings))
@@ -1226,8 +1542,8 @@ result.  The original TREE is not destroyed."
     `(let ((*restarts* ,form))
       ,@forms)))
 
-#|
 
+#+(or WAM-CL LISP500) 
 (defmacro restart-case (restartable-form &rest clauses)
   (let ((catch-tag (gensym))
 	(bindings nil))
@@ -1265,6 +1581,8 @@ result.  The original TREE is not destroyed."
 	,restartable-form))))
 
 
+
+#+(or WAM-CL LISP500) 
 (defmacro with-simple-restart ((name format-control &rest format-arguments)
 			       &rest forms)
   (let ((tag (gensym)))
@@ -1280,22 +1598,31 @@ result.  The original TREE is not destroyed."
 	,@forms))))
 
 
-|#
 
+#+(or WAM-CL LISP500) 
 (defun abort (&optional condition)
   (invoke-restart (find-restart 'abort condition))
   (error 'control-error))
+
+#+(or WAM-CL LISP500) 
 (defun continue (&optional condition)
   (invoke-restart (find-restart 'continue condition)))
+
+#+(or WAM-CL LISP500) 
 (defun muffle-warning (&optional condition)
   (invoke-restart (find-restart 'muffle-warning condition))
   (error 'control-error))
+
+#+(or WAM-CL LISP500) 
 (defun store-value (value &optional condition)
   (invoke-restart (find-restart 'store-value condition) value))
+
+#+(or WAM-CL LISP500) 
 (defun use-value (value &optional condition)
   (invoke-restart (find-restart 'use-value condition) value))
 
 
+#+(or WAM-CL LISP500) 
 (defun integer-string (integer &optional (radix 10))
   (if (= integer 0)
       "0"
@@ -1312,23 +1639,31 @@ result.  The original TREE is not destroyed."
 
 
 
+#+(or WAM-CL LISP500)
 (defun designator-symbol (designator)
   (if (symbolp designator)
       designator
       (find-symbol designator)))
 
-#|
+#+BUILTIN 
 (defun symbolp (object) (or (null object) (eq (type-of object) 'symbol)))
-(defun keywordp (object)
-  (and (symbolp object)
+
+#+BUILTIN 
+(defun keywordp (object) 
+(and (symbolp object)
        (string= (package-name (symbol-package object)) "KEYwORD")))
+
+#+BUILTIN 
 (defun make-symbol (name)
   (let ((symbol (makei 9 0 name nil nil nil nil (- 1) 0)))
     (imakunbound symbol 4)
     (imakunbound symbol 5)
     (imakunbound symbol 6)
     symbol))
+
+#+(or WAM-CL LISP500)
 (defvar *gensym-counter* 0)
+#+(or WAM-CL LISP500)
 (defun gen-sym (&optional x)
   (let ((prefix (if (stringp x) x "G"))
 	(suffix (if (fixnump x)
@@ -1336,6 +1671,7 @@ result.  The original TREE is not destroyed."
 		    (let ((x *gensym-counter*))
 		      (setf *gensym-counter* (+ 1 *gensym-counter*))))))
     (make-symbol (conc-string prefix (integer-string suffix)))))
+
 (let ((gentemp-counter 0))
   (defun gentemp (&optional (prefix "T") (package *package*))
     (setf gentemp-counter (+ 1 gentemp-counter))
@@ -1343,28 +1679,46 @@ result.  The original TREE is not destroyed."
 	    package)))
 
 
+#+BUILTIN 
+#+(or WAM-CL LISP500)
 (defun get (symbol indicator &optional default)
   (getf (symbol-plist symbol) indicator default))
+
+#+(or WAM-CL LISP500)
 (defun (setf get) (new-value symbol indicator &optional default)
   (setf (getf (symbol-plist symbol) indicator default) new-value))
+
+#+(or WAM-CL LISP500)
 (defun (setf rest) (new-tail list) (setf (cdr list) new-tail))
 
-|#
-
+#+(or WAM-CL LISP500)
 (defun remprop (symbol indicator) (remf (symbol-plist symbol) indicator))
-(defun boundp (symbol) (iboundp symbol 4))
+
+#+BUILTIN 
+#+(or WAM-CL LISP500)
 (defun makunbound (symbol) (imakunbound symbol 4))
+
+#+BUILTIN 
+#+(or WAM-CL LISP500)
 (defun set (symbol value) (setf (symbol-value symbol) value))
+
+#+(or WAM-CL LISP500)
 (defun designator-string (designator)
   (if (stringp designator)
       designator
       (if (characterp designator)
 	  (string designator)
 	  (symbol-name designator))))
+
+#+BUILTIN 
+#+(or WAM-CL LISP500)
 (defvar *package* (car (cdr *packages*)))
+
+#+(or WAM-CL LISP500)
 (defun list-all-packages ()
   (copy-list *packages*))
 
+#+(or WAM-CL LISP500)
 (defun /= (number &rest numbers)
   (tagbody
    start
@@ -1377,95 +1731,137 @@ result.  The original TREE is not destroyed."
   t)
 
 
-#|
+
+#+BUILTIN
+#+(or WAM-CL LISP500) 
 (defun > (&rest numbers) (apply #'< (reverse numbers)))
+
+
+#+BUILTIN
+#+(or WAM-CL LISP500) 
 (defun <= (number &rest numbers)
   (dolist (n numbers t)
     (when (< n number)
       (return-from <=))
     (setq number n)))
+
+#+BUILTIN
+#+(or WAM-CL LISP500) 
 (defun >= (number &rest numbers)
   (dolist (n numbers t)
     (when (< number n)
       (return-from >=))
     (setq number n)))
+
+#+BUILTIN
+#+(or WAM-CL LISP500) 
 (defun max (real &rest reals)
   (dolist (r reals real)
     (when (< real r)
       (setq real r))))
+
+#+BUILTIN
+#+(or WAM-CL LISP500) 
 (defun min (real &rest reals)
   (dolist (r reals real)
     (when (< r real)
       (setq real r))))
-|#
+
+#+BUILTIN
+#+(or WAM-CL LISP500) 
 (defun oddp (integer)
   (= (mod integer 2) 1))
+
+#+BUILTIN
+#+(or WAM-CL LISP500) 
 (defun evenp (integer)
   (= (mod integer 2) 0))
+
+
+#+(or WAM-CL LISP500) 
 (defun minusp (real)
   (< real 0))
+
+
+#+(or WAM-CL LISP500) 
 (defun plusp (real)
   (< 0 real))
+
+
+#+(or WAM-CL LISP500) 
 (defun zerop (real)
   (= real 0))
+
+
+#+(or WAM-CL LISP500) 
 (defun abs (number)
   (if (< number 0)
       (- number)
       number))
 
-;; (defmacro incf (place &optional (delta-form 1)) `(setf ,place (+ ,place ,delta-form)))
-
-(defmacro incf (place &optional (delta 1) &environment env)
-  "The first argument is some location holding a number.  This number is
-incremented by the second argument, DELTA, which defaults to 1."
-  (if (and (symbolp (setq place (%symbol-macroexpand place env)))
-           (or (constantp delta)
-               (and (symbolp delta)
-                    (not (nth-value 1 (%symbol-macroexpand delta env))))))
-    `(setq ,place (+ ,place ,delta))
-    (multiple-value-bind (dummies vals newval setter getter)
-        (get-setf-method place env)
-      (let ((d (gensym)))
-        `(let* (,@(mapcar #'list dummies vals)
-                (,d ,delta)
-                (,(car newval) (+ ,getter ,d)))
-           ,setter)))))
 
 
-
-
-(defmacro decf (place &optional (delta-form 1))
-  `(setf ,place (- ,place ,delta-form)))
+#+(or WAM-CL LISP500) 
 (defun byte (size position)
   (cons size position))
+
+#+(or WAM-CL LISP500) 
 (defun byte-size (bytespec)
   (car bytespec))
+
+#+(or WAM-CL LISP500) 
 (defun byte-position (bytespec)
   (cdr bytespec))
+
+#+(or WAM-CL LISP500) 
 (defun char= (&rest characters)
   (apply #'= (mapcar #'char-code characters)))
+
+#+(or WAM-CL LISP500) 
 (defun char/= (&rest characters)
   (apply #'/= (mapcar #'char-code characters)))
+
+#+(or WAM-CL LISP500) 
 (defun char< (&rest characters)
   (apply #'< (mapcar #'char-code characters)))
+
+#+(or WAM-CL LISP500) 
 (defun char> (&rest characters)
   (apply #'> (mapcar #'char-code characters)))
+
+#+(or WAM-CL LISP500) 
 (defun char<= (&rest characters)
   (apply #'<= (mapcar #'char-code characters)))
+
+#+(or WAM-CL LISP500) 
 (defun char>= (&rest characters)
   (apply #'>= (mapcar #'char-code characters)))
+
+#+(or WAM-CL LISP500) 
 (defun char-equal (&rest characters)
   (apply #'char= (mapcar #'char-upcase characters)))
+
+#+(or WAM-CL LISP500) 
 (defun char-not-equal (&rest characters)
   (apply #'char/= (mapcar #'char-upcase characters)))
+
+#+(or WAM-CL LISP500) 
 (defun char-lessp (&rest characters)
   (apply #'char< (mapcar #'char-upcase characters)))
+
+#+(or WAM-CL LISP500) 
 (defun char-greaterp (&rest characters)
   (apply #'char> (mapcar #'char-upcase characters)))
+
+#+(or WAM-CL LISP500) 
 (defun char-not-greaterp (&rest characters)
   (apply #'char<= (mapcar #'char-upcase characters)))
+
+#+(or WAM-CL LISP500) 
 (defun char-not-lessp (&rest characters)
   (apply #'char>= (mapcar #'char-upcase characters)))
+
+#+(or WAM-CL LISP500) 
 (defun character (character)
   (if (characterp character)
       character
@@ -1473,23 +1869,33 @@ incremented by the second argument, DELTA, which defaults to 1."
 	(if (= (length string) 1)
 	    (aref string 0)
 	    (error 'type-error :datum string :expected-type '(string 1))))))
+
+#+LISP500
 (defun characterp (object) (= (ldb '(5 . 0) (ival object)) 24))
+
+#+(or WAM-CL LISP500) 
 (defun alpha-char-p (character)
   (let ((code (char-code character)))
     (or (< 64 code 91)
 	(< 96 code 123)
 	(< 159 code))))
+
+#+(or WAM-CL LISP500) 
 (defun alphanumericp (character)
   (let ((code (char-code character)))
     (or (< 47 code 58)
 	(< 64 code 91)
 	(< 96 code 123)
 	(< 159 code))))
+
+#+(or WAM-CL LISP500) 
 (defun digit-char (weight &optional (radix 10))
   (when (< weight radix)
     (if (< weight 10)
 	(code-char (+ 48 weight))
 	(code-char (+ 55 weight)))))
+
+#+(or WAM-CL LISP500) 
 (defun digit-char-p (char &optional (radix 10))
   (let* ((code (char-code char))
 	 (weight (if (< 47 code 58)
@@ -1499,29 +1905,47 @@ incremented by the second argument, DELTA, which defaults to 1."
 			 (when (< 96 code 123)
 			   (- code 87))))))
     (and weight (< weight radix) weight)))
+
+#+(or WAM-CL LISP500) 
 (defun standard-char-p (character)
   (let ((code (char-code character)))
     (or (= code 10)
 	(< 31 code 127))))
+
+#+(or WAM-CL LISP500) 
 (defun char-upcase (character)
   (let ((code (char-code character)))
     (if (< 96 code 123)
 	(code-char (- code 32))
 	character)))
+
+#+(or WAM-CL LISP500) 
 (defun char-downcase (character)
   (let ((code (char-code character)))
     (if (< 64 code 91)
 	(code-char (+ code 32))
 	character)))
+
+#+(or WAM-CL LISP500) 
 (defun upper-case-p (character)
   (< 64 (char-code character) 91))
+
+#+(or WAM-CL LISP500) 
 (defun lower-case-p (character)
   (< 96 (char-code character) 123))
+
+#+(or WAM-CL LISP500) 
 (defun both-case-p (character)
   (or (upper-case-p character) (lower-case-p character)))
+
+#+(or WAM-CL LISP500) 
 (defun char-int (character)
   (char-code character))
+
+#+(or WAM-CL LISP500) 
 (defconstant char-code-limit 256)
+
+#+(or WAM-CL LISP500) 
 (let ((char-names '((0 . "Null")
 		    (8 . "Backspace")
 		    (9 . "Tab")
@@ -1543,13 +1967,26 @@ incremented by the second argument, DELTA, which defaults to 1."
 	    (code-char (parse-integer name :start 2))
 	    (let ((code (car (rassoc name char-names :test #'string-equal))))
 	      (when code (code-char code)))))))
+
+#+BUILTIN
+#+(or WAM-CL LISP500) 
 (defun atom (object) (not (consp object)))
+
+#+BUILTIN
+#+(or WAM-CL LISP500) 
 (defun rplaca (cons object) (setf (car cons) object) cons)
+
+#+BUILTIN
+#+(or WAM-CL LISP500) 
 (defun rplacd (cons object) (setf (cdr cons) object) cons)
 
 
+
+#+(or WAM-CL LISP500) 
 (defun copy-tree (tree)
   (if (consp tree) (cons (copy-tree (car tree)) (copy-tree (cdr tree))) tree))
+
+#+(or WAM-CL LISP500) 
 (defun sublis (alist tree &rest rest)
   (if (consp tree)
       (let ((a (apply #'sublis alist (car tree) rest))
@@ -1559,6 +1996,8 @@ incremented by the second argument, DELTA, which defaults to 1."
 	    (cons a d)))
       (let ((a (apply #'assoc tree alist rest)))
 	(if a (cdr a) tree))))
+
+#+(or WAM-CL LISP500) 
 (defun nsublis (alist tree &rest rest)
   (if (consp tree)
       (progn
@@ -1567,16 +2006,24 @@ incremented by the second argument, DELTA, which defaults to 1."
 	tree)
       (let ((a (apply #'assoc tree alist rest)))
 	(if a (cdr a) tree))))
+
+#+(or WAM-CL LISP500) 
 (defun copy-list (list)
   (if (consp list) (cons (car list) (copy-list (cdr list))) list))
+
+#+(or WAM-CL LISP500) 
 (defun make-list (size &key initial-element)
   (if (= size 0) nil
       (cons initial-element
 	    (make-list (- size 1) :initial-element initial-element))))
+
+#+(or WAM-CL LISP500) 
 (defun list* (&rest objects)
   (if (cdr objects)
       (cons (car objects) (apply #'list* (cdr objects)))
       (car objects)))
+
+#+(or WAM-CL LISP500) 
 (defun list-length (list)
   (let ((slow list)
 	(fast list)
@@ -1590,19 +2037,24 @@ incremented by the second argument, DELTA, which defaults to 1."
        (when odd (setf slow (cdr slow)))
        (setf odd (not odd))
        (unless (eq slow fast) (go start)))))
-(defun listp (object) (or (consp object) (eq object nil)))
-(defmacro push (item place)
-  `(setf ,place (cons ,item ,place)))
-(defmacro pop (place)
-  `(prog1 (car ,place) (setf ,place (cdr ,place))))
 
+#+(or WAM-CL LISP500) 
+(defun listp (object) (or (consp object) (eq object nil)))
+
+
+
+#+(or WAM-CL LISP500) 
 (defun nth (n list) (if (< n 1) (car list) (nth (- n 1) (cdr list))))
 '(defun (setf nth) (new-object n list)
   (if (< n 1)
       (setf (car list) new-object)
       (setf (nth (- n 1) (cdr list)) new-object)))
 
+
+#+(or WAM-CL LISP500) 
 (defun endp (list) (not list))
+
+#+(or WAM-CL LISP500) 
 (defun nconc (&rest lists)
   (if (cdr lists)
       (if (car lists)
@@ -1610,16 +2062,22 @@ incremented by the second argument, DELTA, which defaults to 1."
 		 (car lists))
 	  (apply #'nconc (cdr lists)))
       (car lists)))
+
+#+(or WAM-CL LISP500) 
 (defun revappend (list tail)
   (if list
       (revappend (cdr list) (cons (car list) tail))
       tail))
+
+#+(or WAM-CL LISP500) 
 (defun nreconc (list tail)
   (if list
       (let ((new-list (cdr list)))
 	(setf (cdr list) tail)
 	(nreconc new-list list))
       tail))
+
+#+(or WAM-CL LISP500) 
 (defun butlast (list &optional (n 1))
   (let* ((r (cons nil nil))
 	 (e list)
@@ -1641,6 +2099,8 @@ incremented by the second argument, DELTA, which defaults to 1."
 	 (setf n (- n 1))
 	 (go start)))
     (cdr r)))
+
+#+(or WAM-CL LISP500) 
 (defun nbutlast (list &optional (n 1))
   (let* ((e list)
 	 (m 0))
@@ -1661,6 +2121,8 @@ incremented by the second argument, DELTA, which defaults to 1."
 	 (go start)))
     (setf (cdr e) nil)
     list))
+
+#+(or WAM-CL LISP500) 
 (defun last (list &optional (n 1))
   (let* ((e list)
 	 (m 0))
@@ -1678,6 +2140,8 @@ incremented by the second argument, DELTA, which defaults to 1."
        (setf e (cdr e))
        (setf n (- n 1))
        (go start))))
+
+#+(or WAM-CL LISP500) 
 (defun ldiff (list object)
   (let* ((r (cons nil nil))
 	 (e r))
@@ -1688,6 +2152,8 @@ incremented by the second argument, DELTA, which defaults to 1."
 	 (setf list (cdr list))
 	 (go start)))
     (cdr r)))
+
+#+(or WAM-CL LISP500) 
 (defun tailp (object list)
   (tagbody
    start
@@ -1695,9 +2161,17 @@ incremented by the second argument, DELTA, which defaults to 1."
      (unless (consp list) (return-from tailp nil))
      (setf list (cdr list))
      (go start)))
+
+#+BUILTIN
+#+(or WAM-CL LISP500) 
 (defun nthcdr (n list) (if (< n 1) list (nthcdr (- n 1) (cdr list))))
+
+
+#+(or WAM-CL LISP500) 
 (defun rest (list) (cdr list))
 
+
+#+(or WAM-CL LISP500) 
 (labels ((all-end (lists)
 	   (dolist (elem lists nil)
 	     (unless elem (return-from all-end t))))
@@ -1741,16 +2215,28 @@ incremented by the second argument, DELTA, which defaults to 1."
 	   (setf end (if end (setf (cdr end) cons) (setf result cons))))
 	 (setf lists (all-cdr lists))
 	 (go start)))))
+
+
+
+#+(or WAM-CL LISP500) 
 (defun mapcan (function &rest lists)
   (apply #'nconc (apply #'mapcar function lists)))
+
+#+(or WAM-CL LISP500) 
 (defun mapcon (function &rest lists)
   (apply #'nconc (apply #'maplist function lists)))
+
+#+(or WAM-CL LISP500) 
 (defun acons (key datum alist) (cons (cons key datum) alist))
+
+#+(or WAM-CL LISP500) 
 (defun copy-alist (alist)
   (when alist (cons (if (consp (car alist))
 			(cons (caar alist) (cdar alist))
 			(car alist))
 		    (copy-alist (cdr alist)))))
+
+#+(or WAM-CL LISP500) 
 (defun pairlis (keys data &optional alist)
   (tagbody
    start
@@ -1762,6 +2248,8 @@ incremented by the second argument, DELTA, which defaults to 1."
   alist)
 
 
+
+#+(or WAM-CL LISP500) 
 (defun some-list-2 (predicate list1 list2)
   (tagbody
    start
@@ -1839,6 +2327,8 @@ incremented by the second argument, DELTA, which defaults to 1."
 	   (3 result))))
 
 
+
+#+BUILTIN 
   (defun member (item list &rest rest)
     (tagbody
        start
@@ -1848,6 +2338,8 @@ incremented by the second argument, DELTA, which defaults to 1."
 	 (setf list (cdr list))
 	 (go start))))
 
+
+#+BUILTIN 
   (defun member-if (predicate list &rest rest)
     (tagbody
        start
@@ -1856,6 +2348,8 @@ incremented by the second argument, DELTA, which defaults to 1."
 	   (return-from member-if list))
 	 (setf list (cdr list))
 	 (go start))))
+
+#+BUILTIN 
   (defun member-if-not (predicate list &rest rest)
     (tagbody
        start
@@ -1909,6 +2403,8 @@ incremented by the second argument, DELTA, which defaults to 1."
 	  (setf (cdr tree) (apply #'subst new predicate (cdr tree) rest))
 	  tree)
 	(if (apply #'satisfies-if-not predicate tree rest) new tree)))
+
+#+BUILTIN 
   (defun assoc (item alist &rest rest)
     (dolist (elem alist)
       (when (apply #'satisfies item (car elem) rest)
@@ -2089,6 +2585,8 @@ incremented by the second argument, DELTA, which defaults to 1."
 	   (seq-next iter)
 	   (go start)))
       count))
+
+#+BUILTIN 
   (defun find (item sequence &rest rest)
     (let ((iter (apply #'seq-start sequence rest)))
       (tagbody
@@ -2099,6 +2597,8 @@ incremented by the second argument, DELTA, which defaults to 1."
 	       (return-from find elem)))
 	   (seq-next iter)
 	   (go start)))))
+
+#+BUILTIN 
   (defun find-if (predicate sequence &rest rest)
     (let ((iter (apply #'seq-start sequence rest)))
       (tagbody
@@ -2109,6 +2609,8 @@ incremented by the second argument, DELTA, which defaults to 1."
 	       (return-from find-if elem)))
 	   (seq-next iter)
 	   (go start)))))
+
+#+BUILTIN 
   (defun find-if-not (predicate sequence &rest rest)
     (let ((iter (apply #'seq-start sequence rest)))
       (tagbody
@@ -2119,6 +2621,8 @@ incremented by the second argument, DELTA, which defaults to 1."
 	       (return-from find-if-not elem)))
 	   (seq-next iter)
 	   (go start)))))
+
+#+BUILTIN 
   (defun position (item sequence &rest rest)
     (let ((iter (apply #'seq-start sequence rest)))
       (tagbody
@@ -2128,6 +2632,8 @@ incremented by the second argument, DELTA, which defaults to 1."
 	     (return-from position (seq-position iter)))
 	   (seq-next iter)
 	   (go start)))))
+
+#+BUILTIN 
   (defun position-if (predicate sequence &rest rest)
     (let ((iter (apply #'seq-start sequence rest)))
       (tagbody
@@ -2137,6 +2643,8 @@ incremented by the second argument, DELTA, which defaults to 1."
 	     (return-from position-if (seq-position iter)))
 	   (seq-next iter)
 	   (go start)))))
+
+#+BUILTIN
   (defun position-if-not (predicate sequence &rest rest)
     (let ((iter (apply #'seq-start sequence rest)))
       (tagbody
@@ -2186,16 +2694,30 @@ incremented by the second argument, DELTA, which defaults to 1."
 	   (seq-next iter)
 	   (go start)))
       (seq-result sequence iter result)))
-)
+)                     
 
+
+#+BUILTIN
+#+(or WAM-CL LISP500) 
 (defun null (object) (if object nil t))
+
+#+BUILTIN
+#+(or WAM-CL LISP500) 
 (defun not (object) (if object nil t))
 
 
 
 
+#+(or WAM-CL LISP500) 
 (defun mod (x y) (multiple-value-call #'(lambda (q r) r) (floor x y)))
+
+#+(or WAM-CL LISP500) 
+#+BUILTIN
 (defun functionp (object) (eq (type-of object) 'function))
+
+
+
+#+(or WAM-CL LISP500) 
 (defun coerce (object result-type)
   (if (typep object result-type)
       object
@@ -2212,18 +2734,19 @@ incremented by the second argument, DELTA, which defaults to 1."
 
 
 
+
+#+(or WAM-CL LISP500) 
 (defmacro deftype (name lambda-list &rest forms)
   `(ensure-type ',name #'(lambda ,lambda-list (block ,name ,@forms))))
+
+
+#+(or WAM-CL LISP500) 
 (defun *= (cons number)
   (or (not cons) (eq (car cons) '*) (= (car cons) number)))
 
 
 
-
-
-
-
-
+#+(or WAM-CL LISP500) 
 (defun ensure-type (name expander)
   (let ((cons (assoc name *type-expanders*)))
     (if cons
@@ -2233,360 +2756,8 @@ incremented by the second argument, DELTA, which defaults to 1."
 
 
 
-#|
-
-
-
-(defun typep (object type-specifier &optional environment)
-  (let ((tag (ldb '(2 . 0) (ival object))))
-    (case type-specifier
-      ((nil extended-char) nil)
-      ((t *) t)
-      (null (not object))
-      (list (or (not object) (= tag 1)))
-      (fixnum (and (= tag 0) (= (ldb '(5 . 0) (ival object)) 16)))
-      (package (and (= tag 2) (= (iref object 1) 5)))
-      (symbol (or (not object) (and (= tag 2) (= (iref object 1) 0))))
-      ((character base-char)
-       (and (= tag 0) (= (ldb '(5 . 0) (ival object)) 24)))
-      (standard-char (and (= tag 0)
-			  (= (ldb '(5 . 0) (ival object)) 24)
-			  (let ((code (char-code object)))
-			    (or (= code 10)
-				(< 31 code 127)))))
-      (bit (member object '(0 1)))
-      (t (setq type-specifier (designator-list type-specifier))
-	 (case (car type-specifier)
-	   (cons (and (= tag 1)
-		      (or (not (cdr type-specifier))
-			  (typep (car object) (cadr type-specifier)))
-		      (or (not (cddr type-specifier))
-			  (typep (car object) (caddr type-specifier)))))
-	   ((string base-string) (and (stringp object)
-				      (*= (cdr type-specifier)
-					  (length object))))
-	   (satisfies (funcall (cadr type-specifier) object))
-	   (member (member object (cdr type-specifier)))
-	   (not (not (typep object (cadr type-specifier))))
-	   (and (every #'(lambda (spec) (typep object spec))
-		       (cdr type-specifier)))
-	   (or (some #'(lambda (spec) (typep object spec))
-		     (cdr type-specifier)))
-	   (eql (eql object (cadr type-specifier)))
-	   (t (when (= tag 2)
-		(let ((class (iref object 1)))
-		  (when (= (ldb '(2 . 0) (ival class)) 2)
-		    (member (car type-specifier)
-			    (mapcar #'class-name
-				    (class-precedence-list class))))))))))))
-
-
-(defun fboundp (function-name)
-  (if (consp function-name)
-      (iboundp (cadr function-name) 6)
-      (iboundp function-name 5)))
-(defun fdefinition (function-name)
-  (if (consp function-name)
-      (if (iboundp (cadr function-name) 6)
-	  (iref (cadr function-name) 6)
-	  (error 'undefined-error :name function-name))
-      (if (iboundp function-name 5)
-	  (iref function-name 5)
-	  (error 'undefined-error :name function-name))))
-(defun function-lambda-expression (function)
-  (values (list* 'lambda (iref function 4) (iref function 5))
-	  (iref function 3)
-	  (iref function 6)))
-(defmacro defconstant (name initial-value &optional documentation)
-  `(progn
-    (setf (iref ',name 4) ,initial-value)
-    (setf (iref ',name 8) (dpb 1 '(1 . 4) (iref ',name 8)))
-    ',name))
-(defmacro defparameter (name initial-value &optional documentation)
-  `(progn
-    (setf (iref ',name 4) ,initial-value)
-    (setf (iref ',name 8) (dpb 1 (cons 1 2) (iref ',name 8)))
-    ',name))
-(defmacro defvar (name &rest rest)
-  `(progn
-    (unless (or (iboundp ',name 4) ,(not rest))
-      (setf (iref ',name 4) ,(car rest)))
-    (setf (iref ',name 8) (dpb 1 (cons 1 2) (iref ',name 8)))
-    ',name))
-(defun type-of (object)
-  (case (ldb (cons 2 0) (ival object))
-    (0 (if (eq object nil)
-	   'null
-	   (if (= (ldb (cons 2 3) (ival object)) 2)
-	       'fixnum
-	       'character)))
-    (1 'cons)
-    (2 (case (iref object 1)
-	 (0 'symbol)
-	 (3 'simple-vector)
-	 (4 'array)
-	 (5 'package)
-	 (6 'function)
-	 (t (class-name (iref object 1)))))
-    (3 (case (jref object 1)
-	 (20 'simple-string)
-	 (84 'double)
-	 (116 'simple-bit-vector)
-	 (t 'file-stream)))))
-(defun equalp (a b)
-  (or (eql a b)
-      (cond
-	((not a) nil)
-	((characterp a) (and (characterp b)
-			     (char-equal a b)))
-	((consp a) (and (consp b)
-			(equalp (car a) (car b))
-			(equalp (cdr a) (cdr b))))
-	((arrayp a) (and (arrayp b)
-			 (equal (array-dimensions a) (array-dimensions b))
-			 (dotimes (i (apply #'* (array-dimensions a)) t)
-			   (unless (equalp (row-major-aref a i)
-					   (row-major-aref b i))
-			     (return)))))
-	((= (ldb '(2 . 0) (ival a)) 2)
-	 (and (= (ldb '(2 . 0) (ival b)) 2)
-	      (eq (iref a 1) (iref b 1))
-	      (= (ldb '(2 . 0) (ival (iref a 1))) 2)
-	      (dotimes (i (iref a 0) t)
-		(unless (equalp (iref a (+ 2 i)) (iref b (+ 2 i)))
-		  (return))))))))
-(defun show-frame (frame index)
-  (let* ((length (fref (- frame 2)))
-	 (fn (fref (- frame length 3))))
-    (when (and (= (ldb '(2 . 0) (ival fn)) 2) (= (iref fn 1) 6))
-      (format *debug-io* "~A: (~A" index (iref fn 6))
-      (dotimes (i length)
-	(format *debug-io* " ~A" (fref (+ i (- frame length 2)))))
-      (format *debug-io* ")~%"))))
-(defun next-frame (frame)
-  (- frame (fref (- frame 2)) 3))
-(defun next-function-frame (frame)
-  (do* ((f (next-frame frame) (next-frame f)))
-       ((or (< f 6)
-	    (let ((fn (fref (- f (fref (- f 2)) 3))))
-	      (and (= (ldb '(2 . 0) (ival fn)) 2) (= (iref fn 1) 6))))
-	(and (> f 5) f))))
-(defun copy-symbol (symbol &optional copy-properties)
-  (let ((new-symbol (make-symbol (iref symbol 2))))
-    (cond
-      (copy-properties
-       (setf (iref new-symbol 4) (iref symbol 4))
-       (setf (iref new-symbol 5) (iref symbol 5))
-       (setf (iref new-symbol 6) (iref symbol 6))
-       (setf (iref new-symbol 10) (iref symbol 10)))
-      (t
-       (imakunbound new-symbol 4)
-       (imakunbound new-symbol 5)
-       (imakunbound new-symbol 6)))
-    new-symbol))
-(defun fixnump (object)
-  (= (ldb '(5 . 0) (ival object)) 16))
-(defun symbol-function (symbol)
-  (if (iboundp symbol 5)
-      (iref symbol 5)
-      (error 'undefined-function :name symbol)))
-(defun (setf symbol-function) (new-contents symbol)
-  (setf (iref symbol 5) new-contents))
-(defun symbol-name (symbol) (iref symbol 2))
-(defun symbol-package (symbol) (iref symbol 9))
-(defun symbol-plist (symbol) (iref symbol 10))
-(defun (setf symbol-plist) (new-plist symbol)
-  (setf (iref symbol 10) new-plist))
-(defun symbol-value (symbol)
-  (if (iboundp symbol 4)
-      (iref symbol 4)
-      (error 'unbound-variable :name symbol)))
-(defun (setf symbol-value) (new-value symbol) (setf (iref symbol 4) new-value))
-(defun find-package (name)
-  (if (packagep name)
-      name
-      (let ((string (designator-string name)))
-	(dolist (package *packages*)
-	  (dolist (package-name (iref package 2))
-	    (when (string= package-name string)
-	      (return-from find-package package)))))))
-(defun export (symbols &optional (package *package*))
-  (setq package (find-package package))
-  (dolist (symbol (designator-list symbols))
-    (setf symbol (designator-symbol symbol))
-    (dolist (using-package (iref package 7))
-      (when (find-symbol (symbol-name symbol) using-package)
-	(cerror 'package-error :package using-package)))
-    (unless (atom (package-get (iref package 3) (symbol-name symbol)))
-      (unless (atom (package-get (iref package 4) (symbol-name symbol)))
-	(cerror 'package-error :package package))
-      (package-rem (iref package 4) symbol)
-      (package-put (iref package 3) symbol))))
-(defun package-rehash (old-vector new-vector)
-  (let ((old-length (length old-vector))
-	(new-length (length new-vector))
-	(i 0))
-    (tagbody
-     start
-       (when (< i old-length)
-	 (dolist (symbol (iref old-vector (+ 2 i)))
-	   (push symbol (iref new-vector (+ 2 (mod (hash (symbol-name symbol))
-						   new-length)))))
-	 (incf i)
-	 (go start)))
-    new-vector))
-(defun package-get (vector string)
-  (dolist (symbol (iref vector (+ 2 (mod (hash string) (length vector))))
-	   '(nil))
-    (when (string= (symbol-name symbol) string)
-      (return symbol))))
-(defun package-put (vector symbol)
-  (push symbol (iref vector (+ 2 (mod (hash (symbol-name symbol))
-				      (length vector))))))
-(defun package-rem (vector string)
-  (let ((index (+ 2 (mod (hash string) (length vector)))))
-    (setf (iref vector index)
-	  (delete string (iref vector index) :key #'symbol-name))))
-(defun find-symbol (string &optional (package *package*))
-  (setq package (find-package package))
-  (unless package
-    (error "Package does not exist."))
-  (let ((symbol (package-get (iref package 4) string)))
-    (if (atom symbol)
-	(values symbol :internal)
-	(let ((symbol (package-get (iref package 3) string)))
-	  (if (atom symbol)
-	      (values symbol :external)
-	      (dolist (used-package (package-use-list package)
-		       (values nil nil))
-		(let ((symbol (package-get (iref used-package 3) string)))
-		  (when (atom symbol)
-		    (values symbol :inherited)))))))))
-(defun find-all-symbols (string)
-  (let ((symbols nil))
-    (dolist (package *packages*)
-      (let ((symbol (package-get (iref package 4) string)))
-	(when (atom symbol)
-	  (push symbol symbols)))
-      (let ((symbol (package-get (iref package 3) string)))
-	(when (atom symbol)
-	  (push symbol symbols))))
-    symbols))
-(defun import (symbols &optional (package *package*))
-  (setq package (find-package package))
-  (dolist (symbol (designator-list symbols))
-    (multiple-value-bind (symbol status)
-	(find-symbol (symbol-name symbol) package)
-      (case status
-	(:inherited
-	 (cerror 'package-error :package package))
-	((nil)
-	 (package-put (iref package 4) symbol)
-	 (unless (iref symbol 9)
-	   (setf (iref symbol 9) package))))))
-  t)
-(defun rename-package (package new-name &optional new-nicknames)
-  (setq package (find-package package))
-  (when (packagep new-name) (setq new-name (package-name new-name)))
-  (setf new-nicknames (mapcar #'designator-string new-nicknames))
-  (setf (iref package 2) (cons new-name new-nicknames))
-  package)
-(defun shadow (symbol-names &optional (package *package*))
-  (setq package (find-package package))
-  (dolist (symbol-name symbol-names)
-    (multiple-value-bind (symbol status)
-	(find-symbol symbol-name package)
-      (unless (member status '(:internal :external))
-	(setq symbol (make-symbol string))
-	(setf (iref symbol 9) package)
-	(package-put (iref package 4) symbol))
-      (pushnew symbol (iref package 5))))
-  t)
-(defun shadowing-import (symbols &optional package)
-  (setq package (find-package package))
-  (dolist (symbol (designator-list symbols))
-    (package-rem (iref package 3) (symbol-name symbol))
-    (package-rem (iref package 4) (symbol-name symbol))
-    (package-put (iref package 4) symbol)
-    (push symbol (iref package 5)))
-  t)
-(defun delete-package (package)
-  (setq package (find-package package))
-  (when (iref package 7)
-    (cerror 'package-error package))
-  (prog1
-      (package-name package)
-    (setf (iref package 2) nil)))
-(defun make-package (package-name &key nicknames (use '("cl")))
-  (let ((all-names (cons package-name nicknames)))
-    (mapc #'(lambda (name)
-	      (when (find-package name)
-		(cerror 'package-error :package name)))
-	  all-names)
-    (let ((package (makei 6 5 all-names (make-array 1021) (make-array 1021) nil
-			  (mapcar #'find-package use))))
-      (mapc #'(lambda (used-package)
-		(push package (iref (find-package used-package) 7)))
-	    use)
-      (push package *packages*)
-      package)))
-(defun make-package-iterator (package symbol-types)
-  (setq package (find-package package))
-  (list nil package symbol-types))
-(defun package-iterate (iterator)
-  (unless (first iterator)
-    (setf (first iterator)
-	  (case (pop (third iterator))
-	    (:internal (iref (second iterator) 4))
-	    (:external (iref (second iterator) 3))
-	    (:inherited "FIXME")
-	    ((nil) (return-from package-iterate nil)))))
-  (pop (first iterator)))
-(defmacro with-package-iterator ((name package-list-form &rest symbol-types)
-				 &rest forms)
-  (let ((package (gensym))
-	(iterator (gensym)))
-    `(dolist (,package (designator-list ,package-list-form))
-      (let ((,iterator (make-package-iterator ,package ',symbol-types)))
-	(macrolet ((,name () (package-iterate ,iterator)))
-	  ,@forms)))))
-(defun unexport (symbols &optional (package *package*))
-  (setq package (find-package package))
-  (dolist (symbol (designator-list symbols))
-    (setq symbol (designator-symbol symbol))
-    (when symbol
-      (when (atom (package-get (iref package 3) (symbol-name symbol)))
-	(package-rem (iref package 3) (symbol-name symbol))
-	(package-put (iref package 4) symbol))))
-  t)
-(defun unintern (symbol &optional (package *package*))
-  (setq package (find-package package))
-  (when (eq package (iref symbol 9))
-    (setf (iref symbol 9) nil))
-  (let* ((name (symbol-name symbol))
-	 (present (or (atom (package-get (iref package 3) name))
-		      (atom (package-get (iref package 4) name)))))
-    (package-rem (iref package 3) name)
-    (package-rem (iref package 4) name)
-    (setf (iref package 5) (delete symbol (iref package 5)))
-    present))
-(defmacro in-package (name)
-  `(setf *package* (find-package ',name)))
-(defun unuse-package (packages-to-unuse &optional (package *package*))
-  (setq package (find-package package))
-  (dolist (package-to-unuse (designator-list packages-to-unuse))
-    (setq package-to-unuse (find-package package-to-unuse))
-    (setf (iref package 6) (delete package-to-unuse (iref package 6)))
-    (setf (iref package-to-unuse 7)
-	  (delete package (iref package-to-unuse 7))))
-  t)
-(defun use-package (packages-to-use &optional (package *package*))
-  (setq package (find-package package))
-  (dolist (package-to-use (designator-list packages-to-use))
-    (setq package-to-use (find-package package-to-use))
-    (push package-to-use (iref package 6))
-    (push package (iref package-to-use 7)))
-  t)
+#+WAM-CL
+#+(or WAM-CL LISP500) 
 (defun ensure-package (name nicknames shadow shadowing-import-from use
 		       import-from intern export)
   (let ((package (find-package name)))
@@ -2614,6 +2785,9 @@ incremented by the second argument, DELTA, which defaults to 1."
     (mapc #'(lambda (symbol-name) (intern symbol-name package)) intern)
     (export export package)
     package))
+
+#+WAM-CL
+#+(or WAM-CL LISP500) 
 (defmacro defpackage (defined-package-name &rest options)
   (flet ((option (option-name)
 	   (mapcan #'(lambda (option)
@@ -2629,202 +2803,11 @@ incremented by the second argument, DELTA, which defaults to 1."
       ,(option :nicknames)
       ,(option :shadow) ,(options :shadowing-import-from) ,(option :use)
       ,(options :import-from) ,(option :intern) ,(option :export))))
-(defmacro do-symbols ((var &optional (package *package*) result-form)
-		      &rest forms)
-  (let ((package-sym (gensym)))
-    `(block nil
-      (let ((,package-sym (find-package package))
-	    (,var nil))
-	(dolist (,var (iref ,package-sym 3))
-	  ,@forms)
-	(dolist (,var (iref ,pakcage-sym 4))
-	  ,@forms)
-	,result-form))))
-(defmacro do-external-symbols ((var &optional (package *package*) result-form)
-			       &rest forms)
-  (let ((package-sym (gensym)))
-    `(let ((,package-sym (find-package ,package)))
-      (dolist (,var (iref ,package-sym 3) ,result-form)
-	,@forms))))
-(defmacro do-all-symbols ((var &optional result-form) &rest forms)
-  (let ((package (gensym))
-	(symbols (gensym))
-	(first (gensym))
-	(start-out (gensym))
-	(start (gensym)))
-    `(let ((,symbols nil)
-	   (,first t))
-      (dolist (,package *packages* ,result-form)
-	,start-out
-	(setq ,symbols (iref ,package (if ,first 3 4)))
-	(setq ,first (not ,first))
-	,start
-	(when ,symbols
-	  ,@forms
-	  (go ,start))
-	(when ,first
-	  (go ,start-out))))))
-(defun intern (string &optional (package *package*))
-  (setq package (find-package package))
-  (multiple-value-bind (symbol status)
-      (find-symbol string package)
-    (unless status
-      (setq symbol (make-symbol string))
-      (setf (iref symbol 9) package)
-      (cond
-	((string= (package-name package) "KEYWORD")
-	 (package-put (iref package 3) symbol)
-	 (setf (symbol-value symbol) symbol))
-	(t
-	 (package-put (iref package 4) symbol))))
-    (values symbol status)))
-(defun package-name (package) (car (iref (find-package package) 2)))
-(defun package-nicknames (package) (cdr (iref (find-package package) 2)))
-(defun package-shadowing-symbols (package) (iref (find-package package) 5))
-(defun package-use-list (package) (iref (find-package package) 6))
-(defun package-used-by-list (package) (iref (find-package package) 7))
-(defun packagep (object) (eq (type-of object) 'package))
 
 
 
-
-(defparameter *standard-class* (makei 1 0))
-(setf (iref *standard-class* 1) *standard-class*)
-(defparameter *structure-class* (makei 1 *standard-class*))
-(defparameter *hash-table* (makei 1 *structure-class*))
-(defun hash-eql (object)
-  (if (and (= (ldb '(2 . 0) (ival object)) 3) (= (jref object 1) 84))
-      (floor (abs object))
-      (ival object)))
-
-(defun sxhash (object &optional (level 4))
-  (if (zerop level)
-      0
-      (let ((lvl (- level 1)))
-	(case (ldb '(2 . 0) (ival object))
-	  (0 (ival object))
-	  (1 (+ (sxhash (car object) lvl) (sxhash (cdr object) lvl)))
-	  (2 (case (iref object 1)
-	       (t (ival object))))
-	  (3 (case (jref object 1)
-	       (20 (hash object))
-	       (84 (floor (abs object)))
-	       (t (ival object))))))))
-(defun make-hash-table (&key (test 'eql) (size 61) (rehash-size 1.999)
-			(rehash-threshold 1))
-  (when (functionp test)
-    (setq test (iref test 6)))
-  (makei 6 *hash-table* 0 rehash-size rehash-threshold test
-	 (case test
-	   (eq #'ival)
-	   (eql #'hash-eql)
-	   (equal #'sxhash)
-	   (equalp #'hash-equalp)
-	   (t (error "Unknown test function ~A." test)))
-	 (makei size 3)))
-(defun gethash (key hash-table &optional default)
-  (let* ((table (hash-table-table hash-table))
-	 (test (hash-table-test hash-table))
-	 (index (mod (funcall (hash-table-hash hash-table) key)
-		     (length table))))
-    (dolist (cons (iref table (+ 2 index)) (values default nil))
-      (when (funcall test (car cons) key)
-	(return (values (cdr cons) t))))))
-(defun (setf gethash) (new-value key hash-table &optional default)
-  (let* ((table (hash-table-table hash-table))
-	 (test (hash-table-test hash-table))
-	 (index (mod (funcall (hash-table-hash hash-table) key)
-		     (length table))))
-    (dolist (cons (iref table (+ 2 index))
-	     (progn
-	       (push (cons key new-value) (iref table (+ 2 index)))
-	       (unless (< (incf (hash-table-count hash-table))
-			  (* (hash-table-rehash-threshold hash-table)
-			     (length table)))
-		 (setf (hash-table-table hash-table)
-		       (makei (floor (* (hash-table-rehash-size hash-table)
-					(length table)))
-			      3))
-		 (setf (hash-table-count hash-table) 0)
-		 (dotimes (index (length table))
-		   (dolist (cons (iref table (+ 2 index)))
-		     (setf (gethash (car cons) hash-table) (cdr cons)))))))
-      (when (funcall test (car cons) key)
-	(setf (cdr cons) new-value)
-	(return (values (cdr cons) t)))))
-  new-value)
-(defun remhash (key hash-table)
-  (let* ((table (hash-table-table hash-table))
-	 (test (hash-table-test hash-table))
-	 (index (mod (funcall (hash-table-hash hash-table) key)
-		     (length table)))
-	 (cons (iref table (+ 2 index)))
-	 (prev-cons nil))
-    (tagbody
-     start
-       (unless cons (return-from remhash))
-       (unless (funcall test (caar cons) key)
-	 (setq prev-cons cons)
-	 (setq cons (cdr cons))
-	 (go start)))
-    (if prev-cons
-	(setf (cdr prev-cons) (cdr cons))
-	(setf (iref table (+ 2 index)) (cdr cons)))
-    (decf (hash-table-count hash-table))
-    t))
-(defun maphash (function hash-table)
-  (let ((table (hash-table-table hash-table)))
-    (dotimes (index (length table))
-      (dolist (cons (iref table (+ 2 index)))
-	(funcall function (car cons) (cdr cons))))))
-(defun hash-table-iterator (hash-table)
-  (let ((table (hash-table-table hash-table))
-	(index 0)
-	(cons nil))
-    #'(lambda ()
-	(block nil
-	  (tagbody
-	   start
-	     (unless cons
-	       (unless (< index (length table))
-		 (return))
-	       (setq cons (iref table (+ 2 index)))
-	       (incf index)
-	       (go start)))
-	  (let ((pair (pop cons)))
-	    (values t (car pair) (cdr pair)))))))
-
-(defmacro with-hash-table-iterator ((name hash-table) &rest forms)
-  (let ((iterator (gensym)))
-    `(let ((,iterator (hash-table-iterator ,hash-table)))
-      (macrolet ((,name ()
-		   `(funcall ,,iterator)))
-	,@forms))))
-(defun clrhash (hash-table)
-  (let ((table (hash-table-table hash-table)))
-    (dotimes (index (length table))
-      (setf (iref table (+ 2 index)) nil)))
-  (setf (hash-table-count hash-table) 0)
-  hash-table)
-(defun hash-table-count (hash-table) (iref hash-table 2))
-(defun (setf hash-table-count) (new-value hash-table)
-  (setf (iref hash-table 2) new-value))
-(defun hash-table-rehash-size (hash-table) (iref hash-table 3))
-(defun hash-table-rehash-threshold (hash-table) (iref hash-table 4))
-(defun hash-table-test (hash-table) (iref hash-table 5))
-(defun hash-table-hash (hash-table) (iref hash-table 6))
-(defun hash-table-table (hash-table) (iref hash-table 7))
-(defun (setf hash-table-table) (new-value hash-table)
-  (setf (iref hash-table 7) new-value))
-(defparameter *class-hash* (make-hash-table))
-(defun find-class (symbol &optional (errorp t) environment)
-  (multiple-value-bind (class foundp)
-      (gethash symbol *class-hash*)
-    (when (and errorp (not foundp))
-      (error "Class ~A not found." symbol))
-    class))
-
-
+#+BUILTIN
+#+(or WAM-CL LISP500) 
 (defun backquote-expand (list level)
   (if (consp list) 
       (if (eq 'backquote (car list)) 
@@ -2854,83 +2837,8 @@ incremented by the second argument, DELTA, which defaults to 1."
 		    (cons 'append (collect list)))))) 
       (list 'quote list))) 
 
+#+BUILTIN
+#+(or WAM-CL LISP500) 
 (defmacro backquote (form)
   (backquote-expand form 0))
 
-(defun macro-function (symbol &optional environment)
-  "(dolist (binding environment)
-    (when (and (consp (car binding))
-	       (= (floor (ival (cdar binding)) 16) 1)
-	       (eq (caar binding) symbol))
-      (return-from macro-function 
-	(when (= (ldb '(1 . 4) (ival (cdr binding))) 1)
-	  (cdr binding)))))"
-  (if (= (ldb '(1 . 1) (iref symbol 8)) 1)
-      (iref symbol 5)))
-
-(defun macroexpand-1 (form &optional env)
-  (if (consp form)
-      (let ((definition (macro-function (car form) env)))
-	(if definition
-	    (values (apply definition (cdr form)) t)
-	    (values form nil)))
-      (if (and form (symbolp form) (= (ldb '(1 . 0) (iref form 8)) 1))
-	  (values (iref form 4) t)
-	  (values form nil))))
-
-(defun macroexpand (form &optional env)
-  (multiple-value-bind (form expanded-p)
-      (macroexpand-1 form env)
-    (if expanded-p
-	(tagbody
-	 start
-	   (multiple-value-bind (expansion expanded-p)
-	       (macroexpand-1 form env)
-	     (if expanded-p
-		 (progn
-		   (setq form expansion)
-		   (go start))
-		 (return-from macroexpand (values expansion t)))))
-	(values form nil))))
-
-(defmacro define-symbol-macro (symbol expansion)
-  `(progn
-    (setf (iref ',symbol 4) ',expansion)
-    (setf (iref ',symbol 8) (dpb 1 (cons 1 0) (iref ',symbol 8)))
-    ',symbol))
-
-(defun special-operator-p (symbol)
-  (member symbol '(block catch eval-when flet function go if labels let let*
-		   load-time-value locally macrolet multiple-value-call
-		   multiple-value-prog1 progn progv quote return-from setq
-		   symbol-macrolet tagbody the throw unwind-protect)))
-(defun constantp (form &optional environment)
-  (not (or (and (symbolp form)
-		(zerop (ldb '(1 . 4) (iref form 8))))
-	   (and (consp form)
-		(not (eq (car form) 'quote))))))
-
-(defun length (sequence)
-  (let ((tag (ldb '(2 . 0) (ival sequence))))
-    (if (= tag 0)
-	0
-	(if (= tag 1)
-	    (let ((i 0)) (dolist (elem sequence i) (setf i (+ 1 i))))
-	    (if (= tag 2)
-		(let ((subtag (iref sequence 1)))
-		  (if (= subtag 3)
-		      (/ (ival (iref sequence 0)) 256)
-		      (if (= subtag 4)
-			  (let ((dimensions/fill (iref sequence 3)))
-			    (if (consp dimensions/fill)
-				(error "not a sequence")
-				(or dimensions/fill
-				    (length (iref sequence 4)))))
-			  0)))
-		(let ((subtag (jref sequence 1)))
-		  (if (= subtag 20)
-		      (- (/ (jref sequence 0) 64) 4)
-		      (if (= subtag 116)
-			  (- (/ (jref sequence 0) 8) 31)
-			  (error "not a sequence")))))))))
-|#

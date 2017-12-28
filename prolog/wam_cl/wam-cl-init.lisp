@@ -34,6 +34,124 @@
 
 (in-package "SYSTEM")
 
+
+(defmacro setf (&rest pairs &environment env)
+             (let ((nargs (length pairs)))
+               (assert (evenp nargs))
+               (cond
+                ((zerop nargs) nil)
+                ((= nargs 2)
+                 (let ((place (car pairs))
+                       (value-form (cadr pairs)))
+                   (cond
+                    ((symbolp place)
+                     `(setq ,place ,value-form))
+                    ((consp place)
+                     (if (eq (car place) 'the)
+                         `(setf ,(caddr place) (the ,(cadr place) ,value-form))
+                       (multiple-value-bind (temps vars newvals setter getter)
+                           (get-setf-expansion place env)
+                         (declare (ignore getter))
+                         `(let (,@(mapcar #'list temps vars))
+                            (multiple-value-bind ,newvals ,value-form
+                              ,setter))))))))
+                (t
+                 (do* ((pairs pairs (cddr pairs))
+                       (setfs (list 'progn))
+                       (splice setfs))
+                      ((endp pairs) setfs)
+                   (setq splice (cdr (rplacd splice
+                                             `((setf ,(car pairs) ,(cadr pairs)))))))))))
+
+(defmacro psetf (&rest pairs &environment env)
+             (let ((nargs (length pairs)))
+               (assert (evenp nargs))
+               (if (< nargs 4)
+                   `(progn (setf ,@pairs) nil)
+                 (let ((setters nil))
+                   (labels ((expand (pairs)
+                                    (if pairs
+                                        (multiple-value-bind (temps vars newvals setter getter)
+                                            (get-setf-expansion (car pairs) env)
+                                          (declare (ignore getter))
+                                          (setq setters (cons setter setters))
+                                          `(let (,@(mapcar #'list temps vars))
+                                             (multiple-value-bind ,newvals ,(cadr pairs)
+                                               ,(expand (cddr pairs)))))
+                                      `(progn ,@setters nil))))
+                     (expand pairs))))))
+
+(defmacro shiftf (&rest places-and-newvalue &environment env)
+             (let ((nargs (length places-and-newvalue)))
+               (assert (>= nargs 2))
+               (let ((place (car places-and-newvalue)))
+                 (multiple-value-bind (temps vars newvals setter getter)
+                     (get-setf-expansion place env)
+                   `(let (,@(mapcar #'list temps vars))
+                      (multiple-value-prog1 ,getter
+                        (multiple-value-bind ,newvals
+                            ,(if (= nargs 2)
+                                 (cadr places-and-newvalue)
+                               `(shiftf ,@(cdr places-and-newvalue)))
+                          ,setter)))))))
+
+(defmacro rotatef (&rest places &environment env)
+             (if (< (length places) 2)
+                 nil
+               (multiple-value-bind (temps vars newvals setter getter)
+                   (get-setf-expansion (car places) env)
+                 `(let (,@(mapcar #'list temps vars))
+                    (multiple-value-bind ,newvals (shiftf ,@(cdr places) ,getter)
+                      ,setter)
+                    nil))))
+
+
+;; Adapted from SBCL.
+(defmacro push (&environment env item place)
+  (if (and (symbolp place)
+	   (eq place (macroexpand place env)))
+      `(setq ,place (cons ,item ,place))
+      (multiple-value-bind (dummies vals newval setter getter)
+        (get-setf-expansion place env)
+        (let ((g (gensym)))
+          `(let* ((,g ,item)
+                  ,@(mapcar #'list dummies vals)
+                  (,(car newval) (cons ,g ,getter)))
+             ,setter)))))
+
+;; Adapted from SBCL.
+(defmacro pushnew (&environment env item place &rest keys)
+  (if (and (symbolp place)
+	   (eq place (macroexpand place env)))
+      `(setq ,place (adjoin ,item ,place ,@keys))
+      (multiple-value-bind (dummies vals newval setter getter)
+        (get-setf-expansion place env)
+        (let ((g (gensym)))
+          `(let* ((,g ,item)
+                  ,@(mapcar #'list dummies vals)
+                  (,(car newval) (adjoin ,g ,getter ,@keys)))
+             ,setter)))))
+
+;; Adapted from SBCL.
+(defmacro pop (&environment env place)
+  (if (and (symbolp place)
+	   (eq place (macroexpand place env)))
+      `(prog1 (car ,place)
+	      (setq ,place (cdr ,place)))
+      (multiple-value-bind (dummies vals newval setter getter)
+        (get-setf-expansion place env)
+        (do* ((d dummies (cdr d))
+              (v vals (cdr v))
+              (let-list nil))
+             ((null d)
+              (push (list (car newval) getter) let-list)
+              `(let* ,(nreverse let-list)
+                 (prog1 (car ,(car newval))
+                        (setq ,(car newval) (cdr ,(car newval)))
+                        ,setter)))
+          (push (list (car d) (car v)) let-list)))))
+
+
 (defmacro make-hash-table (&rest all) `(make-instance 'hash-table ,@all))
 
 
@@ -169,50 +287,6 @@
 (defmacro prog2 (first-form second-form &rest forms)
   `(prog1 (progn ,first-form ,second-form) ,@forms))
 
-;; Adapted from SBCL.
-(defmacro push (&environment env item place)
-  (if (and (symbolp place)
-	   (eq place (macroexpand place env)))
-      `(setq ,place (cons ,item ,place))
-      (multiple-value-bind (dummies vals newval setter getter)
-        (get-setf-expansion place env)
-        (let ((g (gensym)))
-          `(let* ((,g ,item)
-                  ,@(mapcar #'list dummies vals)
-                  (,(car newval) (cons ,g ,getter)))
-             ,setter)))))
-
-;; Adapted from SBCL.
-(defmacro pushnew (&environment env item place &rest keys)
-  (if (and (symbolp place)
-	   (eq place (macroexpand place env)))
-      `(setq ,place (adjoin ,item ,place ,@keys))
-      (multiple-value-bind (dummies vals newval setter getter)
-        (get-setf-expansion place env)
-        (let ((g (gensym)))
-          `(let* ((,g ,item)
-                  ,@(mapcar #'list dummies vals)
-                  (,(car newval) (adjoin ,g ,getter ,@keys)))
-             ,setter)))))
-
-;; Adapted from SBCL.
-(defmacro pop (&environment env place)
-  (if (and (symbolp place)
-	   (eq place (macroexpand place env)))
-      `(prog1 (car ,place)
-	      (setq ,place (cdr ,place)))
-      (multiple-value-bind (dummies vals newval setter getter)
-        (get-setf-expansion place env)
-        (do* ((d dummies (cdr d))
-              (v vals (cdr v))
-              (let-list nil))
-             ((null d)
-              (push (list (car newval) getter) let-list)
-              `(let* ,(nreverse let-list)
-                 (prog1 (car ,(car newval))
-                        (setq ,(car newval) (cdr ,(car newval)))
-                        ,setter)))
-          (push (list (car d) (car v)) let-list)))))
 
 (defmacro psetq (&environment env &rest args)
   (do ((l args (cddr l))

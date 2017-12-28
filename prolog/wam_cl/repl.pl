@@ -82,18 +82,24 @@ with_prompt_str(Str,G):-
         call_cleanup(G,
                      (prompt(_, Old),
                        prompts(Old1, Old2))),!.
-set_prompt_from_package:-
-  ((ignore((reading_package(Package),
+
+get_prompt_from_package(Suffix,Prompt):-
+        reading_package(Package),
         short_package_or_hash(Package,Name0),
         (Name0=="U"->Name="CL-USER";Name=Name0),
         always(nonvar(Name)),
-        atom_concat(Name,'> ',Prompt),
-        prompt(_,Prompt))))).
+        atom_concat(Name,Suffix,Prompt),!.
+get_prompt_from_package(Prompt,Prompt).
+
+set_prompt_from_package:-
+   get_prompt_from_package('>>> ',Prompt),
+   prompt(_,Prompt).
 
 read_eval_print(Result):-
         ignore(catch(lquietly(set_prompt_from_package),_,true)),
         set_md_lang(cl),
-        lquietly(show_uncaught_or_fail(read_no_parse(Expression))),!,        
+        get_prompt_from_package('> ',Prompt),prompt1(Prompt),
+        lquietly(show_uncaught_or_fail(read_no_parse(Expression))),!,       
         lquietly(show_uncaught_or_fail(lisp_add_history(Expression))),!,
         nb_linkval('$mv_return',[Result]),
         set_md_lang(prolog),

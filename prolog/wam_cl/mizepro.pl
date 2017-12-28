@@ -51,6 +51,23 @@ body_cleanup_keep_debug_vars_fuller(Ctx,CodeSt,Code5a):-!,
 
 %body_cleanup_full(Ctx,CodeSt,CodeOutNow):- body_cleanup_keep_debug_vars_fuller(Ctx,CodeSt,CodeOutNow),!.
 
+body_cleanup_fuller(Ctx,A,I):- !,
+ always((   
+   sanitize_true(Ctx,A,B),
+   del_attrs_of(B,freeze),
+   body_cleanup_keep_debug_vars1(Ctx,B,C),   
+   inline_body([],Ctx,',',C,D),   
+   fast_get_sets(Ctx,',',D,E),
+   env_mize(Ctx,',',E,F),
+   body_cleanup_keep_debug_vars1(Ctx,F,G),
+   sanitize_true(Ctx,G,H),
+   add_type_checks_maybe(Ctx,H,I),
+   del_attrs_of(I,preserved_var),
+   del_attrs_of(I,dif))).
+
+% body_cleanup_full(_Ctx,I,I):-!.
+body_cleanup_full(Ctx,I,O):- !, body_cleanup_no_optimize(Ctx,I,O),!.
+
 body_cleanup_full(_Ctx,CodeSt,CodeOutNow):- var(CodeSt),!,CodeOutNow=CodeSt.
 %body_cleanup_full(Ctx,:- CodeSt,:- CodeOutNow):-!,body_cleanup_full(Ctx,CodeSt,CodeOutNow).
 body_cleanup_full(Ctx,CodeSt,CodeOutNow):- 
@@ -76,6 +93,8 @@ body_cleanup_full(Ctx,CodeSt,CodeOutNow):-
 
 add_type_checks_maybe(_,IO,IO).
 
+
+body_cleanup_keep_debug_vars1(Ctx,I,O):- !, body_cleanup_no_optimize(Ctx,I,O),!.
 
 body_cleanup_keep_debug_vars1(Ctx,Code0,CodeOutOut):-
  must_det_l((oper_mize(Code0,Ctx,',',Code0,Code1), mize_body(Ctx,',',Code1,CodeOut),
@@ -149,7 +168,7 @@ oper_mize(W,Ctx,F,C1,C2):- body_mize([],W,Ctx,F,C1,C2).
 
 body_mize(_Skip,_Whole,_Ctx,_,Code,Out):- skip_optimize(Code),Out=Code.
 body_mize(Skip,_Whole,_Ctx,_,Code,Out):- functor(Code,F,N),member(F/N,Skip),Out=Code.
-%body_mize(_Skip,W,_Ctx,_,Var = Ground, true):- var(Var),ground(Ground), trace, occurrences_of_var(Var,W,N)-> N==2.
+%body_mize(_Skip,W,_Ctx,_,Var = Ground, true):- var(Var),ground(Ground),  occurrences_of_var(Var,W,N)-> N==2.
 body_mize(_Skip,_Whole,_Ctx,_,C1,C1):-!.
 body_mize(Skip,W,Ctx,F,(C1,C2),Joined):-!,
    body_mize(Skip,W,Ctx,F,C1,C1O),
@@ -192,16 +211,17 @@ properly_protect(Ctx,C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(pro
 del_attr_rev2(Name,Var):- del_attr(Var,Name).
 del_attrs_of(CodeIn,Name):- term_variables(CodeIn,AttVars),maplist(del_attr_rev2(Name),AttVars).
 
+
 sanitize_true(_, C1,C2):- non_compound_code(C1),!,C2=C1.
 sanitize_true(_,f_clos_pf_set_slot_value(A,B,C,D),set_opv(A,B,C)):-C=D.
 sanitize_true(_,cl_slot_value(A,B,C),get_opv(A,B,C)).
 sanitize_true(Ctx,(C1,C2),Joined):-!,sanitize_true(Ctx,C1,C1O),sanitize_true(Ctx,C2,C2O),conjoin_0(Ctx,C1O,C2O,Joined).
-sanitize_true(Ctx,(C2 ; CodeC),( C2O ; CodeCCO)):-!,sanitize_true(Ctx,C2,C2O),sanitize_true(Ctx,CodeC,CodeCCO).
-sanitize_true(Ctx,(C2 -> CodeC),( C2O -> CodeCCO)):-!,sanitize_true(Ctx,C2,C2O),sanitize_true(Ctx,CodeC,CodeCCO).
-sanitize_true(Ctx,(C2 :- CodeC),( C2 :- CodeCCO)):-!,sanitize_true(Ctx,CodeC,CodeCCO).
-sanitize_true(Ctx,( :- CodeC),( :- CodeCCO)):-!,sanitize_true(Ctx,CodeC,CodeCCO).
-sanitize_true(_Ctx,C1,C1):-!.
-%sanitize_true(Ctx,C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(sanitize_true(Ctx),C1O,C2O),C2=..[F|C2O].
+%sanitize_true(Ctx,(C2 ; CodeC),( C2O ; CodeCCO)):-!,sanitize_true(Ctx,C2,C2O),sanitize_true(Ctx,CodeC,CodeCCO).
+%sanitize_true(Ctx,(C2 -> CodeC),( C2O -> CodeCCO)):-!,sanitize_true(Ctx,C2,C2O),sanitize_true(Ctx,CodeC,CodeCCO).
+%sanitize_true(Ctx,(C2 :- CodeC),( C2 :- CodeCCO)):-!,sanitize_true(Ctx,CodeC,CodeCCO).
+%sanitize_true(Ctx,( :- CodeC),( :- CodeCCO)):-!,sanitize_true(Ctx,CodeC,CodeCCO).
+%sanitize_true(_Ctx,C1,C1):-!.
+sanitize_true(Ctx,C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(sanitize_true(Ctx),C1O,C2O),C2=..[F|C2O].
 
 keeper(C1):- var(C1),!.
 keeper(!).
@@ -210,18 +230,21 @@ discard(C2):- C2==true.
 conjoin_1(Ctx,C1,C2,C3):- discard(C2),!,visit_lit(Ctx,C1,C3).
 conjoin_1(Ctx,C1,C2,C3):- discard(C1),!,visit_lit(Ctx,C2,C3).
 conjoin_1(_,C1,C2,C2):- C1==C2,C2==reset_mv,!.
-conjoin_1(_,clean_escape(_),_,true):- trace,!.
+conjoin_1(_,clean_escape(_),_,true):- !.
 %conjoin_1(Ctx,C1,C2,C3):- conjoinment(Ctx,C1,C2,C3),!.
 
 conjoin_0(Ctx,C1,C2,(C1,C3)):- keeper(C1),!,visit_lit(Ctx,C2,C3).
 conjoin_0(Ctx,C1,C2,(C3,C2)):- keeper(C2),!,visit_lit(Ctx,C1,C3).
-%conjoin_0(Ctx,C1,clean_escape(_),C1):- trace,!.
-conjoin_0(_,(clean_escape(_),_),_,true):- trace.
-conjoin_0(Ctx,(C1,clean_escape(_)),_,C3):- trace,visit_lit(Ctx,C1,C3).
-conjoin_0(Ctx,C1,(clean_escape(_),_),C3):- trace,visit_lit(Ctx,C1,C3).
+%conjoin_0(Ctx,C1,clean_escape(_),C1):- !.
+conjoin_0(_,(clean_escape(_),_),_,true):- !.
+conjoin_0(Ctx,(C1,clean_escape(_)),_,C3):- visit_lit(Ctx,C1,C3).
+conjoin_0(Ctx,C1,(clean_escape(_),_),C3):- visit_lit(Ctx,C1,C3).
 conjoin_0(Ctx,C1,C2,C4):-      conjoin_1(Ctx,C1,C2,C3),!,visit_lit(Ctx,C3,C4).
-conjoin_0(Ctx,C1,(C2,C2a),C3):-conjoin_1(Ctx,C1,C2,C12),!,conjoin_0(Ctx,C12,C2a,C3).
+
 conjoin_0(Ctx,(C1,C1O),C2,OUT):-!,conjoin_0(Ctx,C1O,C2,AAB),conjoin_0(Ctx,C1,AAB,OUT).
+conjoin_0(Ctx,(C1,C1a),(C2,C2a),C13):-conjoin_0(Ctx,C1a,C2,C12),!,conjoin_0(Ctx,C12,C2a,C3),conjoin_0(C1,C3,C13).
+%conjoin_0(Ctx,C1,(C2,C2a),C3):-conjoin_0(Ctx,C1,C2,C12),!,conjoin_0(Ctx,C12,C2a,C3).
+
 conjoin_0(Ctx,C1,C2,(C11,C21)):- !,visit_lit(Ctx,C1,C11),!,visit_lit(Ctx,C2,C21).
 
 visit_lit(_,C1,C1):-!.
@@ -244,10 +267,10 @@ mize_body(Ctx,_,catch(C1,E, C2),catch(C1O,E, C2O)):- !, mize_body(Ctx,->,C1,C1O)
 
 %mize_body(_Ctx,_,C1,C1):-!.
 
-structure_applies(A,B):- copy_term_nat(A,CA),numbervars(CA,0,_),
-  \+ (CA \= B),
+structure_applies(A,B):- copy_term_nat(A,CA),copy_term_nat(B,CB),numbervars(CA,0,_),
+  \+ (CA \= CB),
    A=B.
-structure_variant(A,B):- copy_term_nat(A,CA),copy_term(B,CB),numbervars(CA,0,_),numbervars(CB,0,_),
+structure_variant(A,B):- copy_term_nat(A,CA),copy_term_nat(B,CB),numbervars(CA,0,_),numbervars(CB,0,_),
   \+ (CA \= CB),
    A=B.
 
@@ -351,7 +374,7 @@ mize_body2(_Ctx,_F,InOut,InOut).
   
 mize_body_2e(_Ctx,_,C1,C1):- non_compound_code(C1),!.
 mize_body_2e(_,_,In,ITE):- structure_applies(In,(ITE,R=V)), var(R),var(V),ifthenelse(ITE),R=V,allowed_level(1).
-%mize_body_2e(_Ctx,_,(S1=V,R=S2,B),(R=V,B)):- trace, var(S1),S1==S2.
+%mize_body_2e(_Ctx,_,(S1=V,R=S2,B),(R=V,B)):-  var(S1),S1==S2.
 mize_body_2e(_Ctx,_,(S1=V,R=S2),(R=V)):- var(S1),S1==S2,(var(R);var(V)),S2='$error_this_was_eliminated',allowed_level(2).
 mize_body_2e(_Ctx,_,t_or_nil(G, R),G):- R==t,allowed_level(1).
 mize_body_2e(_Ctx,_,t_or_nil(G, R),\+ G):- R==[],allowed_level(1).
@@ -468,20 +491,20 @@ inline_body(Never,Ctx,FT,(A->B),(AA->BB)):-!,inline_body(Never,Ctx,FT,A,AA),inli
 inline_body(_Never,_Ctx,_,Code,Out):- \+ \+  skip_optimize(Code),!,Out=Code.
 %inline_body(Never,_Ctx,_,Code,Out):- compound(Code),functor(Code,F,N),member(F/N,Never),!,Out=Code.
 inline_body(Never,Ctx,FT,(M:Code:-Body),(M:Code:-Out)):- compound(Code),functor(Code,F,A),!,inline_body([F/A|Never],Ctx,FT,Body,Out).
+inline_body(Never,Ctx,F,C1,Out):- any_inline(Never,Ctx,F,C1,Out).
+inline_body(_Never,_Ctx,_,C1,C1):- non_compound_code(C1),!.
+inline_body(Never,Ctx,_F,C1,C2):- compound_name_arguments(C1,F,C1O),
+  must_maplist(inline_body(Never,Ctx,F),C1O,C2O),!,C2=..[F|C2O].
+inline_body(_Never,_Ctx,_F,C1,C1):-!.
 
-inline_body(_Never,_Ctx,_,In,Out):- stay_all_different(In),simple_inline(In,Out),!.
-
-inline_body(Never,Ctx,F,C1,Out):- 
+any_inline(_Never,_Ctx,_,In,Out):- simple_inline(In,Out),!.
+any_inline(Never,Ctx,F,C1,Out):- 
   maybe_inline(C1),
   stay_all_different(C1),  
   get_inlined(C1,MID),functor(C1,F,A),
   progress_g(dbginfo(inlined(C1):-MID)),!,
   sanitize_true(Ctx,MID,MID2),
-  inline_body([F/A|Never],Ctx,F,MID2,Out).
-inline_body(_Never,_Ctx,_,C1,C1):- non_compound_code(C1),!.
-inline_body(Never,Ctx,_F,C1,C2):- compound_name_arguments(C1,F,C1O),
-  must_maplist(inline_body(Never,Ctx,F),C1O,C2O),!,C2=..[F|C2O].
-inline_body(_Never,_Ctx,_F,C1,C1):-!.
+  inline_body([F/A|Never],Ctx,F,MID2,Out),!.
 
 simple_inline(In,_Out):- \+ compound(In),!,fail.
 simple_inline(cl_list(A,B),B=A).
@@ -496,10 +519,9 @@ list_to_disj(C1,C1).
 get_inlined(P,Out):- bagof(I,clause_interface(P,I),DisjL),list_to_disj(DisjL,Out),!.
 
 never_inline(P):- \+ callable(P),!.
-never_inline(P):- predicate_property(P,foreign).
-never_inline(P):- predicate_property(P,imported_from(system)).
-never_inline(P):- predicate_property(P,number_of_clauses(N)),N==0.
-never_inline(P):- compound(P),functor(P,F,A),never_inline_fa(F,A).
+never_inline(P):- compound(P),functor(P,F,A),never_inline_fa(F,A),!.
+never_inline(P):- (predicate_property(P,number_of_clauses(N))->N==0;true),!.
+never_inline(P):- predicate_property(P,imported_from(system)),!.
 never_inline_fa(set_place,_).
 never_inline_fa(F,_):- atom_concat_or_rtrace(_,' tabled',F).
 never_inline_fa(start_tabling,_).
@@ -510,12 +532,8 @@ never_inline_fa(member,_).
 never_inline_fa(as_rest,_).
 %never_inline_fa(t_or_nil,_).
 
-always_inline(P):- never_inline(P),!,fail.
-always_inline(P):- \+ callable(P),!,fail.
-always_inline(P):- predicate_property(P,foreign),!,fail.
-always_inline(P):- predicate_property(P,imported_from(system)),!,fail.
-always_inline(P):- clause_interface(P,B),B=t_or_nil(_,_),!.
-always_inline(P):- clause_interface(P,B),B=is(_,_),!.
+always_inline(P):- clause_interface(P,B),compound(B),B=t_or_nil(_,_),!.
+always_inline(P):- clause_interface(P,B),compound(B),B=is(_,_),!.
 always_inline(P):- compound(P),functor(P,F,A),always_inline_fa(F,A).
 
 always_inline_fa(F,1):- atom_concat_or_rtrace('addr_tagbody_',M,F),atom_contains(M,'_addr_enter_').
@@ -524,22 +542,13 @@ always_inline_fa(F,_):- atom_concat_or_rtrace(_,'expand1',F).
 always_inline_fa(F,_):- atom_concat_or_rtrace('cl_c',M,F),atom_concat_or_rtrace(_,'ar',M).
 always_inline_fa(F,_):- atom_concat_or_rtrace('cl_c',M,F),atom_concat_or_rtrace(_,'dr',M).
 
+maybe_inline(_):-!,fail.
+maybe_inline(_):- \+ (wam_cl_option(safe(inline),true);wam_cl_option(inline,true)),!,fail.
 maybe_inline(C1):- never_inline(C1),!,fail.
-
-maybe_inline(C1):- always_inline(C1),
-  predicate_property(C1,interpreted),
-  predicate_property(C1,number_of_clauses(1)),
-  \+ clause_has_cuts(C1),
-  wam_cl_option(safe(inline),true),
-  !.
-
-maybe_inline(C1):- 
- \+ (functor(C1,F,_),atom_concat_or_rtrace('cl_',_,F)),
-  predicate_property(C1,interpreted),
-  predicate_property(C1,number_of_clauses(1)),
-  \+ clause_has_cuts(C1),
-  wam_cl_option(inline,true),
-  !.
+maybe_inline(C1):- \+ predicate_property(C1,number_of_clauses(1)),!,fail.
+maybe_inline(C1):- clause_has_cuts(C1),!,fail.
+maybe_inline(C1):- wam_cl_option(safe(inline),true), always_inline(C1),!. 
+maybe_inline(C1):- wam_cl_option(inline,true), functor(C1,F,_),!, \+ atom_concat_or_rtrace('cl_',_,F).
 
 clause_has_cuts(P):- clause_interface(P,I),contains_var(!,I).
 clause_calls_self(P):- clause_interface(P,I),functor(P,F,A),functor(C,F,A),contains_term(E,I),compound(E),E=C.
@@ -571,6 +580,8 @@ mize_prolog_code(InOut,InOut).
 mize_prolog_code1(maplist(_,[]),true).
 mize_prolog_code1(maplist(P,[X]),call(P,X)).
 mize_prolog_code1(call(F,A),Out):- atom(F),Out=..[F,A].
+
+wcl:- profile(cl_compile_file('$ARRAY'([*], claz_base_character, "wam-cl-init-1"))).
 
 :- fixup_exports.
 

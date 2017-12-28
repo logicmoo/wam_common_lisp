@@ -71,8 +71,8 @@ is_symbolp(Symbol):- is_keywordp(Symbol);get_opv(Symbol,classof,claz_symbol).
 
 cl_find_symbol(String,Result):- reading_package(Package)->cl_find_symbol(String,Package,Result).
 cl_find_symbol(String,Pack,Result):-  find_package_or_die(Pack,Package),
-  package_find_symbol(String,Package,Symbol,IntExt),push_values([Symbol,IntExt],Result),!.
-cl_find_symbol(_Var,_P,Result):- push_values([[],[]],Result).
+  package_find_symbol(String,Package,Symbol,IntExt),cl_values_list([Symbol,IntExt],Result),!.
+cl_find_symbol(_Var,_P,Result):- cl_values_list([[],[]],Result).
 
 
 cl_intern(Symbol,Result):- reading_package(Package),cl_intern(Symbol,Package,Result).
@@ -81,7 +81,7 @@ cl_intern(Name,Pack,Result):-
   find_package_or_die(Pack,Package),
   text_to_string(Name,String),
   intern_symbol(String,Package,Symbol,IntExt),
-  push_values([Symbol,IntExt],Result),!.
+  cl_values_list([Symbol,IntExt],Result),!.
 
 
 intern_symbol(String,Package,Symbol,IntExt):- package_find_symbol(String,Package,Symbol,IntExt),!.
@@ -133,6 +133,9 @@ create_keyword(Name,Symbol):- string_upper(Name,String),
    atom_concat_or_rtrace('kw_',Lower,Symbol),
    assert_lsp(package:package_external_symbols(pkg_kw,String,Symbol)).
 
+to_kw(Name0,Name):-atom(Name0),atom_concat('kw_',_,Name0),!,Name0=Name.
+to_kw(Name,Combined):- pl_symbol_name(Name,Str),create_keyword(Str,Combined).
+
 
 print_symbol(Symbol):- 
    writing_package(Package),
@@ -169,7 +172,7 @@ cl_symbol_plist(Symbol,Value):- assertion(is_symbolp(Symbol)),get_opv(Symbol,pli
 %(get x y &optional d) ==  (getf (symbol-plist x) y &optional d)
 cl_get(Symbol,Prop,Optionals,Value):- assertion(is_symbolp(Symbol)),
   cl_symbol_plist(Symbol,PList),
-  nth_value(Optionals,1,[],Default,PresentP),
+  nth_param(Optionals,1,[],Default,PresentP),
   (PList==[]-> Value=Default ;
    ((PresentP==t->get_test_pred(cl_eql,Optionals,EqlPred);EqlPred=cl_eql),
    get_plist_value(EqlPred,PList,Prop,Default,Value))).
@@ -180,17 +183,22 @@ wl:interned_eval(("`sys:putprop")).
 (wl:init_args(3,f_sys_putprop)).
 %(sys:putprop x y) ==  (setf (symbol-plist x) y)
 f_sys_putprop(Symbol,Prop,Value,Optionals,Ret):- assertion(is_symbolp(Symbol)), 
-  nth_value(Optionals,1,[],_Default,PresentP),  
+  nth_param(Optionals,1,[],_Default,PresentP),  
   cl_symbol_plist(Symbol,PList),
   (PresentP==t->get_test_pred(cl_eql,Optionals,EqlPred);EqlPred=cl_eql),
   (((set_plist_value_fail_on_missing(EqlPred,_Old,PList,Prop,Value)
       ->true; 
    (Ret=Value, set_opv(Symbol,plist,[Prop,Value|PList]))))).
-  
+(wl:init_args(3,f_sys_put)).
+f_sys_put(Symbol,Prop,Value,Optionals,Ret):-
+ f_sys_putprop(Symbol,Prop,Value,Optionals,Ret).
 
-nth_value(Optionals,N,Default,Value):- nth1(N,Optionals,Value)->true;Default=Value.
-nth_value(Optionals,N,Default,Value,PresentP):- nth1(N,Optionals,Value)->(PresentP=t);(Default=Value,PresentP=[]).
+nth_param(Optionals,N,Default,Value):- nth1(N,Optionals,Value)->true;Default=Value.
+nth_param(Optionals,N,Default,Value,PresentP):- nth1(N,Optionals,Value)->(PresentP=t);(Default=Value,PresentP=[]).
 
+get_plist_value(_TestFn,[PropWas,_|_],_Prop,_Default,_Value):-var(PropWas),!,break.
+get_plist_value(_TestFn,PList,_Prop,Default,Default):- \+ is_list(PList).
+get_plist_value(_TestFn,PList,_Prop,Default,Default):- \+ is_list(PList).
 get_plist_value(TestFn,[PropWas,Value|_],Prop,_Default,Value):- apply_as_pred(TestFn,Prop,PropWas),!.
 get_plist_value(TestFn,[_,_|PList],Prop,Default,Value):- !, get_plist_value(TestFn,PList,Prop,Default,Value).
 get_plist_value(_TestFn,_PList,_Prop,Default,Default).
@@ -206,8 +214,10 @@ set_plist_value_fail_on_missing(EqlPred,Old,[_,_,Next|PList],Prop,Value):- !, se
 (wl:init_args(2,f_sys_get_sysprop)).
 %(get x y &optional d) ==  (getf (symbol-plist x) y &optional d)
 wl:interned_eval(("`sys:get-sysprop")).
+f_sys_get_sysprop(Symbol,Prop,Optionals,Value):-!, cl_get(Symbol,Prop,Optionals,Value).
+
 f_sys_get_sysprop(Symbol,Prop,Optionals,Value):- assertion(is_symbolp(Symbol)),
-  nth_value(Optionals,1,[],Default,PresentP),
+  nth_param(Optionals,1,[],Default,PresentP),
   (get_opv(Symbol,sysprops,PList) ->  
   ((PList==[]-> Value=Default ;
    ((PresentP==t->get_test_pred(cl_eql,Optionals,EqlPred);EqlPred=cl_eql),
@@ -219,9 +229,11 @@ f_sys_get_sysprop(Symbol,Prop,Optionals,Value):- assertion(is_symbolp(Symbol)),
 (wl:init_args(3,f_sys_put_sysprop)).
 %(sys::put x y) ==  (setf (symbol-plist x) y)
 wl:interned_eval(("#'sys:put-sysprop")).
+f_sys_put_sysprop(Symbol,Prop,Value,Optionals,Ret):-!, f_sys_putprop(Symbol,Prop,Value,Optionals,Ret).
+
 f_sys_put_sysprop(Symbol,Prop,Value,Optionals,Ret):- assertion(is_symbolp(Symbol)),   
   (get_opv(Symbol,sysprops,PList)->true;PList==[]),  
-   nth_value(Optionals,1,[],_Default,PresentP),
+   nth_param(Optionals,1,[],_Default,PresentP),
   (PresentP==t->get_test_pred(cl_eql,Optionals,EqlPred);EqlPred=cl_eql),
   (((set_plist_value_fail_on_missing(EqlPred,_Old,PList,Prop,Value)
       ->true; 

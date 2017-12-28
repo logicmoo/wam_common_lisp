@@ -77,7 +77,7 @@ compile_funop(Ctx,Env,Result,[funcall, FN| FunctionArgs], Body):- \+ is_list(Fun
      compile_funop(Ctx,Env,Result,[apply, FN, [list|FunctionArgs]], Body).
 
 % malformed call
-compile_funop(Ctx,Env,Result,[FN| FunctionArgs], Body):- \+ is_list(FunctionArgs),
+compile_funop(Ctx,Env,Result,[FN| FunctionArgs], Body):- fail,\+ is_list(FunctionArgs),
      compile_funop(Ctx,Env,Result,[apply, [quote, FN], [list|FunctionArgs]], Body).
 
 
@@ -96,11 +96,28 @@ compile_funop(Ctx,Env,Result,[funcall, FN| FunctionArgs], Body):-
 compile_funop(Ctx,Env,Result,[apply, FN, [List,FunctionArg]], Body):- List == list,
       compile_funop(Ctx,Env,Result,[funcall, FN, FunctionArg], Body).
 
-compile_funop(Ctx,Env,Result,[apply, FN, FunctionArgs], Body):-
-      must_compile_body(Ctx,Env,F,FN,ArgsBody1),
-      must_compile_body(Ctx,Env,Args,FunctionArgs,ArgsBody2),
-      compile_apply(Ctx,Env,F,Args,Result,Code),
-      Body = (ArgsBody1,ArgsBody2,Code).
+compile_funop(Ctx,Env,Result,[apply, FN, FunctionArgs], (ArgsBody1,ArgsBody2,Body)):- fail, is_list(FunctionArgs),
+  must_compile_body(Ctx,Env,F,FN,ArgsBody1),
+  expand_arguments(Ctx,Env,FN,1,FunctionArgs,ArgsBody2,Args),
+  compile_apply(Ctx,Env,F,Args,Result,Body).
+
+compile_funop(Ctx,Env,Result,[apply, FN, FunctionArgs], (ArgsBody1,Body)):- fail, var(FunctionArgs),
+  must_compile_body(Ctx,Env,F,FN,ArgsBody1),
+  compile_apply(Ctx,Env,F,FunctionArgs,Result,Body).
+
+compile_funop(Ctx,Env,Result,[apply, FN| FunctionArgs], (ArgsBody1,Body)):- fail, var(FunctionArgs),
+   must_compile_body(Ctx,Env,F,FN,ArgsBody1),
+    compile_apply(Ctx,Env,F,FunctionArgs,Result,Body).
+
+compile_funop(Ctx,Env,Result,[apply, FN, FunctionArgs], (ArgsBody1,ArgsBody2,Body)):- fail,
+  must_compile_body(Ctx,Env,F,FN,ArgsBody1),
+  expand_arguments(Ctx,Env,FN,1,FunctionArgs,ArgsBody2,Args),
+  compile_apply(Ctx,Env,F,Args,Result,Body).
+
+compile_funop(Ctx,Env,Result,[apply, FN| FunctionArgs], (ArgsBody2, Body)):- 
+  %must_compile_body(Ctx,Env,F,FN,ArgsBody1),
+  expand_arguments(Ctx,Env,FN,1,FunctionArgs,ArgsBody2,Args),
+  compile_apply(Ctx,Env,FN,Args,Result,Body).
 
 compile_funop(Ctx,CallEnv,Result,[FN | FunctionArgs], Body):-
       expand_arguments_maybe_macro(Ctx,CallEnv,FN,0,[FN|FunctionArgs],ArgsBody,[FNC|Args]),
@@ -118,13 +135,30 @@ compile_apply_function_or_macro_call(Ctx,Env,FN,Args,Result,ExpandedFunction):-
    ExpandedFunction =.. [ ProposedName | ArgsPlusResult].
 
 
+
+make_apply_list(ArgLast,_):-var(ArgLast),!,fail.
+make_apply_list([ArgLast],ArgLast):-!,is_list(ArgLast),!.
+make_apply_list([A|FunctionArgs],[A|FunctionArgsCorrect]):-
+  make_apply_list(FunctionArgs,FunctionArgsCorrect).
+
+
+compile_apply(Ctx,Env,F,Args,Result,ExpandedFunction):- atom(F),once((append(Left,[List],Args),eval_uses_exact_and_restkeys(F,N))),
+ length(Left,N),
+ append(Left,[List,Result],NewArgs),
+ foc_operator(Ctx,Env,F,_, ProposedName),!,
+ ExpandedFunction =.. [ ProposedName | NewArgs].
+
 compile_apply(_Ctx,_Env,F,Args,Result,cl_apply(F,Args,Result)):- (var(F); \+ is_list(Args)),!.
 
 compile_apply(Ctx,Env,F,Args,Result,ExpandedFunction):- atom(F),
  compile_apply_function_or_macro_call(Ctx,Env,F,Args,Result,ExpandedFunction),!.
 
 compile_apply(Ctx,Env,function(F),Args,Result,ExpandedFunction):- atom(F),
- compile_apply_function_or_macro_call(Ctx,Env,F,Args,Result,ExpandedFunction),!.
+ compile_apply(Ctx,Env,F,Args,Result,ExpandedFunction),!.
+
+%compile_apply(_Ctx,_Env,cl_array_row_major_index, [Array_Get12, Subscripts_Get],Result,ExpandedFunction):-
+% ExpandedFunction =.. [ cl_array_row_major_index ,Array_Get12, Subscripts_Get,Result].
+
 
 compile_apply(_Ctx,_Env,F,Args,Result,cl_apply(F,Args,Result)).
 
@@ -132,6 +166,7 @@ compile_apply(_Ctx,_Env,F,Args,Result,cl_apply(F,Args,Result)).
   
    
 /*
+
 % progn mismatch?
 compile_funop(Ctx,Env,Result,[FN ], Body):- is_list(FN),!,
   trace,must_compile_body(Ctx,Env,Result,FN,Body).

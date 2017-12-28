@@ -116,15 +116,17 @@ compile_macro_function(Ctx,Env,Symbol,[FormalParms|MacroBody0],Macro,HeadParms,E
 % macroexpand-1
 wl:init_args(0,cl_macroexpand).
 cl_macroexpand_1([LispCode|Optionals],Result):- 
-  nth_value(Optionals,1,'$env',MacroEnv),
-  macroexpand_1_or_fail(LispCode,MacroEnv,R)->push_values([R,t],Result);push_values([LispCode,[]],Result).
+  nth_param(Optionals,1,Local,MacroEnv),
+  parent_env(Local),
+  macroexpand_1_or_fail(LispCode,MacroEnv,R)->cl_values_list([R,t],Result);cl_values_list([LispCode,[]],Result).
 
 % macroexpand
 wl:init_args(0,cl_macroexpand_1).
 cl_macroexpand([LispCode|Optionals],Result):- 
-  nth_value(Optionals,1,'$env',MacroEnv),
+  nth_param(Optionals,1,Local,MacroEnv),
+  parent_env(Local),
   macroexpand_all(LispCode,MacroEnv,R),!,
-  (R\==LispCode->push_values([R,t],Result);push_values([R,[]],Result)).
+  (R\==LispCode->cl_values_list([R,t],Result);cl_values_list([R,[]],Result)).
 
 
 macroexpand_all(LispCode,MacroEnv,Result):-

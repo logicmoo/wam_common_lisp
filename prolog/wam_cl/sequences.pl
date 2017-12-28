@@ -79,7 +79,7 @@ range_1_and_2_len(X,Y,Keys,XR,YR,Length):-
 % Maybe move to arglists
 % key_value(Keys,Name,Value,Default).
 key_value(Keys,Name,Value):- is_dict(Keys),!,Keys.Name=Value,!.
-key_value(Keys,Name,Value):- get_plist_value(Keys,Name,Value).
+key_value(Keys,Name,Value):- get_plist_value(cl_eql,Keys,Name,zzzz666,Value),Value\==zzzz666.
 key_value(Keys,Name,Value,_Default):- key_value(Keys,Name,Value),!.
 key_value(_Keys,_Name,Default,Default).
 

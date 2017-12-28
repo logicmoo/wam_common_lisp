@@ -294,13 +294,16 @@ file_sexpr_with_comments(O) --> one_blank,!,file_sexpr_with_comments(O).  % WANT
 file_sexpr_with_comments(C)                 --> sexpr_dcgPeek(`#|`),!, comment_expr(C).
 file_sexpr_with_comments(C)                 --> sexpr_dcgPeek(`;`),!, comment_expr(C).
 file_sexpr_with_comments(Out,S,E):- \+ t_l:sreader_options(with_text,true),!,phrase(file_sexpr(Out),S,E),!.
-file_sexpr_with_comments(Out,S,E):- 
+file_sexpr_with_comments(Out,S,E):- expr_with_comments(Out,file_sexpr(O),O,S,E).
+ 
+
+expr_with_comments(Out,DCG,O,S,E):- 
    lazy_list_character_count(StartPos,S,M),
-   file_sexpr(O,M,ME),
+   call(DCG,M,ME),!,
    lazy_list_character_count(EndPos,ME,E),
    Len is EndPos - StartPos,
    length(Grabber,Len),!,
-   get_sexpr_with_comments(O,Grabber,Out,M,ME).
+   get_sexpr_with_comments(O,Grabber,Out,M,ME),!.
 
 get_sexpr_with_comments(O,_,O,_,_):- compound(O),functor(O,'$COMMENT',_),!.
 get_sexpr_with_comments(O,Txt,with_text(O,Str),S,_E):-append(Txt,_,S),text_to_string(Txt,Str).
@@ -311,27 +314,10 @@ file_sexpr(end_of_file) --> file_eof,!.
 % WANT? 
 file_sexpr(O) --> one_blank,!,file_sexpr(O).
 file_sexpr(C) --> comment_expr(C),!.
-
-
-%   0.0003:   (PICK-UP ANDY IBM-R30 CS-LOUNGE) [0.1000]
-% file_sexpr(planStepLPG(Name,Expr,Value)) --> swhite,sym_or_num(Name),`:`,swhite, sexpr(Expr),swhite, `[`,sym_or_num(Value),`]`,swhite.
-
+% file_sexpr(planStepLPG(Name,Expr,Value)) --> swhite,sym_or_num(Name),`:`,swhite, sexpr(Expr),swhite, `[`,sym_or_num(Value),`]`,swhite.  %   0.0003:   (PICK-UP ANDY IBM-R30 CS-LOUNGE) [0.1000]
 % file_sexpr(Term,Left,Right):- eoln(EOL),append(LLeft,[46,EOL|Right],Left),read_term_from_codes(LLeft,Term,[double_quotes(string),syntax_errors(fail)]),!.
 % file_sexpr(Term,Left,Right):- append(LLeft,[46|Right],Left), ( \+ member(46,Right)),read_term_from_codes(LLeft,Term,[double_quotes(string),syntax_errors(fail)]),!.
-/*
-file_sexpr(Expr,S,E):- \+ t_l:sreader_options(with_text,true),!,
-  sexpr(Expr,S,E),!.
-
-file_sexpr(Out,S,E):- 
-   lazy_list_character_count(StartPos,S,M),
-   sexpr(O,M,ME),
-   lazy_list_character_count(EndPos,ME,E),
-   Len is EndPos - StartPos,
-   length(Grabber,Len),
-   get_sexpr_with_comments(O,Grabber,Out,M,ME).
-*/
 file_sexpr(Expr) --> sexpr(Expr),!.
-
 % file_sexpr(Expr,H,T):- lisp_dump_break,rtrace(phrase(file_sexpr(Expr), H,T)).
 /*
 file_sexpr(Expr) --> {fail},
@@ -467,8 +453,13 @@ sexpr(E)                      --> `#`,read_dispatch(E),!.
 
 sexpr('#\\'(C))                 --> `#\\`,ci(`u`),remove_optional_char(`+`),dcg_basics:xinteger(C),!.
 sexpr('#\\'(C))                 --> `#\\`,!,rsymbol(``,C), swhite.
-sexpr(['#-',K,O]) --> `#-`,sexpr(C),swhite,sexpr(O),!,{as_keyword(C,K)}.
-sexpr(['#+',K,O]) --> `#+`,sexpr(C),swhite,sexpr(O),!,{as_keyword(C,K)}.
+
+%sexpr(['#-',K,Out]) --> `#-`,!,sexpr(C),swhite,expr_with_comments(Out,sexpr(O),O),!,{as_keyword(C,K)}.
+%sexpr(['#+',K,Out]) --> `#+`,!,sexpr(C),swhite,expr_with_comments(Out,sexpr(O),O),!,{as_keyword(C,K)}.
+
+sexpr(['#-',K,O]) --> `#-`,!,sexpr(C),swhite,sexpr(O),!,{as_keyword(C,K)}.
+sexpr(['#+',K,O]) --> `#+`,!,sexpr(C),swhite,sexpr(O),!,{as_keyword(C,K)}.
+
 sexpr('$OBJ'(claz_pathname,C)) --> `#`,ci(`p`),s_string(C).
 sexpr('$S'(C)) -->                  (`#`, ci(`s`),`(`),!,sexpr_list(C),swhite,!.
 sexpr('$OBJ'(claz_bitvector,C)) --> `#*`,radix_digits(2,C),swhite,!.
@@ -497,8 +488,8 @@ sexpr(E)                      --> sym_or_num(E), swhite.
 sexpr(('+1-')) --> `+1-`,!,swhite.
 sexpr(('-1+')) --> `-1+`,!,swhite.
 
-sexpr(('#-')) --> `#-`,!,swhite.
-sexpr(('#+')) --> `#+`,!,swhite.
+%sexpr(('#-')) --> `#-`,!,swhite.
+%sexpr(('#+')) --> `#+`,!,swhite.
 
 sym_or_num(('-1-')) --> `-1-`,swhite,!.
 sym_or_num(('-1+')) --> `-1+`,swhite,!.
@@ -735,8 +726,9 @@ to_unbackquote(I,O):-to_untyped(I,O),!.
 %atom_or_string(X):- (atom(X);string(X)),!.
 as_keyword(C,K):- atom(C),!,(atom_concat_or_rtrace(':',_,C)->K=C;atom_concat_or_rtrace(':',C,K)),!.
 as_keyword(C,C):- \+compound(C),!.
-as_keyword([A|B],[AK|BK]):- as_keyword(A,AK),as_keyword(B,BK),!.
+as_keyword([A|B],[AK|BK]):- !, as_keyword(A,AK),as_keyword(B,BK),!.
 as_keyword(C,C).
+
 
 %% to_untyped( :TermVar, :TermName) is det.
 %

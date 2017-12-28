@@ -38,7 +38,7 @@ ht_match_key_value(Tree,Test,Key,Name,Value):-
 cl_gethash(Key,HT,RetVal):- cl_gethash(Key,HT,[],RetVal).
 cl_gethash(Key,HT,Default,RetVal):- 
   get_table(HT,Tree,_),ht_test_fn(HT,TestFn),
-  (ht_match_key_value(Tree,TestFn,Key,_Name,Value)->push_values([Value,t],RetVal);push_values([Default,[]],RetVal)).
+  (ht_match_key_value(Tree,TestFn,Key,_Name,Value)->cl_values_list([Value,t],RetVal);cl_values_list([Default,[]],RetVal)).
 
 ht_test_fn(HT,TestFn):- get_opv(HT,test,Test),!,as_lisp_binary_fn(Test,TestFn).
 

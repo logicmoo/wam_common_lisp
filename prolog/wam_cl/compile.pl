@@ -50,9 +50,10 @@ lisp_compile(Result,SExpression,Body):-
 lisp_compile(Env,Result,Expression,Body):-
    always(lisp_compile(_Ctx,Env,Result,Expression,(Body))).
 
-lisp_compile(Ctx,Env,Result,SExpression,Body):-
+lisp_compile(Ctx,Env,Result,SExpression,BodyO):-
    quietly(as_sexp(SExpression,Expression)),
-   always(must_compile_progn(Ctx,Env,Result,[Expression],Body)).
+   always(must_compile_progn(Ctx,Env,Result,[Expression],Body)),
+   body_cleanup_fuller(Ctx,Body,BodyO).
    
 
 :- nop( debug_var('FirstForm',Var)),
@@ -69,7 +70,7 @@ compile_each(_Ctx,_Env,[],[],true).
 compile_each(Ctx,Env,[VarR|Result],[Var|Eval],Code):-
   must_compile_body(Ctx,Env,VarR,Var,Code0),
   compile_each(Ctx,Env,Result,Eval,Code1),
-  conjoin_0(Ctx,Code0,Code1,Code).
+  conjoin_0(Ctx,Code0,Code1,Code),!.
 
 
 

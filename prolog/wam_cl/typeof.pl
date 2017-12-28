@@ -79,7 +79,7 @@ type_named('$OBJ'(_,Type),Type):- atom(Type),!.
 type_named(Type,Type):- atomic(Type).
 
 
-cl_typep(Obj,Type,Result):- t_or_nil(is_typep(Obj,Type),Result),push_values([Result,t],_).
+cl_typep(Obj,Type,Result):- t_or_nil(is_typep(Obj,Type),Result),cl_values_list([Result,t],_).
 
 is_subtypep(SubType,Type):- find_class(SubType,SubClass),find_class(Type,Class),is_subclass(SubClass,Class).
 is_subclass(Class,Class).
