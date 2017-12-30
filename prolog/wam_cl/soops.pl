@@ -413,6 +413,8 @@ f_sys_get_iprops(Obj,Result):- findall([Prop|Value],get_opv(Obj,Prop,Value),Resu
 (wl:init_args(exact_only,f_sys_get_opv)).
 wl:interned_eval('`sys:get-opv').
 f_sys_get_opv(Obj,Prop,Value):- get_opv(Obj,Prop,Value).
+wl:interned_eval('`sys:set-opv').
+f_sys_set_opv(Obj,Prop,Value,R):- set_opv(Obj,Prop,Value),R=Obj.
 
 f_u_to_pvs(X,[float|XX]):- notrace(catch(XX is (1.0 * X),_,fail)),!.
 f_u_to_pvs(X,XX):- findall([P|V],((get_opv_ii(X,P,V),\+ personal_props(P))),List),
@@ -494,9 +496,11 @@ get_type_default(keyword,_,typeof,keyword).
 get_type_default(Type,_,Prop,Value):- is_prop_class_alloc(Type,Prop,Where),!,get_opv_iii(Where,Prop,Value).
 
 get_opv_iii(Obj,Prop,Value):- nonvar(Obj),wl:symbol_has_prop_getter(Obj,Prop,Getter),call(Getter,Obj,Prop,Value).
-get_opv_iii(Obj,Prop,Value):- soops:o_p_v(Obj,Prop,Value).
-get_opv_iii(Obj,Prop,Value):- atom(Obj),nb_current(Obj,Ref),nb_current_value(Ref,Prop,Value).
+get_opv_iii(Obj,Prop,Value):- get_opv_iiii(Obj,Prop,Value).
 get_opv_iii(Obj,Prop,Value):- soops:struct_opv(Obj,Prop,Value).
+
+get_opv_iiii(Obj,Prop,Value):- soops:o_p_v(Obj,Prop,Value).
+get_opv_iiii(Obj,Prop,Value):- (atom(Obj);var(Obj)),nb_current(Obj,Ref),nb_current_value(Ref,Prop,Value).
 
 compound_deref(C,_):- \+ compound(C),!,fail.
 compound_deref('$OBJ'(claz_reference,B),B):- atom(B).
@@ -783,6 +787,29 @@ make_soops:- cleanup_mop,tell('si2.data'),
    forall(member(Assert,[o_p_v(_,_,_)]),
      forall(clause(soops:Assert,true),
         ignore((P\==slot1,P\==has_slots,format('~q.~n',[Assert]))))), told.
+
+save_soops:-   
+  tell('si3.data'),
+     forall(get_opv_iiii(Obj,Prop,Value),
+       once(write_o_p_v(Obj,Prop,Value))),
+     told.
+
+write_o_p_v(_,_,Value):- var(Value).
+write_o_p_v(_,extra_info_proclaimed,[]).
+write_o_p_v(_,extra_info_deftype,[]).
+write_o_p_v(_,extra_info,[]).
+write_o_p_v(Obj,doc_deftype,[String,Def]):-write_o_p_v(Obj,doc_deftype,String),write_o_p_v(Obj,result_deftype,Def).
+write_o_p_v(_,ref,_).
+write_o_p_v(Obj,extra_info(_),List):-!,maplist(write_o_p_t(Obj),List).
+write_o_p_v(Obj,result_type(ecl2),WAS):- get_opv_iiii(Obj,result_type(sbcl),WAS).
+write_o_p_v(Obj,lambda_list(ecl2),WAS):- get_opv_iiii(Obj,lambda_list(sbcl),WAS).
+write_o_p_v(Obj,result_type(ecl2),number):- write_o_p_v(Obj,result_type(sbcl),sys_irrational).
+
+write_o_p_v(Obj,lambda_list(sbcl),WAS):- write_o_p_v(Obj,lambda_list,WAS).
+write_o_p_v(Obj,result_type(sbcl),WAS):- write_o_p_v(Obj,result_type,WAS).
+
+write_o_p_v(Obj,Prop,Value):- format('~q.~n',[o_p_v(Obj,Prop,Value)]).
+write_o_p_t(Obj,Prop):- format('~q.~n',[o_p_v(Obj,Prop,t)]).
 
 :- multifile o_p_v/3.
 :- dynamic o_p_v/3.

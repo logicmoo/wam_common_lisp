@@ -19,7 +19,7 @@
 :- include('header').
 
 
-f_u_make_read_table(Out):-create_struct(read_table,Out).
+f_sys_make_read_table(Out):-create_struct(read_table,Out).
   
 
 % reader_intern_symbols(ExprS1,ExprS1):- current_prolog_flag(no_symbol_fix,true),!.
@@ -89,11 +89,12 @@ atom_symbol_s(SymbolName,[],Package,Symbol):- intern_symbol(SymbolName,Package,S
 % PACKAGE::SYMBOL
 atom_symbol_s(PName,   ["", SymbolName],_UPackage,Symbol):- find_package_or_die(PName,Package),intern_symbol(SymbolName,Package,Symbol,_IntExt).
 % PACKAGE:SYMBOL will be made public
-atom_symbol_s(PName,   [SymbolName],_UPackage,Symbol):- \+ current_prolog_flag(lisp_autointern,false), find_package_or_die(PName,Package),atom_symbol_make_public(SymbolName,Package,Symbol),!.
+atom_symbol_s(PName,   [SymbolName],_UPackage,Symbol):- lisp_auto_intern, find_package_or_die(PName,Package),atom_symbol_make_public(SymbolName,Package,Symbol),!.
 % PACKAGE:SYMBOL must exists AND be public
 atom_symbol_s(PName,   [SymbolName],_UPackage,Symbol):- find_package_or_die(PName,Package),atom_symbol_public(SymbolName,Package,Symbol).
 
-
+lisp_auto_intern:- \+ current_prolog_flag(lisp_autointern,false),!.
+lisp_auto_intern:- reading_package(P),!,P==pkg_sys.
 
 % KEYWORD already exist or get created
 atom_symbol_make_public(SymbolName,Package, Symbol):- Package == pkg_kw,!, 

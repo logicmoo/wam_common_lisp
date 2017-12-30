@@ -73,7 +73,7 @@ find_package('$OBJ'(claz_package,UP),Package):- !, find_package(UP,Package),!.
 find_package(Obj,Res):- to_prolog_string_if_needed(Obj,F),!,find_package(F,Res).
 find_package(S,Package):- 
   as_string_upper(S,SN),!,
-  (package_name(Package,SN) ; package_nicknames(Package,SN) ; get_opv_i(Package,nicknames,SN)),!.
+  (package_name(Package,SN) ; package_nicknames(Package,SN) ; get_opv_i(Package,nicknames,SN) ; (atom_concat('SB!',_,SN)->Package=pkg_sys)),!.
 
 find_package_or_die(L,T):- to_prolog_string_if_needed(L,Loc),!,find_package_or_die(Loc,T).
 find_package_or_die(X,Y):-
@@ -204,18 +204,19 @@ is_lisp_package(P):- package_name(P,_).
 
 
 print_package_or_hash(P):-short_package_or_hash(P,O),write(O).
+
    short_package_or_hash(Var,O):- var(Var),!,O=(Var).
    short_package_or_hash([],O):- !,O=("#").
    short_package_or_hash(P,O):- pl_package_name(P,Symbol),shorter_name(Symbol,Short),!,O=(Short).
    short_package_or_hash(P,O):- pl_package_name(P,N),!,O=(N).
-   short_package_or_hash(P,O):- O=(failed_short_package_or_hash(P)).   
+   short_package_or_hash(P,O):- O=(failed_short_package_or_hash(P)).
+
    shorter_name(PN,NN):- package_nicknames(PN,NN),atom_length(PN,B),atom_length(NN,A),A<B.
    shorter_name("SYSTEM","SYS").
    shorter_name("COMMON-LISP","CL").
    %symbol printer might just use 
    shorter_name("COMMON-LISP-USER","U").
    %shorter_name("COMMON-LISP-USER","CL-USER").
-   shorter_name("SYSTEM","SYS").
    shorter_name("SYSTEM","SYS").
    shorter_name("EXTENSIONS","EXT").
    shorter_name(S,S).
@@ -275,9 +276,11 @@ package_nicknames(pkg_prolog, "P").
 package_nicknames(pkg_prolog, "INT").
 
 package_nicknames(pkg_sys, "SYS").
+package_nicknames(pkg_sys, "C").
 package_nicknames(pkg_sys, "SI").
 package_nicknames(pkg_sys, "SB!C").
 package_nicknames(pkg_sys, "SB!SYS").
+
 package_nicknames(pkg_sys, "CCL").
 package_nicknames(pkg_sys, "WAM-CL").
 

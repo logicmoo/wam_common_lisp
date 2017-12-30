@@ -135,6 +135,9 @@ symbol_value0(Env,[Place,Obj],Result):- trace, set_place(Env,getf,[Place,Obj],[]
 symbol_value_error(_Env,Var,_Result):- lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Var).
 throw(X,Y):- writeln(throw(X,Y)),lisp_dump_break,throw(lpa_throw(X,Y)).
 
+reset_mv:- b_getval('$mv_return',[V1,_V2|_])->b_setval('$mv_return',[V1]);true.
+
+push_values([V1|Push],V1):- always(nonvar(Push)),nb_setval('$mv_return',[V1|Push]).
 
 bvof(_,_,T):- notrace(((var(T);T==[tl]))),!,fail.
 bvof(E,M,T):-E=T,!,M=T.
@@ -172,13 +175,6 @@ env_sym_arg_val(Env,Var,InValue,Value):-
 env_sym_arg_val(Env,Var,InValue,Value):- !,
   symbol_value_or(Env,Var,(nonvar(InValue),InValue=Value),Value)-> true;
     lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Var).
-
-
-set_with_prolog_var(Ctx,Env,SetQ,Var,Result,set_var(Env,SetQ, Var, Result)):-
-  rw_add(Ctx,Var,w).
-
-expand_ctx_env_forms(Ctx, Env,Forms,Body, Result):- 
-   must_compile_body(Ctx,Env,Result,Forms, Body).
 
 
 normalize_let1([Variable, Form],[bind, Variable, Form]).

@@ -37,8 +37,9 @@ i can understand it might be important ideology to follow this when discussing a
 "you cannot discuss or implement prototype based inheritance since common lisp does not contain terminology your implementation uses"
 but such constraints would only limit the implementation of common lisp in other languages
 also sticking to only CL terminology would eccourage pedantic people instead of polymaths who program in at least 5 languages a week
-also I am not going to talk down to anyone (not you)..  i am going to treat you like you know just as much as i do about things..
- if my explaination leads to more questions then i expect to have to answer those questions as well
+
+
+ I am not going to talk down to anyone (not you)..  i am going to treat you like you know just as much as i do about things..
 if you do not want to become a contributor, i cannot force you to 
 it would also limit the implementation of other languages in common lisp 
 after 35 years of coding interpretors and compilers for several languages, I am just too stuck in my ways, 

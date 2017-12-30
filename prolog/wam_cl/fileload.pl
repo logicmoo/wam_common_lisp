@@ -38,7 +38,7 @@ tdd1:- cl_compile_file('../../t/daydreamer/*.cl',_).
 tdd2:- cl_load('../../t/daydreamer/*.cl',_).
 
 
-km:- cdkm, cl_compile("km",_).
+km:- cdkm, cl_compile_file("km",_).
 km1:- cdkm, cl_load("km",_).
 
 cl_compile_file_mask(Mask,keys(Keys),TF):- 

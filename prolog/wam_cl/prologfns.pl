@@ -67,7 +67,7 @@ compile_prolog_call(_Ctx,_Env,Prev,[sys_trace],Prev, trace).
 wl:init_args(exact_only, sys_rtrace).
 wl:declared(sys_rtrace,kw_operator).
 wl:interned_eval('`sys:rtrace').
-f_sys_rtrace(Eval,Ret):- rtrace(cl_eval(Eval,Ret)).
+f_sys_rtrace(Eval,Ret):- lisp_compile(Ret,Eval,Body), rtrace(Body).
 f_sys_rtrace(t):- rtrace.
 
 % (sys:prolog)
@@ -107,6 +107,11 @@ wl:interned_eval('`sys:prolog-inline').
 compile_prolog_call(Ctx,Env,Prev,[sys_prolog_inline,Call],Prev, Term ):-
    read_prolog_from_lisp(Call,Term0),
    expand_prolog(Prev,Ctx,Env,Term0,Term).
+
+
+% (rtrace ?progn )
+compile_prolog_call(Ctx,Env,Result,[sys_rtrace|Progn],Prev, rtrace(Body) ):-
+   must_compile_progn(Ctx,Env,Result, Progn, Prev, Body).
 
 as_prolog_object(Operand,PrologArg):- is_stringp(Operand),to_prolog_string(Operand,PrologArg).
 as_prolog_object(Operand,PrologArg):- is_unmberp(Operand),to_prolog_number(Operand,PrologArg).

@@ -262,7 +262,7 @@ cl_plus(Num1, Num2, Result):-
         Result is Num1 + Num2.
 cl_minus(Num1, Num2, Result):-
 	Result is Num1 - Num2.
-cl_times(Num1, Num2, Result):-
+ext_times(Num1, Num2, Result):-
 	Result is Num1 * Num2.
 cl_divide(Num1, Num2, Result):-
 	Result is Num1 / Num2.

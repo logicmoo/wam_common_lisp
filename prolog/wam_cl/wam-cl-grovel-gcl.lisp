@@ -15108,7 +15108,7 @@ First directory is checked for first name and all extensions etc."
   (case type
     (list `(setf (nth ,index ,struct) ,newvalue))
 ;    (list `(si:rplaca-nthcdr ,struct ,index ,newvalue))
-    (vector `(si:elt-set ,struct ,index ,newvalue))
+    (vector `(si::elt-set ,struct ,index ,newvalue))
     (t `(si::structure-set ,struct ',type ,index ,newvalue))))
 
 (defun setf-expand (l env)

@@ -27,7 +27,7 @@ both_outputs(G):-
 
 
 colormsg1(Msg,Args):- mesg_color(Msg,Ctrl),!,ansicall_maybe(Ctrl,format(Msg,Args)).
-%colormsg1(Msg):- writeq(Msg),nl,nl,!. %nononotrace(colormsg11(Msg)).
+%colormsg1(Msg):- writeq(Msg),nl,nl,!. %dnotrace(colormsg11(Msg)).
 colormsg1(Msg):- mesg_color(Msg,Ctrl),!,ansicall_maybe(Ctrl,in_md(prolog,fmt9(Msg))).
 
 %ansicall_maybe(_Ctrl,Cmd):- !,nl,nl,portray_clause_w_vars(Cmd),nl,nl,(Cmd),break.
@@ -46,18 +46,18 @@ fmt_lispcode(Cmt):- is_comment(Cmt,Txt),clean_codes(Txt,Clean),text_to_string(Cl
 fmt_lispcode(Txt):- set_md_lang('common-lisp'),cmpout(comment(Txt)),set_md_lang(prolog).
 
 % Lisp Informational Message (depends on verbosity level)
-dbginfo(X):- nononotrace(ignore((is_verbose;is_must_show_msg(X))->userout(X))).
+dbginfo(X):- dnotrace(ignore((is_verbose;is_must_show_msg(X))->userout(X))).
 
-nononotrace(G):- G.
+dnotrace(G):- notrace(G).
 
 % User Message (intended to be seen)
 userout(flat(X)):- !,write_flat(X).
-userout(X):- simplify_goal_printed(X,XX),!,in_md(cl,nononotrace(dbmsg(comment(XX)))).
+userout(X):- simplify_goal_printed(X,XX),!,in_md(cl,dnotrace(dbmsg(comment(XX)))).
 
-write_flat(X):- !, nononotrace((make_pretty(X,X0),writeq(X0),writeln('.'))),!.
+write_flat(X):- !, dnotrace((make_pretty(X,X0),writeq(X0),writeln('.'))),!.
 
 % Compiler output when writitng files
-cmpout(X):- in_md(prolog,nononotrace(dbmsg(X))).
+cmpout(X):- in_md(prolog,dnotrace(dbmsg(X))).
 
 
 dbmsg(X):- make_pretty(X,X0),both_outputs(dbmsg0(X0)).

@@ -217,6 +217,7 @@ cl_copy_list([M|List],[M|Copy]):-cl_copy_list(List,Copy).
 wl:type_checked(cl_length(claz_cons,integer)).
 cl_length(Sequence,Len):- always(length(Sequence,Len)).
 
+cl_list_length(Sequence,Len):- always(length(Sequence,Len)).
 
 
 cl_remove('$ARRAY'([S],Type,A),B,'$ARRAY'([Sm1],Type,C)):-pl_remove(-1,is_equal,A,B,C,Did),(number(S)->Sm1 is S-Did ; Sm1=S).

@@ -166,11 +166,12 @@ print_prefixed_symbol(Symbol,_,SP,_):- print_package_or_hash(SP),write('::'),wri
 
 
 
-cl_symbol_plist(Symbol,Value):- assertion(is_symbolp(Symbol)),get_opv(Symbol,plist,Value)->true;Value=[].
+cl_symbol_plist(Symbol,Value):- %assertion(is_symbolp(Symbol)),
+   get_opv(Symbol,plist,Value)->true;Value=[].
 
 (wl:init_args(2,cl_get)).
 %(get x y &optional d) ==  (getf (symbol-plist x) y &optional d)
-cl_get(Symbol,Prop,Optionals,Value):- assertion(is_symbolp(Symbol)),
+cl_get(Symbol,Prop,Optionals,Value):- %assertion(is_symbolp(Symbol)),
   cl_symbol_plist(Symbol,PList),
   nth_param(Optionals,1,[],Default,PresentP),
   (PList==[]-> Value=Default ;
@@ -182,7 +183,7 @@ cl_get(Symbol,Prop,Optionals,Value):- assertion(is_symbolp(Symbol)),
 wl:interned_eval(("`sys:putprop")).
 (wl:init_args(3,f_sys_putprop)).
 %(sys:putprop x y) ==  (setf (symbol-plist x) y)
-f_sys_putprop(Symbol,Prop,Value,Optionals,Ret):- assertion(is_symbolp(Symbol)), 
+f_sys_putprop(Symbol,Prop,Value,Optionals,Ret):- %assertion(is_symbolp(Symbol)), 
   nth_param(Optionals,1,[],_Default,PresentP),  
   cl_symbol_plist(Symbol,PList),
   (PresentP==t->get_test_pred(cl_eql,Optionals,EqlPred);EqlPred=cl_eql),
@@ -216,7 +217,7 @@ set_plist_value_fail_on_missing(EqlPred,Old,[_,_,Next|PList],Prop,Value):- !, se
 wl:interned_eval(("`sys:get-sysprop")).
 f_sys_get_sysprop(Symbol,Prop,Optionals,Value):-!, cl_get(Symbol,Prop,Optionals,Value).
 
-f_sys_get_sysprop(Symbol,Prop,Optionals,Value):- assertion(is_symbolp(Symbol)),
+f_sys_get_sysprop(Symbol,Prop,Optionals,Value):- %assertion(is_symbolp(Symbol)),
   nth_param(Optionals,1,[],Default,PresentP),
   (get_opv(Symbol,sysprops,PList) ->  
   ((PList==[]-> Value=Default ;
@@ -231,7 +232,7 @@ f_sys_get_sysprop(Symbol,Prop,Optionals,Value):- assertion(is_symbolp(Symbol)),
 wl:interned_eval(("#'sys:put-sysprop")).
 f_sys_put_sysprop(Symbol,Prop,Value,Optionals,Ret):-!, f_sys_putprop(Symbol,Prop,Value,Optionals,Ret).
 
-f_sys_put_sysprop(Symbol,Prop,Value,Optionals,Ret):- assertion(is_symbolp(Symbol)),   
+f_sys_put_sysprop(Symbol,Prop,Value,Optionals,Ret):- %assertion(is_symbolp(Symbol)),   
   (get_opv(Symbol,sysprops,PList)->true;PList==[]),  
    nth_param(Optionals,1,[],_Default,PresentP),
   (PresentP==t->get_test_pred(cl_eql,Optionals,EqlPred);EqlPred=cl_eql),

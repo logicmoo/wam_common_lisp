@@ -66,6 +66,13 @@ push_le_prepend(O,Env,_,Name,Value):- push_list_prepend(O,Env,Name,Value).
 push_list_prepend(O,Env,Name,Value):- Env=[H|T],ct(O,2,Env,[H|T]),ct(O,1,Env,bv(Name,Value)).
 
 
+
+:- multifile(user:portray/1).
+:- dynamic(user:portray/1).
+:- discontiguous(user:portray/1).
+
+user:portray(List):- notrace((nonvar(List),List=[_|_],sub_term(E,List),ground(E),E = ((environ=W)),write(environment(W)))).
+
 user:portray(environment{name:N, tracker:_}):-!,writeq(N).
 % user:portray(X):- is_rbtree(X),!,writeq(is_rbtree).
 user:portray(env(RB,_)):- get_env_attribute(RB,name,Value),!, writeq(Value).
@@ -182,8 +189,8 @@ make_env_append(_Ctx,_Env,HeadEnv,[[A|List]|More],HeadEnv=ALL):- is_list(List),a
 make_env_append(_Ctx,_Env,HeadEnv,ZippedArgEnv,HeadEnv=ZippedArgEnv):-!.
 */
 make_env_append(Ctx,Env,HeadEnv,More,HeadEnv=ALL):- 
-   env_append(Ctx,Env,More,MALL),
-   env_append(Ctx,Env,MALL,ALL),!.
+  always(( env_append(Ctx,Env,More,MALL),
+   env_append(Ctx,Env,MALL,ALL))),!.
 
 env_append(_Ctx,_Env,More,ALL):-var(More),!,ALL=More.
 env_append(_Ctx,_Env,[VAR|Rest],Rest):-VAR==Rest,!.

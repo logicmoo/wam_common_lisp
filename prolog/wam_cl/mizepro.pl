@@ -17,7 +17,10 @@
 :- include('header').
 
 debug_optimize(Msg):- wdmsg(Msg).
-allowed_level(X):- X =< 1.
+
+
+allowed_level(X):- wam_cl_option(safety,V),V\==1,!,Lvl is 4-V,  X =< Lvl.
+allowed_level(X):- wam_cl_option(speed,V), X =< V.
 /*
 
 0 = dont trust any
@@ -51,23 +54,7 @@ body_cleanup_keep_debug_vars_fuller(Ctx,CodeSt,Code5a):-!,
 
 %body_cleanup_full(Ctx,CodeSt,CodeOutNow):- body_cleanup_keep_debug_vars_fuller(Ctx,CodeSt,CodeOutNow),!.
 
-body_cleanup_fuller(Ctx,A,I):- !,
- always((   
-   sanitize_true(Ctx,A,B),
-   del_attrs_of(B,freeze),
-   body_cleanup_keep_debug_vars1(Ctx,B,C),   
-   inline_body([],Ctx,',',C,D),   
-   fast_get_sets(Ctx,',',D,E),
-   env_mize(Ctx,',',E,F),
-   body_cleanup_keep_debug_vars1(Ctx,F,G),
-   sanitize_true(Ctx,G,H),
-   add_type_checks_maybe(Ctx,H,I),
-   del_attrs_of(I,preserved_var),
-   del_attrs_of(I,dif))).
-
-% body_cleanup_full(_Ctx,I,I):-!.
-body_cleanup_full(Ctx,I,O):- !, body_cleanup_no_optimize(Ctx,I,O),!.
-
+%body_cleanup_full(_Ctx,I,I):-!.
 body_cleanup_full(_Ctx,CodeSt,CodeOutNow):- var(CodeSt),!,CodeOutNow=CodeSt.
 %body_cleanup_full(Ctx,:- CodeSt,:- CodeOutNow):-!,body_cleanup_full(Ctx,CodeSt,CodeOutNow).
 body_cleanup_full(Ctx,CodeSt,CodeOutNow):- 
@@ -76,7 +63,7 @@ body_cleanup_full(Ctx,CodeSt,CodeOutNow):-
    %properly_protect(Ctx,CodeSt,_),
    sanitize_true(Ctx,CodeSt,CodeIn),
    del_attrs_of(CodeIn,freeze),
-   inline_operation([],Ctx,',',CodeIn,Code0),
+   inline_operation([],Ctx,',',CodeIn,Code0),    
    body_cleanup_keep_debug_vars1(Ctx,Code0,Code2),
    body_cleanup_keep_debug_vars1(Ctx,Code2,Code3),   
    env_mize(Ctx,',',Code3,Code4),
@@ -168,7 +155,7 @@ oper_mize(W,Ctx,F,C1,C2):- body_mize([],W,Ctx,F,C1,C2).
 
 body_mize(_Skip,_Whole,_Ctx,_,Code,Out):- skip_optimize(Code),Out=Code.
 body_mize(Skip,_Whole,_Ctx,_,Code,Out):- functor(Code,F,N),member(F/N,Skip),Out=Code.
-%body_mize(_Skip,W,_Ctx,_,Var = Ground, true):- var(Var),ground(Ground),  occurrences_of_var(Var,W,N)-> N==2.
+%body_mize(_Skip,W,_Ctx,_,Var = Ground, true):- var(Var),ground(Ground), trace, occurrences_of_var(Var,W,N)-> N==2.
 body_mize(_Skip,_Whole,_Ctx,_,C1,C1):-!.
 body_mize(Skip,W,Ctx,F,(C1,C2),Joined):-!,
    body_mize(Skip,W,Ctx,F,C1,C1O),
@@ -211,17 +198,17 @@ properly_protect(Ctx,C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(pro
 del_attr_rev2(Name,Var):- del_attr(Var,Name).
 del_attrs_of(CodeIn,Name):- term_variables(CodeIn,AttVars),maplist(del_attr_rev2(Name),AttVars).
 
-
+sanitize_true(_, C1,C2):- \+ compound(C1),!,C2=C1.
 sanitize_true(_, C1,C2):- non_compound_code(C1),!,C2=C1.
 sanitize_true(_,f_clos_pf_set_slot_value(A,B,C,D),set_opv(A,B,C)):-C=D.
 sanitize_true(_,cl_slot_value(A,B,C),get_opv(A,B,C)).
 sanitize_true(Ctx,(C1,C2),Joined):-!,sanitize_true(Ctx,C1,C1O),sanitize_true(Ctx,C2,C2O),conjoin_0(Ctx,C1O,C2O,Joined).
-%sanitize_true(Ctx,(C2 ; CodeC),( C2O ; CodeCCO)):-!,sanitize_true(Ctx,C2,C2O),sanitize_true(Ctx,CodeC,CodeCCO).
-%sanitize_true(Ctx,(C2 -> CodeC),( C2O -> CodeCCO)):-!,sanitize_true(Ctx,C2,C2O),sanitize_true(Ctx,CodeC,CodeCCO).
-%sanitize_true(Ctx,(C2 :- CodeC),( C2 :- CodeCCO)):-!,sanitize_true(Ctx,CodeC,CodeCCO).
-%sanitize_true(Ctx,( :- CodeC),( :- CodeCCO)):-!,sanitize_true(Ctx,CodeC,CodeCCO).
-%sanitize_true(_Ctx,C1,C1):-!.
-sanitize_true(Ctx,C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(sanitize_true(Ctx),C1O,C2O),C2=..[F|C2O].
+sanitize_true(Ctx,(C2 ; CodeC),( C2O ; CodeCCO)):-!,sanitize_true(Ctx,C2,C2O),sanitize_true(Ctx,CodeC,CodeCCO).
+sanitize_true(Ctx,(C2 -> CodeC),( C2O -> CodeCCO)):-!,sanitize_true(Ctx,C2,C2O),sanitize_true(Ctx,CodeC,CodeCCO).
+sanitize_true(Ctx,(C2 :- CodeC),( C2 :- CodeCCO)):-!,sanitize_true(Ctx,CodeC,CodeCCO).
+sanitize_true(Ctx,( :- CodeC),( :- CodeCCO)):-!,sanitize_true(Ctx,CodeC,CodeCCO).
+sanitize_true(_Ctx,C1,C1):-!.
+%sanitize_true(Ctx,C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(sanitize_true(Ctx),C1O,C2O),C2=..[F|C2O].
 
 keeper(C1):- var(C1),!.
 keeper(!).
@@ -235,16 +222,13 @@ conjoin_1(_,clean_escape(_),_,true):- !.
 
 conjoin_0(Ctx,C1,C2,(C1,C3)):- keeper(C1),!,visit_lit(Ctx,C2,C3).
 conjoin_0(Ctx,C1,C2,(C3,C2)):- keeper(C2),!,visit_lit(Ctx,C1,C3).
-%conjoin_0(Ctx,C1,clean_escape(_),C1):- !.
+%conjoin_0(Ctx,C1,clean_escape(_),C1):- trace,!.
 conjoin_0(_,(clean_escape(_),_),_,true):- !.
 conjoin_0(Ctx,(C1,clean_escape(_)),_,C3):- visit_lit(Ctx,C1,C3).
 conjoin_0(Ctx,C1,(clean_escape(_),_),C3):- visit_lit(Ctx,C1,C3).
 conjoin_0(Ctx,C1,C2,C4):-      conjoin_1(Ctx,C1,C2,C3),!,visit_lit(Ctx,C3,C4).
-
+conjoin_0(Ctx,C1,(C2,C2a),C3):-conjoin_1(Ctx,C1,C2,C12),!,conjoin_0(Ctx,C12,C2a,C3).
 conjoin_0(Ctx,(C1,C1O),C2,OUT):-!,conjoin_0(Ctx,C1O,C2,AAB),conjoin_0(Ctx,C1,AAB,OUT).
-conjoin_0(Ctx,(C1,C1a),(C2,C2a),C13):-conjoin_0(Ctx,C1a,C2,C12),!,conjoin_0(Ctx,C12,C2a,C3),conjoin_0(C1,C3,C13).
-%conjoin_0(Ctx,C1,(C2,C2a),C3):-conjoin_0(Ctx,C1,C2,C12),!,conjoin_0(Ctx,C12,C2a,C3).
-
 conjoin_0(Ctx,C1,C2,(C11,C21)):- !,visit_lit(Ctx,C1,C11),!,visit_lit(Ctx,C2,C21).
 
 visit_lit(_,C1,C1):-!.
@@ -267,8 +251,8 @@ mize_body(Ctx,_,catch(C1,E, C2),catch(C1O,E, C2O)):- !, mize_body(Ctx,->,C1,C1O)
 
 %mize_body(_Ctx,_,C1,C1):-!.
 
-structure_applies(A,B):- copy_term_nat(A,CA),copy_term_nat(B,CB),numbervars(CA,0,_),
-  \+ (CA \= CB),
+structure_applies(A,B):- copy_term_nat(A,CA),numbervars(CA,0,_),
+  \+ (CA \= B),
    A=B.
 structure_variant(A,B):- copy_term_nat(A,CA),copy_term_nat(B,CB),numbervars(CA,0,_),numbervars(CB,0,_),
   \+ (CA \= CB),
@@ -500,13 +484,30 @@ inline_body(_Never,_Ctx,_F,C1,C1):-!.
 any_inline(_Never,_Ctx,_,In,Out):- simple_inline(In,Out),!.
 any_inline(Never,Ctx,F,C1,Out):- 
   maybe_inline(C1),
-  stay_all_different(C1),  
+  stay_all_different(C1),
   get_inlined(C1,MID),functor(C1,F,A),
   progress_g(dbginfo(inlined(C1):-MID)),!,
   sanitize_true(Ctx,MID,MID2),
   inline_body([F/A|Never],Ctx,F,MID2,Out),!.
 
+/*
+inline_body(_Never,_Ctx,_,In,Out):- stay_all_different(In),simple_inline(In,Out),!.
+inline_body(Never,Ctx,F,C1,Out):- 
+  maybe_inline(C1),
+  stay_all_different(C1),  
+  get_inlined(C1,MID),functor(C1,F,A),
+  progress_g(dbginfo(inlined(C1):-MID)),!,
+  sanitize_true(Ctx,MID,MID2),
+  inline_body([F/A|Never],Ctx,F,MID2,Out).
+inline_body(_Never,_Ctx,_,C1,C1):- non_compound_code(C1),!.
+inline_body(Never,Ctx,_F,C1,C2):- compound_name_arguments(C1,F,C1O),
+  must_maplist(inline_body(Never,Ctx,F),C1O,C2O),!,C2=..[F|C2O].
+inline_body(_Never,_Ctx,_F,C1,C1):-!.
+*/
 simple_inline(In,_Out):- \+ compound(In),!,fail.
+simple_inline(set_var(E, OP, N, V),set_var(E, N, V)):- atom(N),atom(OP),memberchk(OP,[psetq,setq]).
+simple_inline(set_place(E, OP, N, V),set_var(E, N, V)):- var(V), atom(N),atom(OP),memberchk(OP,[psetq,setq]).
+%simple_inline(set_var(E, OP, [PLACE, N], V),set_place(E, OP, [PLACE, N], V)):- var(V), atom(N),atom(OP),memberchk(OP,[setf]).
 simple_inline(cl_list(A,B),B=A).
 simple_inline(f_clos_pf_set_slot_value(A,B,C,D),set_opv(A,B,C)):-C=D.
 simple_inline(cl_cdr(I,O),(I==[]->O=[];I=[_|O])):- wam_cl_option(debug,0).
@@ -542,7 +543,7 @@ always_inline_fa(F,_):- atom_concat_or_rtrace(_,'expand1',F).
 always_inline_fa(F,_):- atom_concat_or_rtrace('cl_c',M,F),atom_concat_or_rtrace(_,'ar',M).
 always_inline_fa(F,_):- atom_concat_or_rtrace('cl_c',M,F),atom_concat_or_rtrace(_,'dr',M).
 
-maybe_inline(_):-!,fail.
+%maybe_inline(_):-!,fail.
 maybe_inline(_):- \+ (wam_cl_option(safe(inline),true);wam_cl_option(inline,true)),!,fail.
 maybe_inline(C1):- never_inline(C1),!,fail.
 maybe_inline(C1):- \+ predicate_property(C1,number_of_clauses(1)),!,fail.

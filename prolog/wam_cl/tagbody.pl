@@ -44,11 +44,12 @@ compile_body_select_tagbody(Ctx,Env,[],[tagbody| InstrS], Code):- debug_var("_TB
    Code = call_addr_block(Env,CInstrS,Addrs2).
 
 push_label(_).
-goto(Tag,Env):- notrace(throw(goto(Tag,Env))).
+goto(Tag,Env):- quietly(throw(goto(Tag,Env))).
 call_addr_block(EnvCatch,Start,Addrs):-
   catch(Start,
       goto(Tag,EnvCatch),
-           ((always(member(addr(_Pred, Tag,_,NewEnv,NewCode),Addrs))->!;throw(goto(Tag,EnvCatch))),
+           ((always((member(addr(_Pred, Tag,_,NewEnv,NewCode),Addrs);member(addr(Tag, _,_,NewEnv,NewCode),Addrs)))->!;
+              (slow_trace,throw(goto(Tag,EnvCatch)))),
            copy_term(NewEnv:NewCode,NewEnvCopy:NewCodeCopy),
            NewEnvCopy = EnvCatch,
            call_addr_block(EnvCatch,NewCodeCopy,Addrs))).
@@ -59,6 +60,7 @@ call_addr_block(EnvCatch,Start,Addrs):-
 % shared_lisp_compiler:plugin_expand_progbody(Ctx,Env,Result,InstrS,_PreviousResult,Code):-  compile_body_go_tagbody(Ctx,Env,Result,InstrS,Code),!.
 
 push_label(_,_,_).
+push_label(_,_).
 % @IDEA we might use labels later 
 compile_body_go_tagbody(_Ctx,_Env,Result,[label,Label,ID|Rest], PUSH ):-!, debug_var("_LABELRES",Result),
   nop(PUSH = push_label(Label,ID,Rest)),PUSH=true.
@@ -166,16 +168,16 @@ compile_addresses(_TB,Addr,(Head:-Body)):-
 
 
 
-is_reflow([OP|ARGS],Label):- is_reflow(OP,ARGS,Label).
-is_reflow(OPARGS,Label):- OPARGS=..[OP|ARGS],is_reflow(OP,ARGS,Label).
-is_reflow('go',[Label|_],Label).
-is_reflow('cl_go',[Label|_],Label).
-is_reflow('goto',[Label|_],Label).
-is_reflow('tagbody_go',[Label|_],Label).
-is_reflow('gosub',[Label|_],Label).
-is_reflow('return',_,[]).
-is_reflow(OP,[Label|_],Label):- same_symbol(OP,'return-from').
-is_reflow('throw',[Label|_],Label).
+is_reflow([OP|ARGS],Label):- is_reflow3(OP,ARGS,Label).
+is_reflow(OPARGS,Label):- OPARGS=..[OP|ARGS],is_reflow3(OP,ARGS,Label).
+is_reflow3('go',[Label|_],Label).
+is_reflow3('cl_go',[Label|_],Label).
+is_reflow3('goto',[Label|_],Label).
+is_reflow3('tagbody_go',[Label|_],Label).
+is_reflow3('gosub',[Label|_],Label).
+is_reflow3('return',_,[]).
+is_reflow3('throw',[Label|_],Label).
+is_reflow3('return_from',[Label|_],Label).
 
 
 is_label(Atom,Atom):- atomic(Atom),!,Atom\==[].

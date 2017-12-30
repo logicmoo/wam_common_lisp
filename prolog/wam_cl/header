@@ -142,6 +142,7 @@
 
 
 :- ensure_loaded(eightball).
+:- ensure_loaded(places).
 :- ensure_loaded(environs).
 :- ensure_loaded(proclaim).
 :- ensure_loaded(packages).
@@ -178,7 +179,6 @@
 :- ensure_loaded(numbers).
 :- ensure_loaded(operatorfns).
 :- ensure_loaded(pathnames).
-:- ensure_loaded(places).
 :- ensure_loaded(printers).
 :- ensure_loaded(readtables).
 :- ensure_loaded(repl).
@@ -202,3 +202,6 @@
 %:- use_module(utils_list).
 :- use_module(utils_higher_order).
 */
+
+:- grovel_system_symbols.
+

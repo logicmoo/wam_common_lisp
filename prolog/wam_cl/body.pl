@@ -231,19 +231,6 @@ cl_dolist(VarList,FormS,Result):-
              (nb_setarg(2,BV,X),
                Body))).
 
-% =============================================================================
-% = COMPILE =  ( file with several other debugging tools?)
-% =============================================================================
-
-% (compile ...)
-compile_body_form(Ctx,Env,Result,[compile|Forms], Body):- !,
-   must_compile_closure_body(Ctx,CompileEnvironment,CompileResult,[progn|Forms],  CompileBody),
-   
-   debug_var('LResult',CompileResult),
-   debug_var('CompileEnvironment',CompileEnvironment),
-   Result = closure([CompileEnvironment|Env],CompileResult,[],CompileBody),
-   Body = true.
-
 
 % =============================================================================
 % = Multiple Values = 
@@ -255,7 +242,7 @@ compile_body_form(Ctx,Env,Result,['values',R1|EvalList], (ArgBody,Body)):-!,
 compile_body_form(_Ctx,_Env,[],['values'], nb_setval('$mv_return',[])):-!.
 
 :- nb_setval('$mv_return',[]).
-reset_mv:- b_getval('$mv_return',[V1,_V2|_])->b_setval('$mv_return',[V1]);true.
+%reset_mv:- b_getval('$mv_return',[V1,_V2|_])->b_setval('$mv_return',[V1]);true.
 cl_values_list([V1|Push],V1):- always(nonvar(Push)),nb_setval('$mv_return',[V1|Push]).
 
 

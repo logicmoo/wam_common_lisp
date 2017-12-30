@@ -22,7 +22,7 @@ build
 *.o
 *~
 *k
-*/
+#*/
 *.trans.pl
 
 

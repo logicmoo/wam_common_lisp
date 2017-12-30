@@ -53,7 +53,7 @@ lisp_compile(Env,Result,Expression,Body):-
 lisp_compile(Ctx,Env,Result,SExpression,BodyO):-
    quietly(as_sexp(SExpression,Expression)),
    always(must_compile_progn(Ctx,Env,Result,[Expression],Body)),
-   body_cleanup_fuller(Ctx,Body,BodyO).
+   body_cleanup_full(Ctx,Body,BodyO).
    
 
 :- nop( debug_var('FirstForm',Var)),
@@ -72,6 +72,20 @@ compile_each(Ctx,Env,[VarR|Result],[Var|Eval],Code):-
   compile_each(Ctx,Env,Result,Eval,Code1),
   conjoin_0(Ctx,Code0,Code1,Code),!.
 
+compile_each_quoted(_Ctx,_Env,[],[],true).
+compile_each_quoted(Ctx,Env,RPARAMS,CPARAMS,Code):-
+  compile_each(Ctx,Env,PARAMS,CPARAMS,Code1),
+  quotify_each(Ctx,Env,RPARAMS,PARAMS,Code2),
+  Code = (Code1,Code2),!.
+
+quotify_each(_Ctx,_Env,[],[],true).
+quotify_each(Ctx,Env,[VarR|Result],[Var|Eval],Code):-
+  must_quotify(Ctx,Env,VarR,Var,Code0),
+  quotify_each(Ctx,Env,Result,Eval,Code1),
+  conjoin_0(Ctx,Code0,Code1,Code),!.
+
+must_quotify(_Ctx,_Env,SelfEval,SelfEval,true):- notrace(is_self_evaluating_object(SelfEval)),!.
+must_quotify(_Ctx,_Env,[quote,Var],Var,true).
 
 
 must_compile_progn(Ctx,Env,Result,FunctionBody,Code):-
@@ -150,7 +164,7 @@ must_compile_body(Ctx,Env,ResultO,LispCode, BodyO):-
   %maybe_debug_var('_rResult',Result),
   %maybe_debug_var('_LispCode',LispCode),
   %maybe_debug_var('_rBody',Body))),
-  resolve_reader_macros(LispCode,Forms),!,
+  quietly(resolve_reader_macros(LispCode,Forms)),!,
   always((compile_body(Ctx,Env,Result,Forms, Body9)->nonvar(Body9))),
   must_compile_body_pt2(Ctx,Env,Result,ResultO,Forms, Body9,BodyO).
 
@@ -213,6 +227,8 @@ compile_body(Ctx,Env,Result,['#COMMA',Form], (Code,cl_eval(CommaResult,Result)))
 compile_body(Ctx,Env,Result,['#BQ-COMMA-ELIPSE',Form], (Code,cl_eval(CommaResult,Result))):- dump_trace_lisp,!,compile_body(Ctx,Env,CommaResult,Form,Code),!.
 
 
+compile_body(_Ctx,_Env,_Result,[Var|_], _Body):- var(Var),!,lisp_dump_break.
+
 % =============================================================================
 % Conditonal  evaluation/compilation
 % =============================================================================
@@ -267,6 +283,47 @@ compile_body(Ctx,Env,Result,[OP,Flags|Forms], Code):-  same_symbol(OP,'eval-when
 
 
 
+% =============================================================================
+% = COMPILE =  ( file with several other debugging tools?)
+% =============================================================================
+
+% (compile ...)
+compile_body(Ctx,Env,Result,[compile|Forms], Body):- !,
+   must_compile_closure_body(Ctx,CompileEnvironment,CompileResult,[progn|Forms],  CompileBody),
+   
+   debug_var('LResult',CompileResult),
+   debug_var('CompileEnvironment',CompileEnvironment),
+   Result = closure([CompileEnvironment|Env],CompileResult,[],CompileBody),
+   Body = true.
+
+% (lcompile ...)
+wl:interned_eval("(sys:set-opv `SYS:LCOMPILE :compile-as :function)").
+wl:interned_eval("(sys:set-opv `SYS:LCOMPILEN :compile-as :function)").
+compile_body(Ctx,Env,Result,[sys_lcompilen|Forms], Body):- !,
+  ((append(Progn,[KW|More],Forms),is_keywordp(KW))->Keys=[KW|More];(Progn=Forms,Keys=[])),
+  compile_body(Ctx,Env,Result,[sys_lcompile,[progn|Progn]|Keys], Body).
+
+plist_to_names_values([],[],[]).
+plist_to_names_values([Name,Value|Keys],[Name|Names],[Value|Values]):-  
+   plist_to_names_values(Keys,Names,Values).
+
+compile_body(Ctx,Env,Result,[sys_lcompile,Form|Keys], Body):- !,
+   lisp_compile(Ctx,Env,FormValue,Form,Part1),
+   plist_to_names_values(Keys,Names,Values),
+   maplist(f_sys_get_wam_cl_option,Names,Was),
+   maplist(f_sys_set_wam_cl_option,Names,Values),
+   always(Part1),
+   Part2 = must_compile_body(Ctx,CompileEnvironment,CompileResult,FormValue, CompileBody),
+   ignore(CompileEnvironment = Env),
+   debug_var('LResult',CompileResult),
+   debug_var('CResult',CResult),
+   debug_var('CompileEnvironment',CompileEnvironment),
+   Part3 = body_cleanup_full(Ctx,( (CompileBody,CResult=CompileResult)),Opt),
+   Result = closure([CompileEnvironment|Env],CompileResult,[],Opt),   
+   Body = (nl,nl,Part1,Part2,notrace((Part3,cmpout(:- Opt),maplist(f_sys_set_wam_cl_option,Names,Was)))).
+
+
+
 compile_body(Ctx,Env,Result,Form1,Body):- compile_body_form(Ctx,Env,Result,Form1,Body).
 
 
@@ -312,17 +369,31 @@ compile_body(Ctx,Env,Value, Atom,      Body):- atom(Atom), always(compile_symbol
 % SETQ - PSETQ
 compile_body(Ctx,Env,Result,BodyForms, Body):- compile_symbol_setter(Ctx,Env,Result,BodyForms, Body),!.
 
-% SETF - PSETF
-compile_body(Ctx,Env,Result,BodyForms, Body):- compile_setfs(Ctx,Env,Result,BodyForms, Body),!.
-
-% GETF - PUSHNEW
+% SETF, INCF, PUSH - PUSHNEW
 compile_body(Ctx,Env,Result,BodyForms, Body):- compile_accessors(Ctx,Env,Result,BodyForms, Body),!.
 
+% PROCLAIM - SET-DOCUMENTATION
+compile_body(Ctx,Env,Result,BodyForms, Body):- compile_direct_assertions(Ctx,Env,Result,BodyForms, Body),!.
 
-% FUNCALL,EVAL,APPLY, RestOf
+% FUNCALL,EVAL,APPLY, and everything else
 compile_body(Ctx,Env,Result,BodyForms, Body):- always(compile_funop(Ctx,Env,Result,BodyForms, Body)),!.
 
 
+
+wl:init_args(2,X):- at_least_two_args(X).
+
+at_least_two_args(define_compiler_macro).
+at_least_two_args(defsetf).
+at_least_two_args(deftype).
+at_least_two_args(symbol_macrolet).
+at_least_two_args(define_setf_expander).
+
+compile_direct_assertions(_Ctx,_Env,Symbol,[Function,Symbol,A2|AMORE],assert_lsp(Symbol,P)):- notrace(at_least_two_args(Function)),
+  \+ is_fboundp(Function),!,
+   P=..[Function,Symbol,A2,AMORE].
+
+compile_direct_assertions(_Ctx,_Env,Symbol,[Fun0,Symbol,A2|AMORE],assert_lsp(Symbol,P)):- notrace((at_least_two_args(Function),same_symbol(Function,Fun0))),
+  \+ is_fboundp(Function),!,P=..[Function,Symbol,A2,AMORE].
 
 
 % same_symbol(OP1,OP2):-!, OP1=OP2.

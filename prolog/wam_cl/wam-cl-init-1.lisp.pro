@@ -39,7 +39,7 @@
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:264 **********************/
-:-lisp_compile_to_prolog(pkg_user,[defmacro,'apropos-defmacro',[name,ll,'&rest',body],['#BQ',[putprop,[quote,['#COMMA',name]],[quote,'apropos-defmacro'],[quote,[defmacro,['#COMMA',name],['#COMMA',ll],['#BQ-COMMA-ELIPSE',body]]]]]])
+:-lisp_compile_to_prolog(pkg_user,[defmacro,'apropos-defmacro',[name,ll,'&rest',body],['#BQ',[putprop,[quote,['#COMMA',name]],[quote,'apropos-defmacro'],[quote,[defmacro,['#COMMA',name],['#COMMA',ll],['#BQ-COMMA-ELIPSE',body]]]]]]).
 wl:lambda_def(defmacro, u_apropos_defmacro, f_u_apropos_defmacro, [sys_name, u_ll, c38_rest, u_body], [progn, ['#BQ', [sys_putprop, [quote, ['#COMMA', sys_name]], [quote, u_apropos_defmacro], [quote, [defmacro, ['#COMMA', sys_name], ['#COMMA', u_ll], ['#BQ-COMMA-ELIPSE', u_body]]]]]]).
 wl:arglist_info(u_apropos_defmacro, f_u_apropos_defmacro, [sys_name, u_ll, c38_rest, u_body], arginfo{all:[sys_name, u_ll], allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[sys_name, u_ll, u_body], opt:0, req:[sys_name, u_ll], rest:[u_body], sublists:0, whole:0}).
 wl: init_args(2, f_u_apropos_defmacro).
@@ -156,7 +156,7 @@ f_u_apropos_defmacro(Name_In, Ll_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:390 **********************/
-:-lisp_compile_to_prolog(pkg_user,[defmacro,'apropos-defun',[name,ll,'&rest',body],['#BQ',[putprop,[quote,['#COMMA',name]],[quote,'apropos-defun'],[quote,[defun,['#COMMA',name],['#COMMA',ll],['#BQ-COMMA-ELIPSE',body]]]]]])
+:-lisp_compile_to_prolog(pkg_user,[defmacro,'apropos-defun',[name,ll,'&rest',body],['#BQ',[putprop,[quote,['#COMMA',name]],[quote,'apropos-defun'],[quote,[defun,['#COMMA',name],['#COMMA',ll],['#BQ-COMMA-ELIPSE',body]]]]]]).
 wl:lambda_def(defmacro, u_apropos_defun, f_u_apropos_defun, [sys_name, u_ll, c38_rest, u_body], [progn, ['#BQ', [sys_putprop, [quote, ['#COMMA', sys_name]], [quote, u_apropos_defun], [quote, [defun, ['#COMMA', sys_name], ['#COMMA', u_ll], ['#BQ-COMMA-ELIPSE', u_body]]]]]]).
 wl:arglist_info(u_apropos_defun, f_u_apropos_defun, [sys_name, u_ll, c38_rest, u_body], arginfo{all:[sys_name, u_ll], allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[sys_name, u_ll, u_body], opt:0, req:[sys_name, u_ll], rest:[u_body], sublists:0, whole:0}).
 wl: init_args(2, f_u_apropos_defun).
@@ -331,7 +331,7 @@ f_u_apropos_defun(Name_In, Ll_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:2137 **********************/
-:-lisp_compile_to_prolog(pkg_user,['in-package','#:system'])
+:-lisp_compile_to_prolog(pkg_user,['in-package','#:system']).
 :- cl_in_package(system1, _Ignored).
 /*
 ; FIXME See section 5.1.3.
@@ -357,7 +357,7 @@ f_u_apropos_defun(Name_In, Ll_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:2191 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defmacro,'define-modify-macro',[name,'lambda-list',function,'&optional','doc-string'],'$STRING'("Creates a new read-modify-write macro like PUSH or INCF."),[let,[['other-args',[]],['rest-arg',[]],[env,[gensym]],[reference,[gensym]]],[do,[[ll,'lambda-list',[cdr,ll]],[arg,[]]],[[null,ll]],[setq,arg,[car,ll]],[cond,[[eq,arg,[quote,'&optional']]],[[eq,arg,[quote,'&rest']],[if,[symbolp,[cadr,ll]],[setq,'rest-arg',[cadr,ll]],[error,'$STRING'("Non-symbol &REST arg in definition of ~S."),name]],[if,[null,[cddr,ll]],[return,[]],[error,'$STRING'("Illegal stuff after &REST argument in DEFINE-MODIFY-MACRO.")]]],[[memq,arg,[quote,['&key','&allow-other-keys','&aux']]],[error,'$STRING'("~S not allowed in DEFINE-MODIFY-MACRO lambda list."),arg]],[[symbolp,arg],[push,arg,'other-args']],[[and,[listp,arg],[symbolp,[car,arg]]],[push,[car,arg],'other-args']],[t,[error,'$STRING'("Illegal stuff in DEFINE-MODIFY-MACRO lambda list.")]]]],[setq,'other-args',[nreverse,'other-args']],['#BQ',['eval-when',[':compile-toplevel',':load-toplevel',':execute'],[defmacro,['#COMMA',name],[['#COMMA',reference],['#BQ-COMMA-ELIPSE','lambda-list'],'&environment',['#COMMA',env]],['#COMMA','doc-string'],['multiple-value-bind',[dummies,vals,newval,setter,getter],['get-setf-expansion',['#COMMA',reference],['#COMMA',env]],[do,[[d,dummies,[cdr,d]],[v,vals,[cdr,v]],['let-list',[],[cons,[list,[car,d],[car,v]],'let-list']]],[[null,d],[push,[list,[car,newval],['#COMMA',[if,'rest-arg',['#BQ',['list*',[quote,['#COMMA',function]],getter,['#BQ-COMMA-ELIPSE','other-args'],['#COMMA','rest-arg']]],['#BQ',[list,[quote,['#COMMA',function]],getter,['#BQ-COMMA-ELIPSE','other-args']]]]]],'let-list'],['#BQ',['let*',['#COMMA',[nreverse,'let-list']],['#COMMA',setter]]]]]]]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defmacro,'define-modify-macro',[name,'lambda-list',function,'&optional','doc-string'],'$STRING'("Creates a new read-modify-write macro like PUSH or INCF."),[let,[['other-args',[]],['rest-arg',[]],[env,[gensym]],[reference,[gensym]]],[do,[[ll,'lambda-list',[cdr,ll]],[arg,[]]],[[null,ll]],[setq,arg,[car,ll]],[cond,[[eq,arg,[quote,'&optional']]],[[eq,arg,[quote,'&rest']],[if,[symbolp,[cadr,ll]],[setq,'rest-arg',[cadr,ll]],[error,'$STRING'("Non-symbol &REST arg in definition of ~S."),name]],[if,[null,[cddr,ll]],[return,[]],[error,'$STRING'("Illegal stuff after &REST argument in DEFINE-MODIFY-MACRO.")]]],[[memq,arg,[quote,['&key','&allow-other-keys','&aux']]],[error,'$STRING'("~S not allowed in DEFINE-MODIFY-MACRO lambda list."),arg]],[[symbolp,arg],[push,arg,'other-args']],[[and,[listp,arg],[symbolp,[car,arg]]],[push,[car,arg],'other-args']],[t,[error,'$STRING'("Illegal stuff in DEFINE-MODIFY-MACRO lambda list.")]]]],[setq,'other-args',[nreverse,'other-args']],['#BQ',['eval-when',[':compile-toplevel',':load-toplevel',':execute'],[defmacro,['#COMMA',name],[['#COMMA',reference],['#BQ-COMMA-ELIPSE','lambda-list'],'&environment',['#COMMA',env]],['#COMMA','doc-string'],['multiple-value-bind',[dummies,vals,newval,setter,getter],['get-setf-expansion',['#COMMA',reference],['#COMMA',env]],[do,[[d,dummies,[cdr,d]],[v,vals,[cdr,v]],['let-list',[],[cons,[list,[car,d],[car,v]],'let-list']]],[[null,d],[push,[list,[car,newval],['#COMMA',[if,'rest-arg',['#BQ',['list*',[quote,['#COMMA',function]],getter,['#BQ-COMMA-ELIPSE','other-args'],['#COMMA','rest-arg']]],['#BQ',[list,[quote,['#COMMA',function]],getter,['#BQ-COMMA-ELIPSE','other-args']]]]]],'let-list'],['#BQ',['let*',['#COMMA',[nreverse,'let-list']],['#COMMA',setter]]]]]]]]]]]).
 doc: doc_string(define_modify_macro,
 	      _8637108,
 	      function,
@@ -820,7 +820,7 @@ incremented by the second argument, DELTA, which defaults to 1."
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:5125 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defmacro,incf,[place,'&optional',[delta,1],'&environment',env],'$STRING'("The first argument is some location holding a number.  This number is\r\nincremented by the second argument, DELTA, which defaults to 1."),[if,[and,[symbolp,[setq,place,['%symbol-macroexpand',place,env]]],[or,[constantp,delta],[and,[symbolp,delta],[not,['nth-value',1,['%symbol-macroexpand',delta,env]]]]]],['#BQ',[setq,['#COMMA',place],[+,['#COMMA',place],['#COMMA',delta]]]],['multiple-value-bind',[dummies,vals,newval,setter,getter],['get-setf-method',place,env],[let,[[d,[gensym]]],['#BQ',['let*',[['#BQ-COMMA-ELIPSE',[mapcar,function(list),dummies,vals]],[['#COMMA',d],['#COMMA',delta]],[['#COMMA',[car,newval]],[+,['#COMMA',getter],['#COMMA',d]]]],['#COMMA',setter]]]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defmacro,incf,[place,'&optional',[delta,1],'&environment',env],'$STRING'("The first argument is some location holding a number.  This number is\r\nincremented by the second argument, DELTA, which defaults to 1."),[if,[and,[symbolp,[setq,place,['%symbol-macroexpand',place,env]]],[or,[constantp,delta],[and,[symbolp,delta],[not,['nth-value',1,['%symbol-macroexpand',delta,env]]]]]],['#BQ',[setq,['#COMMA',place],[+,['#COMMA',place],['#COMMA',delta]]]],['multiple-value-bind',[dummies,vals,newval,setter,getter],['get-setf-method',place,env],[let,[[d,[gensym]]],['#BQ',['let*',[['#BQ-COMMA-ELIPSE',[mapcar,function(list),dummies,vals]],[['#COMMA',d],['#COMMA',delta]],[['#COMMA',[car,newval]],[+,['#COMMA',getter],['#COMMA',d]]]],['#COMMA',setter]]]]]]]).
 doc: doc_string(incf,
 	      _15624006,
 	      function,
@@ -1079,7 +1079,7 @@ cl_incf(Place_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:5869 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defmacro,decf,[place,'&optional',[delta,1]],['#BQ',[incf,['#COMMA',place],[-,0,['#COMMA',delta]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defmacro,decf,[place,'&optional',[delta,1]],['#BQ',[incf,['#COMMA',place],[-,0,['#COMMA',delta]]]]]).
 wl:lambda_def(defmacro, decf, cl_decf, [sys_place, c38_optional, [sys_delta, 1]], [progn, ['#BQ', [incf, ['#COMMA', sys_place], [-, 0, ['#COMMA', sys_delta]]]]]).
 wl:arglist_info(decf, cl_decf, [sys_place, c38_optional, [sys_delta, 1]], arginfo{all:[sys_place, sys_delta], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_place, sys_delta], opt:[sys_delta], req:[sys_place], rest:0, sublists:0, whole:0}).
 wl: init_args(1, cl_decf).
@@ -1297,7 +1297,7 @@ cl_decf(Place_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:8170 **********************/
-:-lisp_compile_to_prolog(pkg_sys,['in-package','$STRING'("SYSTEM")])
+:-lisp_compile_to_prolog(pkg_sys,['in-package','$STRING'("SYSTEM")]).
 :- cl_in_package('$ARRAY'([*], claz_base_character, "SYSTEM"), _Ignored).
 /*
 #+(or ABCL WAM-CL)
@@ -1322,7 +1322,7 @@ cl_decf(Place_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:8195 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'get-setf-method-inverse',[form,inverse,'setf-function'],[let,[['new-var',[gensym]],[vars,[]],[vals,[]]],[dolist,[x,[cdr,form]],[push,[gensym],vars],[push,x,vals]],[setq,vals,[nreverse,vals]],[values,vars,vals,[list,'new-var'],[if,'setf-function',['#BQ',[['#BQ-COMMA-ELIPSE',inverse],['#COMMA','new-var'],['#BQ-COMMA-ELIPSE',vars]]],[if,[functionp,[car,inverse]],['#BQ',[funcall,['#BQ-COMMA-ELIPSE',inverse],['#BQ-COMMA-ELIPSE',vars],['#COMMA','new-var']]],['#BQ',[['#BQ-COMMA-ELIPSE',inverse],['#BQ-COMMA-ELIPSE',vars],['#COMMA','new-var']]]]],['#BQ',[['#COMMA',[car,form]],['#BQ-COMMA-ELIPSE',vars]]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'get-setf-method-inverse',[form,inverse,'setf-function'],[let,[['new-var',[gensym]],[vars,[]],[vals,[]]],[dolist,[x,[cdr,form]],[push,[gensym],vars],[push,x,vals]],[setq,vals,[nreverse,vals]],[values,vars,vals,[list,'new-var'],[if,'setf-function',['#BQ',[['#BQ-COMMA-ELIPSE',inverse],['#COMMA','new-var'],['#BQ-COMMA-ELIPSE',vars]]],[if,[functionp,[car,inverse]],['#BQ',[funcall,['#BQ-COMMA-ELIPSE',inverse],['#BQ-COMMA-ELIPSE',vars],['#COMMA','new-var']]],['#BQ',[['#BQ-COMMA-ELIPSE',inverse],['#BQ-COMMA-ELIPSE',vars],['#COMMA','new-var']]]]],['#BQ',[['#COMMA',[car,form]],['#BQ-COMMA-ELIPSE',vars]]]]]]).
 wl:lambda_def(defun, sys_get_setf_method_inverse, f_sys_get_setf_method_inverse, [sys_form, sys_inverse, sys_setf_function], [[let, [[sys_new_var, [gensym]], [sys_vars, []], [sys_vals, []]], [dolist, [sys_x, [cdr, sys_form]], [push, [gensym], sys_vars], [push, sys_x, sys_vals]], [setq, sys_vals, [nreverse, sys_vals]], [values, sys_vars, sys_vals, [list, sys_new_var], [if, sys_setf_function, ['#BQ', [['#BQ-COMMA-ELIPSE', sys_inverse], ['#COMMA', sys_new_var], ['#BQ-COMMA-ELIPSE', sys_vars]]], [if, [functionp, [car, sys_inverse]], ['#BQ', [funcall, ['#BQ-COMMA-ELIPSE', sys_inverse], ['#BQ-COMMA-ELIPSE', sys_vars], ['#COMMA', sys_new_var]]], ['#BQ', [['#BQ-COMMA-ELIPSE', sys_inverse], ['#BQ-COMMA-ELIPSE', sys_vars], ['#COMMA', sys_new_var]]]]], ['#BQ', [['#COMMA', [car, sys_form]], ['#BQ-COMMA-ELIPSE', sys_vars]]]]]]).
 wl:arglist_info(sys_get_setf_method_inverse, f_sys_get_setf_method_inverse, [sys_form, sys_inverse, sys_setf_function], arginfo{all:[sys_form, sys_inverse, sys_setf_function], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_form, sys_inverse, sys_setf_function], opt:0, req:[sys_form, sys_inverse, sys_setf_function], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, f_sys_get_setf_method_inverse).
@@ -1393,131 +1393,7 @@ f_sys_get_setf_method_inverse(Form_In, Inverse_In, Setf_function_In, FnResult) :
    set_opv(sys_get_setf_method_inverse, compile_as, kw_function),
    set_opv(sys_get_setf_method_inverse, function, f_sys_get_setf_method_inverse),
    DefunResult=sys_get_setf_method_inverse.
-/*
-:- side_effect(assert_lsp(sys_get_setf_method_inverse,
-			  lambda_def(defun,
-				     sys_get_setf_method_inverse,
-				     f_sys_get_setf_method_inverse,
-				     [sys_form, sys_inverse, sys_setf_function],
-				     
-				     [ 
-				       [ let,
-					 
-					 [ [sys_new_var, [gensym]],
-					   [sys_vars, []],
-					   [sys_vals, []]
-					 ],
-					 
-					 [ dolist,
-					   [sys_x, [cdr, sys_form]],
-					   [push, [gensym], sys_vars],
-					   [push, sys_x, sys_vals]
-					 ],
-					 [setq, sys_vals, [nreverse, sys_vals]],
-					 
-					 [ values,
-					   sys_vars,
-					   sys_vals,
-					   [list, sys_new_var],
-					   
-					   [ if,
-					     sys_setf_function,
-					     
-					     [ '#BQ',
-					       
-					       [ 
-						 [ '#BQ-COMMA-ELIPSE',
-						   sys_inverse
-						 ],
-						 ['#COMMA', sys_new_var],
-						 ['#BQ-COMMA-ELIPSE', sys_vars]
-					       ]
-					     ],
-					     
-					     [ if,
-					       [functionp, [car, sys_inverse]],
-					       
-					       [ '#BQ',
-						 
-						 [ funcall,
-						   
-						   [ '#BQ-COMMA-ELIPSE',
-						     sys_inverse
-						   ],
-						   
-						   [ '#BQ-COMMA-ELIPSE',
-						     sys_vars
-						   ],
-						   ['#COMMA', sys_new_var]
-						 ]
-					       ],
-					       
-					       [ '#BQ',
-						 
-						 [ 
-						   [ '#BQ-COMMA-ELIPSE',
-						     sys_inverse
-						   ],
-						   
-						   [ '#BQ-COMMA-ELIPSE',
-						     sys_vars
-						   ],
-						   ['#COMMA', sys_new_var]
-						 ]
-					       ]
-					     ]
-					   ],
-					   
-					   [ '#BQ',
-					     
-					     [ ['#COMMA', [car, sys_form]],
-					       ['#BQ-COMMA-ELIPSE', sys_vars]
-					     ]
-					   ]
-					 ]
-				       ]
-				     ]))).
-*/
-/*
-:- side_effect(assert_lsp(sys_get_setf_method_inverse,
-			  arglist_info(sys_get_setf_method_inverse,
-				       f_sys_get_setf_method_inverse,
-				       
-				       [ sys_form,
-					 sys_inverse,
-					 sys_setf_function
-				       ],
-				       arginfo{ all:
-						    [ sys_form,
-						      sys_inverse,
-						      sys_setf_function
-						    ],
-						allow_other_keys:0,
-						aux:0,
-						body:0,
-						complex:0,
-						env:0,
-						key:0,
-						names:
-						      [ sys_form,
-							sys_inverse,
-							sys_setf_function
-						      ],
-						opt:0,
-						req:
-						    [ sys_form,
-						      sys_inverse,
-						      sys_setf_function
-						    ],
-						rest:0,
-						sublists:0,
-						whole:0
-					      }))).
-*/
-/*
-:- side_effect(assert_lsp(sys_get_setf_method_inverse,
-			  init_args(exact_only, f_sys_get_setf_method_inverse))).
-*/
+
 /*
 ;; If a macro, expand one level and try again.  If not, go for the
 */
@@ -1537,7 +1413,7 @@ f_sys_get_setf_method_inverse(Form_In, Inverse_In, Setf_function_In, FnResult) :
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:8857 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'expand-or-get-setf-inverse',[form,environment],['multiple-value-bind',[expansion,expanded],['macroexpand-1',form,environment],[if,expanded,['get-setf-expansion',expansion,environment],['get-setf-method-inverse',form,['#BQ',[funcall,function([setf,['#COMMA',[car,form]]])]],t]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'expand-or-get-setf-inverse',[form,environment],['multiple-value-bind',[expansion,expanded],['macroexpand-1',form,environment],[if,expanded,['get-setf-expansion',expansion,environment],['get-setf-method-inverse',form,['#BQ',[funcall,function([setf,['#COMMA',[car,form]]])]],t]]]]).
 wl:lambda_def(defun, sys_expand_or_get_setf_inverse, f_sys_expand_or_get_setf_inverse, [sys_form, sys_environment], [[multiple_value_bind, [sys_expansion, sys_expanded], [macroexpand_1, sys_form, sys_environment], [if, sys_expanded, [get_setf_expansion, sys_expansion, sys_environment], [sys_get_setf_method_inverse, sys_form, ['#BQ', [funcall, function([setf, ['#COMMA', [car, sys_form]]])]], t]]]]).
 wl:arglist_info(sys_expand_or_get_setf_inverse, f_sys_expand_or_get_setf_inverse, [sys_form, sys_environment], arginfo{all:[sys_form, sys_environment], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_form, sys_environment], opt:0, req:[sys_form, sys_environment], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, f_sys_expand_or_get_setf_inverse).
@@ -1572,7 +1448,7 @@ f_sys_expand_or_get_setf_inverse(Form_In, Environment_In, FnResult) :-
 							       [ '#COMMA',
 								 [car, sys_form]
 							       ]
-							     ])
+							     ]).
 						  ],
 						  t,
 						  ElseResult),
@@ -1588,79 +1464,7 @@ f_sys_expand_or_get_setf_inverse(Form_In, Environment_In, FnResult) :-
 	   function,
 	   f_sys_expand_or_get_setf_inverse),
    DefunResult=sys_expand_or_get_setf_inverse.
-/*
-:- side_effect(assert_lsp(sys_expand_or_get_setf_inverse,
-			  lambda_def(defun,
-				     sys_expand_or_get_setf_inverse,
-				     f_sys_expand_or_get_setf_inverse,
-				     [sys_form, sys_environment],
-				     
-				     [ 
-				       [ multiple_value_bind,
-					 [sys_expansion, sys_expanded],
-					 
-					 [ macroexpand_1,
-					   sys_form,
-					   sys_environment
-					 ],
-					 
-					 [ if,
-					   sys_expanded,
-					   
-					   [ get_setf_expansion,
-					     sys_expansion,
-					     sys_environment
-					   ],
-					   
-					   [ sys_get_setf_method_inverse,
-					     sys_form,
-					     
-					     [ '#BQ',
-					       
-					       [ funcall,
-						 function(
-							  [ setf,
-							    
-							    [ '#COMMA',
-							      [car, sys_form]
-							    ]
-							  ])
-					       ]
-					     ],
-					     t
-					   ]
-					 ]
-				       ]
-				     ]))).
-*/
-/*
-:- side_effect(assert_lsp(sys_expand_or_get_setf_inverse,
-			  arglist_info(sys_expand_or_get_setf_inverse,
-				       f_sys_expand_or_get_setf_inverse,
-				       [sys_form, sys_environment],
-				       arginfo{ all:[sys_form, sys_environment],
-						allow_other_keys:0,
-						aux:0,
-						body:0,
-						complex:0,
-						env:0,
-						key:0,
-						names:
-						      [ sys_form,
-							sys_environment
-						      ],
-						opt:0,
-						req:[sys_form, sys_environment],
-						rest:0,
-						sublists:0,
-						whole:0
-					      }))).
-*/
-/*
-:- side_effect(assert_lsp(sys_expand_or_get_setf_inverse,
-			  init_args(exact_only,
-				    f_sys_expand_or_get_setf_inverse))).
-*/
+
 /*
 #+(or ABCL WAM-CL)
 (defun get-setf-expansion (form &optional environment)
@@ -1683,7 +1487,7 @@ f_sys_expand_or_get_setf_inverse(Form_In, Environment_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:9199 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'get-setf-expansion',[form,'&optional',environment],[let,[temp],[cond,[[symbolp,form],['multiple-value-bind',[expansion,expanded],['macroexpand-1',form,environment],[if,expanded,['get-setf-expansion',expansion,environment],[let,[['new-var',[gensym]]],[values,[],[],[list,'new-var'],['#BQ',[setq,['#COMMA',form],['#COMMA','new-var']]],form]]]]],[[setq,temp,[get,[car,form],[quote,'setf-inverse']]],['get-setf-method-inverse',form,['#BQ',[['#COMMA',temp]]],[]]],[[setq,temp,[get,[car,form],[quote,'setf-expander']]],[funcall,temp,form,environment]],[t,['expand-or-get-setf-inverse',form,environment]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'get-setf-expansion',[form,'&optional',environment],[let,[temp],[cond,[[symbolp,form],['multiple-value-bind',[expansion,expanded],['macroexpand-1',form,environment],[if,expanded,['get-setf-expansion',expansion,environment],[let,[['new-var',[gensym]]],[values,[],[],[list,'new-var'],['#BQ',[setq,['#COMMA',form],['#COMMA','new-var']]],form]]]]],[[setq,temp,[get,[car,form],[quote,'setf-inverse']]],['get-setf-method-inverse',form,['#BQ',[['#COMMA',temp]]],[]]],[[setq,temp,[get,[car,form],[quote,'setf-expander']]],[funcall,temp,form,environment]],[t,['expand-or-get-setf-inverse',form,environment]]]]]).
 wl:lambda_def(defun, get_setf_expansion, cl_get_setf_expansion, [sys_form, c38_optional, sys_environment], [[let, [sys_temp], [cond, [[symbolp, sys_form], [multiple_value_bind, [sys_expansion, sys_expanded], [macroexpand_1, sys_form, sys_environment], [if, sys_expanded, [get_setf_expansion, sys_expansion, sys_environment], [let, [[sys_new_var, [gensym]]], [values, [], [], [list, sys_new_var], ['#BQ', [setq, ['#COMMA', sys_form], ['#COMMA', sys_new_var]]], sys_form]]]]], [[setq, sys_temp, [get, [car, sys_form], [quote, sys_setf_inverse]]], [sys_get_setf_method_inverse, sys_form, ['#BQ', [['#COMMA', sys_temp]]], []]], [[setq, sys_temp, [get, [car, sys_form], [quote, sys_setf_expander]]], [funcall, sys_temp, sys_form, sys_environment]], [t, [sys_expand_or_get_setf_inverse, sys_form, sys_environment]]]]]).
 wl:arglist_info(get_setf_expansion, cl_get_setf_expansion, [sys_form, c38_optional, sys_environment], arginfo{all:[sys_form, sys_environment], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_form, sys_environment], opt:[sys_environment], req:[sys_form], rest:0, sublists:0, whole:0}).
 wl: init_args(1, cl_get_setf_expansion).
@@ -1774,134 +1578,7 @@ cl_get_setf_expansion(Form_In, RestNKeys, FnResult) :-
    set_opv(get_setf_expansion, compile_as, kw_function),
    set_opv(get_setf_expansion, function, cl_get_setf_expansion),
    DefunResult=get_setf_expansion.
-/*
-:- side_effect(assert_lsp(get_setf_expansion,
-			  lambda_def(defun,
-				     get_setf_expansion,
-				     cl_get_setf_expansion,
-				     [sys_form, c38_optional, sys_environment],
-				     
-				     [ 
-				       [ let,
-					 [sys_temp],
-					 
-					 [ cond,
-					   
-					   [ [symbolp, sys_form],
-					     
-					     [ multiple_value_bind,
-					       [sys_expansion, sys_expanded],
-					       
-					       [ macroexpand_1,
-						 sys_form,
-						 sys_environment
-					       ],
-					       
-					       [ if,
-						 sys_expanded,
-						 
-						 [ get_setf_expansion,
-						   sys_expansion,
-						   sys_environment
-						 ],
-						 
-						 [ let,
-						   [[sys_new_var, [gensym]]],
-						   
-						   [ values,
-						     [],
-						     [],
-						     [list, sys_new_var],
-						     
-						     [ '#BQ',
-						       
-						       [ setq,
-							 ['#COMMA', sys_form],
-							 
-							 [ '#COMMA',
-							   sys_new_var
-							 ]
-						       ]
-						     ],
-						     sys_form
-						   ]
-						 ]
-					       ]
-					     ]
-					   ],
-					   
-					   [ 
-					     [ setq,
-					       sys_temp,
-					       
-					       [ get,
-						 [car, sys_form],
-						 [quote, sys_setf_inverse]
-					       ]
-					     ],
-					     
-					     [ sys_get_setf_method_inverse,
-					       sys_form,
-					       ['#BQ', [['#COMMA', sys_temp]]],
-					       []
-					     ]
-					   ],
-					   
-					   [ 
-					     [ setq,
-					       sys_temp,
-					       
-					       [ get,
-						 [car, sys_form],
-						 [quote, sys_setf_expander]
-					       ]
-					     ],
-					     
-					     [ funcall,
-					       sys_temp,
-					       sys_form,
-					       sys_environment
-					     ]
-					   ],
-					   
-					   [ t,
-					     
-					     [ sys_expand_or_get_setf_inverse,
-					       sys_form,
-					       sys_environment
-					     ]
-					   ]
-					 ]
-				       ]
-				     ]))).
-*/
-/*
-:- side_effect(assert_lsp(get_setf_expansion,
-			  arglist_info(get_setf_expansion,
-				       cl_get_setf_expansion,
-				       [sys_form, c38_optional, sys_environment],
-				       arginfo{ all:[sys_form, sys_environment],
-						allow_other_keys:0,
-						aux:0,
-						body:0,
-						complex:0,
-						env:0,
-						key:0,
-						names:
-						      [ sys_form,
-							sys_environment
-						      ],
-						opt:[sys_environment],
-						req:[sys_form],
-						rest:0,
-						sublists:0,
-						whole:0
-					      }))).
-*/
-/*
-:- side_effect(assert_lsp(get_setf_expansion,
-			  init_args(1, cl_get_setf_expansion))).
-*/
+
 /*
 #+(or ABCL WAM-CL)
 (defmacro setf (&rest args &environment environment)
@@ -1941,7 +1618,7 @@ cl_get_setf_expansion(Form_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:9955 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defmacro,setf,['&rest',args,'&environment',environment],[let,[[numargs,[length,args]]],[cond,[[=,numargs,2],[let,[[place,[first,args]],['value-form',[second,args]]],[if,[atom,place],['#BQ',[setq,['#COMMA',place],['#COMMA','value-form']]],[progn,['multiple-value-bind',[dummies,vals,'store-vars',setter,getter],['get-setf-expansion',place,environment],[let,[[inverse,[get,[car,place],[quote,'setf-inverse']]]],[if,[and,inverse,[eq,inverse,[car,setter]]],[if,[functionp,inverse],['#BQ',[funcall,['#COMMA',inverse],['#BQ-COMMA-ELIPSE',[cdr,place]],['#COMMA','value-form']]],['#BQ',[['#COMMA',inverse],['#BQ-COMMA-ELIPSE',[cdr,place]],['#COMMA','value-form']]]],[if,[or,[null,'store-vars'],[cdr,'store-vars']],['#BQ',['let*',[['#BQ-COMMA-ELIPSE',[mapcar,function(list),dummies,vals]]],['multiple-value-bind',['#COMMA','store-vars'],['#COMMA','value-form'],['#COMMA',setter]]]],['#BQ',['let*',[['#BQ-COMMA-ELIPSE',[mapcar,function(list),dummies,vals]],['#COMMA',[list,[car,'store-vars'],'value-form']]],['#COMMA',setter]]]]]]]]]]],[[oddp,numargs],[error,'$STRING'("Odd number of arguments to SETF.")]],[t,[do,[[a,args,[cddr,a]],[l,[]]],[[null,a],['#BQ',[progn,['#BQ-COMMA-ELIPSE',[nreverse,l]]]]],[setq,l,[cons,[list,[quote,setf],[car,a],[cadr,a]],l]]]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defmacro,setf,['&rest',args,'&environment',environment],[let,[[numargs,[length,args]]],[cond,[[=,numargs,2],[let,[[place,[first,args]],['value-form',[second,args]]],[if,[atom,place],['#BQ',[setq,['#COMMA',place],['#COMMA','value-form']]],[progn,['multiple-value-bind',[dummies,vals,'store-vars',setter,getter],['get-setf-expansion',place,environment],[let,[[inverse,[get,[car,place],[quote,'setf-inverse']]]],[if,[and,inverse,[eq,inverse,[car,setter]]],[if,[functionp,inverse],['#BQ',[funcall,['#COMMA',inverse],['#BQ-COMMA-ELIPSE',[cdr,place]],['#COMMA','value-form']]],['#BQ',[['#COMMA',inverse],['#BQ-COMMA-ELIPSE',[cdr,place]],['#COMMA','value-form']]]],[if,[or,[null,'store-vars'],[cdr,'store-vars']],['#BQ',['let*',[['#BQ-COMMA-ELIPSE',[mapcar,function(list),dummies,vals]]],['multiple-value-bind',['#COMMA','store-vars'],['#COMMA','value-form'],['#COMMA',setter]]]],['#BQ',['let*',[['#BQ-COMMA-ELIPSE',[mapcar,function(list),dummies,vals]],['#COMMA',[list,[car,'store-vars'],'value-form']]],['#COMMA',setter]]]]]]]]]]],[[oddp,numargs],[error,'$STRING'("Odd number of arguments to SETF.")]],[t,[do,[[a,args,[cddr,a]],[l,[]]],[[null,a],['#BQ',[progn,['#BQ-COMMA-ELIPSE',[nreverse,l]]]]],[setq,l,[cons,[list,[quote,setf],[car,a],[cadr,a]],l]]]]]]]).
 wl:lambda_def(defmacro, setf, cl_setf, [c38_rest, args, c38_environment, sys_environment], [progn, [let, [[sys_numargs, [length, args]]], [cond, [[=, sys_numargs, 2], [let, [[sys_place, [first, args]], [sys_value_form, [second, args]]], [if, [atom, sys_place], ['#BQ', [setq, ['#COMMA', sys_place], ['#COMMA', sys_value_form]]], [progn, [multiple_value_bind, [sys_dummies, sys_vals, sys_store_vars, sys_setter, sys_getter], [get_setf_expansion, sys_place, sys_environment], [let, [[sys_inverse, [get, [car, sys_place], [quote, sys_setf_inverse]]]], [if, [and, sys_inverse, [eq, sys_inverse, [car, sys_setter]]], [if, [functionp, sys_inverse], ['#BQ', [funcall, ['#COMMA', sys_inverse], ['#BQ-COMMA-ELIPSE', [cdr, sys_place]], ['#COMMA', sys_value_form]]], ['#BQ', [['#COMMA', sys_inverse], ['#BQ-COMMA-ELIPSE', [cdr, sys_place]], ['#COMMA', sys_value_form]]]], [if, [or, [null, sys_store_vars], [cdr, sys_store_vars]], ['#BQ', [let_xx, [['#BQ-COMMA-ELIPSE', [mapcar, function(list), sys_dummies, sys_vals]]], [multiple_value_bind, ['#COMMA', sys_store_vars], ['#COMMA', sys_value_form], ['#COMMA', sys_setter]]]], ['#BQ', [let_xx, [['#BQ-COMMA-ELIPSE', [mapcar, function(list), sys_dummies, sys_vals]], ['#COMMA', [list, [car, sys_store_vars], sys_value_form]]], ['#COMMA', sys_setter]]]]]]]]]]], [[oddp, sys_numargs], [error, '$ARRAY'([*], claz_base_character, "Odd number of arguments to SETF.")]], [t, [do, [[sys_a, args, [cddr, sys_a]], [sys_l, []]], [[null, sys_a], ['#BQ', [progn, ['#BQ-COMMA-ELIPSE', [nreverse, sys_l]]]]], [setq, sys_l, [cons, [list, [quote, setf], [car, sys_a], [cadr, sys_a]], sys_l]]]]]]]).
 wl: declared(cl_setf, env_arg1).
 
@@ -2421,7 +2098,7 @@ cl_setf(RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:11516 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'%set-subseq',[sequence,start,'&rest',rest],[let,[[end,[]],v],[ecase,[length,rest],[1,[setq,v,[car,rest]]],[2,[setq,end,[car,rest],v,[cadr,rest]]]],[progn,[replace,sequence,v,':start1',start,':end1',end],v]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'%set-subseq',[sequence,start,'&rest',rest],[let,[[end,[]],v],[ecase,[length,rest],[1,[setq,v,[car,rest]]],[2,[setq,end,[car,rest],v,[cadr,rest]]]],[progn,[replace,sequence,v,':start1',start,':end1',end],v]]]).
 /*
 % ecase:-[[1,[setq,sys_v,[car,rest]]],[2,[setq,end,[car,rest],sys_v,[cadr,rest]]]].
 */
@@ -2555,7 +2232,7 @@ f_sys_pf_set_subseq(Sequence_In, Start_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:11819 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'%define-setf-macro',[name,expander,inverse,doc],[declare,[ignore,doc]],[when,inverse,['put-sysprop',name,[quote,'setf-inverse'],inverse]],[when,expander,['put-sysprop',name,[quote,'setf-expander'],expander]],name])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'%define-setf-macro',[name,expander,inverse,doc],[declare,[ignore,doc]],[when,inverse,['put-sysprop',name,[quote,'setf-inverse'],inverse]],[when,expander,['put-sysprop',name,[quote,'setf-expander'],expander]],name]).
 wl:lambda_def(defun, sys_pf_define_setf_macro, f_sys_pf_define_setf_type_macro, [sys_name, sys_expander, sys_inverse, sys_doc], [[declare, [ignore, sys_doc]], [when, sys_inverse, [sys_put_sysprop, sys_name, [quote, sys_setf_inverse], sys_inverse]], [when, sys_expander, [sys_put_sysprop, sys_name, [quote, sys_setf_expander], sys_expander]], sys_name]).
 wl:arglist_info(sys_pf_define_setf_macro, f_sys_pf_define_setf_type_macro, [sys_name, sys_expander, sys_inverse, sys_doc], arginfo{all:[sys_name, sys_expander, sys_inverse, sys_doc], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_name, sys_expander, sys_inverse, sys_doc], opt:0, req:[sys_name, sys_expander, sys_inverse, sys_doc], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, f_sys_pf_define_setf_type_macro).
@@ -2695,7 +2372,7 @@ f_sys_pf_define_setf_type_macro(Name_In, Expander_In, Inverse_In, Doc_In, FnResu
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:12072 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defmacro,defsetf,['access-function','update-function'],['#BQ',['eval-when',[':load-toplevel',':compile-toplevel',':execute'],['put-sysprop',[quote,['#COMMA','access-function']],[quote,'setf-inverse'],[quote,['#COMMA','update-function']]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defmacro,defsetf,['access-function','update-function'],['#BQ',['eval-when',[':load-toplevel',':compile-toplevel',':execute'],['put-sysprop',[quote,['#COMMA','access-function']],[quote,'setf-inverse'],[quote,['#COMMA','update-function']]]]]]).
 wl:lambda_def(defmacro, defsetf, cl_defsetf, [sys_access_function, sys_update_function], [progn, ['#BQ', [eval_when, [kw_load_toplevel, kw_compile_toplevel, kw_execute], [sys_put_sysprop, [quote, ['#COMMA', sys_access_function]], [quote, sys_setf_inverse], [quote, ['#COMMA', sys_update_function]]]]]]).
 wl:arglist_info(defsetf, cl_defsetf, [sys_access_function, sys_update_function], arginfo{all:[sys_access_function, sys_update_function], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_access_function, sys_update_function], opt:0, req:[sys_access_function, sys_update_function], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_defsetf).
@@ -2912,7 +2589,7 @@ cl_defsetf(Access_function_In, Update_function_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:12280 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[flet,[],[defun,'%set-caar',[x,v],['set-car',[car,x],v]],[defun,'%set-cadr',[x,v],['set-car',[cdr,x],v]],[defun,'%set-cdar',[x,v],['set-cdr',[car,x],v]],[defun,'%set-cddr',[x,v],['set-cdr',[cdr,x],v]],[defun,'%set-caaar',[x,v],['set-car',[caar,x],v]],[defun,'%set-cadar',[x,v],['set-car',[cdar,x],v]],[defun,'%set-cdaar',[x,v],['set-cdr',[caar,x],v]],[defun,'%set-cddar',[x,v],['set-cdr',[cdar,x],v]],[defun,'%set-caadr',[x,v],['set-car',[cadr,x],v]],[defun,'%set-caddr',[x,v],['set-car',[cddr,x],v]],[defun,'%set-cdadr',[x,v],['set-cdr',[cadr,x],v]],[defun,'%set-cdddr',[x,v],['set-cdr',[cddr,x],v]],[defun,'%set-caaaar',[x,v],['set-car',[caaar,x],v]],[defun,'%set-cadaar',[x,v],['set-car',[cdaar,x],v]],[defun,'%set-cdaaar',[x,v],['set-cdr',[caaar,x],v]],[defun,'%set-cddaar',[x,v],['set-cdr',[cdaar,x],v]],[defun,'%set-caadar',[x,v],['set-car',[cadar,x],v]],[defun,'%set-caddar',[x,v],['set-car',[cddar,x],v]],[defun,'%set-cdadar',[x,v],['set-cdr',[cadar,x],v]],[defun,'%set-cdddar',[x,v],['set-cdr',[cddar,x],v]],[defun,'%set-caaadr',[x,v],['set-car',[caadr,x],v]],[defun,'%set-cadadr',[x,v],['set-car',[cdadr,x],v]],[defun,'%set-cdaadr',[x,v],['set-cdr',[caadr,x],v]],[defun,'%set-cddadr',[x,v],['set-cdr',[cdadr,x],v]],[defun,'%set-caaddr',[x,v],['set-car',[caddr,x],v]],[defun,'%set-cadddr',[x,v],['set-car',[cdddr,x],v]],[defun,'%set-cdaddr',[x,v],['set-cdr',[caddr,x],v]],[defun,'%set-cddddr',[x,v],['set-cdr',[cdddr,x],v]],[defsetf,car,'set-car'],[defsetf,cdr,'set-cdr'],[defsetf,caar,'%set-caar'],[defsetf,cadr,'%set-cadr'],[defsetf,cdar,'%set-cdar'],[defsetf,cddr,'%set-cddr'],[defsetf,caaar,'%set-caaar'],[defsetf,cadar,'%set-cadar'],[defsetf,cdaar,'%set-cdaar'],[defsetf,cddar,'%set-cddar'],[defsetf,caadr,'%set-caadr'],[defsetf,caddr,'%set-caddr'],[defsetf,cdadr,'%set-cdadr'],[defsetf,cdddr,'%set-cdddr'],[defsetf,caaaar,'%set-caaaar'],[defsetf,cadaar,'%set-cadaar'],[defsetf,cdaaar,'%set-cdaaar'],[defsetf,cddaar,'%set-cddaar'],[defsetf,caadar,'%set-caadar'],[defsetf,caddar,'%set-caddar'],[defsetf,cdadar,'%set-cdadar'],[defsetf,cdddar,'%set-cdddar'],[defsetf,caaadr,'%set-caaadr'],[defsetf,cadadr,'%set-cadadr'],[defsetf,cdaadr,'%set-cdaadr'],[defsetf,cddadr,'%set-cddadr'],[defsetf,caaddr,'%set-caaddr'],[defsetf,cadddr,'%set-cadddr'],[defsetf,cdaddr,'%set-cdaddr'],[defsetf,cddddr,'%set-cddddr'],[defsetf,first,'set-car'],[defsetf,second,'%set-cadr'],[defsetf,third,'%set-caddr'],[defsetf,fourth,'%set-cadddr'],[defun,'%set-fifth',[x,v],['set-car',[cddddr,x],v]],[defsetf,fifth,'%set-fifth'],[defun,'%set-sixth',[x,v],['set-car',[cdr,[cddddr,x]],v]],[defsetf,sixth,'%set-sixth'],[defun,'%set-seventh',[x,v],['set-car',[cddr,[cddddr,x]],v]],[defsetf,seventh,'%set-seventh'],[defun,'%set-eighth',[x,v],['set-car',[cdddr,[cddddr,x]],v]],[defsetf,eighth,'%set-eighth'],[defun,'%set-ninth',[x,v],['set-car',[cddddr,[cddddr,x]],v]],[defsetf,ninth,'%set-ninth'],[defun,'%set-tenth',[x,v],['set-car',[cdr,[cddddr,[cddddr,x]]],v]],[defsetf,tenth,'%set-tenth'],[defsetf,rest,'set-cdr'],[defsetf,elt,'%set-elt'],[defsetf,nth,'%set-nth'],[defsetf,svref,svset],[defsetf,'fill-pointer','%set-fill-pointer'],[defsetf,subseq,'%set-subseq'],[defsetf,'symbol-value',set],[defsetf,'symbol-function','%set-symbol-function'],[defsetf,'symbol-plist','%set-symbol-plist'],[defsetf,get,put],[defsetf,gethash,puthash],[defsetf,char,'set-char'],[defsetf,schar,'set-schar'],[defsetf,'logical-pathname-translations','%set-logical-pathname-translations'],[defsetf,'readtable-case','%set-readtable-case'],[defsetf,'function-info','%set-function-info'],[defsetf,'stream-external-format','%set-stream-external-format'],[defsetf,'structure-ref','structure-set']])
+:-lisp_compile_to_prolog(pkg_sys,[flet,[],[defun,'%set-caar',[x,v],['set-car',[car,x],v]],[defun,'%set-cadr',[x,v],['set-car',[cdr,x],v]],[defun,'%set-cdar',[x,v],['set-cdr',[car,x],v]],[defun,'%set-cddr',[x,v],['set-cdr',[cdr,x],v]],[defun,'%set-caaar',[x,v],['set-car',[caar,x],v]],[defun,'%set-cadar',[x,v],['set-car',[cdar,x],v]],[defun,'%set-cdaar',[x,v],['set-cdr',[caar,x],v]],[defun,'%set-cddar',[x,v],['set-cdr',[cdar,x],v]],[defun,'%set-caadr',[x,v],['set-car',[cadr,x],v]],[defun,'%set-caddr',[x,v],['set-car',[cddr,x],v]],[defun,'%set-cdadr',[x,v],['set-cdr',[cadr,x],v]],[defun,'%set-cdddr',[x,v],['set-cdr',[cddr,x],v]],[defun,'%set-caaaar',[x,v],['set-car',[caaar,x],v]],[defun,'%set-cadaar',[x,v],['set-car',[cdaar,x],v]],[defun,'%set-cdaaar',[x,v],['set-cdr',[caaar,x],v]],[defun,'%set-cddaar',[x,v],['set-cdr',[cdaar,x],v]],[defun,'%set-caadar',[x,v],['set-car',[cadar,x],v]],[defun,'%set-caddar',[x,v],['set-car',[cddar,x],v]],[defun,'%set-cdadar',[x,v],['set-cdr',[cadar,x],v]],[defun,'%set-cdddar',[x,v],['set-cdr',[cddar,x],v]],[defun,'%set-caaadr',[x,v],['set-car',[caadr,x],v]],[defun,'%set-cadadr',[x,v],['set-car',[cdadr,x],v]],[defun,'%set-cdaadr',[x,v],['set-cdr',[caadr,x],v]],[defun,'%set-cddadr',[x,v],['set-cdr',[cdadr,x],v]],[defun,'%set-caaddr',[x,v],['set-car',[caddr,x],v]],[defun,'%set-cadddr',[x,v],['set-car',[cdddr,x],v]],[defun,'%set-cdaddr',[x,v],['set-cdr',[caddr,x],v]],[defun,'%set-cddddr',[x,v],['set-cdr',[cdddr,x],v]],[defsetf,car,'set-car'],[defsetf,cdr,'set-cdr'],[defsetf,caar,'%set-caar'],[defsetf,cadr,'%set-cadr'],[defsetf,cdar,'%set-cdar'],[defsetf,cddr,'%set-cddr'],[defsetf,caaar,'%set-caaar'],[defsetf,cadar,'%set-cadar'],[defsetf,cdaar,'%set-cdaar'],[defsetf,cddar,'%set-cddar'],[defsetf,caadr,'%set-caadr'],[defsetf,caddr,'%set-caddr'],[defsetf,cdadr,'%set-cdadr'],[defsetf,cdddr,'%set-cdddr'],[defsetf,caaaar,'%set-caaaar'],[defsetf,cadaar,'%set-cadaar'],[defsetf,cdaaar,'%set-cdaaar'],[defsetf,cddaar,'%set-cddaar'],[defsetf,caadar,'%set-caadar'],[defsetf,caddar,'%set-caddar'],[defsetf,cdadar,'%set-cdadar'],[defsetf,cdddar,'%set-cdddar'],[defsetf,caaadr,'%set-caaadr'],[defsetf,cadadr,'%set-cadadr'],[defsetf,cdaadr,'%set-cdaadr'],[defsetf,cddadr,'%set-cddadr'],[defsetf,caaddr,'%set-caaddr'],[defsetf,cadddr,'%set-cadddr'],[defsetf,cdaddr,'%set-cdaddr'],[defsetf,cddddr,'%set-cddddr'],[defsetf,first,'set-car'],[defsetf,second,'%set-cadr'],[defsetf,third,'%set-caddr'],[defsetf,fourth,'%set-cadddr'],[defun,'%set-fifth',[x,v],['set-car',[cddddr,x],v]],[defsetf,fifth,'%set-fifth'],[defun,'%set-sixth',[x,v],['set-car',[cdr,[cddddr,x]],v]],[defsetf,sixth,'%set-sixth'],[defun,'%set-seventh',[x,v],['set-car',[cddr,[cddddr,x]],v]],[defsetf,seventh,'%set-seventh'],[defun,'%set-eighth',[x,v],['set-car',[cdddr,[cddddr,x]],v]],[defsetf,eighth,'%set-eighth'],[defun,'%set-ninth',[x,v],['set-car',[cddddr,[cddddr,x]],v]],[defsetf,ninth,'%set-ninth'],[defun,'%set-tenth',[x,v],['set-car',[cdr,[cddddr,[cddddr,x]]],v]],[defsetf,tenth,'%set-tenth'],[defsetf,rest,'set-cdr'],[defsetf,elt,'%set-elt'],[defsetf,nth,'%set-nth'],[defsetf,svref,svset],[defsetf,'fill-pointer','%set-fill-pointer'],[defsetf,subseq,'%set-subseq'],[defsetf,'symbol-value',set],[defsetf,'symbol-function','%set-symbol-function'],[defsetf,'symbol-plist','%set-symbol-plist'],[defsetf,get,put],[defsetf,gethash,puthash],[defsetf,char,'set-char'],[defsetf,schar,'set-schar'],[defsetf,'logical-pathname-translations','%set-logical-pathname-translations'],[defsetf,'readtable-case','%set-readtable-case'],[defsetf,'function-info','%set-function-info'],[defsetf,'stream-external-format','%set-stream-external-format'],[defsetf,'structure-ref','structure-set']]).
 :- [].
 wl:lambda_def(defun, sys_pf_set_caar, f_sys_pf_set_caar, [sys_x, sys_v], [[sys_set_car, [car, sys_x], sys_v]]).
 wl:arglist_info(sys_pf_set_caar, f_sys_pf_set_caar, [sys_x, sys_v], arginfo{all:[sys_x, sys_v], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_v], opt:0, req:[sys_x, sys_v], rest:0, sublists:0, whole:0}).
@@ -4545,14 +4222,14 @@ al-when
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:16638 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[':execute'])
+:-lisp_compile_to_prolog(pkg_sys,[':execute']).
 :- cl_apply(kw_execute, [], _Ignored).
 /*
 (load (merge-pathnames "seqmacros.lsp" *load-truename*))
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:16652 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[load,['merge-pathnames','$STRING'("seqmacros.lsp"),'*load-truename*']])
+:-lisp_compile_to_prolog(pkg_sys,[load,['merge-pathnames','$STRING'("seqmacros.lsp"),'*load-truename*']]).
 :- get_var(GEnv, xx_load_truename_xx, Xx_load_truename_xx_Get),
    cl_merge_pathnames('$ARRAY'([*], claz_base_character, "seqmacros.lsp"),
 		      Xx_load_truename_xx_Get,
@@ -4576,7 +4253,7 @@ al-when
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:16715 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'error-not-a-sequence',[value],['signal-type-error',value,[quote,sequence]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'error-not-a-sequence',[value],['signal-type-error',value,[quote,sequence]]]).
 wl:lambda_def(defun, sys_error_not_a_sequence, f_sys_error_not_a_sequence, [sys_value], [[sys_signal_type_error, sys_value, [quote, sequence]]]).
 wl:arglist_info(sys_error_not_a_sequence, f_sys_error_not_a_sequence, [sys_value], arginfo{all:[sys_value], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_value], opt:0, req:[sys_value], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, f_sys_error_not_a_sequence).
@@ -4650,7 +4327,7 @@ f_sys_error_not_a_sequence(Value_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:16839 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'error-sequence-index',[sequence,index],[error,[quote,'simple-type-error'],':datum',index,':expected-type',[quote,'unsigned-byte'],':format-control','$STRING'("Not a valid index ~A into sequence ~A"),':format-arguments',[list,index,sequence]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'error-sequence-index',[sequence,index],[error,[quote,'simple-type-error'],':datum',index,':expected-type',[quote,'unsigned-byte'],':format-control','$STRING'("Not a valid index ~A into sequence ~A"),':format-arguments',[list,index,sequence]]]).
 wl:lambda_def(defun, sys_error_sequence_index, f_sys_error_sequence_index, [sequence, index], [[error, [quote, simple_type_error], kw_datum, index, kw_expected_type, [quote, unsigned_byte], kw_format_control, '$ARRAY'([*], claz_base_character, "Not a valid index ~A into sequence ~A"), kw_format_arguments, [list, index, sequence]]]).
 wl:arglist_info(sys_error_sequence_index, f_sys_error_sequence_index, [sequence, index], arginfo{all:[sequence, index], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sequence, index], opt:0, req:[sequence, index], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, f_sys_error_sequence_index).
@@ -4748,7 +4425,7 @@ f_sys_error_sequence_index(Sequence_In, Index_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:17142 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'error-sequence-type',[type],[error,[quote,'simple-type-error'],':datum',[vector],':expected-type',type,':format-control','$STRING'("~S does not specify a sequence type"),':format-arguments',[list,type]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'error-sequence-type',[type],[error,[quote,'simple-type-error'],':datum',[vector],':expected-type',type,':format-control','$STRING'("~S does not specify a sequence type"),':format-arguments',[list,type]]]).
 wl:lambda_def(defun, sys_error_sequence_type, f_sys_error_sequence_type, [type], [[error, [quote, simple_type_error], kw_datum, [vector], kw_expected_type, type, kw_format_control, '$ARRAY'([*], claz_base_character, "~S does not specify a sequence type"), kw_format_arguments, [list, type]]]).
 wl:arglist_info(sys_error_sequence_type, f_sys_error_sequence_type, [type], arginfo{all:[type], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[type], opt:0, req:[type], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, f_sys_error_sequence_type).
@@ -4848,7 +4525,7 @@ f_sys_error_sequence_type(Type_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:17482 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'error-sequence-length',[object,type,size],[error,[quote,'simple-type-error'],':format-control','$STRING'("Cannot create a sequence of size ~S which matches type ~S."),':format-arguments',[list,size,type],':expected-type',type,':datum',object]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'error-sequence-length',[object,type,size],[error,[quote,'simple-type-error'],':format-control','$STRING'("Cannot create a sequence of size ~S which matches type ~S."),':format-arguments',[list,size,type],':expected-type',type,':datum',object]]).
 wl:lambda_def(defun, sys_error_sequence_length, f_sys_error_sequence_length, [sys_object, type, sys_size], [[error, [quote, simple_type_error], kw_format_control, '$ARRAY'([*], claz_base_character, "Cannot create a sequence of size ~S which matches type ~S."), kw_format_arguments, [list, sys_size, type], kw_expected_type, type, kw_datum, sys_object]]).
 wl:arglist_info(sys_error_sequence_length, f_sys_error_sequence_length, [sys_object, type, sys_size], arginfo{all:[sys_object, type, sys_size], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_object, type, sys_size], opt:0, req:[sys_object, type, sys_size], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, f_sys_error_sequence_length).
@@ -4968,7 +4645,7 @@ default value of INITIAL-ELEMENT depends on TYPE."
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:17812 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'make-sequence',[type,size,'&key',['initial-element',[],iesp],'&aux',sequence],'$STRING'("Args: (type length &key initial-element)\r\nCreates and returns a sequence of the given TYPE and LENGTH.  If INITIAL-\r\nELEMENT is given, then it becomes the elements of the created sequence.  The\r\ndefault value of INITIAL-ELEMENT depends on TYPE."),['multiple-value-bind',['element-type',length],['closest-sequence-type',type],[cond,[[eq,'element-type',[quote,'LIST']],[setq,sequence,['make-list',size,':initial-element','initial-element']],[unless,[subtypep,[quote,'LIST'],type],[when,[or,[and,[subtypep,type,[quote,'NULL']],[plusp,size]],[and,[subtypep,type,[quote,'CONS']],[zerop,size]]],['error-sequence-length',['make-list',size,':initial-element','initial-element'],type,0]]]],[t,[setq,sequence,['sys:make-vector',[if,[eq,'element-type',[quote,*]],'T','element-type'],size,[],[],[],[]]],[when,iesp,['fill-array-with-elt',sequence,'initial-element',0,[]]],[unless,[or,[eql,length,[quote,*]],[eql,length,size]],['error-sequence-length',sequence,type,size]]]],sequence]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'make-sequence',[type,size,'&key',['initial-element',[],iesp],'&aux',sequence],'$STRING'("Args: (type length &key initial-element)\r\nCreates and returns a sequence of the given TYPE and LENGTH.  If INITIAL-\r\nELEMENT is given, then it becomes the elements of the created sequence.  The\r\ndefault value of INITIAL-ELEMENT depends on TYPE."),['multiple-value-bind',['element-type',length],['closest-sequence-type',type],[cond,[[eq,'element-type',[quote,'LIST']],[setq,sequence,['make-list',size,':initial-element','initial-element']],[unless,[subtypep,[quote,'LIST'],type],[when,[or,[and,[subtypep,type,[quote,'NULL']],[plusp,size]],[and,[subtypep,type,[quote,'CONS']],[zerop,size]]],['error-sequence-length',['make-list',size,':initial-element','initial-element'],type,0]]]],[t,[setq,sequence,['sys:make-vector',[if,[eq,'element-type',[quote,*]],'T','element-type'],size,[],[],[],[]]],[when,iesp,['fill-array-with-elt',sequence,'initial-element',0,[]]],[unless,[or,[eql,length,[quote,*]],[eql,length,size]],['error-sequence-length',sequence,type,size]]]],sequence]]).
 doc: doc_string(make_sequence,
 	      _66482340,
 	      function,
@@ -5376,7 +5053,7 @@ TODO PORT
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:19025 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'make-seq-iterator',[sequence,'&optional',[start,0]],[declare,[optimize,[safety,0]]],[cond,[[fixnump,start],[let,[[aux,start]],[declare,[fixnum,aux]],[cond,[[minusp,aux],['error-sequence-index',sequence,start]],[[listp,sequence],[nthcdr,aux,sequence]],[[vectorp,sequence],[and,[<,start,[length,['truly-the',vector,sequence]]],start]],[t,['error-not-a-sequence',sequence]]]]],[[not,[or,[listp,sequence],[vectorp,sequence]]],['error-not-a-sequence',sequence]],[[integerp,start],[]],[t,['error-sequence-index',sequence,start]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'make-seq-iterator',[sequence,'&optional',[start,0]],[declare,[optimize,[safety,0]]],[cond,[[fixnump,start],[let,[[aux,start]],[declare,[fixnum,aux]],[cond,[[minusp,aux],['error-sequence-index',sequence,start]],[[listp,sequence],[nthcdr,aux,sequence]],[[vectorp,sequence],[and,[<,start,[length,['truly-the',vector,sequence]]],start]],[t,['error-not-a-sequence',sequence]]]]],[[not,[or,[listp,sequence],[vectorp,sequence]]],['error-not-a-sequence',sequence]],[[integerp,start],[]],[t,['error-sequence-index',sequence,start]]]]).
 wl:lambda_def(defun, sys_make_seq_iterator, f_sys_make_seq_iterator, [sequence, c38_optional, [start, 0]], [[declare, [optimize, [safety, 0]]], [cond, [[sys_fixnump, start], [let, [[sys_aux, start]], [declare, [fixnum, sys_aux]], [cond, [[minusp, sys_aux], [sys_error_sequence_index, sequence, start]], [[listp, sequence], [nthcdr, sys_aux, sequence]], [[vectorp, sequence], [and, [<, start, [length, [ext_truly_the, vector, sequence]]], start]], [t, [sys_error_not_a_sequence, sequence]]]]], [[not, [or, [listp, sequence], [vectorp, sequence]]], [sys_error_not_a_sequence, sequence]], [[integerp, start], []], [t, [sys_error_sequence_index, sequence, start]]]]).
 wl:arglist_info(sys_make_seq_iterator, f_sys_make_seq_iterator, [sequence, c38_optional, [start, 0]], arginfo{all:[sequence, start], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sequence, start], opt:[start], req:[sequence], rest:0, sublists:0, whole:0}).
 wl: init_args(1, f_sys_make_seq_iterator).
@@ -5650,7 +5327,7 @@ TODO PORT
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:22706 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'seq-iterator-ref',[sequence,iterator],[declare,[optimize,[safety,0]]],[if,[fixnump,iterator],[aref,['truly-the',vector,sequence],iterator],[car,['truly-the',cons,iterator]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'seq-iterator-ref',[sequence,iterator],[declare,[optimize,[safety,0]]],[if,[fixnump,iterator],[aref,['truly-the',vector,sequence],iterator],[car,['truly-the',cons,iterator]]]]).
 wl:lambda_def(defun, sys_seq_iterator_ref, f_sys_seq_iterator_ref, [sequence, sys_iterator], [[declare, [optimize, [safety, 0]]], [if, [sys_fixnump, sys_iterator], [aref, [ext_truly_the, vector, sequence], sys_iterator], [car, [ext_truly_the, cons, sys_iterator]]]]).
 wl:arglist_info(sys_seq_iterator_ref, f_sys_seq_iterator_ref, [sequence, sys_iterator], arginfo{all:[sequence, sys_iterator], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sequence, sys_iterator], opt:0, req:[sequence, sys_iterator], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, f_sys_seq_iterator_ref).
@@ -5740,7 +5417,7 @@ f_sys_seq_iterator_ref(Sequence_In, Iterator_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:22926 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'seq-iterator-set',[sequence,iterator,value],[declare,[optimize,[safety,0]]],[if,[fixnump,iterator],[setf,[aref,['truly-the',vector,sequence],iterator],value],[setf,[car,['truly-the',cons,iterator]],value]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'seq-iterator-set',[sequence,iterator,value],[declare,[optimize,[safety,0]]],[if,[fixnump,iterator],[setf,[aref,['truly-the',vector,sequence],iterator],value],[setf,[car,['truly-the',cons,iterator]],value]]]).
 /*
 :- side_effect((compile_each($, _72207160, [sys_iterator], [sys_iterator], true), append([[ext_truly_the, vector, sequence], sys_iterator], [CAR10, CAR], [[ext_truly_the, vector, sequence], sys_iterator, CAR10, CAR]), setf_inverse_op(aref, []))).
 */
@@ -5884,7 +5561,7 @@ f_sys_seq_iterator_set(Sequence_In, Iterator_In, Value_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:23178 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'seq-iterator-next',[sequence,iterator],[declare,[optimize,[safety,0]]],[cond,[[fixnump,iterator],[let,[[aux,['1+',iterator]]],[declare,[fixnum,aux]],[and,[<,aux,[length,['truly-the',vector,sequence]]],aux]]],[[atom,iterator],['error-not-a-sequence',iterator]],[t,[setf,iterator,[cdr,['truly-the',cons,iterator]]],[unless,[listp,iterator],['error-not-a-sequence',iterator]],iterator]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'seq-iterator-next',[sequence,iterator],[declare,[optimize,[safety,0]]],[cond,[[fixnump,iterator],[let,[[aux,['1+',iterator]]],[declare,[fixnum,aux]],[and,[<,aux,[length,['truly-the',vector,sequence]]],aux]]],[[atom,iterator],['error-not-a-sequence',iterator]],[t,[setf,iterator,[cdr,['truly-the',cons,iterator]]],[unless,[listp,iterator],['error-not-a-sequence',iterator]],iterator]]]).
 wl:lambda_def(defun, sys_seq_iterator_next, f_sys_seq_iterator_next, [sequence, sys_iterator], [[declare, [optimize, [safety, 0]]], [cond, [[sys_fixnump, sys_iterator], [let, [[sys_aux, ['1+', sys_iterator]]], [declare, [fixnum, sys_aux]], [and, [<, sys_aux, [length, [ext_truly_the, vector, sequence]]], sys_aux]]], [[atom, sys_iterator], [sys_error_not_a_sequence, sys_iterator]], [t, [setf, sys_iterator, [cdr, [ext_truly_the, cons, sys_iterator]]], [unless, [listp, sys_iterator], [sys_error_not_a_sequence, sys_iterator]], sys_iterator]]]).
 wl:arglist_info(sys_seq_iterator_next, f_sys_seq_iterator_next, [sequence, sys_iterator], arginfo{all:[sequence, sys_iterator], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sequence, sys_iterator], opt:0, req:[sequence, sys_iterator], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, f_sys_seq_iterator_next).
@@ -6066,7 +5743,7 @@ f_sys_seq_iterator_next(Sequence_In, Iterator_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:23709 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'seq-iterator-list-pop',['values-list','seq-list','iterator-list'],[declare,[optimize,[safety,0]]],['do*',[['it-list','iterator-list'],['v-list','values-list']],[[null,'v-list'],'values-list'],['let*',[[it,['cons-car','it-list']],[sequence,['cons-car','seq-list']]],[cond,[[null,it],[return,[]]],[[fixnump,it],['let*',[[n,it],[s,sequence]],[declare,[fixnum,n],[vector,s]],[rplaca,'v-list',[aref,s,n]],[rplaca,'it-list',[and,[<,[incf,n],[length,s]],n]]]],[[atom,it],['error-not-a-sequence',it]],[t,[rplaca,'v-list',['cons-car',it]],[unless,[listp,[setf,it,['cons-cdr',it]]],['error-not-a-sequence',it]],[rplaca,'it-list',it]]],[setf,'v-list',['cons-cdr','v-list'],'it-list',['cons-cdr','it-list'],'seq-list',['cons-cdr','seq-list']]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'seq-iterator-list-pop',['values-list','seq-list','iterator-list'],[declare,[optimize,[safety,0]]],['do*',[['it-list','iterator-list'],['v-list','values-list']],[[null,'v-list'],'values-list'],['let*',[[it,['cons-car','it-list']],[sequence,['cons-car','seq-list']]],[cond,[[null,it],[return,[]]],[[fixnump,it],['let*',[[n,it],[s,sequence]],[declare,[fixnum,n],[vector,s]],[rplaca,'v-list',[aref,s,n]],[rplaca,'it-list',[and,[<,[incf,n],[length,s]],n]]]],[[atom,it],['error-not-a-sequence',it]],[t,[rplaca,'v-list',['cons-car',it]],[unless,[listp,[setf,it,['cons-cdr',it]]],['error-not-a-sequence',it]],[rplaca,'it-list',it]]],[setf,'v-list',['cons-cdr','v-list'],'it-list',['cons-cdr','it-list'],'seq-list',['cons-cdr','seq-list']]]]]).
 wl:lambda_def(defun, sys_seq_iterator_list_pop, f_sys_seq_iterator_list_pop, [values_list, sys_seq_list, sys_iterator_list], [[declare, [optimize, [safety, 0]]], [do_xx, [[sys_it_list, sys_iterator_list], [sys_v_list, values_list]], [[null, sys_v_list], values_list], [let_xx, [[sys_it, [sys_cons_car, sys_it_list]], [sequence, [sys_cons_car, sys_seq_list]]], [cond, [[null, sys_it], [return, []]], [[sys_fixnump, sys_it], [let_xx, [[n, sys_it], [sys_s, sequence]], [declare, [fixnum, n], [vector, sys_s]], [rplaca, sys_v_list, [aref, sys_s, n]], [rplaca, sys_it_list, [and, [<, [incf, n], [length, sys_s]], n]]]], [[atom, sys_it], [sys_error_not_a_sequence, sys_it]], [t, [rplaca, sys_v_list, [sys_cons_car, sys_it]], [unless, [listp, [setf, sys_it, [sys_cons_cdr, sys_it]]], [sys_error_not_a_sequence, sys_it]], [rplaca, sys_it_list, sys_it]]], [setf, sys_v_list, [sys_cons_cdr, sys_v_list], sys_it_list, [sys_cons_cdr, sys_it_list], sys_seq_list, [sys_cons_cdr, sys_seq_list]]]]]).
 wl:arglist_info(sys_seq_iterator_list_pop, f_sys_seq_iterator_list_pop, [values_list, sys_seq_list, sys_iterator_list], arginfo{all:[values_list, sys_seq_list, sys_iterator_list], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[values_list, sys_seq_list, sys_iterator_list], opt:0, req:[values_list, sys_seq_list, sys_iterator_list], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, f_sys_seq_iterator_list_pop).
@@ -6265,7 +5942,7 @@ f_sys_seq_iterator_list_pop(Values_list_In, Seq_list_In, Iterator_list_In, FnRes
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:24683 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'coerce-to-list',[object],[if,[listp,object],object,[do,[[it,['make-seq-iterator',object],['seq-iterator-next',object,it]],[output,[]]],[[null,it],[nreverse,output]],[push,['seq-iterator-ref',object,it],output]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'coerce-to-list',[object],[if,[listp,object],object,[do,[[it,['make-seq-iterator',object],['seq-iterator-next',object,it]],[output,[]]],[[null,it],[nreverse,output]],[push,['seq-iterator-ref',object,it],output]]]]).
 wl:lambda_def(defun, sys_coerce_to_list, f_sys_coerce_to_list, [sys_object], [[if, [listp, sys_object], sys_object, [do, [[sys_it, [sys_make_seq_iterator, sys_object], [sys_seq_iterator_next, sys_object, sys_it]], [sys_output, []]], [[null, sys_it], [nreverse, sys_output]], [push, [sys_seq_iterator_ref, sys_object, sys_it], sys_output]]]]).
 wl:arglist_info(sys_coerce_to_list, f_sys_coerce_to_list, [sys_object], arginfo{all:[sys_object], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_object], opt:0, req:[sys_object], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, f_sys_coerce_to_list).
@@ -6399,7 +6076,7 @@ f_sys_coerce_to_list(Object_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:24969 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'coerce-to-vector',[object,'elt-type',length,'simple-array-p'],[let,[[output,object]],[unless,[and,[vectorp,object],[or,[null,'simple-array-p'],['simple-array-p',object]],[eq,['array-element-type',object],'elt-type']],['let*',[['final-length',[if,[eq,length,[quote,*]],[length,object],length]]],[setf,output,['make-vector','elt-type','final-length',[],[],[],0]],[do,[[i,['make-seq-iterator',object],['seq-iterator-next',output,i]],[j,0,['truly-the',index,['1+',j]]]],[[=,j,'final-length'],[setf,object,output]],[declare,[index,j]],[setf,[aref,output,j],['seq-iterator-ref',object,i]]]]],[unless,[eq,length,[quote,*]],[unless,[=,length,[length,output]],['check-type',output,['#BQ',[vector,['#COMMA','elt-type'],[['#COMMA',length]]]],'$STRING'("coerced object")]]],output]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'coerce-to-vector',[object,'elt-type',length,'simple-array-p'],[let,[[output,object]],[unless,[and,[vectorp,object],[or,[null,'simple-array-p'],['simple-array-p',object]],[eq,['array-element-type',object],'elt-type']],['let*',[['final-length',[if,[eq,length,[quote,*]],[length,object],length]]],[setf,output,['make-vector','elt-type','final-length',[],[],[],0]],[do,[[i,['make-seq-iterator',object],['seq-iterator-next',output,i]],[j,0,['truly-the',index,['1+',j]]]],[[=,j,'final-length'],[setf,object,output]],[declare,[index,j]],[setf,[aref,output,j],['seq-iterator-ref',object,i]]]]],[unless,[eq,length,[quote,*]],[unless,[=,length,[length,output]],['check-type',output,['#BQ',[vector,['#COMMA','elt-type'],[['#COMMA',length]]]],'$STRING'("coerced object")]]],output]]).
 /*
 :- side_effect((compile_each($, BlockExitEnv, [sys_j], [sys_j], true), append([sys_output, sys_j], [CAR54, CAR], [sys_output, sys_j, CAR54, CAR]), setf_inverse_op(aref, []))).
 */
@@ -6458,7 +6135,7 @@ SEQUENCEs."
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:25840 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,concatenate,['result-type','&rest',sequences],'$STRING'("Args: (type &rest sequences)\r\nReturns a new sequence of the specified type, consisting of all elements of\r\nSEQUENCEs."),['do*',[['length-list',[mapcar,function(length),sequences],[rest,'length-list']],[output,['make-sequence','result-type',[apply,function(+),'length-list']]],[sequences,sequences,[rest,sequences]],[i,['make-seq-iterator',output]]],[[null,sequences],output],['do*',[[s,[first,sequences]],[j,['make-seq-iterator',s],['seq-iterator-next',s,j]]],[[null,j]],['seq-iterator-set',output,i,['seq-iterator-ref',s,j]],[setq,i,['seq-iterator-next',output,i]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,concatenate,['result-type','&rest',sequences],'$STRING'("Args: (type &rest sequences)\r\nReturns a new sequence of the specified type, consisting of all elements of\r\nSEQUENCEs."),['do*',[['length-list',[mapcar,function(length),sequences],[rest,'length-list']],[output,['make-sequence','result-type',[apply,function(+),'length-list']]],[sequences,sequences,[rest,sequences]],[i,['make-seq-iterator',output]]],[[null,sequences],output],['do*',[[s,[first,sequences]],[j,['make-seq-iterator',s],['seq-iterator-next',s,j]]],[[null,j]],['seq-iterator-set',output,i,['seq-iterator-ref',s,j]],[setq,i,['seq-iterator-next',output,i]]]]]).
 doc: doc_string(concatenate,
 	      _84291368,
 	      function,
@@ -6654,7 +6331,7 @@ SEQUENCEs, where K is the minimum length of the given SEQUENCEs."
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:26521 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,map,['result-type',function,sequence,'&rest','more-sequences'],'$STRING'("Args: (type function sequence &rest more-sequences)\r\nCreates and returns a sequence of TYPE with K elements, with the N-th element\r\nbeing the value of applying FUNCTION to the N-th elements of the given\r\nSEQUENCEs, where K is the minimum length of the given SEQUENCEs."),['let*',[[sequences,['list*',sequence,'more-sequences']],[function,['coerce-to-function',function]],output,it],[when,'result-type',[let,[[l,[length,sequence]]],[when,'more-sequences',[setf,l,[reduce,function(min),'more-sequences',':initial-value',l,':key',function(length)]]],[setf,output,['make-sequence','result-type',l],it,['make-seq-iterator',output]]]],['do-sequences',['elt-list',sequences,':output',output],[let,[[value,[apply,function,'elt-list']]],[when,'result-type',['seq-iterator-set',output,it,value],[setf,it,['seq-iterator-next',output,it]]]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,map,['result-type',function,sequence,'&rest','more-sequences'],'$STRING'("Args: (type function sequence &rest more-sequences)\r\nCreates and returns a sequence of TYPE with K elements, with the N-th element\r\nbeing the value of applying FUNCTION to the N-th elements of the given\r\nSEQUENCEs, where K is the minimum length of the given SEQUENCEs."),['let*',[[sequences,['list*',sequence,'more-sequences']],[function,['coerce-to-function',function]],output,it],[when,'result-type',[let,[[l,[length,sequence]]],[when,'more-sequences',[setf,l,[reduce,function(min),'more-sequences',':initial-value',l,':key',function(length)]]],[setf,output,['make-sequence','result-type',l],it,['make-seq-iterator',output]]]],['do-sequences',['elt-list',sequences,':output',output],[let,[[value,[apply,function,'elt-list']]],[when,'result-type',['seq-iterator-set',output,it,value],[setf,it,['seq-iterator-next',output,it]]]]]]]).
 doc: doc_string(map,
 	      _87981216,
 	      function,
@@ -6916,7 +6593,7 @@ NIL otherwise."
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:27575 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,some,[predicate,sequence,'&rest','more-sequences'],'$STRING'("Args: (predicate sequence &rest more-sequences)\r\nReturns T if at least one of the elements in SEQUENCEs satisfies PREDICATE;\r\nNIL otherwise."),[reckless,['do-sequences',['elt-list',[cons,sequence,'more-sequences'],':output',[]],[let,[[x,[apply,predicate,'elt-list']]],[when,x,[return,x]]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,some,[predicate,sequence,'&rest','more-sequences'],'$STRING'("Args: (predicate sequence &rest more-sequences)\r\nReturns T if at least one of the elements in SEQUENCEs satisfies PREDICATE;\r\nNIL otherwise."),[reckless,['do-sequences',['elt-list',[cons,sequence,'more-sequences'],':output',[]],[let,[[x,[apply,predicate,'elt-list']]],[when,x,[return,x]]]]]]).
 doc: doc_string(some,
 	      _89932908,
 	      function,
@@ -7057,7 +6734,7 @@ Returns T if every elements of SEQUENCEs satisfy PREDICATE; NIL otherwise."
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:27959 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,every,[predicate,sequence,'&rest','more-sequences'],'$STRING'("Args: (predicate sequence &rest more-sequences)\r\nReturns T if every elements of SEQUENCEs satisfy PREDICATE; NIL otherwise."),[reckless,['do-sequences',['elt-list',[cons,sequence,'more-sequences'],':output',t],[unless,[apply,predicate,'elt-list'],[return,[]]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,every,[predicate,sequence,'&rest','more-sequences'],'$STRING'("Args: (predicate sequence &rest more-sequences)\r\nReturns T if every elements of SEQUENCEs satisfy PREDICATE; NIL otherwise."),[reckless,['do-sequences',['elt-list',[cons,sequence,'more-sequences'],':output',t],[unless,[apply,predicate,'elt-list'],[return,[]]]]]]).
 doc: doc_string(every,
 	      _91102000,
 	      function,
@@ -7207,7 +6884,7 @@ have the same length; NIL otherwise."
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:28789 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'every*',[predicate,'&rest',sequences],'$STRING'("Args: (predicate sequence &rest more-sequences)\r\nReturns T if every elements of SEQUENCEs satisfy PREDICATE and all sequences\r\nhave the same length; NIL otherwise."),[and,[apply,function(=),[mapcar,function(length),sequences]],[apply,function(every),predicate,sequences]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'every*',[predicate,'&rest',sequences],'$STRING'("Args: (predicate sequence &rest more-sequences)\r\nReturns T if every elements of SEQUENCEs satisfy PREDICATE and all sequences\r\nhave the same length; NIL otherwise."),[and,[apply,function(=),[mapcar,function(length),sequences]],[apply,function(every),predicate,sequences]]]).
 doc: doc_string(sys_every_xx,
 	      _92947534,
 	      function,
@@ -7313,7 +6990,7 @@ otherwise."
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:29117 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,notany,[predicate,sequence,'&rest','more-sequences'],'$STRING'("Args: (predicate sequence &rest more-sequences)\r\nReturns T if none of the elements in SEQUENCEs satisfies PREDICATE; NIL\r\notherwise."),[not,[apply,function(some),predicate,sequence,'more-sequences']]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,notany,[predicate,sequence,'&rest','more-sequences'],'$STRING'("Args: (predicate sequence &rest more-sequences)\r\nReturns T if none of the elements in SEQUENCEs satisfies PREDICATE; NIL\r\notherwise."),[not,[apply,function(some),predicate,sequence,'more-sequences']]]).
 doc: doc_string(notany,
 	      _93919754,
 	      function,
@@ -7420,7 +7097,7 @@ PREDICATE; NIL otherwise."
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:29393 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,notevery,[predicate,sequence,'&rest','more-sequences'],'$STRING'("Args: (predicate sequence &rest more-sequences)\r\nReturns T if at least one of the elements in SEQUENCEs does not satisfy\r\nPREDICATE; NIL otherwise."),[not,[apply,function(every),predicate,sequence,'more-sequences']]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,notevery,[predicate,sequence,'&rest','more-sequences'],'$STRING'("Args: (predicate sequence &rest more-sequences)\r\nReturns T if at least one of the elements in SEQUENCEs does not satisfy\r\nPREDICATE; NIL otherwise."),[not,[apply,function(every),predicate,sequence,'more-sequences']]]).
 doc: doc_string(notevery,
 	      _94848216,
 	      function,
@@ -7565,7 +7242,7 @@ stops when it reaches the end of one of the given sequences."
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:29687 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'map-into',['result-sequence',function,'&rest',sequences],'$STRING'("Fills the output sequence with the values returned by applying FUNCTION to the\r\nelements of the given sequences. The i-th element of RESULT-SEQUENCE is the output\r\nof applying FUNCTION to the i-th element of each of the sequences. The map routine\r\nstops when it reaches the end of one of the given sequences."),[let,[[nel,[apply,function(min),[if,[vectorp,'result-sequence'],['array-dimension','result-sequence',0],[length,'result-sequence']],[mapcar,function(length),sequences]]]],[declare,[fixnum,nel]],[when,[and,[vectorp,'result-sequence'],['array-has-fill-pointer-p','result-sequence']],[setf,['fill-pointer','result-sequence'],nel]],[do,[[ir,['make-seq-iterator','result-sequence'],['seq-iterator-next','result-sequence',ir]],[it,[mapcar,function('make-seq-iterator'),sequences]],[val,['make-sequence',[quote,list],[length,sequences]]]],[[null,ir],'result-sequence'],[do,[[i,it,[cdr,i]],[v,val,[cdr,v]],[s,sequences,[cdr,s]]],[[null,i]],[unless,[car,i],['return-from','map-into','result-sequence']],[rplaca,v,['seq-iterator-ref',[car,s],[car,i]]],[rplaca,i,['seq-iterator-next',[car,s],[car,i]]]],['seq-iterator-set','result-sequence',ir,[apply,function,val]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'map-into',['result-sequence',function,'&rest',sequences],'$STRING'("Fills the output sequence with the values returned by applying FUNCTION to the\r\nelements of the given sequences. The i-th element of RESULT-SEQUENCE is the output\r\nof applying FUNCTION to the i-th element of each of the sequences. The map routine\r\nstops when it reaches the end of one of the given sequences."),[let,[[nel,[apply,function(min),[if,[vectorp,'result-sequence'],['array-dimension','result-sequence',0],[length,'result-sequence']],[mapcar,function(length),sequences]]]],[declare,[fixnum,nel]],[when,[and,[vectorp,'result-sequence'],['array-has-fill-pointer-p','result-sequence']],[setf,['fill-pointer','result-sequence'],nel]],[do,[[ir,['make-seq-iterator','result-sequence'],['seq-iterator-next','result-sequence',ir]],[it,[mapcar,function('make-seq-iterator'),sequences]],[val,['make-sequence',[quote,list],[length,sequences]]]],[[null,ir],'result-sequence'],[do,[[i,it,[cdr,i]],[v,val,[cdr,v]],[s,sequences,[cdr,s]]],[[null,i]],[unless,[car,i],['return-from','map-into','result-sequence']],[rplaca,v,['seq-iterator-ref',[car,s],[car,i]]],[rplaca,i,['seq-iterator-next',[car,s],[car,i]]]],['seq-iterator-set','result-sequence',ir,[apply,function,val]]]]]).
 /*
 :- side_effect((compile_each($, LEnv, [], [], true), append([sys_result_sequence], [CAR29, CAR], [sys_result_sequence, CAR29, CAR]), setf_inverse_op(fill_pointer, sys_pf_set_fill_pointer))).
 */
@@ -7889,7 +7566,7 @@ cl_map_into(Result_sequence_In, Function_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:31833 **********************/
-:-lisp_compile_to_prolog(pkg_sys,['in-package','$STRING'("SYSTEM")])
+:-lisp_compile_to_prolog(pkg_sys,['in-package','$STRING'("SYSTEM")]).
 :- cl_in_package('$ARRAY'([*], claz_base_character, "SYSTEM"), _Ignored).
 /*
 #+(or WAM-CL ECL)
@@ -7912,7 +7589,7 @@ Returns, as a list, the union of elements in LIST1 and in LIST2."
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:31860 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,union,[list1,list2,'&key',test,'test-not',key],'$STRING'("Args: (list1 list2 &key (key #'identity) (test #'eql) test-not)\r\nReturns, as a list, the union of elements in LIST1 and in LIST2."),[do,[[x,list1,[cdr,x]],[first],[last]],[[null,x],[when,last,[rplacd,last,list2]],[or,first,list2]],[unless,[member1,[car,x],list2,test,'test-not',key],[if,last,[progn,[rplacd,last,[cons,[car,x],[]]],[setq,last,[cdr,last]]],[progn,[setq,first,[cons,[car,x],[]]],[setq,last,first]]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,union,[list1,list2,'&key',test,'test-not',key],'$STRING'("Args: (list1 list2 &key (key #'identity) (test #'eql) test-not)\r\nReturns, as a list, the union of elements in LIST1 and in LIST2."),[do,[[x,list1,[cdr,x]],[first],[last]],[[null,x],[when,last,[rplacd,last,list2]],[or,first,list2]],[unless,[member1,[car,x],list2,test,'test-not',key],[if,last,[progn,[rplacd,last,[cons,[car,x],[]]],[setq,last,[cdr,last]]],[progn,[setq,first,[cons,[car,x],[]]],[setq,last,first]]]]]]).
 doc: doc_string(union,
 	      _102278640,
 	      function,
@@ -8086,7 +7763,7 @@ Destructive UNION.  Both LIST1 and LIST2 may be destroyed."
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:32457 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,nunion,[list1,list2,'&key',test,'test-not',key],'$STRING'("Args: (list1 list2 &key (key #'identity) (test #'eql) test-not)\r\nDestructive UNION.  Both LIST1 and LIST2 may be destroyed."),[do,[[x,list1,[cdr,x]],[first],[last]],[[null,x],[when,last,[rplacd,last,list2]],[or,first,list2]],[unless,[member1,[car,x],list2,test,'test-not',key],[if,last,[rplacd,last,x],[setq,first,x]],[setq,last,x]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,nunion,[list1,list2,'&key',test,'test-not',key],'$STRING'("Args: (list1 list2 &key (key #'identity) (test #'eql) test-not)\r\nDestructive UNION.  Both LIST1 and LIST2 may be destroyed."),[do,[[x,list1,[cdr,x]],[first],[last]],[[null,x],[when,last,[rplacd,last,list2]],[or,first,list2]],[unless,[member1,[car,x],list2,test,'test-not',key],[if,last,[rplacd,last,x],[setq,first,x]],[setq,last,x]]]]).
 doc: doc_string(nunion,
 	      _105197924,
 	      function,
@@ -8242,7 +7919,7 @@ LIST2."
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:32944 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,intersection,[list1,list2,'&key',test,'test-not',key],'$STRING'("Args: (list1 list2 &key (key #'identity) (test #'eql) test-not)\r\nReturns a list consisting of those objects that are elements of both LIST1 and\r\nLIST2."),[do,[[x,list1,[cdr,x]],[ans]],[[null,x],[nreverse,ans]],[when,[member1,[car,x],list2,test,'test-not',key],[push,[car,x],ans]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,intersection,[list1,list2,'&key',test,'test-not',key],'$STRING'("Args: (list1 list2 &key (key #'identity) (test #'eql) test-not)\r\nReturns a list consisting of those objects that are elements of both LIST1 and\r\nLIST2."),[do,[[x,list1,[cdr,x]],[ans]],[[null,x],[nreverse,ans]],[when,[member1,[car,x],list2,test,'test-not',key],[push,[car,x],ans]]]]).
 doc: doc_string(intersection,
 	      _107793592,
 	      function,
@@ -8393,7 +8070,7 @@ Destructive INTERSECTION.  Only LIST1 may be destroyed."
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:33391 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,nintersection,[list1,list2,'&key',test,'test-not',key],'$STRING'("Args: (list1 list2 &key (key #'identity) (test #'eql) test-not)\r\nDestructive INTERSECTION.  Only LIST1 may be destroyed."),[do,[[x,list1,[cdr,x]],[first],[last]],[[null,x],[when,last,[rplacd,last,[]]],first],[when,[member1,[car,x],list2,test,'test-not',key],[if,last,[rplacd,last,x],[setq,first,x]],[setq,last,x]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,nintersection,[list1,list2,'&key',test,'test-not',key],'$STRING'("Args: (list1 list2 &key (key #'identity) (test #'eql) test-not)\r\nDestructive INTERSECTION.  Only LIST1 may be destroyed."),[do,[[x,list1,[cdr,x]],[first],[last]],[[null,x],[when,last,[rplacd,last,[]]],first],[when,[member1,[car,x],list2,test,'test-not',key],[if,last,[rplacd,last,x],[setq,first,x]],[setq,last,x]]]]).
 doc: doc_string(nintersection,
 	      _109681354,
 	      function,
@@ -8547,7 +8224,7 @@ Returns, as a list, those elements of LIST1 that are not elements of LIST2."
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:33867 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'set-difference',[list1,list2,'&key',test,'test-not',key],'$STRING'("Args: (list1 list2 &key (key #'identity) (test #'eql) test-not)\r\nReturns, as a list, those elements of LIST1 that are not elements of LIST2."),[do,[[x,list1,[cdr,x]],[ans]],[[null,x],[nreverse,ans]],[unless,[member1,[car,x],list2,test,'test-not',key],[push,[car,x],ans]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'set-difference',[list1,list2,'&key',test,'test-not',key],'$STRING'("Args: (list1 list2 &key (key #'identity) (test #'eql) test-not)\r\nReturns, as a list, those elements of LIST1 that are not elements of LIST2."),[do,[[x,list1,[cdr,x]],[ans]],[[null,x],[nreverse,ans]],[unless,[member1,[car,x],list2,test,'test-not',key],[push,[car,x],ans]]]]).
 doc: doc_string(set_difference,
 	      _112084354,
 	      function,
@@ -8695,7 +8372,7 @@ Destructive SET-DIFFERENCE.  Only LIST1 may be destroyed."
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:34255 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'nset-difference',[list1,list2,'&key',test,'test-not',key],'$STRING'("Args: (list1 list2 &key (key #'identity) (test #'eql) test-not)\r\nDestructive SET-DIFFERENCE.  Only LIST1 may be destroyed."),[do,[[x,list1,[cdr,x]],[first],[last]],[[null,x],[when,last,[rplacd,last,[]]],first],[unless,[member1,[car,x],list2,test,'test-not',key],[if,last,[rplacd,last,x],[setq,first,x]],[setq,last,x]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'nset-difference',[list1,list2,'&key',test,'test-not',key],'$STRING'("Args: (list1 list2 &key (key #'identity) (test #'eql) test-not)\r\nDestructive SET-DIFFERENCE.  Only LIST1 may be destroyed."),[do,[[x,list1,[cdr,x]],[first],[last]],[[null,x],[when,last,[rplacd,last,[]]],first],[unless,[member1,[car,x],list2,test,'test-not',key],[if,last,[rplacd,last,x],[setq,first,x]],[setq,last,x]]]]).
 doc: doc_string(nset_difference,
 	      _113960992,
 	      function,
@@ -8844,7 +8521,7 @@ cl_nset_difference(List1_In, List2_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:34737 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'swap-args',[f],[and,f,function([lambda,[x,y],[funcall,f,y,x]])]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'swap-args',[f],[and,f,function([lambda,[x,y],[funcall,f,y,x]])]]).
 wl:lambda_def(defun, sys_swap_args, f_sys_swap_args, [sys_f], [[and, sys_f, function([lambda, [sys_x, sys_y], [funcall, sys_f, sys_y, sys_x]])]]).
 wl:arglist_info(sys_swap_args, f_sys_swap_args, [sys_f], arginfo{all:[sys_f], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_f], opt:0, req:[sys_f], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, f_sys_swap_args).
@@ -8888,7 +8565,7 @@ f_sys_swap_args(In, FnResult) :-
 						      sys_y,
 						      sys_x
 						    ]
-						  ])
+						  ]).
 				       ]
 				     ]))).
 */
@@ -8931,7 +8608,7 @@ those elements of LIST2 that are not elements of LIST1."
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:34853 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'set-exclusive-or',[list1,list2,'&key',test,'test-not',key],'$STRING'("Args: (list1 list2 &key (key #'identity) (test #'eql) test-not)\r\nReturns, as a list, those elements of LIST1 that are not elements of LIST2 and\r\nthose elements of LIST2 that are not elements of LIST1."),[nconc,['set-difference',list1,list2,':test',test,':test-not','test-not',':key',key],['set-difference',list2,list1,':test',['swap-args',test],':test-not',['swap-args','test-not'],':key',key]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'set-exclusive-or',[list1,list2,'&key',test,'test-not',key],'$STRING'("Args: (list1 list2 &key (key #'identity) (test #'eql) test-not)\r\nReturns, as a list, those elements of LIST1 that are not elements of LIST2 and\r\nthose elements of LIST2 that are not elements of LIST1."),[nconc,['set-difference',list1,list2,':test',test,':test-not','test-not',':key',key],['set-difference',list2,list1,':test',['swap-args',test],':test-not',['swap-args','test-not'],':key',key]]]).
 doc: doc_string(set_exclusive_or,
 	      _117239964,
 	      function,
@@ -9096,7 +8773,7 @@ Destructive SET-EXCLUSIVE-OR.  Both LIST1 and LIST2 may be destroyed."
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:35327 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'nset-exclusive-or',[list1,list2,'&key',test,'test-not',key],'$STRING'("Args: (list1 list2 &key (key #'identity) (test #'eql) test-not)\r\nDestructive SET-EXCLUSIVE-OR.  Both LIST1 and LIST2 may be destroyed."),[nconc,['set-difference',list1,list2,':test',test,':test-not','test-not',':key',key],['nset-difference',list2,list1,':test',['swap-args',test],':test-not',['swap-args','test-not'],':key',key]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'nset-exclusive-or',[list1,list2,'&key',test,'test-not',key],'$STRING'("Args: (list1 list2 &key (key #'identity) (test #'eql) test-not)\r\nDestructive SET-EXCLUSIVE-OR.  Both LIST1 and LIST2 may be destroyed."),[nconc,['set-difference',list1,list2,':test',test,':test-not','test-not',':key',key],['nset-difference',list2,list1,':test',['swap-args',test],':test-not',['swap-args','test-not'],':key',key]]]).
 doc: doc_string(nset_exclusive_or,
 	      _118498160,
 	      function,
@@ -9264,7 +8941,7 @@ otherwise."
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:35737 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,subsetp,[list1,list2,'&key',test,'test-not',key],'$STRING'("Args: (list1 list2 &key (key #'identity) (test #'eql) test-not)\r\nReturns T if every element of LIST1 is also an element of LIST2.  Returns NIL\r\notherwise."),[do,[[l,list1,[cdr,l]]],[[null,l],t],[unless,[member1,[car,l],list2,test,'test-not',key],[return,[]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,subsetp,[list1,list2,'&key',test,'test-not',key],'$STRING'("Args: (list1 list2 &key (key #'identity) (test #'eql) test-not)\r\nReturns T if every element of LIST1 is also an element of LIST2.  Returns NIL\r\notherwise."),[do,[[l,list1,[cdr,l]]],[[null,l],t],[unless,[member1,[car,l],list2,test,'test-not',key],[return,[]]]]]).
 doc: doc_string(subsetp,
 	      _119750964,
 	      function,
@@ -9399,7 +9076,7 @@ such pair exists."
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:36099 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'rassoc-if',[test,alist,'&key',key],'$STRING'("Returns the first pair in ALIST whose cdr satisfies TEST. Returns NIL if no\r\nsuch pair exists."),[rassoc,test,alist,':test',function(funcall),':key',key]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'rassoc-if',[test,alist,'&key',key],'$STRING'("Returns the first pair in ALIST whose cdr satisfies TEST. Returns NIL if no\r\nsuch pair exists."),[rassoc,test,alist,':test',function(funcall),':key',key]]).
 doc: doc_string(rassoc_if,
 	      _121452144,
 	      function,
@@ -9491,7 +9168,7 @@ if no such pair exists."
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:36310 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'rassoc-if-not',[test,alist,'&key',key],'$STRING'("Returns the first pair in ALIST whose cdr does not satisfy TEST.  Returns NIL\r\nif no such pair exists."),[rassoc,test,alist,':test-not',function(funcall),':key',key]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'rassoc-if-not',[test,alist,'&key',key],'$STRING'("Returns the first pair in ALIST whose cdr does not satisfy TEST.  Returns NIL\r\nif no such pair exists."),[rassoc,test,alist,':test-not',function(funcall),':key',key]]).
 doc: doc_string(rassoc_if_not,
 	      _122352040,
 	      function,
@@ -9582,7 +9259,7 @@ such pair exists."
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:36539 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'assoc-if',[test,alist,'&key',key],'$STRING'("Returns the first pair in ALIST whose car satisfies TEST.  Returns NIL if no\r\nsuch pair exists."),[assoc,test,alist,':test',function(funcall),':key',key]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'assoc-if',[test,alist,'&key',key],'$STRING'("Returns the first pair in ALIST whose car satisfies TEST.  Returns NIL if no\r\nsuch pair exists."),[assoc,test,alist,':test',function(funcall),':key',key]]).
 doc: doc_string(assoc_if,
 	      _123249408,
 	      function,
@@ -9674,7 +9351,7 @@ if no such pair exists."
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:36749 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'assoc-if-not',[test,alist,'&key',key],'$STRING'("Returns the first pair in ALIST whose car does not satisfy TEST.  Returns NIL\r\nif no such pair exists."),[assoc,test,alist,':test-not',function(funcall),':key',key]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'assoc-if-not',[test,alist,'&key',key],'$STRING'("Returns the first pair in ALIST whose car does not satisfy TEST.  Returns NIL\r\nif no such pair exists."),[assoc,test,alist,':test-not',function(funcall),':key',key]]).
 doc: doc_string(assoc_if_not,
 	      _124146406,
 	      function,
@@ -9765,7 +9442,7 @@ sublist of LIST that begins with the element.  If not found, returns NIL."
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:36976 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'member-if',[test,list,'&key',key],'$STRING'("Searches LIST for an element that satisfies TEST.  If found, returns the\r\nsublist of LIST that begins with the element.  If not found, returns NIL."),[member,test,list,':test',function(funcall),':key',key]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'member-if',[test,list,'&key',key],'$STRING'("Searches LIST for an element that satisfies TEST.  If found, returns the\r\nsublist of LIST that begins with the element.  If not found, returns NIL."),[member,test,list,':test',function(funcall),':key',key]]).
 doc: doc_string(member_if,
 	      _125048608,
 	      function,
@@ -9857,7 +9534,7 @@ the sublist of LIST that begins with the element.  If not found, returns NIL."
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:37238 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'member-if-not',[test,list,'&key',key],'$STRING'("Searches LIST for an element that does not satisfy TEST.  If found, returns\r\nthe sublist of LIST that begins with the element.  If not found, returns NIL."),[member,test,list,':test-not',function(funcall),':key',key]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'member-if-not',[test,list,'&key',key],'$STRING'("Searches LIST for an element that does not satisfy TEST.  If found, returns\r\nthe sublist of LIST that begins with the element.  If not found, returns NIL."),[member,test,list,':test-not',function(funcall),':key',key]]).
 doc: doc_string(member_if_not,
 	      _125949796,
 	      function,
@@ -9948,7 +9625,7 @@ The original TREE is not destroyed."
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:37517 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'subst-if',[new,test,tree,'&key',key],'$STRING'("Substitutes NEW for subtrees of TREE that satisfy TEST and returns the result.\r\nThe original TREE is not destroyed."),[subst,new,test,tree,':test',function(funcall),':key',key]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'subst-if',[new,test,tree,'&key',key],'$STRING'("Substitutes NEW for subtrees of TREE that satisfy TEST and returns the result.\r\nThe original TREE is not destroyed."),[subst,new,test,tree,':test',function(funcall),':key',key]]).
 doc: doc_string(subst_if,
 	      _126844488,
 	      function,
@@ -10051,7 +9728,7 @@ result.  The original TREE is not destroyed."
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:37753 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'subst-if-not',[new,test,tree,'&key',key],'$STRING'("Substitutes NEW for subtrees of TREE that do not satisfy TEST and returns the\r\nresult.  The original TREE is not destroyed."),[subst,new,test,tree,':test-not',function(funcall),':key',key]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'subst-if-not',[new,test,tree,'&key',key],'$STRING'("Substitutes NEW for subtrees of TREE that do not satisfy TEST and returns the\r\nresult.  The original TREE is not destroyed."),[subst,new,test,tree,':test-not',function(funcall),':key',key]]).
 doc: doc_string(subst_if_not,
 	      _127774354,
 	      function,
@@ -10152,7 +9829,7 @@ cl_subst_if_not(New_In, Test_In, Tree_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:38007 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'nsubst-if',[new,test,tree,'&key',key],'$STRING'("Destructive SUBST-IF. TREE may be modified."),[nsubst,new,test,tree,':test',function(funcall),':key',key]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'nsubst-if',[new,test,tree,'&key',key],'$STRING'("Destructive SUBST-IF. TREE may be modified."),[nsubst,new,test,tree,':test',function(funcall),':key',key]]).
 doc: doc_string(nsubst_if,
 	      _128690648,
 	      function,
@@ -10256,7 +9933,7 @@ cl_nsubst_if(New_In, Test_In, Tree_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:38173 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'nsubst-if-not',[new,test,tree,'&key',key],'$STRING'("Destructive SUBST-IF-NOT. TREE may be modified."),[nsubst,new,test,tree,':test-not',function(funcall),':key',key]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'nsubst-if-not',[new,test,tree,'&key',key],'$STRING'("Destructive SUBST-IF-NOT. TREE may be modified."),[nsubst,new,test,tree,':test-not',function(funcall),':key',key]]).
 doc: doc_string(nsubst_if_not,
 	      _129606956,
 	      function,
@@ -10384,7 +10061,7 @@ cl_nsubst_if_not(New_In, Test_In, Tree_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:38676 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defmacro,defun500,[name,'lambda-list','&rest',body],[list,[quote,progn],[list,[quote,funcall],[quote,function([setf,fdefinition])],[list,[quote,function],[list,[quote,lambda],'lambda-list',[cons,[quote,block],[cons,[if,[consp,name],[car,[cdr,name]],name],body]]]],[list,[quote,quote],name]],[list,[quote,quote],name]]])
+:-lisp_compile_to_prolog(pkg_sys,[defmacro,defun500,[name,'lambda-list','&rest',body],[list,[quote,progn],[list,[quote,funcall],[quote,function([setf,fdefinition])],[list,[quote,function],[list,[quote,lambda],'lambda-list',[cons,[quote,block],[cons,[if,[consp,name],[car,[cdr,name]],name],body]]]],[list,[quote,quote],name]],[list,[quote,quote],name]]]).
 wl:lambda_def(defmacro, sys_defun500, f_sys_defun500, [sys_name, sys_lambda_list, c38_rest, sys_body], [progn, [list, [quote, progn], [list, [quote, funcall], [quote, function([setf, fdefinition])], [list, [quote, function], [list, [quote, lambda], sys_lambda_list, [cons, [quote, block], [cons, [if, [consp, sys_name], [car, [cdr, sys_name]], sys_name], sys_body]]]], [list, [quote, quote], sys_name]], [list, [quote, quote], sys_name]]]).
 wl:arglist_info(sys_defun500, f_sys_defun500, [sys_name, sys_lambda_list, c38_rest, sys_body], arginfo{all:[sys_name, sys_lambda_list], allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[sys_name, sys_lambda_list, sys_body], opt:0, req:[sys_name, sys_lambda_list], rest:[sys_body], sublists:0, whole:0}).
 wl: init_args(2, f_sys_defun500).
@@ -10448,7 +10125,7 @@ f_sys_defun500(Name_In, Lambda_list_In, RestNKeys, FnResult) :-
 					   [quote, funcall],
 					   
 					   [ quote,
-					     function([setf, fdefinition])
+					     function([setf, fdefinition]).
 					   ],
 					   
 					   [ list,
@@ -10552,7 +10229,7 @@ f_sys_defun500(Name_In, Lambda_list_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:39248 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,append,['&rest',lists],[if,[cdr,lists],[let,[[list,[car,lists]],[result,[]],[end,[]]],[if,list,[tagbody,start,[if,list,[progn,[setf,end,[if,end,[setf,[cdr,end],[list,[car,list]]],[setf,result,[list,[car,list]]]]],[setf,list,[cdr,list]],[go,start]]],[setf,[cdr,end],[apply,function(append),[cdr,lists]]],['return-from',append,result]],[apply,function(append),[cdr,lists]]]],[car,lists]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,append,['&rest',lists],[if,[cdr,lists],[let,[[list,[car,lists]],[result,[]],[end,[]]],[if,list,[tagbody,start,[if,list,[progn,[setf,end,[if,end,[setf,[cdr,end],[list,[car,list]]],[setf,result,[list,[car,list]]]]],[setf,list,[cdr,list]],[go,start]]],[setf,[cdr,end],[apply,function(append),[cdr,lists]]],['return-from',append,result]],[apply,function(append),[cdr,lists]]]],[car,lists]]]).
 /*
 :- side_effect((compile_each($, _132514638, [], [], true), append([end], [CAR24, CAR], [end, CAR24, CAR]), setf_inverse_op(cdr, rplacd))).
 */
@@ -10627,7 +10304,7 @@ cl_append(_132476098,_133463510):-_133948982=[bv(sys_lists,_132476098)|_13245281
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:39782 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defparameter,'*type-expanders*',[]])
+:-lisp_compile_to_prolog(pkg_sys,[defparameter,'*type-expanders*',[]]).
 :- set_var(AEnv, sys_xx_type_expanders_xx, []).
 /*
 #+(or WAM-CL ECL) 
@@ -10636,7 +10313,7 @@ cl_append(_132476098,_133463510):-_133948982=[bv(sys_lists,_132476098)|_13245281
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:39841 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defconstant,'call-arguments-limit',65536])
+:-lisp_compile_to_prolog(pkg_sys,[defconstant,'call-arguments-limit',65536]).
 :- set_var(AEnv, call_arguments_limit, 65536).
 /*
 #+(or WAM-CL ECL) 
@@ -10645,7 +10322,7 @@ cl_append(_132476098,_133463510):-_133948982=[bv(sys_lists,_132476098)|_13245281
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:39905 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defconstant,'lambda-parameters-limit',65536])
+:-lisp_compile_to_prolog(pkg_sys,[defconstant,'lambda-parameters-limit',65536]).
 :- set_var(AEnv, lambda_parameters_limit, 65536).
 /*
 #+(or WAM-CL ECL) 
@@ -10654,7 +10331,7 @@ cl_append(_132476098,_133463510):-_133948982=[bv(sys_lists,_132476098)|_13245281
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:39972 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defconstant,'multiple-values-limit',65536])
+:-lisp_compile_to_prolog(pkg_sys,[defconstant,'multiple-values-limit',65536]).
 :- set_var(AEnv, multiple_values_limit, 65536).
 /*
 #+(or WAM-CL ECL)
@@ -10664,7 +10341,7 @@ cl_append(_132476098,_133463510):-_133948982=[bv(sys_lists,_132476098)|_13245281
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:40037 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defconstant,'lambda-list-keywords',[quote,['&allow-other-keys','&aux','&body','&environment','&key','&optional','&rest','&whole']]])
+:-lisp_compile_to_prolog(pkg_sys,[defconstant,'lambda-list-keywords',[quote,['&allow-other-keys','&aux','&body','&environment','&key','&optional','&rest','&whole']]]).
 :- set_var(AEnv,
 	   lambda_list_keywords,
 	   
@@ -10704,7 +10381,7 @@ cl_append(_132476098,_133463510):-_133948982=[bv(sys_lists,_132476098)|_13245281
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:40170 **********************/
-:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',psetq,['&rest',rest],[let,[[inits,[]],[sets,[]],[list,rest]],[tagbody,start,[when,[cddr,list],[push,[list,[gensym],[cadr,list]],inits],[setq,list,[cddr,list]],[go,start]]],[setq,list,inits],[tagbody,start,[when,[cddr,rest],[push,[caar,list],sets],[push,[car,rest],sets],[setq,list,[cdr,list]],[setq,rest,[cddr,rest]],[go,start]]],['#BQ',[let,['#COMMA',[reverse,inits]],[setq,['#BQ-COMMA-ELIPSE',sets],['#BQ-COMMA-ELIPSE',rest]]]]]])
+:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',psetq,['&rest',rest],[let,[[inits,[]],[sets,[]],[list,rest]],[tagbody,start,[when,[cddr,list],[push,[list,[gensym],[cadr,list]],inits],[setq,list,[cddr,list]],[go,start]]],[setq,list,inits],[tagbody,start,[when,[cddr,rest],[push,[caar,list],sets],[push,[car,rest],sets],[setq,list,[cdr,list]],[setq,rest,[cddr,rest]],[go,start]]],['#BQ',[let,['#COMMA',[reverse,inits]],[setq,['#BQ-COMMA-ELIPSE',sets],['#BQ-COMMA-ELIPSE',rest]]]]]]).
 :- get_var(GEnv, psetq, Psetq_Get),
    get_var(GEnv, rest, Rest_Get),
    cl_c38_rest(Rest_Get, C38_rest_Ret),
@@ -10746,7 +10423,7 @@ cl_append(_132476098,_133463510):-_133948982=[bv(sys_lists,_132476098)|_13245281
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:40656 **********************/
-:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',return,['&optional',result],['#BQ',['return-from',[],['#COMMA',result]]]])
+:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',return,['&optional',result],['#BQ',['return-from',[],['#COMMA',result]]]]).
 :- set_var(BlockExitEnv, 'block_ret_[]', []),
    always('block_exit_[]', BlockExitEnv),
    f_sys_apropos_defmacro(GoBlockResult,
@@ -10760,7 +10437,7 @@ cl_append(_132476098,_133463510):-_133948982=[bv(sys_lists,_132476098)|_13245281
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:40734 **********************/
-:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',when,['test-form','&rest',forms],['#BQ',[if,['#COMMA','test-form'],[progn,['#BQ-COMMA-ELIPSE',forms]]]]])
+:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',when,['test-form','&rest',forms],['#BQ',[if,['#COMMA','test-form'],[progn,['#BQ-COMMA-ELIPSE',forms]]]]]).
 :- get_var(GEnv, c38_rest, C38_rest_Get),
    get_var(GEnv, when, When_Get),
    get_var(GEnv, forms, Forms_Get),
@@ -10778,7 +10455,7 @@ cl_append(_132476098,_133463510):-_133948982=[bv(sys_lists,_132476098)|_13245281
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:40821 **********************/
-:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',unless,['test-form','&rest',forms],['#BQ',[if,[not,['#COMMA','test-form']],[progn,['#BQ-COMMA-ELIPSE',forms]]]]])
+:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',unless,['test-form','&rest',forms],['#BQ',[if,[not,['#COMMA','test-form']],[progn,['#BQ-COMMA-ELIPSE',forms]]]]]).
 :- get_var(GEnv, c38_rest, C38_rest_Get),
    get_var(GEnv, unless, Unless_Get),
    get_var(GEnv, forms, Forms_Get),
@@ -10800,7 +10477,7 @@ cl_append(_132476098,_133463510):-_133948982=[bv(sys_lists,_132476098)|_13245281
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:40916 **********************/
-:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',and,['&rest',forms],[if,forms,[if,[cdr,forms],['#BQ',[when,['#COMMA',[car,forms]],[and,['#BQ-COMMA-ELIPSE',[cdr,forms]]]]],[car,forms]],['#BQ',t]]])
+:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',and,['&rest',forms],[if,forms,[if,[cdr,forms],['#BQ',[when,['#COMMA',[car,forms]],[and,['#BQ-COMMA-ELIPSE',[cdr,forms]]]]],[car,forms]],['#BQ',t]]]).
 :- get_var(GEnv, and, And_Get),
    get_var(GEnv, forms, Forms_Get),
    cl_c38_rest(Forms_Get, C38_rest_Ret),
@@ -10837,7 +10514,7 @@ cl_append(_132476098,_133463510):-_133948982=[bv(sys_lists,_132476098)|_13245281
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:41061 **********************/
-:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',or,['&rest',forms],[if,forms,[if,[cdr,forms],[let,[[temp,[gensym]]],['#BQ',[let,[[['#COMMA',temp],['#COMMA',[car,forms]]]],[if,['#COMMA',temp],['#COMMA',temp],[or,['#BQ-COMMA-ELIPSE',[cdr,forms]]]]]]],[car,forms]],['#BQ',[]]]])
+:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',or,['&rest',forms],[if,forms,[if,[cdr,forms],[let,[[temp,[gensym]]],['#BQ',[let,[[['#COMMA',temp],['#COMMA',[car,forms]]]],[if,['#COMMA',temp],['#COMMA',temp],[or,['#BQ-COMMA-ELIPSE',[cdr,forms]]]]]]],[car,forms]],['#BQ',[]]]]).
 :- get_var(GEnv, forms, Forms_Get),
    get_var(GEnv, or, Or_Get),
    cl_c38_rest(Forms_Get, C38_rest_Ret),
@@ -10877,7 +10554,7 @@ cl_append(_132476098,_133463510):-_133948982=[bv(sys_lists,_132476098)|_13245281
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:41278 **********************/
-:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',cond,['&rest',clauses],[when,clauses,[if,[cdar,clauses],['#BQ',[if,['#COMMA',[caar,clauses]],[progn,['#BQ-COMMA-ELIPSE',[cdar,clauses]]],[cond,['#BQ-COMMA-ELIPSE',[cdr,clauses]]]]],['#BQ',[or,['#COMMA',[caar,clauses]],[cond,['#BQ-COMMA-ELIPSE',[cdr,clauses]]]]]]]])
+:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',cond,['&rest',clauses],[when,clauses,[if,[cdar,clauses],['#BQ',[if,['#COMMA',[caar,clauses]],[progn,['#BQ-COMMA-ELIPSE',[cdar,clauses]]],[cond,['#BQ-COMMA-ELIPSE',[cdr,clauses]]]]],['#BQ',[or,['#COMMA',[caar,clauses]],[cond,['#BQ-COMMA-ELIPSE',[cdr,clauses]]]]]]]]).
 :- get_var(GEnv, cond, Cond_Get),
    get_var(GEnv, sys_clauses, Clauses_Get),
    cl_c38_rest(Clauses_Get, C38_rest_Ret),
@@ -10922,7 +10599,7 @@ cl_append(_132476098,_133463510):-_133948982=[bv(sys_lists,_132476098)|_13245281
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:41506 **********************/
-:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',case,[keyform,'&rest',clauses],[let,[[temp,[gensym]]],[labels,[[recur,[clauses],[when,clauses,[if,[member,[caar,clauses],[quote,[otherwise,t]]],['#BQ',[progn,['#BQ-COMMA-ELIPSE',[cdar,clauses]]]],['#BQ',[if,['#COMMA',[if,[listp,[caar,clauses]],['#BQ',[member,['#COMMA',temp],[quote,['#COMMA',[caar,clauses]]]]],['#BQ',[eql,['#COMMA',temp],[quote,['#COMMA',[caar,clauses]]]]]]],[progn,['#BQ-COMMA-ELIPSE',[cdar,clauses]]],['#COMMA',[recur,[cdr,clauses]]]]]]]]],['#BQ',[let,[[['#COMMA',temp],['#COMMA',keyform]]],['#COMMA',[recur,clauses]]]]]]])
+:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',case,[keyform,'&rest',clauses],[let,[[temp,[gensym]]],[labels,[[recur,[clauses],[when,clauses,[if,[member,[caar,clauses],[quote,[otherwise,t]]],['#BQ',[progn,['#BQ-COMMA-ELIPSE',[cdar,clauses]]]],['#BQ',[if,['#COMMA',[if,[listp,[caar,clauses]],['#BQ',[member,['#COMMA',temp],[quote,['#COMMA',[caar,clauses]]]]],['#BQ',[eql,['#COMMA',temp],[quote,['#COMMA',[caar,clauses]]]]]]],[progn,['#BQ-COMMA-ELIPSE',[cdar,clauses]]],['#COMMA',[recur,[cdr,clauses]]]]]]]]],['#BQ',[let,[[['#COMMA',temp],['#COMMA',keyform]]],['#COMMA',[recur,clauses]]]]]]]).
 :- get_var(GEnv, c38_rest, C38_rest_Get),
    get_var(GEnv, case, Case_Get),
    get_var(GEnv, sys_clauses, Clauses_Get),
@@ -11065,7 +10742,7 @@ cl_append(_132476098,_133463510):-_133948982=[bv(sys_lists,_132476098)|_13245281
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:41980 **********************/
-:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',ecase,[keyform,'&rest',clauses],[let,[[temp,[gensym]]],['#BQ',[let,[[['#COMMA',temp],['#COMMA',keyform]]],[case,['#COMMA',temp],['#BQ-COMMA-ELIPSE',clauses],[error,[quote,'type-error'],':datum',['#COMMA',temp],':expected-type',['#BQ',[member,['#BQ-COMMA-ELIPSE',[mapcan,function([lambda,[x],[if,[listp,[car,x]],[car,x],[list,[car,x]]]]),clauses]]]]]]]]]])
+:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',ecase,[keyform,'&rest',clauses],[let,[[temp,[gensym]]],['#BQ',[let,[[['#COMMA',temp],['#COMMA',keyform]]],[case,['#COMMA',temp],['#BQ-COMMA-ELIPSE',clauses],[error,[quote,'type-error'],':datum',['#COMMA',temp],':expected-type',['#BQ',[member,['#BQ-COMMA-ELIPSE',[mapcan,function([lambda,[x],[if,[listp,[car,x]],[car,x],[list,[car,x]]]]),clauses]]]]]]]]]]).
 :- get_var(GEnv, c38_rest, C38_rest_Get),
    get_var(GEnv, ecase, Ecase_Get),
    get_var(GEnv, sys_clauses, Clauses_Get),
@@ -11109,7 +10786,7 @@ cl_append(_132476098,_133463510):-_133948982=[bv(sys_lists,_132476098)|_13245281
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:42315 **********************/
-:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacromultiple-value-bind',[vars,'values-form','&rest',forms],['#BQ',['multiple-value-call',function([lambda,['&optional',['#BQ-COMMA-ELIPSE',vars],'&rest',['#COMMA',[gensym]]],['#BQ-COMMA-ELIPSE',forms]]),['#COMMA','values-form']]]])
+:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacromultiple-value-bind',[vars,'values-form','&rest',forms],['#BQ',['multiple-value-call',function([lambda,['&optional',['#BQ-COMMA-ELIPSE',vars],'&rest',['#COMMA',[gensym]]],['#BQ-COMMA-ELIPSE',forms]]),['#COMMA','values-form']]]]).
 :- get_var(GEnv, c38_rest, C38_rest_Get),
    get_var(GEnv, sys_values_form, Values_form_Get),
    get_var(GEnv, forms, Forms_Get),
@@ -11144,7 +10821,7 @@ cl_append(_132476098,_133463510):-_133948982=[bv(sys_lists,_132476098)|_13245281
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:42513 **********************/
-:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro','multiple-value-list',[form],['#BQ',['multiple-value-call',function(list),['#COMMA',form]]]])
+:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro','multiple-value-list',[form],['#BQ',['multiple-value-call',function(list),['#COMMA',form]]]]).
 :- get_var(GEnv, multiple_value_list, Multiple_value_list_Get),
    f_sys_form(Form_Ret),
    get_var(GEnv, sys_form, Form_Get),
@@ -11158,7 +10835,7 @@ cl_append(_132476098,_133463510):-_133948982=[bv(sys_lists,_132476098)|_13245281
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:42601 **********************/
-:-lisp_compile_to_prolog(pkg_sys,['apropos-defun','values-list',[list],[apply,function(values),list]])
+:-lisp_compile_to_prolog(pkg_sys,['apropos-defun','values-list',[list],[apply,function(values),list]]).
 :- get_var(GEnv, values_list, Values_list_Get),
    _143624644=[],
    get_var(GEnv, list, List_Get),
@@ -11172,7 +10849,7 @@ cl_append(_132476098,_133463510):-_133948982=[bv(sys_lists,_132476098)|_13245281
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:42661 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defmacro,'nth-value',[n,form],['#BQ',[nth,['#COMMA',n],['multiple-value-list',['#COMMA',form]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defmacro,'nth-value',[n,form],['#BQ',[nth,['#COMMA',n],['multiple-value-list',['#COMMA',form]]]]]).
 wl:lambda_def(defmacro, nth_value, cl_nth_value, [n, sys_form], [progn, ['#BQ', [nth, ['#COMMA', n], [multiple_value_list, ['#COMMA', sys_form]]]]]).
 wl:arglist_info(nth_value, cl_nth_value, [n, sys_form], arginfo{all:[n, sys_form], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[n, sys_form], opt:0, req:[n, sys_form], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_nth_value).
@@ -11248,7 +10925,7 @@ cl_nth_value(N_In, Form_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:42758 **********************/
-:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',prog,[inits,'&rest',forms],['#BQ',[block,[],[let,['#COMMA',inits],[tagbody,['#BQ-COMMA-ELIPSE',forms]]]]]])
+:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',prog,[inits,'&rest',forms],['#BQ',[block,[],[let,['#COMMA',inits],[tagbody,['#BQ-COMMA-ELIPSE',forms]]]]]]).
 :- get_var(GEnv, c38_rest, C38_rest_Get),
    get_var(GEnv, prog, Prog_Get),
    get_var(GEnv, forms, Forms_Get),
@@ -11267,7 +10944,7 @@ cl_nth_value(N_In, Form_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:42862 **********************/
-:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro','prog*',[inits,'&rest',forms],['#BQ',[block,[],['let*',['#COMMA',inits],[tagbody,['#BQ-COMMA-ELIPSE',forms]]]]]])
+:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro','prog*',[inits,'&rest',forms],['#BQ',[block,[],['let*',['#COMMA',inits],[tagbody,['#BQ-COMMA-ELIPSE',forms]]]]]]).
 :- get_var(GEnv, c38_rest, C38_rest_Get),
    get_var(GEnv, prog_xx, Prog_xx_Get),
    get_var(GEnv, forms, Forms_Get),
@@ -11287,7 +10964,7 @@ cl_nth_value(N_In, Form_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:42968 **********************/
-:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',prog1,['first-form','&rest',forms],[let,[[temp,[gensym]]],['#BQ',[let,[[['#COMMA',temp],['#COMMA','first-form']]],['#BQ-COMMA-ELIPSE',forms],['#COMMA',temp]]]]])
+:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',prog1,['first-form','&rest',forms],[let,[[temp,[gensym]]],['#BQ',[let,[[['#COMMA',temp],['#COMMA','first-form']]],['#BQ-COMMA-ELIPSE',forms],['#COMMA',temp]]]]]).
 :- get_var(GEnv, c38_rest, C38_rest_Get),
    get_var(GEnv, prog1, Prog1_Get),
    get_var(GEnv, forms, Forms_Get),
@@ -11317,7 +10994,7 @@ cl_nth_value(N_In, Form_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:43108 **********************/
-:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',prog2,['first-form','second-form','&rest',forms],[let,[[temp,[gensym]]],['#BQ',[progn,['#COMMA','first-form'],[let,[[['#COMMA',temp],['#COMMA','second-form']]],['#BQ-COMMA-ELIPSE',forms],['#COMMA',temp]]]]]])
+:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',prog2,['first-form','second-form','&rest',forms],[let,[[temp,[gensym]]],['#BQ',[progn,['#COMMA','first-form'],[let,[[['#COMMA',temp],['#COMMA','second-form']]],['#BQ-COMMA-ELIPSE',forms],['#COMMA',temp]]]]]]).
 :- get_var(GEnv, prog2, Prog2_Get),
    get_var(GEnv, c38_rest, C38_rest_Get),
    get_var(GEnv, sys_second_form, Second_form_Get),
@@ -11366,7 +11043,7 @@ cl_nth_value(N_In, Form_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:43708 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,identity,[object],object])
+:-lisp_compile_to_prolog(pkg_sys,[defun,identity,[object],object]).
 wl:lambda_def(defun, identity, cl_identity, [sys_object], [sys_object]).
 wl:arglist_info(identity, cl_identity, [sys_object], arginfo{all:[sys_object], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_object], opt:0, req:[sys_object], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_identity).
@@ -11426,7 +11103,7 @@ cl_identity(Object_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:43767 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,complement,[function],function([lambda,['&rest',rest],[not,[apply,function,rest]]])])
+:-lisp_compile_to_prolog(pkg_sys,[defun,complement,[function],function([lambda,['&rest',rest],[not,[apply,function,rest]]])]).
 wl:lambda_def(defun, complement, cl_complement, [function], [function([lambda, [c38_rest, rest], [not, [apply, function, rest]]])]).
 wl:arglist_info(complement, cl_complement, [function], arginfo{all:[function], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[function], opt:0, req:[function], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_complement).
@@ -11456,7 +11133,7 @@ cl_complement(Function_In, FnResult) :-
 						[ lambda,
 						  [c38_rest, rest],
 						  [not, [apply, function, rest]]
-						])
+						]).
 				     ]))).
 */
 /*
@@ -11491,7 +11168,7 @@ cl_complement(Function_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:43878 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,constantly,[value],function([lambda,['&rest',rest],value])])
+:-lisp_compile_to_prolog(pkg_sys,[defun,constantly,[value],function([lambda,['&rest',rest],value])]).
 wl:lambda_def(defun, constantly, cl_constantly, [sys_value], [function([lambda, [c38_rest, rest], sys_value])]).
 wl:arglist_info(constantly, cl_constantly, [sys_value], arginfo{all:[sys_value], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_value], opt:0, req:[sys_value], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_constantly).
@@ -11521,7 +11198,7 @@ cl_constantly(Value_In, FnResult) :-
 						[ lambda,
 						  [c38_rest, rest],
 						  sys_value
-						])
+						]).
 				     ]))).
 */
 /*
@@ -11567,7 +11244,7 @@ cl_constantly(Value_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:43965 **********************/
-:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',dotimes,[[var,'count-form','&optional','result-form'],'&rest',forms],[let,[[start,[gensym]],[count,[gensym]]],['#BQ',[block,[],[let,[[['#COMMA',var],0],[['#COMMA',count],['#COMMA','count-form']]],[tagbody,['#COMMA',start],[when,[<,['#COMMA',var],['#COMMA',count]],['#BQ-COMMA-ELIPSE',forms],[incf,['#COMMA',var]],[go,['#COMMA',start]]]],['#COMMA','result-form']]]]]])
+:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',dotimes,[[var,'count-form','&optional','result-form'],'&rest',forms],[let,[[start,[gensym]],[count,[gensym]]],['#BQ',[block,[],[let,[[['#COMMA',var],0],[['#COMMA',count],['#COMMA','count-form']]],[tagbody,['#COMMA',start],[when,[<,['#COMMA',var],['#COMMA',count]],['#BQ-COMMA-ELIPSE',forms],[incf,['#COMMA',var]],[go,['#COMMA',start]]]],['#COMMA','result-form']]]]]]).
 :- get_var(GEnv, dotimes, Dotimes_Get),
    get_var(GEnv, c38_optional, C38_optional_Get),
    get_var(GEnv, sys_count_form, Count_form_Get),
@@ -11627,7 +11304,7 @@ cl_constantly(Value_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:44288 **********************/
-:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',do,[vars,['end-test-form','&rest','result-forms'],'&rest',forms],[let,[[start,[gensym]],[inits,[]],[steps,[]]],['#BQ',[block,[],[let,['#COMMA',[dolist,[var,vars,[reverse,inits]],[push,[if,[consp,var],[list,[car,var],[cadr,var]],[list,var]],inits]]],[tagbody,['#COMMA',start],[if,['#COMMA','end-test-form'],[return,[progn,['#BQ-COMMA-ELIPSE','result-forms']]]],['#BQ-COMMA-ELIPSE',forms],['#BQ-COMMA-ELIPSE',[dolist,[var,vars,[when,steps,['#BQ',[[psetq,['#BQ-COMMA-ELIPSE',[reverse,steps]]]]]]],[when,[and,[consp,var],[cddr,var]],[push,[car,var],steps],[push,[caddr,var],steps]]]],[go,['#COMMA',start]]]]]]]])
+:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',do,[vars,['end-test-form','&rest','result-forms'],'&rest',forms],[let,[[start,[gensym]],[inits,[]],[steps,[]]],['#BQ',[block,[],[let,['#COMMA',[dolist,[var,vars,[reverse,inits]],[push,[if,[consp,var],[list,[car,var],[cadr,var]],[list,var]],inits]]],[tagbody,['#COMMA',start],[if,['#COMMA','end-test-form'],[return,[progn,['#BQ-COMMA-ELIPSE','result-forms']]]],['#BQ-COMMA-ELIPSE',forms],['#BQ-COMMA-ELIPSE',[dolist,[var,vars,[when,steps,['#BQ',[[psetq,['#BQ-COMMA-ELIPSE',[reverse,steps]]]]]]],[when,[and,[consp,var],[cddr,var]],[push,[car,var],steps],[push,[caddr,var],steps]]]],[go,['#COMMA',start]]]]]]]]).
 :- get_var(GEnv, c38_rest, C38_rest_Get),
    get_var(GEnv, do, Do_Get),
    get_var(GEnv, sys_result_forms, Result_forms_Get),
@@ -11731,7 +11408,7 @@ cl_constantly(Value_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:44862 **********************/
-:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro','do*',[vars,['end-test-form','&rest','result-forms'],'&rest',forms],[let,[[start,[gensym]],[inits,[]],[steps,[]]],['#BQ',[block,[],['let*',['#COMMA',[dolist,[var,vars,[reverse,inits]],[push,[if,[consp,var],[list,[car,var],[cadr,var]],[list,var]],inits]]],[tagbody,['#COMMA',start],[if,['#COMMA','end-test-form'],[return,[progn,['#BQ-COMMA-ELIPSE','result-forms']]]],['#BQ-COMMA-ELIPSE',forms],['#BQ-COMMA-ELIPSE',[dolist,[var,vars,[when,steps,['#BQ',[[setq,['#BQ-COMMA-ELIPSE',[reverse,steps]]]]]]],[when,[and,[consp,var],[cddr,var]],[push,[car,var],steps],[push,[caddr,var],steps]]]],[go,['#COMMA',start]]]]]]]])
+:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro','do*',[vars,['end-test-form','&rest','result-forms'],'&rest',forms],[let,[[start,[gensym]],[inits,[]],[steps,[]]],['#BQ',[block,[],['let*',['#COMMA',[dolist,[var,vars,[reverse,inits]],[push,[if,[consp,var],[list,[car,var],[cadr,var]],[list,var]],inits]]],[tagbody,['#COMMA',start],[if,['#COMMA','end-test-form'],[return,[progn,['#BQ-COMMA-ELIPSE','result-forms']]]],['#BQ-COMMA-ELIPSE',forms],['#BQ-COMMA-ELIPSE',[dolist,[var,vars,[when,steps,['#BQ',[[setq,['#BQ-COMMA-ELIPSE',[reverse,steps]]]]]]],[when,[and,[consp,var],[cddr,var]],[push,[car,var],steps],[push,[caddr,var],steps]]]],[go,['#COMMA',start]]]]]]]]).
 :- get_var(GEnv, c38_rest, C38_rest_Get),
    get_var(GEnv, do_xx, Do_xx_Get),
    get_var(GEnv, sys_result_forms, Result_forms_Get),
@@ -11834,7 +11511,7 @@ cl_constantly(Value_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:45446 **********************/
-:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',dolist,[[var,'list-form','&optional','result-form'],'&rest',forms],[let,[[start,[gensym]],[list,[gensym]]],['#BQ',[block,[],[let,[[['#COMMA',list],['#COMMA','list-form']],[['#COMMA',var],[]]],[tagbody,['#COMMA',start],[unless,['#COMMA',list],[setf,['#COMMA',var],[]],['return-from',[],['#COMMA','result-form']]],[setf,['#COMMA',var],[car,['#COMMA',list]]],[setf,['#COMMA',list],[cdr,['#COMMA',list]]],['#BQ-COMMA-ELIPSE',forms],[go,['#COMMA',start]]]]]]]])
+:-lisp_compile_to_prolog(pkg_sys,['apropos-defmacro',dolist,[[var,'list-form','&optional','result-form'],'&rest',forms],[let,[[start,[gensym]],[list,[gensym]]],['#BQ',[block,[],[let,[[['#COMMA',list],['#COMMA','list-form']],[['#COMMA',var],[]]],[tagbody,['#COMMA',start],[unless,['#COMMA',list],[setf,['#COMMA',var],[]],['return-from',[],['#COMMA','result-form']]],[setf,['#COMMA',var],[car,['#COMMA',list]]],[setf,['#COMMA',list],[cdr,['#COMMA',list]]],['#BQ-COMMA-ELIPSE',forms],[go,['#COMMA',start]]]]]]]]).
 :- get_var(GEnv, dolist, Dolist_Get),
    get_var(GEnv, c38_optional, C38_optional_Get),
    get_var(GEnv, sys_list_form, List_form_Get),
@@ -11900,7 +11577,7 @@ cl_constantly(Value_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:45844 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defmacro,'check-type',[place,typespec,'&optional',string],['#BQ',[tagbody,start,[unless,[typep,['#COMMA',place],[quote,['#COMMA',typespec]]],['restart-case',[error,[quote,'type-error'],':datum',['#COMMA',place],':expected-type',[quote,['#COMMA',typespec]]],['store-value',[value],[setf,['#COMMA',place],value]]],[go,start]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defmacro,'check-type',[place,typespec,'&optional',string],['#BQ',[tagbody,start,[unless,[typep,['#COMMA',place],[quote,['#COMMA',typespec]]],['restart-case',[error,[quote,'type-error'],':datum',['#COMMA',place],':expected-type',[quote,['#COMMA',typespec]]],['store-value',[value],[setf,['#COMMA',place],value]]],[go,start]]]]]).
 wl:lambda_def(defmacro, check_type, cl_check_type, [sys_place, sys_typespec, c38_optional, string], [progn, ['#BQ', [tagbody, start, [unless, [typep, ['#COMMA', sys_place], [quote, ['#COMMA', sys_typespec]]], [restart_case, [error, [quote, type_error], kw_datum, ['#COMMA', sys_place], kw_expected_type, [quote, ['#COMMA', sys_typespec]]], [store_value, [sys_value], [setf, ['#COMMA', sys_place], sys_value]]], [go, start]]]]]).
 wl:arglist_info(check_type, cl_check_type, [sys_place, sys_typespec, c38_optional, string], arginfo{all:[sys_place, sys_typespec, string], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_place, sys_typespec, string], opt:[string], req:[sys_place, sys_typespec], rest:0, sublists:0, whole:0}).
 wl: init_args(2, cl_check_type).
@@ -12032,7 +11709,7 @@ cl_check_type(Place_In, Typespec_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:46146 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'designator-condition',['default-type',datum,arguments],[if,[symbolp,datum],[apply,function('make-condition'),datum,arguments],[if,[or,[stringp,datum],[functionp,datum]],['make-condition','default-type',':format-control',datum,':format-arguments',arguments],datum]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'designator-condition',['default-type',datum,arguments],[if,[symbolp,datum],[apply,function('make-condition'),datum,arguments],[if,[or,[stringp,datum],[functionp,datum]],['make-condition','default-type',':format-control',datum,':format-arguments',arguments],datum]]]).
 wl:lambda_def(defun, sys_designator_condition, f_sys_designator_condition, [sys_default_type, sys_datum, sys_arguments], [[if, [symbolp, sys_datum], [apply, function(make_condition), sys_datum, sys_arguments], [if, [or, [stringp, sys_datum], [functionp, sys_datum]], [make_condition, sys_default_type, kw_format_control, sys_datum, kw_format_arguments, sys_arguments], sys_datum]]]).
 wl:arglist_info(sys_designator_condition, f_sys_designator_condition, [sys_default_type, sys_datum, sys_arguments], arginfo{all:[sys_default_type, sys_datum, sys_arguments], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_default_type, sys_datum, sys_arguments], opt:0, req:[sys_default_type, sys_datum, sys_arguments], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, f_sys_designator_condition).
@@ -12175,7 +11852,7 @@ f_sys_designator_condition(Default_type_In, Datum_In, Arguments_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:46461 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,error,[datum,'&rest',arguments],[let,[[condition,['designator-condition',[quote,'simple-error'],datum,arguments]]],[when,[typep,condition,'*break-on-signals*'],['invoke-debugger',condition]],['invoke-handler',condition],['invoke-debugger',condition]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,error,[datum,'&rest',arguments],[let,[[condition,['designator-condition',[quote,'simple-error'],datum,arguments]]],[when,[typep,condition,'*break-on-signals*'],['invoke-debugger',condition]],['invoke-handler',condition],['invoke-debugger',condition]]]).
 wl:lambda_def(defun, error, cl_error, [sys_datum, c38_rest, sys_arguments], [[let, [[condition, [sys_designator_condition, [quote, simple_error], sys_datum, sys_arguments]]], [when, [typep, condition, xx_break_on_signals_xx], [invoke_debugger, condition]], [sys_invoke_handler, condition], [invoke_debugger, condition]]]).
 wl:arglist_info(error, cl_error, [sys_datum, c38_rest, sys_arguments], arginfo{all:[sys_datum], allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[sys_datum, sys_arguments], opt:0, req:[sys_datum], rest:[sys_arguments], sublists:0, whole:0}).
 wl: init_args(0, cl_error).
@@ -12287,7 +11964,7 @@ cl_error(Error_Param, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:46751 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,cerror,['continue-format-control',datum,'&rest',arguments],['#BQ',['with-simple-restart',[continue,'continue-format-control'],[apply,function(error),datum,arguments]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,cerror,['continue-format-control',datum,'&rest',arguments],['#BQ',['with-simple-restart',[continue,'continue-format-control'],[apply,function(error),datum,arguments]]]]).
 wl:lambda_def(defun, cerror, cl_cerror, [sys_continue_format_control, sys_datum, c38_rest, sys_arguments], [['#BQ', [with_simple_restart, [continue, sys_continue_format_control], [apply, function(error), sys_datum, sys_arguments]]]]).
 wl:arglist_info(cerror, cl_cerror, [sys_continue_format_control, sys_datum, c38_rest, sys_arguments], arginfo{all:[sys_continue_format_control, sys_datum], allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[sys_continue_format_control, sys_datum, sys_arguments], opt:0, req:[sys_continue_format_control, sys_datum], rest:[sys_arguments], sublists:0, whole:0}).
 wl: init_args(2, cl_cerror).
@@ -12386,7 +12063,7 @@ cl_cerror(Continue_format_control_In, Datum_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:46939 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,signal,[datum,'&rest',arguments],[let,[[condition,['designator-condition',[quote,'simple-condition'],datum,arguments]]],[when,[typep,condition,'*break-on-signals*'],['invoke-debugger',condition]],['invoke-handler',condition],[]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,signal,[datum,'&rest',arguments],[let,[[condition,['designator-condition',[quote,'simple-condition'],datum,arguments]]],[when,[typep,condition,'*break-on-signals*'],['invoke-debugger',condition]],['invoke-handler',condition],[]]]).
 wl:lambda_def(defun, signal, cl_signal, [sys_datum, c38_rest, sys_arguments], [[let, [[condition, [sys_designator_condition, [quote, simple_condition], sys_datum, sys_arguments]]], [when, [typep, condition, xx_break_on_signals_xx], [invoke_debugger, condition]], [sys_invoke_handler, condition], []]]).
 wl:arglist_info(signal, cl_signal, [sys_datum, c38_rest, sys_arguments], arginfo{all:[sys_datum], allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[sys_datum, sys_arguments], opt:0, req:[sys_datum], rest:[sys_arguments], sublists:0, whole:0}).
 wl: init_args(1, cl_signal).
@@ -12503,7 +12180,7 @@ cl_signal(Datum_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:47210 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,warn,[datum,'&rest',arguments],['restart-case',[let,[[warning,[if,[symbolp,datum],[apply,function('make-condition'),[quote,warning],datum,arguments],datum]]],[signal,warning],['print-object',warning,'*error-output*']],['muffle-warning',[],[]]],[]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,warn,[datum,'&rest',arguments],['restart-case',[let,[[warning,[if,[symbolp,datum],[apply,function('make-condition'),[quote,warning],datum,arguments],datum]]],[signal,warning],['print-object',warning,'*error-output*']],['muffle-warning',[],[]]],[]]).
 wl:lambda_def(defun, warn, cl_warn, [sys_datum, c38_rest, sys_arguments], [[restart_case, [let, [[warning, [if, [symbolp, sys_datum], [apply, function(make_condition), [quote, warning], sys_datum, sys_arguments], sys_datum]]], [signal, warning], [print_object, warning, xx_error_output_xx]], [muffle_warning, [], []]], []]).
 wl:arglist_info(warn, cl_warn, [sys_datum, c38_rest, sys_arguments], arginfo{all:[sys_datum], allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[sys_datum, sys_arguments], opt:0, req:[sys_datum], rest:[sys_arguments], sublists:0, whole:0}).
 wl: init_args(1, cl_warn).
@@ -12624,7 +12301,7 @@ cl_warn(Datum_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:47503 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'invoke-debugger',[condition],[let,[['debugger-hook','*debugger-hook*'],['*debugger-hook*',[]]],[when,'debugger-hook',[funcall,'debugger-hook',condition,'debugger-hook']],[format,'*debug-io*','$STRING'("Entering debugger.~%")],[princ,condition,'*debug-io*'],[terpri,'*debug-io*'],[let,[[restarts,['compute-restarts',condition]],[stack,[makef]],['frame-depth',0],['active-frame',[]]],[let,[[count,0]],[dolist,[restart,restarts],[format,'*debug-io*','$STRING'("~A: "),count],[princ,restart,'*debug-io*'],[terpri,'*debug-io*'],[incf,count]]],[setq,'active-frame',['next-function-frame',[-,stack,20]]],['show-frame','active-frame',0],[tagbody,start,[format,'*debug-io*','$STRING'(";~A> "),'frame-depth'],[let,[[form,[read]]],[case,form,[':help',[format,'*debug-io*','$STRING'("Type :help to get help.~%")],[format,'*debug-io*','$STRING'("Type :continue <index> to invoke the indexed restart.~%")]],[':back',[do,[[frame,['next-function-frame',[-,stack,20]],['next-function-frame',frame]],[index,0,[+,1,index]]],[[not,frame]],['show-frame',frame,index]]],[':up',[if,[plusp,'frame-depth'],[progn,[decf,'frame-depth'],[do,[[frame,['next-function-frame',[-,stack,20]],['next-function-frame',frame]],[index,0,[+,1,index]]],[[=,index,'frame-depth'],[setq,'active-frame',frame]]],['show-frame','active-frame','frame-depth']],[format,'*debug-io*','$STRING'("Top of stack.~%")]]],[':down',[let,[[frame,['next-function-frame','active-frame']]],[if,frame,[progn,[incf,'frame-depth'],[setq,'active-frame',frame],['show-frame','active-frame','frame-depth']],[format,'*debug-io*','$STRING'("Bottom of stack.~%")]]]],[':locals',[do,[[env,[fref,[-,'active-frame',1]],[cdr,env]]],[[not,env]],[when,[symbolp,[caar,env]],[format,'*debug-io*','$STRING'("~A~%"),[caar,env]]]]],[':continue',[let,[[index,[read]]],['invoke-restart-interactively',[nth,index,restarts]]]],[t,[let,[[values,['multiple-value-list',[eval,form,[fref,[-,'active-frame',1]]]]],[count,0]],[if,values,[dolist,[value,values],[format,'*debug-io*','$STRING'(";~A: ~S~%"),count,value],[incf,count]],[format,'*debug-io*','$STRING'(";No values.~%")]]]]],[go,start]]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'invoke-debugger',[condition],[let,[['debugger-hook','*debugger-hook*'],['*debugger-hook*',[]]],[when,'debugger-hook',[funcall,'debugger-hook',condition,'debugger-hook']],[format,'*debug-io*','$STRING'("Entering debugger.~%")],[princ,condition,'*debug-io*'],[terpri,'*debug-io*'],[let,[[restarts,['compute-restarts',condition]],[stack,[makef]],['frame-depth',0],['active-frame',[]]],[let,[[count,0]],[dolist,[restart,restarts],[format,'*debug-io*','$STRING'("~A: "),count],[princ,restart,'*debug-io*'],[terpri,'*debug-io*'],[incf,count]]],[setq,'active-frame',['next-function-frame',[-,stack,20]]],['show-frame','active-frame',0],[tagbody,start,[format,'*debug-io*','$STRING'(";~A> "),'frame-depth'],[let,[[form,[read]]],[case,form,[':help',[format,'*debug-io*','$STRING'("Type :help to get help.~%")],[format,'*debug-io*','$STRING'("Type :continue <index> to invoke the indexed restart.~%")]],[':back',[do,[[frame,['next-function-frame',[-,stack,20]],['next-function-frame',frame]],[index,0,[+,1,index]]],[[not,frame]],['show-frame',frame,index]]],[':up',[if,[plusp,'frame-depth'],[progn,[decf,'frame-depth'],[do,[[frame,['next-function-frame',[-,stack,20]],['next-function-frame',frame]],[index,0,[+,1,index]]],[[=,index,'frame-depth'],[setq,'active-frame',frame]]],['show-frame','active-frame','frame-depth']],[format,'*debug-io*','$STRING'("Top of stack.~%")]]],[':down',[let,[[frame,['next-function-frame','active-frame']]],[if,frame,[progn,[incf,'frame-depth'],[setq,'active-frame',frame],['show-frame','active-frame','frame-depth']],[format,'*debug-io*','$STRING'("Bottom of stack.~%")]]]],[':locals',[do,[[env,[fref,[-,'active-frame',1]],[cdr,env]]],[[not,env]],[when,[symbolp,[caar,env]],[format,'*debug-io*','$STRING'("~A~%"),[caar,env]]]]],[':continue',[let,[[index,[read]]],['invoke-restart-interactively',[nth,index,restarts]]]],[t,[let,[[values,['multiple-value-list',[eval,form,[fref,[-,'active-frame',1]]]]],[count,0]],[if,values,[dolist,[value,values],[format,'*debug-io*','$STRING'(";~A: ~S~%"),count,value],[incf,count]],[format,'*debug-io*','$STRING'(";No values.~%")]]]]],[go,start]]]]]]).
 /*
 % case:-[[kw_help,[format,xx_debug_io_xx,'$ARRAY'([*],claz_base_character,"Type :help to get help.~%")],[format,xx_debug_io_xx,'$ARRAY'([*],claz_base_character,"Type :continue <index> to invoke the indexed restart.~%")]],[kw_back,[do,[[sys_frame,[sys_next_function_frame,[-,sys_stack,20]],[sys_next_function_frame,sys_frame]],[index,0,[+,1,index]]],[[not,sys_frame]],[sys_show_frame,sys_frame,index]]],[kw_up,[if,[plusp,sys_frame_depth],[progn,[decf,sys_frame_depth],[do,[[sys_frame,[sys_next_function_frame,[-,sys_stack,20]],[sys_next_function_frame,sys_frame]],[index,0,[+,1,index]]],[[=,index,sys_frame_depth],[setq,sys_active_frame,sys_frame]]],[sys_show_frame,sys_active_frame,sys_frame_depth]],[format,xx_debug_io_xx,'$ARRAY'([*],claz_base_character,"Top of stack.~%")]]],[kw_down,[let,[[sys_frame,[sys_next_function_frame,sys_active_frame]]],[if,sys_frame,[progn,[incf,sys_frame_depth],[setq,sys_active_frame,sys_frame],[sys_show_frame,sys_active_frame,sys_frame_depth]],[format,xx_debug_io_xx,'$ARRAY'([*],claz_base_character,"Bottom of stack.~%")]]]],[kw_locals,[do,[[env,[sys_fref,[-,sys_active_frame,1]],[cdr,env]]],[[not,env]],[when,[symbolp,[caar,env]],[format,xx_debug_io_xx,'$ARRAY'([*],claz_base_character,"~A~%"),[caar,env]]]]],[kw_continue,[let,[[index,[read]]],[invoke_restart_interactively,[nth,index,sys_restarts]]]],[t,[let,[[values,[multiple_value_list,[eval,sys_form,[sys_fref,[-,sys_active_frame,1]]]]],[count,0]],[if,values,[dolist,[sys_value,values],[format,xx_debug_io_xx,'$ARRAY'([*],claz_base_character,";~A: ~S~%"),count,sys_value],[incf,count]],[format,xx_debug_io_xx,'$ARRAY'([*],claz_base_character,";No values.~%")]]]]].
 */
@@ -12671,7 +12348,7 @@ cl_invoke_debugger(_158183862,_166451566):-_168981976=[bv(condition,_158183862)|
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:49800 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,break,['&optional','format-control','&rest','format-arguments'],['with-simple-restart',[continue,'$STRING'("Return from BREAK.")],[let,[['*debugger-hook*',[]]],['invoke-debugger',['make-condition',[quote,'simple-condition'],':format-control','format-control',':format-arguments','format-arguments']]]],[]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,break,['&optional','format-control','&rest','format-arguments'],['with-simple-restart',[continue,'$STRING'("Return from BREAK.")],[let,[['*debugger-hook*',[]]],['invoke-debugger',['make-condition',[quote,'simple-condition'],':format-control','format-control',':format-arguments','format-arguments']]]],[]]).
 wl:lambda_def(defun, break, cl_break, [c38_optional, sys_format_control, c38_rest, sys_format_arguments], [[with_simple_restart, [continue, '$ARRAY'([*], claz_base_character, "Return from BREAK.")], [let, [[xx_debugger_hook_xx, []]], [invoke_debugger, [make_condition, [quote, simple_condition], kw_format_control, sys_format_control, kw_format_arguments, sys_format_arguments]]]], []]).
 wl:arglist_info(break, cl_break, [c38_optional, sys_format_control, c38_rest, sys_format_arguments], arginfo{all:[sys_format_control], allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[sys_format_control, sys_format_arguments], opt:[sys_format_control], req:0, rest:[sys_format_arguments], sublists:0, whole:0}).
 wl: init_args(0, cl_break).
@@ -12792,7 +12469,7 @@ cl_break(Break_Param, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:50144 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defparameter,'*debugger-hook*',[]])
+:-lisp_compile_to_prolog(pkg_sys,[defparameter,'*debugger-hook*',[]]).
 :- set_var(AEnv, xx_debugger_hook_xx, []).
 /*
 #+(or WAM-CL LISP500) 
@@ -12801,7 +12478,7 @@ cl_break(Break_Param, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:50206 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defparameter,'*break-on-signals*',[]])
+:-lisp_compile_to_prolog(pkg_sys,[defparameter,'*break-on-signals*',[]]).
 :- set_var(AEnv, xx_break_on_signals_xx, []).
 /*
 #+(or WAM-CL LISP500) 
@@ -12810,7 +12487,7 @@ cl_break(Break_Param, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:50271 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defparameter,'*handlers*',[]])
+:-lisp_compile_to_prolog(pkg_sys,[defparameter,'*handlers*',[]]).
 :- set_var(AEnv, sys_xx_handlers_xx, []).
 /*
 #+(or WAM-CL LISP500) 
@@ -12824,7 +12501,7 @@ cl_break(Break_Param, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:50328 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'invoke-handler',[condition],[dolist,[handler,'*handlers*'],[when,[typep,condition,[car,handler]],[setq,'*handlers*',[caddr,handler]],[funcall,[cadr,handler],condition]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'invoke-handler',[condition],[dolist,[handler,'*handlers*'],[when,[typep,condition,[car,handler]],[setq,'*handlers*',[caddr,handler]],[funcall,[cadr,handler],condition]]]]).
 wl:lambda_def(defun, sys_invoke_handler, f_sys_invoke_handler, [condition], [[dolist, [sys_handler, sys_xx_handlers_xx], [when, [typep, condition, [car, sys_handler]], [setq, sys_xx_handlers_xx, [caddr, sys_handler]], [funcall, [cadr, sys_handler], condition]]]]).
 wl:arglist_info(sys_invoke_handler, f_sys_invoke_handler, [condition], arginfo{all:[condition], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[condition], opt:0, req:[condition], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, f_sys_invoke_handler).
@@ -12933,7 +12610,7 @@ f_sys_invoke_handler(Condition_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:50552 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defmacro,'handler-bind',[bindings,'&rest',forms],[let,[[form,[quote,'*handlers*']],[handlers,[gensym]]],[dolist,[binding,[reverse,bindings]],[setq,form,['#BQ',[cons,[list,[quote,['#COMMA',[car,binding]]],['#COMMA',[cadr,binding]],[quote,['#COMMA',handlers]]],['#COMMA',form]]]]],['#BQ',[let,[[handlers,'*handlers*'],['*handlers*',['#COMMA',form]]],['#BQ-COMMA-ELIPSE',forms]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defmacro,'handler-bind',[bindings,'&rest',forms],[let,[[form,[quote,'*handlers*']],[handlers,[gensym]]],[dolist,[binding,[reverse,bindings]],[setq,form,['#BQ',[cons,[list,[quote,['#COMMA',[car,binding]]],['#COMMA',[cadr,binding]],[quote,['#COMMA',handlers]]],['#COMMA',form]]]]],['#BQ',[let,[[handlers,'*handlers*'],['*handlers*',['#COMMA',form]]],['#BQ-COMMA-ELIPSE',forms]]]]]).
 wl:lambda_def(defmacro, handler_bind, cl_handler_bind, [bindings, c38_rest, forms], [progn, [let, [[sys_form, [quote, sys_xx_handlers_xx]], [sys_handlers, [gensym]]], [dolist, [binding, [reverse, bindings]], [setq, sys_form, ['#BQ', [cons, [list, [quote, ['#COMMA', [car, binding]]], ['#COMMA', [cadr, binding]], [quote, ['#COMMA', sys_handlers]]], ['#COMMA', sys_form]]]]], ['#BQ', [let, [[sys_handlers, sys_xx_handlers_xx], [sys_xx_handlers_xx, ['#COMMA', sys_form]]], ['#BQ-COMMA-ELIPSE', forms]]]]]).
 wl:arglist_info(handler_bind, cl_handler_bind, [bindings, c38_rest, forms], arginfo{all:[bindings], allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[bindings, forms], opt:0, req:[bindings], rest:[forms], sublists:0, whole:0}).
 wl: init_args(1, cl_handler_bind).
@@ -12971,7 +12648,7 @@ cl_handler_bind(Bindings_In, RestNKeys, FnResult) :-
 				     [quote, Handlers_Get]
 				   ],
 				   Form_Get
-				 ])
+				 ]).
 		       )),
 		get_var(LEnv, forms, Forms_Get),
 		get_var(LEnv, sys_form, Form_Get20),
@@ -13089,7 +12766,7 @@ cl_handler_bind(Bindings_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:50885 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defmacro,'handler-case',[expression,'&rest',clauses],[let,[[tag,[gensym]],[bindings,[]]],['#BQ',['handler-bind',['#COMMA',[dolist,[clause,clauses,[reverse,bindings]],[let,[[typespec,[car,clause]],['var-list',[cadr,clause]],[forms,[cddr,clauses]]],[push,['#BQ',[typespec,function([lambda,[['#COMMA',[if,'var-list',[car,'var-list'],[gensym]]]],['return-from',tag,[progn,['#BQ-COMMA-ELIPSE',forms]]]])]],bindings]]]],['#COMMA',expression]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defmacro,'handler-case',[expression,'&rest',clauses],[let,[[tag,[gensym]],[bindings,[]]],['#BQ',['handler-bind',['#COMMA',[dolist,[clause,clauses,[reverse,bindings]],[let,[[typespec,[car,clause]],['var-list',[cadr,clause]],[forms,[cddr,clauses]]],[push,['#BQ',[typespec,function([lambda,[['#COMMA',[if,'var-list',[car,'var-list'],[gensym]]]],['return-from',tag,[progn,['#BQ-COMMA-ELIPSE',forms]]]])]],bindings]]]],['#COMMA',expression]]]]]).
 wl:lambda_def(defmacro, handler_case, cl_handler_case, [sys_expression, c38_rest, sys_clauses], [progn, [let, [[sys_tag, [gensym]], [bindings, []]], ['#BQ', [handler_bind, ['#COMMA', [dolist, [sys_clause, sys_clauses, [reverse, bindings]], [let, [[sys_typespec, [car, sys_clause]], [sys_var_list, [cadr, sys_clause]], [forms, [cddr, sys_clauses]]], [push, ['#BQ', [sys_typespec, function([lambda, [['#COMMA', [if, sys_var_list, [car, sys_var_list], [gensym]]]], [return_from, sys_tag, [progn, ['#BQ-COMMA-ELIPSE', forms]]]])]], bindings]]]], ['#COMMA', sys_expression]]]]]).
 wl:arglist_info(handler_case, cl_handler_case, [sys_expression, c38_rest, sys_clauses], arginfo{all:[sys_expression], allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[sys_expression, sys_clauses], opt:0, req:[sys_expression], rest:[sys_clauses], sublists:0, whole:0}).
 wl: init_args(1, cl_handler_case).
@@ -13143,7 +12820,7 @@ cl_handler_case(Expression_In, RestNKeys, FnResult) :-
 						    ['#BQ-COMMA-ELIPSE', forms]
 						  ]
 						]
-					      ])
+					      ]).
 				   ]
 				 ],
 				 bindings,
@@ -13231,7 +12908,7 @@ cl_handler_case(Expression_In, RestNKeys, FnResult) :-
 									]
 								      ]
 								    ]
-								  ])
+								  ]).
 						       ]
 						     ],
 						     bindings
@@ -13280,7 +12957,7 @@ cl_handler_case(Expression_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:51328 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defmacro,'ignore-errors',['&rest',forms],['#BQ',['handler-case',[progn,['#BQ-COMMA-ELIPSE',forms]],[error,[condition],[values,[],condition]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defmacro,'ignore-errors',['&rest',forms],['#BQ',['handler-case',[progn,['#BQ-COMMA-ELIPSE',forms]],[error,[condition],[values,[],condition]]]]]).
 wl:lambda_def(defmacro, ignore_errors, cl_ignore_errors, [c38_rest, forms], [progn, ['#BQ', [handler_case, [progn, ['#BQ-COMMA-ELIPSE', forms]], [error, [condition], [values, [], condition]]]]]).
 wl:arglist_info(ignore_errors, cl_ignore_errors, [c38_rest, forms], arginfo{all:0, allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[forms], opt:0, req:0, rest:[forms], sublists:0, whole:0}).
 wl: init_args(0, cl_ignore_errors).
@@ -13355,7 +13032,7 @@ cl_ignore_errors(RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:51477 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defparameter,'*restarts*',[]])
+:-lisp_compile_to_prolog(pkg_sys,[defparameter,'*restarts*',[]]).
 :- set_var(AEnv, sys_xx_restarts_xx, []).
 /*
 #+(or WAM-CL LISP500) 
@@ -13368,7 +13045,7 @@ cl_ignore_errors(RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:51534 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'compute-restarts',['&optional',condition],'$STRING'("FIXME restarts associated with conditions"),[if,condition,'*restarts*','*restarts*']])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'compute-restarts',['&optional',condition],'$STRING'("FIXME restarts associated with conditions"),[if,condition,'*restarts*','*restarts*']]).
 doc: doc_string(compute_restarts,
 	      _179118546,
 	      function,
@@ -13461,7 +13138,7 @@ cl_compute_restarts(Compute_restarts_Param, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:51709 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'find-restart',[identifier,'&optional',condition],[dolist,[restart,'*restarts*'],[when,[eq,restart,identifier],[return,restart]],[when,[eq,['restart-name',restart],identifier],[return,restart]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'find-restart',[identifier,'&optional',condition],[dolist,[restart,'*restarts*'],[when,[eq,restart,identifier],[return,restart]],[when,[eq,['restart-name',restart],identifier],[return,restart]]]]).
 wl:lambda_def(defun, find_restart, cl_find_restart, [sys_identifier, c38_optional, condition], [[dolist, [restart, sys_xx_restarts_xx], [when, [eq, restart, sys_identifier], [return, restart]], [when, [eq, [restart_name, restart], sys_identifier], [return, restart]]]]).
 wl:arglist_info(find_restart, cl_find_restart, [sys_identifier, c38_optional, condition], arginfo{all:[sys_identifier, condition], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_identifier, condition], opt:[condition], req:[sys_identifier], rest:0, sublists:0, whole:0}).
 wl: init_args(1, cl_find_restart).
@@ -13572,7 +13249,7 @@ cl_find_restart(Identifier_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:51962 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'designator-restart',[designator],[if,[restartp,designator],designator,[dolist,[restart,'*restarts*',[error,[quote,'type-error'],':datum',designator,':expected-type',[quote,restart]]],[when,[eq,['restart-name',restart],designator],[return,restart]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'designator-restart',[designator],[if,[restartp,designator],designator,[dolist,[restart,'*restarts*',[error,[quote,'type-error'],':datum',designator,':expected-type',[quote,restart]]],[when,[eq,['restart-name',restart],designator],[return,restart]]]]]).
 wl:lambda_def(defun, sys_designator_restart, f_sys_designator_restart, [sys_designator], [[if, [sys_restartp, sys_designator], sys_designator, [dolist, [restart, sys_xx_restarts_xx, [error, [quote, type_error], kw_datum, sys_designator, kw_expected_type, [quote, restart]]], [when, [eq, [restart_name, restart], sys_designator], [return, restart]]]]]).
 wl:arglist_info(sys_designator_restart, f_sys_designator_restart, [sys_designator], arginfo{all:[sys_designator], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_designator], opt:0, req:[sys_designator], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, f_sys_designator_restart).
@@ -13697,7 +13374,7 @@ f_sys_designator_restart(Designator_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:52254 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'invoke-restart',[restart,'&rest',arguments],[setq,restart,['designator-restart',restart]],[apply,['restart-function',restart],arguments]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'invoke-restart',[restart,'&rest',arguments],[setq,restart,['designator-restart',restart]],[apply,['restart-function',restart],arguments]]).
 wl:lambda_def(defun, invoke_restart, cl_invoke_restart, [restart, c38_rest, sys_arguments], [[setq, restart, [sys_designator_restart, restart]], [apply, [sys_restart_function, restart], sys_arguments]]).
 wl:arglist_info(invoke_restart, cl_invoke_restart, [restart, c38_rest, sys_arguments], arginfo{all:[restart], allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[restart, sys_arguments], opt:0, req:[restart], rest:[sys_arguments], sublists:0, whole:0}).
 wl: init_args(1, cl_invoke_restart).
@@ -13776,7 +13453,7 @@ cl_invoke_restart(Restart_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:52425 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'invoke-restart-interactively',[restart],[setq,restart,['designator-restart',restart]],[apply,['restart-function',restart],[funcall,['restart-interactive-function',restart]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'invoke-restart-interactively',[restart],[setq,restart,['designator-restart',restart]],[apply,['restart-function',restart],[funcall,['restart-interactive-function',restart]]]]).
 wl:lambda_def(defun, invoke_restart_interactively, cl_invoke_restart_interactively, [restart], [[setq, restart, [sys_designator_restart, restart]], [apply, [sys_restart_function, restart], [funcall, [sys_restart_interactive_function, restart]]]]).
 wl:arglist_info(invoke_restart_interactively, cl_invoke_restart_interactively, [restart], arginfo{all:[restart], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[restart], opt:0, req:[restart], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_invoke_restart_interactively).
@@ -13871,7 +13548,7 @@ cl_invoke_restart_interactively(Restart_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:52636 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defmacro,'restart-bind',['restart-bindings','&rest',forms],[let,[[form,[quote,'*restarts*']]],[dolist,[binding,[reverse,'restart-bindings']],[setq,form,['#BQ',[cons,['make-restart',[quote,['#COMMA',[car,binding]]],['#BQ-COMMA-ELIPSE',[cdr,binding]]],['#COMMA',form]]]]],['#BQ',[let,[['*restarts*',['#COMMA',form]]],['#BQ-COMMA-ELIPSE',forms]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defmacro,'restart-bind',['restart-bindings','&rest',forms],[let,[[form,[quote,'*restarts*']]],[dolist,[binding,[reverse,'restart-bindings']],[setq,form,['#BQ',[cons,['make-restart',[quote,['#COMMA',[car,binding]]],['#BQ-COMMA-ELIPSE',[cdr,binding]]],['#COMMA',form]]]]],['#BQ',[let,[['*restarts*',['#COMMA',form]]],['#BQ-COMMA-ELIPSE',forms]]]]]).
 wl:lambda_def(defmacro, restart_bind, cl_restart_bind, [sys_restart_bindings, c38_rest, forms], [progn, [let, [[sys_form, [quote, sys_xx_restarts_xx]]], [dolist, [binding, [reverse, sys_restart_bindings]], [setq, sys_form, ['#BQ', [cons, [sys_make_restart, [quote, ['#COMMA', [car, binding]]], ['#BQ-COMMA-ELIPSE', [cdr, binding]]], ['#COMMA', sys_form]]]]], ['#BQ', [let, [[sys_xx_restarts_xx, ['#COMMA', sys_form]]], ['#BQ-COMMA-ELIPSE', forms]]]]]).
 wl:arglist_info(restart_bind, cl_restart_bind, [sys_restart_bindings, c38_rest, forms], arginfo{all:[sys_restart_bindings], allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[sys_restart_bindings, forms], opt:0, req:[sys_restart_bindings], rest:[forms], sublists:0, whole:0}).
 wl: init_args(1, cl_restart_bind).
@@ -13902,7 +13579,7 @@ cl_restart_bind(Restart_bindings_In, RestNKeys, FnResult) :-
 				 [ cons,
 				   [sys_make_restart, [quote, Car_Ret]|Cdr_Ret],
 				   Form_Get
-				 ])
+				 ]).
 		       )),
 		get_var(LEnv, forms, Forms_Get),
 		get_var(LEnv, sys_form, Form_Get18),
@@ -14019,7 +13696,7 @@ cl_restart_bind(Restart_bindings_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:52935 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defmacro,'restart-case',['restartable-form','&rest',clauses],[let,[['catch-tag',[gensym]],[bindings,[]]],['#BQ',[catch,[quote,['#COMMA','catch-tag']],['restart-bind',['#COMMA',[dolist,[clause,clauses,[reverse,bindings]],[let,[[name,[car,clause]],['lambda-list',[cadr,clause]],[rest,[cddr,clause]],[interactive,[quote,function([lambda,[],[]])]],[report,[quote,function([lambda,[stream],[format,stream,'$STRING'("~A"),[car,clause]]])]],[test,[quote,function([lambda,[condition],t])]]],[tagbody,start,[when,[member,[car,rest],[quote,[':interactive',':report',':test']]],[let,[[value,[cadr,rest]]],[case,[car,rest],[':interactive',[setq,interactive,['#BQ',[function,['#COMMA',value]]]]],[':report',[setq,report,[if,[stringp,value],['#BQ',function([lambda,[stream],['write-string',['#COMMA',value],stream]])],['#BQ',[function,['#COMMA',value]]]]]],[':test',[setq,test,['#BQ',[function,['#COMMA',value]]]]]]],[setq,rest,[cddr,rest]],[go,start]]],[push,['#BQ',[['#COMMA',[car,clause]],function([lambda,['#COMMA',[cadr,clause]],[throw,[quote,['#COMMA','catch-tag']],[progn,['#BQ-COMMA-ELIPSE',rest]]]]),':interactive-function',['#COMMA',interactive],':report-function',['#COMMA',report],':test-function',['#COMMA',test]]],bindings]]]],['#COMMA','restartable-form']]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defmacro,'restart-case',['restartable-form','&rest',clauses],[let,[['catch-tag',[gensym]],[bindings,[]]],['#BQ',[catch,[quote,['#COMMA','catch-tag']],['restart-bind',['#COMMA',[dolist,[clause,clauses,[reverse,bindings]],[let,[[name,[car,clause]],['lambda-list',[cadr,clause]],[rest,[cddr,clause]],[interactive,[quote,function([lambda,[],[]])]],[report,[quote,function([lambda,[stream],[format,stream,'$STRING'("~A"),[car,clause]]])]],[test,[quote,function([lambda,[condition],t])]]],[tagbody,start,[when,[member,[car,rest],[quote,[':interactive',':report',':test']]],[let,[[value,[cadr,rest]]],[case,[car,rest],[':interactive',[setq,interactive,['#BQ',[function,['#COMMA',value]]]]],[':report',[setq,report,[if,[stringp,value],['#BQ',function([lambda,[stream],['write-string',['#COMMA',value],stream]])],['#BQ',[function,['#COMMA',value]]]]]],[':test',[setq,test,['#BQ',[function,['#COMMA',value]]]]]]],[setq,rest,[cddr,rest]],[go,start]]],[push,['#BQ',[['#COMMA',[car,clause]],function([lambda,['#COMMA',[cadr,clause]],[throw,[quote,['#COMMA','catch-tag']],[progn,['#BQ-COMMA-ELIPSE',rest]]]]),':interactive-function',['#COMMA',interactive],':report-function',['#COMMA',report],':test-function',['#COMMA',test]]],bindings]]]],['#COMMA','restartable-form']]]]]]).
 /*
 % case:-[[kw_interactive,[setq,sys_interactive,['#BQ',[function,['#COMMA',sys_value]]]]],[kw_report,[setq,sys_report,[if,[stringp,sys_value],['#BQ',function([lambda,[stream],[write_string,['#COMMA',sys_value],stream]])],['#BQ',[function,['#COMMA',sys_value]]]]]],[kw_test,[setq,test,['#BQ',[function,['#COMMA',sys_value]]]]]].
 */
@@ -14072,7 +13749,7 @@ cl_restart_case(_184572814,_184582572,_184571676):-nop(defmacro),_184572074=[bv(
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:54134 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defmacro,'with-simple-restart',[[name,'format-control','&rest','format-arguments'],'&rest',forms],[let,[[tag,[gensym]]],['#BQ',[block,['#COMMA',tag],['restart-bind',[[['#COMMA',name],function([lambda,[],['return-from',['#COMMA',tag],[values,[],t]]]),':interactive-function',function([lambda,[],[]]),':report-function',function([lambda,[stream],[apply,function(format),stream,[quote,['#COMMA','format-control']],[quote,['#COMMA','format-arguments']]]]),':test-function',function([lambda,[],t])]],['#BQ-COMMA-ELIPSE',forms]]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defmacro,'with-simple-restart',[[name,'format-control','&rest','format-arguments'],'&rest',forms],[let,[[tag,[gensym]]],['#BQ',[block,['#COMMA',tag],['restart-bind',[[['#COMMA',name],function([lambda,[],['return-from',['#COMMA',tag],[values,[],t]]]),':interactive-function',function([lambda,[],[]]),':report-function',function([lambda,[stream],[apply,function(format),stream,[quote,['#COMMA','format-control']],[quote,['#COMMA','format-arguments']]]]),':test-function',function([lambda,[],t])]],['#BQ-COMMA-ELIPSE',forms]]]]]]).
 wl:lambda_def(defmacro, with_simple_restart, cl_with_simple_restart, [[sys_name, sys_format_control, c38_rest, sys_format_arguments], c38_rest, forms], [progn, [let, [[sys_tag, [gensym]]], ['#BQ', [block, ['#COMMA', sys_tag], [restart_bind, [[['#COMMA', sys_name], function([lambda, [], [return_from, ['#COMMA', sys_tag], [values, [], t]]]), kw_interactive_function, function([lambda, [], []]), kw_report_function, function([lambda, [stream], [apply, function(format), stream, [quote, ['#COMMA', sys_format_control]], [quote, ['#COMMA', sys_format_arguments]]]]), kw_test_function, function([lambda, [], t])]], ['#BQ-COMMA-ELIPSE', forms]]]]]]).
 wl:arglist_info(with_simple_restart, cl_with_simple_restart, [[sys_name, sys_format_control, c38_rest, sys_format_arguments], c38_rest, forms], arginfo{all:0, allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[forms, sys_name, sys_format_control, sys_format_arguments], opt:0, req:0, rest:[forms], sublists:0, whole:0}).
 wl: init_args(1, cl_with_simple_restart).
@@ -14165,7 +13842,7 @@ cl_with_simple_restart([Name_In, Format_control_In|Format_arguments_In], RestNKe
 							      ]
 							    ]),
 						   kw_test_function,
-						   function([lambda, [], t])
+						   function([lambda, [], t]).
 						 ]
 					       ],
 					       ['#BQ-COMMA-ELIPSE', forms]
@@ -14222,7 +13899,7 @@ cl_with_simple_restart([Name_In, Format_control_In|Format_arguments_In], RestNKe
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:54614 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,abort,['&optional',condition],['invoke-restart',['find-restart',[quote,abort],condition]],[error,[quote,'control-error']]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,abort,['&optional',condition],['invoke-restart',['find-restart',[quote,abort],condition]],[error,[quote,'control-error']]]).
 wl:lambda_def(defun, abort, cl_abort, [c38_optional, condition], [[invoke_restart, [find_restart, [quote, abort], condition]], [error, [quote, control_error]]]).
 wl:arglist_info(abort, cl_abort, [c38_optional, condition], arginfo{all:[condition], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[condition], opt:[condition], req:0, rest:0, sublists:0, whole:0}).
 wl: init_args(0, cl_abort).
@@ -14297,7 +13974,7 @@ cl_abort(Abort_Param, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:54755 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,continue,['&optional',condition],['invoke-restart',['find-restart',[quote,continue],condition]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,continue,['&optional',condition],['invoke-restart',['find-restart',[quote,continue],condition]]]).
 wl:lambda_def(defun, continue, cl_continue, [c38_optional, condition], [[invoke_restart, [find_restart, [quote, continue], condition]]]).
 wl:arglist_info(continue, cl_continue, [c38_optional, condition], arginfo{all:[condition], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[condition], opt:[condition], req:0, rest:0, sublists:0, whole:0}).
 wl: init_args(0, cl_continue).
@@ -14371,7 +14048,7 @@ cl_continue(Continue_Param, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:54876 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'muffle-warning',['&optional',condition],['invoke-restart',['find-restart',[quote,'muffle-warning'],condition]],[error,[quote,'control-error']]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'muffle-warning',['&optional',condition],['invoke-restart',['find-restart',[quote,'muffle-warning'],condition]],[error,[quote,'control-error']]]).
 wl:lambda_def(defun, muffle_warning, cl_muffle_warning, [c38_optional, condition], [[invoke_restart, [find_restart, [quote, muffle_warning], condition]], [error, [quote, control_error]]]).
 wl:arglist_info(muffle_warning, cl_muffle_warning, [c38_optional, condition], arginfo{all:[condition], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[condition], opt:[condition], req:0, rest:0, sublists:0, whole:0}).
 wl: init_args(0, cl_muffle_warning).
@@ -14448,7 +14125,7 @@ cl_muffle_warning(Muffle_warning_Param, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:55035 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'store-value',[value,'&optional',condition],['invoke-restart',['find-restart',[quote,'store-value'],condition],value]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'store-value',[value,'&optional',condition],['invoke-restart',['find-restart',[quote,'store-value'],condition],value]]).
 wl:lambda_def(defun, store_value, cl_store_value, [sys_value, c38_optional, condition], [[invoke_restart, [find_restart, [quote, store_value], condition], sys_value]]).
 wl:arglist_info(store_value, cl_store_value, [sys_value, c38_optional, condition], arginfo{all:[sys_value, condition], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_value, condition], opt:[condition], req:[sys_value], rest:0, sublists:0, whole:0}).
 wl: init_args(1, cl_store_value).
@@ -14527,7 +14204,7 @@ cl_store_value(Value_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:55174 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'use-value',[value,'&optional',condition],['invoke-restart',['find-restart',[quote,'use-value'],condition],value]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'use-value',[value,'&optional',condition],['invoke-restart',['find-restart',[quote,'use-value'],condition],value]]).
 wl:lambda_def(defun, use_value, cl_use_value, [sys_value, c38_optional, condition], [[invoke_restart, [find_restart, [quote, use_value], condition], sys_value]]).
 wl:arglist_info(use_value, cl_use_value, [sys_value, c38_optional, condition], arginfo{all:[sys_value, condition], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_value, condition], opt:[condition], req:[sys_value], rest:0, sublists:0, whole:0}).
 wl: init_args(1, cl_use_value).
@@ -14616,7 +14293,7 @@ cl_use_value(Value_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:55311 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'integer-string',[integer,'&optional',[radix,10]],[if,[=,integer,0],'$STRING'("0"),[labels,[[recur,[i,l],[if,[=,i,0],l,['multiple-value-bind',[ni,r],[floor,i,radix],[recur,ni,[cons,['code-char',[+,[if,[<,r,10],48,55],r]],l]]]]]],[apply,function(string),[if,[<,0,integer],[recur,integer,[]],[cons,['code-char',45],[recur,[-,integer],[]]]]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'integer-string',[integer,'&optional',[radix,10]],[if,[=,integer,0],'$STRING'("0"),[labels,[[recur,[i,l],[if,[=,i,0],l,['multiple-value-bind',[ni,r],[floor,i,radix],[recur,ni,[cons,['code-char',[+,[if,[<,r,10],48,55],r]],l]]]]]],[apply,function(string),[if,[<,0,integer],[recur,integer,[]],[cons,['code-char',45],[recur,[-,integer],[]]]]]]]]).
 wl:lambda_def(defun, sys_integer_string, f_sys_integer_string, [integer, c38_optional, [sys_radix, 10]], [[if, [=, integer, 0], '$ARRAY'([*], claz_base_character, "0"), [labels, [[sys_recur, [sys_i, sys_l], [if, [=, sys_i, 0], sys_l, [multiple_value_bind, [sys_ni, sys_r], [floor, sys_i, sys_radix], [sys_recur, sys_ni, [cons, [code_char, [+, [if, [<, sys_r, 10], 48, 55], sys_r]], sys_l]]]]]], [apply, function(string), [if, [<, 0, integer], [sys_recur, integer, []], [cons, [code_char, 45], [sys_recur, [-, integer], []]]]]]]]).
 wl:arglist_info(sys_integer_string, f_sys_integer_string, [integer, c38_optional, [sys_radix, 10]], arginfo{all:[integer, sys_radix], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[integer, sys_radix], opt:[sys_radix], req:[integer], rest:0, sublists:0, whole:0}).
 wl: init_args(1, f_sys_integer_string).
@@ -14761,7 +14438,7 @@ f_sys_integer_string(Integer_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:55746 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'designator-symbol',[designator],[if,[symbolp,designator],designator,['find-symbol',designator]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'designator-symbol',[designator],[if,[symbolp,designator],designator,['find-symbol',designator]]]).
 wl:lambda_def(defun, sys_designator_symbol, f_sys_designator_symbol, [sys_designator], [[if, [symbolp, sys_designator], sys_designator, [find_symbol, sys_designator]]]).
 wl:arglist_info(sys_designator_symbol, f_sys_designator_symbol, [sys_designator], arginfo{all:[sys_designator], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_designator], opt:0, req:[sys_designator], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, f_sys_designator_symbol).
@@ -14865,7 +14542,7 @@ f_sys_designator_symbol(Designator_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:56311 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defvar,'*gensym-counter*',0])
+:-lisp_compile_to_prolog(pkg_sys,[defvar,'*gensym-counter*',0]).
 :- set_var(AEnv, xx_gensym_counter_xx, 0).
 /*
 #+(or WAM-CL LISP500)
@@ -14880,7 +14557,7 @@ f_sys_designator_symbol(Designator_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:56363 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'gen-sym',['&optional',x],[let,[[prefix,[if,[stringp,x],x,'$STRING'("G")]],[suffix,[if,[fixnump,x],x,[let,[[x,'*gensym-counter*']],[setf,'*gensym-counter*',[+,1,'*gensym-counter*']]]]]],['make-symbol',['conc-string',prefix,['integer-string',suffix]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'gen-sym',['&optional',x],[let,[[prefix,[if,[stringp,x],x,'$STRING'("G")]],[suffix,[if,[fixnump,x],x,[let,[[x,'*gensym-counter*']],[setf,'*gensym-counter*',[+,1,'*gensym-counter*']]]]]],['make-symbol',['conc-string',prefix,['integer-string',suffix]]]]]).
 wl:lambda_def(defun, sys_gen_sym, f_sys_gen_sym, [c38_optional, sys_x], [[let, [[sys_prefix, [if, [stringp, sys_x], sys_x, '$ARRAY'([*], claz_base_character, "G")]], [sys_suffix, [if, [sys_fixnump, sys_x], sys_x, [let, [[sys_x, xx_gensym_counter_xx]], [setf, xx_gensym_counter_xx, [+, 1, xx_gensym_counter_xx]]]]]], [make_symbol, [sys_conc_string, sys_prefix, [sys_integer_string, sys_suffix]]]]]).
 wl:arglist_info(sys_gen_sym, f_sys_gen_sym, [c38_optional, sys_x], arginfo{all:[sys_x], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x], opt:[sys_x], req:0, rest:0, sublists:0, whole:0}).
 wl: init_args(0, f_sys_gen_sym).
@@ -15021,7 +14698,7 @@ f_sys_gen_sym(Gen_sym_Param, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:56655 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[let,[['gentemp-counter',0]],[defun,gentemp,['&optional',[prefix,'$STRING'("T")],[package,'*package*']],[setf,'gentemp-counter',[+,1,'gentemp-counter']],[intern,['conc-string',prefix,['integer-string','gentemp-counter']],package]]])
+:-lisp_compile_to_prolog(pkg_sys,[let,[['gentemp-counter',0]],[defun,gentemp,['&optional',[prefix,'$STRING'("T")],[package,'*package*']],[setf,'gentemp-counter',[+,1,'gentemp-counter']],[intern,['conc-string',prefix,['integer-string','gentemp-counter']],package]]]).
 :- LEnv=[bv(sys_gentemp_counter, 0)|CDR].
 wl:lambda_def(defun, gentemp, cl_gentemp, [c38_optional, [sys_prefix, '$ARRAY'([*], claz_base_character, "T")], [package, xx_package_xx]], [[setf, sys_gentemp_counter, [+, 1, sys_gentemp_counter]], [intern, [sys_conc_string, sys_prefix, [sys_integer_string, sys_gentemp_counter]], package]]).
 wl:arglist_info(gentemp, cl_gentemp, [c38_optional, [sys_prefix, '$ARRAY'([*], claz_base_character, "T")], [package, xx_package_xx]], arginfo{all:[sys_prefix, package], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_prefix, package], opt:[sys_prefix, package], req:0, rest:0, sublists:0, whole:0}).
@@ -15151,7 +14828,7 @@ cl_gentemp(Gentemp_Param, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:57021 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,[setf,get],['new-value',symbol,indicator,'&optional',default],[setf,[getf,['symbol-plist',symbol],indicator,default],'new-value']])
+:-lisp_compile_to_prolog(pkg_sys,[defun,[setf,get],['new-value',symbol,indicator,'&optional',default],[setf,[getf,['symbol-plist',symbol],indicator,default],'new-value']]).
 /*
 :- side_effect((compile_each($, _199663770, [sys_indicator, sys_default], [sys_indicator, sys_default], true), append([[symbol_plist, symbol], sys_indicator, sys_default], [CAR11, CAR], [[symbol_plist, symbol], sys_indicator, sys_default, CAR11, CAR]), setf_inverse_op(getf, []))).
 */
@@ -15278,7 +14955,7 @@ cl_setf_get(New_value_In, Symbol_In, Indicator_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:57180 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,[setf,rest],['new-tail',list],[setf,[cdr,list],'new-tail']])
+:-lisp_compile_to_prolog(pkg_sys,[defun,[setf,rest],['new-tail',list],[setf,[cdr,list],'new-tail']]).
 /*
 :- side_effect((compile_each($, _200753808, [], [], true), append([list], [CAR8, CAR], [list, CAR8, CAR]), setf_inverse_op(cdr, rplacd))).
 */
@@ -15364,7 +15041,7 @@ cl_setf_rest(New_tail_In, List_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:57269 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,remprop,[symbol,indicator],[remf,['symbol-plist',symbol],indicator]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,remprop,[symbol,indicator],[remf,['symbol-plist',symbol],indicator]]).
 wl:lambda_def(defun, remprop, cl_remprop, [symbol, sys_indicator], [[remf, [symbol_plist, symbol], sys_indicator]]).
 wl:arglist_info(remprop, cl_remprop, [symbol, sys_indicator], arginfo{all:[symbol, sys_indicator], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[symbol, sys_indicator], opt:0, req:[symbol, sys_indicator], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_remprop).
@@ -15452,7 +15129,7 @@ cl_remprop(Symbol_In, Indicator_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:57558 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'designator-string',[designator],[if,[stringp,designator],designator,[if,[characterp,designator],[string,designator],['symbol-name',designator]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'designator-string',[designator],[if,[stringp,designator],designator,[if,[characterp,designator],[string,designator],['symbol-name',designator]]]]).
 wl:lambda_def(defun, sys_designator_string, f_sys_designator_string, [sys_designator], [[if, [stringp, sys_designator], sys_designator, [if, [characterp, sys_designator], [string, sys_designator], [symbol_name, sys_designator]]]]).
 wl:arglist_info(sys_designator_string, f_sys_designator_string, [sys_designator], arginfo{all:[sys_designator], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_designator], opt:0, req:[sys_designator], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, f_sys_designator_string).
@@ -15548,7 +15225,7 @@ f_sys_designator_string(Designator_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:57839 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'list-all-packages',[],['copy-list','*packages*']])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'list-all-packages',[],['copy-list','*packages*']]).
 wl:lambda_def(defun, list_all_packages, cl_list_all_packages, [], [[copy_list, sys_xx_packages_xx]]).
 wl:arglist_info(list_all_packages, cl_list_all_packages, [], arginfo{all:0, allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[], opt:0, req:0, rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_list_all_packages).
@@ -15620,7 +15297,7 @@ cl_list_all_packages(FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:57920 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,/=,[number,'&rest',numbers],[tagbody,start,[when,numbers,[dolist,[n,numbers],[when,[=,number,n],['return-from',/=]]],[setq,number,[pop,numbers]],[go,start]]],t])
+:-lisp_compile_to_prolog(pkg_sys,[defun,/=,[number,'&rest',numbers],[tagbody,start,[when,numbers,[dolist,[n,numbers],[when,[=,number,n],['return-from',/=]]],[setq,number,[pop,numbers]],[go,start]]],t]).
 wl:lambda_def(defun, /=, f_sys_c47_c61, [number, c38_rest, sys_numbers], [[tagbody, start, [when, sys_numbers, [dolist, [n, sys_numbers], [when, [=, number, n], [return_from, /=]]], [setq, number, [pop, sys_numbers]], [go, start]]], t]).
 wl:arglist_info(/=, f_sys_c47_c61, [number, c38_rest, sys_numbers], arginfo{all:[number], allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[number, sys_numbers], opt:0, req:[number], rest:[sys_numbers], sublists:0, whole:0}).
 wl: init_args(1, f_sys_c47_c61).
@@ -15791,7 +15468,7 @@ f_sys_c47_c61(Number_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:59049 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,minusp,[real],[<,real,0]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,minusp,[real],[<,real,0]]).
 wl:lambda_def(defun, minusp, cl_minusp, [real], [[<, real, 0]]).
 wl:arglist_info(minusp, cl_minusp, [real], arginfo{all:[real], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[real], opt:0, req:[real], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_minusp).
@@ -15853,7 +15530,7 @@ cl_minusp(Real_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:59114 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,plusp,[real],[<,0,real]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,plusp,[real],[<,0,real]]).
 wl:lambda_def(defun, plusp, cl_plusp, [real], [[<, 0, real]]).
 wl:arglist_info(plusp, cl_plusp, [real], arginfo{all:[real], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[real], opt:0, req:[real], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_plusp).
@@ -15911,7 +15588,7 @@ cl_plusp(Real_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:59178 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,zerop,[real],[=,real,0]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,zerop,[real],[=,real,0]]).
 wl:lambda_def(defun, zerop, cl_zerop, [real], [[=, real, 0]]).
 wl:arglist_info(zerop, cl_zerop, [real], arginfo{all:[real], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[real], opt:0, req:[real], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_zerop).
@@ -15972,7 +15649,7 @@ cl_zerop(Real_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:59242 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,abs,[number],[if,[<,number,0],[-,number],number]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,abs,[number],[if,[<,number,0],[-,number],number]]).
 wl:lambda_def(defun, abs, cl_abs, [number], [[if, [<, number, 0], [-, number], number]]).
 wl:arglist_info(abs, cl_abs, [number], arginfo{all:[number], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[number], opt:0, req:[number], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_abs).
@@ -16036,7 +15713,7 @@ cl_abs(Number_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:59347 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,byte,[size,position],[cons,size,position]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,byte,[size,position],[cons,size,position]]).
 wl:lambda_def(defun, byte, cl_byte, [sys_size, position], [[cons, sys_size, position]]).
 wl:arglist_info(byte, cl_byte, [sys_size, position], arginfo{all:[sys_size, position], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_size, position], opt:0, req:[sys_size, position], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_byte).
@@ -16098,7 +15775,7 @@ cl_byte(Size_In, Position_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:59427 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'byte-size',[bytespec],[car,bytespec]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'byte-size',[bytespec],[car,bytespec]]).
 wl:lambda_def(defun, byte_size, cl_byte_size, [sys_bytespec], [[car, sys_bytespec]]).
 wl:arglist_info(byte_size, cl_byte_size, [sys_bytespec], arginfo{all:[sys_bytespec], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_bytespec], opt:0, req:[sys_bytespec], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_byte_size).
@@ -16159,7 +15836,7 @@ cl_byte_size(Bytespec_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:59501 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'byte-position',[bytespec],[cdr,bytespec]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'byte-position',[bytespec],[cdr,bytespec]]).
 wl:lambda_def(defun, byte_position, cl_byte_position, [sys_bytespec], [[cdr, sys_bytespec]]).
 wl:arglist_info(byte_position, cl_byte_position, [sys_bytespec], arginfo{all:[sys_bytespec], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_bytespec], opt:0, req:[sys_bytespec], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_byte_position).
@@ -16221,7 +15898,7 @@ cl_byte_position(Bytespec_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:59579 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'char=',['&rest',characters],[apply,function(=),[mapcar,function('char-code'),characters]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'char=',['&rest',characters],[apply,function(=),[mapcar,function('char-code'),characters]]]).
 wl:lambda_def(defun, char_c61, cl_char_c61, [c38_rest, sys_characters], [[apply, function(=), [mapcar, function(char_code), sys_characters]]]).
 wl:arglist_info(char_c61, cl_char_c61, [c38_rest, sys_characters], arginfo{all:0, allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[sys_characters], opt:0, req:0, rest:[sys_characters], sublists:0, whole:0}).
 wl: init_args(0, cl_char_c61).
@@ -16293,7 +15970,7 @@ cl_char_c61(RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:59686 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'char/=',['&rest',characters],[apply,function(/=),[mapcar,function('char-code'),characters]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'char/=',['&rest',characters],[apply,function(/=),[mapcar,function('char-code'),characters]]]).
 wl:lambda_def(defun, char_c47_c61, cl_char_c47_c61, [c38_rest, sys_characters], [[apply, function(/=), [mapcar, function(char_code), sys_characters]]]).
 wl:arglist_info(char_c47_c61, cl_char_c47_c61, [c38_rest, sys_characters], arginfo{all:0, allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[sys_characters], opt:0, req:0, rest:[sys_characters], sublists:0, whole:0}).
 wl: init_args(0, cl_char_c47_c61).
@@ -16365,7 +16042,7 @@ cl_char_c47_c61(RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:59795 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'char<',['&rest',characters],[apply,function(<),[mapcar,function('char-code'),characters]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'char<',['&rest',characters],[apply,function(<),[mapcar,function('char-code'),characters]]]).
 wl:lambda_def(defun, char_c60, cl_char_c60, [c38_rest, sys_characters], [[apply, function(<), [mapcar, function(char_code), sys_characters]]]).
 wl:arglist_info(char_c60, cl_char_c60, [c38_rest, sys_characters], arginfo{all:0, allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[sys_characters], opt:0, req:0, rest:[sys_characters], sublists:0, whole:0}).
 wl: init_args(0, cl_char_c60).
@@ -16437,7 +16114,7 @@ cl_char_c60(RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:59902 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'char>',['&rest',characters],[apply,function(>),[mapcar,function('char-code'),characters]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'char>',['&rest',characters],[apply,function(>),[mapcar,function('char-code'),characters]]]).
 wl:lambda_def(defun, char_c62, cl_char_c62, [c38_rest, sys_characters], [[apply, function(>), [mapcar, function(char_code), sys_characters]]]).
 wl:arglist_info(char_c62, cl_char_c62, [c38_rest, sys_characters], arginfo{all:0, allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[sys_characters], opt:0, req:0, rest:[sys_characters], sublists:0, whole:0}).
 wl: init_args(0, cl_char_c62).
@@ -16509,7 +16186,7 @@ cl_char_c62(RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:60009 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'char<=',['&rest',characters],[apply,function(<=),[mapcar,function('char-code'),characters]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'char<=',['&rest',characters],[apply,function(<=),[mapcar,function('char-code'),characters]]]).
 wl:lambda_def(defun, char_c60_c61, cl_char_c60_c61, [c38_rest, sys_characters], [[apply, function(<=), [mapcar, function(char_code), sys_characters]]]).
 wl:arglist_info(char_c60_c61, cl_char_c60_c61, [c38_rest, sys_characters], arginfo{all:0, allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[sys_characters], opt:0, req:0, rest:[sys_characters], sublists:0, whole:0}).
 wl: init_args(0, cl_char_c60_c61).
@@ -16581,7 +16258,7 @@ cl_char_c60_c61(RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:60118 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'char>=',['&rest',characters],[apply,function(>=),[mapcar,function('char-code'),characters]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'char>=',['&rest',characters],[apply,function(>=),[mapcar,function('char-code'),characters]]]).
 wl:lambda_def(defun, char_c62_c61, cl_char_c62_c61, [c38_rest, sys_characters], [[apply, function(>=), [mapcar, function(char_code), sys_characters]]]).
 wl:arglist_info(char_c62_c61, cl_char_c62_c61, [c38_rest, sys_characters], arginfo{all:0, allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[sys_characters], opt:0, req:0, rest:[sys_characters], sublists:0, whole:0}).
 wl: init_args(0, cl_char_c62_c61).
@@ -16653,7 +16330,7 @@ cl_char_c62_c61(RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:60227 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'char-equal',['&rest',characters],[apply,function('char='),[mapcar,function('char-upcase'),characters]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'char-equal',['&rest',characters],[apply,function('char='),[mapcar,function('char-upcase'),characters]]]).
 wl:lambda_def(defun, char_equal, cl_char_equal, [c38_rest, sys_characters], [[apply, function(char_c61), [mapcar, function(char_upcase), sys_characters]]]).
 wl:arglist_info(char_equal, cl_char_equal, [c38_rest, sys_characters], arginfo{all:0, allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[sys_characters], opt:0, req:0, rest:[sys_characters], sublists:0, whole:0}).
 wl: init_args(0, cl_char_equal).
@@ -16725,7 +16402,7 @@ cl_char_equal(RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:60345 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'char-not-equal',['&rest',characters],[apply,function('char/='),[mapcar,function('char-upcase'),characters]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'char-not-equal',['&rest',characters],[apply,function('char/='),[mapcar,function('char-upcase'),characters]]]).
 wl:lambda_def(defun, char_not_equal, cl_char_not_equal, [c38_rest, sys_characters], [[apply, function(char_c47_c61), [mapcar, function(char_upcase), sys_characters]]]).
 wl:arglist_info(char_not_equal, cl_char_not_equal, [c38_rest, sys_characters], arginfo{all:0, allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[sys_characters], opt:0, req:0, rest:[sys_characters], sublists:0, whole:0}).
 wl: init_args(0, cl_char_not_equal).
@@ -16797,7 +16474,7 @@ cl_char_not_equal(RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:60468 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'char-lessp',['&rest',characters],[apply,function('char<'),[mapcar,function('char-upcase'),characters]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'char-lessp',['&rest',characters],[apply,function('char<'),[mapcar,function('char-upcase'),characters]]]).
 wl:lambda_def(defun, char_lessp, cl_char_lessp, [c38_rest, sys_characters], [[apply, function(char_c60), [mapcar, function(char_upcase), sys_characters]]]).
 wl:arglist_info(char_lessp, cl_char_lessp, [c38_rest, sys_characters], arginfo{all:0, allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[sys_characters], opt:0, req:0, rest:[sys_characters], sublists:0, whole:0}).
 wl: init_args(0, cl_char_lessp).
@@ -16869,7 +16546,7 @@ cl_char_lessp(RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:60586 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'char-greaterp',['&rest',characters],[apply,function('char>'),[mapcar,function('char-upcase'),characters]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'char-greaterp',['&rest',characters],[apply,function('char>'),[mapcar,function('char-upcase'),characters]]]).
 wl:lambda_def(defun, char_greaterp, cl_char_greaterp, [c38_rest, sys_characters], [[apply, function(char_c62), [mapcar, function(char_upcase), sys_characters]]]).
 wl:arglist_info(char_greaterp, cl_char_greaterp, [c38_rest, sys_characters], arginfo{all:0, allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[sys_characters], opt:0, req:0, rest:[sys_characters], sublists:0, whole:0}).
 wl: init_args(0, cl_char_greaterp).
@@ -16941,7 +16618,7 @@ cl_char_greaterp(RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:60707 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'char-not-greaterp',['&rest',characters],[apply,function('char<='),[mapcar,function('char-upcase'),characters]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'char-not-greaterp',['&rest',characters],[apply,function('char<='),[mapcar,function('char-upcase'),characters]]]).
 wl:lambda_def(defun, char_not_greaterp, cl_char_not_greaterp, [c38_rest, sys_characters], [[apply, function(char_c60_c61), [mapcar, function(char_upcase), sys_characters]]]).
 wl:arglist_info(char_not_greaterp, cl_char_not_greaterp, [c38_rest, sys_characters], arginfo{all:0, allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[sys_characters], opt:0, req:0, rest:[sys_characters], sublists:0, whole:0}).
 wl: init_args(0, cl_char_not_greaterp).
@@ -17013,7 +16690,7 @@ cl_char_not_greaterp(RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:60833 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'char-not-lessp',['&rest',characters],[apply,function('char>='),[mapcar,function('char-upcase'),characters]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'char-not-lessp',['&rest',characters],[apply,function('char>='),[mapcar,function('char-upcase'),characters]]]).
 wl:lambda_def(defun, char_not_lessp, cl_char_not_lessp, [c38_rest, sys_characters], [[apply, function(char_c62_c61), [mapcar, function(char_upcase), sys_characters]]]).
 wl:arglist_info(char_not_lessp, cl_char_not_lessp, [c38_rest, sys_characters], arginfo{all:0, allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[sys_characters], opt:0, req:0, rest:[sys_characters], sublists:0, whole:0}).
 wl: init_args(0, cl_char_not_lessp).
@@ -17090,7 +16767,7 @@ cl_char_not_lessp(RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:60956 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,character,[character],[if,[characterp,character],character,[let,[[string,['designator-string',character]]],[if,[=,[length,string],1],[aref,string,0],[error,[quote,'type-error'],':datum',string,':expected-type',[quote,[string,1]]]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,character,[character],[if,[characterp,character],character,[let,[[string,['designator-string',character]]],[if,[=,[length,string],1],[aref,string,0],[error,[quote,'type-error'],':datum',string,':expected-type',[quote,[string,1]]]]]]]).
 wl:lambda_def(defun, character, cl_character, [character], [[if, [characterp, character], character, [let, [[string, [sys_designator_string, character]]], [if, [=, [length, string], 1], [aref, string, 0], [error, [quote, type_error], kw_datum, string, kw_expected_type, [quote, [string, 1]]]]]]]).
 wl:arglist_info(character, cl_character, [character], arginfo{all:[character], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[character], opt:0, req:[character], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_character).
@@ -17214,7 +16891,7 @@ cl_character(Character_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:61311 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'alpha-char-p',[character],[let,[[code,['char-code',character]]],[or,[<,64,code,91],[<,96,code,123],[<,159,code]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'alpha-char-p',[character],[let,[[code,['char-code',character]]],[or,[<,64,code,91],[<,96,code,123],[<,159,code]]]]).
 wl:lambda_def(defun, alpha_char_p, cl_alpha_char_p, [character], [[let, [[sys_code, [char_code, character]]], [or, [<, 64, sys_code, 91], [<, 96, sys_code, 123], [<, 159, sys_code]]]]).
 wl:arglist_info(alpha_char_p, cl_alpha_char_p, [character], arginfo{all:[character], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[character], opt:0, req:[character], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_alpha_char_p).
@@ -17307,7 +16984,7 @@ cl_alpha_char_p(Character_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:61469 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,alphanumericp,[character],[let,[[code,['char-code',character]]],[or,[<,47,code,58],[<,64,code,91],[<,96,code,123],[<,159,code]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,alphanumericp,[character],[let,[[code,['char-code',character]]],[or,[<,47,code,58],[<,64,code,91],[<,96,code,123],[<,159,code]]]]).
 wl:lambda_def(defun, alphanumericp, cl_alphanumericp, [character], [[let, [[sys_code, [char_code, character]]], [or, [<, 47, sys_code, 58], [<, 64, sys_code, 91], [<, 96, sys_code, 123], [<, 159, sys_code]]]]).
 wl:arglist_info(alphanumericp, cl_alphanumericp, [character], arginfo{all:[character], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[character], opt:0, req:[character], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_alphanumericp).
@@ -17408,7 +17085,7 @@ cl_alphanumericp(Character_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:61645 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'digit-char',[weight,'&optional',[radix,10]],[when,[<,weight,radix],[if,[<,weight,10],['code-char',[+,48,weight]],['code-char',[+,55,weight]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'digit-char',[weight,'&optional',[radix,10]],[when,[<,weight,radix],[if,[<,weight,10],['code-char',[+,48,weight]],['code-char',[+,55,weight]]]]]).
 wl:lambda_def(defun, digit_char, cl_digit_char, [sys_weight, c38_optional, [sys_radix, 10]], [[when, [<, sys_weight, sys_radix], [if, [<, sys_weight, 10], [code_char, [+, 48, sys_weight]], [code_char, [+, 55, sys_weight]]]]]).
 wl:arglist_info(digit_char, cl_digit_char, [sys_weight, c38_optional, [sys_radix, 10]], arginfo{all:[sys_weight, sys_radix], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_weight, sys_radix], opt:[sys_radix], req:[sys_weight], rest:0, sublists:0, whole:0}).
 wl: init_args(1, cl_digit_char).
@@ -17507,7 +17184,7 @@ cl_digit_char(Weight_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:61828 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'digit-char-p',[char,'&optional',[radix,10]],['let*',[[code,['char-code',char]],[weight,[if,[<,47,code,58],[-,code,48],[if,[<,64,code,91],[-,code,55],[when,[<,96,code,123],[-,code,87]]]]]],[and,weight,[<,weight,radix],weight]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'digit-char-p',[char,'&optional',[radix,10]],['let*',[[code,['char-code',char]],[weight,[if,[<,47,code,58],[-,code,48],[if,[<,64,code,91],[-,code,55],[when,[<,96,code,123],[-,code,87]]]]]],[and,weight,[<,weight,radix],weight]]]).
 wl:lambda_def(defun, digit_char_p, cl_digit_char_p, [char, c38_optional, [sys_radix, 10]], [[let_xx, [[sys_code, [char_code, char]], [sys_weight, [if, [<, 47, sys_code, 58], [-, sys_code, 48], [if, [<, 64, sys_code, 91], [-, sys_code, 55], [when, [<, 96, sys_code, 123], [-, sys_code, 87]]]]]], [and, sys_weight, [<, sys_weight, sys_radix], sys_weight]]]).
 wl:arglist_info(digit_char_p, cl_digit_char_p, [char, c38_optional, [sys_radix, 10]], arginfo{all:[char, sys_radix], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[char, sys_radix], opt:[sys_radix], req:[char], rest:0, sublists:0, whole:0}).
 wl: init_args(1, cl_digit_char_p).
@@ -17639,7 +17316,7 @@ cl_digit_char_p(Char_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:62126 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'standard-char-p',[character],[let,[[code,['char-code',character]]],[or,[=,code,10],[<,31,code,127]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'standard-char-p',[character],[let,[[code,['char-code',character]]],[or,[=,code,10],[<,31,code,127]]]]).
 wl:lambda_def(defun, standard_char_p, cl_standard_char_p, [character], [[let, [[sys_code, [char_code, character]]], [or, [=, sys_code, 10], [<, 31, sys_code, 127]]]]).
 wl:arglist_info(standard_char_p, cl_standard_char_p, [character], arginfo{all:[character], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[character], opt:0, req:[character], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_standard_char_p).
@@ -17724,7 +17401,7 @@ cl_standard_char_p(Character_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:62269 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'char-upcase',[character],[let,[[code,['char-code',character]]],[if,[<,96,code,123],['code-char',[-,code,32]],character]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'char-upcase',[character],[let,[[code,['char-code',character]]],[if,[<,96,code,123],['code-char',[-,code,32]],character]]]).
 wl:lambda_def(defun, char_upcase, cl_char_upcase, [character], [[let, [[sys_code, [char_code, character]]], [if, [<, 96, sys_code, 123], [code_char, [-, sys_code, 32]], character]]]).
 wl:arglist_info(char_upcase, cl_char_upcase, [character], arginfo{all:[character], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[character], opt:0, req:[character], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_char_upcase).
@@ -17810,7 +17487,7 @@ cl_char_upcase(Character_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:62432 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'char-downcase',[character],[let,[[code,['char-code',character]]],[if,[<,64,code,91],['code-char',[+,code,32]],character]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'char-downcase',[character],[let,[[code,['char-code',character]]],[if,[<,64,code,91],['code-char',[+,code,32]],character]]]).
 wl:lambda_def(defun, char_downcase, cl_char_downcase, [character], [[let, [[sys_code, [char_code, character]]], [if, [<, 64, sys_code, 91], [code_char, [+, sys_code, 32]], character]]]).
 wl:arglist_info(char_downcase, cl_char_downcase, [character], arginfo{all:[character], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[character], opt:0, req:[character], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_char_downcase).
@@ -17894,7 +17571,7 @@ cl_char_downcase(Character_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:62596 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'upper-case-p',[character],[<,64,['char-code',character],91]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'upper-case-p',[character],[<,64,['char-code',character],91]]).
 wl:lambda_def(defun, upper_case_p, cl_upper_case_p, [character], [[<, 64, [char_code, character], 91]]).
 wl:arglist_info(upper_case_p, cl_upper_case_p, [character], arginfo{all:[character], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[character], opt:0, req:[character], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_upper_case_p).
@@ -17956,7 +17633,7 @@ cl_upper_case_p(Character_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:62691 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'lower-case-p',[character],[<,96,['char-code',character],123]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'lower-case-p',[character],[<,96,['char-code',character],123]]).
 wl:lambda_def(defun, lower_case_p, cl_lower_case_p, [character], [[<, 96, [char_code, character], 123]]).
 wl:arglist_info(lower_case_p, cl_lower_case_p, [character], arginfo{all:[character], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[character], opt:0, req:[character], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_lower_case_p).
@@ -18018,7 +17695,7 @@ cl_lower_case_p(Character_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:62787 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'both-case-p',[character],[or,['upper-case-p',character],['lower-case-p',character]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'both-case-p',[character],[or,['upper-case-p',character],['lower-case-p',character]]]).
 wl:lambda_def(defun, both_case_p, cl_both_case_p, [character], [[or, [upper_case_p, character], [lower_case_p, character]]]).
 wl:arglist_info(both_case_p, cl_both_case_p, [character], arginfo{all:[character], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[character], opt:0, req:[character], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_both_case_p).
@@ -18092,7 +17769,7 @@ cl_both_case_p(Character_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:62904 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'char-int',[character],['char-code',character]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'char-int',[character],['char-code',character]]).
 wl:lambda_def(defun, char_int, cl_char_int, [character], [[char_code, character]]).
 wl:arglist_info(char_int, cl_char_int, [character], arginfo{all:[character], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[character], opt:0, req:[character], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_char_int).
@@ -18152,7 +17829,7 @@ cl_char_int(Character_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:62985 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defconstant,'char-code-limit',256])
+:-lisp_compile_to_prolog(pkg_sys,[defconstant,'char-code-limit',256]).
 :- set_var(AEnv, char_code_limit, 256).
 /*
 #+(or WAM-CL LISP500) 
@@ -18181,7 +17858,7 @@ cl_char_int(Character_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:63046 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[let,[['char-names',[quote,[[0|'$STRING'("Null")],[8|'$STRING'("Backspace")],[9|'$STRING'("Tab")],[10|'$STRING'("Newline")],[12|'$STRING'("Page")],[13|'$STRING'("Return")],[32|'$STRING'("Space")],[127|'$STRING'("Rubout")]]]]],[defun,'char-name',[character],['let*',[[code,['char-code',character]],[name,[cdr,[assoc,code,'char-names']]]],[or,name,[when,[<,code,32],['conc-string','$STRING'("U+"),['integer-string',code]]]]]],[defun,'name-char',[name],[setq,name,['designator-string',name]],[if,[<,[length,name],2],[aref,name,0],[if,[=,['char-code',[aref,name,0]],85],['code-char',['parse-integer',name,':start',2]],[let,[[code,[car,[rassoc,name,'char-names',':test',function('string-equal')]]]],[when,code,['code-char',code]]]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[let,[['char-names',[quote,[[0|'$STRING'("Null")],[8|'$STRING'("Backspace")],[9|'$STRING'("Tab")],[10|'$STRING'("Newline")],[12|'$STRING'("Page")],[13|'$STRING'("Return")],[32|'$STRING'("Space")],[127|'$STRING'("Rubout")]]]]],[defun,'char-name',[character],['let*',[[code,['char-code',character]],[name,[cdr,[assoc,code,'char-names']]]],[or,name,[when,[<,code,32],['conc-string','$STRING'("U+"),['integer-string',code]]]]]],[defun,'name-char',[name],[setq,name,['designator-string',name]],[if,[<,[length,name],2],[aref,name,0],[if,[=,['char-code',[aref,name,0]],85],['code-char',['parse-integer',name,':start',2]],[let,[[code,[car,[rassoc,name,'char-names',':test',function('string-equal')]]]],[when,code,['code-char',code]]]]]]]).
 :- LEnv=[bv(sys_char_names, [[0|'$ARRAY'([*], claz_base_character, "Null")], [8|'$ARRAY'([*], claz_base_character, "Backspace")], [9|'$ARRAY'([*], claz_base_character, "Tab")], [10|'$ARRAY'([*], claz_base_character, "Newline")], [12|'$ARRAY'([*], claz_base_character, "Page")], [13|'$ARRAY'([*], claz_base_character, "Return")], [32|'$ARRAY'([*], claz_base_character, "Space")], [127|'$ARRAY'([*], claz_base_character, "Rubout")]])|CDR].
 wl:lambda_def(defun, char_name, cl_char_name, [character], [[let_xx, [[sys_code, [char_code, character]], [sys_name, [cdr, [assoc, sys_code, sys_char_names]]]], [or, sys_name, [when, [<, sys_code, 32], [sys_conc_string, '$ARRAY'([*], claz_base_character, "U+"), [sys_integer_string, sys_code]]]]]]).
 wl:arglist_info(char_name, cl_char_name, [character], arginfo{all:[character], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[character], opt:0, req:[character], rest:0, sublists:0, whole:0}).
@@ -18417,7 +18094,7 @@ cl_char_name(Character_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:64060 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'copy-tree',[tree],[if,[consp,tree],[cons,['copy-tree',[car,tree]],['copy-tree',[cdr,tree]]],tree]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'copy-tree',[tree],[if,[consp,tree],[cons,['copy-tree',[car,tree]],['copy-tree',[cdr,tree]]],tree]]).
 wl:lambda_def(defun, copy_tree, cl_copy_tree, [sys_tree], [[if, [consp, sys_tree], [cons, [copy_tree, [car, sys_tree]], [copy_tree, [cdr, sys_tree]]], sys_tree]]).
 wl:arglist_info(copy_tree, cl_copy_tree, [sys_tree], arginfo{all:[sys_tree], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_tree], opt:0, req:[sys_tree], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_copy_tree).
@@ -18507,7 +18184,7 @@ cl_copy_tree(Tree_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:64191 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,sublis,[alist,tree,'&rest',rest],[if,[consp,tree],[let,[[a,[apply,function(sublis),alist,[car,tree],rest]],[d,[apply,function(sublis),alist,[cdr,tree],rest]]],[if,[and,[eq,a,[car,tree]],[eq,d,[cdr,tree]]],tree,[cons,a,d]]],[let,[[a,[apply,function(assoc),tree,alist,rest]]],[if,a,[cdr,a],tree]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,sublis,[alist,tree,'&rest',rest],[if,[consp,tree],[let,[[a,[apply,function(sublis),alist,[car,tree],rest]],[d,[apply,function(sublis),alist,[cdr,tree],rest]]],[if,[and,[eq,a,[car,tree]],[eq,d,[cdr,tree]]],tree,[cons,a,d]]],[let,[[a,[apply,function(assoc),tree,alist,rest]]],[if,a,[cdr,a],tree]]]]).
 wl:lambda_def(defun, sublis, cl_sublis, [sys_alist, sys_tree, c38_rest, rest], [[if, [consp, sys_tree], [let, [[sys_a, [apply, function(sublis), sys_alist, [car, sys_tree], rest]], [sys_d, [apply, function(sublis), sys_alist, [cdr, sys_tree], rest]]], [if, [and, [eq, sys_a, [car, sys_tree]], [eq, sys_d, [cdr, sys_tree]]], sys_tree, [cons, sys_a, sys_d]]], [let, [[sys_a, [apply, function(assoc), sys_tree, sys_alist, rest]]], [if, sys_a, [cdr, sys_a], sys_tree]]]]).
 wl:arglist_info(sublis, cl_sublis, [sys_alist, sys_tree, c38_rest, rest], arginfo{all:[sys_alist, sys_tree], allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[sys_alist, sys_tree, rest], opt:0, req:[sys_alist, sys_tree], rest:[rest], sublists:0, whole:0}).
 wl: init_args(2, cl_sublis).
@@ -18680,7 +18357,7 @@ cl_sublis(Alist_In, Tree_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:64535 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,nsublis,[alist,tree,'&rest',rest],[if,[consp,tree],[progn,[setf,[car,tree],[apply,function(nsublis),alist,[car,tree],rest]],[setf,[cdr,tree],[apply,function(nsublis),alist,[cdr,tree],rest]],tree],[let,[[a,[apply,function(assoc),tree,alist,rest]]],[if,a,[cdr,a],tree]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,nsublis,[alist,tree,'&rest',rest],[if,[consp,tree],[progn,[setf,[car,tree],[apply,function(nsublis),alist,[car,tree],rest]],[setf,[cdr,tree],[apply,function(nsublis),alist,[cdr,tree],rest]],tree],[let,[[a,[apply,function(assoc),tree,alist,rest]]],[if,a,[cdr,a],tree]]]]).
 /*
 :- side_effect((compile_each($, _232350160, [], [], true), append([sys_tree], [CAR12, CAR], [sys_tree, CAR12, CAR]), setf_inverse_op(car, rplaca))).
 */
@@ -18847,7 +18524,7 @@ cl_nsublis(Alist_In, Tree_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:64838 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'copy-list',[list],[if,[consp,list],[cons,[car,list],['copy-list',[cdr,list]]],list]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'copy-list',[list],[if,[consp,list],[cons,[car,list],['copy-list',[cdr,list]]],list]]).
 wl:lambda_def(defun, copy_list, cl_copy_list, [list], [[if, [consp, list], [cons, [car, list], [copy_list, [cdr, list]]], list]]).
 wl:arglist_info(copy_list, cl_copy_list, [list], arginfo{all:[list], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[list], opt:0, req:[list], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_copy_list).
@@ -18931,7 +18608,7 @@ cl_copy_list(List_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:64957 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'make-list',[size,'&key','initial-element'],[if,[=,size,0],[],[cons,'initial-element',['make-list',[-,size,1],':initial-element','initial-element']]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'make-list',[size,'&key','initial-element'],[if,[=,size,0],[],[cons,'initial-element',['make-list',[-,size,1],':initial-element','initial-element']]]]).
 wl:lambda_def(defun, make_list, cl_make_list, [sys_size, c38_key, sys_initial_element], [[if, [=, sys_size, 0], [], [cons, sys_initial_element, [make_list, [-, sys_size, 1], kw_initial_element, sys_initial_element]]]]).
 wl:arglist_info(make_list, cl_make_list, [sys_size, c38_key, sys_initial_element], arginfo{all:[sys_size], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:[sys_initial_element], names:[sys_size, sys_initial_element], opt:0, req:[sys_size], rest:0, sublists:0, whole:0}).
 wl: init_args(1, cl_make_list).
@@ -19031,7 +18708,7 @@ cl_make_list(Size_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:65145 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'list*',['&rest',objects],[if,[cdr,objects],[cons,[car,objects],[apply,function('list*'),[cdr,objects]]],[car,objects]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'list*',['&rest',objects],[if,[cdr,objects],[cons,[car,objects],[apply,function('list*'),[cdr,objects]]],[car,objects]]]).
 wl:lambda_def(defun, list_xx, cl_list_xx, [c38_rest, sys_objects], [[if, [cdr, sys_objects], [cons, [car, sys_objects], [apply, function(list_xx), [cdr, sys_objects]]], [car, sys_objects]]]).
 wl:arglist_info(list_xx, cl_list_xx, [c38_rest, sys_objects], arginfo{all:0, allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[sys_objects], opt:0, req:0, rest:[sys_objects], sublists:0, whole:0}).
 wl: init_args(0, cl_list_xx).
@@ -19130,7 +18807,7 @@ cl_list_xx(RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:65303 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'list-length',[list],[let,[[slow,list],[fast,list],[odd,[]],[len,0]],[tagbody,start,[when,[atom,fast],['return-from','list-length',len]],[setf,fast,[cdr,fast]],[setf,len,[+,1,len]],[when,odd,[setf,slow,[cdr,slow]]],[setf,odd,[not,odd]],[unless,[eq,slow,fast],[go,start]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'list-length',[list],[let,[[slow,list],[fast,list],[odd,[]],[len,0]],[tagbody,start,[when,[atom,fast],['return-from','list-length',len]],[setf,fast,[cdr,fast]],[setf,len,[+,1,len]],[when,odd,[setf,slow,[cdr,slow]]],[setf,odd,[not,odd]],[unless,[eq,slow,fast],[go,start]]]]]).
 wl:lambda_def(defun, list_length, cl_list_length, [list], [[let, [[sys_slow, list], [sys_fast, list], [sys_odd, []], [sys_len, 0]], [tagbody, start, [when, [atom, sys_fast], [return_from, list_length, sys_len]], [setf, sys_fast, [cdr, sys_fast]], [setf, sys_len, [+, 1, sys_len]], [when, sys_odd, [setf, sys_slow, [cdr, sys_slow]]], [setf, sys_odd, [not, sys_odd]], [unless, [eq, sys_slow, sys_fast], [go, start]]]]]).
 wl:arglist_info(list_length, cl_list_length, [list], arginfo{all:[list], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[list], opt:0, req:[list], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_list_length).
@@ -19233,7 +18910,7 @@ cl_list_length(List_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:65674 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,listp,[object],[or,[consp,object],[eq,object,[]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,listp,[object],[or,[consp,object],[eq,object,[]]]]).
 wl:lambda_def(defun, listp, cl_listp, [sys_object], [[or, [consp, sys_object], [eq, sys_object, []]]]).
 wl:arglist_info(listp, cl_listp, [sys_object], arginfo{all:[sys_object], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_object], opt:0, req:[sys_object], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_listp).
@@ -19305,7 +18982,7 @@ cl_listp(Object_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:65764 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,nth,[n,list],[if,[<,n,1],[car,list],[nth,[-,n,1],[cdr,list]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,nth,[n,list],[if,[<,n,1],[car,list],[nth,[-,n,1],[cdr,list]]]]).
 wl:lambda_def(defun, nth, cl_nth, [n, list], [[if, [<, n, 1], [car, list], [nth, [-, n, 1], [cdr, list]]]]).
 wl:arglist_info(nth, cl_nth, [n, list], arginfo{all:[n, list], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[n, list], opt:0, req:[n, list], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_nth).
@@ -19385,7 +19062,7 @@ cl_nth(N_In, List_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:65859 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[quote,[defun,[setf,nth],['new-object',n,list],[if,[<,n,1],[setf,[car,list],'new-object'],[setf,[nth,[-,n,1],[cdr,list]],'new-object']]]])
+:-lisp_compile_to_prolog(pkg_sys,[quote,[defun,[setf,nth],['new-object',n,list],[if,[<,n,1],[setf,[car,list],'new-object'],[setf,[nth,[-,n,1],[cdr,list]],'new-object']]]]).
 /*
 #+(or WAM-CL LISP500) 
 (defun endp (list) (not list))
@@ -19393,7 +19070,7 @@ cl_nth(N_In, List_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:66006 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,endp,[list],[not,list]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,endp,[list],[not,list]]).
 wl:lambda_def(defun, endp, cl_endp, [list], [[not, list]]).
 wl:arglist_info(endp, cl_endp, [list], arginfo{all:[list], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[list], opt:0, req:[list], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_endp).
@@ -19455,7 +19132,7 @@ cl_endp(List_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:66064 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,nconc,['&rest',lists],[if,[cdr,lists],[if,[car,lists],[progn,[setf,[cdr,[last,[car,lists]]],[apply,function(nconc),[cdr,lists]]],[car,lists]],[apply,function(nconc),[cdr,lists]]],[car,lists]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,nconc,['&rest',lists],[if,[cdr,lists],[if,[car,lists],[progn,[setf,[cdr,[last,[car,lists]]],[apply,function(nconc),[cdr,lists]]],[car,lists]],[apply,function(nconc),[cdr,lists]]],[car,lists]]]).
 /*
 :- side_effect((compile_each($, _239597094, [], [], true), append([[last, [car, sys_lists]]], [CAR12, CAR], [[last, [car, sys_lists]], CAR12, CAR]), setf_inverse_op(cdr, rplacd))).
 */
@@ -19583,7 +19260,7 @@ cl_nconc(Nconc_Param, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:66302 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,revappend,[list,tail],[if,list,[revappend,[cdr,list],[cons,[car,list],tail]],tail]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,revappend,[list,tail],[if,list,[revappend,[cdr,list],[cons,[car,list],tail]],tail]]).
 wl:lambda_def(defun, revappend, cl_revappend, [list, sys_tail], [[if, list, [revappend, [cdr, list], [cons, [car, list], sys_tail]], sys_tail]]).
 wl:arglist_info(revappend, cl_revappend, [list, sys_tail], arginfo{all:[list, sys_tail], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[list, sys_tail], opt:0, req:[list, sys_tail], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_revappend).
@@ -19670,7 +19347,7 @@ cl_revappend(List_In, Tail_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:66437 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,nreconc,[list,tail],[if,list,[let,[['new-list',[cdr,list]]],[setf,[cdr,list],tail],[nreconc,'new-list',list]],tail]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,nreconc,[list,tail],[if,list,[let,[['new-list',[cdr,list]]],[setf,[cdr,list],tail],[nreconc,'new-list',list]],tail]]).
 /*
 :- side_effect((compile_each($, LEnv, [], [], true), append([list], [CAR14, CAR], [list, CAR14, CAR]), setf_inverse_op(cdr, rplacd))).
 */
@@ -19787,7 +19464,7 @@ cl_nreconc(List_In, Tail_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:66605 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,butlast,[list,'&optional',[n,1]],['let*',[[r,[cons,[],[]]],[e,list],[m,0]],[tagbody,start,[when,[consp,e],[setf,m,[+,m,1]],[setf,e,[cdr,e]],[go,start]]],[setf,n,[-,m,n]],[setf,e,r],[tagbody,start,[unless,[consp,list],['return-from',butlast,[]]],[unless,[<,n,1],[setf,e,[setf,[cdr,e],[cons,[car,list],[]]]],[setf,list,[cdr,list]],[setf,n,[-,n,1]],[go,start]]],[cdr,r]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,butlast,[list,'&optional',[n,1]],['let*',[[r,[cons,[],[]]],[e,list],[m,0]],[tagbody,start,[when,[consp,e],[setf,m,[+,m,1]],[setf,e,[cdr,e]],[go,start]]],[setf,n,[-,m,n]],[setf,e,r],[tagbody,start,[unless,[consp,list],['return-from',butlast,[]]],[unless,[<,n,1],[setf,e,[setf,[cdr,e],[cons,[car,list],[]]]],[setf,list,[cdr,list]],[setf,n,[-,n,1]],[go,start]]],[cdr,r]]]).
 /*
 :- side_effect((compile_each($, BlockExitEnv, [], [], true), append([sys_e], [CAR50, CAR], [sys_e, CAR50, CAR]), setf_inverse_op(cdr, rplacd))).
 */
@@ -19857,7 +19534,7 @@ cl_butlast(_242489686,_242490112,_243301358):-_243858460=[bv(list,_242489686),bv
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:67097 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,nbutlast,[list,'&optional',[n,1]],['let*',[[e,list],[m,0]],[tagbody,start,[when,[consp,e],[setf,m,[+,m,1]],[setf,e,[cdr,e]],[go,start]]],[setf,n,[-,m,n]],[setf,e,list],[tagbody,start,[unless,[consp,list],['return-from',nbutlast,[]]],[unless,[<,n,2],[setf,e,[cdr,e]],[setf,n,[-,n,1]],[go,start]]],[setf,[cdr,e],[]],list]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,nbutlast,[list,'&optional',[n,1]],['let*',[[e,list],[m,0]],[tagbody,start,[when,[consp,e],[setf,m,[+,m,1]],[setf,e,[cdr,e]],[go,start]]],[setf,n,[-,m,n]],[setf,e,list],[tagbody,start,[unless,[consp,list],['return-from',nbutlast,[]]],[unless,[<,n,2],[setf,e,[cdr,e]],[setf,n,[-,n,1]],[go,start]]],[setf,[cdr,e],[]],list]]).
 /*
 :- side_effect((compile_each($, GoEnv, [], [], true), append([sys_e], [CAR71, CAR], [sys_e, CAR71, CAR]), setf_inverse_op(cdr, rplacd))).
 */
@@ -19912,7 +19589,7 @@ cl_nbutlast(_244958724,_244959150,_245534468):-_246018558=[bv(list,_244958724),b
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:67538 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,last,[list,'&optional',[n,1]],['let*',[[e,list],[m,0]],[tagbody,start,[when,[consp,e],[setf,m,[+,m,1]],[setf,e,[cdr,e]],[go,start]]],[setf,n,[-,m,n]],[setf,e,list],[tagbody,start,[when,[<,n,1],['return-from',last,e]],[setf,e,[cdr,e]],[setf,n,[-,n,1]],[go,start]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,last,[list,'&optional',[n,1]],['let*',[[e,list],[m,0]],[tagbody,start,[when,[consp,e],[setf,m,[+,m,1]],[setf,e,[cdr,e]],[go,start]]],[setf,n,[-,m,n]],[setf,e,list],[tagbody,start,[when,[<,n,1],['return-from',last,e]],[setf,e,[cdr,e]],[setf,n,[-,n,1]],[go,start]]]]).
 wl:lambda_def(defun,last,cl_last,[list,c38_optional,[n,1]],[[let_xx,[[sys_e,list],[sys_m,0]],[tagbody,start,[when,[consp,sys_e],[setf,sys_m,[+,sys_m,1]],[setf,sys_e,[cdr,sys_e]],[go,start]]],[setf,n,[-,sys_m,n]],[setf,sys_e,list],[tagbody,start,[when,[<,n,1],[return_from,last,sys_e]],[setf,sys_e,[cdr,sys_e]],[setf,n,[-,n,1]],[go,start]]]]).
 wl:arglist_info(last,cl_last,[list,c38_optional,[n,1]],arginfo{all:[list,n],allow_other_keys:0,aux:0,body:0,complex:0,env:0,key:0,names:[list,n],opt:[n],req:[list],rest:0,sublists:0,whole:0}).
 wl:init_args(1,cl_last).
@@ -19948,7 +19625,7 @@ cl_last(_247012532,_247012958,_247313282):-_247747000=[bv(list,_247012532),bv(n,
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:67918 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,ldiff,[list,object],['let*',[[r,[cons,[],[]]],[e,r]],[tagbody,start,[unless,[or,[eq,object,list],[atom,list]],[setf,e,[setf,[cdr,e],[cons,[car,list],[]]]],[setf,list,[cdr,list]],[go,start]]],[cdr,r]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,ldiff,[list,object],['let*',[[r,[cons,[],[]]],[e,r]],[tagbody,start,[unless,[or,[eq,object,list],[atom,list]],[setf,e,[setf,[cdr,e],[cons,[car,list],[]]]],[setf,list,[cdr,list]],[go,start]]],[cdr,r]]]).
 /*
 :- side_effect((compile_each($, _248704630, [], [], true), append([sys_e], [CAR19, CAR], [sys_e, CAR19, CAR]), setf_inverse_op(cdr, rplacd))).
 */
@@ -20005,7 +19682,7 @@ cl_ldiff(_248656884,_248656918,_249247604):-_249590292=[bv(list,_248656884),bv(s
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:68193 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,tailp,[object,list],[tagbody,start,[when,[eq,object,list],['return-from',tailp,t]],[unless,[consp,list],['return-from',tailp,[]]],[setf,list,[cdr,list]],[go,start]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,tailp,[object,list],[tagbody,start,[when,[eq,object,list],['return-from',tailp,t]],[unless,[consp,list],['return-from',tailp,[]]],[setf,list,[cdr,list]],[go,start]]]).
 wl:lambda_def(defun, tailp, cl_tailp, [sys_object, list], [[tagbody, start, [when, [eq, sys_object, list], [return_from, tailp, t]], [unless, [consp, list], [return_from, tailp, []]], [setf, list, [cdr, list]], [go, start]]]).
 wl:arglist_info(tailp, cl_tailp, [sys_object, list], arginfo{all:[sys_object, list], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_object, list], opt:0, req:[sys_object, list], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_tailp).
@@ -20100,7 +19777,7 @@ cl_tailp(Object_In, List_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:68531 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,rest,[list],[cdr,list]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,rest,[list],[cdr,list]]).
 wl:lambda_def(defun, rest, cl_rest, [list], [[cdr, list]]).
 wl:arglist_info(rest, cl_rest, [list], arginfo{all:[list], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[list], opt:0, req:[list], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_rest).
@@ -20200,7 +19877,7 @@ cl_rest(List_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:68591 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[labels,[['all-end',[lists],[dolist,[elem,lists,[]],[unless,elem,['return-from','all-end',t]]]],['all-car',[lists],[when,lists,[cons,[caar,lists],['all-car',[cdr,lists]]]]],['all-cdr',[lists],[when,lists,[cons,[cdar,lists],['all-cdr',[cdr,lists]]]]]],[defun,mapc,[function,'&rest',lists],[let,[['list-1',[car,lists]]],[tagbody,start,[when,['all-end',lists],['return-from',mapc,'list-1']],[apply,function,['all-car',lists]],[setf,lists,['all-cdr',lists]],[go,start]]]],[defun,mapcar,[function,'&rest',lists],[let,[[result,[]],[end,[]]],[tagbody,start,[when,['all-end',lists],['return-from',mapcar,result]],[let,[[cons,[cons,[apply,function,['all-car',lists]],[]]]],[setf,end,[if,end,[setf,[cdr,end],cons],[setf,result,cons]]]],[setf,lists,['all-cdr',lists]],[go,start]]]],[defun,mapl,[function,'&rest',lists],[let,[['list-1',[car,lists]]],[tagbody,start,[when,['all-end',lists],['return-from',mapl,'list-1']],[apply,function,lists],[setf,lists,['all-cdr',lists]],[go,start]]]],[defun,maplist,[function,'&rest',lists],[let,[[result,[]],[end,[]]],[tagbody,start,[when,['all-end',lists],['return-from',maplist,result]],[let,[[cons,[cons,[apply,function,lists],[]]]],[setf,end,[if,end,[setf,[cdr,end],cons],[setf,result,cons]]]],[setf,lists,['all-cdr',lists]],[go,start]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[labels,[['all-end',[lists],[dolist,[elem,lists,[]],[unless,elem,['return-from','all-end',t]]]],['all-car',[lists],[when,lists,[cons,[caar,lists],['all-car',[cdr,lists]]]]],['all-cdr',[lists],[when,lists,[cons,[cdar,lists],['all-cdr',[cdr,lists]]]]]],[defun,mapc,[function,'&rest',lists],[let,[['list-1',[car,lists]]],[tagbody,start,[when,['all-end',lists],['return-from',mapc,'list-1']],[apply,function,['all-car',lists]],[setf,lists,['all-cdr',lists]],[go,start]]]],[defun,mapcar,[function,'&rest',lists],[let,[[result,[]],[end,[]]],[tagbody,start,[when,['all-end',lists],['return-from',mapcar,result]],[let,[[cons,[cons,[apply,function,['all-car',lists]],[]]]],[setf,end,[if,end,[setf,[cdr,end],cons],[setf,result,cons]]]],[setf,lists,['all-cdr',lists]],[go,start]]]],[defun,mapl,[function,'&rest',lists],[let,[['list-1',[car,lists]]],[tagbody,start,[when,['all-end',lists],['return-from',mapl,'list-1']],[apply,function,lists],[setf,lists,['all-cdr',lists]],[go,start]]]],[defun,maplist,[function,'&rest',lists],[let,[[result,[]],[end,[]]],[tagbody,start,[when,['all-end',lists],['return-from',maplist,result]],[let,[[cons,[cons,[apply,function,lists],[]]]],[setf,end,[if,end,[setf,[cdr,end],cons],[setf,result,cons]]]],[setf,lists,['all-cdr',lists]],[go,start]]]]]).
 /*
 :- side_effect((compile_each($, LEnv91, [], [], true), append([end], [CAR97, CAR], [end, CAR97, CAR]), setf_inverse_op(cdr, rplacd))).
 */
@@ -20357,7 +20034,7 @@ cl_mapc(_252338032,_252339720,_252337394):-_255831474=[bv(function,_252338032),b
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:70027 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,mapcan,[function,'&rest',lists],[apply,function(nconc),[apply,function(mapcar),function,lists]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,mapcan,[function,'&rest',lists],[apply,function(nconc),[apply,function(mapcar),function,lists]]]).
 wl:lambda_def(defun, mapcan, cl_mapcan, [function, c38_rest, sys_lists], [[apply, function(nconc), [apply, function(mapcar), function, sys_lists]]]).
 wl:arglist_info(mapcan, cl_mapcan, [function, c38_rest, sys_lists], arginfo{all:[function], allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[function, sys_lists], opt:0, req:[function], rest:[sys_lists], sublists:0, whole:0}).
 wl: init_args(1, cl_mapcan).
@@ -20430,7 +20107,7 @@ cl_mapcan(Function_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:70143 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,mapcon,[function,'&rest',lists],[apply,function(nconc),[apply,function(maplist),function,lists]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,mapcon,[function,'&rest',lists],[apply,function(nconc),[apply,function(maplist),function,lists]]]).
 wl:lambda_def(defun, mapcon, cl_mapcon, [function, c38_rest, sys_lists], [[apply, function(nconc), [apply, function(maplist), function, sys_lists]]]).
 wl:arglist_info(mapcon, cl_mapcon, [function, c38_rest, sys_lists], arginfo{all:[function], allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[function, sys_lists], opt:0, req:[function], rest:[sys_lists], sublists:0, whole:0}).
 wl: init_args(1, cl_mapcon).
@@ -20502,7 +20179,7 @@ cl_mapcon(Function_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:70260 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,acons,[key,datum,alist],[cons,[cons,key,datum],alist]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,acons,[key,datum,alist],[cons,[cons,key,datum],alist]]).
 wl:lambda_def(defun, acons, cl_acons, [key, sys_datum, sys_alist], [[cons, [cons, key, sys_datum], sys_alist]]).
 wl:arglist_info(acons, cl_acons, [key, sys_datum, sys_alist], arginfo{all:[key, sys_datum, sys_alist], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[key, sys_datum, sys_alist], opt:0, req:[key, sys_datum, sys_alist], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_acons).
@@ -20573,7 +20250,7 @@ cl_acons(Key_In, Datum_In, Alist_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:70349 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'copy-alist',[alist],[when,alist,[cons,[if,[consp,[car,alist]],[cons,[caar,alist],[cdar,alist]],[car,alist]],['copy-alist',[cdr,alist]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'copy-alist',[alist],[when,alist,[cons,[if,[consp,[car,alist]],[cons,[caar,alist],[cdar,alist]],[car,alist]],['copy-alist',[cdr,alist]]]]]).
 wl:lambda_def(defun, copy_alist, cl_copy_alist, [sys_alist], [[when, sys_alist, [cons, [if, [consp, [car, sys_alist]], [cons, [caar, sys_alist], [cdar, sys_alist]], [car, sys_alist]], [copy_alist, [cdr, sys_alist]]]]]).
 wl:arglist_info(copy_alist, cl_copy_alist, [sys_alist], arginfo{all:[sys_alist], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_alist], opt:0, req:[sys_alist], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_copy_alist).
@@ -20682,7 +20359,7 @@ cl_copy_alist(Alist_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:70536 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,pairlis,[keys,data,'&optional',alist],[tagbody,start,[when,[and,keys,data],[setf,alist,[acons,[car,keys],[car,data],alist]],[setf,keys,[cdr,keys]],[setf,data,[cdr,data]],[go,start]]],alist])
+:-lisp_compile_to_prolog(pkg_sys,[defun,pairlis,[keys,data,'&optional',alist],[tagbody,start,[when,[and,keys,data],[setf,alist,[acons,[car,keys],[car,data],alist]],[setf,keys,[cdr,keys]],[setf,data,[cdr,data]],[go,start]]],alist]).
 wl:lambda_def(defun,pairlis,cl_pairlis,[sys_keys,sys_data,c38_optional,sys_alist],[[tagbody,start,[when,[and,sys_keys,sys_data],[setf,sys_alist,[acons,[car,sys_keys],[car,sys_data],sys_alist]],[setf,sys_keys,[cdr,sys_keys]],[setf,sys_data,[cdr,sys_data]],[go,start]]],sys_alist]).
 wl:arglist_info(pairlis,cl_pairlis,[sys_keys,sys_data,c38_optional,sys_alist],arginfo{all:[sys_keys,sys_data,sys_alist],allow_other_keys:0,aux:0,body:0,complex:0,env:0,key:0,names:[sys_keys,sys_data,sys_alist],opt:[sys_alist],req:[sys_keys,sys_data],rest:0,sublists:0,whole:0}).
 wl:init_args(2,cl_pairlis).
@@ -20718,7 +20395,7 @@ cl_pairlis(_261306050,_261306084,_261306546,_261512754):-_261427282=[bv(sys_keys
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:70810 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'some-list-2',[predicate,list1,list2],[tagbody,start,[when,[and,list1,list2],[when,[funcall,predicate,[car,list1],[car,list2]],['return-from','some-list-2',t]],[pop,list1],[pop,list2],[go,start]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'some-list-2',[predicate,list1,list2],[tagbody,start,[when,[and,list1,list2],[when,[funcall,predicate,[car,list1],[car,list2]],['return-from','some-list-2',t]],[pop,list1],[pop,list2],[go,start]]]]).
 wl:lambda_def(defun, sys_some_list_2, f_sys_some_list_2, [predicate, sys_list1, sys_list2], [[tagbody, start, [when, [and, sys_list1, sys_list2], [when, [funcall, predicate, [car, sys_list1], [car, sys_list2]], [return_from, sys_some_list_2, t]], [pop, sys_list1], [pop, sys_list2], [go, start]]]]).
 wl:arglist_info(sys_some_list_2, f_sys_some_list_2, [predicate, sys_list1, sys_list2], arginfo{all:[predicate, sys_list1, sys_list2], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[predicate, sys_list1, sys_list2], opt:0, req:[predicate, sys_list1, sys_list2], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, f_sys_some_list_2).
@@ -21253,7 +20930,7 @@ f_sys_some_list_2(Predicate_In, List1_In, List2_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:71086 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[flet,[[satisfies,[object,elem,'&key',key,test,'test-not'],['let*',[[zi,[if,key,[funcall,key,elem],elem]],[r,[funcall,[or,test,'test-not',function(eql)],object,zi]]],[if,'test-not',[not,r],r]]],['satisfies-if',[predicate,elem,'&key',key],[funcall,predicate,[if,key,[funcall,key,elem],elem]]],['satisfies-if-not',[predicate,elem,'&key',key],[not,[funcall,predicate,[if,key,[funcall,key,elem],elem]]]],['seq-start',[sequence,'&key',[start,0],end,'from-end'],[if,[listp,sequence],[if,'from-end',[let,[[acc,[]],[sequence,[nthcdr,start,sequence]]],[tagbody,start,[when,[and,sequence,[or,[not,end],[<,start,end]]],[push,sequence,acc],[setf,sequence,[cdr,sequence]],[setf,start,[+,1,start]],[go,start]]],[list,3,acc,start]],[list,2,[nthcdr,start,sequence],start]],[if,'from-end',[cons,1,[-,end,1]],[cons,0,start]]]],['seq-position',[iter],[case,[car,iter],[[0,1],[cdr,iter]],[t,[caddr,iter]]]],['seq-next',[iter],[case,[car,iter],[0,[setf,[cdr,iter],[+,1,[cdr,iter]]]],[1,[setf,[cdr,iter],[-,[cdr,iter],1]]],[2,[setf,[cadr,iter],[cdadr,iter]],[setf,[caddr,iter],[+,1,[caddr,iter]]]],[t,[setf,[cadr,iter],[cdadr,iter]],[setf,[caddr,iter],[-,[caddr,iter],1]]]]],['seq-ref',[sequence,iter],[case,[car,iter],[[0,1],[aref,sequence,[cdr,iter]]],[2,[caadr,iter]],[t,[caaadr,iter]]]],['seq-set',[sequence,iter,value],[case,[car,iter],[[0,1],[setf,[aref,sequence,[cdr,iter]],value]],[2,[setf,[caadr,iter],value]],[t,[setf,[caaadr,iter],value]]]],['seq-end-p',[sequence,iter,'&key',start,end,'from-end'],[case,[car,iter],[0,[or,[=,[cdr,iter],[length,sequence]],[and,end,[=,end,[cdr,iter]]]]],[1,[<,[cdr,iter],start]],[2,[or,[null,[cadr,iter]],[and,end,[=,end,[caddr,iter]]]]],[t,[or,[null,[cadr,iter]],[<,[caddr,iter],start]]]]],['seq-result',[sequence,iter,result],[case,[car,iter],[0,['make-array',[length,result],':element-type',['array-element-type',sequence],':initial-contents',[reverse,result]]],[1,['make-array',[length,result],':element-type',['array-element-type',sequence],':initial-contents',result]],[2,[reverse,result]],[3,result]]]],[defun,subst,[new,old,tree,'&rest',rest],[if,[consp,tree],[let,[[a,[apply,function(subst),new,old,[car,tree],rest]],[d,[apply,function(subst),new,old,[cdr,tree],rest]]],[if,[and,[eq,a,[car,tree]],[eq,d,[cdr,tree]]],tree,[cons,a,d]]],[if,[apply,function(satisfies),old,tree,rest],new,tree]]],[defun,'subst-if',[new,predicate,tree,'&rest',rest],[if,[consp,tree],[let,[[a,[apply,function(subst),new,predicate,[car,tree],rest]],[d,[apply,function(subst),new,predicate,[cdr,tree],rest]]],[if,[and,[eq,a,[car,tree]],[eq,d,[cdr,tree]]],tree,[cons,a,d]]],[if,[apply,function('satisfies-if'),predicate,tree,rest],new,tree]]],[defun,'subst-if-not',[new,predicate,tree,'&rest',rest],[if,[consp,tree],[let,[[a,[apply,function(subst),new,predicate,[car,tree],rest]],[d,[apply,function(subst),new,predicate,[cdr,tree],rest]]],[if,[and,[eq,a,[car,tree]],[eq,d,[cdr,tree]]],tree,[cons,a,d]]],[if,[apply,function('satisfies-if-not'),predicate,tree,rest],new,tree]]],[defun,nsubst,[new,old,tree,'&rest',rest],[if,[consp,tree],[progn,[setf,[car,tree],[apply,function(subst),new,old,[car,tree],rest]],[setf,[cdr,tree],[apply,function(subst),new,old,[cdr,tree],rest]],tree],[if,[apply,function(satisfies),old,tree,rest],new,tree]]],[defun,'nsubst-if',[new,predicate,tree,'&rest',rest],[if,[consp,tree],[progn,[setf,[car,tree],[apply,function(subst),new,predicate,[car,tree],rest]],[setf,[cdr,tree],[apply,function(subst),new,predicate,[cdr,tree],rest]],tree],[if,[apply,function('satisfies-if'),predicate,tree,rest],new,tree]]],[defun,'nsubst-if-not',[new,predicate,tree,'&rest',rest],[if,[consp,tree],[progn,[setf,[car,tree],[apply,function(subst),new,predicate,[car,tree],rest]],[setf,[cdr,tree],[apply,function(subst),new,predicate,[cdr,tree],rest]],tree],[if,[apply,function('satisfies-if-not'),predicate,tree,rest],new,tree]]],[defun,'assoc-if',[predicate,alist,'&rest',rest],[dolist,[elem,alist],[when,[apply,function('satisfies-if'),predicate,[car,elem],rest],['return-from','assoc-if',elem]]]],[defun,'assoc-if-not',[predicate,alist,'&rest',rest],[dolist,[elem,alist],[when,[apply,function('satisfies-if-not'),predicate,[car,elem],rest],['return-from','assoc-if-not',elem]]]],[defun,rassoc,[item,alist,'&rest',rest],[dolist,[elem,alist],[when,[apply,function(satisfies),item,[cdr,elem],rest],['return-from',rassoc,elem]]]],[defun,'rassoc-if',[predicate,alist,'&rest',rest],[dolist,[elem,alist],[when,[apply,function('satisfies-if'),predicate,[cdr,elem],rest],['return-from','rassoc-if',elem]]]],[defun,'rassoc-if-not',[predicate,alist,'&rest',rest],[dolist,[elem,alist],[when,[apply,function('satisfies-if-not'),predicate,[cdr,elem],rest],['return-from','rassoc-if-not',elem]]]],[defun,adjoin,[item,list,'&rest',rest],[dolist,[elem,list,[cons,item,list]],[when,[apply,function(satisfies),item,elem,rest],['return-from',adjoin,list]]]],[defun,'set-exclusive-or',['list-1','list-2','&rest',rest,'&key',key],[let,[[result,[]]],[dolist,[item,'list-1'],[unless,[apply,function(member),[if,key,[funcall,key,item],item],'list-2',rest],[push,item,result]]],[dolist,[item,'list-2'],[block,matches,[dolist,[elem,'list-1'],[when,[apply,function(satisfies),[if,key,[funcall,key,elem],elem],item,rest],['return-from',matches]]],[push,item,result]]],result]],[defun,'nset-exclusive-or',['list-1','list-2','&rest',rest,'&key',key],[let,[[result,[]],[list,[]],[item,[]]],[tagbody,'start-1',[unless,'list-1',[go,'start-2']],[setf,item,[car,'list-1']],[setf,list,'list-2'],[setf,prev,[]],'start-1-in',[unless,list,[go,'end-1-in']],[let,[[elem,[if,key,[funcall,key,[car,list]],[car,list]]]],[when,[apply,function(satisfies),item,[if,key,[funcall,key,elem],elem],rest],[if,prev,[setf,[cdr,prev],[cdr,list]],[setf,'list-2',[cdr,list]]],[setf,'list-1',[cdr,'list-1']],[go,'start-1']]],[setf,prev,list],[setf,list,[cdr,list]],[go,'start-1-in'],'end-1-in',[setf,item,[cdr,'list-1']],[setf,[cdr,'list-1'],result],[unless,result,[setf,end,'list-1']],[setf,result,'list-1'],[setf,'list-1',item],[go,'start-1'],'start-2',['return-from','nset-exclusive-or',[if,end,[progn,[setf,[cdr,end],'list-2'],result],'list-2']]]]],[defun,fill,[sequence,item,'&rest',rest],[let,[[iter,[apply,function('seq-start'),sequence,rest]]],[tagbody,start,[unless,[apply,function('seq-end-p'),sequence,iter,rest],['seq-set',sequence,iter,item],['seq-next',iter],[go,start]]]],sequence],[defun,every,[predicate,'&rest',sequences],[let,[[iters,[mapcar,function('seq-start'),sequences]]],[tagbody,start,[unless,['some-list-2',function('seq-end-p'),sequences,iters],[unless,[apply,predicate,[mapcar,function('seq-ref'),sequences,iters]],['return-from',every,[]]],[mapc,function('seq-next'),iters],[go,start]]]],t],[defun,some,[predicate,'&rest',sequences],[let,[[iters,[mapcar,function('seq-start'),sequences]]],[tagbody,start,[unless,['some-list-2',function('seq-end-p'),sequences,iters],[let,[[result,[apply,predicate,[mapcar,function('seq-ref'),sequences,iters]]]],[when,result,['return-from',some,result]]],[mapc,function('seq-next'),iters],[go,start]]]]],[defun,notevery,[predicate,'&rest',sequences],[let,[[iters,[mapcar,function('seq-start'),sequences]]],[tagbody,start,[unless,['some-list-2',function('seq-end-p'),sequences,iters],[unless,[apply,predicate,[mapcar,function('seq-ref'),sequences,iters]],['return-from',every,t]],[mapc,function('seq-next'),iters],[go,start]]]]],[defun,notany,[predicate,'&rest',sequences],[let,[[iters,[mapcar,function('seq-start'),sequences]]],[tagbody,start,[unless,['some-list-2',function('seq-end-p'),sequences,iters],[when,[apply,predicate,[mapcar,function('seq-ref'),sequences,iters]],['return-from',every,[]]],[mapc,function('seq-next'),iters],[go,start]]]],t],[defun,'map-into',['result-sequence',function,'&rest',sequences],[let,[['result-iter',['seq-start','result-sequence']],[iters,[mapcar,function('seq-start'),sequences]]],[tagbody,start,[unless,['some-list-2',function('seq-end-p'),sequences,iters],['seq-set','result-sequence','result-iter',[apply,function,[mapcar,function('seq-ref'),sequences,iters]]],['seq-next','result-iter'],[mapc,function('seq-next'),iters],[go,start]]]],'result-sequence'],[defun,reduce,[function,sequence,'&rest',rest],[let,[[iter,[apply,function('seq-start'),sequence,rest]]],[if,[apply,function('seq-end-p'),sequence,iter,rest],[funcall,function],[let,[[elem,['seq-ref',sequence,iter]]],['seq-next',iter],[unless,[apply,function('seq-end-p'),sequence,iter,rest],[tagbody,start,[setq,elem,[funcall,function,elem,['seq-ref',sequence,iter]]],['seq-next',iter],[unless,[apply,function('seq-end-p'),sequence,iter,rest],[go,start]]]],elem]]]],[defun,count,[item,sequence,'&rest',rest],[let,[[iter,[apply,function('seq-start'),sequence,rest]],[count,0]],[tagbody,start,[unless,[apply,function('seq-end-p'),sequence,iter,rest],[when,[apply,function(satisfies),item,['seq-ref',sequence,iter],rest],[setf,count,[+,1,count]]],['seq-next',iter],[go,start]]],count]],[defun,'count-if',[predicate,sequence,'&rest',rest],[let,[[iter,[apply,function('seq-start'),sequence,rest]],[count,0]],[tagbody,start,[unless,[apply,function('seq-end-p'),sequence,iter,rest],[when,[apply,function('satisfies-if'),predicate,['seq-ref',sequence,iter],rest],[setf,count,[+,1,count]]],['seq-next',iter],[go,start]]],count]],[defun,'count-if-not',[predicate,sequence,'&rest',rest],[let,[[iter,[apply,function('seq-start'),sequence,rest]],[count,0]],[tagbody,start,[unless,[apply,function('seq-end-p'),sequence,iter,rest],[when,[apply,function('satisfies-if-not'),predicate,['seq-ref',sequence,iter],rest],[setf,count,[+,1,count]]],['seq-next',iter],[go,start]]],count]],[defun,remove,[item,sequence,'&rest',rest,'&key',count],[let,[[iter,[apply,function('seq-start'),sequence,rest]],[result,[]]],[tagbody,start,[unless,[apply,function('seq-end-p'),sequence,iter,rest],[let,[[elem,['seq-ref',sequence,iter]]],[unless,[and,[apply,function(satisfies),item,elem,rest],[or,[not,count],[not,[minusp,[decf,count]]]]],[push,elem,result]]],['seq-next',iter],[go,start]]],['seq-result',sequence,iter,result]]],[defun,'remove-if',[predicate,sequence,'&rest',rest,'&key',count],[let,[[iter,[apply,function('seq-start'),sequence,rest]],[result,[]]],[tagbody,start,[unless,[apply,function('seq-end-p'),sequence,iter,rest],[let,[[elem,['seq-ref',sequence,iter]]],[unless,[and,[apply,function('satisfies-if'),predicate,elem,rest],[or,[not,count],[not,[minusp,[decf,count]]]]],[push,elem,result]]],['seq-next',iter],[go,start]]],['seq-result',sequence,iter,result]]],[defun,'remove-if-not',[predicate,sequence,'&rest',rest,'&key',count],[let,[[iter,[apply,function('seq-start'),sequence,rest]],[result,[]]],[tagbody,start,[unless,[apply,function('seq-end-p'),sequence,iter,rest],[let,[[elem,['seq-ref',sequence,iter]]],[unless,[and,[apply,function('satisfies-if-not'),predicate,elem,rest],[or,[not,count],[not,[minusp,[decf,count]]]]],[push,elem,result]]],['seq-next',iter],[go,start]]],['seq-result',sequence,iter,result]]]])
+:-lisp_compile_to_prolog(pkg_sys,[flet,[[satisfies,[object,elem,'&key',key,test,'test-not'],['let*',[[zi,[if,key,[funcall,key,elem],elem]],[r,[funcall,[or,test,'test-not',function(eql)],object,zi]]],[if,'test-not',[not,r],r]]],['satisfies-if',[predicate,elem,'&key',key],[funcall,predicate,[if,key,[funcall,key,elem],elem]]],['satisfies-if-not',[predicate,elem,'&key',key],[not,[funcall,predicate,[if,key,[funcall,key,elem],elem]]]],['seq-start',[sequence,'&key',[start,0],end,'from-end'],[if,[listp,sequence],[if,'from-end',[let,[[acc,[]],[sequence,[nthcdr,start,sequence]]],[tagbody,start,[when,[and,sequence,[or,[not,end],[<,start,end]]],[push,sequence,acc],[setf,sequence,[cdr,sequence]],[setf,start,[+,1,start]],[go,start]]],[list,3,acc,start]],[list,2,[nthcdr,start,sequence],start]],[if,'from-end',[cons,1,[-,end,1]],[cons,0,start]]]],['seq-position',[iter],[case,[car,iter],[[0,1],[cdr,iter]],[t,[caddr,iter]]]],['seq-next',[iter],[case,[car,iter],[0,[setf,[cdr,iter],[+,1,[cdr,iter]]]],[1,[setf,[cdr,iter],[-,[cdr,iter],1]]],[2,[setf,[cadr,iter],[cdadr,iter]],[setf,[caddr,iter],[+,1,[caddr,iter]]]],[t,[setf,[cadr,iter],[cdadr,iter]],[setf,[caddr,iter],[-,[caddr,iter],1]]]]],['seq-ref',[sequence,iter],[case,[car,iter],[[0,1],[aref,sequence,[cdr,iter]]],[2,[caadr,iter]],[t,[caaadr,iter]]]],['seq-set',[sequence,iter,value],[case,[car,iter],[[0,1],[setf,[aref,sequence,[cdr,iter]],value]],[2,[setf,[caadr,iter],value]],[t,[setf,[caaadr,iter],value]]]],['seq-end-p',[sequence,iter,'&key',start,end,'from-end'],[case,[car,iter],[0,[or,[=,[cdr,iter],[length,sequence]],[and,end,[=,end,[cdr,iter]]]]],[1,[<,[cdr,iter],start]],[2,[or,[null,[cadr,iter]],[and,end,[=,end,[caddr,iter]]]]],[t,[or,[null,[cadr,iter]],[<,[caddr,iter],start]]]]],['seq-result',[sequence,iter,result],[case,[car,iter],[0,['make-array',[length,result],':element-type',['array-element-type',sequence],':initial-contents',[reverse,result]]],[1,['make-array',[length,result],':element-type',['array-element-type',sequence],':initial-contents',result]],[2,[reverse,result]],[3,result]]]],[defun,subst,[new,old,tree,'&rest',rest],[if,[consp,tree],[let,[[a,[apply,function(subst),new,old,[car,tree],rest]],[d,[apply,function(subst),new,old,[cdr,tree],rest]]],[if,[and,[eq,a,[car,tree]],[eq,d,[cdr,tree]]],tree,[cons,a,d]]],[if,[apply,function(satisfies),old,tree,rest],new,tree]]],[defun,'subst-if',[new,predicate,tree,'&rest',rest],[if,[consp,tree],[let,[[a,[apply,function(subst),new,predicate,[car,tree],rest]],[d,[apply,function(subst),new,predicate,[cdr,tree],rest]]],[if,[and,[eq,a,[car,tree]],[eq,d,[cdr,tree]]],tree,[cons,a,d]]],[if,[apply,function('satisfies-if'),predicate,tree,rest],new,tree]]],[defun,'subst-if-not',[new,predicate,tree,'&rest',rest],[if,[consp,tree],[let,[[a,[apply,function(subst),new,predicate,[car,tree],rest]],[d,[apply,function(subst),new,predicate,[cdr,tree],rest]]],[if,[and,[eq,a,[car,tree]],[eq,d,[cdr,tree]]],tree,[cons,a,d]]],[if,[apply,function('satisfies-if-not'),predicate,tree,rest],new,tree]]],[defun,nsubst,[new,old,tree,'&rest',rest],[if,[consp,tree],[progn,[setf,[car,tree],[apply,function(subst),new,old,[car,tree],rest]],[setf,[cdr,tree],[apply,function(subst),new,old,[cdr,tree],rest]],tree],[if,[apply,function(satisfies),old,tree,rest],new,tree]]],[defun,'nsubst-if',[new,predicate,tree,'&rest',rest],[if,[consp,tree],[progn,[setf,[car,tree],[apply,function(subst),new,predicate,[car,tree],rest]],[setf,[cdr,tree],[apply,function(subst),new,predicate,[cdr,tree],rest]],tree],[if,[apply,function('satisfies-if'),predicate,tree,rest],new,tree]]],[defun,'nsubst-if-not',[new,predicate,tree,'&rest',rest],[if,[consp,tree],[progn,[setf,[car,tree],[apply,function(subst),new,predicate,[car,tree],rest]],[setf,[cdr,tree],[apply,function(subst),new,predicate,[cdr,tree],rest]],tree],[if,[apply,function('satisfies-if-not'),predicate,tree,rest],new,tree]]],[defun,'assoc-if',[predicate,alist,'&rest',rest],[dolist,[elem,alist],[when,[apply,function('satisfies-if'),predicate,[car,elem],rest],['return-from','assoc-if',elem]]]],[defun,'assoc-if-not',[predicate,alist,'&rest',rest],[dolist,[elem,alist],[when,[apply,function('satisfies-if-not'),predicate,[car,elem],rest],['return-from','assoc-if-not',elem]]]],[defun,rassoc,[item,alist,'&rest',rest],[dolist,[elem,alist],[when,[apply,function(satisfies),item,[cdr,elem],rest],['return-from',rassoc,elem]]]],[defun,'rassoc-if',[predicate,alist,'&rest',rest],[dolist,[elem,alist],[when,[apply,function('satisfies-if'),predicate,[cdr,elem],rest],['return-from','rassoc-if',elem]]]],[defun,'rassoc-if-not',[predicate,alist,'&rest',rest],[dolist,[elem,alist],[when,[apply,function('satisfies-if-not'),predicate,[cdr,elem],rest],['return-from','rassoc-if-not',elem]]]],[defun,adjoin,[item,list,'&rest',rest],[dolist,[elem,list,[cons,item,list]],[when,[apply,function(satisfies),item,elem,rest],['return-from',adjoin,list]]]],[defun,'set-exclusive-or',['list-1','list-2','&rest',rest,'&key',key],[let,[[result,[]]],[dolist,[item,'list-1'],[unless,[apply,function(member),[if,key,[funcall,key,item],item],'list-2',rest],[push,item,result]]],[dolist,[item,'list-2'],[block,matches,[dolist,[elem,'list-1'],[when,[apply,function(satisfies),[if,key,[funcall,key,elem],elem],item,rest],['return-from',matches]]],[push,item,result]]],result]],[defun,'nset-exclusive-or',['list-1','list-2','&rest',rest,'&key',key],[let,[[result,[]],[list,[]],[item,[]]],[tagbody,'start-1',[unless,'list-1',[go,'start-2']],[setf,item,[car,'list-1']],[setf,list,'list-2'],[setf,prev,[]],'start-1-in',[unless,list,[go,'end-1-in']],[let,[[elem,[if,key,[funcall,key,[car,list]],[car,list]]]],[when,[apply,function(satisfies),item,[if,key,[funcall,key,elem],elem],rest],[if,prev,[setf,[cdr,prev],[cdr,list]],[setf,'list-2',[cdr,list]]],[setf,'list-1',[cdr,'list-1']],[go,'start-1']]],[setf,prev,list],[setf,list,[cdr,list]],[go,'start-1-in'],'end-1-in',[setf,item,[cdr,'list-1']],[setf,[cdr,'list-1'],result],[unless,result,[setf,end,'list-1']],[setf,result,'list-1'],[setf,'list-1',item],[go,'start-1'],'start-2',['return-from','nset-exclusive-or',[if,end,[progn,[setf,[cdr,end],'list-2'],result],'list-2']]]]],[defun,fill,[sequence,item,'&rest',rest],[let,[[iter,[apply,function('seq-start'),sequence,rest]]],[tagbody,start,[unless,[apply,function('seq-end-p'),sequence,iter,rest],['seq-set',sequence,iter,item],['seq-next',iter],[go,start]]]],sequence],[defun,every,[predicate,'&rest',sequences],[let,[[iters,[mapcar,function('seq-start'),sequences]]],[tagbody,start,[unless,['some-list-2',function('seq-end-p'),sequences,iters],[unless,[apply,predicate,[mapcar,function('seq-ref'),sequences,iters]],['return-from',every,[]]],[mapc,function('seq-next'),iters],[go,start]]]],t],[defun,some,[predicate,'&rest',sequences],[let,[[iters,[mapcar,function('seq-start'),sequences]]],[tagbody,start,[unless,['some-list-2',function('seq-end-p'),sequences,iters],[let,[[result,[apply,predicate,[mapcar,function('seq-ref'),sequences,iters]]]],[when,result,['return-from',some,result]]],[mapc,function('seq-next'),iters],[go,start]]]]],[defun,notevery,[predicate,'&rest',sequences],[let,[[iters,[mapcar,function('seq-start'),sequences]]],[tagbody,start,[unless,['some-list-2',function('seq-end-p'),sequences,iters],[unless,[apply,predicate,[mapcar,function('seq-ref'),sequences,iters]],['return-from',every,t]],[mapc,function('seq-next'),iters],[go,start]]]]],[defun,notany,[predicate,'&rest',sequences],[let,[[iters,[mapcar,function('seq-start'),sequences]]],[tagbody,start,[unless,['some-list-2',function('seq-end-p'),sequences,iters],[when,[apply,predicate,[mapcar,function('seq-ref'),sequences,iters]],['return-from',every,[]]],[mapc,function('seq-next'),iters],[go,start]]]],t],[defun,'map-into',['result-sequence',function,'&rest',sequences],[let,[['result-iter',['seq-start','result-sequence']],[iters,[mapcar,function('seq-start'),sequences]]],[tagbody,start,[unless,['some-list-2',function('seq-end-p'),sequences,iters],['seq-set','result-sequence','result-iter',[apply,function,[mapcar,function('seq-ref'),sequences,iters]]],['seq-next','result-iter'],[mapc,function('seq-next'),iters],[go,start]]]],'result-sequence'],[defun,reduce,[function,sequence,'&rest',rest],[let,[[iter,[apply,function('seq-start'),sequence,rest]]],[if,[apply,function('seq-end-p'),sequence,iter,rest],[funcall,function],[let,[[elem,['seq-ref',sequence,iter]]],['seq-next',iter],[unless,[apply,function('seq-end-p'),sequence,iter,rest],[tagbody,start,[setq,elem,[funcall,function,elem,['seq-ref',sequence,iter]]],['seq-next',iter],[unless,[apply,function('seq-end-p'),sequence,iter,rest],[go,start]]]],elem]]]],[defun,count,[item,sequence,'&rest',rest],[let,[[iter,[apply,function('seq-start'),sequence,rest]],[count,0]],[tagbody,start,[unless,[apply,function('seq-end-p'),sequence,iter,rest],[when,[apply,function(satisfies),item,['seq-ref',sequence,iter],rest],[setf,count,[+,1,count]]],['seq-next',iter],[go,start]]],count]],[defun,'count-if',[predicate,sequence,'&rest',rest],[let,[[iter,[apply,function('seq-start'),sequence,rest]],[count,0]],[tagbody,start,[unless,[apply,function('seq-end-p'),sequence,iter,rest],[when,[apply,function('satisfies-if'),predicate,['seq-ref',sequence,iter],rest],[setf,count,[+,1,count]]],['seq-next',iter],[go,start]]],count]],[defun,'count-if-not',[predicate,sequence,'&rest',rest],[let,[[iter,[apply,function('seq-start'),sequence,rest]],[count,0]],[tagbody,start,[unless,[apply,function('seq-end-p'),sequence,iter,rest],[when,[apply,function('satisfies-if-not'),predicate,['seq-ref',sequence,iter],rest],[setf,count,[+,1,count]]],['seq-next',iter],[go,start]]],count]],[defun,remove,[item,sequence,'&rest',rest,'&key',count],[let,[[iter,[apply,function('seq-start'),sequence,rest]],[result,[]]],[tagbody,start,[unless,[apply,function('seq-end-p'),sequence,iter,rest],[let,[[elem,['seq-ref',sequence,iter]]],[unless,[and,[apply,function(satisfies),item,elem,rest],[or,[not,count],[not,[minusp,[decf,count]]]]],[push,elem,result]]],['seq-next',iter],[go,start]]],['seq-result',sequence,iter,result]]],[defun,'remove-if',[predicate,sequence,'&rest',rest,'&key',count],[let,[[iter,[apply,function('seq-start'),sequence,rest]],[result,[]]],[tagbody,start,[unless,[apply,function('seq-end-p'),sequence,iter,rest],[let,[[elem,['seq-ref',sequence,iter]]],[unless,[and,[apply,function('satisfies-if'),predicate,elem,rest],[or,[not,count],[not,[minusp,[decf,count]]]]],[push,elem,result]]],['seq-next',iter],[go,start]]],['seq-result',sequence,iter,result]]],[defun,'remove-if-not',[predicate,sequence,'&rest',rest,'&key',count],[let,[[iter,[apply,function('seq-start'),sequence,rest]],[result,[]]],[tagbody,start,[unless,[apply,function('seq-end-p'),sequence,iter,rest],[let,[[elem,['seq-ref',sequence,iter]]],[unless,[and,[apply,function('satisfies-if-not'),predicate,elem,rest],[or,[not,count],[not,[minusp,[decf,count]]]]],[push,elem,result]]],['seq-next',iter],[go,start]]],['seq-result',sequence,iter,result]]]]).
 /*
 % case:-[[[0,1],[cdr,sys_iter]],[t,[caddr,sys_iter]]].
 */
@@ -21799,7 +21476,7 @@ f_sys_seq_result1(_268670148,_268671050,_268669164,_268668932):-_278243638=[bv(s
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:85952 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,mod,[x,y],['multiple-value-call',function([lambda,[q,r],r]),[floor,x,y]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,mod,[x,y],['multiple-value-call',function([lambda,[q,r],r]),[floor,x,y]]]).
 wl:lambda_def(defun, mod, cl_mod, [sys_x, sys_y], [[multiple_value_call, function([lambda, [sys_q, sys_r], sys_r]), [floor, sys_x, sys_y]]]).
 wl:arglist_info(mod, cl_mod, [sys_x, sys_y], arginfo{all:[sys_x, sys_y], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_x, sys_y], opt:0, req:[sys_x, sys_y], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, cl_mod).
@@ -21896,7 +21573,7 @@ cl_mod(X_In, Y_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:86151 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,coerce,[object,'result-type'],[if,[typep,object,'result-type'],object,[case,'result-type',[[t],object],[character,[character,object]],[function,[if,[and,[consp,object],[eq,[car,object],[quote,lambda]]],[eval,[list,[quote,function],object]],[if,[fboundp,object],[fdefinition,object]],[error,[quote,'type-error'],':datum',object,':expected-type','result-type']]],[t,[error,[quote,'type-error'],':datum',object,':expected-type','result-type']]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,coerce,[object,'result-type'],[if,[typep,object,'result-type'],object,[case,'result-type',[[t],object],[character,[character,object]],[function,[if,[and,[consp,object],[eq,[car,object],[quote,lambda]]],[eval,[list,[quote,function],object]],[if,[fboundp,object],[fdefinition,object]],[error,[quote,'type-error'],':datum',object,':expected-type','result-type']]],[t,[error,[quote,'type-error'],':datum',object,':expected-type','result-type']]]]]).
 /*
 % case:-[[[t],sys_object],[character,[character,sys_object]],[function,[if,[and,[consp,sys_object],[eq,[car,sys_object],[quote,lambda]]],[eval,[list,[quote,function],sys_object]],[if,[fboundp,sys_object],[fdefinition,sys_object]],[error,[quote,type_error],kw_datum,sys_object,kw_expected_type,sys_result_type]]],[t,[error,[quote,type_error],kw_datum,sys_object,kw_expected_type,sys_result_type]]].
 */
@@ -22089,7 +21766,7 @@ cl_coerce(Object_In, Result_type_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:86646 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defmacro,deftype,[name,'lambda-list','&rest',forms],['#BQ',['ensure-type',[quote,['#COMMA',name]],function([lambda,['#COMMA','lambda-list'],[block,['#COMMA',name],['#BQ-COMMA-ELIPSE',forms]]])]]])
+:-lisp_compile_to_prolog(pkg_sys,[defmacro,deftype,[name,'lambda-list','&rest',forms],['#BQ',['ensure-type',[quote,['#COMMA',name]],function([lambda,['#COMMA','lambda-list'],[block,['#COMMA',name],['#BQ-COMMA-ELIPSE',forms]]])]]]).
 wl:lambda_def(defmacro, deftype, cl_deftype, [sys_name, sys_lambda_list, c38_rest, forms], [progn, ['#BQ', [sys_ensure_type, [quote, ['#COMMA', sys_name]], function([lambda, ['#COMMA', sys_lambda_list], [block, ['#COMMA', sys_name], ['#BQ-COMMA-ELIPSE', forms]]])]]]).
 wl:arglist_info(deftype, cl_deftype, [sys_name, sys_lambda_list, c38_rest, forms], arginfo{all:[sys_name, sys_lambda_list], allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[sys_name, sys_lambda_list, forms], opt:0, req:[sys_name, sys_lambda_list], rest:[forms], sublists:0, whole:0}).
 wl: init_args(2, cl_deftype).
@@ -22139,7 +21816,7 @@ cl_deftype(Name_In, Lambda_list_In, RestNKeys, FnResult) :-
 							  forms
 							]
 						      ]
-						    ])
+						    ]).
 					 ]
 				       ]
 				     ]))).
@@ -22186,7 +21863,7 @@ cl_deftype(Name_In, Lambda_list_In, RestNKeys, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:86796 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,*=,[cons,number],[or,[not,cons],[eq,[car,cons],[quote,*]],[=,[car,cons],number]]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,*=,[cons,number],[or,[not,cons],[eq,[car,cons],[quote,*]],[=,[car,cons],number]]]).
 wl:lambda_def(defun, *=, f_sys_xx_c61, [cons, number], [[or, [not, cons], [eq, [car, cons], [quote, *]], [=, [car, cons], number]]]).
 wl:arglist_info(*=, f_sys_xx_c61, [cons, number], arginfo{all:[cons, number], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[cons, number], opt:0, req:[cons, number], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, f_sys_xx_c61).
@@ -22276,7 +21953,7 @@ f_sys_xx_c61(Cons_In, Number_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:86912 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'ensure-type',[name,expander],[let,[[cons,[assoc,name,'*type-expanders*']]],[if,cons,[setf,[cdr,cons],expander],[push,[cons,name,expander],'*type-expanders*']],name]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'ensure-type',[name,expander],[let,[[cons,[assoc,name,'*type-expanders*']]],[if,cons,[setf,[cdr,cons],expander],[push,[cons,name,expander],'*type-expanders*']],name]]).
 /*
 :- side_effect((compile_each($, LEnv, [], [], true), append([cons], [CAR15, CAR], [cons, CAR15, CAR]), setf_inverse_op(cdr, rplacd))).
 */
@@ -22417,7 +22094,7 @@ f_sys_ensure_type(Name_In, Expander_In, FnResult) :-
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:87128 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defun,'ensure-package',[name,nicknames,shadow,'shadowing-import-from',use,'import-from',intern,export],[let,[[package,['find-package',name]]],[unless,package,[setq,package,['make-package',name,':nicknames',nicknames]]],[shadow,shadow,package],[mapc,function([lambda,[list],[let,[['imported-package',['find-package',[car,list]]],['symbol-names',[cdr,list]]],['shadowing-import',[mapcar,function([lambda,['symbol-name'],['find-symbol','symbol-name','imported-package']]),'symbol-names'],package]]]),'shadowing-import-from'],['use-package',use,package],[mapc,function([lambda,[list],[let,[['imported-package',['find-package',[car,list]]],['symbol-names',[cdr,list]]],[import,[mapcar,function([lambda,['symbol-name'],['find-symbol','symbol-name','imported-package']]),'symbol-names'],package]]]),'import-from'],[mapc,function([lambda,['symbol-name'],[intern,'symbol-name',package]]),intern],[export,export,package],package]])
+:-lisp_compile_to_prolog(pkg_sys,[defun,'ensure-package',[name,nicknames,shadow,'shadowing-import-from',use,'import-from',intern,export],[let,[[package,['find-package',name]]],[unless,package,[setq,package,['make-package',name,':nicknames',nicknames]]],[shadow,shadow,package],[mapc,function([lambda,[list],[let,[['imported-package',['find-package',[car,list]]],['symbol-names',[cdr,list]]],['shadowing-import',[mapcar,function([lambda,['symbol-name'],['find-symbol','symbol-name','imported-package']]),'symbol-names'],package]]]),'shadowing-import-from'],['use-package',use,package],[mapc,function([lambda,[list],[let,[['imported-package',['find-package',[car,list]]],['symbol-names',[cdr,list]]],[import,[mapcar,function([lambda,['symbol-name'],['find-symbol','symbol-name','imported-package']]),'symbol-names'],package]]]),'import-from'],[mapc,function([lambda,['symbol-name'],[intern,'symbol-name',package]]),intern],[export,export,package],package]]).
 wl:lambda_def(defun, sys_ensure_package, f_sys_ensure_package, [sys_name, sys_nicknames, shadow, sys_shadowing_import_from, sys_use, sys_import_from, intern, export], [[let, [[package, [find_package, sys_name]]], [unless, package, [setq, package, [make_package, sys_name, kw_nicknames, sys_nicknames]]], [shadow, shadow, package], [mapc, function([lambda, [list], [let, [[sys_imported_package, [find_package, [car, list]]], [sys_symbol_names, [cdr, list]]], [shadowing_import, [mapcar, function([lambda, [symbol_name], [find_symbol, symbol_name, sys_imported_package]]), sys_symbol_names], package]]]), sys_shadowing_import_from], [use_package, sys_use, package], [mapc, function([lambda, [list], [let, [[sys_imported_package, [find_package, [car, list]]], [sys_symbol_names, [cdr, list]]], [import, [mapcar, function([lambda, [symbol_name], [find_symbol, symbol_name, sys_imported_package]]), sys_symbol_names], package]]]), sys_import_from], [mapc, function([lambda, [symbol_name], [intern, symbol_name, package]]), intern], [export, export, package], package]]).
 wl:arglist_info(sys_ensure_package, f_sys_ensure_package, [sys_name, sys_nicknames, shadow, sys_shadowing_import_from, sys_use, sys_import_from, intern, export], arginfo{all:[sys_name, sys_nicknames, shadow, sys_shadowing_import_from, sys_use, sys_import_from, intern, export], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_name, sys_nicknames, shadow, sys_shadowing_import_from, sys_use, sys_import_from, intern, export], opt:0, req:[sys_name, sys_nicknames, shadow, sys_shadowing_import_from, sys_use, sys_import_from, intern, export], rest:0, sublists:0, whole:0}).
 wl: init_args(exact_only, f_sys_ensure_package).
@@ -22702,7 +22379,7 @@ f_sys_ensure_package(Name_In, Nicknames_In, Shadow_In, Shadowing_import_from_In,
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:88151 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defmacro,defpackage,['defined-package-name','&rest',options],[flet,[[option,['option-name'],[mapcan,function([lambda,[option],[when,[eq,[car,option],'option-name'],[mapcar,function('designator-string'),[cdr,option]]]]),options]],[options,['option-name'],[mapcan,function([lambda,[option],[when,[eq,[car,option],'option-name'],[list,[mapcar,function('designator-string'),[cdr,option]]]]]),options]]],['#BQ',['ensure-package',['#COMMA',['designator-string','defined-package-name']],['#COMMA',[option,':nicknames']],['#COMMA',[option,':shadow']],['#COMMA',[options,':shadowing-import-from']],['#COMMA',[option,':use']],['#COMMA',[options,':import-from']],['#COMMA',[option,':intern']],['#COMMA',[option,':export']]]]]])
+:-lisp_compile_to_prolog(pkg_sys,[defmacro,defpackage,['defined-package-name','&rest',options],[flet,[[option,['option-name'],[mapcan,function([lambda,[option],[when,[eq,[car,option],'option-name'],[mapcar,function('designator-string'),[cdr,option]]]]),options]],[options,['option-name'],[mapcan,function([lambda,[option],[when,[eq,[car,option],'option-name'],[list,[mapcar,function('designator-string'),[cdr,option]]]]]),options]]],['#BQ',['ensure-package',['#COMMA',['designator-string','defined-package-name']],['#COMMA',[option,':nicknames']],['#COMMA',[option,':shadow']],['#COMMA',[options,':shadowing-import-from']],['#COMMA',[option,':use']],['#COMMA',[options,':import-from']],['#COMMA',[option,':intern']],['#COMMA',[option,':export']]]]]]).
 wl:lambda_def(defmacro, defpackage, cl_defpackage, [sys_defined_package_name, c38_rest, sys_options], [progn, [flet, [[sys_option, [sys_option_name], [mapcan, function([lambda, [sys_option], [when, [eq, [car, sys_option], sys_option_name], [mapcar, function(sys_designator_string), [cdr, sys_option]]]]), sys_options]], [sys_options, [sys_option_name], [mapcan, function([lambda, [sys_option], [when, [eq, [car, sys_option], sys_option_name], [list, [mapcar, function(sys_designator_string), [cdr, sys_option]]]]]), sys_options]]], ['#BQ', [sys_ensure_package, ['#COMMA', [sys_designator_string, sys_defined_package_name]], ['#COMMA', [sys_option, kw_nicknames]], ['#COMMA', [sys_option, kw_shadow]], ['#COMMA', [sys_options, kw_shadowing_import_from]], ['#COMMA', [sys_option, kw_use]], ['#COMMA', [sys_options, kw_import_from]], ['#COMMA', [sys_option, kw_intern]], ['#COMMA', [sys_option, kw_export]]]]]]).
 wl:arglist_info(defpackage, cl_defpackage, [sys_defined_package_name, c38_rest, sys_options], arginfo{all:[sys_defined_package_name], allow_other_keys:0, aux:0, body:0, complex:[rest], env:0, key:0, names:[sys_defined_package_name, sys_options], opt:0, req:[sys_defined_package_name], rest:[sys_options], sublists:0, whole:0}).
 wl: init_args(1, cl_defpackage).

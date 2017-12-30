@@ -88,7 +88,7 @@ find_lisp_function(FN,ARITY,ProposedName):-
 make_function_or_macro_call(Ctx,Env,FN,Args,Result,ExpandedFunction):-
    (is_list(Args)->length(Args,ArgsLen);true),
    foc_operator(Ctx,Env,FN,ArgsLen, ProposedName),!,
-   align_args_or_fallback(FN,ProposedName,Args,Result,ArgsPlusResult),
+   align_args_or_fallback(Ctx,Env,FN, ProposedName,Args,Result,ArgsPlusResult),
    ExpandedFunction =.. [ ProposedName | ArgsPlusResult].
 
 
@@ -185,6 +185,8 @@ generate_function_or_macro_name(Ctx,FN,NewProposedName):-
    suffix_by_context(Ctx,ProposedName,NewProposedName),!.
 
 
+eval_uses_env_arg1(F):- quietly((premute_names(F,FF),wl:declared(FF,env_arg1))).
+
 
 eval_uses_exact(F):- quietly((premute_names(F,FF),uses_exact0(FF))).
 
@@ -205,7 +207,7 @@ eval_uses_bind_parameters(F):- quietly((premute_names(F,FF), wl:init_args(bind_p
 
 % eval_uses_exact_and_restkeys(FN,Requireds):- current_predicate(FN/N), Requireds is N-2,Requireds>0.
 
-eval_uses_exact_and_restkeys(F,N):- quietly((premute_names(F,FF), exact_and_restkeys(FF,N))).
+eval_uses_exact_and_restkeys(F,N):- quietly((premute_names(F,FF), exact_and_restkeys(FF,N))),!.
 
 exact_and_restkeys(F,N):- wl:init_args(V,F),integer(V),!,V=N.
 exact_and_restkeys(F,_):- uses_exact0(F),!,fail.
@@ -269,8 +271,17 @@ align_args(FN,ProposedName,Args,Result,[Args,Result]):-
 /*
 % guess invoke(r1,r2,r3,RET).
 */
-align_args_or_fallback(FN,ProposedName,Args,Result,ArgsPlusResult):- align_args(FN,ProposedName,Args,Result,ArgsPlusResult),!.
-align_args_or_fallback(_,_ProposedName,Args,Result,ArgsPlusResult):- append(Args, [Result], ArgsPlusResult).
+align_args_or_fallback(_Ctx,Env,FN,ProposedName,Args,Result,ArgsPlusResult):- 
+   always((align_args_or_fallback_skip_env(FN,ProposedName,Args,Result,ArgsPlusResult),!,
+   ((fail,eval_uses_env_arg1(FN))->
+      append([Env|Args], [Result], ArgsPlusResult);
+      append(Args, [Result], ArgsPlusResult)))).
+
+   
+align_args_or_fallback_skip_env(FN,ProposedName,Args,Result,ArgsPlusResult):- 
+   align_args(FN,ProposedName,Args,Result,ArgsPlusResult),!.
+align_args_or_fallback_skip_env(_,_ProposedName,Args,Result,ArgsPlusResult):- 
+   append(Args, [Result], ArgsPlusResult).
 
 
 only_arity(ProposedName,N):-

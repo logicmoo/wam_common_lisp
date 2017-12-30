@@ -122,7 +122,6 @@ pretty1(set_var(Env,Name, Val)):- may_debug_var('SEnv',Env),may_debug_var(Name,V
 
 pretty1(cl_slot_value(_Env, Name, Val)):- may_debug_var(slot,Name,Val).
 %pretty1(get_kw(ReplEnv, RestNKeys, test, test, cl_eql, true, True)
-pretty1(set_place(_Env, SETF, [Name|_], Val, _)):- is_place_write(SETF), atom(Name),var(Val),debug_var([Name,'_New'],Val).
 pretty1(Env=[List|_]):- compound(List),var(Env),List=[H|_],compound(H),H=bv(_,_), may_debug_var('Env',Env),
   maplist(pretty1,List).
 pretty1(Env=List):- compound(List),var(Env),List=[H|_],compound(H),H=bv(_,_), may_debug_var('Env',Env),

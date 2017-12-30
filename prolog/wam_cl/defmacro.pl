@@ -128,6 +128,7 @@ cl_macroexpand([LispCode|Optionals],Result):-
   macroexpand_all(LispCode,MacroEnv,R),!,
   (R\==LispCode->cl_values_list([R,t],Result);cl_values_list([R,[]],Result)).
 
+f_sys_pf_symbol_macroexpand(_Place_Get, _Env_Get,Result):- Result=[].
 
 macroexpand_all(LispCode,MacroEnv,Result):-
   macroexpand_1_or_fail(LispCode,MacroEnv,Mid) ->
@@ -137,7 +138,7 @@ get_macro_function(Ctx,Env,Procedure, Arguments,MResult,FnResult,CallBody):-
        atom(Procedure),
    length(Arguments,ArgsLen),
    find_operator(Ctx,Env,Procedure,ArgsLen, ProposedName),!,
-   align_args_or_fallback(Procedure,ProposedName,Arguments,FnResult,ArgsPlusResult),
+   align_args_or_fallback(Ctx,Env,Procedure,ProposedName,Arguments,FnResult,ArgsPlusResult),
    ExpandedMacro =.. [ ProposedName | ArgsPlusResult],
    clause_interface(ExpandedMacro,Conj),
    unify_conj(Conj,(CallBody,cl_eval(MResult, FnResult))).
