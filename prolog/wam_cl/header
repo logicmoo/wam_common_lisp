@@ -189,6 +189,8 @@
 :- ensure_loaded(typecheck).
 :- ensure_loaded(typeof).
 :- ensure_loaded(utests).
+:- ensure_loaded(loptions).
+:- ensure_loaded(groveler).
 
 
 /*

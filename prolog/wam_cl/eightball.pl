@@ -242,99 +242,13 @@ assert_local0(G):- doall((clause_asserted_local(G,E),erase(E),fail)),!,user:asse
 clause_asserted_local((H:-_),R):-!, clause(H,_,R).
 clause_asserted_local(H,R):- clause(H,true,R).
 
-
-is_pl_atom_key(N):- wl:wam_cl_option_local(N,_).
-is_pl_atom_key(N):- \+ atom(N),!,fail.
-is_pl_atom_key(N):- current_prolog_flag(N,_).
-is_pl_atom_key(N):- \+ is_symbolp(N),\+ atomic_list_concat([_,_|_],'-',N),downcase_atom(N,N).
-
-to_pl_atom_key(N,K):- var(N),!,K=N. 
-to_pl_atom_key(N,K):- is_pl_atom_key(N),!,N=K.
-to_pl_atom_key(N,K):- to_prolog_string(N,S),!,atom_downcase(S,DC),atomic_list_concat(HC,'-',DC),!,atomic_list_concat(HC,'_',K).
-to_pl_atom_key(N,N).
-
-to_pl_atom_value(N,K):- var(N),!,K=N. 
-to_pl_atom_value(N,K):- number(N),!,K=N. 
-to_pl_atom_value(N,K):- current_prolog_flag(_,N),N=K.
-to_pl_atom_value(N,K):- is_pl_atom_key(N),!,N=K.
-to_pl_atom_value(kw_missing,kw_missing).
-to_pl_atom_value(N,K):- to_prolog_string(N,S),!,atom_downcase(S,DC),atomic_list_concat(HC,'-',DC),!,atomic_list_concat(HC,'_',K).
-to_pl_atom_value(N,N).
-
-:- dynamic(wam_cl_option/2).
-:- thread_local(wl:wam_cl_option_local/2).
-
-f_sys_get_wam_cl_option(N,V):- to_pl_atom_key(N,K),to_pl_atom_value(V,VV),wam_cl_option(K,VV).
-
-wam_cl_option(N,V):- V==true,!,wam_cl_option(N,t).
-wam_cl_option(N,V):- nonvar(N), wl:wam_cl_option_local(N,VV),!,V=VV.
-wam_cl_option(N,V):- var(N), wam_cl_option_local(N,VV),V=VV.
-wam_cl_option(speed,V):- !, (current_prolog_flag(runtime_speed,V)->true;V=1).
-wam_cl_option(safety,V):- !, (current_prolog_flag(runtime_safety,V)->true;V=1).
-wam_cl_option(debug,V):- !, (current_prolog_flag(runtime_debug,V)->true;V=1).
-wam_cl_option(safe(_),t):- !, (wam_cl_option(safety,V),V>0).
-wam_cl_option(_,TF):- wam_cl_option(safety,N),(N<1-> TF=t; TF=kw_missing).
-%wam_cl_option(N,kw_missing).
-
-f_sys_set_wam_cl_option(N,V):- to_pl_atom_key(N,K),to_pl_atom_value(V,VV),set_wam_cl_option(K,VV).
-
-set_wam_cl_option(N,V):- 
-   assertion(nonvar(N)),assertion(nonvar(V)),
-   ignore(set_wam_cl_option_h(N,V)),
-   retractall(wl:wam_cl_option_local(N,_)),!,
-   (V\==kw_missing->asserta(wl:wam_cl_option_local(N,V));true).
-
-was_pkg_prefix(sys,pkg_sys).
-was_pkg_prefix(ext,pkg_ext).
-was_pkg_prefix(u,pkg_user).
-was_pkg_prefix(clos,pkg_clos).
-
-
-set_wam_cl_option_h(speed,V):- number(V),set_prolog_flag(runtime_speed,V).
-set_wam_cl_option_h(safety,V):- number(V),set_prolog_flag(runtime_safety,V).
-set_wam_cl_option_h(debug,V):- number(V),set_prolog_flag(runtime_debug,V),fail.
-set_wam_cl_option_h(Flag,V):- atom(Flag),current_prolog_flag(Flag,_),
-   to_prolog_flag_value(V,TF),!,set_prolog_flag(Flag,TF).
-
-to_prolog_flag_value([],false).
-to_prolog_flag_value(t,true).
-to_prolog_flag_value(O,O).
-
-% grovel_system_symbols:-!.
-grovel_system_symbols:- prolog_load_context(source,File),assertz(wl:interned_eval(call(grovel_system_symbols(File)))).
-
-guess_symbol_name(HC,UPPER):- atomic_list_concat(HC,'_',HCN), get_opv(HCN,name,UPPER),!.
-guess_symbol_name(HC,UPPER):- maplist(resolve_char_codes,HC,RHC),atomics_to_string(RHC,'-',STR),string_upper(STR,UPPER),!.
-
-resolve_char_codes('','_').
-%resolve_char_codes(C48,C):- notrace(catch((name(C48,[99|Codes]),number_codes(N,Codes),name(C,[N])),_,fail)),!,fail.
-resolve_char_codes(C48,_):- notrace(catch((name(C48,[99|Codes]),number_codes(_,Codes)),_,fail)),!,fail.
-resolve_char_codes(C,C).
-
-grovel_system_symbols(File):- 
- ignore(((source_file(M:P,File),functor(P,F,A), A>0,  
-  ((atomic_list_concat([f,Pkg|HC],'_',F),was_pkg_prefix(Pkg,Package))-> true ;
-    (atomic_list_concat([cl|HC],'_',F),Package=pkg_cl)),
-    guess_symbol_name(HC,UPPER),
- always(((
-  cl_intern(UPPER,Package,Symbol),     
-  cl_export(Symbol,Package,_),  
-  wdmsg((grovelled_source_file_symbols(UPPER,Package,Symbol,M,F))))))),fail)).
-
-list_lisp_undefined(Pkg):- 
- ignore(((get_opv(X,package,Pkg),once((get_opv(X,compile_as,Y),Y=kw_function,get_opv(X,function,F),get_opv(X,name,Str),
-   \+ current_predicate(F/_))),
-  wdmsg(lisp_undefined(Pkg,X,Str,Y,F))),fail)).
-
 :- fixup_exports.
 
-system:goal_expansion(always(G),G) :- wam_cl_option(speed,S),S>2.
-system:goal_expansion(certainly(G),G) :- wam_cl_option(safety,0).
+%system:goal_expansion(always(G),G) :- wam_cl_option(speed,S),S>2.
+%system:goal_expansion(certainly(G),G) :- wam_cl_option(safety,0).
 
 :- use_module(debugio).
 :- include('header').
-
-
 
 wl:interned_eval("(defparameter ext:*markdown* cl:t)").
 

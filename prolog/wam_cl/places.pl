@@ -16,6 +16,7 @@
 :- set_module(class(library)).
 :- include('header').
 
+wl:init_args(2,defsetf).
 
 :- include('setf.pl').
 
@@ -33,8 +34,8 @@ f_clos_pf_set_slot_value(Obj,Key,Value,Value):- set_opv(Obj,Key,Value).
 
 lookup_symbol_macro(Ctx,Env,LVar,GET):- get_ctx_env_attribute(Ctx,Env,symbol_macro(LVar),GET).
 
-wl:init_args(1,cl_array_row_major_index).
-wl:init_args(exact_only,cl_row_major_aref).
+wl:init_args(1,array_row_major_index).
+wl:init_args(x,row_major_aref).
 
 wl:setf_inverse(slot_value,clos_pf_set_slot_value).
 wl:setf_inverse(car,rplaca).
@@ -60,39 +61,6 @@ setf_inverse_op_forced(Sym,[sys_set_rslot,[quote,Sym]]).
 
 wl:interned_eval('`sys:set-rslot').
 f_sys_set_rslot(Prop,Obj,Value,Res):- assertion((atom(Obj),atom(Prop))),set_opv(Obj,Prop,Value),Res=Value.
-/*
-#+WAM-CL
-(defmacro decf (place &optional (delta 1))
-  `(incf ,place (- 0 ,delta)))
-
-*/
-
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:5869 **********************/
-/*:-lisp_compile_to_prolog(pkg_sys,[defmacro,decf,[place,'&optional',[delta,1]],['#BQ',[incf,['#COMMA',place],[-,0,['#COMMA',delta]]]]]).
-wl:lambda_def(defmacro, decf, cl_decf, [sys_place, c38_optional, [sys_delta, 1]], [progn, ['#BQ', [incf, ['#COMMA', sys_place], [-, 0, ['#COMMA', sys_delta]]]]]).
-wl:arglist_info(decf, cl_decf, [sys_place, c38_optional, [sys_delta, 1]], arginfo{all:[sys_place, sys_delta], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_place, sys_delta], opt:[sys_delta], req:[sys_place], rest:0, sublists:0, whole:0}).
-wl: init_args(1, cl_decf).
-
-
-### Compiled:  `CL:DECF` 
-
-cl_decf(Place_In, RestNKeys, FnResult) :-
-	nop(defmacro),
-	Env=[bv(sys_place, Place_In), bv(sys_delta, Delta_In)|Opt_var_Param],
-	global_env(Opt_var_Param),
-	opt_var(Opt_var_Param, sys_delta, Delta_In, true, 1, 1, RestNKeys),
-	catch(( get_var(Env, sys_delta, Delta_Get),
-		get_var(Env, sys_place, Place_Get),
-		[incf, Place_Get, [-, 0, Delta_Get]]=MFResult
-	      ),
-	      block_exit(decf, MFResult),
-	      true),
-	cl_eval(MFResult, FnResult).
-:- set_opv(cl_decf, classof, claz_macro),
-   set_opv(decf, compile_as, kw_operator),
-   set_opv(decf, function, cl_decf),
-   _DefMacroResult=decf.
-*/
 
 
 make_place_op(Ctx,Env,Result,incf,GET,LV,SET,Body) :- 
@@ -127,8 +95,8 @@ is_place_write(P):- is_place_op(P), \+ is_only_read_op(P).
 
 is_place_op(setf).
 is_place_op(psetf).
-is_place_op(getf).
-is_place_op(incf).
+%is_place_op(getf).
+%is_place_op(incf).
 is_place_op(decf).
 /*
 is_place_op(rotatef).
@@ -289,7 +257,7 @@ wl:interned_eval_e(
          (push ,sym ,place)))))").
 
 
-%(wl:init_args(2,cl_pushnew)).
+%(wl:init_args(2,pushnew)).
 %cl_pushnew(Element, Place, FnResult) :-
 
 wl:interned_eval_e(
@@ -325,7 +293,7 @@ cl_push(Element, Place, FnResult) :-
 % asserting... u
 wl:arglist_info(f_sys_setf_function_name_p, [sys_name], [_Name_Param], arginfo{all:[sys_name], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_name], opt:0, req:[sys_name], rest:0, whole:0}).
 % asserting... u
-wl:init_args(exact_only, f_sys_setf_function_name_p).
+wl:init_args(x, f_sys_setf_function_name_p).
 % asserting... u
 wl:lambda_def(defun, sys_setf_function_name_p, f_sys_setf_function_name_p, [sys_name], [[and, [consp, sys_name], [consp, [ext_pf_cdr, sys_name]], [null, [u_pf_cddr, sys_name]], [symbolp, [ext_pf_cadr, sys_name]], [eq, [car, sys_name], [quote, setf]]]]).
 f_sys_setf_function_name_p(Name_Param, TrueResult66) :-
@@ -352,7 +320,7 @@ value_or([Value],Value,_):- !.
 value_or([],Value,Value):- !.
 value_or(Value,Value,_).
 
-wl:init_args(1,cl_get_setf_expansion).
+wl:init_args(1,get_setf_expansion).
 
 %place_op(Env,PlOP,[Place,Obj],[],Result):- place_op(Env,PlOP,Obj,[Place],Result).
 

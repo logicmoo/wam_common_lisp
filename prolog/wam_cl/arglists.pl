@@ -355,7 +355,7 @@ simple_atom_var(Atom):- atom(Atom), Atom\=nil,Atom\=[], correct_formal_params_c3
 opt_var(Env, Var, FinalResult, _G, _Default, Nth, Optionals):- nth1(Nth,Optionals,Value),nonvar(Value),FinalResult=Value,set_var(Env,Var,Value).
 opt_var(Env, Var, FinalResult, G, Default, _Nth, _Optionals):-  G, FinalResult=Value,FinalResult=Default,set_var(Env,Var,Value).
 
-align_args_local(FN,RequiredArgs,RestNKeys,Whole,LB,_ArgInfo,RequiredArgs,wl:init_args(exact_only,FN)):- 
+align_args_local(FN,RequiredArgs,RestNKeys,Whole,LB,_ArgInfo,RequiredArgs,wl:init_args(x,FN)):- 
   eval_uses_exact(FN),!,
   LB = true,
   RestNKeys = _,
@@ -417,7 +417,7 @@ expand_function_head(Ctx,Env,Symbol,FN,FormalParms, Whole,HeadParms,ZippedArgEnv
    %debug_var('NilRestNKeys',RestNKeys), 
        function_head_params(Ctx,Env,FN,FormalParms,ZippedArgEnv,_RestNKeys,Whole,RequiredArgs,ArgInfo,_Names,_PVars,HeadCode),
                HeadDefCode = (assert_lsp(Symbol,wl:arglist_info(Symbol,FN,FormalParms,ArgInfo)),!,
-                 assert_lsp(Symbol,wl:init_args(exact_only,FN))),
+                 assert_lsp(Symbol,wl:init_args(x,FN))),
                always(HeadDefCode),
        Whole = RequiredArgs,            
        HeadParms =  RequiredArgs.

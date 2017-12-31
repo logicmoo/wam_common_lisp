@@ -62,7 +62,7 @@
 :- discontiguous compile_macro_ops/5.
 
 % DEFMACRO
-wl:init_args(2,cl_defmacro).
+wl:init_args(2,defmacro).
 cl_defmacro(Symbol,FormalParms,MacroBody,Return):- reenter_lisp(Ctx,Env),compile_macro_ops(Ctx,Env,Return,[defmacro,Symbol,FormalParms|MacroBody],Code),cmpout(Code).
 
 compile_macro_ops(Ctx,Env,Result,[defmacro,Symbol,FormalParms|MacroBody], (Code,FunDef,Result=Symbol)):-
@@ -71,7 +71,7 @@ compile_macro_ops(Ctx,Env,Result,[defmacro,Symbol,FormalParms|MacroBody], (Code,
   FunDef = (set_opv(Macro,classof,claz_macro),set_opv(Symbol,compile_as,kw_operator),set_opv(Symbol,function,Macro)).  
 
 % MACROLET
-wl:init_args(1,cl_macrolet).
+wl:init_args(1,macrolet).
 cl_macrolet(Inits,Progn,Result):- reenter_lisp(Ctx,Env), compile_macro_ops(Ctx,Env,Result,[macrolet,Inits|Progn],Code), always(Code).  
 
 compile_macro_ops(Ctx,Env,Result,[macrolet,MACROLETS|Progn], (maplist(always,Decls),CompileBody)):- 
@@ -114,14 +114,14 @@ compile_macro_function(Ctx,Env,Symbol,[FormalParms|MacroBody0],Macro,HeadParms,E
 
  
 % macroexpand-1
-wl:init_args(0,cl_macroexpand).
+wl:init_args(0,macroexpand).
 cl_macroexpand_1([LispCode|Optionals],Result):- 
   nth_param(Optionals,1,Local,MacroEnv),
   parent_env(Local),
   macroexpand_1_or_fail(LispCode,MacroEnv,R)->cl_values_list([R,t],Result);cl_values_list([LispCode,[]],Result).
 
 % macroexpand
-wl:init_args(0,cl_macroexpand_1).
+wl:init_args(0,macroexpand_1).
 cl_macroexpand([LispCode|Optionals],Result):- 
   nth_param(Optionals,1,Local,MacroEnv),
   parent_env(Local),

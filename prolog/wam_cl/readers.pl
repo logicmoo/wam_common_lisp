@@ -16,7 +16,7 @@
 
 :- include('header').
 
-wl:init_args(exact_args,cl_read).
+wl:init_args(x,read).
 
 
 wl:symbol_has_prop_set_get(sys_xx_stdin_xx,claz_prolog_input_stream,set_input,current_input).

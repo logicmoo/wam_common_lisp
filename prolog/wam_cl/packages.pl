@@ -23,11 +23,11 @@ xlisting_config:xlisting_always(G):- G=package:_, current_predicate(_,G),predica
   \+ predicate_property(G,imported_from(_)).
 
 
-wl:init_args(exact_only,cl_in_package).
+wl:init_args(x,in_package).
 cl_in_package(S,Package):- find_package_or_die(S,Package),
    f_sys_set_symbol_value('xx_package_xx',Package).
 
-wl:init_args(exact_only,cl_use_package).
+wl:init_args(x,use_package).
 cl_use_package(Package,R):- reading_package(CurrentPackage),
                        cl_use_package(Package,CurrentPackage,R).
 
@@ -45,11 +45,11 @@ cl_use_package(Package,CurrentPackage, t):-
    dbginfo(todo(check_for+package_symbolconflicts(package_use_list(CurrentPackage,Package)))).
 
  
-wl:init_args(1,cl_defpackage).
+wl:init_args(1,defpackage).
 cl_defpackage(Name,Keys,R):- cl_make_package(Name,Keys,R).
 
 
-wl:init_args(1,cl_make_package).
+wl:init_args(1,make_package).
 cl_make_package(L,B,T):- to_prolog_string_if_needed(L,Loc),!,cl_make_package(Loc,B,T).
 cl_make_package(AName,List,Package):-
   text_to_string(AName,Name),  

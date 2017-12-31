@@ -22,14 +22,14 @@
 
 cl_eval(Form,Result):- lisp_compile(Result,Form,Body),always(Body).
 
-wl:init_args(1,cl_funcall).
+wl:init_args(1,funcall).
 cl_funcall(function(F),More,R):-!,cl_funcall(F,More,R).
 cl_funcall(ProcedureName,Args,Result):- cl_apply(ProcedureName, [Args], Result).
 % cl_funcall([F|More],R):- append([More],[R],ARGS), lpa_apply(F,ARGS).
 
 
 
-wl:init_args(1,cl_apply).
+wl:init_args(1,apply).
 cl_apply(closure(Environment,ClosureResult,FormalArgs,Body), [Arguments], Result):-!,
   closure(Environment,ClosureResult,FormalArgs,Body,Arguments,Result).
 cl_apply(function(FunctionName), Arguments, Result):-!,cl_apply((FunctionName), Arguments, Result).

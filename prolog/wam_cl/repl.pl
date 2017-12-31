@@ -1,3 +1,4 @@
+#!/usr/bin/env swipl
 /*******************************************************************
  *
  * A Common Lisp compiler/interpretor, written in Prolog
@@ -17,9 +18,14 @@
 :- use_module(init).
 
 :- include('header').
- :- meta_predicate maybe_ltrace(0).
- :- meta_predicate show_uncaught_or_fail(0).
- :- meta_predicate with_prompt_str(+,0).
+
+:- cls.
+:- Six = 6, set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)).
+:- set_prolog_flag(occurs_check,error).
+
+:- meta_predicate maybe_ltrace(0).
+:- meta_predicate show_uncaught_or_fail(0).
+:- meta_predicate with_prompt_str(+,0).
               
 
 repl:- 

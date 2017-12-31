@@ -20,7 +20,7 @@
 
 
 wl:declared(cl_error,inline(error)).
-wl:init_args(0,cl_error).
+wl:init_args(0,error).
 cl_error(Args,Res):- cl_format([t|Args],Res),throw(cl_error(Args,Res)).
 
 % Connection to LPA's built-in error handler

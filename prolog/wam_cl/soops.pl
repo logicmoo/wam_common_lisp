@@ -157,9 +157,9 @@ value_default(claz_object,mut([],claz_object)).
              Kind).
 */
 
-(wl:init_args(0,cl_defstruct)).
-(wl:init_args(0,cl_make_instance)).
-(wl:init_args(0,cl_defclass)).
+(wl:init_args(0,defstruct)).
+(wl:init_args(0,make_instance)).
+(wl:init_args(0,defclass)).
 
 
 find_or_create_class(Name,Kind):- find_class(Name,Kind),Kind\==[],!.
@@ -407,10 +407,10 @@ un_kw1(Prop,Prop).
 
 add_kw_opv(Obj,Key,V):- un_kw(Key,Prop),add_opv_new(Obj,Prop,V).
 
-(wl:init_args(exact_only,f_sys_get_iprops)).
+(wl:init_args(x,f_sys_get_iprops)).
 wl:interned_eval('`sys:get-iprops').
 f_sys_get_iprops(Obj,Result):- findall([Prop|Value],get_opv(Obj,Prop,Value),Result).
-(wl:init_args(exact_only,f_sys_get_opv)).
+(wl:init_args(x,f_sys_get_opv)).
 wl:interned_eval('`sys:get-opv').
 f_sys_get_opv(Obj,Prop,Value):- get_opv(Obj,Prop,Value).
 wl:interned_eval('`sys:set-opv').

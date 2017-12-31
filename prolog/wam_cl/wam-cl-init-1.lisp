@@ -9,10 +9,10 @@
 
 
 (defmacro apropos-defmacro (name ll &rest body)
-   `(putprop ',name 'apropos-defmacro '(defmacro ,name ,ll ,@body)))
+   `(put-sysprop ',name 'apropos-defmacro '(defmacro ,name ,ll ,@body)))
 
 (defmacro apropos-defun (name ll &rest body)
-   `(putprop ',name 'apropos-defun '(defun ,name ,ll ,@body)))
+   `(put-sysprop ',name 'apropos-defun '(defun ,name ,ll ,@body)))
 
 
 ;;; define-modify-macro.lisp
@@ -234,9 +234,9 @@ incremented by the second argument, DELTA, which defaults to 1."
                  (let ((new-var (gensym)))
                    (values nil nil (list new-var)
                            `(setq ,form ,new-var) form)))))
-          ((setq temp (get (car form) 'setf-inverse))
+          ((setq temp (get-sysprop  (car form) 'setf-inverse))
            (get-setf-method-inverse form `(,temp) nil))
-          ((setq temp (get (car form) 'setf-expander))
+          ((setq temp (get-sysprop  (car form) 'setf-expander))
            (funcall temp form environment))
           (t
            (expand-or-get-setf-inverse form environment)))))
@@ -253,7 +253,7 @@ incremented by the second argument, DELTA, which defaults to 1."
             (progn
               (multiple-value-bind (dummies vals store-vars setter getter)
                   (get-setf-expansion place environment)
-                (let ((inverse (get (car place) 'setf-inverse)))
+                (let ((inverse (get-sysprop  (car place) 'setf-inverse)))
                   (if (and inverse (eq inverse (car setter)))
                       (if (functionp inverse)
                           `(funcall ,inverse ,@(cdr place) ,value-form)
@@ -305,7 +305,7 @@ incremented by the second argument, DELTA, which defaults to 1."
      (put-sysprop ',access-function 'setf-inverse ',update-function)))
 
 
-#+(or ABCL WAM-CL) (flet () ;; FLET BEGIN
+;; #+(or ABCL WAM-CL) (flet () ;; FLET BEGIN
 
 (defun %set-caar (x v) (set-car (car x) v))
 (defun %set-cadr (x v) (set-car (cdr x) v))
@@ -407,7 +407,7 @@ incremented by the second argument, DELTA, which defaults to 1."
 
 (defsetf structure-ref structure-set)
 
-) ;; FLET END
+;; ) ;; FLET END
 
 
 ;;;; -*- Mode: Lisp; Syntax: Common-Lisp; indent-tabs-mode: nil; Package: SYSTEM -*-
@@ -1171,7 +1171,7 @@ result.  The original TREE is not destroyed."
 							     (list (car x))))
 						     clauses)))))))
 
-(apropos-defmacromultiple-value-bind (vars values-form &rest forms)
+(apropos-defmacro multiple-value-bind (vars values-form &rest forms)
   `(multiple-value-call #'(lambda (&optional ,@vars &rest ,(gensym))
 			    ,@forms)
                         ,values-form))

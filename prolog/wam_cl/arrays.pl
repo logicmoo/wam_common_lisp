@@ -51,7 +51,7 @@ not_fn(Value,A,B):- \+ call(Value,A,B).
 not_fn(Value,A,B,C):- \+ call(Value,A,B,C).
 
 
-wl:init_args(1,cl_aref).
+wl:init_args(1,aref).
 cl_aref(Obj,Indexes,RetVal):-!, get_array_data(Obj,List),!,nth_index(Indexes,List,RetVal).
 %cl_aref(List,Index,RetVal):- cl_nthcdr(List,Index,RetVal).
 
@@ -66,13 +66,13 @@ get_array_data(Obj,List):- get_opv(Obj,array,Obj2),!,get_array_data(Obj2,List).
 
 
 
-wl:init_args(0,cl_make_array).
+wl:init_args(0,make_array).
 cl_make_array(Dims,RetVal):- e1_as_list(Dims,DimsL),
  create_object(claz_array,[dims=DimsL],RetVal).
 cl_make_array(Dims,Keys,RetVal):- e1_as_list(Dims,DimsL),
  create_object(claz_array,[dims=DimsL|Keys],RetVal).
 
-wl:init_args(0,cl_vector).
+wl:init_args(0,vector).
 cl_vector(Elements,RetVal):-
  length(Elements,Size),
  create_struct(claz_array,[dims=[Size],data=Elements],RetVal).

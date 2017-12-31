@@ -190,7 +190,7 @@ eval_uses_env_arg1(F):- quietly((premute_names(F,FF),wl:declared(FF,env_arg1))).
 
 eval_uses_exact(F):- quietly((premute_names(F,FF),uses_exact0(FF))).
 
-uses_exact0(F):- wl:init_args(exact_only,F),!.
+uses_exact0(F):- wl:init_args(x,F),!.
 uses_exact0(FN):-  function_arg_info(FN,ArgInfo),!,
    ArgInfo.complex==0,ArgInfo.opt==0,ArgInfo.rest==0,ArgInfo.env==0,ArgInfo.whole==0,
    length(ArgInfo.names,NN),

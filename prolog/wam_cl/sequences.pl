@@ -186,7 +186,7 @@ cl_nreverse(Xs, Ys) :-
 
 
 % #'replace
-(wl:init_args(2,cl_replace)).
+(wl:init_args(2,replace)).
 cl_replace(X,Y,Keys,XR):-
    range_1_and_2_len(X,Y,Keys,XR,YR,Count),
    replace_each(Count,XR,YR).
@@ -197,14 +197,14 @@ replace_each(_,_,[]):-!.
 replace_each(Count,XR,[Y|YR]):- nb_setarg(1,XR,Y),arg(2,XR,XT),Count2 is Count-1,replace_each(Count2,XT,YR).
    
 
-wl:init_args(1,cl_mapcar).
+wl:init_args(1,mapcar).
 cl_mapcar(P, [[H|T]], [RH|RT]) :- !, cl_apply(P, [H], RH),cl_mapcar(P, [T], RT).
 cl_mapcar(P, [[H|T],[H2|T2]], [RH|RT]) :- !, cl_apply(P, [H,H2], RH),cl_mapcar(P, [T,T2], RT).
 cl_mapcar(P, [[H|T],[H2|T2],[H3|T3]], [RH|RT]) :- !, cl_apply(P, [H,H2,H3], RH),cl_mapcar(P, [T,T2,T3], RT).
 cl_mapcar(_, [[]|_], []).
 
 
-(wl:init_args(0,cl_nconc)).
+(wl:init_args(0,nconc)).
 cl_nconc([L1,L2],Ret):- !, append(L1,L2,Ret).
 cl_nconc([L1],L1):-!.
 cl_nconc([L1,L2|Lists],Ret):- !,cl_nconc([L2|Lists],LL2), append(L1,LL2,Ret).

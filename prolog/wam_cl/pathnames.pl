@@ -18,10 +18,10 @@
 
 :- include('header').
 
-wl:init_args(0,cl_make_pathname).
+wl:init_args(0,make_pathname).
 cl_make_pathname(I,O):- cl_make_instance([claz_pathname|I],O).
 
-wl:init_args(1,cl_compile_file_pathname).
+wl:init_args(1,compile_file_pathname).
 cl_compile_file_pathname(OSFile,Keys,PLFileOut):-
    F = kw_output_file,
     current_env(Env),

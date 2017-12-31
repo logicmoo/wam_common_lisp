@@ -45,7 +45,7 @@ cl_append(A,B,R):- append(A,B,R),!.
 
 % #'LIST
 wl:declared(cl_list,inline(list)).
-wl:init_args(0,cl_list).
+wl:init_args(0,list).
 cl_list(ListI,ListO):- ListI=ListO.
 
 
@@ -72,13 +72,13 @@ f_u_pf_cddr(A,C):-f_u_pf_cdr(A,B),f_u_pf_cdr(B,C).
 
 wl:interned_eval(("`cl:rplaca")).
 wl:op_replacement(setcar,rplaca).
-wl:init_args(exact_only,cl_rplaca).
+wl:init_args(x,rplaca).
 cl_rplaca(Cons,Obj,Cons):- nb_setarg(1,Cons,Obj).
 f_sys_set_car(A,B,C):-cl_rplaca(A,B,C).
 
 wl:op_replacement(setcdr,rplacd).
 wl:interned_eval(("`cl:rplacd")).
-wl:init_args(exact_only,cl_rplacd).
+wl:init_args(x,rplacd).
 cl_rplacd(Cons,Obj,Cons):- nb_setarg(2,Cons,Obj).
 f_sys_set_cdr(A,B,C):-cl_rplacd(A,B,C).
 
@@ -91,7 +91,7 @@ pl_copy_1assoc([H|T],[H|T]).
 pl_copy_1assoc(HT,HT).
 
 % #'ACONS
-wl: init_args(exact_only, cl_acons).
+wl: init_args(x, cl_acons).
 cl_acons(Key_Param, Datum_Param, Alist_Param, [[Key_Param|Datum_Param]|Alist_Param]).
 
 wl:interned_eval((
@@ -103,7 +103,7 @@ wl:interned_eval(("`SYS:MAKE-VECTOR")).
 
 
 % #'rassoc item alist &key key test test-not => entry
-wl:init_args(2,cl_rassoc).
+wl:init_args(2,rassoc).
 cl_rassoc(Item,AList,Options,RetVal):-
  get_identity_pred(Options,kw_key,Ident),
   get_test_pred(cl_eql,Options,EqlPred),
@@ -112,7 +112,7 @@ cl_rassoc(Item,AList,Options,RetVal):-
   RetVal = [K|V].
 cl_rassoc(_,_,_,[]).
 
-wl:init_args(2,cl_assoc).
+wl:init_args(2,assoc).
 cl_assoc(Item,AList,Options,RetVal):-
  get_identity_pred(Options,kw_key,Ident),
   get_test_pred(cl_eql,Options,EqlPred),
@@ -129,7 +129,7 @@ f_ext_pf_cadr(List,R):- List=[_,R|_]->true;R=[].
 cl_cadr(List,R):- List=[_,R|_]->true;R=[].
 
 
-(wl:init_args(1,cl_last)).
+(wl:init_args(1,last)).
 cl_last(List,[],Tail):-  !, cl_last_1(List,Tail).
 cl_last(List,[N],Ret):- 
   (N=1 -> cl_last_1(List,Ret);

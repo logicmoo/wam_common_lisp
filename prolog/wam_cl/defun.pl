@@ -21,7 +21,7 @@
 :- discontiguous compile_defun_ops/5.
 
 % DEFUN 
-wl:init_args(2,cl_defun).
+wl:init_args(2,defun).
 % (DEFUN (SETF CAR) ....)
 
 
@@ -30,7 +30,7 @@ wl:init_args(2,cl_defun).
 cl_defun(Symbol,FormalParms,FunctionBody,Return):- reenter_lisp(Ctx,Env),compile_defun_ops(Ctx,Env,Return,[defun,Symbol,FormalParms|FunctionBody],Code),cmpout(Code).
 compile_defun_ops(Ctx0,Env,Result,[defun,[setf,Name],FormalParms|FunctionBody], (PushDecl,CODE)):-
   combine_setfs([setf,Name],Symbol),
-  PushDecl = assert_lisp(Name,wl:declared(Name,defun_setf(Symbol))),
+  PushDecl = assert_lsp(Name,wl:declared(Name,defun_setf(Symbol))),
   compile_defun_ops(Ctx0,Env,Result,[defun,Symbol,['&environment','$env'|FormalParms]|FunctionBody], CODE),!. 
 compile_defun_ops(Ctx0,Env,Result,[defun,Symbol,FormalParms|FunctionBody], (Code,FunDef,Result=Symbol)):-  
   duplicate_term(Ctx0,Ctx),Ctx0=Ctx,
@@ -40,7 +40,7 @@ compile_defun_ops(Ctx0,Env,Result,[defun,Symbol,FormalParms|FunctionBody], (Code
   always((FunDef,Code)).  
 
 % FLET
-wl:init_args(1,cl_flet).
+wl:init_args(1,flet).
 cl_flet(Inits,Progn,Result):- reenter_lisp(Ctx,Env), compile_defun_ops(Ctx,Env,Result,[flet,Inits|Progn],Code), !, always(Code). 
 compile_defun_ops(Ctx,Env,Result,[flet,FLETS|Progn], (Conj,CompileBody)):- 
     must_maplist(define_each(Ctx,Env,flet),FLETS,FBOUNDS,Decls),
@@ -48,7 +48,7 @@ compile_defun_ops(Ctx,Env,Result,[flet,FLETS|Progn], (Conj,CompileBody)):-
     must_compile_progn([FBOUNDS|Ctx],[FBOUNDS|Env],Result,Progn, CompileBody),!.    
 
 % LABELS
-wl:init_args(1,cl_labels).
+wl:init_args(1,labels).
 cl_labels(Inits,Progn,Result):- reenter_lisp(Ctx,Env),compile_defun_ops(Ctx,Env,Result,[labels,Inits|Progn],Code),always(Code).  
 compile_defun_ops(Ctx,Env,Result,[labels,LABELS|Progn], (Conj,CompileBody)):-
     must_maplist(define_each(Ctx,Env,labels),LABELS,FBOUNDS,Decls),

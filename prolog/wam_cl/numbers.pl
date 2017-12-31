@@ -73,7 +73,7 @@ cl_my_max(Real, RestNKeys, FnResult) :-
         get_var(LEnv, real, Real_Get24),
         Real_Get24=FnResult.
 */
-wl: init_args(1,cl_max).
+wl: init_args(1,max).
 cl_max(Real,Reals,Out):-  
    (Reals=[R|DoList] ->
     ( R > Real -> 
@@ -81,7 +81,7 @@ cl_max(Real,Reals,Out):-
         cl_max(Real,DoList,Out));
     Out=Real).
 
-wl: init_args(1,cl_min).
+wl: init_args(1,min).
 cl_min(Real,Reals,Out):-  
    Reals=[R|DoList] ->
     ( R < Real -> 

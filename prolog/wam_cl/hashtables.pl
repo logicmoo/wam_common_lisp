@@ -22,7 +22,7 @@ cl_hash_table_p(HT,RetVal):- t_or_nil((cl_class_of(HT,Claz),Claz==claz_hash_tabl
 
 cl_hash_table_test(HT,RetVal):-get_opv(HT,test,RetVal).
 
-(wl:init_args(0,cl_make_hash_table)).
+(wl:init_args(0,make_hash_table)).
 cl_make_hash_table(Keys,HT):- 
   create_object(claz_hash_table,Keys,HT),
   ((get_opv(HT,u_data,Tree),Tree\==[])->true;(rb_new(Tree),set_opv(HT,u_data,'$OBJ'(clz_rb_tree,Tree)))).
@@ -34,7 +34,7 @@ ht_match_key_value(Tree,Test,Key,Name,Value):-
   rb_in(Name,Value,Tree),
   ht_match(Test,Key,Name).
 
-(wl:init_args(exact_args,cl_gethash)).
+(wl:init_args(x,gethash)).
 cl_gethash(Key,HT,RetVal):- cl_gethash(Key,HT,[],RetVal).
 cl_gethash(Key,HT,Default,RetVal):- 
   get_table(HT,Tree,_),ht_test_fn(HT,TestFn),

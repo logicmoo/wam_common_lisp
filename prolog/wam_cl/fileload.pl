@@ -141,7 +141,7 @@ cl_compile_file(File):-
   cl_compile_file(File,([]),_).
 cl_compile_file(File,R):-
   cl_compile_file(File,([]),R).
-(wl:init_args(1,cl_compile_file)).
+(wl:init_args(1,compile_file)).
 cl_compile_file(File,Keys,R):-
   do_compile_1file(Keys,File),!,
   cl_truename(File,R),!.
@@ -264,7 +264,7 @@ pl_load(L,Keys,T):- cl_load(L,Keys,T),!.
 
 cl_load(L):- cl_load(L,_).
 cl_load(L,T):- cl_load(L,[],T).
-(wl:init_args(1,cl_load)).
+(wl:init_args(1,load)).
 cl_load(L,Keys,T):- to_prolog_string_if_needed(L,Loc)->L\==Loc,!,cl_load(Loc,Keys,T).
 %cl_load('$OBJ'(_Pathname,Loc),Keys,T):- !, cl_load(Loc,Keys,T).
 cl_load(File,_Keys,t):- fail,
@@ -367,7 +367,7 @@ cl_require(Name_Param, RestNKeys, FResult) :-
 % asserting... u
 wl:arglist_info(cl_provide, [sys_name], [_Name_Param], arginfo{all:[sys_name], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_name], opt:0, req:[sys_name], rest:0, whole:0}).
 % asserting... u
-wl:init_args(exact_only, cl_provide).
+wl:init_args(x, cl_provide).
 % asserting... u
 wl:lambda_def(defun, provide, cl_provide, [sys_name], [[let, [[string, [string, sys_name]]], [pushnew, string, xx_modules_xx, kw_test, function(string_c61)], string]]).
 % asserting... u

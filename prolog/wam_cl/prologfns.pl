@@ -64,7 +64,7 @@ wl:interned_eval('`sys:trace').
 compile_prolog_call(_Ctx,_Env,Prev,[sys_prolog_trace],Prev, trace).
 compile_prolog_call(_Ctx,_Env,Prev,[sys_trace],Prev, trace).
 
-wl:init_args(exact_only, sys_rtrace).
+wl:init_args(x, sys_rtrace).
 wl:declared(sys_rtrace,kw_operator).
 wl:interned_eval('`sys:rtrace').
 f_sys_rtrace(Eval,Ret):- lisp_compile(Ret,Eval,Body), rtrace(Body).
