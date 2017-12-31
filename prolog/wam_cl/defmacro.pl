@@ -106,7 +106,8 @@ compile_macro_function(Ctx,Env,Symbol,[FormalParms|MacroBody0],Macro,HeadParms,E
 
    LabelSymbol = '', % LabelSymbol =Symbol       
  within_labels_context(Ctx,LabelSymbol,((
-   expand_function_head_macro(Ctx,Env,Symbol,Macro,FormalParms,_Whole, HeadParms,ZippedArgEnv,_ArgInfo, HeadDefCode,HeadCode),   
+   Whole=[Symbol|_],
+   expand_function_head_macro(Ctx,Env,Symbol,Macro,FormalParms,Whole, HeadParms,ZippedArgEnv,_ArgInfo, HeadDefCode,HeadCode),   
    make_env_append(Ctx,Env,HeadEnv,ZippedArgEnv,EnvAssign),
    must_compile_body(Ctx,HeadEnv,MFResult,[block,Symbol|MacroBody],MFBody), 
    body_cleanup_keep_debug_vars(Ctx,((DocCode,

@@ -247,7 +247,7 @@ ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,required,[F|FormalParms],[List|Par
   %debug_var('Destructure',List),
   %List = [H|T],List = [H|T],
   %debug_var('H',List),
-  Whole2 = List,
+ Whole2 = List,
   is_list(F),!,
   SubFormal = F,
 
@@ -355,42 +355,42 @@ simple_atom_var(Atom):- atom(Atom), Atom\=nil,Atom\=[], correct_formal_params_c3
 opt_var(Env, Var, FinalResult, _G, _Default, Nth, Optionals):- nth1(Nth,Optionals,Value),nonvar(Value),FinalResult=Value,set_var(Env,Var,Value).
 opt_var(Env, Var, FinalResult, G, Default, _Nth, _Optionals):-  G, FinalResult=Value,FinalResult=Default,set_var(Env,Var,Value).
 
-align_args_local(FN,RequiredArgs,RestNKeys,Whole,LB,_ArgInfo,RequiredArgs,wl:init_args(x,FN)):- 
+align_args_local(FN,RequiredArgs,RestNKeys,WholeMinusSymbol,LB,_ArgInfo,RequiredArgs,wl:init_args(x,FN)):- 
   eval_uses_exact(FN),!,
   LB = true,
   RestNKeys = _,
-  RequiredArgs = Whole.
+  RequiredArgs =WholeMinusSymbol.
 
 % invoke([r1,r2,r3],RET).
-align_args_local(FN,RequiredArgs,RestNKeys,Whole,LB,_ArgInfo,PARAMS,wl:init_args(bind_parameters,FN)):-
+align_args_local(FN,RequiredArgs,RestNKeys,WholeMinusSymbol,LB,_ArgInfo,PARAMS,wl:init_args(bind_parameters,FN)):-
   eval_uses_bind_parameters(FN),!,
-  LB = append(RequiredArgs,RestNKeys,Whole),
-  PARAMS = [Whole].
+  LB = append(RequiredArgs,RestNKeys,WholeMinusSymbol),
+  PARAMS = [WholeMinusSymbol].
 
 % invoke([r1,r2,r3],RET).
-align_args_local(FN,RequiredArgs,RestNKeys,Whole,LB,_ArgInfo,PARAMS,wl:init_args(0,FN)):-
+align_args_local(FN,RequiredArgs,RestNKeys,WholeMinusSymbol,LB,_ArgInfo,PARAMS,wl:init_args(0,FN)):-
   eval_uses_rest_only(FN),!,
-  LB = append(RequiredArgs,RestNKeys,Whole),
-  PARAMS = [Whole].   
+  LB = append(RequiredArgs,RestNKeys,WholeMinusSymbol),
+  PARAMS = [WholeMinusSymbol].   
 
 % invoke(r1,r2,[o3,key1,value1],RET).
-align_args_local(FN,RequiredArgs,RestNKeys,Whole,LB,ArgInfo,ArgsPlus,wl:init_args(N,FN)):- 
+align_args_local(FN,RequiredArgs,RestNKeys,WholeMinusSymbol,LB,ArgInfo,ArgsPlus,wl:init_args(N,FN)):- 
   eval_uses_exact_and_restkeys(FN,N),!,
   RestNKeys = _,
   append(RequiredArgs,[RestNKeys],BetterArgs),
-   (ArgInfo.whole == 0 -> LB = true ; LB = append(RequiredArgs,RestNKeys,Whole)),
+   (ArgInfo.whole == 0 -> LB = true ; LB = append(RequiredArgs,RestNKeys,WholeMinusSymbol)),
   BetterArgs = ArgsPlus.
 
-align_args_local(FN,RequiredArgs,RestNKeys,Whole,LB,ArgInfo,GoodHeadParms,wl:init_args(Reqs,FN)):-
+align_args_local(FN,RequiredArgs,RestNKeys,WholeMinusSymbol,LB,ArgInfo,GoodHeadParms,wl:init_args(Reqs,FN)):-
  always(is_list(RequiredArgs)),length(RequiredArgs,Reqs),
  append(RequiredArgs,[RestNKeys],RARGS), 
-   (ArgInfo.whole == 0 -> LB = true ; LB = append(RequiredArgs,RestNKeys,Whole)),
+   (ArgInfo.whole == 0 -> LB = true ; LB = append(RequiredArgs,RestNKeys,WholeMinusSymbol)),
  align_args(FN,FN,RARGS,kILLiTT,HeadParms),!,
  append(GoodHeadParms,[kILLiTT],HeadParms).
 
-align_args_local(FN,RequiredArgs,RestNKeys,Whole,LB,ArgInfo,HeadParms,wl:init_args(Reqs,FN)):-
+align_args_local(FN,RequiredArgs,RestNKeys,WholeMinusSymbol,LB,ArgInfo,HeadParms,wl:init_args(Reqs,FN)):-
  always(is_list(RequiredArgs)),length(RequiredArgs,Reqs),
-   (ArgInfo.whole == 0 -> LB = true ; LB = append(RequiredArgs,RestNKeys,Whole)),
+   (ArgInfo.whole == 0 -> LB = true ; LB = append(RequiredArgs,RestNKeys,WholeMinusSymbol)),
  append(RequiredArgs,[RestNKeys],HeadParms),!.
 
 
@@ -404,28 +404,30 @@ expand_function_head_macro(Ctx,Env,Symbol,Macro,FormalParms,Whole, HeadParms,Zip
     
 
 % Dotted HeadParms
-expand_function_head(Ctx,Env,Symbol,FN,FormalParms, Whole,HeadParms,ZippedArgEnv,ArgInfo,HeadDefCode,HeadCode):- 
+expand_function_head(Ctx,Env,Symbol,FN,FormalParms,Whole,HeadParms,ZippedArgEnv,ArgInfo,HeadDefCode,HeadCode):- 
    append(Req,Rest,FormalParms),Rest\==[],\+ Rest=[_|_], 
    append(Req,['&rest',Rest],NewFormalParms),!,
-   expand_function_head(Ctx,Env,Symbol,FN,NewFormalParms, Whole,HeadParms,ZippedArgEnv,ArgInfo,HeadDefCode,HeadCode).
+   expand_function_head(Ctx,Env,Symbol,FN,NewFormalParms,Whole,HeadParms,ZippedArgEnv,ArgInfo,HeadDefCode,HeadCode).
 
 
 
 % eval_uses_exact
-expand_function_head(Ctx,Env,Symbol,FN,FormalParms, Whole,HeadParms,ZippedArgEnv,ArgInfo, HeadDefCode,(HeadCode)):-
+expand_function_head(Ctx,Env,Symbol,FN,FormalParms,Whole,HeadParms,ZippedArgEnv,ArgInfo, HeadDefCode,(HeadCode)):-
+      Whole = [_|WholeMinusSymbol],
    (eval_uses_exact(FN) ; \+ (member(Mode,FormalParms), \+ simple_atom_var(Mode))),!,
    %debug_var('NilRestNKeys',RestNKeys), 
        function_head_params(Ctx,Env,FN,FormalParms,ZippedArgEnv,_RestNKeys,Whole,RequiredArgs,ArgInfo,_Names,_PVars,HeadCode),
                HeadDefCode = (assert_lsp(Symbol,wl:arglist_info(Symbol,FN,FormalParms,ArgInfo)),!,
                  assert_lsp(Symbol,wl:init_args(x,FN))),
                always(HeadDefCode),
-       Whole = RequiredArgs,            
+     WholeMinusSymbol= RequiredArgs,            
        HeadParms =  RequiredArgs.
        
 
 
 % eval_uses_bind_parameters
-expand_function_head(Ctx,Env,Symbol,FN,FormalParms, Whole ,HeadParms,ZippedArgEnv,ArgInfo, HeadDefCode,HeadCodeOut):-
+expand_function_head(Ctx,Env,Symbol,FN,FormalParms,Whole,HeadParms,ZippedArgEnv,ArgInfo, HeadDefCode,HeadCodeOut):-
+   Whole = [_|WholeMinusSymbol],
    eval_uses_bind_parameters(FN),!,
    debug_var('PBRestNKeys',RestNKeys),
    always((function_head_params(Ctx,Env,FN,FormalParms,ZippedArgEnv,RestNKeys,Whole,RequiredArgs,ArgInfo,_Names,_PVars,
@@ -434,22 +436,23 @@ expand_function_head(Ctx,Env,Symbol,FN,FormalParms, Whole ,HeadParms,ZippedArgEn
                 assert_lsp(Symbol,wl:init_args(bind_parameters,FN))),
                always(HeadDefCode),   
    debug_var('BinderCode',BindCode),
-   debug_var('Whole',Whole), 
+   debug_var('WholeMinusSymbol',WholeMinusSymbol), 
    HeadCodeOut = (
-     append(RequiredArgs,RestNKeys, Whole),
+     append(RequiredArgs,RestNKeys,WholeMinusSymbol),
      ignore(HeadCodeIgnored),
-     must_bind_parameters(Env,RestNKeys,FormalParms,Whole,Env,BindCode),
+     must_bind_parameters(Env,RestNKeys,FormalParms,WholeMinusSymbol,Env,BindCode),
      always(BindCode)),
-   HeadParms = [Whole])).
+   HeadParms = [WholeMinusSymbol])).
 
 % align_args_local
-expand_function_head(Ctx,Env,Symbol,FN,FormalParms, Whole ,HeadParms,[ZippedArgEnv|Env],ArgInfo, (HeadDefCode,assert_lsp(Symbol,Used)),
+expand_function_head(Ctx,Env,Symbol,FN,FormalParms,Whole,HeadParms,[ZippedArgEnv|Env],ArgInfo, (HeadDefCode,assert_lsp(Symbol,Used)),
   HeadCodeOut):-
+   Whole = [_|WholeMinusSymbol],
    debug_var('RestNKeys',RestNKeys),
    always((function_head_params(Ctx,Env,FN,FormalParms,ZippedArgEnv,RestNKeys,Whole,RequiredArgs,ArgInfo,_Names,_PVars,HeadCode),
    HeadDefCode = (assert_lsp(Symbol,wl:arglist_info(Symbol,FN,FormalParms,ArgInfo))),
    always(HeadDefCode),
-   align_args_local(FN,RequiredArgs,RestNKeys,Whole,LB,ArgInfo,HeadParms,Used),!,  
+   align_args_local(FN,RequiredArgs,RestNKeys,WholeMinusSymbol,LB,ArgInfo,HeadParms,Used),!,  
    assert_lsp(Symbol,Used:-true),
    HeadCodeOut = (LB,HeadCode))).
 
