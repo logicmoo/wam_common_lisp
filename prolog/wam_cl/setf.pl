@@ -4,7 +4,7 @@
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:8170 **********************/
 %:-lisp_compile_to_prolog(pkg_sys,['in-package','$STRING'("SYSTEM")]).
 %:- cl_in_package('$ARRAY'([*], claz_base_character, "SYSTEM"), _Ignored).
-/*
+wl:interned_eval_devel("
 #+(or ABCL WAM-CL)
 (defun get-setf-method-inverse (form inverse setf-function)
   (let ((new-var (gensym))
@@ -24,7 +24,7 @@
 
 ;;; If a macro, expand one level and try again.  If not, go for the
 ;;; SETF function.
-*/
+").
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:8195 **********************/
 :-lisp_compile_to_prolog(pkg_sys,[defun,'get-setf-method-inverse',[form,inverse,'setf-function'],[let,[['new-var',[gensym]],[vars,[]],[vals,[]]],[dolist,[x,[cdr,form]],[push,[gensym],vars],[push,x,vals]],[setq,vals,[nreverse,vals]],[values,vars,vals,[list,'new-var'],[if,'setf-function',['#BQ',[['#BQ-COMMA-ELIPSE',inverse],['#COMMA','new-var'],['#BQ-COMMA-ELIPSE',vars]]],[if,[functionp,[car,inverse]],['#BQ',[funcall,['#BQ-COMMA-ELIPSE',inverse],['#BQ-COMMA-ELIPSE',vars],['#COMMA','new-var']]],['#BQ',[['#BQ-COMMA-ELIPSE',inverse],['#BQ-COMMA-ELIPSE',vars],['#COMMA','new-var']]]]],['#BQ',[['#COMMA',[car,form]],['#BQ-COMMA-ELIPSE',vars]]]]]]).
@@ -99,13 +99,9 @@ f_sys_get_setf_method_inverse(Form_In, Inverse_In, Setf_function_In, FnResult) :
    set_opv(sys_get_setf_method_inverse, function, f_sys_get_setf_method_inverse),
    DefunResult=sys_get_setf_method_inverse.
 
-/*
+wl:interned_eval_devel("
 ;; If a macro, expand one level and try again.  If not, go for the
-*/
-/*
 ;; SETF function.
-*/
-/*
 #+(or ABCL WAM-CL)
 (defun expand-or-get-setf-inverse (form environment)
   (multiple-value-bind (expansion expanded)
@@ -115,7 +111,7 @@ f_sys_get_setf_method_inverse(Form_In, Inverse_In, Setf_function_In, FnResult) :
         (get-setf-method-inverse form `(funcall #'(setf ,(car form)))
                                  t))))
 
-*/
+").
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:8857 **********************/
 :-lisp_compile_to_prolog(pkg_sys,[defun,'expand-or-get-setf-inverse',[form,environment],['multiple-value-bind',[expansion,expanded],['macroexpand-1',form,environment],[if,expanded,['get-setf-expansion',expansion,environment],['get-setf-method-inverse',form,['#BQ',[funcall,function([setf,['#COMMA',[car,form]]])]],t]]]]).
@@ -170,7 +166,7 @@ f_sys_expand_or_get_setf_inverse(Form_In, Environment_In, FnResult) :-
 	   f_sys_expand_or_get_setf_inverse),
    DefunResult=sys_expand_or_get_setf_inverse.
 
-/*
+wl:interned_eval_devel("
 #+(or ABCL WAM-CL)
 (defun get-setf-expansion (form &optional environment)
   (let (temp)
@@ -188,13 +184,14 @@ f_sys_expand_or_get_setf_inverse(Form_In, Environment_In, FnResult) :-
            (funcall temp form environment))
           (t
            (expand-or-get-setf-inverse form environment)))))
+").
 
-or lese
+wl:interned_eval_orig_alt("
 (defun get-setf-expansion (form &optional env)
   (declare (optimize (safety 2)))
   (get-setf-method form env))
 
-*/
+").
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:9199 **********************/
 :-lisp_compile_to_prolog(pkg_sys,[defun,'get-setf-expansion',[form,'&optional',environment],[let,[temp],[cond,[[symbolp,form],['multiple-value-bind',[expansion,expanded],['macroexpand-1',form,environment],[if,expanded,['get-setf-expansion',expansion,environment],[let,[['new-var',[gensym]]],[values,[],[],[list,'new-var'],['#BQ',[setq,['#COMMA',form],['#COMMA','new-var']]],form]]]]],[[setq,temp,[get,[car,form],[quote,'setf-inverse']]],['get-setf-method-inverse',form,['#BQ',[['#COMMA',temp]]],[]]],[[setq,temp,[get,[car,form],[quote,'setf-expander']]],[funcall,temp,form,environment]],[t,['expand-or-get-setf-inverse',form,environment]]]]]).
@@ -289,7 +286,21 @@ cl_get_setf_expansion(Form_In, RestNKeys, FnResult) :-
    set_opv(get_setf_expansion, function, cl_get_setf_expansion),
    DefunResult=get_setf_expansion.
 
-
+wl:interned_eval_devel("
+(defmacro shiftf (&rest places-and-newvalue &environment env)
+             (let ((nargs (length places-and-newvalue)))
+               (assert (>= nargs 2))
+               (let ((place (car places-and-newvalue)))
+                 (multiple-value-bind (temps vars newvals setter getter)
+                     (get-setf-expansion place env)
+                   `(let (,@(mapcar #'list temps vars))
+                      (multiple-value-prog1 ,getter
+                        (multiple-value-bind ,newvals
+                            ,(if (= nargs 2)
+                                 (cadr places-and-newvalue)
+                               `(shiftf ,@(cdr places-and-newvalue)))
+                          ,setter)))))))
+").
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init.lisp:3312 **********************/
 :-lisp_compile_to_prolog(pkg_sys,[defmacro,shiftf,['&rest','places-and-newvalue','&environment',env],[let,[[nargs,[length,'places-and-newvalue']]],[assert,[>=,nargs,2]],[let,[[place,[car,'places-and-newvalue']]],['multiple-value-bind',[temps,vars,newvals,setter,getter],['get-setf-expansion',place,env],['#BQ',[let,[['#BQ-COMMA-ELIPSE',[mapcar,function(list),temps,vars]]],['multiple-value-prog1',['#COMMA',getter],['multiple-value-bind',['#COMMA',newvals],['#COMMA',[if,[=,nargs,2],[cadr,'places-and-newvalue'],['#BQ',[shiftf,['#BQ-COMMA-ELIPSE',[cdr,'places-and-newvalue']]]]]],['#COMMA',setter]]]]]]]]]).
@@ -349,7 +360,7 @@ cl_shiftf(RestNKeys, FnResult) :-
    set_opv(shiftf, function, cl_shiftf),
    DefMacroResult=shiftf.
 
-/*
+wl:interned_eval_devel("
 (defmacro rotatef (&rest places &environment env)
              (if (< (length places) 2)
                  nil
@@ -359,10 +370,7 @@ cl_shiftf(RestNKeys, FnResult) :-
                     (multiple-value-bind ,newvals (shiftf ,@(cdr places) ,getter)
                       ,setter)
                     nil))))
-
-
-;; Adapted from SBCL.
-*/
+").
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init.lisp:4028 **********************/
 :-lisp_compile_to_prolog(pkg_sys,[defmacro,rotatef,['&rest',places,'&environment',env],[if,[<,[length,places],2],[],['multiple-value-bind',[temps,vars,newvals,setter,getter],['get-setf-expansion',[car,places],env],['#BQ',[let,[['#BQ-COMMA-ELIPSE',[mapcar,function(list),temps,vars]]],['multiple-value-bind',['#COMMA',newvals],[shiftf,['#BQ-COMMA-ELIPSE',[cdr,places]],['#COMMA',getter]],['#COMMA',setter]],[]]]]]]).
@@ -417,10 +425,11 @@ cl_rotatef(RestNKeys, FnResult) :-
    set_opv(rotatef, compile_as, kw_operator),
    set_opv(rotatef, function, cl_rotatef),
    DefMacroResult=rotatef.
-/*
+
+
+
+wl:interned_eval_devel("
 ; Adapted from SBCL.
-*/
-/*
 (defmacro push (&environment env item place)
   (if (and (symbolp place)
 	   (eq place (macroexpand place env)))
@@ -433,8 +442,8 @@ cl_rotatef(RestNKeys, FnResult) :-
                   (,(car newval) (cons ,g ,getter)))
              ,setter)))))
 
-;; Adapted from SBCL.
-*/
+
+").
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init.lisp:4485 **********************/
 :-lisp_compile_to_prolog(pkg_sys,[defmacro,push,['&environment',env,item,place],[if,[and,[symbolp,place],[eq,place,[macroexpand,place,env]]],['#BQ',[setq,['#COMMA',place],[cons,['#COMMA',item],['#COMMA',place]]]],['multiple-value-bind',[dummies,vals,newval,setter,getter],['get-setf-expansion',place,env],[let,[[g,[gensym]]],['#BQ',['let*',[[['#COMMA',g],['#COMMA',item]],['#BQ-COMMA-ELIPSE',[mapcar,function(list),dummies,vals]],[['#COMMA',[car,newval]],[cons,['#COMMA',g],['#COMMA',getter]]]],['#COMMA',setter]]]]]]]).
@@ -502,10 +511,8 @@ cl_push(Item_In, Place_In, RestNKeys, FnResult) :-
    set_opv(push, function, cl_push),
    DefMacroResult=push.
 
-/*
+wl:interned_eval_devel("
 ; Adapted from SBCL.
-*/
-/*
 (defmacro pushnew (&environment env item place &rest keys)
   (if (and (symbolp place)
 	   (eq place (macroexpand place env)))
@@ -518,8 +525,7 @@ cl_push(Item_In, Place_In, RestNKeys, FnResult) :-
                   (,(car newval) (adjoin ,g ,getter ,@keys)))
              ,setter)))))
 
-;; Adapted from SBCL.
-*/
+").
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init.lisp:4948 **********************/
 :-lisp_compile_to_prolog(pkg_sys,[defmacro,pushnew,['&environment',env,item,place,'&rest',keys],[if,[and,[symbolp,place],[eq,place,[macroexpand,place,env]]],['#BQ',[setq,['#COMMA',place],[adjoin,['#COMMA',item],['#COMMA',place],['#BQ-COMMA-ELIPSE',keys]]]],['multiple-value-bind',[dummies,vals,newval,setter,getter],['get-setf-expansion',place,env],[let,[[g,[gensym]]],['#BQ',['let*',[[['#COMMA',g],['#COMMA',item]],['#BQ-COMMA-ELIPSE',[mapcar,function(list),dummies,vals]],[['#COMMA',[car,newval]],[adjoin,['#COMMA',g],['#COMMA',getter],['#BQ-COMMA-ELIPSE',keys]]]],['#COMMA',setter]]]]]]]).
@@ -588,10 +594,9 @@ cl_pushnew(Item_In, Place_In, RestNKeys, FnResult) :-
    set_opv(pushnew, compile_as, kw_operator),
    set_opv(pushnew, function, cl_pushnew),
    DefMacroResult=pushnew.
-/*
+
+wl:interned_eval_devel("
 ; Adapted from SBCL.
-*/
-/*
 (defmacro pop (&environment env place)
   (if (and (symbolp place)
 	   (eq place (macroexpand place env)))
@@ -609,9 +614,7 @@ cl_pushnew(Item_In, Place_In, RestNKeys, FnResult) :-
                         (setq ,(car newval) (cdr ,(car newval)))
                         ,setter)))
           (push (list (car d) (car v)) let-list)))))
-
-
-*/
+").
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init.lisp:5443 **********************/
 :-lisp_compile_to_prolog(pkg_sys,[defmacro,pop,['&environment',env,place],[if,[and,[symbolp,place],[eq,place,[macroexpand,place,env]]],['#BQ',[prog1,[car,['#COMMA',place]],[setq,['#COMMA',place],[cdr,['#COMMA',place]]]]],['multiple-value-bind',[dummies,vals,newval,setter,getter],['get-setf-expansion',place,env],['do*',[[d,dummies,[cdr,d]],[v,vals,[cdr,v]],['let-list',[]]],[[null,d],[push,[list,[car,newval],getter],'let-list'],['#BQ',['let*',['#COMMA',[nreverse,'let-list']],[prog1,[car,['#COMMA',[car,newval]]],[setq,['#COMMA',[car,newval]],[cdr,['#COMMA',[car,newval]]]],['#COMMA',setter]]]]],[push,[list,[car,d],[car,v]],'let-list']]]]]).
@@ -686,10 +689,8 @@ cl_pop(Place_In, RestNKeys, FnResult) :-
    DefMacroResult=pop.  
 
 
-/*
+wl:interned_eval_devel('
 ; See section 5.1.3.
-*/
-/*
 #+WAM-CL
 (defmacro incf (place &optional (delta 1) &environment env)
   "The first argument is some location holding a number.  This number is
@@ -702,13 +703,12 @@ incremented by the second argument, DELTA, which defaults to 1."
     (multiple-value-bind (dummies vals newval setter getter)
         (get-setf-method place env)
       (let ((d (gensym)))
-        `(let* (,@(mapcar #'list dummies vals)
+        `(let* (,@(mapcar #\'list dummies vals)
                 (,d ,delta)
                 (,(car newval) (+ ,getter ,d)))
            ,setter)))))
 
-
-*/
+').
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:5125 **********************/
 :-lisp_compile_to_prolog(pkg_sys,[defmacro,incf,[place,'&optional',[delta,1],'&environment',env],'$STRING'("The first argument is some location holding a number.  This number is\r\nincremented by the second argument, DELTA, which defaults to 1."),[if,[and,[symbolp,[setq,place,['%symbol-macroexpand',place,env]]],[or,[constantp,delta],[and,[symbolp,delta],[not,['nth-value',1,['%symbol-macroexpand',delta,env]]]]]],['#BQ',[setq,['#COMMA',place],[+,['#COMMA',place],['#COMMA',delta]]]],['multiple-value-bind',[dummies,vals,newval,setter,getter],['get-setf-method',place,env],[let,[[d,[gensym]]],['#BQ',['let*',[['#BQ-COMMA-ELIPSE',[mapcar,function(list),dummies,vals]],[['#COMMA',d],['#COMMA',delta]],[['#COMMA',[car,newval]],[+,['#COMMA',getter],['#COMMA',d]]]],['#COMMA',setter]]]]]]]).
@@ -850,7 +850,8 @@ wl:lambda_def(defun, sys_get_setf_method_inverse, f_sys_get_setf_method_inverse,
 wl:arglist_info(sys_get_setf_method_inverse, f_sys_get_setf_method_inverse, [sys_form, sys_inverse, sys_setf_function], arginfo{all:[sys_form, sys_inverse, sys_setf_function], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_form, sys_inverse, sys_setf_function], opt:0, req:[sys_form, sys_inverse, sys_setf_function], rest:0, sublists:0, whole:0}).
 wl: init_args(x, f_sys_get_setf_method_inverse).
 
-/*
+wl:interned_eval_devel("
+
 (defmacro setf (&rest pairs &environment env)
              (let ((nargs (length pairs)))
                (assert (evenp nargs))
@@ -879,7 +880,8 @@ wl: init_args(x, f_sys_get_setf_method_inverse).
                    (setq splice (cdr (rplacd splice
                                              `((setf ,(car pairs) ,(cadr pairs)))))))))))
 
-*/
+").
+
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init.lisp:1023 **********************/
 :-lisp_compile_to_prolog(pkg_sys,[defmacro,setf,['&rest',pairs,'&environment',env],[let,[[nargs,[length,pairs]]],[assert,[evenp,nargs]],[cond,[[zerop,nargs],[]],[[=,nargs,2],[let,[[place,[car,pairs]],['value-form',[cadr,pairs]]],[cond,[[symbolp,place],['#BQ',[setq,['#COMMA',place],['#COMMA','value-form']]]],[[consp,place],[if,[eq,[car,place],[quote,the]],['#BQ',[setf,['#COMMA',[caddr,place]],[the,['#COMMA',[cadr,place]],['#COMMA','value-form']]]],['multiple-value-bind',[temps,vars,newvals,setter,getter],['get-setf-expansion',place,env],[declare,[ignore,getter]],['#BQ',[let,[['#BQ-COMMA-ELIPSE',[mapcar,function(list),temps,vars]]],['multiple-value-bind',['#COMMA',newvals],['#COMMA','value-form'],['#COMMA',setter]]]]]]]]]],[t,['do*',[[pairs,pairs,[cddr,pairs]],[setfs,[list,[quote,progn]]],[splice,setfs]],[[endp,pairs],setfs],[setq,splice,[cdr,[rplacd,splice,['#BQ',[[setf,['#COMMA',[car,pairs]],['#COMMA',[cadr,pairs]]]]]]]]]]]]]).
@@ -1359,7 +1361,7 @@ wl:arglist_info(ext_get_setf_method, f_ext_get_setf_method, [u_form, c38_optiona
 wl: init_args(1, f_ext_get_setf_method).
 
 
-/*
+wl:interned_eval_devel('
 ;;; GET-SETF-METHOD.
 ;;; It just calls GET-SETF-METHOD-MULTIPLE-VALUE
 ;;;  and checks the number of the store variable.
@@ -1370,7 +1372,9 @@ wl: init_args(1, f_ext_get_setf_method).
 	    (error "Multiple store-variables are not allowed."))
     (values vars vals stores store-form access-form)))
 
-*/%### Compiled:  `EXT:GET-SETF-METHOD`
+').
+
+%### Compiled:  `EXT:GET-SETF-METHOD`
 %```prolog
 
 f_ext_get_setf_method(Form_In, RestNKeys, FnResult):- !,

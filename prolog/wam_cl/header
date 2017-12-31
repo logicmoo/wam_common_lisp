@@ -93,9 +93,15 @@
 :- dynamic(wl:uses_rest_only/1).
 :- discontiguous(wl:uses_rest_only/1).
 
+% Ran at load
 :- multifile(wl:interned_eval/1).
 :- dynamic(wl:interned_eval/1).
 :- discontiguous(wl:interned_eval/1).
+
+% Ran at for rebuilding
+:- multifile(wl:interned_eval_devel/1).
+:- dynamic(wl:interned_eval_devel/1).
+:- discontiguous(wl:interned_eval_devel/1).
 
 :- multifile(wl:type_checked/1).
 :- dynamic(wl:type_checked/1).
