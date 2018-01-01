@@ -118,7 +118,7 @@ compile_progn(Ctx,Env,Result, Form , PreviousResult, Body):-
 
 % Compiler Plugin
 must_compile_progbody(Ctx,Env,Result,Form,PreviousResult,FormBody):-  
-	shared_lisp_compiler:plugin_expand_progbody(Ctx,Env,Result,Form,PreviousResult,FormBody),!.
+	wl:plugin_expand_progbody(Ctx,Env,Result,Form,PreviousResult,FormBody),!.
 must_compile_progbody(Ctx,Env,Result,Form,_PreviousResult,FormBody):-
         % locally(
   % local_override('$compiler_PreviousResult',the(PreviousResult)),
@@ -177,6 +177,12 @@ must_compile_body_pt2(Ctx,_Env,Result,ResultO,_Forms, Body9,BodyO):-
 
 :- discontiguous(compile_body/5).
 % Prolog vars
+% Compiler Plugin
+
+compile_body(Ctx,Env,Result,In1,Code):-
+  clause(wl:plugin_expand_progbody_1st(Ctx,Env,Result,In2,_PreviousResult,Code),Body),
+  structure_applies_here(In1,In2,Body),!.
+
 compile_body(_Ctx,_Env,Result,Var, true):- Result == Var,!.
 compile_body(_Ctx,_Env,ResultO,LispCode, Body):- var(LispCode), get_attr(LispCode,preserved_var,t),!,true=Body,
    ResultO = LispCode.
@@ -255,7 +261,7 @@ compile_body(Ctx,Env,Result,[OP,Flags,Forms], OutCode):-  same_symbol(OP,'eval-w
    do_when(Flags,Code,Result):- 
       (is_when(Flags) -> locally_let(sym('sys::*compiler-mode*')=sym(':execute'),Code);Result=[]).
    
-% assuem always true (debugging) 
+% assume always true (debugging) 
 compile_body(Ctx,Env,Result,[OP,_Flags|Forms], Code):-   same_symbol(OP,'eval-when'), !,must_compile_body(Ctx,Env,Result,[progn,Forms],Code).
 
 % Maybe later we'll try something simular?
@@ -341,11 +347,11 @@ compile_body(Ctx,Env,Result,LispCode,CompileBody):-
 
 % Compiler Plugin
 compile_body(Ctx,Env,Result,InstrS,Code):-
-  shared_lisp_compiler:plugin_expand_progbody(Ctx,Env,Result,InstrS,_PreviousResult,Code),!.
+  wl:plugin_expand_progbody(Ctx,Env,Result,InstrS,_PreviousResult,Code),!.
 
 
 % example of making CONS inine
-shared_lisp_compiler:plugin_expand_progbody(Ctx,Env,Result,[cons, IN1,IN2],_, Body):- 
+wl:plugin_expand_progbody(Ctx,Env,Result,[cons, IN1,IN2],_, Body):- 
   \+ current_prolog_flag(lisp_inline,false), !,
         must_compile_body(Ctx,Env,MID1,IN1,  ValueBody1),
         must_compile_body(Ctx,Env,MID2,IN2,  ValueBody2),

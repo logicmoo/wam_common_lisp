@@ -13,7 +13,7 @@
  *
  *******************************************************************/
 :- module(typcheck, []).
-:- set_module(class(library)).
+
 :- include('header').
 
 do_correctly(P,AT):- compound(P),functor(P,F,A),functor(AT,F,A),wl:type_checked(AT).

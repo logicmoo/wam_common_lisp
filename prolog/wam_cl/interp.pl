@@ -34,7 +34,7 @@
 
 :- module(interp, []).
 
-:- set_module(class(library)).
+end_of_file.
 
 :- include('header').
 

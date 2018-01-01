@@ -1,5 +1,5 @@
 :-module(lisp_code_names,[lisp_code_name/2]).
-:- set_module(class(library)).
+
 :- set_prolog_flag(double_quotes,chars).
 
 lisp_code_name(0,"Nul").

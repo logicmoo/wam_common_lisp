@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(streams, []).
 
-:- set_module(class(library)).
+
 
 :- include('header').
 

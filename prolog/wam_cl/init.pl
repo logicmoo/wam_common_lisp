@@ -13,7 +13,7 @@
  *
  *******************************************************************/
 :- module(in1t, []).
-:- set_module(class(library)).
+
 
 :- set_prolog_flag(backtrace,true).
 :- set_prolog_flag(backtrace_depth,500).
@@ -132,7 +132,7 @@ handle_1program_arg(N):- handle_program_args(_,N),!.
 
 % helpfull
 handle_program_args('--help','-?'):- listing(handle_program_args),show_help,imply_interactive(false).
-handle_program_args('--debug','-debug'):- nop(cl_push_new(xx_features_xx,kw_debugger)),set_lisp_option(debug).
+handle_program_args('--debug','-debug'):- nop(pl_pushnew(xx_features_xx,kw_debugger)),set_lisp_option(debug).
 handle_program_args('--package','-p',Package):- do_after_load(cl_in_package(Package)).
 handle_program_args('--quiet','--silent'):- set_lisp_option(quiet).
 
@@ -152,7 +152,9 @@ handle_program_args('--test','--markdown'):- set_prolog_flag(lisp_markdown,true)
 
 
 % incomplete 
-handle_program_args('--ansi','-ansi'):- cl_push_new(xx_features_xx,kw_ansi).
+handle_program_args('--ansi','-ansi'):- pl_pushnew(xx_features_xx,kw_ansi).
+
+pl_pushnew(Symbol,Item):- cl_symbol_value(Symbol,Old),cl_adjoin(Item,Old,[],New),f_sys_set_symbol_value(Symbol,New).
 
 tidy_database:-
         reset_env,

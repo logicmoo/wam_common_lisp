@@ -35,7 +35,7 @@ tst:is_local_test(block2,[block,block2,[tagbody,setq(b,2),[go,tag2],setq(a,1),(t
                      'return-from'(block2,c),(tag2),setq(a,4),[go,tag1]]],6).
 */
 
-shared_lisp_compiler:plugin_expand_progbody(Ctx,Env,Result,InstrS,Prev,Code):- 
+wl:plugin_expand_progbody(Ctx,Env,Result,InstrS,Prev,Code):- 
   compile_prolog_call(Ctx,Env,Result,InstrS,Prev,Code),!.
 
 

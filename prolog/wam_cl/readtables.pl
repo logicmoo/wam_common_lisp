@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(readtables, []).
 
-:- set_module(class(library)).
+
 
 :- include('header').
 
@@ -137,7 +137,7 @@ atom_symbol_test(SymbolName,Symbol):- reading_package(Package),atom_symbol(Symbo
 resolve_reader_macros(I,O):- remove_comments(I,M),resolve_inlines(M,M2),remove_comments(M2,O).
 
 
-str_to_expression(Str, Expression):- lisp_add_history(Str),parse_sexpr_interned(string(Str), Expression),!.
+str_to_expression(Str, Expression):- lisp_add_history(Str),as_sexp_interned(string(Str), Expression),!.
 str_to_expression(Str, Expression):- with_input_from_string(Str,read_and_parse(Expression)),!.
 
 remove_comments(IO,IO):- \+ compound(IO),!.

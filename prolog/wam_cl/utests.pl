@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(tests, []).
 
-:- set_module(class(library)).
+
 
 :- include('header').
 
@@ -160,7 +160,7 @@ fibc(A, K) :- !,
             K=L
         ;   K=1
         ).
-fibc(_, _) :- '<<=='(fibc(n),if(n>1, fibc(n-1)+fibc(n-2), 1)).
+%fibc(_, _) :- '<<=='(fibc(n),if(n>1, fibc(n-1)+fibc(n-2), 1)).
 
 
 % HANDWRITTEN
@@ -230,7 +230,7 @@ fibd(A, K) :- !,
             K=L
         ;   K=1
         ).
-fibd(_, _) :- '<<=='(fibd(n),if(n>1, fibd(n-1)+fibd(n-2), 1)).
+%fibd(_, _) :- '<<=='(fibd(n),if(n>1, fibd(n-1)+fibd(n-2), 1)).
 % YAP
 % ?- time(fibd(38,O)).
 % 41.608 CPU in 42.418 seconds ( 98% CPU)

@@ -16,7 +16,7 @@
  *******************************************************************/
 :- module(string, []).
 
-:- set_module(class(library)).
+
 
 % base-string == (vector base-character) 
 % simple-base-string == (simple-array base-character (*))
@@ -178,6 +178,8 @@ char_lessp(X,Y):- to_prolog_char(X,XX),to_prolog_char(Y,YY), char_type(XX,upper(
 char_greaterp(X,Y):- to_prolog_char(X,XX),to_prolog_char(Y,YY), char_type(XX,upper(XXX)),char_type(YY,upper(YYY)), XXX@>YYY.
 char_same(X,Y):- to_prolog_char(X,XX),to_prolog_char(Y,YY), char_type(XX,upper(XXX)),char_type(YY,upper(YYY)), XXX==YYY.
 char_same(X,Y):- to_prolog_char(X,XX),to_prolog_char(Y,YY), XX==YY.
+
+char_exact(X,Y):- to_prolog_char(X,XX),to_prolog_char(Y,YY), XX==YY.
 
 
 % string-equals

@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(loadfile, []).
 
-:- set_module(class(library)).
+
 
 :- include('header').
 
@@ -339,7 +339,7 @@ with_each_file(How,File):- working_directory(CD,CD),with_fstem(CD,File,Found),!,
 % asserting... u
 wl:arglist_info(cl_require, [sys_name, c38_optional, u_pathnames], [_Name_Param], arginfo{all:[sys_name, u_pathnames], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_name, u_pathnames], opt:[u_pathnames], req:[sys_name], rest:0, whole:0}).
 % asserting... u
-wl:init_args(1, cl_require).
+wl:init_args(1,require).
 % asserting... u
 wl:lambda_def(defun, require, cl_require, [sys_name, c38_optional, u_pathnames], [[let, [[string, [string, sys_name]]], [unless, [find, string, xx_modules_xx, kw_test, function(string_c61)], [u_do_list_designator, [u_file, u_pathnames], [load, u_file]]]]]).
 % asserting... u
@@ -353,10 +353,10 @@ cl_require(Name_Param, RestNKeys, FResult) :-
         (   IFTEST\==[]
         ->  FResult=[]
         ;   get_var(LEnv, u_pathnames, Pathnames_Get),
-            f_u_file(Pathnames_Get, List_designator_Param),
+            throw(f_u_file(Pathnames_Get, List_designator_Param)),
             get_var(LEnv, u_file, File_Get),
             cl_load(File_Get, [], Load_Ret),
-            f_u_do_list_designator(List_designator_Param, Load_Ret, ElseResult),
+            throw(f_u_do_list_designator(List_designator_Param, Load_Ret, ElseResult)),
             FResult=ElseResult
         ).
 /*:- set_opv(cl_require, classof, claz_compiled_function),

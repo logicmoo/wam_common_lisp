@@ -20,7 +20,7 @@
  *******************************************************************/
 :- module(eq4l1y,[]).
 
-:- set_module(class(library)).
+
 
 :- include('header').
 
@@ -58,10 +58,17 @@ is_special_var_c(_,_):-!,fail.
 sym_arg_val_envc(N,A,B,_) :- is_special_var_c(N,B) -> true ; A = B.
 
 
+%   every(List, Pred)
+%   suceeds when Pred(Elem) succeeds for each Elem in the List.
+
+every([], _Pred):-!.
+every([Head|Tail], Pred) :-
+        lpa_apply(Pred, [Head]),
+        every(Tail, Pred).
 
 
 show_special:-
-		setof(Package:Var=Type:Value, symp:symbol_info(Var, Package, Type, Value), SVs)
+		setof(Var=Value, get_opv_iii(Var, value, Value), SVs)
 	->	writef('Variable \tValue\n\n'),
 		every(SVs, [(Var2 = Value2)]^(writef('%t :\t%t\n',[Var2, Value2])))
 	;	writef('No special variables\n').

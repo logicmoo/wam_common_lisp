@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(pathname, []).
 
-:- set_module(class(library)).
+
 
 :- include('header').
 
@@ -70,7 +70,7 @@ pl_compiled_filename0(File,PL):- get_var(sys_xx_compile_file_type_xx,Ext),
 
 
 to_prolog_pathname(Cmp,Out):- compound(Cmp),Cmp='$OBJ'(claz_pathname,S),!,always(to_prolog_pathname(S,Out)).
-to_prolog_pathname(Ref,Value):- atom(Ref),!,((is_symbolp(Ref),is_boundp(Ref),symbol_value(Ref,PValue))->to_prolog_pathname(PValue,Value);Ref=Value).
+to_prolog_pathname(Ref,Value):- atom(Ref),!,((is_symbolp(Ref),is_boundp(Ref),cl_symbol_value(Ref,PValue))->to_prolog_pathname(PValue,Value);Ref=Value).
 to_prolog_pathname(Ref,O):- is_pathnamep(Ref),get_opv(Ref,name,V),!,always(show_call_trace(to_prolog_pathname(V,O))).
 to_prolog_pathname(Str,O):- is_stringp(Str),!,string_to_prolog_atom(Str,O).
 to_prolog_pathname(Obj,PL):- string_to_prolog_atom(Obj,PL).

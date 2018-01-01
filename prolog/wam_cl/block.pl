@@ -47,7 +47,7 @@ loop_1var_n_step([Variable, Form],[bind, Variable, Form],[]).
 loop_1var_n_step(Variable,[bind, Variable, []],[]).
 
 
-shared_lisp_compiler:plugin_expand_progbody(Ctx,Env,Result,InstrS,_PreviousResult,Code):- 
+wl:plugin_expand_progbody(Ctx,Env,Result,InstrS,_PreviousResult,Code):- 
   compile_body_block(Ctx,Env,Result,InstrS,Code),!.
 
 

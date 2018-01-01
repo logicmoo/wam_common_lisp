@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(errs, []).
 
-:- set_module(class(library)).
+
 
 :- include('header').
 
@@ -33,7 +33,7 @@ cl_error(Args,Res):- cl_format([t|Args],Res),throw(cl_error(Args,Res)).
 	write(Form),
 	nl.
 '?ERROR?'(Error, Goal):-
-	error_hook(Error, Goal).
+	wl:error_hook(Error, Goal).
 
 lisp_error_description(unbound_atom,        100, 'No value found for atom: ').
 lisp_error_description(atom_does_not_exist, 101, 'SetQ: Variable does not exist: ').

@@ -13,7 +13,7 @@
  *
  *******************************************************************/
 :- module(env, []).
-:- set_module(class(library)).
+
 :- include('header').
 
 
@@ -161,7 +161,7 @@ set_env_attribute0(Env,Name,Value):-
 sub_term_index(Sub,Term,N,T) :-
         compound(Term),
         arg(N0, T0, Sub0),
-        ((Sub0=Sub,T0=T,N0=N);sub_n_subterm(Sub,Sub0,N,T)).
+        ((Sub0=Sub,T0=T,N0=N);sub_term_index(Sub,Sub0,N,T)).
         
 
 remove_env_attribute(ENV,Name):-fail,

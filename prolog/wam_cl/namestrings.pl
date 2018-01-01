@@ -21,7 +21,7 @@
  *
  *******************************************************************/
 :- module(pnames, []).
-:- set_module(class(library)).
+
 :- include('header').
 %:- set_prolog_flag(verbose_load,full).
 :- set_prolog_flag(verbose,normal).

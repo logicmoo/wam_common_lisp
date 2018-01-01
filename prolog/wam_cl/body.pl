@@ -211,7 +211,7 @@ compile_body_form(Ctx,Env,Result,[with_slots,Slots,Obj|Progn],Body):-
 compile_body_form(Ctx,Env,Result,['dolist'|Rest], Code):- !,
   always(compile_dolist(Ctx,Env,Result,['dolist'|Rest], Code)).
 
-wl: init_args(1, cl_dolist).
+wl: init_args(1,dolist).
 wl: declared(cl_dolist,inlined).
 cl_dolist(VarList,FormS,Result):-
    compile_dolist(_Ctx,_Env,Result,['dolist',VarList|FormS], Code),

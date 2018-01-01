@@ -20,7 +20,7 @@
   write_trans/4,
   parse_sexpr/2]).
 
-:- set_module(class(library)).
+
 :- use_module(library(filestreams)).
 :- use_module(library(bugger)).
 
@@ -502,7 +502,7 @@ sym_or_num(('1-')) --> `1-`,swhite,!.
 sym_or_num(('#+')) --> `#+`,swhite,!.
 sym_or_num(('#-')) --> `#-`,swhite,!.
 sym_or_num(('-#+')) --> `-#+`,swhite,!.
-sym_or_num(E) --> dcg_and2(rsymbol_maybe(``,E), \+ lnumber(_)),!.
+sym_or_num(E) --> dcg_and2(rsymbol_maybe(``,E),dcg_not(lnumber(_))),!.
 sym_or_num((E)) --> lnumber(E),swhite,!.
 sym_or_num('#'(E)) --> [C],{name(E,[C])}.
 
@@ -630,6 +630,8 @@ oneof_ci(OneOf,[C])--> {member(C,OneOf)},ci([C]).
 dcg_and2(DCG1,DCG2,S,E) :- dcg_phrase(DCG1,S,E),dcg_phrase(DCG2,S,E).
 dcg_phrase(\+ DCG1,S,E):- !, \+ phrase(DCG1,S,E).
 dcg_phrase(DCG1,S,E):- phrase(DCG1,S,E).
+
+dcg_not(DCG1,S,E) :- \+ dcg_phrase(DCG1,S,E).
 
 enumber(N)--> lnumber(L),!,{to_untyped(L,N)}.
 

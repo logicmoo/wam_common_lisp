@@ -85,6 +85,10 @@
 :- dynamic(wl:declared/2).
 :- discontiguous(wl:declared/2).
 
+:- multifile(wl:error_hook/2).
+:- dynamic(wl:error_hook/2).
+:- discontiguous(wl:error_hook/2).
+
 :- multifile(wl:init_args/2).
 :- dynamic(wl:init_args/2).
 :- discontiguous(wl:init_args/2).
@@ -92,6 +96,18 @@
 :- multifile(wl:uses_rest_only/1).
 :- dynamic(wl:uses_rest_only/1).
 :- discontiguous(wl:uses_rest_only/1).
+
+:- multifile(wl:interned_eval/1).
+:- dynamic(wl:interned_eval/1).
+:- discontiguous(wl:interned_eval/1).
+
+:- multifile(wl:plugin_expand_progbody/6).
+:- dynamic(wl:plugin_expand_progbody/6).
+:- discontiguous(wl:plugin_expand_progbody/6).
+
+:- multifile(wl:plugin_expand_progbody_1st/6).
+:- dynamic(wl:plugin_expand_progbody/6).
+:- discontiguous(wl:plugin_expand_progbody_1st/6).
 
 % Ran at load
 :- multifile(wl:interned_eval/1).

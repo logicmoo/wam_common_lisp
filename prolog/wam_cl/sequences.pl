@@ -100,8 +100,23 @@ append_r([H|T], L, [H|R]) :-
     append_r(T, L, R).
 append_r([], L, L).
 
+
+% #'ADJOIN
+wl:init_args(2, adjoin).
+cl_adjoin(Item,List,Keys,RetVal):-
+ get_identity_pred(Keys,kw_key,Ident),
+ get_test_pred(cl_eql,Keys,EqlPred),
+ key_value(Keys,kw_from_end,FromEnd1,[]),
+ range_1(List,Keys,RList,_Start1),
+ ((FromEnd1==[]->append(_,[V|_Rest],RList); append_r(_,[V|_Rest],RList))),
+ call_as_ident(Ident,V,Id),apply_as_pred(EqlPred,Item,Id),!,
+  RetVal = List.
+cl_adjoin(Item,List,_,[Item|List]).
+
+
+
 % #'MEMBER
-wl:init_args(2, cl_member).
+wl:init_args(2,member).
 cl_member(Item,List,Keys,RetVal):-
  get_identity_pred(Keys,kw_key,Ident),
  get_test_pred(cl_eql,Keys,EqlPred),
@@ -113,27 +128,27 @@ cl_member(Item,List,Keys,RetVal):-
 cl_member(_,_,_,[]).
 
 % #'MEMBER-IF
-wl:init_args(2, cl_member_if).
+wl:init_args(2,member_if).
 cl_member_if(E,Seq,Keys,Result):- cl_member(E,Seq,[kw_test,cl_funcall|Keys],Result).  
 
 % #'MEMBER-IF-NOT
-wl:init_args(2, cl_member_if_not).
+wl:init_args(2,member_if_not).
 cl_member_if_not(E,Seq,Keys,Result):- cl_member(E,Seq,[kw_test_not,cl_funcall|Keys],Result).
 
-wl:init_args(2, cl_find).
+wl:init_args(2,find).
 cl_find(E,Seq,Keys,Result):-
    cl_member(E,Seq,Keys,MemberResult),
    cl_car(MemberResult,Result).
 
-wl:init_args(2, cl_find_if).
+wl:init_args(2,find_if).
 cl_find_if(E,Seq,Keys,Result):- cl_find(E,Seq,[kw_test,cl_funcall|Keys],Result).  
 
-wl:init_args(2, cl_find_if_not).
+wl:init_args(2,find_if_not).
 cl_find_if_not(E,Seq,Keys,Result):- cl_find(E,Seq,[kw_test_not,cl_funcall|Keys],Result).
 
 
 % #'SEARCH  - http://www.lispworks.com/documentation/HyperSpec/Body/f_search.htm
-wl:init_args(2, cl_search).
+wl:init_args(2,search).
 cl_search(X,Y,Keys,RetVal):-
  get_identity_pred(Keys,kw_key,Ident),
  get_test_pred(cl_eql,Keys,EqlPred),
@@ -154,7 +169,7 @@ cl_search(_,_,_,[]).
 
 
 % #'POSITION   - http://www.lispworks.com/documentation/HyperSpec/Body/f_pos_p.htm
-wl:init_args(2, cl_position).
+wl:init_args(2,position).
 cl_position(Item,List,Keys,RetVal):-
  get_identity_pred(Keys,kw_key,Ident),
  get_test_pred(cl_eql,Keys,EqlPred),
@@ -167,11 +182,11 @@ cl_position(Item,List,Keys,RetVal):-
 cl_position(_,_,_,[]).
 
 % #'POSITION-IF
-wl:init_args(2, cl_position_if).
+wl:init_args(2,position_if).
 cl_position_if(E,Seq,Keys,Result):- cl_position(E,Seq,[kw_test,cl_funcall|Keys],Result).  
 
 % #'POSITION-IF-NOT
-wl:init_args(2, cl_position_if_not).
+wl:init_args(2,position_if_not).
 cl_position_if_not(E,Seq,Keys,Result):- cl_position(E,Seq,[kw_test_not,cl_funcall|Keys],Result).
 
 
