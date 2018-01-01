@@ -96,7 +96,7 @@ is_place_write(P):- is_place_op(P), \+ is_only_read_op(P).
 is_place_op(setf).
 is_place_op(psetf).
 %is_place_op(getf).
-%is_place_op(incf).
+is_place_op(incf).
 is_place_op(decf).
 /*
 is_place_op(rotatef).
