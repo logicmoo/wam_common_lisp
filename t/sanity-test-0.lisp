@@ -161,7 +161,3 @@ f_u_fifteen(MResult) :-
   (LET ((a 'hello) )(LET ((a a)(*package* (find-package :keyword) ) )(PRINT a) ) )(PRINT a) ) ))
 
 
-(DEFMACRO prwre (&whole w &rest r &environment e) `(PRINT (LIST ',w ',r `,e) ) )
-(MACROEXPAND-1 '(prwre 1 2 3) )
-
-
