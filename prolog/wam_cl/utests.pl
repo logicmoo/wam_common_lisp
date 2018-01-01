@@ -237,9 +237,46 @@ fibd(A, K) :- !,
 
 
 
+
+
+
+wl:lambda_def(defmacro, u_is, f_u_is, [u_eqf, u_expected, u_actual], [progn, [let, [[u_a, [gensym, '$ARRAY'([*], claz_base_character, "a")]], [u_b, [gensym, '$ARRAY'([*], claz_base_character, "b")]]], ['#BQ', [let, [[['#COMMA', u_a], ['#COMMA', u_expected]], [['#COMMA', u_b], ['#COMMA', u_actual]]], [if, [['#COMMA', u_eqf], ['#COMMA', u_a], ['#COMMA', u_b]], [format, t, '$ARRAY'([*], claz_base_character, "OK: ~a is ~a to ~a~%"), [quote, ['#COMMA', u_expected]], [quote, ['#COMMA', u_eqf]], [quote, ['#COMMA', u_actual]]], [progn, [format, t, '$ARRAY'([*], claz_base_character, "FAILED: when matching ~a and ~a~%"), ['#COMMA', u_a], ['#COMMA', u_b]], [sys_prolog_inline, '$ARRAY'([*], claz_base_character, "trace")]]]]]]]).
+wl:arglist_info(u_is, f_u_is, [u_eqf, u_expected, u_actual], arginfo{all:[u_eqf, u_expected, u_actual], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[u_eqf, u_expected, u_actual], opt:0, req:[u_eqf, u_expected, u_actual], rest:0, sublists:0, whole:0}).
+wl:init_args(x, f_u_is).
+
+f_u_is(Eqf_In, Expected_In, Actual_In, FnResult) :-
+        nop(defmacro),
+        Env=[bv(u_eqf, Eqf_In), bv(u_expected, Expected_In), bv(u_actual, Actual_In)|ReplEnv],
+        global_env(ReplEnv),
+        catch(( ( cl_gensym('$ARRAY'([*], claz_base_character, "a"), A_Init),
+                  cl_gensym('$ARRAY'([*], claz_base_character, "b"), B_Init),
+                  LEnv=[bv(u_a, A_Init), bv(u_b, B_Init)|Env],
+                  get_var(LEnv, u_a, A_Get),
+                  ( get_var(LEnv, u_actual, Actual_Get),
+                    get_var(LEnv, u_b, B_Get)
+                  ),
+                  ( get_var(LEnv, u_a, A_Get17),
+                    get_var(LEnv, u_expected, Expected_Get)
+                  ),
+                  get_var(LEnv, u_b, B_Get18),
+                  ( get_var(LEnv, u_a, A_Get22),
+                    get_var(LEnv, u_eqf, Eqf_Get20)
+                  ),
+                  ( get_var(LEnv, u_actual, Actual_Get21),
+                    get_var(LEnv, u_expected, Expected_Get19)
+                  ),
+                  get_var(LEnv, u_b, B_Get23)
+                ),
+                [let, [[A_Get, Expected_Get], [B_Get, Actual_Get]], [if, [Eqf_Get20, A_Get17, B_Get18], [format, t, '$ARRAY'([*], claz_base_character, "OK: ~a is ~a to ~a~%"), [quote, Expected_Get19], [quote, Eqf_Get20], [quote, Actual_Get21]], [progn, [format, t, '$ARRAY'([*], claz_base_character, "FAILED: when matching ~a and ~a~%"), A_Get22, B_Get23], [sys_prolog_inline, '$ARRAY'([*], claz_base_character, "trace")]]]]=MFResult
+              ),
+              block_exit(u_is, MFResult),
+              true),
+        cl_eval(MFResult, FnResult).
+:- set_opv(f_u_is, classof, claz_macro),
+   set_opv(u_is, compile_as, kw_operator),
+   set_opv(u_is, function, f_u_is).
+
 :- fixup_exports.
-
-
 
 end_of_file.
 

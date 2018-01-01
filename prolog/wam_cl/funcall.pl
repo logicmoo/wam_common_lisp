@@ -60,8 +60,8 @@ compile_funop(Ctx,Env,Result,[FN| Args], Code):- var(FN),!,
 
 % Use a previous DEFMACRO
 compile_funop(Ctx,Env,Result,LispCode,CompileBody):-
-  fail, %DISABLED
-  macroexpand_1_or_fail(Ctx,Env,LispCode,[],CompileBody0Result),
+  %fail, %DISABLED
+  macroexpand_1_or_fail(LispCode,Ctx,CompileBody0Result),
   dbginfo(macroexpand:-LispCode),
   dbginfo(into:-CompileBody0Result),
   must_compile_body(Ctx,Env,Result,CompileBody0Result, CompileBody),
@@ -171,18 +171,19 @@ lisp_env_eval(Env, Expression, Result):-
   lisp_compile(Env,Result,Expression,Body),
   user:always(Body).
 
-closure(ClosureEnvironment,ClosureResult,FormalParams,ClosureBody,ActualParams,ClosureResult):-
+closure(ClosureEnvironment,Whole,ClosureResult,FormalParams,ClosureBody,Symbol,ActualParams,ClosureResult):-
   M = closure(ClosureEnvironment,ClosureResult,FormalParams,ClosureBody,ActualParams,ClosureResult),
   del_attrs_of(M,dif),
   del_attrs_of(M,vn),
-  arglists:must_bind_parameters(ClosureEnvironment,_RestNKeys,FormalParams, ActualParams,_EnvOut, BinderCode),
+  must_bind_parameters(ClosureEnvironment,Whole,_RestNKeys,FormalParams,Symbol,ActualParams,_EnvOut, BinderCode),
   always(user:BinderCode),
   always(user:ClosureBody).
 
 apply_c(_EnvIns,function, [A],[function,A]).
 apply_c(EnvIn,[lambda, FormalParams, Body], ActualParams, Result):-
 	!,
-	must_bind_parameters(EnvIn,_RestNKeys,FormalParams, ActualParams,EnvOut,BinderCode),!,
+        Whole = [[]|ActualParams],
+	must_bind_parameters(EnvIn,Whole,_RestNKeys,FormalParams, ActualParams,EnvOut,BinderCode),!,
         always(BinderCode),
 	lisp_env_eval(EnvOut, Body, Result),
 	!.
@@ -190,8 +191,9 @@ apply_c(EnvIn,closure(ClosureEnvironment,ClosureResult,FormalParams,ClosureBody)
 	closure([ClosureEnvironment|EnvIn],ClosureResult,FormalParams,ClosureBody,ActualParams, Result).
     
 apply_c(EnvIn, ProcedureName, ActualParams, Result):-
+        Whole = [ProcedureName|ActualParams],
 	get_lambda_def(defmacro,ProcedureName,FormalParams, LambdaExpression),!,
-	must_bind_parameters(EnvIn,_RestNKeys,FormalParams, ActualParams, Env,BinderCode),
+	must_bind_parameters(EnvIn,Whole,_RestNKeys,FormalParams, ActualParams, Env,BinderCode),
         always(BinderCode),
         lisp_env_eval(Env,LambdaExpression, Result),
 	!.

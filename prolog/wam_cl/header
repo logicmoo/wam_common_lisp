@@ -164,6 +164,7 @@
 
 
 :- ensure_loaded(eightball).
+:- ensure_loaded(utests).
 :- ensure_loaded(places).
 :- ensure_loaded(environs).
 :- ensure_loaded(proclaim).
@@ -210,9 +211,9 @@
 :- ensure_loaded(tagbody).
 :- ensure_loaded(typecheck).
 :- ensure_loaded(typeof).
-:- ensure_loaded(utests).
 :- ensure_loaded(loptions).
 :- ensure_loaded(groveler).
+:- ensure_loaded(paramfns).
 
 
 /*

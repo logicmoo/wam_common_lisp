@@ -340,8 +340,9 @@ compile_body(Ctx,Env,Result,Form1,Body):- compile_body_form(Ctx,Env,Result,Form1
 % Use a previous DEFMACRO
 compile_body(Ctx,Env,Result,LispCode,CompileBody):-
   fail, %DISABLED    (NOT)
-  macroexpand_1_or_fail(LispCode,[],CompileBody0Result),
-  dbginfo(macroexpand=LispCode),dbginfo(into=CompileBody0Result),
+  macroexpand_1_or_fail(LispCode,[Ctx],CompileBody0Result),
+  dbginfo(macroexpand=LispCode),
+  dbginfo(into=CompileBody0Result),
   must_compile_body(Ctx,Env,Result,CompileBody0Result, CompileBody),
   !.
 

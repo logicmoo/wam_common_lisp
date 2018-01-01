@@ -81,7 +81,7 @@ new_partly_named_opv_pt2(_SKind,_Name,Attrs,Obj,Kind):-
   %maplist(add_missing_opv(Obj,Kind),Attrs).
 
 call_init_slot_props(Kind,Obj):-
-  forall(get_struct_opv(Kind,slot,Name,SlotInfo),
+  forall(get_struct_opv(Kind,slotname,Name,SlotInfo),
     init_struct_opv(Kind,Obj,Name,SlotInfo)).
 
 init_struct_opv(Kind,Obj,Name,SlotInfo):-
@@ -100,31 +100,54 @@ init_slot_props_iv(Kind,N,Obj,[Value|Props]):-
   init_slot_props_kv(Kind,N2,Obj,Props).
 
 add_i_opv(Kind,Obj,N,Value):- get_struct_opv(Kind,ordinal,N,SlotInfo),
-  get_struct_opv(Kind,slot,Key,SlotInfo),
+  get_struct_opv(Kind,slotname,Key,SlotInfo),
    add_opv(Obj,Key,Value).
+
+f_clos_pf_set_slot_value(Obj,Key,Value,Value):- set_slot(Obj,Key,Value).
+set_slot(Obj,Key,Value):- get_object_slot_name(Obj,Key,SlotName), set_opv(Obj,SlotName,Value).
+
+get_object_slot_name(Obj,Key,SlotName):-
+  type_or_class_nameof(Obj,Kind),
+  get_slot_name(Kind,Key,SlotName).
+
+get_slot_name(Kind,Key,SlotName):-
+   get_struct_opv(Kind,keyword,Key,SlotInfo),
+   get_struct_opv(Kind,slotfullname,SlotName,SlotInfo),!.
+get_slot_name(Kind,Key,SlotName):-
+   get_struct_opv(Kind,slotname,Key,SlotInfo),
+   get_struct_opv(Kind,slotfullname,SlotName,SlotInfo),!.
+get_slot_name(Kind,SlotName,SlotName):-
+   get_struct_opv(Kind,slotfullname,SlotName,_),!.
 
 init_slot_props_kv(_,_,_,[]).
 init_slot_props_kv(Kind,Ord,Obj,[Key,Value|Props]):- is_keywordp(Key),
   (type_slot_number(Kind,Key,SOrd)->Ord2 is SOrd+1;Ord2 is Ord+1),
-  add_kw_opv(Obj,Key,Value),  
+  get_slot_name(Kind,Key,SlotName),
+  add_kw_opv(Obj,SlotName,Value),!,  
   init_slot_props_kv(Kind,Ord2,Obj,Props).
+
 init_slot_props_kv(Kind,Ord,Obj,[[Key|List]|Props]):- 
-   is_keywordp(Key),!,maplist(add_kw_opv(Obj,Key),List),
+   is_keywordp(Key),!,
+     get_slot_name(Kind,Key,SlotName),
+     maplist(add_kw_opv(Obj,SlotName),List),
   (type_slot_number(Kind,Key,SOrd)->Ord2 is SOrd+1;Ord2 is Ord+1),
    init_slot_props_kv(Kind,Ord2,Obj,Props).
+
 init_slot_props_kv(Kind,Ord,Obj,[KV|Props]):- get_kv(KV,Key,Value),
   (type_slot_number(Kind,Key,SOrd)->Ord2 is SOrd+1;Ord2 is Ord+1),
-  add_kw_opv(Obj,Key,Value),  
+  get_slot_name(Kind,Key,SlotName),
+  add_kw_opv(Obj,SlotName,Value),  
   init_slot_props_kv(Kind,Ord2,Obj,Props).
 init_slot_props_kv(Kind,Ord,Obj,[Value|Props]):-
   always(type_slot_number(Kind,Key,Ord)),
-  add_kw_opv(Obj,Key,Value),
+  get_slot_name(Kind,Key,SlotName),
+  add_kw_opv(Obj,SlotName,Value),
   Ord2 is Ord+1,
   init_slot_props_kv(Kind,Ord2,Obj,Props).
 
 
 type_slot_number(Kind,Key,Ordinal):-
-   get_struct_opv(Kind,slot,Key,SlotInfo),   
+   get_struct_opv(Kind,slotname,Key,SlotInfo),   
    get_struct_opv(Kind,ordinal,Ordinal,SlotInfo).
 
 
@@ -199,7 +222,7 @@ define_class(Name,KeyWords,SlotsIn,Kind):-
 
 
 is_prop_class_alloc(Kind,Prop,Where):- \+ not_shareble_prop(Prop),
-  get_struct_opv(Kind,slot,Prop,ZLOT)*->
+  get_struct_opv(Kind,slotname,Prop,ZLOT)*->
    (get_struct_opv(Kind,allocation,kw_class,ZLOT)->ensure_metaobject(Kind,Where)).
 
 % @TODO Store INITIALIZE-INSTANCE, REINITIALIZE-INSTANCE, and SHARED-INITIALIZE  Hooks
@@ -233,9 +256,8 @@ define_kind(DefType,Name,KeyWords,SlotsIn,Kind):-
   always(Code),  
   add_class_keywords(Kind,KeyWords),
   get_struct_offset(Kind,Offset),
-  NOffset is Offset +1,
-  add_class_slots(DefType,Kind,NOffset,Slots),
-  
+  NOffset is Offset +1,  
+  add_class_slots(DefType,Kind,NOffset,Slots),  
   generate_missing_struct_functions(Kind))).
 
 get_struct_offset(Kind,W):- get_struct_opv(Kind,initial_offset,W).
@@ -249,9 +271,10 @@ generate_missing_struct_functions(Kind):-
  always(Code),
  maybe_add_kw_function(Kind,SName,"-P",kw_predicate, [obj],( eq('class-of'(obj),quote(Kind)))),
  % make accessors
- struct_opv_else(Kind,kw_conc_name,ConcatName,string_concat(SName,"-",ConcatName)),
- forall(get_struct_opv(Kind,slot,Keyword,ZLOT),
-   maybe_add_get_set_functions(Kind,ConcatName,Keyword,ZLOT)))).
+ struct_opv_else(Kind,kw_conc_name,ConcatName,(string_concat(SName,"-",ConcatName),
+    assert_struct_opv(Kind,kw_conc_name,ConcatName))),
+ forall(get_struct_opv(Kind,slotfullname,_,ZLOT),
+   maybe_add_get_set_functions(Kind,ZLOT)))).
 
 make_default_constructor(Kind,Code):- 
  always((
@@ -268,29 +291,39 @@ make_default_constructor(Kind,Code):-
          assert_lsp((user:Head:-Body))))).
  
 
-maybe_add_get_set_functions(Kind,ConcatName,Keyword,ZLOT):- 
+maybe_add_get_set_functions(Kind,ZLOT):- 
    (\+ get_struct_opv(Kind,read_only,t,ZLOT) ->
-     maybe_add_set_function(Kind,ConcatName,Keyword,ZLOT) ; true),
-   maybe_add_get_function(Kind,ConcatName,Keyword,ZLOT).
+     maybe_add_set_function(Kind,ZLOT) ; true),
+   maybe_add_get_function(Kind,ZLOT).
 
-maybe_add_get_function(Kind,_ConcName,_Keyword,ZLOT):- get_struct_opv(Kind,kw_accessor,_Getter,ZLOT),!.
-maybe_add_get_function(Kind,ConcatName,Keyword,ZLOT):- 
-  always((get_struct_opv(Kind,slot,Keyword,ZLOT),
-  to_prolog_string_anyways(Keyword,Name),
-  create_keyword(Name,KW),
-  atom_concat_or_rtrace(ConcatName,Name,Getter),
-  maybe_add_function(Getter,[obj],['slot-value',obj,[quote,KW]],Added),
-  ( Added\==[]-> assert_struct_opv4(Kind,kw_accessor,Added,ZLOT) ; true ))).
-
-maybe_add_set_function(Kind,_ConcName,_Keyword,ZLOT):- get_struct_opv(Kind,setter_fn,_Getter,ZLOT),!.
-maybe_add_set_function(Kind,ConcatName,Keyword,ZLOT):-   
+maybe_add_get_function(Kind,ZLOT):- get_struct_opv(Kind,getter_fn,_Getter,ZLOT),!.
+maybe_add_get_function(Kind,ZLOT):-   
   always((
-  get_struct_opv(Kind,slot,Keyword,ZLOT),
-  to_prolog_string_anyways(Keyword,Name),
-  atom_concat_or_rtrace(ConcatName,Name,Getter),
-  atomic_list_concat(['SETF',Getter],'-',Setter),
-  maybe_add_function(Setter,[obj,val],['setf',[Keyword,obj],val],Added),
+  get_struct_opv(Kind,slotfullname,GetterSym,ZLOT),
+  maybe_add_function(GetterSym,[obj],['slot-value',obj,[quote,GetterSym]],Added),
+  ( Added\==[]-> assert_struct_opv4(Kind,getter_fn,Added,ZLOT) ; true ))).
+
+maybe_add_set_function(Kind,ZLOT):- get_struct_opv(Kind,setter_fn,_Setter,ZLOT),!.
+maybe_add_set_function(Kind,ZLOT):-   
+  always((
+  get_struct_opv(Kind,slotfullname,SetterSym,ZLOT),
+  to_prolog_string_anyways(SetterSym,SetterSymName),
+  atomic_list_concat(['SETF',SetterSymName],'-',Setter),cl_intern(Setter,SetterFn),
+  maybe_add_function(SetterFn,[obj,val],['clos_pf_set_slot_value',obj,[quote,SetterSym],val],Added),
   ( Added\==[]-> assert_struct_opv4(Kind,setter_fn,Added,ZLOT) ; true ))).
+/*
+f_u_setf_point_z(A, B, G) :-
+        D=[bv(u_obj, A), bv(u_val, B)|C],
+        global_env(C),
+        catch(( ( get_var(D, u_obj, E),
+                  get_var(D, u_val, F),
+                  set_opv(E, u_z, F)
+                ),
+                F=G
+              ),
+              block_exit(u_setf_point_z, G),
+              true).
+*/
 
 f_clos_class_direct_superclasses(C,SL):-findall(S,struct_opv(C,include,S),SL).
 
@@ -340,13 +373,17 @@ add_class_keywords(Kind,[Key,Value|KeyWords]):-
 assert_struct_kw(Kind, Key, Value):- 
   ignore(( \+ is_keywordp(Key) , dbginfo(warn(assert_struct_kw(Kind, Key, Value))))),
   assert_struct_opv(Kind, Key, Value).
-
+  
 assert_struct_opv(Obj, KW, Value):-
   un_kw(KW,Key),
   show_call_trace(assertz_new(soops:struct_opv(Obj, Key, Value))).
+
+%assert_struct_opv4(_Obj, keyword, _Value, _Info):- trace,fail.
+
 assert_struct_opv4(Obj, KW, Value,Info):-
   un_kw(KW,Key),
-  un_kw(Value,KeyValue),
+  % (KW==keyword-> Value=KeyValue ; un_kw(Value,KeyValue)),
+  Value=KeyValue,
   show_call_trace(assertz_new(soops:struct_opv(Obj, Key, KeyValue,Info))).
 
 get_struct_opv(Obj, KW, String):-
@@ -394,10 +431,11 @@ un_kw(Key,Prop):- notrace(un_kw1(Key,Prop)).
 un_kw1(Prop,Prop):- var(Prop),!.
 un_kw1(Key,Prop):- \+ atomic(Key),!,Key=Prop.
 un_kw1([],[]):-!.
+un_kw1(Key,Key):-!.
 %un_kw1(Key,Prop):-string(Key),Key=Prop,!.
 un_kw1(Key,Prop):- soops:struct_opv(K, accessor, Key, Slot),
   (soops:struct_opv(K, keyword, KW, Slot);
-    soops:struct_opv(K, slot, KW, Slot)),!,=(KW,Prop).
+    soops:struct_opv(K, slotname, KW, Slot)),!,=(KW,Prop).
 
 un_kw1(Key,Prop):- \+ atomic_list_concat([_,_|_],'_',Key),!,Prop=Key.
 un_kw1(Key,Prop):- Prop\==name,to_prolog_string_anyways(Key,Str),prologcase_name(Str,Prop),!.
@@ -587,6 +625,9 @@ add_opv(Obj,Prop,Value):- add_opv_new(Obj,Prop,Value),!.
 % add_opv_new(Sym,value,SValue):- atom(SValue),(atom_contains(SValue,'(');atom_contains(SValue,' ')),(as_sexp(SValue,Value)->SValue\==Value),!,set_opv(Sym,value,Value).
 % add_opv_new(Obj,Prop,Value):-  add_opv_new(Obj,Prop,Value).
 add_opv_new(Obj,Prop,V):- (\+atomic(V)),is_stringp(V),to_prolog_string_if_needed(V,V0),!,show_call_trace(add_opv_new(Obj,Prop,V0)).
+
+add_opv_new(Obj,u_x,V):-dmsg(add_opv_new(Obj,u_x,V)),break.
+
 add_opv_new(Obj,Key,Value):- 
   always(\+ is_list(Obj);Obj==[]),
   un_kw(Key,Prop),
@@ -672,7 +713,7 @@ ensure_opv_type_inited(Kind):- is_obj_type(Kind),!.
 ensure_opv_type_inited(Kind):- 
   asserta(is_obj_type(Kind)),!,
   get_deftype(Kind,DefType),
-  findall(Slot,soops:struct_opv(Kind,slot,Slot,_),Slots),add_class_slots(DefType,Kind,1,Slots).
+  findall(Slot,soops:struct_opv(Kind,slotname,Slot,_),Slots),add_class_slots(DefType,Kind,1,Slots).
 
 get_deftype(Kind,DefType):- (is_structure_class(Kind) -> DefType=defstruct; DefType=defclass).
 
@@ -692,15 +733,26 @@ add_slot_def(_Defclass,N,Kind,[Prop,Default|Keys]):-  \+ list_oddp(Keys),
    add_slot_def_props(N,Kind,Prop,[Default|Keys]).
 add_slot_def(_DefType,N,Kind,[Prop|Keys]):- add_slot_def_props(N,Kind,Prop,Keys).
 
-add_slot_def_props(N,Kind,Key,MoreInfo):-
-   always((get_szlot('zlot_',Kind,Key,SlotInfo),
-   assert_struct_opv4(Kind,slot,Key,SlotInfo), 
-   to_prolog_string_anyways(Key,SName),create_keyword(SName,KW),assert_struct_opv4(Kind,keyword,KW,SlotInfo),
+add_slot_def_props(N,Kind,SlotSym,MoreInfo):-
+   always((get_szlot('zlot_',Kind,SlotSym,SlotInfo),
+     assert_struct_opv4(Kind,slotname,SlotSym,SlotInfo), 
+   to_prolog_string_anyways(SlotSym,SName),
+
+   create_keyword(SName,KW),assert_struct_opv4(Kind,keyword,KW,SlotInfo),
+
+      struct_opv_else(Kind,kw_conc_name,ConcatName,
+        (get_struct_opv(Kind,symbolname,KName),to_prolog_string_anyways(KName,KSName),string_concat(KSName,"-",ConcatName),
+              assert_struct_opv(Kind,kw_conc_name,ConcatName))),
+      
+       
+      atom_concat_or_rtrace(ConcatName,SName,GetterName),cl_intern(GetterName,Getter),
+
+   assert_struct_opv4(Kind,slotfullname,Getter,SlotInfo),
    %claz_to_symbol(Kind,ClassSymbol),cl_symbol_package(ClassSymbol,Package),trace,intern_symbol(SName,Package,Name,_),
    %assert_struct_opv4(Kind,name,Name,SlotInfo),
    ignore((nonvar(N),(assert_struct_opv4(Kind,ordinal,N,SlotInfo)))),
-   ignore((kind_attribute_pred(Kind,Key,Pred),assert_struct_opv4(Kind,accessor_predicate,Pred,SlotInfo))),
-   add_slot_more_info(Key,Kind,SlotInfo,MoreInfo))).
+   ignore((kind_attribute_pred(Kind,SlotSym,Pred),assert_struct_opv4(Kind,accessor_predicate,Pred,SlotInfo))),
+   add_slot_more_info(SlotSym,Kind,SlotInfo,MoreInfo))).
 
 is_slot_name(KW):- \+ is_list(KW).
 

@@ -30,8 +30,6 @@ get_setf_expander_get_set(Ctx,Env,[OP,LVar|EXTRA],[OP,GET|EXTRA],[INVERSE,GET|EX
 %get_setf_expander_get_set(Ctx,Env,LVar,GET,[sys_set_symbol_value,GET], true):- atom(LVar),lookup_symbol_macro(Ctx,Env,LVar,GET),!.
 %get_setf_expander_get_set(_,_,LVar,GET,[set,GET], true):- \+ atom(LVar),atom(LVar),LVar=GET.
 
-f_clos_pf_set_slot_value(Obj,Key,Value,Value):- set_opv(Obj,Key,Value).
-
 lookup_symbol_macro(Ctx,Env,LVar,GET):- get_ctx_env_attribute(Ctx,Env,symbol_macro(LVar),GET).
 
 wl:init_args(1,array_row_major_index).
@@ -95,7 +93,6 @@ is_place_write(P):- is_place_op(P), \+ is_only_read_op(P).
 
 is_place_op(setf).
 is_place_op(psetf).
-%is_place_op(getf).
 is_place_op(incf).
 is_place_op(decf).
 /*
@@ -347,7 +344,12 @@ plistify(L,L):-L==[],!.
 plistify([H|T],[H|T]):-!.
 plistify(H,[H]).
 
-place_op(Env,getf,Obj,Place,[Value],Value):-!,get_place_value(Env, Obj, Place, Value).
+wl:plugin_expand_progbody_1st(Ctx,Env,Result,[incf,Symbol|Delta],_PreviousResult,(Code,
+ place_op(Env,incf, Symbol, value, CDelta,  Result))):-
+   compile_each(Ctx,Env,Delta,CDelta,Code).
+
+
+%place_op(Env,getf,Obj,Place,[Value],Value):-!,get_place_value(Env, Obj, Place, Value).
 place_op(Env,setf,Obj,Place, [Value], Value):-!,set_place_value(Env, Obj, Place, Value).
 
 place_op(Env,incf, Obj, Place, LV,  Result):- value_or(LV,Value,1),!,

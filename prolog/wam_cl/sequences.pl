@@ -24,35 +24,16 @@
 
 :- include('header').
 
-
-%module(_,_).
-
 %:- ensure_loaded((utils_writef)).
 :- ensure_loaded(library(lists)).
 
+is_listp(Obj):- compound(Obj)-> Obj=[_|_] ; Obj == [].
+is_endp(Obj):- Obj == [].
 
+cl_listp(Obj,RetVal):- t_or_nil(is_listp(Obj),RetVal).
+cl_endp(Obj,RetVal):- t_or_nil(is_endp(Obj), RetVal).
 
 f_sys_memq(E,L,R):- t_or_nil((member(Q,L),Q==E),R).
-
-
-xform_with_ident([],_Ident,[]).
-xform_with_ident([Y0|YR0],Ident,[Y|YR]):-
-   call_as_ident(Ident,Y0,Y),
-   xform_with_ident(YR0,Ident,YR).
-
-call_as_ident(Pred,X,Result):- function(Pred,X,Result).
-
-apply_as_pred(EqlPred,X,Y,Z):-call(EqlPred,X,Y,Z,R)->R\==[].
-apply_as_pred(EqlPred,X,Y):-call(EqlPred,X,Y,R)->R\==[].
-apply_as_pred(EqlPred,X):-call(EqlPred,X,R)->R\==[].
-
-% Maybe move to funcall 
-function(cl_funcall,Pred,Y,Result):- !, function(Pred,Y,Result).
-function(Pred,X,Y,Result):- cl_apply(Pred,[X,Y],Result).
-function(X,function(X)).
-% used by call_as_ident/3
-function([],X,X):-!.
-function(Pred,X,Result):- call(Pred,X,Result),!.
 
 
 range_1(X,Keys,XR,Start1):-
@@ -75,13 +56,6 @@ range_1_and_2_len(X,Y,Keys,XR,YR,Length):-
    subseqence_from(Y,Start2,YR),
    Length is min(End1-Start1,End2-Start2).
 
-
-% Maybe move to arglists
-% key_value(Keys,Name,Value,Default).
-key_value(Keys,Name,Value):- is_dict(Keys),!,Keys.Name=Value,!.
-key_value(Keys,Name,Value):- get_plist_value(cl_eql,Keys,Name,zzzz666,Value),Value\==zzzz666.
-key_value(Keys,Name,Value,_Default):- key_value(Keys,Name,Value),!.
-key_value(_Keys,_Name,Default,Default).
 
 
 range_subseq(X,0,[],X):-!.
@@ -250,6 +224,25 @@ cl_subst(A,B,C,R):-pl_subst(C,B,A,R).
 pl_subst( Var, VarS,SUB,SUB ) :- Var==VarS,!.
 pl_subst([H|T],B,A,[HH|TT]):- !,pl_subst(H,B,A,HH),pl_subst(T,B,A,TT).
 pl_subst( Var, _,_,Var ).
+
+
+% wl:type_checked(cl_subseq(sequence(T,E),number,sequence(T,E))).
+cl_subseq(Seq,Offset,Result):- 
+  always(coerce_to(Seq, sequence(Was,Info), Mid)),
+  always(pl_subseq(Mid,Offset,MOut)),
+  always(coerce_to(MOut, object(Was,Info),Result)).
+
+cl_subseq(Seq,Start,End,Result):- 
+  always(coerce_to(Seq, sequence(Was,Info), Mid)),
+  range_subseq(Mid,Start,End,MOut),
+  always(coerce_to(MOut, object(Was,Info),Result)).
+
+pl_subseq([], Skip, []):- Skip =:=0 -> true ; throw('should not be greater than :END').
+pl_subseq([Head|Tail], Skip, [Head|Cmpl]) :- Skip<1,!,
+	pl_subseq(Tail, Skip, Cmpl).
+pl_subseq([_|Tail], Skip, Cmpl) :- Skip2 is Skip-1,
+	pl_subseq(Tail, Skip2, Cmpl).
+
 
 :- fixup_exports.
 

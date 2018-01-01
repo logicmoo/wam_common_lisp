@@ -424,7 +424,6 @@ expand_function_head(Ctx,Env,Symbol,FN,FormalParms,Whole,HeadParms,ZippedArgEnv,
        HeadParms =  RequiredArgs.
        
 
-
 % eval_uses_bind_parameters
 expand_function_head(Ctx,Env,Symbol,FN,FormalParms,Whole,HeadParms,ZippedArgEnv,ArgInfo, HeadDefCode,HeadCodeOut):-
    Whole = [_|WholeMinusSymbol],
@@ -440,7 +439,7 @@ expand_function_head(Ctx,Env,Symbol,FN,FormalParms,Whole,HeadParms,ZippedArgEnv,
    HeadCodeOut = (
      append(RequiredArgs,RestNKeys,WholeMinusSymbol),
      ignore(HeadCodeIgnored),
-     must_bind_parameters(Env,RestNKeys,FormalParms,WholeMinusSymbol,Env,BindCode),
+     must_bind_parameters(Env,Whole,RestNKeys,FormalParms,WholeMinusSymbol,Env,BindCode),
      always(BindCode)),
    HeadParms = [WholeMinusSymbol])).
 
@@ -507,13 +506,13 @@ expand_arguments(Ctx,Env,FN,ArgNum,[Arg|Args], Body, [Result|Results]):-!,
        expand_arguments(Ctx,Env,FN,ArgNum2,Args, ArgsBody, Results).
 
 
-make_bind_value_missing( Var,Env,true):-simple_atom_var(Var),!,make_bind_value(Var,[],Env),!.
-make_bind_value_missing([Var,InitForm],Env,Code):-!,simple_atom_var(Var),compile_init_form(Env,Value,InitForm,Code),make_bind_value(Var,Value,Env),!.
-make_bind_value_missing([Var,InitForm,IfPresent],Env,Code):-simple_atom_var(Var),make_bind_value(IfPresent,[],Env),make_bind_value_missing([Var,InitForm],Env,Code).
+make_bind_value_missing( Var,Env,true):-simple_atom_var(Var),!,make_bind_value_required(Var,[],Env),!.
+make_bind_value_missing([Var,InitForm],Env,Code):-!,simple_atom_var(Var),lisp_compile(Env,Value,InitForm,Code),make_bind_value_required(Var,Value,Env),!.
+make_bind_value_missing([Var,InitForm,IfPresent],Env,Code):-simple_atom_var(Var),make_bind_value_required(IfPresent,[],Env),make_bind_value_missing([Var,InitForm],Env,Code).
 
-make_bind_value(Var,Value,Env):-simple_atom_var(Var),!,debug_var([Var,'_In'],Value),append_open_list(Env,bv(Var,Value)).
-make_bind_value([Var,_InitForm],Value,Env):-simple_atom_var(Var),make_bind_value(Var,Value,Env).
-make_bind_value([Var,_InitForm,IfPresent],Value,Env):-simple_atom_var(Var),make_bind_value(IfPresent,t,Env),make_bind_value(Var,Value,Env).
+make_bind_value_required(Var,Value,Env):-simple_atom_var(Var),!,debug_var([Var,'_In'],Value),append_open_list(Env,bv(Var,Value)).
+make_bind_value_required([Var,_InitForm],Value,Env):-simple_atom_var(Var),make_bind_value_required(Var,Value,Env).
+make_bind_value_required([Var,_InitForm,IfPresent],Value,Env):-simple_atom_var(Var),make_bind_value_required(IfPresent,t,Env),make_bind_value_required(Var,Value,Env).
 
 
 must_or(Goal,Else):- Goal->true;Else.
@@ -531,97 +530,107 @@ correct_formal_params_destructuring([A, B|R],[A, B, '&rest',R]):- simple_atom_va
 correct_formal_params_destructuring([A|R],[A,'&rest',R]):- simple_atom_var(A),simple_atom_var(R),!.
 correct_formal_params_destructuring(AA,AA).
 
-must_bind_parameters(Env,RestNKeys,FormalParms0,Params,Env,Code):-
+must_bind_parameters(Env,Whole,RestNKeys,FormalParms0,Params,Env,Code):-
   always(((correct_formal_params(FormalParms0,FormalParms),
-   bind_each_param(Env,RestNKeys,FormalParms,Params,Code)))),!.
+   bind_each_param(Env,Whole,RestNKeys,FormalParms,Params,Code)))),!.
 
-bind_each_param(Env,RestNKeys, FormalParms, Arguments,BindCode):-
+bind_each_param(Env,Whole,RestNKeys, FormalParms, Arguments,BindCode):-
   % append_open_list(Env,bind),
-  bind_parameters(Env,RestNKeys, 'required', FormalParms, Arguments, BindCode),!.
+  bind_parameters(Env,Whole,RestNKeys, 'required', FormalParms, Arguments, BindCode),!.
 
 
 append_open_list(Env,Value):- append(_,[Value|_],Env),!.
 append_open_list(EnvList,Value):- member(Env,EnvList),append(_,[Value|_],Env),!.
 append_open_list(ClosedList,Value):- ClosedList = [_Env|List], setarg(2,ClosedList,[Value|List]).
 
-bind_parameters(_Env,_RestNKeys,_Mode, [], _, true):-!.
+bind_parameters(_Env,_Whole,_RestNKeys,_Mode, [], _, true):-!.
 
 % Switch mode &optional, &key or &aux mode
-bind_parameters(Env,RestNKeys,_,[Mode|FormalParms],Params,Code):- 
+bind_parameters(Env,Whole,RestNKeys,_,[Mode|FormalParms],Params,Code):- 
   arg(_,v('&optional','&key','&aux'),Mode), !, 
-  bind_parameters(Env,RestNKeys,Mode,FormalParms,Params,Code).
+  bind_parameters(Env,Whole,RestNKeys,Mode,FormalParms,Params,Code).
 
 % &rest
-bind_parameters(Env,RestNKeys,_,['&rest',Var|FormalParms],Params,Code):- !, 
-  make_bind_value(Var,Params,Env),
-  bind_parameters(Env,RestNKeys,'&rest',FormalParms,Params,Code).
+bind_parameters(Env,Whole,RestNKeys,_,['&rest',Var|FormalParms],Params,Code):- !, 
+  make_bind_value_required(Var,Params,Env),
+  bind_parameters(Env,Whole,RestNKeys,'&rest',FormalParms,Params,Code).
 
 % &environment
-bind_parameters(Env,RestNKeys,_,['&environment',Var|FormalParms],Params,(get_env('$env',Var,Env),Code)):- !,   
-  bind_parameters(Env,RestNKeys,'&rest',FormalParms,Params,Code).
+bind_parameters(Env,Whole,RestNKeys,Mode,['&environment',Var|FormalParms],Params,(ignore(parent_env(ParentEnv)),Code)):- !, 
+   enforce_atomic(Var),
+   make_bind_value_required(Var,ParentEnv,Env),
+   bind_parameters(Env,Whole,RestNKeys,Mode,FormalParms,Params,Code).
 
-bind_parameters(Env,_RestNKeys,'required',[Var],Value,true):- nonvar(Value), \+ is_list(Value),
-  enforce_atomic(Var),make_bind_value(Var,Value,Env),!.
+% &whole
+bind_parameters(Env,Whole,RestNKeys,Mode,['&whole',Var|FormalParms],Params,Code):- !, 
+   enforce_atomic(Var),
+   make_bind_value_required(Var,Whole,Env),
+   bind_parameters(Env,Whole,RestNKeys,Mode,FormalParms,Params,Code).
+
+bind_parameters(Env,_Whole,_RestNKeys,'required',[Var],Value,true):- nonvar(Value), \+ is_list(Value),
+  enforce_atomic(Var),make_bind_value_required(Var,Value,Env),!.
+
 % Parsing required(s)
-bind_parameters(Env,RestNKeys,'required',[Var|FormalParms],In,Code):-  must_or(In=[Value|Params],throw(args_underflow)),
-  enforce_atomic(Var),make_bind_value(Var,Value,Env),
-  bind_parameters(Env,RestNKeys,'required',FormalParms,Params,Code).
+bind_parameters(Env,Whole,RestNKeys,'required',[Var|FormalParms],In,Code):-  must_or(In=[Value|Params],(break,throw(args_underflow))),
+  enforce_atomic(Var),make_bind_value_required(Var,Value,Env),
+  bind_parameters(Env,Whole,RestNKeys,'required',FormalParms,Params,Code).
 
 % Parsing optional(s)
-bind_parameters(Env,RestNKeys,'&optional',[NDM|FormalParms],Params,(Code1,Code)):- Params==[], !,
+bind_parameters(Env,Whole,RestNKeys,'&optional',[NDM|FormalParms],Params,(Code1,Code)):- Params==[], !,
   make_bind_value_missing(NDM,Env,Code1),
-  bind_parameters(Env,RestNKeys,'&optional',FormalParms,Params,Code).
-bind_parameters(Env,RestNKeys,'&optional',[NDM|FormalParms],[Value|Params],Code):- !,
-  make_bind_value(NDM,Value,Env),
-  bind_parameters(Env,RestNKeys,'&optional',FormalParms,Params,Code).
+  bind_parameters(Env,Whole,RestNKeys,'&optional',FormalParms,Params,Code).
+bind_parameters(Env,Whole,RestNKeys,'&optional',[NDM|FormalParms],[Value|Params],Code):- !,
+  make_bind_value_required(NDM,Value,Env),
+  bind_parameters(Env,Whole,RestNKeys,'&optional',FormalParms,Params,Code).
 
 % Parsing aux(s)
-bind_parameters(Env,RestNKeys,'&aux',[NDM|FormalParms],Params,(Code1,Code)):- 
+bind_parameters(Env,Whole,RestNKeys,'&aux',[NDM|FormalParms],Params,(Code1,Code)):- 
   make_bind_value_missing(NDM,Env,Code1),
-  bind_parameters(Env,RestNKeys,'&aux',FormalParms,Params,Code).
+  bind_parameters(Env,Whole,RestNKeys,'&aux',FormalParms,Params,Code).
 
 % Parsing &allow-other-keys
-bind_parameters(Env,RestNKeys,_,['&allow_other_keys'|FormalParms],Params,Code):- !,
-  make_bind_value(':allow-other-keys',t),
-  bind_parameters(Env,RestNKeys,aux,FormalParms,Params,Code).
-bind_parameters(Env,RestNKeys,_,['&allow-other-keys'|FormalParms],Params,Code):- !,
-  make_bind_value(':allow-other-keys',t),
-  bind_parameters(Env,RestNKeys,aux,FormalParms,Params,Code).
+bind_parameters(Env,Whole,RestNKeys,_,['&allow_other_keys'|FormalParms],Params,Code):- !,
+  make_bind_value_required(':allow-other-keys',t),
+  bind_parameters(Env,Whole,RestNKeys,aux,FormalParms,Params,Code).
+bind_parameters(Env,Whole,RestNKeys,_,['&allow-other-keys'|FormalParms],Params,Code):- !,
+  make_bind_value_required(':allow-other-keys',t),
+  bind_parameters(Env,Whole,RestNKeys,aux,FormalParms,Params,Code).
 
 % &body TODO
-bind_parameters(Env,RestNKeys,_,['&body'.Var|FormalParms],Params,Code):- !,
-  make_bind_value(Var,Params,Env),
-  bind_parameters(Env,RestNKeys,'required',FormalParms,Params,Code).
+bind_parameters(Env,Whole,RestNKeys,_,['&body'.Var|FormalParms],Params,Code):- !,
+  make_bind_value_required(Var,Params,Env),
+  bind_parameters(Env,Whole,RestNKeys,'required',FormalParms,Params,Code).
 
 
 % Parsing &key (key var)
-bind_parameters(Env,RestNKeys,'&key',[[KWS,Var]|FormalParms],Params,Params,(Code1,Code)):- 
+bind_parameters(Env,Whole,RestNKeys,'&key',[[KWS,Var]|FormalParms],Params,Params,(Code1,Code)):- 
    simple_atom_var(KWS),simple_atom_var(Var),!,
-  (append(_,[KWS,Value],Params) -> (make_bind_value(Var,Value,Env),Code1=true);
-   make_bind_value_missing(Var,Env,Code1)),!,
-   bind_parameters(Env,RestNKeys,'&key',FormalParms,Params,Code).
+  (append(_,[KWS,Value],Params) -> 
+    (make_bind_value_required(Var,Value,Env),Code1=true);
+      make_bind_value_missing(Var,Env,Code1)),!,
+ bind_parameters(Env,Whole,RestNKeys,'&key',FormalParms,Params,Code).
 
 % Parsing &key key
-bind_parameters(Env,RestNKeys,'&key',[Var|FormalParms],Params,Params,Code):-
+bind_parameters(Env,Whole,RestNKeys,'&key',[Var|FormalParms],Params,Params,Code):-
    simple_atom_var(Var),!,
-  (append(_,[Var,Value],Params) -> make_bind_value(Var,Value,Env); make_bind_value(Var,[],Env)),!,
-   bind_parameters(Env,RestNKeys,'&key',FormalParms,Params,Code).
+  (append(_,[Var,Value],Params) -> make_bind_value_required(Var,Value,Env); make_bind_value_required(Var,[],Env)),!,
+   bind_parameters(Env,Whole,RestNKeys,'&key',FormalParms,Params,Code).
  
 % Parsing &key (key initform keyp)
 % Parsing &key ((key name) initform keyp)
-bind_parameters(Env,RestNKeys,'&key',[[KWSpec,InitForm,IfPresent]|FormalParms],Params,Params,(Code1,Code)):-
+bind_parameters(Env,Whole,RestNKeys,'&key',[[KWSpec,InitForm,IfPresent]|FormalParms],Params,Params,(Code1,Code)):-
    from_kw_spec(KWSpec,KWS,Var),!,
-  (append(_,[KWS,Value],Params) -> (make_bind_value(IfPresent,t,Env),make_bind_value(Var,Value,Env),Code1=true);
+  (append(_,[KWS,Value],Params) -> (make_bind_value_required(IfPresent,t,Env),make_bind_value_required(Var,Value,Env),Code1=true);
    make_bind_value_missing([KWSpec,InitForm,IfPresent],Env,Code1)),!,
-   bind_parameters(Env,RestNKeys,'&key',FormalParms,Params,Code).
+   bind_parameters(Env,Whole,RestNKeys,'&key',FormalParms,Params,Code).
 
 % Parsing &key (key initform)
 % Parsing &key ((key name) initform)
-bind_parameters(Env,RestNKeys,'&key',[[KWSpec,InitForm]|FormalParms],Params,Params,(Code1,Code)):- 
+bind_parameters(Env,Whole,RestNKeys,'&key',[[KWSpec,InitForm]|FormalParms],Params,Params,(Code1,Code)):- 
    from_kw_spec(KWSpec,KWS,Var),!,
-  (append(_,[KWS,Value],Params) -> (make_bind_value(Var,Value,Env),Code1=true);
+  (append(_,[KWS,Value],Params) -> (make_bind_value_required(Var,Value,Env),Code1=true);
    make_bind_value_missing([KWSpec,InitForm],Env,Code1)),!,
-  bind_parameters(Env,RestNKeys,'&key',FormalParms,Params,Code).
+  bind_parameters(Env,Whole,RestNKeys,'&key',FormalParms,Params,Code).
 
 
 from_kw_spec([KWS,Var],KWS,Var):- !,simple_atom_var(KWS),simple_atom_var(Var).

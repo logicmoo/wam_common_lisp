@@ -197,7 +197,7 @@ wl:interned_eval_orig_alt("
 :-lisp_compile_to_prolog(pkg_sys,[defun,'get-setf-expansion',[form,'&optional',environment],[let,[temp],[cond,[[symbolp,form],['multiple-value-bind',[expansion,expanded],['macroexpand-1',form,environment],[if,expanded,['get-setf-expansion',expansion,environment],[let,[['new-var',[gensym]]],[values,[],[],[list,'new-var'],['#BQ',[setq,['#COMMA',form],['#COMMA','new-var']]],form]]]]],[[setq,temp,[get,[car,form],[quote,'setf-inverse']]],['get-setf-method-inverse',form,['#BQ',[['#COMMA',temp]]],[]]],[[setq,temp,[get,[car,form],[quote,'setf-expander']]],[funcall,temp,form,environment]],[t,['expand-or-get-setf-inverse',form,environment]]]]]).
 wl:lambda_def(defun, get_setf_expansion, cl_get_setf_expansion, [sys_form, c38_optional, sys_environment], [[let, [sys_temp], [cond, [[symbolp, sys_form], [multiple_value_bind, [sys_expansion, sys_expanded], [macroexpand_1, sys_form, sys_environment], [if, sys_expanded, [get_setf_expansion, sys_expansion, sys_environment], [let, [[sys_new_var, [gensym]]], [values, [], [], [list, sys_new_var], ['#BQ', [setq, ['#COMMA', sys_form], ['#COMMA', sys_new_var]]], sys_form]]]]], [[setq, sys_temp, [get, [car, sys_form], [quote, sys_setf_inverse]]], [sys_get_setf_method_inverse, sys_form, ['#BQ', [['#COMMA', sys_temp]]], []]], [[setq, sys_temp, [get, [car, sys_form], [quote, sys_setf_expander]]], [funcall, sys_temp, sys_form, sys_environment]], [t, [sys_expand_or_get_setf_inverse, sys_form, sys_environment]]]]]).
 wl:arglist_info(get_setf_expansion, cl_get_setf_expansion, [sys_form, c38_optional, sys_environment], arginfo{all:[sys_form, sys_environment], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_form, sys_environment], opt:[sys_environment], req:[sys_form], rest:0, sublists:0, whole:0}).
-wl: init_args(1, cl_get_setf_expansion).
+wl: init_args(1,get_setf_expansion).
 
 /*
 
@@ -308,7 +308,7 @@ wl:lambda_def(defmacro, shiftf, cl_shiftf, [c38_rest, sys_places_and_newvalue, c
 wl: declared(cl_shiftf, env_arg1).
 
 wl:arglist_info(shiftf, cl_shiftf, [c38_rest, sys_places_and_newvalue, c38_environment, env], arginfo{all:0, allow_other_keys:0, aux:0, body:0, complex:[rest, environment], env:[env], key:0, names:[sys_places_and_newvalue, env], opt:0, req:0, rest:[sys_places_and_newvalue], sublists:0, whole:0}).
-wl: init_args(0, cl_shiftf).
+wl: init_args(0,shiftf).
 
 /*
 
@@ -378,7 +378,7 @@ wl:lambda_def(defmacro, rotatef, cl_rotatef, [c38_rest, sys_places, c38_environm
 wl: declared(cl_rotatef, env_arg1).
 
 wl:arglist_info(rotatef, cl_rotatef, [c38_rest, sys_places, c38_environment, env], arginfo{all:0, allow_other_keys:0, aux:0, body:0, complex:[rest, environment], env:[env], key:0, names:[sys_places, env], opt:0, req:0, rest:[sys_places], sublists:0, whole:0}).
-wl: init_args(0, cl_rotatef).
+wl: init_args(0,rotatef).
 
 /*
 
@@ -451,7 +451,7 @@ wl:lambda_def(defmacro, push, cl_push, [c38_environment, env, item, sys_place], 
 wl: declared(cl_push, env_arg1).
 
 wl:arglist_info(push, cl_push, [c38_environment, env, item, sys_place], arginfo{all:[item, sys_place], allow_other_keys:0, aux:0, body:0, complex:[environment], env:[env], key:0, names:[env, item, sys_place], opt:0, req:[item, sys_place], rest:0, sublists:0, whole:0}).
-wl: init_args(2, cl_push).
+wl: init_args(2,push).
 
 /*
 
@@ -533,7 +533,7 @@ wl:lambda_def(defmacro, pushnew, cl_pushnew, [c38_environment, env, item, sys_pl
 wl: declared(cl_pushnew, env_arg1).
 
 wl:arglist_info(pushnew, cl_pushnew, [c38_environment, env, item, sys_place, c38_rest, sys_keys], arginfo{all:[item, sys_place], allow_other_keys:0, aux:0, body:0, complex:[environment, rest], env:[env], key:0, names:[env, item, sys_place, sys_keys], opt:0, req:[item, sys_place], rest:[sys_keys], sublists:0, whole:0}).
-wl: init_args(2, cl_pushnew).
+wl: init_args(2,pushnew).
 
 /*
 
@@ -622,7 +622,7 @@ wl:lambda_def(defmacro, pop, cl_pop, [c38_environment, env, sys_place], [progn, 
 wl: declared(cl_pop, env_arg1).
 
 wl:arglist_info(pop, cl_pop, [c38_environment, env, sys_place], arginfo{all:[sys_place], allow_other_keys:0, aux:0, body:0, complex:[environment], env:[env], key:0, names:[env, sys_place], opt:0, req:[sys_place], rest:0, sublists:0, whole:0}).
-wl: init_args(1, cl_pop).
+wl: init_args(1,pop).
 
 /*
 
@@ -692,7 +692,7 @@ cl_pop(Place_In, RestNKeys, FnResult) :-
 wl:interned_eval_devel('
 ; See section 5.1.3.
 #+WAM-CL
-(defmacro incf (place &optional (delta 1) &environment env)
+(defmacro incf-is (place &optional (delta 1) &environment env)
   "The first argument is some location holding a number.  This number is
 incremented by the second argument, DELTA, which defaults to 1."
   (if (and (symbolp (setq place (%symbol-macroexpand place env)))
@@ -703,7 +703,7 @@ incremented by the second argument, DELTA, which defaults to 1."
     (multiple-value-bind (dummies vals newval setter getter)
         (get-setf-method place env)
       (let ((d (gensym)))
-        `(let* (,@(mapcar #\'list dummies vals)
+        `(let* (,@(mapcar (function list) dummies vals)
                 (,d ,delta)
                 (,(car newval) (+ ,getter ,d)))
            ,setter)))))
@@ -721,13 +721,13 @@ wl:lambda_def(defmacro, incf, cl_incf, [sys_place, c38_optional, [sys_delta, 1],
 wl: declared(cl_incf, env_arg1).
 
 wl:arglist_info(incf, cl_incf, [sys_place, c38_optional, [sys_delta, 1], c38_environment, env], arginfo{all:[sys_place, sys_delta], allow_other_keys:0, aux:0, body:0, complex:[environment], env:[env], key:0, names:[sys_place, sys_delta, env], opt:[sys_delta], req:[sys_place], rest:0, sublists:0, whole:0}).
-wl: init_args(1, cl_incf).
+wl: init_args(1,incf).
 
 /*
 
 ### Compiled:  `CL:INCF` 
 */
-cl_incf(Place_In, RestNKeys, FnResult) :-
+incf_macroexpand1_(Place_In, RestNKeys, MFResult) :-
 	nop(defmacro),
 	AEnv=[bv(sys_place, Place_In), bv(sys_delta, Delta_In), bv(env, Env_In)|Opt_var_Param],
 	global_env(Opt_var_Param),
@@ -802,25 +802,25 @@ cl_incf(Place_In, RestNKeys, FnResult) :-
 		_15634562=MFResult
 	      ),
 	      block_exit(incf, MFResult),
-	      true),
-	cl_eval(MFResult, FnResult).
+	      true).
 :- set_opv(cl_incf, classof, claz_macro),
    set_opv(incf, compile_as, kw_operator),
    set_opv(incf, function, cl_incf),
    DefMacroResult=incf.
 
-/*
-#+WAM-CL
+/*`
+wl:interned_eval_devel(
+"#+WAM-CL
 (defmacro decf (place &optional (delta 1))
   `(incf ,place (- 0 ,delta)))
-
+"). % "
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:5869 **********************/
 :-lisp_compile_to_prolog(pkg_sys,[defmacro,decf,[place,'&optional',[delta,1]],['#BQ',[incf,['#COMMA',place],[-,0,['#COMMA',delta]]]]]).
 wl:lambda_def(defmacro, decf, cl_decf, [sys_place, c38_optional, [sys_delta, 1]], [progn, ['#BQ', [incf, ['#COMMA', sys_place], [-, 0, ['#COMMA', sys_delta]]]]]).
 wl:arglist_info(decf, cl_decf, [sys_place, c38_optional, [sys_delta, 1]], arginfo{all:[sys_place, sys_delta], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_place, sys_delta], opt:[sys_delta], req:[sys_place], rest:0, sublists:0, whole:0}).
-wl: init_args(1, cl_decf).
+wl: init_args(1,decf).
 
 /*
 
@@ -889,13 +889,13 @@ wl:lambda_def(defmacro, setf, cl_setf, [c38_rest, sys_pairs, c38_environment, en
 wl: declared(cl_setf, env_arg1).
 
 wl:arglist_info(setf, cl_setf, [c38_rest, sys_pairs, c38_environment, env], arginfo{all:0, allow_other_keys:0, aux:0, body:0, complex:[rest, environment], env:[env], key:0, names:[sys_pairs, env], opt:0, req:0, rest:[sys_pairs], sublists:0, whole:0}).
-wl: init_args(0, cl_setf).
+wl: init_args(0,setf).
 
 /*
 
 ### Compiled:  `CL:SETF` 
 */
-cl_setf(RestNKeys, FnResult) :-
+cl_setf(RestNKeys, FnResult) :- slow_trace,
 	nop(defmacro),
 	Env=[bv(sys_pairs, RestNKeys), bv(env, Env_In)|CDR],
 	global_env(CDR),
@@ -999,7 +999,7 @@ cl_setf(RestNKeys, FnResult) :-
 
 wl:lambda_def(defun, ext_get_setf_method_multiple_value, f_ext_get_setf_method_multiple_value, [u_form, c38_optional, env, c38_aux, u_tem], [[cond, [[symbolp, u_form], [let, [[u_store, [gensym]]], [values, [], [], [list, u_store], ['#BQ', [setq, ['#COMMA', u_form], ['#COMMA', u_store]]], u_form]]], [[or, [not, [consp, u_form]], [not, [symbolp, [car, u_form]]]], [error, '$ARRAY'([*], claz_base_character, "Cannot get the setf-method of ~S."), u_form]], [[multiple_value_bind, [u_t1, exp], [macroexpand, u_form, env], [when, exp, [setq, u_tem, u_t1]]], [ext_get_setf_method_multiple_value, u_tem, env]], [[get, [car, u_form], [quote, u_setf_method]], [apply, [get, [car, u_form], [quote, u_setf_method]], env, [cdr, u_form]]], [[or, [get, [car, u_form], [quote, u_setf_update_fn]], [setq, u_tem, [get, [car, u_form], [quote, sys_structure_access]]]], [let, [[u_vars, [u_to_gensyms, [cdr, u_form]]], [u_store, [gensym]]], [values, u_vars, [cdr, u_form], [list, u_store], [cond, [u_tem, [u_setf_structure_access, [car, u_vars], [car, u_tem], [cdr, u_tem], u_store]], [[let, [[u_f, [get, [car, u_form], [quote, u_setf_update_fn]]]], ['#BQ', [['#COMMA', u_f], ['#BQ-COMMA-ELIPSE', u_vars], ['#COMMA', u_store]]]]]], [cons, [car, u_form], u_vars]]]], [[get, [car, u_form], [quote, u_setf_lambda]], [let_xx, [[u_vars, [u_to_gensyms, [cdr, u_form]]], [u_store, [gensym]], [u_f, [get, [car, u_form], [quote, u_setf_lambda]]]], [values, u_vars, [cdr, u_form], [list, u_store], [funcall, [apply, u_f, u_vars], u_store], [cons, [car, u_form], u_vars]]]], [[macro_function, [car, u_form]], [ext_get_setf_method_multiple_value, [macroexpand, u_form, env]]], [t, [let, [[u_vars, [u_to_gensyms, [cdr, u_form]]], [u_store, [gensym]]], [values, u_vars, [cdr, u_form], [list, u_store], ['#BQ', [funcall, function([setf, ['#COMMA', [car, u_form]]]), ['#COMMA', u_store], ['#BQ-COMMA-ELIPSE', u_vars]]], [cons, [car, u_form], u_vars]]]]]]).
 wl:arglist_info(ext_get_setf_method_multiple_value, f_ext_get_setf_method_multiple_value, [u_form, c38_optional, env, c38_aux, u_tem], arginfo{all:[u_form, env], allow_other_keys:0, aux:[u_tem], body:0, complex:0, env:0, key:0, names:[u_form, env, u_tem], opt:[env], req:[u_form], rest:0, sublists:0, whole:0}).
- wl:init_args(1, f_ext_get_setf_method_multiple_value).
+ wl:init_args(1,ext_get_setf_method_multiple_value).
 
  % ### Compiled:  `EXT:GET-SETF-METHOD-MULTIPLE-VALUE`
 % ```prolog
@@ -1358,7 +1358,7 @@ f_u_setf_structure_access(Struct_In, Type_In, Index_In, Newvalue_In, FnResult) :
 
 wl:lambda_def(defun, ext_get_setf_method, f_ext_get_setf_method, [u_form, c38_optional, env], [[multiple_value_bind, [u_vars, u_vals, u_stores, u_store_form, u_access_form], [ext_get_setf_method_multiple_value, u_form, env], [unless, [=, [list_length, u_stores], 1], [error, '$ARRAY'([*], claz_base_character, "Multiple store-variables are not allowed.")]], [values, u_vars, u_vals, u_stores, u_store_form, u_access_form]]]).
 wl:arglist_info(ext_get_setf_method, f_ext_get_setf_method, [u_form, c38_optional, env], arginfo{all:[u_form, env], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[u_form, env], opt:[env], req:[u_form], rest:0, sublists:0, whole:0}).
-wl: init_args(1, f_ext_get_setf_method).
+wl: init_args(1,ext_get_setf_method).
 
 
 wl:interned_eval_devel('

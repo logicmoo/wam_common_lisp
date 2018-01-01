@@ -354,7 +354,7 @@ is_special_op('nth-value', pkg_cl).
 is_special_op('prog*', pkg_cl).
 is_special_op('return-from', pkg_cl).
 is_special_op('symbol-macrolet', pkg_cl).
-% is_special_op('truly-the', 'sb-ext').
+is_special_op('truly-the', pkg_ext).
 is_special_op('unwind-protect', pkg_cl).
 
 is_special_op(block, pkg_cl).
@@ -386,8 +386,7 @@ is_special_op(tagbody, pkg_cl).
 is_special_op(the, pkg_cl).
 is_special_op(throw, pkg_cl).
 is_special_op(unless, pkg_cl).
-is_special_op(while, pkg_user).
-is_special_op(u_while, pkg_user).
+is_special_op(while, pkg_cl).
 is_special_op(when, pkg_cl).
 is_special_op(defclass, pkg_cl).
 is_special_op(defstruct, pkg_cl).

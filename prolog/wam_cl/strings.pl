@@ -80,7 +80,6 @@ to_prolog_char((Atom),Char):- name(Atom,[C|Odes]),!,
 
 
 % SHARED SECTION
-:- multifile(wl:coercion/3).
 wl:coercion(In, claz_prolog_string, Out):- to_prolog_string(In,Out).
 wl:coercion(In, claz_string, Out):- cl_string(In,Out).
 wl:coercion(In, claz_character, Out):- make_character(In,Out).

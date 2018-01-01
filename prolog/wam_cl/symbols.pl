@@ -194,9 +194,6 @@ f_sys_putprop(Symbol,Prop,Value,Optionals,Ret):- %assertion(is_symbolp(Symbol)),
 f_sys_put(Symbol,Prop,Value,Optionals,Ret):-
  f_sys_putprop(Symbol,Prop,Value,Optionals,Ret).
 
-nth_param(Optionals,N,Default,Value):- nth1(N,Optionals,Value)->true;Default=Value.
-nth_param(Optionals,N,Default,Value,PresentP):- nth1(N,Optionals,Value)->(PresentP=t);(Default=Value,PresentP=[]).
-
 get_plist_value(_TestFn,[PropWas,_|_],_Prop,_Default,_Value):-var(PropWas),!,break.
 get_plist_value(_TestFn,PList,_Prop,Default,Default):- \+ is_list(PList),!,break.
 get_plist_value(TestFn,[PropWas,Value|PList],Prop,Default,Value):- 

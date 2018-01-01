@@ -15,9 +15,10 @@
          (z (point-z point)))
     (sqrt (+ (* x x) (* y y) (* z z)))))
 
+(progn 
 (defun reflect-in-y-axis (point)
   (setf (point-y point)
-        (- (point-y point))))
+        (- (point-y point)))))
 
 (list (setf my-point (make-point :x 3 :y 4 :z 12)) (setf my-point2 (make-point :x 3 :y 4 :z 12)))
 (setf my-point3 #S(POINT :X 3 :Y 4 :Z 12))
@@ -70,6 +71,8 @@
         (slot-value point 'z) z))
 
 (set-point-values my-point 3 4 12)
+
+(break)
 
 (defun distance-from-origin (point)
   (with-slots (x y z)

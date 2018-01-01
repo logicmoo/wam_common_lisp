@@ -25,6 +25,21 @@
 :- include('header').
 
 
+cl_nth(Axis,List,RetVal):- nth0(Axis,List,RetVal).
+cl_elt(List,Axis,RetVal):- nth0(Axis,List,RetVal).
+
+cl_nthcdr(_,[],[]):-!.
+cl_nthcdr(0,List,List).
+cl_nthcdr(Index,[_|List],RetVal):- Next is Index-1,cl_nthcdr(Next,List,RetVal).
+
+cl_set_nthcdr(_,[],[]):-!.
+cl_set_nthcdr(0,List,Tail):- nb_setarg(2,List,Tail).
+cl_set_nthcdr(Index,[_|List],Tail):- Next is Index-1,cl_set_nthcdr(Next,List,Tail).
+
+nth_index([Index],List,RetVal):- !, cl_nth(Index,List,RetVal). 
+nth_index([],List,List):-!.
+nth_index([Index|Indexes],List,RetVal):- cl_nth(Index,List,IndexedVal),nth_index(Indexes,IndexedVal,RetVal).
+
 % #'CONSP
 cl_consp(Obj,RetVal):- t_or_nil(is_consp(Obj),RetVal).
 is_consp(Obj):- nonvar(Obj),Obj=[_|_].
