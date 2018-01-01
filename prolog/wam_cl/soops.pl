@@ -258,7 +258,7 @@ make_default_constructor(Kind,Code):-
  get_struct_opv(Kind,symbolname,Name),to_prolog_string_anyways(Name,SName),
  atom_concat_or_rtrace("MAKE-",SName,FnName),
  reader_intern_symbols(FnName,Sym),
- foc_operator(_,_,kw_function,Sym,3,Function), 
+ foc_operator(_,_,Sym,3,Function), 
  Head=..[Function,List,Obj],
  Body=..[cl_make_instance,[Kind|List],Obj],
  Code = (assert_lsp(wl:init_args(0,Function)),

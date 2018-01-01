@@ -80,7 +80,7 @@ compile_macro_ops(Ctx,Env,Result,[macrolet,MACROLETS|Progn], (maplist(always,Dec
     
 
 
-define_each_macro(Ctx,Env,_MacroLet,[Symbol|DEFN],fbound(Sym)=bound_type(kw_operator,UniqueMacroName),CompileBody)  :-    
+define_each_macro(Ctx,Env,_MacroLet,[Symbol|DEFN],fbound(Sym)=bound_type(kw_macro,UniqueMacroName),CompileBody)  :-    
    (always(foc_operator(Ctx,Env,Symbol,_Len, Macro0)),suffix_by_context(Ctx,Macro0,Macro)),
    gensym(Macro,UniqueMacroName),
    compile_macro(Ctx,Env,[Symbol|DEFN],Sym,UniqueMacroName,CompileBody),
@@ -113,6 +113,16 @@ compile_macro_function(Ctx,Env,Symbol,[FormalParms|MacroBody0],Macro,HeadParms,E
    body_cleanup_keep_debug_vars(Ctx,((DocCode,
      assert_lsp(Symbol,wl:lambda_def(defmacro,Symbol,Macro, FormalParms, [progn | MacroBody])),HeadDefCode)),CompileBody)))).
 
+wl:plugin_expand_progbody_1st(Ctx,Env,Result,[macroexpand_1,LispCode|ARGS],_PreviousResult,
+      (LispCodeEval,ARGSCode,cl_macroexpand_1([LispCodeResult|ARGSResult],Result))):-
+   must_compile_body(Ctx,Env,LispCodeResult,LispCode,LispCodeEval),
+   compile_each(Ctx,Env,ARGSResult,ARGS,ARGSCode).
+  
+wl:plugin_expand_progbody_1st(Ctx,Env,Result,[macroexpand,LispCode|ARGS],_PreviousResult,
+      (LispCodeEval,ARGSCode,cl_macroexpand([LispCodeResult|ARGSResult],Result))):-
+   must_compile_body(Ctx,Env,LispCodeResult,LispCode,LispCodeEval),
+   compile_each(Ctx,Env,ARGSResult,ARGS,ARGSCode).
+  
  
 % macroexpand-1
 wl:init_args(0,macroexpand).
@@ -124,8 +134,8 @@ cl_macroexpand_1([LispCode|Optionals],Result):-
 % macroexpand
 wl:init_args(0,macroexpand_1).
 cl_macroexpand([LispCode|Optionals],Result):- 
-  nth_param(Optionals,1,Local,MacroEnv),
-  parent_env(Local),
+  nth_param(Optionals,1,kw_undefined,MacroEnvArg),
+  ((MacroEnvArg=kw_undefined)->parent_env(MacroEnv);MacroEnvArg=MacroEnv),
   macroexpand_all(LispCode,MacroEnv,R),!,
   (R\==LispCode->cl_values_list([R,t],Result);cl_values_list([R,[]],Result)).
 
@@ -135,14 +145,24 @@ macroexpand_all(LispCode,MacroEnv,Result):-
   macroexpand_1_or_fail(LispCode,MacroEnv,Mid) ->
     macroexpand_all(Mid,MacroEnv,Result) ; Result=LispCode.
 
-get_macro_function(Ctx,Env,Procedure, Arguments,MResult,FnResult,CallBody):- 
-       atom(Procedure),
+get_macro_function(Ctx,Env,Procedure,Arguments,MResult,CallBody):-  atom(Procedure),
    length(Arguments,ArgsLen),
-   find_operator(Ctx,Env,Procedure,ArgsLen, ProposedName),!,
-   align_args_or_fallback(Ctx,Env,Procedure,ProposedName,Arguments,FnResult,ArgsPlusResult),
+   notrace(find_operator(Ctx,Env,Procedure,ArgsLen, ProposedName)),!,
+   notrace(align_args_or_fallback(Ctx,Env,Procedure,ProposedName,Arguments,_FnResult,ArgsPlusResult)),
    ExpandedMacro =.. [ ProposedName | ArgsPlusResult],
+   get_mf_interface(ExpandedMacro,CallBody,MResult).
+
+
+get_mf_interface(ExpandedMacro,CallBody,MResult):- 
+   ExpandedMacro =.. [ ProposedName | ArgsPlusResult],
+   atom_concat(ProposedName,'_macroexpand1_',ProposedName_macroexpand1_),
+   ExpandedMacro_macroexpand1_ =.. [ ProposedName_macroexpand1_ | ArgsPlusResult],
+   clause_interface(ExpandedMacro_macroexpand1_,CallBody),
+   append(_,[MResult],ArgsPlusResult).
+
+get_mf_interface(ExpandedMacro,CallBody,MResult):- 
    clause_interface(ExpandedMacro,Conj),
-   unify_conj(Conj,(CallBody,cl_eval(MResult, FnResult))).
+   unify_conj(Conj,(CallBody,cl_eval(MResult, _))).
 
 unify_conj(Conj,To):- nonplainvar(Conj),Conj=To,!.
 unify_conj((CA,(CB,CC)),(A,B)):- var(A),nonplainvar(B),!, unify_conj(((CA,CB),CC),(A,B)).
@@ -154,14 +174,15 @@ wl:declared(u_is,interpret).
 macroexpand_1_or_fail([Procedure|_],_,_):- wl:declared(Procedure,interpret),!,fail.
 
 macroexpand_1_or_fail([Procedure|Arguments],MacroEnv,MResult):- nonplainvar(Procedure),   
-   get_macro_function(_Ctx,MacroEnv,Procedure, Arguments, MResult, _FnResult, CallBody),!,always(CallBody),!.
+   get_macro_function(_Ctx,MacroEnv,Procedure, Arguments, MResult, CallBody),!,always(CallBody),!.
 
 macroexpand_1_or_fail([Procedure|Arguments],MacroEnv,CompileBody0Result):- nonplainvar(Procedure),
    debug_var('MacroEnvArgs',MacroEnv),
    get_lambda_def(defmacro,Procedure, FormalParams, LambdaExpression),!,
    always((debug_var('EnvThru',EnvThru),debug_var('NewEnv',NewEnv),
    debug_var('MEnv',Env),debug_var('NextEnv',NextEnv),debug_var('CommaResult',CommaResult),
-   must_bind_parameters(NewEnv, _RestNKeys, FormalParams, Arguments,EnvThru,BindCode),!,
+   Whole = [Procedure|Arguments],
+   must_bind_parameters(NewEnv,Whole, _RestNKeys, FormalParams, Arguments,EnvThru,BindCode),!,
    append(_,[],NewEnv),!,
    NextEnv = [NewEnv|Env],  
    always(BindCode),
