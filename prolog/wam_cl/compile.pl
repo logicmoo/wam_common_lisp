@@ -84,7 +84,7 @@ quotify_each(Ctx,Env,[VarR|Result],[Var|Eval],Code):-
   quotify_each(Ctx,Env,Result,Eval,Code1),
   conjoin_0(Ctx,Code0,Code1,Code),!.
 
-must_quotify(_Ctx,_Env,SelfEval,SelfEval,true):- notrace(is_self_evaluating_object(SelfEval)),!.
+must_quotify(_Ctx,_Env,SelfEval,SelfEval,true):- quietly(is_self_evaluating_object(SelfEval)),!.
 must_quotify(_Ctx,_Env,[quote,Var],Var,true).
 
 
@@ -211,7 +211,7 @@ compile_body(_Cx,_Ev, [],nil,true):- !.
 compile_body(_Ctx,_Env,Result,'$S'([Type|Args]),create_struct([Type|Args],Result)).
 
 % numbers
-compile_body(_Cx,_Ev,Result,SelfEval,Body):- notrace(is_self_evaluating_object(SelfEval)),!,
+compile_body(_Cx,_Ev,Result,SelfEval,Body):- quietly(is_self_evaluating_object(SelfEval)),!,
   ensure_assignment(Result=SelfEval,Body).
 
 % =============================================================================
@@ -395,11 +395,11 @@ at_least_two_args(deftype).
 at_least_two_args(symbol_macrolet).
 at_least_two_args(define_setf_expander).
 
-compile_direct_assertions(_Ctx,_Env,Symbol,[Function,Symbol,A2|AMORE],assert_lsp(Symbol,P)):- notrace(at_least_two_args(Function)),
+compile_direct_assertions(_Ctx,_Env,Symbol,[Function,Symbol,A2|AMORE],assert_lsp(Symbol,P)):- quietly(at_least_two_args(Function)),
   \+ is_fboundp(Function),!,
    P=..[Function,Symbol,A2,AMORE].
 
-compile_direct_assertions(_Ctx,_Env,Symbol,[Fun0,Symbol,A2|AMORE],assert_lsp(Symbol,P)):- notrace((at_least_two_args(Function),same_symbol(Function,Fun0))),
+compile_direct_assertions(_Ctx,_Env,Symbol,[Fun0,Symbol,A2|AMORE],assert_lsp(Symbol,P)):- quietly((at_least_two_args(Function),same_symbol(Function,Fun0))),
   \+ is_fboundp(Function),!,P=..[Function,Symbol,A2,AMORE].
 
 

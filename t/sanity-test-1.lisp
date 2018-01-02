@@ -182,8 +182,12 @@
   ((legs :reader leg-count :initarg :legs)
    (comes-from :reader comes-from :initarg :comes-from)))
 
+(defparameter my-animal (make-instance 'animal))
+
 (defclass mammal (animal)
   ((diet :initform 'antelopes :initarg :diet)))
+
+(defparameter my-mammal (make-instance 'mammal))
 
 (defclass aardvark (mammal)
   ((cute-p :accessor cute-p :initform nil)))
@@ -191,9 +195,10 @@
 (#-allegro class-direct-superclasses #+allegro aclmop:class-direct-superclasses
    (find-class 'aardvark))
 
-;; ACL needs to instantiate a class before its precedence-list becomes visible
-;; #+allegro
-(make-instance 'aardvark)
+;; ACL needs to instantiate a class before its precedence-list becomes visible #+allegro
+
+(defparameter my-aardvark (make-instance 'aardvark))
+
 
 (#-allegro class-precedence-list #+allegro aclmop:class-precedence-list
    (find-class 'aardvark))

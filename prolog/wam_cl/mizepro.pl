@@ -36,21 +36,21 @@ body_cleanup(Ctx,CodeIn,CodeOut):- quietly(body_cleanup_full(Ctx,CodeIn,CodeOut)
 body_cleanup_keep_debug_vars(Ctx,CodeIn,CodeOut):- quietly(body_cleanup_full(Ctx,CodeIn,CodeOut)),!.
 
 body_cleanup_no_optimize(Ctx,CodeSt,CodeIn):-!, 
- always((   
+ quietly(always((   
   %show_ctx_info(Ctx),
    sanitize_true(Ctx,CodeSt,CodeIn),
    %del_attrs_of(CodeIn,freeze),   
    ! % inline_body([],Ctx,',',CodeIn,Code5a)
-   )),!.
+   ))),!.
 
 body_cleanup_keep_debug_vars_fuller(Ctx,CodeSt,Code5a):-!, 
- always((   
+ quietly(always((   
   %show_ctx_info(Ctx),
    sanitize_true(Ctx,CodeSt,CodeIn),
    del_attrs_of(CodeIn,freeze),
    (inline_body([],Ctx,',',CodeIn,Code5a)),
    del_attrs_of(Code5a,dif)
-   )),!.
+   ))),!.
 
 %body_cleanup_full(Ctx,CodeSt,CodeOutNow):- body_cleanup_keep_debug_vars_fuller(Ctx,CodeSt,CodeOutNow),!.
 
@@ -58,7 +58,7 @@ body_cleanup_keep_debug_vars_fuller(Ctx,CodeSt,Code5a):-!,
 body_cleanup_full(_Ctx,CodeSt,CodeOutNow):- var(CodeSt),!,CodeOutNow=CodeSt.
 %body_cleanup_full(Ctx,:- CodeSt,:- CodeOutNow):-!,body_cleanup_full(Ctx,CodeSt,CodeOutNow).
 body_cleanup_full(Ctx,CodeSt,CodeOutNow):- 
- always((   
+ quietly(always((   
   %show_ctx_info(Ctx),
    %properly_protect(Ctx,CodeSt,_),
    sanitize_true(Ctx,CodeSt,CodeIn),
@@ -76,7 +76,7 @@ body_cleanup_full(Ctx,CodeSt,CodeOutNow):-
    body_cleanup_keep_debug_vars1(Ctx,Code5,CodeOut),
    add_type_checks_maybe(Ctx,CodeOut,CodeOutNow),
    del_attrs_of(CodeOutNow,preserved_var),
-   del_attrs_of(CodeOutNow,dif))).
+   del_attrs_of(CodeOutNow,dif)))).
 
 add_type_checks_maybe(_,IO,IO).
 
@@ -198,6 +198,7 @@ properly_protect(Ctx,C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(pro
 del_attr_rev2(Name,Var):- del_attr(Var,Name).
 del_attrs_of(CodeIn,Name):- term_variables(CodeIn,AttVars),maplist(del_attr_rev2(Name),AttVars).
 
+
 sanitize_true(_, C1,C2):- \+ compound(C1),!,C2=C1.
 sanitize_true(_, C1,C2):- non_compound_code(C1),!,C2=C1.
 sanitize_true(_,f_clos_pf_set_slot_value(A,B,C,D),set_slot(A,B,C)):-C=D.
@@ -208,6 +209,7 @@ sanitize_true(Ctx,(C2 -> CodeC),( C2O -> CodeCCO)):-!,sanitize_true(Ctx,C2,C2O),
 sanitize_true(Ctx,(C2 :- CodeC),( C2 :- CodeCCO)):-!,sanitize_true(Ctx,CodeC,CodeCCO).
 sanitize_true(Ctx,( :- CodeC),( :- CodeCCO)):-!,sanitize_true(Ctx,CodeC,CodeCCO).
 sanitize_true(_Ctx,C1,C1):-!.
+:- '$hide'(sanitize_true/3).
 %sanitize_true(Ctx,C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(sanitize_true(Ctx),C1O,C2O),C2=..[F|C2O].
 
 keeper(C1):- var(C1),!.

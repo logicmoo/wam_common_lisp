@@ -54,6 +54,9 @@ struct_opv(claz_array,super_priority,[claz_t]).
 struct_opv(claz_array,symbolname,array).
 struct_opv(claz_asterisks_around_constant_variable_name,super_priority,[claz_dubious_asterisks_around_variable_name,claz_style_warning,claz_warning,claz_simple_condition,claz_condition,claz_sys_slot_object,claz_t]).
 struct_opv(claz_asterisks_around_lexical_variable_name,super_priority,[claz_dubious_asterisks_around_variable_name,claz_style_warning,claz_warning,claz_simple_condition,claz_condition,claz_sys_slot_object,claz_t]).
+struct_opv(claz_base_character,include,claz_character).
+struct_opv(claz_base_character,super_priority,[claz_character,claz_t]).
+struct_opv(claz_base_character,symbolname,claz_base_character).
 struct_opv(claz_base_string,classof,claz_built_in_class).
 struct_opv(claz_base_string,include,claz_string).
 struct_opv(claz_base_string,prototype,"").
@@ -192,9 +195,6 @@ struct_opv(claz_character,super_priority,[claz_t]).
 struct_opv(claz_character,symbolname,character).
 struct_opv(claz_character,type,char_code,zlot_character_value).
 struct_opv(claz_character,type,string,zlot_character_name).
-struct_opv(claz_base_character,symbolname,claz_base_character).
-struct_opv(claz_base_character,include,claz_character).
-struct_opv(claz_base_character,super_priority,[claz_character,claz_t]).
 struct_opv(claz_class,classof,claz_built_in_class).
 struct_opv(claz_class,classof,claz_standard_class).
 struct_opv(claz_class,include,claz_dependent_update_mixin).
@@ -3236,6 +3236,52 @@ struct_opv(claz_hash_table(claz_string,claz_package),classof,claz_built_in_class
 struct_opv(claz_hash_table(claz_string,claz_symbol),classof,claz_built_in_class).
 struct_opv(claz_hash_table(claz_t,claz_t),classof,claz_built_in_class).
 struct_opv(claz_hash_table(claz_t,claz_t),include,claz_hash_table).
+struct_opv(claz_hash_table, accessor, hash_table_rehash_size, zlot_hash_table_rehash_size).
+struct_opv(claz_hash_table, accessor, hash_table_rehash_threshold, zlot_hash_table_rehash_threshold).
+struct_opv(claz_hash_table, accessor, hash_table_size, zlot_hash_table_size).
+struct_opv(claz_hash_table, accessor, hash_table_test, zlot_hash_table_test).
+struct_opv(claz_hash_table, accessor, sys_hash_table_weakness, zlot_hash_table_weakness).
+struct_opv(claz_hash_table, accessor, u_hash_table_data, zlot_hash_table_data).
+struct_opv(claz_hash_table, accessor, u_hash_table_lock, zlot_hash_table_lock).
+struct_opv(claz_hash_table, classof, claz_standard_class).
+struct_opv(claz_hash_table, classof,claz_built_in_class).
+struct_opv(claz_hash_table, conc_name, "HASH-TABLE-").
+struct_opv(claz_hash_table, initform, 0.75, zlot_hash_table_rehash_threshold).
+struct_opv(claz_hash_table, initform, 1.5, zlot_hash_table_rehash_size).
+struct_opv(claz_hash_table, initform, 11, zlot_hash_table_size).
+struct_opv(claz_hash_table, initform, [], zlot_hash_table_data).
+struct_opv(claz_hash_table, initform, [], zlot_hash_table_lock).
+struct_opv(claz_hash_table, initform, [], zlot_hash_table_weakness).
+struct_opv(claz_hash_table, initform, [quote, eql], zlot_hash_table_test).
+struct_opv(claz_hash_table, keyword, kw_data, zlot_hash_table_data).
+struct_opv(claz_hash_table, keyword, kw_lock, zlot_hash_table_lock).
+struct_opv(claz_hash_table, keyword, kw_rehash_size, zlot_hash_table_rehash_size).
+struct_opv(claz_hash_table, keyword, kw_rehash_threshold, zlot_hash_table_rehash_threshold).
+struct_opv(claz_hash_table, keyword, kw_size, zlot_hash_table_size).
+struct_opv(claz_hash_table, keyword, kw_test, zlot_hash_table_test).
+struct_opv(claz_hash_table, keyword, kw_weakness, zlot_hash_table_weakness).
+struct_opv(claz_hash_table, ordinal, 1, zlot_hash_table_test).
+struct_opv(claz_hash_table, ordinal, 2, zlot_hash_table_size).
+struct_opv(claz_hash_table, ordinal, 3, zlot_hash_table_rehash_size).
+struct_opv(claz_hash_table, ordinal, 4, zlot_hash_table_rehash_threshold).
+struct_opv(claz_hash_table, ordinal, 5, zlot_hash_table_weakness).
+struct_opv(claz_hash_table, ordinal, 6, zlot_hash_table_lock).
+struct_opv(claz_hash_table, ordinal, 7, zlot_hash_table_data).
+struct_opv(claz_hash_table, setter_fn, u_setf_hash_table_data, zlot_hash_table_data).
+struct_opv(claz_hash_table, setter_fn, u_setf_hash_table_lock, zlot_hash_table_lock).
+struct_opv(claz_hash_table, setter_fn, u_setf_hash_table_rehash_size, zlot_hash_table_rehash_size).
+struct_opv(claz_hash_table, setter_fn, u_setf_hash_table_rehash_threshold, zlot_hash_table_rehash_threshold).
+struct_opv(claz_hash_table, setter_fn, u_setf_hash_table_size, zlot_hash_table_size).
+struct_opv(claz_hash_table, setter_fn, u_setf_hash_table_test, zlot_hash_table_test).
+struct_opv(claz_hash_table, setter_fn, u_setf_hash_table_weakness, zlot_hash_table_weakness).
+struct_opv(claz_hash_table, slot, test, zlot_hash_table_test).
+struct_opv(claz_hash_table, slot, u_data, zlot_hash_table_data).
+struct_opv(claz_hash_table, slot, u_lock, zlot_hash_table_lock).
+struct_opv(claz_hash_table, slot, u_rehash_size, zlot_hash_table_rehash_size).
+struct_opv(claz_hash_table, slot, u_rehash_threshold, zlot_hash_table_rehash_threshold).
+struct_opv(claz_hash_table, slot, u_size, zlot_hash_table_size).
+struct_opv(claz_hash_table, slot, u_weakness, zlot_hash_table_weakness).
+struct_opv(claz_hash_table, symbolname, hash_table).
 struct_opv(claz_i18n_locale_conv,classof,claz_clos_structure_class).
 struct_opv(claz_i18n_locale_conv,include,claz_structure_object).
 struct_opv(claz_i18n_locale_conv,initargs,[kw_currency_symbol],zlot_i18n_locale_conv_currency_symbol).
@@ -3478,8 +3524,8 @@ struct_opv(claz_jar_stream,type,integer,zlot_jar_stream_bytes_per_unit).
 struct_opv(claz_jar_stream,type,pathname,zlot_jar_stream_pathname).
 struct_opv(claz_jar_stream,type,prolog_input_stream,zlot_jar_stream_input).
 struct_opv(claz_jar_stream,type,prolog_reader,zlot_jar_stream_reader).
-struct_opv(claz_keyword,symbolname,keyword).
 struct_opv(claz_keyword,include,claz_symbol).
+struct_opv(claz_keyword,symbolname,keyword).
 struct_opv(claz_lambda_list_unavailable,include,claz_debug_debug_condition).
 struct_opv(claz_lambda_list_unavailable,super_priority,[claz_debug_debug_condition,claz_serious_condition,claz_condition,claz_sys_slot_object,claz_t]).
 struct_opv(claz_lexenv,name,"HANDLED-CONDITIONS",zlot_lexenv_handled_conditions).
@@ -6214,7 +6260,6 @@ struct_opv(claz_structure_class,writers,[[setf,sys_class_defstruct_form]],zlot_c
 struct_opv(claz_structure_object,classof,claz_built_in_class).
 struct_opv(claz_structure_object,classof,claz_clos_structure_class).
 struct_opv(claz_structure_object,classof,claz_structure_class).
-% struct_opv(claz_structure_object,include,claz_structure_c33_object).
 struct_opv(claz_structure_object,include,claz_sys_slot_object).
 struct_opv(claz_structure_object,include,claz_t).
 struct_opv(claz_structure_object,name,"ALTERNATE-METACLASS",zlot_structure_object_alternate_metaclass).
@@ -6260,7 +6305,6 @@ struct_opv(claz_structure_object,slot,pure,zlot_structure_object_pure).
 struct_opv(claz_structure_object,slot,slots,zlot_structure_object_slots).
 struct_opv(claz_structure_object,slot,structure_class,zlot_structure_object_structure_class).
 struct_opv(claz_structure_object,slot,type,zlot_structure_object_type).
-%struct_opv(claz_structure_object,super_priority,[claz_structure_c33_object,claz_structure_object,claz_sys_slot_object,claz_t]).
 struct_opv(claz_structure_object,super_priority,[claz_sys_slot_object,claz_t]).
 struct_opv(claz_structure_object,super_priority,[claz_t]).
 struct_opv(claz_structure_object,symbolname,structure_object).
@@ -10515,52 +10559,3 @@ struct_opv(claz_zero_rank_array,slot,element_type,zlot_zero_rank_array_element_t
 struct_opv(claz_zero_rank_array,type,boolean,zlot_zero_rank_array_adjustable).
 struct_opv(claz_zero_rank_array,type,t,zlot_zero_rank_array_data).
 struct_opv(claz_zero_rank_array,type,t,zlot_zero_rank_array_element_type).
-
-struct_opv(claz_hash_table, symbolname, hash_table).
-struct_opv(claz_hash_table, classof,claz_built_in_class).
-struct_opv(claz_hash_table, classof, claz_standard_class).
-
-struct_opv(claz_hash_table, slot, test, zlot_hash_table_test).
-struct_opv(claz_hash_table, keyword, kw_test, zlot_hash_table_test).
-struct_opv(claz_hash_table, ordinal, 1, zlot_hash_table_test).
-struct_opv(claz_hash_table, initform, [quote, eql], zlot_hash_table_test).
-struct_opv(claz_hash_table, slot, u_size, zlot_hash_table_size).
-struct_opv(claz_hash_table, keyword, kw_size, zlot_hash_table_size).
-struct_opv(claz_hash_table, ordinal, 2, zlot_hash_table_size).
-struct_opv(claz_hash_table, initform, 11, zlot_hash_table_size).
-struct_opv(claz_hash_table, slot, u_rehash_size, zlot_hash_table_rehash_size).
-struct_opv(claz_hash_table, keyword, kw_rehash_size, zlot_hash_table_rehash_size).
-struct_opv(claz_hash_table, ordinal, 3, zlot_hash_table_rehash_size).
-struct_opv(claz_hash_table, initform, 1.5, zlot_hash_table_rehash_size).
-struct_opv(claz_hash_table, slot, u_rehash_threshold, zlot_hash_table_rehash_threshold).
-struct_opv(claz_hash_table, keyword, kw_rehash_threshold, zlot_hash_table_rehash_threshold).
-struct_opv(claz_hash_table, ordinal, 4, zlot_hash_table_rehash_threshold).
-struct_opv(claz_hash_table, initform, 0.75, zlot_hash_table_rehash_threshold).
-struct_opv(claz_hash_table, slot, u_weakness, zlot_hash_table_weakness).
-struct_opv(claz_hash_table, keyword, kw_weakness, zlot_hash_table_weakness).
-struct_opv(claz_hash_table, ordinal, 5, zlot_hash_table_weakness).
-struct_opv(claz_hash_table, initform, [], zlot_hash_table_weakness).
-struct_opv(claz_hash_table, slot, u_lock, zlot_hash_table_lock).
-struct_opv(claz_hash_table, keyword, kw_lock, zlot_hash_table_lock).
-struct_opv(claz_hash_table, ordinal, 6, zlot_hash_table_lock).
-struct_opv(claz_hash_table, initform, [], zlot_hash_table_lock).
-struct_opv(claz_hash_table, conc_name, "HASH-TABLE-").
-struct_opv(claz_hash_table, setter_fn, u_setf_hash_table_test, zlot_hash_table_test).
-struct_opv(claz_hash_table, accessor, hash_table_test, zlot_hash_table_test).
-struct_opv(claz_hash_table, setter_fn, u_setf_hash_table_size, zlot_hash_table_size).
-struct_opv(claz_hash_table, accessor, hash_table_size, zlot_hash_table_size).
-struct_opv(claz_hash_table, setter_fn, u_setf_hash_table_rehash_size, zlot_hash_table_rehash_size).
-struct_opv(claz_hash_table, accessor, hash_table_rehash_size, zlot_hash_table_rehash_size).
-struct_opv(claz_hash_table, setter_fn, u_setf_hash_table_rehash_threshold, zlot_hash_table_rehash_threshold).
-struct_opv(claz_hash_table, accessor, hash_table_rehash_threshold, zlot_hash_table_rehash_threshold).
-struct_opv(claz_hash_table, setter_fn, u_setf_hash_table_weakness, zlot_hash_table_weakness).
-struct_opv(claz_hash_table, accessor, sys_hash_table_weakness, zlot_hash_table_weakness).
-struct_opv(claz_hash_table, setter_fn, u_setf_hash_table_lock, zlot_hash_table_lock).
-struct_opv(claz_hash_table, accessor, u_hash_table_lock, zlot_hash_table_lock).
-struct_opv(claz_hash_table, slot, u_data, zlot_hash_table_data).
-struct_opv(claz_hash_table, keyword, kw_data, zlot_hash_table_data).
-struct_opv(claz_hash_table, ordinal, 7, zlot_hash_table_data).
-struct_opv(claz_hash_table, initform, [], zlot_hash_table_data).
-struct_opv(claz_hash_table, setter_fn, u_setf_hash_table_data, zlot_hash_table_data).
-struct_opv(claz_hash_table, accessor, u_hash_table_data, zlot_hash_table_data).
-
