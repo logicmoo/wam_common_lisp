@@ -141,10 +141,8 @@ foc_operator(Ctx,_Env,BindType,FN, _Len, ProposedName):- generate_function_or_ma
 
 existing_operator(Ctx,Env,BindType,FN, _Len, ProposedName):-  show_success(get_symbol_fbounds(Ctx,Env,FN,BindType,ProposedName)),!.
 existing_operator(_Ctx,_Env,kw_function,FN,_Len, ProposedName):- get_opv(FN,symbol_function,ProposedName),!.
-existing_operator(_Ctx,_Env,kw_special,FN,_Len, ProposedName):- get_opv(FN,special_function,ProposedName),!.
-existing_operator(_Ctx,_Env,kw_macro,FN,_Len, ProposedName):- get_opv(FN,special_function,ProposedName),!.
-%existing_operator(_Ctx,_Env,kw_macro,FN,_Len, ProposedName):- get_opv(FN,macro_function,ProposedName),!.
-%existing_operator(_Ctx,_Env,kw_special,FN,_Len, ProposedName):- get_opv(FN,macro_function,ProposedName),!.
+existing_operator(_Ctx,_Env,kw_special,FN,_Len, ProposedName):- get_opv(FN,symbol_function,ProposedName),!.
+existing_operator(_Ctx,_Env,kw_macro,FN,_Len, ProposedName):- get_opv(FN,symbol_function,ProposedName),!.
 existing_operator(_Ctx,_Env,_,FN,_Len, ProposedName):- get_opv(FN,symbol_function,ProposedName),!.
 
 existing_operator(_Ctx,_Env,kw_function,FN,ArgsLen, ProposedName):- atom(FN),upcase_atom(FN,FN),
@@ -315,7 +313,7 @@ get_lambda_def(DefType,ProcedureName,FormalParams,LambdaExpression):-
   wl:lambda_def(DefType,_,ProcedureName,FormalParams,LambdaExpression).
 
 
-is_special_op(S,P):- get_opv(S,macro_function,kw_special),get_opv(S,symbol_package,P).
+is_special_op(S,P):- get_opv(S,symbol_function,kw_special),get_opv(S,symbol_package,P).
 is_special_op('%%allocate-closures', pkg_sbc).
 is_special_op('%cleanup-fun', pkg_sbc).
 is_special_op('%escape-fun', pkg_sbc).
@@ -373,7 +371,7 @@ is_special_op(while, pkg_cl).
 is_special_op(when, pkg_cl).
 is_special_op(defclass, pkg_cl).
 is_special_op(defstruct, pkg_cl).
-
+ 
 :- fixup_exports.
 
 

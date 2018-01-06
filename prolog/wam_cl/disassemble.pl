@@ -31,8 +31,7 @@ f_disassemble(Function, Prolog):-
 
 
 clauses_related(M,Obj,H,B,PrintKeyRef):- nonvar(Obj), get_opv(Obj,symbol_function,Obj2),clauses_related(M,Obj2,H,B,PrintKeyRef).
-clauses_related(M,Obj,H,B,PrintKeyRef):- nonvar(Obj), get_opv(Obj,macro_function,Obj2),clauses_related(M,Obj2,H,B,PrintKeyRef).
-clauses_related(M,Obj,H,B,PrintKeyRef):- nonvar(Obj), get_opv(Obj,special_function,Obj2),clauses_related(M,Obj2,H,B,PrintKeyRef).
+clauses_related(M,Obj,H,B,PrintKeyRef):- nonvar(Obj), get_opv(Obj2,symbol_function,Obj),clauses_related(M,Obj2,H,B,PrintKeyRef).
 clauses_related(_,P,H,B,PrintKeyRef):-
    H= wl:lambda_def(_DefType,H1,H2,_Args,_Body),
    clause_interface(H,B,PrintKeyRef),

@@ -41,7 +41,7 @@ compile_defun_ops(Ctx0,Env,Result,[defun,Symbol,FormalParms|FunctionBody], (Code
 
 % FLET
 wl:init_args(1,flet).
-f_flet(Inits,Progn,Result):- reenter_lisp(Ctx,Env), compile_defun_ops(Ctx,Env,Result,[flet,Inits|Progn],Code), !, always(Code). 
+sf_flet(Inits,Progn,Result):- reenter_lisp(Ctx,Env), compile_defun_ops(Ctx,Env,Result,[flet,Inits|Progn],Code), !, always(Code). 
 compile_defun_ops(Ctx,Env,Result,[flet,FLETS|Progn], (Conj,CompileBody)):- 
     must_maplist(define_each(Ctx,Env,flet),FLETS,FBOUNDS,Decls),
     list_to_conjuncts(Decls,Conj),
@@ -49,7 +49,7 @@ compile_defun_ops(Ctx,Env,Result,[flet,FLETS|Progn], (Conj,CompileBody)):-
 
 % LABELS
 wl:init_args(1,labels).
-f_labels(Inits,Progn,Result):- reenter_lisp(Ctx,Env),compile_defun_ops(Ctx,Env,Result,[labels,Inits|Progn],Code),always(Code).  
+sf_labels(Inits,Progn,Result):- reenter_lisp(Ctx,Env),compile_defun_ops(Ctx,Env,Result,[labels,Inits|Progn],Code),always(Code).  
 compile_defun_ops(Ctx,Env,Result,[labels,LABELS|Progn], (Conj,CompileBody)):-
     must_maplist(define_each(Ctx,Env,labels),LABELS,FBOUNDS,Decls),
     list_to_conjuncts(Decls,Conj),

@@ -104,12 +104,15 @@ package_find_symbol(String,Package,Symbol,kw_internal):- package_internal_symbol
 package_find_symbol(String,PW,Symbol,kw_inherited):-  package_use_list(PW,Package),package_external_symbols(Package,String,Symbol),!.
 %package_find_symbol(String,Package,Symbol,Found):-  to_prolog_string_if_needed(String,PlString),!,package_find_symbol(PlString,Package,Symbol,Found).
 
-% @TODO Add symbol shadowing 
+% @TODO Confirm symbol shadowing is correct
 f_import(Symbol,Result):- reading_package(Package),f_import(Symbol,Package,Result).
-f_import(List,Pack,t):- is_list(List),maplist([Symbol]>>f_import(Symbol,Pack,_),List).
-f_import(String,Package,R):- to_prolog_string_if_needed(String,PlString),!,f_import(PlString,Package,R).
+%f_import(String,Package,R):- to_prolog_string_if_needed(String,PlString),!,f_import(PlString,Package,R).
 f_import(Symbol,Pack,t):- 
    find_package_or_die(Pack,Package),
+   pl_import(Package,Symbol).
+
+pl_import(Pack,List):- is_list(List),maplist(pl_import(Pack),List).
+pl_import(Package,Symbol):-
    pl_symbol_name(Symbol,String),
    package_find_symbol_or_missing(String,Package,OldSymbol,IntExt),!,
    package_import_symbol_step2(Package,Symbol,String,OldSymbol,IntExt).
@@ -131,10 +134,15 @@ package_import_symbol_step2(Package,Symbol,String,OldSymbol,kw_internal):-
 
 
 
+% @TODO Confirm symbol shadowing is correct 
 f_export(Symbol,Result):- reading_package(Package),f_export(Symbol,Package,Result).
-f_export(List,Pack,t):- is_list(List),maplist([Symbol]>>f_export(Symbol,Pack,_),List).
+%f_export(String,Package,R):- to_prolog_string_if_needed(String,PlString),!,f_export(PlString,Package,R).
 f_export(Symbol,Pack,t):- 
    find_package_or_die(Pack,Package),
+   pl_export(Package,Symbol).
+
+pl_export(Pack,List):- is_list(List),maplist(pl_export(Pack),List).
+pl_export(Package,Symbol):- 
    pl_symbol_name(Symbol,String),
    package_find_symbol_or_missing(String,Package,OldSymbol,IntExt),!,
    package_export_symbol_step2(Package,Symbol,String,OldSymbol,IntExt).

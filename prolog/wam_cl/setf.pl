@@ -353,7 +353,7 @@ mf_shiftf(RestNKeys, FnResult) :-
 	[let, Mapcar_Ret, [multiple_value_prog1, Getter_Get, [multiple_value_bind, Newvals_Get, CAR, Setter_Get]]]=MFResult,
 	=(MFResult, FnResult).
 :- set_opv(mf_shiftf,type_of,macro),   
-   set_opv(shiftf, macro_function, mf_shiftf),
+   set_opv(shiftf, symbol_function, mf_shiftf),
    DefMacroResult=shiftf.
 
 wl:interned_eval_devel("
@@ -418,7 +418,7 @@ mf_rotatef(RestNKeys, FnResult) :-
 	_20912602=MFResult,
 	=(MFResult, FnResult).
 :- set_opv(mf_rotatef,type_of,macro),
-   set_opv(rotatef, macro_function, mf_rotatef),
+   set_opv(rotatef, symbol_function, mf_rotatef),
    DefMacroResult=rotatef.
 
 
@@ -502,7 +502,7 @@ mf_push(Item_In, Place_In, RestNKeys, FnResult) :-
 	_22831648=MFResult,
 	=(MFResult, FnResult).
 :- set_opv(mf_push,type_of,macro),
-   set_opv(push, macro_function, mf_push),
+   set_opv(push, symbol_function, mf_push),
    DefMacroResult=push.
 
 wl:interned_eval_devel("
@@ -592,7 +592,7 @@ mf_pushnew([Item_In, Place_In| RestNKeys], FnResult) :-
 	_25518664=MFResult,
 	=(MFResult, FnResult).
 :- set_opv(mf_pushnew,type_of,macro),
-   set_opv(pushnew, macro_function, mf_pushnew),
+   set_opv(pushnew, symbol_function, mf_pushnew),
    DefMacroResult=pushnew.
 
 wl:interned_eval_devel("
@@ -684,7 +684,7 @@ mf_pop(Place_In, RestNKeys, FnResult) :-
 	      true),
 	=(MFResult, FnResult).
 :- set_opv(mf_pop,type_of,macro),
-   set_opv(pop, macro_function, mf_pop),
+   set_opv(pop, symbol_function, mf_pop),
    DefMacroResult=pop.  
 
 
@@ -803,7 +803,7 @@ mf_incf(Place_In, RestNKeys, MFResult) :-
 	      block_exit(incf, MFResult),
 	      true).
 :- set_opv(mf_incf,type_of,macro),
-   set_opv(incf, macro_function, mf_incf),
+   set_opv(incf, symbol_function, mf_incf),
    DefMacroResult=incf.
 
 /*`
@@ -837,7 +837,7 @@ mf_decf(Place_In, RestNKeys, FnResult) :-
 	      true),
 	=(MFResult, FnResult).
 :- set_opv(mf_decf,type_of,macro),
-   set_opv(decf, macro_function, mf_decf),
+   set_opv(decf, symbol_function, mf_decf),
    DefMacroResult=decf.
 
 
@@ -988,12 +988,12 @@ mf_setf(RestNKeys, FnResult) :- slow_trace,
 	      true),
 	=(MFResult, FnResult).
 :- set_opv(mf_setf,type_of,macro),
-   set_opv(setf, macro_function, mf_setf),
+   set_opv(setf, symbol_function, mf_setf),
    DefMacroResult=setf.
 
 
 
-wl:lambda_def(defun, ext_get_setf_method_multiple_value, f_ext_get_setf_method_multiple_value, [u_form, c38_optional, env, c38_aux, u_tem], [[cond, [[symbolp, u_form], [let, [[u_store, [gensym]]], [values, [], [], [list, u_store], ['#BQ', [setq, ['#COMMA', u_form], ['#COMMA', u_store]]], u_form]]], [[or, [not, [consp, u_form]], [not, [symbolp, [car, u_form]]]], [error, '$ARRAY'([*], claz_base_character, "Cannot get the setf-method of ~S."), u_form]], [[multiple_value_bind, [u_t1, exp], [macroexpand, u_form, env], [when, exp, [setq, u_tem, u_t1]]], [ext_get_setf_method_multiple_value, u_tem, env]], [[get, [car, u_form], [quote, u_setf_method]], [apply, [get, [car, u_form], [quote, u_setf_method]], env, [cdr, u_form]]], [[or, [get, [car, u_form], [quote, u_setf_update_fn]], [setq, u_tem, [get, [car, u_form], [quote, sys_structure_access]]]], [let, [[u_vars, [u_to_gensyms, [cdr, u_form]]], [u_store, [gensym]]], [values, u_vars, [cdr, u_form], [list, u_store], [cond, [u_tem, [u_setf_structure_access, [car, u_vars], [car, u_tem], [cdr, u_tem], u_store]], [[let, [[u_f, [get, [car, u_form], [quote, u_setf_update_fn]]]], ['#BQ', [['#COMMA', u_f], ['#BQ-COMMA-ELIPSE', u_vars], ['#COMMA', u_store]]]]]], [cons, [car, u_form], u_vars]]]], [[get, [car, u_form], [quote, u_setf_lambda]], [let_xx, [[u_vars, [u_to_gensyms, [cdr, u_form]]], [u_store, [gensym]], [u_f, [get, [car, u_form], [quote, u_setf_lambda]]]], [values, u_vars, [cdr, u_form], [list, u_store], [funcall, [apply, u_f, u_vars], u_store], [cons, [car, u_form], u_vars]]]], [[macro_function, [car, u_form]], [ext_get_setf_method_multiple_value, [macroexpand, u_form, env]]], [t, [let, [[u_vars, [u_to_gensyms, [cdr, u_form]]], [u_store, [gensym]]], [values, u_vars, [cdr, u_form], [list, u_store], ['#BQ', [funcall, function([setf, ['#COMMA', [car, u_form]]]), ['#COMMA', u_store], ['#BQ-COMMA-ELIPSE', u_vars]]], [cons, [car, u_form], u_vars]]]]]]).
+wl:lambda_def(defun, ext_get_setf_method_multiple_value, f_ext_get_setf_method_multiple_value, [u_form, c38_optional, env, c38_aux, u_tem], [[cond, [[symbolp, u_form], [let, [[u_store, [gensym]]], [values, [], [], [list, u_store], ['#BQ', [setq, ['#COMMA', u_form], ['#COMMA', u_store]]], u_form]]], [[or, [not, [consp, u_form]], [not, [symbolp, [car, u_form]]]], [error, '$ARRAY'([*], claz_base_character, "Cannot get the setf-method of ~S."), u_form]], [[multiple_value_bind, [u_t1, exp], [macroexpand, u_form, env], [when, exp, [setq, u_tem, u_t1]]], [ext_get_setf_method_multiple_value, u_tem, env]], [[get, [car, u_form], [quote, u_setf_method]], [apply, [get, [car, u_form], [quote, u_setf_method]], env, [cdr, u_form]]], [[or, [get, [car, u_form], [quote, u_setf_update_fn]], [setq, u_tem, [get, [car, u_form], [quote, sys_structure_access]]]], [let, [[u_vars, [u_to_gensyms, [cdr, u_form]]], [u_store, [gensym]]], [values, u_vars, [cdr, u_form], [list, u_store], [cond, [u_tem, [u_setf_structure_access, [car, u_vars], [car, u_tem], [cdr, u_tem], u_store]], [[let, [[u_f, [get, [car, u_form], [quote, u_setf_update_fn]]]], ['#BQ', [['#COMMA', u_f], ['#BQ-COMMA-ELIPSE', u_vars], ['#COMMA', u_store]]]]]], [cons, [car, u_form], u_vars]]]], [[get, [car, u_form], [quote, u_setf_lambda]], [let_xx, [[u_vars, [u_to_gensyms, [cdr, u_form]]], [u_store, [gensym]], [u_f, [get, [car, u_form], [quote, u_setf_lambda]]]], [values, u_vars, [cdr, u_form], [list, u_store], [funcall, [apply, u_f, u_vars], u_store], [cons, [car, u_form], u_vars]]]], [[symbol_function, [car, u_form]], [ext_get_setf_method_multiple_value, [macroexpand, u_form, env]]], [t, [let, [[u_vars, [u_to_gensyms, [cdr, u_form]]], [u_store, [gensym]]], [values, u_vars, [cdr, u_form], [list, u_store], ['#BQ', [funcall, function([setf, ['#COMMA', [car, u_form]]]), ['#COMMA', u_store], ['#BQ-COMMA-ELIPSE', u_vars]]], [cons, [car, u_form], u_vars]]]]]]).
 wl:arglist_info(ext_get_setf_method_multiple_value, f_ext_get_setf_method_multiple_value, [u_form, c38_optional, env, c38_aux, u_tem], arginfo{all:[u_form, env], allow_other_keys:0, aux:[u_tem], body:0, complex:0, env:0, key:0, names:[u_form, env, u_tem], opt:[env], req:[u_form], rest:0, sublists:0, whole:0}).
  wl:init_args(1,ext_get_setf_method_multiple_value).
 

@@ -99,6 +99,40 @@ wl:grovel_pred(M,F,1):-
    PBody=..[F,N],
    (assert_lsp(user:Head :- t_or_nil(M:PBody,RetVal))))),fail)).
 
+
+make_special_operator(Symbol):-
+  atom_concat('sf_',Symbol,SF),
+  set_opv(Symbol,symbol_function,SF),
+  set_opv(SF,type_of,ext_special_operator).
+
+:- assertz(wl:interned_eval(call(maplist(make_special_operator,[
+         block,
+         let_xx,
+         return_from,
+         catch,
+         load_time_value,
+         setq,
+         eval_when,
+         locally,
+         symbol_macrolet,
+         flet,
+         macrolet,
+         tagbody,
+         function,
+         multiple_value_call,
+         the,
+         go,
+         multiple_value_prog1,
+         throw,
+         if,
+         progn,
+         unwind_protect,
+         labels,
+         progv,
+         let,
+         quote])))).
+
+
 :- fixup_exports.
 
 :- include('header').

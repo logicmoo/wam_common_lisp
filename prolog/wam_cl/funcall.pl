@@ -30,8 +30,8 @@ f_funcall(ProcedureName,Args,Result):- f_apply(ProcedureName, [Args], Result).
 
 
 wl:init_args(1,apply).
-f_apply(closure(Environment,ClosureResult,FormalArgs,Body), [Arguments], Result):-!,
-  closure(Environment,ClosureResult,FormalArgs,Body,Arguments,Result).
+f_apply(closure(kw_function,Environment,ClosureResult,FormalArgs,Body), [Arguments], Result):-!,
+  closure(kw_function,Environment,ClosureResult,FormalArgs,Body,Arguments,Result).
 f_apply(function(FunctionName), Arguments, Result):-!,f_apply((FunctionName), Arguments, Result).
 f_apply(FunctionName,Arguments,Result):- FunctionName==[],!,lisp_dump_break,Result=Arguments.
 f_apply((FunctionName), Arguments, Result):-!,

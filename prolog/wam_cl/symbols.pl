@@ -64,8 +64,6 @@ is_keywordp(Symbol):- package:package_external_symbols(pkg_kw,_,Symbol).
 is_symbolp(Symbol):- is_keywordp(Symbol);get_opv(Symbol,type_of,symbol).
 
 is_fboundp(Symbol):- get_opv(Symbol,symbol_function,_).
-is_fboundp(Symbol):- get_opv(Symbol,macro_function,_).
-is_fboundp(Symbol):- get_opv(Symbol,special_function,_).
 
 %is_keywordp(Symbol):- atom(Symbol),sanity((always(\+ atom_concat_or_rtrace(':',_,Symbol)))),!,fail.
 

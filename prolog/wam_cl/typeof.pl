@@ -37,9 +37,7 @@ i_class(Var,Class):-attvar(Var),get_attr(Var,classof,Class).
 i_class(Var,claz_locative):-var(Var).
 %i_class(symbol, claz_symbol):-!.
 % compounds
-i_class(function(OP),Class):- get_opv(OP,special_function,Obj),f_class_of(Obj,Class).
 i_class(function(OP),Class):- get_opv(OP,symbol_function,Obj),f_class_of(Obj,Class).
-i_class(function(OP),Class):- get_opv(OP,macro_function,Obj),f_class_of(Obj,Class).
 i_class([_|_],claz_cons):-!.
 i_class(X,claz_package):- is_packagep(X),!.
 i_class('$OBJ'(Type,_Data),Type).
@@ -54,7 +52,7 @@ i_class(Dict,Type):- is_dict(Dict,Type).
 i_class(Number,claz_integer):- integer(Number).
 i_class(Number,claz_float):- float(Number).
 i_class(Atom,Kind):- atom(Atom),atomic_list_concat([Type,_Name],'_znst_',Atom),atom_concat_or_rtrace('claz_',Type,Kind).
-i_class(Obj,Type):- get_opv_i(Obj,classof,Type).
+i_class(Obj,Type):- get_opv_iiii(Obj,classof,Type).
 i_class(function(_),claz_function).
 
 
@@ -66,11 +64,9 @@ i_type(Dict,Type):- is_dict(Dict,Type).
 i_type(Str,string):- is_stringp(Str).
 i_type('#\\'(_),character).
 i_type(Obj,Type):- number(Obj),!,number_type_of(Obj,Type).
-i_type('$OBJ'(Type,_Data),Type).
-
-i_type(function(OP),Class):- get_opv(OP,special_function,Obj),f_type_of(Obj,Class).
+i_type(Obj,Type):- compound(Obj),i_class(Obj,Class),claz_to_symbol(Class,Type).
+i_type('$NUMBER'(Type,_),Type).
 i_type(function(OP),Class):- get_opv(OP,symbol_function,Obj),f_type_of(Obj,Class).
-i_type(function(OP),Class):- get_opv(OP,macro_function,Obj),f_type_of(Obj,Class).
 
 a_type(Obj,Type):- get_opv_iiii(Obj,type_of,Type),!.
 a_type(Obj,Type):- get_opv_iiii(Obj,classof,Class),claz_to_symbol(Class,Type),!.

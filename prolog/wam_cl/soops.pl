@@ -538,6 +538,7 @@ get_opv_i(Sym,Prop,Value):- atom(Sym),is_keywordp(Sym),!,get_type_default(keywor
 get_opv_i(KindObj,Prop,Value):- get_kind_ref(KindObj,Kind,Obj),get_opv_ii(Kind,Obj,Prop,Value).
 
 get_opv_ii(_Kind,Obj,Prop,Value):- quietly(get_opv_iiii(Obj,Prop,Value)).
+get_opv_ii(Class,Obj,Prop,Symbol):- type_of == Prop,!,get_opv_iii(Class,Obj,classof,Value),!,claz_to_symbol(Value,Symbol).
 get_opv_ii(Kind,Obj,Prop,Symbol):- classof == Prop,!,get_opv_iii(Kind,Obj,type_of,Value),!,find_class(Value,Symbol).
 get_opv_ii(symbol,Obj,Prop,Value):- nonvar(Obj),wl:quietly((symbol_has_prop_getter(Obj,Prop,Getter),call(Getter,Obj,Prop,Value))).
 
@@ -567,7 +568,7 @@ not_shareble_prop0(type_of).
 not_shareble_prop0(symbol_value).
 not_shareble_prop0(conc_name).
 
-
+                                                                         
 
 get_type_default(keyword,Name,symbol_name,Out):- atom(Name), string_concat(kw_,Str,Name),string_upper(Str,Out).
 get_type_default(keyword,_,symbol_package,pkg_keyword).
@@ -648,7 +649,6 @@ builtin_slot(Prop):-notrace((nonvar(Prop),builtin_slot0(Prop))).
 builtin_slot0(classof).
 builtin_slot0(type_of).
 builtin_slot0(symbol_function).
-builtin_slot0(macro_function).
 builtin_slot0(symbol_package).
 builtin_slot0(symbol_value).
 
@@ -827,8 +827,8 @@ get_opv_else(Obj,Prop,Value,Else):- get_opv(Obj,Prop,Value)*->true;Else.
 decl_mapped_opv(Kind,Maps):- is_list(Maps),!,maplist(decl_mapped_opv(Kind),Maps).
 decl_mapped_opv(Kind,Prop=Pred):-
   assertz(wl:interned_eval(call(assert_lsp(wl:type_attribute_pred_dyn(Kind,Prop,Pred))))),
-  modulize(call(Pred,Obj,Val),OPred),
-  assertz(wl:interned_eval(call(forall(OPred,add_opv_new(Obj,Prop,Val))))),
+  nop(modulize(call(Pred,Obj,Val),OPred)),
+  nop(assertz(wl:interned_eval(call(forall(OPred,add_opv_new(Obj,Prop,Val)))))),
   nop(assert_lsp((OPred:- (is_kind(Obj,Kind),(fail->!;true),get_opv(Obj,Prop,Val))))).
 
 is_kind(O,_K):- nonvar(O).
@@ -868,7 +868,7 @@ cleanup_opv0:-
    get_opv_iiii(Obj,compile_as,kw_special),
    get_opv_iiii(Obj,function,Was),
    atom_concat('m',Was,WillBe),
-   assert_if_new(soops:o_p_v(Obj,macro_function,WillBe)),
+   assert_if_new(soops:o_p_v(Obj,symbol_function,WillBe)),
    retract(soops:o_p_v(Obj,function,Was)),
    retract(soops:o_p_v(Obj,compile_as,kw_special)),
    doall(retract(soops:o_p_v(Obj,compile_as,kw_special))))).
@@ -927,7 +927,7 @@ process_si:-
     process_si(soops:o_p_v(X,Y,Z)),
     erase(Ref))).
    
-%process_si(soops:o_p_v(X,Y,Z)):- Y==value, show_call_trace(nb_setval(X,Z)).
+%process_si(soops:o_p_v(X,Y,Z)):- Y==symbol_value, show_call_trace(nb_setval(X,Z)).
 process_si(soops:o_p_v(X,Y,Z)):- X\==[], set_opv(X,Y,Z).
 
 :- if(true).
