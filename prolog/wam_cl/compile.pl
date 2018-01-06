@@ -60,12 +60,6 @@ lisp_compile(Ctx,Env,Result,SExpression,BodyO):-
    nb_linkval('$compiler_PreviousResult',the(Var)).
 
 
-
-must_compile_closure_body(Ctx,Env,Result,Function, Body):-
-  must_compile_body(Ctx,Env,Result,Function, Body0),
-  body_cleanup_keep_debug_vars(Ctx,Body0,Body).
-
-
 compile_each(_Ctx,_Env,[],[],true).
 compile_each(Ctx,Env,[VarR|Result],[Var|Eval],Code):-
   must_compile_body(Ctx,Env,VarR,Var,Code0),
@@ -84,8 +78,30 @@ quotify_each(Ctx,Env,[VarR|Result],[Var|Eval],Code):-
   quotify_each(Ctx,Env,Result,Eval,Code1),
   conjoin_0(Ctx,Code0,Code1,Code),!.
 
+must_quotify(_Ctx,_Env,SelfEval,SelfEval,true):- var(SelfEval),!.
 must_quotify(_Ctx,_Env,SelfEval,SelfEval,true):- quietly(is_self_evaluating_object(SelfEval)),!.
 must_quotify(_Ctx,_Env,[quote,Var],Var,true).
+
+
+% Operator
+expand_arguments_maybe_macro(Ctx,Env,FN,_N,MacroArgs,MacroArgs,true):- nonplainvar(FN), is_lisp_operator(Ctx,Env,FN),!.
+expand_arguments_maybe_macro(Ctx,Env,FN,N,Args,MacroArgs,ArgBody):-
+  expand_arguments(Ctx,Env,FN,N,Args,MacroArgs,ArgBody),!.
+
+
+% The idea here is that FN/ArgNum may need evaluated or may have its own special evaluator 
+expand_arguments(_Ctx,_Env,_FunctionName,_ArgNum,[], [], true):-!.
+expand_arguments(Ctx,Env,FN,_, ArgsO, Args, true):- nonvar(FN), is_lisp_operator(Ctx,Env,FN),!,Args=ArgsO.
+expand_arguments(Ctx,Env,FN,0,[Arg|Results],[Arg|Args], ArgsBody):- atom(Arg),!,
+    expand_arguments(Ctx,Env,FN,1,Results,Args, ArgsBody).
+expand_arguments(Ctx,Env,FN,ArgNum,[Result|Results],[Arg|Args], Body):-!,
+       must_compile_body(Ctx,Env,Result,Arg, ArgBody),
+       Body = (ArgBody, ArgsBody),
+       ArgNum2 is ArgNum + 1,
+       expand_arguments(Ctx,Env,FN,ArgNum2,Results,Args, ArgsBody).
+
+
+
 
 
 must_compile_progn(Ctx,Env,Result,FunctionBody,Code):-
@@ -104,7 +120,7 @@ must_compile_progn(Ctx,Env,Result,FormsIn, PreviousResult, Body):-
    always(((compile_progn(Ctx,Env,Result,Forms,PreviousResult,Body0),nonvar(Body0)))),
    lquietly((sanitize_true(Ctx,Body0,Body))).
 
-compile_progn(_Cx,_Ev,Result,Var,_PreviousResult,Out):- quietly(is_ftVar(Var)),!,Out=cl_eval([progn|Var],Result).
+compile_progn(_Cx,_Ev,Result,Var,_PreviousResult,Out):- quietly(is_ftVar(Var)),!,Out=f_eval([progn|Var],Result).
 compile_progn(_Cx,_Ev,Result,[], PreviousResult,true):-!, PreviousResult = Result.
 compile_progn(Ctx,Env,Result,[Form | Forms], PreviousResult, Body):-  !,
 	must_compile_progbody(Ctx,Env,FormResult, Form,PreviousResult,FormBody),
@@ -229,8 +245,8 @@ compile_body(_Cx,_Ev,Item,[quote, Item],  true):- !.
 % ` Backquoted 
 compile_body(_Cx,Env,Result,['#BQ',Form], Code):-!,compile_bq(Env,Result,Form,Code),!.
 compile_body(_Cx,Env,Result,['`',Form], Code):-!,compile_bq(Env,Result,Form,Code),!.
-compile_body(Ctx,Env,Result,['#COMMA',Form], (Code,cl_eval(CommaResult,Result))):-!,compile_body(Ctx,Env,CommaResult,Form,Code),!.
-compile_body(Ctx,Env,Result,['#BQ-COMMA-ELIPSE',Form], (Code,cl_eval(CommaResult,Result))):- dump_trace_lisp,!,compile_body(Ctx,Env,CommaResult,Form,Code),!.
+compile_body(Ctx,Env,Result,['#COMMA',Form], (Code,f_eval(CommaResult,Result))):-!,compile_body(Ctx,Env,CommaResult,Form,Code),!.
+compile_body(Ctx,Env,Result,['#BQ-COMMA-ELIPSE',Form], (Code,f_eval(CommaResult,Result))):- dump_trace_lisp,!,compile_body(Ctx,Env,CommaResult,Form,Code),!.
 
 
 compile_body(_Ctx,_Env,_Result,[Var|_], _Body):- var(Var),!,lisp_dump_break.
@@ -299,34 +315,38 @@ compile_body(Ctx,Env,Result,[compile|Forms], Body):- !,
    
    debug_var('LResult',CompileResult),
    debug_var('CompileEnvironment',CompileEnvironment),
-   Result = closure([CompileEnvironment|Env],CompileResult,[],CompileBody),
+   % ClosureEnvironment,Whole,ClosureResult,FormalParams,ClosureBody,Symbol,ActualParams,ClosureResult
+   Result = closure(kw_function,[CompileEnvironment|Env],CompileResult,[],CompileBody),
    Body = true.
-
-% (lcompile ...)
-wl:interned_eval("(sys:set-opv `SYS:LCOMPILE :compile-as :function)").
-wl:interned_eval("(sys:set-opv `SYS:LCOMPILEN :compile-as :function)").
-compile_body(Ctx,Env,Result,[sys_lcompilen|Forms], Body):- !,
-  ((append(Progn,[KW|More],Forms),is_keywordp(KW))->Keys=[KW|More];(Progn=Forms,Keys=[])),
-  compile_body(Ctx,Env,Result,[sys_lcompile,[progn|Progn]|Keys], Body).
 
 plist_to_names_values([],[],[]).
 plist_to_names_values([Name,Value|Keys],[Name|Names],[Value|Values]):-  
    plist_to_names_values(Keys,Names,Values).
 
-compile_body(Ctx,Env,Result,[sys_lcompile,Form|Keys], Body):- !,
+% (lcompile ...)
+wl:interned_eval("(sys:set-opv `SYS:LCOMPILE :compile-as :function)").
+compile_body(Ctx,Env,ResultO,[sys_lcompile,Form|Keys], Body):- !,
    lisp_compile(Ctx,Env,FormValue,Form,Part1),
    plist_to_names_values(Keys,Names,Values),
    maplist(f_sys_get_wam_cl_option,Names,Was),
    maplist(f_sys_set_wam_cl_option,Names,Values),
    always(Part1),
    Part2 = must_compile_body(Ctx,CompileEnvironment,CompileResult,FormValue, CompileBody),
-   ignore(CompileEnvironment = Env),
-   debug_var('LResult',CompileResult),
-   debug_var('CResult',CResult),
-   debug_var('CompileEnvironment',CompileEnvironment),
-   Part3 = body_cleanup_full(Ctx,( (CompileBody,CResult=CompileResult)),Opt),
-   Result = closure([CompileEnvironment|Env],CompileResult,[],Opt),   
-   Body = (nl,nl,Part1,Part2,notrace((Part3,cmpout(:- Opt),maplist(f_sys_set_wam_cl_option,Names,Was)))).
+  % ignore(CompileEnvironment = Env),
+   debug_var('LResult',CompileResult),debug_var('CResult',CResult),debug_var('CompileEnvironment',CompileEnvironment),
+   Part3 = body_cleanup_full(Ctx,( (CompileEnvironment = Env,CompileBody,CResult=CompileResult)),Opt),
+   Whole = [sys_lcompile,Form|Keys],
+   Symbol = sys_lcompile,
+   % closure(FType,ClosureEnvironment,Whole,Result,FormalParams,ClosureBody,Symbol,ActualParams,ResultO)
+   ResultO = closure(kw_function,[CompileEnvironment|Env],Whole,CompileResult,[],Opt,Symbol),   
+   Body = (nl,nl,Part1,Part2,Part3,cmpout(:- Opt),maplist(f_sys_set_wam_cl_option,Names,Was)).
+
+% (lcompilen ...)
+wl:interned_eval("(sys:set-opv `SYS:LCOMPILEN :compile-as :function)").
+compile_body(Ctx,Env,Result,[sys_lcompilen|Forms], Body):- !,
+  ((append(Progn,[KW|More],Forms),is_keywordp(KW))->Keys=[KW|More];(Progn=Forms,Keys=[])),
+  compile_body(Ctx,Env,Result,[sys_lcompile,[progn|Progn]|Keys], Body).
+
 
 
 
@@ -336,6 +356,9 @@ compile_body(Ctx,Env,Result,Form1,Body):- compile_body_form(Ctx,Env,Result,Form1
 % =============================================================================
 % INTERFACES
 % =============================================================================
+
+compile_body(Ctx,Env,Result,Form1,Body):- compile_closures(Ctx,Env,Result,Form1,Body).
+
 
 % Use a previous DEFMACRO
 compile_body(Ctx,Env,Result,LispCode,CompileBody):-
@@ -429,7 +452,8 @@ reduce_atom0(X,XX):- downcase_atom(X,XX)->X\==XX.
 %reduce_atom(X,XX):- atom_concat_or_rtrace('$',XX,X).
 reduce_atom0(X,XX):- prologcase_name(X,XX)->X\==XX.
 reduce_atom0(X,XX):- atom_concat_or_rtrace(':',XX,X).
-reduce_atom0(X,XX):- atom_concat_or_rtrace('cl_',XX,X).
+reduce_atom0(X,XX):- atom_concat_or_rtrace('mf_',XX,X).
+reduce_atom0(X,XX):- atom_concat_or_rtrace('sf_',XX,X).
 reduce_atom0(X,XX):- atom_concat_or_rtrace('f_',XX,X).
 /*
 reduce_atom(X,XX):- atom_concat_or_rtrace('u_',XX,X).

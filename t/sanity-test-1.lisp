@@ -4,10 +4,11 @@
 
 ;; 3.1. Review of defstruct
 
-(progn #+WAM-CL (prolog-inline "nop(trace)")(is eq 'point (defstruct point x y z)))
-;; (defstruct point x y z)
-
 (is eq 'point4d (defstruct point4d x y z t))
+
+(progn #+WAM-CL (prolog-inline "nop(trace)")(is eq 'point (defstruct point x y z)))
+;; (defstruct point x y z)          
+
 
 (defun distance-from-origin (point)
   (let* ((x (point-x point))
@@ -18,6 +19,8 @@
 (defun reflect-in-y-axis (point)
   (setf (point-y point)
         (- (point-y point))))
+
+;; (break)
 
 (list (setf my-point (make-point :x 3 :y 4 :z 12)) (setf my-point2 (make-point :x 3 :y 4 :z 12)))
 (setf my-point3 #S(POINT :X 3 :Y 4 :Z 12))
@@ -228,6 +231,7 @@
 (shiftf (cute-p Eric) t)
 
 (slot-value Eric 'diet)
+
 
 
 

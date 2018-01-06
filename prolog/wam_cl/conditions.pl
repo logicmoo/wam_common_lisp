@@ -19,9 +19,9 @@
 :- include('header').
 
 
-wl:declared(cl_error,inline(error)).
+wl:declared(f_error,inline(error)).
 wl:init_args(0,error).
-cl_error(Args,Res):- cl_format([t|Args],Res),throw(cl_error(Args,Res)).
+f_error(Args,Res):- f_format([t|Args],Res),throw(f_error(Args,Res)).
 
 % Connection to LPA's built-in error handler
 

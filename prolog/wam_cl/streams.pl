@@ -19,7 +19,7 @@
 :- include('header').
 
 % (defparameter cl::*error-output* (make-synonym-stream 'wam-cl::*stderr* ))
-cl_make_synonym_stream(Name,Ret):-
+f_make_synonym_stream(Name,Ret):-
   create_struct(claz_synonym_stream,[symbol=Name],Ret).
 
 
@@ -52,7 +52,7 @@ stream_first(stream) <<==
 	first(stream).
 
 stream_rest(stream) <<==
-	cl_apply(second(stream), []).
+	f_apply(second(stream), []).
 
 stream_cons(a, b) <<==
 	list_2( a, b).

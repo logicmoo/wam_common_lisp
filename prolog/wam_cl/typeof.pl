@@ -12,11 +12,11 @@
  * The program is a *HUGE* common-lisp compiler/interpreter. It is written for YAP/SWI-Prolog .
  *
  *******************************************************************/
-:- module(typeof, []).
+:- module(typ30f, []).
 
 :- include('header').
 
-cl_class_of(Obj,Class):- i_class(Obj,Class),!.
+f_class_of(Obj,Class):- i_class(Obj,Class),!.
 
 :- user:use_module(library('dialect/sicstus/arrays'),[is_array/1]).
 % :- use_module(library('dialect/sicstus')).
@@ -30,13 +30,18 @@ is_self_evaluating_object(P):- compound_name_arity(P,F,_),atom_concat_or_rtrace(
 
 is_self_evaluationing_const(X):- atomic(X),is_self_evaluationing_const0(X),!.
 is_self_evaluationing_const0(X):- (X==t;X==[];number(X);is_keywordp(X);string(X);(blob(X,T),T\==text)),!.
+is_self_evaluationing_const0(X):- is_packagep(X),!.
 is_self_evaluationing_const0(X):- is_functionp(X),!.
 
 i_class(Var,Class):-attvar(Var),get_attr(Var,classof,Class).
 i_class(Var,claz_locative):-var(Var).
+%i_class(symbol, claz_symbol):-!.
 % compounds
-i_class(function(OP),Class):- get_opv(OP,function,Obj),cl_class_of(Obj,Class).
+i_class(function(OP),Class):- get_opv(OP,special_function,Obj),f_class_of(Obj,Class).
+i_class(function(OP),Class):- get_opv(OP,symbol_function,Obj),f_class_of(Obj,Class).
+i_class(function(OP),Class):- get_opv(OP,macro_function,Obj),f_class_of(Obj,Class).
 i_class([_|_],claz_cons):-!.
+i_class(X,claz_package):- is_packagep(X),!.
 i_class('$OBJ'(Type,_Data),Type).
 i_class('#\\'(_),claz_character).
 i_class('$COMPLEX'(_,_),claz_complex).
@@ -54,41 +59,48 @@ i_class(function(_),claz_function).
 
 
 i_type(Var,sys_locative):-var(Var).
+i_type(Obj,Type):- atom(Obj),!,a_type(Obj,Type),!.
 i_type([],null):-!.
 i_type([_|_],cons):-!.
-i_type(Obj,Type):- get_opv_i(Obj,dims,List),(List=[N] -> Type = [simple_vector,N]; Type = [array,List]).
-i_type(Obj,Type):- get_opv_i(Obj,typeof,Type).
-i_type(Obj,Type):- get_opv_i(Obj,classof,Class),claz_to_symbol(Class,Type).
 i_type(Dict,Type):- is_dict(Dict,Type).
 i_type(Str,string):- is_stringp(Str).
-i_type(t,boolean).
 i_type('#\\'(_),character).
 i_type(Obj,Type):- number(Obj),!,number_type_of(Obj,Type).
 i_type('$OBJ'(Type,_Data),Type).
-i_type(Atom,Type):- atom(Atom),atomic_list_concat([Type,_Name],'_znst_',Atom).
-i_type(function(OP),Class):- get_opv(OP,function,Obj),cl_type_of(Obj,Class).
+
+i_type(function(OP),Class):- get_opv(OP,special_function,Obj),f_type_of(Obj,Class).
+i_type(function(OP),Class):- get_opv(OP,symbol_function,Obj),f_type_of(Obj,Class).
+i_type(function(OP),Class):- get_opv(OP,macro_function,Obj),f_type_of(Obj,Class).
+
+a_type(Obj,Type):- get_opv_iiii(Obj,type_of,Type),!.
+a_type(Obj,Type):- get_opv_iiii(Obj,classof,Class),claz_to_symbol(Class,Type),!.
+a_type(Obj,Type):- get_opv_iiii(Obj,dims,List),(List=[N] -> Type = [simple_vector,N]; Type = [array,List]),!.
+a_type(Atom,Type):- atomic_list_concat([Type,_Name],'_znst_',Atom),!.
+a_type(t,boolean).
+a_type(Atom,Type):- atomic_list_concat([Prefix|Rest],'_',Atom),prefix_to_typeof(Prefix,Rest,Atom,Type),!.
+
 
 type_ges(function(_),function).
 type_ges(Obj,Type):- compound(Obj),functor(Obj,Type,_).
 type_ges(Atom,Type):- atom(Atom),atomic_list_concat([Prefix|Rest],'_',Atom),prefix_to_typeof(Prefix,Rest,Atom,Type),!.
 
 
-type_or_class_nameof(Obj,Name):- quietly((cl_class_of(Obj,Type),type_named(Type,Name),atom(Name))).
+type_or_class_nameof(Obj,Type):- quietly(f_type_of(Obj,Type)).
 
 type_named('$OBJ'(_,Type),Type):- atom(Type),!.
 type_named(Type,Type):- atomic(Type).
 
 
-cl_typep(Obj,Type,Result):- t_or_nil(is_typep(Obj,Type),Result),cl_values_list([Result,t],_).
+f_typep(Obj,Type,Result):- t_or_nil(is_typep(Obj,Type),Result),f_values_list([Result,t],_).
 
 is_subtypep(SubType,Type):- find_class(SubType,SubClass),find_class(Type,Class),is_subclass(SubClass,Class).
 is_subclass(Class,Class).
 is_subclass(SubClass,Class):- get_struct_opv(SubClass,include,Class);(get_struct_opv(SubClass,super_priority,Classes),memberchk(Class,Classes)).
 is_typep(Obj,Type):- i_type(Obj,SubType),is_subtypep(SubType,Type),!.
 
-cl_type_of(O,T):- i_type(O,T),!.
-cl_type_of(O,T):- type_ges(O,T),!.
-cl_type_of(_Obj,t).
+f_type_of(O,T):- i_type(O,T),!.
+f_type_of(O,T):- type_ges(O,T),!.
+f_type_of(_Obj,t).
 
 
 

@@ -60,20 +60,44 @@ resolve_char_codes('','_').
 resolve_char_codes(C48,_):- notrace(catch((name(C48,[99|Codes]),number_codes(_,Codes)),_,fail)),!,fail.
 resolve_char_codes(C,C).
 
+
 grovel_system_symbols(File):- 
  ignore(((source_file(M:P,File),functor(P,F,A), A>0,  
-  ((atomic_list_concat([f,Pkg|HC],'_',F),was_pkg_prefix(Pkg,Package))-> true ;
-    (atomic_list_concat([cl|HC],'_',F),Package=pkg_cl)),
+  ((atomic_list_concat([MF,Pkg|HC],'_',F),memberchk(MF,['sf','f','mf']),was_pkg_prefix(Pkg,Package))-> true ;
+    (atomic_list_concat([MF|HC],'_',F),memberchk(MF,['sf','f','mf']),Package=pkg_cl)),
     guess_symbol_name(HC,UPPER),
  always(((
-  cl_intern(UPPER,Package,Symbol),     
-  cl_export(Symbol,Package,_),  
+  f_intern(UPPER,Package,Symbol),     
+  f_export(Symbol,Package,_),  
   wdmsg((grovelled_source_file_symbols(UPPER,Package,Symbol,M,F))))))),fail)).
 
 list_lisp_undefined(Pkg):- 
- ignore(((get_opv(X,package,Pkg),once((get_opv(X,compile_as,Y),Y=kw_function,get_opv(X,function,F),get_opv(X,name,Str),
+ ignore(((get_opv(X,symbol_package,Pkg),once((Y=symbol_function,get_opv(X,Y,F),get_opv(X,symbol_name,Str),
    \+ current_predicate(F/_))),
   wdmsg(lisp_undefined(Pkg,X,Str,Y,F))),fail)).
+
+
+
+grovel_preds(M):-
+ %module_property(M,file(File)),
+ 
+ doall((
+  source_file(M:P,_File),
+  %current_predicate(_,M:P), \+ predicate_property(M:P,imported_from(_)),
+  %predicate_property(M:P,module(M)),
+  functor(P,F,A),
+  once(forall(clause(wl:grovel_pred(M,F,A),B),call(B))),
+  fail)).
+
+wl:grovel_pred(M,F,1):-
+  atom(F),atom(M),
+  atom_concat_or_rtrace('is_',R,F),atom_concat(_,'p',R),
+  doall(((get_opv_iiii(_Sym,symbol_function,SF),
+  (atom(SF),atom_concat(Prefix,R,SF),
+   \+ atomic_list_concat([_,_,_|_],'_',Prefix),
+   Head=..[SF,N,RetVal],
+   PBody=..[F,N],
+   (assert_lsp(user:Head :- t_or_nil(M:PBody,RetVal))))),fail)).
 
 :- fixup_exports.
 

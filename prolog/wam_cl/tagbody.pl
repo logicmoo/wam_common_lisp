@@ -147,11 +147,11 @@ compute_new_address(TB,Label,Pred):- always(atomic_list_concat([TB,Label],'_',Pr
  COMPILES TO
 
  addr_tagbody_1_u_point_b(ENV) :-
-       cl_print("(incf val 08)", _Print_Ret10),
+       f_print("(incf val 08)", _Print_Ret10),
        trace,
        set_place(ENV, incf, u_val, [8], _Incf_Ret11),
        get_var(ENV, u_val, U_Val_Res),
-       cl_print(U_Val_Res, U_Val_Res),
+       f_print(U_Val_Res, U_Val_Res),
        addr_tagbody_1_u_point_a(ENV).
 
  */
@@ -171,7 +171,7 @@ compile_addresses(_TB,Addr,(Head:-Body)):-
 is_reflow([OP|ARGS],Label):- is_reflow3(OP,ARGS,Label).
 is_reflow(OPARGS,Label):- OPARGS=..[OP|ARGS],is_reflow3(OP,ARGS,Label).
 is_reflow3('go',[Label|_],Label).
-is_reflow3('cl_go',[Label|_],Label).
+is_reflow3('f_go',[Label|_],Label).
 is_reflow3('goto',[Label|_],Label).
 is_reflow3('tagbody_go',[Label|_],Label).
 is_reflow3('gosub',[Label|_],Label).

@@ -29,11 +29,11 @@ wl:symbol_has_prop_set_get(sys_xx_stderr_xx,claz_prolog_output_stream,set_output
 % *DEBUG-IO*, *ERROR-OUTPUT*, *QUERY-IO*, *STANDARD-INPUT*, *STANDARD-OUTPUT*, *TRACE-OUTPUT*
 
 % &optional INPUT_STREAM EOF_ERROR_P EOF_VALUE RECURSIVE_P => OBJECT
-cl_read(Obj):-
+f_read(Obj):-
   current_input(Input),
   pl_lisp_read(Input,t,[],[],Obj).
 
-cl_read(Input,Obj):-  pl_lisp_read(Input,t,[],[],Obj).
+f_read(Input,Obj):-  pl_lisp_read(Input,t,[],[],Obj).
 
 pl_lisp_read(INPUT_STREAM,_EOF_ERROR_P, _EOF_VALUE, _RECURSIVE_P,OBJECT):-   
     lisp_read_typed(INPUT_STREAM, Forms0),!,   

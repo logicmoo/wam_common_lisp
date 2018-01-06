@@ -494,18 +494,6 @@ bind_formal_old([FormalParam|FormalParms], [ActualParam|ActualParams],
 
 
 
-% The idea here is that FN/ArgNum may need evaluated or may have its own special evaluator 
-expand_arguments(_Ctx,_Env,_FunctionName,_ArgNum,[], true, []):-!.
-expand_arguments(Ctx,Env,FN,_, Args, true, ArgsO):- nonvar(FN), is_lisp_operator(Ctx,Env,FN),!,Args=ArgsO.
-expand_arguments(Ctx,Env,FN,0,[Arg|Args], ArgsBody, [Arg|Results]):- atom(Arg),!,
-    expand_arguments(Ctx,Env,FN,1,Args, ArgsBody, Results).
-expand_arguments(Ctx,Env,FN,ArgNum,[Arg|Args], Body, [Result|Results]):-!,
-       must_compile_body(Ctx,Env,Result,Arg, ArgBody),
-       Body = (ArgBody, ArgsBody),
-       ArgNum2 is ArgNum + 1,
-       expand_arguments(Ctx,Env,FN,ArgNum2,Args, ArgsBody, Results).
-
-
 make_bind_value_missing( Var,Env,true):-simple_atom_var(Var),!,make_bind_value_required(Var,[],Env),!.
 make_bind_value_missing([Var,InitForm],Env,Code):-!,simple_atom_var(Var),lisp_compile(Env,Value,InitForm,Code),make_bind_value_required(Var,Value,Env),!.
 make_bind_value_missing([Var,InitForm,IfPresent],Env,Code):-simple_atom_var(Var),make_bind_value_required(IfPresent,[],Env),make_bind_value_missing([Var,InitForm],Env,Code).
@@ -530,8 +518,9 @@ correct_formal_params_destructuring([A, B|R],[A, B, '&rest',R]):- simple_atom_va
 correct_formal_params_destructuring([A|R],[A,'&rest',R]):- simple_atom_var(A),simple_atom_var(R),!.
 correct_formal_params_destructuring(AA,AA).
 
-must_bind_parameters(Env,Whole,RestNKeys,FormalParms0,Params,Env,Code):-
+must_bind_parameters(Env,Whole,RestNKeys,FormalParms0,Symbol,Params,Env,Code):-
   always(((correct_formal_params(FormalParms0,FormalParms),
+   ignore(Whole = [Symbol|Params]),
    bind_each_param(Env,Whole,RestNKeys,FormalParms,Params,Code)))),!.
 
 bind_each_param(Env,Whole,RestNKeys, FormalParms, Arguments,BindCode):-

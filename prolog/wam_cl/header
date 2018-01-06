@@ -188,6 +188,7 @@
 :- ensure_loaded(prologfns).
 :- ensure_loaded(compile).
 :- ensure_loaded(conditions).
+:- ensure_loaded(closures).
 :- ensure_loaded(describe).
 :- ensure_loaded(disassemble).
 :- ensure_loaded(fileload).

@@ -24,51 +24,51 @@ xlisting_config:xlisting_always(G):- G=package:_, current_predicate(_,G),predica
 
 
 wl:init_args(x,in_package).
-cl_in_package(S,Package):- find_package_or_die(S,Package),
+f_in_package(S,Package):- find_package_or_die(S,Package),
    f_sys_set_symbol_value('xx_package_xx',Package).
 
 wl:init_args(x,use_package).
-cl_use_package(Package,R):- reading_package(CurrentPackage),
-                       cl_use_package(Package,CurrentPackage,R).
+f_use_package(Package,R):- reading_package(CurrentPackage),
+                       f_use_package(Package,CurrentPackage,R).
 
-cl_use_package(Package,CurrentPackage, t):- Package==CurrentPackage,!.
-cl_use_package(Package,CurrentPackage, R):- 
+f_use_package(Package,CurrentPackage, t):- Package==CurrentPackage,!.
+f_use_package(Package,CurrentPackage, R):- 
   find_package(Package,Package0),
   Package\==Package0,!,
-  cl_use_package(Package0,CurrentPackage, R).
-cl_use_package(Package,CurrentPackage, R):- 
+  f_use_package(Package0,CurrentPackage, R).
+f_use_package(Package,CurrentPackage, R):- 
   find_package(CurrentPackage,CurrentPackage0),
   CurrentPackage0\==CurrentPackage,!,
-  cl_use_package(Package,CurrentPackage0, R).
-cl_use_package(Package,CurrentPackage, t):- 
-   assert_lsp(package_use_list(CurrentPackage,Package)),
+  f_use_package(Package,CurrentPackage0, R).
+f_use_package(Package,CurrentPackage, t):- 
+   assert_lsp([Package,CurrentPackage],package_use_list(CurrentPackage,Package)),
    dbginfo(todo(check_for+package_symbolconflicts(package_use_list(CurrentPackage,Package)))).
 
  
 wl:init_args(1,defpackage).
-cl_defpackage(Name,Keys,R):- cl_make_package(Name,Keys,R).
+f_defpackage(Name,Keys,R):- f_make_package(Name,Keys,R).
 
 
 wl:init_args(1,make_package).
-cl_make_package(L,B,T):- to_prolog_string_if_needed(L,Loc),!,cl_make_package(Loc,B,T).
-cl_make_package(AName,List,Package):-
+f_make_package(L,B,T):- to_prolog_string_if_needed(L,Loc),!,f_make_package(Loc,B,T).
+f_make_package(AName,List,Package):-
   text_to_string(AName,Name),  
   atom_concat_or_rtrace(pkg_,Name,Down),prologcase_name(Down,Package),
-  add_opv(Package,classof,claz_package),
-  asserta(package_name(Package,Name)),
-  init_slot_props(claz_package,2,Package,List), 
+  add_opv(Package,type_of,package),
+  asserta_if_new(package_name(Package,Name)),
+  init_instance_slots(claz_package,2,Package,List), 
   string_upper(Name,UName),
-  (Name==UName -> true ; add_kw_opv(Package,kw_nicknames,UName)).
+  (Name==UName -> true ; add_opv(Package,kw_nicknames,UName)).
   %instance_opv(Package,claz_package,[]).
 
-cl_find_package(S,Obj):- find_package(S,Package),!,always(as_package_object(Package,Obj)).
-cl_find_package(_,[]).
+f_find_package(S,Obj):- find_package(S,Package),!,always(as_package_object(Package,Obj)).
+f_find_package(_,[]).
 
 pl_package_name(S,Name):- find_package(S,Package),(get_opv(Package,name,Name)->true;package_name(Package,Name)).
 
-cl_package_name(P,N):- pl_package_name(P,S),to_lisp_string(S,N).
+f_package_name(P,N):- pl_package_name(P,S),to_lisp_string(S,N).
 
-find_package(S,S):- is_lisp_package(S),!.
+find_package(S,S):- is_packagep(S),!.
 find_package('$OBJ'(claz_package,UP),Package):- !, find_package(UP,Package),!.
 find_package(Obj,Res):- to_prolog_string_if_needed(Obj,F),!,find_package(F,Res).
 find_package(S,Package):- 
@@ -82,7 +82,7 @@ find_package_or_die(X,Y):-
 as_package_object(Package,'$OBJ'(claz_package,Package)).
 
 
-reading_package(Package):- always((get_opv('xx_package_xx',value,UP),find_package(UP,Package))),!.
+reading_package(Package):- always((get_opv('xx_package_xx',symbol_value,UP),find_package(UP,Package))),!.
 reading_package(pkg_user).
 % TODO
 writing_package(Package):- reading_package(Package).
@@ -105,59 +105,59 @@ package_find_symbol(String,PW,Symbol,kw_inherited):-  package_use_list(PW,Packag
 %package_find_symbol(String,Package,Symbol,Found):-  to_prolog_string_if_needed(String,PlString),!,package_find_symbol(PlString,Package,Symbol,Found).
 
 % @TODO Add symbol shadowing 
-cl_import(Symbol,Result):- reading_package(Package),cl_import(Symbol,Package,Result).
-cl_import(List,Pack,t):- is_list(List),maplist([Symbol]>>cl_import(Symbol,Pack,_),List).
-cl_import(String,Package,R):- to_prolog_string_if_needed(String,PlString),!,cl_import(PlString,Package,R).
-cl_import(Symbol,Pack,t):- 
+f_import(Symbol,Result):- reading_package(Package),f_import(Symbol,Package,Result).
+f_import(List,Pack,t):- is_list(List),maplist([Symbol]>>f_import(Symbol,Pack,_),List).
+f_import(String,Package,R):- to_prolog_string_if_needed(String,PlString),!,f_import(PlString,Package,R).
+f_import(Symbol,Pack,t):- 
    find_package_or_die(Pack,Package),
    pl_symbol_name(Symbol,String),
    package_find_symbol_or_missing(String,Package,OldSymbol,IntExt),!,
    package_import_symbol_step2(Package,Symbol,String,OldSymbol,IntExt).
 
 package_import_symbol_step2(Package,Symbol,String,_OldSymbol,'$missing'):-
-   assert_lsp(package:package_internal_symbols(Package,String,Symbol)).
+   assert_lsp(Symbol,package:package_internal_symbols(Package,String,Symbol)).
 package_import_symbol_step2(_Package,Symbol,_String,OldSymbol,_IntExt):- Symbol == OldSymbol,!.
 package_import_symbol_step2(Package,Symbol,String,OldSymbol,kw_iherited):-
-   assert_lsp(package:package_shadowing_symbols(Package,OldSymbol)),
-   assert_lsp(package:package_internal_symbols(Package,String,Symbol)).
+   assert_lsp(Symbol,package:package_shadowing_symbols(Package,OldSymbol)),
+   assert_lsp(Symbol,package:package_internal_symbols(Package,String,Symbol)).
 package_import_symbol_step2(Package,Symbol,String,OldSymbol,kw_external):-
    retract(package:package_external_symbols(Package,String,OldSymbol)),
-   assert_lsp(package:package_shadowing_symbols(Package,OldSymbol)),
-   assert_lsp(package:package_internal_symbols(Package,String,Symbol)).
+   assert_lsp(Symbol,package:package_shadowing_symbols(Package,OldSymbol)),
+   assert_lsp(Symbol,package:package_internal_symbols(Package,String,Symbol)).
 package_import_symbol_step2(Package,Symbol,String,OldSymbol,kw_internal):-
    retract(package:package_internal_symbols(Package,String,OldSymbol)),
-   assert_lsp(package:package_shadowing_symbols(Package,OldSymbol)),
-   assert_lsp(package:package_internal_symbols(Package,String,Symbol)).
+   assert_lsp(Symbol,package:package_shadowing_symbols(Package,OldSymbol)),
+   assert_lsp(Symbol,package:package_internal_symbols(Package,String,Symbol)).
 
 
 
-cl_export(Symbol,Result):- reading_package(Package),cl_export(Symbol,Package,Result).
-cl_export(List,Pack,t):- is_list(List),maplist([Symbol]>>cl_export(Symbol,Pack,_),List).
-cl_export(Symbol,Pack,t):- 
+f_export(Symbol,Result):- reading_package(Package),f_export(Symbol,Package,Result).
+f_export(List,Pack,t):- is_list(List),maplist([Symbol]>>f_export(Symbol,Pack,_),List).
+f_export(Symbol,Pack,t):- 
    find_package_or_die(Pack,Package),
    pl_symbol_name(Symbol,String),
    package_find_symbol_or_missing(String,Package,OldSymbol,IntExt),!,
    package_export_symbol_step2(Package,Symbol,String,OldSymbol,IntExt).
 
 package_export_symbol_step2(Package,Symbol,String,_OldSymbol,'$missing'):-
-   assert_lsp(package:package_external_symbols(Package,String,Symbol)).
+   assert_lsp(Symbol,package:package_external_symbols(Package,String,Symbol)).
 package_export_symbol_step2(_Package,Symbol,_String,OldSymbol,kw_exported):- Symbol == OldSymbol,!.
 package_export_symbol_step2(Package,Symbol,String,OldSymbol,kw_inheritied):-
-   assert_lsp(package:package_shadowing_symbols(Package,OldSymbol)),
-   assert_lsp(package:package_external_symbols(Package,String,Symbol)).
+   assert_lsp(Symbol,package:package_shadowing_symbols(Package,OldSymbol)),
+   assert_lsp(Symbol,package:package_external_symbols(Package,String,Symbol)).
 package_export_symbol_step2(Package,Symbol,String,OldSymbol,kw_external):-
    retract(package:package_external_symbols(Package,String,OldSymbol)),
-   assert_lsp(package:package_shadowing_symbols(Package,OldSymbol)),
-   assert_lsp(package:package_external_symbols(Package,String,Symbol)).
+   assert_lsp(Symbol,package:package_shadowing_symbols(Package,OldSymbol)),
+   assert_lsp(Symbol,package:package_external_symbols(Package,String,Symbol)).
 package_export_symbol_step2(Package,Symbol,String,OldSymbol,kw_internal):-
    retract(package:package_internal_symbols(Package,String,OldSymbol)),
-   assert_lsp(package:package_shadowing_symbols(Package,OldSymbol)),
-   assert_lsp(package:package_external_symbols(Package,String,Symbol)).
+   assert_lsp(Symbol,package:package_shadowing_symbols(Package,OldSymbol)),
+   assert_lsp(Symbol,package:package_external_symbols(Package,String,Symbol)).
 
 
-cl_unexport(Symbol,Result):- reading_package(Package),cl_unexport(Symbol,Package,Result).
-cl_unexport(List,Pack,t):- is_list(List),maplist([Symbol]>>cl_unexport(Symbol,Pack,_),List).
-cl_unexport(Symbol,Pack,t):- 
+f_unexport(Symbol,Result):- reading_package(Package),f_unexport(Symbol,Package,Result).
+f_unexport(List,Pack,t):- is_list(List),maplist([Symbol]>>f_unexport(Symbol,Pack,_),List).
+f_unexport(Symbol,Pack,t):- 
    find_package_or_die(Pack,Package),
    pl_symbol_name(Symbol,String),
    package_find_symbol_or_missing(String,Package,OldSymbol,IntExt),!,
@@ -167,13 +167,13 @@ package_unexport_symbol_step2(_Package,Symbol,_String,OldSymbol,kw_internal):- O
 package_unexport_symbol_step2(_Package,_Symbol,_String,_OldSymbol,'$missing'):-!.
 package_unexport_symbol_step2(Package,Symbol,String,OldSymbol,_):-
    retract(package:package_external_symbols(Package,String,OldSymbol)) -> 
-     assert_lsp(package:package_external_symbols(Package,String,Symbol));
+     assert_lsp(Symbol,package:package_external_symbols(Package,String,Symbol));
      true.
 
 
-cl_shadow(Symbol,Result):- reading_package(Package),cl_shadow(Symbol,Package,Result).
-cl_shadow(List,Pack,t):- is_list(List),maplist([Symbol]>>cl_shadow(Symbol,Pack,_),List).
-cl_shadow(Symbol,Pack,t):- 
+f_shadow(Symbol,Result):- reading_package(Package),f_shadow(Symbol,Package,Result).
+f_shadow(List,Pack,t):- is_list(List),maplist([Symbol]>>f_shadow(Symbol,Pack,_),List).
+f_shadow(Symbol,Pack,t):- 
    find_package_or_die(Pack,Package),
    pl_symbol_name(Symbol,String),
    package_find_symbol_or_missing(String,Package,OldSymbol,IntExt),!,
@@ -185,7 +185,7 @@ package_shadow_symbol_step2(_Package,_String,_OldSymbol,kw_internal).
 package_shadow_symbol_step2( Package,String,_OldSymbol,'$missing'):-
    make_fresh_internal_symbol(Package,String,_Symbol).
 package_shadow_symbol_step2(Package,String,OldSymbol,kw_inherited):-
-   assert_lsp(package:package_shadowing_symbols(Package,OldSymbol)),
+   assert_lsp(OldSymbol,package:package_shadowing_symbols(Package,OldSymbol)),
    make_fresh_internal_symbol(Package,String,_Symbol).
 
 
@@ -194,11 +194,11 @@ make_fresh_internal_symbol(pkg_kw,String,Symbol):- !, create_keyword(String,Symb
 make_fresh_internal_symbol(Package,String,Symbol):- 
    ignore(symbol_case_name(String,Package,Symbol)),
    create_symbol(String,Package,Symbol),
-   assert_lsp(package:package_internal_symbols(Package,String,Symbol)).
+   assert_lsp(Symbol,package:package_internal_symbols(Package,String,Symbol)).
 
 
 
-is_lisp_package(P):- package_name(P,_). 
+is_packagep(P):- package_name(P,_). 
 
 
 
@@ -386,15 +386,16 @@ symbol_case_name(String,Package,ProposedName):-
   package_symbol_prefix(Package,Prefix),!,
   atom_concat_if_new(Prefix,String,CasePN),prologcase_name(CasePN,ProposedName),!.
 
-function_case_name(String,Package,ProposedName):- is_list(String),notrace(catch(atomic_list_concat(String,'_',NewName),_,fail)),!,
-  function_case_name(NewName,Package,ProposedName).
-function_case_name(String,Package,ProposedName):- 
-  package_function_prefix(Package,Prefix),!,
+function_case_name(BindType,String,Package,ProposedName):- is_list(String),notrace(catch(atomic_list_concat(String,'_',NewName),_,fail)),!,
+  function_case_name(BindType,NewName,Package,ProposedName).
+function_case_name(BindType,String,Package,ProposedName):- 
+  package_function_prefix(BindType,Package,Prefix),!,
   atom_concat_if_new(Prefix,String,CasePN),prologcase_name(CasePN,ProposedName),!.
 
-package_function_prefix(A,B):- no_repeats(A,package_fprefix(A,B)).
-package_fprefix(pkg_cl,'cl_').
-package_fprefix(Pk,Pre):- Pk\==pkg_cl, package_symbol_prefix(Pk,Pre0),atom_concat_or_rtrace('f_',Pre0,Pre).
+package_function_prefix(BindType,A,B):- no_repeats(A,package_fprefix(BindType,A,B)).
+package_fprefix(kw_function,Pk,Pre):- package_symbol_prefix(Pk,Pre0),atom_concat_or_rtrace('f_',Pre0,Pre).
+package_fprefix(kw_special,Pk,Pre):- package_symbol_prefix(Pk,Pre0),atom_concat_or_rtrace('sf_',Pre0,Pre).
+package_fprefix(kw_macro,Pk,Pre):- package_symbol_prefix(Pk,Pre0),atom_concat_or_rtrace('mf_',Pre0,Pre).
 
 package_symbol_prefix(A,B):- no_repeats(A,package_prefix(A,B)).
 package_prefix(pkg_cl,'').
@@ -403,7 +404,7 @@ package_prefix(pkg_sys,'sys_').
 package_prefix(pkg_user,'u_').
 package_prefix(pkg_ext,'ext_').
 package_prefix(PN,Pre):- nonvar(PN),package_nicknames(Pk,PN),!,package_prefix(Pk,Pre).
-package_prefix(Pk,Pre):- is_lisp_package(Pk),atom_concat_or_rtrace('pkg_',Package,Pk),atom_concat_or_rtrace(Package,'_',Pre).
+package_prefix(Pk,Pre):- is_packagep(Pk),atom_concat_or_rtrace('pkg_',Package,Pk),atom_concat_or_rtrace(Package,'_',Pre).
 
 
 save_pi:- tell('pi2.data'),

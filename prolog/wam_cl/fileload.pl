@@ -26,22 +26,22 @@ lci :- with_lisp_translation(file('ci2.data'),print_term).
 print_term(COMMENTP):- is_comment(COMMENTP,_),!.
 print_term([_|N]):- P=..[struct_opv_new|N],reader_intern_symbols(P,PI), format('~N~q.~n',[PI]).
 
-dd:- cddd,cl_compile_file('dd.cl',_).
+dd:- cddd,f_compile_file('dd.cl',_).
 
-dd1:- cddd,cl_load('dd_compile.cl',_),
-           cl_load('gate_compile.cl',_).
+dd1:- cddd,f_load('dd_compile.cl',_),
+           f_load('gate_compile.cl',_).
 
-dd2:- cddd,cl_load('dd.cl',_).
+dd2:- cddd,f_load('dd.cl',_).
 
-tdd:- cl_compile_file('../../t/daydreamer/*.cl',_).
-tdd1:- cl_compile_file('../../t/daydreamer/*.cl',_).
-tdd2:- cl_load('../../t/daydreamer/*.cl',_).
+tdd:- f_compile_file('../../t/daydreamer/*.cl',_).
+tdd1:- f_compile_file('../../t/daydreamer/*.cl',_).
+tdd2:- f_load('../../t/daydreamer/*.cl',_).
 
 
-km:- cdkm, cl_compile_file("km",_).
-km1:- cdkm, cl_load("km",_).
+km:- cdkm, f_compile_file("km",_).
+km1:- cdkm, f_load("km",_).
 
-cl_compile_file_mask(Mask,keys(Keys),TF):- 
+f_compile_file_mask(Mask,keys(Keys),TF):- 
    with_each_file(do_compile_1file(Keys,TF),Mask).
 
 
@@ -137,14 +137,14 @@ Notes: None.
 */
 
 
-cl_compile_file(File):-
-  cl_compile_file(File,([]),_).
-cl_compile_file(File,R):-
-  cl_compile_file(File,([]),R).
+f_compile_file(File):-
+  f_compile_file(File,([]),_).
+f_compile_file(File,R):-
+  f_compile_file(File,([]),R).
 (wl:init_args(1,compile_file)).
-cl_compile_file(File,Keys,R):-
+f_compile_file(File,Keys,R):-
   do_compile_1file(Keys,File),!,
-  cl_truename(File,R),!.
+  f_truename(File,R),!.
 
 wl:interned_eval(("(defparameter sys::*output-file-pathname* ())")).
 
@@ -153,7 +153,7 @@ do_compile_1file(Keys,File0):-
    %ignore(R=t),
    pl_probe_file(File0,File),
    prolog_to_os_filename(File,OSFile),
-   cl_compile_file_pathname(OSFile,Keys,PLFilePath),
+   f_compile_file_pathname(OSFile,Keys,PLFilePath),
    to_prolog_pathname(PLFilePath,PLFile),
    locally_let(
      [sym('sys::*compile-file-pathname*')=path(str(File)),
@@ -232,23 +232,23 @@ lisp_compile_to_prolog(PExpression):-
   lisp_grovel(PrologCode),!.
    
 grovel_time_called(do_when).
-grovel_time_called(cl_in_package).
-grovel_time_called(cl_use_package).
-grovel_time_called(cl_defpackage).
+grovel_time_called(f_in_package).
+grovel_time_called(f_use_package).
+grovel_time_called(f_defpackage).
 grovel_time_called(CL_DEF):- atom(CL_DEF),atom_contains(CL_DEF,'_def').
 grovel_time_called(set_opv).
 %grovel_time_called(sys_trace).
 
-grovel_file(File,Keys,Load_RetO):- wdmsg(:- cl_compile_file(File,Keys,Load_RetO)).
+grovel_file(File,Keys,Load_RetO):- wdmsg(:- f_compile_file(File,Keys,Load_RetO)).
 
 lisp_grovel(PrologCode):- ( \+ compound(PrologCode); \+ callable(PrologCode)),!.
 lisp_grovel((A,B)):-!, lisp_grovel(A),lisp_grovel(B).
-lisp_grovel(cl_load(File,Keys,_Load_Ret)):- !, grovel_file(File,Keys,_Load_RetO).
-lisp_grovel(cl_require(File,Keys,_Load_Ret)):- !, grovel_file(File,Keys,_Load_RetO).
+lisp_grovel(f_load(File,Keys,_Load_Ret)):- !, grovel_file(File,Keys,_Load_RetO).
+lisp_grovel(f_require(File,Keys,_Load_Ret)):- !, grovel_file(File,Keys,_Load_RetO).
 lisp_grovel(A):- is_assert_op(A,Where,AA),!,lisp_grovel_assert(Where,AA).
 lisp_grovel(PAB):- PAB=..[F,A|_],grovel_time_called(F),!,(var(A)-> true;call(PAB)),!.
 %lisp_grovel(PAB):- grovel_time_called(PAB)->always(PAB);true.
-%lisp_grovel(cl_compile_file(File,Keys,Load_Ret)):- !, cl_compile_file(File,Keys,Load_Ret).
+%lisp_grovel(f_compile_file(File,Keys,Load_Ret)):- !, f_compile_file(File,Keys,Load_Ret).
 lisp_grovel(_).
 
 lisp_grovel_assert(T,MP):- compound(MP),strip_module(MP,_,P),functor(P,F,_),
@@ -260,18 +260,18 @@ lisp_grovel_assert(T):-lisp_grovel_assert(u,T),!.
 
 pl_load(File,_Keys,T):- exists_file(File),file_name_extension(_Base,Ext,File),prolog_file_type(Ext,Type),Type==prolog,!,
    ensure_loaded(File),T=t.
-pl_load(L,Keys,T):- cl_load(L,Keys,T),!.
+pl_load(L,Keys,T):- f_load(L,Keys,T),!.
 
-cl_load(L):- cl_load(L,_).
-cl_load(L,T):- cl_load(L,[],T).
+f_load(L):- f_load(L,_).
+f_load(L,T):- f_load(L,[],T).
 (wl:init_args(1,load)).
-cl_load(L,Keys,T):- to_prolog_string_if_needed(L,Loc)->L\==Loc,!,cl_load(Loc,Keys,T).
-%cl_load('$OBJ'(_Pathname,Loc),Keys,T):- !, cl_load(Loc,Keys,T).
-cl_load(File,_Keys,t):- fail,
+f_load(L,Keys,T):- to_prolog_string_if_needed(L,Loc)->L\==Loc,!,f_load(Loc,Keys,T).
+%f_load('$OBJ'(_Pathname,Loc),Keys,T):- !, f_load(Loc,Keys,T).
+f_load(File,_Keys,t):- fail,
    % check maybe for fresh
    pl_compiled_filename(File,PL),exists_file(PL),!,dbginfo(in_comment(ensure_loaded(PL))),!,ensure_loaded(PL).
-%cl_load(File,R):- cl_compile_file(File,t),!,pl_compiled_filename(File,PL),exists_file(PL),!,in_comment(dbginfo(ensure_loaded(PL))),!,ensure_loaded(PL).
-cl_load(File,Keys,t):- 
+%f_load(File,R):- f_compile_file(File,t),!,pl_compiled_filename(File,PL),exists_file(PL),!,in_comment(dbginfo(ensure_loaded(PL))),!,ensure_loaded(PL).
+f_load(File,Keys,t):- 
   with_each_file(load_1file(Keys),File).
 
 load_1file(_Keys,File):- 
@@ -337,49 +337,49 @@ with_each_file(How,File):- working_directory(CD,CD),with_fstem(CD,File,Found),!,
 
 %cl:require( :tables "tables.lisp")
 % asserting... u
-wl:arglist_info(cl_require, [sys_name, c38_optional, u_pathnames], [_Name_Param], arginfo{all:[sys_name, u_pathnames], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_name, u_pathnames], opt:[u_pathnames], req:[sys_name], rest:0, whole:0}).
+wl:arglist_info(f_require, [sys_name, c38_optional, u_pathnames], [_Name_Param], arginfo{all:[sys_name, u_pathnames], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_name, u_pathnames], opt:[u_pathnames], req:[sys_name], rest:0, whole:0}).
 % asserting... u
 wl:init_args(1,require).
 % asserting... u
-wl:lambda_def(defun, require, cl_require, [sys_name, c38_optional, u_pathnames], [[let, [[string, [string, sys_name]]], [unless, [find, string, xx_modules_xx, kw_test, function(string_c61)], [u_do_list_designator, [u_file, u_pathnames], [load, u_file]]]]]).
+wl:lambda_def(defun, require, f_require, [sys_name, c38_optional, u_pathnames], [[let, [[string, [string, sys_name]]], [unless, [find, string, xx_modules_xx, kw_test, function(string_c61)], [u_do_list_designator, [u_file, u_pathnames], [load, u_file]]]]]).
 % asserting... u
-cl_require(Name_Param, RestNKeys, FResult) :-
+f_require(Name_Param, RestNKeys, FResult) :-
         Env=[bv(sys_name, Name_Param), bv(u_pathnames, Pathnames_Param)],
         opt_var(Env, u_pathnames, Pathnames_Param, true, [], 1, RestNKeys),
-        cl_string(Name_Param, String_Init),
+        f_string(Name_Param, String_Init),
         LEnv=[[bv(string, String_Init)]|Env],
         get_var(LEnv, xx_modules_xx, Xx_modules_xx_Get),
-        cl_find(String_Init, Xx_modules_xx_Get, [kw_test, function(string_c61)], IFTEST),
+        f_find(String_Init, Xx_modules_xx_Get, [kw_test, function(string_c61)], IFTEST),
         (   IFTEST\==[]
         ->  FResult=[]
         ;   get_var(LEnv, u_pathnames, Pathnames_Get),
             throw(f_u_file(Pathnames_Get, List_designator_Param)),
             get_var(LEnv, u_file, File_Get),
-            cl_load(File_Get, [], Load_Ret),
+            f_load(File_Get, [], Load_Ret),
             throw(f_u_do_list_designator(List_designator_Param, Load_Ret, ElseResult)),
             FResult=ElseResult
         ).
-/*:- set_opv(cl_require, classof, claz_compiled_function),
+/*:- set_opv(f_require,type_of,compiled_function),
    set_opv(require, compile_as, kw_function),
-   set_opv(require, function, cl_require).*/
+   set_opv(require, function, f_require).*/
 
 
 % asserting... u
-wl:arglist_info(cl_provide, [sys_name], [_Name_Param], arginfo{all:[sys_name], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_name], opt:0, req:[sys_name], rest:0, whole:0}).
+wl:arglist_info(f_provide, [sys_name], [_Name_Param], arginfo{all:[sys_name], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_name], opt:0, req:[sys_name], rest:0, whole:0}).
 % asserting... u
-wl:init_args(x, cl_provide).
+wl:init_args(x, f_provide).
 % asserting... u
-wl:lambda_def(defun, provide, cl_provide, [sys_name], [[let, [[string, [string, sys_name]]], [pushnew, string, xx_modules_xx, kw_test, function(string_c61)], string]]).
+wl:lambda_def(defun, provide, f_provide, [sys_name], [[let, [[string, [string, sys_name]]], [pushnew, string, xx_modules_xx, kw_test, function(string_c61)], string]]).
 % asserting... u
-cl_provide(Name_Param, FResult) :-
+f_provide(Name_Param, FResult) :-
        % Env=[bv(sys_name, Name_Param)],
-        cl_string(Name_Param, String_Init),
+        f_string(Name_Param, String_Init),
        % LEnv=[[bv(string, String_Init)]|Env],
-        cl_pushnew(String_Init,xx_modules_xx, [kw_test, function(string_c61)],_Pushnew_R),
+        sf_pushnew(String_Init,xx_modules_xx, [kw_test, function(string_c61)],_Pushnew_R),
         String_Init=FResult.
-/*:- set_opv(cl_provide, classof, claz_compiled_function),
+/*:- set_opv(f_provide,type_of,compiled_function),
    set_opv(provide, compile_as, kw_function),
-   set_opv(provide, function, cl_provide).
+   set_opv(provide, function, f_provide).
 */
 :- fixup_exports.
 

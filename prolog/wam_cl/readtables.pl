@@ -14,6 +14,7 @@
  *******************************************************************/
 :- module(readtables, []).
 
+% some of this code will be moved to readers probably
 
 
 :- include('header').
@@ -71,7 +72,7 @@ simple_atom_token(SymbolName):- atom_concat_or_rtrace('$',_,SymbolName),upcase_a
 simple_atom_token(SymbolName):- string_upper(SymbolName,UP),string_lower(SymbolName,DOWN),!,UP==DOWN.
 
 atom_symbol(SymbolName,_,Token):- simple_atom_token(SymbolName),!,SymbolName=Token.
-atom_symbol(SymbolName,_,Obj):- cl_type_of(SymbolName,X)->X\==t,SymbolName=Obj.
+atom_symbol(SymbolName,_,Obj):- f_type_of(SymbolName,X)->X\==t,SymbolName=Obj.
 atom_symbol(SymbolName,Package,Symbol):-
   string_upper(SymbolName,SymbolNameU), 
   string_list_concat([SymbolName1|SymbolNameS],":",SymbolNameU),
@@ -83,42 +84,44 @@ atom_symbol_s("",[SymbolName],_UPackage,Symbol):- !,atom_symbol_s(SymbolName,[],
 % #::SYMBOL
 atom_symbol_s("#",["",SymbolName],UPackage,_Symbol):- throw('@TODO *** - READ from #<INPUT CONCATENATED-STREAM #<INPUT STRING-INPUT-STREAM> #<IO TERMINAL-STREAM>>: token ":BAR" after #: should contain no colon'(atom_symbol_s("#",["",SymbolName],UPackage))).  
 % #:SYMBOL
-atom_symbol_s("#",[SymbolName],_UPackage,Symbol):- cl_make_symbol(SymbolName,Symbol).
+atom_symbol_s("#",[SymbolName],_UPackage,Symbol):- f_make_symbol(SymbolName,Symbol).
 % SYMBOL
 atom_symbol_s(SymbolName,[],Package,Symbol):- intern_symbol(SymbolName,Package,Symbol,_).
 % PACKAGE::SYMBOL
 atom_symbol_s(PName,   ["", SymbolName],_UPackage,Symbol):- find_package_or_die(PName,Package),intern_symbol(SymbolName,Package,Symbol,_IntExt).
-% PACKAGE:SYMBOL will be made public
-atom_symbol_s(PName,   [SymbolName],_UPackage,Symbol):- lisp_auto_intern, find_package_or_die(PName,Package),atom_symbol_make_public(SymbolName,Package,Symbol),!.
-% PACKAGE:SYMBOL must exists AND be public
+% PACKAGE:SYMBOL must exist AND also exported
 atom_symbol_s(PName,   [SymbolName],_UPackage,Symbol):- find_package_or_die(PName,Package),atom_symbol_public(SymbolName,Package,Symbol).
 
-lisp_auto_intern:- \+ current_prolog_flag(lisp_autointern,false),!.
-lisp_auto_intern:- reading_package(P),!,P==pkg_sys.
+
+lisp_auto_export_expected(pkg_sys).
+lisp_auto_export_expected(_Package):- \+ current_prolog_flag(lisp_primordial,false),!.
+
 
 % KEYWORD already exist or get created
 atom_symbol_make_public(SymbolName,Package, Symbol):- Package == pkg_kw,!, 
   (package_find_symbol(SymbolName,Package,Symbol,_IntExt)->true;create_keyword(SymbolName,Symbol)).
-% SYMBOL if exists will become public
+% SYMBOL if exists will become exported
 atom_symbol_make_public(SymbolName,Package, Symbol):- package_find_symbol(SymbolName,Package,Symbol,IntExt), 
-   (IntExt\==kw_internal -> true ; cl_export(Symbol,Package,_)).
+   (IntExt\==kw_internal -> true ; f_export(Symbol,Package,_)).
 
 % SYMBOL was found on used-by-list
 atom_symbol_make_public(SymbolName,Package,Symbol):- 
    get_opv_i(Users,uses,Package),
    package_find_symbol(SymbolName,Users,Symbol,_IntExt),
-   show_call_trace(cl_import(Symbol,Package,_)),
+   show_call_trace(f_import(Symbol,Package,_)),
    % should we move the home package?
-   show_call_trace(cl_export(Symbol,Package,_)),!.
-% SYMBOL if not exists will become public
+   show_call_trace(f_export(Symbol,Package,_)),!.
+% SYMBOL if not exists will become exported
 atom_symbol_make_public(SymbolName,Package,Symbol):- true,
-   intern_symbol(SymbolName,Package,Symbol,_),cl_export(Symbol,Package,_).
+   intern_symbol(SymbolName,Package,Symbol,_),f_export(Symbol,Package,_).
 
 
 
+% PACKAGE:SYMBOL will be made exported
+atom_symbol_public(SymbolName,Package, Symbol):- lisp_auto_export_expected(Package),!,atom_symbol_make_public(SymbolName,Package,Symbol),!.
 % KEYWORD must already exist
 atom_symbol_public(SymbolName,Package, Symbol):- Package == pkg_kw,!, (package_find_symbol(SymbolName,Package,Symbol,_IntExt)->true;throw('symbol_not_exists'(SymbolName,Package))).
-% SYMBOL must exists AND be public
+% SYMBOL must exists AND be exported
 atom_symbol_public(SymbolName,Package, Symbol):- package_find_symbol(SymbolName,Package,Symbol,IntExt), 
    (IntExt\==kw_internal -> true ;throw('symbol_not_exported'(SymbolName,Package))).
 atom_symbol_public(SymbolName,Package,_Symbol):- throw('symbol_not_exists'(SymbolName,Package)).

@@ -25,7 +25,7 @@
 :- include('header').
 
 
-cl:cl_trace(t):- rtrace,trace.
+cl:f_trace(t):- rtrace,trace.
 
 /*
 TODO fix prolog_call
@@ -65,7 +65,7 @@ compile_prolog_call(_Ctx,_Env,Prev,[sys_prolog_trace],Prev, trace).
 compile_prolog_call(_Ctx,_Env,Prev,[sys_trace],Prev, trace).
 
 wl:init_args(x, sys_rtrace).
-wl:declared(sys_rtrace,kw_operator).
+wl:declared(sys_rtrace,kw_special).
 wl:interned_eval('`sys:rtrace').
 f_sys_rtrace(Eval,Ret):- lisp_compile(Ret,Eval,Body), rtrace(Body).
 f_sys_rtrace(t):- rtrace.
@@ -78,7 +78,7 @@ compile_prolog_call(_Ctx,_Env,Prev,[sys_prolog],Prev, break).
 compile_prolog_call(_Ctx,_Env,Prev,[sys_break],Prev, break).
 compile_prolog_call(_Ctx,_Env,Prev,[break],Prev, break).
 
-cl_break([]):- break.
+f_break([]):- break.
 
 %compile_body_h(_Ctx,_Env,Result, nop(X),  nop(X)):- !, debug_var("_NopResult",Result).
 compile_prolog_call(Ctx,Env,Result,call_for(Body0,Result),Prev, Body):-!,
@@ -144,10 +144,10 @@ locally_let(N=V,G):-!,locally_let([N=V],G).
 locally_let([N=V|More],G):- 
  always(get_var(N,Was)),
   setup_call_cleanup(
-     set_opv(N,value,V),
+     set_opv(N,symbol_value,V),
      %once(locally($(N)=V,..)),
-     (locally_let(More,G),set_opv(N,value,Was)),
-        set_opv(N,value,Was)).
+     (locally_let(More,G),set_opv(N,symbol_value,Was)),
+        set_opv(N,symbol_value,Was)).
 locally_let([],G):- !,call_interned_eval(G). 
 
 subst_castifies(G,G):- \+ compound(G),!.
@@ -160,8 +160,8 @@ castify(str(O),S):-!, castify1(O,M),to_lisp_string(M,S).
 castify(plstr(O),S):-!, castify1(O,M),to_prolog_string(M,S).
 castify(path(O),S):-!, castify1(O,M),to_lisp_pathname(M,S).
 castify(sym(O),S):-!, castify1(O,M),reader_intern_symbols(M,S).
-castify(value(O),S):- castify1(O,M),always(get_opv(M,value,S)).
-castify(value(O),S):- castify1(O,M),always(get_opv(M,value,S)).
+castify(value(O),S):- castify1(O,M),always(get_opv(M,symbol_value,S)).
+castify(value(O),S):- castify1(O,M),always(get_opv(M,symbol_value,S)).
 castify(get_slot(Slot,O),S):- castify1(O,M),castify1(Slot,LSlot),always(get_opv(M,LSlot,S)).
 
 castify1(O,O):- \+compound(O),!.

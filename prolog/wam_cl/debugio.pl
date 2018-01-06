@@ -97,7 +97,7 @@ dbmsg_assert(Where,Head):- !, always((nop(pre_annotation("#### annotating...",Wh
 
 pre_annotation(What,Where):- where_where(Where,Where1),colormsg1("\n~w `~w` ",[What,Where1]).
 
-where_where(Where,Atom):- locally_let(sym('cl:*package*')=pkg_kw,with_output_to(atom(Atom),cl_prin1(Where,_))),!.
+where_where(Where,Atom):- locally_let(sym('cl:*package*')=pkg_kw,with_output_to(atom(Atom),f_prin1(Where,_))),!.
 where_where(Where,Where).
 
 :- thread_local(t_l:in_print_cmt/0).

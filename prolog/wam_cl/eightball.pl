@@ -156,17 +156,17 @@ dinterp_c(M,C,G,GG,L):-
    clause(M:GG,Body),G=GG,
    dinterp(M,C,Body,L),(var(C)-> true ; (!,C)).
 
-just_call(_,G):- compound(G),functor(G,F,_),f_just_call(F).
+just_call(_,G):- compound(G),functor(G,F,_),just_call_f(F).
 just_call(M,G):- predicate_property(M:G,nodebug).
 just_call(M,G):- M:predicate_property(_:G,nodebug).
 just_call(M,G):- notrace(catch( (M:clause(G,_),fail), _, true)).
-f_just_call('$sig_atomic').
-f_just_call(maplist).
-f_just_call(dinterp).
-f_just_call(with_mutex).
-f_just_call(flag).
-f_just_call(is).
-f_just_call(gensym).
+just_call_f('$sig_atomic').
+just_call_f(maplist).
+just_call_f(dinterp).
+just_call_f(with_mutex).
+just_call_f(flag).
+just_call_f(is).
+just_call_f(gensym).
 
 nonquietly_must_or_rtrace0(G):- 
   (catch((G),E,gripe_problem(uncaught(E),(rtrace(G),!,fail)))

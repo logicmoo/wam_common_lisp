@@ -20,38 +20,15 @@
 grovel_math:-
   doall((((((clause(arithmetic:eval(P,_,_),_),nonvar(P)),(functor(P,F,A),always(define_cl_math(F,A)))))),fail)),
   grovel_preds(_).
-
-grovel_preds(M):-
- %module_property(M,file(File)),
- 
- doall((
-  source_file(M:P,_File),
-  %current_predicate(_,M:P), \+ predicate_property(M:P,imported_from(_)),
-  %predicate_property(M:P,module(M)),
-  functor(P,F,A),
-  once(forall(clause(wl:grovel_pred(M,F,A),B),call(B))),
-  fail)).
-
-wl:grovel_pred(M,F,1):-
-  atom(F),atom(M),
-  atom_concat_or_rtrace('is_',R,F),atom_concat(_,'p',R),
-  doall(((get_opv_iii(_Sym,function,SF),
-  (atom(SF),atom_concat(Prefix,R,SF),
-   \+ atomic_list_concat([_,_,_|_],'_',Prefix),
-   Head=..[SF,N,RetVal],
-   PBody=..[F,N],
-   (assert_lsp(user:Head :- t_or_nil(M:PBody,RetVal))))),fail)).
-
+      
 wl:interned_eval(call(notrace(grovel_math))).
 
-
-% define_cl_math(F,0):- atom_concat_or_rtrace('cl_',F,CLN), P=..[CLN,X],FP=..[F], assertz(P:- X is FP).
 
 
 /*
 (defun my-max (real &rest reals) (dolist (r reals real)(when (> r real) (setq real r)))) 
 ==>
-cl_my_max(Real, RestNKeys, FnResult) :-
+f_my_max(Real, RestNKeys, FnResult) :-
         nop(global_env(ReplEnv)),
         GEnv=[[[bv(real, Real), bv(u_reals, RestNKeys)]|ReplEnv]|ReplEnv],
         get_var(GEnv, real, Real_Get),
@@ -74,26 +51,26 @@ cl_my_max(Real, RestNKeys, FnResult) :-
         Real_Get24=FnResult.
 */
 wl: init_args(1,max).
-cl_max(Real,Reals,Out):-  
+f_max(Real,Reals,Out):-  
    (Reals=[R|DoList] ->
     ( R > Real -> 
-       cl_max(R,DoList,Out);
-        cl_max(Real,DoList,Out));
+       f_max(R,DoList,Out);
+        f_max(Real,DoList,Out));
     Out=Real).
 
 wl: init_args(1,min).
-cl_min(Real,Reals,Out):-  
+f_min(Real,Reals,Out):-  
    Reals=[R|DoList] ->
     ( R < Real -> 
-       cl_min(R,DoList,Out);
-        cl_min(Real,DoList,Out));
+       f_min(R,DoList,Out);
+        f_min(Real,DoList,Out));
     Out=Real.
 
 define_cl_math(max,_):-!.
 define_cl_math(min,_):-!.
-define_cl_math(F,1):- atom_concat_or_rtrace('cl_',F,CLN), P=..[CLN,X,R],FP=..[F,X],
+define_cl_math(F,1):- atom_concat_or_rtrace('f_',F,CLN), P=..[CLN,X,R],FP=..[F,X],
   (is_defined(CLN,2)-> true ; always(assert_lsp(P:- R is FP))).
-define_cl_math(F,2):- atom_concat_or_rtrace('cl_',F,CLN), P=..[CLN,X,Y,R],FP=..[F,X,Y],
+define_cl_math(F,2):- atom_concat_or_rtrace('f_',F,CLN), P=..[CLN,X,Y,R],FP=..[F,X,Y],
   (is_defined(CLN,3)-> true ; always(assert_lsp(P:- R is FP))).
 define_cl_math(_,_).
 
@@ -130,41 +107,41 @@ is_zerop(N):- N=:=0.
 
 % Lisp Comparison Predicates
 
-cl_c61(N1,N2,Ret):- t_or_nil( (N1=:=N2),Ret). 
+f_c61(N1,N2,Ret):- t_or_nil( (N1=:=N2),Ret). 
 '='(N1,N2,Ret):- t_or_nil( (N1=:=N2),Ret).
 
-cl_c60_c61(N1,N2,Ret):- t_or_nil('=<'(N1,N2),Ret).
+f_c60_c61(N1,N2,Ret):- t_or_nil('=<'(N1,N2),Ret).
 '<='(N1,N2,Ret):- t_or_nil('=<'(N1,N2),Ret).
 
-cl_c62_c61(N1,N2,Ret):- t_or_nil('>='(N1,N2),Ret).
+f_c62_c61(N1,N2,Ret):- t_or_nil('>='(N1,N2),Ret).
 '>='(N1,N2,Ret):- t_or_nil('>='(N1,N2),Ret).
 
-cl_c60(N1,N2,Ret):- t_or_nil(<(N1,N2),Ret). 
+f_c60(N1,N2,Ret):- t_or_nil(<(N1,N2),Ret). 
 '<'(N1,N2,Ret):- t_or_nil(<(N1,N2),Ret). 
 
-cl_c62(N1,N2,Ret):- t_or_nil(<(N1,N2),Ret). 
+f_c62(N1,N2,Ret):- t_or_nil(<(N1,N2),Ret). 
 '>'(N1,N2,Ret):- t_or_nil(>(N1,N2),Ret). 
 
 % Lisp Operators/Functions
-cl_sqrt(X,Y):-
+f_sqrt(X,Y):-
     X < 0 
-       -> (NX is -X , cl_sqrt(NX,NY), Y = '$COMPLEX'(0, NY))
+       -> (NX is -X , f_sqrt(NX,NY), Y = '$COMPLEX'(0, NY))
      ;
     (\+ integer(X)
       -> (Y is sqrt(X)) 
       ;
       (IY is sqrt(X), RY is floor(IY),(RY=:=IY -> Y=RY ; Y=IY))).
 
-cl_exp(N,Ret):- Ret is exp(N).
+f_exp(N,Ret):- Ret is exp(N).
 
-cl_expt(N1,N2,Ret):- Ret is (N1 ^ N2).
+f_expt(N1,N2,Ret):- Ret is (N1 ^ N2).
 
 
 
 
 % asserting1... u
 wl: lambda_def(defun,Sym,Cl_Sym,[u_x, c38_optional, [u_y, 1]],[[truncate,Sym, [/, u_x, u_y]]]):-
-  var_or_atom(Cl_Sym),tround(Sym),atom_concat_or_rtrace('cl_',Sym,Cl_Sym).
+  var_or_atom(Cl_Sym),tround(Sym),atom_concat_or_rtrace('f_',Sym,Cl_Sym).
 
 
 de_ratio('$RATIO'(N,D),N,D):-!.
@@ -185,10 +162,10 @@ tround0(ceiling).
 tround0(truncate).
 
 % asserting... u
-cl_ceiling(X, RestNKeys, MResult):- pl_truncate(ceiling,X, RestNKeys, MResult).
-cl_floor(X, RestNKeys, MResult):- pl_truncate(floor,X, RestNKeys, MResult).
-cl_truncate(X, RestNKeys, MResult):- pl_truncate(truncate,X, RestNKeys, MResult).
-cl_round(X, RestNKeys, MResult):- pl_truncate(round,X, RestNKeys, MResult).
+f_ceiling(X, RestNKeys, MResult):- pl_truncate(ceiling,X, RestNKeys, MResult).
+f_floor(X, RestNKeys, MResult):- pl_truncate(floor,X, RestNKeys, MResult).
+f_truncate(X, RestNKeys, MResult):- pl_truncate(truncate,X, RestNKeys, MResult).
+f_round(X, RestNKeys, MResult):- pl_truncate(round,X, RestNKeys, MResult).
 pl_truncate(_Type, X, RestNKeys, MResult):- 
      nth_param(RestNKeys,1,Y,1),
      de_ratio(X,X0,Xd),
@@ -199,13 +176,13 @@ pl_truncate(_Type, X, RestNKeys, MResult):-
      Whole  is XX div YY,
      Rement is XX mod YY,
      re_ratio(Rement,DD,RatRem),!,
-     cl_values_list([Whole,RatRem],MResult).
+     f_values_list([Whole,RatRem],MResult).
 
 % asserting... u
-cl_ftruncate(X, RestNKeys, MResult):- pl_ftruncate(truncate,X, RestNKeys, MResult).
-cl_fceiling(X, RestNKeys, MResult):- pl_ftruncate(ceiling,X, RestNKeys, MResult).
-cl_ffloor(X, RestNKeys, MResult):- pl_ftruncate(floor,X, RestNKeys, MResult).
-cl_fround(X, RestNKeys, MResult):- pl_ftruncate(round,X, RestNKeys, MResult).
+f_ftruncate(X, RestNKeys, MResult):- pl_ftruncate(truncate,X, RestNKeys, MResult).
+f_fceiling(X, RestNKeys, MResult):- pl_ftruncate(ceiling,X, RestNKeys, MResult).
+f_ffloor(X, RestNKeys, MResult):- pl_ftruncate(floor,X, RestNKeys, MResult).
+f_fround(X, RestNKeys, MResult):- pl_ftruncate(round,X, RestNKeys, MResult).
 pl_ftruncate(_Type,X, RestNKeys, MResult):- 
      nth_param(RestNKeys,1,Y,1),
      de_ratio(X,X0,Xd),
@@ -216,7 +193,7 @@ pl_ftruncate(_Type,X, RestNKeys, MResult):-
      Whole  is (XX div YY)*1.0,
      Rement is (XX mod YY)*1.0,
      re_ratio(Rement,DD,RatRem),!,
-     cl_values_list([Whole,RatRem],MResult).
+     f_values_list([Whole,RatRem],MResult).
 
 /*
 ;;; If the numbers do not divide exactly and the result of (/ number divisor)
@@ -239,32 +216,32 @@ wl:interned_eval_todo(
         (1- tru))
       (values tru rem))))').
 
-%cl_truncate(X,Y):- Y is floor(X).
-%cl_log(X,Y):- Y is log(X).
+%f_truncate(X,Y):- Y is floor(X).
+%f_log(X,Y):- Y is log(X).
 
 
 '1+'(N,Ret):- Ret is N + 1.
 '1-'(N,Ret):- Ret is N - 1.
 
-cl_c43(N1,N2,Ret):- Ret is (N1 + N2).
+f_c43(N1,N2,Ret):- Ret is (N1 + N2).
 '+'(N1,N2,Ret):- Ret is (N1 + N2).
 
-cl_c45(N1,N2,Ret):- Ret is (N1 + N2).
+f_c45(N1,N2,Ret):- Ret is (N1 + N2).
 '-'(N1,N2,Ret):- Ret is (N1 - N2).
 
-cl_c42(N1,N2,Ret):- Ret is (N1 + N2).
+f_c42(N1,N2,Ret):- Ret is (N1 + N2).
 '*'(N1,N2,Ret):- Ret is (N1 * N2).
 
-cl_c47(N1,N2,Ret):- Ret is (N1 + N2).
+f_c47(N1,N2,Ret):- Ret is (N1 + N2).
 '/'(N1,N2,Ret):- Ret is (N1 / N2).
 
-cl_plus(Num1, Num2, Result):-
+f_plus(Num1, Num2, Result):-
         Result is Num1 + Num2.
-cl_minus(Num1, Num2, Result):-
+f_minus(Num1, Num2, Result):-
 	Result is Num1 - Num2.
 ext_times(Num1, Num2, Result):-
 	Result is Num1 * Num2.
-cl_divide(Num1, Num2, Result):-
+f_divide(Num1, Num2, Result):-
 	Result is Num1 / Num2.
 
 

@@ -18,12 +18,12 @@
 
 :- include('header').
 
-cl_hash_table_p(HT,RetVal):- t_or_nil((cl_class_of(HT,Claz),Claz==claz_hash_table),RetVal).
+f_hash_table_p(HT,RetVal):- t_or_nil((f_class_of(HT,Claz),Claz==claz_hash_table),RetVal).
 
-cl_hash_table_test(HT,RetVal):-get_opv(HT,test,RetVal).
+f_hash_table_test(HT,RetVal):-get_opv(HT,test,RetVal).
 
 (wl:init_args(0,make_hash_table)).
-cl_make_hash_table(Keys,HT):- 
+f_make_hash_table(Keys,HT):- 
   create_object(claz_hash_table,Keys,HT),
   ((get_opv(HT,u_data,Tree),Tree\==[])->true;(rb_new(Tree),set_opv(HT,u_data,'$OBJ'(clz_rb_tree,Tree)))).
 
@@ -35,10 +35,10 @@ ht_match_key_value(Tree,Test,Key,Name,Value):-
   ht_match(Test,Key,Name).
 
 (wl:init_args(x,gethash)).
-cl_gethash(Key,HT,RetVal):- cl_gethash(Key,HT,[],RetVal).
-cl_gethash(Key,HT,Default,RetVal):- 
+f_gethash(Key,HT,RetVal):- f_gethash(Key,HT,[],RetVal).
+f_gethash(Key,HT,Default,RetVal):- 
   get_table(HT,Tree,_),ht_test_fn(HT,TestFn),
-  (ht_match_key_value(Tree,TestFn,Key,_Name,Value)->cl_values_list([Value,t],RetVal);cl_values_list([Default,[]],RetVal)).
+  (ht_match_key_value(Tree,TestFn,Key,_Name,Value)->f_values_list([Value,t],RetVal);f_values_list([Default,[]],RetVal)).
 
 ht_test_fn(HT,TestFn):- get_opv(HT,test,Test),!,as_lisp_binary_fn(Test,TestFn).
 
@@ -50,14 +50,14 @@ f_sys_puthash(Key,HT,RetVal,RetVal):-
       (nb_rb_get_node(Tree,Name,Node),nb_rb_set_node_value(Node,RetVal));
       nb_rb_insert(Tree,Key,RetVal)).
    
-cl_remhash(Key,HT,RetVal):-  
+f_remhash(Key,HT,RetVal):-  
   get_table(HT,Tree,BV),ht_test_fn(HT,TestFn),!,
   t_or_nil(( ht_match_key_value(Tree,TestFn,Key,Name,_OldValue),rb_delete(Tree,Name,NT),nb_setarg(2,BV,NT)),RetVal).
 
-cl_clrhash(HT,RetVal):-  RetVal=t,
+f_clrhash(HT,RetVal):-  RetVal=t,
   rb_new(Tree),set_opv(HT,u_data,'$OBJ'(clz_rb_tree,Tree)).
 
-cl_maphash(Fn,HT,RetVal):-  RetVal=[],
+f_maphash(Fn,HT,RetVal):-  RetVal=[],
   get_table(HT,Tree,_),as_lisp_binary_fn(Fn,MapFn),
   forall(rb_in(Name,Value,Tree),ignore(ht_match(MapFn,Name,Value))).
 
@@ -65,7 +65,7 @@ cl_maphash(Fn,HT,RetVal):-  RetVal=[],
 f_ext_maphash_iter(Function, Hash_table, FnResult) :-
         global_env(ReplEnv5),
         _Env10=[bv(function, Function), bv(hash_table, Hash_table)|ReplEnv5],
-        cl_with_hash_table_iterator([u_next_entry, hash_table],
+        f_with_hash_table_iterator([u_next_entry, hash_table],
 
                                     [ loop,
 
@@ -92,11 +92,11 @@ f_ext_maphash_iter(Function, Hash_table, FnResult) :-
 
 ### Compiled:  `CL:WITH-HASH-TABLE-ITERATOR`
 */
-cl_with_hash_table_iterator([Name, Hash_table], RestNKeys, FnResult) :-
+sf_with_hash_table_iterator([Name, Hash_table], RestNKeys, FnResult) :-
         global_env(ReplEnv),
         CDR20=[bv(u_body, Body), bv(sys_name, Name), bv(hash_table, Hash_table)|ReplEnv],
         as_body(u_body, Body, RestNKeys),
-        cl_gensym(Iter_Init),
+        f_gensym(Iter_Init),
         LEnv=[bv(u_iter, Iter_Init)|CDR20],
         get_var(LEnv, hash_table, Hash_table_Get),
         get_var(LEnv, sys_name, Name_Get),
@@ -105,10 +105,10 @@ cl_with_hash_table_iterator([Name, Hash_table], RestNKeys, FnResult) :-
         MFResult = [let, [[Iter_Get13, [u_hash_table_iterator_function, Hash_table_Get]]], 
          [macrolet, [[Name_Get, [], [quote, [funcall, Iter_Get13]]]]
                |Body_Get]],
-        cl_eval(MFResult, FnResult).
+        f_eval(MFResult, FnResult).
 
 
-cl_hash_table_count(HT,RetVal):-get_table(HT,Tree,_),rb_size(Tree,RetVal).
+f_hash_table_count(HT,RetVal):-get_table(HT,Tree,_),rb_size(Tree,RetVal).
 
 ht_match(Test,Key,Matcher):- (call(Test,Key,Matcher,R)->R=t).
 
@@ -129,15 +129,15 @@ f_sys_hash_table_iterator_function(Hash_table, FnResult) :-
         f_sys_hash_table_entries(Hash_table_Get, Entries_Init),
         _LEnv=[bv(sys_entries, Entries_Init)|Env26],
         FnResult =
-         closure(LEnv22, LetResult10, [],  
+         closure(kw_function,LEnv22, LetResult10, [],  
           (get_var(LEnv22, sys_entries, Entries_Get), 
-           cl_car(Entries_Get, Entry_Init), LEnv11=[bv(sys_entry, Entry_Init)|LEnv22], 
+           f_car(Entries_Get, Entry_Init), LEnv11=[bv(sys_entry, Entry_Init)|LEnv22], 
            get_var(LEnv11, sys_entries, Entries_Get15), 
-           cl_cdr(Entries_Get15, Entries), set_var(LEnv11, sys_entries, Entries), 
+           f_cdr(Entries_Get15, Entries), set_var(LEnv11, sys_entries, Entries), 
            get_var(LEnv11, sys_entry, IFTEST), 
            (IFTEST\==[]-> 
-             get_var(LEnv11, sys_entry, Entry_Get19), cl_car(Entry_Get19, Car_Ret), 
-             get_var(LEnv11, sys_entry, Entry_Get20), cl_cdr(Entry_Get20, Cdr_Ret), 
+             get_var(LEnv11, sys_entry, Entry_Get19), f_car(Entry_Get19, Car_Ret), 
+             get_var(LEnv11, sys_entry, Entry_Get20), f_cdr(Entry_Get20, Cdr_Ret), 
              nb_setval('$mv_return', [t, Car_Ret, Cdr_Ret]), LetResult10=t;
                 LetResult10=[]))).
 

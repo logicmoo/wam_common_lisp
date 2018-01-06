@@ -25,9 +25,9 @@ wl:init_args(2,defun).
 % (DEFUN (SETF CAR) ....)
 
 
-%cl_defun(Symbol,FormalParms,FunctionBody,Result):- is_setf_op(Symbol,Accessor),!,cl_defsetf(Accessor,[FormalParms|FunctionBody],Result).
+%f_defun(Symbol,FormalParms,FunctionBody,Result):- is_setf_op(Symbol,Accessor),!,f_defsetf(Accessor,[FormalParms|FunctionBody],Result).
 % DEFUN SYMBOL
-cl_defun(Symbol,FormalParms,FunctionBody,Return):- reenter_lisp(Ctx,Env),compile_defun_ops(Ctx,Env,Return,[defun,Symbol,FormalParms|FunctionBody],Code),cmpout(Code).
+mf_defun(Symbol,FormalParms,FunctionBody,Return):- reenter_lisp(Ctx,Env),compile_defun_ops(Ctx,Env,Return,[defun,Symbol,FormalParms|FunctionBody],Code),cmpout(Code).
 compile_defun_ops(Ctx0,Env,Result,[defun,[setf,Name],FormalParms|FunctionBody], (PushDecl,CODE)):-
   combine_setfs([setf,Name],Symbol),
   PushDecl = assert_lsp(Name,wl:declared(Name,defun_setf(Symbol))),
@@ -36,12 +36,12 @@ compile_defun_ops(Ctx0,Env,Result,[defun,Symbol,FormalParms|FunctionBody], (Code
   duplicate_term(Ctx0,Ctx),Ctx0=Ctx,
   compile_function(Ctx,Env,[Symbol,FormalParms|FunctionBody],_Sym,Function,Code),
   debug_var('DefunResult',Result),
-  FunDef = (set_opv(Function,classof,claz_function),set_opv(Symbol,compile_as,kw_function),set_opv(Symbol,function,Function)),   
+  FunDef = set_opv(Symbol,symbol_function,Function),   
   always((FunDef,Code)).  
 
 % FLET
 wl:init_args(1,flet).
-cl_flet(Inits,Progn,Result):- reenter_lisp(Ctx,Env), compile_defun_ops(Ctx,Env,Result,[flet,Inits|Progn],Code), !, always(Code). 
+f_flet(Inits,Progn,Result):- reenter_lisp(Ctx,Env), compile_defun_ops(Ctx,Env,Result,[flet,Inits|Progn],Code), !, always(Code). 
 compile_defun_ops(Ctx,Env,Result,[flet,FLETS|Progn], (Conj,CompileBody)):- 
     must_maplist(define_each(Ctx,Env,flet),FLETS,FBOUNDS,Decls),
     list_to_conjuncts(Decls,Conj),
@@ -49,17 +49,17 @@ compile_defun_ops(Ctx,Env,Result,[flet,FLETS|Progn], (Conj,CompileBody)):-
 
 % LABELS
 wl:init_args(1,labels).
-cl_labels(Inits,Progn,Result):- reenter_lisp(Ctx,Env),compile_defun_ops(Ctx,Env,Result,[labels,Inits|Progn],Code),always(Code).  
+f_labels(Inits,Progn,Result):- reenter_lisp(Ctx,Env),compile_defun_ops(Ctx,Env,Result,[labels,Inits|Progn],Code),always(Code).  
 compile_defun_ops(Ctx,Env,Result,[labels,LABELS|Progn], (Conj,CompileBody)):-
     must_maplist(define_each(Ctx,Env,labels),LABELS,FBOUNDS,Decls),
     list_to_conjuncts(Decls,Conj),
     must_maplist(add_symbol_fbounds(Ctx,Env),FBOUNDS),
     must_compile_progn(Ctx,Env,Result,Progn, CompileBody).   
 
-% wl:needs_env(cl_special_operator_p).
+% wl:needs_env(f_special_operator_p).
 define_each(Ctx,Env,_LabelsOrFLET,[SymbolName|DEFN],(fbound(Sym)=bound_type(kw_function,UniqueCtxFunction)),CompileBody)  :-    
     combine_setfs(SymbolName,Symbol),
-   (always(foc_operator(Ctx,Env,Symbol,_Len, Function)),suffix_by_context(Ctx,Function,CtxFunction)),
+   (always(foc_operator(Ctx,Env,kw_function,Symbol,_Len, Function)),suffix_by_context(Ctx,Function,CtxFunction)),
    gensym(CtxFunction,UniqueCtxFunction),
    compile_function(Ctx,Env,[Symbol|DEFN],Sym,UniqueCtxFunction,CompileBody).
 
@@ -70,7 +70,7 @@ varuse:attr_unify_hook(_,Other):- trace,var(Other).
 
 compile_function(Ctx,Env,[Symbol,FormalParms|FunctionBody0],Symbol,CtxFunction,CompileBodyOpt):-
 
-   (var(CtxFunction) -> (always(foc_operator(Ctx,Env,Symbol,_Len, Function)),suffix_by_context(Ctx,Function,CtxFunction)); 
+   (var(CtxFunction) -> (always(foc_operator(Ctx,Env,kw_function,Symbol,_Len, Function)),suffix_by_context(Ctx,Function,CtxFunction)); 
      true),
 
    LabelSymbol = '', % LabelSymbol =Symbol 

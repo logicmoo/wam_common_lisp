@@ -44,7 +44,7 @@ wl:setf_inverse(aref,svref).
 setf_inverse_op(Sym,Inv):- setf_inverse_op0(Sym,Inv),!.
 %setf_inverse_op(Sym,Inverse):- setf_inverse_op0(Sym,Inv),listify(Inv,Inverse).
 setf_inverse_op0(Sym,Inverse):- wl:setf_inverse(Sym,Inverse).
-setf_inverse_op0(G,S):- notrace((cl_get(G,sys_setf_inverse,[],S),S\==[])),ground(S),!.
+setf_inverse_op0(G,S):- notrace((f_get(G,sys_setf_inverse,[],S),S\==[])),ground(S),!.
 setf_inverse_op0(Sym,Inverse):- 
    symbol_prefix_and_atom(Sym,FunPkg,Name),
    member(SETPRefix,['setf','set','pf_set']),
@@ -124,12 +124,12 @@ wl:init_args(2,X):- at_least_two_args(X).
 
 combine_setfs(Name0,Name):-atom(Name0),!,Name0=Name.
 combine_setfs([Setf,Name],Combined):- 
-  cl_symbol_package(Name,Pkg),pl_symbol_name(Setf,SetfStr),pl_symbol_name(Name,NameStr),atomics_to_string([SetfStr,NameStr],"-",SETF_STR),
+  f_symbol_package(Name,Pkg),pl_symbol_name(Setf,SetfStr),pl_symbol_name(Name,NameStr),atomics_to_string([SetfStr,NameStr],"-",SETF_STR),
   string_upper(SETF_STR,UPPER_SETF_STR),
-  cl_intern(UPPER_SETF_STR,Pkg,Combined).
+  f_intern(UPPER_SETF_STR,Pkg,Combined).
 
 guess_setfs([Setf,Name],Combined):- 
-  cl_symbol_package(Name,Pkg),pl_symbol_name(Setf,SetfStr),pl_symbol_name(Name,NameStr),atomics_to_string([SetfStr,NameStr],"-",SETF_STR),
+  f_symbol_package(Name,Pkg),pl_symbol_name(Setf,SetfStr),pl_symbol_name(Name,NameStr),atomics_to_string([SetfStr,NameStr],"-",SETF_STR),
   string_upper(SETF_STR,UPPER_SETF_STR),
   package_find_symbol(UPPER_SETF_STR,Pkg,Combined,_IntExt).
 %combine_setfs([setf,Name],Combined):- atomic_list_concat([setf,Name],'_',Combined).
@@ -145,7 +145,7 @@ compile_setfs(_Ctx,_Env,Symbol,[Fun0,Symbol,A2|AMORE],assert_lsp(Symbol,P)):- no
 
 is_setf_or_setq(CL_SETQ):- \+ atom(CL_SETQ),!,fail.
 is_setf_or_setq(CL_SETQ):- is_setf_or_setq0(CL_SETQ),!.
-is_setf_or_setq(CL_SETQ):- atom_concat('cl_',Root,CL_SETQ),!,is_setf_or_setq0(Root).
+is_setf_or_setq(CL_SETQ):- atom_concat('f_',Root,CL_SETQ),!,is_setf_or_setq0(Root).
 is_setf_or_setq0(psetf). is_setf_or_setq0(psetq). is_setf_or_setq0(setf). is_setf_or_setq0(setq).
 
 set_with_prolog_var(Ctx,Env,PSetQ,Var,Result,set_var(Env, Var, Result)):- assertion(is_setf_or_setq(PSetQ)),!,
@@ -178,7 +178,7 @@ compile_accessors(Ctx,Env,Result,[setf, LVar, ValuesForms], Code):- atom(LVar),
      must_compile_body(Ctx,Env,Result,[setf, SET, ValuesForms],Code).
 
 compile_accessors(Ctx,Env,Result,[setf, Place, ValuesForms], (Part1, set_var(Env,Place,Result))):- atom(Place),
-     assertion(is_symbolp(Place)),
+     %assertion(is_symbolp(Place)),
      rw_add(Ctx,Place,w),
      must_compile_body(Ctx,Env,Result,ValuesForms,Part1).
 
@@ -255,7 +255,7 @@ wl:interned_eval_e(
 
 
 %(wl:init_args(2,pushnew)).
-%cl_pushnew(Element, Place, FnResult) :-
+%f_pushnew(Element, Place, FnResult) :-
 
 wl:interned_eval_e(
 '(defmacro my-push (element place)
@@ -265,18 +265,18 @@ wl:interned_eval_e(
              (,new-sym (cons ,el-sym ,place)))
         (setf ,place ,new-sym)))))').
 
-cl_push(Element, Place, FnResult) :-
+f_push(Element, Place, FnResult) :-
         global_env(ReplEnv),
         Env=[bv(u_element, Element), bv(u_place, Place)|ReplEnv],
-        cl_gensym(El_sym_Init),
-        cl_gensym('$ARRAY'([*], claz_base_character, "NEW"), New_sym_Init),
+        f_gensym(El_sym_Init),
+        f_gensym('$ARRAY'([*], claz_base_character, "NEW"), New_sym_Init),
         LEnv=[bv(u_el_sym, El_sym_Init), bv(u_new_sym, New_sym_Init)|Env],
         get_var(LEnv, u_el_sym, El_sym_Get12),
         get_var(LEnv, u_element, Element_Get),
         get_var(LEnv, u_new_sym, New_sym_Get15),
         get_var(LEnv, u_place, Place_Get14),
         [let_xx, [[El_sym_Get12, Element_Get], [New_sym_Get15, [cons, El_sym_Get12, Place_Get14]]], [setf, Place_Get14, New_sym_Get15]]=MFResult,
-        cl_eval(MFResult, FnResult).
+        f_eval(MFResult, FnResult).
 
 
 /*
@@ -301,7 +301,7 @@ f_sys_setf_function_name_p(Name_Param, TrueResult66) :-
                 (   IFTEST40==[]
                 ->  f_ext_pf_cadr(Name_Param, PredArgResult53),
                     (   is_symbolp(PredArgResult53)
-                    ->  cl_car(Name_Param, Is_eq_Param),
+                    ->  f_car(Name_Param, Is_eq_Param),
                         t_or_nil(is_eq(Is_eq_Param, setf), TrueResult),
                         TrueResult66=TrueResult
                     ;   TrueResult66=[]
@@ -345,7 +345,7 @@ plistify([H|T],[H|T]):-!.
 plistify(H,[H]).
 
 wl:plugin_expand_progbody_1st(Ctx,Env,Result,[incf,Symbol|Delta],_PreviousResult,(Code,
- place_op(Env,incf, Symbol, value, CDelta,  Result))):-
+ place_op(Env,incf, Symbol,symbol_value, CDelta,  Result))):-
    compile_each(Ctx,Env,Delta,CDelta,Code).
 
 
@@ -380,12 +380,12 @@ place_extract([Value|Place],Value,Place).
 
 get_place_value(_,[H|_],car,H).
 get_place_value(_,[_|T],cdr,T).
-get_place_value(Env, Obj, value, Value):- atom(Obj),!,get_symbol_value(Env,Obj,Value).
+get_place_value(Env, Obj,symbol_value, Value):- atom(Obj),!,get_symbol_value(Env,Obj,Value).
 get_place_value(_Env, Obj, Place, Value):- get_opv(Obj, Place, Value).
 
-set_place_value(_,Cons,car,H):- is_consp(Cons),!, cl_rplaca(Cons,H,_).
-set_place_value(_,Cons,cdr,T):- is_consp(Cons),!, cl_rplacd(Cons,T,_).
-set_place_value(Env, Obj, value, Value):- atom(Obj),!,set_var(Env,Obj,Value).
+set_place_value(_,Cons,car,H):- is_consp(Cons),!, f_rplaca(Cons,H,_).
+set_place_value(_,Cons,cdr,T):- is_consp(Cons),!, f_rplacd(Cons,T,_).
+set_place_value(Env, Obj,symbol_value, Value):- atom(Obj),!,set_var(Env,Obj,Value).
 set_place_value(_Env, Obj, Place, Value):- set_opv(Obj, Place, Value).
 
 
@@ -398,8 +398,8 @@ with_place_value(Env,OPR,Obj,Type,Place,Value):-
 with_place_value6(_Env,OPR,_Place,[Type,Prop],Type,Obj, Value):- call_opv(OPR,Obj,Prop,Value),!.
 with_place_value6(_Env,OPR, Place,_List,      _Type,Obj, Value):- call_opv(OPR,Obj,Place,Value),!.
 
-call_opv(OPR,[slot_value,Obj,Place],value,Value):- !, call(OPR,Obj,Place,Value).
-call_opv(OPR,[Place,Obj],value,Value):- !, call(OPR,Obj,Place,Value).
+call_opv(OPR,[slot_value,Obj,Place],symbol_value,Value):- !, call(OPR,Obj,Place,Value).
+call_opv(OPR,[Place,Obj],symbol_value,Value):- !, call(OPR,Obj,Place,Value).
 call_opv(OPR,Obj,Place,Value):- !, call(OPR,Obj,Place,Value).
 */
 /*

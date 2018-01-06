@@ -212,8 +212,8 @@ compile_body_form(Ctx,Env,Result,['dolist'|Rest], Code):- !,
   always(compile_dolist(Ctx,Env,Result,['dolist'|Rest], Code)).
 
 wl: init_args(1,dolist).
-wl: declared(cl_dolist,inlined).
-cl_dolist(VarList,FormS,Result):-
+wl: declared(f_dolist,inlined).
+f_dolist(VarList,FormS,Result):-
    compile_dolist(_Ctx,_Env,Result,['dolist',VarList|FormS], Code),
    always(Code).
    
@@ -237,13 +237,13 @@ cl_dolist(VarList,FormS,Result):-
 % =============================================================================
 % VALUES (r1 . rest )
 compile_body_form(Ctx,Env,Result,['values',R1|EvalList], (ArgBody,Body)):-!,
-    expand_arguments(Ctx,Env,funcall,0,[R1|EvalList], ArgBody, [Result|Results]),
+    expand_arguments(Ctx,Env,funcall,0,[Result|Results],[R1|EvalList], ArgBody),
     Body = nb_setval('$mv_return',[Result|Results]).
 compile_body_form(_Ctx,_Env,[],['values'], nb_setval('$mv_return',[])):-!.
 
 :- nb_setval('$mv_return',[]).
 %reset_mv:- b_getval('$mv_return',[V1,_V2|_])->b_setval('$mv_return',[V1]);true.
-cl_values_list([V1|Push],V1):- always(nonvar(Push)),nb_setval('$mv_return',[V1|Push]).
+f_values_list([V1|Push],V1):- always(nonvar(Push)),nb_setval('$mv_return',[V1|Push]).
 
 
 % Macro MULTIPLE-VALUE-BIND
@@ -282,67 +282,12 @@ compile_body_form(_Ctx,Env,[],['#setqFromValues',Vars], setq_from_values(Env,Var
 % =============================================================================
 % EVAL
 % =============================================================================
-compile_body_form(_Ctx,_Env,Result,[eval,Var], cl_eval(Var,Result)):- \+ is_list(Var), !. 
-compile_body_form(_Ctx,_Env,Result,[eval,[A|Var]], cl_eval([A|Var],Result)):- \+ atom(A), !. % NEVER SEEN
-compile_body_form(_Ctx,_Env,Result,[eval,Var], cl_eval(Var,Result)):- !.
+compile_body_form(_Ctx,_Env,Result,[eval,Var], f_eval(Var,Result)):- \+ is_list(Var), !. 
+compile_body_form(_Ctx,_Env,Result,[eval,[A|Var]], f_eval([A|Var],Result)):- \+ atom(A), !. % NEVER SEEN
+compile_body_form(_Ctx,_Env,Result,[eval,Var], f_eval(Var,Result)):- !.
 compile_body_form(Ctx,Env,Result,['eval',Form1],
-  (Body1,cl_eval(Result1,Result))):- !,
+  (Body1,f_eval(Result1,Result))):- !,
    must_compile_body(Ctx,Env,Result1,Form1, Body1).
-
-% =============================================================================
-% = LAMBDA/CLOSURES = 
-% =============================================================================
-
-% (function (lambda ... ))
-compile_body_form(Ctx,_Env,Result,POrSTerm, Body):- p_or_s(POrSTerm,function,[[lambda,LambdaArgs| LambdaBody]]),
-      !,
-      must_compile_closure_body(Ctx,ClosureEnvironment,ClosureResult,[progn|LambdaBody],  ClosureBody),
-      debug_var('LArgs',LambdaArgs),
-      debug_var('LResult',ClosureResult),
-      debug_var('LEnv',ClosureEnvironment),
-   debug_var('Function',Result),
-   Result = closure(ClosureEnvironment,ClosureResult,LambdaArgs,ClosureBody),
-   Body = true.
-
-% (lambda ...)
-compile_body_form(Ctx,Env,Result,[lambda,LambdaArgs|LambdaBody], Body):-
-	!,
-	must_compile_closure_body(Ctx,ClosureEnvironment,ClosureResult,[progn|LambdaBody],  ClosureBody),
-   debug_var('LArgs',LambdaArgs),
-   debug_var('LResult',ClosureResult),
-   debug_var('Lambda',Result),
-   debug_var('ClosureEnvironment',ClosureEnvironment),
-   Body =
-     (Result = closure([ClosureEnvironment|Env],ClosureResult,LambdaArgs,ClosureBody)).
-
-% ((lambda ...) ...)
-compile_body_form(Ctx,_Env,Result,[POrSTerm|ARGS],Body):- 
-   p_or_s(POrSTerm,lambda,[LambdaArgs|LambdaBody]),
-   must_compile_closure_body(Ctx,ClosureEnvironment,ClosureResult,[progn|LambdaBody],  ClosureBody),
-    ClosureResult = Result,debug_var('ClosureEnv',ClosureEnvironment),debug_var('ClosureResult',Result),
-   Body = closure(ClosureEnvironment,ClosureResult,LambdaArgs,ClosureBody,ARGS,Result).
-
-
-% (function .)
-compile_body_form(Ctx,Env,Result,POrSTerm, Pre):- p_or_s(POrSTerm,function,[Symbol]),
-  find_operator_else_function(Ctx,Env,Symbol,Result,Pre).
-
-% ((function .) ...)
-compile_body_form(Ctx,Env,Result,[POrSTerm|ARGS],(Pre,Body)):- p_or_s(POrSTerm,function,[Symbol]),
-  find_operator_else_function(Ctx,Env,Symbol,FResult,Pre),
-  must_compile_body(Ctx,Env,Result,[FResult|ARGS],Body).
-
-% (closure ...)
-compile_body_form(_Ctx,_Env,Result,POrSTerm,Body):- 
-   p_or_s(POrSTerm,closure,[ClosureEnvironment,ClosureResult,LambdaArgs,ClosureBody]),
-   debug_var('Closure',Result),debug_var('ClosureResult',ClosureResult),
-   Body = (Result = closure(ClosureEnvironment,ClosureResult,LambdaArgs,ClosureBody)).
-% ((closure ...) ...)
-compile_body_form(_Ctx,_Env,Result,[POrSTerm|ARGS],Body):- 
-   p_or_s(POrSTerm,closure,[ClosureEnvironment,ClosureResult,LambdaArgs,ClosureBody]),
-    ClosureResult = Result,debug_var('ClosureEnv',ClosureEnvironment),debug_var('ClosureResult',Result),
-   Body = closure(ClosureEnvironment,ClosureResult,LambdaArgs,ClosureBody,ARGS,Result).
-
 
 
 % =============================================================================

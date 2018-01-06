@@ -32,13 +32,13 @@ is_characterp(X):-var(X),!,fail.
 is_characterp('#\\'(V)):- nonvar(V).
 
 is_stringp(X):-var(X),!,fail.
-%is_stringp(X):- string(X),nop(dbginfo(is_stringp(X))).
+% is_stringp(X):- string(X),nop(dbginfo(is_stringp(X))).
 is_stringp('$ARRAY'([_N],claz_base_character,List)):- nonvar(List).
 
 % deduced now
-%cl_stringp(A, R):- t_or_nil(is_stringp(A),R).
+% GROVELED f_stringp(A, R):- t_or_nil(is_stringp(A),R).
 
-cl_string(O,S):- to_prolog_string(O,PLS),to_lisp_string(PLS,S).
+f_string(O,S):- to_prolog_string(O,PLS),to_lisp_string(PLS,S).
 
 to_prolog_string(SS,SS):- notrace(var(SS)),!,break.
 to_prolog_string([],"").
@@ -81,9 +81,9 @@ to_prolog_char((Atom),Char):- name(Atom,[C|Odes]),!,
 
 % SHARED SECTION
 wl:coercion(In, claz_prolog_string, Out):- to_prolog_string(In,Out).
-wl:coercion(In, claz_string, Out):- cl_string(In,Out).
+wl:coercion(In, claz_string, Out):- f_string(In,Out).
 wl:coercion(In, claz_character, Out):- make_character(In,Out).
-wl:coercion(In, claz_string, Out):- cl_string(In,Out).
+wl:coercion(In, claz_string, Out):- f_string(In,Out).
 wl:coercion(In, claz_cons, Out):- functor(In,_F,A),arg(A,In,Out),is_list(Out).
 
 wl:coercion(List, object(_,'$ARRAY'(A1,A2)), '$ARRAY'(A1,A2,List)).
@@ -109,67 +109,67 @@ index_of_first_failure(_,_,_,_,[]).
 
 % string>
 (wl:init_args(2,string_c62)).
-wl:type_checked(cl_string_c62(claz_cons,claz_cons,keys,index)).
-cl_string_c62(X,Y,Keys,R):-
+wl:type_checked(f_string_c62(claz_cons,claz_cons,keys,index)).
+f_string_c62(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_success(Start1,@>,XR,YR,R).
 
 
 % string>=
 (wl:init_args(2,string_c62_c61)).
-wl:type_checked(cl_string_c62_c61(claz_cons,claz_cons,keys,index)).
-cl_string_c62_c61(X,Y,Keys,R):-
+wl:type_checked(f_string_c62_c61(claz_cons,claz_cons,keys,index)).
+f_string_c62_c61(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_success(Start1,@>=,XR,YR,R).
 
 
 % string<
 (wl:init_args(2,string_c60)).
-wl:type_checked(cl_string_c60(claz_cons,claz_cons,keys,index)).
-cl_string_c60(X,Y,Keys,R):-
+wl:type_checked(f_string_c60(claz_cons,claz_cons,keys,index)).
+f_string_c60(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_success(Start1,@<,XR,YR,R).
 
 
 % string<=
 (wl:init_args(2,string_c60_c61)).
-wl:type_checked(cl_string_c60_c61(claz_cons,claz_cons,keys,index)).
-cl_string_c60_c61(X,Y,Keys,R):-
+wl:type_checked(f_string_c60_c61(claz_cons,claz_cons,keys,index)).
+f_string_c60_c61(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_success(Start1,@=<,XR,YR,R).
 
 % string/=
 (wl:init_args(2,string_c47_c61)).
-wl:type_checked(cl_string_c47_c61(claz_cons,claz_cons,keys,index)).
-cl_string_c47_c61(X,Y,Keys,R):-
+wl:type_checked(f_string_c47_c61(claz_cons,claz_cons,keys,index)).
+f_string_c47_c61(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_success(Start1,\==,XR,YR,R).
 
 % string-lessp
 (wl:init_args(2,string_lessp)).
-wl:type_checked(cl_string_lessp(claz_cons,claz_cons,keys,index)).
-cl_string_lessp(X,Y,Keys,R):-
+wl:type_checked(f_string_lessp(claz_cons,claz_cons,keys,index)).
+f_string_lessp(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_success(Start1,char_lessp,XR,YR,R).
 
 % string-not-lessp
 (wl:init_args(2,string_not_lessp)).
-wl:type_checked(cl_string_not_lessp(claz_cons,claz_cons,keys,index)).
-cl_string_not_lessp(X,Y,Keys,R):-
+wl:type_checked(f_string_not_lessp(claz_cons,claz_cons,keys,index)).
+f_string_not_lessp(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_failure(Start1,char_lessp,XR,YR,R).
 
 % string-greaterp
 (wl:init_args(2,string_greaterp)).
-wl:type_checked(cl_string_greaterp(claz_cons,claz_cons,keys,index)).
-cl_string_greaterp(X,Y,Keys,R):-
+wl:type_checked(f_string_greaterp(claz_cons,claz_cons,keys,index)).
+f_string_greaterp(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_success(Start1,char_greaterp,XR,YR,R).
 
 % string-not-greaterp
 (wl:init_args(2,string_not_greaterp)).
-wl:type_checked(cl_string_not_greaterp(claz_cons,claz_cons,keys,index)).
-cl_string_not_greaterp(X,Y,Keys,R):-
+wl:type_checked(f_string_not_greaterp(claz_cons,claz_cons,keys,index)).
+f_string_not_greaterp(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_failure(Start1,char_greaterp,XR,YR,R).
 
@@ -182,9 +182,9 @@ char_exact(X,Y):- to_prolog_char(X,XX),to_prolog_char(Y,YY), XX==YY.
 
 
 % string-equals
-wl:type_checked(cl_string_equals(claz_cons,claz_cons,keys,boolean)).
+wl:type_checked(f_string_equals(claz_cons,claz_cons,keys,boolean)).
 (wl:init_args(2,string_equals)).
-cl_string_equals(X,Y,Keys,R):-
+f_string_equals(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_failure(Start1,char_same,XR,YR,Index),
    t_or_nil(Index==[],R).
@@ -192,16 +192,16 @@ cl_string_equals(X,Y,Keys,R):-
 
 % string-not-equal
 (wl:init_args(2,string_not_equal)).
-wl:type_checked(cl_string_not_equal(claz_cons,claz_cons,keys,index)).
-cl_string_not_equal(X,Y,Keys,R):-
+wl:type_checked(f_string_not_equal(claz_cons,claz_cons,keys,index)).
+f_string_not_equal(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_failure(Start1,char_same,XR,YR,R).
 
 
 % string=
-wl:type_checked(cl_string_c61(claz_cons,claz_cons,keys,boolean)).
+wl:type_checked(f_string_c61(claz_cons,claz_cons,keys,boolean)).
 (wl:init_args(2,string_c61)).
-cl_string_c61(X,Y,Keys,R):-
+f_string_c61(X,Y,Keys,R):-
    range_1_and_2(X,Y,Keys,XR,YR,Start1),
    index_of_first_failure(Start1,char_exact,XR,YR,Index),
    t_or_nil(Index==[],R).
@@ -210,7 +210,7 @@ cl_string_c61(X,Y,Keys,R):-
 %is_string_equal_case_sensitive(X,Y):- to_prolog_string(X,XX),to_prolog_string(Y,YY),XX==YY.
 %is_string_equal_case_insensitive(X,Y):- to_prolog_string(X,XX),to_prolog_string(Y,YY),
 %  (XX==YY-> true ; (string_upper(XX,XXX),string_upper(YY,YYY),XXX==YYY)).
-cl_char(String,Index,Char):-cl_aref(String,[Index],Char).
+f_char(String,Index,Char):-f_aref(String,[Index],Char).
   
 
 

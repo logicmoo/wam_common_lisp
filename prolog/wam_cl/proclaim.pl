@@ -16,12 +16,12 @@
 :- set_module(class(library)).
 :- include('header').
 
-cl_declare(_,_).
-cl_proclaim(Assert,t):- assert(is_proclaimed(Assert)).
+f_declare(_,_).
+f_proclaim(Assert,t):- assert(is_proclaimed(Assert)).
 
-cl_sxhash(O,H):- term_hash(O,H).
+f_sxhash(O,H):- term_hash(O,H).
 
-:- cl_intern("PSXHASH",pkg_sys,_).
+:- f_intern("PSXHASH",pkg_sys,_).
 f_sys_psxhash(O,H):- f_u_to_pvs(O,HT),term_hash(HT,H).
 %f_u_psxhash(O,H):-f_sys_psxhash(O,H).
 
@@ -37,13 +37,13 @@ set_proclamation(O,P,V):- atom_concat(P,'_proclaimed',PP), set_opv(O,PP,V).
 
 wl:init_args(3,deftype).
 wl:interned_eval("(sys:set-opv `cl:deftype :compile-as :operator)").
-cl_deftype(Name,Lambda,Doc,Test,NameO):- set_opv(Name,typedoc,Doc),cl_deftype(Name,Lambda,Test,NameO).
-cl_deftype(Name,Lambda,Test,NameO):- store_meta_info(set_deftype,Name,Lambda,Test,[],NameO).
+f_deftype(Name,Lambda,Doc,Test,NameO):- set_opv(Name,typedoc,Doc),f_deftype(Name,Lambda,Test,NameO).
+f_deftype(Name,Lambda,Test,NameO):- store_meta_info(set_deftype,Name,Lambda,Test,[],NameO).
 set_deftype(O,P,V):- atom_concat(P,'_deftype',PP), set_opv(O,PP,V).
 
 
-cl_defsetf(Get,Set,[],Res):- trace,
-   cl_defsetf(Get,Set,Res),!.
+f_defsetf(Get,Set,[],Res):- trace,
+   f_defsetf(Get,Set,Res),!.
 
 wl:init_args(3,sys_defknown).
 wl:interned_eval("(sys:set-opv `SYS:defknown :compile-as :operator)").

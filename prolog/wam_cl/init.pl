@@ -22,7 +22,7 @@
 :- set_prolog_flag(toplevel_print_anon,true).
 :- set_prolog_flag(last_call_optimisation,false).
 :- set_prolog_flag(lisp_verbose,1).
-:- set_prolog_flag(lisp_autointern,true).
+:- set_prolog_flag(lisp_primordial,true).
 :- set_prolog_flag(lisp_markdown,false).
 :- set_prolog_flag(lisp_exe,[]).
 :- set_prolog_flag(lisp_main,[]).
@@ -113,7 +113,7 @@ handle_all_os_program_args(ARGV):-
 
 handle_all_program_args([N,V|More]):- handle_1program_arg(N=V),!,handle_all_program_args(More).
 handle_all_program_args([N|More]):- handle_1program_arg(N),!,handle_all_program_args(More).
-handle_all_program_args([N|More]):- exists_file(N),imply_flag(verbose,0),imply_interactive(false),!,do_after_load(((set_program_args(More),cl_load(N,_)))).
+handle_all_program_args([N|More]):- exists_file(N),imply_flag(verbose,0),imply_interactive(false),!,do_after_load(((set_program_args(More),f_load(N,_)))).
 handle_all_program_args(More):- do_after_load(((set_program_args(More)))).
 
 set_program_args(More):- maplist(to_lisp_string,More,List),set_var(ext_xx_args_xx,List).
@@ -133,13 +133,13 @@ handle_1program_arg(N):- handle_program_args(_,N),!.
 % helpfull
 handle_program_args('--help','-?'):- listing(handle_program_args),show_help,imply_interactive(false).
 handle_program_args('--debug','-debug'):- nop(pl_pushnew(xx_features_xx,kw_debugger)),set_lisp_option(debug).
-handle_program_args('--package','-p',Package):- do_after_load(cl_in_package(Package)).
+handle_program_args('--package','-p',Package):- do_after_load(f_in_package(Package)).
 handle_program_args('--quiet','--silent'):- set_lisp_option(quiet).
 
 % compiler
 handle_program_args('--exe','-o',File):- set_prolog_flag(lisp_exe,File),imply_interactive(false).
 handle_program_args('--main','-main',Main):- set_prolog_flag(lisp_main,Main),imply_interactive(false).
-handle_program_args('--compile','-c',File):- do_after_load(cl_compile_file(File,[],_)),imply_interactive(false).
+handle_program_args('--compile','-c',File):- do_after_load(f_compile_file(File,[],_)),imply_interactive(false).
 handle_program_args('--l','-l',File):- do_after_load(pl_load(File,[],_)),imply_interactive(false).
 handle_program_args('--quit','-quit'):- set_interactive(false).
 
@@ -154,7 +154,7 @@ handle_program_args('--test','--markdown'):- set_prolog_flag(lisp_markdown,true)
 % incomplete 
 handle_program_args('--ansi','-ansi'):- pl_pushnew(xx_features_xx,kw_ansi).
 
-pl_pushnew(Symbol,Item):- cl_symbol_value(Symbol,Old),cl_adjoin(Item,Old,[],New),f_sys_set_symbol_value(Symbol,New).
+pl_pushnew(Symbol,Item):- f_symbol_value(Symbol,Old),f_adjoin(Item,Old,[],New),f_sys_set_symbol_value(Symbol,New).
 
 tidy_database:-
         reset_env,
@@ -179,10 +179,10 @@ primordial_init:-
  set_prolog_flag(wamcl_init_level,1),
  always((
   % allows "PACKAGE:SYM" to be created on demand (could this be an initials a default)  
-  set_opv(xx_package_xx, value, pkg_sys),
+  set_opv(xx_package_xx,symbol_value, pkg_sys),
   ensure_env,
-  set_opv(xx_package_xx,value,pkg_sys),
-  set_prolog_flag(lisp_autointern,true),
+  set_opv(xx_package_xx,symbol_value,pkg_sys),
+  set_prolog_flag(lisp_primordial,true),
   current_prolog_flag(os_argv,Y),handle_all_os_program_args(Y),
   clear_op_buffer,  
   set_prolog_flag(wamcl_init_level,2),
@@ -196,7 +196,7 @@ do_wamcl_inits:-
   primordial_init,
   set_prolog_flag(wamcl_init_level,6),
   clear_op_buffer,
-  set_opv(xx_package_xx,value,pkg_user),
+  set_opv(xx_package_xx,symbol_value,pkg_user),
   set_prolog_flag(wamcl_init_level,7).
 
 % program inits
@@ -274,7 +274,7 @@ $ swipl -x wamcl.prc
 
 ').
 
-:- set_opv(xx_package_xx,value,pkg_sys).
+:- set_opv(xx_package_xx,symbol_value,pkg_sys).
 
 :- fixup_exports.
 

@@ -32,16 +32,16 @@
 
 t_or_nil(G,Ret):- G->Ret=t;Ret=[].
 
-cl_not(Obj,Ret):- t_or_nil(Obj == [] , Ret).
+f_not(Obj,Ret):- t_or_nil(Obj == [] , Ret).
 
-cl_eq(A,B,Ret):- t_or_nil( is_eq(A,B) , Ret).
-cl_eql(A,B,Ret):- t_or_nil( is_eql(A,B) , Ret).
-cl_equal(A,B,Ret):- t_or_nil( is_equal(A,B) , Ret).
-cl_equalp(A,B,Ret):- t_or_nil( is_equalp(A,B) , Ret).
+f_eq(A,B,Ret):- t_or_nil( is_eq(A,B) , Ret).
+f_eql(A,B,Ret):- t_or_nil( is_eql(A,B) , Ret).
+f_equal(A,B,Ret):- t_or_nil( is_equal(A,B) , Ret).
+f_equalp(A,B,Ret):- t_or_nil( is_equalp(A,B) , Ret).
 equal(A,B,Ret):- t_or_nil( is_equal(A,B) , Ret).
 
 
-is_eql(X,Y):- is_eq(X,Y)->true;cl_type_of(X,T),cl_type_of(Y,T), notrace(catch(X=:=Y,_,fail)).
+is_eql(X,Y):- is_eq(X,Y)->true;f_type_of(X,T),f_type_of(Y,T), notrace(catch(X=:=Y,_,fail)).
 is_eq(X,Y):- same_term(X,Y).
 % is_eq(X,Y):- X==Y, (\+ compound(X)-> true ; \+ \+ ((gensym(cookie,Cook),setarg(1,X,Cook),X==Y))).
 is_equal(X,Y):- (X=@=Y->true;is_eql(X,Y)).
@@ -68,7 +68,7 @@ every([Head|Tail], Pred) :-
 
 
 show_special:-
-		setof(Var=Value, get_opv_iii(Var, value, Value), SVs)
+		setof(Var=Value, get_opv_iiii(Var,symbol_value, Value), SVs)
 	->	writef('Variable \tValue\n\n'),
 		every(SVs, [(Var2 = Value2)]^(writef('%t :\t%t\n',[Var2, Value2])))
 	;	writef('No special variables\n').

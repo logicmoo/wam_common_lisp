@@ -88,15 +88,15 @@ lisplist([X|Xs],EQ) --> sexpr1(X), !, lisplist(Xs,EQ).
 lisplist(X,EQ) --> ['.'], sexpr1(X), [EQ].
 
 wl:init_args(0,format).
-cl_format([Stream,Fmt],t):- !, cl_print(cl_format(Stream,Fmt),_).
-cl_format([Stream,Fmt|ArgS],t):-cl_print(cl_format(Stream,Fmt,ArgS),_).
+f_format([Stream,Fmt],t):- !, f_print(f_format(Stream,Fmt),_).
+f_format([Stream,Fmt|ArgS],t):-f_print(f_format(Stream,Fmt,ArgS),_).
 
-cl_prin1(X,X):- quietly((copy_term(X,Y),writeExpression(Y))).
-cl_princ(X,X):- is_stringp(X),!,to_prolog_string(X,S),write(S).
-cl_princ(X,X):- copy_term(X,Y),writeExpression(Y),nl.
-cl_print(X,X):-quietly((cl_prin1(X,X))),nl.
-cl_terpri(t):-nl.
-cl_write_line(X,Y):-cl_princ(X,Y),nl.
+f_prin1(X,X):- quietly((copy_term(X,Y),writeExpression(Y))).
+f_princ(X,X):- is_stringp(X),!,to_prolog_string(X,S),write(S).
+f_princ(X,X):- copy_term(X,Y),writeExpression(Y),nl.
+f_print(X,X):-quietly((f_prin1(X,X))),nl.
+f_terpri(t):-nl.
+f_write_line(X,Y):-f_princ(X,Y),nl.
 
 % writeExpression/1 displays a lisp expression
 writeExpression(X):- notrace(writeExpression0(X)).

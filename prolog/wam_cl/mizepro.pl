@@ -202,7 +202,7 @@ del_attrs_of(CodeIn,Name):- term_variables(CodeIn,AttVars),maplist(del_attr_rev2
 sanitize_true(_, C1,C2):- \+ compound(C1),!,C2=C1.
 sanitize_true(_, C1,C2):- non_compound_code(C1),!,C2=C1.
 sanitize_true(_,f_clos_pf_set_slot_value(A,B,C,D),set_slot(A,B,C)):-C=D.
-sanitize_true(_,cl_slot_value(A,B,C),get_opv(A,B,C)).
+sanitize_true(_,f_slot_value(A,B,C),get_opv(A,B,C)).
 sanitize_true(Ctx,(C1,C2),Joined):-!,sanitize_true(Ctx,C1,C1O),sanitize_true(Ctx,C2,C2O),conjoin_0(Ctx,C1O,C2O,Joined).
 sanitize_true(Ctx,(C2 ; CodeC),( C2O ; CodeCCO)):-!,sanitize_true(Ctx,C2,C2O),sanitize_true(Ctx,CodeC,CodeCCO).
 sanitize_true(Ctx,(C2 -> CodeC),( C2O -> CodeCCO)):-!,sanitize_true(Ctx,C2,C2O),sanitize_true(Ctx,CodeC,CodeCCO).
@@ -319,7 +319,7 @@ mize_body_1e(_Ctx,_,C1,C1):- non_compound_code(C1),!.
 mize_body_1e(_Ctx,_,C1,C2):- idiom_replace(C1,C2).
 mize_body_1e(_Ctx,_F,(A=B),true):- A==B,allowed_level(1),!.
 mize_body_1e(_Ctx,_F,(A==B),true):- A==B,allowed_level(1),!.
-mize_body_1e(_Ctx,_,cl_list(G, R),R=G):- allowed_level(1),!.
+mize_body_1e(_Ctx,_,f_list(G, R),R=G):- allowed_level(1),!.
 mize_body_1e(_Ctx,_,C1,L=[R]):- structure_applies(C1 , (L=[R, []])). % wam_cl_option(elim_vars,true).
 
 mize_body_1e(Ctx,F,(C1,C2,C4),C5):- conjoinment(Ctx,C1,C2,C3),!,mize_body_1e(Ctx,F,(C3,C4),C5).
@@ -510,10 +510,10 @@ simple_inline(In,_Out):- \+ compound(In),!,fail.
 simple_inline(set_var(E, OP, N, V),set_var(E, N, V)):- atom(N),atom(OP),memberchk(OP,[psetq,setq]).
 simple_inline(set_place(E, OP, N, V),set_var(E, N, V)):- var(V), atom(N),atom(OP),memberchk(OP,[psetq,setq]).
 %simple_inline(set_var(E, OP, [PLACE, N], V),set_place(E, OP, [PLACE, N], V)):- var(V), atom(N),atom(OP),memberchk(OP,[setf]).
-simple_inline(cl_list(A,B),B=A).
+simple_inline(f_list(A,B),B=A).
 simple_inline(f_clos_pf_set_slot_value(A,B,C,D),set_slot(A,B,C)):-C=D.
-simple_inline(cl_cdr(I,O),(I==[]->O=[];I=[_|O])):- wam_cl_option(debug,0).
-simple_inline(cl_car(I,O),(I==[]->O=[];I=[O|_])):- wam_cl_option(debug,0).
+simple_inline(f_cdr(I,O),(I==[]->O=[];I=[_|O])):- wam_cl_option(debug,0).
+simple_inline(f_car(I,O),(I==[]->O=[];I=[O|_])):- wam_cl_option(debug,0).
 list_to_disj([C1],(C1O)):-!, list_to_disj(C1,C1O).
 list_to_disj([C1,C2],(C1O;C2O)):-!, list_to_disj(C1,C1O),list_to_disj(C2,C2O).
 list_to_disj([C1|C2],(C1O;C2O)):-!, list_to_disj(C1,C1O),list_to_disj(C2,C2O).
@@ -542,8 +542,8 @@ always_inline(P):- compound(P),functor(P,F,A),always_inline_fa(F,A).
 always_inline_fa(F,1):- atom_concat_or_rtrace('addr_tagbody_',M,F),atom_contains(M,'_addr_enter_').
 always_inline_fa(F,1):- atom_concat_or_rtrace('addr_tagbody_',_,F), functor(P,F,1), \+ clause_calls_self(P).
 always_inline_fa(F,_):- atom_concat_or_rtrace(_,'expand1',F).
-always_inline_fa(F,_):- atom_concat_or_rtrace('cl_c',M,F),atom_concat_or_rtrace(_,'ar',M).
-always_inline_fa(F,_):- atom_concat_or_rtrace('cl_c',M,F),atom_concat_or_rtrace(_,'dr',M).
+always_inline_fa(F,_):- atom_concat_or_rtrace('f_c',M,F),atom_concat_or_rtrace(_,'ar',M).
+always_inline_fa(F,_):- atom_concat_or_rtrace('f_c',M,F),atom_concat_or_rtrace(_,'dr',M).
 
 %maybe_inline(_):-!,fail.
 maybe_inline(_):- \+ (wam_cl_option(safe(inline),true);wam_cl_option(inline,true)),!,fail.
@@ -551,7 +551,7 @@ maybe_inline(C1):- never_inline(C1),!,fail.
 maybe_inline(C1):- \+ predicate_property(C1,number_of_clauses(1)),!,fail.
 maybe_inline(C1):- clause_has_cuts(C1),!,fail.
 maybe_inline(C1):- wam_cl_option(safe(inline),true), always_inline(C1),!. 
-maybe_inline(C1):- wam_cl_option(inline,true), functor(C1,F,_),!, \+ atom_concat_or_rtrace('cl_',_,F).
+maybe_inline(C1):- \+ predicate_property(C1,dynamic),!,fail.
 
 clause_has_cuts(P):- clause_interface(P,I),contains_var(!,I).
 clause_calls_self(P):- clause_interface(P,I),functor(P,F,A),functor(C,F,A),contains_term(E,I),compound(E),E=C.
@@ -584,7 +584,7 @@ mize_prolog_code1(maplist(_,[]),true).
 mize_prolog_code1(maplist(P,[X]),call(P,X)).
 mize_prolog_code1(call(F,A),Out):- atom(F),Out=..[F,A].
 
-wcl:- profile(cl_compile_file('$ARRAY'([*], claz_base_character, "wam-cl-init-1"))).
+wcl:- profile(f_compile_file('$ARRAY'([*], claz_base_character, "wam-cl-init-1"))).
 
 :- fixup_exports.
 

@@ -50,7 +50,7 @@ deflexical(Env,defparameter, Var, Result):-
    set_var(Env,Var,Result).
 
 deflexical(_Env,defvar, Var, Result):-   
-   (get_opv(Var, value, _) -> true ; update_opv(Var, value, Result)),
+   (get_opv(Var,symbol_value, _) -> true ; update_opv(Var,symbol_value, Result)),
    set_opv(Var,declared_as,defvar).
 
 deflexical(Env,setq, Var, Result):- !, set_var(Env,Var,Result).
@@ -91,7 +91,7 @@ compile_symbol_getter(Ctx,Env,Value, Var, Body):-  always((atom(Var),!,
 
 compile_symbol_setter(Ctx,Env,Result,[SetQ, Var, ValueForm, StringL], (Code,Body)):- 
         is_stringp(StringL),to_prolog_string(StringL,String),is_def_maybe_docs(SetQ),
-        (atom(Var)->cl_symbol_package(Var,Package);reading_package(Package)),
+        (atom(Var)->f_symbol_package(Var,Package);reading_package(Package)),
         Code = assert_lsp(Var,doc:doc_string(Var,Package,variable,String)),
 	!, must_compile_body(Ctx,Env,Result,[SetQ, Var, ValueForm], Body).
 
@@ -127,8 +127,8 @@ symbol_value_or(Env,Var,G,Value):-
 
 symbol_value0(Env,Var,Value):-  bvof(bv(Var, Value),_,Env).
 symbol_value0(_Env,Var,_Value):- notrace((nonvar(Var),is_functionp(Var),dbginfo(is_functionp(Var)))),!,lisp_dump_break.
-symbol_value0(_Env,Var,Result):- get_opv(Var, value, Result),!.
-symbol_value0(_Env,Var,Result):- atom(Var),get_opv(Var,value,Result),!.
+symbol_value0(_Env,Var,Result):- get_opv(Var,symbol_value, Result),!.
+symbol_value0(_Env,Var,Result):- atom(Var),get_opv(Var,symbol_value,Result),!.
 symbol_value0(Env,[Place,Obj],Result):- trace, set_place(Env,getf,[Place,Obj],[],Result).
 
 
@@ -152,18 +152,18 @@ set_var(Env,Var,Result):- % ensure_env(Env),!,
      (bvof(bv(Var,_),BV,Env)
       -> nb_setarg(2,BV,Result)
       ;	( 
-        (get_opv(Var, value, _Old) 
-           -> update_opv(Var, value, Result) 
+        (get_opv(Var,symbol_value, _Old) 
+           -> update_opv(Var,symbol_value, Result) 
            ; set_symbol_value_last_chance(Env,Var,Result)))).
 
 %set_symbol_value_last_chance(_Env,Var,Result):- nb_current(Var,_)-> nb_setval(Var,Result),!.
 %set_symbol_value_last_chance(Env,Var,Result):- add_to_env(Env,Var,Result),!.
-set_symbol_value_last_chance(_Env,Var,Result):- set_opv(Var, value, Result),!.
+set_symbol_value_last_chance(_Env,Var,Result):- set_opv(Var,symbol_value, Result),!.
 set_symbol_value_last_chance(_Env,Var,_Result):- 
   lisp_error_description(atom_does_not_exist, ErrNo, _),throw(ErrNo, Var).
 
 
-cl_defparameter(Var, Result, Result):- 
+f_defparameter(Var, Result, Result):- 
    set_opv(Var,declared_as,defparameter),
    set_var(_Env,Var,Result).
 
@@ -210,7 +210,7 @@ compile_let(Ctx,Env,Result,[LET, NewBindingsIn| BodyForms], Body):- !,
         
         must_maplist(normalize_let1,NewBindingsIn,NewBindings),
 	zip_with(Variables, ValueForms, [Variable, Form, [bind, Variable, Form]]^true, NewBindings),
-	expand_arguments(Ctx,Env,'funcall',1,ValueForms, VarInitCode, Values),
+	expand_arguments(Ctx,Env,'funcall',1,Values,ValueForms,VarInitCode),
 
         zip_with(Variables, Values, [Var, Value, BV]^make_letvar(LET,Var,Value,BV),Bindings),
 
@@ -247,10 +247,10 @@ maybe_specials_in_body(SpecialBindings,BodyFormsBody,SpecialBody):-
    SpecialBody = (PreCode, BodyFormsBody, PostCode). 
     % Some SAFE specials -> SpecialBody = setup_call_cleanup(PreCode, BodyFormsBody, PostCode).
 
-is_special_var(Var):- atom(Var),!,get_opv_i(Var,value,_).
+is_special_var(Var):- atom(Var),!,get_opv_i(Var,symbol_value,_).
 
 make_letvar(ext_letf,Place,Value,place(Place,Value,_OldValue)):- is_list(Place).
-make_letvar(_,Var,Value,sv(Var,Value,value,_OldValue)):- is_special_var(Var),!.
+make_letvar(_,Var,Value,sv(Var,Value,symbol_value,_OldValue)):- is_special_var(Var),!.
 make_letvar(_,Var,Value,bv(Var,Value)).
 %make_letvar(_,Var,Value,vv(Var,Value)).
 

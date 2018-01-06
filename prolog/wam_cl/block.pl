@@ -63,10 +63,10 @@ wl:plugin_expand_progbody(Ctx,Env,Result,InstrS,_PreviousResult,Code):-
       repeat,
         get_var(BlockExitEnv, u_temp_var, U_temp_var_Get),
         (   U_temp_var_Get>3
-        ->  cl_print(kw_done, Print_Ret),
+        ->  f_print(kw_done, Print_Ret),
             throw(block_exit([], Print_Ret)),
             _rPrevRes115=Print_Ret
-        ;   cl_print(U_temp_var_Get, Print_Ret46),
+        ;   f_print(U_temp_var_Get, Print_Ret46),
             '1+'(U_temp_var_Get, D1_c43_Ret),
             set_var(BlockExitEnv, u_temp_var, D1_c43_Ret),
             fail,

@@ -68,7 +68,7 @@ if_op_2_then_test(OP,PRED):-
   clause_interface(PFUN,t_or_nil(PPRED,Ret)),
   PPRED=..[PRED,AA1,AA2],
   RET==Ret,AA1==A1,AA2==A2.
-%cl_eq(A,B,Ret):- t_or_nil( is_eq(A,B) , Ret).
+%f_eq(A,B,Ret):- t_or_nil( is_eq(A,B) , Ret).
 compile_test_body(Ctx,Env,Unused,[OP,Arg1,Arg2],(Arg1Body,Arg2Body),PredBody):- if_op_2_then_test(OP,Pred),
    must_compile_body(Ctx,Env,Arg1Result,Arg1,Arg1Body),
    must_compile_body(Ctx,Env,Arg2Result,Arg2,Arg2Body),

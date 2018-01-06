@@ -32,7 +32,7 @@
 repl:- 
  in_md(cl,(
    lisp_banner,   
-   set_prolog_flag(lisp_autointern,false), % requires  "PACKAGE:SYM" to already externally exists
+   set_prolog_flag(lisp_primordial,false), % requires  "PACKAGE:SYM" to already externally exists
    with_prompt_str('> ',
    ((	repeat,
         catch(read_eval_print(Result),'$aborted',fail),
@@ -229,7 +229,7 @@ eval_repl_atom(noltrace, t):- set_prolog_flag(lisp_trace,false),nodebug(lisp(tra
 eval_repl_atom(debug, t):- debug(lisp(_)),debug,debugging.
 eval_repl_atom(nodebug, t):- nodebug(lisp(_)),nodebug,debugging.
 
-%eval_repl_atom(make, O):- !, always((make, cl_compile_file_mask(pack('wam_commmon_lisp/prolog/wam_cl/lisp/'),keys([]),O))).
+%eval_repl_atom(make, O):- !, always((make, f_compile_file_mask(pack('wam_commmon_lisp/prolog/wam_cl/lisp/'),keys([]),O))).
 
 eval_repl_atom(UC, R):- atom(UC),downcase_atom(UC,DC),DC\==UC,eval_repl_atom(DC, R).
 
@@ -239,7 +239,7 @@ eval_repl_atom(show, t):-
         user:macro_lambda/5,
         user:function_lambda/4]).
 
-lw:- cl_load("wam-cl-params",_).
+lw:- f_load("wam-cl-params",_).
 %:- cddd.
 % invoke_eval(['in-package', "SYSTEM"], In_package_Ret):
 %lisp_add_history("prolog.")
