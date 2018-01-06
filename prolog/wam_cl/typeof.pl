@@ -16,7 +16,7 @@
 
 :- include('header').
 
-f_class_of(Obj,Class):- i_class(Obj,Class),!.
+f_class_of(Obj,Class):- quietly(i_class(Obj,Class0)),!,Class=Class0.
 
 :- user:use_module(library('dialect/sicstus/arrays'),[is_array/1]).
 % :- use_module(library('dialect/sicstus')).
@@ -37,24 +37,28 @@ i_class(Var,Class):-attvar(Var),get_attr(Var,classof,Class).
 i_class(Var,claz_locative):-var(Var).
 %i_class(symbol, claz_symbol):-!.
 % compounds
-i_class(function(OP),Class):- get_opv(OP,symbol_function,Obj),f_class_of(Obj,Class).
+i_class(function(OP),Class):- atom(OP),get_opv(OP,symbol_function,Obj),f_class_of(Obj,Class).
 i_class([_|_],claz_cons):-!.
-i_class(X,claz_package):- is_packagep(X),!.
 i_class('$OBJ'(Type,_Data),Type).
 i_class('#\\'(_),claz_character).
 i_class('$COMPLEX'(_,_),claz_complex).
 i_class('$NUMBER'(Type,_),Type).
-% atomics
-i_class([],claz_null):-!.
 i_class(Str,claz_string):- is_stringp(Str).
+i_class(function(_),claz_function).
+% atomics
+i_class(X,claz_package):- is_packagep(X),!.
+i_class([],claz_null):-!.
 i_class(t,claz_symbol).
-i_class(Dict,Type):- is_dict(Dict,Type).
+i_class(symbol,claz_symbol).
+i_class(Dict,Class):- is_dict(Dict,Class).
 i_class(Number,claz_integer):- integer(Number).
 i_class(Number,claz_float):- float(Number).
-i_class(Atom,Kind):- atom(Atom),atomic_list_concat([Type,_Name],'_znst_',Atom),atom_concat_or_rtrace('claz_',Type,Kind).
-i_class(Obj,Type):- get_opv_iiii(Obj,classof,Type).
-i_class(function(_),claz_function).
+i_class(Obj,Class):- get_opv_iiii(Obj,classof,Class).
+i_class(Obj,Class):- get_opv_iiii(Obj,type_of,Type),always_find_class(Type,Class).
+i_class(Atom,Class):- atom(Atom),atomic_list_concat([Type,_Name],'_znst_',Atom),always_find_class(Type,Class).
 
+always_find_class(Type,Class):- find_class(Type,Class),!.
+always_find_class(Type,Class):- atom_concat_or_rtrace('claz_',Type,Class).
 
 i_type(Var,sys_locative):-var(Var).
 i_type(Obj,Type):- atom(Obj),!,a_type(Obj,Type),!.

@@ -21,8 +21,8 @@
 :- set_module(class(library)).
 
 wl:declared(f_special_operator_p,needs_env).
-f_special_operator_p(Env,Obj,RetVal):- t_or_nil(is_lisp_operator(_,Env,Obj),RetVal).
-f_special_operator_p(Obj,RetVal):- t_or_nil(is_lisp_operator(Obj),RetVal).
+f_special_operator_p(Env,Obj,RetVal):- t_or_nil(is_special_operator_p(Env,Obj),RetVal).
+f_special_operator_p(Obj,RetVal):- t_or_nil(is_special_operator_p(Obj),RetVal).
 
 is_special_operator_p(Env,Obj):- is_lisp_operator(_,Env,Obj).
 is_special_operator_p(Obj):- is_lisp_operator(_,_,Obj).
@@ -140,17 +140,25 @@ foc_operator(Ctx,_Env,BindType,FN, _Len, ProposedName):- generate_function_or_ma
 
 
 existing_operator(Ctx,Env,BindType,FN, _Len, ProposedName):-  show_success(get_symbol_fbounds(Ctx,Env,FN,BindType,ProposedName)),!.
-existing_operator(_Ctx,_Env,kw_function,FN,_Len, ProposedName):- get_opv(FN,symbol_function,ProposedName),!.
-existing_operator(_Ctx,_Env,kw_special,FN,_Len, ProposedName):- get_opv(FN,symbol_function,ProposedName),!.
-existing_operator(_Ctx,_Env,kw_macro,FN,_Len, ProposedName):- get_opv(FN,symbol_function,ProposedName),!.
+
+existing_operator(_Ctx,_Env,kw_function,FN,_Len, ProposedName):- get_opv(FN,symbol_function,ProposedName),
+   (latom_starts_with(ProposedName,'f_');latom_starts_with(ProposedName,'sf_')).
+existing_operator(_Ctx,_Env,kw_special,FN,_Len, ProposedName):- get_opv(FN,symbol_function,ProposedName),
+   (latom_starts_with(ProposedName,'f_');latom_starts_with(ProposedName,'sf_')).
+existing_operator(_Ctx,_Env,kw_macro,FN,_Len, ProposedName):- get_opv(FN,symbol_function,ProposedName),
+   (latom_starts_with(ProposedName,'mf_')).
+
 existing_operator(_Ctx,_Env,_,FN,_Len, ProposedName):- get_opv(FN,symbol_function,ProposedName),!.
 
 existing_operator(_Ctx,_Env,kw_function,FN,ArgsLen, ProposedName):- atom(FN),upcase_atom(FN,FN),
   (number(ArgsLen)-> Arity is ArgsLen+1; between(1,5,Arity)),is_defined(FN,Arity),ProposedName=FN.
-%existing_operator(_Ctx,_Env,kw_macro,FN,ArgsLen, ProposedName):- atom(FN),upcase_atom(FN,FN),
+%existing_operator(_Ctx,_Env,kw_macro,FN,ArgsLen, ProposedName):- atom(FN),upcase_atom(FN,FN),                           
 %  (number(ArgsLen)-> Arity is ArgsLen+1; between(1,5,Arity)),is_defined(FN,Arity),ProposedName=FN.
 %existing_operator(_Ctx,_Env,_BindType,FN,_ArgLen, ProposedName):-some_defined_function_or_macro(FN,2,['mf_'],ProposedName),!.
 existing_operator(_Ctx,_Env,_BindType,FN,ArgLen, ProposedName):-some_defined_function_or_macro(FN,ArgLen,['sf_','f_'],ProposedName),!. % 'mf_'
+
+latom_starts_with(ProposedName,Start):- atom(ProposedName),atom_concat(Start,_,ProposedName).
+
 
 
 generate_function_or_macro_name(Ctx,FN,BindType,NewProposedName):-

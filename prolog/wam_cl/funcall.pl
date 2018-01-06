@@ -102,7 +102,20 @@ compile_funop(Ctx,Env,Result,[apply, FN, FunctionArgs], Body):-
 compile_funop(Ctx,Env,Result,[FN| FunctionArgs], Body):- \+ is_list(FunctionArgs),trace,
      compile_funop(Ctx,Env,Result,[apply, [quote, FN], [list|FunctionArgs]], Body).
 
-compile_funop(Ctx,CallEnv,Result,[FN | FunctionArgs], Body):-
+
+% Special Operator
+compile_funop(Ctx,CallEnv,Result,[FN | FunctionArgs], Body):-  is_lisp_operator(Ctx,CallEnv,FN),!,      
+      compile_apply(Ctx,CallEnv,FN,FunctionArgs,Result,ExpandedFunction),
+      Body = (ExpandedFunction).
+
+% Macro
+compile_funop(Ctx,CallEnv,Result,[FN | FunctionArgs], Body):-  is_lisp_operator(Ctx,CallEnv,FN),!,      
+      compile_apply(Ctx,CallEnv,FN,FunctionArgs,Result,ExpandedFunction),
+      Body = (ExpandedFunction).
+
+
+% NORMAL CALL
+compile_funop(Ctx,CallEnv,Result,[FN | FunctionArgs], Body):- 
       expand_arguments_maybe_macro(Ctx,CallEnv,FN,0,[FNC|Args],[FN|FunctionArgs],ArgsBody),
       compile_apply(Ctx,CallEnv,FNC,Args,Result,ExpandedFunction),
       Body = (ArgsBody,ExpandedFunction).
@@ -110,43 +123,67 @@ compile_funop(Ctx,CallEnv,Result,[FN | FunctionArgs], Body):-
 % TODO- HOW DID WE GET HERE?
 compile_funop(_Ctx,_Env,Result,[FN | FunctionArgs],f_eval([FN|FunctionArgs],Result)). 
 
+check_foc_operator(Ctx,Env,BindType,F,Args,BetterName):-
+   foc_operator(Ctx,Env,BindType,F,Args,ProposedName),
+   do_check_foc_operator(Ctx,Env,BindType,F,Args,ProposedName, BetterName),!.
+
+
+do_check_foc_operator(_Ctx,_Env,_BindType,_F,_Args,ProposedName, BetterName):-   
+   current_predicate(ProposedName/N),N>1,!,ProposedName= BetterName.
+
+do_check_foc_operator(_Ctx,_Env,_BindType,_F,_Args,ProposedName, BetterName):-
+  atom_concat('mf_',Root,ProposedName),  
+  atom_concat('sf_',Root,BetterName),
+  current_predicate(BetterName/N),N>1,
+  wdmsg(rename(ProposedName)),!.
+
+do_check_foc_operator(_Ctx,_Env,_BindType,_F,_Args,ProposedName, BetterName):-
+  atom_concat('mf_',Root,ProposedName),  
+  atom_concat('f_',Root,BetterName),
+  current_predicate(BetterName/N),N>1,
+  wdmsg(rename(BetterName)),!.
+   
+   
+  
+
 
 compile_apply_function_or_macro_call(Ctx,Env,FN,Args,Result,ExpandedFunction):-
  always((
    (is_list(Args)->length(Args,ArgsLen);true),
-   foc_operator(Ctx,Env,kw_function,FN,ArgsLen, ProposedName),!,
+   check_foc_operator(Ctx,Env,kw_function,FN,ArgsLen, ProposedName),!,
    align_args_or_fallback(Ctx,Env,FN, ProposedName,Args,Result,ArgsPlusResult),!,
    ExpandedFunction =.. [ ProposedName | ArgsPlusResult])),!.
 
 
-compile_apply(Ctx,Env,F,Args,Result,ExpandedFunction):- always(compile_apply0(Ctx,Env,F,Args,Result,ExpandedFunction)),!.
-
+compile_apply(Ctx,Env,F,Args,Result,ExpandedFunction):- 
+   always(compile_apply0(Ctx,Env,F,Args,Result,ExpandedFunction)),!.
 
 compile_apply0(Ctx,Env,F,Args,Result,ExpandedFunction):-  F==[],!,
    trace_or_throw(compile_apply0(Ctx,Env,F,Args,Result,ExpandedFunction)).
-  
+compile_apply0(Ctx,Env,F,Args,Result,ExpandedFunction):-
+  compile_apply1(Ctx,Env,F,Args,Result,ExpandedFunction),!.
 
-compile_apply0(Ctx,Env,F,Args,Result,ExpandedFunction):- atom(F),
+compile_apply1(Ctx,Env,F,Args,Result,ExpandedFunction):- atom(F),
  (eval_uses_exact_and_restkeys(F,N); ( F==list,N=0)),
  length(Left,N),
  append(Left,IntoList,Args),
  append(Left,[IntoList,Result],NewArgs),
- foc_operator(Ctx,Env,kw_function,F,_, ProposedName),!,
+ check_foc_operator(Ctx,Env,kw_function,F,_, ProposedName),!,
  ExpandedFunction =.. [ ProposedName | NewArgs].
 
-compile_apply0(_Ctx,_Env,F,Args,Result,f_apply(F,Args,Result)):- (var(F); \+ is_list(Args)),!.
+compile_apply1(_Ctx,_Env,F,Args,Result,f_apply(F,Args,Result)):- (var(F); \+ is_list(Args)),!.
 
-compile_apply0(Ctx,Env,F,Args,Result,ExpandedFunction):- atom(F),
+compile_apply1(Ctx,Env,F,Args,Result,ExpandedFunction):- atom(F),
  compile_apply_function_or_macro_call(Ctx,Env,F,Args,Result,ExpandedFunction),!.
 
-compile_apply0(Ctx,Env,function(F),Args,Result,ExpandedFunction):- atom(F),
- compile_apply0(Ctx,Env,F,Args,Result,ExpandedFunction),!.
+compile_apply1(Ctx,Env,function(F),Args,Result,ExpandedFunction):- atom(F),
+ compile_apply1(Ctx,Env,F,Args,Result,ExpandedFunction),!.
 
 
-compile_apply0(Ctx,Env,function(F),Args,Result,ExpandedFunction):- atom(F),
+compile_apply1(Ctx,Env,function(F),Args,Result,ExpandedFunction):- atom(F),
  compile_apply_function_or_macro_call(Ctx,Env,F,Args,Result,ExpandedFunction),!.
 
-compile_apply0(_Ctx,_Env,F,Args,Result,f_apply(F,Args,Result)).
+compile_apply1(_Ctx,_Env,F,Args,Result,f_apply(F,Args,Result)).
 
 
   

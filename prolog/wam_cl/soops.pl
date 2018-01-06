@@ -230,9 +230,9 @@ f_slot_exists_p(Obj,Slot,Value):- t_or_nil(get_opv(Obj,Slot,_),Value).
 
 f_slot_value(Obj,Slot,Value):- always(get_opv(Obj,Slot,Value)).
 
-f_defstruct([[Name,KeyWords]|Slots],Name):- !, always(define_struct(Name,KeyWords,Slots,_Kind)).
-f_defstruct([[Name|KeyWords]|Slots],Name):- !, always(define_struct(Name,KeyWords,Slots,_Kind)).
-f_defstruct([Name|Slots],Name):- always(define_struct(Name,[],Slots,_Kind)).
+sf_defstruct([[Name,KeyWords]|Slots],Name):- !, always(define_struct(Name,KeyWords,Slots,_Kind)).
+sf_defstruct([[Name|KeyWords]|Slots],Name):- !, always(define_struct(Name,KeyWords,Slots,_Kind)).
+sf_defstruct([Name|Slots],Name):- always(define_struct(Name,[],Slots,_Kind)).
 
 f_defclass([Name,Supers,Slots|KwInfo],Kind):- !, always(define_class(Name,[[kw_include|Supers]|KwInfo],Slots,Kind)).
 
@@ -557,10 +557,10 @@ get_opv_ii(Kind,Obj,Prop,Value):- notrace(is_prop_class_alloc(Kind,Prop,Where))-
 
 get_opv_iii(symbol,Obj,Prop,Value):- nonvar(Obj),wl:symbol_has_prop_getter(Obj,Prop,Getter),call(Getter,Obj,Prop,Value).
 get_opv_iii(_Kind,Obj,Prop,Value):- get_opv_iiii(Obj,Prop,Value).
-get_opv_iii(_Kind,Obj,Prop,Value):- soops:struct_opv(Obj,Prop,Value).
 
 get_opv_iiii(Obj,Prop,Value):- (atom(Obj);var(Obj)),nb_current(Obj,Ref),nb_current_value(Ref,Prop,Value).
 get_opv_iiii(Obj,Prop,Value):- soops:o_p_v(Obj,Prop,Value).
+get_opv_iiii(Obj,Prop,Value):- soops:struct_opv(Obj,Prop,Value).
 
 not_shareble_prop(Prop):-notrace((nonvar(Prop),not_shareble_prop0(Prop))).
 not_shareble_prop0(classof).
