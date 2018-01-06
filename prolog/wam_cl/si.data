@@ -51852,9 +51852,9 @@ o_p_v(u_test_not,type_of,symbol).
 o_p_v(u_testp,symbol_name,"TESTP").
 o_p_v(u_testp,symbol_package,pkg_user).
 o_p_v(u_testp,type_of,symbol).
-o_p_v(u_to_pvs,symbol_name,"TO-PVS").
-o_p_v(u_to_pvs,symbol_package,pkg_user).
-o_p_v(u_to_pvs,type_of,symbol).
+o_p_v(sys_to_pvs,symbol_name,"TO-PVS").
+o_p_v(sys_to_pvs,symbol_package,pkg_user).
+o_p_v(sys_to_pvs,type_of,symbol).
 o_p_v(unbound_slot,symbol_name,"UNBOUND-SLOT").
 o_p_v(unbound_slot,symbol_package,pkg_cl).
 o_p_v(unbound_slot,type_of,symbol).

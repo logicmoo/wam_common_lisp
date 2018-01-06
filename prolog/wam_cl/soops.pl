@@ -234,7 +234,7 @@ sf_defstruct([[Name,KeyWords]|Slots],Name):- !, always(define_struct(Name,KeyWor
 sf_defstruct([[Name|KeyWords]|Slots],Name):- !, always(define_struct(Name,KeyWords,Slots,_Kind)).
 sf_defstruct([Name|Slots],Name):- always(define_struct(Name,[],Slots,_Kind)).
 
-f_defclass([Name,Supers,Slots|KwInfo],Kind):- !, always(define_class(Name,[[kw_include|Supers]|KwInfo],Slots,Kind)).
+sf_defclass([Name,Supers,Slots|KwInfo],Kind):- !, always(define_class(Name,[[kw_include|Supers]|KwInfo],Slots,Kind)).
 
 
 define_class(Name,KeyWords,SlotsIn,Kind):- 
@@ -485,10 +485,10 @@ f_sys_get_opv(Obj,Prop,Value):- get_opv(Obj,Prop,Value).
 wl:interned_eval('`sys:set-opv').
 f_sys_set_opv(Obj,Prop,Value,R):- set_opv(Obj,Prop,Value),R=Obj.
 
-f_u_to_pvs(X,[float|XX]):- notrace(catch(XX is (1.0 * X),_,fail)),!.
-f_u_to_pvs(X,XX):- findall([P|V],((get_opv_i(X,P,V),\+ personal_props(P))),List),
+f_sys_to_pvs(X,[float|XX]):- notrace(catch(XX is (1.0 * X),_,fail)),!.
+f_sys_to_pvs(X,XX):- findall([P|V],((get_opv_i(X,P,V),\+ personal_props(P))),List),
   List\==[],sort(List,XX),!.
-f_u_to_pvs(X,[str|XX]):- format(string(S),'~w',[X]),string_upper(S,XX),!.
+f_sys_to_pvs(X,[str|XX]):- format(string(S),'~w',[X]),string_upper(S,XX),!.
 
    personal_props(sname).
    personal_props(ref).
@@ -542,7 +542,6 @@ get_opv_ii(Class,Obj,Prop,Symbol):- type_of == Prop,!,get_opv_iii(Class,Obj,clas
 get_opv_ii(Kind,Obj,Prop,Symbol):- classof == Prop,!,get_opv_iii(Kind,Obj,type_of,Value),!,find_class(Value,Symbol).
 get_opv_ii(symbol,Obj,Prop,Value):- nonvar(Obj),wl:quietly((symbol_has_prop_getter(Obj,Prop,Getter),call(Getter,Obj,Prop,Value))).
 
-get_opv_ii(Kind,Obj,Prop,Symbol):- typeof == Prop,!,get_opv_iii(Kind,Obj,classof,Value),!,claz_to_symbol(Value,Symbol).
 get_opv_ii(Kind,Obj,Prop,Values):-
    kind_attribute_pred(Kind,Prop,Pred),
    modulize(call(Pred,Obj,Value),OPred),

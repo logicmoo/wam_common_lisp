@@ -25,9 +25,9 @@ wl:init_args(2,defun).
 % (DEFUN (SETF CAR) ....)
 
 
-%f_defun(Symbol,FormalParms,FunctionBody,Result):- is_setf_op(Symbol,Accessor),!,f_defsetf(Accessor,[FormalParms|FunctionBody],Result).
+%f_defun(Symbol,FormalParms,FunctionBody,Result):- is_setf_op(Symbol,Accessor),!,sf_defsetf(Accessor,[FormalParms|FunctionBody],Result).
 % DEFUN SYMBOL
-mf_defun(Symbol,FormalParms,FunctionBody,Return):- reenter_lisp(Ctx,Env),compile_defun_ops(Ctx,Env,Return,[defun,Symbol,FormalParms|FunctionBody],Code),cmpout(Code).
+sf_defun(Symbol,FormalParms,FunctionBody,Return):- reenter_lisp(Ctx,Env),compile_defun_ops(Ctx,Env,Return,[defun,Symbol,FormalParms|FunctionBody],Code),cmpout(Code).
 compile_defun_ops(Ctx0,Env,Result,[defun,[setf,Name],FormalParms|FunctionBody], (PushDecl,CODE)):-
   combine_setfs([setf,Name],Symbol),
   PushDecl = assert_lsp(Name,wl:declared(Name,defun_setf(Symbol))),
@@ -36,7 +36,7 @@ compile_defun_ops(Ctx0,Env,Result,[defun,Symbol,FormalParms|FunctionBody], (Code
   duplicate_term(Ctx0,Ctx),Ctx0=Ctx,
   compile_function(Ctx,Env,[Symbol,FormalParms|FunctionBody],_Sym,Function,Code),
   debug_var('DefunResult',Result),
-  FunDef = set_opv(Symbol,symbol_function,Function),   
+  FunDef = (set_opv(Symbol,symbol_function,Function),   set_opv(Function,type_of,compiled_function)),
   always((FunDef,Code)).  
 
 % FLET

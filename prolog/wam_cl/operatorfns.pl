@@ -134,8 +134,9 @@ find_operator_or_die(Env,BindType,Symbol, R):- trace_or_throw(find_operator_or_d
 
 f_sys_coerce_to_function(FN,ProposedName):- find_lisp_function(FN,_ARITY,ProposedName).
 
-foc_operator(Ctx,Env,BindType,FN, Len, ProposedName):-  find_operator(Ctx,Env,BindType,FN, Len, ProposedName).
-foc_operator(Ctx,_Env,BindType,FN, _Len, ProposedName):- generate_function_or_macro_name(Ctx,FN,BindType,ProposedName),!.
+foc_operator(Ctx,Env,BindType,FN, Len, ProposedName):-  find_operator(Ctx,Env,BindType,FN, Len, ProposedName),!.
+foc_operator(Ctx,_Env,BindType,FN, _Len, ProposedName):- 
+  show_call_trace((generate_function_or_macro_name(Ctx,FN,BindType,ProposedName))),!.
 
 
 

@@ -63,12 +63,12 @@
 
 % DEFMACRO
 wl:init_args(2,defmacro).
-mf_defmacro(Symbol,FormalParms,MacroBody,Return):- reenter_lisp(Ctx,Env),compile_macro_ops(Ctx,Env,Return,[defmacro,Symbol,FormalParms|MacroBody],Code),cmpout(Code).
+sf_defmacro(Symbol,FormalParms,MacroBody,Return):- reenter_lisp(Ctx,Env),compile_macro_ops(Ctx,Env,Return,[defmacro,Symbol,FormalParms|MacroBody],Code),cmpout(Code).
 
 compile_macro_ops(Ctx,Env,Result,[defmacro,Symbol,FormalParms|MacroBody], (Code,FunDef,Result=Symbol)):-
   compile_macro(Ctx,Env,[Symbol,FormalParms|MacroBody],_Sym,Macro,Code),
   debug_var('DefMacroResult',Result),
-  FunDef = (set_opv(Macro,type_of,macro),set_opv(Symbol,symbol_function,Macro)).  
+  FunDef = (set_opv(Macro,type_of,sys_macro),set_opv(Symbol,symbol_function,Macro)).  
 
 % MACROLET
 wl:init_args(1,macrolet).
@@ -145,12 +145,12 @@ f_sys_pf_symbol_macroexpand(_Place_Get, _Env_Get,Result):- Result=[].
 wl:interned_eval(("`ext:set-symbol-macro-function")).
 f_ext_set_symbol_macro_function(Symbol,FunctionSpec,ResultIsMacro):- 
   as_symbol_macro_function(_Ctx,_Env,Symbol,FunctionSpec,ResultIsMacro),
-  set_opv(Symbol,symbol_function,ResultIsMacro).
+  set_opv(Symbol,symbol_function,ResultIsMacro),set_opv(ResultIsMacro,type_of,sys_macro).
 
 wl:interned_eval(("`ext:set-symbol-macro")).
 f_ext_set_symbol_macro(Symbol,FunctionSpec,ResultIsMacro):- 
   as_symbol_macro_function(_Ctx,_Env,Symbol,FunctionSpec,ResultIsMacro),
-  set_opv(Symbol,symbol_function,ResultIsMacro).  
+  set_opv(Symbol,symbol_function,ResultIsMacro),set_opv(ResultIsMacro,type_of,sys_macro).
 
 as_symbol_macro_function(Ctx,Env,_Symbol,function(MF),ResultIsMacro):-eval(Ctx,Env,function(MF),ResultIsMacro).
 as_symbol_macro_function(Ctx,Env,_Symbol,MF,ResultIsMacro):- \+ is_list(MF),eval(Ctx,Env,MF,ResultIsMacro).

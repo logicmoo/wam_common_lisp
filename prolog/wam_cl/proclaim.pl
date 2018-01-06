@@ -16,8 +16,8 @@
 :- set_module(class(library)).
 :- include('header').
 
-f_declare(_,_).
-f_proclaim(Assert,t):- assert(is_proclaimed(Assert)).
+sf_declare(_,_).
+sf_proclaim(Assert,t):- assert(is_proclaimed(Assert)).
 
 f_sxhash(O,H):- term_hash(O,H).
 
@@ -31,23 +31,23 @@ f_sys_psxhash(O,H):- f_u_to_pvs(O,HT),term_hash(HT,H).
 */
 wl:init_args(3,sys_proclamation).
 wl:interned_eval("(sys:set-opv `sys:proclamation :compile-as :operator)").
-f_sys_proclamation(Name,ArgumentTypes,ResultType,List,NameO):- 
+sf_sys_proclamation(Name,ArgumentTypes,ResultType,List,NameO):- 
   store_meta_info(set_proclamation,Name,ArgumentTypes,ResultType,[List],NameO).
 set_proclamation(O,P,V):- atom_concat(P,'_proclaimed',PP), set_opv(O,PP,V).
 
 wl:init_args(3,deftype).
 wl:interned_eval("(sys:set-opv `cl:deftype :compile-as :operator)").
-f_deftype(Name,Lambda,Doc,Test,NameO):- set_opv(Name,typedoc,Doc),f_deftype(Name,Lambda,Test,NameO).
-f_deftype(Name,Lambda,Test,NameO):- store_meta_info(set_deftype,Name,Lambda,Test,[],NameO).
+sf_deftype(Name,Lambda,Doc,Test,NameO):- set_opv(Name,typedoc,Doc),sf_deftype(Name,Lambda,Test,NameO).
+sf_deftype(Name,Lambda,Test,NameO):- store_meta_info(set_deftype,Name,Lambda,Test,[],NameO).
 set_deftype(O,P,V):- atom_concat(P,'_deftype',PP), set_opv(O,PP,V).
 
 
-f_defsetf(Get,Set,[],Res):- trace,
+sf_defsetf(Get,Set,[],Res):- trace,
    f_defsetf(Get,Set,Res),!.
 
 wl:init_args(3,sys_defknown).
 wl:interned_eval("(sys:set-opv `SYS:defknown :compile-as :operator)").
-f_sys_defknown(Name,ArgumentTypes,ResultType,List,NameO):- store_meta_info(set_defknown,Name,ArgumentTypes,ResultType,List,NameO).
+sf_sys_defknown(Name,ArgumentTypes,ResultType,List,NameO):- store_meta_info(set_defknown,Name,ArgumentTypes,ResultType,List,NameO).
 set_defknown(O,P,V):- set_opv(O,P,V).
  
 store_meta_info(_With,In,_ArgumentTypes,_ResultType,_List,[]):- In==[],!.

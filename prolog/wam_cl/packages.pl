@@ -53,7 +53,7 @@ f_use_package(Package,CurrentPackage, t):-
 
  
 wl:init_args(1,defpackage).
-f_defpackage(Name,Keys,R):- f_make_package(Name,Keys,R).
+sf_defpackage(Name,Keys,R):- f_make_package(Name,Keys,R).
 
 
 wl:init_args(1,make_package).

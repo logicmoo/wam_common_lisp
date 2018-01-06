@@ -232,10 +232,11 @@ lisp_compile_to_prolog(PExpression):-
   lisp_grovel(PrologCode),!.
    
 grovel_time_called(do_when).
-grovel_time_called(f_in_package).
-grovel_time_called(f_use_package).
-grovel_time_called(f_defpackage).
+%grovel_time_called(sf_in_package).
+%grovel_time_called(f_use_package).
+%grovel_time_called(sf_defpackage).
 grovel_time_called(CL_DEF):- atom(CL_DEF),atom_contains(CL_DEF,'_def').
+grovel_time_called(CL_DEF):- atom(CL_DEF),atom_contains(CL_DEF,'_package').
 grovel_time_called(set_opv).
 %grovel_time_called(sys_trace).
 

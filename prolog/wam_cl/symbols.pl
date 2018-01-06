@@ -27,7 +27,8 @@ do_or_die(G):- G->true;throw(do_or_die(G)).
 wl:interned_eval(("`ext:set-symbol-function")).
 f_ext_set_symbol_function(Symbol,Function):- 
   as_funcallable(Symbol,Function,Funcallable),
-  set_opv(Symbol,symbol_function,Funcallable).
+  set_opv(Symbol,symbol_function,Funcallable),
+  (atom(Funcallable)->set_opv(Funcallable,type_of,compiled_function);true).
 
 symbol_prefix_and_atom(Sym,FunPkg,Name):- 
    pl_symbol_name(Sym,SName),

@@ -52,7 +52,7 @@ was_pkg_prefix(clos,pkg_clos).
 % grovel_system_symbols:-!.
 grovel_system_symbols:- prolog_load_context(source,File),assertz(wl:interned_eval(call(grovel_system_symbols(File)))).
 
-guess_symbol_name(HC,UPPER):- atomic_list_concat(HC,'_',HCN), get_opv(HCN,name,UPPER),!.
+guess_symbol_name(HC,UPPER):- atomic_list_concat(HC,'_',HCN), get_opv(HCN,symbol_name,UPPER),!.
 guess_symbol_name(HC,UPPER):- maplist(resolve_char_codes,HC,RHC),atomics_to_string(RHC,'-',STR),string_upper(STR,UPPER),!.
 
 resolve_char_codes('','_').
@@ -68,7 +68,8 @@ grovel_system_symbols(File):-
     guess_symbol_name(HC,UPPER),
  always(((
   f_intern(UPPER,Package,Symbol),     
-  f_export(Symbol,Package,_),  
+  f_export(Symbol,Package,_),
+  (get_opv(Symbol,symbol_function,F)-> true ;show_call_trace(set_opv(Symbol,symbol_function,F))),
   wdmsg((grovelled_source_file_symbols(UPPER,Package,Symbol,M,F))))))),fail)).
 
 list_lisp_undefined(Pkg):- 
