@@ -45,11 +45,18 @@ bq_append(A,B,C):- always(append(A,B,C)),!.
 
 
 
+
+
+ec_lisp_eval(Env, Result,Expression,Body):- lisp_compile(Env,Result,Expression,Body),!.
+
+/*
 ec_lisp_eval(Env,Result,Form,true):- atom(Form),!,get_var(Env,Form,Result).
 %bq_call(Eval,Env,Result,Result,true).
 % @TODO fix this workaround 
-ec_lisp_eval(Env,['eval_in_env',Result,Env],Result,true).
-
+ec_lisp_eval(Env, Result,Expression,true):- f_sys_env_eval(Env, Expression, Result).
+%ec_lisp_eval(Env,Form,Form,true).
+%ec_lisp_eval(Env,['sys_env_eval',Env,Form],Form,true).
+*/
 
 is_quoted(SelfEval):-SelfEval=[Q,_],atom(Q),fail,nop(is_quote(Q)).
 %is_quote(quote).

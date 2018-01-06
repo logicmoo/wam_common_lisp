@@ -106,7 +106,7 @@ apply_c(EnvIn,[lambda, FormalParams| Body], ActualParams, Result):-
 	must_bind_parameters(EnvIn,Whole,_RestNKeys,FormalParams,Symbol, ActualParams,EnvOut,BinderCode),!,
         ignore(Whole = [Symbol|ActualParams]),
         always(BinderCode),
-	lisp_env_eval(EnvOut, Body, Result),
+	f_sys_env_eval(EnvOut, Body, Result),
 	!.
 apply_c(EnvIn,closure(FType,ClosureEnvironment,Whole,ClosureResult,Symbol,FormalParams,ClosureBody), ActualParams, Result):-
 	closure(FType,[ClosureEnvironment|EnvIn],Whole,ClosureResult,FormalParams,Symbol,ClosureBody,ActualParams, Result).
@@ -116,7 +116,7 @@ apply_c(EnvIn, ProcedureName, ActualParams, Result):-
 	get_lambda_def(defmacro,ProcedureName,FormalParams, LambdaExpression),!,
 	must_bind_parameters(EnvIn,Whole,_RestNKeys,FormalParams,ProcedureName, ActualParams, Env,BinderCode),
         always(BinderCode),
-        lisp_env_eval(Env,LambdaExpression, Result),
+        f_sys_env_eval(Env,LambdaExpression, Result),
 	!.
 /*apply_c(Env,ProcedureName, Args, Result):-
 	named_lambda(ProcedureName, LambdaExpression),!,

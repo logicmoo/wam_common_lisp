@@ -23,8 +23,15 @@ xlisting_config:xlisting_always(G):- G=package:_, current_predicate(_,G),predica
   \+ predicate_property(G,imported_from(_)).
 
 
-wl:init_args(x,in_package).
-f_in_package(S,Package):- find_package_or_die(S,Package),
+
+wl:init_args(x,sys_select_package).
+wl:interned_eval("
+(defmacro in-package (name)
+  `(eval-when (:compile-toplevel :load-toplevel :execute)
+     (si::select-package ,(string name))))
+").
+% SYS::SELECT-PACKAGE
+f_sys_select_package(S,Package):- find_package_or_die(S,Package),
    f_sys_set_symbol_value('xx_package_xx',Package).
 
 wl:init_args(x,use_package).

@@ -161,9 +161,9 @@ compile_funop(Ctx,Env,Result,[FN | FunctionArgs], Body):-
 */
 
 
-lisp_env_eval(_Env, _Pt1^Body, _Result):- !,
+f_sys_env_eval(_Env, _Pt1^Body, _Result):- !,
   always(Body).
-lisp_env_eval(Env, Expression, Result):-
+f_sys_env_eval(Env, Expression, Result):-
   lisp_compile(Env,Result,Expression,Body),
   user:always(Body).
 
