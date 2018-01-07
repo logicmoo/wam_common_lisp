@@ -34,10 +34,12 @@ compile_defun_ops(Ctx0,Env,Result,[defun,[setf,Name],FormalParms|FunctionBody], 
   compile_defun_ops(Ctx0,Env,Result,[defun,Symbol,['&environment','$env'|FormalParms]|FunctionBody], CODE),!. 
 compile_defun_ops(Ctx0,Env,Result,[defun,Symbol,FormalParms|FunctionBody], (Code,FunDef,Result=Symbol)):-  
   duplicate_term(Ctx0,Ctx),Ctx0=Ctx,
+  always(foc_operator(Ctx,Env,kw_function,Symbol,_Len, Function)),
+  FunDef = (set_opv(Symbol,symbol_function,Function),   set_opv(Function,type_of,compiled_function)),
+  always(FunDef),
   compile_function(Ctx,Env,[Symbol,FormalParms|FunctionBody],_Sym,Function,Code),
   debug_var('DefunResult',Result),
-  FunDef = (set_opv(Symbol,symbol_function,Function),   set_opv(Function,type_of,compiled_function)),
-  always((FunDef,Code)).  
+  always(Code).  
 
 % FLET
 wl:init_args(1,flet).

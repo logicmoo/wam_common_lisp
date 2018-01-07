@@ -589,7 +589,7 @@ get_ref_object(Ref,Object):- always(atom(Ref)),
    %put_attr(Object0,type_of,ref),
    nb_put_attr(Object0,ref,Ref),
    always(nb_setval(Ref,Object0)),!,
-   always(b_getval(Ref,Object)),!.
+   always(nb_current(Ref,Object)),!.
 
 /*
 set_ref_object(Ref,Object):- quietly(nb_set_value(?(Ref),pointer,Object)),!.

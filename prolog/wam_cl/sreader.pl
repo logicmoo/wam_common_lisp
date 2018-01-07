@@ -123,7 +123,7 @@ maybe_cache_lisp_translation(File,Temp,WithPart2):-
 
 write_trans(Outs,File,WithPart2,Lisp):-
    always((call(WithPart2,Lisp,Part),
-   b_getval('$lisp_translation_line',Line),
+   nb_current('$lisp_translation_line',Line),
    format(Outs,'~N~q.~n',[lisp_trans(Part,File:Line)]))),!.
 
 /* alternate method*/

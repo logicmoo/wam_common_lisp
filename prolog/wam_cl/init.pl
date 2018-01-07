@@ -15,6 +15,7 @@
 :- module(in1t, []).
 
 
+
 :- set_prolog_flag(backtrace,true).
 :- set_prolog_flag(backtrace_depth,500).
 :- set_prolog_flag(backtrace_goal_depth,30).

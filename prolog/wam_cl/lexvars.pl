@@ -135,7 +135,7 @@ symbol_value0(Env,[Place,Obj],Result):- trace, set_place(Env,getf,[Place,Obj],[]
 symbol_value_error(_Env,Var,_Result):- lisp_error_description(unbound_atom, ErrNo, _),throw(ErrNo, Var).
 throw(X,Y):- writeln(throw(X,Y)),lisp_dump_break,throw(lpa_throw(X,Y)).
 
-reset_mv:- b_getval('$mv_return',[V1,_V2|_])->b_setval('$mv_return',[V1]);true.
+reset_mv:- nb_current('$mv_return',[V1,_V2|_])->b_setval('$mv_return',[V1]);true.
 
 push_values([V1|Push],V1):- always(nonvar(Push)),nb_setval('$mv_return',[V1|Push]).
 

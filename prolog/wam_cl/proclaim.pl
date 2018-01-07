@@ -22,7 +22,7 @@ sf_proclaim(Assert,t):- assert(is_proclaimed(Assert)).
 f_sxhash(O,H):- term_hash(O,H).
 
 :- f_intern("PSXHASH",pkg_sys,_).
-f_sys_psxhash(O,H):- f_u_to_pvs(O,HT),term_hash(HT,H).
+f_sys_psxhash(O,H):- f_sys_to_pvs(O,HT),term_hash(HT,H).
 %f_u_psxhash(O,H):-f_sys_psxhash(O,H).
 
 /*

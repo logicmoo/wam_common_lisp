@@ -83,9 +83,9 @@ user:portray(env(_,_)):- writeq(env/2).
 add_to_env(ENV,Name,Value):- update_or_append(nb_setarg,ENV,Name,Value).
 %add_to_env(Name,Value):- global_env(ENV),update_or_prepend(nb_setarg,ENV,Name,Value).
 
-global_env(ENV):- ignore(b_getval('$env_global',ENV)),!.
-parent_env(ENV):- ignore(b_getval('$env_current',ENV)),!.
-toplevel_env(ENV):- b_getval('$env_toplevel',ENV),!.
+global_env(ENV):- ignore(nb_current('$env_global',ENV)),!.
+parent_env(ENV):- ignore(nb_current('$env_current',ENV)),!.
+toplevel_env(ENV):- nb_current('$env_toplevel',ENV),!.
 
 
 %new_compile_ctx(ENV):- new_assoc(ENV)put_attr(ENV,type,ctx).
@@ -205,8 +205,8 @@ env_append(_Ctx,_Env,ZippedArgEnv,ZippedArgEnv):-!.
 % GlobalBindings
 
 ensure_env(ENV):- (nonvar(ENV)->true;(is_env(ENV)->true;current_env(ENV))).
-ensure_ctx(ENV):- (nonvar(ENV)->true;(is_env(ENV)->true;b_getval('$env_global',ENV))).
-current_env(ENV):- ensure_env,nb_current('$env_current',WASENV),!,(is_env(ENV)->WASENV==ENV;WASENV=ENV).
+ensure_ctx(ENV):- (nonvar(ENV)->true;(is_env(ENV)->true;ignore((notrace((nb_current('$env_global',ENV))))))).
+current_env(ENV):- ignore((notrace((ensure_env,nb_current('$env_current',WASENV),!,(is_env(ENV)->WASENV==ENV;WASENV=ENV))))).
 
 ensure_env :-
   (nb_current('$env_current',_)->true;reset_env).

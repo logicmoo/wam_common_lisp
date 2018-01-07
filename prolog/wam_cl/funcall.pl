@@ -129,19 +129,21 @@ check_foc_operator(Ctx,Env,BindType,F,Args,BetterName):-
 
 
 do_check_foc_operator(_Ctx,_Env,_BindType,_F,_Args,ProposedName, BetterName):-   
-   current_predicate(ProposedName/N),N>1,!,ProposedName= BetterName.
+   current_predicate(ProposedName/N),N>=1,!,ProposedName= BetterName.
 
 do_check_foc_operator(_Ctx,_Env,_BindType,_F,_Args,ProposedName, BetterName):-
   atom_concat('mf_',Root,ProposedName),  
   atom_concat('sf_',Root,BetterName),
-  current_predicate(BetterName/N),N>1,
+  current_predicate(BetterName/N),N>=1,
   wdmsg(rename(ProposedName)),!.
 
 do_check_foc_operator(_Ctx,_Env,_BindType,_F,_Args,ProposedName, BetterName):-
   atom_concat('mf_',Root,ProposedName),  
   atom_concat('f_',Root,BetterName),
-  current_predicate(BetterName/N),N>1,
+  current_predicate(BetterName/N),N>=1,
   wdmsg(rename(BetterName)),!.
+
+do_check_foc_operator(_Ctx,_Env,_BindType,_F,_Args,ProposedName, ProposedName).
    
    
   

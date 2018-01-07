@@ -173,7 +173,7 @@ macroexpand_all(LispCode,MacroEnv,Result):-
 
 
 f_macro_function(Procedure,ProposedName):-
-    notrace(find_operator(_Ctx,_Env,kw_macro,Procedure,_ArgsLen, ProposedName)),!.
+    (find_operator(_Ctx,_Env,kw_macro,Procedure,_ArgsLen, ProposedName);ProposedName=[]),!.
 
 
 get_macro_function(Ctx,Env,Procedure,Arguments,MResult,CallBody):-  atom(Procedure),

@@ -45,7 +45,7 @@ is_eql(X,Y):- is_eq(X,Y)->true;f_type_of(X,T),f_type_of(Y,T), notrace(catch(X=:=
 is_eq(X,Y):- same_term(X,Y).
 % is_eq(X,Y):- X==Y, (\+ compound(X)-> true ; \+ \+ ((gensym(cookie,Cook),setarg(1,X,Cook),X==Y))).
 is_equal(X,Y):- (X=@=Y->true;is_eql(X,Y)).
-is_equalp(X,Y):- is_equal(X,Y)->true;((f_u_to_pvs(X,XX),f_u_to_pvs(Y,YY), XX=@=YY)-> true ; ( \+ X\=Y)).
+is_equalp(X,Y):- is_equal(X,Y)->true;((f_sys_to_pvs(X,XX),f_sys_to_pvs(Y,YY), XX=@=YY)-> true ; ( \+ X\=Y)).
 
 
 

@@ -255,6 +255,15 @@ lw:- f_load("wam-cl-params",_).
 
 :- initialization((lisp),main).
 
+
 :- use_module(library(shell)).
+
+:- if(getuid(1006)).
+:- use_module(library(eggdrop)).
+:- initialization((do_wamcl_inits,egg_go_fg),main).
+
+lisp_call([S|TERM],_Vs,R):- lisp_compiled_eval([S|TERM],R).
+
+:- endif.
 %:- process_si.
 %:- cddd.
