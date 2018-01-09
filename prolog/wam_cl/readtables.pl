@@ -29,9 +29,7 @@ reader_intern_symbols(ExprS1,Expr):-
   reader_intern_symbols(Package,ExprS1,Expr),!.
 
 reader_intern_symbols(_,Var,Var):- (var(Var);Var==[]),!.
-reader_intern_symbols(Package,SymbolName,Symbol):-
-   atom(SymbolName),atom_symbol(SymbolName,Package,Symbol),!.
-
+reader_intern_symbols(Package,SymbolName,Symbol):- atom(SymbolName),!,atom_symbol(Package,SymbolName,Symbol).
 
 reader_intern_symbols(_Package,Some,Some):- \+ compound(Some),!.
 reader_intern_symbols(Package,[S|Some],[SR|SomeR]):-!, 
@@ -71,9 +69,9 @@ simple_atom_token(SymbolName):- atom_concat_or_rtrace('#',_,SymbolName),upcase_a
 simple_atom_token(SymbolName):- atom_concat_or_rtrace('$',_,SymbolName),upcase_atom(SymbolName,SymbolName).
 simple_atom_token(SymbolName):- string_upper(SymbolName,UP),string_lower(SymbolName,DOWN),!,UP==DOWN.
 
-atom_symbol(SymbolName,_,Token):- simple_atom_token(SymbolName),!,SymbolName=Token.
-atom_symbol(SymbolName,_,Obj):- f_type_of(SymbolName,X)->X\==t,SymbolName=Obj.
-atom_symbol(SymbolName,Package,Symbol):-
+atom_symbol(_,SymbolName,Token):- simple_atom_token(SymbolName),!,SymbolName=Token.
+atom_symbol(_,SymbolName,Obj):- notrace(f_type_of(SymbolName,X))->X\==t,SymbolName=Obj.
+atom_symbol(Package,SymbolName,Symbol):-
   string_upper(SymbolName,SymbolNameU), 
   string_list_concat([SymbolName1|SymbolNameS],":",SymbolNameU),
   always(atom_symbol_s(SymbolName1,SymbolNameS,Package,Symbol)),!.
@@ -86,9 +84,9 @@ atom_symbol_s("#",["",SymbolName],UPackage,_Symbol):- throw('@TODO *** - READ fr
 % #:SYMBOL
 atom_symbol_s("#",[SymbolName],_UPackage,Symbol):- f_make_symbol(SymbolName,Symbol).
 % SYMBOL
-atom_symbol_s(SymbolName,[],Package,Symbol):- intern_symbol(SymbolName,Package,Symbol,_).
+atom_symbol_s(SymbolName,[],Package,Symbol):- !,intern_symbol(SymbolName,Package,Symbol,_).
 % PACKAGE::SYMBOL
-atom_symbol_s(PName,   ["", SymbolName],_UPackage,Symbol):- find_package_or_die(PName,Package),intern_symbol(SymbolName,Package,Symbol,_IntExt).
+atom_symbol_s(PName,   ["", SymbolName],_UPackage,Symbol):- !, find_package_or_die(PName,Package),intern_symbol(SymbolName,Package,Symbol,_IntExt).
 % PACKAGE:SYMBOL must exist AND also exported
 atom_symbol_s(PName,   [SymbolName],_UPackage,Symbol):- find_package_or_die(PName,Package),atom_symbol_public(SymbolName,Package,Symbol).
 
@@ -131,8 +129,85 @@ string_list_concat(StrS,Sep,String):- atomic_list_concat(L,Sep,String),atomics_t
 atomics_to_strings([A|L],[S|StrS]):- atom(A),atom_string(A,S),!,atomics_to_strings(L,StrS).
 atomics_to_strings([],[]).
 
-atom_symbol_test(SymbolName,Symbol):- reading_package(Package),atom_symbol(SymbolName,Package,Symbol),!.
+atom_symbol_test(SymbolName,Symbol):- reading_package(Package),atom_symbol(Package,SymbolName,Symbol),!.
 
+
+:- dynamic(is_rename_w/4).
+
+make_renames:- 
+ fix_symbols,
+ tell('rename.data'),
+ forall(member(Assert,[is_rename_w(_,_,_,_)]),
+   forall(Assert,format('~q.~n',[Assert]))), told.
+
+rewrite_packages:- 
+  rewrite_some(rewrite_package,'pi.data','pi.data_r').
+rewrite_package(P,PR):- P=..[F,A,B,C],PR=..[F,A,C,B].
+
+rewrite_with_renames:-
+  make_renames,
+  rewrite_some(readname_terms,'pi.data','pi.data_r'),
+  rewrite_some(readname_terms,'si.data','si.data_r'),
+  rewrite_some(readname_terms,'ci.data','ci.data_r').
+
+rewrite_some(Call,In,Out):-
+ open(In,read,IS),
+ open(Out,write,OS),
+ repeat,
+ read_term(IS,Term,[]),
+ (Term==end_of_file->! ; 
+ (once((call(Call,Term,TermO),
+ format(OS,'~q.~n',[TermO])))),fail).
+
+
+readname_terms(Term,Term):-var(Term),!.
+readname_terms([H|Term],[HH|TermO]):- !,readname_terms(H,HH),readname_terms(Term,TermO).
+readname_terms(Term,TermO):- compound(Term), compound_name_arguments(Term,F,TermL),
+     must_maplist(readname_terms,TermL,TermLO),TermO=..[F|TermLO].
+readname_terms(Term,TermO):- \+ atom(Term),!,Term=TermO.
+readname_terms(Term,TermO):- is_rename_w(Term,_,_,TermO),!.
+readname_terms(TermI,TermO):- atom_concat('f_',Term,TermI), is_rename_w(Term,_,_,TermOO),atom_concat('f_',TermOO,TermO),!.
+readname_terms(TermI,TermO):- atom_concat('sf_',Term,TermI), is_rename_w(Term,_,_,TermOO),atom_concat('sf_',TermOO,TermO),!.
+readname_terms(TermI,TermO):- atom_concat('mf_',Term,TermI), is_rename_w(Term,_,_,TermOO),atom_concat('mf_',TermOO,TermO),!.
+readname_terms(TermI,TermO):- atom_concat('claz_',Term,TermI), is_rename_w(Term,_,_,TermOO),atom_concat('claz_',TermOO,TermO),!.
+readname_terms(Term,Term).
+
+
+
+fix_symbols:-
+  forall(symbol_overlap(sys(pkg_cl,S1),sys(pkg_clos,S2)),move_symbol_into(S2,sys(pkg_cl))),
+  forall(symbol_overlap(sys(pkg_sys,S1),sys(pkg_sys,S2)),move_symbol_into(S1,sys(pkg_sys))),
+  forall(symbol_in(int(pkg_cl,S1)),move_symbol_into(S1,sys(pkg_sys))),
+  forall(symbol_in(sys(pkg_sys,S1)),move_symbol_into(S1,sys(pkg_sys))).
+
+fix_symbols2:-
+  symbol_in(int(pkg_sys,S1)),move_symbol_into(S1,int(pkg_sys)).
+
+
+symbol_in(sys(P1,S1)):- package_external_symbols(P1,_,S1).
+symbol_in(int(P1,S1)):- package_internal_symbols(P1,_,S1).
+
+move_symbol_into(S1,int(P2)):- f_symbol_package(S1,P1),pl_symbol_name(S1,N1),intern_symbol(N1,P2,S2,_),
+  add_rename(S1,P1,int(P2),S2).
+move_symbol_into(S1,sys(P2)):- f_symbol_package(S1,P1),pl_symbol_name(S1,N1),intern_symbol(N1,P2,S2,_),f_export(S2,P2,_),
+  add_rename(S1,P1,sys(P2),S2).
+
+%  forall(retract(soops:o_p_v(S1,X,Y)),(skipped_p(X)->true;assert(soops:o_p_v(S2,X,Y)))),
+add_rename(S1,P1,INEXT,S2):-
+   assert_if_new(is_rename_w(S1,P1,INEXT,S2)),
+   wdmsg(add_rename(S1,P1,INEXT,S2)).
+
+skipped_p(symbol_package).
+
+
+symbol_overlap(sys(P1,S1),sys(P2,S2)):-
+  dif(P1,pkg_kw),dif(P2,pkg_kw),package_external_symbols(P1,N1,S1),dif(P1,P2), package_external_symbols(P2,N1,S2).
+symbol_overlap(int(P1,S1),int(P2,S2)):-
+  dif(P1,pkg_kw),dif(P2,pkg_kw),package_internal_symbols(P1,N1,S1),dif(P1,P2), package_internal_symbols(P2,N1,S2).
+symbol_overlap(sys(P1,S1),int(P2,S2)):-
+  dif(P1,pkg_kw),dif(P2,pkg_kw),package_external_symbols(P1,N1,S1),dif(P1,P2), package_internal_symbols(P2,N1,S2).
+symbol_overlap(int(P1,S1),sys(P2,S2)):-
+  dif(P1,pkg_kw),dif(P2,pkg_kw),package_internal_symbols(P1,N1,S1),dif(P1,P2), package_external_symbols(P2,N1,S2).
 
 
 
@@ -201,10 +276,6 @@ as_sexp2(Str,Expression):- expand_pterm_to_sterm(Str,Expression),!.
                                                   
 
 
-
-
-
-
 expand_pterm_to_sterm(VAR,VAR):- notrace(is_ftVar(VAR)),!.
 expand_pterm_to_sterm('NIL',[]):-!.
 expand_pterm_to_sterm(nil,[]):-!.
@@ -232,4 +303,6 @@ keep_as_pl_term(D):-atom_concat_or_rtrace('$',_,D).
 :- fixup_exports.
 
 end_of_file.
+
+
 

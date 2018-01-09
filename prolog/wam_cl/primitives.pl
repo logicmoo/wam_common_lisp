@@ -29,6 +29,8 @@
 %:- ensure_loaded((utils_writef)).
 :- ensure_loaded(library(lists)).
 
+wl:init_args(x,Here):- functor(P,Here,3),predicate_property(P,imported_from(eq4l1y)).
+wl:init_args(x,Here):- functor(P,Here,2),predicate_property(P,imported_from(eq4l1y)).
 
 t_or_nil(G,Ret):- G->Ret=t;Ret=[].
 

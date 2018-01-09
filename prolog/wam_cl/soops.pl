@@ -118,21 +118,21 @@ get_object_slot_name(Obj,Key,SlotName):-
     
 
 get_kind_slot(Kind,Key,SlotName):- 
-  no_repeats(get_kind_supers(Kind,Sup)),
-  get_slot_name(Sup,Key,SlotName).
-
-get_kind_supers(Kind,Sup):- get_kind_supers2(Kind,[],Sup).
+  (no_repeats(get_kind_supers(Kind,Sup))*->get_slot_name(Sup,Key,SlotName);get_slot_name(Kind,Key,SlotName)).
+ 
+get_kind_supers(Kind,Sup):- find_class(Kind,KSup), get_kind_supers2(KSup,[],Sup).
 get_kind_supers2(Kind,ExceptFor,Sup):-find_class(Kind,KSup),!,get_kind_supers3(KSup,ExceptFor,Sup).
 get_kind_supers3(Kind,ExceptFor,_Sup):- member(Kind,ExceptFor),!,fail.
 get_kind_supers3(Kind,_,Kind).
 get_kind_supers3(Kind,ExceptFor,Sup):-get_struct_opv(Kind,type,E),get_kind_supers2(E,[Kind|ExceptFor],Sup).
 get_kind_supers3(Kind,ExceptFor,Sup):-get_struct_opv(Kind,kw_include,List),member(E,List),get_kind_supers2(E,[Kind|ExceptFor],Sup).
 
-get_slot_name(Kind,Key,SlotName):- quietly(get_slot_name0(Kind,Key,SlotName)).
+get_slot_name(Kind,Key,SlotName):- quietly(get_slot_name0(Kind,Key,SlotName)),!.
 get_slot_name0(Kind,Key,SlotName):-
    (get_struct_opv(Kind,slotfullname,Key,_)*-> Key=SlotName;
    (((get_struct_opv(Kind,slotname,Key,SlotInfo), get_struct_opv(Kind,slotfullname,SlotName,SlotInfo))) *-> true;
-   (get_struct_opv(Kind,keyword,Key,SlotInfo),get_struct_opv(Kind,slotfullname,SlotName,SlotInfo)))).
+   (get_struct_opv(Kind,keyword,Key,SlotInfo),get_struct_opv(Kind,slotfullname,SlotName,SlotInfo)))),!.
+get_slot_name0(Key,SlotName):- builtin_slot(Key),Key=SlotName.
 
 is_zlot_key(SlotInfo,SlotName):-
    get_struct_opv(_Kind,slotfullname,SlotName,SlotInfo);
@@ -399,7 +399,6 @@ struct_opv_else(Kind,Key,Value,Else):-
    (get_struct_opv(Kind,Key,Value)->true;
      (Else,assert_struct_opv(Kind,Key,Value))).
   
-
 
 
 add_class_keywords(_Struct,[]):-!.
