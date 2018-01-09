@@ -41,7 +41,7 @@ on_x_rtrace(G):- catch(G,E,(dbginfo(E),rtrace(G),break)).
 atom_concat_or_rtrace(X,Y,Z):- tracing->atom_concat(X,Y,Z);catch(atom_concat(X,Y,Z),_,break).
 
 
-nonplainvar(V):- nonvar(V);attvar_non_vn(V).
+nonplainvar(V):- notrace(nonvar(V);attvar_non_vn(V)),!.
 attvar_non_vn(V):- attvar(V),get_attr(V,searchvar,_),!.
 attvar_non_vn(V):- attvar(V),copy_term(V,VV),del_attr(VV,vn),del_attr(VV,rwstate),del_attr(VV,varuse),
   (get_attrs(VV,[]);\+attvar(VV)).

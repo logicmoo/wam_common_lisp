@@ -70,12 +70,14 @@ is_fboundp(Symbol):- get_opv(Symbol,symbol_function,_).
 
 
 
+wl:init_args(x,find_symbol).
 f_find_symbol(String,Result):- reading_package(Package)->f_find_symbol(String,Package,Result).
 f_find_symbol(String,Pack,Result):-  find_package_or_die(Pack,Package),
   package_find_symbol(String,Package,Symbol,IntExt),f_values_list([Symbol,IntExt],Result),!.
 f_find_symbol(_Var,_P,Result):- f_values_list([[],[]],Result).
 
 
+wl:init_args(x,intern).
 f_intern(Symbol,Result):- reading_package(Package),f_intern(Symbol,Package,Result).
 % f_intern(Symbol,Package,Result):- \+ is_keywordp(Symbol),is_symbolp(Symbol),!,f_intern_symbol(Symbol,Package,Result).
 f_intern(Name,Pack,Result):-
