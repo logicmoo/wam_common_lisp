@@ -212,7 +212,7 @@ compile_body_form(Ctx,Env,Result,['dolist'|Rest], Code):- !,
   always(compile_dolist(Ctx,Env,Result,['dolist'|Rest], Code)).
 
 wl: init_args(1,dolist).
-wl: declared(f_dolist,inlined).
+wl: declared(dolist,inlined).
 f_dolist(VarList,FormS,Result):-
    compile_dolist(_Ctx,_Env,Result,['dolist',VarList|FormS], Code),
    always(Code).
@@ -253,6 +253,10 @@ compile_body_form(Ctx,Env,Result,[OP,Vars,Eval1|ProgN], Body):- same_symbol(OP,'
 
   
 %maybe_special_letvars(Var,[Var,[if,[boundp,[quote,Var]],[get_var,Var],[]] ]).
+
+% Macro MULTIPLE-VALUE-SETQ
+compile_body_form(Ctx,Env,Result,[OP,Vars,Eval], Body):- same_symbol(OP,'multiple-value-setq'),
+  must_compile_body(Ctx,Env,Result,[progn,Eval,['#setqFromValues',Vars]],Body).
 
 % Macro MULTIPLE-VALUE-LIST
 compile_body_form(Ctx,Env,Result,[OP,Eval1], (Body,nb_current('$mv_return',Result))):-
