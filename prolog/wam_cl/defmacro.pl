@@ -220,7 +220,7 @@ macroexpand_1_or_fail([Procedure|Arguments],MacroEnv,CompileBody0Result):- nonpl
    append(_,[],NewEnv),!,
    NextEnv = [NewEnv|Env],  
    always(BindCode),
-   always(expand_commas(NewEnv,CommaResult,LambdaExpression,CodeS)),
+   always(expand_commas(Ctx,1,NewEnv,CommaResult,LambdaExpression,CodeS)),
    body_cleanup_keep_debug_vars(Ctx,CodeS,Code),
    % (local_override(with_forms,lisp_grovel)-> (lisp_dumpST) ; true),
    always(Code),

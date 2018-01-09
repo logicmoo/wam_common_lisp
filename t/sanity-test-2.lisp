@@ -13,7 +13,6 @@
 
 (defparameter my-daft-point2 (make-instance 'daft-point :x 19))
 
-(break)
 
 (list (daft-x my-daft-point)
       (daft-y my-daft-point)

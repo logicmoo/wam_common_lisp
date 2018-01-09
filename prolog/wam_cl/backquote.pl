@@ -37,7 +37,7 @@ macro_expand(X, X):-
 
 expand_commas(Ctx,Depth,Env,Result,Forms,Code):-
   b_setval('$bq_depth',Depth),
-  always(expand_backquote(Ctx,Depth,ec_lisp_eval,Ctx,Depth,Env,Result,Forms,Code)),!,
+  always(expand_backquote(Ctx,Depth,ec_lisp_eval,Env,Result,Forms,Code)),!,
   b_setval('$bq_depth',Depth).
 
 compile_bq(Ctx,Depth,Env,Result,Forms,Code):- always(expand_backquote(Ctx,Depth,ec_lisp_compile,Env,Result,Forms,Code)),!.
