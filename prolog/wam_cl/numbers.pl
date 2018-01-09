@@ -167,7 +167,7 @@ f_floor(X, RestNKeys, MResult):- pl_truncate(floor,X, RestNKeys, MResult).
 f_truncate(X, RestNKeys, MResult):- pl_truncate(truncate,X, RestNKeys, MResult).
 f_round(X, RestNKeys, MResult):- pl_truncate(round,X, RestNKeys, MResult).
 pl_truncate(_Type, X, RestNKeys, MResult):- 
-     nth_param(RestNKeys,1,Y,1),
+     nth_param(RestNKeys,1,1,Y),
      de_ratio(X,X0,Xd),
      de_ratio(Y,Y0,Yd),
      XX is X0 * Yd,
@@ -184,7 +184,7 @@ f_fceiling(X, RestNKeys, MResult):- pl_ftruncate(ceiling,X, RestNKeys, MResult).
 f_ffloor(X, RestNKeys, MResult):- pl_ftruncate(floor,X, RestNKeys, MResult).
 f_fround(X, RestNKeys, MResult):- pl_ftruncate(round,X, RestNKeys, MResult).
 pl_ftruncate(_Type,X, RestNKeys, MResult):- 
-     nth_param(RestNKeys,1,Y,1),
+     nth_param(RestNKeys,1,1,Y),
      de_ratio(X,X0,Xd),
      de_ratio(Y,Y0,Yd),
      XX is X0 * Yd,

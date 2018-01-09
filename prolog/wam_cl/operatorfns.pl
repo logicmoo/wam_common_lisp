@@ -275,7 +275,8 @@ only_arity(ProposedName,N):-
   is_defined(ProposedName,N),
   forall((between(0,6,Other),Other\=N),  \+ is_defined(ProposedName,Other)).
 
-is_defined(ProposedName,N):- functor(G,ProposedName,N),current_predicate(_,G).
+is_defined(ProposedName,N):- integer(N),atom(ProposedName),!,functor(G,ProposedName,N),current_predicate(_,G),!.
+is_defined(ProposedName,N):- current_predicate(ProposedName/N).
 
 maybe_symbol_package(Symbol,Package):-  get_opv(Symbol,package,Package),!.
 maybe_symbol_package(_Symbol,Package):- reading_package(Package).

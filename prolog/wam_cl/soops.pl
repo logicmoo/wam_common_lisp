@@ -476,12 +476,13 @@ un_kw1(Key,Prop):- atom_concat_or_rtrace(':',Prop,Key),lisp_dump_break,!.
 un_kw1(Prop,Prop).
 */
 
-(wl:init_args(x,f_sys_get_iprops)).
+wl:init_args(x,sys_get_iprops).
 wl:interned_eval('`sys:get-iprops').
 f_sys_get_iprops(Obj,Result):- nonvar(Obj),findall([Prop|Value],get_opv_i(Obj,Prop,Value),Result).
-(wl:init_args(x,f_sys_get_opv)).
+wl:init_args(x,sys_get_opv).
 wl:interned_eval('`sys:get-opv').
 f_sys_get_opv(Obj,Prop,Value):- get_opv(Obj,Prop,Value).
+wl:init_args(x,sys_set_opv).
 wl:interned_eval('`sys:set-opv').
 f_sys_set_opv(Obj,Prop,Value,R):- set_opv(Obj,Prop,Value),R=Obj.
 
