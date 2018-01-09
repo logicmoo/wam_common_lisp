@@ -3750,6 +3750,7 @@ package_external_symbols(pkg_sys,"ADJOIN-EQL",sys_adjoin_eql).
 package_external_symbols(pkg_sys,"APPEASE-CERRORS",sys_appease_cerrors).
 package_external_symbols(pkg_sys,"APPLYHOOK",sys_applyhook).
 package_external_symbols(pkg_sys,"ARGLIST",sys_arglist).
+package_external_symbols(pkg_sys,"ARGS",sys_args).
 package_external_symbols(pkg_sys,"ARGV",sys_argv).
 package_external_symbols(pkg_sys,"ASET",sys_aset).
 package_external_symbols(pkg_sys,"ASSQ",sys_assq).
@@ -4338,93 +4339,6 @@ package_external_symbols(pkg_threads,"WITH-MUTEX",threads_with_mutex).
 package_external_symbols(pkg_threads,"WITH-THREAD-LOCK",threads_with_thread_lock).
 package_external_symbols(pkg_threads,"YIELD",threads_yield).
 package_external_symbols(pkg_xp,"*PRINT-SHARED*",xp_xx_print_shared_xx).
-package_internal_symbols(pkg_cl,"%CLASS-NAME",pf_class_name).
-package_internal_symbols(pkg_cl,"%END",pf_end).
-package_internal_symbols(pkg_cl,"%SET-CLASS-NAME",pf_set_class_name).
-package_internal_symbols(pkg_cl,"%START",pf_start).
-package_internal_symbols(pkg_cl,"(SETF COMMON-LISP:COMPILER-MACRO-FUNCTION)",c40_setf_c32_common_lisp_c58_compiler_macro_function_c41).
-package_internal_symbols(pkg_cl,"(SETF COMMON-LISP:RESTART-NAME)",c40_setf_c32_common_lisp_c58_restart_name_c41).
-package_internal_symbols(pkg_cl,"(SETF COMMON-LISP:STREAM-ELEMENT-TYPE)",c40_setf_c32_common_lisp_c58_stream_element_type_c41).
-package_internal_symbols(pkg_cl,"APROPOS-1",apropos_1).
-package_internal_symbols(pkg_cl,"APROPOS-2",apropos_2).
-package_internal_symbols(pkg_cl,"APROPOS-3",apropos_3).
-package_internal_symbols(pkg_cl,"APROPOS-4",apropos_4).
-package_internal_symbols(pkg_cl,"APROPOS-5",apropos_5).
-package_internal_symbols(pkg_cl,"APROPOS-LIST-1",apropos_list_1).
-package_internal_symbols(pkg_cl,"APROPOS-LIST-2",apropos_list_2).
-package_internal_symbols(pkg_cl,"ARGS",args).
-package_internal_symbols(pkg_cl,"ARITHMETIC-ERROR-OPERANDS-1",arithmetic_error_operands_1).
-package_internal_symbols(pkg_cl,"ARITHMETIC-ERROR-OPERATION-1",arithmetic_error_operation_1).
-package_internal_symbols(pkg_cl,"BAD-SEQ-LIMIT",bad_seq_limit).
-package_internal_symbols(pkg_cl,"BINDING",binding).
-package_internal_symbols(pkg_cl,"BINDINGS",bindings).
-package_internal_symbols(pkg_cl,"BREAK-1",break_1).
-package_internal_symbols(pkg_cl,"BREAK-2",break_2).
-package_internal_symbols(pkg_cl,"CALL-TEST",call_test).
-package_internal_symbols(pkg_cl,"CELL-ERROR-NAME-1",cell_error_name_1).
-package_internal_symbols(pkg_cl,"CERROR-1",cerror_1).
-package_internal_symbols(pkg_cl,"CERROR-2",cerror_2).
-package_internal_symbols(pkg_cl,"COMPILE-CLOSURE-SLOT",compile_closure_slot).
-package_internal_symbols(pkg_cl,"COMPILE-FILE-1",compile_file_1).
-package_internal_symbols(pkg_cl,"COMPLEMENT-1",complement_1).
-package_internal_symbols(pkg_cl,"COMPUTE-RESTARTS-1",compute_restarts_1).
-package_internal_symbols(pkg_cl,"CONSTANTLY-1",constantly_1).
-package_internal_symbols(pkg_cl,"DEFINE-MODIFY-MACRO-1",define_modify_macro_1).
-package_internal_symbols(pkg_cl,"DEFPACKAGE-MODERNIZE",defpackage_modernize).
-package_internal_symbols(pkg_cl,"DEFPACKAGE-RECORD-SYMNAME",defpackage_record_symname).
-package_internal_symbols(pkg_cl,"DEFSETF-1",defsetf_1).
-package_internal_symbols(pkg_cl,"DEFSTRUCT-1",defstruct_1).
-package_internal_symbols(pkg_cl,"DEFSTRUCT-2",defstruct_2).
-package_internal_symbols(pkg_cl,"END",end).
-package_internal_symbols(pkg_cl,"ENV",env).
-package_internal_symbols(pkg_cl,"FILE-ERROR-PATHNAME-1",file_error_pathname_1).
-package_internal_symbols(pkg_cl,"FORMS",forms).
-package_internal_symbols(pkg_cl,"FROM-END",from_end).
-package_internal_symbols(pkg_cl,"FROM-END-P",from_end_p).
-package_internal_symbols(pkg_cl,"INDEX",index).
-package_internal_symbols(pkg_cl,"ITEM",item).
-package_internal_symbols(pkg_cl,"KEY",key).
-package_internal_symbols(pkg_cl,"LIST-COUNT-IF",list_count_if).
-package_internal_symbols(pkg_cl,"LIST-SUBSTITUTE*",list_substitute_xx).
-package_internal_symbols(pkg_cl,"N",n).
-package_internal_symbols(pkg_cl,"NOT-P",not_p).
-package_internal_symbols(pkg_cl,"NSET-EXCLUSIVE-OR-1",nset_exclusive_or_1).
-package_internal_symbols(pkg_cl,"NSET-EXCLUSIVE-OR-2",nset_exclusive_or_2).
-package_internal_symbols(pkg_cl,"NSUBLIS-MACRO",nsublis_macro).
-package_internal_symbols(pkg_cl,"PACKAGE-ERROR-PACKAGE-1",package_error_package_1).
-package_internal_symbols(pkg_cl,"PPRINT-FILL-1",pprint_fill_1).
-package_internal_symbols(pkg_cl,"PPRINT-LINEAR-1",pprint_linear_1).
-package_internal_symbols(pkg_cl,"PPRINT-TABULAR-1",pprint_tabular_1).
-package_internal_symbols(pkg_cl,"PREDICATE",predicate).
-package_internal_symbols(pkg_cl,"PRINT-NOT-READABLE-OBJECT-1",print_not_readable_object_1).
-package_internal_symbols(pkg_cl,"PSETF-RECURSE",psetf_recurse).
-package_internal_symbols(pkg_cl,"REAL-COUNT",real_count).
-package_internal_symbols(pkg_cl,"RESTART-BIND-1",restart_bind_1).
-package_internal_symbols(pkg_cl,"SET-EXCLUSIVE-OR-1",set_exclusive_or_1).
-package_internal_symbols(pkg_cl,"SET-EXCLUSIVE-OR-2",set_exclusive_or_2).
-package_internal_symbols(pkg_cl,"SIMPLE-CONDITION-FORMAT-ARGUMENTS-1",simple_condition_format_arguments_1).
-package_internal_symbols(pkg_cl,"SIMPLE-CONDITION-FORMAT-ARGUMENTS-PRELIMINARY",simple_condition_format_arguments_preliminary).
-package_internal_symbols(pkg_cl,"SIMPLE-CONDITION-FORMAT-ARGUMENTS-PRELIMINARY-1",simple_condition_format_arguments_preliminary_1).
-package_internal_symbols(pkg_cl,"SIMPLE-CONDITION-FORMAT-CONTROL-1",simple_condition_format_control_1).
-package_internal_symbols(pkg_cl,"SIMPLE-CONDITION-FORMAT-CONTROL-PRELIMINARY",simple_condition_format_control_preliminary).
-package_internal_symbols(pkg_cl,"SIMPLE-CONDITION-FORMAT-CONTROL-PRELIMINARY-1",simple_condition_format_control_preliminary_1).
-package_internal_symbols(pkg_cl,"SO-ACCEPTCONN",so_acceptconn).
-package_internal_symbols(pkg_cl,"START",start).
-package_internal_symbols(pkg_cl,"STREAM-ERROR-STREAM-1",stream_error_stream_1).
-package_internal_symbols(pkg_cl,"SUBST-DISPATCH",subst_dispatch).
-package_internal_symbols(pkg_cl,"TEST",test).
-package_internal_symbols(pkg_cl,"TEST-ERROR",test_error).
-package_internal_symbols(pkg_cl,"TEST-NOT",test_not).
-package_internal_symbols(pkg_cl,"TEST-NOT-P",test_not_p).
-package_internal_symbols(pkg_cl,"TEST-P",test_p).
-package_internal_symbols(pkg_cl,"THE-END",the_end).
-package_internal_symbols(pkg_cl,"THE-START",the_start).
-package_internal_symbols(pkg_cl,"TYPE-ERROR-DATUM-1",type_error_datum_1).
-package_internal_symbols(pkg_cl,"TYPE-ERROR-EXPECTED-TYPE-1",type_error_expected_type_1).
-package_internal_symbols(pkg_cl,"UNBOUND-SLOT-INSTANCE-1",unbound_slot_instance_1).
-package_internal_symbols(pkg_cl,"VECTOR-COUNT-IF",vector_count_if).
-package_internal_symbols(pkg_cl,"VECTOR-SUBSTITUTE*",vector_substitute_xx).
-package_internal_symbols(pkg_cl,"WITH-START-END",with_start_end).
 package_internal_symbols(pkg_clos,"$ALL-SUPERCLASSES",clos_c36_all_superclasses).
 package_internal_symbols(pkg_clos,"$ALLOCATION",clos_c36_allocation).
 package_internal_symbols(pkg_clos,"$ARGORDER",clos_c36_argorder).
@@ -7985,6 +7899,7 @@ package_internal_symbols(pkg_sys,"%BENV%",sys_pf_benv_pf).
 package_internal_symbols(pkg_sys,"%CHECK-OBJECT",sys_pf_check_object).
 package_internal_symbols(pkg_sys,"%CIRCLEP",sys_pf_circlep).
 package_internal_symbols(pkg_sys,"%CLASS",sys_pf_class).
+package_internal_symbols(pkg_sys,"%CLASS-NAME",sys_pf_class_name).
 package_internal_symbols(pkg_sys,"%CLEAR-OUTPUT",sys_pf_clear_output).
 package_internal_symbols(pkg_sys,"%COMPILE",sys_pf_compile).
 package_internal_symbols(pkg_sys,"%COMPILE-SYSTEM",sys_pf_compile_system).
@@ -8172,6 +8087,7 @@ package_internal_symbols(pkg_sys,"%SET-CDDDAR",sys_pf_set_cdddar).
 package_internal_symbols(pkg_sys,"%SET-CDDDDR",sys_pf_set_cddddr).
 package_internal_symbols(pkg_sys,"%SET-CDDDR",sys_pf_set_cdddr).
 package_internal_symbols(pkg_sys,"%SET-CDDR",sys_pf_set_cddr).
+package_internal_symbols(pkg_sys,"%SET-CLASS-NAME",sys_pf_set_class_name).
 package_internal_symbols(pkg_sys,"%SET-DOCUMENTATION",sys_pf_set_documentation).
 package_internal_symbols(pkg_sys,"%SET-EIGHTH",sys_pf_set_eighth).
 package_internal_symbols(pkg_sys,"%SET-ELT",sys_pf_set_elt).
@@ -8247,6 +8163,9 @@ package_internal_symbols(pkg_sys,"%WRITE-SEQUENCE",sys_pf_write_sequence).
 package_internal_symbols(pkg_sys,"%WRITE-STRING",sys_pf_write_string).
 package_internal_symbols(pkg_sys,"%WRITE-TO-STRING",sys_pf_write_to_string).
 package_internal_symbols(pkg_sys,"(SETF CLOSURE-NAME)",sys_c40_setf_c32_closure_name_c41).
+package_internal_symbols(pkg_sys,"(SETF COMMON-LISP:COMPILER-MACRO-FUNCTION)",sys_c40_setf_c32_common_lisp_c58_compiler_macro_function_c41).
+package_internal_symbols(pkg_sys,"(SETF COMMON-LISP:RESTART-NAME)",sys_c40_setf_c32_common_lisp_c58_restart_name_c41).
+package_internal_symbols(pkg_sys,"(SETF COMMON-LISP:STREAM-ELEMENT-TYPE)",sys_c40_setf_c32_common_lisp_c58_stream_element_type_c41).
 package_internal_symbols(pkg_sys,"(SETF ELT)",sys_c40_setf_c32_elt_c41).
 package_internal_symbols(pkg_sys,"(SETF HASH-TABLE-WARN-IF-NEEDS-REHASH-AFTER-GC)",sys_c40_setf_c32_hash_table_warn_if_needs_rehash_after_gc_c41).
 package_internal_symbols(pkg_sys,"(SETF HASH-TABLE-WEAK-P)",sys_c40_setf_c32_hash_table_weak_p_c41).
@@ -8727,7 +8646,14 @@ package_internal_symbols(pkg_sys,"APPLY&SKIP&RET",sys_apply_c38_skip_c38_ret).
 package_internal_symbols(pkg_sys,"APPLY-KEY",sys_apply_key).
 package_internal_symbols(pkg_sys,"APPLY-UNLIST",sys_apply_unlist).
 package_internal_symbols(pkg_sys,"APPLYP",sys_applyp).
+package_internal_symbols(pkg_sys,"APROPOS-1",sys_apropos_1).
+package_internal_symbols(pkg_sys,"APROPOS-2",sys_apropos_2).
+package_internal_symbols(pkg_sys,"APROPOS-3",sys_apropos_3).
+package_internal_symbols(pkg_sys,"APROPOS-4",sys_apropos_4).
+package_internal_symbols(pkg_sys,"APROPOS-5",sys_apropos_5).
 package_internal_symbols(pkg_sys,"APROPOS-DO-MORE",sys_apropos_do_more).
+package_internal_symbols(pkg_sys,"APROPOS-LIST-1",sys_apropos_list_1).
+package_internal_symbols(pkg_sys,"APROPOS-LIST-2",sys_apropos_list_2).
 package_internal_symbols(pkg_sys,"ARG",sys_arg).
 package_internal_symbols(pkg_sys,"ARG-COUNT-ERROR",sys_arg_count_error).
 package_internal_symbols(pkg_sys,"ARG-COUNT-ERROR-ARGS",sys_arg_count_error_args).
@@ -8755,6 +8681,8 @@ package_internal_symbols(pkg_sys,"ARGUMENT-PRECEDENCE-ORDER",sys_argument_preced
 package_internal_symbols(pkg_sys,"ARGUMENTS",sys_arguments).
 package_internal_symbols(pkg_sys,"ARGUMENTS-OUT-OF-DOMAIN-ERROR",sys_arguments_out_of_domain_error).
 package_internal_symbols(pkg_sys,"ARGVARS",sys_argvars).
+package_internal_symbols(pkg_sys,"ARITHMETIC-ERROR-OPERANDS-1",sys_arithmetic_error_operands_1).
+package_internal_symbols(pkg_sys,"ARITHMETIC-ERROR-OPERATION-1",sys_arithmetic_error_operation_1).
 package_internal_symbols(pkg_sys,"ARRAY-INITIAL-ELEMENT-MISMATCH",sys_array_initial_element_mismatch).
 package_internal_symbols(pkg_sys,"ARRAY-READABLY-PRINTABLE-P",sys_array_readably_printable_p).
 package_internal_symbols(pkg_sys,"ARRAY-READER",sys_array_reader).
@@ -8806,6 +8734,7 @@ package_internal_symbols(pkg_sys,"BACKQUOTE-READER",sys_backquote_reader).
 package_internal_symbols(pkg_sys,"BACKQUOTIFY",sys_backquotify).
 package_internal_symbols(pkg_sys,"BACKQUOTIFY-1",sys_backquotify_1).
 package_internal_symbols(pkg_sys,"BACKTRACE-AS-LIST",sys_backtrace_as_list).
+package_internal_symbols(pkg_sys,"BAD-SEQ-LIMIT",sys_bad_seq_limit).
 package_internal_symbols(pkg_sys,"BARRIER",sys_barrier).
 package_internal_symbols(pkg_sys,"BASE",sys_base).
 package_internal_symbols(pkg_sys,"BASE-CLASSNAME",sys_base_classname).
@@ -8880,6 +8809,8 @@ package_internal_symbols(pkg_sys,"BQ-NON-SPLICING",sys_bq_non_splicing).
 package_internal_symbols(pkg_sys,"BQ-OPTIMIZE-FOR-VECTOR",sys_bq_optimize_for_vector).
 package_internal_symbols(pkg_sys,"BQ-SPLICING-P",sys_bq_splicing_p).
 package_internal_symbols(pkg_sys,"BQ-TRANSFORM",sys_bq_transform).
+package_internal_symbols(pkg_sys,"BREAK-1",sys_break_1).
+package_internal_symbols(pkg_sys,"BREAK-2",sys_break_2).
 package_internal_symbols(pkg_sys,"BREAK-LOOP",sys_break_loop).
 package_internal_symbols(pkg_sys,"BREAK-LOOP-1",sys_break_loop_1).
 package_internal_symbols(pkg_sys,"BREAK-LOOP-2",sys_break_loop_2).
@@ -9122,6 +9053,7 @@ package_internal_symbols(pkg_sys,"CALL",sys_call).
 package_internal_symbols(pkg_sys,"CALL&PUSH",sys_call_c38_push).
 package_internal_symbols(pkg_sys,"CALL-METHOD-ARGS",sys_call_method_args).
 package_internal_symbols(pkg_sys,"CALL-SPLICING",sys_call_splicing).
+package_internal_symbols(pkg_sys,"CALL-TEST",sys_call_test).
 package_internal_symbols(pkg_sys,"CALL-TEST-P",sys_call_test_p).
 package_internal_symbols(pkg_sys,"CALL0",sys_call0).
 package_internal_symbols(pkg_sys,"CALL1",sys_call1).
@@ -9195,7 +9127,10 @@ package_internal_symbols(pkg_sys,"CCLOSURE-CALL-CODE-PRODUCER-2",sys_cclosure_ca
 package_internal_symbols(pkg_sys,"CDR&PUSH",sys_cdr_c38_push).
 package_internal_symbols(pkg_sys,"CDR-TYPE",sys_cdr_type).
 package_internal_symbols(pkg_sys,"CELL",sys_cell).
+package_internal_symbols(pkg_sys,"CELL-ERROR-NAME-1",sys_cell_error_name_1).
 package_internal_symbols(pkg_sys,"CELLS",sys_cells).
+package_internal_symbols(pkg_sys,"CERROR-1",sys_cerror_1).
+package_internal_symbols(pkg_sys,"CERROR-2",sys_cerror_2).
 package_internal_symbols(pkg_sys,"CERROR-OF-TYPE",sys_cerror_of_type).
 package_internal_symbols(pkg_sys,"CFP-OUTPUT-FILE-DEFAULT",sys_cfp_output_file_default).
 package_internal_symbols(pkg_sys,"CH",sys_ch).
@@ -9382,7 +9317,9 @@ package_internal_symbols(pkg_sys,"COMMENT",sys_comment).
 package_internal_symbols(pkg_sys,"COMMENT-READER",sys_comment_reader).
 package_internal_symbols(pkg_sys,"COMMUTING-FORMS-P",sys_commuting_forms_p).
 package_internal_symbols(pkg_sys,"COMMUTING-FORMS-P-1",sys_commuting_forms_p_1).
+package_internal_symbols(pkg_sys,"COMPILE-CLOSURE-SLOT",sys_compile_closure_slot).
 package_internal_symbols(pkg_sys,"COMPILE-FAILURE-P",sys_compile_failure_p).
+package_internal_symbols(pkg_sys,"COMPILE-FILE-1",sys_compile_file_1).
 package_internal_symbols(pkg_sys,"COMPILE-FILE-PATHNAME-HELPER",sys_compile_file_pathname_helper).
 package_internal_symbols(pkg_sys,"COMPILE-FORM",sys_compile_form).
 package_internal_symbols(pkg_sys,"COMPILE-FORM-IN-TOPLEVEL-ENVIRONMENT",sys_compile_form_in_toplevel_environment).
@@ -9405,6 +9342,7 @@ package_internal_symbols(pkg_sys,"COMPILER-MACRO-KEYWORD-ARGUMENT",sys_compiler_
 package_internal_symbols(pkg_sys,"COMPILER-MACRO-KEYWORD-PROBLEM",sys_compiler_macro_keyword_problem).
 package_internal_symbols(pkg_sys,"COMPILER-MACROEXPAND-1",sys_compiler_macroexpand_1).
 package_internal_symbols(pkg_sys,"COMPLAINT",sys_complaint).
+package_internal_symbols(pkg_sys,"COMPLEMENT-1",sys_complement_1).
 package_internal_symbols(pkg_sys,"COMPLETION",sys_completion).
 package_internal_symbols(pkg_sys,"COMPLETION-1",sys_completion_1).
 package_internal_symbols(pkg_sys,"COMPLETION-2",sys_completion_2).
@@ -9424,6 +9362,7 @@ package_internal_symbols(pkg_sys,"COMPONENT-MATCH-WILD-P",sys_component_match_wi
 package_internal_symbols(pkg_sys,"COMPOUND-OBJECT-P",sys_compound_object_p).
 package_internal_symbols(pkg_sys,"COMPOUND-TYPE",sys_compound_type).
 package_internal_symbols(pkg_sys,"COMPUTE-CLASSFILE",sys_compute_classfile).
+package_internal_symbols(pkg_sys,"COMPUTE-RESTARTS-1",sys_compute_restarts_1).
 package_internal_symbols(pkg_sys,"CONC-NAME",sys_conc_name).
 package_internal_symbols(pkg_sys,"CONCAT-PNAMES",sys_concat_pnames).
 package_internal_symbols(pkg_sys,"CONCATENATE-TO-STRING",sys_concatenate_to_string).
@@ -9463,6 +9402,7 @@ package_internal_symbols(pkg_sys,"CONSTANT-MODIFIED",sys_constant_modified).
 package_internal_symbols(pkg_sys,"CONSTANT-MODIFIED-FUN-NAME",sys_constant_modified_fun_name).
 package_internal_symbols(pkg_sys,"CONSTANT-TYPE-P",sys_constant_type_p).
 package_internal_symbols(pkg_sys,"CONSTANT-WARNING",sys_constant_warning).
+package_internal_symbols(pkg_sys,"CONSTANTLY-1",sys_constantly_1).
 package_internal_symbols(pkg_sys,"CONSTRUCTOR",sys_constructor).
 package_internal_symbols(pkg_sys,"CONSTRUCTORS",sys_constructors).
 package_internal_symbols(pkg_sys,"CONSTS",sys_consts).
@@ -9653,6 +9593,7 @@ package_internal_symbols(pkg_sys,"DEFINE-BOA-CONSTRUCTOR",sys_define_boa_constru
 package_internal_symbols(pkg_sys,"DEFINE-CONSTRUCTORS",sys_define_constructors).
 package_internal_symbols(pkg_sys,"DEFINE-COPIER",sys_define_copier).
 package_internal_symbols(pkg_sys,"DEFINE-KEYWORD-CONSTRUCTOR",sys_define_keyword_constructor).
+package_internal_symbols(pkg_sys,"DEFINE-MODIFY-MACRO-1",sys_define_modify_macro_1).
 package_internal_symbols(pkg_sys,"DEFINE-PREDICATE",sys_define_predicate).
 package_internal_symbols(pkg_sys,"DEFINE-PRINT-FUNCTION",sys_define_print_function).
 package_internal_symbols(pkg_sys,"DEFINE-READER",sys_define_reader).
@@ -9672,6 +9613,11 @@ package_internal_symbols(pkg_sys,"DEFMACRO-LAMBDA-LIST-BROKEN-KEY-LIST-ERROR",sy
 package_internal_symbols(pkg_sys,"DEFMACRO-LAMBDA-LIST-BROKEN-KEY-LIST-ERROR-INFO",sys_defmacro_lambda_list_broken_key_list_error_info).
 package_internal_symbols(pkg_sys,"DEFMACRO-LAMBDA-LIST-BROKEN-KEY-LIST-ERROR-PROBLEM",sys_defmacro_lambda_list_broken_key_list_error_problem).
 package_internal_symbols(pkg_sys,"DEFMACRO-SPECIAL",sys_defmacro_special).
+package_internal_symbols(pkg_sys,"DEFPACKAGE-MODERNIZE",sys_defpackage_modernize).
+package_internal_symbols(pkg_sys,"DEFPACKAGE-RECORD-SYMNAME",sys_defpackage_record_symname).
+package_internal_symbols(pkg_sys,"DEFSETF-1",sys_defsetf_1).
+package_internal_symbols(pkg_sys,"DEFSTRUCT-1",sys_defstruct_1).
+package_internal_symbols(pkg_sys,"DEFSTRUCT-2",sys_defstruct_2).
 package_internal_symbols(pkg_sys,"DEFSTRUCT-ACCESSOR-SYMBOL",sys_defstruct_accessor_symbol).
 package_internal_symbols(pkg_sys,"DEFSTRUCT-CONSTRUCTOR",sys_defstruct_constructor).
 package_internal_symbols(pkg_sys,"DEFSTRUCT-DEFAULT-CONSTRUCTOR",sys_defstruct_default_constructor).
@@ -10029,6 +9975,7 @@ package_internal_symbols(pkg_sys,"FENV-ASSOC",sys_fenv_assoc).
 package_internal_symbols(pkg_sys,"FENV-SEARCH",sys_fenv_search).
 package_internal_symbols(pkg_sys,"FIELD-KEY",sys_field_key).
 package_internal_symbols(pkg_sys,"FILE",sys_file).
+package_internal_symbols(pkg_sys,"FILE-ERROR-PATHNAME-1",sys_file_error_pathname_1).
 package_internal_symbols(pkg_sys,"FILE-STREAM-P",sys_file_stream_p).
 package_internal_symbols(pkg_sys,"FILL-POINTER-MISC",sys_fill_pointer_misc).
 package_internal_symbols(pkg_sys,"FILL-POINTER-OUCH",sys_fill_pointer_ouch).
@@ -10294,6 +10241,7 @@ package_internal_symbols(pkg_sys,"FROB",sys_frob).
 package_internal_symbols(pkg_sys,"FROM",sys_from).
 package_internal_symbols(pkg_sys,"FROM-DEFCLASS-P",sys_from_defclass_p).
 package_internal_symbols(pkg_sys,"FROM-END",sys_from_end).
+package_internal_symbols(pkg_sys,"FROM-END-P",sys_from_end_p).
 package_internal_symbols(pkg_sys,"FROM-FILE",sys_from_file).
 package_internal_symbols(pkg_sys,"FROM-WILDCARD",sys_from_wildcard).
 package_internal_symbols(pkg_sys,"FRONTEND",sys_frontend).
@@ -10822,6 +10770,7 @@ package_internal_symbols(pkg_sys,"LIST-ACCESS",sys_list_access).
 package_internal_symbols(pkg_sys,"LIST-ACCESS-SET",sys_list_access_set).
 package_internal_symbols(pkg_sys,"LIST-BACKWARD",sys_list_backward).
 package_internal_symbols(pkg_sys,"LIST-COPY-SEQ",sys_list_copy_seq).
+package_internal_symbols(pkg_sys,"LIST-COUNT-IF",sys_list_count_if).
 package_internal_symbols(pkg_sys,"LIST-DELETE",sys_list_delete).
 package_internal_symbols(pkg_sys,"LIST-DELETE-DUPLICATES*",sys_list_delete_duplicates_xx).
 package_internal_symbols(pkg_sys,"LIST-DELETE-FROM-END",sys_list_delete_from_end).
@@ -10859,6 +10808,7 @@ package_internal_symbols(pkg_sys,"LIST-REPLACE-FROM-VECTOR*",sys_list_replace_fr
 package_internal_symbols(pkg_sys,"LIST-SET-ELT",sys_list_set_elt).
 package_internal_symbols(pkg_sys,"LIST-SIZE",sys_list_size).
 package_internal_symbols(pkg_sys,"LIST-STATISTICS",sys_list_statistics).
+package_internal_symbols(pkg_sys,"LIST-SUBSTITUTE*",sys_list_substitute_xx).
 package_internal_symbols(pkg_sys,"LIST-TO-HT",sys_list_to_ht).
 package_internal_symbols(pkg_sys,"LIST-TO-MV",sys_list_to_mv).
 package_internal_symbols(pkg_sys,"LIST-TRACED-FUNCTIONS",sys_list_traced_functions).
@@ -11185,6 +11135,7 @@ package_internal_symbols(pkg_sys,"NORMAL-MUMBLE-REMOVE",sys_normal_mumble_remove
 package_internal_symbols(pkg_sys,"NORMAL-MUMBLE-REMOVE-FROM-END",sys_normal_mumble_remove_from_end).
 package_internal_symbols(pkg_sys,"NOT-FEATURE-READER",sys_not_feature_reader).
 package_internal_symbols(pkg_sys,"NOT-JAVA-6",sys_not_java_6).
+package_internal_symbols(pkg_sys,"NOT-P",sys_not_p).
 package_internal_symbols(pkg_sys,"NOT-READABLE-READER",sys_not_readable_reader).
 package_internal_symbols(pkg_sys,"NOTE-FAR-ASSIGNED-VAR",sys_note_far_assigned_var).
 package_internal_symbols(pkg_sys,"NOTE-FAR-USED-BLOCK",sys_note_far_used_block).
@@ -11197,8 +11148,11 @@ package_internal_symbols(pkg_sys,"NOTE-OPTIMIZE",sys_note_optimize).
 package_internal_symbols(pkg_sys,"NOTE-REFERENCES",sys_note_references).
 package_internal_symbols(pkg_sys,"NOTE-TOPLEVEL-FORM",sys_note_toplevel_form).
 package_internal_symbols(pkg_sys,"NOTP",sys_notp).
+package_internal_symbols(pkg_sys,"NSET-EXCLUSIVE-OR-1",sys_nset_exclusive_or_1).
+package_internal_symbols(pkg_sys,"NSET-EXCLUSIVE-OR-2",sys_nset_exclusive_or_2).
 package_internal_symbols(pkg_sys,"NSPLICE",sys_nsplice).
 package_internal_symbols(pkg_sys,"NSTRING-CAPITALIZE1",sys_nstring_capitalize1).
+package_internal_symbols(pkg_sys,"NSUBLIS-MACRO",sys_nsublis_macro).
 package_internal_symbols(pkg_sys,"NTH-SLOT",sys_nth_slot).
 package_internal_symbols(pkg_sys,"NULL-LEXENV-P",sys_null_lexenv_p).
 package_internal_symbols(pkg_sys,"NUM-OPERAND-LENGTH",sys_num_operand_length).
@@ -11327,6 +11281,7 @@ package_internal_symbols(pkg_sys,"PACKAGE-AT-VARIANCE",sys_package_at_variance).
 package_internal_symbols(pkg_sys,"PACKAGE-AT-VARIANCE-ERROR",sys_package_at_variance_error).
 package_internal_symbols(pkg_sys,"PACKAGE-DESIGNATOR",sys_package_designator).
 package_internal_symbols(pkg_sys,"PACKAGE-DOCUMENTATION",sys_package_documentation).
+package_internal_symbols(pkg_sys,"PACKAGE-ERROR-PACKAGE-1",sys_package_error_package_1).
 package_internal_symbols(pkg_sys,"PACKAGE-HASHTABLE",sys_package_hashtable).
 package_internal_symbols(pkg_sys,"PACKAGE-ITERATE",sys_package_iterate).
 package_internal_symbols(pkg_sys,"PACKAGE-ITERATOR",sys_package_iterator).
@@ -11400,10 +11355,13 @@ package_internal_symbols(pkg_sys,"POST-BREAK-IF",sys_post_break_if).
 package_internal_symbols(pkg_sys,"POST-PRINT",sys_post_print).
 package_internal_symbols(pkg_sys,"PPN-FWD",sys_ppn_fwd).
 package_internal_symbols(pkg_sys,"PPRINT-DISPATCH-P",sys_pprint_dispatch_p).
+package_internal_symbols(pkg_sys,"PPRINT-FILL-1",sys_pprint_fill_1).
+package_internal_symbols(pkg_sys,"PPRINT-LINEAR-1",sys_pprint_linear_1).
 package_internal_symbols(pkg_sys,"PPRINT-LOGICAL-BLOCK-BOTH-ERROR",sys_pprint_logical_block_both_error).
 package_internal_symbols(pkg_sys,"PPRINT-LOGICAL-BLOCK-END",sys_pprint_logical_block_end).
 package_internal_symbols(pkg_sys,"PPRINT-LOGICAL-BLOCK-PREFIX-NOT-STRING-ERROR",sys_pprint_logical_block_prefix_not_string_error).
 package_internal_symbols(pkg_sys,"PPRINT-LOGICAL-BLOCK-SUFFIX-NOT-STRING-ERROR",sys_pprint_logical_block_suffix_not_string_error).
+package_internal_symbols(pkg_sys,"PPRINT-TABULAR-1",sys_pprint_tabular_1).
 package_internal_symbols(pkg_sys,"PRE",sys_pre).
 package_internal_symbols(pkg_sys,"PRE-BREAK-IF",sys_pre_break_if).
 package_internal_symbols(pkg_sys,"PRE-PRINT",sys_pre_print).
@@ -11435,6 +11393,7 @@ package_internal_symbols(pkg_sys,"PRINT-FUNCTION",sys_print_function).
 package_internal_symbols(pkg_sys,"PRINT-INSPECTION",sys_print_inspection).
 package_internal_symbols(pkg_sys,"PRINT-LABEL",sys_print_label).
 package_internal_symbols(pkg_sys,"PRINT-LINES-WITH-PREFIX",sys_print_lines_with_prefix).
+package_internal_symbols(pkg_sys,"PRINT-NOT-READABLE-OBJECT-1",sys_print_not_readable_object_1).
 package_internal_symbols(pkg_sys,"PRINT-OBJECT-STREAM-SPECIALIZER",sys_print_object_stream_specializer).
 package_internal_symbols(pkg_sys,"PRINT-OPTION",sys_print_option).
 package_internal_symbols(pkg_sys,"PRINT-REFERENCE",sys_print_reference).
@@ -11513,6 +11472,7 @@ package_internal_symbols(pkg_sys,"PROTOTYPE",sys_prototype).
 package_internal_symbols(pkg_sys,"PROXY-P",sys_proxy_p).
 package_internal_symbols(pkg_sys,"PROXY-PRELOADED-FUNCTION",sys_proxy_preloaded_function).
 package_internal_symbols(pkg_sys,"PROXY-STRING",sys_proxy_string).
+package_internal_symbols(pkg_sys,"PSETF-RECURSE",sys_psetf_recurse).
 package_internal_symbols(pkg_sys,"PTEMP",sys_ptemp).
 package_internal_symbols(pkg_sys,"PTY",sys_pty).
 package_internal_symbols(pkg_sys,"PUNT-PRINT-IF-TOO-LONG",sys_punt_print_if_too_long).
@@ -11619,6 +11579,7 @@ package_internal_symbols(pkg_sys,"REQUIRED-ARGS",sys_required_args).
 package_internal_symbols(pkg_sys,"REQUIRES-STEPBEFORE",sys_requires_stepbefore).
 package_internal_symbols(pkg_sys,"REST-FLAG",sys_rest_flag).
 package_internal_symbols(pkg_sys,"REST-P",sys_rest_p).
+package_internal_symbols(pkg_sys,"RESTART-BIND-1",sys_restart_bind_1).
 package_internal_symbols(pkg_sys,"RESTART-CLAUSES",sys_restart_clauses).
 package_internal_symbols(pkg_sys,"RESTART-FUNCTION",sys_restart_function).
 package_internal_symbols(pkg_sys,"RESTART-INTERACTIVE",sys_restart_interactive).
@@ -11735,6 +11696,8 @@ package_internal_symbols(pkg_sys,"SET-CLOSURE-CONST",sys_set_closure_const).
 package_internal_symbols(pkg_sys,"SET-CURRENT-LANGUAGE",sys_set_current_language).
 package_internal_symbols(pkg_sys,"SET-DEFAULT-FILE-ENCODING",sys_set_default_file_encoding).
 package_internal_symbols(pkg_sys,"SET-EQUAL",sys_set_equal).
+package_internal_symbols(pkg_sys,"SET-EXCLUSIVE-OR-1",sys_set_exclusive_or_1).
+package_internal_symbols(pkg_sys,"SET-EXCLUSIVE-OR-2",sys_set_exclusive_or_2).
 package_internal_symbols(pkg_sys,"SET-FDEFINITION",sys_set_fdefinition).
 package_internal_symbols(pkg_sys,"SET-FILE-DOC",sys_set_file_doc).
 package_internal_symbols(pkg_sys,"SET-FILL-POINTER",sys_set_fill_pointer).
@@ -11900,6 +11863,12 @@ package_internal_symbols(pkg_sys,"SIMPLE-BIT-ARRAY",sys_simple_bit_array).
 package_internal_symbols(pkg_sys,"SIMPLE-CELL-ERROR",sys_simple_cell_error).
 package_internal_symbols(pkg_sys,"SIMPLE-CHARACTER-STRING",sys_simple_character_string).
 package_internal_symbols(pkg_sys,"SIMPLE-COMPILER-NOTE",sys_simple_compiler_note).
+package_internal_symbols(pkg_sys,"SIMPLE-CONDITION-FORMAT-ARGUMENTS-1",sys_simple_condition_format_arguments_1).
+package_internal_symbols(pkg_sys,"SIMPLE-CONDITION-FORMAT-ARGUMENTS-PRELIMINARY",sys_simple_condition_format_arguments_preliminary).
+package_internal_symbols(pkg_sys,"SIMPLE-CONDITION-FORMAT-ARGUMENTS-PRELIMINARY-1",sys_simple_condition_format_arguments_preliminary_1).
+package_internal_symbols(pkg_sys,"SIMPLE-CONDITION-FORMAT-CONTROL-1",sys_simple_condition_format_control_1).
+package_internal_symbols(pkg_sys,"SIMPLE-CONDITION-FORMAT-CONTROL-PRELIMINARY",sys_simple_condition_format_control_preliminary).
+package_internal_symbols(pkg_sys,"SIMPLE-CONDITION-FORMAT-CONTROL-PRELIMINARY-1",sys_simple_condition_format_control_preliminary_1).
 package_internal_symbols(pkg_sys,"SIMPLE-CONDITION-FORMAT-STRING-1",sys_simple_condition_format_string_1).
 package_internal_symbols(pkg_sys,"SIMPLE-CONTROL-ERROR",sys_simple_control_error).
 package_internal_symbols(pkg_sys,"SIMPLE-DESTRUCTURING-BIND",sys_simple_destructuring_bind).
@@ -11997,6 +11966,7 @@ package_internal_symbols(pkg_sys,"SLOTD-INITIALIZATION-ERROR-KIND",sys_slotd_ini
 package_internal_symbols(pkg_sys,"SLOTD-INITIALIZATION-ERROR-VALUE",sys_slotd_initialization_error_value).
 package_internal_symbols(pkg_sys,"SLOTD-INITIALIZATION-TYPE-ERROR",sys_slotd_initialization_type_error).
 package_internal_symbols(pkg_sys,"SLOTLIST",sys_slotlist).
+package_internal_symbols(pkg_sys,"SO-ACCEPTCONN",sys_so_acceptconn).
 package_internal_symbols(pkg_sys,"SOCKET-STREAM",sys_socket_stream).
 package_internal_symbols(pkg_sys,"SOFTWARE",sys_software).
 package_internal_symbols(pkg_sys,"SORT-LIST",sys_sort_list).
@@ -12094,6 +12064,7 @@ package_internal_symbols(pkg_sys,"STREAM-ENCODING-ERROR",sys_stream_encoding_err
 package_internal_symbols(pkg_sys,"STREAM-END-S-EXPRESSION",sys_stream_end_s_expression).
 package_internal_symbols(pkg_sys,"STREAM-END-S-EXPRESSION-PRELIMINARY",sys_stream_end_s_expression_preliminary).
 package_internal_symbols(pkg_sys,"STREAM-END-S-EXPRESSION-PRELIMINARY-1",sys_stream_end_s_expression_preliminary_1).
+package_internal_symbols(pkg_sys,"STREAM-ERROR-STREAM-1",sys_stream_error_stream_1).
 package_internal_symbols(pkg_sys,"STREAM-FASL-P",sys_stream_fasl_p).
 package_internal_symbols(pkg_sys,"STREAM-INPUT-ELEMENT-TYPE",sys_stream_input_element_type).
 package_internal_symbols(pkg_sys,"STREAM-LINE-NUMBER",sys_stream_line_number).
@@ -12152,6 +12123,7 @@ package_internal_symbols(pkg_sys,"SUBFORMS",sys_subforms).
 package_internal_symbols(pkg_sys,"SUBLIS-IN-FORM",sys_sublis_in_form).
 package_internal_symbols(pkg_sys,"SUBR-INFO",sys_subr_info).
 package_internal_symbols(pkg_sys,"SUBSCRIPTS",sys_subscripts).
+package_internal_symbols(pkg_sys,"SUBST-DISPATCH",sys_subst_dispatch).
 package_internal_symbols(pkg_sys,"SUBST-IF-THEN",sys_subst_if_then).
 package_internal_symbols(pkg_sys,"SUBST-IF-THEN-SUBST",sys_subst_if_then_subst).
 package_internal_symbols(pkg_sys,"SUBST-IN-FORM",sys_subst_in_form).
@@ -12257,15 +12229,20 @@ package_internal_symbols(pkg_sys,"TEST",sys_test).
 package_internal_symbols(pkg_sys,"TEST-ARGUMENT-SYNTAX",sys_test_argument_syntax).
 package_internal_symbols(pkg_sys,"TEST-BITNAME-ARG",sys_test_bitname_arg).
 package_internal_symbols(pkg_sys,"TEST-BITS-ARG",sys_test_bits_arg).
+package_internal_symbols(pkg_sys,"TEST-ERROR",sys_test_error).
 package_internal_symbols(pkg_sys,"TEST-FONT-ARG",sys_test_font_arg).
 package_internal_symbols(pkg_sys,"TEST-FORM",sys_test_form).
 package_internal_symbols(pkg_sys,"TEST-FUNCTION",sys_test_function).
 package_internal_symbols(pkg_sys,"TEST-LIST",sys_test_list).
 package_internal_symbols(pkg_sys,"TEST-NOT",sys_test_not).
+package_internal_symbols(pkg_sys,"TEST-NOT-P",sys_test_not_p).
+package_internal_symbols(pkg_sys,"TEST-P",sys_test_p).
 package_internal_symbols(pkg_sys,"TESTP",sys_testp).
 package_internal_symbols(pkg_sys,"TEXT",sys_text).
 package_internal_symbols(pkg_sys,"TEXT-INDENT-RAW",sys_text_indent_raw).
+package_internal_symbols(pkg_sys,"THE-END",sys_the_end).
 package_internal_symbols(pkg_sys,"THE-FRAME",sys_the_frame).
+package_internal_symbols(pkg_sys,"THE-START",sys_the_start).
 package_internal_symbols(pkg_sys,"THEN",sys_then).
 package_internal_symbols(pkg_sys,"THEREIS",sys_thereis).
 package_internal_symbols(pkg_sys,"THING",sys_thing).
@@ -12343,6 +12320,8 @@ package_internal_symbols(pkg_sys,"TYPE-CALL-ERROR",sys_type_call_error).
 package_internal_symbols(pkg_sys,"TYPE-CATEGORY",sys_type_category).
 package_internal_symbols(pkg_sys,"TYPE-CLASS",sys_type_class).
 package_internal_symbols(pkg_sys,"TYPE-CLASS-OR-LOSE",sys_type_class_or_lose).
+package_internal_symbols(pkg_sys,"TYPE-ERROR-DATUM-1",sys_type_error_datum_1).
+package_internal_symbols(pkg_sys,"TYPE-ERROR-EXPECTED-TYPE-1",sys_type_error_expected_type_1).
 package_internal_symbols(pkg_sys,"TYPE-ERROR-STRING",sys_type_error_string).
 package_internal_symbols(pkg_sys,"TYPE-FOR-DISCRIMINATION",sys_type_for_discrimination).
 package_internal_symbols(pkg_sys,"TYPE-LIST",sys_type_list).
@@ -12413,6 +12392,7 @@ package_internal_symbols(pkg_sys,"TYPESPEC-ERROR",sys_typespec_error).
 package_internal_symbols(pkg_sys,"UNBIND",sys_unbind).
 package_internal_symbols(pkg_sys,"UNBIND1",sys_unbind1).
 package_internal_symbols(pkg_sys,"UNBOUND->NIL",sys_unbound_c62_nil).
+package_internal_symbols(pkg_sys,"UNBOUND-SLOT-INSTANCE-1",sys_unbound_slot_instance_1).
 package_internal_symbols(pkg_sys,"UNDEFINED-ALIEN-STYLE-WARNING",sys_undefined_alien_style_warning).
 package_internal_symbols(pkg_sys,"UNDEFINED-ALIEN-SYMBOL",sys_undefined_alien_symbol).
 package_internal_symbols(pkg_sys,"UNDEFINED-CLASSOID",sys_undefined_classoid).
@@ -12532,6 +12512,7 @@ package_internal_symbols(pkg_sys,"VARLIST",sys_varlist).
 package_internal_symbols(pkg_sys,"VARS",sys_vars).
 package_internal_symbols(pkg_sys,"VARSET",sys_varset).
 package_internal_symbols(pkg_sys,"VECTOR-COPY-SEQ",sys_vector_copy_seq).
+package_internal_symbols(pkg_sys,"VECTOR-COUNT-IF",sys_vector_count_if).
 package_internal_symbols(pkg_sys,"VECTOR-DELETE-DUPLICATES*",sys_vector_delete_duplicates_xx).
 package_internal_symbols(pkg_sys,"VECTOR-ENDTEST",sys_vector_endtest).
 package_internal_symbols(pkg_sys,"VECTOR-FE-ENDTEST",sys_vector_fe_endtest).
@@ -12560,6 +12541,7 @@ package_internal_symbols(pkg_sys,"VECTOR-READER",sys_vector_reader).
 package_internal_symbols(pkg_sys,"VECTOR-REMOVE-DUPLICATES",sys_vector_remove_duplicates).
 package_internal_symbols(pkg_sys,"VECTOR-REPLACE-FROM-LIST*",sys_vector_replace_from_list_xx).
 package_internal_symbols(pkg_sys,"VECTOR-REPLACE-FROM-VECTOR*",sys_vector_replace_from_vector_xx).
+package_internal_symbols(pkg_sys,"VECTOR-SUBSTITUTE*",sys_vector_substitute_xx).
 package_internal_symbols(pkg_sys,"VECTOR-UPD",sys_vector_upd).
 package_internal_symbols(pkg_sys,"VENV",sys_venv).
 package_internal_symbols(pkg_sys,"VENV-ASSOC",sys_venv_assoc).
@@ -12598,6 +12580,7 @@ package_internal_symbols(pkg_sys,"WITH-NO-PACKAGE-LOCK-INTERNAL",sys_with_no_pac
 package_internal_symbols(pkg_sys,"WITH-NTH-HASH-SLOT",sys_with_nth_hash_slot).
 package_internal_symbols(pkg_sys,"WITH-OPEN",sys_with_open).
 package_internal_symbols(pkg_sys,"WITH-SET-KEYS",sys_with_set_keys).
+package_internal_symbols(pkg_sys,"WITH-START-END",sys_with_start_end).
 package_internal_symbols(pkg_sys,"WITH-STREAM-S-EXPRESSION",sys_with_stream_s_expression).
 package_internal_symbols(pkg_sys,"WITH-TAG",sys_with_tag).
 package_internal_symbols(pkg_sys,"WITH-TAGL",sys_with_tagl).
