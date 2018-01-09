@@ -243,11 +243,21 @@ compile_body(_Cx,_Ev,Item,[quote, Item],  true):- !.
 
 
 % ` Backquoted 
-compile_body(_Cx,Env,Result,['#BQ',Form], Code):-!,compile_bq(Env,Result,Form,Code),!.
-compile_body(_Cx,Env,Result,['`',Form], Code):-!,compile_bq(Env,Result,Form,Code),!.
-compile_body(Ctx,Env,Result,['#COMMA',Form], (Code,f_eval(CommaResult,Result))):-!,compile_body(Ctx,Env,CommaResult,Form,Code),!.
-compile_body(Ctx,Env,Result,['#BQ-COMMA-ELIPSE',Form], (Code,f_eval(CommaResult,Result))):- dump_trace_lisp,!,compile_body(Ctx,Env,CommaResult,Form,Code),!.
+% ``,,(cons 1 1)
+%  `,`,(cons 1 1)
 
+compile_body(Ctx,Env,Result,['#BQ',Form], Code):-!,get_bqd(BQD),compile_bq(Ctx,BQD,Env,Result,Form,Code),!.
+compile_body(Ctx,Env,Result,['`',Form], Code):-!,compile_body(Ctx,Env,Result,['#BQ',Form], Code).
+
+compile_body(_Ctx,_Env,['#COMMA',Form],['#COMMA',Form],true).
+/*
+% error
+compile_body(Ctx,Env,Result,['#COMMA',Form], (Code,f_eval(CommaResult,Result))):-!,compile_body(Ctx,Env,CommaResult,Form,Code),!.
+% error
+compile_body(Ctx,Env,Result,['#BQ-COMMA-ELIPSE',Form], (Code,f_eval(CommaResult,Result))):- 
+  % lisp_dump_trace,
+  !,compile_body(Ctx,Env,CommaResult,Form,Code),!.
+*/
 
 compile_body(_Ctx,_Env,_Result,[Var|_], _Body):- var(Var),!,lisp_dump_break.
 
