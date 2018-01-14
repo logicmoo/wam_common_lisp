@@ -6262,7 +6262,7 @@ struct_opv(claz_structure_object,slot,structure_class,zlot_structure_object_stru
 struct_opv(claz_structure_object,slot,type,zlot_structure_object_type).
 %struct_opv(claz_structure_object,super_priority,[claz_structure_c33_object,claz_structure_object,claz_sys_slot_object,claz_t]).
 struct_opv(claz_structure_object,super_priority,[claz_sys_slot_object,claz_t]).
-struct_opv(claz_structure_object,super_priority,[claz_t]).
+%struct_opv(claz_structure_object,super_priority,[claz_t]).
 struct_opv(claz_structure_object,symbolname,structure_object).
 struct_opv(claz_structure_object,type,list,zlot_structure_object_slots).
 struct_opv(claz_structure_object,type,structure_class,zlot_structure_object_structure_class).

@@ -194,6 +194,7 @@
 :- ensure_loaded(fileload).
 :- ensure_loaded(threading).
 :- ensure_loaded(funcall).
+:- ensure_loaded(clstructs).
 
 :- ensure_loaded(defun).
 :- ensure_loaded(defgeneric).

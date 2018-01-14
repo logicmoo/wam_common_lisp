@@ -181,26 +181,6 @@ type_slot_number(Kind,Key,Ordinal):-
 
 
 /*
-name_value_default(m(_,array_of(Kind),Name),Name-mut([],array_of(Kind))).
-name_value_default(m(_,prolog_array_list(Kind),Name),Name-mut([],array_of(Kind))).
-name_value_default(m(_,Kind,Name),Name-Def):-value_default(Kind,Def).
-name_value_default(m(_,Kind,Name),Name-mut(@(null),Kind)).
-name_value_default(N-Value,N-Value).
-*/
-
-value_default(claz_prolog_concurrent_hash_map(Key,Value),mut([],map(Key,Value))).
-value_default(claz_prolog_hash_map(Key,Value),mut([],map(Key,Value))).
-value_default(claz_list,[]).
-value_default(integer,0).
-value_default(claz_object,mut([],claz_object)).
-
-%value_default(claz_simple_string, @(null)).
-%value_default(claz_string, @(null)).
-%value_default(prolog_array_list(_),[]).
-%value_default(array_of(_),[]).
-
-
-/*
 :- defstruct([obr, [':print-function', 'print-ob']],
              "OB representation structure",
              [obnames, []],
