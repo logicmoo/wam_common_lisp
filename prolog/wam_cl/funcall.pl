@@ -151,7 +151,7 @@ do_check_foc_operator(_Ctx,_Env,_BindType,_F,_Args,ProposedName, ProposedName).
 
 compile_apply_function_or_macro_call(Ctx,Env,FN,Args,Result,ExpandedFunction):-
  always((
-   (is_list(Args)->length(Args,ArgsLen);true),
+   (is_list(Args)->length(Args,ArgsLen);(integer(Args)->ArgsLen=Args;true)),
    check_foc_operator(Ctx,Env,kw_function,FN,ArgsLen, ProposedName),!,
    align_args_or_fallback(Ctx,Env,FN, ProposedName,Args,Result,ArgsPlusResult),!,
    ExpandedFunction =.. [ ProposedName | ArgsPlusResult])),!.
@@ -166,7 +166,7 @@ compile_apply0(Ctx,Env,F,Args,Result,ExpandedFunction):-
   compile_apply1(Ctx,Env,F,Args,Result,ExpandedFunction),!.
 
 compile_apply1(Ctx,Env,F,Args,Result,ExpandedFunction):- atom(F),
- (eval_uses_exact_and_restkeys(F,N); ( F==list,N=0)),
+ ((get_init_args(F,N),integer(N)); ( F==list,N=0)),
  length(Left,N),
  append(Left,IntoList,Args),
  append(Left,[IntoList,Result],NewArgs),

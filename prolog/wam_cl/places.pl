@@ -35,7 +35,7 @@ lookup_symbol_macro(Ctx,Env,LVar,GET):- get_ctx_env_attribute(Ctx,Env,symbol_mac
 wl:init_args(1,array_row_major_index).
 wl:init_args(x,row_major_aref).
 
-wl:setf_inverse(slot_value,clos_pf_set_slot_value).
+wl:setf_inverse(slot_value,sys_pf_set_slot_value).
 wl:setf_inverse(car,rplaca).
 wl:setf_inverse(cdr,rplacd).
 wl:setf_inverse(aref,svref).

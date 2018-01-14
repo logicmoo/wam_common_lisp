@@ -136,7 +136,7 @@ f_exp(N,Ret):- Ret is exp(N).
 
 f_expt(N1,N2,Ret):- Ret is (N1 ^ N2).
 
-
+f_sys_random_posfixnum(Res):- Res is random(2147483647)+1.
 
 
 % asserting1... u

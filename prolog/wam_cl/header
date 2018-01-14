@@ -192,6 +192,7 @@
 :- ensure_loaded(describe).
 :- ensure_loaded(disassemble).
 :- ensure_loaded(fileload).
+:- ensure_loaded(threading).
 :- ensure_loaded(funcall).
 
 :- ensure_loaded(defun).

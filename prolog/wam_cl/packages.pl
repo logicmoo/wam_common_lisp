@@ -23,6 +23,7 @@ xlisting_config:xlisting_always(G):- G=package:_, current_predicate(_,G),predica
   \+ predicate_property(G,imported_from(_)).
 
 
+f_list_all_packages(Ret):- findall(P,package_name(P,_),List),list_to_set(List,Ret).
 
 wl:init_args(x,sys_select_package).
 wl:interned_eval("
@@ -247,7 +248,7 @@ print_package_or_hash(P):-short_package_or_hash(P,O),write(O).
 package_name(pkg_kw,"KEYWORD").
 package_name(pkg_user,"COMMON-LISP-USER").
 package_name(pkg_cl,"COMMON-LISP").
-package_name(pkg_clos,"CLOS").
+package_name(pkg_clos,"CLOS"):- \+ current_prolog_flag(wamcl_pcl,true).
 package_name(pkg_prolog,"PROLOG").
 package_name(pkg_custom,"CUSTOM").
 package_name(pkg_debug,"DEBUG").
@@ -302,8 +303,18 @@ package_nicknames(pkg_sys, "SB!SYS").
 package_nicknames(pkg_sys, "CCL").
 package_nicknames(pkg_sys, "WAM-CL").
 
-package_nicknames(pkg_os, "OS").
+/*
 package_nicknames(pkg_clos, "MOP").
+package_nicknames(pkg_clos, "PCL").
+package_nicknames(pkg_clos, "SB-PCL").
+package_nicknames(pkg_clos, "CLOS").
+*/
+package_nicknames(pkg_sys, "MOP").
+package_nicknames(pkg_sys, "PCL").
+package_nicknames(pkg_sys, "SB-PCL").
+package_nicknames(pkg_sys, "CLOS"):- \+ current_prolog_flag(wamcl_pcl,true).
+
+package_nicknames(pkg_os, "OS").
 package_nicknames(pkg_tl, "TPL").
 package_nicknames(pkg_precompiler, "PRE").
 package_nicknames(pkg_profiler, "PROF").
@@ -316,7 +327,7 @@ package_use_list(pkg_user, pkg_cl).
 package_use_list(pkg_user, pkg_sys).
 package_use_list(pkg_user, pkg_prolog).
 package_use_list(pkg_user, pkg_custom).
-package_use_list(pkg_user, pkg_clos).
+package_use_list(pkg_user, pkg_clos):- current_prolog_flag(wamcl_pcl,true).
 package_use_list(pkg_user, pkg_ext).
 
 package_use_list(pkg_cl, pkg_ext).
@@ -324,15 +335,17 @@ package_use_list(pkg_cl, pkg_prolog).
 package_use_list(pkg_cl, pkg_sys).
 %package_use_list(pkg_cl, pkg_clos).
 
+/*
 package_use_list(pkg_clos, pkg_cl).
 package_use_list(pkg_clos, pkg_ext).
 package_use_list(pkg_clos, pkg_prolog).
 package_use_list(pkg_clos, pkg_sys).
+*/
 
 package_use_list(pkg_prolog, pkg_cl).
 package_use_list(pkg_prolog, pkg_ext).
 package_use_list(pkg_prolog, pkg_sys).
-package_use_list(pkg_prolog, pkg_clos).
+package_use_list(pkg_prolog, pkg_clos):- current_prolog_flag(wamcl_pcl,true).
 package_use_list(pkg_prolog, pkg_custom).
 package_use_list(pkg_prolog, pkg_gray).
 package_use_list(pkg_prolog, pkg_gstream).
@@ -358,7 +371,7 @@ package_use_list(pkg_ext, pkg_i18n).
 package_use_list(pkg_ext, pkg_os).
 package_use_list(pkg_ext, pkg_socket).
 package_use_list(pkg_ext, pkg_threads).
-package_use_list(pkg_ext, pkg_clos).
+package_use_list(pkg_ext, pkg_clos):- current_prolog_flag(wamcl_pcl,true).
 package_use_list(pkg_ext, pkg_sys).
 package_use_list(pkg_ext, pkg_prolog).
 

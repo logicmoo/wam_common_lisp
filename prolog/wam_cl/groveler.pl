@@ -40,13 +40,20 @@ wl:body_compiled(quote).
 
 wl:body_compiled(setq). 
 
+:- assertz(wl:interned_eval(call(define_body_compiled))).
+
+
+define_body_compiled:- forall(wl:body_compiled(Symbol),define_body_compiled(Symbol)).
+
+% TODO
+define_body_compiled(_Op). 
 
 
 
-was_pkg_prefix(sys,pkg_sys).
 was_pkg_prefix(sys,pkg_sys).
 was_pkg_prefix(u,pkg_user).
-was_pkg_prefix(clos,pkg_clos).
+was_pkg_prefix(clos,pkg_sys):- \+  current_prolog_flag(wamcl_pcl,true).
+was_pkg_prefix(clos,pkg_clos):- current_prolog_flag(wamcl_pcl,true).
 
 
 % grovel_system_symbols:-!.
@@ -106,33 +113,35 @@ make_special_operator(Symbol):-
   set_opv(Symbol,symbol_function,SF),
   set_opv(SF,type_of,sys_special_operator).
 
-:- assertz(wl:interned_eval(call(maplist(make_special_operator,[
-         block,
-         let_xx,
-         return_from,
-         catch,
-         load_time_value,
-         setq,
-         eval_when,
-         locally,
-         symbol_macrolet,
-         flet,
-         macrolet,
-         tagbody,
-         function,
-         multiple_value_call,
-         the,
-         go,
-         multiple_value_prog1,
-         throw,
-         if,
-         progn,
-         unwind_protect,
-         labels,
-         progv,
-         let,
-         quote])))).
+make_special_operator_symbols:- forall(cl_special_form(Symbol),make_special_operator(Symbol)).
 
+cl_special_form(block).
+cl_special_form(let_xx).
+cl_special_form(return_from).
+cl_special_form(catch).
+cl_special_form(load_time_value).
+cl_special_form(setq).
+cl_special_form(eval_when).
+cl_special_form(locally).
+cl_special_form(symbol_macrolet).
+cl_special_form(flet).
+cl_special_form(macrolet).
+cl_special_form(tagbody).
+cl_special_form(function).
+cl_special_form(multiple_value_call).
+cl_special_form(the).
+cl_special_form(go).
+cl_special_form(multiple_value_prog1).
+cl_special_form(throw).
+cl_special_form(if).
+cl_special_form(progn).
+cl_special_form(unwind_protect).
+cl_special_form(labels).
+cl_special_form(progv).
+cl_special_form(let).
+cl_special_form(quote).
+ 
+:- assertz(wl:interned_eval(call(make_special_operator_symbols))).
 
 :- fixup_exports.
 

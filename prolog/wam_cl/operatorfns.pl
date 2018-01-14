@@ -139,28 +139,27 @@ foc_operator(Ctx,_Env,BindType,FN, _Len, ProposedName):-
   show_call_trace((generate_function_or_macro_name(Ctx,FN,BindType,ProposedName))),!.
 
 
+bind_type_naming(kw_function,FN,ProposedName):- (atom_concat('f_',FN,ProposedName);atom_concat('sf_',FN,ProposedName)),!.
+bind_type_naming(kw_special,FN,ProposedName):-  (atom_concat('sf_',FN,ProposedName);atom_concat('f_',FN,ProposedName)),!.
+bind_type_naming(kw_macro,FN,ProposedName):- atom_concat('mf_',FN,ProposedName).
 
-existing_operator(Ctx,Env,BindType,FN, _Len, ProposedName):-  show_success(get_symbol_fbounds(Ctx,Env,FN,BindType,ProposedName)),!.
-
-existing_operator(_Ctx,_Env,kw_function,FN,_Len, ProposedName):- get_opv(FN,symbol_function,ProposedName),
-   (latom_starts_with(ProposedName,'f_');latom_starts_with(ProposedName,'sf_')).
-existing_operator(_Ctx,_Env,kw_special,FN,_Len, ProposedName):- get_opv(FN,symbol_function,ProposedName),
-   (latom_starts_with(ProposedName,'f_');latom_starts_with(ProposedName,'sf_')).
-existing_operator(_Ctx,_Env,kw_macro,FN,_Len, ProposedName):- get_opv(FN,symbol_function,ProposedName),
-   (latom_starts_with(ProposedName,'mf_')).
-
-existing_operator(_Ctx,_Env,_,FN,_Len, ProposedName):- get_opv(FN,symbol_function,ProposedName),!.
-
+existing_operator(Ctx,Env,BindType,FN, _Len, ProposedName):- show_success(get_symbol_fbounds(Ctx,Env,FN,BindType,ProposedName)),!.
+existing_operator(_,_,BindType,FN,_, ProposedName):- get_opv(FN,symbol_function,ProposedName),bind_type_naming(BindType,_,ProposedName).
+existing_operator(_Ctx,_Env,BindType,FN,_Len, ProposedName):- bind_type_naming(BindType,FN,ProposedName),is_defined(ProposedName,_).
+%existing_operator(_Ctx,_Env,BindType,FN,_Len, ProposedName):- get_opv(FN,symbol_function,ProposedName),!,var(BindType).
+existing_operator(_Ctx,_Env,BindType,FN,_,ProposedName):- bind_type_naming(BindType,_,FN),ProposedName = FN.
 existing_operator(_Ctx,_Env,kw_function,FN,ArgsLen, ProposedName):- atom(FN),upcase_atom(FN,FN),
   (number(ArgsLen)-> Arity is ArgsLen+1; between(1,5,Arity)),is_defined(FN,Arity),ProposedName=FN.
 %existing_operator(_Ctx,_Env,kw_macro,FN,ArgsLen, ProposedName):- atom(FN),upcase_atom(FN,FN),                           
 %  (number(ArgsLen)-> Arity is ArgsLen+1; between(1,5,Arity)),is_defined(FN,Arity),ProposedName=FN.
 %existing_operator(_Ctx,_Env,_BindType,FN,_ArgLen, ProposedName):-some_defined_function_or_macro(FN,2,['mf_'],ProposedName),!.
-existing_operator(_Ctx,_Env,_BindType,FN,ArgLen, ProposedName):-some_defined_function_or_macro(FN,ArgLen,['sf_','f_'],ProposedName),!. % 'mf_'
+existing_operator(_Ctx,_Env,BindType,FN,ArgLen, ProposedName):-
+   some_defined_function_or_macro(FN,ArgLen,['sf_','f_','mf_'],ProposedName),!,
+   bind_type_naming(BindType,_,ProposedName). % 
 
-latom_starts_with(ProposedName,Start):- atom(ProposedName),atom_concat(Start,_,ProposedName).
 
-
+generate_function_or_macro_name(_Ctx,FN,BindType,ProposedName):-
+    bind_type_naming(BindType,_,FN),ProposedName = FN.
 
 generate_function_or_macro_name(Ctx,FN,BindType,NewProposedName):-
     maybe_symbol_package(FN,Package),
@@ -172,15 +171,6 @@ generate_function_or_macro_name(Ctx,FN,BindType,NewProposedName):-
 
 eval_uses_env_arg1(F):- quietly((premute_names(F,FF),wl:declared(FF,env_arg1))).
 
-
-eval_uses_exact(F):- quietly((premute_names(F,FF),uses_exact0(FF))).
-
-uses_exact0(F):- wl:init_args(x,F),!.
-uses_exact0(FN):-  function_arg_info(FN,ArgInfo),!,
-   ArgInfo.complex==0,ArgInfo.opt==0,ArgInfo.rest==0,ArgInfo.env==0,ArgInfo.whole==0,
-   length(ArgInfo.names,NN),
-   arg_info_count(ArgInfo,req,N),!,
-   N==NN.
    
 
 function_arg_info(FN,ArgInfo):- wl:arglist_info(FN,_,_,ArgInfo).
@@ -188,16 +178,25 @@ function_arg_info(FN,ArgInfo):- wl:arglist_info(FN,_,_,_,ArgInfo).
 function_arg_info(FN,ArgInfo):- wl:arglist_info(_,FN,_,_,ArgInfo).
 
 
-eval_uses_bind_parameters(F):- quietly((premute_names(F,FF), wl:init_args(bind_parameters,FF))),!.
+eval_uses_whole(F):- quietly((premute_names(F,FF), get_init_args(FF,while))),!.
+eval_bind_parameters(F):- quietly((premute_names(F,FF), get_init_args(FF,bind_parameters))),!.
 
-% eval_uses_exact_and_restkeys(FN,Requireds):- current_predicate(FN/N), Requireds is N-2,Requireds>0.
+% get_init_args(FN,Requireds):- current_predicate(FN/N), Requireds is N-2,Requireds>0.
 
-eval_uses_exact_and_restkeys(F,N):- quietly((premute_names(F,FF), exact_and_restkeys(FF,N))),!.
+get_init_args(F,Args):- nonvar(Args),!,get_init_args(F,ArgsV),ArgsV=Args.
+get_init_args(F,N):- quietly((premute_names(F,FF), exact_and_restkeys(FF,N))),!.
 
-exact_and_restkeys(F,N):- wl:init_args(V,F),integer(V),!,V=N.
-exact_and_restkeys(F,_):- uses_exact0(F),!,fail.
+
+exact_and_restkeys(F,N):- wl:init_args(N,F).
 exact_and_restkeys(F,N):- function_arg_info(F,ArgInfo),ArgInfo.req=L,ArgInfo.all\==L,!,arg_info_count(ArgInfo,req,N).
-exact_and_restkeys(F,0):- uses_rest_only0(F),!.
+exact_and_restkeys(F,0):- function_arg_info(F,ArgInfo),ArgInfo.req==0,ArgInfo.all\==0,!.
+exact_and_restkeys(F,0):- wl:declared(F,lambda(['&rest'|_])),!.
+exact_and_restkeys(FN,x):-  function_arg_info(FN,ArgInfo),!,
+   ArgInfo.complex==0,ArgInfo.opt==0,ArgInfo.rest==0,ArgInfo.env==0,ArgInfo.whole==0,
+   length(ArgInfo.names,NN),
+   arg_info_count(ArgInfo,req,N),!,
+   N==NN.
+
 
 arg_info_count(ArgInfo,Prop,N):- 
   Value=ArgInfo.Prop,
@@ -208,38 +207,29 @@ arg_info_count(ArgInfo,Prop,N):-
 
 premute_names(F,F).
 premute_names(F,FF):- atom_concat_or_rtrace('f_',F,FF).
-premute_names(F,FF):- atom_concat_or_rtrace('mf_',F,FF).
+% premute_names(F,FF):- atom_concat_or_rtrace('mf_',F,FF).
 premute_names(F,FF):- atom_concat_or_rtrace('sf_',F,FF).
 premute_names(F,FF):- atom_concat_or_rtrace('f_',FF,F).
-premute_names(F,FF):- atom_concat_or_rtrace('mf_',FF,F).
+% premute_names(F,FF):- atom_concat_or_rtrace('mf_',FF,F).
 premute_names(F,FF):- atom_concat_or_rtrace('sf_',FF,F).
 
-eval_uses_rest_only(F):- quietly((premute_names(F,FF),uses_rest_only0(FF))),!.
-
-uses_rest_only0(F):- wl:init_args(0,F),!.
-uses_rest_only0(F):- function_arg_info(F,ArgInfo),ArgInfo.req==0,ArgInfo.all\==0,!.
-%uses_rest_only0(F):- same_symbol(F,FF),wl:declared(FF,lambda(['&rest'|_])),!.
 
 % Non built-in function expands into an explicit function call
 
 % invoke(r1,r2,r3,RET).
 align_args(FN,ProposedName,Args,Result,ArgsPlusResult):- 
-  (eval_uses_exact(FN);eval_uses_exact(ProposedName)),
+  (get_init_args(FN,x);get_init_args(ProposedName,x)),
    append(Args, [Result], ArgsPlusResult).
 
 % invoke(r1,r2,[o3,key1,value1],RET).
 align_args(FN,ProposedName,Args,Result,ArgsPlusResult):- 
-  (eval_uses_exact_and_restkeys(FN,N);eval_uses_exact_and_restkeys(ProposedName,N)),
+  (get_init_args(FN,N);get_init_args(ProposedName,N)),number(N),
   always(length(Left,N)),append(Left,Rest,Args),
   append(Left, [Rest,Result], ArgsPlusResult).
 
-% invoke([r1,r2,r3],RET).
-align_args(FN,ProposedName,Args,Result,[Args,Result]):-
-  (eval_uses_rest_only(FN);eval_uses_rest_only(ProposedName)).
-
-% invoke([r1,r2,r3],RET).
-align_args(FN,ProposedName,Args,Result,[Args,Result]):-
-  (eval_uses_bind_parameters(FN);eval_uses_bind_parameters(ProposedName)).
+% invoke([fn,r1,r2,r3],RET).
+align_args(FN,ProposedName,Args,Result,[[FN|Args],Result]):-
+  (eval_uses_whole(FN);eval_uses_whole(ProposedName)).
 
 
 % guess invoke(r1,RET).
@@ -278,7 +268,10 @@ only_arity(ProposedName,N):-
 is_defined(ProposedName,N):- integer(N),atom(ProposedName),!,functor(G,ProposedName,N),current_predicate(_,G),!.
 is_defined(ProposedName,N):- current_predicate(ProposedName/N).
 
-is_defined(FN):- is_fboundp(FN),foc_operator(_Ctx,_Env,_BindType,FN,_,ProposedName),is_defined(ProposedName,_).
+is_implemented(FN):- is_fboundp(FN),
+  foc_operator(_Ctx,_Env,_BindType,FN,_,ProposedName),  
+  ProposedName\==FN,is_defined(ProposedName,NN),!,
+  ((get_init_args(FN,N)->integer(N))->NN==N;true).
 
 maybe_symbol_package(Symbol,Package):-  get_opv(Symbol,symbol_package,Package),!.
 maybe_symbol_package(_Symbol,Package):- reading_package(Package).
@@ -299,7 +292,7 @@ guess_prolog_functor(P,F,A):- functor(P,F,A).
 currently_visible_package(P):- reading_package(Package),
   (P=Package;package_use_list(Package,P)).
 
-is_lisp_operator(Ctx,Env,Sym):- get_symbol_fbounds(Ctx,Env,Sym,kw_special,_).
+is_lisp_operator(Ctx,Env,Sym):- get_symbol_fbounds(Ctx,Env,Sym,BindType,_),!,BindType\==kw_function.
 is_lisp_operator(_,_,G):- notrace(lisp_operator(G)).
 
 
@@ -314,9 +307,10 @@ lisp_operator('define-caller-pattern').
 lisp_operator('define-variable-pattern').
 lisp_operator(u_define_caller_pattern).
 lisp_operator(f_u_define_caller_pattern).
+lisp_operator(S):- get_opv(S,symbol_function,FN),!, lisp_operator(FN).
 lisp_operator(S):- nonvar(S),compiler_macro_left_right(S,_,_).
 lisp_operator(S):- get_lambda_def(defmacro,S,_,_).
-lisp_operator(S):-is_special_op(S,P),currently_visible_package(P).
+lisp_operator(S):- is_special_op(S,P),currently_visible_package(P).
 %lisp_operator(S):-is_special_op(S,_P).
 
 get_lambda_def(DefType,ProcedureName,FormalParams,LambdaExpression):-

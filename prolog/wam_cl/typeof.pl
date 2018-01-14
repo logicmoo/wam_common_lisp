@@ -77,9 +77,10 @@ i_type('$NUMBER'(Type,_),Type).
 i_type(function(OP),Class):- get_opv(OP,symbol_function,Obj),f_type_of(Obj,Class).
 
 % atomics
-a_type(Obj,Type):- get_opv_iiii(Obj,classof,Class),claz_to_symbol(Class,Type),!.
+%a_type(Obj,Type):- get_opv_iiii(Obj,classof,Class),claz_to_symbol(Class,Type),!.
 a_type(Obj,Type):- b_type(Obj,Type).
 
+b_type(Obj,Type):- nonvar(Type),b_type(Obj,Type0),!,Type=Type0.
 b_type(Obj,Type):- get_opv_iiii(Obj,type_of,Type),!.
 b_type(Obj,Type):- get_opv_iiii(Obj,dims,List),(List=[N] -> Type = [simple_vector,N]; Type = [array,List]),!.
 b_type(Atom,Type):- atomic_list_concat([Type,_Name],'_znst_',Atom),!.

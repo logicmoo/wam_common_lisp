@@ -72,8 +72,8 @@ sexpr1('$OBJ'(T,X)) --> {T==claz_prolog,with_output_to(atom(SPClosure),fmt9(X)),
 sexpr1('$OBJ'(T,X)) --> {T==claz_function},['#\''],sexpr1(X).
 sexpr1('$OBJ'(T,X)) --> {T==claz_vector},['#('],lisplist(X,')').
 sexpr1('$OBJ'(T,X)) --> {T==claz_pathname},['#P'],sexpr1(X).
-sexpr1('$OBJ'(T,X)) --> ['#S('],{is_list(X),is_structure_class(T),claz_to_symbol(T,TP)},sexpr1(TP),lisplist(X,')').
-sexpr1('$OBJ'(T,X)) --> ['#S'],{is_list(X),is_structure_class(T),claz_to_symbol(T,TP)},sexpr1(TP),sexpr1(X).
+sexpr1('$OBJ'(T,X)) --> ['#S('],{is_list(X),is_structure_classp(T),claz_to_symbol(T,TP)},sexpr1(TP),lisplist(X,')').
+sexpr1('$OBJ'(T,X)) --> ['#S'],{is_list(X),is_structure_classp(T),claz_to_symbol(T,TP)},sexpr1(TP),sexpr1(X).
 sexpr1('$OBJ'(claz_package,X)) -->  !,sexpr1(X).
 sexpr1('$OBJ'(T,X)) --> ['#<'],{claz_to_symbol(T,TP)},!,sexpr1(TP),sexpr1(X),['>'].
 sexpr1('$OBJ'(T,X)) --> ['#<'],!,sexpr1(T),sexpr1(X),['>'].
