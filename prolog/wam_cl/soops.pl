@@ -514,6 +514,7 @@ ref:attr_unify_hook(Same,Var):- get_attr(Var,ref,SameO)->Same==SameO;var(Var).
 
 get_opv(Obj,Prop,Values):- no_repeats((Obj-Prop),get_opv_i(Obj,Prop,Values)).
 
+get_kind_ref(KindObj,Kind,Obj):- var(KindObj),!,Obj=KindObj,Kind=_.
 get_kind_ref(KindObj,Kind,Obj):- compound_deref(KindObj,Real),!,get_kind_ref(Real,Kind,Obj).
 get_kind_ref('$OBJ'(Kind,_,Obj),Kind,Obj):- !.
 get_kind_ref('$OBJ'(Kind,Obj),Kind,Obj):- !.
@@ -549,7 +550,7 @@ get_opv_iii(_Kind,Obj,Prop,Value):- get_opv_iiii(Obj,Prop,Value).
 
 get_opv_iiii(Obj,Prop,Value):- (atom(Obj);var(Obj)),nb_current(Obj,Ref),nb_current_value(Ref,Prop,Value).
 get_opv_iiii(Obj,Prop,Value):- soops:o_p_v(Obj,Prop,Value).
-get_opv_iiii(Obj,Prop,Value):- soops:struct_opv(Obj,Prop,Value).
+%get_opv_iiii(Obj,Prop,Value):- soops:struct_opv(Obj,Prop,Value).
 
 not_shareble_prop(Prop):-notrace((nonvar(Prop),not_shareble_prop0(Prop))).
 not_shareble_prop0(type_of).
@@ -833,7 +834,7 @@ kind_attribute_pred(Kind,Prop,Pred):- wl:type_attribute_pred_dyn(Kind,Prop,Pred)
 
 :- discontiguous soops:struct_opv/4.
 :- dynamic((soops:struct_opv/4)).
-:- soops:ensure_loaded('ci.data').
+%:- soops:ensure_loaded('ci.data').
 cleanup_mop:-  
  ignore((get_struct_opv(X,include,claz_object),get_struct_opv(X,include,Y),Y\==claz_object,show_call_trace(retract(soops:struct_opv(X,include,claz_object))),fail)),
  ignore((get_struct_opv(X,include,claz_t),get_struct_opv(X,include,Y),Y\==claz_t,show_call_trace(retract(soops:struct_opv(X,include,claz_t))),fail)).

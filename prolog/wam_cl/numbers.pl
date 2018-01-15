@@ -107,19 +107,23 @@ is_zerop(N):- N=:=0.
 
 % Lisp Comparison Predicates
 
-f_c61(N1,N2,Ret):- t_or_nil( (N1=:=N2),Ret). 
+%f_c61(N1,N2,Ret):- t_or_nil( (N1=:=N2),Ret). 
+'f_='(N1,N2,Ret):- t_or_nil( (N1=:=N2),Ret).
 '='(N1,N2,Ret):- t_or_nil( (N1=:=N2),Ret).
 
-f_c60_c61(N1,N2,Ret):- t_or_nil('=<'(N1,N2),Ret).
+%f_c60_c61(N1,N2,Ret):- t_or_nil('=<'(N1,N2),Ret).
+'f_<='(N1,N2,Ret):- t_or_nil('=<'(N1,N2),Ret).
 '<='(N1,N2,Ret):- t_or_nil('=<'(N1,N2),Ret).
 
-f_c62_c61(N1,N2,Ret):- t_or_nil('>='(N1,N2),Ret).
-'>='(N1,N2,Ret):- t_or_nil('>='(N1,N2),Ret).
-
-f_c60(N1,N2,Ret):- t_or_nil(<(N1,N2),Ret). 
+%f_c60(N1,N2,Ret):- t_or_nil(<(N1,N2),Ret). 
+'f_<'(N1,N2,Ret):- t_or_nil(<(N1,N2),Ret). 
 '<'(N1,N2,Ret):- t_or_nil(<(N1,N2),Ret). 
 
-f_c62(N1,N2,Ret):- t_or_nil(<(N1,N2),Ret). 
+%f_c62_c61(N1,N2,Ret):- t_or_nil('>='(N1,N2),Ret).
+'f_>='(N1,N2,Ret):- t_or_nil('>='(N1,N2),Ret).
+'>='(N1,N2,Ret):- t_or_nil('>='(N1,N2),Ret).
+
+'f_>'(N1,N2,Ret):- t_or_nil(>(N1,N2),Ret). 
 '>'(N1,N2,Ret):- t_or_nil(>(N1,N2),Ret). 
 
 % Lisp Operators/Functions
@@ -221,20 +225,25 @@ wl:interned_eval_todo(
 
 
 '1+'(N,Ret):- Ret is N + 1.
+'f_1+'(N,Ret):- Ret is N + 1.
 '1-'(N,Ret):- Ret is N - 1.
+'f_1-'(N,Ret):- Ret is N - 1.
 
-'f_+'(N1,N2,Ret):- '+'(N1,N2,Ret).
-f_c43(N1,N2,Ret):- '+'(N1,N2,Ret).
+%f_c43(N1,N2,Ret):- '+'(N1,N2,Ret).
 '+'(A1,A2,Ret):- coerce_to(A1, number, N1),coerce_to(A2, number, N2), Ret is (N1 + N2).
+'f_+'(N1,N2,Ret):- '+'(N1,N2,Ret).
 
-f_c45(N1,N2,Ret):- Ret is (N1 + N2).
+%f_c45(N1,N2,Ret):- Ret is (N1 + N2).
 '-'(N1,N2,Ret):- Ret is (N1 - N2).
+'f_-'(N1,N2,Ret):- Ret is (N1 - N2).
 
-f_c42(N1,N2,Ret):- Ret is (N1 + N2).
+%f_c42(N1,N2,Ret):- Ret is (N1 + N2).
 '*'(N1,N2,Ret):- Ret is (N1 * N2).
+'f_*'(N1,N2,Ret):- Ret is (N1 * N2).
 
-f_c47(N1,N2,Ret):- Ret is (N1 + N2).
+%f_c47(N1,N2,Ret):- Ret is (N1 + N2).
 '/'(N1,N2,Ret):- Ret is (N1 / N2).
+'f_/'(N1,N2,Ret):- Ret is (N1 / N2).
 
 f_plus(Num1, Num2, Result):-
         Result is Num1 + Num2.

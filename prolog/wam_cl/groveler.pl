@@ -54,30 +54,49 @@ was_pkg_prefix(sys,pkg_sys).
 was_pkg_prefix(u,pkg_user).
 was_pkg_prefix(clos,pkg_sys):- \+  current_prolog_flag(wamcl_pcl,true).
 was_pkg_prefix(clos,pkg_clos):- current_prolog_flag(wamcl_pcl,true).
-
+was_pkg_prefix(Prfx,Package):- package_symbol_prefix(Prfx_,Package),atom_concat(Prfx,'_',Prfx_).
 
 % grovel_system_symbols:-!.
 grovel_system_symbols:- prolog_load_context(source,File),assertz(wl:interned_eval(call(grovel_system_symbols(File)))).
 
-guess_symbol_name(HC,UPPER):- atomic_list_concat(HC,'_',HCN), get_opv(HCN,symbol_name,UPPER),!.
-guess_symbol_name(HC,UPPER):- maplist(resolve_char_codes,HC,RHC),atomics_to_string(RHC,'-',STR),string_upper(STR,UPPER),!.
-
-resolve_char_codes('','_').
-%resolve_char_codes(C48,C):- notrace(catch((name(C48,[99|Codes]),number_codes(N,Codes),name(C,[N])),_,fail)),!,fail.
-resolve_char_codes(C48,_):- notrace(catch((name(C48,[99|Codes]),number_codes(_,Codes)),_,fail)),!,fail.
-resolve_char_codes(C,C).
-
 
 grovel_system_symbols(File):- 
  ignore(((source_file(M:P,File),functor(P,F,A), A>0,  
-  ((atomic_list_concat([MF,Pkg|HC],'_',F),memberchk(MF,['sf','f','mf']),was_pkg_prefix(Pkg,Package))-> true ;
-    (atomic_list_concat([MF|HC],'_',F),memberchk(MF,['sf','f','mf']),Package=pkg_cl)),
-    guess_symbol_name(HC,UPPER),
- always(((
-  f_intern(UPPER,Package,Symbol),     
-  f_export(Symbol,Package,_),
+ atomic_list_concat([MF,Pkg|HC],'_',F),
+  memberchk(MF,['sf','f','mf']),
+ once(always((
+  guess_function_symbol(MF,[Pkg|HC],Symbol),
+  known_symbol(Symbol,Package),f_export(Symbol,Package,_),
   (get_opv(Symbol,symbol_function,F)-> true ;show_call_trace(set_opv(Symbol,symbol_function,F))),
-  wdmsg((grovelled_source_file_symbols(UPPER,Package,Symbol,M,F))))))),fail)).
+  pl_symbol_name(Symbol,String),
+  wdmsg((grovelled_source_file_symbols(String,Package,Symbol,M,F)))))),fail))).
+
+pkg_search_order(Package):- package_use_list(pkg_user, Package).
+
+known_symbol(Symbol):- known_symbol(Symbol,_Package).
+known_symbol(Symbol,Package):- package_external_symbols(Package,_,Symbol).
+known_symbol(Symbol,Package):- get_opv_iiii(Symbol,type_of,symbol),get_opv_iiii(Symbol,symbol_package,Package).
+known_symbol(Symbol,Package):- package_internal_symbols(Package,_,Symbol).
+
+guess_function_symbol(_MF,[Pkg|HC],Symbol):- atomic_list_concat([Pkg|HC],'_',Symbol),known_symbol(Symbol).
+guess_function_symbol(_MF,[Pkg|HC],Symbol):- was_pkg_prefix(Pkg,Package),!,
+   into_symbol_name(HC,String),f_intern(String,Package,Symbol).
+guess_function_symbol(_MF,HC,Symbol):- 
+   pkg_search_order(Package),
+   was_pkg_prefix(Pkg,Package),
+   atomic_list_concat([Pkg|HC],'_',Symbol),
+   known_symbol(Symbol,Package).
+guess_function_symbol(MF,HC,Symbol):- 
+   into_symbol_name(HC,String),
+   guess_named_symbol(MF,String,Symbol).
+
+guess_named_symbol(_MF,String,Symbol):- 
+   pkg_search_order(Package),
+   package_find_symbol(String,Package,Symbol,_),!.
+guess_named_symbol(_MF,String,Symbol):-
+   reading_package(Package),
+   f_intern(String,Package,Symbol).
+
 
 list_lisp_undefined(Pkg):- 
  ignore(((get_opv(X,symbol_package,Pkg),once((Y=symbol_function,get_opv(X,Y,F),get_opv(X,symbol_name,Str),

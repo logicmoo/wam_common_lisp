@@ -202,7 +202,7 @@ unify_conj(Conj,To):- nonplainvar(Conj),Conj=To,!.
 unify_conj((CA,(CB,CC)),(A,B)):- var(A),nonplainvar(B),!, unify_conj(((CA,CB),CC),(A,B)).
 unify_conj((CA,(CB,CC)), AB):- unify_conj(((CA,CB),CC),AB).
 
-wl:declared(u_is,interpret).
+wl:declared(sys_is,interpret).
  
 
 macroexpand_1_or_fail([Procedure|_],_,_):- wl:declared(Procedure,interpret),!,fail.

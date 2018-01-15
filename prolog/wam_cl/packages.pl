@@ -83,7 +83,6 @@ find_package(S,Package):-
   as_string_upper(S,SN),!,
   (package_name(Package,SN) ; package_nicknames(Package,SN) ; get_opv_i(Package,nicknames,SN) ; (atom_concat('SB!',_,SN)->Package=pkg_sys)),!.
 
-find_package_or_die(L,T):- to_prolog_string_if_needed(L,Loc),!,find_package_or_die(Loc,T).
 find_package_or_die(X,Y):-
  find_package(X,Y) -> true ; throw(find_package_or_die(X,Y)).  
 
@@ -109,9 +108,20 @@ package_find_symbol_or_missing(_String,_Package,_NoSymbol,'$missing').
 package_find_symbol(String,Package,Symbol,Found):- to_prolog_string_if_needed(String,PlString),!,package_find_symbol(PlString,Package,Symbol,Found).
 package_find_symbol(String,Package,Symbol,kw_external):- package_external_symbols(Package,String,Symbol),!.
 package_find_symbol(String,Package,Symbol,kw_internal):- package_internal_symbols(Package,String,Symbol),!.
+package_find_symbol(String,Package,Symbol,kw_internal):- get_opv(Symbol,symbol_name,String),get_opv(Symbol,symbol_package,Package),
+  ((Package == pkg_cl -> (retract_all_1(soops:o_p_v(Symbol,_,_)), writeq(retract_all_1(soops:o_p_v(Symbol,_,_))))
+    ;
+  ((assertz(package:package_internal_symbols(Package,String,Symbol)),!,
+  writeq(package:package_internal_symbols(Package,String,Symbol)),nl)))),!.
 package_find_symbol(String,PW,Symbol,kw_inherited):-  package_use_list(PW,Package),package_external_symbols(Package,String,Symbol),!.
 %package_find_symbol(String,Package,Symbol,Found):-  to_prolog_string_if_needed(String,PlString),!,package_find_symbol(PlString,Package,Symbol,Found).
 
+
+retract_all_1(G):- forall(retract(G),true).
+
+grab_missing_symbols:- 
+ forall((get_opv(Symbol,symbol_name,String),get_opv(Symbol,symbol_package,Package)),package_find_symbol(String,Package,_,_)).
+  
 % @TODO Confirm symbol shadowing is correct
 f_import(Symbol,Result):- reading_package(Package),f_import(Symbol,Package,Result).
 %f_import(String,Package,R):- to_prolog_string_if_needed(String,PlString),!,f_import(PlString,Package,R).
@@ -136,8 +146,8 @@ package_import_symbol_step2(Package,Symbol,String,OldSymbol,kw_external):-
    assert_lsp(Symbol,package:package_shadowing_symbols(Package,OldSymbol)),
    assert_lsp(Symbol,package:package_internal_symbols(Package,String,Symbol)).
 package_import_symbol_step2(Package,Symbol,String,OldSymbol,kw_internal):-
-   retract(package:package_internal_symbols(Package,String,OldSymbol)),
-   assert_lsp(Symbol,package:package_shadowing_symbols(Package,OldSymbol)),
+   ignore(retract(package:package_internal_symbols(Package,String,OldSymbol))),
+   ((OldSymbol \== Symbol,nonvar(OldSymbol)) -> assert_lsp(Symbol,package:package_shadowing_symbols(Package,OldSymbol)) ; true),
    assert_lsp(Symbol,package:package_internal_symbols(Package,String,Symbol)).
 
 
@@ -245,27 +255,29 @@ print_package_or_hash(P):-short_package_or_hash(P,O),write(O).
 :- dynamic package_external_symbols/3.
 :- dynamic package_internal_symbols/3.
 
-package_name(pkg_kw,"KEYWORD").
-package_name(pkg_user,"COMMON-LISP-USER").
 package_name(pkg_cl,"COMMON-LISP").
 package_name(pkg_clos,"CLOS"):- \+ current_prolog_flag(wamcl_pcl,true).
-package_name(pkg_prolog,"PROLOG").
-package_name(pkg_custom,"CUSTOM").
-package_name(pkg_debug,"DEBUG").
+package_name(pkg_os,"POSIX").
+package_name(pkg_threads,"THREADS").
+package_name(pkg_charset,"CHARSET").
+package_name(pkg_sys,"SYSTEM").
 package_name(pkg_ext,"SB-EXT").
+package_name(pkg_user,"COMMON-LISP-USER").
+package_name(pkg_kw,"KEYWORD").
+/*
+package_name(pkg_sys,"PROLOG").
+package_name(pkg_custom,"CUSTOM").
+package_name(pkg_debug,"DEBUG").
 package_name(pkg_ffi,"FFI").
 package_name(pkg_format,"FORMAT").
 package_name(pkg_loop,"LOOP").
-package_name(pkg_os,"POSIX").
 package_name(pkg_readline,"READLINE").
 package_name(pkg_regexp,"REGEXP").
 package_name(pkg_screen,"SCREEN").
 package_name(pkg_socket,"SOCKET").
-package_name(pkg_sys,"SYSTEM").
 package_name(pkg_threads,"THREADS").
 package_name(pkg_tl,"TOP-LEVEL").
 package_name(pkg_xp,"XP").
-package_name(pkg_charset,"CHARSET").
 package_name(pkg_gray,"GRAY").
 package_name(pkg_gstream,"GSTREAM").
 package_name(pkg_i18n,"I18N").
@@ -274,7 +286,7 @@ package_name(pkg_jvm,"JVM").
 package_name(pkg_precompiler,"PRECOMPILER").
 package_name(pkg_profiler,"PROFILER").
 package_name(pkg_sequence,"SEQUENCE").
-
+*/
 :- decl_mapped_opv(claz_package,[name=package_name]).
 
 package_nicknames(pkg_cl, "CL").
@@ -288,8 +300,8 @@ package_nicknames(pkg_user, "EMACS-CL-USER").
 
 package_nicknames(pkg_ext, "SB!EXT").
 
-package_nicknames(pkg_prolog, "P").
-package_nicknames(pkg_prolog, "INT").
+%package_nicknames(pkg_sys, "P").
+%package_nicknames(pkg_sys, "INT").
 
 package_nicknames(pkg_sys, "SYS").
 package_nicknames(pkg_sys, "EXCL").
@@ -315,51 +327,67 @@ package_nicknames(pkg_sys, "SB-PCL").
 package_nicknames(pkg_sys, "CLOS"):- \+ current_prolog_flag(wamcl_pcl,true).
 
 package_nicknames(pkg_os, "OS").
+/*
 package_nicknames(pkg_tl, "TPL").
 package_nicknames(pkg_precompiler, "PRE").
 package_nicknames(pkg_profiler, "PROF").
-
+*/
 
 
 :- decl_mapped_opv(claz_package,[nicknames=package_nicknames]).
 
 package_use_list(pkg_user, pkg_cl).
-package_use_list(pkg_user, pkg_sys).
-package_use_list(pkg_user, pkg_prolog).
-package_use_list(pkg_user, pkg_custom).
 package_use_list(pkg_user, pkg_clos):- current_prolog_flag(wamcl_pcl,true).
+package_use_list(pkg_user, pkg_threads).
+package_use_list(pkg_user, pkg_os).
+package_use_list(pkg_user, pkg_sys).
+package_use_list(pkg_user, pkg_charset).
 package_use_list(pkg_user, pkg_ext).
+%package_use_list(pkg_user, pkg_sys).
+%package_use_list(pkg_user, pkg_custom).
 
-package_use_list(pkg_cl, pkg_ext).
-package_use_list(pkg_cl, pkg_prolog).
+
 package_use_list(pkg_cl, pkg_sys).
-%package_use_list(pkg_cl, pkg_clos).
+package_use_list(pkg_cl, pkg_clos):- current_prolog_flag(wamcl_pcl,true).
+package_use_list(pkg_cl, pkg_ext).
 
 /*
 package_use_list(pkg_clos, pkg_cl).
 package_use_list(pkg_clos, pkg_ext).
-package_use_list(pkg_clos, pkg_prolog).
+package_use_list(pkg_clos, pkg_sys).
 package_use_list(pkg_clos, pkg_sys).
 */
-
-package_use_list(pkg_prolog, pkg_cl).
-package_use_list(pkg_prolog, pkg_ext).
-package_use_list(pkg_prolog, pkg_sys).
-package_use_list(pkg_prolog, pkg_clos):- current_prolog_flag(wamcl_pcl,true).
-package_use_list(pkg_prolog, pkg_custom).
-package_use_list(pkg_prolog, pkg_gray).
-package_use_list(pkg_prolog, pkg_gstream).
-package_use_list(pkg_prolog, pkg_i18n).
-package_use_list(pkg_prolog, pkg_os).
-package_use_list(pkg_prolog, pkg_socket).
-package_use_list(pkg_prolog, pkg_threads).
-
-
+/*
 package_use_list(pkg_sys, pkg_cl).
 package_use_list(pkg_sys, pkg_ext).
-package_use_list(pkg_sys, pkg_prolog).
+package_use_list(pkg_sys, pkg_sys).
+package_use_list(pkg_sys, pkg_clos):- current_prolog_flag(wamcl_pcl,true).
+*/
+/*
+package_use_list(pkg_sys, pkg_custom).
+package_use_list(pkg_sys, pkg_gray).
+package_use_list(pkg_sys, pkg_gstream).
+package_use_list(pkg_sys, pkg_i18n).
+package_use_list(pkg_sys, pkg_os).
+package_use_list(pkg_sys, pkg_socket).
+*/
+
+package_use_list(pkg_sys, pkg_threads).
+package_use_list(pkg_sys, pkg_os).
+package_use_list(pkg_sys, pkg_cl).
+package_use_list(pkg_sys, pkg_ext).
 
 
+package_use_list(pkg_os, pkg_cl).
+package_use_list(pkg_os, pkg_ext).
+
+package_use_list(pkg_threads, pkg_cl).
+package_use_list(pkg_threads, pkg_ext).
+package_use_list(pkg_threads, pkg_sys).
+package_use_list(pkg_threads, pkg_os).
+
+/*
+package_use_list(pkg_sys, pkg_sys).
 package_use_list(pkg_tl, pkg_cl).
 package_use_list(pkg_tl, pkg_ext).
 
@@ -373,7 +401,7 @@ package_use_list(pkg_ext, pkg_socket).
 package_use_list(pkg_ext, pkg_threads).
 package_use_list(pkg_ext, pkg_clos):- current_prolog_flag(wamcl_pcl,true).
 package_use_list(pkg_ext, pkg_sys).
-package_use_list(pkg_ext, pkg_prolog).
+package_use_list(pkg_ext, pkg_sys).
 
 package_use_list(pkg_ffi, pkg_cl).
 package_use_list(pkg_ffi, pkg_ext).
@@ -388,8 +416,7 @@ package_use_list(pkg_java, pkg_ext).
 package_use_list(pkg_java, pkg_sys).
 
 package_use_list(pkg_loop, pkg_cl).
-package_use_list(pkg_os, pkg_cl).
-package_use_list(pkg_os, pkg_ext).
+
 package_use_list(pkg_precompiler, pkg_cl).
 package_use_list(pkg_precompiler, pkg_ext).
 package_use_list(pkg_precompiler, pkg_sys).
@@ -402,10 +429,9 @@ package_use_list(pkg_regexp, pkg_cl).
 package_use_list(pkg_screen, pkg_cl).
 package_use_list(pkg_screen, pkg_ext).
 package_use_list(pkg_sequence, pkg_cl).
-package_use_list(pkg_threads, pkg_cl).
-package_use_list(pkg_threads, pkg_ext).
-package_use_list(pkg_threads, pkg_sys).
+
 package_use_list(pkg_xp, pkg_cl).
+*/
 
 :- decl_mapped_opv(claz_package,[uses=package_use_list]).
 
@@ -425,13 +451,14 @@ package_function_prefix(BindType,A,B):- no_repeats(A,package_fprefix(BindType,A,
 package_fprefix(kw_function,Pk,Pre):- package_symbol_prefix(Pk,Pre0),atom_concat_or_rtrace('f_',Pre0,Pre).
 package_fprefix(kw_special,Pk,Pre):- package_symbol_prefix(Pk,Pre0),atom_concat_or_rtrace('sf_',Pre0,Pre).
 package_fprefix(kw_macro,Pk,Pre):- package_symbol_prefix(Pk,Pre0),atom_concat_or_rtrace('mf_',Pre0,Pre).
+package_fprefix(kw_operator,Pk,Pre):- trace,package_symbol_prefix(Pk,Pre0),atom_concat_or_rtrace('sf_',Pre0,Pre).
 
 package_symbol_prefix(A,B):- no_repeats(A,package_prefix(A,B)).
 package_prefix(pkg_cl,'').
-package_prefix(pkg_kw,'kw_').
 package_prefix(pkg_sys,'sys_').
-package_prefix(pkg_user,'u_').
 package_prefix(pkg_ext,'ext_').
+package_prefix(pkg_user,'u_').
+package_prefix(pkg_kw,'kw_').
 package_prefix(PN,Pre):- nonvar(PN),package_nicknames(Pk,PN),!,package_prefix(Pk,Pre).
 package_prefix(Pk,Pre):- is_packagep(Pk),atom_concat_or_rtrace('pkg_',Package,Pk),atom_concat_or_rtrace(Package,'_',Pre).
 

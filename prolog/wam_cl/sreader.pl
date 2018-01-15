@@ -462,9 +462,10 @@ sexpr(['#+',K,O]) --> `#+`,!,sexpr(C),swhite,sexpr(O),!,{as_keyword(C,K)}.
 
 sexpr('$OBJ'(claz_pathname,C)) --> `#`,ci(`p`),s_string(C).
 sexpr('$S'(C)) -->                  (`#`, ci(`s`),`(`),!,sexpr_list(C),swhite,!.
+%sexpr('$COMPLEX'(R,I)) --> `#`,ci(`c`),`(`,!,  lnumber(R),lnumber(I),`)`.
+sexpr('$COMPLEX'(R,I)) -->         (`#`, ci(`c`),`(`),!,sexpr_list([R,I]),swhite,!.
 sexpr('$OBJ'(claz_bitvector,C)) --> `#*`,radix_digits(2,C),swhite,!.
 
-sexpr('$COMPLEX'(R,I)) --> (`#`,ci(`c`),`(`),!,  lnumber(R),lnumber(I),`)`.
 sexpr(function(E))                 --> `#\'`, sexpr(E), !. %, swhite.
 sexpr('$OBJ'(claz_vector,V))                 --> `#(`, !, sexpr_vector(V,`)`),!, swhite,!.
 

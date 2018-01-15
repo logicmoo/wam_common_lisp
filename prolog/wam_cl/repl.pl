@@ -229,7 +229,7 @@ eval_repl_atom(noltrace, t):- set_prolog_flag(lisp_trace,false),nodebug(lisp(tra
 eval_repl_atom(debug, t):- debug(lisp(_)),debug,debugging.
 eval_repl_atom(nodebug, t):- nodebug(lisp(_)),nodebug,debugging.
 
-%eval_repl_atom(make, O):- !, always((make, f_compile_file_mask(pack('wam_commmon_lisp/prolog/wam_cl/lisp/'),keys([]),O))).
+%eval_repl_atom(make, O):- !, always((make, f_sys_compile_file_mask(pack('wam_commmon_lisp/prolog/wam_cl/lisp/'),keys([]),O))).
 
 eval_repl_atom(UC, R):- atom(UC),downcase_atom(UC,DC),DC\==UC,eval_repl_atom(DC, R).
 

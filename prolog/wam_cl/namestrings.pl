@@ -122,6 +122,17 @@ check_varname(UP):- name(UP,[C|_]),(char_type(C,digit)->throw(check_varname(UP))
                         
 
 
+resolve_char_codes('','_').
+resolve_char_codes('pf','%').
+%resolve_char_codes(C48,C):- notrace(catch((name(C48,[99|Codes]),number_codes(N,Codes),name(C,[N])),_,fail)),!,fail.
+resolve_char_codes(C48,_):- notrace(catch((name(C48,[99|Codes]),number_codes(_,Codes)),_,fail)),!,fail.
+resolve_char_codes(D1,N):- atom_concat('d',N,D1),notrace(catch(atom_number(N,_),_,fail)),!.
+resolve_char_codes(C,CC):- atom_concat(C,'-',CC).
+
+into_symbol_name(Atom,UPPER):- atomic(Atom),atomic_list_concat([Pkg|HC],'_',Atom),!,into_symbol_name([Pkg|HC],UPPER).
+into_symbol_name(HC,UPPER):- maplist(resolve_char_codes,HC,RHC),atomics_to_string(RHC,'',STR),
+   atom_trim_suffix(STR,'-',Trimed),string_upper(Trimed,UPPER),!.
+
 % *PACKAGE* becomes xx_package_xx
 % %MAKE-PACKAGE becomes pf_make_package
 

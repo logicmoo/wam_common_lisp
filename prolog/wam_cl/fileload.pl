@@ -41,7 +41,7 @@ tdd2:- f_load('../../t/daydreamer/*.cl',_).
 km:- cdkm, f_compile_file("km",_).
 km1:- cdkm, f_load("km",_).
 
-f_compile_file_mask(Mask,keys(Keys),TF):- 
+f_sys_compile_file_mask(Mask,keys(Keys),TF):- 
    with_each_file(do_compile_1file(Keys,TF),Mask).
 
 

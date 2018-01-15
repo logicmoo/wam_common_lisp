@@ -32,9 +32,9 @@ f_nthcdr(_,[],[]):-!.
 f_nthcdr(0,List,List).
 f_nthcdr(Index,[_|List],RetVal):- Next is Index-1,f_nthcdr(Next,List,RetVal).
 
-f_set_nthcdr(_,[],[]):-!.
-f_set_nthcdr(0,List,Tail):- nb_setarg(2,List,Tail).
-f_set_nthcdr(Index,[_|List],Tail):- Next is Index-1,f_set_nthcdr(Next,List,Tail).
+f_set_set_nthcdr(_,[],[]):-!.
+f_set_set_nthcdr(0,List,Tail):- nb_setarg(2,List,Tail).
+f_set_set_nthcdr(Index,[_|List],Tail):- Next is Index-1,f_set_set_nthcdr(Next,List,Tail).
 
 nth_index([Index],List,RetVal):- !, f_nth(Index,List,RetVal). 
 nth_index([],List,List):-!.
@@ -66,7 +66,7 @@ f_list(ListI,ListO):- ListI=ListO.
 
 %:- dynamic(op_replacement/2).
 wl:op_replacement(first,car).
-f_sys_pf_car(List, Result):-f_car(List, Result).
+%f_sys_pf_car(List, Result):-f_car(List, Result).
 f_first(List, Result):-f_car(List, Result).
 f_car(List, Result):- 
   (List = [Result|_] -> true;
@@ -76,14 +76,14 @@ f_car(List, Result):-
 
 wl:op_replacement(rest,cdr).
 wl:op_replacement(sys_pf_cdr,cdr).
-f_sys_pf_cdr(List, Result):-f_cdr(List, Result).
-f_u_pf_cdr(List, Result):-f_cdr(List, Result).
+%f_sys_pf_cdr(List, Result):-f_cdr(List, Result).
+%f_u_pf_cdr(List, Result):-f_cdr(List, Result).
 f_cdr(List, Result):- List==[]->Result=[];
 	once( (	List = [_|Result]
 	    ;	error(rest_not_cons, ErrNo, _),
 		throw(ErrNo)	)).
 
-f_u_pf_cddr(A,C):-f_u_pf_cdr(A,B),f_u_pf_cdr(B,C).
+%f_u_pf_cddr(A,C):-f_u_pf_cdr(A,B),f_u_pf_cdr(B,C).
 
 wl:interned_eval(("`cl:rplaca")).
 wl:op_replacement(setcar,rplaca).
@@ -140,7 +140,7 @@ f_assoc(_,_,_,[]).
 % assoc item alist
 
 f_second(List,R):- List=[_,R|_]->true;R=[].
-f_sys_pf_cadr(List,R):- List=[_,R|_]->true;R=[].
+%f_sys_pf_cadr(List,R):- List=[_,R|_]->true;R=[].
 f_cadr(List,R):- List=[_,R|_]->true;R=[].
 
 
