@@ -44,17 +44,17 @@ reader_intern_symbols(_Package,'#\\'(X),'#\\'(X)):-!.
 reader_intern_symbols(P,I,O):- resolve_reader_macros(I,M)->I\==M,!,reader_intern_symbols(P,M,O).
 
 % #<unbound>
-reader_intern_symbols(_,'$OBJ'([Unbound]),'$OBJ'(unbound,[])):- Unbound = unbound,!.
+reader_intern_symbols(_,'$OBJ'([Unbound]),'$OBJ'(unbound,[])):- Unbound == unbound,!.
 % #'symbol
 reader_intern_symbols(_,'$OBJ'(Function,F),function(F)):- Function==function,!.
 reader_intern_symbols(Package,'$OBJ'(Expr),'$OBJ'(ExprO)):-!,reader_intern_symbols(Package,(Expr),(ExprO)).
 
 reader_intern_symbols(Package,ExprI,ExprO):- ExprI=..[F,C,D|Expr],F=='$ARRAY',!,  
-  ((find_or_create_class(D,K),atom(K));reader_intern_symbols(Package,C,K)),
+  ((foc_class(D,K),atom(K));reader_intern_symbols(Package,C,K)),
   must_maplist(reader_intern_symbols(Package),Expr,TT),ExprO=..[F,C,K|TT].
 
 reader_intern_symbols(Package,ExprI,ExprO):- ExprI=..[F,C|Expr],F=='$OBJ',!,
-  ((find_or_create_class(C,K),atom(K));reader_intern_symbols(Package,C,K)),
+  ((foc_class(C,K),atom(K));reader_intern_symbols(Package,C,K)),
   must_maplist(reader_intern_symbols(Package),Expr,TT),ExprO=..[F,K|TT].
 reader_intern_symbols(Package,ExprI,ExprO):- ExprI=..[F|Expr],atom_concat_or_rtrace('$',_,F),!,
   must_maplist(reader_intern_symbols(Package),Expr,TT),ExprO=..[F|TT].

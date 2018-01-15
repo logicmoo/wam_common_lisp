@@ -119,7 +119,7 @@ wl:interned_eval(call((to_lisp_pathname("",Path),
 
 % Uses Symbol value: *SOURCE-FILE-TYPES*
 check_file_types(SearchTypes):- 
-   f_symbol_value(custom_xx_source_file_types_xx,FileTypes),
+   f_symbol_value(sys_xx_source_file_types_xx,FileTypes),
    maplist(to_file_exts,FileTypes,SearchTypes),!.
 check_file_types(['.cl','.lisp','.lsp','.el']).
 

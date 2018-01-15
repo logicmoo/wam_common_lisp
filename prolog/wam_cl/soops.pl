@@ -86,7 +86,7 @@ new_init_instance_pt2(_SKind,_Name,Attrs,Obj,Kind):-
 call_init_slot_props(Kind,Obj):- get_opv_else(Obj,instance,Kinds,Kinds=[])->
   (member(Kind,Kinds)->!;(set_opv(Obj,instance,[Kind|Kinds]),fail)).
 call_init_slot_props(Kind,Obj):-
- always((
+ always_ignore((
   forall(get_kind_supers(Kind,Sup),call_init_slot_props(Sup,Obj)),
   ensure_opv_type_inited(Kind),
   forall(get_struct_opv(Kind,sys_slot_definition_initargs,From,SlotInfo),
@@ -94,9 +94,9 @@ call_init_slot_props(Kind,Obj):-
      (get_opv_iii(Kind,Obj,Into,_)-> true ; 
         (get_opv_else(Obj,From,Value,Value=[]),set_opv(Obj,Into,Value))))),
    forall(get_struct_opv(Kind,kw_initform,Value,SlotInfo),
-     (get_struct_opv(Kind,getter_fn,Into,SlotInfo),
+     always_ignore((get_struct_opv(Kind,getter_fn,Into,SlotInfo),
       ( % get_opv_iii(Kind,Obj,Name,_)-> true ; 
-         (f_eval(Value,Result),set_opv(Obj,Into,Result))))))).
+         (f_eval(Value,Result),set_opv(Obj,Into,Result)))))))).
 
 
 when_must(True,Then):- True->always(Then);true.
@@ -194,18 +194,16 @@ type_slot_number(Kind,Key,Ordinal):-
 (wl:init_args(0,defclass)).
 
 
-find_or_create_class(Name,Kind):- find_class(Name,Kind),Kind\==[],!.
-find_or_create_class(Name,Kind):- 
-   %to_prolog_string_anyways(Name,SName),
+foc_class(Name,Kind):- find_class(Name,Kind),Kind\==[],!.
+foc_class(Name,Kind):- % to_prolog_string_anyways(Name,SName),
    new_named_opv(claz_structure_class,Name,[],Kind),!.
 
-find_class(Name,Claz):- (var(Name) -> lisp_dump_break ; true) , 
-  get_struct_opv(Claz,symbolname,Name),!.
+find_class(Name,Claz):- atom(Name),atom_concat_or_rtrace('claz_',_,Name),!,Claz=Name.
+find_class(Name,Claz):- (var(Name) -> lisp_dump_break ; true) , get_struct_opv(Claz,class_name,Name),!.
 %find_class(Name,Claz):- get_struct_opv(Claz,name,Name),!.
 find_class(Name,Claz):-
   to_prolog_string_anyways(Name,StringC)->string_upper(StringC,NameS),
   get_struct_opv(Claz,kw_namestring,NameS).
-find_class(Name,Claz):- atom(Name),atom_concat_or_rtrace('claz_',_,Name),!,Claz=Name.
 
 
 f_find_class(Name,Claz):- always(is_symbolp(Name)),
@@ -265,7 +263,7 @@ is_structure_classp(T):- get_opv(T,type_of,TT),!,TT=structure_class.
 
 define_kind(DefType,Name,KeyWords,SlotsIn,Kind):- 
  always((
-  assert_struct_opv(Kind,symbolname,Name),
+  assert_struct_opv(Kind,class_name,Name),
   assert_struct_opv(Kind,type,Name),  
   % add doc for string
   maybe_get_docs('class',Name,SlotsIn,Slots,Code),
@@ -292,10 +290,10 @@ generate_missing_struct_functions(Kind):-
  forall(get_struct_opv(Kind,getter_fn,_,ZLOT),
    maybe_add_get_set_functions(Kind,ZLOT)))),
    forall(get_struct_opv(Kind,kw_reader,ReaderSymbol,ZLOT),
-     always((get_struct_opv(Kind,getter_fn,GetterSym,ZLOT),
+     always_ignore((get_struct_opv(Kind,getter_fn,GetterSym,ZLOT),
       maybe_add_slot_accessor_function(Kind,ReaderSymbol,GetterSym)))),
  forall(get_struct_opv(Kind,kw_accessor,ReaderSymbol,ZLOT),
-   always((get_struct_opv(Kind,getter_fn,GetterSym,ZLOT),
+   always_ignore((get_struct_opv(Kind,getter_fn,GetterSym,ZLOT),
      maybe_add_slot_accessor_function(Kind,ReaderSymbol,GetterSym)))).
 
 maybe_add_slot_accessor_function(Kind,ReaderSymbol,GetterSym):-
@@ -308,9 +306,11 @@ maybe_add_slot_accessor_function(Kind,ReaderSymbol,GetterSym):-
      set_opv(ReaderSymbol,ftype_lambda_list,[object])),
   cmpout(PrologCode),!.
 maybe_add_slot_accessor_function(_Kind,ReaderSymbol,GetterSym):-
-  show_call_debug(maybe_add_function(ReaderSymbol,[obj],['slot-value',obj,[quote,GetterSym]],_Added1)).
+  show_call_trace(maybe_add_function(ReaderSymbol,[obj],['slot-value',obj,[quote,GetterSym]],_Added1)).
 
   %Added\==[]-> assert_struct_opv4(Kind,getter_fn,Added,ZLOT) ; true )
+
+always_ignore(G):- always(ignore(G)).
 
 /*
 (defclass animal ()
@@ -319,7 +319,7 @@ maybe_add_slot_accessor_function(_Kind,ReaderSymbol,GetterSym):-
 */
 make_default_constructor(Kind,Code):- 
  always((
- get_struct_opv(Kind,symbolname,Name),to_prolog_string_anyways(Name,SName),
+ get_struct_opv(Kind,class_name,Name),to_prolog_string_anyways(Name,SName),
  atom_concat_or_rtrace("MAKE-",SName,FnName),
  reader_intern_symbols(FnName,Sym),
  foc_operator(_,_,kw_function,Sym,3,Function), 
@@ -333,15 +333,15 @@ make_default_constructor(Kind,Code):-
  
 
 maybe_add_get_set_functions(Kind,ZLOT):- 
+   maybe_add_get_function(Kind,ZLOT),
    (\+ get_struct_opv(Kind,read_only,t,ZLOT) ->
-     maybe_add_set_function(Kind,ZLOT) ; true),
-   maybe_add_get_function(Kind,ZLOT).
+   maybe_add_set_function(Kind,ZLOT) ; true).
 
 %maybe_add_get_function(Kind,ZLOT):- get_struct_opv(Kind,getter_fn,_Getter,ZLOT),!.
 maybe_add_get_function(Kind,ZLOT):-   
   always(( get_struct_opv(Kind,getter_fn,GetterSym,ZLOT), maybe_add_slot_accessor_function(Kind,GetterSym,GetterSym))).
 
-maybe_add_set_function(Kind,ZLOT):- get_struct_opv(Kind,setter_fn,_Setter,ZLOT),!.
+%maybe_add_set_function(Kind,ZLOT):- get_struct_opv(Kind,setter_fn,_Setter,ZLOT),!.
 maybe_add_set_function(Kind,ZLOT):-   
   always((
   get_struct_opv(Kind,getter_fn,SetterSym,ZLOT),
@@ -384,7 +384,7 @@ maybe_add_function(FnName,ArgList,LispBody,R):-
    (is_fboundp(Sym)->R=Sym;
      (R=Result,as_sexp(LispBody,SLispBody),
        reader_intern_symbols(pkg_user,[defun,FnName,ArgList,[progn,SLispBody]],LispInterned),
-         lisp_compile(Result,LispInterned,PrologCode),always(PrologCode))).
+         ((lisp_compile(Result,LispInterned,PrologCode),always(PrologCode))))).
 
 
 struct_opv_else(Kind,Key,Value,Else):-
@@ -615,7 +615,7 @@ f_class_name(C,S):- claz_to_symbol(C,S).
 
 claz_to_symbol(C,S):- claz_to_symbol0(C,S)*->true;claz_to_symbol1(C,S).
 
-claz_to_symbol0(C,S):- get_struct_opv(C,symbolname,S).
+claz_to_symbol0(C,S):- get_struct_opv(C,class_name,S).
 %claz_to_symbol0(C,S):- get_struct_opv(C,name,S), \+ string(S).
 claz_to_symbol0(C,S):- get_struct_opv(C,type,S).
 claz_to_symbol0(claz_symbol,symbol).
@@ -758,7 +758,7 @@ add_slot_def_props(N,Kind,SlotSym,MoreInfo):-
    create_keyword(SName,KW),assert_struct_opv4(Kind,sys_slot_definition_initargs,KW,SlotInfo),
 
       struct_opv_else(Kind,kw_conc_name,ConcatName,
-        (get_struct_opv(Kind,symbolname,KName),to_prolog_string_anyways(KName,KSName),string_concat(KSName,"-",ConcatName),
+        (get_struct_opv(Kind,class_name,KName),to_prolog_string_anyways(KName,KSName),string_concat(KSName,"-",ConcatName),
               assert_struct_opv(Kind,kw_conc_name,ConcatName))),
       
        
@@ -832,9 +832,13 @@ kind_attribute_pred(Kind,Prop,Pred):- wl:type_attribute_pred_dyn(Kind,Prop,Pred)
 
 
 
+:- discontiguous soops:struct_opv/3.
 :- discontiguous soops:struct_opv/4.
+:- dynamic((soops:struct_opv/3)).
 :- dynamic((soops:struct_opv/4)).
-%:- soops:ensure_loaded('ci.data').
+:- multifile((soops:struct_opv/3)).
+:- multifile((soops:struct_opv/4)).
+:- soops:ensure_loaded('ci.data').
 cleanup_mop:-  
  ignore((get_struct_opv(X,include,claz_object),get_struct_opv(X,include,Y),Y\==claz_object,show_call_trace(retract(soops:struct_opv(X,include,claz_object))),fail)),
  ignore((get_struct_opv(X,include,claz_t),get_struct_opv(X,include,Y),Y\==claz_t,show_call_trace(retract(soops:struct_opv(X,include,claz_t))),fail)).

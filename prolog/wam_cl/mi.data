@@ -1,0 +1,354 @@
+added_method(claz_built_in_class, [setf, class_name], kw_name, [setf, class_name]).
+added_method(claz_built_in_class, [setf, sys_class_default_initargs], kw_name, [setf, sys_class_default_initargs]).
+added_method(claz_built_in_class, [setf, sys_class_direct_default_initargs], kw_name, [setf, sys_class_direct_default_initargs]).
+added_method(claz_built_in_class, [setf, sys_class_direct_methods], kw_name, [setf, sys_class_direct_methods]).
+added_method(claz_built_in_class, [setf, sys_class_direct_slots], kw_name, [setf, sys_class_direct_slots]).
+added_method(claz_built_in_class, [setf, sys_class_direct_subclasses], kw_name, [setf, sys_class_direct_subclasses]).
+added_method(claz_built_in_class, [setf, sys_class_direct_superclasses], kw_name, [setf, sys_class_direct_superclasses]).
+added_method(claz_built_in_class, [setf, sys_class_finalized_p], kw_name, [setf, sys_class_finalized_p]).
+added_method(claz_built_in_class, [setf, sys_class_layout], kw_name, [setf, sys_class_layout]).
+added_method(claz_built_in_class, [setf, sys_class_precedence_list], kw_name, [setf, sys_class_precedence_list]).
+added_method(claz_built_in_class, [setf, sys_class_slots], kw_name, [setf, sys_class_slots]).
+added_method(claz_built_in_class, allocate_instance, kw_name, allocate_instance).
+added_method(claz_built_in_class, class_name, kw_name, class_name).
+added_method(claz_built_in_class, sys_class_default_initargs, kw_name, sys_class_default_initargs).
+added_method(claz_built_in_class, sys_class_direct_default_initargs, kw_name, sys_class_direct_default_initargs).
+added_method(claz_built_in_class, sys_class_direct_methods, kw_name, sys_class_direct_methods).
+added_method(claz_built_in_class, sys_class_direct_slots, kw_name, sys_class_direct_slots).
+added_method(claz_built_in_class, sys_class_direct_subclasses, kw_name, sys_class_direct_subclasses).
+added_method(claz_built_in_class, sys_class_direct_superclasses, kw_name, sys_class_direct_superclasses).
+added_method(claz_built_in_class, sys_class_finalized_p, kw_name, sys_class_finalized_p).
+added_method(claz_built_in_class, sys_class_layout, kw_name, sys_class_layout).
+added_method(claz_built_in_class, sys_class_precedence_list, kw_name, sys_class_precedence_list).
+added_method(claz_built_in_class, sys_class_slots, kw_name, sys_class_slots).
+added_method(claz_built_in_class, sys_ensure_class_using_class, kw_name, sys_ensure_class_using_class).
+added_method(claz_built_in_class, sys_validate_superclass, kw_documentation, '$ARRAY'([*], claz_base_character, [#\('T'), #\(h), #\(i), #\(s), #\(' '), #\(g), #\(e), #\(n), #\(e), #\(r), #\(i), #\(c), #\(' '), #\(f), #\(u), #\(n), #\(c), #\(t), #\(i), #\(o), #\(n), #\(' '), #\(i), #\(s), #\(' '), #\(c), #\(a), #\(l), #\(l), #\(e), #\(d), #\(' '), #\(t), #\(o), #\(' '), #\(d), #\(e), #\(t), #\(e), #\(r), #\(m), #\(i), #\(n), #\(e), #\(' '), #\(w), #\(h), #\(e), #\(t), #\(h), #\(e), #\(r), #\(' '), #\(t), #\(h), #\(e), #\(' '), #\(c), #\(l), #\(a), #\(s), #\(s), #\(' '), #\(' '), #\(s), #\(u), #\(p), #\(e), #\(r), #\(c), #\(l), #\(a), #\(s), #\(s), #\(' '), #\(i), #\(s), #\(' '), #\(s), #\(u), #\(i), #\(t), #\(a), #\(b), #\(l), #\(e), #\(' '), #\(f), #\(o), #\(r), #\(' '), #\(u), #\(s), #\(e), #\(' '), #\(a), #\(s), #\(' '), #\(a), #\(' '), #\(s), #\(u), #\(p), #\(e), #\(r), #\(c), #\(l), #\(a), #\(s), #\(s), #\(' '), #\(o), #\(f), #\(' '), #\(c), #\(l), #\(a), #\(s), #\(s), #\('.')])).
+added_method(claz_built_in_class, sys_validate_superclass, kw_name, sys_validate_superclass).
+added_method(claz_class, [setf, documentation], kw_name, [setf, documentation]).
+added_method(claz_class, allocate_instance, kw_name, allocate_instance).
+added_method(claz_class, documentation, kw_name, documentation).
+added_method(claz_class, make_instance, kw_name, make_instance).
+added_method(claz_class, make_load_form, kw_name, make_load_form).
+added_method(claz_class, print_object, kw_name, print_object).
+added_method(claz_class, shared_initialize, kw_name, shared_initialize).
+added_method(claz_class, sys_add_direct_method, kw_name, sys_add_direct_method).
+added_method(claz_class, sys_add_direct_subclass, kw_name, sys_add_direct_subclass).
+added_method(claz_class, sys_direct_slot_definition_class, kw_name, sys_direct_slot_definition_class).
+added_method(claz_class, sys_effective_slot_definition_class, kw_name, sys_effective_slot_definition_class).
+added_method(claz_class, sys_ensure_class_using_class, kw_name, sys_ensure_class_using_class).
+added_method(claz_class, sys_remove_direct_method, kw_name, sys_remove_direct_method).
+added_method(claz_class, sys_remove_direct_subclass, kw_name, sys_remove_direct_subclass).
+added_method(claz_class, sys_specializer_direct_generic_functions, kw_name, sys_specializer_direct_generic_functions).
+added_method(claz_class, sys_specializer_direct_methods, kw_name, sys_specializer_direct_methods).
+added_method(claz_class, sys_validate_superclass, kw_documentation, '$ARRAY'([*], claz_base_character, [#\('T'), #\(h), #\(i), #\(s), #\(' '), #\(g), #\(e), #\(n), #\(e), #\(r), #\(i), #\(c), #\(' '), #\(f), #\(u), #\(n), #\(c), #\(t), #\(i), #\(o), #\(n), #\(' '), #\(i), #\(s), #\(' '), #\(c), #\(a), #\(l), #\(l), #\(e), #\(d), #\(' '), #\(t), #\(o), #\(' '), #\(d), #\(e), #\(t), #\(e), #\(r), #\(m), #\(i), #\(n), #\(e), #\(' '), #\(w), #\(h), #\(e), #\(t), #\(h), #\(e), #\(r), #\(' '), #\(t), #\(h), #\(e), #\(' '), #\(c), #\(l), #\(a), #\(s), #\(s), #\(' '), #\(' '), #\(s), #\(u), #\(p), #\(e), #\(r), #\(c), #\(l), #\(a), #\(s), #\(s), #\(' '), #\(i), #\(s), #\(' '), #\(s), #\(u), #\(i), #\(t), #\(a), #\(b), #\(l), #\(e), #\(' '), #\(f), #\(o), #\(r), #\(' '), #\(u), #\(s), #\(e), #\(' '), #\(a), #\(s), #\(' '), #\(a), #\(' '), #\(s), #\(u), #\(p), #\(e), #\(r), #\(c), #\(l), #\(a), #\(s), #\(s), #\(' '), #\(o), #\(f), #\(' '), #\(c), #\(l), #\(a), #\(s), #\(s), #\('.')])).
+added_method(claz_class, sys_validate_superclass, kw_name, sys_validate_superclass).
+added_method(claz_condition, print_object, kw_name, print_object).
+added_method(claz_function, [setf, documentation], kw_name, [setf, documentation]).
+added_method(claz_function, documentation, kw_name, documentation).
+added_method(claz_generic_function, [setf, sys_generic_function_name], kw_name, [setf, sys_generic_function_name]).
+added_method(claz_generic_function, add_method, kw_name, add_method).
+added_method(claz_generic_function, print_object, kw_name, print_object).
+added_method(claz_generic_function, remove_method, kw_name, remove_method).
+added_method(claz_generic_function, shared_initialize, kw_name, shared_initialize).
+added_method(claz_generic_function, sys_ensure_generic_function_using_class, kw_name, sys_ensure_generic_function_using_class).
+added_method(claz_list, [setf, documentation], kw_name, [setf, documentation]).
+added_method(claz_list, documentation, kw_name, documentation).
+added_method(claz_method, add_method, kw_name, add_method).
+added_method(claz_method, print_object, kw_name, print_object).
+added_method(claz_method, remove_method, kw_name, remove_method).
+added_method(claz_method, sys_add_direct_method, kw_name, sys_add_direct_method).
+added_method(claz_method, sys_remove_direct_method, kw_name, sys_remove_direct_method).
+added_method(claz_method_combination, print_object, kw_name, print_object).
+added_method(claz_null, sys_ensure_class_using_class, kw_name, sys_ensure_class_using_class).
+added_method(claz_null, sys_ensure_generic_function_using_class, kw_name, sys_ensure_generic_function_using_class).
+added_method(claz_package, [setf, documentation], kw_name, [setf, documentation]).
+added_method(claz_package, documentation, kw_name, documentation).
+added_method(claz_standard_class, [setf, class_name], kw_name, [setf, class_name]).
+added_method(claz_standard_class, [setf, sys_class_default_initargs], kw_name, [setf, sys_class_default_initargs]).
+added_method(claz_standard_class, [setf, sys_class_direct_default_initargs], kw_name, [setf, sys_class_direct_default_initargs]).
+added_method(claz_standard_class, [setf, sys_class_direct_methods], kw_name, [setf, sys_class_direct_methods]).
+added_method(claz_standard_class, [setf, sys_class_direct_slots], kw_name, [setf, sys_class_direct_slots]).
+added_method(claz_standard_class, [setf, sys_class_direct_subclasses], kw_name, [setf, sys_class_direct_subclasses]).
+added_method(claz_standard_class, [setf, sys_class_direct_superclasses], kw_name, [setf, sys_class_direct_superclasses]).
+added_method(claz_standard_class, [setf, sys_class_finalized_p], kw_name, [setf, sys_class_finalized_p]).
+added_method(claz_standard_class, [setf, sys_class_layout], kw_name, [setf, sys_class_layout]).
+added_method(claz_standard_class, [setf, sys_class_precedence_list], kw_name, [setf, sys_class_precedence_list]).
+added_method(claz_standard_class, [setf, sys_class_slots], kw_name, [setf, sys_class_slots]).
+added_method(claz_standard_class, [setf, sys_slot_value_using_class], kw_name, [setf, sys_slot_value_using_class]).
+added_method(claz_standard_class, allocate_instance, kw_name, allocate_instance).
+added_method(claz_standard_class, change_class, kw_name, change_class).
+added_method(claz_standard_class, class_name, kw_name, class_name).
+added_method(claz_standard_class, initialize_instance, kw_name, initialize_instance).
+added_method(claz_standard_class, make_instance, kw_name, make_instance).
+added_method(claz_standard_class, make_instances_obsolete, kw_name, make_instances_obsolete).
+added_method(claz_standard_class, reinitialize_instance, kw_name, reinitialize_instance).
+added_method(claz_standard_class, sys_add_dependent, kw_name, sys_add_dependent).
+added_method(claz_standard_class, sys_class_default_initargs, kw_name, sys_class_default_initargs).
+added_method(claz_standard_class, sys_class_direct_default_initargs, kw_name, sys_class_direct_default_initargs).
+added_method(claz_standard_class, sys_class_direct_methods, kw_name, sys_class_direct_methods).
+added_method(claz_standard_class, sys_class_direct_slots, kw_name, sys_class_direct_slots).
+added_method(claz_standard_class, sys_class_direct_subclasses, kw_name, sys_class_direct_subclasses).
+added_method(claz_standard_class, sys_class_direct_superclasses, kw_name, sys_class_direct_superclasses).
+added_method(claz_standard_class, sys_class_finalized_p, kw_name, sys_class_finalized_p).
+added_method(claz_standard_class, sys_class_layout, kw_name, sys_class_layout).
+added_method(claz_standard_class, sys_class_precedence_list, kw_name, sys_class_precedence_list).
+added_method(claz_standard_class, sys_class_prototype, kw_name, sys_class_prototype).
+added_method(claz_standard_class, sys_class_slots, kw_name, sys_class_slots).
+added_method(claz_standard_class, sys_compute_class_precedence_list, kw_name, sys_compute_class_precedence_list).
+added_method(claz_standard_class, sys_compute_default_initargs, kw_name, sys_compute_default_initargs).
+added_method(claz_standard_class, sys_compute_effective_slot_definition, kw_name, sys_compute_effective_slot_definition).
+added_method(claz_standard_class, sys_compute_slots, kw_name, sys_compute_slots).
+added_method(claz_standard_class, sys_finalize_inheritance, kw_name, sys_finalize_inheritance).
+added_method(claz_standard_class, sys_map_dependents, kw_name, sys_map_dependents).
+added_method(claz_standard_class, sys_reader_method_class, kw_name, sys_reader_method_class).
+added_method(claz_standard_class, sys_remove_dependent, kw_name, sys_remove_dependent).
+added_method(claz_standard_class, sys_slot_boundp_using_class, kw_name, sys_slot_boundp_using_class).
+added_method(claz_standard_class, sys_slot_exists_p_using_class, kw_name, sys_slot_exists_p_using_class).
+added_method(claz_standard_class, sys_slot_makunbound_using_class, kw_name, sys_slot_makunbound_using_class).
+added_method(claz_standard_class, sys_slot_value_using_class, kw_name, sys_slot_value_using_class).
+added_method(claz_standard_class, sys_writer_method_class, kw_name, sys_writer_method_class).
+added_method(claz_standard_generic_function, [setf, documentation], kw_name, [setf, documentation]).
+added_method(claz_standard_generic_function, add_method, kw_name, add_method).
+added_method(claz_standard_generic_function, compute_applicable_methods, kw_name, compute_applicable_methods).
+added_method(claz_standard_generic_function, documentation, kw_name, documentation).
+added_method(claz_standard_generic_function, find_method, kw_name, find_method).
+added_method(claz_standard_generic_function, reinitialize_instance, kw_name, reinitialize_instance).
+added_method(claz_standard_generic_function, remove_method, kw_name, remove_method).
+added_method(claz_standard_generic_function, shared_initialize, kw_name, shared_initialize).
+added_method(claz_standard_generic_function, sys_add_dependent, kw_name, sys_add_dependent).
+added_method(claz_standard_generic_function, sys_compute_applicable_methods_using_classes, kw_name, sys_compute_applicable_methods_using_classes).
+added_method(claz_standard_generic_function, sys_compute_discriminating_function, kw_name, sys_compute_discriminating_function).
+added_method(claz_standard_generic_function, sys_compute_effective_method, kw_name, sys_compute_effective_method).
+added_method(claz_standard_generic_function, sys_generic_function_argument_precedence_order, kw_name, sys_generic_function_argument_precedence_order).
+added_method(claz_standard_generic_function, sys_generic_function_declarations, kw_name, sys_generic_function_declarations).
+added_method(claz_standard_generic_function, sys_generic_function_lambda_list, kw_name, sys_generic_function_lambda_list).
+added_method(claz_standard_generic_function, sys_generic_function_method_class, kw_name, sys_generic_function_method_class).
+added_method(claz_standard_generic_function, sys_generic_function_method_combination, kw_name, sys_generic_function_method_combination).
+added_method(claz_standard_generic_function, sys_generic_function_methods, kw_name, sys_generic_function_methods).
+added_method(claz_standard_generic_function, sys_generic_function_name, kw_name, sys_generic_function_name).
+added_method(claz_standard_generic_function, sys_generic_function_optional_arguments, kw_name, sys_generic_function_optional_arguments).
+added_method(claz_standard_generic_function, sys_generic_function_required_arguments, kw_name, sys_generic_function_required_arguments).
+added_method(claz_standard_generic_function, sys_make_method_lambda, kw_name, sys_make_method_lambda).
+added_method(claz_standard_generic_function, sys_map_dependents, kw_name, sys_map_dependents).
+added_method(claz_standard_generic_function, sys_method_more_specific_p, kw_name, sys_method_more_specific_p).
+added_method(claz_standard_generic_function, sys_remove_dependent, kw_name, sys_remove_dependent).
+added_method(claz_standard_method, [setf, documentation], kw_name, [setf, documentation]).
+added_method(claz_standard_method, add_method, kw_name, add_method).
+added_method(claz_standard_method, documentation, kw_name, documentation).
+added_method(claz_standard_method, function_keywords, kw_name, function_keywords).
+added_method(claz_standard_method, method_qualifiers, kw_name, method_qualifiers).
+added_method(claz_standard_method, remove_method, kw_name, remove_method).
+added_method(claz_standard_method, sys_make_method_lambda, kw_name, sys_make_method_lambda).
+added_method(claz_standard_method, sys_method_function, kw_name, sys_method_function).
+added_method(claz_standard_method, sys_method_generic_function, kw_name, sys_method_generic_function).
+added_method(claz_standard_method, sys_method_lambda_list, kw_name, sys_method_lambda_list).
+added_method(claz_standard_method, sys_method_specializers, kw_name, sys_method_specializers).
+added_method(claz_standard_object, change_class, kw_name, change_class).
+added_method(claz_standard_object, initialize_instance, kw_name, initialize_instance).
+added_method(claz_standard_object, print_object, kw_name, print_object).
+added_method(claz_standard_object, reinitialize_instance, kw_name, reinitialize_instance).
+added_method(claz_standard_object, shared_initialize, kw_name, shared_initialize).
+added_method(claz_standard_object, update_instance_for_different_class, kw_name, update_instance_for_different_class).
+added_method(claz_standard_object, update_instance_for_redefined_class, kw_name, update_instance_for_redefined_class).
+added_method(claz_structure_class, [setf, class_name], kw_name, [setf, class_name]).
+added_method(claz_structure_class, [setf, documentation], kw_name, [setf, documentation]).
+added_method(claz_structure_class, [setf, sys_class_default_initargs], kw_name, [setf, sys_class_default_initargs]).
+added_method(claz_structure_class, [setf, sys_class_direct_default_initargs], kw_name, [setf, sys_class_direct_default_initargs]).
+added_method(claz_structure_class, [setf, sys_class_direct_methods], kw_name, [setf, sys_class_direct_methods]).
+added_method(claz_structure_class, [setf, sys_class_direct_slots], kw_name, [setf, sys_class_direct_slots]).
+added_method(claz_structure_class, [setf, sys_class_direct_subclasses], kw_name, [setf, sys_class_direct_subclasses]).
+added_method(claz_structure_class, [setf, sys_class_direct_superclasses], kw_name, [setf, sys_class_direct_superclasses]).
+added_method(claz_structure_class, [setf, sys_class_finalized_p], kw_name, [setf, sys_class_finalized_p]).
+added_method(claz_structure_class, [setf, sys_class_layout], kw_name, [setf, sys_class_layout]).
+added_method(claz_structure_class, [setf, sys_class_precedence_list], kw_name, [setf, sys_class_precedence_list]).
+added_method(claz_structure_class, [setf, sys_class_slots], kw_name, [setf, sys_class_slots]).
+added_method(claz_structure_class, [setf, sys_slot_value_using_class], kw_name, [setf, sys_slot_value_using_class]).
+added_method(claz_structure_class, allocate_instance, kw_name, allocate_instance).
+added_method(claz_structure_class, class_name, kw_name, class_name).
+added_method(claz_structure_class, documentation, kw_name, documentation).
+added_method(claz_structure_class, sys_class_default_initargs, kw_name, sys_class_default_initargs).
+added_method(claz_structure_class, sys_class_direct_default_initargs, kw_name, sys_class_direct_default_initargs).
+added_method(claz_structure_class, sys_class_direct_methods, kw_name, sys_class_direct_methods).
+added_method(claz_structure_class, sys_class_direct_slots, kw_name, sys_class_direct_slots).
+added_method(claz_structure_class, sys_class_direct_subclasses, kw_name, sys_class_direct_subclasses).
+added_method(claz_structure_class, sys_class_direct_superclasses, kw_name, sys_class_direct_superclasses).
+added_method(claz_structure_class, sys_class_finalized_p, kw_name, sys_class_finalized_p).
+added_method(claz_structure_class, sys_class_layout, kw_name, sys_class_layout).
+added_method(claz_structure_class, sys_class_precedence_list, kw_name, sys_class_precedence_list).
+added_method(claz_structure_class, sys_class_prototype, kw_name, sys_class_prototype).
+added_method(claz_structure_class, sys_class_slots, kw_name, sys_class_slots).
+added_method(claz_structure_class, sys_slot_boundp_using_class, kw_name, sys_slot_boundp_using_class).
+added_method(claz_structure_class, sys_slot_exists_p_using_class, kw_name, sys_slot_exists_p_using_class).
+added_method(claz_structure_class, sys_slot_makunbound_using_class, kw_name, sys_slot_makunbound_using_class).
+added_method(claz_structure_class, sys_slot_value_using_class, kw_name, sys_slot_value_using_class).
+added_method(claz_structure_object, print_object, kw_name, print_object).
+added_method(claz_symbol, [setf, documentation], kw_name, [setf, documentation]).
+added_method(claz_symbol, [setf, sys_slot_value_using_class], kw_name, [setf, sys_slot_value_using_class]).
+added_method(claz_symbol, change_class, kw_name, change_class).
+added_method(claz_symbol, documentation, kw_name, documentation).
+added_method(claz_symbol, make_instance, kw_name, make_instance).
+added_method(claz_symbol, make_instances_obsolete, kw_name, make_instances_obsolete).
+added_method(claz_symbol, sys_find_method_combination, kw_name, sys_find_method_combination).
+added_method(claz_symbol, sys_slot_boundp_using_class, kw_name, sys_slot_boundp_using_class).
+added_method(claz_symbol, sys_slot_makunbound_using_class, kw_name, sys_slot_makunbound_using_class).
+added_method(claz_symbol, sys_slot_value_using_class, kw_name, sys_slot_value_using_class).
+added_method(claz_sys_eql_specializer, sys_add_direct_method, kw_name, sys_add_direct_method).
+added_method(claz_sys_eql_specializer, sys_remove_direct_method, kw_name, sys_remove_direct_method).
+added_method(claz_sys_eql_specializer, sys_specializer_direct_generic_functions, kw_name, sys_specializer_direct_generic_functions).
+added_method(claz_sys_eql_specializer, sys_specializer_direct_methods, kw_name, sys_specializer_direct_methods).
+added_method(claz_sys_forward_referenced_class, [setf, class_name], kw_name, [setf, class_name]).
+added_method(claz_sys_forward_referenced_class, [setf, sys_class_default_initargs], kw_name, [setf, sys_class_default_initargs]).
+added_method(claz_sys_forward_referenced_class, [setf, sys_class_direct_default_initargs], kw_name, [setf, sys_class_direct_default_initargs]).
+added_method(claz_sys_forward_referenced_class, [setf, sys_class_direct_methods], kw_name, [setf, sys_class_direct_methods]).
+added_method(claz_sys_forward_referenced_class, [setf, sys_class_direct_slots], kw_name, [setf, sys_class_direct_slots]).
+added_method(claz_sys_forward_referenced_class, [setf, sys_class_direct_subclasses], kw_name, [setf, sys_class_direct_subclasses]).
+added_method(claz_sys_forward_referenced_class, [setf, sys_class_direct_superclasses], kw_name, [setf, sys_class_direct_superclasses]).
+added_method(claz_sys_forward_referenced_class, [setf, sys_class_finalized_p], kw_name, [setf, sys_class_finalized_p]).
+added_method(claz_sys_forward_referenced_class, [setf, sys_class_layout], kw_name, [setf, sys_class_layout]).
+added_method(claz_sys_forward_referenced_class, [setf, sys_class_precedence_list], kw_name, [setf, sys_class_precedence_list]).
+added_method(claz_sys_forward_referenced_class, [setf, sys_class_slots], kw_name, [setf, sys_class_slots]).
+added_method(claz_sys_forward_referenced_class, class_name, kw_name, class_name).
+added_method(claz_sys_forward_referenced_class, sys_class_default_initargs, kw_name, sys_class_default_initargs).
+added_method(claz_sys_forward_referenced_class, sys_class_direct_default_initargs, kw_name, sys_class_direct_default_initargs).
+added_method(claz_sys_forward_referenced_class, sys_class_direct_methods, kw_name, sys_class_direct_methods).
+added_method(claz_sys_forward_referenced_class, sys_class_direct_slots, kw_name, sys_class_direct_slots).
+added_method(claz_sys_forward_referenced_class, sys_class_direct_subclasses, kw_name, sys_class_direct_subclasses).
+added_method(claz_sys_forward_referenced_class, sys_class_direct_superclasses, kw_name, sys_class_direct_superclasses).
+added_method(claz_sys_forward_referenced_class, sys_class_finalized_p, kw_name, sys_class_finalized_p).
+added_method(claz_sys_forward_referenced_class, sys_class_layout, kw_name, sys_class_layout).
+added_method(claz_sys_forward_referenced_class, sys_class_precedence_list, kw_name, sys_class_precedence_list).
+added_method(claz_sys_forward_referenced_class, sys_class_slots, kw_name, sys_class_slots).
+added_method(claz_sys_forward_referenced_class, sys_ensure_class_using_class, kw_name, sys_ensure_class_using_class).
+added_method(claz_sys_forward_referenced_class, sys_validate_superclass, kw_documentation, '$ARRAY'([*], claz_base_character, [#\('T'), #\(h), #\(i), #\(s), #\(' '), #\(g), #\(e), #\(n), #\(e), #\(r), #\(i), #\(c), #\(' '), #\(f), #\(u), #\(n), #\(c), #\(t), #\(i), #\(o), #\(n), #\(' '), #\(i), #\(s), #\(' '), #\(c), #\(a), #\(l), #\(l), #\(e), #\(d), #\(' '), #\(t), #\(o), #\(' '), #\(d), #\(e), #\(t), #\(e), #\(r), #\(m), #\(i), #\(n), #\(e), #\(' '), #\(w), #\(h), #\(e), #\(t), #\(h), #\(e), #\(r), #\(' '), #\(t), #\(h), #\(e), #\(' '), #\(c), #\(l), #\(a), #\(s), #\(s), #\(' '), #\(' '), #\(s), #\(u), #\(p), #\(e), #\(r), #\(c), #\(l), #\(a), #\(s), #\(s), #\(' '), #\(i), #\(s), #\(' '), #\(s), #\(u), #\(i), #\(t), #\(a), #\(b), #\(l), #\(e), #\(' '), #\(f), #\(o), #\(r), #\(' '), #\(u), #\(s), #\(e), #\(' '), #\(a), #\(s), #\(' '), #\(a), #\(' '), #\(s), #\(u), #\(p), #\(e), #\(r), #\(c), #\(l), #\(a), #\(s), #\(s), #\(' '), #\(o), #\(f), #\(' '), #\(c), #\(l), #\(a), #\(s), #\(s), #\('.')])).
+added_method(claz_sys_forward_referenced_class, sys_validate_superclass, kw_name, sys_validate_superclass).
+added_method(claz_sys_funcallable_standard_class, [setf, class_name], kw_name, [setf, class_name]).
+added_method(claz_sys_funcallable_standard_class, [setf, sys_class_default_initargs], kw_name, [setf, sys_class_default_initargs]).
+added_method(claz_sys_funcallable_standard_class, [setf, sys_class_direct_default_initargs], kw_name, [setf, sys_class_direct_default_initargs]).
+added_method(claz_sys_funcallable_standard_class, [setf, sys_class_direct_methods], kw_name, [setf, sys_class_direct_methods]).
+added_method(claz_sys_funcallable_standard_class, [setf, sys_class_direct_slots], kw_name, [setf, sys_class_direct_slots]).
+added_method(claz_sys_funcallable_standard_class, [setf, sys_class_direct_subclasses], kw_name, [setf, sys_class_direct_subclasses]).
+added_method(claz_sys_funcallable_standard_class, [setf, sys_class_direct_superclasses], kw_name, [setf, sys_class_direct_superclasses]).
+added_method(claz_sys_funcallable_standard_class, [setf, sys_class_finalized_p], kw_name, [setf, sys_class_finalized_p]).
+added_method(claz_sys_funcallable_standard_class, [setf, sys_class_layout], kw_name, [setf, sys_class_layout]).
+added_method(claz_sys_funcallable_standard_class, [setf, sys_class_precedence_list], kw_name, [setf, sys_class_precedence_list]).
+added_method(claz_sys_funcallable_standard_class, [setf, sys_class_slots], kw_name, [setf, sys_class_slots]).
+added_method(claz_sys_funcallable_standard_class, [setf, sys_slot_value_using_class], kw_name, [setf, sys_slot_value_using_class]).
+added_method(claz_sys_funcallable_standard_class, allocate_instance, kw_name, allocate_instance).
+added_method(claz_sys_funcallable_standard_class, class_name, kw_name, class_name).
+added_method(claz_sys_funcallable_standard_class, initialize_instance, kw_name, initialize_instance).
+added_method(claz_sys_funcallable_standard_class, make_instance, kw_name, make_instance).
+added_method(claz_sys_funcallable_standard_class, make_instances_obsolete, kw_name, make_instances_obsolete).
+added_method(claz_sys_funcallable_standard_class, reinitialize_instance, kw_name, reinitialize_instance).
+added_method(claz_sys_funcallable_standard_class, sys_add_dependent, kw_name, sys_add_dependent).
+added_method(claz_sys_funcallable_standard_class, sys_class_default_initargs, kw_name, sys_class_default_initargs).
+added_method(claz_sys_funcallable_standard_class, sys_class_direct_default_initargs, kw_name, sys_class_direct_default_initargs).
+added_method(claz_sys_funcallable_standard_class, sys_class_direct_methods, kw_name, sys_class_direct_methods).
+added_method(claz_sys_funcallable_standard_class, sys_class_direct_slots, kw_name, sys_class_direct_slots).
+added_method(claz_sys_funcallable_standard_class, sys_class_direct_subclasses, kw_name, sys_class_direct_subclasses).
+added_method(claz_sys_funcallable_standard_class, sys_class_direct_superclasses, kw_name, sys_class_direct_superclasses).
+added_method(claz_sys_funcallable_standard_class, sys_class_finalized_p, kw_name, sys_class_finalized_p).
+added_method(claz_sys_funcallable_standard_class, sys_class_layout, kw_name, sys_class_layout).
+added_method(claz_sys_funcallable_standard_class, sys_class_precedence_list, kw_name, sys_class_precedence_list).
+added_method(claz_sys_funcallable_standard_class, sys_class_prototype, kw_name, sys_class_prototype).
+added_method(claz_sys_funcallable_standard_class, sys_class_slots, kw_name, sys_class_slots).
+added_method(claz_sys_funcallable_standard_class, sys_compute_class_precedence_list, kw_name, sys_compute_class_precedence_list).
+added_method(claz_sys_funcallable_standard_class, sys_compute_default_initargs, kw_name, sys_compute_default_initargs).
+added_method(claz_sys_funcallable_standard_class, sys_compute_effective_slot_definition, kw_name, sys_compute_effective_slot_definition).
+added_method(claz_sys_funcallable_standard_class, sys_compute_slots, kw_name, sys_compute_slots).
+added_method(claz_sys_funcallable_standard_class, sys_finalize_inheritance, kw_name, sys_finalize_inheritance).
+added_method(claz_sys_funcallable_standard_class, sys_map_dependents, kw_name, sys_map_dependents).
+added_method(claz_sys_funcallable_standard_class, sys_reader_method_class, kw_name, sys_reader_method_class).
+added_method(claz_sys_funcallable_standard_class, sys_remove_dependent, kw_name, sys_remove_dependent).
+added_method(claz_sys_funcallable_standard_class, sys_slot_boundp_using_class, kw_name, sys_slot_boundp_using_class).
+added_method(claz_sys_funcallable_standard_class, sys_slot_exists_p_using_class, kw_name, sys_slot_exists_p_using_class).
+added_method(claz_sys_funcallable_standard_class, sys_slot_makunbound_using_class, kw_name, sys_slot_makunbound_using_class).
+added_method(claz_sys_funcallable_standard_class, sys_slot_value_using_class, kw_name, sys_slot_value_using_class).
+added_method(claz_sys_funcallable_standard_class, sys_writer_method_class, kw_name, sys_writer_method_class).
+added_method(claz_sys_slot_definition, [setf, sys_slot_definition_allocation], kw_name, [setf, sys_slot_definition_allocation]).
+added_method(claz_sys_slot_definition, [setf, sys_slot_definition_allocation_class], kw_name, [setf, sys_slot_definition_allocation_class]).
+added_method(claz_sys_slot_definition, [setf, sys_slot_definition_documentation], kw_name, [setf, sys_slot_definition_documentation]).
+added_method(claz_sys_slot_definition, [setf, sys_slot_definition_initargs], kw_name, [setf, sys_slot_definition_initargs]).
+added_method(claz_sys_slot_definition, [setf, sys_slot_definition_initform], kw_name, [setf, sys_slot_definition_initform]).
+added_method(claz_sys_slot_definition, [setf, sys_slot_definition_initfunction], kw_name, [setf, sys_slot_definition_initfunction]).
+added_method(claz_sys_slot_definition, [setf, sys_slot_definition_location], kw_name, [setf, sys_slot_definition_location]).
+added_method(claz_sys_slot_definition, [setf, sys_slot_definition_name], kw_name, [setf, sys_slot_definition_name]).
+added_method(claz_sys_slot_definition, [setf, sys_slot_definition_readers], kw_name, [setf, sys_slot_definition_readers]).
+added_method(claz_sys_slot_definition, [setf, sys_slot_definition_type], kw_name, [setf, sys_slot_definition_type]).
+added_method(claz_sys_slot_definition, [setf, sys_slot_definition_writers], kw_name, [setf, sys_slot_definition_writers]).
+added_method(claz_sys_slot_definition, shared_initialize, kw_name, shared_initialize).
+added_method(claz_sys_slot_definition, sys_slot_definition_allocation, kw_name, sys_slot_definition_allocation).
+added_method(claz_sys_slot_definition, sys_slot_definition_allocation_class, kw_name, sys_slot_definition_allocation_class).
+added_method(claz_sys_slot_definition, sys_slot_definition_documentation, kw_name, sys_slot_definition_documentation).
+added_method(claz_sys_slot_definition, sys_slot_definition_initargs, kw_name, sys_slot_definition_initargs).
+added_method(claz_sys_slot_definition, sys_slot_definition_initform, kw_name, sys_slot_definition_initform).
+added_method(claz_sys_slot_definition, sys_slot_definition_initfunction, kw_name, sys_slot_definition_initfunction).
+added_method(claz_sys_slot_definition, sys_slot_definition_location, kw_name, sys_slot_definition_location).
+added_method(claz_sys_slot_definition, sys_slot_definition_name, kw_name, sys_slot_definition_name).
+added_method(claz_sys_slot_definition, sys_slot_definition_readers, kw_name, sys_slot_definition_readers).
+added_method(claz_sys_slot_definition, sys_slot_definition_type, kw_name, sys_slot_definition_type).
+added_method(claz_sys_slot_definition, sys_slot_definition_writers, kw_name, sys_slot_definition_writers).
+added_method(claz_sys_standard_accessor_method, sys_accessor_method_slot_definition, kw_name, sys_accessor_method_slot_definition).
+added_method(claz_sys_standard_direct_slot_definition, sys_reader_method_class, kw_name, sys_reader_method_class).
+added_method(claz_sys_standard_direct_slot_definition, sys_writer_method_class, kw_name, sys_writer_method_class).
+added_method(claz_sys_standard_effective_slot_definition, [setf, sys_slot_value_using_class], kw_name, [setf, sys_slot_value_using_class]).
+added_method(claz_sys_standard_effective_slot_definition, sys_slot_boundp_using_class, kw_name, sys_slot_boundp_using_class).
+added_method(claz_sys_standard_effective_slot_definition, sys_slot_makunbound_using_class, kw_name, sys_slot_makunbound_using_class).
+added_method(claz_sys_standard_effective_slot_definition, sys_slot_value_using_class, kw_name, sys_slot_value_using_class).
+added_method(claz_sys_standard_slot_definition, [setf, documentation], kw_name, [setf, documentation]).
+added_method(claz_sys_standard_slot_definition, documentation, kw_name, documentation).
+added_method(claz_t, [setf, class_name], kw_name, [setf, class_name]).
+added_method(claz_t, [setf, documentation], kw_name, [setf, documentation]).
+added_method(claz_t, [setf, sys_class_default_initargs], kw_name, [setf, sys_class_default_initargs]).
+added_method(claz_t, [setf, sys_class_direct_default_initargs], kw_name, [setf, sys_class_direct_default_initargs]).
+added_method(claz_t, [setf, sys_class_direct_methods], kw_name, [setf, sys_class_direct_methods]).
+added_method(claz_t, [setf, sys_class_direct_slots], kw_name, [setf, sys_class_direct_slots]).
+added_method(claz_t, [setf, sys_class_direct_subclasses], kw_name, [setf, sys_class_direct_subclasses]).
+added_method(claz_t, [setf, sys_class_direct_superclasses], kw_name, [setf, sys_class_direct_superclasses]).
+added_method(claz_t, [setf, sys_class_finalized_p], kw_name, [setf, sys_class_finalized_p]).
+added_method(claz_t, [setf, sys_class_layout], kw_name, [setf, sys_class_layout]).
+added_method(claz_t, [setf, sys_class_precedence_list], kw_name, [setf, sys_class_precedence_list]).
+added_method(claz_t, [setf, sys_class_slots], kw_name, [setf, sys_class_slots]).
+added_method(claz_t, [setf, sys_generic_function_name], kw_name, [setf, sys_generic_function_name]).
+added_method(claz_t, [setf, sys_slot_definition_allocation], kw_name, [setf, sys_slot_definition_allocation]).
+added_method(claz_t, [setf, sys_slot_definition_allocation_class], kw_name, [setf, sys_slot_definition_allocation_class]).
+added_method(claz_t, [setf, sys_slot_definition_documentation], kw_name, [setf, sys_slot_definition_documentation]).
+added_method(claz_t, [setf, sys_slot_definition_initargs], kw_name, [setf, sys_slot_definition_initargs]).
+added_method(claz_t, [setf, sys_slot_definition_initform], kw_name, [setf, sys_slot_definition_initform]).
+added_method(claz_t, [setf, sys_slot_definition_initfunction], kw_name, [setf, sys_slot_definition_initfunction]).
+added_method(claz_t, [setf, sys_slot_definition_location], kw_name, [setf, sys_slot_definition_location]).
+added_method(claz_t, [setf, sys_slot_definition_name], kw_name, [setf, sys_slot_definition_name]).
+added_method(claz_t, [setf, sys_slot_definition_readers], kw_name, [setf, sys_slot_definition_readers]).
+added_method(claz_t, [setf, sys_slot_definition_type], kw_name, [setf, sys_slot_definition_type]).
+added_method(claz_t, [setf, sys_slot_definition_writers], kw_name, [setf, sys_slot_definition_writers]).
+added_method(claz_t, [setf, sys_slot_value_using_class], kw_name, [setf, sys_slot_value_using_class]).
+added_method(claz_t, compute_applicable_methods, kw_name, compute_applicable_methods).
+added_method(claz_t, describe_object, kw_name, describe_object).
+added_method(claz_t, documentation, kw_name, documentation).
+added_method(claz_t, find_method, kw_name, find_method).
+added_method(claz_t, make_load_form, kw_name, make_load_form).
+added_method(claz_t, no_applicable_method, kw_name, no_applicable_method).
+added_method(claz_t, print_object, kw_name, print_object).
+added_method(claz_t, shared_initialize, kw_name, shared_initialize).
+added_method(claz_t, slot_missing, kw_name, slot_missing).
+added_method(claz_t, slot_unbound, kw_name, slot_unbound).
+added_method(claz_t, sys_add_dependent, kw_name, sys_add_dependent).
+added_method(claz_t, sys_class_prototype, kw_name, sys_class_prototype).
+added_method(claz_t, sys_compute_applicable_methods_using_classes, kw_name, sys_compute_applicable_methods_using_classes).
+added_method(claz_t, sys_compute_effective_method, kw_name, sys_compute_effective_method).
+added_method(claz_t, sys_compute_effective_slot_definition, kw_name, sys_compute_effective_slot_definition).
+added_method(claz_t, sys_ensure_class_using_class, kw_name, sys_ensure_class_using_class).
+added_method(claz_t, sys_ensure_generic_function_using_class, kw_name, sys_ensure_generic_function_using_class).
+added_method(claz_t, sys_find_method_combination, kw_name, sys_find_method_combination).
+added_method(claz_t, sys_make_method_lambda, kw_name, sys_make_method_lambda).
+added_method(claz_t, sys_map_dependents, kw_name, sys_map_dependents).
+added_method(claz_t, sys_method_more_specific_p, kw_name, sys_method_more_specific_p).
+added_method(claz_t, sys_remove_dependent, kw_name, sys_remove_dependent).
+added_method(claz_t, sys_slot_boundp_using_class, kw_name, sys_slot_boundp_using_class).
+added_method(claz_t, sys_slot_exists_p_using_class, kw_name, sys_slot_exists_p_using_class).
+added_method(claz_t, sys_slot_makunbound_using_class, kw_name, sys_slot_makunbound_using_class).
+added_method(claz_t, sys_slot_value_using_class, kw_name, sys_slot_value_using_class).
+added_method(claz_t, update_instance_for_redefined_class, kw_name, update_instance_for_redefined_class).
+added_method(claz_type_error, print_object, kw_name, print_object).
+added_method(claz_unbound_variable, print_object, kw_name, print_object).
+added_method(claz_undefined_function, print_object, kw_name, print_object).
+
