@@ -89,12 +89,12 @@ call_init_slot_props(Kind,Obj):-
  always_ignore((
   forall(get_kind_supers(Kind,Sup),call_init_slot_props(Sup,Obj)),
   ensure_opv_type_inited(Kind),
-  forall(get_struct_opv(Kind,sys_slot_definition_initargs,From,SlotInfo),
-    (get_struct_opv(Kind,getter_fn,Into,SlotInfo),
+  forall(get_struct_opv(Kind,kw_initargs,[From|_],ZLOT),
+    (get_struct_opv(Kind,kw_readers,[Into|_],ZLOT),
      (get_opv_iii(Kind,Obj,Into,_)-> true ; 
         (get_opv_else(Obj,From,Value,Value=[]),set_opv(Obj,Into,Value))))),
-   forall(get_struct_opv(Kind,kw_initform,Value,SlotInfo),
-     always_ignore((get_struct_opv(Kind,getter_fn,Into,SlotInfo),
+   forall(get_struct_opv(Kind,kw_initform,Value,ZLOT),
+     always_ignore((get_struct_opv(Kind,getter_fn,Into,ZLOT),
       ( % get_opv_iii(Kind,Obj,Name,_)-> true ; 
          (f_eval(Value,Result),set_opv(Obj,Into,Result)))))))).
 
@@ -110,8 +110,8 @@ init_slot_props_iv(Kind,N,Obj,[Value|Props]):-
   add_i_opv(Kind,Obj,N,Value), N2 is N + 1,
   init_instance_kv(Kind,N2,Obj,Props).
 
-add_i_opv(Kind,Obj,N,Value):- get_struct_opv(Kind,ordinal,N,SlotInfo),
-  get_struct_opv(Kind,sys_slot_definition_name,Key,SlotInfo),
+add_i_opv(Kind,Obj,N,Value):- get_struct_opv(Kind,ordinal,N,ZLOT),
+  get_struct_opv(Kind,kw_name,Key,ZLOT),
    add_opv(Obj,Key,Value).
 
 f_sys_pf_set_slot_value(Obj,Key,Value,Value):- set_slot(Obj,Key,Value).
@@ -123,36 +123,47 @@ get_object_slot_name(Obj,Key,SlotName):-
     get_kind_slot(Kind,Key,SlotName).
     
 
+struct_opv(Claz, sys_name, Local, ZLOT)
+
 get_kind_slot(Kind,Key,SlotName):- 
   (no_repeats(get_kind_supers(Kind,Sup))*->get_slot_name(Sup,Key,SlotName);get_slot_name(Kind,Key,SlotName)).
  
 get_kind_supers(Kind,Sup):- find_class(Kind,KSup), get_kind_supers2(KSup,[],Sup).
 get_kind_supers2(Kind,ExceptFor,Sup):-find_class(Kind,KSup),!,get_kind_supers3(KSup,ExceptFor,Sup).
+
 get_kind_supers3(Kind,ExceptFor,_Sup):- member(Kind,ExceptFor),!,fail.
 get_kind_supers3(Kind,_,Kind).
 get_kind_supers3(Kind,ExceptFor,Sup):-get_struct_opv(Kind,type,E),get_kind_supers2(E,[Kind|ExceptFor],Sup).
-get_kind_supers3(Kind,ExceptFor,Sup):-get_struct_opv(Kind,kw_include,List),member(E,List),get_kind_supers2(E,[Kind|ExceptFor],Sup).
+get_kind_supers3(Kind,ExceptFor,Sup):-get_struct_opv(Kind,kw_include,List),e_member(E,List),get_kind_supers2(E,[Kind|ExceptFor],Sup).
+get_kind_supers3(Kind,ExceptFor,Sup):-get_struct_opv(Kind,kw_include,List),e_member(E,List),get_kind_supers2(E,[Kind|ExceptFor],Sup).
+get_kind_supers3(Kind,ExceptFor,Sup):-get_struct_opv(Kind,sys_class_precedence_list,List),e_member(E,List),get_kind_supers2(E,[Kind|ExceptFor],Sup).
 
-get_slot_name(Kind,Key,SlotName):- quietly(get_slot_name0(Kind,Key,SlotName)),!.
+get_slot_name(Kind,Key,SlotName):- quietly((find_class(Kind,KSup),!,get_slot_name0(KSup,Key,SlotName))).
 get_slot_name0(Kind,Key,SlotName):-
-   (get_struct_opv(Kind,getter_fn,Key,_)*-> Key=SlotName;
-   (((get_struct_opv(Kind,sys_slot_definition_name,Key,SlotInfo), get_struct_opv(Kind,getter_fn,SlotName,SlotInfo))) *-> true;
-   (get_struct_opv(Kind,sys_slot_definition_initargs,Key,SlotInfo),get_struct_opv(Kind,getter_fn,SlotName,SlotInfo)))),!.
+   (get_struct_opv(Kind,kw_readers,[Key|_],_)*-> Key=SlotName;
+   (((get_struct_opv(Kind,kw_name,Key,ZLOT), get_struct_opv(Kind,kw_readers,[SlotName|_],ZLOT))) *-> true;
+   (get_struct_opv(Kind,kw_initargs,[Key|_],ZLOT),get_struct_opv(Kind,kw_readers,[SlotName|_],ZLOT)))).
 get_slot_name0(Key,SlotName):- builtin_slot(Key),Key=SlotName.
 
-is_zlot_key(SlotInfo,SlotName):-
-   get_struct_opv(_Kind,getter_fn,SlotName,SlotInfo);
-   get_struct_opv(_Kind,sys_slot_definition_name,SlotName,SlotInfo);
-   get_struct_opv(_Kind,sys_slot_definition_initargs,SlotName,SlotInfo).
+is_zlot_key(Kind,ZLOT,SlotName):-
+  (get_struct_opv(Kind,kw_readers,OneOf,ZLOT),e_member(SlotName,OneOf));
+   get_struct_opv(Kind,getter_fn,SlotName,ZLOT);
+   get_struct_opv(Kind,kw_name,SlotName,ZLOT);   
+   (get_struct_opv(Kind,kw_initargs,OneOf,ZLOT),e_member(SlotName,OneOf)).
 
+e_member(E,L):- is_list(L),!,member(E,L).
+e_member(E,E).
 
 slot_is_nonlist(kw_type).
 slot_is_nonlist(kw_instance).
 
 init_instance_kv(_,_,[]).
 init_instance_kv(Kind,Obj,[Key,Value|Props]):-  always(is_keywordp(Key)),
-  add_opv_new(Obj,Key,Value),!,  
+  set_slot(Obj,Key,Value),!,
   init_instance_kv(Kind,Obj,Props).
+
+
+
 /*
 init_instance_kv(Kind,Obj,[[Key|List]|Props]):- is_keywordp(Key),
    slot_is_nonlist(Key),
@@ -176,8 +187,8 @@ init_instance_kv(Kind,Obj,[Value|Props]):-
 */
 
 type_slot_number(Kind,Key,Ordinal):-
-   get_struct_opv(Kind,sys_slot_definition_name,Key,SlotInfo),   
-   get_struct_opv(Kind,ordinal,Ordinal,SlotInfo).
+   get_struct_opv(Kind,kw_name,Key,ZLOT),   
+   get_struct_opv(Kind,ordinal,Ordinal,ZLOT).
 
 
 /*
@@ -220,6 +231,8 @@ f_slot_exists_p(Obj,Slot,Value):- t_or_nil(get_opv(Obj,Slot,_),Value).
 
 f_slot_value(Obj,Slot,Value):- always(get_opv(Obj,Slot,Value)).
 
+f_class_slot_value(_Kind,Obj,Slot,Value):- always(get_opv(Obj,Slot,Value)).
+
 sf_defstruct([[Name,KeyWords]|Slots],Name):- !, always(define_struct(Name,KeyWords,Slots,_Kind)).
 sf_defstruct([[Name|KeyWords]|Slots],Name):- !, always(define_struct(Name,KeyWords,Slots,_Kind)).
 sf_defstruct([Name|Slots],Name):- always(define_struct(Name,[],Slots,_Kind)).
@@ -236,7 +249,7 @@ define_class(Name,KeyWords,SlotsIn,Kind):-
 
 is_prop_class_alloc(Kind,SlotName,Where):- % \+ not_shareble_prop(SlotName),
   get_struct_opv(Kind,kw_allocation,kw_class,ZLOT),
-  is_zlot_key(ZLOT,SlotName),
+  is_zlot_key(Kind,ZLOT,SlotName),
   ensure_metaobject(Kind,Where).
 
 % @TODO Store INITIALIZE-INSTANCE, REINITIALIZE-INSTANCE, and SHARED-INITIALIZE  Hooks
@@ -289,28 +302,32 @@ generate_missing_struct_functions(Kind):-
     assert_struct_opv(Kind,kw_conc_name,ConcatName))),
  forall(get_struct_opv(Kind,getter_fn,_,ZLOT),
    maybe_add_get_set_functions(Kind,ZLOT)))),
-   forall(get_struct_opv(Kind,kw_reader,ReaderSymbol,ZLOT),
-     always_ignore((get_struct_opv(Kind,getter_fn,GetterSym,ZLOT),
+   forall(get_struct_opv(Kind,kw_readers,[ReaderSymbol|_],ZLOT),
+     always_ignore((get_struct_opv(Kind,kw_readers,[GetterSym|_],ZLOT),
       maybe_add_slot_accessor_function(Kind,ReaderSymbol,GetterSym)))),
  forall(get_struct_opv(Kind,kw_accessor,ReaderSymbol,ZLOT),
-   always_ignore((get_struct_opv(Kind,getter_fn,GetterSym,ZLOT),
+   always_ignore((get_struct_opv(Kind,kw_readers,[GetterSym|_],ZLOT),
      maybe_add_slot_accessor_function(Kind,ReaderSymbol,GetterSym)))).
 
 maybe_add_slot_accessor_function(Kind,ReaderSymbol,GetterSym):-
   foc_operator(_Ctx,_Env,kw_function,ReaderSymbol,_, ProposedName),
   Head=..[ProposedName,Obj,Value],
-  Body= get_opv_ii(Kind,Obj,GetterSym,Value),
+  Body= f_class_slot_value(Kind,Obj,GetterSym,Value),
   PrologCode =
     (assert_lsp(ReaderSymbol, (Head:-Body)),
      set_opv(ReaderSymbol,symbol_function,ProposedName),
      set_opv(ReaderSymbol,ftype_lambda_list,[object])),
   cmpout(PrologCode),!.
-maybe_add_slot_accessor_function(_Kind,ReaderSymbol,GetterSym):-
-  show_call_trace(maybe_add_function(ReaderSymbol,[obj],['slot-value',obj,[quote,GetterSym]],_Added1)).
 
-  %Added\==[]-> assert_struct_opv4(Kind,getter_fn,Added,ZLOT) ; true )
+maybe_add_slot_accessor_function(Kind,ReaderSymbol,GetterSym):-
+  is_zlot_key(Kind,ZLOT,GetterSym),
+  show_call_debug(maybe_add_function(ReaderSymbol,[obj],
+   ['slot-value',obj,[quote,GetterSym]],Added1)), 
+   (Added1\==[]-> assert_struct_opv4(Kind,kw_readers,[GetterSym],ZLOT) ; true ).
 
+% % % % % % 
 always_ignore(G):- always(ignore(G)).
+
 
 /*
 (defclass animal ()
@@ -339,9 +356,9 @@ maybe_add_get_set_functions(Kind,ZLOT):-
 
 %maybe_add_get_function(Kind,ZLOT):- get_struct_opv(Kind,getter_fn,_Getter,ZLOT),!.
 maybe_add_get_function(Kind,ZLOT):-   
-  always(( get_struct_opv(Kind,getter_fn,GetterSym,ZLOT), maybe_add_slot_accessor_function(Kind,GetterSym,GetterSym))).
+  always(( get_struct_opv(Kind,kw_readers,[GetterSym|_],ZLOT), maybe_add_slot_accessor_function(Kind,GetterSym,GetterSym))).
 
-%maybe_add_set_function(Kind,ZLOT):- get_struct_opv(Kind,setter_fn,_Setter,ZLOT),!.
+maybe_add_set_function(Kind,ZLOT):- get_struct_opv(Kind,setter_fn,_Setter,ZLOT),!.
 maybe_add_set_function(Kind,ZLOT):-   
   always((
   get_struct_opv(Kind,getter_fn,SetterSym,ZLOT),
@@ -414,7 +431,7 @@ assert_struct_kw(Kind, Key, Value):-
 assert_struct_opv(Obj, Key, Value):-
   show_call_trace(assertz_new(soops:struct_opv(Obj, Key, Value))).
 
-%assert_struct_opv4(_Obj, sys_slot_definition_initargs, _Value, _Info):- trace,fail.
+%assert_struct_opv4(_Obj, kw_initargs, _Value, _Info):- trace,fail.
 
 assert_struct_opv4(Obj, Key, Value,Info):-
   show_call_trace(assertz_new(soops:struct_opv(Obj, Key, Value,Info))).
@@ -425,14 +442,14 @@ get_struct_opv(Obj, Key, String):- soops:struct_opv(Obj , Key, String).
 get_struct_opv(Obj, Key, Value, Info):- soops:struct_opv(Obj, Key, Value, Info).
 
 
-get_szlot(Prefix,Type,Key,SlotInfo):-
+get_szlot(Prefix,Type,Key,ZLOT):-
   Type=..[Kind|Params],
   claz_to_symbol(Kind,Sym),
   to_prolog_string_anyways(Sym,ClassName),
   atomic_list_concat([ClassName,Key],'_',SlotInfo0),
   atom_concat_or_rtrace(Prefix,SlotInfo0,SlotInfo1),
   prologcase_name(SlotInfo1,SlotInfo2),
-  SlotInfo=..[SlotInfo2|Params].
+  ZLOT=..[SlotInfo2|Params].
    
 /*
 %o_p_v(hash_table_znst_12,
@@ -457,8 +474,8 @@ un_kw1([],[]):-!.
 un_kw1(Key,Key):-!.
 %un_kw1(Key,Prop):-string(Key),Key=Prop,!.
 un_kw1(Key,Prop):- soops:struct_opv(K, accessor, Key, Slot),
-  (soops:struct_opv(K, sys_slot_definition_initargs, KW, Slot);
-    soops:struct_opv(K, sys_slot_definition_name, KW, Slot)),!,=(KW,Prop).
+  (soops:struct_opv(K, kw_initargs, KW, Slot);
+    soops:struct_opv(K, kw_name, KW, Slot)),!,=(KW,Prop).
 
 un_kw1(Key,Prop):- \+ atomic_list_concat([_,_|_],'_',Key),!,Prop=Key.
 un_kw1(Key,Prop):- Prop\==name,to_prolog_string_anyways(Key,Str),prologcase_name(Str,Prop),!.
@@ -550,7 +567,7 @@ get_opv_iii(_Kind,Obj,Prop,Value):- get_opv_iiii(Obj,Prop,Value).
 
 get_opv_iiii(Obj,Prop,Value):- (atom(Obj);var(Obj)),nb_current(Obj,Ref),nb_current_value(Ref,Prop,Value).
 get_opv_iiii(Obj,Prop,Value):- soops:o_p_v(Obj,Prop,Value).
-%get_opv_iiii(Obj,Prop,Value):- soops:struct_opv(Obj,Prop,Value).
+get_opv_iiii(Obj,Prop,Value):- soops:struct_opv(Obj,Prop,Value).
 
 not_shareble_prop(Prop):-notrace((nonvar(Prop),not_shareble_prop0(Prop))).
 not_shareble_prop0(type_of).
@@ -730,7 +747,7 @@ ensure_opv_type_inited(Kind):- cache:is_kind_innited(Kind),!.
 ensure_opv_type_inited(Kind):- 
   asserta(cache:is_kind_innited(Kind)),!,
   get_deftype(Kind,DefType),
-  findall(Slot,soops:struct_opv(Kind,sys_slot_definition_name,Slot,_),Slots),add_class_slots(DefType,Kind,1,Slots).
+  findall(Slot,soops:struct_opv(Kind,kw_name,Slot,_),Slots),add_class_slots(DefType,Kind,1,Slots).
 
 get_deftype(Kind,DefType):- (is_structure_classp(Kind) -> DefType=defstruct; DefType=defclass).
 
@@ -751,11 +768,11 @@ add_slot_def(_Defclass,N,Kind,[Prop,Default|Keys]):-  \+ list_oddp(Keys),
 add_slot_def(_DefType,N,Kind,[Prop|Keys]):- add_slot_def_props(N,Kind,Prop,Keys).
 
 add_slot_def_props(N,Kind,SlotSym,MoreInfo):-
-   always((get_szlot('zlot_',Kind,SlotSym,SlotInfo),
-     assert_struct_opv4(Kind,sys_slot_definition_name,SlotSym,SlotInfo), 
+   always((get_szlot('zlot_',Kind,SlotSym,ZLOT),
+     assert_struct_opv4(Kind,kw_name,SlotSym,ZLOT), 
    to_prolog_string_anyways(SlotSym,SName),
 
-   create_keyword(SName,KW),assert_struct_opv4(Kind,sys_slot_definition_initargs,KW,SlotInfo),
+   create_keyword(SName,KW),assert_struct_opv4(Kind,kw_initargs,[KW],ZLOT),
 
       struct_opv_else(Kind,kw_conc_name,ConcatName,
         (get_struct_opv(Kind,class_name,KName),to_prolog_string_anyways(KName,KSName),string_concat(KSName,"-",ConcatName),
@@ -764,39 +781,35 @@ add_slot_def_props(N,Kind,SlotSym,MoreInfo):-
        
       atom_concat_or_rtrace(ConcatName,SName,GetterName),f_intern(GetterName,Getter),
 
-   assert_struct_opv4(Kind,getter_fn,Getter,SlotInfo),
+   assert_struct_opv4(Kind,kw_readers,[Getter],ZLOT),
    %claz_to_symbol(Kind,ClassSymbol),f_symbol_package(ClassSymbol,Package),trace,intern_symbol(SName,Package,Name,_),
-   %assert_struct_opv4(Kind,name,Name,SlotInfo),
-   ignore((nonvar(N),(assert_struct_opv4(Kind,ordinal,N,SlotInfo)))),
-   ignore((kind_attribute_pred(Kind,SlotSym,Pred),assert_struct_opv4(Kind,accessor_predicate,Pred,SlotInfo))),
-   add_slot_more_info(SlotSym,Kind,SlotInfo,MoreInfo))).
+   %assert_struct_opv4(Kind,name,Name,ZLOT),
+   ignore((nonvar(N),(assert_struct_opv4(Kind,ordinal,N,ZLOT)))),
+   ignore((kind_attribute_pred(Kind,SlotSym,Pred),assert_struct_opv4(Kind,accessor_predicate,Pred,ZLOT))),
+   add_slot_more_info(SlotSym,Kind,ZLOT,MoreInfo))).
 
 is_slot_name(KW):- \+ is_list(KW).
 
 add_slot_more_info(_SlotKW,_Kind,_SlotInfo,[]):-!.
 add_slot_more_info(_SlotKW,_Kind,_SlotInfo,[[]]):-!.
-add_slot_more_info(SlotName,Kind,SlotInfo,[KW,Value|MoreInfo]):- is_slot_name(KW),
-   assert_slot_prop(SlotName,Kind,KW,Value,SlotInfo),!,
-   add_slot_more_info(SlotName,Kind,SlotInfo,MoreInfo).
+add_slot_more_info(SlotName,Kind,ZLOT,[KW,Value|MoreInfo]):- is_slot_name(KW),
+   assert_slot_prop(SlotName,Kind,KW,Value,ZLOT),!,
+   add_slot_more_info(SlotName,Kind,ZLOT,MoreInfo).
 
-add_slot_more_info(SlotName,Kind,SlotInfo,[[Default,KW,Value]]):- is_slot_name(KW),
-   assert_slot_prop(SlotName,Kind,kw_initform,Default,SlotInfo),!,
-   assert_slot_prop(SlotName,Kind,KW,Value,SlotInfo),!.
+add_slot_more_info(SlotName,Kind,ZLOT,[[Default,KW,Value]]):- is_slot_name(KW),
+   assert_slot_prop(SlotName,Kind,kw_initform,Default,ZLOT),!,
+   assert_slot_prop(SlotName,Kind,KW,Value,ZLOT),!.
    
 
-add_slot_more_info(SlotName,Kind,SlotInfo,[[KW,Value]|MoreInfo]):- is_slot_name(KW),
-   assert_slot_prop(SlotName,Kind,KW,Value,SlotInfo),!,
-   add_slot_more_info(SlotName,Kind,SlotInfo,MoreInfo).
+add_slot_more_info(SlotName,Kind,ZLOT,[[KW,Value]|MoreInfo]):- is_slot_name(KW),
+   assert_slot_prop(SlotName,Kind,KW,Value,ZLOT),!,
+   add_slot_more_info(SlotName,Kind,ZLOT,MoreInfo).
 
-add_slot_more_info(SlotName,Kind,SlotInfo,[[Value]]):-
-   assert_slot_prop(SlotName,Kind,sys_slot_definition_initform,Value,SlotInfo),!.
+add_slot_more_info(SlotName,Kind,ZLOT,[[Value]]):-
+   assert_slot_prop(SlotName,Kind,kw_initform,Value,ZLOT),!.
 
-assert_slot_prop(_SlotName,Kind,Prop,Value,SlotInfo):-
-   /*(Prop == kw_accessor -> (assert_struct_opv4(Kind,getter_fn,SlotName,SlotInfo),
-     show_call_trace(maybe_add_function(Value,[obj],['slot-value',obj,[quote,SlotName]],_Added))) ; true),
-   (Prop == kw_reader -> (assert_struct_opv4(Kind,getter_fn,SlotName,SlotInfo),
-     show_call_trace(maybe_add_function(Value,[obj],['slot-value',obj,[quote,SlotName]],_Added2))) ; true),*/
-  assert_struct_opv4(Kind,Prop,Value,SlotInfo).
+assert_slot_prop(_SlotName,Kind,Prop,Value,ZLOT):-
+  assert_struct_opv4(Kind,Prop,Value,ZLOT).
 
 
 
