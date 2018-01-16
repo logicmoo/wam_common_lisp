@@ -22,35 +22,37 @@
 % simple-base-string == (simple-array base-character (*))
 
 as_string_upper(C,SN):- compound(C),\+ is_list(C),functor(C,_P,A),arg(A,C,S),!, as_string_upper(S,SN).
-as_string_upper(S,U):- to_prolog_string(S,D),string_upper(D,U).
-
-to_prolog_string_if_needed(L,Loc):- \+ atomic(L),is_stringp(L),!,always(to_prolog_string(L,Loc)).
-to_prolog_string_if_needed(L,Loc):- \+ string(L),is_symbolp(L),!,always(to_prolog_string(L,Loc)).
-
+as_string_upper(S,U):- to_prolog_string_anyways(S,D),string_upper(D,U).
 
 is_characterp(X):-var(X),!,fail.
 is_characterp('#\\'(V)):- nonvar(V).
 
-is_stringp(X):-var(X),!,fail.
-% is_stringp(X):- string(X),nop(dbginfo(is_stringp(X))).
-is_stringp('$ARRAY'([_N],claz_base_character,List)):- nonvar(List).
+is_stringp(X):- string(X),nop(dbginfo(is_stringp(X))).
+is_stringp(X):- is_lisp_string(X).
+
+is_lisp_string(X):-var(X),!,fail.
+is_lisp_string('$ARRAY'([_N],claz_base_character,List)):- nonvar(List).
 
 % deduced now
 % GROVELED f_stringp(A, R):- t_or_nil(is_stringp(A),R).
 
 f_string(O,S):- to_prolog_string(O,PLS),to_lisp_string(PLS,S).
 
+% only handles the same things as #'STRING
+to_prolog_string(SS,SS):- notrace(string(SS)),!.
 to_prolog_string(SS,SS):- notrace(var(SS)),!,break.
 to_prolog_string([],"").
-to_prolog_string(SS,SS):- notrace(string(SS)),!.
 to_prolog_string('$ARRAY'(_N,claz_base_character,List),SS):- !,always(lisp_chars_to_pl_string(List,SS)),!.
 %to_prolog_string('$ARRAY'(_,_,List),SS):-  !,lisp_chars_to_pl_string(List,SS).
-to_prolog_string(S,SN):- is_symbolp(S),!,pl_symbol_name(S,S2),to_prolog_string(S2,SN).
 to_prolog_string('#\\'(Code),Str):- !, (\+ number(Code)->Char=Code;char_code(Char,Code)),text_to_string(Char,Str).
+to_prolog_string(S,SN):- is_symbolp(S),!,pl_symbol_name(S,S2),to_prolog_string(S2,SN).
 
-
+% Only Make a STRING if not already a Prolog String
+to_prolog_string_if_needed(L,Loc):- \+ string(L),!,always(to_prolog_string_anyways(L,Loc)).
+% Always make a STRING
+to_prolog_string_anyways(I,O):- atom(I),upcase_atom(I,I),!,atom_string(I,O).
 to_prolog_string_anyways(I,O):- to_prolog_string(I,O),!.
-to_prolog_string_anyways(sys_name,O):-!,O="NAME".
+to_prolog_string_anyways(I,O):- is_classp(I),claz_to_symbol(I,Symbol),!,to_prolog_string_anyways(Symbol,O).
 to_prolog_string_anyways(I,O):- always(atom_string(I,O)),!.
 
 

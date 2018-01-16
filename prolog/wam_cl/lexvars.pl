@@ -181,22 +181,28 @@ normalize_let1([Variable, Form],[bind, Variable, Form]).
 normalize_let1([bind, Variable, Form],[bind, Variable, Form]).
 normalize_let1( Variable,[bind, Variable, []]).
 
+let_or_let_xx(let).
+let_or_let_xx(let_xx).
+  
 
 %  (LET  () .... )
-compile_let(Ctx,Env,Result,[_LET, []| BodyForms], Body):- !, must_compile_progn(Ctx,Env,Result, BodyForms, Body).
+compile_let(Ctx,Env,Result,[LET, []| BodyForms], Body):- let_or_let_xx(LET), !, must_compile_progn(Ctx,Env,Result, BodyForms, Body).
 
 %  (LET ((*package* (find-package :keyword))) *package*)
-compile_let(Ctx,Env,Result,[let, [[Var,VarInit]]| BodyForms], (VarInitCode,locally_set(Var,Value,BodyCode))):-
+compile_let(Ctx,Env,Result,[LET, [[Var,VarInit]]| BodyForms], (VarInitCode,locally_set(Var,Value,BodyCode))):-
+ let_or_let_xx(LET),
  is_special_var(Var),!,
  must_compile_body(Ctx,Env,Value,VarInit,VarInitCode),
   must_compile_progn(Ctx,Env,Result,BodyForms,BodyCode).
 
 %  (LET ((local 1)) local)
-compile_let(Ctx,Env,Result,[let, [[Var,VarInit]]| BodyForms], (VarInitCode,locally_bind(Env,Var,Value,BodyCode))):- fail,
+/*compile_let(Ctx,Env,Result,[let, [[Var,VarInit]]| BodyForms], (VarInitCode,locally_bind(Env,Var,Value,BodyCode))):- fail,
  atom(Var),
  must_compile_body(Ctx,Env,Value,VarInit,VarInitCode),
-  must_compile_progn(Ctx,Env,Result,BodyForms,BodyCode).
+  must_compile_progn(Ctx,Env,Result,BodyForms,BodyCode).*/
 
+compile_let(Ctx,Env,Result,               [let_xx,[V1,V2|V3] | BodyForms], Body):- !,
+    compile_let(Ctx,Env,Result,[let,[V1], [ let_xx, [ V2|V3] | BodyForms]], Body).
 
 %  (LET  (....) .... )
 compile_let(Ctx,Env,Result,[LET, NewBindingsIn| BodyForms], Body):- !,

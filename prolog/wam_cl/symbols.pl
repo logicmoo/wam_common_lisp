@@ -23,6 +23,7 @@ f_symbol_value(Symbol,Value):- is_keywordp(Symbol)->Symbol=Value;do_or_die(get_o
 f_symbol_function(Symbol,Function):- do_or_die(get_opv(Symbol,symbol_function,Function)),!.
 do_or_die(G):- G->true;throw(do_or_die(G)).
 
+%f_symbol_package(Symbol,Package):- is_keywordp(Symbol)->Package=pkg_kw;get_opv(Symbol,symbol_package,Package).
 f_symbol_package(Symbol,Package):- nonvar(Symbol),
  ((fail,dif(kw_inherited,Local),package_find_symbol(_String,Package,Symbol,Local))->true;
  (quietly(is_keywordp(Symbol))->Package=pkg_kw;
@@ -83,15 +84,15 @@ f_find_symbol(_Var,_P,Result):- f_values_list([[],[]],Result).
 
 
 wl:init_args(x,intern).
-f_intern(Symbol,Result):- reading_package(Package),f_intern(Symbol,Package,Result).
+f_intern(String,Result):- reading_package(Package),f_intern(String,Package,Result).
 % f_intern(Symbol,Package,Result):- \+ is_keywordp(Symbol),is_symbolp(Symbol),!,f_intern_symbol(Symbol,Package,Result).
-f_intern(Name,Pack,Result):-
+f_intern(String,Pack,Result):-
   find_package_or_die(Pack,Package),
-  text_to_string(Name,String),
   intern_symbol(String,Package,Symbol,IntExt),
   f_values_list([Symbol,IntExt],Result),!.
 
 
+intern_symbol(String,Package,Symbol,IntExt):- to_prolog_string_if_needed(String,PlString),!,intern_symbol(PlString,Package,Symbol,IntExt).
 intern_symbol(String,Package,Symbol,IntExt):- package_find_symbol(String,Package,Symbol,IntExt),!.
 intern_symbol(String,Package,Symbol,IntExt):- 
    make_fresh_internal_symbol(Package,String,Symbol),
@@ -128,15 +129,14 @@ f_make_symbol(SymbolName,Package,Symbol):-
 
 
 create_symbol(String,pkg_kw,Symbol):-!,create_keyword(String,Symbol).
-create_symbol(String,Package,Symbol):- to_prolog_string_if_needed(String,PlString),!,create_symbol(PlString,Package,Symbol).
 create_symbol(String,Package,Symbol):-
-   text_to_string(String,Name),
+   to_prolog_string_anyways(String,Name),
    set_opv(Symbol,type_of,symbol),
    set_opv(Symbol,symbol_name,Name),
    set_opv(Symbol,symbol_package,Package),!.
 
 create_keyword(Name,Symbol):- atom_concat_or_rtrace(':',Make,Name),!,create_keyword(Make,Symbol).
-create_keyword(Name,Symbol):- string_upper(Name,String),
+create_keyword(Name,Symbol):- as_string_upper(Name,String),
    prologcase_name(String,Lower),
    atom_concat_or_rtrace('kw_',Lower,Symbol),
    assert_lsp(package:package_external_symbols(pkg_kw,String,Symbol)).

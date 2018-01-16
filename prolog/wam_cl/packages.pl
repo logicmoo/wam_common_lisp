@@ -84,7 +84,7 @@ find_package(S,Package):-
   (package_name(Package,SN) ; package_nicknames(Package,SN) ; get_opv_i(Package,nicknames,SN) ; (atom_concat('SB!',_,SN)->Package=pkg_sys)),!.
 
 find_package_or_die(X,Y):-
- find_package(X,Y) -> true ; throw(find_package_or_die(X,Y)).  
+ find_package(X,Y) -> true ; break,trace_or_throw(find_package_or_die(X,Y)).  
 
 as_package_object(Package,'$OBJ'(claz_package,Package)).
 
@@ -220,7 +220,7 @@ package_shadow_symbol_step2(Package,String,OldSymbol,kw_inherited):-
 % caller is responsible for avoiding conflicts
 make_fresh_internal_symbol(pkg_kw,String,Symbol):- !, create_keyword(String,Symbol).
 make_fresh_internal_symbol(Package,String,Symbol):- 
-   ignore(symbol_case_name(String,Package,Symbol)),
+   (var(Symbol)->symbol_case_name(String,Package,Symbol);true),
    create_symbol(String,Package,Symbol),
    assert_lsp(Symbol,package:package_internal_symbols(Package,String,Symbol)).
 
@@ -439,7 +439,8 @@ package_use_list(pkg_xp, pkg_cl).
 
 
 
-symbol_case_name(String,Package,ProposedName):- 
+symbol_case_name(Name,Package,ProposedName):- 
+  to_prolog_string(Name,String),
   package_symbol_prefix(Package,Prefix),!,
   atom_concat_if_new(Prefix,String,CasePN),prologcase_name(CasePN,ProposedName),!.
 

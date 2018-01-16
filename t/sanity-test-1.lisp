@@ -224,7 +224,7 @@
 
 ;; (break)
 
-#+TODO (setf Eric (make-instance 'figurine-aardvark
+(setf Eric (make-instance 'figurine-aardvark
                           :legs 4
                           :made-by "Jen"
                           :made-in "Brittany"
@@ -233,7 +233,7 @@
 #+HAS_SHIFTF
 (shiftf (cute-p Eric) t)
 
-#+TODO (slot-value Eric 'diet)
+(slot-value Eric 'diet)
 
 
 

@@ -33,6 +33,11 @@ tst:is_local_test(do(0.1),
        (temp-two 0 (1+ temp-one)))     
       ((= 3 temp-two) temp-one))",  3).
 
+tst:is_local_test(do(0.2),
+"(do* ((temp-one 1 (1+ temp-one))
+       (temp-two 0 (1+ temp-one)))     
+      ((= 3 temp-two) temp-one))",  2).
+
 
  
 loop_vars_to_let_n_step([],[],InOut,InOut).
