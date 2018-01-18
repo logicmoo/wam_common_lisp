@@ -50,7 +50,7 @@ get_test_pred(IfMissing,Keys,Pred):-
   Pred = IfMissing.
 
 %to_function(function(ValueI),ValueO):-!,to_function(ValueI,ValueO).
-to_function(Value,Call):-find_operator_or_die(_Env,kw_function,Value,Call).
+to_function(Value,Call):- find_operator_or_die(_Env,kw_function,Value,Call).
 to_neg_function(Value,not_fn(Neg)):-to_function(Value,Neg).
 
 not_fn(Value,A):- \+ call(Value,A).

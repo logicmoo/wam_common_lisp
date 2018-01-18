@@ -34,8 +34,11 @@ f_apply(closure(kw_function,Environment,ClosureResult,FormalArgs,Body), [Argumen
   closure(kw_function,Environment,ClosureResult,FormalArgs,Body,Arguments,Result).
 f_apply(function(FunctionName), Arguments, Result):-!,f_apply((FunctionName), Arguments, Result).
 f_apply(FunctionName,Arguments,Result):- FunctionName==[],!,lisp_dump_break,Result=Arguments.
-f_apply((FunctionName), Arguments, Result):-!,
+f_apply(FunctionName, Arguments, Result):- atom(FunctionName),!,
   lisp_compiled_eval([FunctionName|Arguments],Result).
+f_apply(FunctionName, Arguments, Result):- is_list(FunctionName),!,
+  append(FunctionName, Arguments,FunArguments),
+  lisp_compiled_eval(FunArguments,Result).
 
 
 
@@ -57,11 +60,20 @@ compile_funop(Ctx,Env,Result,[FN| Args], Code):- var(FN),!,
 
 % compile_funop(Ctx,Env,Result,[list|Args], Body):- expand_arguments(Ctx,Env,list,1,Result,Args,Body).
 
+% Use a previous DEFMACRO
+compile_funop(Ctx,Env,Result,LispCode,CompileBody):-
+  %fail, %DISABLED
+  macroexpand_1_or_fail(Ctx,Env,LispCode,Ctx,CompileBody0Result),
+  dbginfo(macroexpand:-LispCode),
+  dbginfo(into:-CompileBody0Result),
+  must_compile_body(Ctx,Env,Result,CompileBody0Result, CompileBody),
+  !.
+      
 
 % Use a previous DEFMACRO
 compile_funop(Ctx,Env,Result,LispCode,CompileBody):-
   %fail, %DISABLED
-  macroexpand_1_or_fail(LispCode,Ctx,CompileBody0Result),
+  macroexpand_1_or_fail(Ctx,Env,LispCode,Ctx,CompileBody0Result),
   dbginfo(macroexpand:-LispCode),
   dbginfo(into:-CompileBody0Result),
   must_compile_body(Ctx,Env,Result,CompileBody0Result, CompileBody),
@@ -173,7 +185,8 @@ compile_apply1(Ctx,Env,F,Args,Result,ExpandedFunction):- atom(F),
  check_foc_operator(Ctx,Env,kw_function,F,_, ProposedName),!,
  ExpandedFunction =.. [ ProposedName | NewArgs].
 
-compile_apply1(_Ctx,_Env,F,Args,Result,f_apply(F,Args,Result)):- (var(F); \+ is_list(Args)),!.
+compile_apply1(_Ctx,_Env,F,Args,Result,Out):- (var(F); \+ is_list(Args)),!,
+            Out = f_apply(F,Args,Result).
 
 compile_apply1(Ctx,Env,F,Args,Result,ExpandedFunction):- atom(F),
  compile_apply_function_or_macro_call(Ctx,Env,F,Args,Result,ExpandedFunction),!.
@@ -185,7 +198,8 @@ compile_apply1(Ctx,Env,function(F),Args,Result,ExpandedFunction):- atom(F),
 compile_apply1(Ctx,Env,function(F),Args,Result,ExpandedFunction):- atom(F),
  compile_apply_function_or_macro_call(Ctx,Env,F,Args,Result,ExpandedFunction),!.
 
-compile_apply1(_Ctx,_Env,F,Args,Result,f_apply(F,Args,Result)).
+compile_apply1(_Ctx,_Env,F,Args,Result,Out):- 
+   Out = f_apply(F,Args,Result).
 
 
   

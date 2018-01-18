@@ -375,12 +375,29 @@ compile_body(Ctx,Env,Result,Form1,Body):- compile_closures(Ctx,Env,Result,Form1,
 
 % Use a previous DEFMACRO
 compile_body(Ctx,Env,Result,LispCode,CompileBody):-
-  fail, %DISABLED    (NOT)
-  macroexpand_1_or_fail(LispCode,[Ctx],CompileBody0Result),
-  dbginfo(macroexpand=LispCode),
-  dbginfo(into=CompileBody0Result),
+  fail, %DISABLED
+  MacroEnv= Env,
+  macroexpand_1_or_fail(Ctx,Env,LispCode,MacroEnv,CompileBody0Result),
+  dbginfo(macroexpand:-LispCode),
+  dbginfo(into:-CompileBody0Result),
   must_compile_body(Ctx,Env,Result,CompileBody0Result, CompileBody),
   !.
+
+
+wl:declared(=,binpred).
+wl:declared(<,binpred).
+wl:declared(>,binpred).
+wl:declared('<=',binpred).
+wl:declared('>=',binpred).
+
+% BinPRED-1   (< 1)
+compile_body(Ctx,Env,t,[BinPRED,Form],Code):- wl:declared(BinPRED,binpred),
+   must_compile_body(Ctx,Env,_Result,Form,Code),!.
+% BinPRED-3+  (<  1 2 3 ...)
+compile_body(Ctx,Env,Result,[BinPRED,Form1,Form2,Form3|FormS],Code):- wl:declared(BinPRED,binpred),
+  must_compile_body(Ctx,Env,Result,[and,[BinPRED,Form1,Form2],[BinPRED,Form2,Form3|FormS]],Code).
+
+
 
 % Compiler Plugin
 compile_body(Ctx,Env,Result,InstrS,Code):-

@@ -213,7 +213,7 @@ compile_body_form(Ctx,Env,Result,['dolist'|Rest], Code):- !,
 
 wl: init_args(1,dolist).
 wl: declared(dolist,inlined).
-f_dolist(VarList,FormS,Result):-
+sf_dolist(VarList,FormS,Result):-
    compile_dolist(_Ctx,_Env,Result,['dolist',VarList|FormS], Code),
    always(Code).
    
@@ -286,9 +286,10 @@ compile_body_form(_Ctx,Env,[],['#setqFromValues',Vars], setq_from_values(Env,Var
 % =============================================================================
 % EVAL
 % =============================================================================
-compile_body_form(_Ctx,_Env,Result,[eval,Var], f_eval(Var,Result)):- \+ is_list(Var), !. 
-compile_body_form(_Ctx,_Env,Result,[eval,[A|Var]], f_eval([A|Var],Result)):- \+ atom(A), !. % NEVER SEEN
-compile_body_form(_Ctx,_Env,Result,[eval,Var], f_eval(Var,Result)):- !.
+
+      %compile_body_form(_Ctx,_Env,Result,[eval,Var], f_eval(Var,Result)):- \+ is_list(Var), !. 
+%compile_body_form(_Ctx,_Env,Result,[eval,[A|Var]], f_eval([A|Var],Result)):- \+ atom(A), !. % NEVER SEEN
+%compile_body_form(_Ctx,_Env,Result,[eval,Var], f_eval(Var,Result)):- var(Var)!.
 compile_body_form(Ctx,Env,Result,['eval',Form1],
   (Body1,f_eval(Result1,Result))):- !,
    must_compile_body(Ctx,Env,Result1,Form1, Body1).

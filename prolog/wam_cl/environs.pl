@@ -17,6 +17,25 @@
 :- include('header').
 
 
+
+
+:- nb_setval('$labels_suffix','').
+suffix_by_context(_Ctx,Atom,SuffixAtom):- nb_current('$labels_suffix',Suffix),atom_concat_suffix(Atom,Suffix,SuffixAtom).
+suffixed_atom_concat(Ctx,L,R,LRS):- atom_concat_or_rtrace(L,R,LR),suffix_by_context(Ctx,LR,LRS).
+push_labels_context(Ctx,Atom):- suffix_by_context(Ctx,Atom,SuffixAtom),b_setval('$labels_suffix',SuffixAtom).
+within_labels_context(_Ctx,Label,G):- nb_current('$labels_suffix',Suffix),
+   setup_call_cleanup(b_setval('$labels_suffix',Label),G,b_setval('$labels_suffix',Suffix)).
+gensym_in_labels(Ctx,Stem,GenSym):- suffix_by_context(Ctx,Stem,SuffixStem),gensym(SuffixStem,GenSym).
+
+get_label_suffix(_Ctx,Suffix):-nb_current('$labels_suffix',Suffix).
+
+
+show_ctx_info(Ctx):- term_attvars(Ctx,CtxVars),maplist(del_attr_rev2(freeze),CtxVars),show_ctx_info2(Ctx).
+show_ctx_info2(Ctx):- ignore((get_tracker(Ctx,Ctx0),in_comment(show_ctx_info3(Ctx0)))).
+show_ctx_info3(Ctx):- is_rbtree(Ctx),!,forall(rb_in(Key, Value, Ctx),fmt9(Key=Value)).
+show_ctx_info3(Ctx):- fmt9(ctx=Ctx).
+     
+
 % el_new(el(X,X)):-X=[].
 %el_new(X):-X=[tl].
 
@@ -49,6 +68,7 @@ update_el_tail_or_append(O,Env,Name,Value,TO):- Env=[H|T],
     (T==[]-> TO=[bv(Name,Value)],
        (ct(O,2,Env,TO));update_el_tail_or_append(O,T,Name,Value,TO)))).
 
+
 ct(O,N,P,E):- var(E) -> true ; call(O,N,P,E).
   
 /** PUSH-APPEND **/
@@ -71,12 +91,24 @@ push_list_prepend(O,Env,Name,Value):- Env=[H|T],ct(O,2,Env,[H|T]),ct(O,1,Env,bv(
 :- dynamic(user:portray/1).
 :- discontiguous(user:portray/1).
 
-user:portray(List):- notrace((nonvar(List),List=[_|_],sub_term(E,List),ground(E),E = ((environ=W)),write(environment(W)))).
+my_portray_list(Var):- var(Var),!,writeq(Var),!.
+my_portray_list([]):- writeq('}').
+my_portray_list([H|List]):- hide_portray(H),!,my_portray_list(List).
+my_portray_list([H|List]):- my_portray_list(H),!,write(','),my_portray_list(List).
+my_portray_list(_).
 
-user:portray(environment{name:N, tracker:_}):-!,writeq(N).
-% user:portray(X):- is_rbtree(X),!,writeq(is_rbtree).
-user:portray(env(RB,_)):- get_env_attribute(RB,name,Value),!, writeq(Value).
-user:portray(env(_,_)):- writeq(env/2).
+hide_portray(C):- ground(C),hide_portray_g(C).
+
+hide_portray_g(var_tracker(_)=_Dict).
+
+% user:portray(List):- notrace((nonvar(List),List=[_|_],sub_term(E,List),ground(E),E = ((environ=W)),write(environment(W)))).
+
+user:portray(X):- is_rbtree(X),!,writeq(is_rbtree).
+%user:portray(List):- nonvar(List),List=[_|_],member(E,List),hide_portray(E),!,write('[{'),ignore(my_portray_list(List)),write('}]'),!.
+%user:portray(Hide):- hide_portray(Hide),!,write('.').
+user:portray(environment{name:N, tracker:_}):-!,writeq(e(N)).
+%user:portray(env(RB,_)):- get_env_attribute(RB,name,Value),!, writeq(Value).
+%user:portray(env(_,_)):- writeq(env/2).
 
 
 
@@ -156,6 +188,28 @@ set_env_attribute0(Env,Name,Value):-
   nb_setarg(2,Sub,SetT),
   nb_setarg(1,Sub,Name=Value).
 
+get_lambda_def(Ctx,Env,defmacro,ProcedureName,FormalParams,LambdaExpression):- 
+   get_symbol_fbounds(Ctx,Env,ProcedureName,kw_macro,[lambda,FormalParams|LambdaExpression]).
+
+get_lambda_def(Ctx,Env,defun,ProcedureName,FormalParams,LambdaExpression):- 
+   get_symbol_fbounds(Ctx,Env,ProcedureName,kw_function,[lambda,FormalParams|LambdaExpression]).
+
+get_lambda_def(_Ctx,_Env,DefType,ProcedureName,FormalParams,LambdaExpression):-
+  wl:lambda_def(DefType,ProcedureName,_,FormalParams,LambdaExpression).
+get_lambda_def(_Ctx,_Env,DefType,ProcedureName,FormalParams,LambdaExpression):-
+  wl:lambda_def(DefType,_,ProcedureName,FormalParams,LambdaExpression).
+
+get_symbol_fbounds(Ctx,Env,Sym,BoundType,FBOUND):-
+  ((get_env_attribute(Ctx,fbound(Sym,BoundType),FBOUND));
+   get_env_attribute(Env,fbound(Sym,BoundType),FBOUND)),!.
+
+
+remove_symbol_fbounds(Ctx,Sym):-
+  remove_env_attribute(Ctx,fbound(Sym,_)).
+     
+add_symbol_fbounds(Ctx,Env,Name=Value):- 
+  always((set_env_attribute(Ctx,Name,Value),
+  set_env_attribute(Env,Name,Value))).
 
 
 sub_term_index(Sub,Term,N,T) :-
@@ -204,8 +258,8 @@ env_append(_Ctx,_Env,ZippedArgEnv,ZippedArgEnv):-!.
 
 % GlobalBindings
 
-ensure_env(ENV):- (nonvar(ENV)->true;(is_env(ENV)->true;current_env(ENV))).
 ensure_ctx(ENV):- (nonvar(ENV)->true;(is_env(ENV)->true;ignore((notrace((nb_current('$env_global',ENV))))))).
+ensure_env(ENV):- (nonvar(ENV)->true;(is_env(ENV)->true;current_env(ENV))).
 current_env(ENV):- ignore((notrace((ensure_env,nb_current('$env_current',WASENV),!,(is_env(ENV)->WASENV==ENV;WASENV=ENV))))).
 
 ensure_env :-

@@ -20,18 +20,19 @@
 :- include('header').
 
 % local symbol?
-rw_add(Ctx,Var,RW):- atom(Var),!,  get_var_tracker(Ctx,Var,Dict),arginfo_incr(RW,Dict).
+rw_add(Ctx,Var,RW):- atom(Var), wam_cl_option(var_rw_counts,true),!,  get_var_tracker(Ctx,Var,Dict),arginfo_incr(RW,Dict).
 rw_add(_Ctx,_Var,_RW).
 
 %rwstate:attr_unify_hook(_,_):-!,fail.
 %rwstate:attr_unify_hook(_,V):-always(var(V)),fail.
 
 % actual var
-add_tracked_var(Ctx,Atom,Var):-
+add_tracked_var(Ctx,Atom,Var):-  wam_cl_option(var_rw_counts,true),!,
    get_var_tracker(Ctx,Atom,Dict),
    Vars=Dict.vars,
    sort([Var|Vars],NewVars),
    b_set_dict(vars,Dict,NewVars).
+add_tracked_var(_Ctx,_Atom,_Var).
 
 %get_var_tracker(_,Atom,rw{name:Atom,r:0,w:0,p:0,ret:0,u:0,vars:[]}):-!. % mockup
 get_var_tracker(Ctx0,Atom,Dict):- get_tracker(Ctx0,Ctx), always(sanity(atom(Atom))),get_env_attribute(Ctx,var_tracker(Atom),Dict),(is_dict(Dict)->true;(trace,oo_get_attr(Ctx,var_tracker(Atom),_SDict))).

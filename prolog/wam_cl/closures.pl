@@ -113,7 +113,7 @@ apply_c(EnvIn,closure(FType,ClosureEnvironment,Whole,ClosureResult,Symbol,Formal
     
 apply_c(EnvIn, ProcedureName, ActualParams, Result):-
         Whole = [ProcedureName|ActualParams],
-	get_lambda_def(defmacro,ProcedureName,FormalParams, LambdaExpression),!,
+	get_lambda_def(EnvIn,Env,defmacro,ProcedureName,FormalParams, LambdaExpression),!,
 	must_bind_parameters(EnvIn,Whole,_RestNKeys,FormalParams,ProcedureName, ActualParams, Env,BinderCode),
         always(BinderCode),
         f_sys_env_eval(Env,LambdaExpression, Result),

@@ -48,36 +48,6 @@ is_macrop(X):- atom_concat_or_rtrace('mf_',Symbol,X),symbol_foperator(Symbol).
 %compile_body(_Ctx,_Env,[],_, true):- local_override(with_forms,lisp_grovel),!.
 
 
-
-:- nb_setval('$labels_suffix','').
-suffix_by_context(_Ctx,Atom,SuffixAtom):- nb_current('$labels_suffix',Suffix),atom_concat_suffix(Atom,Suffix,SuffixAtom).
-suffixed_atom_concat(Ctx,L,R,LRS):- atom_concat_or_rtrace(L,R,LR),suffix_by_context(Ctx,LR,LRS).
-push_labels_context(Ctx,Atom):- suffix_by_context(Ctx,Atom,SuffixAtom),b_setval('$labels_suffix',SuffixAtom).
-within_labels_context(_Ctx,Label,G):- nb_current('$labels_suffix',Suffix),
-   setup_call_cleanup(b_setval('$labels_suffix',Label),G,b_setval('$labels_suffix',Suffix)).
-gensym_in_labels(Ctx,Stem,GenSym):- suffix_by_context(Ctx,Stem,SuffixStem),gensym(SuffixStem,GenSym).
-
-get_label_suffix(_Ctx,Suffix):-nb_current('$labels_suffix',Suffix).
-
-remove_symbol_fbounds(Ctx,Sym):-
-  remove_env_attribute(Ctx,fbound(Sym)).
-
-get_symbol_fbounds(Ctx,Env,Sym,BoundType,ProposedName):-
-  get_env_attribute(Ctx,fbound(Sym),bound_type(BoundType,ProposedName));
-   get_env_attribute(Env,fbound(Sym),bound_type(BoundType,ProposedName)).
-
-add_symbol_fbounds(Ctx,Env,Name=Value):- 
-  always((set_env_attribute(Ctx,Name,Value),
-  set_env_attribute(Env,Name,Value))).
-   
-
-show_ctx_info(Ctx):- term_attvars(Ctx,CtxVars),maplist(del_attr_rev2(freeze),CtxVars),show_ctx_info2(Ctx).
-show_ctx_info2(Ctx):- ignore((get_tracker(Ctx,Ctx0),in_comment(show_ctx_info3(Ctx0)))).
-show_ctx_info3(Ctx):- is_rbtree(Ctx),!,forall(rb_in(Key, Value, Ctx),fmt9(Key=Value)).
-show_ctx_info3(Ctx):- fmt9(ctx=Ctx).
-     
-
-
 as_lisp_funcallable(Atom,Atom):-atom(Atom),!.
 as_lisp_funcallable(function(P),P).
 as_lisp_funcallable([quote,P],P).
@@ -296,11 +266,14 @@ is_lisp_operator(Ctx,Env,Sym):- get_symbol_fbounds(Ctx,Env,Sym,BindType,_),!,Bin
 is_lisp_operator(_,_,G):- notrace(lisp_operator(G)).
 
 
+lisp_operator(FN):- \+ atom(FN),!,fail.
+lisp_operator(FN):- wl:declared(FN,kw_function),!,fail.
 lisp_operator(X):- atom_concat_or_rtrace('mf_',Symbol,X),symbol_foperator(Symbol).
 lisp_operator(X):- atom_concat_or_rtrace('sf_',Symbol,X),symbol_foperator(Symbol).
 lisp_operator(defpackage).
-lisp_operator(Sym):- wl:declared(Sym,kw_operator).
-lisp_operator(Sym):- wl:declared(Sym,kw_macro).
+lisp_operator(FN):- wl:declared(FN,kw_operator).
+lisp_operator(FN):- wl:declared(FN,kw_special).
+lisp_operator(FN):- wl:declared(FN,kw_macro).
 lisp_operator(if).
 lisp_operator('data-assrt').
 lisp_operator('define-caller-pattern').
@@ -309,17 +282,11 @@ lisp_operator(u_define_caller_pattern).
 lisp_operator(f_u_define_caller_pattern).
 lisp_operator(S):- get_opv(S,symbol_function,FN),!, lisp_operator(FN).
 lisp_operator(S):- nonvar(S),compiler_macro_left_right(S,_,_).
-lisp_operator(S):- get_lambda_def(defmacro,S,_,_).
+lisp_operator(S):- get_lambda_def(_Ctx,_Env,defmacro,S,_,_).
 lisp_operator(S):- is_special_op(S,P),currently_visible_package(P).
 %lisp_operator(S):-is_special_op(S,_P).
 
-get_lambda_def(DefType,ProcedureName,FormalParams,LambdaExpression):-
-  wl:lambda_def(DefType,ProcedureName,_,FormalParams,LambdaExpression).
-get_lambda_def(DefType,ProcedureName,FormalParams,LambdaExpression):-
-  wl:lambda_def(DefType,_,ProcedureName,FormalParams,LambdaExpression).
-
-
-is_special_op(S,P):- get_opv(S,symbol_function,kw_special),get_opv(S,symbol_package,P).
+is_special_op(S,P):- get_opv(S,symbol_function,SF),get_opv(S,symbol_package,P),is_special_operator_p(SF).
 is_special_op('%%allocate-closures', pkg_sbc).
 is_special_op('%cleanup-fun', pkg_sbc).
 is_special_op('%escape-fun', pkg_sbc).

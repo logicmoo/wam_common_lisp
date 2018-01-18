@@ -4,8 +4,11 @@
 ;;; #+ALT Alternative definition
 ;;; #+ABCL From ABCL
 ;;; #+SBCL From SBCL
+;;; #+ECL From ECL
 ;;; #+SICL From SICL
-;;; #+SICL From SICL
+
+
+(in-package #:system)
 
 
 (defmacro apropos-defmacro (name ll &rest body)

@@ -82,7 +82,7 @@ apply_f(_Binds,[closure, FormalParams, Body, Bindings0], ActualParams, Result):-
 	!.
 
 apply_f(_Binds,ProcedureName, ActualParams, Result):-
-	get_lambda_def(defun,ProcedureName,FormalParams, LambdaExpression),!,
+	get_lambda_def(Ctx,Env,defun,ProcedureName,FormalParams, LambdaExpression),!,
 	bind_formal_parameters(FormalParams, ActualParams, Bindings),
         eval(LambdaExpression, Bindings, Result),
 	!.

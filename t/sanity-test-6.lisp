@@ -50,6 +50,10 @@ Examples:
      `(values ',expansion ',expanded-p)))  ;;   EXPAND-1
 
 
+(defmacro mlets (x &environment env) (let ((form `(babbit ,x))) (macroexpand form env)))
+(macrolet ((babbit (z) `(+ ,z ,z))) (mlets 5))
+(macrolet ((babbit (z) `(+ ,z ,z ,z))) (mlets 5))
+
 (prolog-call "lisp")
 
 '(list 

@@ -60,7 +60,7 @@ compile_defun_ops(Ctx,Env,Result,[labels,LABELS|Progn], (Conj,CompileBody)):-
     must_compile_progn(Ctx,Env,Result,Progn, CompileBody).   
 
 % wl:needs_env(f_special_operator_p).
-define_each(Ctx,Env,_LabelsOrFLET,[SymbolName|DEFN],(fbound(Sym)=bound_type(kw_function,UniqueCtxFunction)),CompileBody)  :-    
+define_each(Ctx,Env,_LabelsOrFLET,[SymbolName|DEFN],(fbound(Sym,kw_function)=function(UniqueCtxFunction)),CompileBody)  :-    
     combine_setfs(SymbolName,Symbol),
    (always(foc_operator(Ctx,Env,kw_function,Symbol,_Len, Function)),suffix_by_context(Ctx,Function,CtxFunction)),
    gensym(CtxFunction,UniqueCtxFunction),
