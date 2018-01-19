@@ -111,7 +111,7 @@ compile_prolog_call(Ctx,Env,Prev,[sys_prolog_inline,Call],Prev, Term ):-
 
 % (rtrace ?progn )
 compile_prolog_call(Ctx,Env,Result,[sys_rtrace|Progn],Prev, rtrace(Body) ):-
-   must_compile_progn(Ctx,Env,Result, Progn, Prev, Body).
+   rtrace(must_compile_progn(Ctx,Env,Result, Progn, Prev, Body)).
 
 as_prolog_object(Operand,PrologArg):- is_stringp(Operand),to_prolog_string(Operand,PrologArg).
 as_prolog_object(Operand,PrologArg):- is_unmberp(Operand),to_prolog_number(Operand,PrologArg).
