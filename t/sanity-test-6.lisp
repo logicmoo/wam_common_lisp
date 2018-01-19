@@ -49,17 +49,31 @@ Examples:
        (macroexpand-1 form env)
      `(values ',expansion ',expanded-p)))  ;;   EXPAND-1
 
-
+(defmacro babbit (z) `(+ ,z 1))
 (defmacro mlets (x &environment env) (let ((form `(babbit ,x))) (macroexpand form env)))
-(macrolet ((babbit (z) `(+ ,z ,z))) (mlets 5))
-(macrolet ((babbit (z) `(+ ,z ,z ,z))) (mlets 5))
+(is eql 10 (macrolet ((babbit (z) `(+ ,z ,z))) (mlets 5)))
+(is eql 15 (macrolet ((babbit (z) `(+ ,z ,z ,z))) (mlets 5)))
+
+  
+(is eq 'MACFUN (defmacro macfun (x) '(macro-function 'macfun)))
+(is eq () (not (macro-function 'macfun))) 
+(is eq '(NO YES) (macrolet ((foo (&environment env)
+               (if (macro-function 'bar env)
+                  ''yes
+                  ''no)))
+    (list (foo)
+          (macrolet ((bar () :beep))
+             (foo)))))
+ 
+
+
 
 (prolog-call "lisp")
 
 '(list 
 ;; Simple examples involving just the global environment
- (macroexpand-1 '(alpha a b))  ;;   (BETA A B), true
- (expand-1 (alpha a b))  ;;   (BETA A B), true
+(is '(BETA A B) (macroexpand-1 '(alpha a b)))  ;;   , true
+(is '(BETA A B) (expand-1 (alpha a b)))  ;;   (BETA A B), true
  (macroexpand '(alpha a b))  ;;   (GAMMA A B), true
  (expand (alpha a b))  ;;   (GAMMA A B), true
  (macroexpand-1 'not-a-macro)  ;;   NOT-A-MACRO, false
