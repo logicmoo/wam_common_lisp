@@ -188,28 +188,24 @@ set_env_attribute0(Env,Name,Value):-
   nb_setarg(2,Sub,SetT),
   nb_setarg(1,Sub,Name=Value).
 
-get_lambda_def(Ctx,Env,defmacro,ProcedureName,FormalParams,LambdaExpression):- 
-   get_symbol_fbounds(Ctx,Env,ProcedureName,kw_macro,[lambda,FormalParams|LambdaExpression]).
-
-get_lambda_def(Ctx,Env,defun,ProcedureName,FormalParams,LambdaExpression):- 
-   get_symbol_fbounds(Ctx,Env,ProcedureName,kw_function,[lambda,FormalParams|LambdaExpression]).
-
-get_lambda_def(_Ctx,_Env,DefType,ProcedureName,FormalParams,LambdaExpression):-
-  wl:lambda_def(DefType,ProcedureName,_,FormalParams,LambdaExpression).
-get_lambda_def(_Ctx,_Env,DefType,ProcedureName,FormalParams,LambdaExpression):-
-  wl:lambda_def(DefType,_,ProcedureName,FormalParams,LambdaExpression).
+get_lambda_def(Ctx,Env,defmacro,ProcedureName,FormalParams,LambdaExpression):- get_symbol_fbounds(Ctx,Env,ProcedureName,kw_macro,[lambda,FormalParams|LambdaExpression]).
+get_lambda_def(Ctx,Env,defun,ProcedureName,FormalParams,LambdaExpression):- get_symbol_fbounds(Ctx,Env,ProcedureName,kw_function,[lambda,FormalParams|LambdaExpression]).
+get_lambda_def(_Ctx,_Env,DefType,ProcedureName,FormalParams,LambdaExpression):- wl:lambda_def(DefType,ProcedureName,_,FormalParams,LambdaExpression).
+get_lambda_def(_Ctx,_Env,DefType,ProcedureName,FormalParams,LambdaExpression):-  wl:lambda_def(DefType,_,ProcedureName,FormalParams,LambdaExpression).
 
 get_symbol_fbounds(Ctx,Env,Sym,BoundType,FBOUND):-
   ((get_env_attribute(Ctx,fbound(Sym,BoundType),FBOUND));
    get_env_attribute(Env,fbound(Sym,BoundType),FBOUND)),!.
 
 
-remove_symbol_fbounds(Ctx,Sym):-
-  remove_env_attribute(Ctx,fbound(Sym,_)).
      
 add_symbol_fbounds(Ctx,Env,Name=Value):- 
   always((set_env_attribute(Ctx,Name,Value),
   set_env_attribute(Env,Name,Value))).
+
+remove_symbol_fbounds(Ctx,Env,Name=Value):- 
+  always((remove_env_attribute(Ctx,Name,Value),
+  remove_env_attribute(Env,Name,Value))).
 
 
 sub_term_index(Sub,Term,N,T) :-
