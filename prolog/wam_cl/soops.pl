@@ -165,6 +165,8 @@ get_slot_name0(Kind,SlotName,ZLOT):- get_struct_opv_i(Kind,_,_,SlotName),ZLOT=Sl
 get_slot_name0(Kind,SlotName,ZLOT):- get_struct_opv_i(Kind,_,OneOf,ZLOT),notrace(e_member(SlotName,OneOf)),!.
 get_slot_name0(Kind,SlotName,ZLOT):- get_struct_opv_i(Super,_,OneOf,ZLOT),notrace(e_member(SlotName,OneOf)),
    wdmsg(always(f_subtypep(Kind,Super))).
+get_slot_name0(claz_symbol,value,symbol_value).
+
 /*
 get_slot_name0(Kind,SlotName,ZLOT):-
    (get_struct_opv(Kind,_,_,ZLOT),ZLOT=SlotName);   

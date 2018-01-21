@@ -164,7 +164,7 @@ get_ctx_env_attribute(Ctx,Env,Name,Value):- get_env_attribute(Env,Name,Value)->t
    
 get_env_attribute(Env,Name,Value):- notrace(get_env_attribute0(Env,Name,Value)).
 get_env_attribute0(ENV,Name,Value):-fail, get_tracker(ENV,Ctx),rb_in(Name,Value,Ctx).
-get_env_attribute0(Env,Name,Value):-  sub_term(Sub,Env),compound(Sub),Sub= (PName=VValue),Name==PName,Value=VValue,!.
+get_env_attribute0(Env,Name,Value):-  sub_term(Sub,Env),compound(Sub),Sub=(PName=VValue),(Name=PName),Value=VValue,!.
 
 
 set_env_attribute(Env,Name,Value):- quietly(always(set_env_attribute0(Env,Name,Value))).
@@ -193,10 +193,20 @@ get_lambda_def(Ctx,Env,defun,ProcedureName,FormalParams,LambdaExpression):- get_
 get_lambda_def(_Ctx,_Env,DefType,ProcedureName,FormalParams,LambdaExpression):- wl:lambda_def(DefType,ProcedureName,_,FormalParams,LambdaExpression).
 get_lambda_def(_Ctx,_Env,DefType,ProcedureName,FormalParams,LambdaExpression):-  wl:lambda_def(DefType,_,ProcedureName,FormalParams,LambdaExpression).
 
-get_symbol_fbounds(Ctx,Env,Sym,BoundType,FBOUND):-
-  ((get_env_attribute(Ctx,fbound(Sym,BoundType),FBOUND));
-   get_env_attribute(Env,fbound(Sym,BoundType),FBOUND)),!.
+get_symbol(Sym,Symbol):- \+ compound(Sym),!,Sym=Symbol.
+get_symbol(Sym,Symbol):- arg(1,Sym,Mid),!,get_symbol(Mid,Symbol).
+get_symbol(Sym,Sym).
 
+get_symbol_fbounds(Ctx,Env,Sym,BindTypeReq,FBOUND):- get_symbol(Sym,Symbol),  
+  (Symbol==u_babbit->trace;true),
+  get_symbol_fbounds0(Ctx,Env,Symbol,BindType,FBOUND),
+  BindTypeReq=BindType.
+
+get_symbol_fbounds0(Ctx,Env,Symbol,BindType,FBOUND):- 
+  ((get_env_attribute(Env,fbound(Symbol,BindType),FBOUND));
+   get_env_attribute(Ctx,fbound(Symbol,BindType),FBOUND)),!.
+%get_symbol_fbounds0(_Ctx,_Env,Symbol,BindType,ProposedName):- get_opv(Symbol,symbol_function,ProposedName),
+%  (atom(ProposedName)->bind_type_naming(BindType,_,ProposedName);bind_type_naming_of(BindType,Symbol,ProposedName)).
 
      
 add_symbol_fbounds(Ctx,Env,Name=Value):- 

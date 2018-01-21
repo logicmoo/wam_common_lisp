@@ -64,12 +64,13 @@ find_lisp_function(FN,ARITY,ProposedName):-
 find_lisp_function(FN,ARITY,ProposedName):-
   find_operator(_Ctx,_Env,kw_special,FN,ARITY, ProposedName).
 
+/*
 make_function_or_macro_call(Ctx,Env,FN,Args,Result,ExpandedFunction):-
    (is_list(Args)->length(Args,ArgsLen);true),
    foc_operator(Ctx,Env,symbol_function,FN,ArgsLen, ProposedName),!,
    align_args_or_fallback(Ctx,Env,FN, ProposedName,Args,Result,ArgsPlusResult),
    ExpandedFunction =.. [ ProposedName | ArgsPlusResult].
-
+*/
 
 get_each_search_suffix(Ctx,Each):-
    ((get_label_suffix(Ctx,Whole),atomic_list_concat(List,'_',Whole),
@@ -94,10 +95,10 @@ find_operator_else_function(Ctx,Env,BindType,Symbol,ProposedName,true):-
   find_operator(Ctx,Env,BindType,Symbol, _Len, ProposedName),!.
 find_operator_else_function(_Ctx,Env,BindType,Symbol,ProposedName,Pre):- 
    Pre = find_operator_or_die(Env,BindType,Symbol, ProposedName),!.
-find_operator_else_function(_Cxt,_Env,_BindType,Symbol,function(Symbol),true).
+%find_operator_else_function(_Cxt,_Env,_BindType,Symbol,function(Symbol),true).
 
 find_operator_or_die(Env,BindType,Symbol, ProposedName):- nonvar(Symbol), find_operator(Env,Env,BindType,Symbol, _Len, ProposedName),!.
-find_operator_or_die(_Env,kw_function,Symbol, function(Symbol)).
+%find_operator_or_die(_Env,kw_function,Symbol, function(Symbol)).
 find_operator_or_die(Env,BindType,Symbol, R):- trace_or_throw(find_operator_or_die(Env,BindType,Symbol, R)).
 
 
@@ -108,7 +109,7 @@ foc_operator(Ctx,Env,BindType,FN, Len, ProposedName):-  find_operator(Ctx,Env,Bi
 foc_operator(Ctx,_Env,BindType,FN, _Len, ProposedName):- 
   show_call_trace((generate_function_or_macro_name(Ctx,FN,BindType,ProposedName))),!.
 
-
+bind_type_naming_of(BindType,FN,Named):- wdmsg(bind_type_naming_of(BindType,FN,Named)).
 bind_type_naming(kw_function,FN,ProposedName):- (atom_concat('f_',FN,ProposedName);atom_concat('sf_',FN,ProposedName)),!.
 bind_type_naming(kw_special,FN,ProposedName):-  (atom_concat('sf_',FN,ProposedName);atom_concat('f_',FN,ProposedName)),!.
 bind_type_naming(kw_macro,FN,ProposedName):- atom_concat('mf_',FN,ProposedName).
@@ -152,7 +153,7 @@ eval_uses_whole(F):- quietly((premute_names(F,FF), get_init_args(FF,while))),!.
 eval_bind_parameters(F):- quietly((premute_names(F,FF), get_init_args(FF,bind_parameters))),!.
 
 % get_init_args(FN,Requireds):- current_predicate(FN/N), Requireds is N-2,Requireds>0.
-
+get_init_args(F,_):- is_list(F),!,fail.
 get_init_args(F,Args):- nonvar(Args),!,get_init_args(F,ArgsV),ArgsV=Args.
 get_init_args(F,N):- quietly((premute_names(F,FF), exact_and_restkeys(FF,N))),!.
 

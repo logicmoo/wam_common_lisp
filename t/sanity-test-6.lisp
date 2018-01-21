@@ -57,16 +57,25 @@ Examples:
   
 (is eq 'MACFUN (defmacro macfun (x) '(macro-function 'macfun)))
 (is eq () (not (macro-function 'macfun))) 
-(is eq '(NO YES) (macrolet ((foo (&environment env)
-               (if (macro-function 'bar env)
-                  ''yes
-                  ''no)))
+
+(is eq '(NO YES) 
+  (macrolet ((foo (&environment env)
+         (if (macro-function 'bar env)
+                  ''yes ''no)))
     (list (foo)
           (macrolet ((bar () :beep))
-             (foo)))))
+             (foo))))
+	)
+
+
+(if (macro-function 'bar) ''yes ''no)
  
+(macrolet ((foo (&environment env) (if (macro-function 'bar env) ''yes ''no)))  (foo))
 
 
+(is eq () 
+  (MACROLET ((foo (&environment env) ) )(macro-function 'foo nil) )
+                                                       )
 
 (prolog-call "lisp")
 

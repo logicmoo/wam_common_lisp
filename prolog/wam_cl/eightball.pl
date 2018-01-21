@@ -120,9 +120,10 @@ dinterp(N,C,M:G,L):-!,assertion(nonvar(G)),N:dinterp(M,C,G,L).
 %dinterp(_,_,is_functionp(G),_Level):-!,rtrace(is_functionp(G)).
 dinterp(_,_,true,_).
 dinterp(M,_,call(G),L):-!,dinterp(M,_,G,L) .
+dinterp(M,C,(Cond *-> Then ; Else),L):-!,L2 is L +1,( dinterp(M,C,Cond,L2)  *->  dinterp(M,C,Then,L) ; dinterp(M,C,Else,L)).
+dinterp(M,C,(Cond -> Then ; Else),L):-!,L2 is L +1,( dinterp(M,C,Cond,L2) ->  dinterp(M,C,Then,L) ; dinterp(M,C,Else,L)).
 dinterp(M,_,(\+ G),L):-!,\+ dinterp(M,_,G,L).
 dinterp(M,C,(Cond -> Then ; Else),L):-!,( dinterp(M,C,Cond,L)  ->  dinterp(M,C,Then,L) ; dinterp(M,C,Else,L)).
-dinterp(M,C,(Cond *-> Then ; Else),L):-!,L2 is L +1,( dinterp(M,C,Cond,L2)  *->  dinterp(M,C,Then,L) ; dinterp(M,C,Else,L)).
 dinterp(M,C,(Cond -> Then),L):-!,(dinterp(M,C,Cond,L) -> dinterp(M,C,Then,L)).
 dinterp(M,C,(Cond *-> Then),L):-!,L2 is L +1,(dinterp(M,C,Cond,L2) *-> dinterp(M,C,Then,L)).
 dinterp(M,C,(GoalsL ; GoalsR),L):-!,L2 is L +1,(dinterp(M,C,GoalsL,L2) ; dinterp(M,C,GoalsR,L2)).

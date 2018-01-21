@@ -376,8 +376,7 @@ compile_body(Ctx,Env,Result,Form1,Body):- compile_closures(Ctx,Env,Result,Form1,
 % Use a previous DEFMACRO
 compile_body(Ctx,Env,Result,LispCode,CompileBody):-
   fail, %DISABLED
-  MacroEnv= Env,
-  macroexpand_1_or_fail(Ctx,Env,LispCode,MacroEnv,CompileBody0Result),
+  macroexpand_1_or_fail(Ctx,Env,LispCode,CompileBody0Result),
   dbginfo(macroexpand:-LispCode),
   dbginfo(into:-CompileBody0Result),
   must_compile_body(Ctx,Env,Result,CompileBody0Result, CompileBody),

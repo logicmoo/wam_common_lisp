@@ -323,14 +323,24 @@ wl:init_args(1,get_setf_expansion).
 
 %place_op(Env,PlOP,Obj,Value,Result):- var(Env),ensure_env(Env), \+ var(Env),!, place_op(Env,PlOP,Obj,Value,Result).
 
-to_place([value,Obj],Obj,value):-!.
-to_place([symbol_value,Obj],Obj,value):-!.
+to_place([value,Obj],Obj,symbol_value):-!.
+to_place([symbol_value,Obj],Obj,symbol_value):-!.
 to_place([slot_value,Obj,Place],Obj,Place):-!.
 to_place([aref,Obj|Index],Obj,[aref|Index]):-!.
 to_place([Place,Obj],Obj,Place):-!.
 to_place([Place,Obj|Args],Obj,[Place|Args]):-!.
 %to_place([Obj],Obj,value):-!.
 to_place(Obj,Obj,value).
+
+
+get_place(SomePlace,Value):-
+   to_place(SomePlace,Obj,Prop),
+   ignore(get_opv(Obj,Prop,Value)).
+   
+set_place(SomePlace,Value):-
+   to_place(SomePlace,Obj,Prop),
+   set_opv(Obj,Prop,Value).
+   
 
 get_place(Env, Oper, Obj, Value,  Result):-
   always(to_place(Obj,RObj,Place)),!,

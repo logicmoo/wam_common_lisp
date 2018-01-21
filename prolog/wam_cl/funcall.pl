@@ -63,21 +63,12 @@ compile_funop(Ctx,Env,Result,[FN| Args], Code):- var(FN),!,
 % Use a previous DEFMACRO
 compile_funop(Ctx,Env,Result,LispCode,CompileBody):-
   %fail, %DISABLED
-  macroexpand_1_or_fail(Ctx,Env,LispCode,Ctx,CompileBody0Result),
+  macroexpand_1_or_fail(Ctx,Env,LispCode,CompileBody0Result),
   dbginfo(macroexpand:-LispCode),
   dbginfo(into:-CompileBody0Result),
   must_compile_body(Ctx,Env,Result,CompileBody0Result, CompileBody),
   !.
       
-
-% Use a previous DEFMACRO
-compile_funop(Ctx,Env,Result,LispCode,CompileBody):-
-  %fail, %DISABLED
-  macroexpand_1_or_fail(Ctx,Env,LispCode,Ctx,CompileBody0Result),
-  dbginfo(macroexpand:-LispCode),
-  dbginfo(into:-CompileBody0Result),
-  must_compile_body(Ctx,Env,Result,CompileBody0Result, CompileBody),
-  !.
 
 compile_funop(Ctx,Env,Result,[Op | FunctionArgs], Body):- nonvar(Op), wl:op_replacement(Op,Op2), !,
   must_compile_body(Ctx,Env,Result,[Op2 | FunctionArgs],Body).
