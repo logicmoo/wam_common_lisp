@@ -226,7 +226,7 @@ macroexpand_1_or_fail(Ctx,Env,[Procedure|Arguments],MFResult):- atom(Procedure),
    debug_var('MFResult',MFResult),   
    quotify_each(Ctx,Env,QuotedArgs,Arguments,Code),
    always(Code),
-   trace,Expr = [[lambda,FormalParams|LambdaExpression]|QuotedArgs],
+   Expr = [[lambda,FormalParams|LambdaExpression]|QuotedArgs],
    dbginfo(foo(Expr)),   
    lisp_compile(Ctx,Env,MFResult,Expr,BodyCode),
    body_cleanup_keep_debug_vars(Ctx,(Code,BodyCode),SCode),
@@ -240,9 +240,9 @@ macroexpand_1_or_fail(Ctx,Env,[Procedure|Arguments],MFResult):- fail, atom(Proce
    always(Code),
    Expr = [[lambda,FormalParams|LambdaExpression]|QuotedArgs],
    dbginfo(foo(Expr)),   
-   trace,lisp_compile(Ctx,Env,MFResult,Expr,BodyCode),
+   lisp_compile(Ctx,Env,MFResult,Expr,BodyCode),
    body_cleanup_keep_debug_vars(Ctx,(Code,BodyCode),SCode),
-   trace,copy_term(SCode,SCodeO),always(BodyCode),
+   copy_term(SCode,SCodeO),always(BodyCode),
    dbginfo((macroResult([Procedure|Arguments],SCodeO,MFResult))),!.
 
 
@@ -253,8 +253,8 @@ macroexpand_1_or_fail(Ctx,Env,[Procedure|Arguments],MFResult):- atom(Procedure),
    always(Code),
    Expr = [[lambda,FormalParams|LambdaExpression]|QuotedArgs],
    dbginfo(foo(Expr)),  
-   trace,lisp_compile(Ctx,Env,MFResult,Expr,BodyCode),   
-   trace,copy_term(BodyCode,SCodeO),always(BodyCode),
+   lisp_compile(Ctx,Env,MFResult,Expr,BodyCode),   
+   copy_term(BodyCode,SCodeO),always(BodyCode),
    dbginfo((macroResult([Procedure|Arguments],SCodeO,MFResult))),!.
 
 
@@ -270,7 +270,7 @@ macroexpand_1_or_fail(Ctx,Env,[Procedure|Arguments],CompileBody0Result):- atom(P
    body_cleanup_keep_debug_vars(Ctx,CodeS,Code),
    wdmsg(Code),
    % (local_override(with_forms,lisp_grovel)-> (lisp_dumpST) ; true),
-   trace,always(Code),
+   always(Code),
    must_compile_body(Ctx,NewEnv,CompileBody0Result,CommaResult, MCBR),
    always(MCBR),
    dbginfo((macroResult([Procedure|Arguments],Code,CommaResult,CompileBody0Result))),!.
@@ -280,7 +280,7 @@ macroexpand_1_or_fail(Ctx,Env,[Procedure|Arguments],CompileBody0Result):- atom(P
    get_lambda_def(Ctx,Env,defmacro,Procedure, FormalParams, LambdaExpression),!,
    debug_var('MEnv',Env),debug_var('NewEnv',NewEnv),debug_var('CommaResult',CommaResult),  
    must_bind_parameters(Env,FormalParams,Procedure, Arguments,NewEnv,BindCode),!,
-   trace,ignore(Ctx =  Env),
+   ignore(Ctx =  Env),
    always(BindCode),
    always(expand_commas(Ctx,1,NewEnv,CommaResult,LambdaExpression,CodeS)),
    body_cleanup_keep_debug_vars(Ctx,CodeS,Code),
