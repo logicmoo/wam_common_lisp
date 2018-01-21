@@ -198,7 +198,7 @@ get_symbol(Sym,Symbol):- arg(1,Sym,Mid),!,get_symbol(Mid,Symbol).
 get_symbol(Sym,Sym).
 
 get_symbol_fbounds(Ctx,Env,Sym,BindTypeReq,FBOUND):- get_symbol(Sym,Symbol),  
-  (Symbol==u_babbit->trace;true),
+  %(Symbol==u_babbit->trace;true),
    BindTypeReq=BindType,
   get_symbol_fbounds0(Ctx,Env,Symbol,BindType,FBOUND),
   BindTypeReq=BindType.

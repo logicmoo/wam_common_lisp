@@ -108,13 +108,13 @@ compile_macro_function(Ctx,Env,Symbol,[FormalParms|MacroBody0],Macro,HeadParmsMF
    
    LabelSymbol = '', % LabelSymbol =Symbol       
  within_labels_context(Ctx,LabelSymbol,((
-   expand_function_head_macro(Ctx,Env,Symbol,Macro,FormalParms,Whole, _HeadParms,ZippedArgEnv,_ArgInfo, HeadDefCode,HeadCode),   
-   make_env_append(Ctx,Env,HeadEnv,[ZippedArgEnv|EnvIn],EnvAssign),
+   destructure_parameters(Ctx,Env,Symbol,Macro,FormalParms,Whole, _HeadParms,ZippedArgEnv,_ArgInfo, HeadDefCode,HeadCode),   
+   make_env_append(Ctx,Env,HeadEnv,ZippedArgEnv,EnvAssign),
    must_compile_body(Ctx,HeadEnv,MFResult,[block,Symbol|MacroBody],MFBody), 
    body_cleanup_keep_debug_vars(Ctx,((DocCode,
      assert_lsp(Symbol,wl:lambda_def(defmacro,Symbol,Macro, FormalParms, MacroBody)),HeadDefCode)),CompileBody)))),
-   debug_var('MacroEnv',EnvIn),
-   HeadParmsMF = [Whole,EnvIn].
+   debug_var('MacroEnv',Env),
+   HeadParmsMF = [Whole,Env].
 
 wl:plugin_expand_progbody_1st(Ctx,Env,Result,[macroexpand_1,LispCode|ARGS],_PreviousResult,
       (LispCodeEval,ARGSCode,f_macroexpand_1([LispCodeResult|ARGSResult],Result))):-
@@ -227,7 +227,7 @@ macroexpand_1_or_fail(Ctx,Env,[Procedure|Arguments],MFResult):- atom(Procedure),
    quotify_each(Ctx,Env,QuotedArgs,Arguments,Code),
    always(Code),
    Expr = [[lambda,FormalParams|LambdaExpression]|QuotedArgs],
-   dbginfo(foo(Expr)),   
+   dbginfo(foo1(Expr)),   
    lisp_compile(Ctx,Env,MFResult,Expr,BodyCode),
    body_cleanup_keep_debug_vars(Ctx,(Code,BodyCode),SCode),
    copy_term(SCode,SCodeO),always(BodyCode),
@@ -239,20 +239,20 @@ macroexpand_1_or_fail(Ctx,Env,[Procedure|Arguments],MFResult):- fail, atom(Proce
    quotify_each(Ctx,Env,QuotedArgs,Arguments,Code),
    always(Code),
    Expr = [[lambda,FormalParams|LambdaExpression]|QuotedArgs],
-   dbginfo(foo(Expr)),   
+   dbginfo(foo2(Expr)),   
    lisp_compile(Ctx,Env,MFResult,Expr,BodyCode),
    body_cleanup_keep_debug_vars(Ctx,(Code,BodyCode),SCode),
    copy_term(SCode,SCodeO),always(BodyCode),
    dbginfo((macroResult([Procedure|Arguments],SCodeO,MFResult))),!.
 
 
-macroexpand_1_or_fail(Ctx,Env,[Procedure|Arguments],MFResult):- atom(Procedure), nonplainvar(Procedure),
+macroexpand_1_or_fail(Ctx,Env,[Procedure|Arguments],MFResult):- fail, atom(Procedure), nonplainvar(Procedure),
    get_lambda_def(Ctx,Env,defmacro,Procedure, FormalParams, LambdaExpression),!,   
   % Whole = [Procedure|Arguments],
    quotify_each(Ctx,Env,QuotedArgs,Arguments,Code),
    always(Code),
    Expr = [[lambda,FormalParams|LambdaExpression]|QuotedArgs],
-   dbginfo(foo(Expr)),  
+   dbginfo(foo3(Expr)),  
    lisp_compile(Ctx,Env,MFResult,Expr,BodyCode),   
    copy_term(BodyCode,SCodeO),always(BodyCode),
    dbginfo((macroResult([Procedure|Arguments],SCodeO,MFResult))),!.

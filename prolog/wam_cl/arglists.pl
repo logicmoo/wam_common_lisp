@@ -230,7 +230,13 @@ ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,MODE,['&whole',F|FormalParms],Para
  
 % &environment
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,Mode,['&environment',F|FormalParms],Params,[F|Names],[V|PVars],
-  (parent_env(V),Code)):-  !,
+  (parent_env(V),Code)):- fail, !,
+  arginfo_append(F,env,ArgInfo),
+  arginfo_append(environment,complex,ArgInfo),
+  ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,Mode,FormalParms,Params,Names,PVars,Code).
+
+ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,Mode,['&environment',F|FormalParms],Params,[F|Names],[V|PVars],
+  (Code)):- Env=V, !,
   arginfo_append(F,env,ArgInfo),
   arginfo_append(environment,complex,ArgInfo),
   ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,Mode,FormalParms,Params,Names,PVars,Code).
@@ -360,6 +366,7 @@ align_args_local(FN,RequiredArgs,RestNKeys,WholeMinusSymbol,LB,_ArgInfo,PARAMS,w
   LB = true,
   RestNKeys = _,
   PARAMS = RequiredArgs,
+  append(RequiredArgs,RestNKeys,WholeMinusSymbol),
   RequiredArgs =WholeMinusSymbol.
 
 /*
@@ -399,10 +406,10 @@ align_args_local(FN,RequiredArgs,RestNKeys,WholeMinusSymbol,LB,ArgInfo,HeadParms
    (ArgInfo.whole == 0 -> LB = true ; LB = append(RequiredArgs,RestNKeys,WholeMinusSymbol)),
  append(RequiredArgs,[RestNKeys],HeadParms),!.
 
-expand_function_head_macro(Ctx,Env,Symbol,FN,FormalParms,Whole,HeadParms,ZippedArgEnv,ArgInfo,HeadDefCode,HeadCode) :- 
+destructure_parameters(Ctx,Env,Symbol,FN,FormalParms,Whole,HeadParms,ZippedArgEnv,ArgInfo,HeadDefCode,HeadCode) :- 
  expand_function_head(Ctx,Env,Symbol,FN,FormalParms,Whole,HeadParms,ZippedArgEnv,ArgInfo,HeadDefCode,HeadCode).
 /*
-expand_function_head_macro(Ctx,Env,Symbol,Macro,FormalParms,Whole, HeadParms,ZippedArgEnv,ArgInfo, HeadDefCode,HeadCode):-
+destructure_parameters(Ctx,Env,Symbol,Macro,FormalParms,Whole, HeadParms,ZippedArgEnv,ArgInfo, HeadDefCode,HeadCode):-
   expand_function_head(Ctx,Env,Symbol,Macro,FormalParms,Whole, HeadParms0,ZippedArgEnv,ArgInfo, HeadDefCode0,HeadCode0),!,
   (ArgInfo.env==0 -> 
     ((HeadCode=(global_env(Env),HeadCode0),HeadDefCode=HeadDefCode0,HeadParms=HeadParms0)) 
@@ -460,6 +467,7 @@ expand_function_head(Ctx,Env,Symbol,FN,FormalParms,Whole,HeadParms,ZippedArgEnv,
    HeadDefCode = (assert_lsp(Symbol,wl:arglist_info(Symbol,FN,FormalParms,ArgInfo))),
    always(HeadDefCode),
    align_args_local(FN,RequiredArgs,RestNKeys,WholeMinusSymbol,LB,ArgInfo,HeadParms,Used),!,  
+   append(RequiredArgs,RestNKeys,WholeMinusSymbol),
    assert_lsp(Symbol,Used:-true),
    HeadCodeOut = (LB,HeadCode))).
 
@@ -525,6 +533,11 @@ correct_formal_params_destructuring([A, B, C|R],[A, B, C,'&rest',R]):- simple_at
 correct_formal_params_destructuring([A, B|R],[A, B, '&rest',R]):- simple_atom_var(A),simple_atom_var(B),simple_atom_var(R),!.
 correct_formal_params_destructuring([A|R],[A,'&rest',R]):- simple_atom_var(A),simple_atom_var(R),!.
 correct_formal_params_destructuring(AA,AA).
+
+
+must_bind_parameters(Env,FormalParms,Symbol,Params,EnvForBody,Code):-
+  destructure_parameters(Env,Env,Symbol,Symbol,FormalParms,[Symbol|Params],_HeadParms,ZippedArgEnv,_ArgInfo,_HeadDefCode,HeadCodeOut),
+  Code = ((EnvForBody = [ZippedArgEnv|Env]),HeadCodeOut).
 
 must_bind_parameters(Env,Whole,RestNKeys,FormalParms0,Symbol,Params,Env,Code):-
   always(((correct_formal_params(FormalParms0,FormalParms),
