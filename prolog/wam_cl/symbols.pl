@@ -267,9 +267,9 @@ sf_symbol_macrolet(Env,SymbolMacroLets,Body,Return):-
   compile_symbol_macrolet(Env,Env,Return,[symbol_macrolet,SymbolMacroLets,Body],LispCodeEval),
   always(LispCodeEval).
 
-compile_symbol_macrolet(Ctx,Env,Return,[symbol_macrolet,SymbolMacroLets,Body],LispCodeEval):-
+compile_symbol_macrolet(Ctx,Env,Return,[symbol_macrolet,SymbolMacroLets|Body],LispCodeEval):-
     must_maplist(define_each_symbol_macro(Env),SymbolMacroLets,Enrichments),
-     lisp_compile(Ctx,[Enrichments|Env],Return,Body,LispCodeEval). 
+     must_compile_progn(Ctx,[Enrichments|Env],Return,Body,LispCodeEval). 
 
 wl:plugin_expand_progbody(Ctx,Env,Result,InstrS,_PreviousResult,Code):- compile_symbol_macrolet(Ctx,Env,Result,InstrS,Code),!.
 
