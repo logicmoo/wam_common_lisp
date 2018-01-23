@@ -65,6 +65,9 @@
 wl:init_args(2,defmacro).
 sf_defmacro(Env,Symbol,FormalParms,MacroBody,Return):- reenter_lisp(Ctx,Env),compile_macro_ops(Ctx,Env,Return,[defmacro,Symbol,FormalParms|MacroBody],Code),cmpout(Code).
 
+wl:init_args(2,define_compiler_macro).
+sf_define_compiler_macro(Env,Symbol,FormalParms,MacroBody,Return):- reenter_lisp(Ctx,Env),compile_macro_ops(Ctx,Env,Return,[defmacro,Symbol,FormalParms|MacroBody],Code),cmpout(Code).
+
 compile_macro_ops(Ctx,Env,Result,[defmacro,Symbol,FormalParms|MacroBody], (Code,FunDef,Result=Symbol)):-
   compile_defmacro(Ctx,Env,[Symbol,FormalParms|MacroBody],Macro,Code),
   debug_var('DefMacroResult',Result),
