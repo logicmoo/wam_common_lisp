@@ -264,9 +264,17 @@ sf_define_symbol_macro(_Env,Symbol,Macro,Symbol):- set_opv(Symbol,symbol_macro,M
 %sf_symbol_macrolet(Env,SymbolMacroLets,Body,Decls,Return):- sf_symbol_macrolet(Env,SymbolMacroLets,[let,Decls,Body],Return).
 wl:init_args(1,symbol_macrolet).
 sf_symbol_macrolet(Env,SymbolMacroLets,Body,Return):-
+  compile_symbol_macrolet(Env,Env,Return,[symbol_macrolet,SymbolMacroLets,Body],LispCodeEval),
+  always(LispCodeEval).
+
+compile_symbol_macrolet(Ctx,Env,Return,[symbol_macrolet,SymbolMacroLets,Body],LispCodeEval):-
     must_maplist(define_each_symbol_macro(Env),SymbolMacroLets,Enrichments),
-     lisp_compile([Enrichments|Env],Return,Body,LispCodeEval),
-     always(LispCodeEval).
+     lisp_compile(Ctx,[Enrichments|Env],Return,Body,LispCodeEval). 
+
+wl:plugin_expand_progbody(Ctx,Env,Result,InstrS,_PreviousResult,Code):- compile_symbol_macrolet(Ctx,Env,Result,InstrS,Code),!.
+
+
+define_each_symbol_macro(_Env,[Symbol,Macro],symbol_macro(Symbol)=Macro).
 
 wl:interned_eval(("`sys:symbol-macro")).
 f_sys_symbol_macro(Symbol,Macro):-
