@@ -2254,7 +2254,7 @@ o_p_v(define_setf_expander,symbol_function,mf_define_setf_expander).
 o_p_v(define_setf_expander,symbol_name,"DEFINE-SETF-EXPANDER").
 o_p_v(define_setf_expander,symbol_package,pkg_cl).
 o_p_v(define_setf_expander,type_of,symbol).
-o_p_v(define_symbol_macro,symbol_function,mf_define_symbol_type_macro).
+o_p_v(define_symbol_macro,symbol_function,mf_define_symbol_macro).
 o_p_v(define_symbol_macro,symbol_name,"DEFINE-SYMBOL-MACRO").
 o_p_v(define_symbol_macro,symbol_package,pkg_cl).
 o_p_v(define_symbol_macro,type_of,symbol).
@@ -4258,7 +4258,7 @@ o_p_v(mf_define_compiler_type_macro,type_of,sys_macro).
 o_p_v(mf_define_condition,type_of,sys_macro).
 o_p_v(mf_define_modify_type_macro,type_of,sys_macro).
 o_p_v(mf_define_setf_expander,type_of,sys_macro).
-o_p_v(mf_define_symbol_type_macro,type_of,sys_macro).
+o_p_v(mf_define_symbol_macro,type_of,sys_macro).
 o_p_v(mf_defmacro,type_of,sys_macro).
 o_p_v(mf_defpackage,type_of,sys_macro).
 o_p_v(mf_defparameter,type_of,sys_macro).
@@ -16005,7 +16005,7 @@ o_p_v(sys_make_gensym_list,symbol_function,f_sys_make_gensym_list).
 o_p_v(sys_make_gensym_list,symbol_name,"MAKE-GENSYM-LIST").
 o_p_v(sys_make_gensym_list,symbol_package,pkg_sys).
 o_p_v(sys_make_gensym_list,type_of,symbol).
-o_p_v(sys_make_global_symbol_macro,symbol_function,f_sys_make_global_symbol_type_macro).
+o_p_v(sys_make_global_symbol_macro,symbol_function,f_sys_make_global_symbol_macro).
 o_p_v(sys_make_global_symbol_macro,symbol_name,"MAKE-GLOBAL-SYMBOL-MACRO").
 o_p_v(sys_make_global_symbol_macro,symbol_package,pkg_sys).
 o_p_v(sys_make_global_symbol_macro,type_of,symbol).
@@ -16263,7 +16263,7 @@ o_p_v(sys_make_structure_writer,symbol_function,f_sys_make_structure_writer).
 o_p_v(sys_make_structure_writer,symbol_name,"MAKE-STRUCTURE-WRITER").
 o_p_v(sys_make_structure_writer,symbol_package,pkg_sys).
 o_p_v(sys_make_structure_writer,type_of,symbol).
-o_p_v(sys_make_symbol_macro,symbol_function,f_sys_make_symbol_type_macro).
+o_p_v(sys_make_symbol_macro,symbol_function,f_sys_make_symbol_macro).
 o_p_v(sys_make_symbol_macro,symbol_name,"MAKE-SYMBOL-MACRO").
 o_p_v(sys_make_symbol_macro,symbol_package,pkg_sys).
 o_p_v(sys_make_symbol_macro,type_of,symbol).
@@ -17713,7 +17713,7 @@ o_p_v(sys_pf_define_setf_macro,symbol_function,f_sys_pf_define_setf_type_macro).
 o_p_v(sys_pf_define_setf_macro,symbol_name,"%DEFINE-SETF-MACRO").
 o_p_v(sys_pf_define_setf_macro,symbol_package,pkg_sys).
 o_p_v(sys_pf_define_setf_macro,type_of,symbol).
-o_p_v(sys_pf_define_symbol_macro,symbol_function,f_sys_pf_define_symbol_type_macro).
+o_p_v(sys_pf_define_symbol_macro,symbol_function,f_sys_pf_define_symbol_macro).
 o_p_v(sys_pf_define_symbol_macro,symbol_name,"%DEFINE-SYMBOL-MACRO").
 o_p_v(sys_pf_define_symbol_macro,symbol_package,pkg_sys).
 o_p_v(sys_pf_define_symbol_macro,type_of,symbol).
@@ -18253,7 +18253,7 @@ o_p_v(sys_pf_proclaim_constant,symbol_function,f_sys_pf_proclaim_constant).
 o_p_v(sys_pf_proclaim_constant,symbol_name,"%PROCLAIM-CONSTANT").
 o_p_v(sys_pf_proclaim_constant,symbol_package,pkg_sys).
 o_p_v(sys_pf_proclaim_constant,type_of,symbol).
-o_p_v(sys_pf_proclaim_symbol_macro,symbol_function,f_sys_pf_proclaim_symbol_type_macro).
+o_p_v(sys_pf_proclaim_symbol_macro,symbol_function,f_sys_pf_proclaim_symbol_macro).
 o_p_v(sys_pf_proclaim_symbol_macro,symbol_name,"%PROCLAIM-SYMBOL-MACRO").
 o_p_v(sys_pf_proclaim_symbol_macro,symbol_package,pkg_sys).
 o_p_v(sys_pf_proclaim_symbol_macro,type_of,symbol).
@@ -18612,7 +18612,7 @@ o_p_v(sys_pf_set_symbol_function,symbol_function,f_sys_pf_set_symbol_function).
 o_p_v(sys_pf_set_symbol_function,symbol_name,"%SET-SYMBOL-FUNCTION").
 o_p_v(sys_pf_set_symbol_function,symbol_package,pkg_sys).
 o_p_v(sys_pf_set_symbol_function,type_of,symbol).
-o_p_v(sys_pf_set_symbol_macro,symbol_function,f_sys_pf_set_symbol_type_macro).
+o_p_v(sys_pf_set_symbol_macro,symbol_function,f_sys_pf_set_symbol_macro).
 o_p_v(sys_pf_set_symbol_macro,symbol_name,"%SET-SYMBOL-MACRO").
 o_p_v(sys_pf_set_symbol_macro,symbol_package,pkg_sys).
 o_p_v(sys_pf_set_symbol_macro,type_of,symbol).
@@ -26360,4 +26360,3 @@ o_p_v(zerop,sys_flushable,t).
 o_p_v(zerop,sys_foldable,t).
 o_p_v(zerop,sys_movable,t).
 o_p_v(zerop,type_of,symbol).
-

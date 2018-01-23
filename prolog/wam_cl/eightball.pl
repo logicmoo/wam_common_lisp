@@ -233,9 +233,12 @@ trim_off(W,A,B):- atomic(A), string_concat(W,B,A),!.
 trim_off(_,A,A).
 
 assert_lsp(G):- assert_lsp(u,G).
+assert_lsp(S,(G1,G2)):- !,assert_lsp(S,G1),assert_lsp(S,G2).
 assert_lsp(_,G):-  notrace((copy_term_nat(G,GG),assert_local(GG))).
+
 assert_local(user:G):-!,assert_local(G).
 assert_local(user:G:-B):-!,assert_local(G:-B).
+assert_local((G,B)):- !,assert_local(G),assert_local(B).
 assert_local(G:-B):- B==true,!,assert_local(G).
 assert_local(G):- assert_local0(G).
 assert_local0(G):- \+ \+ (clause_asserted_local(G,_)),!.

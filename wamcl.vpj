@@ -4177,9 +4177,7 @@
 				</Folder>
 				<F
 					N="prolog/wam_cl/*.*"
-					Recurse="0"
-					Refilter="0"
-					Excludes=""/>
+					Excludes="*~;*.bak"/>
 				<F N="prolog/wam_cl/.gitignore"/>
 			</Folder>
 			<F N="prolog/wamcl.pl"/>

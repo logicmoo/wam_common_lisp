@@ -92,7 +92,7 @@ f_sys_maphash_iter(Function, Hash_table, FnResult) :-
 
 ### Compiled:  `CL:WITH-HASH-TABLE-ITERATOR`
 */
-sf_with_hash_table_iterator([Name, Hash_table], RestNKeys, FnResult) :-
+sf_with_hash_table_iterator(ReplEnv,[Name, Hash_table], RestNKeys, FnResult) :-
         global_env(ReplEnv),
         CDR20=[bv(u_body, Body), bv(sys_name, Name), bv(hash_table, Hash_table)|ReplEnv],
         as_body(u_body, Body, RestNKeys),

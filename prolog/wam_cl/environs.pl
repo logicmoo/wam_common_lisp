@@ -204,8 +204,17 @@ get_symbol_fbounds(Ctx,Env,Sym,BindTypeReq,FBOUND):- get_symbol(Sym,Symbol),
   BindTypeReq=BindType.
 
 get_symbol_fbounds0(Ctx,Env,Symbol,BindType,FBOUND):- 
-  ((get_env_attribute(Env,fbound(Symbol,BindType),FBOUND));
-   get_env_attribute(Ctx,fbound(Symbol,BindType),FBOUND)),!.
+  ((get_env_attribute(Env,fbound(Symbol,BindType),FBOUND0));
+   get_env_attribute(Ctx,fbound(Symbol,BindType),FBOUND0)),!,
+  normalized_fbound(FBOUND0,FBOUND).
+
+normalized_fbound(FBOUND0,FBOUND):- \+ compound(FBOUND0),FBOUND0=FBOUND.
+normalized_fbound(function(FBOUND0),FBOUND):- !, normalized_fbound(FBOUND0,FBOUND).
+normalized_fbound(FBOUND0,FBOUND):- FBOUND0=FBOUND.
+  
+
+
+
 %get_symbol_fbounds0(_Ctx,_Env,Symbol,BindType,ProposedName):- get_opv(Symbol,symbol_function,ProposedName),
 %  (atom(ProposedName)->bind_type_naming(BindType,_,ProposedName);bind_type_naming_of(BindType,Symbol,ProposedName)).
 

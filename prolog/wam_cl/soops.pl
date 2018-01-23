@@ -266,11 +266,11 @@ is_class_classp(built_in_class).
 is_class_classp(structure_class).
 is_class_classp(class).
 
-sf_defstruct([[Name,KeyWords]|Slots],Name):- !, always(define_struct(Name,KeyWords,Slots,_Kind)).
-sf_defstruct([[Name|KeyWords]|Slots],Name):- !, always(define_struct(Name,KeyWords,Slots,_Kind)).
-sf_defstruct([Name|Slots],Name):- always(define_struct(Name,[],Slots,_Kind)).
+sf_defstruct(_ReplEnv,[[Name,KeyWords]|Slots],Name):- !, always(define_struct(Name,KeyWords,Slots,_Kind)).
+sf_defstruct(_ReplEnv,[[Name|KeyWords]|Slots],Name):- !, always(define_struct(Name,KeyWords,Slots,_Kind)).
+sf_defstruct(_ReplEnv,[Name|Slots],Name):- always(define_struct(Name,[],Slots,_Kind)).
 
-sf_defclass([Name,Supers,Slots|KwInfo],Kind):- !, always(define_class(Name,[[kw_include,Supers]|KwInfo],Slots,Kind)).
+sf_defclass(_ReplEnv,[Name,Supers,Slots|KwInfo],Kind):- !, always(define_class(Name,[[kw_include,Supers]|KwInfo],Slots,Kind)).
 
 
 define_class(Name,KeyWords,SlotsIn,Kind):- 
@@ -321,16 +321,16 @@ define_kind(DefType,Name,KeyWords,SlotsIn,Kind):-
   get_struct_offset(Kind,Offset),
   NOffset is Offset +1,  
   add_class_slots(DefType,Kind,NOffset,Slots),  
-  generate_missing_struct_functions(Kind))).
+  generate_missing_claz_functions(KindKind,Kind))).
 
 get_struct_offset(Kind,W):- get_struct_opv(Kind,initial_offset,W).
 get_struct_offset(_,0).
 
-generate_missing_struct_functions(Kind):-
+generate_missing_claz_functions(_KindKind,Kind):-
   always(( claz_to_symbol(Kind,Name),
   to_prolog_string_anyways(Name,SName),
  % define keyword defaults now
- make_default_constructor(Kind,Code),
+ show_call_trace(make_default_constructor(Kind,Code)),
  always(Code),
  show_call_trace(maybe_add_kw_function(Kind,SName,"-P",kw_predicate, [obj],( eq('type-of'(obj),quote(Name))))),
  % make accessors
@@ -366,7 +366,7 @@ make_default_constructor(Kind,Code):-
          assert_lsp(FnSym,wl:init_args(0,Function)),
          %set_opv(Function,type_of,compiled_function),
          set_opv(FnSym,symbol_function,Function),
-         show_call_trace(assert_lsp(Name,(user:Head:-Body)))))).
+         assert_lsp(Name,(user:Head:-Body))))).
  
 
 
@@ -486,8 +486,10 @@ intern_slot_name(Prefix,Type,Key,SlotInfo2):-
   to_prolog_string_anyways(Key,KeyName),force_symbol_package(Key,Pack2),
   choose_package(Pack1,Pack2,Package),
   %(Package\==Pack2-> KeyNameUsed = Key ; KeyNameUsed=KeyName),
-  atomics_to_string([Prefix,ClassName,'-',KeyName],String))),
-  f_intern(String,Package,SlotInfo2),!.
+  (atom_concat(_,'-',ClassName)->ClassNameDash=ClassName;atom_concat(ClassName,'-',ClassNameDash)),
+  atomics_to_string([Prefix,ClassNameDash,KeyName],String))),
+  string_upper(String,StringUC),
+  f_intern(StringUC,Package,SlotInfo2),!.
   
 
 package_not_for_slots([]).
@@ -695,6 +697,9 @@ builtin_slot0(_,symbol_name).
 builtin_slot0(_,symbol_package).
 builtin_slot0(_,symbol_value).
 builtin_slot0(_,symbol_function).
+builtin_slot0(_,symbol_macro).
+builtin_slot0(_,symbol_plist).
+%builtin_slot0(_,compile_as).
 
 
 

@@ -35,9 +35,9 @@ to_clz_or_str_a(Name,Claz):- atom_concat_or_rtrace('claz_',Name,Claz),!.
 
 %;;(ADD-CI "BUILT-IN-CLASS" T "class_symbol" T)
 %;;(ADD-CI "BUILT-IN-CLASS" T "method" (SETF CLASS-NAME) :NAME (SETF CLASS-NAME))
-sf_sys_add_ci(_Str,Claz0,S0,LspValue,t):-  
+sf_sys_add_ci(_ReplEnv,_Str,Claz0,S0,LspValue,t):-  
   to_claz(Claz0,Claz),add_ci_p2(Claz,S0,LspValue).
-sf_sys_add_ci(_Str,Claz0,S0,LspObj,LspKey,LspValue,t):-
+sf_sys_add_ci(_ReplEnv,_Str,Claz0,S0,LspObj,LspKey,LspValue,t):-
   to_claz(Claz0,Claz),add_ci_p2(Claz,S0,LspObj,LspKey,LspValue).
 
 notify_assert(G):- clause(G,_),!.
@@ -63,14 +63,14 @@ add_ci_p2(Claz,kw_method,SlotName,SlotProp,SlotPropValue):- notify_assert(added_
 add_ci_p2(Claz,KW,       SlotName,SlotProp,SlotPropValue):- trace, notify_assert(added_ci(Claz,KW,SlotName,SlotProp,SlotPropValue)).
 
 /*
-sf_sys_add_ci2(list, type_of, built_in_class).
-sf_sys_add_ci2(logical_pathname, class_name, logical_pathname).
-sf_sys_add_ci2(logical_pathname, sys_class_precedence_list, [pathname, t]).
-sf_sys_add_ci2(logical_pathname, type_of, built_in_class).
-sf_sys_add_ci2(claz_, class_name, _).
-sf_sys_add_ci2(claz_, sys_class_precedence_list, claz_).
-sf_sys_add_ci2(claz_, type_of, _).
-sf_sys_add_ci2(number, "subclass", complex).
+sf_sys_add_ci2(_ReplEnv,list, type_of, built_in_class).
+sf_sys_add_ci2(_ReplEnv,logical_pathname, class_name, logical_pathname).
+sf_sys_add_ci2(_ReplEnv,logical_pathname, sys_class_precedence_list, [pathname, t]).
+sf_sys_add_ci2(_ReplEnv,logical_pathname, type_of, built_in_class).
+sf_sys_add_ci2(_ReplEnv,claz_, class_name, _).
+sf_sys_add_ci2(_ReplEnv,claz_, sys_class_precedence_list, claz_).
+sf_sys_add_ci2(_ReplEnv,claz_, type_of, _).
+sf_sys_add_ci2(_ReplEnv,number, "subclass", complex).
 */
 
 ds_create_struct(Type,ARGS,R):-
@@ -303,30 +303,6 @@ system_subclazz(claz_wrong_number_of_arguments_exception,claz_program_error).
 
 
 
-data_record(claz_symbol_macro,[
-  m(rw,claz_object,expansion)]).
-
-data_record(cla__non_constant_init_form,[
-  m(rw,claz_object,form)]).
-
-data_record(claz_sys_weak_hash_entry_weak_key_and_value,[
-  m(rw,claz_sys_weak_reference(claz_object),key),
-  m(rw,claz_sys_weak_reference(claz_object),value),
-  m(ro,claz_weak_hash_table,this__0)]).
-
-data_record(claz_closure_binding,[
-  m(rw,claz_object,value)]).
-
-data_record(claz_processing_terminated,[
-  m(rw,integer,status)]).
-
-data_record(claz_sys_repl_console,[
-  m(rw,claz_sys_string_buffer,input_buffer),
-  m(rw,claz_sys_reader,reader),
-  m(rw,claz_sys_writer,writer),
-  m(rw,claz_boolean,disposed),
-  m(ro,claz_sys_thread,repl_thread),
-  m(ro,claz_object,debugger_hook)]).
 
 data_record(claz_complex_vector(Kind),[
   m(rw,integer,capacity),
@@ -335,6 +311,7 @@ data_record(claz_complex_vector(Kind),[
   m(rw,array_of(Kind),elements),
   m(rw,claz_array,array),
   m(rw,integer,displacement)]).
+
 data_record(claz_complex_vector,[
   m(rw,integer,capacity),
   m(rw,integer,fill_pointer),
@@ -342,13 +319,6 @@ data_record(claz_complex_vector,[
   m(rw,claz_list,elements),
   m(rw,claz_array,array),
   m(rw,integer,displacement)]).
-
-data_record(cla__rest_param,[
-  m(rw,claz_symbol,var),
-  m(rw,claz_boolean,special)]).
-
-data_record(claz_ffi_stack_frame,[
-  m(ro,claz_sys_stack_trace_element,ffi_frame)]).
 
 data_record(claz_bignum,[
   m(ro,claz_sys_big_integer,value)]).
@@ -358,14 +328,6 @@ data_record(claz_complex_bit_vector,[
   m(rw,claz_boolean,is_displaced),
   m(rw,claz_array,array),
   m(rw,integer,displacement)]).
-
-data_record(cla__slow_matcher,[
-  m(ro,claz_argument_list_processor,this__0)]).
-
-data_record(cla__aux_param,[
-  m(rw,claz_symbol,var),
-  m(rw,claz_boolean,special),
-  m(rw,cla__init_form,initform)]).
 
 data_record(claz_simple_array(unsigned_byte16),[
   m(ro,array_of(integer),dimv),
@@ -383,40 +345,9 @@ data_record(claz_package,[
   m(rw,claz_sys_array_list(claz_package),used_by_list),
   m(rw,claz_hash_table(claz_string,claz_package),local_nicknames)]).
 
-data_record(cla__arg_list,[
-  m(ro,claz_list,args),
-  m(rw,integer,args_consumed),
-  m(ro,integer,len),
-  m(ro,claz_environment,env)]).
-
-data_record(claz_claz_sys_proxy___entry,[
-  m(rw,claz_sys_class,iface),
-  m(rw,claz_sys_map,lisp_defined_methods)]).
-
-data_record(claz_interpreter___unhandled_condition,[
-  m(rw,claz_object,condition)]).
-
 data_record(claz_condition,[
   m(rw,claz_string,message)]).
 
-data_record(claz_sys_weak_hash_entry,[
-  m(rw,claz_object,key),
-  m(rw,integer,hash),
-  m(rw,claz_object,value),
-  m(rw,claz_sys_weak_hash_entry,next),
-  m(rw,integer,slot),
-  m(ro,claz_weak_hash_table,this__0)]).
-
-data_record(claz_illegal_monitor_state,[
-  m(rw,claz_string,message)]).
-
-data_record(cla__required_param,[
-  m(rw,claz_symbol,var),
-  m(rw,claz_boolean,special)]).
-
-data_record(claz_emf_cache,[
-  m(rw,claz_hash_table(claz_emf_cache___cache_entry,claz_object),cache),
-  m(rw,index_of(claz_emf_cache___eql_specialization),eql_specializations)]).
 
 data_record(claz_random_state,[
   m(rw,claz_sys_random,random)]).
@@ -451,28 +382,12 @@ data_record(claz_slot_class,[
   m(rw,claz_list,default_initargs)]).
 
 
-
-data_record(claz_sys_weak_hash_entry_weak_key_or_value,[
-  m(ro,claz_weak_hash_table,this__0)]).
-
 data_record(claz_synonym_stream,[
   m(ro,claz_symbol,stream_name)]).
 
-data_record(cla__constant_init_form,[
-  m(rw,claz_object,value)]).
-
-data_record(claz_lisp_thread___stack_segment,[
-  m(ro,array_of(claz_sys_object),stack),
-  m(ro,claz_lisp_thread___stack_segment,next),
-  m(rw,integer,stack_ptr)]).
 
 data_record(claz_socket_stream,[
   m(ro,claz_sys_socket,socket)]).
-
-data_record(claz_memory_class_loader,[
-  m(ro,claz_hash_table(claz_string,claz_ffi_object),hashtable),
-  m(ro,claz_ffi_object,boxed_this),
-  m(ro,claz_string,internal_name_prefix)]).
 
 data_record(claz_slime_input_stream,[
   m(rw,claz_string,s),
@@ -497,13 +412,6 @@ data_record(claz_byte_array_output_stream,[
 
 data_record(claz_stream_error,[
   m(ro,claz_sys_throwable,cause)]).
-
-data_record(cla__fast_matcher,[
-  m(ro,claz_argument_list_processor,this__0)]).
-
-data_record(claz_go,[
-  m(ro,claz_object,tagbody),
-  m(ro,claz_object,tag)]).
 
 data_record(claz_broadcast_stream,[
   m(ro,array_of(claz_stream),streams)]).
@@ -530,22 +438,6 @@ data_record(claz_function,[
   m(rw,integer,hot_count),
   m(ro,claz_object,loaded_from)]).
 
-data_record(ffi_script_engine,[
-  m(rw,claz_interpreter,interpreter),
-  m(rw,claz_function,eval_script),
-  m(rw,claz_function,eval_function),
-  m(rw,claz_function,compile_script),
-  m(rw,claz_function,eval_compiled_script)]).
-
-data_record(ffi_script_engine___abclaz_compiled_script,[
-  m(rw,claz_object,function),
-  m(ro,ffi_script_engine,this__0)]).
-
-data_record(claz_return,[
-  m(ro,claz_object,tag),
-  m(ro,claz_object,block),
-  m(ro,claz_object,result)]).
-
 data_record(claz_string_output_stream,[
   m(ro,claz_seekable_string_writer,string_writer)]).
 
@@ -564,15 +456,6 @@ data_record(claz_simple_array(Kind),[
   m(ro,integer,total_size),
   m(ro,array_of(Kind),data)]).
 
-data_record(claz_string_functions___string_indices_and_chars,[
-  m(rw,claz_string,string1),
-  m(rw,claz_boolean,convert_case),
-  m(rw,array_of(char_code),array1),
-  m(rw,array_of(char_code),array2),
-  m(rw,integer,start1),
-  m(rw,integer,end1),
-  m(rw,integer,start2),
-  m(rw,integer,end2)]).
 
 data_record(claz_symbol,[
   m(ro,claz_simple_string,name),
@@ -583,13 +466,6 @@ data_record(claz_symbol,[
   m(rw,claz_object,function),
   m(rw,claz_list,property_list),
   m(rw,bitmask,flags)]).
-
-data_record(claz_claz_sys_handler___entry,[
-  m(rw,claz_function,handler),
-  m(rw,claz_object,data),
-  m(rw,integer,count),
-  m(rw,claz_sys_map(claz_string,claz_claz_sys_handler___entry),entry_table),
-  m(rw,claz_string,event)]).
 
 data_record(claz_operator,[
   m(rw,claz_object,lambda_name),
@@ -603,23 +479,12 @@ data_record(claz_function_binding,[
 data_record(claz_capitalize_stream,[
   m(rw,claz_boolean,in_word)]).
 
-data_record(claz_special_binding,[
-  m(ro,integer,idx),
-  m(rw,claz_object,value)]).
-
 data_record(claz_basic_vector(Kind),[
   m(rw,integer,capacity),
   m(rw,array_of(Kind),elements)]).
 data_record(claz_simple_vector,[
   m(rw,integer,capacity),
   m(rw,claz_list,data)]).
-
-data_record(cla__optional_param,[
-  m(rw,claz_symbol,var),
-  m(rw,claz_boolean,special),
-  m(rw,claz_symbol,supplied_var),
-  m(rw,claz_boolean,supplied_special),
-  m(rw,cla__init_form,init_form)]).
 
 data_record(claz_structure_object,[
   m(ro,claz_structure_class,structure_class),
@@ -649,17 +514,6 @@ data_record(claz_bit_vector,[
   m(rw,integer,capacity),
   m(rw,array_of(long),bits)]).
 
-data_record(claz_ffi_object__2,[
-  m(ro,claz_list,val__acc),
-  m(ro,claz_object,val__fn)]).
-
-data_record(claz_shell_command___reader_thread,[
-  m(rw,array_of(char_code),buf),
-  m(ro,claz_sys_input_stream,input_stream),
-  m(ro,claz_sys_buffered_reader,reader),                                  
-  m(ro,claz_shell_command,this__0),
-  m(rw,claz_boolean,done)]).
-
 data_record(claz_double_float,[
   m(ro,double,value)]).
 
@@ -675,22 +529,6 @@ data_record(claz_simple_array(unsigned_byte32),[
   m(ro,integer,total_size),
   m(ro,claz_list,data)]).
 
-data_record(cla__keyword_param,[
-  m(rw,claz_symbol,keyword)]).
-
-data_record(claz_weak_hash_table,[
-  m(ro,claz_object,rehash_size),
-  m(ro,claz_object,rehash_threshold),
-  m(rw,integer,threshold),
-  m(rw,array_of(claz_sys_weak_hash_entry),buckets),
-  m(rw,integer,count),
-  m(ro,claz_weak_hash_table___comparator,comparator),
-  m(ro,j_reentrant_lock,lock),
-  m(rw,claz_sys_weak_hash_entry,bucket_type),
-  m(ro,claz_object,weakness),
-  m(rw,claz_sys_reference_queue(claz_object),queue),
-  m(rw,claz_sys_map(claz_sys_reference,claz_sys_weak_hash_entry),entry_lookup)]).
-
 data_record(claz_case_frob_stream,[
   m(ro,claz_stream,target)]).
 
@@ -698,14 +536,6 @@ data_record(claz_complex,[
   m(ro,claz_object,realpart),
   m(ro,claz_object,imagpart)]).
 
-data_record(claz_fill_pointer_output_stream___writer,[
-  m(ro,claz_fill_pointer_output_stream,this__0)]).
-
-data_record(claz_jar_stream,[
-  m(ro,claz_pathname,pathname),
-  m(ro,claz_sys_input_stream,input),
-  m(ro,claz_sys_reader,reader),
-  m(ro,integer,bytes_per_unit)]).
 
 data_record(claz_char_hash_map(T),[
   m(ro,array_of(T),constants_by_char_code),
@@ -722,15 +552,6 @@ data_record(claz_simple_array__t,[
   m(ro,claz_object,element_type),
   m(ro,integer,total_size),
   m(ro,claz_list,data)]).
-
-data_record(claz_primitives__pf_finalize__1,[
-  m(rw,claz_sys_thread,thread),
-  m(ro,claz_object,val__fun),
-  m(ro,claz_primitives__pf_finalize,this__0)]).
-
-data_record(cla__environment_param,[
-  m(rw,claz_symbol,var),
-  m(rw,claz_boolean,special)]).
 
 data_record(claz_ffi_object,[
   m(ro,claz_sys_object,obj),
@@ -766,15 +587,6 @@ data_record(claz_readtable,[
 data_record(claz_fill_pointer_output_stream,[
   m(rw,claz_complex_string,string_buffer)]).
 
-data_record(claz_sys_weak_hash_entry_weak_value,[
-  m(rw,claz_sys_weak_reference(claz_object),value),
-  m(ro,claz_weak_hash_table,this__0)]).
-
-data_record(claz_claz_sys_proxy_lisp_invocation_handler,[
-  m(rw,claz_function,function)]).
-
-data_record(claz_runtime_class,[
-  m(rw,claz_sys_map(claz_string,claz_function),methods)]).
 
 data_record(claz_lisp_thread,[
   m(rw,claz_object,thread_value),
@@ -796,62 +608,6 @@ data_record(claz_lisp_thread,[
 data_record(claz_byte_array_input_stream,[
   m(ro,claz_sys_byte_array_input_stream,byte_array_input_stream)]).
 
-data_record(claz_zip_cache___entry,[
-  m(rw,long,last_modified),
-  m(rw,j_zip_file,file)]).
-
-data_record(clzip___directories,[
-  m(rw,j_zip_output_stream,out)]).
-
-data_record(claz_wrong_number_of_arguments_exception,[
-  m(rw,claz_operator,operator),
-  m(rw,integer,expected_min_args),
-  m(rw,integer,expected_max_args),
-  m(rw,claz_object,actual_args),
-  m(rw,claz_string,message)]).
-
-data_record(claz_sys_weak_hash_entry_weak_key,[
-  m(rw,claz_sys_weak_reference(claz_object),key),
-  m(ro,claz_weak_hash_table,this__0)]).
-
-data_record(claz_emf_cache___cache_entry,[
-  m(ro,claz_list,array)]).
-
-data_record(claz_special_bindings_mark,[
-  m(rw,integer,idx),
-  m(rw,claz_special_binding,binding),
-  m(rw,claz_special_bindings_mark,next)]).
-
-data_record(claz_readtable___dispatch_table,[
-  m(ro,claz_char_hash_map(claz_object),functions)]).
-
-data_record(claz_ffi_class_loader_pf_get_default_classloader,[
-  m(ro,claz_object,default_class_loader)]).
-
-data_record(claz_argument_list_processor,[
-  m(rw,array_of(cla__param),required_parameters),
-  m(rw,array_of(cla__param),optional_parameters),
-  m(rw,array_of(cla__keyword_param),keyword_parameters),
-  m(rw,array_of(cla__param),aux_vars),
-  m(rw,array_of(cla__param),positional_parameters),
-  m(rw,claz_symbol,rest_var),
-  m(rw,cla__param,rest_param),
-  m(rw,claz_symbol,env_var),
-  m(rw,cla__param,env_param),
-  m(rw,integer,arity),
-  m(rw,integer,min_args),
-  m(rw,integer,max_args),
-  m(rw,array_of(claz_symbol),variables),
-  m(rw,array_of(claz_boolean),specials),
-  m(rw,claz_boolean,and_key),
-  m(rw,claz_boolean,allow_other_keys),
-  m(ro,cla__argument_matcher,matcher),
-  m(rw,claz_boolean,matcher_needs_env),
-  m(rw,claz_operator,function)]).
-
-data_record(claz_fasl_class_loader,[
-  m(ro,claz_string,base_name),
-  m(ro,claz_ffi_object,boxed_this)]).
 
 data_record(claz_closure,[
   m(ro,claz_object,body),
@@ -865,24 +621,10 @@ data_record(claz_racf_unmappable_character_exception,[
   m(ro,char_code,character_value),
   m(ro,claz_string,charset_name)]).
 
-data_record(claz_finalizer___finalizing_weak_reference,[
-  m(rw,claz_sys_linked_list(claz_sys_runnable),finalizers)]).
-
-data_record(claz_random_access_writer,[
-  m(ro,claz_random_access_character_file,this__0)]).
-
-data_record(claz_random_access_reader,[
-  m(rw,array_of(char_code),read_buf),
-  m(ro,claz_random_access_character_file,this__0)]).
-
 data_record(claz_racf_malformed_input_exception,[
   m(ro,integer,position),
   m(ro,char_code,character),
   m(ro,claz_string,charset_name)]).
-
-data_record(claz_random_access_output_stream,[
-  m(rw,array_of(unsigned_byte8),write_buf),
-  m(ro,claz_random_access_character_file,this__0)]).
 
 data_record(claz_decoding_reader,[
   m(rw,claz_sys_byte_buffer,bbuf),
@@ -906,18 +648,6 @@ data_record(claz_random_access_character_file,[
   m(rw,claz_sys_char_buffer,single_char_buf),
   m(rw,claz_sys_byte_buffer,short_byte_buf)]).
 
-data_record(claz_random_access_input_stream,[
-  m(rw,array_of(unsigned_byte8),read_buf),
-  m(ro,claz_random_access_character_file,this__0)]).
-
-
-data_record(claz_ffi_object__1,[
-  m(ro,claz_list,val__acc),
-  m(ro,claz_ffi_object,this__0)]).
-
-data_record(claz_stack_frame,[
-  m(rw,claz_stack_frame,next),
-  m(rw,claz_environment,env)]).
 
 data_record(claz_single_float,[
   m(ro,float,value)]).
@@ -928,19 +658,6 @@ data_record(claz_compiled_closure,[
 data_record(claz_special_operator,[
   m(rw,integer,call_count),
   m(rw,integer,hot_count)]).
-
-data_record(claz_claz_sys_proxy___lisp_handler,[
-  m(rw,claz_sys_map,table)]).
-
-data_record(claz_autoload,[
-  m(ro,claz_string,file_name),
-  m(ro,claz_string,class_name),
-  m(ro,claz_symbol,function_symbol)]).
-
-data_record(claz_char_hash_map__1,[
-  m(ro,claz_sys_iterator(claz_sys_character),car_it),
-  m(rw,integer,char_num),
-  m(ro,claz_char_hash_map,this__0)]).
 
 data_record(claz_layout,[
   m(ro,claz_object,lisp_class),
@@ -1000,16 +717,6 @@ data_record(claz_environment,[
   m(rw,claz_binding,tags),
   m(rw,claz_boolean,inactive)]).
 
-data_record(claz_hash_table___hash_entry,[
-  m(rw,claz_object,key),
-  m(rw,integer,hash),
-  m(rw,claz_object,value),
-  m(rw,claz_hash_table___hash_entry,next)]).
-
-data_record(claz_lisp_thread___stack_marker,[
-  m(ro,integer,num_args)]).
-
-
 data_record(claz_complex_array(Kind),[
   m(ro,array_of(integer),dimv),
   m(rw,integer,total_size),
@@ -1024,11 +731,6 @@ data_record(claz_complex_array,[
   m(rw,claz_list,data),
   m(rw,claz_array,array),
   m(rw,integer,displacement)]).
-
-data_record(claz_profiler__1__1,[
-  m(rw,claz_sys_thread,thread),
-  m(ro,claz_lisp_thread,val__thread),
-  m(ro,claz_profiler__1,this__0)]).
 
 data_record(claz_cons,[
   m(rw,claz_object,car),
@@ -1081,6 +783,32 @@ term_expansion(mop_direct(A,P,B),mop_direct(AA,P,BB)):-
 
 end_of_file.
 
+data_record(claz_symbol_macro,[
+  m(rw,claz_object,expansion)]).
+
+data_record(cla__non_constant_init_form,[
+  m(rw,claz_object,form)]).
+
+data_record(claz_sys_weak_hash_entry_weak_key_and_value,[
+  m(rw,claz_sys_weak_reference(claz_object),key),
+  m(rw,claz_sys_weak_reference(claz_object),value),
+  m(ro,claz_weak_hash_table,this__0)]).
+
+data_record(claz_closure_binding,[
+  m(rw,claz_object,value)]).
+
+data_record(claz_processing_terminated,[
+  m(rw,integer,status)]).
+
+data_record(claz_sys_repl_console,[
+  m(rw,claz_sys_string_buffer,input_buffer),
+  m(rw,claz_sys_reader,reader),
+  m(rw,claz_sys_writer,writer),
+  m(rw,claz_boolean,disposed),
+  m(ro,claz_sys_thread,repl_thread),
+  m(ro,claz_object,debugger_hook)]).
+
+
 true.
 
 ?- listing(sf_sys_add_ci2).
@@ -1090,5 +818,307 @@ true.
 ?- lisitng(added_ci2).
 Correct to: "listing(added_ci2)"? yes
 :- dynamic added_ci2/5.
+
+
+
+
+
+data_record(claz_ffi_object__1,[
+  m(ro,claz_list,val__acc),
+  m(ro,claz_ffi_object,this__0)]).
+
+data_record(claz_hash_table___hash_entry,[
+  m(rw,claz_object,key),
+  m(rw,integer,hash),
+  m(rw,claz_object,value),
+  m(rw,claz_hash_table___hash_entry,next)]).
+
+data_record(claz_profiler__1__1,[
+  m(rw,claz_sys_thread,thread),
+  m(ro,claz_lisp_thread,val__thread),
+  m(ro,claz_profiler__1,this__0)]).
+
+
+data_record(claz_lisp_thread___stack_marker,[
+  m(ro,integer,num_args)]).
+
+data_record(claz_primitives__pf_finalize__1,[
+  m(rw,claz_sys_thread,thread),
+  m(ro,claz_object,val__fun),
+  m(ro,claz_primitives__pf_finalize,this__0)]).
+
+data_record(cla__environment_param,[
+  m(rw,claz_symbol,var),
+  m(rw,claz_boolean,special)]).
+
+
+data_record(claz_claz_sys_proxy___lisp_handler,[
+  m(rw,claz_sys_map,table)]).
+
+data_record(claz_autoload,[
+  m(ro,claz_string,file_name),
+  m(ro,claz_string,class_name),
+  m(ro,claz_symbol,function_symbol)]).
+
+data_record(claz_char_hash_map__1,[
+  m(ro,claz_sys_iterator(claz_sys_character),car_it),
+  m(rw,integer,char_num),
+  m(ro,claz_char_hash_map,this__0)]).
+
+data_record(claz_string_functions___string_indices_and_chars,[
+  m(rw,claz_string,string1),
+  m(rw,claz_boolean,convert_case),
+  m(rw,array_of(char_code),array1),
+  m(rw,array_of(char_code),array2),
+  m(rw,integer,start1),
+  m(rw,integer,end1),
+  m(rw,integer,start2),
+  m(rw,integer,end2)]).
+
+
+data_record(claz_ffi_object__2,[
+  m(ro,claz_list,val__acc),
+  m(ro,claz_object,val__fn)]).
+
+data_record(claz_shell_command___reader_thread,[
+  m(rw,array_of(char_code),buf),
+  m(ro,claz_sys_input_stream,input_stream),
+  m(ro,claz_sys_buffered_reader,reader),                                  
+  m(ro,claz_shell_command,this__0),
+  m(rw,claz_boolean,done)]).
+
+data_record(cla__rest_param,[
+  m(rw,claz_symbol,var),
+  m(rw,claz_boolean,special)]).
+
+data_record(claz_ffi_stack_frame,[
+  m(ro,claz_sys_stack_trace_element,ffi_frame)]).
+
+data_record(cla__arg_list,[
+  m(ro,claz_list,args),
+  m(rw,integer,args_consumed),
+  m(ro,integer,len),
+  m(ro,claz_environment,env)]).
+
+data_record(claz_claz_sys_proxy___entry,[
+  m(rw,claz_sys_class,iface),
+  m(rw,claz_sys_map,lisp_defined_methods)]).
+
+data_record(claz_interpreter___unhandled_condition,[
+  m(rw,claz_object,condition)]).
+
+
+
+
+
+
+
+
+
+data_record(cla__slow_matcher,[
+  m(ro,claz_argument_list_processor,this__0)]).
+
+data_record(cla__aux_param,[
+  m(rw,claz_symbol,var),
+  m(rw,claz_boolean,special),
+  m(rw,cla__init_form,initform)]).
+
+data_record(claz_sys_weak_hash_entry,[
+  m(rw,claz_object,key),
+  m(rw,integer,hash),
+  m(rw,claz_object,value),
+  m(rw,claz_sys_weak_hash_entry,next),
+  m(rw,integer,slot),
+  m(ro,claz_weak_hash_table,this__0)]).
+
+data_record(claz_illegal_monitor_state,[
+  m(rw,claz_string,message)]).
+
+data_record(cla__required_param,[
+  m(rw,claz_symbol,var),
+  m(rw,claz_boolean,special)]).
+
+data_record(claz_emf_cache,[
+  m(rw,claz_hash_table(claz_emf_cache___cache_entry,claz_object),cache),
+  m(rw,index_of(claz_emf_cache___eql_specialization),eql_specializations)]).
+
+data_record(claz_sys_weak_hash_entry_weak_key_or_value,[
+  m(ro,claz_weak_hash_table,this__0)]).
+
+data_record(cla__constant_init_form,[
+  m(rw,claz_object,value)]).
+
+data_record(claz_lisp_thread___stack_segment,[
+  m(ro,array_of(claz_sys_object),stack),
+  m(ro,claz_lisp_thread___stack_segment,next),
+  m(rw,integer,stack_ptr)]).
+
+
+
+data_record(cla__fast_matcher,[
+  m(ro,claz_argument_list_processor,this__0)]).
+
+data_record(claz_go,[
+  m(ro,claz_object,tagbody),
+  m(ro,claz_object,tag)]).
+
+data_record(cla__optional_param,[
+  m(rw,claz_symbol,var),
+  m(rw,claz_boolean,special),
+  m(rw,claz_symbol,supplied_var),
+  m(rw,claz_boolean,supplied_special),
+  m(rw,cla__init_form,init_form)]).
+
+data_record(ffi_script_engine,[
+  m(rw,claz_interpreter,interpreter),
+  m(rw,claz_function,eval_script),
+  m(rw,claz_function,eval_function),
+  m(rw,claz_function,compile_script),
+  m(rw,claz_function,eval_compiled_script)]).
+
+data_record(ffi_script_engine___abclaz_compiled_script,[
+  m(rw,claz_object,function),
+  m(ro,ffi_script_engine,this__0)]).
+
+data_record(claz_return,[
+  m(ro,claz_object,tag),
+  m(ro,claz_object,block),
+  m(ro,claz_object,result)]).
+
+data_record(claz_claz_sys_handler___entry,[
+  m(rw,claz_function,handler),
+  m(rw,claz_object,data),
+  m(rw,integer,count),
+  m(rw,claz_sys_map(claz_string,claz_claz_sys_handler___entry),entry_table),
+  m(rw,claz_string,event)]).
+
+data_record(cla__keyword_param,[
+  m(rw,claz_symbol,keyword)]).
+
+data_record(claz_weak_hash_table,[
+  m(ro,claz_object,rehash_size),
+  m(ro,claz_object,rehash_threshold),
+  m(rw,integer,threshold),
+  m(rw,array_of(claz_sys_weak_hash_entry),buckets),
+  m(rw,integer,count),
+  m(ro,claz_weak_hash_table___comparator,comparator),
+  m(ro,j_reentrant_lock,lock),
+  m(rw,claz_sys_weak_hash_entry,bucket_type),
+  m(ro,claz_object,weakness),
+  m(rw,claz_sys_reference_queue(claz_object),queue),
+  m(rw,claz_sys_map(claz_sys_reference,claz_sys_weak_hash_entry),entry_lookup)]).
+
+data_record(claz_wrong_number_of_arguments_exception,[
+  m(rw,claz_operator,operator),
+  m(rw,integer,expected_min_args),
+  m(rw,integer,expected_max_args),
+  m(rw,claz_object,actual_args),
+  m(rw,claz_string,message)]).
+
+
+data_record(claz_zip_cache___entry,[
+  m(rw,long,last_modified),
+  m(rw,j_zip_file,file)]).
+
+data_record(clzip___directories,[
+  m(rw,j_zip_output_stream,out)]).
+
+data_record(claz_sys_weak_hash_entry_weak_key,[
+  m(rw,claz_sys_weak_reference(claz_object),key),
+  m(ro,claz_weak_hash_table,this__0)]).
+
+data_record(claz_emf_cache___cache_entry,[
+  m(ro,claz_list,array)]).
+
+data_record(claz_special_bindings_mark,[
+  m(rw,integer,idx),
+  m(rw,claz_special_binding,binding),
+  m(rw,claz_special_bindings_mark,next)]).
+
+data_record(claz_readtable___dispatch_table,[
+  m(ro,claz_char_hash_map(claz_object),functions)]).
+
+data_record(claz_ffi_class_loader_pf_get_default_classloader,[
+  m(ro,claz_object,default_class_loader)]).
+
+data_record(claz_argument_list_processor,[
+  m(rw,array_of(cla__param),required_parameters),
+  m(rw,array_of(cla__param),optional_parameters),
+  m(rw,array_of(cla__keyword_param),keyword_parameters),
+  m(rw,array_of(cla__param),aux_vars),
+  m(rw,array_of(cla__param),positional_parameters),
+  m(rw,claz_symbol,rest_var),
+  m(rw,cla__param,rest_param),
+  m(rw,claz_symbol,env_var),
+  m(rw,cla__param,env_param),
+  m(rw,integer,arity),
+  m(rw,integer,min_args),
+  m(rw,integer,max_args),
+  m(rw,array_of(claz_symbol),variables),
+  m(rw,array_of(claz_boolean),specials),
+  m(rw,claz_boolean,and_key),
+  m(rw,claz_boolean,allow_other_keys),
+  m(ro,cla__argument_matcher,matcher),
+  m(rw,claz_boolean,matcher_needs_env),
+  m(rw,claz_operator,function)]).
+
+data_record(claz_fasl_class_loader,[
+  m(ro,claz_string,base_name),
+  m(ro,claz_ffi_object,boxed_this)]).
+
+
+data_record(claz_random_access_output_stream,[
+  m(rw,array_of(unsigned_byte8),write_buf),
+  m(ro,claz_random_access_character_file,this__0)]).
+
+data_record(claz_finalizer___finalizing_weak_reference,[
+  m(rw,claz_sys_linked_list(claz_sys_runnable),finalizers)]).
+
+data_record(claz_random_access_writer,[
+  m(ro,claz_random_access_character_file,this__0)]).
+
+data_record(claz_random_access_reader,[
+  m(rw,array_of(char_code),read_buf),
+  m(ro,claz_random_access_character_file,this__0)]).
+
+
+data_record(claz_fill_pointer_output_stream___writer,[
+  m(ro,claz_fill_pointer_output_stream,this__0)]).
+data_record(claz_memory_class_loader,[
+  m(ro,claz_hash_table(claz_string,claz_ffi_object),hashtable),
+  m(ro,claz_ffi_object,boxed_this),
+  m(ro,claz_string,internal_name_prefix)]).
+
+
+data_record(claz_jar_stream,[
+  m(ro,claz_pathname,pathname),
+  m(ro,claz_sys_input_stream,input),
+  m(ro,claz_sys_reader,reader),
+  m(ro,integer,bytes_per_unit)]).
+
+
+data_record(claz_sys_weak_hash_entry_weak_value,[
+  m(rw,claz_sys_weak_reference(claz_object),value),
+  m(ro,claz_weak_hash_table,this__0)]).
+
+data_record(claz_claz_sys_proxy_lisp_invocation_handler,[
+  m(rw,claz_function,function)]).
+
+data_record(claz_runtime_class,[
+  m(rw,claz_sys_map(claz_string,claz_function),methods)]).
+
+data_record(claz_random_access_input_stream,[
+  m(rw,array_of(unsigned_byte8),read_buf),
+  m(ro,claz_random_access_character_file,this__0)]).
+
+
+data_record(claz_stack_frame,[
+  m(rw,claz_stack_frame,next),
+  m(rw,claz_environment,env)]).
+
+
+data_record(claz_special_binding,[
+  m(ro,integer,idx),
+  m(rw,claz_object,value)]).
 
 

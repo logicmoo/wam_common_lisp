@@ -175,7 +175,7 @@ print_prefixed_symbol(Symbol,_,SP,_):- print_package_or_hash(SP),write('::'),wri
 
 
 f_symbol_plist(Symbol,Value):- %assertion(is_symbolp(Symbol)),
-   get_opv(Symbol,plist,Value)->true;Value=[].
+   get_opv(Symbol,symbol_plist,Value)->true;Value=[].
 
 (wl:init_args(2,get)).
 %(get x y &optional d) ==  (getf (symbol-plist x) y &optional d)
@@ -197,7 +197,7 @@ f_sys_putprop(Symbol,Prop,Value,Optionals,Ret):- %assertion(is_symbolp(Symbol)),
   (PresentP==t->get_test_pred(f_eql,Optionals,EqlPred);EqlPred=f_eql),
   (((set_plist_value_fail_on_missing(EqlPred,_Old,PList,Prop,Value)
       ->true; 
-   (Ret=Value, set_opv(Symbol,plist,[Prop,Value|PList]))))).
+   (Ret=Value, set_opv(Symbol,symbol_plist,[Prop,Value|PList]))))).
 (wl:init_args(3,sys_put)).
 f_sys_put(Symbol,Prop,Value,Optionals,Ret):-
  f_sys_putprop(Symbol,Prop,Value,Optionals,Ret).
@@ -253,6 +253,35 @@ correct_missing_symbols:-
   Pkg\==pkg_kw,atom(Sym),create_symbol(Str,Pkg,Sym),fail)).
 
 wl:interned_eval(call(correct_missing_symbols)).
+
+
+
+expand_symbol_macro(Env,Symbol,Macro):- get_env_attribute(Env,symbol_macro(Symbol),Macro),!.
+expand_symbol_macro(_Env,Symbol,Macro):- get_opv(Symbol,symbol_macro,Macro).
+
+f_sys_pf_symbol_macroexpand(Place_Get, _Env_Get,Place_Get).
+sf_define_symbol_macro(_Env,Symbol,Macro,Symbol):- set_opv(Symbol,symbol_macro,Macro).
+%sf_symbol_macrolet(Env,SymbolMacroLets,Body,Decls,Return):- sf_symbol_macrolet(Env,SymbolMacroLets,[let,Decls,Body],Return).
+wl:init_args(1,symbol_macrolet).
+sf_symbol_macrolet(Env,SymbolMacroLets,Body,Return):-
+    must_maplist(define_each_symbol_macro(Env),SymbolMacroLets,Enrichments),
+     lisp_compile([Enrichments|Env],Return,Body,LispCodeEval),
+     always(LispCodeEval).
+
+wl:interned_eval(("`sys:symbol-macro")).
+f_sys_symbol_macro(Symbol,Macro):-
+  get_opv(Symbol,symbol_macro,Macro).
+
+/*
+wl:interned_eval(("`sys:get-symbol-macro")).
+f_sys_get_symbol_macro(Symbol,Macro):-
+  get_opv(Symbol,symbol_macro,Macro).
+*/
+
+wl:interned_eval(("`sys:set-symbol-macro")).
+f_sys_set_symbol_macro(Symbol,Macro,Macro):-
+  set_opv(Symbol,symbol_macro,Macro).
+
 
 :- fixup_exports.
 

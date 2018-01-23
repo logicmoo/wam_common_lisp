@@ -237,7 +237,8 @@ only_arity(ProposedName,N):-
   forall((between(0,6,Other),Other\=N),  \+ is_defined(ProposedName,Other)).
 
 is_defined(ProposedName,N):- integer(N),atom(ProposedName),!,functor(G,ProposedName,N),current_predicate(_,G),!.
-is_defined(ProposedName,N):- current_predicate(ProposedName/N).
+is_defined(ProposedName,N):- \+ compound(ProposedName),!,current_predicate(ProposedName/N).
+is_defined(ProposedName,N):- wdmsg(is_defined(ProposedName,N)),!,break,fail.
 
 is_implemented(FN):- is_fboundp(FN),
   foc_operator(_Ctx,_Env,_BindType,FN,_,ProposedName),  

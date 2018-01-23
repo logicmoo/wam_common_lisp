@@ -3248,6 +3248,7 @@ package_external_symbols(pkg_sys,"GET-SETF-METHOD",sys_get_setf_method).
 package_external_symbols(pkg_sys,"GET-SETF-METHOD-INVERSE",sys_get_setf_method_inverse).
 package_external_symbols(pkg_sys,"GET-SETF-METHOD-MULTIPLE-VALUE",sys_get_setf_method_multiple_value).
 package_external_symbols(pkg_sys,"GET-SOCKET-STREAM",sys_get_socket_stream).
+package_external_symbols(pkg_sys,"GET-SYMBOL-MACRO",sys_get_symbol_macro).
 package_external_symbols(pkg_sys,"GET-SYSPROP",sys_get_sysprop).
 package_external_symbols(pkg_sys,"GET-TIME-ZONE",sys_get_time_zone).
 package_external_symbols(pkg_sys,"GET-WAM-CL-OPTION",sys_get_wam_cl_option).
@@ -3528,6 +3529,7 @@ package_external_symbols(pkg_sys,"SET-CAR",sys_set_car).
 package_external_symbols(pkg_sys,"SET-CDR",sys_set_cdr).
 package_external_symbols(pkg_sys,"SET-CHAR",sys_set_char).
 package_external_symbols(pkg_sys,"SET-CHAR-BIT",sys_set_char_bit).
+package_external_symbols(pkg_sys,"SET-CLASS-SLOT-VALUE",sys_set_class_slot_value).
 package_external_symbols(pkg_sys,"SET-FLOATING-POINT-MODES",sys_set_floating_point_modes).
 package_external_symbols(pkg_sys,"SET-FUNCALLABLE-INSTANCE-FUNCTION",sys_set_funcallable_instance_function).
 package_external_symbols(pkg_sys,"SET-FUNCTION-INFO-VALUE",sys_set_function_info_value).
@@ -3792,6 +3794,7 @@ package_external_symbols(pkg_threads,"THREADP",threads_threadp).
 package_external_symbols(pkg_threads,"WITH-MUTEX",threads_with_mutex).
 package_external_symbols(pkg_threads,"WITH-THREAD-LOCK",threads_with_thread_lock).
 package_external_symbols(pkg_threads,"YIELD",threads_yield).
+package_external_symbols(pkg_sys,"TO-PVS",sys_to_pvs).
 package_internal_symbols(pkg_sys,"%ACCESSOR-METHOD-SLOT-DEFINITION",sys_pf_accessor_method_slot_definition).
 package_internal_symbols(pkg_sys,"%CLASS",sys_pf_class).
 package_internal_symbols(pkg_sys,"%CLASS-PRECEDENCE-LIST",sys_pf_class_precedence_list).

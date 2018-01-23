@@ -108,7 +108,7 @@ compile_funop(Ctx,Env,Result,[FN| FunctionArgs], Body):- \+ is_list(FunctionArgs
 
 % Special Operator
 compile_funop(Ctx,CallEnv,Result,[FN | FunctionArgs], Body):-  is_lisp_operator(Ctx,CallEnv,FN),!,      
-      compile_apply(Ctx,CallEnv,FN,FunctionArgs,Result,ExpandedFunction),
+      compile_apply(Ctx,CallEnv,FN,FunctionArgs,Result,ExpandedFunction), 
       Body = (ExpandedFunction).
 
 % Macro
@@ -126,38 +126,51 @@ compile_funop(Ctx,CallEnv,Result,[FN | FunctionArgs], Body):-
 % TODO- HOW DID WE GET HERE?
 compile_funop(_Ctx,_Env,Result,[FN | FunctionArgs],f_eval([FN|FunctionArgs],Result)). 
 
-check_foc_operator(Ctx,Env,BindType,F,Args,BetterName):-
+
+check_foc_operator(Ctx,Env,BindType,F,Args,BetterName,PushPreArgs):-
    foc_operator(Ctx,Env,BindType,F,Args,ProposedName),
-   do_check_foc_operator(Ctx,Env,BindType,F,Args,ProposedName, BetterName),!.
+   do_check_foc_operator(Ctx,Env,BindType,F,Args,ProposedName, BetterName,PushPreArgs),!.
 
 
-do_check_foc_operator(_Ctx,_Env,_BindType,_F,_Args,ProposedName, BetterName):-   
-   current_predicate(ProposedName/N),N>=1,!,ProposedName= BetterName.
-
-do_check_foc_operator(_Ctx,_Env,_BindType,_F,_Args,ProposedName, BetterName):-
+do_check_foc_operator(_Ctx,Env,_BindType,_F,_Args,ProposedName, BetterName,[Env]):-
   atom_concat('mf_',Root,ProposedName),  
   atom_concat('sf_',Root,BetterName),
   current_predicate(BetterName/N),N>=1,
-  wdmsg(rename(ProposedName)),!.
+  wdmsg(rename(ProposedName,BetterName)),!.
 
-do_check_foc_operator(_Ctx,_Env,_BindType,_F,_Args,ProposedName, BetterName):-
+do_check_foc_operator(_Ctx,Env,_BindType,_F,_Args,ProposedName, BetterName,[Env]):-
+  atom_concat('sf_',Root,ProposedName),  
+  atom_concat('sf_',Root,BetterName),
+  current_predicate(BetterName/N),N>=1,
+  wdmsg(rename(ProposedName,BetterName)),!.
+
+do_check_foc_operator(_Ctx,_Env,_BindType,_F,_Args,ProposedName, BetterName,[]):-
   atom_concat('mf_',Root,ProposedName),  
   atom_concat('f_',Root,BetterName),
   current_predicate(BetterName/N),N>=1,
-  wdmsg(rename(BetterName)),!.
+  wdmsg(rename(ProposedName,BetterName)),!.
 
-do_check_foc_operator(_Ctx,_Env,_BindType,_F,_Args,ProposedName, ProposedName).
+do_check_foc_operator(_Ctx,Env,_BindType,_F,_Args,ProposedName, BetterName,[Env]):-
+  atom_concat('mf_',Root,ProposedName),  
+  atom_concat('sf_',Root,BetterName),
+  wdmsg(rename(ProposedName,BetterName)),!.
+
+do_check_foc_operator(_Ctx,_Env,_BindType,_F,_Args,ProposedName, BetterName,[]):-   
+   current_predicate(ProposedName/N),N>=1,!,ProposedName= BetterName.
+
+do_check_foc_operator(_Ctx,_Env,_BindType,_F,_Args,ProposedName, ProposedName,[]).
    
    
   
-
-
 compile_apply_function_or_macro_call(Ctx,Env,FN,Args,Result,ExpandedFunction):-
  always((
    (is_list(Args)->length(Args,ArgsLen);(integer(Args)->ArgsLen=Args;true)),
-   check_foc_operator(Ctx,Env,kw_function,FN,ArgsLen, ProposedName),!,
+   check_foc_operator(Ctx,Env,BindType,FN,ArgsLen, ProposedName,Extra),!,
+   wdmsg(BindType->ProposedName),
+   (BindType == kw_macro -> true ; true),
    align_args_or_fallback(Ctx,Env,FN, ProposedName,Args,Result,ArgsPlusResult),!,
-   ExpandedFunction =.. [ ProposedName | ArgsPlusResult])),!.
+   append(Extra,ArgsPlusResult,ExtraArgsPlusResult),
+   ExpandedFunction =.. [ ProposedName | ExtraArgsPlusResult])),!.
 
 
 compile_apply(Ctx,Env,F,Args,Result,ExpandedFunction):- 
@@ -173,8 +186,9 @@ compile_apply1(Ctx,Env,F,Args,Result,ExpandedFunction):- atom(F),
  length(Left,N),
  append(Left,IntoList,Args),
  append(Left,[IntoList,Result],NewArgs),
- check_foc_operator(Ctx,Env,kw_function,F,_, ProposedName),!,
- ExpandedFunction =.. [ ProposedName | NewArgs].
+ check_foc_operator(Ctx,Env,kw_function,F,_, ProposedName, Extra),!,
+ append(Extra,NewArgs,NewNewArgs),
+ ExpandedFunction =.. [ ProposedName | NewNewArgs].
 
 compile_apply1(_Ctx,_Env,F,Args,Result,Out):- (var(F); \+ is_list(Args)),!,
             Out = f_apply(F,Args,Result).
@@ -204,8 +218,7 @@ compile_funop(Ctx,Env,Result,[FN | FunctionArgs], Body):-
    show_call(must_compile_body(Ctx,Env,Result,[eval,[FN| FunctionArgs]],Body)).
 */
 
-
-f_sys_env_eval(_Env, _Pt1^Body, _Result):- !,
+current_predicatef_sys_env_eval(_Env, _Pt1^Body, _Result):- !,
   always(Body).
 f_sys_env_eval(Env, Expression, Result):-
   lisp_compile(Env,Result,Expression,Body),

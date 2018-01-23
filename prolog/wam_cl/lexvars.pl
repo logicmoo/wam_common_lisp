@@ -164,9 +164,9 @@ set_symbol_value_last_chance(_Env,Var,_Result):-
   lisp_error_description(atom_does_not_exist, ErrNo, _),throw(ErrNo, Var).
 
 
-sf_defparameter(Var, Result, Result):- 
+sf_defparameter(Env,Var, Result, Result):- 
    set_opv(Var,declared_as,defparameter),
-   set_var(_Env,Var,Result).
+   set_var(Env,Var,Result).
 
 
 env_sym_arg_val(Env,Var,InValue,Value):-

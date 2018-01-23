@@ -1,6 +1,8 @@
 
 :- style_check(-singleton).
 
+end_of_file.
+
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:8170 **********************/
 %:-lisp_compile_to_prolog(pkg_sys,['in-package','$STRING'("SYSTEM")]).
 %:- f_in_package('$ARRAY'([*], claz_base_character, "SYSTEM"), _Ignored).
@@ -452,56 +454,59 @@ wl: init_args(2,push).
 
 ### Compiled:  `CL:PUSH` 
 */
-mf_push(Item_In, Place_In, RestNKeys, FnResult) :-
-	nop(defmacro),
-	Env=[bv(env, Env_In), bv(item, Item_In), bv(sys_place, Place_In)|CDR],
-	global_env(CDR),
-	parent_env(Env_In),
-	get_var(Env, sys_place, Place_Get),
-	(   is_symbolp(Place_Get)
-	->  get_var(Env, env, Env_Get),
-	    get_var(Env, sys_place, Place_Get16),
-	    f_macroexpand([Place_Get16, Env_Get], Macroexpand_Ret),
-	    f_eq(Place_Get16, Macroexpand_Ret, TrueResult),
-	    IFTEST=TrueResult
-	;   IFTEST=[]
-	),
-	(   IFTEST\==[]
-	->  get_var(Env, item, Item_Get),
-	    get_var(Env, sys_place, Place_Get20),
-	    _22831648=[setq, Place_Get20, [cons, Item_Get, Place_Get20]]
-	;   LEnv=[bv(sys_dummies, []), bv(sys_vals, []), bv(sys_newval, []), bv(sys_setter, []), bv(sys_getter, [])|Env],
-	    get_var(LEnv, env, Env_Get27),
-	    get_var(LEnv, sys_place, Place_Get26),
-	    f_get_setf_expansion(Place_Get26, Env_Get27, Setf_expansion_Ret),
-	    setq_from_values(LEnv,
-			     
-			     [ sys_dummies,
-			       sys_vals,
-			       sys_newval,
-			       sys_setter,
-			       sys_getter
-			     ]),
-	    f_gensym(G_Init),
-	    LEnv30=[bv(sys_g, G_Init)|LEnv],
-	    get_var(LEnv30, item, Item_Get33),
-	    get_var(LEnv30, sys_dummies, Dummies_Get),
-	    get_var(LEnv30, sys_g, G_Get),
-	    get_var(LEnv30, sys_vals, Vals_Get),
-	    f_mapcar(f_list, [Dummies_Get, Vals_Get], Mapcar_Ret),
-	    get_var(LEnv30, sys_newval, Newval_Get),
-	    f_car(Newval_Get, Car_Ret),
-	    get_var(LEnv30, sys_g, G_Get37),
-	    get_var(LEnv30, sys_getter, Getter_Get),
-	    bq_append([[G_Get, Item_Get33]|Mapcar_Ret],
-		      [[Car_Ret, [cons, G_Get37, Getter_Get]]],
-		      Bq_append_Ret),
-	    get_var(LEnv30, sys_setter, Setter_Get),
-	    _22831648=[let_xx, Bq_append_Ret, Setter_Get]
-	),
-	_22831648=MFResult,
-	=(MFResult, FnResult).
-:- set_opv(mf_push,type_of,macro),
+mf_push([push, Item_In, Place_In|RestNKeys], Env_In, MFResult) :-
+        nop(defmacro),
+        GEnv=[bv(u_env, Env_In), bv(u_item, Item_In), bv(u_place, Place_In)],
+        catch(( ( get_var(GEnv, u_place, Place_Get),
+                  (   is_symbolp(Place_Get)
+                  ->  get_var(GEnv, u_env, Env_Get),
+                      get_var(GEnv, u_place, Place_Get13),
+                      f_macroexpand([Place_Get13, Env_Get], Macroexpand_Ret),
+                      f_eq(Place_Get13, Macroexpand_Ret, TrueResult),
+                      IFTEST=TrueResult
+                  ;   IFTEST=[]
+                  ),
+                  (   IFTEST\==[]
+                  ->  get_var(GEnv, u_item, Item_Get),
+                      get_var(GEnv, u_place, Place_Get17),
+                      _2122=[setq, Place_Get17, [cons, Item_Get, Place_Get17]]
+                  ;   LEnv=[bv(u_dummies, []), bv(u_vals, []), bv(u_newval, []), bv(u_setter, []), bv(u_getter, [])|GEnv],
+                      get_var(LEnv, u_env, Env_Get24),
+                      get_var(LEnv, u_place, Place_Get23),
+                      f_get_setf_expansion(Place_Get23,
+                                           [Env_Get24],
+                                           Setf_expansion_Ret),
+                      setq_from_values(LEnv,
+
+                                       [ u_dummies,
+                                         u_vals,
+                                         u_newval,
+                                         u_setter,
+                                         u_getter
+                                       ]),
+                      f_gensym(G_Init),
+                      LEnv27=[bv(u_g, G_Init)|LEnv],
+                      get_var(LEnv27, u_dummies, Dummies_Get),
+                      get_var(LEnv27, u_g, G_Get),
+                      get_var(LEnv27, u_item, Item_Get30),
+                      get_var(LEnv27, u_vals, Vals_Get),
+                      f_mapcar(f_list, [Dummies_Get, Vals_Get], Mapcar_Ret),
+                      get_var(LEnv27, u_newval, Newval_Get),
+                      f_car(Newval_Get, Car_Ret),
+                      get_var(LEnv27, u_g, G_Get34),
+                      get_var(LEnv27, u_getter, Getter_Get),
+                      bq_append([[G_Get, Item_Get30]|Mapcar_Ret],
+                                [[Car_Ret, [cons, G_Get34, Getter_Get]]],
+                                Bq_append_Ret),
+                      get_var(LEnv27, u_setter, Setter_Get),
+                      _2122=[let_xx, Bq_append_Ret, Setter_Get]
+                  )
+                ),
+                _2122=MFResult
+              ),
+              block_exit(push, MFResult),
+              true).
+:- set_opv(mf_push, type_of, sys_macro),
    set_opv(push, symbol_function, mf_push),
    DefMacroResult=push.
 
@@ -535,63 +540,71 @@ wl: init_args(2,pushnew).
 
 ### Compiled:  `CL:PUSHNEW` 
 */
-sf_pushnew(Item_In, Place_In, RestNKeys, FnResult):- 
-  mf_pushnew([Item_In, Place_In| RestNKeys],Env, MFResult),
+sf_pushnew(Env,Item_In, Place_In, RestNKeys, FnResult):- 
+  mf_pushnew([pushnew, Item_In, Place_In|RestNKeys],Env, MFResult),
   f_eval(MFResult, FnResult).
+mf_pushnew([pushnew, Item_In, Place_In|RestNKeys], Env_In, MFResult) :-
+        nop(defmacro),
+        GEnv=[bv(u_env, Env_In), bv(u_item, Item_In), bv(u_place, Place_In), bv(u_keys, RestNKeys)],
+        catch(( ( get_var(GEnv, u_place, Place_Get),
+                  (   is_symbolp(Place_Get)
+                  ->  get_var(GEnv, u_env, Env_Get),
+                      get_var(GEnv, u_place, Place_Get14),
+                      f_macroexpand([Place_Get14, Env_Get], Macroexpand_Ret),
+                      f_eq(Place_Get14, Macroexpand_Ret, TrueResult),
+                      IFTEST=TrueResult
+                  ;   IFTEST=[]
+                  ),
+                  (   IFTEST\==[]
+                  ->  get_var(GEnv, u_item, Item_Get),
+                      ( get_var(GEnv, u_keys, Keys_Get),
+                        get_var(GEnv, u_place, Place_Get18)
+                      ),
+                      get_var(GEnv, u_place, Place_Get20),
+                      _2292=[setq, Place_Get18, [adjoin, Item_Get, Place_Get20|Keys_Get]]
+                  ;   LEnv=[bv(u_dummies, []), bv(u_vals, []), bv(u_newval, []), bv(u_setter, []), bv(u_getter, [])|GEnv],
+                      get_var(LEnv, u_env, Env_Get26),
+                      get_var(LEnv, u_place, Place_Get25),
+                      f_get_setf_expansion(Place_Get25,
+                                           [Env_Get26],
+                                           Setf_expansion_Ret),
+                      setq_from_values(LEnv,
 
-mf_pushnew([Item_In, Place_In| RestNKeys], FnResult) :- 
-	nop(defmacro),
-	Env=[bv(env, Env_In), bv(item, Item_In), bv(sys_place, Place_In), bv(sys_keys, RestNKeys)|EnvArg],
-	%global_env(CDR),
-	parent_env(Env_In),
-	get_var(Env, sys_place, Place_Get),
-	(   is_symbolp(Place_Get)
-	->  get_var(Env, env, Env_Get),
-	    get_var(Env, sys_place, Place_Get17),
-	    f_macroexpand([Place_Get17, Env_Get], Macroexpand_Ret),
-	    f_eq(Place_Get17, Macroexpand_Ret, TrueResult),
-	    IFTEST=TrueResult
-	;   IFTEST=[]
-	),
-	(   IFTEST\==[]
-	->  get_var(Env, item, Item_Get),
-	    get_var(Env, sys_keys, Keys_Get),
-	    get_var(Env, sys_place, Place_Get21),
-	    _25518664=[setq, Place_Get21, [adjoin, Item_Get, Place_Get21|Keys_Get]]
-	;   LEnv=[bv(sys_dummies, []), bv(sys_vals, []), bv(sys_newval, []), bv(sys_setter, []), bv(sys_getter, [])|Env],
-	    get_var(LEnv, env, Env_Get29),
-	    get_var(LEnv, sys_place, Place_Get28),
-	    f_get_setf_expansion(Place_Get28, Env_Get29, Setf_expansion_Ret),
-	    setq_from_values(LEnv,
-			     
-			     [ sys_dummies,
-			       sys_vals,
-			       sys_newval,
-			       sys_setter,
-			       sys_getter
-			     ]),
-	    f_gensym(G_Init),
-	    LEnv32=[bv(sys_g, G_Init)|LEnv],
-	    get_var(LEnv32, item, Item_Get35),
-	    get_var(LEnv32, sys_dummies, Dummies_Get),
-            trace,
-	    get_var(LEnv32, sys_g, G_Get),
-	    get_var(LEnv32, sys_vals, Vals_Get),
-	    f_mapcar(f_list, [Dummies_Get, Vals_Get], Mapcar_Ret),
-	    get_var(LEnv32, sys_newval, Newval_Get),
-	    f_car(Newval_Get, Car_Ret),
-	    get_var(LEnv32, sys_g, G_Get39),
-	    get_var(LEnv32, sys_getter, Getter_Get),
-	    get_var(LEnv32, sys_keys, Keys_Get41),
-	    bq_append([[G_Get, Item_Get35]|Mapcar_Ret],
-		      [[Car_Ret, [adjoin, G_Get39, Getter_Get|Keys_Get41]]],
-		      Bq_append_Ret),
-	    get_var(LEnv32, sys_setter, Setter_Get),
-	    _25518664=[let_xx, Bq_append_Ret, Setter_Get]
-	),
-	_25518664=MFResult,
-	=(MFResult, FnResult).
-:- set_opv(mf_pushnew,type_of,macro),
+                                       [ u_dummies,
+                                         u_vals,
+                                         u_newval,
+                                         u_setter,
+                                         u_getter
+                                       ]),
+                      f_gensym(G_Init),
+                      LEnv29=[bv(u_g, G_Init)|LEnv],
+                      get_var(LEnv29, u_dummies, Dummies_Get),
+                      get_var(LEnv29, u_g, G_Get),
+                      get_var(LEnv29, u_item, Item_Get32),
+                      get_var(LEnv29, u_vals, Vals_Get),
+                      f_mapcar(f_list, [Dummies_Get, Vals_Get], Mapcar_Ret),
+                      get_var(LEnv29, u_newval, Newval_Get),
+                      f_car(Newval_Get, Car_Ret),
+                      get_var(LEnv29, u_g, G_Get36),
+                      get_var(LEnv29, u_getter, Getter_Get),
+                      get_var(LEnv29, u_keys, Keys_Get38),
+                      bq_append([[G_Get, Item_Get32]|Mapcar_Ret],
+
+                                [
+                                  [ Car_Ret,
+                                    [adjoin, G_Get36, Getter_Get|Keys_Get38]
+                                  ]
+                                ],
+                                Bq_append_Ret),
+                      get_var(LEnv29, u_setter, Setter_Get),
+                      _2292=[let_xx, Bq_append_Ret, Setter_Get]
+                  )
+                ),
+                _2292=MFResult
+              ),
+              block_exit(pushnew, MFResult),
+              true).
+:- set_opv(mf_pushnew, type_of, sys_macro),
    set_opv(pushnew, symbol_function, mf_pushnew),
    DefMacroResult=pushnew.
 

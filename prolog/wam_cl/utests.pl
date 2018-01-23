@@ -244,14 +244,13 @@ wl:lambda_def(defmacro, sys_is, mf_sys_is, [u_eqf, u_expected, u_actual], [progn
 wl:arglist_info(sys_is, sf_sys_is, [u_eqf, u_expected, u_actual], arginfo{all:[u_eqf, u_expected, u_actual], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[u_eqf, u_expected, u_actual], opt:0, req:[u_eqf, u_expected, u_actual], rest:0, sublists:0, whole:0}).
 wl:init_args(x, sys_is).
 
-sf_sys_is(Eqf_In, Expected_In, Actual_In, FnResult):- 
-  mf_sys_is(Eqf_In, Expected_In, Actual_In, MFResult),
-  f_eval(MFResult, FnResult).
+sf_sys_is(ReplEnv,Eqf_In, Expected_In, Actual_In, FnResult):- 
+  mf_sys_is([sys_is,Eqf_In, Expected_In, Actual_In],ReplEnv, MFResult),
+  f_sys_env_eval(ReplEnv,MFResult, FnResult).
 
-mf_sys_is(Eqf_In, Expected_In, Actual_In, MFResult) :-
+mf_sys_is([sys_is,Eqf_In, Expected_In, Actual_In],ReplEnv, MFResult) :-
         nop(defmacro),
         Env=[bv(u_eqf, Eqf_In), bv(u_expected, Expected_In), bv(u_actual, Actual_In)|ReplEnv],
-        global_env(ReplEnv),
         catch(( ( f_gensym('$ARRAY'([*], claz_base_character, "a"), A_Init),
                   f_gensym('$ARRAY'([*], claz_base_character, "b"), B_Init),
                   LEnv=[bv(u_a, A_Init), bv(u_b, B_Init)|Env],

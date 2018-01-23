@@ -265,8 +265,7 @@ wl:interned_eval_e(
              (,new-sym (cons ,el-sym ,place)))
         (setf ,place ,new-sym)))))').
 
-f_push(Element, Place, FnResult) :-
-        global_env(ReplEnv),
+sf_push(ReplEnv,Element, Place, FnResult) :-
         Env=[bv(u_element, Element), bv(u_place, Place)|ReplEnv],
         f_gensym(El_sym_Init),
         f_gensym('$ARRAY'([*], claz_base_character, "NEW"), New_sym_Init),
