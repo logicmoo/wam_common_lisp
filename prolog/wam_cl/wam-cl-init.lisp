@@ -30,9 +30,10 @@
 
 (compile-file "wam-cl-init-00")
 (load "wam-cl-init-00")
-(compile-file "wam-cl-init-10")
-(compile-file "wam-cl-init-20")
-(compile-file "wam-cl-init-30")
+
+'(compile-file "wam-cl-init-10")
+'(compile-file "wam-cl-init-20")
+'(compile-file "wam-cl-init-30")
 '(load "wam-cl-init2")
 '(load "wam-cl-init3")
 '(write-line " WAM CommonLisp ")

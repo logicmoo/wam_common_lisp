@@ -155,8 +155,10 @@ get_super_class(Kind,Sup):- get_struct_opv(Kind,kw_include,Sup).
 get_super_class(Kind,Sup):- get_struct_opv(Kind,sys_class_precedence_list,List),!,e_member(Sup,List).
 
 
-get_kind_slot_name(Kind,Key,SlotName):- find_class(Kind,KSup),!,get_slot_name0(KSup,Key,SlotName),!.
+get_kind_slot_name(Kind,Key,SlotName):- nonvar(Key),find_class(Kind,KSup),!,get_slot_name0(KSup,Key,SlotName),!.
 get_slot_name0(Kind,Key,SlotName):- builtin_slot(Kind,Key),!,Key=SlotName.
+
+get_slot_name0(Kind,Key,SlotName):- sys_hash_table_index_vector==Key,!,wdmsg(get_slot_name0(Kind,Key,SlotName)),break.
 %get_slot_name0(claz_u_mammal, kw_legs, u_mammal_legs):-!.
 %get_slot_name0(claz_u_mammal, kw_comes_from, u_mammal_comes_from):-!.
 %get_slot_name0(claz_u_aardvark, kw_legs, u_mammal_legs):-!.
@@ -415,7 +417,7 @@ maybe_add_kw_function(Kind,L,R,Key,ArgList,LispBody):-
    maybe_add_function(FnName,ArgList,LispBody,_).
 
 maybe_add_function(FnName,ArgList,LispBody,R):-   
-   ((atom(FnName),reader_intern_symbols(FnName,Sym),is_fboundp(Sym))->R=Sym;
+   ((atom(FnName),reader_intern_symbols(FnName,Sym),is_implemented(Sym))->R=Sym;
      ((R=Result,as_sexp(LispBody,SLispBody),
        reader_intern_symbols([defun,FnName,ArgList,[progn,SLispBody]],LispInterned),
          ((lisp_compile(Result,LispInterned,PrologCode),

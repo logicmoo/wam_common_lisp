@@ -2,7 +2,7 @@
 %; WAM-CL translated Lisp File (see https://github.com/TeamSPoon/wam_common_lisp/tree/master/prolog/wam_cl )
 %; File: "wam-cl-init-00" (/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp)
 %; PWD: /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/
-%; Start time: Tue Jan 23 00:53:20 2018
+%; Start time: Tue Jan 23 17:36:40 2018
 
 :-style_check(-discontiguous).
 :-style_check(-singleton).
@@ -53,10 +53,125 @@
 /*
 #-WAM-CL (defmacro put-sysprop (s p v) `(setf (get ,s ,p) ,v ))
 
+
 */
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:294 **********************/
 :-lisp_compile_to_prolog(pkg_sys,'$COMMENT'([flag_removed,[-,':WAM-CL'],[defmacro,'put-sysprop',[s,p,v],['#BQ',[setf,[get,['#COMMA',s],['#COMMA',p]],['#COMMA',v]]]]]))
+/*
+(defclass pathname ()
+  ((host      :accessor pathname-host
+              :initarg :host
+              :initform nil)
+   (device    :accessor pathname-device
+              :initarg :device
+              :initform :unspecific)
+   (directory :accessor pathname-directory
+              :initarg :directory
+              :initform nil)
+   (name      :accessor pathname-name
+              :initarg :name
+              :initform nil)
+   (type      :accessor pathname-type
+              :initarg :type
+              :initform nil)
+   (version   :accessor pathname-version
+              :initarg :version
+              :initform nil))
+  (:documentation "A physical pathname."))
+
+*/
+
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:363 **********************/
+:-lisp_compile_to_prolog(pkg_sys,[defclass,pathname,[],[[host,':accessor','pathname-host',':initarg',':host',':initform',[]],[device,':accessor','pathname-device',':initarg',':device',':initform',':unspecific'],[directory,':accessor','pathname-directory',':initarg',':directory',':initform',[]],[name,':accessor','pathname-name',':initarg',':name',':initform',[]],[type,':accessor','pathname-type',':initarg',':type',':initform',[]],[version,':accessor','pathname-version',':initarg',':version',':initform',[]]],[':documentation','$STRING'("A physical pathname.")]])
+:- sf_defclass(Sf_defclass_Param,
+	       
+	       [ pathname,
+		 [],
+		 
+		 [ 
+		   [ sys_host,
+		     kw_accessor,
+		     pathname_host,
+		     kw_initarg,
+		     kw_host,
+		     kw_initform,
+		     []
+		   ],
+		   
+		   [ sys_device,
+		     kw_accessor,
+		     pathname_device,
+		     kw_initarg,
+		     kw_device,
+		     kw_initform,
+		     kw_unspecific
+		   ],
+		   
+		   [ directory,
+		     kw_accessor,
+		     pathname_directory,
+		     kw_initarg,
+		     kw_directory,
+		     kw_initform,
+		     []
+		   ],
+		   
+		   [ sys_name,
+		     kw_accessor,
+		     pathname_name,
+		     kw_initarg,
+		     kw_name,
+		     kw_initform,
+		     []
+		   ],
+		   
+		   [ type,
+		     kw_accessor,
+		     pathname_type,
+		     kw_initarg,
+		     kw_type,
+		     kw_initform,
+		     []
+		   ],
+		   
+		   [ sys_version,
+		     kw_accessor,
+		     pathname_version,
+		     kw_initarg,
+		     kw_version,
+		     kw_initform,
+		     []
+		   ]
+		 ],
+		 
+		 [ kw_documentation,
+		   '$ARRAY'([*], claz_base_character, "A physical pathname.")
+		 ]
+	       ],
+	       _Ignored).
+/*
+(defmethod print-object ((self pathname) stream)
+  (format stream ""(defmethod print-object ((self pathname) stream)\r\n  (format stream \"~:[~;#P\\\"~]~A~0@*~:[~;\\\"~]\" *print-escape* (namestring self))\r\n  self)\r\n\r\n\r\n".
+*/
+
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:1055 **********************/
+:-lisp_compile_to_prolog(pkg_sys,[defmethod,'print-object',[[self,pathname],stream],[format,stream,'$STRING'("~:[~;#P\"~]~A~0@*~:[~;\"~]"),'*print-escape*',[namestring,self]],self])
+ defmethod(print_object,
+	     [[sys_self, pathname], stream],
+	     
+	     [ 
+	       [ format,
+		 stream,
+		 '$ARRAY'([*],
+			  claz_base_character,
+			  "~:[~;#P\"~]~A~0@*~:[~;\"~]"),
+		 xx_print_escape_xx,
+		 [namestring, sys_self]
+	       ],
+	       sys_self
+	     ]).
+
 /*
 (defmacro defun=sourceinfo (name ll &rest body)
   "Used to show what was already compiled"
@@ -64,7 +179,7 @@
 
 */
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:361 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:1199 **********************/
 :-lisp_compile_to_prolog(pkg_sys,[defmacro,'defun=sourceinfo',[name,ll,'&rest',body],'$STRING'("Used to show what was already compiled"),['#BQ',['put-sysprop',[quote,['#COMMA',name]],[quote,'defun=sourceinfo'],['#BQ',[defun,['#COMMA',[quote,['#COMMA',name]]],['#COMMA',[quote,['#COMMA',ll]]],['#COMMA',[quote,['#BQ-COMMA-ELIPSE',body]]]]]]]])
 /*
 :- side_effect(generate_function_or_macro_name([name='GLOBAL', environ=env_1],
@@ -206,7 +321,7 @@ mf_sys_defun_c61_sourceinfo([sys_defun_c61_sourceinfo, Name_In, Ll_In|RestNKeys]
 
 */
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:533 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:1371 **********************/
 :-lisp_compile_to_prolog(pkg_sys,[defmacro,'defmacro=sourceinfo',[name,ll,'&rest',body],'$STRING'("Used to show what was already compiled"),['#BQ',['put-sysprop',[quote,['#COMMA',name]],[quote,'defmacro=sourceinfo'],[quote,[defmacro,['#COMMA',name],['#COMMA',ll],['#BQ-COMMA-ELIPSE',body]]]]]])
 /*
 :- side_effect(generate_function_or_macro_name([name='GLOBAL', environ=env_1],
@@ -335,7 +450,7 @@ mf_sys_defmacro_c61_sourceinfo([sys_defmacro_c61_sourceinfo, Name_In, Ll_In|Rest
 	      ,@(if string `(,string (list ,@args)) `("The assertion "(defmacro assert (test-form &optional places string &rest args)\r\n  (declare (dynamic-extent args))\r\n  `(do nil (,test-form nil)\r\n     (multiple-value-setq\r\n\t ,places\r\n       (apply 'assert-places ',places (list ,@places)\r\n\t      ,@(if string `(,string (list ,@args)) `(\"The assertion ~:@(~S~) failed.\" ',test-form nil))))))\r\n\r\n\r\n".
 */
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:711 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:1549 **********************/
 :-lisp_compile_to_prolog(pkg_sys,[defmacro,assert,['test-form','&optional',places,string,'&rest',args],[declare,['dynamic-extent',args]],['#BQ',[do,[],[['#COMMA','test-form'],[]],['multiple-value-setq',['#COMMA',places],[apply,[quote,'assert-places'],[quote,['#COMMA',places]],[list,['#BQ-COMMA-ELIPSE',places]],['#BQ-COMMA-ELIPSE',[if,string,['#BQ',[['#COMMA',string],[list,['#BQ-COMMA-ELIPSE',args]]]],['#BQ',['$STRING'("The assertion ~:@(~S~) failed."),[quote,['#COMMA','test-form']],[]]]]]]]]]])
 /*
 :- side_effect(generate_function_or_macro_name([name='GLOBAL', environ=env_1],
@@ -505,7 +620,7 @@ mf_assert([assert, Test_form_In|Optionals], MacroEnv, MFResult) :-
 
 */
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:1040 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:1878 **********************/
 :-lisp_compile_to_prolog(pkg_sys,[defmacro,'eval-when-tl',[['&rest',when],'&body',body],[if,[or,[member,[quote,eval],when],[member,[quote,':execute'],when]],['#BQ',[progn,['#BQ-COMMA-ELIPSE',body]]],[]]])
 /*
 :- side_effect(generate_function_or_macro_name([name='GLOBAL', environ=env_1],
@@ -622,7 +737,7 @@ mf_sys_eval_when_tl([sys_eval_when_tl, When_In|RestNKeys], SubEnv, MFResult) :-
 
 */
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:1168 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:2006 **********************/
 :-lisp_compile_to_prolog(pkg_sys,[defun,'list*',[arg,'&rest',others],'$STRING'("Return a list of the arguments with last cons a dotted pair"),[cond,[[null,others],arg],[[null,[cdr,others]],[cons,arg,[car,others]]],[t,[do,[[x,others,[cdr,x]]],[[null,[cddr,x]],[rplacd,x,[cadr,x]]]],[cons,arg,others]]]])
 doc: doc_string(list_xx,
 	      _8328,
@@ -764,7 +879,7 @@ f_list_xx(Arg_In, RestNKeys, FnResult) :-
 
 */
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:1451 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:2289 **********************/
 :-lisp_compile_to_prolog(pkg_sys,[defmacro,psetq,['&environment',env,'&rest',args],[do,[[l,args,[cddr,l]],[forms,[]],[bindings,[]]],[[endp,l],['list*',[quote,'let*'],[reverse,bindings],[reverse,[cons,[],forms]]]],[if,[and,[symbolp,[car,l]],[eq,[car,l],['macroexpand-1',[car,l],env]]],[let,[[sym,[gensym]]],[push,[list,sym,[cadr,l]],bindings],[push,[list,[quote,setq],[car,l],sym],forms]],['multiple-value-bind',[dummies,vals,newval,setter,getter],['get-setf-expansion',['macroexpand-1',[car,l],env],env],[declare,[ignore,getter]],[do,[[d,dummies,[cdr,d]],[v,vals,[cdr,v]]],[[null,d]],[push,[list,[car,d],[car,v]],bindings]],[push,[list,[car,newval],[cadr,l]],bindings],[push,setter,forms]]]]])
 /*
 :- side_effect(generate_function_or_macro_name([name='GLOBAL', environ=env_1],
@@ -988,7 +1103,7 @@ mf_psetq([psetq|RestNKeys], Env_In, MFResult) :-
                                              `((setf ,(car pairs) ,(cadr pairs)))))))))))
 */
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:2288 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:3126 **********************/
 :-lisp_compile_to_prolog(pkg_sys,[defmacro,setf,['&rest',pairs,'&environment',env],[let,[[nargs,[length,pairs]]],[assert,[evenp,nargs]],[cond,[[zerop,nargs],[]],[[=,nargs,2],[let,[[place,[car,pairs]],['value-form',[cadr,pairs]]],[cond,[[symbolp,place],['#BQ',[setq,['#COMMA',place],['#COMMA','value-form']]]],[[consp,place],[if,[eq,[car,place],[quote,the]],['#BQ',[setf,['#COMMA',[caddr,place]],[the,['#COMMA',[cadr,place]],['#COMMA','value-form']]]],['multiple-value-bind',[temps,vars,newvals,setter,getter],['get-setf-expansion',place,env],[declare,[ignore,getter]],['#BQ',[let,[['#BQ-COMMA-ELIPSE',[mapcar,function(list),temps,vars]]],['multiple-value-bind',['#COMMA',newvals],['#COMMA','value-form'],['#COMMA',setter]]]]]]]]]],[t,['do*',[[pairs,pairs,[cddr,pairs]],[setfs,[list,[quote,progn]]],[splice,setfs]],[[endp,pairs],setfs],[setq,splice,[cdr,[rplacd,splice,['#BQ',[[setf,['#COMMA',[car,pairs]],['#COMMA',[cadr,pairs]]]]]]]]]]]]])
 /*
 % macroexpand:-[assert,[evenp,sys_nargs]].
@@ -1374,7 +1489,7 @@ mf_setf([setf|RestNKeys], Env_In, MFResult) :-
 
 */
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:3598 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:4436 **********************/
 :-lisp_compile_to_prolog(pkg_sys,[defmacro,psetf,['&rest',pairs,'&environment',env],[let,[[nargs,[length,pairs]]],[assert,[evenp,nargs]],[if,[<,nargs,4],['#BQ',[progn,[setf,['#BQ-COMMA-ELIPSE',pairs]],[]]],[let,[[setters,[]]],[labels,[[expand,[pairs],[if,pairs,['multiple-value-bind',[temps,vars,newvals,setter,getter],['get-setf-expansion',[car,pairs],env],[declare,[ignore,getter]],[setq,setters,[cons,setter,setters]],['#BQ',[let,[['#BQ-COMMA-ELIPSE',[mapcar,function(list),temps,vars]]],['multiple-value-bind',['#COMMA',newvals],['#COMMA',[cadr,pairs]],['#COMMA',[expand,[cddr,pairs]]]]]]],['#BQ',[progn,['#BQ-COMMA-ELIPSE',setters],[]]]]]],[expand,pairs]]]]]])
 /*
 % macroexpand:-[assert,[evenp,sys_nargs]].
@@ -1649,7 +1764,7 @@ mf_psetf([psetf|RestNKeys], Env_In, MFResult) :-
 
 */
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:4621 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:5459 **********************/
 :-lisp_compile_to_prolog(pkg_sys,[defmacro,shiftf,['&rest','places-and-newvalue','&environment',env],[let,[[nargs,[length,'places-and-newvalue']]],[assert,[>=,nargs,2]],[let,[[place,[car,'places-and-newvalue']]],['multiple-value-bind',[temps,vars,newvals,setter,getter],['get-setf-expansion',place,env],['#BQ',[let,[['#BQ-COMMA-ELIPSE',[mapcar,function(list),temps,vars]]],['multiple-value-prog1',['#COMMA',getter],['multiple-value-bind',['#COMMA',newvals],['#COMMA',[if,[=,nargs,2],[cadr,'places-and-newvalue'],['#BQ',[shiftf,['#BQ-COMMA-ELIPSE',[cdr,'places-and-newvalue']]]]]],['#COMMA',setter]]]]]]]]])
 /*
 % macroexpand:-[assert,[>=,sys_nargs,2]].
@@ -1903,7 +2018,7 @@ mf_shiftf([shiftf|RestNKeys], Env_In, MFResult) :-
 ;; Adapted from SBCL.
 */
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:5353 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:6191 **********************/
 :-lisp_compile_to_prolog(pkg_sys,[defmacro,rotatef,['&rest',places,'&environment',env],[if,[<,[length,places],2],[],['multiple-value-bind',[temps,vars,newvals,setter,getter],['get-setf-expansion',[car,places],env],['#BQ',[let,[['#BQ-COMMA-ELIPSE',[mapcar,function(list),temps,vars]]],['multiple-value-bind',['#COMMA',newvals],[shiftf,['#BQ-COMMA-ELIPSE',[cdr,places]],['#COMMA',getter]],['#COMMA',setter]],[]]]]]])
 /*
 :- side_effect(generate_function_or_macro_name(
@@ -2083,7 +2198,7 @@ mf_rotatef([rotatef|RestNKeys], Env_In, MFResult) :-
 ;; Adapted from SBCL.
 */
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:5822 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:6660 **********************/
 :-lisp_compile_to_prolog(pkg_sys,[defmacro,push,['&environment',env,item,place],[if,[and,[symbolp,place],[eq,place,[macroexpand,place,env]]],['#BQ',[setq,['#COMMA',place],[cons,['#COMMA',item],['#COMMA',place]]]],['multiple-value-bind',[dummies,vals,newval,setter,getter],['get-setf-expansion',place,env],[let,[[g,[gensym]]],['#BQ',['let*',[[['#COMMA',g],['#COMMA',item]],['#BQ-COMMA-ELIPSE',[mapcar,function(list),dummies,vals]],[['#COMMA',[car,newval]],[cons,['#COMMA',g],['#COMMA',getter]]]],['#COMMA',setter]]]]]]])
 /*
 :- side_effect(generate_function_or_macro_name(
@@ -2306,7 +2421,7 @@ mf_push([push, Item_In, Place_In|RestNKeys], Env_In, MFResult) :-
 ;; Adapted from SBCL.
 */
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:6298 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:7136 **********************/
 :-lisp_compile_to_prolog(pkg_sys,[defmacro,pushnew,['&environment',env,item,place,'&rest',keys],[if,[and,[symbolp,place],[eq,place,[macroexpand,place,env]]],['#BQ',[setq,['#COMMA',place],[adjoin,['#COMMA',item],['#COMMA',place],['#BQ-COMMA-ELIPSE',keys]]]],['multiple-value-bind',[dummies,vals,newval,setter,getter],['get-setf-expansion',place,env],[let,[[g,[gensym]]],['#BQ',['let*',[[['#COMMA',g],['#COMMA',item]],['#BQ-COMMA-ELIPSE',[mapcar,function(list),dummies,vals]],[['#COMMA',[car,newval]],[adjoin,['#COMMA',g],['#COMMA',getter],['#BQ-COMMA-ELIPSE',keys]]]],['#COMMA',setter]]]]]]])
 /*
 :- side_effect(generate_function_or_macro_name(
@@ -2555,7 +2670,7 @@ mf_pushnew([pushnew, Item_In, Place_In|RestNKeys], Env_In, MFResult) :-
 
 */
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:6806 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-00.lisp:7644 **********************/
 :-lisp_compile_to_prolog(pkg_sys,[defmacro,pop,['&environment',env,place],[if,[and,[symbolp,place],[eq,place,[macroexpand,place,env]]],['#BQ',[prog1,[car,['#COMMA',place]],[setq,['#COMMA',place],[cdr,['#COMMA',place]]]]],['multiple-value-bind',[dummies,vals,newval,setter,getter],['get-setf-expansion',place,env],['do*',[[d,dummies,[cdr,d]],[v,vals,[cdr,v]],['let-list',[]]],[[null,d],[push,[list,[car,newval],getter],'let-list'],['#BQ',['let*',['#COMMA',[nreverse,'let-list']],[prog1,[car,['#COMMA',[car,newval]]],[setq,['#COMMA',[car,newval]],[cdr,['#COMMA',[car,newval]]]],['#COMMA',setter]]]]],[push,[list,[car,d],[car,v]],'let-list']]]]])
 /*
 % macroexpand:-[push,[list,[car,sys_newval],sys_getter],sys_let_list].
@@ -2796,5 +2911,5 @@ mf_pop([pop, Place_In|RestNKeys], Env_In, MFResult) :-
 */
 
 
-%; Total compilation time: 12.364 seconds
+%; Total compilation time: 12.695 seconds
 

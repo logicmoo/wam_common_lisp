@@ -13,6 +13,33 @@
 
 #-WAM-CL (defmacro put-sysprop (s p v) `(setf (get ,s ,p) ,v ))
 
+
+(defclass pathname ()
+  ((name      :accessor pathname-name
+              :initarg :name
+              :initform nil)
+   (type      :accessor pathname-type
+              :initarg :type
+              :initform nil)
+   (host      :accessor pathname-host
+              :initarg :host
+              :initform nil)
+   (device    :accessor pathname-device
+              :initarg :device
+              :initform :unspecific)
+   (directory :accessor pathname-directory
+              :initarg :directory
+              :initform nil)
+   (version   :accessor pathname-version
+              :initarg :version
+              :initform nil))
+  (:documentation "A physical pathname."))
+
+(defmethod print-object ((self pathname) stream)
+  (format stream "~:[~;#P\"~]~A~0@*~:[~;\"~]" *print-escape* (namestring self))
+  self)
+
+
 (defmacro defun=sourceinfo (name ll &rest body)
   "Used to show what was already compiled"
    `(put-sysprop ',name 'defun=sourceinfo `(defun ,',name ,',ll ,',@body)))
