@@ -51,7 +51,17 @@ f_sys_apropos_symbol(Symbol,_Verbose,t):- f_prin1(Symbol,_),
   ((is_fboundp(Symbol),f_symbol_function(Symbol,Function))->(write(' (fbound) '),f_prin1(Function,_));true),!,
   ((is_boundp(Symbol),f_symbol_value(Symbol,Value))->(write(' (bound) '),f_prin1(Value,_));true),!,
   nl.          
-  
+
+f_describe(Obj,Ret):-
+ pl_describe(Obj,[],Ret).
+
+pl_describe(Obj,_Skipping,Ret):-
+   f_type_of(Obj,Type),
+   f_class_of(Obj,Class),
+   format('~N',[]),
+   sformat(Repr,'~q',[Obj]),
+   f_sys_get_iprops(Obj,Parts),
+   f_print([[kw_object|Obj],[kw_type|Type],[kw_class|Class],[sys_prolog|Repr]|Parts],Ret).
 
 maybe_get_docs(Type,Name,[Str|FunctionBody],FunctionBody,Code):- is_stringp(Str),to_prolog_string(Str,String),
   Code = assert_lsp(Name,doc:doc_string(Name,_Package,Type,String)).

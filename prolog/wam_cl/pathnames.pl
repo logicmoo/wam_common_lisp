@@ -139,9 +139,12 @@ found_strem(Path0,File0,SearchTypes,Found):-
    (fail,absolute_file_name(File,Found,[relative_to(Path),
      access(read),file_type(directory),file_errors(fail),expand(true),solutions(all)]),exists_directory(Found))).
 
-
+f_pathname(S,P):- is_stream(S),stream_property(S,file(File)),!,f_pathname(File,P).
 f_pathname(P,P):- is_pathnamep(P),!.
 f_pathname(String,Pathname):- f_sys_string_to_pathname(String,Pathname).
+
+f_sys_pathname_to_string(Atom,String):- f_string(Atom,String),!.
+f_sys_pathname_to_string(Pathname,String):- throw(todo(f_sys_pathname_to_string(Pathname,String))).
 
 f_sys_string_to_pathname(String,Pathname):- 
   to_prolog_string(String,String0),atom_string(PlPath,String0),
