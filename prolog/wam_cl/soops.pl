@@ -918,7 +918,7 @@ cleanup_mop:-
  ignore((get_struct_opv(X,kw_include,claz_t),get_struct_opv(X,kw_include,Y),Y\==claz_t,show_call_trace(retract(soops:struct_opv(X,kw_include,claz_t))),fail)).
 
 save_mop:- cleanup_mop,tell('ci3.data'),
- forall(member(Assert,[get_struct_opv(_,P,_),get_struct_opv(_,P,_,_),get_struct_opv(_,P,_,_,_)]),
+ forall(member(Assert,[struct_opv(_,P,_),struct_opv(_,P,_,_)]),
    forall(soops:Assert,
       ignore((P\==slot1,P\==has_slots,format('~q.~n',[Assert]))))), told.
 :- style_check(-discontiguous).

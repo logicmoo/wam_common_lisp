@@ -140,7 +140,42 @@ found_strem(Path0,File0,SearchTypes,Found):-
      access(read),file_type(directory),file_errors(fail),expand(true),solutions(all)]),exists_directory(Found))).
 
 
+f_pathname(P,P):- is_pathnamep(P),!.
+f_pathname(String,Pathname):- f_sys_string_to_pathname(String,Pathname).
 
+f_sys_string_to_pathname(String,Pathname):- to_prolog_string(String,String0),
+  file_name_extension(Base, Ext,String0),dot_is_nil_pathname(Base,Name),dot_is_nil_pathname(Ext,Type),
+  file_directory_name(Base,PlDir),dot_is_nil_pathname(PlDir,Dir),
+  f_make_instance([claz_pathname,kw_name,Name,kw_type,Type,kw_directory,Dir],Pathname).
+
+dot_is_nil_pathname('.',[]):-!.
+dot_is_nil_pathname('',[]):-!.
+dot_is_nil_pathname(Atom,String):- atom_string(Atom,String).
+
+
+
+wl:interned_eval('
+(defclass pathname ()
+  ((host      :accessor pathname-host
+              :initarg :host
+              :initform nil)
+   (device    :accessor pathname-device
+              :initarg :device
+              :initform :unspecific)
+   (directory :accessor pathname-directory
+              :initarg :directory
+              :initform nil)
+   (name      :accessor pathname-name
+              :initarg :name
+              :initform nil)
+   (type      :accessor pathname-type
+              :initarg :type
+              :initform nil)
+   (version   :accessor pathname-version
+              :initarg :version
+              :initform nil))
+  (:documentation "A physical pathname."))
+').
 
 :- fixup_exports.
 
