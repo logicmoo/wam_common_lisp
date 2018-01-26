@@ -365,9 +365,9 @@ data_record(claz_hash_table,[
   m(ro,integer,rehash_size),
   m(ro,number,rehash_threshold),
   m(rw,integer,threshold),
-  m(rw,array_of(claz_hash_table___hash_entry),buckets),
+  m(rw,array_of(claz_hash_table_entry),buckets),
   m(rw,integer,count),
-  m(ro,claz_hash_table___comparator,comparator),
+  m(ro,function,test),
   m(ro,j_reentrant_lock,lock)]).
 
 data_record(claz_zero_rank_array,[
@@ -827,11 +827,11 @@ data_record(claz_ffi_object__1,[
   m(ro,claz_list,val__acc),
   m(ro,claz_ffi_object,this__0)]).
 
-data_record(claz_hash_table___hash_entry,[
+data_record(claz_hash_table_entry,[
   m(rw,claz_object,key),
   m(rw,integer,hash),
   m(rw,claz_object,value),
-  m(rw,claz_hash_table___hash_entry,next)]).
+  m(rw,claz_hash_table_entry,next)]).
 
 data_record(claz_profiler__1__1,[
   m(rw,claz_sys_thread,thread),
@@ -1001,7 +1001,7 @@ data_record(claz_weak_hash_table,[
   m(rw,integer,threshold),
   m(rw,array_of(claz_sys_weak_hash_entry),buckets),
   m(rw,integer,count),
-  m(ro,claz_weak_hash_table___comparator,comparator),
+  m(ro,claz_weak_hash_table___test,test),
   m(ro,j_reentrant_lock,lock),
   m(rw,claz_sys_weak_hash_entry,bucket_type),
   m(ro,claz_object,weakness),

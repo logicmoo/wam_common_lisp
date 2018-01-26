@@ -68,17 +68,17 @@ pl_compiled_filename0(Obj,PL):- compound(Obj),arg(2,Obj,From),string(From),
 pl_compiled_filename0(File,PL):- get_var(sys_xx_compile_file_type_xx,Ext),
    pl_probe_file(File,Found),atomic_list_concat([Found,Ext],'.',PL),exists_file(PL),!.
 
-
 to_prolog_pathname(Cmp,Out):- compound(Cmp),Cmp='$OBJ'(claz_pathname,S),!,always(to_prolog_pathname(S,Out)).
 to_prolog_pathname(Ref,Value):- atom(Ref),!,((is_symbolp(Ref),is_boundp(Ref),f_symbol_value(Ref,PValue))->to_prolog_pathname(PValue,Value);Ref=Value).
-to_prolog_pathname(Ref,O):- is_pathnamep(Ref),get_opv(Ref,name,V),!,always(show_call_trace(to_prolog_pathname(V,O))).
 to_prolog_pathname(Str,O):- is_stringp(Str),!,string_to_prolog_atom(Str,O).
 to_prolog_pathname(Obj,PL):- string_to_prolog_atom(Obj,PL).
+to_prolog_pathname(Ref,O):- is_pathnamep(Ref),get_opv(Ref,name,V),!,always(show_call_trace(to_prolog_pathname(V,O))).
 %to_prolog_pathname0('$OBJ'(_T,TXT),PL):- to_prolog_string(TXT,STR),!,string_to_prolog_atom(STR,PL).
 %to_prolog_pathname0(TXT,PL):- string_to_prolog_atom(TXT,PL),!.
 
 is_pathnamep(P):- i_class(P,C),!,C==claz_pathname.
 
+to_lisp_pathname(P,P):- is_pathnamep(P),!.
 to_lisp_pathname('$OBJ'(claz_pathname,PathString),'$OBJ'(claz_pathname,PathString)):-!.
 to_lisp_pathname(Pathname,'$OBJ'(claz_pathname,PathString)):- 
   (is_stringp(Pathname)->PathStr=Pathname;text_to_string(Pathname,PathStr)),
@@ -94,6 +94,8 @@ nil_lastvar(G):- functor(G,_,A),arg(A,G,[]).
 
 or_die(G):- G ->true;throw(die(G)).
 or_nil(G):- G ->true;nil_lastvar(G).
+
+% "(make-pathname :host "abacus" :device "C" :directory '(:absolute "My Documents" "werther-project") :name "wlskdjaeks" :type "doc")"
 
 
 
@@ -143,8 +145,21 @@ f_pathname(S,P):- is_stream(S),stream_property(S,file(File)),!,f_pathname(File,P
 f_pathname(P,P):- is_pathnamep(P),!.
 f_pathname(String,Pathname):- f_sys_string_to_pathname(String,Pathname).
 
-f_sys_pathname_to_string(Atom,String):- f_string(Atom,String),!.
-f_sys_pathname_to_string(Pathname,String):- throw(todo(f_sys_pathname_to_string(Pathname,String))).
+f_namestring(Pathname,String):- trace,
+    get_opv(Pathname,pathname_directory,D),
+    (D==[]->DS1='';(loc_to_pl(D,DS),atom_concat(DS,'/',DS1))),
+    get_opv(Pathname,pathname_name,N),
+    (N==[]->DS2=DS1;(loc_to_pl(N,NS),atom_concat(DS1,NS,DS2))),
+    get_opv(Pathname,pathname_type,E),
+    (E==[]->sformat(String,'~w',[DS2]);(loc_to_pl(E,ES),sformat(String,'~w.~w',[DS2,ES]))),
+    !.
+f_namestring(Atom,String):- f_string(Atom,String),!.
+f_namestring(In,Out):- to_prolog_pathname(In,Atom),atom_string(Atom,String),to_lisp_string(String,Out).
+f_namestring(Pathname,String):-
+    get_opv(Pathname,pathname_namestring,PN),!,
+    string_to_prolog_atom(PN,Atom),atom_string(Atom,String).
+f_namestring(Pathname,String):-
+    throw(todo(f_namestring(Pathname,String))).
 
 f_sys_string_to_pathname(String,Pathname):- 
   to_prolog_string(String,String0),atom_string(PlPath,String0),
@@ -163,9 +178,17 @@ lisp_dir_list(PlDir,_,LispDir):-
     (atomic_list_concat(List,'/',PlDir),LispDir = [kw_relative|DirStrs])),
   must_maplist(maybe_nil_pathname('.'),List,DirStrs).
 
+loc_to_pl(L,A):- a_2_l(A,L),!.
+loc_to_pl(L,A):- is_list(L),must_maplist(loc_to_pl,L,LL),atomic_list_concat(LL,'/',A).
+loc_to_pl(S,A):- atom_string(A,S).
+
+a_2_l('.',kw_relative):-!.
+a_2_l('..',kw_up):-!.
+a_2_l('*',kw_wild):-!.
+a_2_l('',kw_absolute):-!.
 maybe_nil_pathname(PlPath,'',""):- atom_concat(_,'.',PlPath),!.
-maybe_nil_pathname(_,'..',kw_up):-!.
 maybe_nil_pathname(_,'',[]):-!.
+maybe_nil_pathname(_,A,L):- a_2_l(A,L),!.
 maybe_nil_pathname(_,Atom,String):- atom_string(Atom,String).
 
 

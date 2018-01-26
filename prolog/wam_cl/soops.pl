@@ -155,19 +155,23 @@ get_super_class(Kind,Sup):- get_struct_opv(Kind,kw_include,Sup).
 get_super_class(Kind,Sup):- get_struct_opv(Kind,sys_class_precedence_list,List),!,e_member(Sup,List).
 
 
-get_kind_slot_name(Kind,Key,SlotName):- nonvar(Key),find_class(Kind,KSup),!,get_slot_name0(KSup,Key,SlotName),!.
-get_slot_name0(Kind,Key,SlotName):- builtin_slot(Kind,Key),!,Key=SlotName.
+get_kind_slot_name(Kind,Key,SlotName):- find_class(Kind,KSup),!,quietly(always(get_slot_name0(KSup,Key,SlotName))).
 
-get_slot_name0(Kind,Key,SlotName):- sys_hash_table_index_vector==Key,!,wdmsg(get_slot_name0(Kind,Key,SlotName)),break.
+get_slot_name0(Kind,SlotName,ZLOT):- var(SlotName),!,get_struct_opv_i(Kind,_,_,SlotName),ZLOT=SlotName.
+get_slot_name0(Kind,SlotName,ZLOT):- get_struct_opv_i(Kind,_,_,SlotName),ZLOT=SlotName,!.
+get_slot_name0(Kind,Key,SlotName):- builtin_slot(Kind,Key),!,Key=SlotName.
 %get_slot_name0(claz_u_mammal, kw_legs, u_mammal_legs):-!.
 %get_slot_name0(claz_u_mammal, kw_comes_from, u_mammal_comes_from):-!.
 %get_slot_name0(claz_u_aardvark, kw_legs, u_mammal_legs):-!.
 %get_slot_name0(claz_u_aardvark, kw_comes_from, u_mammal_comes_from):-!.
-get_slot_name0(Kind,SlotName,ZLOT):- get_struct_opv_i(Kind,_,_,SlotName),ZLOT=SlotName.
+%get_slot_name0(claz_symbol,value,symbol_value).
+get_slot_name0(Kind,Key,SlotName):- sys_hash_table_index_vector==Key,!,wdmsg(get_slot_name0(Kind,Key,SlotName)),break.
+get_slot_name0(Kind,SlotName,ZLOT):- get_struct_opv_i(Kind,sys_name, Name, ZLOT),same_symbol_names(SlotName,Name),!.
 get_slot_name0(Kind,SlotName,ZLOT):- get_struct_opv_i(Kind,_,OneOf,ZLOT),notrace(e_member(SlotName,OneOf)),!.
-get_slot_name0(Kind,SlotName,ZLOT):- get_struct_opv_i(Super,_,OneOf,ZLOT),notrace(e_member(SlotName,OneOf)),
+get_slot_name0(Kind,SlotName,ZLOT):- get_struct_opv_i(Super,_,OneOf,ZLOT),notrace(e_member(SlotName,OneOf)),!,
    wdmsg(always(f_subtypep(Kind,Super))).
-get_slot_name0(claz_symbol,value,symbol_value).
+
+same_symbol_names(S1,S2):- pl_symbol_name(S1,N1),pl_symbol_name(S2,N2),!,N1=N2.
 
 /*
 get_slot_name0(Kind,SlotName,ZLOT):-
@@ -747,7 +751,7 @@ add_opv_new_ii(_Kind,Obj,Prop,Value):- add_opv_new_iiii(Obj,Prop,Value).
 % u_daft_point_znst_1,u_daft_point_znst_2,u_daft_point_z
 
 
-add_opv_new_iiii(Obj,Prop,Value):- assertion(ground(o_p_v(Obj,Prop,Value))),fail.
+%add_opv_new_iiii(Obj,Prop,Value):- assertion(ground(o_p_v(Obj,Prop,Value))),fail.
 add_opv_new_iiii(Ref,u_daft_point_z,_Value):- Ref\==u_daft_point_znst_metaobject_0,!,break.
 % add_opv_new_iiii(Obj,Prop,Value):- get_opv_iiii(Obj,Prop,OldValue),Value==OldValue,!.
 add_opv_new_iiii(Ref,Prop,Value):-current_prolog_flag(wamcl_gvars,true),!, always(get_ref_object(Ref,Object)),!,   

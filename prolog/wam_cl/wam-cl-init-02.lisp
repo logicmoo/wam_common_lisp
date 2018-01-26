@@ -34,11 +34,9 @@
 	(make-instance 'hash-table test size 
                           rehash-size rehash-threshold))))
 |#
-    
-  
 (defclass hash-table :slots
-			((key :type vector)
-			 (value :type vector)
+			(
+			 (data :type vector)
 			 (size :type :integer)
 			 (count :type :integer)
 			 (hash-function)
@@ -47,6 +45,8 @@
 			 (empty :type symbol)
 			 (deleted :type symbol)
 			 (not-found)))
+    
+  
 
 
 (export 'compiler-macroexpand)

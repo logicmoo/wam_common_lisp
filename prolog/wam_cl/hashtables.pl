@@ -12,7 +12,7 @@
  * The program is a *HUGE* common-lisp compiler/interpreter. It is written for YAP/SWI-Prolog .
  *
  *******************************************************************/
-:- module(hashts, []).
+:- module(hash7s, []).
 
 :- set_module(class(library)).
 
@@ -20,15 +20,15 @@
 
 f_hash_table_p(HT,RetVal):- t_or_nil((f_class_of(HT,Claz),Claz==claz_hash_table),RetVal).
 
-f_hash_table_test(HT,RetVal):-get_opv(HT,test,RetVal).
+f_hash_table_test(HT,RetVal):-get_opv(HT,hash_table_test,RetVal).
 
 (wl:init_args(0,make_hash_table)).
 f_make_hash_table(Keys,HT):- 
   create_object(claz_hash_table,Keys,HT),
-  ((get_opv(HT,u_data,Tree),Tree\==[])->true;(rb_new(Tree),set_opv(HT,u_data,'$OBJ'(clz_rb_tree,Tree)))).
+  ((get_opv(HT,sys_hash_table_data,Tree),Tree\==[])->true;(rb_new(Tree),set_opv(HT,sys_hash_table_data,'$OBJ'(clz_rb_tree,Tree)))).
 
 wl:setf_inverse(gethash,sys_puthash).
-get_table(HT,Tree,Data):- get_opv(HT,u_data,Data),arg(2,Data,Tree).
+get_table(HT,Tree,Data):- get_opv(HT,sys_hash_table_data,Data),arg(2,Data,Tree).
 
 ht_match_key_value(Tree,Test,Key,Name,Value):-
   rb_in(Name,Value,Tree),
@@ -40,11 +40,12 @@ f_gethash(Key,HT,Default,RetVal):-
   get_table(HT,Tree,_),ht_test_fn(HT,TestFn),
   (ht_match_key_value(Tree,TestFn,Key,_Name,Value)->f_values_list([Value,t],RetVal);f_values_list([Default,[]],RetVal)).
 
-ht_test_fn(HT,TestFn):- get_opv(HT,test,Test),!,as_lisp_binary_fn(Test,TestFn).
+ht_test_fn(HT,TestFn):- get_opv(HT,hash_table_test,Test),!,as_lisp_binary_fn(Test,TestFn).
 
 as_lisp_binary_fn(Test,TestFn):- as_funcallable(Test,Test,TestFn).
 
 f_sys_puthash(Key,HT,RetVal,RetVal):-
+  set_prolog_flag(wamcl_gvars,true),
    get_table(HT,Tree,_),ht_test_fn(HT,TestFn),!,
    (ht_match_key_value(Tree,TestFn,Key,Name,_OldValue)-> 
       (nb_rb_get_node(Tree,Name,Node),nb_rb_set_node_value(Node,RetVal));
@@ -55,7 +56,8 @@ f_remhash(Key,HT,RetVal):-
   t_or_nil(( ht_match_key_value(Tree,TestFn,Key,Name,_OldValue),rb_delete(Tree,Name,NT),nb_setarg(2,BV,NT)),RetVal).
 
 f_clrhash(HT,RetVal):-  RetVal=t,
-  rb_new(Tree),set_opv(HT,u_data,'$OBJ'(clz_rb_tree,Tree)).
+  set_prolog_flag(wamcl_gvars,true),
+  rb_new(Tree),set_opv(HT,sys_hash_table_data,'$OBJ'(claz_sys_rb_tree,Tree)).
 
 f_maphash(Fn,HT,RetVal):-  RetVal=[],
   get_table(HT,Tree,_),as_lisp_binary_fn(Fn,MapFn),
@@ -64,8 +66,8 @@ f_maphash(Fn,HT,RetVal):-  RetVal=[],
 
 f_sys_maphash_iter(Function, Hash_table, FnResult) :-
         global_env(ReplEnv5),
-        _Env10=[bv(function, Function), bv(hash_table, Hash_table)|ReplEnv5],
-        f_with_hash_table_iterator([u_next_entry, hash_table],
+        Env10=[bv(function, Function), bv(hash_table, Hash_table)|ReplEnv5],
+        sf_with_hash_table_iterator(Env10,[u_next_entry, hash_table],
 
                                     [ loop,
 
@@ -92,20 +94,49 @@ f_sys_maphash_iter(Function, Hash_table, FnResult) :-
 
 ### Compiled:  `CL:WITH-HASH-TABLE-ITERATOR`
 */
-sf_with_hash_table_iterator(ReplEnv,[Name, Hash_table], RestNKeys, FnResult) :-
-        global_env(ReplEnv),
-        CDR20=[bv(u_body, Body), bv(sys_name, Name), bv(hash_table, Hash_table)|ReplEnv],
-        as_body(u_body, Body, RestNKeys),
-        f_gensym(Iter_Init),
-        LEnv=[bv(u_iter, Iter_Init)|CDR20],
-        get_var(LEnv, hash_table, Hash_table_Get),
-        get_var(LEnv, sys_name, Name_Get),
-        get_var(LEnv, u_body, Body_Get),
-        get_var(LEnv, u_iter, Iter_Get13),
-        MFResult = [let, [[Iter_Get13, [u_hash_table_iterator_function, Hash_table_Get]]], 
-         [macrolet, [[Name_Get, [], [quote, [funcall, Iter_Get13]]]]
-               |Body_Get]],
-        f_eval(MFResult, FnResult).
+sf_with_hash_table_iterator(SubEnv, [Macroname_In, Hashtable_In|CDR], RestNKeys, FResult) :-
+        mf_with_hash_table_iterator(
+                                    [ with_hash_table_iterator,
+                                      [Macroname_In, Hashtable_In|CDR]
+                                    | RestNKeys
+                                    ],
+                                    SubEnv,
+                                    MFResult),
+        f_sys_env_eval(SubEnv, MFResult, FResult).
+
+mf_with_hash_table_iterator([with_hash_table_iterator, [Macroname_In, Hashtable_In|CDR]|RestNKeys], SubEnv, MFResult) :-
+        nop(defmacro),
+        GEnv=[bv(u_body, Body_In), bv(u_macroname, Macroname_In), bv(u_hashtable, Hashtable_In)],
+        as_body(u_body, Body_In, RestNKeys),
+        catch(( ( get_var(GEnv, u_macroname, Macroname_Get),
+                  (   is_symbolp(Macroname_Get)
+                  ->  _2126=[]
+                  ;   f_sys_text('$ARRAY'([*],
+                                        claz_base_character,
+                                        "~S: macro name should be a symbol, not ~S"),
+                               Text_Ret),
+                      get_var(GEnv, u_macroname, Macroname_Get13),
+                      f_error(
+                              [ Text_Ret,
+                                with_hash_table_iterator,
+                                Macroname_Get13
+                              ],
+                              ElseResult),
+                      _2126=ElseResult
+                  ),
+                  f_gensym('$ARRAY'([*], claz_base_character, "WHTI-"), Var_Init),
+                  LEnv=[bv(u_var, Var_Init)|GEnv],
+                  get_var(LEnv, u_hashtable, Hashtable_Get),
+                  get_var(LEnv, u_macroname, Macroname_Get21),
+                  ( get_var(LEnv, u_body, Body_Get),
+                    get_var(LEnv, u_var, Var_Get)
+                  ),
+                  get_var(LEnv, u_var, Var_Get22)
+                ),
+                [let, [[Var_Get, [sys_hash_table_iterator, Hashtable_Get]]], [macrolet, [[Macroname_Get21, [], [quote, [sys_hash_table_iterate, Var_Get22]]]]|Body_Get]]=MFResult
+              ),
+              block_exit(with_hash_table_iterator, MFResult),
+              true).
 
 
 f_hash_table_count(HT,RetVal):-get_table(HT,Tree,_),rb_size(Tree,RetVal).
@@ -122,25 +153,29 @@ ht_match(Test,Key,Matcher):- (call(Test,Key,Matcher,R)->R=t).
                        nil)))))
 
 */
-f_sys_hash_table_iterator_function(Hash_table, FnResult) :-
-        nop(global_env(ReplEnv)),
-        Env26=[bv(hash_table, Hash_table)|ReplEnv],
-        get_var(Env26, hash_table, Hash_table_Get),
-        f_sys_hash_table_entries(Hash_table_Get, Entries_Init),
-        _LEnv=[bv(sys_entries, Entries_Init)|Env26],
-        FnResult =
-         closure(kw_function,LEnv22, LetResult10, [],  
-          (get_var(LEnv22, sys_entries, Entries_Get), 
-           f_car(Entries_Get, Entry_Init), LEnv11=[bv(sys_entry, Entry_Init)|LEnv22], 
-           get_var(LEnv11, sys_entries, Entries_Get15), 
-           f_cdr(Entries_Get15, Entries), set_var(LEnv11, sys_entries, Entries), 
-           get_var(LEnv11, sys_entry, IFTEST), 
-           (IFTEST\==[]-> 
-             get_var(LEnv11, sys_entry, Entry_Get19), f_car(Entry_Get19, Car_Ret), 
-             get_var(LEnv11, sys_entry, Entry_Get20), f_cdr(Entry_Get20, Cdr_Ret), 
-             nb_setval('$mv_return', [t, Car_Ret, Cdr_Ret]), LetResult10=t;
-                LetResult10=[]))).
-
+f_sys_hash_table_iterator_function(Hash_table_In, FnResult) :-
+        GEnv=[bv(hash_table, Hash_table_In)],
+        catch(( ( get_var(GEnv, hash_table, Hash_table_Get),
+                  f_u_hash_table_entries(Hash_table_Get, Entries_Init),
+                  LEnv=[bv(u_entries, Entries_Init)|GEnv]
+                ),
+                closure(kw_function, [ClosureEnvironment|LEnv], Whole, LetResult12, [],  
+                  (get_var(ClosureEnvironment, u_entries, Entries_Get), 
+                   f_car(Entries_Get, Entry_Init), 
+                   LEnv13=[bv(u_entry, Entry_Init)|ClosureEnvironment],
+                   get_var(LEnv13, u_entries, Entries_Get17), 
+                   f_cdr(Entries_Get17, Entries), 
+                   set_var(LEnv13, u_entries, Entries), get_var(LEnv13, u_entry, IFTEST), 
+                     (IFTEST\==[]->get_var(LEnv13, u_entry, Entry_Get21), 
+                       f_car(Entry_Get21, Car_Ret), get_var(LEnv13, u_entry, Entry_Get22), 
+                       f_cdr(Entry_Get22, Cdr_Ret), 
+                       nb_setval('$mv_return', [t, Car_Ret, Cdr_Ret]), 
+                        LetResult12=t;LetResult12=[])), 
+                   [lambda, [], [let, [[u_entry, [car, u_entries]]], [setq, u_entries, [cdr, u_entries]], 
+                    [if, u_entry, [values, t, [car, u_entry], [cdr, u_entry]], []]]])=FnResult
+              ),
+              block_exit(sys_hash_table_iterator_function, FnResult),
+              true).
 :- fixup_exports.
 
 end_of_file.
