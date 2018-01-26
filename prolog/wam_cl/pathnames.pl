@@ -69,14 +69,14 @@ pl_compiled_filename0(File,PL):- get_var(sys_xx_compile_file_type_xx,Ext),
    pl_probe_file(File,Found),atomic_list_concat([Found,Ext],'.',PL),exists_file(PL),!.
 
 to_prolog_pathname(Cmp,Out):- compound(Cmp),Cmp='$OBJ'(claz_pathname,S),!,always(to_prolog_pathname(S,Out)).
+to_prolog_pathname(Ref,O):- is_pathnamep(Ref),f_namestring(Ref,V),!,always(show_call_trace(to_prolog_pathname(V,O))).
 to_prolog_pathname(Ref,Value):- atom(Ref),!,((is_symbolp(Ref),is_boundp(Ref),f_symbol_value(Ref,PValue))->to_prolog_pathname(PValue,Value);Ref=Value).
 to_prolog_pathname(Str,O):- is_stringp(Str),!,string_to_prolog_atom(Str,O).
 to_prolog_pathname(Obj,PL):- string_to_prolog_atom(Obj,PL).
-to_prolog_pathname(Ref,O):- is_pathnamep(Ref),get_opv(Ref,name,V),!,always(show_call_trace(to_prolog_pathname(V,O))).
 %to_prolog_pathname0('$OBJ'(_T,TXT),PL):- to_prolog_string(TXT,STR),!,string_to_prolog_atom(STR,PL).
 %to_prolog_pathname0(TXT,PL):- string_to_prolog_atom(TXT,PL),!.
 
-is_pathnamep(P):- i_class(P,C),!,C==claz_pathname.
+is_pathnamep(P):- P\='$OBJ'(claz_pathname,_), i_class(P,C),!,C==claz_pathname.
 
 to_lisp_pathname(P,P):- is_pathnamep(P),!.
 to_lisp_pathname('$OBJ'(claz_pathname,PathString),'$OBJ'(claz_pathname,PathString)):-!.
@@ -164,7 +164,7 @@ f_namestring(Pathname,String):-
 f_sys_string_to_pathname(String,Pathname):- 
   to_prolog_string(String,String0),atom_string(PlPath,String0),
   file_base_name(PlPath,BaseExt),
-  file_name_extension(Base, Ext,BaseExt),atom_string(Base,Name),
+  file_name_extension(Base, Ext,BaseExt),maybe_nil_pathname(('.'),Base,Name),
   maybe_nil_pathname(BaseExt,Ext,Type),
   file_directory_name(PlPath,PlDir),lisp_dir_list(PlDir,PlPath,LispDir),
   f_make_instance([claz_pathname,kw_name,Name,kw_type,Type,kw_directory,LispDir],Pathname).
@@ -175,9 +175,11 @@ lisp_dir_list('/',_,[kw_absolute]).
 lisp_dir_list(PlDir,_,LispDir):- 
   ((is_absolute_file_name(PlDir),atomic_list_concat([_|List],'/',PlDir))
      -> LispDir = [kw_absolute|DirStrs] ; 
-    (atomic_list_concat(List,'/',PlDir),LispDir = [kw_relative|DirStrs])),
+    (atomic_list_concat(List,'/',PlDir),LispDir = DirStrs)),
   must_maplist(maybe_nil_pathname('.'),List,DirStrs).
 
+loc_to_pl([kw_relative],'.').
+loc_to_pl([kw_relative,kw_up|More],Out):-!,loc_to_pl([kw_up|More],Out).
 loc_to_pl(L,A):- a_2_l(A,L),!.
 loc_to_pl(L,A):- is_list(L),must_maplist(loc_to_pl,L,LL),atomic_list_concat(LL,'/',A).
 loc_to_pl(S,A):- atom_string(A,S).
@@ -212,7 +214,7 @@ wl:interned_eval('
               :initform nil)
    (version   :accessor pathname-version
               :initarg :version
-              :initform nil))
+              :initform :newest))
   (:documentation "A physical pathname."))
 ').
 
