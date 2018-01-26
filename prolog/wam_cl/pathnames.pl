@@ -145,7 +145,7 @@ f_pathname(S,P):- is_stream(S),stream_property(S,file(File)),!,f_pathname(File,P
 f_pathname(P,P):- is_pathnamep(P),!.
 f_pathname(String,Pathname):- f_sys_string_to_pathname(String,Pathname).
 
-f_namestring(Pathname,String):- trace,
+f_namestring(Pathname,String):- 
     get_opv(Pathname,pathname_directory,D),
     (D==[]->DS1='';(loc_to_pl(D,DS),atom_concat(DS,'/',DS1))),
     get_opv(Pathname,pathname_name,N),
