@@ -163,6 +163,13 @@ set_symbol_value_last_chance(_Env,Var,Result):- set_opv(Var,symbol_value, Result
 set_symbol_value_last_chance(_Env,Var,_Result):- 
   lisp_error_description(atom_does_not_exist, ErrNo, _),throw(ErrNo, Var).
 
+wl:init_args(1,setq).
+sf_setq(Env,Var,[Value], Result):- 
+   set_var(Env,Var,Value),!,Result=Value.   
+sf_setq(Env,Var,[Value,Var2|MORE], Result):- 
+   set_var(Env,Var,Value),
+   sf_setq(Env,Var2,MORE,Result).
+  
 
 sf_defparameter(Env,Var, Result, Result):- 
    set_opv(Var,declared_as,defparameter),

@@ -72,12 +72,45 @@ new_partly_named_opv(SKind,Name,Attrs,Obj):-
 new_partly_named_opv_pt1(SKind,Name,_Attrs,Obj,Kind):-
   always((
   (var(Kind)->find_class(SKind,Kind);true),
-  (var(Obj)->
-    (instance_prefix(Kind,Pre),!,atomic_list_concat([Pre,Name],'_',PName),
-           claz_to_symbol(Kind,Type),
-                prologcase_name(PName,Obj),to_prolog_string_anyways(Name,SName),
-                add_opv_new(Obj,type_of,Type),
-                set_opv(Obj,debug_name,SName));add_opv_new(Obj,type_of,Type)))).
+  claz_to_symbol(Kind,Type),
+  (var(Obj)->create_object_instance(Kind,Type,Name,Obj);add_opv_new(Obj,type_of,Type))
+  )).
+
+
+is_dict_type(claz_pathname,
+  pathname{pathname_host:[],pathname_device:[],pathname_directory:[],pathname_name:[],pathname_type:[],pathname_version:[],debug_name:[],ref:[]}).
+
+
+
+guess_ref_name(Obj,Ref):- ((get_dict(ref,Obj,Ref0),(Ref0==[]->(guess_ref_name0(Obj,Ref),nb_set_dict(ref,Obj,Ref));Ref0=Ref))),!.
+guess_ref_name(Obj,Ref):- guess_ref_name0(Obj,Ref).
+guess_ref_name0(Obj,Ref):- get_opv(Obj,ref,Ref).
+guess_ref_name0(Obj,Ref):-
+  type_or_class_nameof(Obj,Kind),
+  get_opv(Obj,debug_name,Name), 
+  instance_prefix(Kind,Pre),!,atomic_list_concat([Pre,Name],'_',PName),
+  prologcase_name(PName,Ref).  
+guess_ref_name0(_Obj,Ref):- gensym('sdfZZZZZZZZsdfsdf_',Ref).
+
+
+create_object_instance(Kind,Type,Name,Obj):- 
+  (is_dict_type(Type,Blank);is_dict_type(Kind,Blank)),!,
+  copy_term(Blank,Obj),
+  to_prolog_string_anyways(Name,SName),
+  add_opv_new(Obj,type_of,Type),
+   set_opv(Obj,debug_name,SName),
+   instance_prefix(Kind,Pre),!,atomic_list_concat([ref,Pre,Name],'_',PName),
+   prologcase_name(PName,Ref),
+   nb_set_dict(ref,Obj,Ref).
+
+
+create_object_instance(Kind,Type,Name,Obj):- 
+  instance_prefix(Kind,Pre),!,atomic_list_concat([ref,Pre,Name],'_',PName),
+  prologcase_name(PName,Obj),to_prolog_string_anyways(Name,SName),
+  add_opv_new(Obj,type_of,Type),
+  set_opv(Obj,debug_name,SName).
+
+
 
 new_init_instance_pt2(_SKind,_Name,Attrs,Obj,Kind):-
   always((     
@@ -605,6 +638,9 @@ get_opv_ii(Kind,Obj,Prop,Value):- notrace(is_prop_class_alloc(Kind,Prop,Where))-
 get_opv_iii(symbol,Obj,Prop,Value):- nonvar(Obj),wl:symbol_has_prop_getter(Obj,Prop,Getter),call(Getter,Obj,Prop,Value).
 get_opv_iii(_Kind,Obj,Prop,Value):- get_opv_iiii(Obj,Prop,Value).
 
+get_opv_iiii(Obj,type_of,Value):- is_dict(Obj,Value),!.
+get_opv_iiii(Obj,Prop,Value):- is_dict(Obj),!,
+ ((get_dict(Prop,Obj,Value)-> true;((guess_ref_name(Obj,Ref),get_opv_iiii(Ref,Prop,Value))))).
 get_opv_iiii(Obj,Prop,Value):- current_prolog_flag(wamcl_gvars,true),(atom(Obj);var(Obj)),nb_current(Obj,Ref),nb_current_value(Ref,Prop,Value).
 get_opv_iiii(Obj,Prop,Value):- soops:o_p_v(Obj,Prop,Value).
 get_opv_iiii(Obj,Prop,Value):- soops:struct_opv(Obj,Prop,Value).
@@ -626,28 +662,28 @@ get_type_default(Kind,Obj,Prop,Value):- is_prop_class_alloc(Kind,Prop,Where),Obj
 %get_opv_pred(Obj,Prop,Value):- fail,fail,fail,fail,fail,fail,fail, get_obj_prefix(Obj,Prefix),atom_concat_or_rtrace(Prefix,DashKey,Prop),atom_concat_or_rtrace('_',Key,DashKey),!,get_opv_i(Kind,Obj,Key,Value).
   
 
-set_ref_object(Ref,Object):- quietly(nb_setval(Ref,Object)),!.
+set_ref_object(Ref,Obj):- quietly(nb_setval(Ref,Obj)),!.
 release_ref_object(Ref):- dbginfo(release_ref_object(Ref)),quietly(nb_setval(Ref,[])),!.
-has_ref_object(Ref,Object):- nb_current(Ref,Object),Object\==[].
-get_ref_object(Ref,Object):- has_ref_object(Ref,Object),!.
-get_ref_object(Ref,Object):- always(atom(Ref)), 
+has_ref_object(Ref,Obj):- nb_current(Ref,Obj),Obj\==[].
+get_ref_object(Ref,Obj):- has_ref_object(Ref,Obj),!.
+get_ref_object(Ref,Obj):- always(atom(Ref)), 
    %oo_empty(Object0),
    %put_attr(Object0,type_of,ref),
    nb_put_attr(Object0,ref,Ref),
    always(nb_setval(Ref,Object0)),
-   always(nb_current(Ref,Object)),!.
+   always(nb_current(Ref,Obj)),!.
 
 /*
-set_ref_object(Ref,Object):- quietly(nb_set_value(?(Ref),pointer,Object)),!.
+set_ref_object(Ref,Obj):- quietly(nb_set_value(?(Ref),pointer,Obj)),!.
 release_ref_object(Ref):- dbginfo(release_ref_object(Ref)),quietly(nb_set_value(?(Ref),pointer,[])),!.
-has_ref_object(Ref,Object):- nb_current_value(?(Ref),pointer,Object),Object\=[],!.
-get_ref_object(Ref,Object):- nb_current_value(?(Ref),pointer,Object),Object\=[],!.
-get_ref_object(Ref,Object):- 
+has_ref_object(Ref,Obj):- nb_current_value(?(Ref),pointer,Obj),Obj\=[],!.
+get_ref_object(Ref,Obj):- nb_current_value(?(Ref),pointer,Obj),Obj\=[],!.
+get_ref_object(Ref,Obj):- 
    oo_empty(Object0),
    oo_put_attr(Object0,type_of,ref),
    oo_put_attr(Object0,ref,Ref),
    always(nb_set_value(?(Ref),pointer,Object0)),!,
-   always(nb_current_value(?(Ref),pointer,Object)),!.
+   always(nb_current_value(?(Ref),pointer,Obj)),!.
 */
 
 
@@ -750,13 +786,15 @@ add_opv_new_ii(_Kind,Obj,Prop,Value):- add_opv_new_iiii(Obj,Prop,Value).
 
 % u_daft_point_znst_1,u_daft_point_znst_2,u_daft_point_z
 
-
+add_opv_new_iiii(Obj,type_of,Type):- is_dict(Obj),!,nb_setarg(1,Obj,Type).
 %add_opv_new_iiii(Obj,Prop,Value):- assertion(ground(o_p_v(Obj,Prop,Value))),fail.
 add_opv_new_iiii(Ref,u_daft_point_z,_Value):- Ref\==u_daft_point_znst_metaobject_0,!,break.
 % add_opv_new_iiii(Obj,Prop,Value):- get_opv_iiii(Obj,Prop,OldValue),Value==OldValue,!.
-add_opv_new_iiii(Ref,Prop,Value):-current_prolog_flag(wamcl_gvars,true),!, always(get_ref_object(Ref,Object)),!,   
+add_opv_new_iiii(Obj,Prop,Value):- is_dict(Obj),!,always(((get_dict(Prop,Obj,_)->nb_set_dict(Prop,Obj,Value);
+   ((guess_ref_name(Obj,Ref),add_opv_new_iiii(Ref,Prop,Value)))))).
+add_opv_new_iiii(Ref,Prop,Value):-current_prolog_flag(wamcl_gvars,true),!, always(get_ref_object(Ref,Obj)),!,   
    %show_call_trace
-   (always(nb_put_attr(Object,Prop,Value))).
+   (always(nb_put_attr(Obj,Prop,Value))).
 add_opv_new_iiii(Obj,Prop,Value):- % show_call_trace
    ((atom(Obj),(atom_concat(sys_,_,Obj);atom_concat(os_,_,Obj)))->true;wdmsg(assert_lsp(o_p_v(Obj,Prop,Value)))),
    assert_lsp(Obj,soops:o_p_v(Obj,Prop,Value)).

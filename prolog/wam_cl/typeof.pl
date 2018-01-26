@@ -23,6 +23,7 @@ f_class_of(_,claz_t).
 % :- use_module(library('dialect/sicstus')).
 % Numbers, pathnames, and arrays are examples of self-evaluating objects.
 is_self_evaluating_object(X):- var(X),!.
+is_self_evaluating_object(X):- is_pathnamep(X),!.
 is_self_evaluating_object(X):- atomic(X),!,is_self_evaluationing_const(X).
 is_self_evaluating_object('$OBJ'(_,_)):-!.
 is_self_evaluating_object('#\\'(_)):-!.

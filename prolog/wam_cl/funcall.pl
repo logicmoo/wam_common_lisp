@@ -129,7 +129,7 @@ compile_funop(_Ctx,_Env,Result,[FN | FunctionArgs],f_eval([FN|FunctionArgs],Resu
 
 check_foc_operator(Ctx,Env,BindType,F,Args,BetterName,PushPreArgs):-
    foc_operator(Ctx,Env,BindType,F,Args,ProposedName),
-   do_check_foc_operator(Ctx,Env,BindType,F,Args,ProposedName, BetterName,PushPreArgs),!.
+   show_call_trace(do_check_foc_operator(Ctx,Env,BindType,F,Args,ProposedName, BetterName,PushPreArgs)),!.
 
 
 do_check_foc_operator(_Ctx,Env,_BindType,_F,_Args,ProposedName, BetterName,[Env]):-
@@ -141,8 +141,8 @@ do_check_foc_operator(_Ctx,Env,_BindType,_F,_Args,ProposedName, BetterName,[Env]
 do_check_foc_operator(_Ctx,Env,_BindType,_F,_Args,ProposedName, BetterName,[Env]):-
   atom_concat('sf_',Root,ProposedName),  
   atom_concat('sf_',Root,BetterName),
-  current_predicate(BetterName/N),N>=1,
-  wdmsg(rename(ProposedName,BetterName)),!.
+  %current_predicate(BetterName/N),N>=1,
+  !.
 
 do_check_foc_operator(_Ctx,_Env,_BindType,_F,_Args,ProposedName, BetterName,[]):-
   atom_concat('mf_',Root,ProposedName),  
@@ -165,10 +165,9 @@ do_check_foc_operator(_Ctx,_Env,_BindType,_F,_Args,ProposedName, ProposedName,[]
 compile_apply_function_or_macro_call(Ctx,Env,FN,Args,Result,ExpandedFunction):-
  always((
    (is_list(Args)->length(Args,ArgsLen);(integer(Args)->ArgsLen=Args;true)),
-   check_foc_operator(Ctx,Env,BindType,FN,ArgsLen, ProposedName,Extra),!,
-   wdmsg(BindType->ProposedName),
-   (BindType == kw_macro -> true ; true),
-   align_args_or_fallback(Ctx,Env,FN, ProposedName,Args,Result,ArgsPlusResult),!,
+   check_foc_operator(Ctx,Env,BindType,FN,ArgsLen, ProposedName,Extra),!,  
+   (BindType == kw_function -> true ; wdmsg(BindType->ProposedName)),
+   align_args_or_fallback1(Ctx,Env,FN, ProposedName,Args,Result,ArgsPlusResult),!,
    append(Extra,ArgsPlusResult,ExtraArgsPlusResult),
    ExpandedFunction =.. [ ProposedName | ExtraArgsPlusResult])),!.
 
@@ -186,7 +185,7 @@ compile_apply1(Ctx,Env,F,Args,Result,ExpandedFunction):- atom(F),
  length(Left,N),
  append(Left,IntoList,Args),
  append(Left,[IntoList,Result],NewArgs),
- check_foc_operator(Ctx,Env,kw_function,F,_, ProposedName, Extra),!,
+ check_foc_operator(Ctx,Env,_Non_Macro_kw_function,F,_, ProposedName, Extra),!,
  append(Extra,NewArgs,NewNewArgs),
  ExpandedFunction =.. [ ProposedName | NewNewArgs].
 

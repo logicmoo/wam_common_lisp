@@ -158,7 +158,7 @@ subst_castifies(C1,C2):- compound_name_arguments(C1,F,C1O),
 castify(O,O):- \+compound(O),!,fail.
 castify(str(O),S):-!, castify1(O,M),to_lisp_string(M,S).
 castify(plstr(O),S):-!, castify1(O,M),to_prolog_string(M,S).
-castify(path(O),S):-!, castify1(O,M),to_lisp_pathname(M,S).
+castify(path(O),S):-!, castify1(O,M),f_pathname(M,S).
 castify(sym(O),S):-!, castify1(O,M),reader_intern_symbols(M,S).
 castify(value(O),S):- castify1(O,M),always(get_opv(M,symbol_value,S)).
 castify(value(O),S):- castify1(O,M),always(get_opv(M,symbol_value,S)).

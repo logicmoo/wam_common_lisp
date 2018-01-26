@@ -460,7 +460,7 @@ sexpr('#\\'(C))                 --> `#\\`,!,rsymbol(``,C), swhite.
 sexpr(['#-',K,O]) --> `#-`,!,sexpr(C),swhite,sexpr(O),!,{as_keyword(C,K)}.
 sexpr(['#+',K,O]) --> `#+`,!,sexpr(C),swhite,sexpr(O),!,{as_keyword(C,K)}.
 
-sexpr('$OBJ'(claz_pathname,C)) --> `#`,ci(`p`),s_string(C).
+sexpr(P) --> `#`,ci(`p`),s_string(C),{f_pathname(C,P)}.
 sexpr('$S'(C)) -->                  (`#`, ci(`s`),`(`),!,sexpr_list(C),swhite,!.
 %sexpr('$COMPLEX'(R,I)) --> `#`,ci(`c`),`(`,!,  lnumber(R),lnumber(I),`)`.
 sexpr('$COMPLEX'(R,I)) -->         (`#`, ci(`c`),`(`),!,sexpr_list([R,I]),swhite,!.
@@ -738,7 +738,7 @@ as_keyword(C,C).
 % Converted To Untyped.
 %
 to_untyped(S,S):- var(S),!.
-to_untyped(S,S):- var(S),!.
+to_untyped(S,S):- is_dict(S),!.
 to_untyped([],[]):-!.
 to_untyped('#-'(C,I),'#-'(K,O)):- as_keyword(C,K),!,to_untyped(I,O),!.
 to_untyped('#+'(C,I),'#+'(K,O)):- as_keyword(C,K),!,to_untyped(I,O),!.

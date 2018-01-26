@@ -216,10 +216,11 @@ get_macro_function(Ctx,Env,Procedure,Arguments,MFResult,CallBody):-
 
 get_macro_function(Ctx,Env,Procedure,Arguments,MResult,CallBody):-  atom(Procedure),
    length(Arguments,ArgsLen),
-   (find_operator(Ctx,Env,kw_special,Procedure,ArgsLen, ProposedName)),!,
-   notrace(align_args_or_fallback(Ctx,Env,Procedure,ProposedName,Arguments,_FnResult,ArgsPlusResult)),
+   (find_operator(Ctx,Env,kw_macro,Procedure,ArgsLen, ProposedName)),!,
+   notrace(align_args_or_fallback1(Ctx,Env,Procedure,ProposedName,Arguments,_FnResult,ArgsPlusResult)),
    ExpandedMacro =.. [ ProposedName | ArgsPlusResult],
    get_mf_interface(Env,ExpandedMacro,CallBody,MResult).
+
 
 
 get_mf_interface(Env,MacroSymbol,CallBody,MResult):- 

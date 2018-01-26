@@ -40,6 +40,7 @@ shrink_lisp_strings(Str,Str).
 is_characterp_lisp(X):- compound(X),X='#\\'(_). %,is_characterp(X).
 
 sexpr1(X) --> {is_ftVar(X),(get_var_name(X,N)->format(atom(NN),'~w',[N]);format(atom(NN),'~w',[X]))},!,[NN].
+sexpr1(PN) --> {is_pathnamep(PN)},['#P'],{f_namestring(PN,NS),sformat(Out,'~w',NS)},[Out].
 sexpr1(Str)--> {is_stringp(Str),to_prolog_string(Str,PStr)},!,[PStr].
 sexpr1([]) --> !, ['(',')'].
 sexpr1(X)--> {atom(X)},!,[X].
@@ -71,7 +72,6 @@ sexpr1('$OBJ'(T,X)) --> {T==claz_prolog,with_output_to(atom(SPClosure),fmt9(X)),
   ['{',TSPClosure,'}.'], !.
 sexpr1('$OBJ'(T,X)) --> {T==claz_function},['#\''],sexpr1(X).
 sexpr1('$OBJ'(T,X)) --> {T==claz_vector},['#('],lisplist(X,')').
-sexpr1('$OBJ'(T,X)) --> {T==claz_pathname},['#P'],sexpr1(X).
 sexpr1('$OBJ'(T,X)) --> ['#S('],{is_list(X),is_structure_classp(T),claz_to_symbol(T,TP)},sexpr1(TP),lisplist(X,')').
 sexpr1('$OBJ'(T,X)) --> ['#S'],{is_list(X),is_structure_classp(T),claz_to_symbol(T,TP)},sexpr1(TP),sexpr1(X).
 sexpr1('$OBJ'(claz_package,X)) -->  !,sexpr1(X).

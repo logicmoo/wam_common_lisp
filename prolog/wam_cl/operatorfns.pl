@@ -61,14 +61,14 @@ is_lisp_funcallable(closure,_).
 
 find_lisp_function(FN,ARITY,ProposedName):-
   find_operator(_Ctx,_Env,kw_function,FN,ARITY, ProposedName).
-find_lisp_function(FN,ARITY,ProposedName):-
+find_lisp_function(FN,ARITY,ProposedName):- fail,
   find_operator(_Ctx,_Env,kw_special,FN,ARITY, ProposedName).
 
 /*
 make_function_or_macro_call(Ctx,Env,FN,Args,Result,ExpandedFunction):-
    (is_list(Args)->length(Args,ArgsLen);true),
-   foc_operator(Ctx,Env,symbol_function,FN,ArgsLen, ProposedName),!,
-   align_args_or_fallback(Ctx,Env,FN, ProposedName,Args,Result,ArgsPlusResult),
+   foc_ope rator(Ctx,Env,symbol_function,FN,ArgsLen, ProposedName),!,
+   align_ args  _or_fallback(Ctx,Env,FN, ProposedName,Args,Result,ArgsPlusResult),
    ExpandedFunction =.. [ ProposedName | ArgsPlusResult].
 */
 
@@ -110,12 +110,14 @@ foc_operator(Ctx,_Env,BindType,FN, _Len, ProposedName):-
   show_call_trace((generate_function_or_macro_name(Ctx,FN,BindType,ProposedName))),!.
 
 bind_type_naming_of(BindType,FN,Named):- wdmsg(bind_type_naming_of(BindType,FN,Named)).
-bind_type_naming(kw_function,FN,ProposedName):- (atom_concat('f_',FN,ProposedName);atom_concat('sf_',FN,ProposedName)),!.
-bind_type_naming(kw_special,FN,ProposedName):-  (atom_concat('sf_',FN,ProposedName);atom_concat('f_',FN,ProposedName)),!.
+bind_type_naming(kw_function,FN,ProposedName):- (atom_concat('f_',FN,ProposedName)),!.
+bind_type_naming(kw_special,FN,ProposedName):-  (atom_concat('sf_',FN,ProposedName)),!.
+%bind_type_naming(kw_function,FN,ProposedName):- (atom_concat('sf_',FN,ProposedName)),!.
+%bind_type_naming(kw_special,FN,ProposedName):-  (atom_concat('f_',FN,ProposedName)),!.
 bind_type_naming(kw_macro,FN,ProposedName):- atom_concat('mf_',FN,ProposedName).
 
 existing_operator(Ctx,Env,BindType,FN, _Len, ProposedName):- show_success(get_symbol_fbounds(Ctx,Env,FN,BindType,ProposedName)),!.
-existing_operator(_,_,BindType,FN,_, ProposedName):- get_opv(FN,symbol_function,ProposedName),bind_type_naming(BindType,_,ProposedName).
+existing_operator(_,_,BindType,FN,_, ProposedName):- get_opv(FN,symbol_function,ProposedName),!,bind_type_naming(BindType,_,ProposedName).
 existing_operator(_Ctx,_Env,BindType,FN,_Len, ProposedName):- bind_type_naming(BindType,FN,ProposedName),is_defined(ProposedName,_).
 %existing_operator(_Ctx,_Env,BindType,FN,_Len, ProposedName):- get_opv(FN,symbol_function,ProposedName),!,var(BindType).
 existing_operator(_Ctx,_Env,BindType,FN,_,ProposedName):- bind_type_naming(BindType,_,FN),ProposedName = FN.
@@ -179,10 +181,10 @@ arg_info_count(ArgInfo,Prop,N):-
 premute_names(F,F).
 premute_names(F,FF):- atom_concat_or_rtrace('f_',F,FF).
 % premute_names(F,FF):- atom_concat_or_rtrace('mf_',F,FF).
-premute_names(F,FF):- atom_concat_or_rtrace('sf_',F,FF).
+%premute_names(F,FF):- atom_concat_or_rtrace('sf_',F,FF).
 premute_names(F,FF):- atom_concat_or_rtrace('f_',FF,F).
 % premute_names(F,FF):- atom_concat_or_rtrace('mf_',FF,F).
-premute_names(F,FF):- atom_concat_or_rtrace('sf_',FF,F).
+%premute_names(F,FF):- atom_concat_or_rtrace('sf_',FF,F).
 
 
 % Non built-in function expands into an explicit function call
@@ -219,18 +221,19 @@ align_args(FN,ProposedName,Args,Result,[[FN|Args],Result]):-
 /*
 % guess invoke(r1,r2,r3,RET).
 */
-align_args_or_fallback(_Ctx,Env,FN,ProposedName,Args,Result,ArgsPlusResult):- 
-   always((align_args_or_fallback_skip_env(FN,ProposedName,Args,Result,ArgsPlusResult),!,
-   ((fail,eval_uses_env_arg1(FN))->
-      append([Env|Args], [Result], ArgsPlusResult);
-      append(Args, [Result], ArgsPlusResult)))).
 
-   
+align_args_or_fallback1(_Ctx,_Env,FN,ProposedName,Args,Result,ArgsPlusResult):- 
+   align_args_or_fallback_skip_env(FN,ProposedName,Args,Result,ArgsPlusResult),!.
+      
 align_args_or_fallback_skip_env(FN,ProposedName,Args,Result,ArgsPlusResult):- 
    align_args(FN,ProposedName,Args,Result,ArgsPlusResult),!.
 align_args_or_fallback_skip_env(_,_ProposedName,Args,Result,ArgsPlusResult):- 
    append(Args, [Result], ArgsPlusResult).
 
+/*align_args_or_fallback_skip_env(FN,ProposedName,Args,Result,ArgsPlusResult):- 
+   compile_apply_function_or_macro_call(Ctx,Env,FM,Args,Result,ExpandedFunction),!.
+  
+*/
 
 only_arity(ProposedName,N):-
   is_defined(ProposedName,N),

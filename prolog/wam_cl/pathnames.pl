@@ -18,16 +18,13 @@
 
 :- include('header').
 
-wl:init_args(0,make_pathname).
-f_make_pathname(I,O):- f_make_instance([claz_pathname|I],O).
-
 wl:init_args(1,compile_file_pathname).
 f_compile_file_pathname(OSFile,Keys,PLFileOut):-
    F = kw_output_file,
     current_env(Env),
    get_kw(Env,Keys,F,sys_output_file, 
      PLFile, pl_compiled_filename(OSFile,PLFile), _Present),
-   to_lisp_pathname(PLFile,PLFileOut).
+   f_pathname(PLFile,PLFileOut).
 
 
 /*
@@ -68,26 +65,14 @@ pl_compiled_filename0(Obj,PL):- compound(Obj),arg(2,Obj,From),string(From),
 pl_compiled_filename0(File,PL):- get_var(sys_xx_compile_file_type_xx,Ext),
    pl_probe_file(File,Found),atomic_list_concat([Found,Ext],'.',PL),exists_file(PL),!.
 
-to_prolog_pathname(Cmp,Out):- compound(Cmp),Cmp='$OBJ'(claz_pathname,S),!,always(to_prolog_pathname(S,Out)).
-to_prolog_pathname(Ref,O):- is_pathnamep(Ref),f_namestring(Ref,V),!,always(show_call_trace(to_prolog_pathname(V,O))).
-to_prolog_pathname(Ref,Value):- atom(Ref),!,((is_symbolp(Ref),is_boundp(Ref),f_symbol_value(Ref,PValue))->to_prolog_pathname(PValue,Value);Ref=Value).
-to_prolog_pathname(Str,O):- is_stringp(Str),!,string_to_prolog_atom(Str,O).
-to_prolog_pathname(Obj,PL):- string_to_prolog_atom(Obj,PL).
-%to_prolog_pathname0('$OBJ'(_T,TXT),PL):- to_prolog_string(TXT,STR),!,string_to_prolog_atom(STR,PL).
-%to_prolog_pathname0(TXT,PL):- string_to_prolog_atom(TXT,PL),!.
 
-is_pathnamep(P):- P\='$OBJ'(claz_pathname,_), i_class(P,C),!,C==claz_pathname.
+is_pathnamep(P):- f_type_of(P,C),!,C==pathname.
 
-to_lisp_pathname(P,P):- is_pathnamep(P),!.
-to_lisp_pathname('$OBJ'(claz_pathname,PathString),'$OBJ'(claz_pathname,PathString)):-!.
-to_lisp_pathname(Pathname,'$OBJ'(claz_pathname,PathString)):- 
-  (is_stringp(Pathname)->PathStr=Pathname;text_to_string(Pathname,PathStr)),
-  to_lisp_string(PathStr,PathString).
 
 % Uses Symbol value: *DEFAULT-PATHNAME-DEFAULTS*
 f_truename(In,Pathname):- or_die(f_probe_file(In,Pathname)).
 f_probe_file(In,Pathname):- 
-   or_nil((pl_probe_file(In,O)->to_lisp_pathname(O,Pathname))).
+   or_nil((pl_probe_file(In,O)->f_pathname(O,Pathname))).
 
 nil_lastvar((_,G)):-!, nil_lastvar(G).
 nil_lastvar(G):- functor(G,_,A),arg(A,G,[]).
@@ -108,27 +93,16 @@ pl_probe_file(In,M):- path_probe(FD),once((with_fstem(FD,In,M))),!.
 
 set_default_path_early:-
    working_directory(X,X),
-   assertz(wl:interned_eval(call((to_lisp_pathname(X,Path),
+   assertz(wl:interned_eval(call((f_pathname(X,Path),
      set_opv(sym('cl:*default-pathname-defaults*'),symbol_value,Path))))).
 
 :- prolog_load_context(directory,X),
-   assertz(wl:interned_eval(call((to_lisp_pathname(X,Path),
+   assertz(wl:interned_eval(call((f_pathname(X,Path),
      set_opv(sym('sys:*LISP-HOME*'),symbol_value,Path))))).
 
-wl:interned_eval(call((to_lisp_pathname("",Path),
+wl:interned_eval(call((f_pathname("",Path),
      set_opv(sym('cl:*default-pathname-defaults*'),symbol_value,Path)))).
 
-
-% Uses Symbol value: *SOURCE-FILE-TYPES*
-check_file_types(SearchTypes):- 
-   f_symbol_value(sys_xx_source_file_types_xx,FileTypes),
-   maplist(to_file_exts,FileTypes,SearchTypes),!.
-check_file_types(['.cl','.lisp','.lsp','.el']).
-
-to_file_exts(Str,Atom):- to_prolog_string_anyways(Str,At),atom_concat_or_rtrace('.',At,Atom),!.
-
-string_to_prolog_atom(TXT,A):- to_prolog_string_anyways(TXT,T),!,always((text_to_string(T,S),atom_string(A,S))),!.
-%string_to_prolog_atom(TXT,A):- always((text_to_string(TXT,S),atom_string(A,S))),!.
 
 with_fstem(Path,File,Found):-   
    check_file_types(SearchTypes),!,
@@ -141,9 +115,32 @@ found_strem(Path0,File0,SearchTypes,Found):-
    (fail,absolute_file_name(File,Found,[relative_to(Path),
      access(read),file_type(directory),file_errors(fail),expand(true),solutions(all)]),exists_directory(Found))).
 
-f_pathname(S,P):- is_stream(S),stream_property(S,file(File)),!,f_pathname(File,P).
-f_pathname(P,P):- is_pathnamep(P),!.
-f_pathname(String,Pathname):- f_sys_string_to_pathname(String,Pathname).
+
+% Uses Symbol value: *SOURCE-FILE-TYPES*
+check_file_types(SearchTypes):- 
+   f_symbol_value(sys_xx_source_file_types_xx,FileTypes),
+   maplist(to_file_exts,FileTypes,SearchTypes),!.
+check_file_types(['.cl','.lisp','.lsp','.el']).
+
+to_file_exts(Str,Atom):- to_prolog_string_anyways(Str,At),atom_concat_or_rtrace('.',At,Atom),!.
+
+
+% ========================================================================
+% PATHNAME ROUND TRIP
+% ========================================================================
+
+wl:init_args(0,make_pathname).
+f_make_pathname(I,O):- f_make_instance([claz_pathname|I],O).
+
+to_prolog_pathname(Ref,O):- is_pathnamep(Ref),!,f_namestring(Ref,V),!,always(show_call_trace(to_prolog_pathname(V,O))).
+to_prolog_pathname(Cmp,Out):- compound(Cmp),Cmp='$OBJ'(CP,S),CP==claz_pathname,!,always(to_prolog_pathname(S,Out)).
+to_prolog_pathname(Ref,Value):- atom(Ref),!,((is_symbolp(Ref),is_boundp(Ref),f_symbol_value(Ref,PValue))->to_prolog_pathname(PValue,Value);Ref=Value).
+%to_prolog_pathname(Str,O):- is_stringp(Str),!,string_to_prolog_atom(Str,O).
+to_prolog_pathname(Obj,PL):- string_to_prolog_atom(Obj,PL).
+%to_prolog_pathname0('$OBJ'(_T,TXT),PL):- to_prolog_string(TXT,STR),!,string_to_prolog_atom(STR,PL).
+%to_prolog_pathname0(TXT,PL):- string_to_prolog_atom(TXT,PL),!.
+string_to_prolog_atom(TXT,A):- to_prolog_string_anyways(TXT,T),!,always((text_to_string(T,S),atom_string(A,S))),!.
+%string_to_prolog_atom(TXT,A):- always((text_to_string(TXT,S),atom_string(A,S))),!.
 
 f_namestring(Pathname,String):- 
     get_opv(Pathname,pathname_directory,D),
@@ -153,21 +150,26 @@ f_namestring(Pathname,String):-
     get_opv(Pathname,pathname_type,E),
     (E==[]->sformat(String,'~w',[DS2]);(loc_to_pl(E,ES),sformat(String,'~w.~w',[DS2,ES]))),
     !.
+f_namestring(pathname_znst_3,_String):- break,!,fail.
 f_namestring(Atom,String):- f_string(Atom,String),!.
-f_namestring(In,Out):- to_prolog_pathname(In,Atom),atom_string(Atom,String),to_lisp_string(String,Out).
+f_namestring(In,Out):- trace,to_prolog_pathname(In,Atom),atom_string(Atom,String),to_lisp_string(String,Out).
 f_namestring(Pathname,String):-
     get_opv(Pathname,pathname_namestring,PN),!,
     string_to_prolog_atom(PN,Atom),atom_string(Atom,String).
 f_namestring(Pathname,String):-
     throw(todo(f_namestring(Pathname,String))).
 
+f_pathname(S,P):- is_stream(S),stream_property(S,file(File)),!,f_pathname(File,P).
+f_pathname(P,P):- is_pathnamep(P),!.
+f_pathname(P,L):- to_prolog_pathname(P,M),atom_string(M,S),!,f_sys_string_to_pathname(S,L).
+f_pathname(String,Pathname):- f_sys_string_to_pathname(String,Pathname).
 f_sys_string_to_pathname(String,Pathname):- 
   to_prolog_string(String,String0),atom_string(PlPath,String0),
   file_base_name(PlPath,BaseExt),
   file_name_extension(Base, Ext,BaseExt),maybe_nil_pathname(('.'),Base,Name),
   maybe_nil_pathname(BaseExt,Ext,Type),
   file_directory_name(PlPath,PlDir),lisp_dir_list(PlDir,PlPath,LispDir),
-  f_make_instance([claz_pathname,kw_name,Name,kw_type,Type,kw_directory,LispDir],Pathname).
+  f_make_pathname([kw_name,Name,kw_type,Type,kw_directory,LispDir],Pathname).
 
 lisp_dir_list('.',PlPath,[kw_relative]):- atom_concat('.',_,PlPath),!.
 lisp_dir_list('.',_PlPath,[]).

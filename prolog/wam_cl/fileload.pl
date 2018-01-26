@@ -376,7 +376,7 @@ f_provide(Name_Param, FResult) :-
        % Env=[bv(sys_name, Name_Param)],
         f_string(Name_Param, String_Init),
        % LEnv=[[bv(string, String_Init)]|Env],
-        sf_pushnew(String_Init,xx_modules_xx, [kw_test, function(string_c61)],_Pushnew_R),
+        sf_pushnew(_,String_Init,xx_modules_xx, [kw_test, function(string_c61)],_Pushnew_R),
         String_Init=FResult.
 /*:- set_opv(f_provide,type_of,compiled_function),
    set_opv(provide, compile_as, kw_function),
