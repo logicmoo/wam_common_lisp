@@ -1,0 +1,39 @@
+
+Some notes on using "5/1/90  May Day PCL (REV 4b)" with KCL and AKCL.
+
+1. KCL will try to load the PCL file "init" when it starts up,
+   if you rename the files as is mentioned in defsys.lisp and the 
+   currect directory is the one containing PCL.  I suggest that
+   you do not rename any file except maybe "defsys", and also 
+   that you change the (files-renamed-p t) to (files-renamed-p nil) 
+   in defsys.lisp.
+
+2. Do not comment out the file kcl-patches.lisp, even if you are
+   using AKCL.  It contins a patch to make compiler messages more
+   informative for AKCL, and also sets compiler::*compile-ordinaries*
+   to T, so that methods will get compiled.
+
+3. While fixup.lisp compiles, there will be a pause, because 
+   KCL's compiler is not reentrant, and some uncompiled
+   code is run.  If you want, you can change the form
+   (fix-early-generic-functions) to (fix-early-generic-functions t)
+   in fixup.lisp to see what is happening.
+
+4. (If you are using AKCL 605 or newer, skip this step.)
+   If you want, you can apply the changes in kcl-mods.text
+   to your KCL or AKCL to make PCL run faster.  The file kcl-mods.text
+   is different from what it was in versions of PCL earlier than
+   May Day PCL.  If you do not make these changes, or if you made 
+   the old changes, things will still work.
+
+5. If you are using AKCL, and you previously used the kcl-low.lisp
+   file from rascal.ics.utexas.edu, you should not use it this time.
+   The kcl-low.lisp that comes with May Day PCL works fine.  (If you
+   insist on using an old version of kcl-low.lisp, you will need to
+   use an old version of the KCL part of fin.lisp as well: this is
+   what is done for IBCL, by the way.) 
+
+6. I recommend that you use AKCL version 457 or newer rather than using
+   KCL or an older version of AKCL, because there are some bugs in KCL
+   that cause problems for May Day PCL.
+

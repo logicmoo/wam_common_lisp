@@ -1,0 +1,180 @@
+Here is the standard information about PCL.  I have also added you to
+the CommonLoops@Xerox.com mailing list.
+
+Portable CommonLoops (PCL) started out as an implementation of
+CommonLoops written entirely in CommonLisp.  It is in the process of
+being converted to an implementation of CLOS.  Currently it implements a
+only a subset of the CLOS specification.  Unfortunately, there is no
+detailed description of the differences between PCL and the CLOS
+specification, the source code is often the best documentation.
+
+  Currently, PCL runs in the following implementations of
+  Common Lisp:
+
+   EnvOS Medley
+   Symbolics (Release 7.2)
+   Lucid (3.0)
+   ExCL (Franz Allegro 3.0.1)
+   KCL (June 3, 1987)
+   AKCL (1.86, June 30, 1987)
+   Ibuki Common Lisp (01/01, October 15, 1987)
+   TI (Release 4.1)
+   Coral Common Lisp (Allegro 1.2)
+   Golden Common Lisp (3.1)
+   CMU
+   VAXLisp (2.0)
+   HP Common Lisp
+   Pyramid Lisp
+
+There are several ways of obtaining a copy of PCL.
+
+*** Arpanet Access to PCL ***
+
+The primary way of getting PCL is by Arpanet FTP.
+
+The files are stored on arisia.xerox.com.  You can copy them using
+anonymous FTP (username "anonymous", password "anonymous"). There are
+several directories which are of interest:
+
+/pcl
+
+This directory contains the PCL sources as well as some rudimentary
+documentation (including this file).  All of these files are combined
+into a single Unix TAR file.  The name of this file is "tarfile".
+
+Extract the individual files from this tarfile by saying:
+
+tar -xf tarfile *
+
+where `tarfile' is the name you have given the tarfile in your
+directory.  Once you have done this, the following files are of special
+interest:
+
+readme.text   READ IT
+
+notes.text    contains notes about the current state of PCL, and some
+              instructions for installing PCL at your site.  You should
+              read this file whenever you get a new version of PCL.
+
+get-pcl.text  contains the latest draft of this message
+
+
+/pcl/doc
+
+This directory contains TeX source files for the most recent draft of
+the CLOS specification.  There are TeX source files for two documents
+called concep.tex and functi.tex.  These correspond to chapter 1 and 2
+of the CLOS specification.
+
+
+/pcl/archive
+
+This directory contains the joint archives of two important mailings
+lists:
+
+  CommonLoops@Xerox.com
+
+    is the mailing list for all PCL users.  It carries announcements
+    of new releases of PCL, bug reports and fixes, and general advice
+    about how to use PCL and CLOS.
+
+  Common-Lisp-Object-System@Sail.Stanford.edu
+
+    is a small mailing list used by the designers of CLOS.
+
+The file cloops.text is always the newest of the archive files.
+
+The file cloops1.text is the oldest of the archive files.  Higher
+numbered versions are more recent versions of the files.
+
+*** Getting PCL on Macintosh floppies *** 
+
+PCL is listed in APDAlog.  It is distributed on Macintosh floppies.
+This makes it possible for people who don't have FTP access to arisia
+(but who do have a Macintosh) to get PCL.
+
+For $40 you receive a version of PCL and a copy of the CLOS spec (X3J13
+document number 88-002R).  The APDAlog catalog number is T0259LL/A and
+you can order by calling:
+
+  From the U.S.   (800)282-2732
+  From Canada     (800)637-0029
+  International   (408)562-3910
+  FAX             (408)562-3971
+
+
+NOTE:  Whenever there is a new release of PCL you want, you should
+probably wait a couple of months before ordering it from APDAlog.  We
+want to let new PCL's stabilize a bit before sending it to them, and it
+will take them some time to integrate the new disks into their
+distribution.
+
+*** Using the BITFTP server at Princeton ***
+
+For people who can't FTP from Internet (Arpanet) hosts, but who have
+mail access to the BITNET, there exists a way to get the PCL files using
+the BITFTP service provided by Princeton Univerity.  If you know exactly
+where to find the files that interest you, this is quite easy.  In
+particular, you have to know:
+
+ * the Internet host name of the host that maintains the files (such
+   as `arisia.Xerox.COM')
+ * the directory where to find the files, relative to the root of the
+   FTP tree (i.E. `pub')
+ * whether the files are binary or ASCII text.
+ * the names of the files (say `pcl90.tar.Z' and `pcl90.README')
+
+To do this, send a message to BITFTP@PUCC (or BITFTP@PUCC.BITNET if you
+aren't on BITNET itself).  The subject line of the message will be
+ignored.  The text (body) of the message should be:
+
+        FTP arisia.xerox.com UUENCODE
+        CD pcl
+        BINARY
+        GET tarfile
+        QUIT
+
+Then you wait (probably for about a day when you are in Europe) and
+eventually you will receive E-Mail messages from BITFTP@PUCC (or
+BITFTP2%PUCC...) with subject lines like `uudecoded file tarfile part
+13'.  Then you have to carefully concatenate the contents of ALL of
+these files in the correct order.
+
+  Note: The following works on our Suns and should work on any
+  Berkeley UNIX machine.  If you don't have the `compress' or `zcat'
+  program, you can get a free version (with MIT's X Window System
+  distribution, for example).
+
+The resulting file can be `uudecode'd like this:
+
+        dagobert% uudecode name-of-the-assembled-file
+
+This will give you a file tarfile.Z (it may actually have a different
+name; then you may want to rename it in the first place).  The `.Z' at
+the end means that the file you now have is compressed.  You can
+uncompress it with `uncompress tarfile.  You can untar the uncompressed
+file with `tar -xvf tarfile'.
+
+This will write all files in the tarfile to the current directory.
+
+If you want to know more about the BITFTP service, send a letter to
+`BITFTP@PUCC' that contains the single line `HELP'.
+
+*** Xerox Internet Access to PCL ***
+
+Xerox XNS users can get PCL from {NB:PARC:XEROX}<PCL>
+
+
+
+Send any comments, bug-reports or suggestions for improvements to:
+
+   CommonLoops.pa@Xerox.com
+
+Send mailing list requests or other administrative stuff to:
+
+  CommonLoops-Request@Xerox.com
+
+
+Thanks for your interest in PCL.
+----------
+

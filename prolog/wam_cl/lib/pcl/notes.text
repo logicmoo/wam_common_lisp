@@ -1,0 +1,244 @@
+
+These notes correspond to the "July 92 PCL (1d)" version of PCL.
+
+Changes for July 92 PCL (1d) include support for UCL lisp (thanks to
+Eric Eide) and a bug patch for class redefinition of classes with user-defined
+class allocations.
+
+Changes since July 92 PCL (beta) include some minor bug fixes and performance
+enhancements, along with new support for MCL 2.0 (thanks to Tom Morgan and
+the kind folks at Apple) and for CLISP (thanks to Bruno Haible).
+
+===========================================================================
+This version of PCL is much closer than previous versions of PCL
+to the metaobject protocol specified in "The Art of the Metaobject Protocol", 
+chapters 5 and 6, by Gregor Kiczales, Jim des Riveres, and Daniel G. Bobrow.
+
+[Please read the file march-92-notes.text and may-day-notes.text also.
+  Most of those files still apply.]
+
+Newly supported:
+
+accessor-method-slot-definition
+no-next-method
+generic-function-argument-precedence-order
+reader-method-class
+writer-method-class
+(setf class-name)
+
+defgeneric :method option
+
+class-default-initargs, class-precedence-list, class-prototype,
+   and class-slots now signal errors when class is not finalized
+   (as specified in AMOP ch 6).
+
+Improvements to slot-access
+  Optimization for slot-value of specialized parameter inside of defmethod.
+  Optimization for standard cases of slot-value everywhere else.
+
+Additional support for structures
+  Redefines defstruct macro to give PCL access to all structure information
+  for structure classes in addition to calling the original lisp defstruct.
+
+All AMOP generic-functions now exported.
+
+-------------------------
+New gfs which obey AMOP ch 6, and some caveats:
+
+documentation
+  Stored in all classes, pcl::documentation works as defined.
+
+generic-function-declarations
+  Stored, but ignored.
+
+make-method-lambda
+method-function
+  Compatible with AMOP, but will require additions to
+  compute-discriminating-function and compute-effective-method to
+  make fully useful.
+
+  In July 92 PCL, method-function returns the documented AMOP
+  method-function specified by the lambda returned by make-method-lambda.
+  However, that method-function is not actually used in method function
+  dispatch.  Instead, PCL's make-method-lambda and expand-defmethod also
+  create an optimized method function (method-optimized-function) or
+  closure generator (method-closure-generator) that it actually uses for
+  method function caching and dispatch.  This is the same optimized
+  function whose lambda-list is the lambda-list of the method used in
+  previous versions of PCL.  There are two cases to worry about with this:
+
+  1. The user specializes their own method on make-method-lambda without
+     redefining compute-discriminating-function or being careful to make
+     sure the method-optimized-function is set up properly (as done by the
+     standard make-method-lambda).  Expand-defmethod will detect this case
+     and create a method-optimized-function that calls the method-function
+     created by the new make-method-lambda with the parameters *of the
+     normal make-method-lambda*, i.e. (args methods).  This should work
+     for most cases, albeit slowly, but will fail if the user's modification
+     expects a different lambda list (as in the example of the AMOP, p. 209).
+
+  2. The user specializes their own method on make-method-lambda, but also
+     specializes compute-discriminating-function to call method-function
+     directly.  This should work.
+
+
+-------------------------
+Functions which DO NOT obey AMOP:
+
+compute-applicable-methods
+compute-applicable-methods-using-classes
+  Handles class-eq specializers without signalling an error.  
+  See march-92-notes.text
+
+compute-discriminating-function
+  [the resulting function works differently different because 
+   compute-effective-method is different, and because make-method-lambda 
+   does not exist.]
+
+compute-effective-method
+  Returns only one value.
+
+-------------------------
+Miscellaneous optimizations:
+
+Optimizations of slot-value of specialized parameter inside of
+  defmethod:
+
+  1. Closure variables are now used instead of lookup permutation
+     vectors to store slot indices when the effective methods are
+     cached each set of parameter classes they're called on (which
+     is now all the time, using March 92's optimizations), saving an
+     aref per slot access.
+  2. The cached effective methods optimize slot-access based on the type
+     of slot indices for the cached parameters.  There are three cases:
+       (a) The most common case -- all specialized parameter slot
+        accesses within the defmethod are on :instance allocated slots
+        on standard instances without user-defined slot-value-using-class
+        methods.  In this case, the cached closure for the method
+        directly accesses the slot through an aref on the standard
+        instance, without having to call (typep x 'fixnum) or figure out
+        what type of instance it is.
+       (b) If one of the slot accesses is on a non-:instance allocated slot,
+        on a non-standard instance, or has a user-defined slot-value-using-class
+        method, and store-optimized-method-lambda-p is true for the
+        generic-function and method (the default defined in low.lisp being
+        *compile-slot-access-method-functions-at-runtime-p* is T), then the
+        method to be cached is compiled at runtime to optimize the slot accesses
+        from a stored version of the method-lambda.  The compiled method to be
+        cached directly codes in each slot access for the particular index
+        and the type of the instance.
+       (c). If there are non-standard slot accesses, as in case (b), but
+        store-optimized-method-lambda-p for the generic-function and method
+        is NIL, then the cached methods are not compiled at runtime.  Instead,
+        the cached effective method is similar to previous PCL's, i.e.
+        having to check the index and instance type for each slot access,
+        though looking up the cached index in a closure variable rather than
+        a permutation vector to save an aref.
+
+Further optimizations of slot-value outside of defmethod or inside
+  of defmethod, but not of a specialized parameter:
+
+  1. If no non-standard specialized methods have been defined on
+     slot-value-using-class, then slot-value directly looks up the
+     value of the slot without calling any generic-functions or functions.
+
+  2. If non-standard specialized methods have been defined on
+     slot-value-using-class, then PCL arranges to call an automatically
+     created generic function that has one method: a reader method defined
+     on class slot-object (as in March 92 PCL).  This optimized generic-function
+     is now called whether or not the slot-name is constant.
+
+Make-instance, shared-initialize, and allocate-instance speeded up by:
+  1. Implementing suggested instance slot-vector allocation optimization
+     of the AMOP that copies a slot-vector whose side-effect-free slots
+     are already initialized.
+  2. Using internal copy of slot-definitions (as structures) to speed
+     up time-intensive internal slot accesses (also speeds up
+     slot-value-using-class).
+  3. Usually assuming and assuring that all slot init-functions are compiled.
+
+declarations of variable types throughout PCL where applicable.
+
+avoids unnecessary class updates by lazier class finalization, giving
+  faster compiling and loading.
+
+
+-------------------------
+Miscellaneous optional optimizations (see global variables at beginning
+of file low.lisp for full options):
+
+Variable *compile-all-method-functions-p* can be set to T, forcing all
+  method functions to be compiled and allowing method function dispatch
+  code to assume they are compiled.  Default is NIL.
+
+Generic function store-method-function-p (generic-function method initargs)
+  can be specialized to return NIL if the (normally unused) documented
+  method-functions are not needed.  Saves some space and compile time.
+  Default returns T.  Variable *standard-store-method-function-p*, which
+  is what the default store-method-function-p method looks up, can be
+  set to NIL if it is known that documented method functions will never
+  be needed.
+
+Generic function store-optimized-method-lambda-p (generic-function method initargs)
+  can be specialized to return NIL if it is not desireable to optimize
+  defmethod slot-accesses for non :instance allocated slots by compiling
+  the cached methods at runtime.  (This might be the case if your lisp's
+  compiler is slow, e.g. KCL, and each such method will only be called a
+  few times, so that the optimization isn't worth the added runtime compile
+  time.  Alternatively, *compile-slot-access-method-functions-at-runtime-p*
+  in low.lisp can be set to NIL to make this the default for all methods.
+
+-------------------------
+Useful extensions to CLOS and AMOP:
+
+boundp-method-class
+finalize-all-classes
+
+trace-methods
+  Traces all individual methods of a generic-function (as per trace-method).
+
+(setf standard-instance-access)
+(setf funcallable-standard-instance-access)
+  Functions to allow direct setting of instance slots
+  (as standard-instance-access and funcallable-standard-instance-access).
+
+standard-instance-slot-value
+(setf standard-instance-slot-value)
+standard-instance-slot-boundp
+funcallable-standard-instance-slot-value
+(setf funcallable-standard-instance-slot-value)
+funcallable-standard-instance-slot-boundp
+structure-instance-slot-value
+(setf structure-instance-slot-value)
+structure-instance-slot-boundp
+  Macros for highly optimized slot access given type of instance
+  (analogous to standard-instance-access):
+
+with-optimized-slots
+  Optimized version of with-slots with a couple of useful additions
+  to with-slots' functionality.
+
+with-standard-instance-slots
+  Slightly faster version of with-optimized-slots for use when instance
+  is guaranteed to be a standard-instance.
+
+this-method
+  Function locally defined within the body of methods to return the method
+  currently being executed.
+
+
+-------------------------
+Useful low-level extensions to PCL:
+
+Class wrappers now have one unreserved field available for programmer use
+  (accessed by wrapper-unreserved-field).
+
+Hooks built in to allow programmers to define their own USER-INSTANCE
+  low-level type of instances different from STD-INSTANCE, FSC-INSTANCE,
+  STRUCTURE-INSTANCE, or BUILT-IN-INSTANCE (see file user-instances.lisp
+  as an example of their use to save space over standard instances).
+
+
+-- Trent Lange
+   e-mail:  lange@cs.ucla.edu
+

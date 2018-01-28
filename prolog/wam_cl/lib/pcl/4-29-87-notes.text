@@ -1,0 +1,80 @@
+
+
+These notes correspond to *pcl-system-date* "4/29/87 prime April 29, 1987". 
+
+The notes from the last release are stored as 4-21-notes.text
+
+This release runs in:
+  ExCL
+  Lucid
+  Symbolics Common Lisp (Genera)
+  Vaxlisp (2.0)
+  Xerox Common Lisp (Lyric Release)
+  Kyoto Common Lisp (5.2)
+  TI Common Lisp (Release 3)
+
+CMU Lisp (nee Spice) should be working soon, I will announce another
+release at that time.
+
+TI release 2 should also be working soon, I will announce that when it
+happens.
+
+
+Note once again, that Xerox Lisp users should FTP all the source files
+from /pub/pcl/ as well as all the dfasl files from /pub/pcl/xerox/.
+Included in the xerox specific directory is a file called PCL-ENV, which
+provides some simple environment support for using PCL in Xerox Lisp.
+You must load PCL BEFORE loading pcl-env.
+
+
+MAJOR CHANGES IN THIS RELEASE:  
+
+  make has been renamed to make-instance
+
+  make-instance has been renamed to allocate-instance
+
+for compatibility, make can continue to be used as a synonym for
+make-instance.  unfortunately, code which used to call make-instance
+must be converted.
+
+I would actually suggest that you do both of these name changes right
+away.  Two passes through the code using Query Replace seems to work
+quite well (changing make-instance to allocate-instance and then make to
+make-instance.)  I was able to change all of PCL in about 10 minutes
+that way.
+
+---
+
+all functions and generic functions whose name included the string
+"get-slot" have been renamed.  Basically, get-slot was replaced
+everywhere it appeared with slot-value.
+
+get-slot itself still exists for compatibility, but you should start
+converting your code to use slot-value.
+
+
+
+OTHER CHANGES in this release:
+
+There is a new file called PKG which does the exports for PCL.  PCL now
+exports fewer symbols than before.  Specifically, PCL now exports only
+those symbols documented in the CLOS spec chapters 1 and 2.  This means
+that some symbols which may be needed by some programs are not exported.
+
+A good example is print-instance.  print-instance is not exported and
+since print-instance has not yet been renamed to print-object programs
+which define methods on print-instance may want to import that symbol.
+
+---
+
+pcl should load faster in this release.  In particular, the file fixup
+should load in less than half the time it did before.  This release
+should load in something like 80% of the time it took in the last
+release.  Remember, these numbers are only for comparison, your mileage
+may vary.
+
+---
+
+This release of PCL, as well as the last one, has *pcl-system-date*
+which presents the date in both mm/dd/yy and  Month day year format.
+

@@ -1,0 +1,655 @@
+-*- Mode: Text -*-
+
+Copyright (c) 1985, 1986, 1987, 1988, 1989 Xerox Corporation.
+All rights reserved.
+
+Use and copying of this document is permitted.  Any distribution of this
+document must comply with all applicable United States export control
+laws.
+
+Last updated: 6/3/89 by Gregor
+              10/26/89 by Gregor -- added :RETURN, removed :ISHIFT
+
+This file contains documentation of the PCL abstract LAP code.  Any port
+of PCL is required to implement the abstract LAP code interface.  There
+is a portable, relatively good performance implementation in the file
+lap.lisp, port-specific implementations are in that file as well.
+
+The PCL abstract LAP code mechanism exists to provide PCL with a way to
+create high-performance method lookup functions.  Using this mechanism,
+PCL can produce "LAP closures" which do the method lookup.  By allowing
+PCL to specify these closures using abstract LAP code rather that Lisp
+code we hope to achieve the following:
+
+  * Better runtime performance.  By using abstract LAP code, we
+    will get better machine instruction sequences than we would
+    from compiling Lisp code. 
+
+  * Better load and update time performance.  Because it should
+    be possible to "assemble" the LAP code more quickly than
+    compiling Lisp code, PCL will spend less time building the
+    method lookup code.
+
+  * Ability to use PCL without a compiler.  The LAP assembler will
+    still be required but this should be much smaller than the full
+    lisp compiler.
+
+Of course, not all implementations of the LAP code mechanism will
+satisfy all of these goals.  The first is the most important.
+
+In particular, many PCL ports will use the portable LAP implementation.
+KCL will use the portable implementation in all of its ports.  Other
+Lisps may have custom LAP implementations for some ports and use the
+portable implementation for other ports.
+
+Some Lisps will have a custom LAP implementation but will nonetheless
+require the compiler to be loaded to generate LAP closure constructors.
+
+An important point is why we have chosen to take this route rather than
+have each implementation implement the method lookup codes itself.  This
+was done because we are, at PARC, just beginning to study cache behavior
+for CLOS programs.  As we learn more about this we will want to modify
+the caching strategy PCL uses.  This architecture, because it leaves
+PCL to implement caching behavior makes it possible to do this.  Once
+this study is complete, implementations may want to do their own, ultra
+high performance implementations of caching strategies.
+
+
+
+Production of LAP closures is a two step process.  In the first step, a
+port-specific function is called to take abstract LAP code and produce a
+a "lap closure generator".  Lap closure generators are functions which
+are called with a set of closure variable values and return a LAP
+closure.
+
+The intermediary of the lap closure generators provides an important
+optimization.  Because it is assumed that producing the LAP closure
+generator can take much longer than producing a LAP closure from the
+generator, PCL attempts to make only one closure generator for each
+sequence of LAP code.  Because of the way PCL generates the LAP code
+sequences, this is quite easy for it to do.
+
+The rest of this document is divided into six parts.  
+
+  * the metatypes std-instance and fsc-instance
+
+  * an abstraction for simple vector indices
+
+  * important optimizations
+
+  * the port specific function for making lap closure generators
+
+  * the actual abstract LAP code
+
+  * examples
+
+*** The metatypes STD-INSTANCE and FSC-INSTANCE ***
+
+In PCL, instances with metaclass STANDARD-CLASS are represented using
+the metatype STD-INSTANCE.  (Note that in Cinco de Mayo PCL, this
+metatype is called IWMC-CLASS.)  Each port must implement this metatype.
+The metatype could be implemented by the following DEFSTRUCT.
+
+   (defstruct (std-instance 
+                (:predicate std-instance-p)
+                (:conc-name %std-instance-)
+                (:constructor %allocate-std-instance (wrapper slots))
+                (:constructor %allocate-std-instance-1 ())
+                (:print-function print-std-instance))
+     (wrapper nil)
+     (slots nil))
+
+ PCL itself will guarantee correct access to this structure and the
+ accessors and constructors.  With this in mind, the following are
+ important.
+
+ * Being able to type test this structure quickly is critical. See 
+   the :STD-INSTANCE-P opcode.
+
+ * The allocation functions should compile inline, do no argument
+   checking and be as fast as possible.
+
+ * The accessor functions should compile inline, do no checking of their
+   arguments and be as fast as possible.  SETF of the accessors should
+   do the same.
+
+The port is also required to implement the metatype FSC-INSTANCE (called
+FUNCALLABLE-INSTANCE, or FIN for short, in Cinco de Mayo PCL).  Objects
+with this metatype are used, among other things, to implement generic
+functions.  These objects have field structure associated with them and
+are also functions that can be applied to arguments.  The fields are the
+same as those for STD-INSTANCE, the FSC-INSTANCE metatype has
+predicates, print-functions, constructors and accessors as follows:
+
+  fsc-instance-p
+  print-fsc-instance
+  %fsc-instance-wrapper
+  %fsc-instance-slots
+  %allocate-fsc-instance (wrapper slots)
+  %allocate-fsc-instance-1 ()
+
+In addition, objects of metatype FSC-INSTANCE have a property called the
+funcallable instance function.  When an FSC-INSTANCE is applied to
+arguments, the funcallable instance function is what is actually called.
+The funcallable instance function of an FSC-INSTANCE can be changed
+using the function SET-FUNCALLABLE-INSTANCE-FUNCTION.  There is no
+mechanism for obtaining the funcallable instance function of an
+FSC-INSTANCE.
+
+It is possible to implement the FSC-INSTANCE metatype in pure Common
+Lisp. A simple implementation which uses lexical closures as the
+instances and a hash table to record that the lexical closures are of
+metatype FSC-INSTANCE is easy to write.  Unfortunately, this
+implementation adds significant overhead:
+
+   to generic-function-invocation (1 function call)
+   to slot-access (1 function call or one hash table lookup)
+   to class-of a generic-function (1 hash-table lookup)
+
+In addition, it would prevent the FSC-INSTANCEs from being garbage
+collected.  In short, the pure Common Lisp implementation really isn't
+practical.
+
+Note that previous implementations of FINS were always based on the
+lexical closure metatype.  In some ports, that provides poor
+performance.  Those ports may want to consider reimplementing to use the
+compiled code metatype.  In that implementation strategy, LAP closure
+variables would become constants of the compiled code object.
+
+The following note from JonL is of interest when working on a FIN
+implementation:
+
+  Date: Tue, 16 May 89 05:45:56 PDT
+  From: Jon L White <jonl@lucid.com>
+  
+  This isn't a bug in Lucid's compiler -- it's a lurking bug in PCL
+  that will "bite" most implementations where different settings of
+  the compiler optimization switches will produce morphologically
+  different (but of course functionally equivalent) function objects.
+  
+  The difficulty is in how discriminator codes service cache misses.  
+  They  "call out" to (potentially) random functions that will in some 
+  cases "smash" the function object that was actually running as the 
+  discriminator code.  This is all right providing you don't return to 
+  that function frame, but alas ...
+   
+  I know this is a more extensive problem because the code in the
+  port-independent function 'notice-methods-change' goes out of
+  its way to do a tail-recursive call to the function that is going
+  to smash the possibly-executing discriminator code.  Here is the
+  commentary from that code (sic):
+  
+  ;; In order to prevent this we take a simple measure:  we just
+  ;; make sure that it doesn't try to reference our its own closure
+  ;; variables after it makes the dcode change.  This is done by
+  ;; having notice-methods-change-2 do the work of making the change
+  ;; AND calling the actual generic function (a closure variable)
+  ;; over.  This means that at the time the dcode change is made,
+  ;; there is a pointer to the generic function on the stack where
+  ;; it won't be affected by the change to the closure variables.
+  
+  
+  A similar thing should be done in the construction of standard-accessor, 
+  checking, and  caching dcodes.  In an experimental version here at Lucid, 
+  I rewrote  dcode.lisp to do that, and there is no problem with it.  
+  Although that code is somewhat Lucid-specific, it could be of help to 
+  someone who wanted to rewrite the generic dcode.lisp (no pun intended). 
+  Contact me privately if you are interested.
+  
+  Doing a tail-recursive call out of dcodes when there is a cache miss
+  is a good thing, regardless of other problems.  I think one might as
+  well do it.  However, I should point out that in the presence of 
+  multiprocessing, there is another more serious problem that cannot be
+  solved so simply.  Think about what happens when one process decides
+  to update a dcode while another process is still using it; no such
+  stack-maintenance discipline will fix this case.  A tail-recursive
+  exit from the dcode will *immensely* reduce the likelihood that
+  another process can sneak in during the interval in which the dcode
+  requires consistency in its function; but it can't reduce that
+  likelihood to zero.
+  
+  The more desirable thing to do is to put the whole "dcode" down one 
+  more level of indirection through the symbol-function cell of the 
+  generic function.  This is effectively what PCL's 'make-trampoline' 
+  function does, but unfortunately that is not a very efficient approach 
+  when you consider how most compilers will compile it.  Something akin 
+  to the "mattress-pads" in Steve Haflich's code (in the fin.lisp file) 
+  could probably be done for many other implementations as well.
+
+
+*** Index Operations ***
+
+Indexes are an abstraction for indexes into a simple vector.  This
+abstraction is used to make it possible to generate more efficient
+code to access simple vectors.  The idea being that this may make it
+possible to use alternate addressing modes to address these.
+
+The "index value" of an index is defined to be the fixnum of which that
+index is an alternate form.  So, using the Lisp function SVREF with the
+index value of an index accesses the same element as using the index
+with the appropriate access function or operand.
+
+The format of an index is unspecified, but is assumed to be something
+like a fixnum with certain bits ignored.  Accessing a vector using an
+index must be done using the appropriate special accessor function or
+opcode.
+
+Conversion from index values to indices and vice-versa can be done with
+the following functions:
+
+INDEX-VALUE->INDEX (index-value)
+INDEX->INDEX-VALUE (index)
+
+
+The following constant indicates the maximum index value an index can
+have in a given port.  This must be at least 2^16.
+
+INDEX-VALUE-LIMIT  - a fixnum, must be at least 2^16.
+
+
+MAKE-INDEX-MASK (<cache-size> <line-size>)
+
+This function is used to make index masks.  Because I am lazy, I show an
+implementation of it in the common case where indexes are just fixnums:
+
+  (defun make-index-mask (cache-size line-size)
+    (let ((cache-size-in-bits (floor (log cache-size 2)))
+          (line-size-in-bits (floor (log line-size 2)))
+          (mask 0))
+      (dotimes (i cache-size-in-bits) (setq mask (dpb 1 (byte 1 i) mask)))
+      (dotimes (i line-size-in-bits)  (setq mask (dpb 0 (byte 1 i) mask))) 
+      mask))
+
+*** Optimizations ***
+
+This section discusses two important optimizations related to LAP
+closures.  The first relates to calling LAP closures themselves, the
+second relates to calling other functions from LAP closures.
+
+The important point about calling LAP closures is that almost all of the
+time, LAP closures will be used as the funcallable-instance-function of
+funcallable instances.  It is required that LAP closures be funcallable
+themselves, but usually they will be stored in a FIN and the fin will
+then be funcalled.  This brings up several optimizations, including ones
+having to do with access to the closure variables of a LAP closure.
+
+When a LAP closure is used to do method lookup, the function the LAP
+closure ends up calling has the same number of required arguments as the
+LAP closure itself.  Since the LAP closure must check its required
+arguments to do the lookup, it is redundant for the function called to
+do so as well.  Since LAP closures do all calls in a tail recursive way,
+it should even be possible to optimize out certain parts of the normal
+stack frame initialization.
+
+A similar situation occurs between effective method functions and the
+individual method functions; the difference is that in effective method
+functions, the calls are not necessarily tail recursive.
+
+Consequently, it would be nice to have a way to call certain functions
+and inhibit the checking of required arguments.  This is made possible
+by use of the PCL-FAST-APPLY and PCL-FAST-FUNCALL macros together with
+the PCL-FAST-CALL compiler declaration.
+
+The PCL-FAST-CALL compiler declaration declares that a function may be
+fast called.  Not all callers of the function will necessarily fast call
+it, but most probably will.  The :JMP opcode can only be used to call a
+function compiled with the PCL-FAST-CALL declaration.
+
+The PCL-FAST-APPLY and PCL-FAST-FUNCALL macros are used to fast call a
+function.  The function argument must be a compiled function that has
+the PCL-FAST-CALL compiler declaration in its lambda declarations.
+
+The basic idea is that the PCL-FAST-CALL compiler declaration causes the
+compiler to set up an additional entrypoint to the function.  This
+entrypoint comes after checking of required arguments but before
+processing of other arguments.
+
+Note:  When FAST-APPLY is used, the required arguments will be given as
+separate arguments and all other arguments will appear as a single
+spread argument.  For example:
+
+(let ((fn (compile () '(lambda (a b &optional (c 'z))
+                         (declare (pcl-fast-call))
+                         (list a b c)))))
+
+  (pcl-fast-apply fn 'x 'y ())          ;legal
+  (pcl-fast-apply fn 'x 'y '(foo))      ;legal
+  (pcl-fast-apply fn '(a b c))          ;illegal
+  )
+
+*** Producing LAP Closure Generators ***
+
+Each implementation of the LAP code mechanism must provide a port
+specific function making lap closure generators.  In the portable
+implementation, this function is called PLAP-CLOSURE-GENERATOR.  In
+ExCL it should be called EXCL-LAP-CLOSURE-GENERATOR etc.
+
+At any time, the value of the variable *make-lap-closure-generator* is a
+symbol which names the function currently being used to make lap closure
+generators.
+
+The port specific function must accept arguments as follows:
+
+PLAP-CLOSURE-GENERATOR (<closure-vars>
+                        <args>
+                        <index-registers>
+                        <simple-vector-registers>
+                        <lap-code>)
+
+This returns a lap-closure generator.  A lap-closure generator is a
+function which is called with a number of arguments equal to the length
+of <closure-vars>.  These arguments are the values of the closure
+variables for the lap closure.  These values cannot be changed once the
+LAP closure is created.   PCL takes care of keeping track of
+lap-closure-generators it already has on hand and reusing them.  The
+function RESET-LAP-CLOSURE-GENERATORS can be called to force PCL to
+forget all the lap closure generators it has remembered.
+
+  <args> 
+
+A list of symbols.  This provides a way to name particular arguments to
+the LAP closure. Arguments which will not be referenced by name are
+given as NIL. All required arguments to the LAP closure are explicitly
+included (perhaps as NIL).  If &REST appears at the end of arguments it
+means that non-required arguments are allowed, these will be processed
+by the methods.  If &REST does not appear at the end of arguments, the
+lap closure should signal an error if more than the indicated number of
+arguments are supplied.
+
+Examples:
+
+ -  (obj-0 obj-1)
+
+    Specifies a two argument lap closure.  If more or less than
+    two arguments are supplied an error is signalled.  Within
+    the actual lap code, both arguments can be referenced by
+    name (see the :ARG operand).
+
+ -  (obj-0 nil &rest)
+
+    Specifies a two or more argument lap closure.  If less than
+    two arguments are supplied an error is signalled.  Within
+    the actual lap code, the first argument can be referenced by
+    name (see the :ARG operand).
+
+
+  <closure-vars>
+
+A list of symbols.  The closure will have these as closure variables.
+Within the lap code these can be accessed using the :CVAR operand.  The
+lap code cannot change these values.  SET-FUNCALLABLE-INSTANCE-FUNCTION
+is permitted to have the special knowledge that there are at most ?? of
+these and to be prepared to do something special when the funcallable
+instance function of a funcallable instance is set to a lap closure.
+
+  <index-registers>
+
+A list of register numbers.  These registers will be used only to hold
+indexes.  Other registers may be used to hold indexes as well, but the
+only values put into these registers will be indexes.
+
+  <simple-vector-registers>
+
+A list of register numbers.  These registers will be used only to hold
+simple-vectors.  Other registers may be used to hold simple-vectors as
+well, but the only values put into these registers will be
+simple-vectors.
+
+
+  <lap-code>
+
+The actual lap code for this closure.  This is a list of LAP code
+opcodes.  See the section "Abstract LAP Code" for more details.
+
+Each implementation must also supply a function named PRE-MAKE-xxx where
+xxx is the same as the name of its make-lap-closure-generator function.
+The macro doesn't evaluate its arguments, and when it appears in a file
+it should try to do some of the work at load time.  It might appear in a
+file like this:
+
+(eval-when (load)
+  (setq 1-arg-std-lap 
+        (pre-make-plap-closure-generator ...)))
+
+*** Abstract LAP Code ***
+
+Each lap code operand has the form: (opcode operand1 ... operandn).
+
+In some cases, the distinction between an operand and an opcode is
+somewhat arbitrary.  In general, opcodes have a significant "action"
+component to their behavior.  Operands select a piece of data to operate
+on.  Some operands select their data in a more complex way, but they are
+operands anyways.
+
+All data must be in a register before it can be operated on.   This
+requirement means that the only place a non-register operand can appear
+is as the first argument to the :move opcode.  (Actually, there is one
+other exception, a :iref operand can be the target of a move as well.)
+Moreover, only register operands can appear as the second argument to
+the :move opcode and this register must not appear in the <from>
+operand.
+
+>> The operands are:
+ 
+ (:reg <n>)
+   
+A pseudo register.  <n> is an integer in the range [0 , 31].
+
+A particular implementation can map this to a real register, a memory
+location or the stack.  The abstract LAP code itself does not include
+the notion of a stack.
+
+PCL will attempt to optimize register use in two ways.  PCL itself will
+attempt to re-use registers whenever possible.  That is, the port should
+not have to worry with doing live register analysis for the registers.
+In addition, PCL will consider lower numbered registers to be "faster"
+than higher numbered ones.
+
+
+ (:cvar <name>)
+
+A closure variable of the lap-closure.  <name> is a symbol.
+
+
+ (:arg <name>)
+
+An argument to the LAP closure.  <name> is a symbol.
+
+ (:std-wrapper <from>)
+ (:fsc-wrapper <from>)
+ (:built-in-wrapper <from>)
+ (:structure-wrapper <from>)
+ (:other-wrapper <from>)
+
+Get the class wrapper of <from>.  For std-instances and fsc-instances
+this just fetches the wrapper field.  The specific port is required to
+implement fast access to the wrappers of built-in, structure and other
+metatypes.  A callback mechanism allows the port to ask PCL to generate
+a class and wrapper for objects for which no class and wrapper exists
+yet.  This mechanism is <<to be spec'd out>>.
+
+
+ (:std-slots <operand>)
+ (:fsc-slots <operand>)
+
+Fetch the slots field of a std-instance or a fsc-instance.
+
+ (:constant <constant>)
+
+This just allows inline constants. <constant> can be any Lisp object.
+
+The following operands operate on indexes.  Each is patterned after a
+Lisp function which would have a corresponding effect on the index value
+of the index.
+
+ (:i1+ <index>)
+ (:i+ <index-1> <index-2>)
+ (:i- <index-1> <index-2>)
+ (:ilogand <index-1> <index-2>)
+ (:ilogxor <index-1> <index-2>)
+
+Like the corresponding Lisp functions.  
+
+
+ (:iref <vector> <index>)
+
+Like the SVREF function.  <vector> must be a simple vector.
+
+ (:cref <vector> <constant>)
+
+The :cref operand is for constant vector references.  <constant> must be
+a fixnum.
+
+>> The opcodes are:
+
+ (:move <from> <to>)
+
+A full word move operation.  
+
+
+ (:eq <from1> <from2> <label>)
+ (:neq <from1> <from2> <label>)
+
+EQ and NOT EQ conditional branches.  If the value contained in <from1>
+is EQ (or not) to the value contained in <from2>, jump to <label>.
+Otherwise continue execution at the next opcode.  <label> is a symbol.
+
+ (:fix= <from1> <from2> <label>)
+
+A fixnum = conditional branch.
+
+ (:izerop <from> <label>)
+
+Jump to label if and only if the index <from> is 0.
+
+ (:std-instance-p <from> <destination-label>)
+ (:fsc-instance-p <from> <destination-label>)
+ (:built-in-instance-p <from> <destination-label>)
+ (:structure-instance-p <from> <destination-label>)
+
+Test the metatype of <from> and dispatch.  If the metatype of from is of
+the specified type execution jumps to <destination-label>.  Otherwise,
+execution proceeds normally at the next opcode.  See the :xxx-wrapper
+operands.
+
+ (:jmp <function>)
+
+fcn contains a function to call.  This must be a compiled function,
+which had the PCL-FAST-CALL declaration in it.  The call should be "tail
+recursive" in that whatever values it returns should be returned
+immediately from the LAP closure itself.
+
+Method lookup is implemented by finding a function in the cache and then
+using :JMP to call it.  The various kinds of traps are implemented by
+using :JMP to call a trap function that was stored in one of the closure
+variables.
+
+ (:return <value>)
+
+Return immediately from the LAP closure.  <value> is the single value to
+return.
+
+In certain cases of method lookup when all the methods are accessor methods, 
+there is an important optimization which implements the slot access in the 
+discriminating function itself.  This opcode is used in that case.
+
+ (:label <label>)
+
+Identifies a point in the lap code.  <label> is a symbol.  This can be
+the target of any of the control transfer opcodes (:GO, :EQ, :NEQ,
+:FIX=, :STD-INSTANCE-P, :FSC-INSTANCE-P, :STRUCTURE-INSTANCE-P,
+:BUILT-IN-INSTANCE-P)
+
+ (:go <label>)
+
+Jump to the label <label>.  <label> is a symbol.
+
+*** Examples ***
+
+Here is an example of the use of the abstract LAP mechanism.  It doesn't
+use all operands or opcodes, but it is representative of the LAP
+sequences PCL will use.
+
+Several things are worth noting:
+  * This is, I believe, just about the simplest such sequence.  There
+    are some others of comparable simplicity, but none much simpler.
+
+  * A total of only 5 registers are used.  I haven't checked, but I
+    am pretty sure most all such code sequences will get by with 16
+    or less and many will stay under 8.
+
+(defun make-1-arg-std-dfun ()
+  (let ((cg
+	  (making-lap-closure-generator
+	    (initialize-lap-cvars '(cache mask reflect trap))	
+	    (initialize-lap-args '(a0))
+	    (initialize-lap-registers 4 4 3)
+	    (let ((cache (allocate-lap-register 'simple-vector))
+		  (count (allocate-lap-register))
+		  (wrapper (allocate-lap-register))
+		  (index (allocate-lap-register 'index))
+		  (t1 (allocate-lap-register))
+		  (t2 (allocate-lap-register))
+		  (i1 (allocate-lap-register 'index))
+		  (i2 (allocate-lap-register 'index)))
+
+	      (opcode :move (operand :cvar 'cache) cache)
+	      (opcode :move (operand :arg 'a0) t1)	      
+	      (opcode :std-instance-p t1 'std-instance)
+	      (opcode :go 'trap)
+	      (opcode :label 'std-instance)
+	      ;;
+	      ;; The stable register pattern for the rest of the code is:
+	      ;;   cache    Cache
+	      ;;   count    Cache count
+	      ;;   wrapper  Wrapper
+	      ;;   index    index under consideration
+	      ;;
+	      ;; Whenever we jump to HIT, this pattern must be in force.
+	      ;;
+	      (opcode :move (operand :std-wrapper t1) wrapper);
+	      (opcode :move (operand :cref cache 0) count)    ;
+	      (opcode :move (operand :cref wrapper 0) i2)     ;wrapper-no -> i2
+	      (opcode :move (operand :cvar 'mask) i1)	      ;mask       -> i1
+	      (opcode :move (operand :ilogand i1 i2) index)   ;
+						              ;
+	      (opcode :move (operand :iref cache index) t1)   ;key        -> t1
+	      (opcode :eq t1 wrapper 'hit)                    ;
+	      (opcode :move (operand :cvar 'reflect) i1)      ;reflect    -> i1
+	      (opcode :move index i2)		              ;index      -> i2
+	      (opcode :move (operand :i- i1 i2) index)	      ;
+	      (opcode :move (operand :iref cache index) t1)   ;key        -> t1
+	      (opcode :eq t1 wrapper 'hit)                    ;
+	      (opcode :go 'trap)
+	      
+	      ;;
+	      ;; To do the hit, we use registers as follows:
+	      ;;   0   cache comes in here
+	      ;;   1   cache count comes in here
+	      ;;   2   use this for the function
+	      ;;   3   index comes in here
+	      ;;   4   1+ index, then new count
+	      ;;   
+	      (opcode :label 'hit)
+	      (opcode :move (operand :i1+ index) i1)
+	      (opcode :move (operand :iref cache i1) t1)
+
+	      (opcode :move (operand :cref cache 0) t2)
+	      (opcode :fix= count t2 'call)
+	      (opcode :go 'trap)
+
+	      (opcode :label 'call)
+	      (opcode :jmp t1)
+
+	      (opcode :label 'trap)
+	      (opcode :move (operand :cvar 'trap) t1)
+	      (opcode :jmp t1)))))
+
+    (funcall cg
+	     (make-array 16)
+	     (make-index-mask 16 2)
+	     (- 16 2)
+	     #'(lambda (a)
+		 (declare (pcl-fast-call) (ignore a))
+		 (break "Trap")))))
+

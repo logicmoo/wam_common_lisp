@@ -1,0 +1,105 @@
+A (very) few words about PCL-ENV.  If you require more information, consult the
+source code.  While it is not particularly well documented, it is the final
+arbiter of truth regarding its own functionality.
+
+The file PCL-ENV.LISP defines some low-level facilities to integrate PCL into
+the XeroxLisp environment.  The first order of business is teaching the
+FileManager (nee FilePackage) about CLOS defineing forms.  This in turn brings
+us to the issue of names.
+
+
+o  Names and the FileManager
+
+For the FileManager to keep track of defining forms, it needs to know how to
+extract a (unique) name and FileManager type from the form.  PCL-ENV includes
+FileManager support for the definers DEFCLASS, DEFGENERIC, and DEFMETHOD.
+
+DEFCLASS
+The name of a DEFCLASS form is the name of the class defined by the form.  The
+FileManager type is PCL::CLASSES.  There is a FileManager "undefiner" provided
+for DEFCLASS.
+
+DEFGENERIC
+The name of a DEFGENERIC form is the name of the generic-function defined by the
+form.  The FileManager type is PCL::GENERIC-FUNCTIONS.
+
+DEFMETHOD
+The name of a DEFMETHOD form is a list of the form
+(<gf-name> {<qualifier>}* ({<specializer>*})).  The FileManager type is
+PCL::METHODS.  There is a FileManager "undefiner" provided for DEFMETHOD.
+However, note that if a generic-function was created as a side-effect of the
+DEFMETHOD, the undefiner will leave the generic-function defined (albet with no
+methods).
+
+When editing, it would be onerous to require the programmer to type in the full name of a
+method.  PCL-ENV arranges it so that (ED <gf-name>) will ask the programmer
+which method on that generic-function should be edited.  (If there is only one
+method, it is assumed that that is the method to be edited.)  As of the
+Victoria-Day release, EQL specialized methods are handled correctly.
+
+
+o  Inspecting CLOS objects (and metaobjects)
+
+PCL-ENV defines a protocol that is used to inspect objects, and arranges that
+the standard INSPECT function uses this protocol.  Programmers can use this
+protocol by defining additional methods on the following generic-functions.
+
+INSPECT-SLOT-NAMES object
+Returns a list of "slots" to include in the inspector.  The default method
+returns a list of all slots on the object.
+
+INSPECT-SLOT-VALUE object slot-name
+Returns the value to associated with the slot-name in the inspector.  Slot-name
+is one of the items returned by INSPECT-SLOT-NAMES.  The default method returns
+(SLOT-VALUE object slot-name).
+
+INSPECT-SETF-SLOT-VALUE object slot-name new-value
+Sets the value associated with the slot-name in the inspector.  Slot-name is one
+of the items returned by INSPECT-SLOT-NAMES.  The default method executes
+(SETF (SLOT-VALUE object slot-name) new-value).
+
+INSPECT-TITLE object inspect-window
+Returns the title to use in the inspect-window when inspecting object.  The
+default returns the string "Inspecting the class <class-name>" when the object
+is a class, or "Inspecting a <class-name>" otherwise.
+
+
+o  Debugging and the Stack
+
+Debugging in PCL is complicated by generic-functions and methods appear on the
+stack not as single objects, but as collections of functions that the programmer
+did not directly call.  PCL-ENV redefines a number of internal debugger
+functions to simplify the presentation of the stack, and allow the programmer to
+access to the original defining forms from the stack.  These changes only affect
+the "short" display backtrace (brought up by BT in a break window); the full
+backtrace (brought up by BT!) is unaffected.
+
+
+o  Misc
+
+Prettyprinting
+
+The support for standard Prettyprinting is pretty minimal.  Only DEFMETHOD,
+DEFCLASS, WITH-ACCESSORS, and WITH-SLOTS are supported, and they aren't really
+done right.  Thanks to Harley Davis, PCL-ENV defines SEdit pretty-print specs
+for the forms DEFCLASS, DEFMETHOD, DEFGENERIC, GENERIC-FLET, GENERIC-LABELS,
+CALL-NEXT-METHOD, SYMBOL-MACROLET, WITH-ACCESSORS, WITH-SLOTS, and
+MAKE-INSTANCE.
+
+?=
+
+The function SMARTARGLIST is changed to return appropriate values for the
+arglists of generic-functions.  The macros DEFCLASS and DEFMETHOD have "pretty"
+arglists defined.
+
+PrettyFileIndex
+
+Again thanks to Harley Davis, PCL-ENV teaches PRETTY-FILE-INDEX about classes,
+methods, and accessors.  The variables PCL::*PFI-INDEX-ACCESSORS* and
+PCL::*PFI-METHOD-INDEX* may be changed by the user to tailor the computation of
+the file index.  Note that the file PRETTY-FILE-INDEX must be loaded before
+PCL-ENV for this to take effect.
+
+
+--- smL								25-May-89
+

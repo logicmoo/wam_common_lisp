@@ -1,0 +1,98 @@
+Copyright (c) Xerox Corporation 1989, 1990. All rights reserved.
+
+These notes correspond to the "5/1/90 May Day PCL (REV 2)" version of PCL.
+
+This version is just Rainy Day PCL with the various patches people have
+mailed out included.  Barring unforseen circumstances, this will be the
+last version of PCL.  We are now working on the Metaobject Protocol.
+
+
+Please read this entire file carefully.  Failure to do so guarantees
+that you will have problems porting your code from the previous release
+of PCL.
+
+You may also be interested in looking at previous versions of the
+notes.text file.  These are called xxx-notes.text where xxx is the
+version of the PCL system the file corresponds to.  At least the last
+two versions of this file contain useful information for any PCL user.
+
+This version of PCL has been tested at PARC in the following Common
+Lisps:
+
+  Symbolics 7.2, 7.4
+  Coral 1.3
+  Lucid 3.0
+  Allegro 3.0.1
+
+These should work, but haven't been tested yet:
+
+  TI
+  Golden Common Lisp 3.1
+  EnvOS Medley
+  IBCL (October 15, 1987)
+
+This release of PCL is substantially different from previous releases.
+The architecture of the runtime system (method lookup and slot access)
+is different, and the metaobject protocol is different.  Much of the
+code in this release is new or modified from the last release.
+
+When it stabilizes, this release should be much faster for all
+applications especially large ones.
+
+This beta version of the new release includes a number of known
+problems.  These include:
+
+* Even less documentation than ever before.  I haven't written much of a
+notes file for what is different yet.  Please send me comments for what
+to include in this file.
+
+* Some known performance problems in development versions of compilers.
+At the very least, you want to compile PCL itself using the highest
+performance compiler settings you have.  
+
+
+=== Notes for this release (such as they are) ===
+
+* There is one major incompatible change in this release.  In this
+release compiling files with defmethod and defclass forms doesn't, by
+default, affect the running lisp image.  The winning part of this is you
+can compile a file without `installing' the class and method definitions
+in the file.  The losing part is that because PCL is a portable program,
+it can't both do this and let a class definition and a method which
+specializes to that class appear in the same file.
+
+So, you can't (by default) have:
+
+  (defclass foo () ())
+  (defmethod bar ((f foo)) 'foo)
+
+in the same file.
+
+But you say you want to do this, almost everyone does.  If you want to
+do this just evaluate the following form before after loading PCL but
+before working with it:
+
+  (pushnew 'compile pcl::*defclass-times*)
+
+You may also want to do:
+
+  (pushnew 'compile pcl::*defmethod-times*)
+
+
+* You probably also want to begin using a precom file for your system.
+Do this by having a file whose only contents is
+
+  (pcl::precompile-random-code-segments <your-system-name>)
+
+don't quote <your-system-name>
+
+for example, for the clim system, the precom file has the one line:
+
+  (pcl::precompile-random-code-segments clim)
+
+compile this file after loading and running your system for a while.
+load it before loading your compiled system.  A future version of this
+feature won't require you to have run your system for a while, it will
+only require that you have loaded it.
+
+

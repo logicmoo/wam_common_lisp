@@ -1,0 +1,152 @@
+Copyright (c) Xerox Corporation 1989. All rights reserved.
+
+These notes correspond to the "5/22/89 Victoria PCL" version of PCL.
+
+Please read this entire file carefully.  Failure to do so guarantees
+that you will have problems porting your code from the previous release
+of PCL.
+
+You may also be interested in looking at previous versions of the
+notes.text file.  These are called xxx-notes.text where xxx is the
+version of the PCL system the file corresponds to.  At least the last
+two versions of this file contain useful information for any PCL user.
+
+This version of PCL has been tested at PARC in the following Common
+Lisps:
+
+  Symbolics 7.2, 7.4
+  Coral 1.2
+  Lucid 3.0
+  IBCL (October 15, 1987)
+  Allegro 3.0.1
+  Golden Common Lisp 3.1
+  EnvOS Medley
+
+These should work, but haven't been tested yet:
+
+  TI
+
+This release is similar to Cinco de Mayo and Passover PCL.  The major
+difference is that this release actually works.
+
+***
+
+*other-exports* flushed.  More exports now on *exports*
+
+The symbol STANDARD is now exported from the PCL package. standard-class
+standard-method standard-generic-function standard-object built-in-class
+structure-class
+
+scoping problem with *next-methods*
+
+
+method and generic function initialization protocol
+
+methods are immutable
+
+type-specifiers --> specializers
+
+load-truename etc.
+
+defgeneric ensure-generic-function define-method-combination
+
+metabraid changes
+
+file namings
+
+***
+
+There are a number of minor and one major difference between this
+release and No Cute Name PCL.
+
+
+- In the last release there was an implementation of the specified CLOS
+initialization protocol.  This implementation had the correct behavior,
+but some of the generic functions had temporary names (*make-instance,
+*initialize-instance and *default-initargs).  This was done to give
+people time to convert their code to the behavior of the new
+initialization protocol.
+
+In this release, all generic functions in the specified initialization
+protocol have their proper names.  The implementation of the old,
+obsolete initialization protocol has disappeared entirely.
+
+The following renamings have happened:
+
+  12/7/88 release                this release
+
+  *make-instance                 make-instance
+  *initialize-instance           initialize-instance
+  *default-initargs              default-initargs
+
+The functions shared-initialize and reinitialize-instance already had
+the proper names.
+
+The new initialization protocol is documented fully in the 88-002R
+specification.
+
+As part of this change, PCL now uses the new initialization protocol to
+create metaobjects internally.  That is it calls make-instance to create
+these metaobjects.  The actual initargs passed are not yet as specified,
+that will be in a later release.
+
+This is the largest change in this release.  If you have not already
+started using the new initialization protocol (with the temporary *xxx
+names) you are going to have to do so now.  In most cases, old methods
+on the generic functions INITIALIZE, INITIALIZE-FROM-DEFAULTS and
+INITIALIZE-FROM-INIT-PLIST must be substantially rewritten to convert
+them to methods on INITIALIZE and SHARED-INITIALIZE.
+
+- slots with :ALLOCATION, :CLASS now inherit properly.  As part of this
+change, some slot description objects now return a class object as the
+result of SLOTD-ALLOCATION.
+
+- There is now a minimal implementation of the DEFGENERIC macro.  This
+implementation supports no options, but it does allow you to define a
+generic function in one place and put some comments there with it.
+
+- The following functions and macros have disappeared.  This table also
+  show briefly what you use instead.
+
+    DEFMETHOD-SETF               (use DEFMETHOD)
+    RUN-SUPER                    (use CALL-NEXT-METHOD)
+    OBSOLETE-WITH-SLOTS          (use WITH-SLOTS or WITH-ACCESSORS)
+    SYMBOL-CLASS                 (use FIND-CLASS)
+    CBOUNDP                      (use FIND-CLASS)
+    CLASS-NAMED                  (use FIND-CLASS)
+    GET-SETF-GENERIC-FUNCTION    (use GDEFINITION)
+
+- In certain ports, method lookup will be faster because of a new scheme
+to deal with interrupts and the cache code.  In other ports it will be
+slightly slower.  In all ports, the cache code now interacts properly
+with interrupts.
+
+- DEFMETHOD should interact properly with TRACE, ADVISE etc. in most
+ports.  two new port-specific functions (in defs.lisp) implement this.
+These are unencapsulated-fdefinition and fdefine-carefully.  If this
+doesn't work properly in your port, fix the definition of these
+functions and send it back so it can be in the next release.
+
+- This release runs in Golden Common Lisp version 3.0.
+
+- Previously, the use of slot-value (or with-slots) in the body of a
+method which had an illegal specializer gave strange errors.  Now it
+gives a more reasonable error message.
+
+- An annoying problem which caused KCL and friends to complain about
+*exports* being unbound has been fixed.
+
+- The walker has been modified to understand the ccl:%stack-block
+special form in Coral Common Lisp.
+
+- The use of defadvice in pre 3.0 releases has been fixed in Lucid Low.
+
+- multiple-value-setq inside of with-slots now returns the correct
+value.
+
+- A minor bug having to do with macroexpansion environments and the KCL
+walker has been fixed.
+
+- A bug in the parsing of defmethod which caused only symbols (rather
+than non-nil atoms) to be used as qualifiers.
+

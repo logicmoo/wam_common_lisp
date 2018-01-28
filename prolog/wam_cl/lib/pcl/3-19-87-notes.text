@@ -1,0 +1,138 @@
+
+
+These notes correspond to *pcl-system-date* 3/19/87 prime.
+
+This release runs in:
+  ExCL
+  Lucid
+  Symbolics Common Lisp (Genera)
+  Vaxlisp (2.0)
+  Xerox Common Lisp (Lyric Release)
+
+CMU Lisp (nee Spice) and KCL should be working soon, I will announce
+another release at that time.  I figured it was better to get some
+people beating on it as soon as possibl.
+
+Xerox Lisp users should FTP all the source files from /pub/pcl/ as well
+as all the dfasl files from /pub/pcl/xerox/.  Included in the xerox
+specific directory is a file called PCL-ENV, which provides some simple
+environment support for using PCL in Xerox Lisp.
+
+
+
+Following is a description of some of the things that are different in
+this release of PCL.  This list isn't in any particular order.  There
+are a number of incompatible changes in this release, please read the
+whole thing carefully.
+
+As usual, please enjoy, and send bug-reports, questions etc. to
+CommonLoops@Xerox.com.
+
+***
+The single most significant change is that discriminator-objects with
+corresponding discriminating functions have been replaced by generic
+function objects.  What does this mean??  Well, in previous releases of
+PCL, if you did:
+
+(defmethod foo ((x class)) 'class)
+(defmethod foo ((x method)) 'method)
+
+Then (discriminator-named 'foo) returned a discriminator object which
+had both of these methods defined on it.  (symbol-function 'foo)
+returned a discriminating function, which (discriminator-named 'foo) had
+put in foo's function cell.
+
+In this release of PCL, the above defmethod's put a generic-function
+object in foo's function cell.  This generic-function object is a
+combination of the discriminator object and discriminating function of
+the previous releases of PCL.  This generic-function object is
+funcallable, funcalling it causes the appropriate method to be looked up
+and called.  This generic function object has accessors which return the
+methods defined on the generic function.  This generic function object
+is mutable.  It is possible to add and remove methods from it.
+
+(defmethod foo ((x class)) 'class)
+(defmethod foo ((x method)) 'method)
+
+(generic-function-methods #'foo)
+(#<Method FOO (METHOD) 3434> #<Method FOO (CLASS) 3245>)
+
+(foo (make 'class))  ==> 'class
+(foo (make 'method)) ==> 'method
+
+(remove-method #'foo (car (generic-function-methods #'foo)))
+
+(foo (make 'class))  ==> 'class
+(foo (make 'method)) ==> no matching method error
+
+
+Note that as part of this change, the name of any function, generic
+function or class which included the string "DISCRIMINATOR" has changed.
+The name changes that happened were:
+  The class essential-discriminator was renamed to generic-function,
+  The class basic-discriminator and the class discrimiantor were
+  combined and renamed to standard-generic-function.
+
+If you went through your code and made the following name changes, you
+would probably win, (this is what I did to PCL and it worked).
+
+  essential-discriminator  ==> generic-function
+  basic-discriminator      ==> standard-generic-function
+  discriminator
+    (when it appears as a specializer)
+         ==> standard-generic-function
+  discriminator
+    (when it appears as part of a variable name or something)
+         ==> generic-function
+
+***
+In most Lisp implementations, method lookup is at least twice as fast as
+it was in the previous release.
+
+***
+The compiler isn't called when PCL is loaded anymore.  In a future
+release, the compiler will also not be called when any other method
+definitions are loaded.  This is part of an effort to get PCL to a state
+where the compiler will never be needed when compiled files are loaded.
+
+***
+PCL now has a mechanism for naming the generic-function's and method
+functions defined by defmethod.  This means that in ports of PCL which
+take advantage of this mechanism, you will see useful function names in
+the debugger rather than the useless gensym names that have been in the
+past few releases.
+
+***
+Compiled files containing defmethod forms should be smaller and load
+faster.
+
+***
+Many of the files in the system have been renamed.  More files will be
+renamed in upcoming releases.
+
+***
+An important part of the bootstrapping code has been re-written.  The
+remainder of this code (the BRAID1 and BRAID2 files) will be re-written
+sometime soon.
+
+The changes made to bootstrapping in this release were done to make
+early methods more understandable, and as part of implementing generic
+function objects.  Also, most users should find that PCL loads in less
+time than it did before.
+
+The changes which will be made to bootstrapping in a future release will
+make understanding the "Braid" stuff easier, and will make it possible
+to implement slot-description objects as described in the CURRENT DRAFT
+of the Common Lisp Object System Chapter 3.
+
+***
+The defsys file has been re-written AGAIN.  This shouldn't affect users
+since there are still the old familiar variables *pcl-pathname-defaults*
+and *pathname-extensions*.
+
+***
+The specialized foo-notes files are all gone.  Most of them were
+hopelessly out of date, and installing pcl is now the same operation for
+any Lisp.  In particular, note that in Vaxlisp, it is no longer
+necessary to push lisp:vaxlisp on the *features* list.
+

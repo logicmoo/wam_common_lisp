@@ -1,0 +1,45 @@
+Copyright (c) Xerox Corporation 1988. All rights reserved.
+
+
+These notes correspond to the "12/7/88  Can't think of a cute name PCL"
+version of PCL.
+
+Please read this entire file carefully.  You may also be interested in
+looking at previous versions of the notes.text file.  These are called
+xxx-notes.text where xxx is the version of the PCL system the file
+corresponds to.  At least the last two versions of this file contain
+useful information for any PCL user.
+
+This version of PCL has been tested at PARC in the following Common
+Lisps:
+
+  Symbolics 7.2
+  Coral 1.2
+  Lucid 3.0
+  KCL (October 15, 1987)
+  Allegro 3.0.1
+
+These three should work, but haven't been tested just yet.
+
+  EnvOS Medley
+  TI
+
+The notes file hasn't yet been fleshed out yet.
+
+The two major changes in this release are:
+
+  - The generic function cache algorithm has been revised.  In addition
+    generic function caches now expand automatically. Programs that used
+    to run into problems with lots of cache misses shouldn't run into
+    those problems anymore. 
+
+  - the DEFCONSTRUCTOR hack now works.  Please see the construct.lisp
+    file for details.  If you are consing lots of instances, you may be
+    able to get a tremendous performance boost by using this hack.
+
+
+Another important change is that this version includes some KCL patches
+which dramatically improve PCL performance in KCL.  See the kcl-mods.text
+file for more details.
+
+

@@ -1,0 +1,537 @@
+Copyright (c) Xerox Corporation 1988. All rights reserved.
+
+
+These notes correspond to the "8/24/88 (beta) AAAI PCL" version of PCL.
+
+Please read this entire document carefully.
+
+There have been a number of changes since the 8/2/88 version of PCL.  As
+usual, these changes are part of our efforts to make PCL conform with
+the CLOS specicification (88-002R).  This release contains the big
+changes which the 7/7 through 8/2 releases were really getting ready
+for.
+
+This version of PCL has been tested at PARC in the following Common
+Lisps:
+
+  Symbolics 7.2
+  Coral 1.2
+  Lucid 3.0
+  Franz ??
+  Xerox Lyric
+  Xerox Medley (aka EnvOS Medley)
+  KCL (October 15, 1987)
+
+
+Most of the changes in this version of PCL fall into one of two
+categories.
+
+The first major set of changes makes the order of arguments to setf
+generic functions and methods conform with the spec.  In addition, these
+changes allow the first argument to defmethod to be of the form (SETF
+<symbol>).
+
+The second major set of changes have to do with slot access and instance
+structure.  Importantly, PCL now checks to see if a slot is bound, and
+calls slot-unbound if the slot is unbound.  This is a major change from
+previous releases in which slot access just returned NIL for slots which
+had not yet been set.  These changes affect all the functions which
+access the slots of an instance.  In addition, the generic functions
+which are called by the slot access functions in exceptional
+circumstances are affected.  This set of changes also include the
+implemenentation of the real initialization protocol as specified by
+88-002R.
+
+In addition, there are a number of other changes.  The most significant
+of these has to do with the symbols which the PCL package exports by
+default.
+
+The rest of this document goes on to first describe the slot access
+changes, then describe the setf generic function changes, and finally
+describe some of the other minor changes.  
+
+At the very end of this file is a new section which lists PCL features
+which are scheduled to disappear in future releases.  Please read this
+section and take it to heart.  This features will be disappearing.
+
+
+*** Changes to slot access and instance structure ***
+
+This release includes a number of changes to the way slot access works
+in PCL.  Some of these changes are incompatible with old behavior.  Code
+which was written with the actual CLOS spec in mind should not be
+affected by these incompatible changes, but some older code may be
+affected.
+
+The basic thrust of the changes to slot access is to bring the following
+functions and generic functions in line with the specification:
+
+   slot-boundp
+   slot-exists-p
+   slot-makunbound
+   slot-missing      
+   slot-unbound
+   slot-value     
+
+   slot-boundp-using-class
+   slot-exists-p-using-class
+   slot-makunbound-using-class
+   slot-value-using-class
+
+   (setf slot-value)
+   (setf slot-value-using-class)
+
+   change-class
+   make-instances-obsolete
+
+   make-instance (temporarily called *make-instance)
+   initialize-instance (temporarily called *initialize-instance)
+   reinitialize-instance
+   update-instance-for-different-class
+   update-instance-for-redefined-class
+   shared-initialize
+
+In this release, these functions accept the specified number of
+arguments, return the specified values, have the specified effects, and
+are called by the rest of PCL in the specified way at the specified
+times (with the exception that PCL does not yet call *make-instance to
+create its own metaobjects).  Because PCL now checks for unbound slots,
+you may notice a slight performance degradation in certain applications.
+
+For complete information, you should of course see the CLOS specification.
+The rest of this note is a short summary of how this new behavior is
+different from the last release.
+
+- Dynamic slots are no longer supported.  Various functions like
+  slot-value-always and remove-slot no longer exist.  Also,
+  slot-value-using-class now only accepts the three arguments as
+  described in the spec.  The two extra arguments having to do with
+  dynamic slots are no longer accepted.
+
+  Shortly, we will release a metaclass which provides the now missing
+  dynamic slot behavior.
+
+- slot-missing now receives and accepts different arguments.
+
+- slot-unbound is now implemented, and is called at the appropriate
+  times.
+
+- the initialization protocol specified in 88-002R is now almost
+  completely implemented.  The only difference is that the current
+  implementation does not currently check the validity of initargs.
+  So, no errors are signalled in improper initargs are supplied.
+
+  Because of name conflicts with the two other initialization protocols
+  PCL currently supports, some of the specified initialization functions
+  do not have their proper name.  The mapping between names in the
+  specification and names in this version of PCL is as follows:
+
+     SPECIFIED                                IN PCL
+
+   make-instance                           *make-instance
+   initialize-instance                     *initialize-instance
+   reinitialize-instance                   <has proper name>
+   update-instance-for-different-class     <has proper name>
+   update-instance-for-redefined-class     <has proper name>
+   shared-initialize                       <has proper name>
+
+
+  In a future release of PCL, these functions will have their proper
+  names, and all the old, obsolete initialization protocols will
+  disappear.
+
+  Convert to using this new wonderful initialization protocol soon.
+
+  Sometime soon we will release a version of PCL which does significant
+  optimization of calls to make-instance.  This should speed up instance
+  creation dramatically, which should significantly improve the
+  performance of some programs.
+
+- The function all-slots no longer exists.  There is a new generic
+  function called slots-to-inspect, which controls the default behavior
+  of describe.  It also controls the default behavior of the inspector
+  in ports which have connected their inspectors to PCL.  It specifies
+  which slots of a given class should be inspected.  See the definition
+  in the file high.lisp for more.
+
+- the metaclass obsolete-class no longer exists.  The mechanism by which
+  instances are marked as being obsolete is now internal, as described
+  in the spec.  The generic-function make-instances-obsolete can be used
+  to force the instances of a class to go through the obsolete instance
+  update protocol (see update-instance-for-redefined-class).
+
+- all-std-class-readers-miss-1, a generic function which was part of
+  the database interface code I sent out a few weeks ago, has a slightly
+  different argument list.  People using the code I sent out a few weeks
+  ago should replace the definition there with:
+
+  (defmethod all-std-class-readers-miss-1
+	     ((class db-class) wrapper slot-name)
+    (declare (ignore wrapper slot-name))
+    ())
+
+- The implementation of the slot access generic functions have been
+  considerably streamlined.  The impenetrable macrology which used to be
+  used is now gone.
+
+- Because the behavior of the underlying slot access generic functions
+  has changed, it is possible that some user code which hacks the
+  underlying instance structure may break.  Most of this code shouldn't
+  break though.  There have been some questions on the mailing list
+  about what is the right way to modify the structure of an instance.
+  I am working on that section of chapter 3 right now, and will answer
+  those questions sometime soon.
+
+
+*** Changes to SETF generic functions ***
+
+This release of PCL includes a significant change related to the order
+of arguments of setf generic functions.  To most user programs, this
+change should be invisible.  Your program should run just fine in the
+new version of PCL.  Even so, there is some conversion you should do to
+your program, since DEFMETHOD-SETF is now obsolete and will be going
+away soon.
+
+Some programs may take some work to adapt to this change.  This will
+be particularly true of programs which manipulated methods for setf
+generic-functions using make-instance, add-method and friends.
+
+Included here is a brief overview of this change to PCL.  Most people
+will find that this is all they need to know about this change.
+
+The CLOS specification assumes a default behavior for SETF in the
+absence of any defsetf or define-modify-macro.  The default behavior is
+to expand forms like:
+
+   (SETF (FOO x y) a)
+
+into:
+
+   (FUNCALL #'(SETF FOO) a x y)
+
+The key point is that by default, setf expands into a call to a function
+with a well-defined name, and that in that call, the new value argument
+comes before all the other arguments.
+
+This requires a change in PCL, because previously, PCL arranged for the
+new-value argument to be the last required argument.  This change
+affects the way automatically generated writer methods work, and the way
+that defmethod with a first argument of the form (SETF <symbol>) works.
+
+An important point is that I cannot implement function names of the form
+(SETF <symbol>) portably in PCL.  As a result, in PCL, I am using names
+of the form |SETF FOO|.  Note that the symbol |SETF FOO| is interned in
+the home package of the symbol FOO.  (See the description of the
+GET-SETF-FUNCTION and GET-SETF-FUNCTION-NAME).
+
+
+The user-visible changes are:
+
+- DEFMETHOD will accept lists of the form (SETF FOO) as a first
+  argument.  This will define methods on the generic function named
+  by the symbol |SETF FOO|.  As specified in the spec, these methods
+  should expect to receive the new-value as their first argument.
+  Calls to defmethod of this form will also arrange for SETF of FOO to
+  expand into an appropriate call to |SETF FOO|.
+
+- Automatically generated writer methods will expect to receive the new
+  value as their first argument.
+
+- DEFMETHOD-SETF will also place the new-value as the first argument.
+  This is for backward compatibility, since defmethod-setf itself will
+  be obsolete, and you should convert your code to stop using it.
+
+- GET-SETF-FUNCTION is a function which takes a function name and
+  returns the setf function for that function if there is one.  Note
+  that it doesn't take an environment argument.  Note that this function
+  is not specified in Common Lisp or CLOS.  PCL will continue to support
+  it as an extra export indefinetely.
+
+- GET-SETF-FUNCTION-NAME is a function which takes a function name
+  and returns the symbol which names the setf function for that
+  function.  Note that this function  is not specified in Common Lisp
+  or CLOS.  PCL will continue to support it as an extra export
+  indefinetely. 
+
+- For convenience, PCL defines a macro called DO-STANDARD-DEFSETF which
+  can be used to do the appropriate defsetf.  This may be helpful for
+  programs which have calls to setf of a generic-function before any
+  of the generic function's method definitions.  A use of this macro
+  looks like:
+
+     (do-standard-defsetf position-x)
+
+  Afterwards, a form like (SETF (POSITION-X P) V) will expand into a
+  form like (|SETF POSITION-X| V P).
+
+  The reason you may have to use do-standard-defsetf is that I cannot
+  portably change every implementations SETF to have the new default
+  behavior.  The proper way to use this is to take an early file in
+  your system, and put a bunch of calls to do-standard-defsetf in it.
+  Note that as soon as PCL sees a defmethod with a name argument of
+  the form (SETF FOO), or it sees a :accessor in a defclass, it will
+  do an appropriate do-standard-defsetf for you.
+
+
+In summary, the only things that will need to be changed in most
+programs is that uses of defmethod-setf should be converted to
+appropriate uses of defmethod.
+
+Here is an example of a typical user program which is affected by this
+change.  
+
+(defclass position ()
+    ((x :initform 0 :accessor pos-x)
+     (y :initform 0 :accessor pos-y)))
+
+(defclass monitored-position (position)
+    ())
+
+(defmethod-setf pos-x :before ((p monitored-position)) (new)
+  (format *trace-output* "~&Changing x coord of ~S to ~D." p new))
+
+(defmethod-setf pos-y :before ((p monitored-position)) (new)
+  (format *trace-output* "~&Changing y coord of ~S to ~D." p new))
+
+
+To bring this program up to date, you should convert the two
+defmethod-setf forms as follows:
+
+(defmethod (setf pos-x) :before (new (p monitored-position))
+  (format *trace-output* "~&Changing x coord of ~S to ~D." p new))
+
+(defmethod (setf pos-y) :before (new (p monitored-position))
+  (format *trace-output* "~&Changing y coord of ~S to ~D." p new))
+
+
+*** Other changes in this release ***
+
+* The symbols exported by the PCL package have now changed.  The PCL
+package now exports the symbols listed in the table of contents of
+chapter 2 of the spec.  This list of symbols is the value of the
+variable pcl::*exports*.
+
+Following is the list of symbols which were exported in the 8/2/88
+version but which are not exported in the 8/18/88 version.
+
+DEFMETHOD-SETF      DEFGENERIC-OPTIONS      DEFGENERIC-OPTIONS-SETF
+CLASS-CHANGED       CLASS-NAMED             SYMBOL-CLASS
+CBOUNDP             GET-METHOD              GET-SETF-GENERIC-FUNCTION
+MAKE-METHOD-CALL 
+
+Following is the list of symbols which are exported in the 8/18/88
+version, but which were not exported in previous versions:
+
+CALL-METHOD         CLASS-NAME              COMPUTE-APPLICABLE-METHODS
+DEFGENERIC          ENSURE-GENERIC-FUNCTION FIND-METHOD
+FUNCTION-KEYWORDS   GENERIC-FLET            GENERIC-LABELS
+INITIALIZE-INSTANCE MAKE-INSTANCES-OBSOLETE NO-APPLICABLE-METHOD
+NO-NEXT-METHOD      REINITIALIZE-INSTANCE   SHARED-INITIALIZE
+SLOT-BOUNDP         SLOT-EXISTS-P           SLOT-MAKUNBOUND
+SLOT-MISSING        SLOT-UNBOUND            SYMBOL-MACROLET
+UPDATE-INSTANCE-FOR-DIFFERENT-CLASS
+UPDATE-INSTANCE-FOR-REDEFINED-CLASS
+WITH-ADDED-METHODS
+
+It should be noted that not all of these newly exported symbols have
+been "implemented" yet.
+
+
+* Any program written using PCL will need to be completely recompiled
+to run with this release of PCL.
+
+* The generic-function generic-function-pretty-arglist now returns a
+nice arglist for any generic function.  It combines all the keyword
+arguments accepted by the methods to get the combined set of keywords.
+In some ports, the environment specific ARGLIST function has been
+connected to this, and so the environments will print out nice arglists
+for generic functions.
+
+* Some bugs in trace-method have been fixed.  Trace-method should now
+work in all ports of PCL.
+
+* NO-MATCHING-METHOD has been renamed to NO-APPLICABLE-METHOD.  In
+addition, it now receives arguments as specified.
+
+* defmethod has been modified to allow macros which expand into
+declarations.
+
+* The :documentation slot option is now accepted in defclass forms.  The
+documentation string put here cannot yet be retrieved using the
+documentation function.  That will happen in a later release.
+
+* The :writer slot option is now implemented.
+
+* Some brain damage in high.lisp which caused method lookup to work
+incorrectly for built in classes.  In addition, it caused the
+class-local-supers and class-direct-subclasses of the built in classes
+to be strange.  People using CLOS browsers should notice this change
+dramatically, as it will make the browse of the built in part of the
+class lattice look right.
+
+
+*** Older Changes ***
+
+Following are changes which appeared in release of PCL from 7/7/88 to
+8/2/88.  Each change is marked with the release it appeared in.
+
+
+
+8/2/88
+Loading defclass forms should be much faster now.  The bug which caused
+all the generic functions in the world to be invalidated whenever a
+class was defined has now been fixed.
+
+Loading defmethod forms should also be much faster.  A bug which caused
+a tremendous amount of needles computation whenever a method was also
+fixed.
+
+
+
+8/2/88
+A bug which caused several slots of the classes T, OBJECT, CLASS and
+STANDARD-CLASS to be unbound has been fixed.
+
+
+
+8/1/88
+load-pcl now adds the symbols :PCL and :PORTABLE-COMMONLOOPS to
+*features*.
+
+PCL still doesn't do any sort of call to PROVIDE because of the total
+lack of uniformity in the behavior of require and provide in the various
+common lisp implementations.
+
+
+8/1/88
+This version of PCL finally fixes the horrible bug that prevented
+the initform for :class allocation slots from being evaluated when the
+class was defined.
+
+
+7/20/88
+PCL now converts the function describe into a generic function of one
+argument.  This is to bring it into conformance with the spec as
+described in 88-002.
+
+In Symbolics Genera, it is actually a function of one required and one
+optional argument.  This is because the 3600 sometimes calls describe
+with more than one argument.
+
+In Lucid Lisp, describe only takes an optional argument.  This argument
+defaults to the value of *.  PCL converts describe to a generic function
+of one required argument so it is not possible to call describe with
+only one argument.
+
+
+7/7/88
+class-named and symbol-class have been replaced by find-class.
+find-class is documented in 88-002R.
+
+
+7/7/88
+with-slots and with-accessors now conform to 88-002R.
+
+The old definition of with-slots is now called obsolete-with-slots.  The
+same is true for with-accessors.
+
+   with-slots    ---> obsolete-with-slots
+   with-accessors --> obsolete-with-accessors
+
+The temporary correct definition of with-slots, with-slots* is now
+called with-slots. The same is true for with-accessors*.
+
+   with-slots*    --> with-slots
+   with-accessors* -> with-accessors
+
+
+7/7/88
+The class-precedence list of the class null now conforms to 88-002R.
+
+In previous releases of PCL, the class precedence-list of the class
+null was: (null list symbol sequence t).  In this release the class
+precedence list of the class null is: (null symbol list sequence t).
+
+This change was made to bring PCL into conformance with the spec.
+
+
+
+7/7/88
+
+print-object now takes only two arguments.
+
+This changes was made to begin bringing print-object in conformance with
+88-002R.  print-object conforms to the spec to the extent that is is
+called at the approrpiate times for PCL instances.  In most
+implementations, it is not called at the appropriate times for other
+instances.  This is not under my control, encourage your vendor to
+provide the proper support for print-object.
+
+
+7/7/88
+This version of PCL now includes a beta test version of a new iteration
+package.  This iteration package was designed by Pavel Curtis and
+implemented by Bill vanMelle.  This iteration package is defined in the
+file iterate.lisp.  Please feel free to experiment with it.  We are all
+very interested in comments on its use.
+
+
+
+*** PCL Features that will be disappearing ***
+
+This section describes features in PCL that will be disappearing in
+future releases.  For each change, I try to give a release date after
+which I will feel free to remove this feature.  This list should not be
+considered complete.  Certain other PCL features will disappear as well.
+The items on this list are the user-interface level items that it is
+possible to give a lot of warning about.  Other changes will have more
+subtle effects, for example when the lambda-list congruence rules are
+implemented.
+
+- :accessor-prefix in defclass 
+
+Can disappear anytime after 8/29.
+
+Warning that this is obsolete has been out for some time.  You should
+use :accessor in each of the slot specifications of the defclass form.
+It is true that this is slightly more cumbersome, but the semantic
+difficulties associated with :accesor-prefix are even worse.
+
+- :constructor in defclass
+
+Can disappear anytime after 8/29.
+
+Warning that this is obsolete has been out for some time.  It will be
+disappearing shortly because the intialization protocol which it goes
+with will be disappearing.  A future release of PCL will support a
+special mechanism for defining functions of the form:
+
+(defun make-foo (x y &optional z)
+  (make-instance 'foo 'x x :y y :z z))
+
+In the case where there are only :after methods on initialize-instance
+and shared-initialize, these functions will run like the wind.  We hope
+to release this facility by 9/15.
+
+- old definition of make-instance, intialize, initialize-from-defaults,
+  initialize-from-init-plist
+
+Can disappear anytime after 8/29.
+
+Convert to using the new initialization protocol as described in the
+spec and above.
+
+- mki, old definition of initialize-instance
+
+Can disappear anytime after 8/29.
+
+Convert to using the new initialization protocol as described in the
+spec and above.
+
+- defmethod-setf
+
+Can disappear anytime after 9/15.
+
+Convert to using (defmethod (setf foo) ...
+
+

@@ -1,0 +1,167 @@
+Copyright (c) Xerox Corporation 1988. All rights reserved.
+
+These notes correspond to the beta test release of March 17th 1988.
+Later versions of this release will run in the usual lisps, but for the
+time being this has only been tested in Symbolics, Lucid, Coral,
+Xerox, Ibuki (01/01), TI and VAXLisp Common Lisps.
+
+Note may not run in all Franz Lisps, I believe it runs on the SUN3
+though.  I will get back to this in a few days when I get the needed
+code from Franz.
+
+***
+This release will run in Lucid 3.0 beta 2, with the boolean.lbin patch.
+
+***
+This release contains a prototype implementation of the make-instance
+behavior documented in the CLOS specification (X3J13 document # 88-002).
+This prototype implementation does not provide high performance, but it
+should conform to the specification with one exception, it does not
+check the validity of the initargs.
+
+All the generic functions in the instance creation protocol are as
+specified in the CLOS specification except that make-instance is called
+mki instead.  This name is a temporary name, it is so that people can
+try out the new make-instance protocol without having to convert all
+their code at once.  In a future release, the name make-instance will be
+switched to the new behavior.
+
+***
+Standard method combination is supported.  General declarative
+method combination is not yet supported, so define-method-combination does
+not yet work, but standard method combination is what generic functions
+do by default now.  :after :before :around and unqualified methods are
+supported.  Error checking is minimal.
+
+***
+call-next-method works with standard-method-combination.
+call-next-method is much faster than it was before, and call-next-method
+behaves as a lexically defined function.  This means it is possible to
+pass around funargs which include call-next-method.
+
+***
+All uses of slot-value within a method body should be optimized.  It
+should no longer be necessary to use with-slots just to get the
+optimization.
+
+***
+There are new macros with-slots* and with-accessors*.  These correspond
+to the macros which will appear in the final specification, with-slots
+and with-accessors.  They work as follows:
+
+(with-slots* ((x x-slot)             
+              (y y-slot))         ===\ (let ((#:g1 (foo)))
+             (foo)                ===/   (swapf (slot-value #:g1 'x-slot)
+  (swapf x y))                                  (slot-value #:g1 'y-slot))) 
+
+(with-accessors* ((x position-x)          
+                  (y position-y)) ===\ (let ((#:g1 (foo)))
+                 (foo)            ===/   (incf (position-x #:g1))
+  (incf x)                               (incf (position-y #:g1)))
+  (incf y))
+
+As an abbreviation, the (<variable-name> <slot-name>) pairs in with-slots*
+can be abbreviated to just <variable-and-slot-name> when the variable
+and slot name are the same.  This means that:
+
+(with-slots* (x y z) <instance-form> &body <body>)
+
+is equivalent to:
+
+(with-slots* ((x x) (y y) (z z)) <instance-form> &body <body>)
+
+You should begin to convert your code to use these macros as soon as
+possible since the old macro with-slots will swap names with with-slots*
+sometime soon.
+
+A trick you may want to use for remembering the order of the first two
+arguments to with-slots* and with-accessors* is that it is "like
+multiple-value-bind".
+
+***
+In addition this release includes the beginnings of support for doing
+some of the compiling which PCL does a load time at compile time
+instead.  To use this support, put the form:
+
+  (pcl::precompile-random-code-segments)
+
+in a file which is compiled after all your other pcl using files are
+loaded.  Then arrange for that file to be loaded before all your
+other pcl using files are loaded.
+
+For example, if your system has two files called "classes" and "methods",
+create a new file called "precom" that contains:
+
+  (in-package 'pcl)
+ 
+  (pcl::precompile-random-code-segments)
+
+
+Then you can use the defsystem stuff defined in the file defsys to
+maintain your system as follows:
+
+(defsystem my-very-own-system
+	   "/usr/myname/lisp/"
+  ((classes   (precom)           ()                ())
+   (methods   (precom classes)   (classes)         ())
+   (precom    ()                 (classes methods) (classes methods))))
+
+This defsystem should be read as follows:
+
+* Define a system named MY-VERY-OWN-SYSTEM, the sources and binaries
+  should be in the directory "/usr/me/lisp/".  There are three files
+  in the system, there are named classes, methods and precom.  (The
+  extension the filenames have depends on the lisp you are running in.)
+  
+* For the first file, classes, the (precom) in the line means that
+  the file precom should be loaded before this file is loaded.  The
+  first () means that no other files need to be loaded before this
+  file is compiled.  The second () means that changes in other files
+  don't force this file to be recompiled.
+
+* For the second file, methods, the (precom classes) means that both
+  of the files precom and classes must be loaded before this file
+  can be loaded.  The (classes) means that the file classes must be
+  loaded before this file can be compiled.  The () means that changes
+  in other files don't force this file to be recompiled.
+
+* For the third file, precom, the first () means that no other files
+  need to be loaded before this file is loaded.  The first use of
+  (classes methods)  means that both classes and methods must be
+  loaded before this file can be compiled.  The second use of (classes
+  methods) mean that whenever either classes or methods changes precom
+  must be recompiled.
+
+Then you can compile your system with:
+
+ (operate-on-system 'my-very-own-system :compile)
+
+and load your system with:
+
+ (operate-on-system 'my-very-own-system :load)
+
+***
+The code walker has gone through some signigificant revision.  The
+principle change is that the function walk-form now takes three required
+arguments, and the walk-function itself now must accept an environment
+argument.  There are other changes having to do with the implementation
+specific representation of macroexpansion environments.  For details see
+the file walk.lisp.
+
+***
+The following functions and macros which used to be supported for
+backward compatibility only are now not supported at all:
+
+WITH* and WITH
+
+DEFMETH
+
+GET-SLOT
+
+MAKE
+
+
+***
+There are other small changes in this release.  If you notice one that
+causes you problems please send me a message about it.
+

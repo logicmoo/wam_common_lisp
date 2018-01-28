@@ -1,0 +1,53 @@
+
+
+These notes correspond to *pcl-system-date* "4/21/87  April 21rst 1987".
+
+The notes from the last release are stored as 3-19-notes.text
+
+This release runs in:
+  ExCL
+  Lucid
+  Symbolics Common Lisp (Genera)
+  Vaxlisp (2.0)
+  Xerox Common Lisp (Lyric Release)
+  Kyoto Common Lisp (5.2)
+
+CMU Lisp (nee Spice) should be working soon, I will announce another
+release at that time.
+
+Xerox Lisp users should FTP all the source files from /pub/pcl/ as well
+as all the dfasl files from /pub/pcl/xerox/.  Included in the xerox
+specific directory is a file called PCL-ENV, which provides some simple
+environment support for using PCL in Xerox Lisp.
+
+
+The major difference in this release is that defclass conforms to the
+CLOS specification (pretty much I hope).  Previous warnings about what
+would happen when defclass became CLOS defclass now apply.  Once major
+difference is that PCL currently does require that all a classes
+superclasses be defined when a defclass form is evaluated.  This will
+change sometime soon.
+
+Other small changes include:
+
+Some more of the files have been renamed and restructured (as promised).
+
+the defclass parsing protocol has changed
+
+slotd datastructures are now instances of the class
+standard-slot-description.
+
+a performance bug in the ExCL port which causes method lookup and slot
+access to cons needlessly.
+
+a bug in the 3600 port which broke the printer for stack consed closures
+
+make-specializable
+
+a bug in Lucid lisp which made it impossible to say (compile-pcl) has
+been patched around, this is the bug that manifested itself as NAME
+being ubound.
+
+
+As usual, please enjoy and send comments.
+
