@@ -9,7 +9,7 @@
 :-use_module(library(wamcl_runtime)).
 
 /*
-(in-package #:system)
+(in-package "SYSTEM")
 
 */
 

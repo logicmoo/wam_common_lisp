@@ -168,7 +168,7 @@ f_u_mapcar_visualize(Func_Param, L_Param, FnResult) :-
 	   _Ignored).
 :- was_info(with_lisp_translation(file('/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init.lisp'),
 				  lisp_compile_to_prolog_output(<stream>(0x1d443d0)))).
-(in-package #:system)
+(in-package "SYSTEM")
 
 :- cl_in_package(system1, _Ignored4).
 (defpackage "SYSTEM" (:nicknames "SYS"))

@@ -8,7 +8,7 @@
 ;;; #+SICL From SICL
 
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 
 #+(or WAM-CL LISP500) 

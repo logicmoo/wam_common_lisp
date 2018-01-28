@@ -9,7 +9,7 @@
 ;;;;
 ;;;;    See file '../Copyright' for full details.
 
-(in-package #:lisp)
+(in-package "COMMON-LISP")
 
 (defmacro declaim (&rest decl-specs)
   (if (cdr decl-specs)

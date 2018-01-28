@@ -33,7 +33,7 @@
 ;; #+SICL From SICL
 */
 /*
-(in-package #:system)
+(in-package "SYSTEM")
 
 
 

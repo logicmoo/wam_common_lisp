@@ -11,7 +11,7 @@
 ;;;;                           number routines
 
 
-(in-package #:lisp)
+(in-package "COMMON-LISP")
 (export
  '(isqrt abs phase signum cis asin acos sinh cosh tanh
    asinh acosh atanh
@@ -24,7 +24,7 @@
    ))
 
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 
 (proclaim '(optimize (safety 2) (space 3)))

@@ -8,7 +8,7 @@
 ;;; #+SICL From SICL
 
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 
 #-WAM-CL (defmacro put-sysprop (s p v) `(setf (get ,s ,p) ,v ))

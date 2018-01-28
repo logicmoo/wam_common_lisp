@@ -174,7 +174,7 @@
 ;;;; provided with absolutely no warranty. See the COPYING and CREDITS
 ;;;; files for more information.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 ;;; The flags passed back by BACKQUOTIFY can be interpreted as follows:
 ;;;
@@ -666,7 +666,7 @@
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defun make-hash-table (&key (test 'eql) (size 11) (rehash-size 1.5)
                              (rehash-threshold 0.75)
@@ -730,7 +730,7 @@
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (resolve 'defstruct)
 
@@ -801,7 +801,7 @@
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 ;;; Adapted from ECL.
 
@@ -1032,7 +1032,7 @@
 
 ;;; Adapted from CMUCL.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defun map1 (function original-arglists accumulate take-car)
   (let* ((arglists (copy-list original-arglists))
@@ -1172,7 +1172,7 @@
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defun map (result-type function sequence &rest more-sequences)
   (let* ((sequences (cons sequence more-sequences))
@@ -1238,7 +1238,7 @@
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (export '(index java-long %type-error check-sequence-bounds require-type
           normalize-type))
@@ -1796,7 +1796,7 @@
 
 ;;; Adapted from SBCL.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 ;;; Is X a (possibly-improper) list of at least N elements?
 (defun list-of-length-at-least-p (x n)
@@ -2047,7 +2047,7 @@
 ;;; exception statement from your version.
 
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 
 (export '(concatenate-fasls))
@@ -2149,7 +2149,7 @@
 
 ;;; From CMUCL/SBCL.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defmacro define-setf-expander (access-fn lambda-list &body body)
   (require-type access-fn 'symbol)
@@ -3800,7 +3800,7 @@ returns the pathname of the contrib if it can be found."
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defun byte (size position)
   (cons size position))
@@ -3911,7 +3911,7 @@ returns the pathname of the contrib if it can be found."
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (export '(record-source-information untraced-function))
 
@@ -4093,7 +4093,7 @@ present.  Will probably just filter when presenting in slime.
 
 ;;; Adapted from SBCL.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defun ldiff (list object)
   (require-type list 'list)
@@ -4202,7 +4202,7 @@ the test function `test'."
 
 ;;; Adapted from SBCL.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defun ed (&optional x)
   "Starts the editor (on a file or a function if named).  Functions
@@ -4592,7 +4592,7 @@ the file system."
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defun read-from-string (string &optional (eof-error-p t) eof-value
                                 &key (start 0) end preserve-whitespace)
@@ -4638,7 +4638,7 @@ the file system."
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defun read-sequence (sequence stream &key (start 0) end)
   (declare (type stream stream))
@@ -4960,7 +4960,7 @@ the file system."
 
 (defvar *debug-level* 0)
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defun show-restarts (restarts stream)
   (when restarts
@@ -5112,7 +5112,7 @@ called by BREAK. This hook is run before *DEBUGGER-HOOK*.")
 
 ;;; Adapted from OpenMCL.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (require "EXTENSIBLE-SEQUENCES-BASE")
 
@@ -5208,7 +5208,7 @@ called by BREAK. This hook is run before *DEBUGGER-HOOK*.")
 
 ;;; Adapted from SBCL.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 ;; FIXME See section 5.1.3.
 (defmacro define-modify-macro (name lambda-list function &optional doc-string)
@@ -5391,7 +5391,7 @@ called by BREAK. This hook is run before *DEBUGGER-HOOK*.")
 
 ;;;; Adapted from CMUCL/SBCL.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 ;; Redefine DEFMACRO to use PARSE-DEFMACRO.
 (defmacro defmacro (name lambda-list &rest body)
@@ -5628,7 +5628,7 @@ called by BREAK. This hook is run before *DEBUGGER-HOOK*.")
 
 ;;; Adapted from SBCL.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (require '#:collect)
 
@@ -6460,7 +6460,7 @@ called by BREAK. This hook is run before *DEBUGGER-HOOK*.")
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defmacro deftype (name lambda-list &rest body)
   (when (eq (symbol-package name) +cl-package+)
@@ -6999,7 +6999,7 @@ called by BREAK. This hook is run before *DEBUGGER-HOOK*.")
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (require "EXTENSIBLE-SEQUENCES-BASE")
 
@@ -7335,7 +7335,7 @@ called by BREAK. This hook is run before *DEBUGGER-HOOK*.")
 
 ;;; Adapted from CMUCL.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defvar *gentemp-counter* 0)
 
@@ -7390,7 +7390,7 @@ called by BREAK. This hook is run before *DEBUGGER-HOOK*.")
 
 ;;; Adapted from CMUCL.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (require "EXTENSIBLE-SEQUENCES-BASE")
 
@@ -7620,7 +7620,7 @@ elements into it from the source sequence."
 
 ;(require "EXTENSIBLE-SEQUENCES-BASE")
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defmacro type-specifier-atom (type)
   `(if (atom ,type) ,type (car ,type)))
@@ -7694,7 +7694,7 @@ elements into it from the source sequence."
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 ;;; PROVIDE, REQUIRE (from SBCL)
 (defun provide (module-name)
@@ -7830,7 +7830,7 @@ elements into it from the source sequence."
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (require '#:clos)
 (require '#:format)
@@ -8012,7 +8012,7 @@ elements into it from the source sequence."
 
 ;;; Adapted from CMUCL/SBCL.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defun read-evaluated-form ()
   (fresh-line *query-io*)
@@ -8368,7 +8368,7 @@ elements into it from the source sequence."
 
 ;;;; Adapted from CMUCL/SBCL.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (export '(parse-body))
 
@@ -8871,7 +8871,7 @@ Taken from cmucl.
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defun get-setf-method-inverse (form inverse setf-function)
   (let ((new-var (gensym))
@@ -9174,7 +9174,7 @@ Used to be in SLIME but generally useful, so now back in ABCL proper."
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 ;;; From CMUCL.
 
@@ -9444,7 +9444,7 @@ Used to be in SLIME but generally useful, so now back in ABCL proper."
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 ;;; From CMUCL.
 
@@ -9530,7 +9530,7 @@ Used to be in SLIME but generally useful, so now back in ABCL proper."
 
 ;;; Adapted from CMUCL.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defmacro check-type (place type &optional type-string)
   (let ((place-value (gensym)))
@@ -10236,7 +10236,7 @@ Uses \"New I/O\" in JVM \"worse named API of all time\".
 
 ;;; Adapted from SBCL.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defconstant seconds-in-week (* 60 60 24 7))
 (defconstant weeks-offset 2145)
@@ -10443,7 +10443,7 @@ Uses \"New I/O\" in JVM \"worse named API of all time\".
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (require "EXTENSIBLE-SEQUENCES-BASE")
 
@@ -11191,7 +11191,7 @@ Optionally, prefer the strategy named NAME if one exists."
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defun list-length (list)
   (do ((n 0 (+ n 2))
@@ -11245,7 +11245,7 @@ Optionally, prefer the strategy named NAME if one exists."
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defun fifth (list)
   (car (cddddr list)))
@@ -11319,7 +11319,7 @@ Optionally, prefer the strategy named NAME if one exists."
 
 ;;; Adapted from CMUCL.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defun bit-array-same-dimensions-p (array1 array2)
   (declare (type (array bit) array1 array2))
@@ -11758,7 +11758,7 @@ Optionally, prefer the strategy named NAME if one exists."
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 ;;; From SBCL.
 (defmacro with-output-to-string ((var &optional string &key (element-type ''character))
@@ -16741,7 +16741,7 @@ or T when any keyword is acceptable due to presence of
 
 ;;; Adapted from SBCL.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (declaim (inline equal-components-p))
 (defun equal-components-p (component1 component2)
@@ -16814,7 +16814,7 @@ or T when any keyword is acceptable due to presence of
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (require '#:compiler-types)
 
@@ -17286,7 +17286,7 @@ or T when any keyword is acceptable due to presence of
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (require "JVM-CLASS-FILE")
 (require "JAVA")
@@ -17361,7 +17361,7 @@ which stores the Java object `symbol'."
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (require 'clos)
 (require 'format)
@@ -17658,7 +17658,7 @@ which stores the Java object `symbol'."
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defun load (filespec
              &key
@@ -17726,7 +17726,7 @@ which stores the Java object `symbol'."
 
 ;;; Adapted from SBCL.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defmacro do-all-symbols ((var &optional result-form) &body body)
   (multiple-value-bind (forms decls) (parse-body body nil)
@@ -18089,7 +18089,7 @@ to the thread perfoming the socket write"))
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (declaim (ftype (function (t) t) coerce-list-to-vector))
 (defun coerce-list-to-vector (list)
@@ -18357,7 +18357,7 @@ to the thread perfoming the socket write"))
 
 ;;; Adapted from SBCL.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defmacro dolist ((var list-form &optional (result-form nil)) &body body)
   ;; We repeatedly bind the var instead of setting it so that we never
@@ -18558,7 +18558,7 @@ to the thread perfoming the socket write"))
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (require "COMPILER-PASS2")
 
@@ -19595,7 +19595,7 @@ interpreted toplevel form, non-NIL if it is 'simple enough'."
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 ;; Adapted from SBCL.
 (defun cfp-output-file-default (input-file)
@@ -19650,7 +19650,7 @@ interpreted toplevel form, non-NIL if it is 'simple enough'."
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (export '(*compiler-error-context*
           compiler-style-warn
@@ -29017,7 +29017,7 @@ Could arguably better named as *SIGNAL-COMPILE-WARNINGS-P*.")
 
 ;;; Type information that matters to the compiler.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (export '(+true-type+
           +false-type+
@@ -29822,7 +29822,7 @@ Could arguably better named as *SIGNAL-COMPILE-WARNINGS-P*.")
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defun concatenate-to-string (sequences)
   (declare (optimize speed (safety 0)))
@@ -30100,7 +30100,7 @@ Could arguably better named as *SIGNAL-COMPILE-WARNINGS-P*.")
 ;;;;      United States of America
 ;;;;      +1-617-221-1000
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defpackage "LOOP" (:use "COMMON-LISP"))
 
@@ -32199,7 +32199,7 @@ collected result will be returned as the value of the LOOP."
 (defmacro %caddr (x)
   (list '%car (list '%cdr (list '%cdr x))))
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 ;; Redefined in precompiler.lisp.
 (defun eval (form)
@@ -32236,7 +32236,7 @@ collected result will be returned as the value of the LOOP."
 
 (export 'precompile '#:extensions)
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defun simple-format (destination control-string &rest args)
   (apply #'format destination control-string args))
@@ -33025,7 +33025,7 @@ collected result will be returned as the value of the LOOP."
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 ;;; From CMUCL.
 
@@ -35981,7 +35981,7 @@ collected result will be returned as the value of the LOOP."
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (require "EXTENSIBLE-SEQUENCES-BASE")
 
@@ -36521,7 +36521,7 @@ collected result will be returned as the value of the LOOP."
 
 ;;; Adapted from SBCL.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (eval-when (:compile-toplevel)
   (require '#:collect))
@@ -36589,7 +36589,7 @@ collected result will be returned as the value of the LOOP."
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defmacro dotimes ((var count &optional (result nil)) &body body)
   (multiple-value-bind (forms decls) (parse-body body nil)
@@ -36786,7 +36786,7 @@ collected result will be returned as the value of the LOOP."
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (export '(source-transform define-source-transform expand-source-transform))
 
@@ -36889,7 +36889,7 @@ collected result will be returned as the value of the LOOP."
 
 ;;; Adapted from SBCL.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defun upgraded-element-type-bits (bits)
   (if (zerop (mod bits 8))
@@ -38928,7 +38928,7 @@ collected result will be returned as the value of the LOOP."
 
 ;;; Adapted from SBCL.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 
 (defun apropos-list (string-designator &optional package-designator
@@ -40940,7 +40940,7 @@ collected result will be returned as the value of the LOOP."
 (defun macroexpand-all (form &optional env)
   (precompiler:precompile-form form t env))
 
-(in-package #:lisp)
+(in-package "COMMON-LISP")
 
 (export '(compiler-let))
 
@@ -40953,7 +40953,7 @@ collected result will be returned as the value of the LOOP."
                        (eval (cadr binding))) bindings)
       (macroexpand-all `(progn ,@forms) env))))
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defun set-function-definition (name new old)
   (let ((*warn-on-redefinition* nil))
@@ -41293,7 +41293,7 @@ collected result will be returned as the value of the LOOP."
 
 ;;; Adapted from SBCL.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 ;;; Can this object contain other objects?
 (defun compound-object-p (x)
@@ -41622,7 +41622,7 @@ collected result will be returned as the value of the LOOP."
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (require 'clos)
 
@@ -41758,7 +41758,7 @@ collected result will be returned as the value of the LOOP."
 
 ;;; Adapted from SBCL.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defun %print-unreadable-object (object stream type identity body)
   (setf stream (out-synonym-of stream))
@@ -41823,7 +41823,7 @@ collected result will be returned as the value of the LOOP."
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defun write-sequence (sequence stream &key (start 0) end)
   (declare (type stream stream))
@@ -41956,7 +41956,7 @@ collected result will be returned as the value of the LOOP."
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (export '(check-declaration-type proclaimed-type proclaimed-ftype ftype-result-type *inline-declarations*))
 
@@ -55327,7 +55327,7 @@ DEPRECATED. Use ASDF:ACTION-DESCRIPTION and/or ASDF::FORMAT-ACTION instead."))
 
 ;;; From CMUCL.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (require '#:collect)
 
@@ -55399,7 +55399,7 @@ DEPRECATED. Use ASDF:ACTION-DESCRIPTION and/or ASDF::FORMAT-ACTION instead."))
 
 ;;; Adapted from CMUCL.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defmacro assert (test-form &optional places datum &rest arguments)
   "Signals an error if the value of test-form is nil.  Continuing from this
@@ -55861,7 +55861,7 @@ DEPRECATED. Use ASDF:ACTION-DESCRIPTION and/or ASDF::FORMAT-ACTION instead."))
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defun string-upcase (string &key (start 0) end)
   (%string-upcase string start end))
@@ -56425,7 +56425,7 @@ DEPRECATED. Use ASDF:ACTION-DESCRIPTION and/or ASDF::FORMAT-ACTION instead."))
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defparameter *known-types* (make-hash-table :test 'eq))
 
@@ -64514,7 +64514,7 @@ the sequence argument to be a proper sequence.
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defun simple-array-p (object)
   (and (arrayp object)
@@ -64718,7 +64718,7 @@ the sequence argument to be a proper sequence.
 ;;; obligated to do so.  If you do not wish to do so, delete this
 ;;; exception statement from your version.
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defun write-byte (byte stream)
   (declare (type stream stream))

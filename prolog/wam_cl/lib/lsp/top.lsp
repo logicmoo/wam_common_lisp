@@ -20,7 +20,7 @@
 
 (in-package #:compiler) ; just to bypass mtcl boot problems
 
-(in-package #:lisp)
+(in-package "COMMON-LISP")
 ;(require '(iolib seqlib trace))
 
 (export '(+ ++ +++ - * ** *** / // ///))
@@ -30,7 +30,7 @@
 #+Threads
 (export '(%disable-scheduler %enable-scheduler))
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (export '(*break-readtable* *lisp-init-file-list* *tpl-evalhook*))
 #+Threads

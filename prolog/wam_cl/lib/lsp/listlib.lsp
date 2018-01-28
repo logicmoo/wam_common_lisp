@@ -10,13 +10,13 @@
 ;;;;                        list manipulating routines
 
 
-(in-package #:lisp)
+(in-package "COMMON-LISP")
 
 (export '(union nunion intersection nintersection
           set-difference nset-difference set-exclusive-or nset-exclusive-or
           subsetp))
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (proclaim '(optimize (safety 2) (space 3)))
 

@@ -8,7 +8,7 @@
 ;;; #+SICL From SICL
 
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 
 (defmacro make-hash-table (&rest all) `(make-instance 'hash-table ,@all))

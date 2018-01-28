@@ -11,14 +11,14 @@
 ;;;;                    package routines
 
 
-(in-package #:lisp)
+(in-package "COMMON-LISP")
 
 
 (export '(find-all-symbols do-symbols do-external-symbols do-all-symbols))
 (export '(apropos apropos-list))
 
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 
 (proclaim '(optimize (safety 2) (space 3)))

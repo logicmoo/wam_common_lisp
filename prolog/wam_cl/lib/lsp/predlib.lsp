@@ -11,11 +11,11 @@
 ;;;;                              predicate routines
 
 
-(in-package #:lisp)
+(in-package "COMMON-LISP")
 (export '(deftype typep subtypep coerce))
 
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 
 (proclaim '(optimize (safety 2) (space 3)))

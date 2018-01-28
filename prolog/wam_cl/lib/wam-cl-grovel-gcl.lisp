@@ -976,7 +976,7 @@
 ;;; whether they are input/output or both
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(in-package #:lisp)
+(in-package "COMMON-LISP")
 
 (export '(make-user-stream define-user-stream-type *user-defined-stream-types*))
 
@@ -1242,7 +1242,7 @@
 ;;;;                            module routines
 
 
-;; (in-package #:lisp)
+;; (in-package "COMMON-LISP")
 
 ;; (export '(*modules* provide require))
 ;; (export '(documentation variable function structure type setf compiler-macro))
@@ -1908,7 +1908,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; BEGIN FILE ./lsp/gcl_sym.lsp
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; (in-package #:lisp)
+;; (in-package "COMMON-LISP")
 ;; (export '(macro-function))
 (in-package :si)
 
@@ -3580,7 +3580,7 @@ called...  Lower down we would see that goo is called twice.
 ;;;;                           sequence routines
 
 
-;; (in-package #:lisp)
+;; (in-package "COMMON-LISP")
 
 ;; (export '(make-sequence concatenate map map-into))
 
@@ -5703,7 +5703,7 @@ Then you may simply
 ;;;;                    package routines
 
 
-;; (in-package #:lisp)
+;; (in-package "COMMON-LISP")
 
 
 ;; (export '(find-all-symbols do-symbols do-external-symbols do-all-symbols with-package-iterator))
@@ -6233,7 +6233,7 @@ Then you may simply
 ;;;; This file is IMPLEMENTATION-DEPENDENT.
 
 
-;(in-package #:lisp)
+;(in-package "COMMON-LISP")
 
 
 ;(export 'time)
@@ -7760,7 +7760,7 @@ Good luck!				 The GCL Development Team")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;to-do fast link defentry, sig propagation
 
-;; (in-package #:lisp)
+;; (in-package "COMMON-LISP")
 ;; (export '(string char schar string= string/= string> string>= 
 ;; 		 string< string<= string-equal string-not-equal
 ;; 		 string-greaterp string-not-lessp string-lessp
@@ -9885,7 +9885,7 @@ user_init{") ,@
 ;; If you are working in another package you should (import 'si::arglist)
 ;; to avoid typing the si::
 
-;; (in-package #:lisp)
+;; (in-package "COMMON-LISP")
 
 ;; (export '(trace untrace))
 ;; (export 'step)
@@ -10814,7 +10814,7 @@ user_init{") ,@
 ;;;;                           DESCRIBE and INSPECT
 
 
-;; (in-package #:lisp)
+;; (in-package "COMMON-LISP")
 
 ;; (export '(describe inspect))
 
@@ -11892,7 +11892,7 @@ user_init{") ,@
 ;;;;        The IO library.
 
 
-;; (in-package #:lisp)
+;; (in-package "COMMON-LISP")
 
 ;; (export '(with-open-stream with-input-from-string with-output-to-string parse-integer))
 ;; (export '(read-from-string))
@@ -12516,7 +12516,7 @@ user_init{") ,@
 ; rather than recursion, as needed for large data sets.
 
 
-;; (in-package #:lisp)
+;; (in-package "COMMON-LISP")
 ;; (export '(endp nthcdr last butlast nbutlast ldiff tailp list-length make-list 
 ;; 	       rest acons pairlis copy-list copy-alist nconc nreconc nth first
 ;; 	       second third fourth fifth sixth seventh eighth ninth tenth copy-tree
@@ -14708,7 +14708,7 @@ First directory is checked for first name and all extensions etc."
 ;;;;                                setf routines
 
 
-;; (in-package #:lisp)
+;; (in-package "COMMON-LISP")
 
 
 ;; (export '(setf psetf shiftf rotatef
@@ -15388,7 +15388,7 @@ First directory is checked for first name and all extensions etc."
 ;;;;        The structure routines.
 
 
-;; (in-package #:lisp)
+;; (in-package "COMMON-LISP")
 ;; (export 'defstruct)
 
 
@@ -16204,7 +16204,7 @@ First directory is checked for first name and all extensions etc."
 ;;;;                           sequence routines
 
 
-;; (in-package #:lisp)
+;; (in-package "COMMON-LISP")
 
 
 ;; (export '(copy-seq reduce fill replace length elt every some notevery notany

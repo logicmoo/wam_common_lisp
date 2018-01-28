@@ -1,5 +1,5 @@
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (defpackage "SYSTEM" (:nicknames "SYS"))
 (defpackage "COMMON-LISP" (:nicknames "CL" "LISP")(:uses "SYSTEM"))

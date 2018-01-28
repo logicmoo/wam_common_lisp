@@ -33,7 +33,7 @@
 ;; #+SICL From SICL
 */
 /*
-(in-package #:system)
+(in-package "SYSTEM")
 
 
 ;;; define-modify-macro.lisp
@@ -177,7 +177,7 @@
 ;; Adapted from SBCL.
 */
 /*
-(in-package #:system)
+(in-package "SYSTEM")
 
 ;; FIXME See section 5.1.3.
 */

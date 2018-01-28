@@ -9,7 +9,7 @@
 ;;;;    See file '../Copyright' for full details.
 ;;;;         defines SYS:DEFMACRO*, the defmacro preprocessor
 
-(in-package #:system)
+(in-package "SYSTEM")
 
 (eval-when (compile) (proclaim '(optimize (safety 2) (space 3))))
 
@@ -40,6 +40,7 @@
 ;;;	     [ &aux { sym | ( v [ init ] ) }* ]
 ;;;	  |  . sym }
 ;;;	 )
+
 
 (defvar *dl*)
 (defvar *key-check*)
