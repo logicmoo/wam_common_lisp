@@ -38,19 +38,28 @@ add_tracked_var(_Ctx,_Atom,_Var).
 get_var_tracker(Ctx0,Atom,Dict):- get_tracker(Ctx0,Ctx), always(sanity(atom(Atom))),get_env_attribute(Ctx,var_tracker(Atom),Dict),(is_dict(Dict)->true;(trace,oo_get_attr(Ctx,var_tracker(Atom),_SDict))).
 get_var_tracker(Ctx0,Atom,Dict):- get_tracker(Ctx0,Ctx),Dict=rw{name:Atom,r:0,w:0,p:0,ret:0,u:0,vars:[]},set_env_attribute(Ctx,var_tracker(Atom),Dict),!.
 
+sf_defconstant(Env,Var,Value,Result):- sf_deflexical(Env,kw_constant, Var, Value, Result).
+sf_defconst(Env,Var,Value,Result):- sf_deflexical(Env,kw_constant, Var, Value, Result).
+sf_defvar(Env,Var,Value,Result):- sf_deflexical(Env,kw_variable, Var, Value, Result).
+sf_defvar(Env,Var,Result):- sf_deflexical(Env,kw_variable, Var, [], Result).
+
+sf_deflexical(Env,Type,[quote,Var],Value,Result):- !,
+  sf_deflexical(Env,Type,Var,Value,Result).
+sf_deflexical(Env,Type,Var,Value,Result):- 
+   f_sys_env_eval(Env,Value,Result),
+   deflexical(Env,Type,Var,Result).
+
 
 %TODO Make it a constantp
-deflexical(Env,defconstant, Var, Result):- 
+deflexical(Env,kw_constant, Var, Result):- 
    set_var(Env,Var,Result),
    set_opv(Var,declared_as,defconstant).
-deflexical(Env,defconst, Var, Result):- 
-  deflexical(Env,defconstant, Var, Result).
 
-deflexical(Env,defparameter, Var, Result):- 
+deflexical(Env, kw_special, Var, Result):- 
    set_opv(Var,declared_as,defparameter),
    set_var(Env,Var,Result).
 
-deflexical(_Env,defvar, Var, Result):-   
+deflexical(_Env,kw_variable, Var, Result):-   
    (get_opv(Var,symbol_value, _) -> true ; update_opv(Var,symbol_value, Result)),
    set_opv(Var,declared_as,defvar).
 

@@ -1,0 +1,69 @@
+;;
+;; Configuration file for ECL
+;;
+(in-package "LISP")
+;;
+;; * Short and long site names
+;;
+;; Edit these with the name of your site:
+;;
+(defun short-site-name ()
+  "Args: ()
+Returns, as a string, the location of the machine on which ECL runs."
+  "@SHORT_SITE_NAME@")
+
+(defun long-site-name () 
+  "Args: ()
+Returns, as a string, the location of the machine on which ECL runs."
+  "@LONG_SITE_NAME@")
+
+;;
+;; * ECL version, architecture, etc
+;;
+(defun lisp-implementation-version ()
+  "Args:()
+Returns the version of your ECL as a string."
+  "@ECL_VERSION@")
+
+(defun machine-type ()
+  "Args: ()
+Returns, as a string, the type of the machine on which ECL runs."
+  @architecture@)
+
+;; obtained from uname(2) where available
+(defun machine-instance ()
+  "Args: ()
+Returns, as a string, the identifier of the machine on which ECL runs. Obtained
+from uname(2) where available."
+  "@MACHINE_INSTANCE@")
+
+(defun machine-version ()
+  "Args: ()
+Returns, as a string, the version of the machine on which ECL runs. Obtained from
+uname(2) where available."
+  "@MACHINE@")
+
+(defun software-type ()
+  "Args: ()
+Returns, as a string, the type of the software under which ECL runs."
+  "@OS_TYPE@")
+
+(defun software-version ()
+  "Args: ()
+Returns, as a string, the version of the software under which ECL runs."
+  "@OS_RELEASE@")
+
+;;
+;; * Set up some room
+;;
+#-boehm-gc
+(progn
+  (sys::allocate 'CONS 200)
+  (sys::allocate 'STRING 40))
+
+;;
+;; * Set configuration pathnames. Notice the trailing slash!
+;;   Otherwise it would not be a directory.
+;;
+(si::pathname-translations "SYS" '(("**;*.*" "@libdir@/**/*.*")))
+(si::pathname-translations "HOME" '(("**;*.*" "~/**/*.*")))

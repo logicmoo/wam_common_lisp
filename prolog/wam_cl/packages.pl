@@ -25,14 +25,25 @@ xlisting_config:xlisting_always(G):- G=package:_, current_predicate(_,G),predica
 
 f_list_all_packages(Ret):- findall(P,package_name(P,_),List),list_to_set(List,Ret).
 
+wl:init_args(1,in_package).
 wl:init_args(x,sys_select_package).
 wl:interned_eval("
 (defmacro in-package (name)
   `(eval-when (:compile-toplevel :load-toplevel :execute)
      (si::select-package ,(string name))))
 ").
+wl:interned_eval("
+(defmacro zint-str (name)
+  `(print ,(string name)))
+").
+sf_in_package(C, A, E) :-
+        mf_in_package([in_package, A], C, D),
+        f_sys_env_eval(C, D, E).
 % SYS::SELECT-PACKAGE
 f_sys_select_package(S,Package):- find_package_or_die(S,Package),
+   f_sys_set_symbol_value('xx_package_xx',Package).
+
+f_in_package(S,Package):- find_package_or_die(S,Package),
    f_sys_set_symbol_value('xx_package_xx',Package).
 
 wl:init_args(x,use_package).

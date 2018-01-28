@@ -147,6 +147,35 @@ method-combination-lambda-list::= (wholevar var*
 :- set_module(class(library)).
 :- include('header').
 
+/*
+ * (si::process-lambda-list lambda-list context)
+ *
+ * Parses different types of lambda lists. CONTEXT may be MACRO,
+ * FTYPE, FUNCTION, METHOD or DESTRUCTURING-BIND, and determines the
+ * valid sytax. The output is made of several values:
+ *
+ * MKCL_VALUES(0) = (N req1 ... )                       ; required values
+ * MKCL_VALUES(1) = (N opt1 init1 flag1 ... )   ; optional values
+ * MKCL_VALUES(2) = rest-var                            ; rest-variable, if any
+ * MKCL_VALUES(3) = key-flag                            ; T if &key was supplied
+ * MKCL_VALUES(4) = (N key1 var1 init1 flag1 ... )      ; keyword arguments
+ * MKCL_VALUES(5) = allow-other-keys                    ; flag &allow-other-keys
+ * MKCL_VALUES(6) = (N aux1 init1 ... )         ; auxiliary variables
+ *
+ * 1) The prefix "N" is an integer value denoting the number of
+ * variables which are declared within this section of the lambda
+ * list.
+ *
+ * 2) The INIT* arguments are lisp forms which are evaluated when
+ * no value is provided.
+ *
+ * 3) The FLAG* arguments is the name of a variable which holds a
+ * boolean value in case an optional or keyword argument was
+ * provided. If it is NIL, no such variable exists.
+ */
+
+f_sys_process_lambda_list(LambdaList,Context):- throw(f_sys_process_lambda_list(LambdaList,Context)).
+
 
 reserved_symbols(_Names,_PVars).
 as_rest(_,R,R).

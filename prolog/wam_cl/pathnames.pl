@@ -132,7 +132,7 @@ to_file_exts(Str,Atom):- to_prolog_string_anyways(Str,At),atom_concat_or_rtrace(
 wl:init_args(0,make_pathname).
 f_make_pathname(I,O):- f_make_instance([claz_pathname|I],O).
 
-to_prolog_pathname(Ref,O):- is_pathnamep(Ref),!,f_namestring(Ref,V),!,always(show_call_trace(to_prolog_pathname(V,O))).
+to_prolog_pathname(Ref,O):- is_pathnamep(Ref),!,f_namestring(Ref,V),!,always(show_call_trace((Ref=Ref,to_prolog_pathname(V,O)))).
 to_prolog_pathname(Cmp,Out):- compound(Cmp),Cmp='$OBJ'(CP,S),CP==claz_pathname,!,always(to_prolog_pathname(S,Out)).
 to_prolog_pathname(Ref,Value):- atom(Ref),!,((is_symbolp(Ref),is_boundp(Ref),f_symbol_value(Ref,PValue))->to_prolog_pathname(PValue,Value);Ref=Value).
 %to_prolog_pathname(Str,O):- is_stringp(Str),!,string_to_prolog_atom(Str,O).
@@ -166,10 +166,13 @@ f_pathname(String,Pathname):- f_sys_string_to_pathname(String,Pathname).
 f_sys_string_to_pathname(String,Pathname):- 
   to_prolog_string(String,String0),atom_string(PlPath,String0),
   file_base_name(PlPath,BaseExt),
-  file_name_extension(Base, Ext,BaseExt),maybe_nil_pathname(('.'),Base,Name),
-  maybe_nil_pathname(BaseExt,Ext,Type),
+  file_name_extension_lisp(Base, Ext,BaseExt),
+  maybe_nil_filename(BaseExt,Base,Name),
+  maybe_nil_extname(BaseExt,Ext,Type),
   file_directory_name(PlPath,PlDir),lisp_dir_list(PlDir,PlPath,LispDir),
   f_make_pathname([kw_name,Name,kw_type,Type,kw_directory,LispDir],Pathname).
+
+file_name_extension_lisp(Base, Ext,BaseExt):- file_name_extension(Base0,Ext,BaseExt),(Ext==''->Base=BaseExt;Base=Base0).
 
 lisp_dir_list('.',PlPath,[kw_relative]):- atom_concat('.',_,PlPath),!.
 lisp_dir_list('.',_PlPath,[]).
@@ -178,7 +181,7 @@ lisp_dir_list(PlDir,_,LispDir):-
   ((is_absolute_file_name(PlDir),atomic_list_concat([_|List],'/',PlDir))
      -> LispDir = [kw_absolute|DirStrs] ; 
     (atomic_list_concat(List,'/',PlDir),LispDir = DirStrs)),
-  must_maplist(maybe_nil_pathname('.'),List,DirStrs).
+  must_maplist(maybe_nil_dirname('.'),List,DirStrs).
 
 loc_to_pl([kw_relative],'.').
 loc_to_pl([kw_relative,kw_up|More],Out):-!,loc_to_pl([kw_up|More],Out).
@@ -190,10 +193,21 @@ a_2_l('.',kw_relative):-!.
 a_2_l('..',kw_up):-!.
 a_2_l('*',kw_wild):-!.
 a_2_l('',kw_absolute):-!.
-maybe_nil_pathname(PlPath,'',""):- atom_concat(_,'.',PlPath),!.
-maybe_nil_pathname(_,'',[]):-!.
-maybe_nil_pathname(_,A,L):- a_2_l(A,L),!.
-maybe_nil_pathname(_,Atom,String):- atom_string(Atom,String).
+
+maybe_nil_dirname(PlPath,'',""):- atom_concat(_,'.',PlPath),!.
+maybe_nil_dirname(_,'',[]):-!.
+maybe_nil_dirname(_,A,L):- a_2_l(A,L),!.
+maybe_nil_dirname(_,Atom,String):- atom_string(Atom,String).
+
+maybe_nil_filename(PlPath,'',""):- atom_concat('.',_,PlPath),!.
+maybe_nil_filename(_,'',[]):-!.
+maybe_nil_filename(_,'*',kw_wild).
+maybe_nil_filename(_,Atom,String):- atom_string(Atom,String).
+
+maybe_nil_extname(PlPath,'',""):- atom_concat(Left,'.',PlPath),atom_length(Left,AL),AL>0,!.
+maybe_nil_extname(_,'',[]):-!.
+maybe_nil_extname(_,'*',kw_wild).
+maybe_nil_extname(_,Atom,String):- atom_string(Atom,String).
 
 
 

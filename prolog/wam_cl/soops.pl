@@ -103,6 +103,7 @@ create_object_instance(Kind,Type,Name,Obj):-
    prologcase_name(PName,Ref),
    nb_set_dict(ref,Obj,Ref).
 
+
 create_object_instance(Kind,Type,Name,Obj):- 
   instance_prefix(Kind,Pre),!,atomic_list_concat([Pre,Name],'_',PName),
   prologcase_name(PName,Obj),to_prolog_string_anyways(Name,SName),
@@ -183,7 +184,7 @@ get_kind_supers3(Kind,ExceptFor,Sup):-
    SupSup \== claz_t.
 
 get_super_class(Kind,Sup):- get_struct_opv(Kind,type,Type),find_class(Type,Sup)->Sup\==Kind.
-get_super_class(Kind,Sup):- get_struct_opv(Kind,kw_include,Sup).
+get_super_class(Kind,Sup):- get_struct_opv(Kind,sys_include,Sup).
 get_super_class(Kind,Sup):- get_struct_opv(Kind,sys_class_precedence_list,List),!,e_member(Sup,List).
 
 
@@ -359,7 +360,9 @@ define_kind(DefType,Name,KeyWords,SlotsIn,Kind):-
   init_instance_kv(KindKind,Kind,KeyWords),
   get_struct_offset(Kind,Offset),
   NOffset is Offset +1,  
-  add_class_slots(DefType,Kind,NOffset,Slots),  
+  (memberchk(kw_named,KeyWords) -> 
+      add_class_slots(DefType,Kind,NOffset,[[class_name,Name]|Slots]);
+      add_class_slots(DefType,Kind,NOffset,Slots)),
   generate_missing_claz_functions(KindKind,Kind))).
 
 get_struct_offset(Kind,W):- get_struct_opv(Kind,sys_structure_class_initial_offset,W).
@@ -375,7 +378,7 @@ generate_missing_claz_functions(_KindKind,Kind):-
  % make accessors
  struct_opv_else(Kind,sys_structure_class_conc_name,ConcatName,(string_concat(SName,"-",ConcatName))),
     
- forall(get_struct_opv(Kind,kw_name,SlotName,ZLOT),
+ forall(get_struct_opv(Kind,sys_name,SlotName,ZLOT),
    (intern_slot_name('',ConcatName,SlotName,ConcSlotName),
     add_slot_accessor_functions(Kind,ConcSlotName,ZLOT))),
  forall(get_struct_opv(Kind,kw_reader,Accessor,ZLOT),
@@ -652,8 +655,8 @@ get_opv_iiii(Obj,Prop,Value):- soops:struct_opv(Obj,Prop,Value).
 not_shareble_prop(Prop):-notrace((nonvar(Prop),not_shareble_prop0(Prop))).
 not_shareble_prop0(type_of).
 not_shareble_prop0(symbol_value).
+not_shareble_prop0(conc_name).
 not_shareble_prop0(sys_structure_class_conc_name).
-
                                                                          
 
 get_type_default(keyword,Name,symbol_name,Out):- atom(Name), string_concat(kw_,Str,Name),string_upper(Str,Out).
@@ -882,9 +885,9 @@ add_slot_def_props(N,Kind,SlotSym,MoreInfo):-
    assert_struct_opv4(Kind,sys_initargs,[KW],ZLOT),
  /*
    struct_opv_else(Kind,sys_structure_class_conc_name,ConcatName,
-        (get_struct_opv(Kind,class_ name,KName),to_prolog_string_anyways(KName,KSName),string_concat(KSName,"-",ConcatName),
+        (get_struct_opv(Kind,class_name,KName),to_prolog_string_anyways(KName,KSName),string_concat(KSName,"-",ConcatName),
               assert_struct_opv(Kind,sys_structure_class_conc_name,ConcatName))),
-      
+       
  */      
       %atom_concat_or_rtrace(ConcatName,SName,GetterName),
       %ignore((nonvar(N),(assert_struct_opv4(Kind,sys_slot_definition_location,N,ZLOT)))),

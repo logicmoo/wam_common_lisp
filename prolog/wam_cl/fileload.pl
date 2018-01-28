@@ -144,7 +144,7 @@ f_compile_file(File,R):-
 (wl:init_args(1,compile_file)).
 f_compile_file(File,Keys,R):-
   do_compile_1file(Keys,File),!,
-  f_truename(File,R),!.
+  f_compile_file_pathname(File,Keys,R),!.
 
 wl:interned_eval(("(defparameter sys::*output-file-pathname* ())")).
 
