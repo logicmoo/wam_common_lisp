@@ -11,11 +11,11 @@
 ;;;;                           sequence routines
 
 
-(in-package 'lisp)
+(in-package #:lisp)
 
 (export '(make-sequence concatenate map some every notany notevery))
 
-(in-package 'system)
+(in-package #:system)
 
 
 (proclaim '(optimize (safety 2) (space 3)))

@@ -11,7 +11,7 @@
 ;;;;                                setf routines
 
 
-(in-package 'lisp)
+(in-package #:lisp)
 
 
 (export '(setf psetf shiftf rotatef
@@ -20,7 +20,7 @@
           define-setf-method get-setf-method get-setf-method-multiple-value))
 
 
-(in-package 'system)
+(in-package #:system)
 
 (eval-when (compile) (proclaim '(optimize (safety 2) (space 3))))
 (eval-when (eval compile) (defun sys::clear-compiler-properties (symbol)))

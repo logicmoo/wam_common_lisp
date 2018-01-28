@@ -11,11 +11,11 @@
 ;;;;	module routines
 
 
-(in-package 'lisp)
+(in-package #:lisp)
 
 (export '(*modules* provide require))
 
-(in-package 'system)
+(in-package #:system)
 
 
 (eval-when (compile) (proclaim '(optimize (safety 2) (space 3))))

@@ -10,14 +10,14 @@
 ;;;                           DESCRIBE and INSPECT
 
 
-(in-package 'lisp)
+(in-package #:lisp)
 
 #+AKCL (import 'sys::arglist 'lisp)
 
 (export '(arglist describe inspect))
 (export '(documentation variable function structure type setf))
 
-(in-package 'system)
+(in-package #:system)
 
 (proclaim '(optimize (safety 2) (space 3)))
 

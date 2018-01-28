@@ -10,7 +10,7 @@
 ;;;;                    Exporting external symbols of LISP package
 
 
-(in-package 'lisp)
+(in-package #:lisp)
 
 (export '(
 	  &whole

@@ -1,4 +1,4 @@
-(in-package 'si)
+(in-package #:si)
 (proclaim '(FUNCTION DEFMACRO* (T T T) T))
 (proclaim '(FUNCTION DM-VL (T T T) T))
 (proclaim '(FUNCTION DM-V (T T) T))

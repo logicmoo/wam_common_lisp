@@ -11,7 +11,7 @@
 ;;;;                           sequence routines
 
 
-(in-package 'lisp)
+(in-package #:lisp)
 ;(provide seqlib)
 
 (export '(reduce fill replace
@@ -26,7 +26,7 @@
           mismatch search
           sort stable-sort merge))
 
-(in-package 'system)
+(in-package #:system)
 
 (proclaim '(optimize (safety 2) (space 3)))
 

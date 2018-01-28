@@ -10,10 +10,10 @@
 ;;;;        The structure routines.
 
 
-(in-package 'lisp)
+(in-package #:lisp)
 (export 'defstruct)
 
-(in-package 'system)
+(in-package #:system)
 
 (proclaim '(optimize (safety 2) (space 3)))
 

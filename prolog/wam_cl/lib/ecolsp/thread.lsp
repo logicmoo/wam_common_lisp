@@ -9,7 +9,7 @@
 
 ;;;;  thread top level and utilities
 
-(in-package 'system)
+(in-package #:system)
 
 (export '(spawn
 	  pass

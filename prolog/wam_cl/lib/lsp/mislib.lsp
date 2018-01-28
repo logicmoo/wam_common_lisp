@@ -8,14 +8,14 @@
 ;;;;
 ;;;;    See file '../Copyright' for full details.
 
-(in-package 'lisp)
+(in-package #:lisp)
 
 
 (export 'time)
 (export '(decode-universal-time encode-universal-time))
 
 
-(in-package 'system)
+(in-package #:system)
 
 
 (proclaim '(optimize (safety 2) (space 3)))

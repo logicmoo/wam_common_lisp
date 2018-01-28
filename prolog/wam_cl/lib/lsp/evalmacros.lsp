@@ -8,11 +8,11 @@
 ;;;;
 ;;;;    See file '../Copyright' for full details.
 
-(in-package 'lisp)
+(in-package #:lisp)
 
 (export '(defvar defparameter defconstant))
 
-(in-package 'system)
+(in-package #:system)
 
 
 (eval-when (compile) (proclaim '(optimize (safety 2) (space 3))))

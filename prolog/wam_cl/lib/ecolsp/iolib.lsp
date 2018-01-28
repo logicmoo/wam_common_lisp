@@ -10,13 +10,13 @@
 ;;;;        The IO library.
 
 
-(in-package 'lisp)
+(in-package #:lisp)
 
 (export '(with-open-stream with-input-from-string with-output-to-string
 	  read-from-string write-to-string prin1-to-string princ-to-string
 	  with-open-file y-or-n-p yes-or-no-p dribble))
 
-(in-package 'system)
+(in-package #:system)
 
 (proclaim '(optimize (safety 2) (space 3)))
 

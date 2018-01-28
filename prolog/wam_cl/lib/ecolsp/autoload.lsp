@@ -12,7 +12,7 @@
 
 ;;; Program Development Environment
 
-(in-package 'system)
+(in-package #:system)
 (setq *record-source-pathname-p* nil)
 (defun record-source-pathname (symbol type)
   ;; type is either:
@@ -35,7 +35,7 @@
 	  (putprop symbol alist (car type))))))
 
 ;;; Go into LISP.
-(in-package 'lisp)
+(in-package #:lisp)
 
 (defun lisp-implementation-type () "ECoLisp")
 

@@ -277,6 +277,19 @@ Does not check if the third gang is a single-element list."
                    `(apply #',(cadr fn) ,@(cdr access-form))))
           (t (error "Can't get the setf-method of ~S." fn)))))
 
+(define-setf-method char-bit (&environment env char name)
+  (multiple-value-bind (temps vals stores store-form access-form)
+      (get-setf-method char env)
+    (let ((ntemp (gensym))
+	  (store (gensym))
+	  (stemp (first stores)))
+      (values `(,ntemp ,@temps)
+	      `(,name ,@vals)
+	      `(,store)
+	      `(let ((,stemp (set-char-bit ,access-form ,ntemp ,store)))
+	         ,store-form ,store)
+	      `(char-bit ,access-form ,ntemp)))))
+
 (define-setf-expander ldb (&environment env bytespec int)
   (multiple-value-bind (temps vals stores store-form access-form)
       (get-setf-expansion int env)
@@ -307,6 +320,23 @@ Does not check if the third gang is a single-element list."
 ;;; The expansion function for SETF.
 (defun setf-expand-1 (place newvalue env)
   (declare (si::c-local))
+
+  (when (and (consp place) (eq (car place) 'THE))
+        (return-from setf-expand-1
+          (setf-expand-1 (caddr place) `(the ,(cadr place) ,newvalue) env)))
+  (when (symbolp place)
+        (return-from setf-expand-1 `(setq ,place ,newvalue)))
+  (when (and (consp place)
+	     (not (or (get (car place) 'SETF-LAMBDA)
+		      (get (car place) 'SETF-UPDATE-FN))))
+	(multiple-value-setq (place g) (macroexpand place env))
+	(if g (return-from setf-expand-1 (setf-expand-1 place newvalue env))))
+  (when (and (symbolp (car place)) (setq g (get (car place) 'SETF-UPDATE-FN)))
+        (return-from setf-expand-1 `(,g ,@(cdr place) ,newvalue)))
+  (when (and (symbolp (car place))
+             (setq g (get (car place) 'STRUCTURE-ACCESS)))
+    (return-from setf-expand-1
+      (setf-structure-access (cadr place) (car g) (cdr g) newvalue)))
   (multiple-value-bind (vars vals stores store-form access-form)
       (get-setf-expansion place env)
     (declare (ignore access-form))

@@ -10,54 +10,69 @@
 
 ;;;;                                setf routines
 
-
-(in-package 'lisp)
-
-
-(export '(setf psetf shiftf rotatef
-          define-modify-macro defsetf
-          getf remf incf decf push pushnew pop
-          define-setf-method get-setf-method get-setf-method-multiple-value))
-
-
-(in-package 'system)
-
-(eval-when (compile) (proclaim '(optimize (safety 2) (space 3))))
-(eval-when (eval compile) (defun sys::clear-compiler-properties (symbol)))
-(eval-when (eval compile) (setq sys:*inhibit-macro-special* nil))
-
+(in-package "SYSTEM")
 
 ;;; DEFSETF macro.
 (defmacro defsetf (access-fn &rest rest)
+  "Syntax: (defsetf symbol update-fun [doc])
+	or
+	(defsetf symbol lambda-list (store-var) {decl | doc}* {form}*)
+Defines an expansion
+	(setf (SYMBOL arg1 ... argn) value)
+	=> (UPDATE-FUN arg1 ... argn value)
+	   or
+	   (let* ((temp1 ARG1) ... (tempn ARGn) (temp0 value)) rest)
+where REST is the value of the last FORM with parameters in LAMBDA-LIST bound
+to the symbols TEMP1 ... TEMPn and with STORE-VAR bound to the symbol TEMP0.
+The doc-string DOC, if supplied, is saved as a SETF doc and can be retrieved
+by (documentation 'SYMBOL 'setf)."
   (cond ((and (car rest) (or (symbolp (car rest)) (functionp (car rest))))
          `(eval-when (compile load eval)
-		 (sys:putprop ',access-fn ',(car rest) 'SETF-UPDATE-FN)
-                 (remprop ',access-fn 'SETF-LAMBDA)
-                 (remprop ',access-fn 'SETF-METHOD)
-                 (sys:putprop ',access-fn
-                             ,(when (not (endp (cdr rest)))
-                                    (unless (stringp (cadr rest))
-                                            (error "A doc-string expected."))
-                                    (unless (endp (cddr rest))
-                                            (error "Extra arguments."))
-                                    (cadr rest))
-                             'SETF-DOCUMENTATION)
+		 (put-sysprop ',access-fn 'SETF-UPDATE-FN ',(car rest))
+                 (rem-sysprop ',access-fn 'SETF-LAMBDA)
+                 (rem-sysprop ',access-fn 'SETF-METHOD)
+		 (rem-sysprop ',access-fn 'SETF-SYMBOL)
+		 ,@(si::expand-set-documentation access-fn 'setf (cadr rest))
                  ',access-fn))
 	(t
-	 (unless (= (list-length (cadr rest)) 1)
-		 (error "(store-variable) expected."))
+	 (let* ((store (second rest))
+		(args (first rest))
+		(body (cddr rest))
+		(doc (find-documentation body)))
+	   (unless (and (= (list-length store) 1) (symbolp (first store)))
+		(error "Single store-variable expected."))
+	   (setq rest `(lambda ,args #'(lambda ,store ,@body)))
          `(eval-when (compile load eval)
-		 (sys:putprop ',access-fn ',rest 'SETF-LAMBDA)
-                 (remprop ',access-fn 'SETF-UPDATE-FN)
-                 (remprop ',access-fn 'SETF-METHOD)
-                 (sys:putprop ',access-fn
-                             ,(find-documentation (cddr rest))
-                             'SETF-DOCUMENTATION)
-                 ',access-fn))))
+	      (put-sysprop ',access-fn 'SETF-LAMBDA #'(lambda (,@store ,@args) ,@body))
+                 (rem-sysprop ',access-fn 'SETF-UPDATE-FN)
+                 (rem-sysprop ',access-fn 'SETF-METHOD)
+	      (rem-sysprop ',access-fn 'SETF-SYMBOL)
+	      ,@(si::expand-set-documentation access-fn 'setf doc)
+	      ',access-fn)))))
 
 
 ;;; DEFINE-SETF-METHOD macro.
-(defmacro define-setf-method (access-fn args &rest body)
+(defmacro define-setf-expander (access-fn args &rest body)
+  "Syntax: (define-setf-expander symbol defmacro-lambda-list {decl | doc}*
+          {form}*)
+Defines the SETF-method for generalized-variables (SYMBOL ...).
+When a form (setf (SYMBOL arg1 ... argn) value-form) is evaluated, the FORMs
+given in the DEFINE-SETF-EXPANDER are evaluated in order with the parameters in
+DEFMACRO-LAMBDA-LIST bound to ARG1 ... ARGn.  The last FORM must return five
+values
+	(var1 ... vark)
+	(form1 ... formk)
+	(value-var)
+	storing-form
+	access-form
+in order.  These values are collectively called the five gangs of the
+generalized variable (SYMBOL arg1 ... argn).  The whole SETF form is then
+expanded into
+	(let* ((var1 from1) ... (vark formk)
+	       (value-var value-form))
+	  storing-form)
+The doc-string DOC, if supplied, is saved as a SETF doc and can be retrieved
+by (DOCUMENTATION 'SYMBOL 'SETF)."
   (let ((env (member '&environment args :test #'eq)))
     (if env
 	(setq args (cons (second env)
@@ -67,19 +82,22 @@
 	  (setq args (cons env args))
 	  (push `(declare (ignore ,env)) body))))
   `(eval-when (compile load eval)
-	  (sys:putprop ',access-fn #'(lambda ,args ,@body) 'SETF-METHOD)
-          (remprop ',access-fn 'SETF-LAMBDA)
-          (remprop ',access-fn 'SETF-UPDATE-FN)
-          (sys:putprop ',access-fn
-                      ,(find-documentation body)
-                      'SETF-DOCUMENTATION)
+	  (put-sysprop ',access-fn 'SETF-METHOD #'(lambda ,args ,@body))
+          (rem-sysprop ',access-fn 'SETF-LAMBDA)
+          (rem-sysprop ',access-fn 'SETF-UPDATE-FN)
+	  (rem-sysprop ',access-fn 'SETF-SYMBOL)
+	  ,@(si::expand-set-documentation access-fn 'setf
+					  (find-documentation body))
           ',access-fn))
 
 
 ;;; GET-SETF-METHOD.
 ;;; It just calls GET-SETF-METHOD-MULTIPLE-VALUE
 ;;;  and checks the number of the store variable.
-(defun get-setf-method (form &optional env)
+(defun get-setf-expansion (form &optional env)
+  "Args: (place)
+Returns the 'five gangs' (see DEFINE-SETF-EXPANDER) for PLACE as five values.
+Checks if the third gang is a single-element list."
   (multiple-value-bind (vars vals stores store-form access-form)
       (get-setf-method-multiple-value form env)
     (unless (= (list-length stores) 1)
@@ -89,64 +107,42 @@
 
 ;;;; GET-SETF-METHOD-MULTIPLE-VALUE.
 
-(defun get-setf-method-multiple-value (form &optional env &aux tem)
-  (cond ((symbolp form)
+(defun get-setf-method-multiple-value (form &optional env &aux f)
+  "Args: (form)
+Returns the 'five gangs' (see DEFINE-SETF-EXPANDER) for PLACE as five values.
+Does not check if the third gang is a single-element list."
+  (flet ((rename-arguments (vars &aux names values all-args)
+	   (dolist (item vars)
+	     (unless (or (fixnump item) (keywordp item))
+	       (push item values)
+	       (setq item (gensym))
+	       (push item names))
+	     (push item all-args))
+	   (values (gensym) (nreverse names) (nreverse values) (nreverse all-args))))
+    (cond ((and (setq f (macroexpand form env)) (not (equal f form)))
+	   (return-from get-setf-method-multiple-value
+	     (get-setf-method-multiple-value f env)))
+	  ((symbolp form)
 	 (let ((store (gensym)))
 	   (values nil nil (list store) `(setq ,form ,store) form)))
 	((or (not (consp form)) (not (symbolp (car form))))
 	 (error "Cannot get the setf-method of ~S." form))
-	((and env (setq tem (assoc (car form) (second env))))
-	 (setq tem (macroexpand form env))
-	 (when (eq form tem)
-	   (error "Cannot get setf-method for ~a" form))
-	 (return-from get-setf-method-multiple-value
-		      (get-setf-method-multiple-value tem env)))
-	((get (car form) 'SETF-METHOD)
-	 (apply (get (car form) 'SETF-METHOD) env (cdr form)))
-	((or (get (car form) 'SETF-UPDATE-FN)
-	     (setq tem (get (car form) 'STRUCTURE-ACCESS)))
-	 (let ((vars (mapcar #'(lambda (x)
-	                         (declare (ignore x))
-	                         (gensym))
-	                     (cdr form)))
-	       (store (gensym)))
-	   (values vars (cdr form) (list store)
-		   (if tem
-		       (setf-structure-access (car vars) (car tem)
-					      (cdr tem) store)
-		       `(,(get (car form) 'SETF-UPDATE-FN)
-			 ,@vars ,store))
-		   (cons (car form) vars))))
-	((get (car form) 'SETF-LAMBDA)
-	 (let* ((vars (mapcar #'(lambda (x)
-	                          (declare (ignore x))
-	                          (gensym))
-	                      (cdr form)))
-		(store (gensym))
-		(l (get (car form) 'SETF-LAMBDA))
-		(f `(lambda ,(car l) #'(lambda ,(cadr l) ,@(cddr l)))))
-	   (values vars (cdr form) (list store)
-		   (funcall (apply f vars) store)
-		   (cons (car form) vars))))
-	((macro-function (car form))
-	 (get-setf-method-multiple-value (macroexpand form)))
-	#+clos
-        ((special-form-p (car form))
-	 (error "Cannot expand the SETF form ~S." form))
-	#+clos
-	((get (car form) 'SETF-SYMBOL)
-	 (let ((vars (mapcar #'(lambda (x)
-	                         (declare (ignore x))
-	                         (gensym))
-	                     (cdr form)))
-	       (store (gensym)))
-	   (values vars (cdr form) (list store)
-		   ;; use the symbol here, otherwise the CLOS walker punts.
-	           `(funcall #',(get (car form) 'SETF-SYMBOL) ,store ,@vars)
-		   (cons (car form) vars))))
+	  ((setq f (get-sysprop (car form) 'SETF-METHOD))
+	   (apply f env (cdr form)))
 	(t
-	 (error "Cannot expand the SETF form ~S." form))))
-
+	   (let* ((name (car form)) writer)
+	     (multiple-value-bind (store vars inits all)
+		 (rename-arguments (cdr form))
+	       (setq writer
+		     (cond ((setq f (get-sysprop name 'SETF-UPDATE-FN))
+			    `(,f ,@all ,store))
+			   ((setq f (get-sysprop name 'STRUCTURE-ACCESS))
+			    (setf-structure-access (car all) (car f) (cdr f) store))
+			   ((setq f (get-sysprop (car form) 'SETF-LAMBDA))
+			    (apply f store all))
+			   (t
+			    `(funcall #'(SETF ,name) ,store ,@all))))
+	       (values vars inits (list store) writer (cons name all))))))))
 
 ;;;; SETF definitions.
 
@@ -195,9 +191,13 @@
 (defsetf elt sys:elt-set)
 (defsetf symbol-value set)
 (defsetf symbol-function sys:fset)
-(defsetf macro-function (s) (v) `(progn (sys:fset ,s (cons 'MACRO ,v)) ,v))
+(defsetf fdefinition sys:fset)
+(defsetf macro-function (s) (v) `(sys:fset ,s ,v t))
 (defsetf aref (a &rest il) (v) `(sys:aset ,v ,a ,@il))
-(defsetf get (s p &optional d) (v) `(sys:putprop ,s ,v ,p))
+(defsetf row-major-aref (a i) (v) `(sys:row-major-aset ,a ,i ,v))
+(defsetf get (s p &optional d) (v)
+  (if d `(progn ,d (sys:putprop ,s ,v ,p)) `(sys:putprop ,s ,v ,p)))
+(defsetf get-sysprop put-sysprop)
 (defsetf nth (n l) (v) `(progn (rplaca (nthcdr ,n ,l) ,v) ,v))
 (defsetf char sys:char-set)
 (defsetf schar sys:schar-set)
@@ -206,28 +206,24 @@
 (defsetf fill-pointer sys:fill-pointer-set)
 (defsetf symbol-plist sys:set-symbol-plist)
 (defsetf gethash (k h &optional d) (v) `(sys:hash-set ,k ,h ,v))
-(defsetf documentation (s d) (v)
-  `(case ,d
-     (variable (sys:putprop ,s ,v 'VARIABLE-DOCUMENTATION))
-     (function (sys:putprop ,s ,v 'FUNCTION-DOCUMENTATION))
-     (structure (sys:putprop ,s ,v 'STRUCTURE-DOCUMENTATION))
-     (type (sys:putprop ,s ,v 'TYPE-DOCUMENTATION))
-     (setf (sys:putprop ,s ,v 'SETF-DOCUMENTATION))
-     (t (error "~S is an illegal documentation type." ,d))))
+#-clos
+(defsetf documentation (s d) (v) `(sys::set-documentation ,s ,d ,v))
 #+clos
 (defsetf sys:instance-ref sys:instance-set)
 #+clos
 (defsetf sys:gfun-spec-how-ref sys:gfun-spec-how-set)
 #+clos
 (defsetf sys:gfun-instance sys:gfun-instance-set)
+(defsetf compiler-macro-function (fname) (function)
+  `(sys::put-sysprop ,fname 'sys::compiler-macro ,function))
 
 
-(define-setf-method getf (&environment env place indicator &optional default)
+(define-setf-expander getf (&environment env place indicator &optional default)
   (multiple-value-bind (vars vals stores store-form access-form)
-      (get-setf-method place env)
-    (let ((itemp (gensym)) (store (gensym)))
-      (values `(,@vars ,itemp)
-              `(,@vals ,indicator)
+      (get-setf-expansion place env)
+    (let* ((itemp (gensym)) (store (gensym)) (def (gensym)))
+      (values `(,@vars ,itemp ,def)
+              `(,@vals ,indicator ,default)
               `(,store)
               `(let ((,(car stores) (sys:put-f ,access-form ,store ,itemp)))
                  ,store-form
@@ -239,20 +235,20 @@
   `(PROGN (REPLACE ,sequence1 ,sequence2 :START1 ,start1 :END1 ,end1)
     ,sequence2))
 
-(define-setf-method THE (&environment env type place)
+(define-setf-expander THE (&environment env type place)
   (multiple-value-bind (vars vals stores store-form access-form)
-      (get-setf-method place env)
+      (get-setf-expansion place env)
     (values vars vals stores
             (subst `(THE ,type ,(first stores)) (first stores) store-form)
             `(THE ,type ,access-form))))
 
 #|
-(define-setf-method apply (&environment env fn &rest rest)
+(define-setf-expander apply (&environment env fn &rest rest)
   (unless (and (consp fn) (eq (car fn) 'FUNCTION) (symbolp (cadr fn))
 	       (null (cddr fn)))
 	  (error "Can't get the setf-method of ~S." fn))
   (multiple-value-bind (vars vals stores store-form access-form)
-      (get-setf-method (cons (cadr fn) rest) env)
+      (get-setf-expansion (cons (cadr fn) rest) env)
     (unless (eq (car (last store-form)) (car (last vars)))
             (error "Can't get the setf-method of ~S." fn))
     (values vars vals stores
@@ -260,14 +256,14 @@
 	    `(apply #',(cadr fn) ,@(cdr access-form)))))
 |#
 
-(define-setf-method apply (&environment env fn &rest rest)
+(define-setf-expander apply (&environment env fn &rest rest)
   (unless (and (consp fn)
                (or (eq (car fn) 'FUNCTION) (eq (car fn) 'QUOTE))
                (symbolp (cadr fn))
                (null (cddr fn)))
     (error "Can't get the setf-method of ~S." fn))
   (multiple-value-bind (vars vals stores store-form access-form)
-      (get-setf-method (cons (cadr fn) rest) env)
+      (get-setf-expansion (cons (cadr fn) rest) env)
     (cond ((eq (car (last store-form)) (car (last vars)))
            (values vars vals stores
                    `(apply #',(car store-form) ,@(cdr store-form))
@@ -294,10 +290,10 @@
 	         ,store-form ,store)
 	      `(char-bit ,access-form ,ntemp)))))
 
-(define-setf-method ldb (&environment env bytespec int)
+(define-setf-expander ldb (&environment env bytespec int)
   (multiple-value-bind (temps vals stores store-form access-form)
-      (get-setf-method int env)
-    (let ((btemp (gensym))
+      (get-setf-expansion int env)
+    (let* ((btemp (gensym))
 	  (store (gensym))
 	  (stemp (first stores)))
       (values `(,btemp ,@temps)
@@ -307,10 +303,10 @@
 	         ,store-form ,store)
 	      `(ldb ,btemp ,access-form)))))
 
-(define-setf-method mask-field (&environment env bytespec int)
+(define-setf-expander mask-field (&environment env bytespec int)
   (multiple-value-bind (temps vals stores store-form access-form)
-      (get-setf-method int env)
-    (let ((btemp (gensym))
+      (get-setf-expansion int env)
+    (let* ((btemp (gensym))
 	  (store (gensym))
 	  (stemp (first stores)))
       (values `(,btemp ,@temps)
@@ -322,7 +318,9 @@
 
 
 ;;; The expansion function for SETF.
-(defun setf-expand-1 (place newvalue env &aux g)
+(defun setf-expand-1 (place newvalue env)
+  (declare (si::c-local))
+
   (when (and (consp place) (eq (car place) 'THE))
         (return-from setf-expand-1
           (setf-expand-1 (caddr place) `(the ,(cadr place) ,newvalue) env)))
@@ -340,8 +338,8 @@
     (return-from setf-expand-1
       (setf-structure-access (cadr place) (car g) (cdr g) newvalue)))
   (multiple-value-bind (vars vals stores store-form access-form)
-      (get-setf-method place env)
-;    (declare (ignore access-form))
+      (get-setf-expansion place env)
+    (declare (ignore access-form))
     `(let* ,(mapcar #'list
 		    (append vars stores)
 		    (append vals (list newvalue)))
@@ -349,12 +347,14 @@
        ,store-form)))
 
 (defun setf-structure-access (struct type index newvalue)
+  (declare (si::c-local))
   (case type
     (LIST `(sys:rplaca-nthcdr ,struct ,index ,newvalue))
     (VECTOR `(sys:elt-set ,struct ,index ,newvalue))
     (t `(sys::structure-set ,struct ',type ,index ,newvalue))))
 
 (defun setf-expand (l env)
+  (declare (si::c-local))
   (cond ((endp l) nil)
         ((endp (cdr l)) (error "~S is an illegal SETF form." l))
         (t
@@ -364,6 +364,28 @@
 
 ;;; SETF macro.
 (defmacro setf (&environment env &rest rest)
+  "Syntax: (setf {place form}*)
+Evaluates each FORM and assigns the value to the corresponding PLACE in order.
+Returns the value of the last FORM.
+Each PLACE may be any one of the following:
+  * A symbol that names a variable.
+  * A function call form whose first element is the name of the following
+    functions:
+	nth	elt	subseq	rest	first ... tenth
+	c?r	c??r	c???r	c????r
+	aref	svref	char	schar	bit	sbit	fill-pointer
+	get	getf	documentation	symbol-value	symbol-function
+	symbol-plist	macro-function	gethash		fdefinition
+	char-bit	ldb	mask-field
+	apply	slot-value
+    where '?' stands for either 'a' or 'd'.
+  * A function call form whose first element is:
+        1. an access function for a structure slot
+        1. an accessor method for a CLOS object
+  * the form (THE type place) with PLACE being a place recognized by SETF.
+  * a macro call which expands to a place recognized by SETF.
+  * any form for which a DEFSETF or DEFINE-SETF-EXPANDER declaration has been
+    made."
   (cond ((endp rest) nil)
         ((endp (cdr rest)) (error "~S is an illegal SETF form." rest))
         ((endp (cddr rest)) (setf-expand-1 (car rest) (cadr rest) env))
@@ -373,6 +395,9 @@
 ;;; PSETF macro.
 
 (defmacro psetf (&environment env &rest rest)
+  "Syntax: (psetf {place form}*)
+Similar to SETF, but evaluates all FORMs first, and then assigns each value to
+the corresponding PLACE.  Returns NIL."
   (cond ((endp rest) nil)
         ((endp (cdr rest)) (error "~S is an illegal PSETF form." rest))
         ((endp (cddr rest))
@@ -388,7 +413,7 @@
 		 nil))
 	   (when (endp (cdr r)) (error "~S is an illegal PSETF form." rest))
 	   (multiple-value-bind (vars vals stores store-form access-form)
-	       (get-setf-method (car r) env)
+	       (get-setf-expansion (car r) env)
              (declare (ignore access-form))
 	     (setq store-forms (cons store-form store-forms))
 	     (setq pairs
@@ -400,6 +425,10 @@
 
 ;;; SHIFTF macro.
 (defmacro shiftf (&environment env &rest rest)
+  "Syntax: (shiftf {place}+ form)
+Saves the values of PLACE and FORM, and then assigns the value of each PLACE
+to the PLACE on its left.  The rightmost PLACE gets the value of FORM.
+Returns the original value of the leftmost PLACE."
   (do ((r rest (cdr r))
        (pairs nil)
        (stores nil)
@@ -417,7 +446,7 @@
 	    ,@store-forms
 	    ,g))
     (multiple-value-bind (vars vals stores1 store-form access-form)
-	(get-setf-method (car r) env)
+	(get-setf-expansion (car r) env)
       (setq pairs (nconc pairs (mapcar #'list vars vals)))
       (setq stores (cons (car stores1) stores))
       (setq store-forms (cons store-form store-forms))
@@ -426,6 +455,10 @@
 
 ;;; ROTATEF macro.
 (defmacro rotatef (&environment env &rest rest)
+  "Syntax: (rotatef {place}*)
+Saves the values of PLACEs, and then assigns to each PLACE the saved value of
+the PLACE to its right.  The rightmost PLACE gets the value of the leftmost
+PLACE.  Returns NIL."
   (do ((r rest (cdr r))
        (pairs nil)
        (stores nil)
@@ -441,7 +474,7 @@
 	    ,@store-forms
 	    nil))
     (multiple-value-bind (vars vals stores1 store-form access-form)
-	(get-setf-method (car r) env)
+	(get-setf-expansion (car r) env)
       (setq pairs (nconc pairs (mapcar #'list vars vals)))
       (setq stores (cons (car stores1) stores))
       (setq store-forms (cons store-form store-forms))
@@ -450,6 +483,15 @@
 
 ;;; DEFINE-MODIFY-MACRO macro, by Bruno Haible.
 (defmacro define-modify-macro (name lambdalist function &optional docstring)
+  "Syntax: (define-modify-macro symbol lambda-list function-name [doc])
+Defines a read-modify-write macro like INCF.  The defined macro will expand
+a form (SYMBOL place form1 ... formn) into a form that in effect SETFs the
+value of (FUNCTION-NAME place arg1 ... argm) into PLACE, where ARG1 ... ARGm
+are parameters in LAMBDA-LIST which are bound to FORM1 ... FORMn.  For
+example, INCF could be defined as
+	(define-modify-macro incf (&optional (x 1)) +)
+The doc-string DOC, if supplied, is saved as a FUNCTION doc and can be
+retrieved by (DOCUMENTATION 'SYMBOL 'FUNCTION)."
   (let* ((varlist nil)
          (restvar nil))
     (do* ((lambdalistr lambdalist (cdr lambdalistr))
@@ -483,7 +525,7 @@
     (setq varlist (nreverse varlist))
     `(DEFMACRO ,name (&ENVIRONMENT ENV %REFERENCE ,@lambdalist) ,docstring
        (MULTIPLE-VALUE-BIND (VARS VALS STORES SETTER GETTER)
-           (GET-SETF-METHOD %REFERENCE ENV)
+           (GET-SETF-EXPANSION %REFERENCE ENV)
 	 (IF (SYMBOLP GETTER)
 	     (SUBST (LIST* (QUOTE ,function) GETTER ,@varlist ,restvar)
                     (CAR STORES)
@@ -523,7 +565,7 @@
                (let ((access-form reference))
                  (list 'setq reference ,update-form))))
        (multiple-value-bind (vars vals stores store-form access-form)
-	   (get-setf-method reference env)
+	   (get-setf-expansion reference env)
          `(let* ,(mapcar #'list
 		  (append vars stores)
 		  (append vals (list ,update-form)))
@@ -534,8 +576,11 @@
 ;;; Some macro definitions.
 
 (defmacro remf (&environment env place indicator)
+  "Syntax: (remf place form)
+Removes the property specified by FORM from the property list stored in PLACE.
+Returns T if the property list had the specified property; NIL otherwise."
   (multiple-value-bind (vars vals stores store-form access-form)
-      (get-setf-method place env)
+      (get-setf-expansion place env)
     `(let* ,(mapcar #'list vars vals)
        (declare (:read-only ,@vars)) ; Beppe
        (multiple-value-bind (,(car stores) flag)
@@ -543,14 +588,27 @@
          ,store-form
          flag))))
 
-(define-modify-macro incf (&optional (delta 1)) +)
-(define-modify-macro decf (&optional (delta 1)) -)
+(define-modify-macro incf (&optional (delta 1)) +
+  "Syntax: (incf place [form])
+Increments the value of PLACE by the value of FORM.  FORM defaults to 1.")
+
+(define-modify-macro decf (&optional (delta 1)) -
+  "Syntax: (decf place [form])
+Decrements the value of PLACE by the value of FORM.  FORM defaults to 1.")
 
 (defmacro push (&environment env item place)
+  "Syntax: (push form place)
+Evaluates FORM, conses the value of FORM to the value stored in PLACE, and
+makes it the new value of PLACE.  Returns the new value of PLACE."
   (when (symbolp place)
     (return-from push `(setq ,place (cons ,item ,place))))
   (multiple-value-bind (vars vals stores store-form access-form)
-      (get-setf-method place env)
+      (get-setf-expansion place env)
+    ;; The item to be pushed has to be evaluated before the destination
+    (unless (constantp item)
+      (setq vals (cons item vals)
+	    item (gensym)
+	    vars (cons item vars)))
     `(let* ,(mapcar #'list
 		    (append vars stores)
 		    (append vals (list (list 'cons item access-form))))
@@ -558,10 +616,21 @@
        ,store-form)))
 
 (defmacro pushnew (&environment env item place &rest rest)
+  "Syntax: (pushnew form place {keyword-form value-form}*)
+Evaluates FORM first.  If the value is already in the list stored in PLACE,
+does nothing.  Else, conses the value onto the list and makes the result the
+new value of PLACE.  Returns NIL.  KEYWORD-FORMs and VALUE-FORMs are used to
+check if the value of FORM is already in PLACE as if their values are passed
+to MEMBER."
   (cond ((symbolp place)
 	 (return-from pushnew `(setq ,place (adjoin ,item ,place ,@rest)))))
   (multiple-value-bind (vars vals stores store-form access-form)
-      (get-setf-method place env)
+      (get-setf-expansion place env)
+    ;; The item to be pushed has to be evaluated before the destination
+    (unless (constantp item)
+      (setq vals (cons item vals)
+	    item (gensym)
+	    vars (cons item vars)))
     `(let* ,(mapcar #'list
 		    (append vars stores)
 		    (append vals
@@ -570,6 +639,9 @@
        ,store-form)))
 
 (defmacro pop (&environment env place)
+  "Syntax: (pop place)
+Gets the cdr of the value stored in PLACE and makes it the new value of PLACE.
+Returns the car of the old value in PLACE."
   (when (symbolp place)
         (return-from pop
           (let ((temp (gensym)))
@@ -577,7 +649,7 @@
                 (setq ,place (cdr ,place))
                 ,temp))))
   (multiple-value-bind (vars vals stores store-form access-form)
-      (get-setf-method place env)
+      (get-setf-expansion place env)
     `(let* ,(mapcar #'list
 		    (append vars stores)
 		    (append vals (list (list 'cdr access-form))))
@@ -590,7 +662,7 @@
 ; --> (MULTIPLE-VALUE-BIND (dummy1 ... dummyk) form
 ;       (SETF place1 dummy1 ... placek dummyk)
 ;       (VALUES dummy1 ... dummyk))
-(define-setf-method VALUES (&environment env &rest subplaces)
+(define-setf-expander VALUES (&environment env &rest subplaces)
   (do ((temps) (vals) (stores)
        (storeforms) (accessforms)
        (placesr subplaces))
@@ -606,7 +678,7 @@
             `(VALUES ,@storeforms)
             `(VALUES ,@accessforms)))
     (multiple-value-bind (SM1 SM2 SM3 SM4 SM5)
-        (get-setf-method (pop placesr) env)
+        (get-setf-expansion (pop placesr) env)
       (setq temps (revappend SM1 temps)
 	    vals (revappend SM2 vals)
 	    stores (revappend SM3 stores)

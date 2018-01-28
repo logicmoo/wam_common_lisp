@@ -18,9 +18,9 @@
 ;;;;  Reworked for Threads November 1988, by Giuseppe Attardi.
 ;;;;  Reworked for CLOS November 1988, by Giuseppe Attardi.
 
-(in-package 'compiler) ; just to bypass mtcl boot problems
+(in-package #:compiler) ; just to bypass mtcl boot problems
 
-(in-package 'lisp)
+(in-package #:lisp)
 ;(require '(iolib seqlib trace))
 
 (export '(+ ++ +++ - * ** *** / // ///))
@@ -30,7 +30,7 @@
 #+Threads
 (export '(%disable-scheduler %enable-scheduler))
 
-(in-package 'system)
+(in-package #:system)
 
 (export '(*break-readtable* *lisp-init-file-list* *tpl-evalhook*))
 #+Threads
@@ -391,7 +391,7 @@
 
       (setq *lisp-initialized* t))
 
-    (in-package 'user)
+    (in-package #:user)
 
     (catch *quit-tag*
       (let ((*tpl-level* -1))

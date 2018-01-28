@@ -9,13 +9,13 @@
 ;;;;        Tracer package for Common Lisp
 
 
-(in-package 'lisp)
+(in-package #:lisp)
 
 (export '(trace untrace))
 (export 'step)
 
 
-(in-package 'system)
+(in-package #:system)
 
 (proclaim '(optimize (safety 2) (space 3)))
 

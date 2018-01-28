@@ -80,13 +80,13 @@
 ;;;maintain source compatibility they can add the SI nickname the
 ;;;loop-si-kludge package.  How's that?
 
-;(in-package 'loop-si-kludge)
+;(in-package #:loop-si-kludge)
 
 ;(export '(loop-tequal loop-tassoc loop-tmember loop-use-system-destructuring?
 ;	  loop-named-variable loop-simplep loop-simplep-1
 ;	  loop-sequencer loop-sequence-elements-path))
 
-(in-package 'SYSTEM)
+(in-package #:SYSTEM)
 
 (provide :loop)
 

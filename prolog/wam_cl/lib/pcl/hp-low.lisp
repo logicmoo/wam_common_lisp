@@ -18,7 +18,7 @@
 ;;;   CommonLoops Coordinator
 ;;;   Xerox PARC
 ;;;   3333 Coyote Hill Rd.
-;;;   Palo Alto, CA 94304
+;;;   Palo Alto, CA 94304                                        
 ;;; (or send Arpanet mail to CommonLoops-Coordinator.pa@Xerox.arpa)
 ;;;
 ;;; Suggestions, comments and requests for improvements are also welcome.

@@ -1,5 +1,5 @@
 
-(in-package 'system)
+(in-package #:system)
 
 ;;; Disable PDE facilities within LISP kernel:
 (setq *features* (delete ':pde *features*))

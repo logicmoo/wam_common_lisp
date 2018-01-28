@@ -1,4 +1,4 @@
-(in-package 'compiler)
+(in-package #:compiler)
 (defvar file-list
   '( "defmacro.lsp" "evalmacros.lsp" "top.lsp"
 	"module.lsp" "predlib.lsp" "setf.lsp"

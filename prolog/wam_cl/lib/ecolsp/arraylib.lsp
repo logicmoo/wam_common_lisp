@@ -13,7 +13,7 @@
 ;;;;                            array routines
 
 
-(in-package 'lisp)
+(in-package #:lisp)
 
 
 (export '(make-array vector
@@ -29,7 +29,7 @@
           adjust-array))
 
 
-(in-package 'system)
+(in-package #:system)
 
 
 (proclaim '(optimize (safety 2) (space 3)))
