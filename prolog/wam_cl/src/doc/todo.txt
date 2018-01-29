@@ -1,0 +1,189 @@
+
+*	error-set can be eliminated, as well as FRS_CATCHALL fr_class and
+	Kcatchall keyword.
+
+*	Removed call
+	(wt-data nil)
+	before loop (dolist (x *linking-calls*) ..) in ctop-write.
+	Created inconsistency in size of data vector in cfun.
+	What was it for?
+
+*	For local entry functions the binding for args which are special
+	should be done after the label TTL: has been emitted.
+
+*	From triang-mod.cl. The following:
+	 (setf (aref board (aref a i)) 0)
+	compiles to:
+	{object V3;
+	object V4;
+	V3= (VV[10]->s.s_dbind);
+	V4= MAKE_FIXNUM(((VV[15]->s.s_dbind))->fixa.fixa_self[V1]);
+	((V3))->fixa.fixa_self[fix((V4))]= 0;
+	}
+	even though:
+	(proclaim '(type (vector fixnum) board sequence a b c))
+
+*	When compiling do/do* references to variables in test forms should
+	be considered multiple.
+
+*	The mechanism for printing circular structure fails on sun when
+	size exceeds PRINTcircleSIZE.
+
+*	disassemble does not behave as in help.doc.
+
+*	c1apply-optimize could emit code for testing whether there are
+	sufficient elements in the list
+
+*	Update code to use constants in <limits.h>
+
+*	The mechanism of local/global entries in cmptop.lsp is worth while
+	only if all arguments are unboxed.
+
+*	Lavori piu' impegnativi:
+	- Rifare il trattamento di ihs
+	- introdurre dichiarazione :dynamic-extent
+	- aggiungere agli ottimizzatori i flags usati da Sherlis
+
+*	Completare la modifica di print-doc (describe.lsp) per stampare
+	intestazioni ripetute per quei simboli (list, *, etc.) che hanno
+	documentazione multipla.
+
+*	Completare l'aggiunta di nomi di caratteri:
+	#\F1, ... , #\F12, #\C-F1, .. , #\C-F12, #\M-F1, .. , #\M-F12
+	#\Up, #\Down, #\Left, #\Right, #\C-Up, #\C-Down, #\C-Left, #\C-Right
+	#\PgUp, #\PgDn, #\Home, #\End, #\C-PgUp, #\C-PgDn, #\C-Home, #\C-End
+
+*	verificare se usando una VAR come *destination*
+                (let* ((kind (var-kind var))
+                       (lcl (next-lcl))
+		       (temp (list 'VAR (make-var :kind kind :loc lcl))))
+                  (wt-nl "{" *volatile* (rep-type kind)) (wt-lcl lcl) (wt ";")
+                  (let ((*destination* temp)) (c2expr* form))
+	si puo' semplificare inline-args evitando l'uso di coerce-loc.
+
+*	questa clausola di cmpinline.lsp
+			((or (eq (var-kind var) 'LEXICAL)
+			     (eq (var-kind var) 'OBJECT))
+			 (let ((lcl-loc (list 'LCL (next-lcl))))
+			   (wt-nl "{object " lcl-loc "= "
+				  (wt-lcl (var-loc var)) (wt ";")
+				  (push (coerce-loc lcl-loc type) locs)
+				  (incf *inline-blocks*))))
+	e' dubbia: (wt-lcl (var-loc var)) per un LEXICAL?
+
+*	parameter closure-p in t3local-fun could be eliminated: it is present
+	in (fun-closure fun).
+
+*	All loops of the kind:
+		for (i = 0;  i < maxpage;  i++) {
+	in gbc.c, could be changed to i = minpage, where:
+		minpage = page(heap_end);
+	just after
+		heap_end = core_end = sbrk(0);
+	in alloc.c
+
+*	In macro_expand1:
+		     (lex_env[1] == OBJNULL) ? Cnil :
+	dovrebbe forse essere
+		     (lex_env[1] == Cnil) ? Cnil :
+
+*	trattamento or non soddisfacente:
+	(let ((dir (or (and output-file
+                       (pathname-directory output-file))
+                  (pathname-directory input-pathname)))
+
+	if((V2)==Cnil){
+	VALUES(0) = Cnil;
+	goto L42;}
+	Lpathname_directory(1,(V2))               /*  PATHNAME-DIRECTORY*/;
+L42:
+	if(VALUES(0)==Cnil)goto L41;
+	V11= VALUES(0);
+	goto L40;
+L41:
+	Lpathname_directory(1,(V1))               /*  PATHNAME-DIRECTORY*/;
+	V11= VALUES(0);
+L40:
+	if((V2)==Cnil){
+	VALUES(0) = Cnil;
+	goto L45;}
+	Lpathname_name(1,(V2))                    /*  PATHNAME-NAME   */;
+L45:
+	if(VALUES(0)==Cnil)goto L44;
+	V12= VALUES(0);
+	goto L43;
+L44:
+	Lpathname_name(1,(V1))                    /*  PATHNAME-NAME   */;
+	V12= VALUES(0);
+L43:
+
+*	in sysfun, scambiare never-change-special-var-p con
+	change-special-var-p per evitare creazione di troppe plist
+
+*	(setq spec (pop vl)) produces:
+	{object V12;                              /*  G4356           */
+	V12= CAR((V1));
+	V1= CDR((V1));
+	V2= (V12);
+	}
+
+*	 (or (and (foo)
+                  (listp args))
+              ...
+	if(VALUES(0)!=Cnil){
+	goto L21;}
+	VALUES(0) = Cnil;
+	goto L20;
+L21:
+	VALUES(0) = (type_of((V2))==t_cons||(V2)==Cnil?Ct:Cnil);
+L20:
+	if(VALUES(0)==Cnil)goto L19;
+
+        potrebbe essere migliorata. c2or dovrebbe chiamare c2expr con
+	JUMP-TRUE come *destination*, ma dovrebbe sapere in quale
+	locazione unwind-exit mette il risultato facendoselo ritornare.
+
+*	cambiare vref1 perche' ritorni solo var anziche' (var)
+
+*	(min (* *step-level* 2) 20) produce
+	(number_compare(number_times((VV[58]->s.s_dbind),MAKE_FIXNUM(2)),MAKE_FIXNUM(20))<=0?number_times((VV[58]->s.s_dbind),MAKE_FIXNUM(2)):MAKE_FIXNUM(20))
+
+*	Aggiungere ottimizzazione travel_push_type in print.d per
+	la stampa ciclica, come AKCL.
+
+*	Rimettere #. in default-init in cmptype.lsp (finito bootstrap
+	da AKCL)
+
+*	ricorsione diretta in c2call-global (utile per labels)
+	da' problemi a flet.
+
+*	unwind-exit caso FRAME considera SIMPLE-FUNCALL. Deve considerare
+	anche FUN-VAL?
+
+*	(let ((start start) (end end))
+	    (declare (fixnum start end))
+	puo' evitare di creare variabili object e poi relative unboxed
+
+*	scambiare ordine argomenti di si:putprop per facilitare (setf get).
+
+*	aggiungere funzioni di lwp.d in cmp/sysfun.lsp
+
+*	Rewrite setjmp.s so that PC is stored in slot 0 of buf, consistently
+	with _setjmp.
+
+*	Change lex.h and elsewhere so that:
+
+	lex-var:        (symbol value)      	; for local binding
+		  (....	   or          ....)
+			symbol                  ; for special binding
+
+	lex-fd:         (fun-name 'FUNCTION' . function)
+		  (....		or				...)
+			(macro-name 'MACRO' . expansion-function)
+
+	lex-tag:  	(tag    'TAG'  	.   frame-id)
+		  (....		or                    ....)
+			(block-name 'BLOCK' . frame-id)
+
+*	Funzione directory non funziona sotto DOS: la free chiamata
+	da setbuf fallisce.

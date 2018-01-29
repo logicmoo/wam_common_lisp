@@ -1,0 +1,453 @@
+
+   *	Dependency from CLOS in cmp/cmpspecial reflected in cmp/Makefile.in
+
+   *	Fixed src/configure.in which was not creating directory h.
+
+   * 	Modified inline-function to cosider type of *destination* so that
+	it uses proper type also for IF expressions
+
+   *	Fixed va_start in cmplam.lsp
+
+   *	Modified Lmapcar et al. not to use VALUES for args to apply, since
+	methods may clobber them with compute-effective-method.
+
+   *	eliminated spice data type, replaced by immediate (= locative)
+
+   *	Fixed bug in c2multiple-value-bind
+
+   *	Optimized c2multiple-value-prog1 when values are discarded
+
+   *	Reworked cmpcatch, cmpblock, cmptop to handle properly jumps
+	from inside unwind-protect.
+
+   *	Moved computation of return type for aref/aset from c1call-symbol
+	to c2call-global, when types of variable rebound by let are known.
+
+   *	Fixed compilation of lambda with both &rest and &key
+
+   *	Fixed sharp-a-reader for #2A().
+
+   *	Revised inline-args to use temporary variable of proper type.
+
+   *	Revised configure.in and all Makefile.in so that config.h and ecl.h
+	are created in the directory of each machine, to avoid clashes
+	when compiling from the same set of srouces.
+
+   *	Eliminated standard_read_object_non_recursive from read.d.
+
+   *	Revised define-modify-macro, define-setf-method THE (in setf.lsp)
+	and replaceable (in cmplet.lsp) to allow optimization of
+	(incf (the fixnum x)).
+
+   *	Fixed return value for (setf subseq).
+
+   *	Corrected decode-universal-time.
+
+   *	Flush_stream on string_output_stream's adds null termination.
+
+   *	Compiler: when a type mismatch is detected, type is set to T.
+
+   *	*features* are now keywords
+
+   *	Compiler optimizes calls to generic arithmetic operators, like + in:
+	(defun foo (x) (declare (single-float x)) (+ x x))
+	by correctly implementing contravariance (wrong in KCL/GCL).
+
+   *	Added clause for fixnum return type in cases like this (cmp/sysfun.lsp)
+
+	:inline-unsafe '((t fixnum) fixnum nil nil "(#0)->ust.ust_self[#1]")
+	:inline-unsafe '((t fixnum) character nil nil "(#0)->ust.ust_self[#1]")
+
+	so that (setq n (char-int (schar string index))) is optimized to:
+
+	V1= ((V2))->ust.ust_self[fix((V3))];
+
+   *	Added linux support contributed by Marcus Daniels.
+
+   *	Compiler: introduced *not-compile-too* to better handle eval-when.
+	When situation is (load) *not-compile-too* is T and evaluation
+	is skipped.
+
+   *	Fixed string termination in array_allocself in c/array.c
+
+   *	Turned into keywords :inline-always, :inline-safe etc. to avoid
+	package conflicts (e.g. definline is in sys:)
+
+   *	Compiler: fixed new-local for not including lex when not used
+
+   *	Fixed define-setf-method and expand-defmacro to accept &environemnt
+	in any position.
+
+   *	Revised all allocation routines to set field (e.g. in_slots) to
+	NULL before calling alloc_relblock, otherwise conservative GC will
+	find garbage in it.
+
+   *	Compiler: variable VVprotect is used in init_code to store
+	data vector and protect it from GC while init_code is executed.
+	VVprotect is declared volatile so that it is stored on the stack.
+	Beware of optimizing compilers which elimiante such variable
+	discovering it is never used.
+
+   *	CLOS: replaced :read-only declaration with variable-rebinding which
+	carries reference to variable rebound so that its type can be
+	retrieved in order to optimize slot-value.
+
+   *	Compiler: rewritten handling of closure variables. Introduced levels
+	of environments (*env-lvl*) and maximum size of environment (*max-env*)
+
+   *	Compiler: list with name of lambda block is recorded as name of
+	closure, so that it can be put in the C code (useful for methods).
+	A list is used in order to distinguish such blocks from labels,
+	since to the former tail-recursion does not apply.
+
+   *	Improved handling of unwind-protect and fixed catch in cmpcatch.lsp.
+
+   *	Avoided cycle in error handler when init.lsp generated an error.
+
+   *	Eliminated LOOP as special form, so that it can be redefined.
+
+   *	Fixed arg to pack_hash in unintern.
+
+   *	Fixed wrong coersion for defparameter (coerce-locs in cmpinline.lsp)
+
+   *	Fixes to local functions used in closures. Revised closure-p.
+
+   *	Fixed return-from in cmpblock.lsp
+
+   *	Name of outer block in lambda closure is preserved in C code
+	as closure name.
+
+   *	Fixed c1vref to reset var-loc to 'OBJECT for clb vars.
+	Example:
+	(let ((z))
+	  (foo #'(lambda () (setq z nil)))
+	  (defun gee (hmm r)
+	    (flet ((do-state ()
+		     (bar #'(lambda (x) x) hmm)))
+	      (do-state))
+	    #'(lambda ()
+		(bar #'(lambda (x) x) hmm))))
+
+   *	Fixed rest parameter used in apply within closure.
+
+   *	Fixed double generation of init_keywords for shared functions.
+
+   *	Fixed cmplet: must not rebind *env*.
+
+   *	Eliminated field referred-tags from compiler info structure,
+	a variable is used instead.
+
+   *	Rewritten cmpblock and cmptag.
+
+   *	Fixed bug in aset array with two indexes
+
+   *	Fixed compiler bug with blocks referenced through closures
+
+   *	Cleaned up initialization in main.c. Eliminated si:init-system. 
+
+   *	in read_VV VV is cleared before reading
+
+   *	define-a-class for structure-metaclass avoids creating new class
+	if new structure definition is identical to previous
+
+   *	fixed double appearance of functions in invocation history
+
+   *	eliminated use of declaration :read-only
+
+   *	c2apply uses Lapply instead of transfering arguments to VALUES.
+	Lapply puts the argument on the stack.
+	This is to avoid that compute-applicable-method will clobber them
+	before the function is called.
+
+   *	fixed c1let*: variable cannot be replaced if its form side-effects
+	some previous variable
+
+   *	c2call-lambda (in cmp/cmpcall.lsp) assumes stack growing downwards
+	and not NO_ARG_ARRAY
+
+   *	Fixed siLmake_vector (array.c) to add extra byte for terminator
+	to strings (e.g. those created with (concatenate 'string ..)).
+	Minor fixes to other functions creating strings (e.g. use memcpy
+	rather than for loops)
+
+   *	Fixed c2lambda-expr-with*-key, and c1var-ref. &rest variable only
+	used in closure was discarded.
+
+   *	Fixed c1let*: forms were considered in reverse order, this affected
+	determining when variable could be replaced in body.
+	Also changed var-changed-in-forms to check for side-effect on replaced
+	variable.
+
+   *	the GNU loader calls malloc before invoking main to store
+	address of exit routine.
+	This does not happen with dumped image, so we should not
+	free that area as we were doing in version 0.5.
+
+   *	fixed (floor -1.2 3)
+
+   *	rewritten C version of extended_mul
+
+   *	fixed (asin 2) and (acos 2)
+
+   *	fixed (let ((*read-suppress* t)) (read)) #c(2 3)
+
+   *	(log x 0) now signals error (as CMU-LISP), instead of returning 0.
+
+   *	Eliminated enter_mark_origin_block
+
+   *	Relocation: indication on how to perform relocation is available
+	in the tables reloc_howto_type in gnu/binutils/bfd (eg. coff-mips.c).
+	Here is a sample entry:
+  /* A 16 bit reference to a symbol, normally from a data section.  */
+  HOWTO (MIPS_R_REFHALF,	/* type */
+	 0,			/* rightshift */
+	 1,			/* size (0 = byte, 1 = short, 2 = long) */
+	 16,			/* bitsize */
+	 false,			/* pc_relative */
+	 0,			/* bitpos */
+	 complain_overflow_bitfield, /* complain_on_overflow */
+	 mips_generic_reloc,	/* special_function */
+	 "REFHALF",		/* name */
+	 true,			/* partial_inplace */
+	 0xffff,		/* src_mask */
+	 0xffff,		/* dst_mask */
+	 false),		/* pcrel_offset */
+
+	which is dealt as:
+
+	case R_REFHALF:
+	      *(unsigned short *)where += new_value;
+	      break;
+
+   *	Dumping images is performed using the unexec code from GNU emacs
+
+   *	Eliminated function si:initialization-failure
+
+   *	Correction to float-precision (in num_co.c): it is now 24 for
+	short-float and 53 for long-float.
+
+   *	Supposedly IBM RT now uses IEEFLOAT.
+	Removed all #ifdef IBMRT from num_co.c. They were identical to
+	the VAX case except in init_co, where it was:
+	#ifdef IBMRT
+		l[0] = 0x80;
+		l[1] = 0;
+		smallest_float = *(float *)l;
+		smallest_double = *(double *)l;
+	#endif
+
+   *	Changed inline-type-matches to ensure that the result type
+	is type<= than the arguments when optimizer expresses type as
+	FIXNUM-FLOAT.
+
+   *	let* omits variables if used just once in the body
+	(useful for macroexpansion of setf).
+
+   *	Changes to make ECL more compatible with CMU-LISP:
+	- GBC			->	GC
+	- *NOTIFY-GBC*		->	*GC-VERBOSE*
+	- BYE, BY		->	QUIT
+	- trace keywords:
+		entrycond	->	cond-before
+		exitcond	->	cond-after
+		entry		->	print-before
+		exit		->	print-after
+		exitbreak	->	break-after
+	- Floating point numbers:
+		single-float = short-float = IEEE single
+		double-float = long-float  = IEEE double
+
+   *	Revised data structures to pack them better.
+	Added paramter align to alloc_relblock to indicate alignment
+	of allocated block. Necessary e.g. for array of longfloat.
+
+   *	Revised rational. rationalize is now identical to rational.
+
+   *	Fixed routine error() which used to get into loop.
+
+   *	Revised cmpfun.lsp. Conditional optimizers are handled by a single
+	function (raher than two: one for the condition and one for the
+	optimization). It returns NIL if not applicable.
+	Added various optimizations from AKCL, except co1constant-fold
+	(never called), co1sublis, co1read-byte, co1read-char,
+	co1write-byte, co1write-char (these require special declarations),
+	co1special-fix-decl (ECL already handles declarations in do/prog).
+
+   *	Revised get-inline-loc to save in temporaries any argument which
+	is not a LOCATION or a VARIABLE
+
+   *	Eliminated c2get which performed open coding of get.
+
+   *	Patch: added call to __builtin_saveregs() in Fdo and FdoA
+	to fix problem with form (do () (()) (return)) on sparc:
+	ecl_raw ../o/ (print 3) (do () (()) (return)) SIGSEGV
+
+   *	Eliminated funcall_with_catcher. Was introduced when compiling
+	with safety=1: each function call did a frs_push!
+	When safety=3, cs_check is no more issued.
+
+   *	coerce-loc (cmpinline.lsp) strips off the variable when it is replaced.
+	This eliminates the occurrences of fix(MAKE_FIXNUM(.)).
+
+   *	Eliminated location SIMPLE-CALL from c2call-unknown-global
+	(cmpcall.lsp).
+
+   *	Revised structures for cfun and cclosures. They now occupy 4 words.
+	The info on the block with the C code is contained in the block itself
+	in a static struct of type codeblock.
+
+   *	To print circular structures we perform successive alloca of
+	increasing size. On i386 processor these can be just incremental
+	allocations since they just move the SP register.
+	On sparc or other processors a new array is necessary.
+	See macro SIZEincrement in print.d.
+
+   *	Eliminated assembler macro VSTACK with C macro ESTACK.
+
+   *	Converted code and compiler to ASCII C.
+
+   *	Constant functions environment are created at load time
+
+   *	Added character names: #\C-x, #\M-x and #\C-M-x.
+	Changed char-bits to reflect this.
+
+   *	Fixed do, do*, dolist, prog, progv macros, which did non expand body
+	when searching for declarations.
+
+   *	Online documentation is no longer loaded into memory, but the relevant
+	portions are read directly from file "help.doc".
+
+   *	ECL at boot uses 14000 cons cells, versus 17000 of AKCL.
+	Such data is obtained from (si:room-report), (room) instead shows
+	ratio between used cells and allocated cells, which is 56% for ECL,
+	and 50% for AKCL, which may lead one to think that ECL occupies more
+	space.
+
+   *	eliminated location DBIND used for compiling DEFVAR
+
+   *	let* avoids generating LCLs for the variables REPLACED.
+
+   *	Under DOS, go32 calls malloc before entering main to store routine
+	do_global_cleanup. Therefore init_alloc must be called from within
+	malloc, and must initialize malloc_list.	
+
+   *	alloc_simple_string (differently from KCL/DCL) has parameter the
+	length of the string. It allocates one extra byte for the final '\0'.
+
+   *	Eliminated push 'LB done in c1unwind:
+	 (let ((*blocks* (cons 'LB *blocks*))
+                   (*tags* (cons 'LB *tags*))
+                   (*vars* (cons 'LB *vars*)))
+                  (c1expr (car args))))
+	which caused variables to become unnecessarily LEXICAL.
+
+   *	Eliminated ccb-vref from vref: that information is already present
+	in field ref-ccb of variable.
+
+   *	Added function IHS-ENV in error.c used in top.lsp
+
+   *	fixed KCL (not AKCL) bug in edit_double from print.d:
+	if ((*((int *)&d+1) & 0x7ff00000) == 0x7ff00000)
+
+   *	(si::standard-readtable) is necessary to modify the standard
+	readtable in autoload.lsp.
+
+   *	labels can be tail-recursive
+
+   *	Eliminated flag *compile-to-linking-calls*
+
+   *	Added optimization for let: variables which are not used and
+ 	whose initform produces no side-effect are discarded
+	(useful for instance for pop)
+
+   *	Eliminated funcall-c (an AKCL optimization).
+
+   *	Eliminated mechanism of Ufun for t1defun.
+	In cmptop, cmpcall and lsp/ufun_list.
+
+   *	If duplicated keyword args are present, the first one is used
+
+   *	Commented out siLread_externals and siLset_up_combined from
+	unixfasl.c
+
+   *	DOWN_STACK flag is always true
+
+   *	GBC needs not look into VALUES(i): they are immediately
+	transerred to the cstack.
+
+   *	Use GCC extensions: variable length arrays, computed goto.
+	(marked with __GNUC__)
+
+   *    Code imported from AKCL is enclosed with flags: AKCL, HAVE_SIGACTION,
+	HAVE_SIGVEC, SETJMP_ONE_DIRECTION
+
+   *	modified defsysfun to express optional arguments
+
+   *	Eliminated: si:copy-stream, si:standard-readtable
+
+   *	find_symbol accepts char* and package.
+
+   *	KCL used value stack nontrivially in:
+	 - print.d for circular objects
+	   (eliminated allocating array on stack. If size is not enough
+	   travel_push longjmp back to grow it)
+	 - print.d for printing bignums (eliminated with recursion),
+	    and for circular lists. When PRINTcircle is true, space is
+	    needed for travel_push to store all elements traversed.
+	    We use alloca for this (macro setupPRINTcircle).
+	    If size is not enough, we increase it by longjump back to
+	    setupPRINTcircle. The correct sequence is:
+		setupPRINT(x, strm);
+		setupPRINTcircle(x);
+	   	write_object(x, 0);
+	 - fmt_indirection, fmt_iteration for the arguments of the directive
+	 - lambda_bind to create bindings (eliminated)
+	 - psetq to store values (eliminated)
+	   (The following were eliminated by means of MV_SAVE, MV_RESTORE)
+	 - read.d for reading vectors
+	 - unwind-protect, to preserve values, while performing clean-up
+	 - toplevel.c: Fthe must check types after values are computed
+
+   *    Eliminated nlj_active. Test is performed on the value returned to
+	_setjmp by _longjmp, which is the number of values of the returning
+	form + 1.
+	The value received from frs_push (when != 0) must be decremented
+	and returned.
+
+   *	Each function returns an integer representing number of values returned
+		Values themselves are returned in VALUES(i).
+   		Functions which set VALUES should use the macro RETURN.
+
+   *	Changed order of arguments to aset: (aset array v i0 .. in)
+	so that one can use apply #'aset instead of aset-by-cursor, which
+	has been eliminated.
+
+   *	Changed FEtoo_few_arguments and FEtoo_many_arguments:
+   	argument is &narg.
+	Eliminated too_few_arguments and too_many_arguments
+
+   *	Eliminated use of endp_temp in eval.c, list.d
+
+   *	Assignment to a temporary variable is still necessary in two cases:
+	1. to depart from right to left order of evaluation for C function
+	   arguments
+	2. to avoid that expression values being kept in registers will not be
+	   seen by GC.
+
+   *	Before entering GC, issue call to __builtin_savereg() to get data
+	out of registers, specially on RISC machines.
+
+   *	Removed preprocessor flags REVERSE_PARAMETER_ORDER and UNIX, and
+	machines DGUX, ATT3B2, AOSVS from machines.h
+	DOWNWARD_STACK now means downward: grows toward lower addresses.
+
+   *	Lexical environments are created on the C stack.
+        A new environment is created with lex_new by any function which
+	performs new bindings (either variables, functions, or tags) or
+	wants an empty env (like eval).
+	lex_dcl must be used as declaration before calling lex_new.
+	_new. should allocate lex_env and
+	More compact encoding is possible, for instance storing just SYMBOL
+	instead of (SYMBOL) for special variables.
+
+   *	read uses bignum arithmetic routines mul_int_big and add_int_big!

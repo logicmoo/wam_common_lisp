@@ -1,0 +1,3993 @@
+\documentstyle[latexinfo,ecl]{report} % -*-latexinfo-*-
+\pagestyle{headings}
+\pagenumbering{roman}
+
+\begin{document}
+\alwaysrefill
+\newindex{cp}
+\newindex{ky}
+\bibliographystyle{alpha}
+\finalout
+
+\def\theabstract{
+\ecl{} is an implementation of \clisp{} designed for being
+{\emph embeddable} into C based applications.
+
+\ecl{} (ECL for short) uses standard C calling conventions for
+Lisp compiled functions, which allows C programs to easily call
+Lisp functions and viceversa. No foreign function interface is
+required: data can be exchanged between C and Lisp with no need
+for conversion.
+
+\ecl{} is based on a Common Runtime Support (CRS) which provides basic
+facilities for memory managment, dynamic loading and dumping of binary
+images, support for multiple threads of execution.  The CRS is built
+into a library that can be linked with the code of the application.
+\ecl{} is modular: main modules are the program development tools (top
+level, debugger, trace, stepper), the compiler, and CLOS.  A native
+implementation of CLOS is available in \ecl{}: one can configure \ecl{} with
+or without CLOS.  A runtime version of \ecl{} can be built with just the
+modules which are required by the application.
+
+The \ecl{} compiler compiles from Lisp to C, and then invokes the GCC
+compiler to produce binaries.
+
+\ecl{} is currently supported on Sun workstations under Solaris,
+Silicon Graphics under IRIX, on IBM PC's under either DOS/go32 or
+Linux.
+
+This document describes how to obtain \ecl{}, install it and use it.  It
+then describes the specifics of the \ecl{} implementation of \clisp{} with
+respect to the definition in \cite{Steele:84}, and some implementation
+details.  One chapter describes the multithread facility of \ecl{}.  }
+
+\begin{iftex}
+\pagestyle{empty}
+\title{ECoLisp User's Manual}
+
+\author{Giuseppe Attardi\\
+Dipartimento di Informatica\\
+Universit\`a di Pisa\\
+} 
+\date{June 1994} 
+\maketitle
+\abstract{\theabstract}
+
+\clearpage
+\pagestyle{headings}
+\pagenumbering{roman}
+\tableofcontents
+
+\clearpage
+\pagenumbering{arabic}
+\end{iftex}
+
+\setfilename{ecl.info}
+\c node Top, Introduction, (dir), (dir)
+
+\begin{ifinfo}
+\vspace{1.3in}
+\begin{center}
+ECoLisp User's Manual
+Giuseppe Attardi
+
+Dipartimento di Informatica
+Universita` di Pisa
+\end{center}
+
+\theabstract
+
+\end{ifinfo}
+
+\chapter*{Preface}
+
+ECoLisp (ECL for short) is a full implementation of the \clisp{}
+language as described in the \clisp{} reference \cite{Steele:84},
+
+All \clisp{} functions, macros, and special forms are defined in \ecl{},
+though a few of them have slightly different meanings from those
+described in \cite{Steele:84}.  All such differences are described in this
+report. If a \clisp{} function (or macro or special form) does not
+work as described in \cite{Steele:84} and if this report does not describe
+the difference explicitly, then there must be a bug in \ecl{}.  All
+Common Lisp variables and constants are defined in \ecl{} exactly as
+described in \cite{Steele:84}.
+
+Currently, \ecl{} has been ported to the following platforms:
+
+\begin{enumerate}
+
+\item  Sparc, SunOS
+
+\item  Silicon Graphics, Irix
+
+\item  Intel x86, DOS/go32
+
+\end{enumerate}
+
+This report is intended to complement \cite{Steele:84}.
+This report describes deviations of \ecl{} from \clisp{}, those features
+specific to \ecl{}, and the implementation-dependent functions of
+\clisp{}.
+
+\chapter{Introduction}
+
+\section{Support}
+
+\section{Credits}
+
+Kyoto \clisp{}, from which \ecl{} is mostly derived, was
+developed at the Research Institute for Mathematical Sciences (RIMS),
+Kyoto University, with the cooperation of Nippon Data General
+Corporation.
+The main developers of Kyoto \clisp{} were
+Taiichi Yuasa and Masami Hagiya, of the Research Institute for
+Mathematical Sciences, at Kyoto University.
+
+I must thank Yuasa and Hagiya for allowing me to use their code in
+ECoLisp and to put ECoLisp in the Public Domain under the GNU General
+Public Licence as published by the Free Software Foundation.
+
+This document is based in part on the material in \cite{Yuasa:85}
+
+The following people or organizations must be credited for support
+in the devlopement of Kyoto \clisp:
+Prof. Reiji Nakajima at RIMS, Kyoto University;
+Nippon Data General Corporation;
+Teruo Yabe; Toshiyasu Harada; Takashi Suzuki;
+Kibo Kurokawa;
+Data General Corporation;
+Richard Gabriel; Daniel Weinreb; Skef Wholey; Carl Hoffman;
+Naruhiko Kawamura; Takashi Sakuragawa; Akinori Yonezawa;
+Etsuya Shibayama;
+Hagiwara Laboratory;
+Shuji Doshita; Takashi Hattori.
+
+William F. Schelter improved KCL in several areas and developed Austin
+Kyoto \clisp{} (AKCL). Many ideas and code from AKCL have been incorporated
+in \ecl{}.
+
+The following people contributed to the developement of \ecl{}:
+Stefano Diomedi, Tito Flagella, and Mauro Gaspari.
+
+Andreas Stolcke helped in testing the release and configuration.
+
+\section{Distribution}
+\section{Installation}
+ 
+This section explains how to install the \ecl{} system, separately for
+each version of \ecl{}.
+
+\subsection{Unix Installation}
+
+\begin{enumerate}
+
+\item Obtain the distribution from one the sites below via anonymous ftp:
+\begin{itemize}
+\item   ftp.icsi.berkeley.edu [128.32.201.7], directory \file{/pub/ai/ecl}
+\item   ftp.di.unipi.it [131.114.4.36], directory \file{/pub/lang/lisp}
+\end{itemize}
+The distribution is in compressed tar file named like \file{ecl-XX.tar.gz}
+where \code{XX} is the version number.
+
+\item Prepare a directory (hereafter called \dfn{ECL directory}) for
+ECoLisp.  In the following examples, we suppose that the {\emph ECL
+directory} is \file{/usr/local/ecl}.
+
+\item  Extract the content from the compressed tar file.
+\begin{example}
+zcat ecl-XX.tar | tar xf -
+\end{example}
+
+\item An autoconfiguration mechanism allows you to perform a standard
+installation with the following commands:
+\begin{example}
+./configure
+make
+make install
+\end{example}
+The last one will try to install executable files, manual pages and info files
+in standard directories like \file{/usr/local/bin}, \file{/usr/local/man/man1},
+\file{/usr/local/info}.
+If you don't have access rights to these directories, you can either
+give to configure alternate places or skip this step.
+Try \code{./configure -help} for instructions on how to supply this
+information to configure.
+
+\end{enumerate}
+
+The configuration script figures out the machine where it is running and
+creates a directory \code{machine} where to perform the installation.
+If the program fails to recognize the machine, you will have to
+check whether it is one of the supported machines present in
+\code{src/h/machine.h}.
+
+At the end of installation, the directory \code{machine} will contain
+the following files:
+
+\begin{example} 
+Executable files:
+    ecl               the \ecl{} interpreter and compiler
+
+Command files:
+    ecl.csh           script to invoke \ecl
+
+Help files:
+    help.doc          data for the online help
+
+Auxiliary files:
+    ecl_raw           Kernel Lisp
+    libcrs.a          Common Runtime Support library
+    compiler.o        compiler
+    compiler.data     data for the compiler
+    sysfun.lsp        data base for the compiler
+\end{example}
+
+You can remove all intermediate files produced during installation
+with the command \code{make clean}. 
+
+\section{Entering and leaving \ecl}
+ 
+\ecl{} is invoked by the command \code{ecl}.
+
+\begin{example}
+% ecl
+ECL (ECoLisp)  Version (0.8) 05/14/1993
+\end{example}
+
+\vspace{2 em}
+
+When invoked, \ecl{} will print the banner and initialize the system.
+The date in the \ecl{} banner identifies the revision of \ecl{}.
+\code{Version (0.8) 05/14/1993} is the value of the
+function \code{lisp-implementation-version}.
+
+If there exists a file named {\file init.lsp} in the current working
+directory, \ecl{} successively evaluates the forms in the file,
+immediately after the system initialization.  The user may set up his
+or her own \ecl{} environment (e.g., the memory configuration) with
+\file{init.lsp}.
+
+After the initialization, \ecl{} enters the \dfn{top-level loop}  and
+prints the prompt `\code{>}'.
+
+\begin{example}
+        Type :h for Help.  Top level.
+        >
+\end{example}
+
+The prompt indicates that \ecl{} is now ready to receive a form from the
+terminal and to evaluate it.
+
+Usually, the current package (i.e., the value of \defvar{*package*}) is
+the user package, and the prompt appears as above.  If, however, the
+current package is other than the user package, then the prompt will
+be prefixed by the package name.
+
+\begin{example}
+\var{package-name}>
+\end{example}
+
+To exit from \ecl{}, call the function \code{quit}.
+
+\begin{example}
+          >(quit)
+          Bye.
+          %
+\end{example}
+
+Alternatively, you may type \ctrl{D}, i.e. press the key {\key D}
+while pressing down the control key (\key{CTL}).
+
+\begin{example}
+          >\ctrl{D}bye.
+          %
+\end{example}
+
+You can disable \ctrl{D} as the exit command by setting to \code{T} the
+following variable:
+\defvar{*ignore-eof-on-terminal-io*}[sys]
+This variable controls whether an end of file character (normally \ctrl{D})
+should terminate the session. The default value is \nil.
+\enddefvar
+
+The top-level loop of \ecl{} is almost the same as that defined in
+Section 20.2 of \cite{Steele:84}.  Since the input from the terminal is in
+line mode, each top-level form should be followed by a newline.  If
+more than one value is returned by the evaluation of the top-level
+form, the values will be printed successively.  If no value is
+returned, then nothing will be printed.
+
+\begin{lisp}
+>(values 1 2)
+1
+2
+
+>(values)
+
+>
+\end{lisp}
+
+\vspace{1 em}
+
+When an error is signalled, control will enter the break loop.
+\begin{lisp}
+
+>(defun foo (x) (bar x))
+foo
+
+>(defun bar (y) (bee y y))
+bar
+
+>(foo 'lish)
+Error: The function BEE is undefined.
+Error signalled by BAR.
+
+Broken at BAR.
+>>
+\end{lisp}
+
+\vspace{1 em}
+
+`\code{>>}' in the last line is the prompt of the break loop.
+Like in the top-level loop, the prompt will be prefixed by the current
+package name, if the current package is other than the \code{user}
+package.
+
+To go back to the top-level loop, type \code{:q}
+
+\begin{lisp}
+>>:q
+
+Top level.
+>
+\end{lisp}
+
+\vspace{1 em}
+
+See Section 5.4 for the details of the break loop.
+
+The terminal interrupt (usually caused by typing \ctrl{C}
+(Control-\code{C})) is a kind of error.  It breaks the running program
+and calls the break level loop.
+
+Example:
+\begin{lisp}
+>(defun foo () (do () (nil)))
+foo
+
+>(foo)
+\ctrl{C}
+Correctable error: Console interrupt.
+Signalled by DO.
+
+Broken at FOO.
+>>
+\end{lisp}
+
+\chapter{Data Types}
+
+\ecl{} supports all \clisp{} data types exactly as defined in the
+\cite{Steele:84}.  This chapter simply complements Chapter 2 of \cite{Steele:84}, by
+describing implementation dependent features of \clisp{} data types.
+Each section in this chapter corresponds to the section in Chapter 2
+of \cite{Steele:84}, with the same section title.
+
+\section{Numbers}
+
+\subsection{Integers}
+
+{\tindexed Fixnum}'s in \ecl{} are those integers in the range \(-2^29\)
+to \(2^29-1\), inclusive.
+They are represented as immediate data, so no memory allocation is
+involved when using \code{fixnum}'s.
+Other integers are \code{bignums}. Thus 25 factorial (25!)
+
+\begin{lisp}
+15511210043330985984000000
+\end{lisp}
+
+is definetely a bignum in \ecl{}.
+
+\clisp{} constants related to integers have the following values
+in \ecl{}.
+
+\begin{example}
+
+  most-positive-fixnum \(= 536870911 = 2^29-1\)
+  most-negative-fixnum \(= -536870912 = - 2^29\)
+
+  boole-1 \(= 3\)
+  boole-2 \(= 5\)
+  boole-and \(= 1\)
+  boole-andc1 \(= 4\)
+  boole-andc2 \(= 2\)
+  boole-c1 \(= 12\)
+  boole-c2 \(= 10\)
+  boole-clr \(= 0\)
+  boole-eqv \(= 9\)
+  boole-ior \(= 7\)
+  boole-nand \(= 14\)
+  boole-nor \(= 8\)
+  boole-orc1 \(= 13\)
+  boole-orc2 \(= 11\)
+  boole-set \(= 15\)
+  boole-xor \(= 6\)
+\end{example}
+
+See Chapter 12 of \cite{Steele:84} for their meanings.
+
+
+\subsection{Ratios}
+ 
+There are no implementation-dependent features for ratios.
+
+\subsection{Floating-Point Numbers}
+
+\ecl{} supports two floating point formats: \tindexed{single-float} and
+\tindexed{double-float}.  These are implemented with IEEE single and double
+float arithmetic, respectively.  \code{short-float} is a synonym for
+\code{single-float}, and \code{long-float} is a synonym for
+\code{double-float}.  The initial value of
+\vindexed{read-default-float-format} is \code{single-float}.
+
+Both \code{single-float} and \code{double-float} are represented with a pointer
+descriptor, so float operations can cause number consing.  Number consing is
+greatly reduced if type declarations are supplied in programs.
+
+An expression such as \code{(eql 1.0s0 1.0d0)} is false, but \code{(eql
+1.0f0 1.0d0)} is true.  Similarly, \code{(typep 1.0l0 'short-float)} is
+false, but \code{(typep 1.0l0 'double-float}) is true.  For output purposes
+all floating-point numbers are assumed to be of {\emph single} or {\emph double}
+format.
+
+The floating-point precisions and exponent sizes are:
+
+\begin{example}
+
+Format    precision exponent    
+---------------------------- 
+Short      24 bits    8 bits
+Single     24 bits    8 bits
+Double     53 bits   11 bits
+Long       53 bits   11 bits
+
+\end{example}
+
+There is no ``minus zero.'' \code{(eql 0.0 -0.0)} is true.
+
+
+\clisp{} constants related to floating-point numbers have the
+following values in \ecl{}.
+\begin{example}
+
+    most-positive-short-float
+      = most-positive-single-float
+      = - most-negative-short-float
+      = - most-negative-single-float
+      = 3.402823s38
+
+    least-positive-short-float
+      = least-positive-single-float
+      = - least-negative-short-float
+      = - least-negative-single-float
+      = 1.401298s-45
+
+    most-positive-long-float
+      = most-positive-double-float
+      = - most-negative-long-float
+      = - most-negative-double-float
+      = 1.797693134862315f308
+
+    least-positive-long-float
+      = least-positive-double-float
+      = - least-negative-long-float
+      = - least-negative-double-float
+      = 4.940656458412469f-324
+
+    short-float-epsilon
+      = 2.980232s-8
+
+    short-float-negative-epsilon
+      = 2.980232s-8
+
+    long-float-epsilon
+      = double-float-epsilon
+      = single-float-epsilon
+      = 5.5511151231257827f-17
+
+    long-float-negative-epsilon
+      = double-float-negative-epsilon
+      = single-float-negative-epsilon
+      = 5.5511151231257827f-17
+
+    pi = 3.141592653589793
+
+\end{example}
+
+See Chapter 12 of \cite{Steele:84} for their meanings.
+
+
+\subsection{Complex Numbers}
+ 
+There are no implementation-dependent features for complex numbers.
+
+
+\section{Characters}
+
+\subsection{Standard Characters}
+
+\ecl{} supports all standard and semi-standard characters listed in
+Section 2.2.1 of \cite{Steele:84}.
+Non-printing characters have the following character codes.
+\begin{example}
+
+       Character        Code  (in octal)
+       --------------------------------
+       #\back{}Space                 040
+       #\back{}Newline               012
+       #\back{}Backspace             010
+       #\back{}Tab                   011
+       #\back{}Linefeed              012
+       #\back{}Page                  014
+       #\back{}Return                015
+       #\back{}Rubout                177
+
+\end{example}
+
+Note that \code{#\back{}Linefeed} is synonymous with
+\code{#\back{}Newline} and thus is a member of \code{standard-char}.
+Other semi-standard characters are not members of \code{standard-char}.
+
+\subsection{Line Divisions}
+
+Since \ecl{} represents the \code{#\back{}Newline} character by a single
+code 12, problems with line divisions discussed in Section 2.2.2 of the
+\cite{Steele:84} are absent in \ecl{}.
+
+
+\subsection{Non-standard Characters}
+ 
+\ecl{} supports no additional non-standard characters.
+
+
+\subsection{Character Attributes}
+ 
+The font fields of \ecl{} characters are always 0.
+
+\clisp{} constants related to characters have the following values in
+\ecl{}.
+
+\begin{example}
+    char-bits-limit = 16
+    char-code-limit = 256
+    char-control-bit = 1 
+    char-font-limit = 1 
+    char-meta-bit = 2
+    char-super-bit = 4
+    char-hyper-bit = 8
+\end{example}
+
+See Chapter 13 of \cite{Steele:84} for their meanings.
+
+
+\subsection{String Characters}
+ 
+Since the font fields of \ecl{} characters are always \code{0},
+\code{string-char} is considered to be identical to \code{character}.
+
+
+\section{Symbols}
+ 
+The print name of a symbol may consist of up to 16777216 (i.e., the value
+of \code{array-total-size-limit}) characters.  However, when a symbol is
+read, the number of characters (not counting escape characters)
+in the print name is limited to 2048.
+
+
+\section{Lists and Conses}
+ 
+There are no implementation-dependent features for lists and conses.
+
+\section{Arrays}
+ 
+\ecl{} arrays can have up to 64 ranks.
+
+When the value of the \clisp{} variable \code{*print-array*} (see
+Section 22.1.6 of \cite{Steele:84}) is \nil, then bit-vectors are printed as
+\code{#<a bit-vector \var{address}>}, other vectors are printed as
+\code{#<a vector \var{address}>}, and other arrays are printed as
+\code{#<an array \var{address}>}. The default value for
+\code{*print-array*} is \nil.
+
+\clisp{} constants related to arrays have the following values in
+\ecl{}.
+
+\begin{example}
+    array-dimension-limit = 16777216
+    array-rank-limit = 64
+    array-total-size-limit = 16777216
+\end{example}
+
+See Section 17.1 of \cite{Steele:84} for their meanings.
+
+
+\subsection{Vectors}
+ 
+In \ecl{}, array elements are represented in one of six ways depending
+on the type of the \code{array}.
+
+\begin{example}
+
+Array Type                               Element Representation
+---------------------------------------------------------------
+(array t) and (vector t)                      a cell pointer
+(array fixnum) and (vector fixnum)            32 bit signed integer
+(array string-char) and string                8 bit code
+(array short-float) and (vector short-float)  32 bit floating point
+(array long-float) and (vector long-float)    64 bit floating point
+(array bit) and bit-vector                    1 bit bit
+\end{example}
+
+\subsection{Strings}
+
+A string may consists of up to 16777216 (i.e., the value of
+\code{array-total-size-limit}) characters.  However, when a string is
+read, the number of characters (not counting escape characters) in the
+string is limited to 2048.
+
+
+\subsection{Bit-Vectors}
+ 
+There are no implementation-dependent features for bit-vectors.
+
+
+\section{Hash Tables}
+ 
+All hash tables are printed as \code{#<a hash-table \var{address}>}.
+
+
+\section{Readtables}
+ 
+All readtables are printed as \code{#<a readtable \var{address}>}.
+
+
+\section{Packages}
+ 
+The following packages are built into \ecl{}.
+
+\begin{example}
+     lisp     user     keyword     system
+\end{example}
+
+The \code{system} package has two nicknames \code{sys} and \code{si};
+\code{system:symbol} may be written as \code{sys:symbol} or
+\code{si:symbol}.  Other packages have no nicknames.
+
+Depending on the configuation option by which \ecl{} has been built,
+additional packages may be available:
+\begin{example}
+     compiler clos xlib
+\end{example}
+
+The \code{compiler} package contains symbols used by the \ecl{} compiler.
+Other packages are described in Section 11.6 of \cite{Steele:84}.
+The \code{clos} package is used for the internal symbols of the
+\clisp{} Object System, which is described in Chapter 14.
+The \code{xlib} package is used for the internal symbols of CLX,
+the \clisp{} Language X Interface to the X Window System, which is described
+in a separate manual.
+
+Packages are printed as \code{#<\var{package-name} package>}.
+
+
+\section{Pathnames}
+ 
+\ecl{} provides a \code{#} macro \code{#"} that reads a pathname:
+\code{#"\var{string}"} is equivalent to \code{(pathname
+"\var{string}"}).  For example,
+
+\begin{lisp}
+#"foo.lsp"
+\end{lisp}
+
+is equivalent to
+
+\begin{lisp}
+(pathname "foo.lsp").
+\end{lisp}
+
+The same format is used when a pathname is printed.
+
+The initial value of the \clisp{} variable
+\code{*default-pathname-defaults*} is \code{#""} (or, equivalently,
+\code{(pathname "")}).
+
+A pathname in the file system of \clisp{} consists of the following
+six elements:
+
+\begin{example}
+          host  device  directory  name  type  version
+\end{example}
+
+Among these elements, \ecl{} does not use \code{host}, \code{device},
+and \code{version}.  That is, when converting a namestring into a
+pathname, \ecl{} turns these three elements into \nil.  Conversely, when
+converting a pathname into a namestring, \ecl{} ignores these three
+elements.
+
+In the sequel, we explain how \ecl{} converts a namestring into a
+pathname.
+
+If a namestring contains one or more periods `.', the last period
+separates the namestring into the file name and the filetype.
+
+\begin{example}
+     "foo.lsp"
+         name:          "foo" 
+         type:          "lsp"
+
+     "a.b.c" 
+         name:          "a.b" 
+         type:          "c" 
+\end{example}
+
+If a namestring ends with a period, the filetype becomes the null
+string.
+\begin{example}
+     "foo." 
+          name:          "foo" 
+          type:          ""  (null string)
+\end{example}
+
+If a namestring begins with a period, the file name becomes \nil.
+
+\begin{example}
+     ".lsp" 
+          name:          nil 
+          type:          "lsp" 
+\end{example}
+
+If a namestring contains no period, the filetype is \nil.
+
+\begin{example}
+    "foo" 
+          name:          "foo" 
+          type:          nil 
+\end{example}
+
+In a pathname, the file directory is represented as a list.
+
+\begin{example}
+     "common/demo/foo.lsp" 
+          directory:     ("common"   "demo") 
+          name:          "foo" 
+          type:          "lsp" 
+\end{example}
+
+If a namestring does not contain a directory, the directory component
+of the pathname is \nil. 
+
+\begin{example}
+     "foo.lsp" 
+          directory:     nil 
+          name:          "foo" 
+          type:          "lsp" 
+\end{example}
+
+In a pathname, the root directory is represented by the keyword
+\code{:root}.
+
+\begin{example}
+     "/usr/common/foo.lsp"
+          directory:     (:root "usr" "common") 
+          name:          "foo" 
+          type:          "lsp" 
+\end{example}
+
+The abbreviation symbols `\code{.}' and `\code{..}' may be used
+in a namestring.
+
+\begin{example}
+     "./demo/queen.lsp" 
+          directory:     (\pxlref{:current} "demo") 
+          name:          "queen" 
+          type:          "lsp" 
+
+     "../../demo/queen.lsp" 
+          directory:     (\pxlref{:parent} :parent "demo") 
+          name:          "queen" 
+          type:          "lsp" 
+\end{example}
+
+\code{:current} and \code{:parent} represent the current directory
+and the parent directory, respectively.
+
+The part of a namestring after the last slash `\code{/}' is always regarded
+as representing the file name and the filetype.  In order to represent
+a pathname with both the name and the filetype \nil, end the pathname
+with a slash.
+
+\begin{example}
+     "/usr/common/" 
+          directory:     (:root "usr" "common") 
+          name:          nil 
+          type:          nil 
+
+     "/usr/common/.lsp" 
+          directory:     (:root "usr" "common") 
+          name:          nil 
+          type:          "lsp" 
+\end{example}
+
+`\code{*}' in the place of file name or filetype becomes  \code{:wild}
+
+\begin{example}
+     "*.lsp" 
+          name:          :wild 
+          type:          "lsp" 
+
+     "foo.*" 
+          name:          "foo" 
+          type:          :wild 
+\end{example}
+
+\section{Streams}
+ 
+Streams are printed in the following formats.
+
+\begin{description}
+\item[\code #<input stream  \var{file-name}>]
+An input stream from the file \var{file-name}.
+
+\item[\code{#<output stream \var{file-name}>}]
+An output stream to the file \var{file-name}.
+
+\item[\code{#<string-input stream from \var{string}>}]
+An input stream generated by \code{(make-string-input-stream
+\var{string} )}.
+
+\item[\code{#<a string-output stream>}] An output stream generated by
+the function \code{make-string-output-stream}.
+
+\item[\code{#<a two-way stream>}]
+A stream generated by the function \code{make-two-way-stream}.
+
+\item[\code{#<an echo stream>}]
+A bidirectional stream generated by the function \code{make-echo-stream}.
+
+\item[\code{#<synonym stream to \var{symbol}>}]
+The stream generated by \code{(make-synonym-stream \var{symbol} )}.
+
+\item[\code{#<a concatenated stream>}]
+An input stream generated by the function \code{make-concatenated-stream}.
+
+\item[\code{#<a broadcast stream>}]
+An output stream generated by the function \code{make-broadcast-stream}.
+\end{description}
+
+\section{Random-States}
+
+\ecl{} provides a \code{#} macro `\code{#$}' that reads a random state.
+\code{#$}\var{integer} is equivalent to \code{(make-random-state
+\var{integer})}.  The same format is used when a random state is
+printed.
+
+
+\section{Structures}
+ 
+There are no implementation-dependent features for structures.
+
+
+\section{Functions}
+ 
+An interpreted function (including macro expansion functions) is
+represented in one of the following formats.
+
+\begin{description}
+
+\item[\code (lambda \var{lambda-list} . body)] A lambda-expression
+with null lexical environment and with no implicit block around it.
+This type of function typically appears when \code{`(lambda \var{lambda-list} .  body)} is evaluated.
+
+\item[\code (lambda-block \var{block-name   lambda-list}  .  body)]
+A lambda-expression with null lexical environment but with an implicit
+block around it.  This type of function typically appears when \code{(defun \var{function-name lambda-list} .  body)} is evaluated.  In
+this case, \var{block-name} is identical to \var{function-name} .
+
+\item[\code (lambda-closure \var{env1   env2   env3   lambda-list} .  body)]
+
+A lambda-expression with lexical environments but with no implicit
+block around it.  This type of function typically appears when \code{#`(lambda \var{lambda-list} .  body)} (or, equivalently, \code{(function (lambda \var{lambda-list} .  body))}) is evaluated. \var{env1}, \var{env2}, and \var{env3} represent the variable bindings, the local
+function/macro definitions, and the tag/block-name establishments,
+respectively, at the time the closure was created.
+
+\item[\code (lambda-block-closure \var{env1 env2 env3 block-name lambda-list}  .  body)]
+
+A lambda-expression with lexical environments and with an implicit
+block around it.  Local functions and local macros are represented
+in this format. \var{env1}, \var{env2}, and \var{env3} represent the
+variable bindings, the local function/macro bindings, and the
+tag/block-name establishments, respectively, at the time the local
+function/macro was created by \code{flet}, \code{labels}, or
+\code{macrolet}.  The \var{block-name} is identical to the local
+function/macro name.
+\end{description}
+
+Compiled functions (including compiled macro-expansion functions) are
+printed in the following formats.
+
+\begin{lisp}
+#<compiled-function \var{name}>
+\end{lisp}
+or
+\begin{lisp}
+#<compiled-closure nil>
+\end{lisp}
+
+Incidentally, the value of \code{(symbol-function \var{special-form-name})}
+is a list,
+
+\begin{lisp}
+(special . \var{address})
+\end{lisp}
+
+if \var{special-form-name} names a special form.
+
+\clisp{} constants related to functions have the following values in \ecl{}.
+
+\begin{example}
+call-arguments-limit = 64
+lambda-list-keywords = (&optional &rest &key &allow-other-keys
+                        &aux &whole &environment &body)
+lambda-parameters-limit = 64
+multiple-values-limit = 32
+\end{example}
+
+Refer to \cite{Steele:84} for their meanings.
+
+
+\section{Unreadable Data Objects}
+ 
+There are no implementation-dependent features for unreadable data objects.
+
+
+\section{Overlap, Inclusion, and Disjointness of Types}
+
+ 
+In \ecl{}, the types \code{number} and \code{array} are certainly
+subtypes of \code{common}, since \ecl{} does not extend the set of objects
+of these types.
+
+
+\chapter{Input and Output}
+
+\section{Read Macros}
+
+The following \code{#} macros are introduced in \ecl{}. 
+
+\begin{description}
+\item[\code{#"}] \code{#"\var{string}"} reads a pathname.\hfill\break
+\code{#" \var{string} "} is equivalent to \code{(pathname "\var{string}")}.
+ 
+\item[\code{#$}] \code{#$\var{integer}} reads a random state.
+  \hfill\break \code{#$}\var{integer} is equivalent to \code{    (make-random-state \var{integer})} .
+\end{description}
+
+The \code{#} macro '\code{#,}' works as described in \cite{Steele:84}, only
+if it is included in a constant object.  The forms immediately after
+\code{`#,'} below will be evaluated when the compiled code is loaded.
+
+\begin{lisp}
+'#,x
+'(a b c (d #,e f) g)
+#(1 2 3 #,(+ a b c) 5 6)
+#C(0.0 #,(exp 1))
+\end{lisp}
+
+Otherwise, the effect of using '\code{#,}' is unpredictable.  Note
+that, when interpreted code is loaded, '\code{#,}' has the same effect
+as the \code{#} macro '\code{#.}'.
+
+
+\section{Input and Output Functions}
+
+The input and output functions of \ecl{} almost follow the definitions in
+Chapter 22 of \cite{Steele:84}.  Most of the differences come from the fact
+that, in \ecl{}, input from the terminal is always in line mode and
+binary I/O is not supported.
+
+In \ecl{}, \code{*terminal-io*} is a two-way stream from the standard
+input and to the standard output.  The echoing to the terminal is
+performed by the underlying operating system.  In particular, when a
+disk file is assigned to the standard output, nothing will be echoed
+at the terminal.
+
+Those functions that deviate from the definitions in \cite{Steele:84}
+are listed below.
+
+\defun{load}{\var{pathname} \keys{:print :verbose :if-does-not-exist}}
+If \var{pathname} does not specify the filetype of the input file,
+then load first tries to load a file with the filetype \code{.o}, i.e., the
+fasl file (see Chapter 6). If it fails, then \code{load} tries to load a
+file with the filetype \code{.lsp}.
+\ecl{} assumes that \code{.lsp} is the standard filetype for source
+files.  If it fails again, then \code{load} will load the specified
+file with no filetype.
+
+\code{load} recognizes a file as a fasl file if and only if the
+filetype of the file is \code{.o}.  Other files are assumed to be
+source files.
+\enddefun
+
+\defun{open}{}
+The argument to the keyword variable \code{:element-type}
+and \code{:element-type} is always bound to the value
+\code{string-char}.
+\enddefun
+
+\defun{close}{}
+The keyword variable \var{:abort} is always ignored.
+\enddefun
+
+\defun{listen}{}
+\code{listen} always returns \true.
+\enddefun
+
+\defun{read-char-no-hang}{}
+\code{read-char-no-hang} is equivalent to \code{read-char}.
+\enddefun
+
+\defun{clear-input}{}
+\code{clear-input} and \code{clear-output} simply
+return \nil{} without doing anything.
+\enddefun
+
+\defun{read-byte}{}
+\enddefun
+\defun{write-byte}{}
+These functions may operate on any stream.  They read or write a byte
+(8 bits) at a time.
+\enddefun
+
+The functions \code{princ}, \code{write-char} and \code{write-byte} do
+not always flush the stream.  The stream is flushed when
+\begin{enumerate}
+\item a newline character is written, or
+
+\item the input from the terminal is requested in the case that these
+functions operate on \code{*terminal-io*}
+\end{enumerate}
+\enddefun
+
+\section{Block Transfer}
+
+More efficient block transfer can be obtained with the following functions.
+
+\defun{read-bytes}{\var{stream} \var{string} \var{start} \var{end}}
+It reads from \var{stream} a series of bytes to be placed into \var{string}
+starting from position \var{start} up to \var{end} (exclusive). It returns
+the number of bytes actually transferred, or \code{-1} if the operation
+failed. The \var{stream} is automatically flushed. This function may operate
+on any stream.
+\enddefun
+
+\defun{write-bytes}{\var{stream} \var{string} \var{start} \var{end}}
+It writes onto \var{stream}the series of bytes from \var{string}
+starting from position \var{start} up to \var{end} (exclusive). It returns
+the number of bytes actually transferred, or \code{-1} if the operation
+failed. The \var{stream} is automatically flushed. This function may operate
+on any stream.
+\enddefun
+
+\section{Network Streams}
+
+With a configuration option, the following function is available which opens
+streams across network connections.
+
+\defun{open-client-stream}{\var{host} \var{port}}
+The string \var{host} indicates the name of the host, while \var{port} is
+an integer which identifies the port number to which to connect.
+This function returns a two-way stream which can be used in any of the stream
+operations.
+\enddefun
+
+\defun{open-server-stream}{\var{host} \var{port}}
+A stream connected to port number \var{port} is created to
+which clients can connect.
+This function returns a two-way stream which can be used in any of the stream
+operations.
+\enddefun
+
+\section{CLOS Streams}
+
+When the optional CLOS subsystem is available, an interface is provided by \ecl
+for using CLOS objects as \clisp{} input/output character streams.
+Such support can be used for instance to build interactive character streams,
+which may be used by applications as the stream argument for \clisp{}
+I/O functions such as \code{read}, \code{listen}, \code{prin1}, etc.
+The fundamental interface to \code{interactive-stream} objects consists of
+(generic) functions which implement the basic \clisp{} character stream
+operations (see \clisp{}, Chapter 22) but whose details are implementation
+dependent.
+
+The following functions are automatically invoked by \ecl{} when a stream
+operation involves a CLOS object as a stream parameter. The programmer
+should define these methods for any class of objects which are to be used
+for character input/output.
+
+\subsection{CLOS Stream Input}
+
+Character input from an \code{interactive-stream} is implemented by the
+following methods.
+
+\defmethod{stream-read-char}{(\var{object} interactive-stream)}
+Returns the next character object read from the CLOS stream \var{object}.
+\enddefmethod
+
+\defmethod{stream-read-line}{(\var{object} interactive-stream) \&rest \var{make-array-options}}
+Reads character objects from the CLOS stream \var{object}, up to and including
+the next \code{#\newline} character, and returns them as a string (without the
+\code{#\newline}. If given, the \var{make-array-options} arguments are passed
+to \code{make-array} when the returned string is created.
+\enddefmethod
+
+\defmethod{stream-unread-char}{(\var{object} interactive-stream) \var{character}}
+Unreads the character object \var{character} from the CLOS stream \var{object}.
+\var{character} will be the next character read by \code{stream-read-char}.
+\enddefmethod
+
+\defmethod{stream-peek-char}{(\var{object} interactive-stream) \var{peek-type}}
+Returns the character object which would be returned by \code{stream-read-char} but does not remove it from the input buffer.
+If \var{peek-type} is \true{}, \code{steam-peek-char} skips over any whitespace
+characters, removing them from the input buffer, and returns the next
+character.
+\enddefmethod
+
+\defmethod{stream-listen}{(\var{object} interactive-stream)}
+Returns \nil{} is no character is immediately available from the CLOS stream
+\var{object}. Otherwise, the next character is returned, as if
+\code{stream-peek-char} had been called.
+\enddefmethod
+
+\defmethod{stream-clear-input}{\var{object}}
+Clears any buffered characters on the CLOS stream \var{object}. Returns \nil.
+\enddefmethod
+
+\subsection{CLOS Stream Output}
+
+Character output from an \code{interactive-stream} is implemented by the
+following methods.
+
+\defmethod{stream-write-char}{(\var{object} interactive-stream) \var{character}}
+Outputs the character \var{character} to the CLOS stream \var{object}
+and returns it.
+\enddefmethod
+
+\defmethod{stream-write-line}{(\var{object} interactive-stream) \var{string} \&optional \var{start} \var{end}}
+Writes character objects from thestring \var{string} onto the CLOS stream
+\var{object}. If given, the \var{start} and \var{end} arguments indicate
+a substring that is to be output.
+\enddefmethod
+
+\defmethod{stream-fresh-line}{(\var{object} interactive-stream)}
+Outputs a \code{#\back}\code{newline} character to the CLOS stream
+\var{object} if and only if the stream is not already at the beginning
+of a new line.  Returns non-\nil{} if a \code{#\back}\code{newline} was
+output and \nil{} otherwise.
+\enddefmethod
+
+\defmethod{stream-clear-output}{(\var{object} interactive-stream)}
+Aborts any outstanding output operation on the CLOS stream \var{object} and
+returns \nil.
+\enddefmethod
+
+\defmethod{stream-forse-output}{(\var{object} interactive-stream)}
+Initiates the emptying of the internal buffers on the CLOS stream \var{object}
+and returns \nil.
+\enddefmethod
+
+\chapter{Memory Management}
+ 
+\section{Implementation Types}
+
+Each \ecl{} object belongs to one of the 22 {\emph implementation types}.
+The implementation types are shown in Table 4-1 with the corresponding
+\clisp{} data types.  In the table, the compiled functions are divided
+into three implementation types; \code{cfun} is the type of compiled
+functions without environment, \code{cclosure} is the type of
+compiled functions with environment (i.e., the type of compiled
+closures) and \code{gfun} is the type of compiled generic
+functions of CLOS.
+
+\centerline{Table 4-1  Implementation Types}
+
+\vspace{1 em}
+
+\begin{tabular}{ll}
+
+{\emph Implementation Type}&{\emph \clisp{} Data Type} \\[1 em]
+
+\code{cons}&\code{cons}\\
+{\tindexed fixnum}&{\tindexed fixnum}\\
+\code{bignum}&\code{bignum}\\
+\code{ratio}&\code{ratio}\\
+\code{short-float}&\code{short-float}\\
+\code{long-float}&\code{long-float (= double-float = single-float)}\\
+\code{complex}&\code{complex}\\
+\code{character}&\code{character}\\
+\code{symbol}&\code{symbol}\\
+\code{package}&\code{package}\\
+\code{hash-table}&\code{hash-table}\\
+\code{array}&\code{(and array (not vector))}\\
+\code{vector}& \code{(and vector (not string) (not bit-vector))}\\
+\code{string}&\code{string}\\
+\code{bit-vector}&\code{bit-vector}\\
+\code{structure}&\code{structure}\\
+\code{stream}&\code{stream}\\
+\code{random-state}&\code{random-state}\\
+\code{readtable}&\code{readtable}\\
+\code{cfun}&\code{compiled-function  without environment} \\
+\code{cclosure}&\code{compiled-function  with environment} \\
+\code{gfun}&\code{none (CLOS generic-function)} \\
+\code{instance}&\code{none (CLOS instance)} \\
+\code{thread}&\code{none (thread)} \\
+\code{cont}&\code{none (continuation)} \\
+\end{tabular}
+
+Each object is represented by a cell allocated in the heap area of the
+interpreter.  The size of the cell is determined by the implementation
+type of the object.
+
+The implementation types are classified according to the size of the
+cells for the objects of the type, as shown in Table 4-2.  The size of
+the cells in the same type class is the same.
+
+
+\centerline{Table 4-2  Classification of Implementation Types}
+
+\vspace{1 em}
+
+\begin{tabular}{ll}
+
+{\emph Class}&{\emph Implementation Types}\\[1 em]
+
+1&\code{        CONS BIGNUM RATIO COMPLEX STRUCTURE}\\
+2&\code{        SHORT-FLOAT RANDOM-STATE READTABLE}\\
+3&\code{        LONG-FLOAT CFUN CCLOSURE}\\
+4&\code{        SYMBOL}\\
+5&\code{        PACKAGE}\\
+6&\code{        ARRAY HASH-TABLE VECTOR BIT-VECTOR STREAM}\\
+7&\code{        STRING}\\
+8&\code{        PATHNAME}\\
+\end{tabular}
+
+For objects of the (implementation) types \code{readtable},
+\code{symbol}, \code{package}, \code{array}, \code{hash-table},
+\code{vector}, \code{bit-vector}, \code{stream}, \code{cclosure},
+\code{string}, \code{cfun}, and \code{structure} (or
+\code{instance}), the cell is simply a header of the object.  The
+body of the object is allocated separately from the cell and is
+managed in a different manner.  The memory space occupied by the
+body of such an object is called a \dfn{block}.  A block is
+either \dfn{contiguous} or \dfn{relocatable} depending on the
+area in which it is allocated.  The difference between the two
+areas will be explained below.  Table 4-3 lists these types,
+along with the contents of the body and the kind of the block.
+
+\vspace{1 em}
+                
+\centerline{Table 4-3  Types with Bodies}
+
+\vspace{1 em}
+
+\begin{tabular}{lll}
+
+
+{\emph Type}&{\emph Body}&{\emph Block}\\[1 em]
+
+\code{readtable}&\code{read table}&\code{contiguous}\\
+\code{symbol}&\code{symbol name}&\code{relocatable}\\
+\code{package}&\code{hash table}&\code{contiguous}\\
+\code{array}&\code{array body}&\code{relocatable or contiguous}\\
+\code{hash-table}&\code{hash table}&\code{relocatable}\\
+\code{vector}&\code{vector body}&\code{relocatable or contiguous}\\
+\code{bit-vector}&\code{bit-vector body}&\code{relocatable or contiguous}\\
+\code{stream}&\code{I/O buffer}&\code{contiguous}\\
+\code{cclosure}&\code{code}&\code{   contiguous}\\
+\code{string}&\code{string body}&\code{relocatable or contiguous}\\
+\code{cfun}&\code{code}&\code{contiguous}\\
+\code{structure}&\code{structure body}&\code{relocatable}\\
+\code{instance}&\code{instance slots}&\code{relocatable}\\
+\code{thread}&\code{thread data}&\code{contiguous}\\
+\end{tabular}
+
+\vspace{1 em}
+
+Usually, the body of an array, a vector, a bit-vector, or a string is
+allocated as a relocatable block.  In \ecl{}, the function \code{make-array} takes an extra keyword argument \kwd{static}.  If the
+\kwd{static} argument is supplied with a non-\nil{} value, then the
+body of the array is allocated as a contiguous block.
+
+\section{Heap and Relocatable Areas}
+
+The memory space of \ecl{} is divided into two parts: the heap area and
+the relocatable area.  Both areas occupy a contiguous space in the
+memory.
+
+Cells of \ecl{} objects are allocated in the heap.  \ecl{} divides the heap
+into pages (1 page = 2048 bytes), and each page consists of cells in
+the same type class (see Table 4-2).  Cells in different type classes
+are allocated in different pages.  Some blocks are also allocated in
+the heap: They are called contiguous blocks.  The pages for contiguous
+blocks contain only contiguous blocks.  Thus each page in the heap is
+either a page for cells in a particular type class, or a page for
+contiguous blocks.  Blocks not in the heap are called relocatable
+blocks and are allocated in the relocatable area.
+
+The user may specify the maximum number of pages that can be allocated
+for each type class by calling the \ecl{} specific function \code{allocate}.  There is also a limit on the number of pages for
+contiguous blocks; the limit can be altered by calling the \ecl
+specific function \code{allocate-contiguous-pages} size of the
+relocatable area is specified by the \ecl{} specific function \code{allocate-relocatable-pages}.  See Section 4.4 for these functions.
+
+In some installations of \ecl{}, the total amount of memory that \ecl{} can
+use is limited.  In such cases, the entire memory may become exhausted
+before the maximum number of pages for each type class, for contiguous
+blocks, or for the relocatable area have been allocated.
+
+The heap lies in a part of memory with lower address than the
+relocatable area and there is a ``hole'' between the two areas (see
+Figure 4-1).  On request for a new page of heap, the page with the
+lowest address in the hole is used.  When the hole is exhausted, the
+relocatable area is shifted toward the higher address space and a new
+hole of an appropriate size is created between the two areas.
+
+\vspace{1 em}
+
+\centerline{Figure 4-1  Heap and Relocatable Area}
+
+\vspace{1 em}
+
+\centerline\code{{lower address} \hspace*{3in}{}\code{higher address}}
+
+\centerline{\fbox{\hspace*{.5in}{}\emph{heap}\hspace*{.5in}{}}
+\hspace*{2 em}{}\emph{hole} \hspace*{2 em}{}\fbox{\emph{relocatable area}}}
+
+\section{The Garbage Collector}
+
+\ecl{} uses a {\emph conservative garbage collection} technique for collecting
+the C stack and a type accurate technique for areas containing Lisp objects.
+Scanning conservatively the C stack, looking for potential pointers to Lisp
+objects, ensures that no live Lisp objects get collected, even if they
+are passed to external procedures in C or some other language.
+This approach greatly simplies integration of Lisp and C code, since
+it is not necessary to protect Lisp object form collection when a foreign
+function is invoked.
+
+The garbage collector of \ecl{} has three levels according to what it
+collects:
+\begin{enumerate}
+        \item cells
+        \item cells and relocatable blocks
+        \item cells, relocatable blocks and contiguous blocks.
+\end{enumerate}
+
+In levels 2 and 3, the relocatable area is shifted to the higher
+address space to reserve an appropriate number of pages in the hole.
+
+For each type class, \ecl{} keeps a free list of unused cells, and when
+the free list is exhausted, a new page is allocated, or the garbage
+collector is invoked, depending on whether the maximum number of pages
+for that class have been allocated or not.
+
+The garbage collector does not compactify the heap.  That is, cells
+and contiguous blocks are never moved to another place.  Moreover,
+once a page is allocated for a particular type class or for contiguous
+blocks, that page will never be freed for other classes, even if the
+entire page becomes garbage.
+
+On the other hand, the relocatable area is compactified during level 2
+and level 3 of garbage collection.  A relocatable block is really
+relocatable.
+
+The garbage collector is automatically invoked in one of the following
+situations.  The number in the parentheses indicates the level of garbage
+collection that is performed.
+
+\begin{enumerate}
+\item  The free list of a certain type class is exhausted
+after the maximum number of pages have been allocated for that
+type class (1). 
+
+\item The hole is exhausted (2).
+
+\item The relocatable area is exhausted after the maximum number of
+pages have been allocated for the relocatable area (2).
+
+\item The contiguous blocks are exhausted after the maximum number of
+pages have been allocated for contiguous blocks (3).
+\end{enumerate}
+
+The garbage collector is also invoked by the following \ecl{} specific
+function.
+
+\defun{gc}[system]{\var{x}}
+The garbage collector is invoked with the level specified by \var{x}.
+If \var{x} is \nil, the garbage collector is invoked for level 1
+garbage collection.  If \var{x} is \true{}, it is invoked for level 3
+garbage collection.  Otherwise, it is invoked for level 2 garbage
+collection.  If \code{sys:*gc-verbose*} is non-\nil, then it print
+messages at the start and end of each garbage collection.
+\enddefun
+
+\defvar{*gc-verbose*}[system]
+This variable controls whether to print messages at the
+start and end of each garbage collection.
+If \code{sys:*gc-verbose*} is \nil, \code{gc} foregoes printing any
+messages.  The default value is \code{T}.
+\enddefvar
+
+\section{Allocation Functions}
+ 
+The following functions are used to set or inspect the (maximum)
+number of pages for each type class, for contiguous blocks, or for
+relocatable blocks.
+
+\defun{allocate}[extensions]{\var{type} \var{number}} Sets the
+maximum number of pages for the type class of the implementation type
+\var{type} to \var{number}.  If more than \var{number} pages have
+already been allocated, an error is signalled.
+\enddefun
+
+\defun{allocated-pages}[sys]{\var{type}}
+Returns the number of pages currently allocated
+for the type class of the implementation type \var{type}.
+\enddefun
+
+\defun{maximum-allocatable-pages}[sys]{\var{type}}
+Returns the current maximum number of pages
+for type class of the implementation type \var{type}.
+\enddefun
+
+\defun{allocate-contiguous-pages}[sys]{\var{number}}
+Sets the maximum number of pages for contiguous blocks to \var{number}.
+\enddefun
+
+\defun{allocated-contiguous-pages}[sys]{}
+Returns the number of pages allocated for contiguous blocks.
+\enddefun
+
+\defun{maximum-contiguous-pages}[sys]{}
+Returns the current maximum number of pages for contiguous blocks.
+\enddefun
+
+\defun{allocate-relocatable-pages}[sys]{\var{number}}
+Sets the maximum number of pages for relocatable blocks
+to \var{number}.  The relocatable area is expanded to \var{number}
+pages immediately.  Therefore,``the current maximum number'' and ``the
+number of pages allocated'' have the same meanings for relocatable blocks.
+\enddefun
+
+\defun{allocated-relocatable-pages}[sys]{}
+Returns the number of pages allocated for relocatable blocks.
+\enddefun
+
+If the pages for a particular type class are exhausted after the
+maximum number of pages for that class have been allocated, and if
+there remain no free cells (actually, if there remain very few cells),
+\ecl{} behaves as directed by the value of the \ecl{} specific variable
+\code{*ignore-maximum-pages*}.  If the value is \nil, then \ecl
+signals a correctable error and enters the break loop.  The user can
+reset the maximum number by calling \code{allocate} and then continue
+the execution of the program by typing \kwd{r}.
+
+Example:
+
+\begin{lisp}
+
+>(make-list 100000)
+
+Correctable error: The storage for CONS is exhausted.
+                   Currently, 531 pages are allocated.
+                   Use ALLOCATE to expand the space.
+Signalled by MAKE-LIST.
+
+Broken at FUNCALL.
+>>(ALLOCATE 'CONS 1000)
+t
+
+>>:r
+
+(nil nil nil nil nil nil nil nil nil nil ............
+\end{lisp}
+ 
+The user can also reset the maximum number of pages for relocatable
+blocks and for contiguous blocks in a similar manner.  On the other
+hand, if the value of \code{*ignore-maximum-pages*} is non-\nil, then
+\ecl{} automatically increments the maximum number of pages for the class
+by 50 percent.  The initial value of \code{*ignore-maximum-pages*} is
+\true.
+
+
+\section{Storage Information}
+ 
+\defun{room}{\&optional \var{x}}
+The function \code{room} prints the storage information.  The argument
+\var{x}  is simply ignored and
+the output of \code{room}  is always in the same
+format.  \code{room}  prints the following information:
+\enddefun
+
+\begin{itemize}
+
+\item for each type class
+\begin{itemize}
+\item the number of pages so-far allocated for the type class 
+\item the maximum number of pages for the type class
+\item the percentage of used cells to cells so-far allocated 
+\item the number of times the garbage collector has been 
+called to collect cells of the type class 
+\item the implementation types that belong to the type class
+\end{itemize}
+\item the number of pages actually allocated for contiguous blocks
+\item the maximum number of pages for contiguous blocks
+\item the number of times the garbage collector has been called to 
+collect contiguous blocks 
+\item the number of pages in the hole
+\item the maximum number of pages for relocatable blocks
+\item the number of times the garbage collector has been called to
+collect relocatable blocks 
+\item the total number of pages allocated for cells
+\item the total number of pages allocated
+\item the number of available pages
+\item the number of pages \ecl{} can use.
+\end{itemize}
+
+The number of times the garbage collector has been called is not
+shown, if the number is zero.
+
+In the following example, the maximum of \code{531} pages have
+already been allocated for the type class to which cons belongs, but
+only 16.9 percent of the cells are actually used.  The garbage
+collector was once invoked to collect cells in this type class.
+
+\begin{lisp}
+
+> (room)
+ 200/200   48.4%    CONS BIGNUM RATIO COMPLEX STRUCTURE
+   1/5      7.4%    SHORT-FLOAT RANDOM-STATE READTABLE
+  10/34    99.3%    LONG-FLOAT CFUN CCLOSURE
+  47/64    71.9%    SYMBOL
+   1/1      8.9%    PACKAGE
+   2/69    81.8%    ARRAY HASH-TABLE VECTOR BIT-VECTOR STREAM
+  16/40    95.9%    STRING
+   1/1      6.8%    PATHNAME
+
+   0/271            contiguous (1 blocks)
+     127            hole
+     40     3.4%    relocatable
+
+  278 pages for cells
+  445 total pages
+14709 pages available
+ 1230 pages in heap but not gc'd + pages needed for gc marking
+16384 maximum pages
+
+\end{lisp}
+
+\chapter{Program Development Facilities}
+
+\section{The Tracer}
+ 
+The Tracer causes selected \code{functions} to be traced.  When such a traced  
+\code{function} is invoked, it prints
+
+\begin{description}
+\item[]  \var{level} > (\var{name   arg1   ...   argn}) 
+\end{description}
+
+On return from a traced \code{function}, it prints
+\begin{description}
+\item[]  < \var{level}  (\var{name   value1   ...   valuen}) 
+\end{description}
+
+\var{name} is the name of the traced \code{function}, \var{args} are
+the arguments, and \var{values} are the return values.  \var{level} is
+a number which is incremented each time a traced \code{function} is
+invoked and is decremented at the completion of the invocation.  Trace
+print-outs are indented according to the \var{level}.
+
+In the current version of \ecl{}, macros and special forms cannot be
+traced.
+
+\defmac{trace}{\mstar{\var{function-name} \mor
+               (\var{function-name} \mstar{\&key \var{form}})}}
+
+Causes one or more functions to be traced.  Each \var{function-name}
+must be a symbol which is not evaluated.  If a function is called from
+a compiled function in the same file, tracing will not be enabled.  If
+this is the case, to enable tracing, recompile the caller with a
+\code{notinline} declaration for the called function. \code{trace}
+returns a name list of those functions that were traced by the call to
+trace.  If no \var{function-name} is given, \code{trace} simply
+returns a name list of all the currently traced functions.
+
+Trace options can cause the normal printout to be suppressed, or cause
+extra information to be printed.  Each option is a pair of an option
+keyword and a value form. If an already traced function is traced
+again, any new options replace the old options.  \var{form} is an
+expression to be evaluated in an environment where \var{sys::arglist}
+is bound to the current list of arguments to the function.
+
+The following options are defined:
+
+\begin{description}
+\item[\kwd{cond} \var{form}, 
+\kwd{cond-before} \var{form},
+\kwd{cond-after} \var{form}]\hfill\\
+If \kwd{cond-before} is specified, then \code{trace} does nothing unless
+\var{form} evaluates to true at the time of the call.  \kwd{cond-after}
+is similar, but suppresses the initial printout, and is tested when the
+function returns.  \kwd{cond} tries both before and after.
+
+\item[\kwd{step} \var{form}]\hfill\\
+If \var{form} evaluates to true, the stepper is entered.
+
+\item[\kwd{break} \var{form}, 
+\kwd{break-after} \var{form}]\hfill\\
+If specified, and \var{form} evaluates to true, then the debugger is
+invoked at the start of the function or at the end of the function
+according to the respective option.
+
+\item[\kwd{print} \var{form},
+\kwd{print-after} \var{form}]\hfill\\
+In addition to the usual printout, the result of evaluating \var{form}
+is printed at the start of the function or at the end of the function,
+according to the respective option.  Multiple print options cause
+multiple values to be printed.
+\end{description}
+\enddefmac
+
+\defmac{untrace}{\mstar{\var{function-name}}}
+
+Causes the specified functions to be not traced any more.
+\var{function-names} must be symbols and they are not
+evaluated. \code{untrace} returns a name list of those functions that
+were untraced by the call to \code{untrace}.  If no
+\var{function-name} is given, \code{untrace} will untrace all the
+currently traced functions and will return a list of their names.
+
+\enddefmac
+
+\section{The Stepper}
+
+\defmac{step}{\var{form}}
+
+Starts evaluating the {it form} in the single-step mode.  In this
+mode, before any form is evaluated, the Stepper will print the form
+and prompt the user for a Stepper command.  The Stepper binds the two
+variables \vindexed{print-level} and \vindexed{print-length} both to
+\code{2}, so that the current form may not occupy too much space on
+the screen.  A Stepper command will be executed when the user types
+the single character for the command followed by the required
+arguments, if any, and presses the newline key.  If the user presses
+the newline key without having typed any character, then the Stepper
+will assume that the Stepper command \code{n} was abbreviated.
+
+\enddefmac
+
+The Stepper commands are:
+
+\begin{description}
+\item[\code{Newline}]  Next.\hfill\\
+Evaluates the current form in the single-step mode. 
+
+\item[\kwd{s}, \kwd{skip}] Skip.\hfill\\
+Evaluates the current form in
+the ordinary mode.  The single-step mode will be resumed at completion
+of the evaluation.
+
+\item[\kwd{b}, \kwd{back}] Backwards.\hfill\\
+Steps back to previous step form.
+
+\item[\kwd{pr}, \kwd{print}] Print.\hfill\\
+Pretty-prints the current form.
+
+\item[\kwd{form}] Form.\hfill\\
+Return the current form.  Nothing is
+done, but the current form is returned as the value of this command.  As a
+consequence, it is printed by the top level in the usual way and saved in
+the variable \code{*}.  The main purpose of this command is to allow the
+current form to be examined further by accessing \code{*}.
+
+\item[\kwd{ret}, \kwd{return}] Return.\hfill\\
+Return without evaluating the
+current form.
+
+\item[\kwd{x}, \kwd{exit}] Exit.\hfill\\
+Evaluates the current form and any other forms in the ordinary mode.
+
+\item[\code{?}] Help.\hfill\\
+Lists the commands. 
+\end{description}
+
+\section{Errors}
+
+\defvar{*break-enable*}
+
+This variable is used to determine whether to enter the break loop (see
+Section 5.4) when an error occurs.  Even the function \code{break}
+checks this variable.  Initially, this variable is set to \true{}, and
+thus an error will invoke the break loop.  If the value is \nil,
+functions that cause fatal errors, such as \code{ error}, will just
+print an error message and control will return to the top-level loop (or
+to the current break loop, if already in the break loop).  Functions
+that cause correctable errors, such as \code{ cerror}, will print an
+error message and a ``continue message'', and control will return to the
+next form.  In \ecl{}, backtrace is not part of an error message, but a
+break loop command will print backtrace.  Therefore, if
+\vindexed{break-enable} is \nil, no backtrace appears on the screen.
+
+When the break loop is entered, \vindexed{break-enable} will be bound
+to \nil.
+
+\enddefvar
+
+\section{The Break Loop}
+ 
+The break loop is a read-eval-print loop similar to the top-level
+loop.  In addition to ordinary Lisp forms, the break loop accepts
+various commands with which the user can inspect and modify the state
+of the program execution.  Each break loop command is identified with
+a keyword (i.e., a symbol in the \code{keyword} package).  A break
+loop command is executed when the user inputs a list whose first
+element is the keyword that identifies the command.  The rest of the
+list is the arguments to the command.  They are evaluated before being
+passed to the command.  If the command needs no arguments, then the
+user may input only the keyword.  It is an error if the given keyword
+does not identify any command.  Any other input to the break loop is
+regarded as an ordinary Lisp form; the form will be evaluated and the
+resulting values will be printed on the terminal.
+
+There can be several instances of the break loop at the same time, and
+each such instance is identified by a {\emph level number}.  When the
+break loop is entered during execution in the top-level loop, the break
+loop instance is given the level number 1.  The break loop instance that
+is entered from the level {\emph n} break loop is given the level number
+\var{n}|code{+1}.  The prompt of the level {\emph n} break loop is
+\var{n}\code{+1} consecutive \code{>}'s, occasionally prefixed with the
+name of the current package.
+
+The break loop keeps track of the invocation sequence of functions
+(including special forms and macro expansion functions), which led up
+to the break loop from the previous break loop (or from the top-level
+loop, if the current break loop is level 1).  The invocation sequence
+is maintained in a pushdown stack of {\emph events}.  An event consists
+of an {\emph event function} and an {\emph event environment}.  An event
+function is:
+\begin{enumerate}
+\item an interpreted (i.e., not compiled) function (global function, local function, lambda-expression, or closure), 
+
+\item a special form within an interpreted function, 
+
+\item a macro expansion function called from an interpreted function, 
+
+\item a compiled function called from an interpreted function, or 
+
+\item a compiled function called from another compiled function which
+was compiled while the \code{safety} optimize level is 3 or with a
+\code{notinline} declaration for the called function (see Chapter 7).
+\end{enumerate}
+
+An event is pushed on the event stack when execution of its event
+function begins, and is poped away at the completion of the execution.
+An event environment is the `environment' of the event function at the
+time the next event is pushed.  Actually, an event environment is a
+pointer to the main stack of \ecl{}.  For each interpreted event function
+(i.e., event function in classes 1, 2, and 3), the pointer points to
+the first entry of the three contiguous main stack entries that hold
+the lexical environment of the event function.  For each compiled
+event function (i.e., event function in classes 4 and 5), the pointer
+is set to the first entry of the main stack area that is used locally
+by the compiled code.  In most cases, the first argument to the
+compiled function is saved in the first entry, the second argument in
+the second entry, and so on.  The local variables of the function are
+allocated in the entries following the arguments.  However, this is
+not always the case.  Refer to Section 7.3 for variable allocations in
+compiled functions.
+
+By break level commands, the user can choose one of the events as the
+{\emph current event}.  If the current event function is an interpreted
+event function, then the break loop evaluates Lisp forms in the
+lexical environment retrieved from the event environment.  In
+particular, local variables may be referenced by the variable names,
+local functions and local macros may be invoked as usual, established
+blocks may be exited from, and tags may be used as the destination of
+\code{go}.  If the current function is a compiled function, Lisp
+forms are evaluated in the null environment.
+
+Within the break loop, each event is represented by the {\emph event
+symbol}.  The \kwd{backtrace} command, for example, lists events in
+terms of their event symbols.  If the event function is a named
+function (global or local) or a macro expansion function, then the
+function or macro name is used as the event symbol.  If the event
+function is a special form, then the name of the special form is used.
+If the event function is a lambda-expression (or a closure), then the
+symbol lambda (or lambda-closure) is used.
+
+To suppress unnecessary information, the user can hide (or make
+invisible) some of the events.  Invisible events do not appear in the
+backtrace, for example.  Initially, only those events are invisible
+whose event symbols belong to the system internal package system.
+When the break loop is entered, the last visible event becomes the
+current event.
+
+The break loop commands are described below.  Some of the commands
+allow abbreviation in the keywords that identify them.  For example,
+the user may abbreviate \kwd{current} as \kwd{c}.  The break
+loop commands return no values at all.
+
+\defn{Break Command}{:current}{}
+\enddfn
+\defnx{Break Command}{:c}{}
+Prints the event symbol of the current event.
+\enddfn
+
+\defn{Break Command}{:previous}{\&optional \var{n}}
+\enddfn
+\defnx{Break Command}{:p}{\&optional \var{n}}
+Makes the \var{n}-th previous visible event the
+new current event.  Invisible events are not counted.  If there are
+less than \var{n} previous events, then the first visible event in the
+invocation sequence becomes the new current event. \var{n} must be a
+positive integer and the default is \code{1}.
+\enddfn
+
+\defn{Break Command}{:next}{\&optional \var{n}}
+\enddfn
+\defnx{Break Command}{:n}{\&optional \var{n}}
+Makes the \var{n}-th next visible event the
+new current event.  If there are less than \var{n} next events,
+then the last visible event in the invocation sequence
+becomes the new current event. \var{n}  must be a positive integer and the  
+default is \code{1}.
+\enddfn
+
+\defn{Break Command}{:backtrace}{}
+\enddfn
+\defnx{Break Command}{:b}{}
+Prints the event symbols of all visible events in order.  The symbol of
+the current event is printed
+in upper-case letters and the event symbols of other events are in lower-case.
+\enddfn
+
+\defn{Break Command}{:help}{}
+\enddfn
+\defnx{Break Command}{:h}{}
+Lists the break loop commands.
+\enddfn
+
+\defn{Break Command}{:quit}{\&optional \var{n}}
+\enddfn
+\defnx{Break Command}{:q}{\&optional \var{n}}
+Returns control to the level \var{n} break loop.  If \var{n} is 0 or if
+\var{n} is omitted, then control will return to the top-level
+loop. \var{n} must be a non-negative integer smaller than the current
+break level.
+\enddfn
+
+\defn{Break Command}{:resume}{}
+\enddfn
+\defnx{Break Command}{:r}{}
+Returns control to the caller of the break loop.  If the break loop has
+been entered from \code{cerror}, \code{cerror} returns \nil{} as its
+value and control will resume at that point.  Otherwise, this command
+returns control to the previous break loop (or to the top-level loop, if
+the current break level is \code{1}).
+\enddfn
+
+\defn{Break Command}{:variables}{}
+\enddfn
+\defnx{Break Command}{:v}{}
+Prints the names of the bound variables in the current
+environment.  To see the value of a bound variable, just type the
+variable name.
+\enddfn
+
+\defn{Break Command}{:functions}{}
+Prints the names of the local functions and local macros
+in the current environment.  To see the definition of a local function
+or macro, use the function special form in the usual way.  That is,
+\code{(function \var{name})} will return the definition of the local
+function or macro whose name is \var{name}.  Local functions and local
+macros may be invoked as usual.
+\enddfn
+
+\defn{Break Command}{:blocks}{}
+Prints the names of the blocks established in the current
+environment.  If a block \var{block} is established, then the \code{return-from} form \code{(return-from \var{block value})} works as
+usual.  That is, the block form that established \var{block} will
+return \var{value} as its value and control will resume at that point.
+\enddfn
+
+\defn{Break Command}{:tags}{}
+Prints the tags established in the current environment.  If a tag 
+\var{tag} is established, then the \code{go} form \code{(go \var{tag})} works
+as usual.  That is, control will resume at the position of
+\var{tag} in the surrounding \code{tagbody}.
+\enddfn
+
+\defn{Break Command}{:local}{\&optional \var{n}}
+\enddfn
+\defnx{Break Command}{:l}{\&optional \var{n}}
+If \var{n} is \code{0} or if it is omitted, then this command prints
+the value stored in the main stack entry that is pointed to by the
+current event environment. \var{n} is an offset from that entry.  If
+\var{n} is positive, then the value of the {\emph n}-th next (i.e.,
+toward the top of the main stack) entry is printed.  If \var{n} is
+negative, then the value of the \var{n}-th previous (i.e., toward the
+bottom of the main stack) entry is printed. \var{n} must be an
+integer.  It is an error if the specified entry does not lie between
+the bottom and the top of the stack.
+\enddfn
+
+\defn{Break Command}{:hide}{\var{symbol}}
+Hides all events whose event symbol is \var{symbol}.  In particular, by
+\code{:hide 'lambda} and \code{hide 'lambda-closure}, all events become
+invisible whose event functions are lambda-expressions and closures,
+respectively.  If the event symbol of the current event happens to be
+\var{symbol}, then the last previous visible event will become the new
+current event.
+\var{symbol} must be a symbol.
+
+Events of \code{eval} and \code{evalhook} may never become
+invisible and attempts to hide them are simply ignored.  It is always
+the case that the first event function is either \code{eval} 
+or \code{evalhook}.  Keeping both of them visible is the simplest way
+to avoid the silly attempts of the user to hide all events.
+\enddfn
+
+\defn{Break Command}{:hide-package}{\var{package}}
+Hides all events whose event symbol belongs to the package
+\var{package}. \var{package} may be any object that represents a
+package, i.e., a package object, a symbol, or a string.  If the event
+symbol of the current event happens to belong to the package
+\var{package}, then the last previous visible event will become the
+new current event.  Even if \code{lisp} package was specified as
+\var{package}, events of \code{eval} and \code{evalhook} do not
+become invisible.  See the description of \kwd{hide} above.
+\enddfn
+
+\defn{Break Command}{:unhide}{\var{symbol}}
+\kwd{unhide} is the inverse command of \kwd{hide}.  If, however, \var{
+symbol} belongs to one of the \kwd{hide-package}d packages, events
+of \var{symbol} become visible only after the package is \code{:unhide-package 'd}. \var{symbol} must be a symbol.
+\enddfn
+
+\defn{Break Command}{:unhide-package}{\var{package}}
+\kwd{unhide-package} is the inverse command of \kwd{hide-package}.
+However, an event whose event symbol belongs to \var{package} becomes
+visible only after the symbol is \code{unhide 'd}, if the symbol was
+\kwd{code 'd} before. \var{package} may be any object that
+represents a package, i.e., a package object, a symbol, or a string.
+\enddfn
+
+Example:
+
+\begin{lisp}
+> (defun fact (x) (if (= x 0) one (* x (fact (1- x)))))
+fact                    ;;;  Wrong definition for  fact, the factorial. 
+        
+> (fact 6)              ;;;  Tries to calculate factorial 6. 
+
+Error: The variable ONE is unbound.
+Error signalled by IF.
+
+Broken at IF:           ;;;  Enters the break-loop. 
+>> :h                   ;;;  Help. 
+
+Break commands:
+:q(uit)         Return to some previous break level.
+:pop            Pop to previous break level.
+:c(ontinue)     Continue execution.
+:b(acktrace)    Print backtrace.
+:f(unction)     Show current function.
+:p(revious)     Go to previous function.
+:n(ext)         Go to next function.
+:g(o)           Go to next function.
+:fs             Search forward for function.
+:bs             Search backward for function.
+:v(ariables)    Show local variables, functions, blocks, and tags.
+:l(ocal)        Return the nth local value on the stack.
+:hide           Hide function.
+:unhide         Unhide function.
+:hp             Hide package.
+:unhp           Unhide package.
+:unhide-all     Unhide all variables and packages.
+:vs             Show value stack.
+:bds            Show binding stack.
+:m(essage)      Show error message.
+:hs             Help stack.
+
+Top level commands:
+:cf             Compile file.
+:exit or ^D     Exit Lisp.
+:ld             Load file.
+:step           Single step form.
+:tr(ace)        Trace function.
+:untr(ace)      Untrace function.
+
+Help commands:
+:apropos        Apropos.
+:doc(ument)     Document.
+:h(elp) or ?    Help.  Type ":help help" for more information.
+
+>> :b                   ;;;  Backtrace. 
+Backtrace: eval > fact > if > fact > if > fact > if > fact >
+if > fact > if > fact > if > fact > IF
+
+>>: p                   ;;;  Moves to the previous event. 
+Broken at FACT.
+
+>> :b                   ;;;  Now inside of  fact  but outside of  if. 
+Backtrace: eval > fact > if > fact > if > fact > if > fact > 
+if > fact > if > fact > if > FACT > if
+
+>> :v                   ;;;  Shows local variables. 
+Local variables:
+  X: 1
+Block names: FACT.
+
+>> x                    ;;;  The value of x is 1. 
+1
+
+>> (return-from fact 1) ;;;  Returns from the  fact  block with value  1. 
+720                     ;;;  Now the correct answer. 
+
+>                      ;;;  Top-level.
+\end{lisp}
+
+\section{Describe and Inspect}
+
+\defun{describe}{\var{object}}
+Prints the information about \var{object}  to the stream that is
+the value of \code{*standard-output*}.  The description of an object
+consists of several fields, each of which is described in a recursive
+manner.  For example, a symbol may have fields such as home package,
+variable documentation, value, function documentation, function
+binding, type documentation, \code{deftype} definition, properties.
+\enddefun
+
+\defun{inspect}{\var{object}}
+Prints the information about \var{object} in an interactive manner.
+The output of inspect is similar to that of \code{describe}, but
+after printing the label and the value of a field (the value itself is
+not \code{describe 'd}), it prompts the user to input a one-character
+command.  The input to \code{inspect} is taken from the stream that
+is the value of \code{*query-io*}.  Normally, the inspection of \var{object} terminates after all of its fields have been inspected.  The
+following commands are supported:
+
+\begin{description}
+\item[\code{n}] Next.hfill\\
+Goes to the next level; the field is inspected recursively.
+
+\item[\code{s}] Skip.hfill\\
+Skips the inspection of the field. \code{inspect}  proceeds to  
+the next field. 
+
+\item[\code{p}] Print.hfill\\
+Pretty-prints the field and prompts again.
+
+\item[\code{u} \var{form}] Update.hfill\\
+The \var{form}  is evaluated and the field is  
+replaced by the resulting value.  If the field cannot be updated, the message 
+\code{Not updated.}  will be printed. 
+
+\item[\code{a}] Abort.hfill\\
+Aborts the inspection of the current object.  The field and  
+the rest of the fields are not inspected.
+
+\item[\code{e} \var{form}] Eval.hfill\\
+Evaluates the specified form in the null environment 
+and prints the resulting values.  Then prompts again with the same 
+field.
+
+\item[\code{q}] Quit.hfill\\
+Aborts the entire inspection.
+
+\item[\code{?}] Help.hfill\\
+Lists the \code{inspect} commands.
+\end{description}
+
+\section{Online Help}
+
+Online help is provided by the following functions.
+
+\defun{help}{\&optional \var{symbol}}
+\code{help} with no arguments prints a greeting message to \ecl{} beginners.
+\code{help} with a symbol argument prints the documentation associated
+with the symbol.
+\enddefun
+
+\defun{help*}{\var{string} \&optional \var{package}}
+Prints the documentation associated with those symbols in the specified
+\var{package} whose print names contain \var{string} as substring.
+\var{string} may be a symbol, in which case the print name of that symbol is
+used. \var{package} is optional and defaults to the LISP psackage.
+If \var{package} is \nil, then all packages are searched.
+\enddefun
+
+\chapter{The Compiler}
+ 
+The \ecl{} compiler translates a Lisp program stored in a source file into
+a C program, invokes the C compiler to compile the C program, and then
+generates an object file, called {\emph fasl file} (or {\emph o-file}
+because of the actual filetype).  The compiled program in a fasl file
+is loaded by the function \code{load}.
+
+Ordinarily, the object program generated by the \ecl{} compiler scarcely does
+runtime error-checking for runtime efficiency.  In addition, Lisp functions
+in the same source file are linked together and some system functions are
+open-coded in-line.  To control runtime error checking, supply appropriate
+\code{optimize} declarations (see Section 7.1).
+
+The \ecl{} compiler processes the \code{eval-when} special form exactly
+as specified in \cite{Steele:84} (see Section 5.3.3 of \cite{Steele:84}).
+
+Notice that KCL and AKCL instead behave differently from the \clisp{}
+specification, since they normally process all top-level forms in \emph{compile-time-too} mode.  If it is desired that each top-level form
+be processed in {\emph compile-time-too} mode, set the value of the \ecl
+specific variable \code{*eval-when-compiler*} to \true.
+
+The \ecl{} compiler is invoked by the functions \code{compile-file},
+\code{compile}, and \code{disassemble} described below.  In
+addition, the \ecl{} compiler may be invoked directly by the Shell
+commands \code{ecl}.  This command requires the file name of the
+source file as its argument. \code{ecl} simply adds \code{.lsp} to
+the file name argument to obtain the full name of the source file.
+
+\begin{example}
+        \code{\% ecl} \var{filename}
+\end{example}
+
+has the same effect as the compiler invocation \code{(compile-file
+\var{filename})} from within \ecl{}, and
+
+\begin{example}
+        \code{\% ecl -C} \var{filename}
+\end{example}
+
+has the same effects as \code{(compile-file \var{filename} :o-file t
+:c-file t :h-file t :data-file t)}.
+
+\defun{compile-file}{\var{pathname}
+        \keys{:output-file :output-file :o-file :c-file :h-file :data-file}}
+\code{compile-file} compiles the Lisp program stored in the
+file specified by \var{input-pathname}, and generates a binary file.
+Also \code{compile-file} generates the following temporary files.
+
+\vspace{1 em}
+\begin{tabular}{l@{\hspace{1in}}l}
+{\emph Temporary File}&{\emph Contents} \\ \hline
+
+{\emph c-file}&   C version of the Lisp program \\
+\var{h-file} & The include file referenced in the c-file \\
+\var{data-file} & The Lisp data to be used at load time\\
+\end{tabular}
+
+If files of these names already exist, the old files will be
+deleted first.  Usually, these intermediate files are automatically
+deleted after execution of \code{compile-file}.
+
+The input-file is determined in the usual manner (see Section 2.9),
+except that, if the filetype is not specified, then the default
+filetype \code{.lsp} will be used.  The keyword parameter \code{:output-file} defines the default directory and the default name to be
+applied to the output files (i.e., the fasl file and the temporary
+files).  \kwd{output-file} itself defaults to \var{input-pathname}.
+That is, if \kwd{output-file} is not supplied, then the directory
+and the name of the input file will be used as the default directory
+and the default name for the output files.  The filetypes of the
+output files are fixed as follows.
+
+\vspace{1 em}
+
+\begin{tabular}{l@{\hspace{1in}}l}
+{\emph Output File}&{\emph Filetype}\\ \hline 
+ 
+        fasl file&      \code{.o} \\ 
+        c-file&         \code{.c} \\
+        h-file&         \code{.h} \\ 
+        data-file&      \code{.data}
+\end{tabular}
+
+\vspace{1 em}
+
+Each output file can be specified by the corresponding keyword
+parameter.  If the value of the keyword parameter is \nil, then
+the output file will be deleted after execution of \code{compile-file}.  If the value of the keyword parameter is \true{},
+then the output file will be left in the default directory under the
+default name.  Otherwise, the output file will be left in the
+directory under the name specified by the keyword parameter.  The
+default value of \kwd{o-file} is \true{}, and the default values
+of \kwd{c-file, :h-file}, and \kwd{data-file} are all \code{nil}.
+
+\begin{lisp}
+(compile-file 'foo) 
+\end{lisp}
+
+\begin{description}
+\item[] The source file is \code{FOO.lsp} and the fasl file is \code{FOO.o}
+both in the current directory.
+\end{description}
+
+\begin{lisp}
+(compile-file 'foo.lish) 
+\end{lisp}
+
+\begin{description}
+\item[] The source file is \code{FOO.LISH} and the fasl file is \code{FOO.o}'.
+\end{description}
+
+\begin{lisp}
+(compile-file "/usr/mas/foo" :output-file "/usr/tai/baa") 
+\end{lisp}
+
+\begin{description}
+\item[] The source file is \code{foo.lsp} in the directory \code{/usr/mas},
+and the fasl file is \code{baa.o} in the directory \code{/usr/tai}.
+\end{description}
+\enddefun
+
+\defun{compile}{\var{name} \var{code} \&optional \var{definition}}
+If \var{definition}  is not supplied, \var{name}  should be the name
+of a not-yet-compiled function.  In this case, compile compiles the
+function, replaces the previous definition of \var{name} with the
+compiled function,{\emph and} returns \var{name}.  If \var{definition}
+is supplied, it should be a lambda-expression to be compiled and \var{name} should be a symbol.  If \var{name} is a non-\nil{} symbol,
+then compile installs the compiled function as the function definition
+of \var{name} and returns \var{name}.  If \var{name} is \nil,
+then compile simply returns the compiled function.
+
+The \ecl{} compiler is essentially a file compiler, and forms to be
+compiled are supposed to be stored in a file.  Thus compile actually
+creates a source file which contains the form designated by the
+arguments.  Then compile calls \code{compile-file} to get a fasl
+file, which is then loaded into \ecl{}.  The source file and the fasl
+file are given the names {\file gazonk.lsp} and {\file gazonk.fasl},
+respectively.  These files are not deleted automatically after the
+execution of \code{compile}.
+
+\enddefun
+
+\defun{disassemble}{\&optional \var{thing} \keys{:h-file :data-file}}
+
+This function does not actually disassemble.  It always calls
+the \ecl{} compiler and prints the contents of the c-file, i.e., the
+C-language code, generated by the \ecl{} compiler.  If \var{thing} is not
+supplied, or if it is \nil, then the previously compiled form
+by disassemble will be compiled again.  If \var{thing} is a symbol
+other than \nil, then it must be the name of a not-yet-compiled
+function, whose definition is to be compiled.  In this case, it is an
+error if the name is associated with a special form or a macro.  If
+\var{thing} is a lambda-expression \code{(lambda \var{lambda-list .
+body})}, then \code{disassemble} first creates a function definition
+\code{(defun gazonk \var{lambda-list .  body})} and this definition
+is compiled.  (The function name \code{gazonk} has no special
+meanings.  Indeed, the displayed code is essentially independent of
+the function name.)  Otherwise, \var{thing} itself will be compiled as
+a top-level form.  In any case, \code{disassemble} does not install
+the compiled function.  \code{disassemble} returns no value.
+
+No intermediate h-file is created if the keyword parameter \code{:h-file} is \nil{} or if \kwd{h-file} is not supplied.
+Otherwise, an intermediate h-file is created under the name specified
+by \kwd{h-file}.  Similarly, the intermediate data-file is
+specified by the keyword parameter \kwd{data-file}.
+
+\enddefun
+
+\defvar{*eval-when-compile*} The compiler processes each
+top-level form in \dfn{not-compile-time} mode if the value of
+this variable is \nil, and in \dfn{compile-time-too} mode,
+otherwise.  See Section 5.3.3 of \cite{Steele:84} for these two modes.
+The initial value of this variable is \nil.
+\enddefvar
+
+
+\chapter{Declarations}
+ 
+\ecl{} supports all kinds of declarations described in the
+\cite{Steele:84}.  Any valid declaration will affect the \ecl{} environment in
+some way or another, although information obtained by declarations,
+other than special declarations, is mainly used by the \ecl{} compiler.
+
+As described in \cite{Steele:84}, \clisp{} declarations are divided into
+two classes: \var{proclamations} and others.  A proclamation is a global
+declaration given by the function \code{proclaim}, the top-level
+\emph{macro} \code{defvar}, or the top-level macro \code{defparameter}.
+Once given, a proclamation remains effective during the \ecl{} session
+unless it is shadowed by a local declaration or is canceled by another
+proclamation.  Any other declaration is a \emph{local declaration} and
+is given only by the special form \code{declare}.  A local declaration
+remains in effect only within the body of the construct that surrounds
+the declaration.
+
+In the following nonsensical example borrowed from Chapter 9 of
+\cite{Steele:84},
+
+\begin{lisp}
+(defun nonsense (k x z)
+   (foo z x)
+   (let ((j (foo k x))
+         (x (* k k)))
+        (declare (inline foo) (special x z))
+     (foo x j z)))
+\end{lisp}
+
+the \code{inline} and the special declarations both remain
+in effect within the surrounding \code{let} form.  In this case,
+we say that the \code{let} form is the {\emph surrounding
+construct} of these declarations.
+
+\defun{proclamation}{\var{decl-spec}}
+This function is introduced to \ecl{} so that the user can see currently
+effective proclamations.  The argument \var{decl-spec} specifies the
+proclamation to be checked.  It may be any declaration specification that
+can be a valid argument to the function \code{proclaim}.  The
+function \code{proclamation} returns \true{} if the specified
+proclamation is still in effect.  Otherwise, it returns \nil.
+For example,
+
+\begin{lisp}
+>(proclaim '(special *x*))  ;;;  The variable  *x*  is 
+nil                         ;;;  proclaimed to be globally special. 
+ 
+>(proclamation '(special *x*))
+t
+ 
+>(defvar *y*)                ;;;  Another way to proclaim a variable 
+nil                          ;;;  to be globally special. 
+ 
+>(proclamation '(special *y*))
+t
+\end{lisp}
+
+\enddefun
+
+\defspec{the}{\var{value-type form}}
+
+The \ecl{} interpreter does actually check whether the value of the
+{\emph form} conforms to the data type specified by {\emph value-type} and
+signals an error if the value does not.  The type checking is performed by
+the function \code{typep}.  For example,
+\enddefspec
+
+\begin{lisp}
+(the fixnum (foo))
+\end{lisp}
+
+is equivalent to
+\begin{lisp}
+(let ((values (multiple-value-list (foo))))
+   (cond ((endp values) (error ``Too few return values."))
+         ((not (endp (cdr values)))
+          (error ``Too many return values."))
+         ((typep (car values) 'fixnum) (car values))
+         (t (error ``~s is not of type fixnum." (car values)))))
+\end{lisp}
+
+\begin{description} 
+\item[] On the other hand, the \ecl{} compiler uses the special form to
+obtain type information for compiled code optimization. No code for
+runtime type-checking is embedded in the compiled code.
+\end{description}
+
+\section{Declaration Specifiers}
+ 
+\ecl{} recognizes all declaration specifiers defined in \cite{Steele:84}.
+The syntax of each such declaration specifier is exactly the same as
+defined in \cite{Steele:84}.  In addition, \ecl{} recognizes the \code{object} declaration specifier which is specific to \ecl{}.
+
+\defn{Declaration}{special}{\mstar{\var{variable-name}}}
+The interpreter and the compiler of \ecl{} both treat special
+declarations exactly as described in \cite{Steele:84}.
+\enddefn
+
+\defn{Declaration}{type}{\var{type} \mstar{\var{variable-name}}}
+A \code{type} proclamation  \code{(type {\emph type var1
+var2} ...)} specifies that the dynamic values of the named variables
+are of the type {\emph type}.  A local \code{type} declaration
+specifies that the variables mentioned are bound by the surrounding
+construct and have values of the type {\emph type} during execution of
+the surrounding construct.  The compiler issues a warning if one of
+the named variables is not bound by the surrounding construct.  The
+information given by \code{type} declarations is used by the compiler
+to optimize the compiled code.  The behavior of the compiled code is
+unpredictable if a wrong \code{type} declaration is supplied.  The
+compiler detects certain wrong \code{type} declarations at compile
+time.
+\enddfn
+
+For example,
+\begin{lisp}
+>(defun foo (x y)
+   (declare (fixnum x) (character y))
+   (setq x y)
+  ...))
+foo
+
+>(compile 'foo)
+
+; (defun foo ...) is being compiled.
+;; Warning: Type mismatches between x and y.
+\end{lisp}
+
+See Section 7.3 for further information on \code{type} declarations.
+
+\defn{Declaration}{type}{\mstar{\var{variable-name}}}
+(\var{type var1 var2} ...) is equivalent to
+ \code{(type \var{type var1 var2} ...)}, provided
+that \var{type} is one of the symbols in Table 4-1
+of \cite{Steele:84}, other
+than \code{function}.  Declaration specifications that begin
+with \code{function} are
+regarded as \code{function} declarations (see below).
+\enddfn
+
+\defn{Declaration}{function}{\var{function-name} \var{argument-types} . \var{return-types}}
+A \code{function} declaration is used to obtain type
+information for function call forms.  That is, a \code{function}
+declaration specifies the argument and the return types of each form
+that calls the named function.
+\enddfn
+
+\begin{lisp}
+(defun foo ()
+  (declare (function bar (character) fixnum))
+  (+ (bar (atcholi1)) (bar (atcholi2))))
+\end{lisp}
+
+In this example, the \code{function} declaration
+specifies that the two functions \code{atcholi1} and \code{atcholi2}
+both return character objects when called within the body of \code{foo}, and that the function bar returns fixnum objects when called
+within the body of \code{foo}.  The type information given by
+function declarations is used by the compiler to optimize the compiled
+code.  The behavior of the compiled code is unpredictable if a wrong
+\code{function} declaration is supplied.  The compiler detects
+certain wrong \code{function} declarations at compile time.
+
+For example,
+
+\begin{lisp} 
+>(defun foo (x)
+   (declare (fixnum x)
+            (function bar (character) fixnum))
+   (bar x))
+foo
+
+>(compile 'foo)
+
+; (defun foo ...) is being compiled.
+;; Warning: The type of the form x is not character.
+\end{lisp}
+
+However, the compiler does not check the number of arguments, and thus,
+the following function definition will be compiled successfully without
+any warnings.
+
+\begin{lisp} 
+(defun foo ()
+  (declare (function bar (character character) fixnum))
+  (+ (bar (atcholi1)) (bar (atcholi2) (atcholi3) (atcholi4))))
+\end{lisp}
+
+For this definition, the compiler assumes that the three functions
+\code{atcholi1}, \code{atcholi2}, and \code{atcholi3} will return
+fixnum objects.  The return type of \code{atcholi4} is unknown at
+compile time.
+
+The complete syntax of a function declaration is:
+
+\begin{example} 
+(function  function-name
+  ( \mstar{type} \mopt{ { \&optional \mor &rest \mor &key } \mstar{thing} } )
+  { (values \mstar{ type } ) \mor \mstar{ type } } 
+)
+\end{example}
+
+Although \&optional, \&rest, and \&key markers may appear in the list of
+argument types, only those \var{types} are recognized that appear before
+any such markers and the rest of the list is simply ignored.  Note that
+functions with \&optional, \&rest, or \&key parameters may still be
+declared by \code{function} declarations because of the use of \code{function} declarations mentioned above.
+
+The \code{values} construct in the specification of return types is
+almost useless: \code{(function \var{function-name argument-types}
+(\var{values} \var{type1 type2} ...))} is equivalent to \code{(function \var{function-name argment-types type1 type2} ...)}.
+
+See Section 7.3 for further information on \code{function} declarations.
+
+\defn{Declaration}{ftype}{\var{function-type}
+\mstar{\var{function-name}}} \var{function-type} must be a list whose
+first element is the symbol \code{function}.  \code{(ftype (function
+. \var{rest}) \var{function-name-1} ...  \var{function-name-n})} is
+equivalent to
+\var{n} consecutive \code{function} declarations \code{(function
+\var{function-name-1} . \var{rest})} ... \code{(function
+\var{function-name-n} . \var{rest})}.
+\enddfn
+
+\defn{Declaration}{notinline}{\mstar{\var{function-name}}}
+\code{(notinline \var{function1 function2} ...)}  specifies
+that the compiler should not compile the named functions in-line.  Calls
+to the named functions can be traced and an event (see Section 5.4) is pushed
+on the event stack when any one of the named functions is invoked.
+\enddfn
+
+\defn{Declaration}{inline}{\mstar{\var{function-name}}}
+An \code{inline} proclamation cancels currently
+effective \code{notinline} proclamations, and a local
+\code{inline} declaration locally shadows currently effective
+\code{notinline} declarations.
+\enddfn
+
+\begin{lisp}
+>(defun foo (x)
+   (cons (car x)
+         (locally (declare (inline car)) (car x))))
+foo
+
+>(defun bar (x)
+   (cons (car x)
+         (locally (declare (inline car)) (car x))))
+foo
+
+>(proclaim '(notinline car))
+nil
+
+>(compile 'foo)
+...
+
+>(proclaim '(inline car))
+nil
+
+>(compile 'bar)
+...
+\end{lisp}
+
+Usually, primitive functions such as \code{car} are
+compiled in-line.  Therefore, in this example, only the first call to
+\code{car} within \code{foo} is compiled not in-line.
+
+In general, the \ecl{} compiler compiles functions in-line whenever
+possible.  Thus an \code{inline} declaration \code{(inline \var{function1 function2} ...)} is worthless if none of the named functions
+have previously been declared to be \code{notinline}.
+
+\defn{Declaration}{ignore}{\mstar{\var{variable-name}}}
+Usually, the compiler issues a warning if a lexical variable is
+never referred to.  \code{(ignore \var{var1 ...  varn})} causes the
+compiler not to issue a warning even if the named variables are never
+referred to.  The compiler issues a warning if one of the named
+variables is not bound by the surrounding construct, or if a named
+variable is actually referred to.  \code{ignore} proclamations are
+simply ignored.
+\enddfn
+
+\defn{Declaration}{optimize}{\mstar{(\var{quality value}) \mor \var{quality}\}}}
+\ecl{} supports the four \code{optimize} qualities listed in the
+\cite{Steele:84}.
+
+\code{speed} and \code{compilation-speed} are used to set up the
+optimization switch of the C language compiler which is invoked to
+compile the C-language code generated by the \ecl{} compiler (see Chapter
+6).  \code{(optimize (speed \var{n}))} and \code{(optimize
+(compilation-speed \var{m}))} are equivalent, where \var{n} and \var{m} are integers between 0 and 3, and \var{m} is equal to 3-\var{n}.
+When a \ecl{} session is started, the \code{speed} quality is set to 3.
+That is, by default, the compiler generates the fastest code in the
+longest compilation time.  The \code{space} quality specifies whether
+the code size is important or not: The compiled code is a little bit
+larger and faster when compiled with the space quality 0, than when
+compiled with the space quality 1, 2, or 3.  When a \ecl{} session is
+started, the \code{space} quality is set to 0.  The \code{safety}
+quality determines how much runtime error checking code should be
+embedded in the compiled code.  If the \code{safety} quality is 0,
+the compiled code scarcely does runtime error checking.  If the \code{safety} quality is 1, then the compiled code for a function will check
+the number of arguments to the function at runtime.  If the \code{safety} quality is 2 or 3, then the compiled code does full runtime
+error checking.  In addition, the highest quality value 3 causes the
+compiler to treat all functions as if they were declared to be \code{notinline}.  When a \ecl{} session is started, the \code{safety}
+quality is set to 0.
+\enddfn
+
+\defn{Declaration}{declaration}{\mstar{\var{name}}}
+A \code{declaration} declaration is used exactly as specified in the
+\cite{Steele:84}.
+\enddfn
+
+\defn{Declaration}{object}{\mstar{\var{variable-name}}}
+This is the only declaration specifier that is specific to \ecl{}.     
+\code{(object \var{var1  ...  varn})}  affects only variable bindings and
+specifies that the named variables can be allocated in the
+C stack (see Section 7.3).  The compiler issues a warning if
+one of the named variables is not bound by the surrounding
+construct. \code{object} proclamations are simply ignored.
+\enddfn
+
+\section{Significant Type Specifiers}
+
+Whenever a declaration is encountered, each type specifier
+(if any) in the declaration is converted to one of the following type
+specifiers, which are collectively called the {\emph significant type
+specifiers}.
+
+\begin{example}
+          |------------   fixnum 
+          |------------   character 
+          |------------   short-float 
+          |------------   long-float 
+      t --|----   (array t)  --------------  (vector t) 
+          |----   (array fixnum)  ---------  (vector fixnum) 
+          |----   (array string-char)   ---  string 
+          |----   (array short-float)   ---  (vector short-float) 
+          |----   (array long-float)    ---  (vector long-float) 
+          |----   (array bit)   -----------   bit-vector 
+\end{example}
+
+Here, the lines indicate subtype relations; the right type
+is a subtype of the left type.  For instance, \code{(vector t)} 
+is a subtype of  \code{(array t)}  and \true{}, and
+\code{(array t)} itself is a subtype of \true.  However,
+\code{(array t)} and \code{(array string-char)} are disjoint types.
+
+The function \code{subtypep} is used for the conversion to significant
+type specifiers: If the first value of \code{(subtypep \var{raw-type
+type})} is
+\true{} for one of the significant type specifiers \var{type},
+then the type specifier \var{raw-type} in
+the declaration is converted to \var{type}.  If there are more than one
+such significant type specifiers, then the type specifier that is a
+subtype of other specifiers is selected.
+For example, type specifiers {\tindexed fixnum},  \code{(mod 3)}, and
+\code{(member 0 1)} are all converted to {\tindexed fixnum}, though they are
+also subtypes of \true.
+
+Because of this type specifier conversion, \ecl{} may sometimes regard
+two seemingly distinct declarations as the same.
+For example, the following \code{type} declarations are completely equivalent,
+internally in \ecl{}.
+
+\begin{lisp}
+declare (type fixnum x))
+
+declare (type (mod 3) x))
+
+declare (type (member 0 1) x))
+\end{lisp}
+ 
+Type specifiers in declaration specifications passed to the
+\ecl{} specific function
+\code{proclamation} are also converted to significant type specifiers.  Thus, for example,
+
+\begin{lisp}
+>(proclaim '(function foo (fixnum) fixnum))
+nil
+
+>(proclamation '(function foo ((mod 3)) (member 0 1)))
+t
+
+>(proclamation '(function foo (number) character))
+nil
+\end{lisp}
+
+The first call to \code{proclamation} returns \true{} because
+both \code{(mod 3)} and \code{(member 0 1)}  are converted to
+{\tindexed fixnum} before the function type of \code{foo} is checked.
+
+\section{Treatment of Type Declarations}
+ 
+\ecl{} uses several runtime stacks.
+
+Arguments to functions, lexical and temporary variables are allocated
+on the C stack. Temporary values saved on the C stack may sometimes be
+represented as \var{raw data} instead of pointers to heap-allocated
+cells.  Accessing such raw data on the C stack results in faster
+compiled code, partly because no pointer deferencing operation is
+necessary, and partly because no cell is newly allocated on the heap
+when a new object is created. This is particularly helpful for numeric code
+which computes with floating point numbers.
+
+\ecl{} uses a conservative garbage collector to scan the C stack and find
+references to live object.
+
+\section{Variable Allocations}
+
+If a lexical variable is declared to be of {\tindexed fixnum},
+\code{character}, \code{short-float}, \code{long-float}, or their
+subtypes, then it is allocated on the C stack rather than on the value
+stack.  In addition, the variable always has a raw datum as its value:
+32 bit signed integer for fixnums, 8 bit character code with 24 bit
+padding for characters (remember that the font and bit fields of \ecl
+characters are always 0), 32 bit floating point representation for
+short-floats, and 64 bit floating point representation for
+long-floats.  Similarly, if a lexical variable is named in an \code{object} declaration (see Section 7.1), then it is allocated on the C
+stack but, in this case, the variable always has a cell pointer as its
+value.  The user is strongly recommended to make sure that objects
+stored in such an \code{object} variable may never be garbage
+collected unexpectedly.  For example,
+
+\begin{lisp}
+(do ((x (foo) (cdr x)))
+    ((endp x))
+    (let ((y (car x)))
+         (declare (object y))
+      (bar y)))
+\end{lisp}
+
+this \code{object} declaration is completely safe because the value
+of the variable \var{y} is always a substructure of the value of
+\var{x}, which in turn is protected against garbage collection.
+Incidentally, loop variables of \code{dolist} may always be declared
+as object variables, since the \code{dolist} form has essentially the
+same control structure as the \code{do} form above.  On the other
+hand, the result of evaluation of the following form is unpredictable,
+because the cons cell pointed to from the \code{object} variable
+\var{z} may be garbage collected before \code{bar} is called.
+
+\begin{lisp}
+(let ((z (cons x y)))
+     (declare (object z))
+  (foo (cons x y))
+  (bar z))
+\end{lisp}
+
+Lexical variables that are not declared to be of {\tindexed fixnum},
+\tindexed{character}, \tindexed{short-float}, \tindexed{long-float}, or
+their subtypes, and that are not named in \code{object} declarations
+are usually allocated on the value stack, but may possibly be allocated
+on the C stack automatically by the compiler.
+
+\section{Built-in Functions that Operate on Raw Data Directly}
+ 
+Some built-in \clisp{} functions can directly operate on raw data, if
+appropriate declarations are supplied.  The addition function \(+\) is
+among such functions.
+
+\begin{lisp}
+(let ((x 1))
+     (declare (fixnum x))
+  ...
+  (setq x (+ x 2))
+  ...
+  )
+\end{lisp}
+
+In the compiled code for this \code{let} form, the raw fixnum datum
+(i.e., the 32 bit signed integer) stored in \var{x} is simply
+incremented by 2 and the resulting 32 bit signed integer is stored
+back into \var{x}.  The compiler is sure that the addition for 32
+bit signed integers will be performed on the call to \code{+}, because
+the arguments are both fixnums and the return value must be also a
+fixnum since the value is to be assigned to the {\tindexed fixnum}
+variable.  The knowledge of both the argument types and the return
+type is necessary for this decision: Addition of two fixnums may
+possibly produce a bignum and addition of two bignums may happen to
+produce a fixnum value.  If either the argument type or the return
+type were not known to the compiler, the general addition function
+would be called to handle the general case.  In the following form,
+for example, the compiler cannot be sure that the return value of the
+multiplication is a fixnum or that the arguments of the addition are
+fixnums.
+
+\begin{lisp}
+(setq x (+ (* x 3) 2))
+\end{lisp}
+
+In order to obtain the optimal code, a \code{the} special form should
+surround the multiplication.
+
+\begin{lisp}
+(setq x (+ (the fixnum (* x 3)) 2))
+\end{lisp}
+
+Built-in \clisp{} functions that can directly operate on raw data are:
+
+\begin{enumerate}
+\item arithmetic functions such as \code{+},  \code{-},
+\code{1+}, \code{1-},  \code{*}, \code{floor},  \code{mod}, \code{/}, and
+\code{expt}.
+
+\item predicates such as \code{eq}, \code{eql}, \code{equal},
+\code{zerop}, \code{plusp}, \code{minusp}, \code{=}, \code{/=}, \code{<},
+\code{<=}, \code{>}, \code{>=}, \code{char=}, \code{char/=}, \code{char<},
+\code{char<=}, \code{char>}, and \code{char>=}.
+
+\item sequence processing functions that receive or return one or more
+fixnum values, such as \code{nth}, \code{nthcdr}, \code{length}, and
+\code{elt}.
+
+\item array access functions such as \code{svref}, \code{char}, \code{schar},
+and \code{aref} (see below).
+
+\item system-internal functions for array update (see below).
+ 
+\item type-specific functions such as \code{char-code}, \code{code-char},
+and \code{float}.
+\end{enumerate}
+
+As mentioned in Section 2.5.1, array elements are represented in one
+of six ways depending on the type of the array.  By supplying
+appropriate array type declarations, array access and update
+operations can handle raw data stored in arrays.  For example,
+
+\begin{lisp}
+(let ((a (make-array n :element-type 'fixnum))
+      (sum 0))
+     (declare (type (array fixnum) a)
+              (fixnum sum))
+  (dotimes (i n)             ;;; Array initialization.
+           (declare (fixnum i))
+     (setf (aref a i) i))
+  ....
+  (dotimes (i n)             ;;; Summing up the elements.
+           (declare (fixnum i))
+     (setq sum (+ (aref a i) sum)))
+  ....
+  )
+\end{lisp}
+
+The \code{setf} form replaces the \code{i-th} element of the
+array  a  by the raw fixnum value of \code{i}.  The
+\code{aref} form retrieves the raw fixnum datum stored
+in \code{a}.  This raw datum is then added to the raw fixnum
+value of the fixnum variable \code{sum}, producing the raw fixnum datum to be stored
+in \code{sum}.  Similar raw data handling is possible for
+arrays of types
+\code{(array fixnum),  (vector fixnum),
+ (array string-char),  string,
+ (array short-float),  (vector short-float),
+ (array long-float)}, and \code{(vector long-float)}.
+
+\section{Arguments/Values Passing}
+
+Function proclamations \code{(function \var{function-name}
+(\var{arg-type1} \var{arg-type2} ...) \var{return-type})} or its
+equivalents give the compiler the chance to generate compiled code so
+that arguments to the named functions and resulting values of the named
+functions will be passed via the C stack, thus increasing the efficiency
+of calls to these functions.  Such arguments/values passing via the C
+stack is possible only if the called function is also defined in the
+same source file.  This is because the code for the called function must
+have two entries: One entry for C arguments/values passing and another
+for ordinary Lisp arguments/values passing.  (An ordinary function has
+only the latter entry.)  When the latter entry is used, the arguments
+are {\emph unboxed} and passed to the former entry.  On return from the
+function, the resulting value is cast into a Lisp data type.
+
+A good example of this follows.
+
+\begin{lisp}
+(eval-when (compile)
+  (proclaim '(function tak (fixnum fixnum fixnum) fixnum)))
+
+(defun tak (x y z)
+  (declare (fixnum x y z))
+  (if (not (< y x))
+      z
+      (tak (tak (1- x) y z)
+           (tak (1- y) z x)
+           (tak (1- z) x y))))
+
+;;; Call (tak 18 12 6).
+\end{lisp}
+
+When \code{tak} is called with the arguments \code{18, 12}, and \code{6}, the raw fixnum data of the arguments are set to the parameters
+\code{x}, \code{y}, \code{z}.  After that, only raw C data are used
+to perform the execution: No cell pointers are newly allocated nor even
+referenced.  The built-in functions \(<\) and \code{1-} directly
+operate on the raw data.  Only at the return from the top-level call of
+\code{tak}, the resulting raw data value (which happens to be \code{7}) is reallocated on the heap.  Note that both the \code{function}
+proclamation and the local {\tindexed fixnum} declaration are necessary
+to obtain the optimal code.  The \code{function} proclamation is
+necessary for arguments/values passing via the C stack and the
+{\tindexed fixnum} declaration is necessary to unbox the parameters into
+C variables.
+
+\chapter{Operating System Interface}
+
+\ecl{} provides the following facilities that are not defined in
+\cite{Steele:84}.
+
+\defun{save-system}[sys]{\var{filename}}
+\code{save} saves the current memory image into a program file \var{filename}.
+After saving the memory image, the \ecl{} process terminates
+immediately.  To execute the saved program file, specify the full
+pathname of the file, as indicated in the example below.
+
+\vspace{1 em}
+
+     Example:
+\begin{lisp}
+>(defun plus (x y) (+ x y))
+plus
+
+>(save "savefile")
+%
+
+% pwd
+/usr/hagiya
+% /usr/hagiya/savefile
+
+>(plus 2 3)
+5
+
+>(quit)
+Bye.
+%
+\end{lisp}
+\enddefun
+
+\defun{system}{\var{string}}
+Executes a Shell command as if \var{string} is an input to the Shell.  
+On return from the Shell command, \code{system} returns the exit code
+of the command as an integer.
+\enddefun
+
+
+\defun{quit}{\&optional \var{exit-code}}
+Terminates \ecl{} and returns the \var{exit-code} to the parent process.
+\var{exit-code} must be an integer and its default value is \code{0}.
+\enddefun
+
+\chapter{Macros}
+ 
+\section{System Macros}
+ 
+The \ecl{} interpreter implements the following system macros as if
+they were special forms.  That is, macro forms of the following macros are
+directly evaluated without being macro-expanded.
+
+\begin{example}
+    and       case      cond      decf      defmacro  defun
+    do        do*       dolist    dotimes   incf      locally
+    loop      multiple-value-bind           multiple-value-list
+    multiple-value-setq           or        pop       prog
+    prog*     prog1     prog2     psetq     push      return
+    setf      unless    when
+\end{example}
+
+For these macro forms, the functions \code{macro-function} and
+\code{special-form-p} both return non-\nil{} values:
+\code{macro-function} returns the macro expansion function and
+\code{special-form-p} returns \true.  Of course, functions such as
+\code{macroexpand} and \code{macroexpand-1} will successfully expand
+macro forms for these system macros.
+
+\section{Defmacro Lambda-Lists}
+ 
+A \dfn{defmacro lambda-list} is a lambda-list-like construct that is used
+as the third element in the \code{defmacro} form,
+\begin{lisp}
+(defmacro \var{name defmacro-lambda-list \mopt{declaration \mor doc-string} \mstar{form}})
+\end{lisp}
+
+The description of defmacro lambda-lists in \cite{Steele:84} is quite ambiguous.
+\ecl{} employs the following syntax.
+
+The complete syntax of a defmacro lambda-list is:
+
+\begin{example}
+( \mopt{ &whole \var{var} }
+  \mopt{ &environment \var{var} }
+  \mstar{ \var{pseudo-var} }
+  \mopt{ \&optional \mstar{ var \mor ( pseudo-var \mopt{ initform \mopt{ pseudo-var } } ) } }
+  { \mopt{ { &rest \mor &body } pseudo-var }
+    \mopt{ &key \mstar{ var \mor ( { var \mor ( keyword pseudo-var ) } 
+                     \mopt{ initform \mopt{ pseudo-var } } ) } 
+             \mopt{ &allow-other-keys } } 
+      \mopt{ &aux \mstar{ var \mor ( pseudo-var \mopt{ initform } ) } } 
+ \mor . var } 
+)
+\end{example}
+
+where \var{pseudo-var} is either a symbol or a list of the following form:
+
+\begin{example}
+( \mstar{ pseudo-var } 
+  \mopt{ \&optional \mstar{ var \mor ( pseudo-var \mopt{ initform \mopt{ pseudo-var } } ) } } 
+  { \mopt{ { &rest \mor &body } pseudo-var } 
+    \mopt{ &key \mstar{ var \mor ( { var \mor ( keyword pseudo-var ) } 
+                     \mopt{ initform \mopt{ pseudo-var } } ) } 
+             \mopt{ &allow-other-keys } } 
+      \mopt{ &aux \mstar{ var \mor ( pseudo-var \mopt{ initform } ) } } 
+  \mor . var } 
+)
+\end{example}
+
+The defmacro lambda-list keyword \code{&whole} may appear only at the
+top-level, first in the defmacro lambda-list.  It is not allowed within
+\var{pseudo-var}.  Use of the \code{&whole} keyword does not affect the
+processing of the rest of the defmacro lambda-list:
+
+\begin{lisp}
+(defmacro foo (&whole w x y) ...)
+\end{lisp}
+and
+\begin{lisp} 
+(defmacro foo (x y) ...)
+\end{lisp}
+
+both bind the variables \code{x} and \code{y} to the second and the
+third elements, respectively, of macro forms of \code{foo}.
+
+The defmacro lambda-list keyword \code{&environment} may appear only at
+the top-level, first in the defmacro lambda-list if \code{&whole} is
+not supplied, or immediately after the variable that follows
+\code{&whole}, if \code{&whole} is supplied.  \code{&environment} is
+not allowed within \var{pseudo-var}.  Like \code{&whole}, use of
+\code{&environment} does not affect the processing of the rest of the
+defmacro lambda-list.  If an \code{&environment} parameter is supplied
+andif this parameter is not used at all, then the \ecl{} compiler will
+issue a warning.  To suppress the warning, just remove the parameter
+from the defmacro lambda-list, or add an \code{ignore} declaration.
+ 
+The defmacro lambda-list keyword \code{&body} is completely
+equivalent to the \&rest keyword.  \ecl{} takes no special action
+for \code{&body} parameters.
+
+Although useless, \ecl{} allows supplied-p parameters to be destructured.
+This is useless because supplied-p parameters can never be bound to a
+non-empty list.  Our intention is to stick to the specification in the
+\cite{Steele:84} as far as possible, even if it is silly to do so.
+
+Like for ordinary lambda-lists, the interpreter detects invalid arguments to macro expansion functions.  When a parameter is destructured, the
+structure of the corresponding argument is also checked.  Such runtime
+argument checking may or may not be embedded in compiled code, depending on
+the environment when the code was generated.  If the code
+was generated while the \code{safety} optimize level is zero (that is,
+while the value of \code{(proclamation '(optimize (safety 0)))} is \true{}),
+then the generated code does not perform argument checking at all.
+Otherwise, the compiled code does check the validity of arguments.
+
+\chapter{The C Language Interface}
+ 
+This chapter describes the facility of \ecl{} to interface the C language
+and \ecl{}.  With this facility, the user can arrange his or her C-language
+programs so that they can be invoked from \ecl{}. In addition, the user can
+write Lisp function definitions in the C language to increase runtime
+efficiency.
+
+The basic idea of interfacing the C language is this:  As mentioned
+in Chapter 6, the \ecl{} compiler, given a Lisp source file, creates an
+intermediate C-language program file, called {\emph c-file}, which is
+then compiled by the C-language compiler to obtain the final
+fasl-file.  Usually, the c-file consists of C-language function
+definitions.  The first C-language function in the c-file is the
+``initializer'', which is executed when the fasl file is loaded, and
+the other C-language functions are the C versions of the Lisp
+functions (including macro expansion functions) defined in the source
+file.  By using the top-level macros \code{Clines} and \code{defCfun}
+described below, the user can direct the compiler to insert his or her
+own C-language function definitions and/or C-language preprocessor
+macros such as \code{#define} and \code{#include} into the c-file.  In
+order that such C-language functions be invoked from \ecl{}, another
+top-level macro \code{defentry} is used.  This macro defines a Lisp
+function whose body consists of the calling sequence to the specified
+C-language function.
+
+The C-language function definitions are placed in the c-file in the
+order of the corresponding Lisp functions defined
+in the source file.  That is, the C code for the first Lisp function comes
+first, the C code for the second Lisp function comes second, and so on.  If
+a \code{Clines} or \code{defCfun} macro form appears between two
+Lisp function definitions in the source file, then the C code specified by
+the macro is placed in between the C code for the Lisp functions.
+
+We define some terminology here which is used throughout this Chapter.
+A {\emph C-id} is either a Lisp string consisting of a valid C-language
+identifier, or a Lisp symbol whose print-name, with all its alphabetic
+characters turned into lower case, is a valid C identifier.  Thus the
+symbol \code{foo} is equivalent to the string \code{"foo"} when used as
+a C-id.  Similarly, a {\emph C-expr} is a string or a symbol that may be
+regarded as a C-language expression.  A {\emph C-type} is one of the Lisp
+symbols \code{int, char, float, double,} and \code{object}.  Each
+corresponds to a data type in the C language; \code{object} is the
+type of Lisp object and other C-types are primitive data types in C.
+
+\defmac{Clines}{\mstar{string}}
+When the \ecl{} compiler encounters a macro form  \code{(Clines        
+\var{string1 ...  stringn})}, it simply outputs the \var{strings} into
+the c-file.  The arguments are not evaluated and each argument must be
+a string.  Each \var{string} may consist of any number of lines, and
+separate lines in the \var{string} are placed in separate lines in the
+c-file.  In addition, each \var{string} opens a fresh line in the
+c-file, i.e., the first character in the \var{string} is placed at the
+first column of a line.  Therefore, C-language preprocessor commands
+such as \code{#define} and \code{#include} will be recognized as
+such by the C compiler, if the ' # ' sign appears as the first
+character of the \var{string} or as the first character of a line
+within the \var{string}.
+
+When interpreted, a \code{Clines} macro form expands to \nil.
+
+\enddefmac
+
+
+\defmac{defentry}{\var{function} \var{parameter-list} \var{C-function}}
+
+\code{defentry} defines a Lisp function whose body consists of the
+calling sequence to a C-language function. \var{function} is the name
+of the Lisp function to be defined, and \var{C-function} specifies
+the C function to be invoked. \var{C-function} must be either a list
+\code{(\var{type C-id})} or \var{C-id}, where \var{type} and
+\var{C-id} are the type and the name of the C function. \var{type}
+must be a C-type or the symbol \code{void} which means that the C
+function returns no value.  \code{(object \var{C-id})} may be
+abbreviated as \var{C-id}.  \var{parameter-list} is a list of C-types
+for the parameters of the C function.  For example, the following
+\code{defentry} form defines a Lisp function \code{tak} from which
+the C function \code{tak} above is called.
+
+\enddefmac
+
+\begin{lisp}
+(defentry tak (int int int) (int tak))
+\end{lisp}
+
+The Lisp function \code{tak} defined by this \code{defentry} form
+requires three arguments.  The arguments are converted to
+\code{int} values before they are passed to the C function.  On return
+from the C
+function, the returned \code{int} value is converted
+to a Lisp integer (actually a fixnum)
+and this fixnum will be returned as the value
+of the Lisp function.  See below for
+type conversion between Lisp and the C language.
+
+A \code{defentry} form is treated in the above way only when it
+appears as a top-level form of a Lisp source file.  Otherwise, a
+\code{defentry} form expands to \nil.
+
+\defmac{defla}{\var{name} \var{lambda-list} \mstar{declaration \mor \var{doc-string}}}
+
+When interpreted, \code{defla} is exactly the same as \code{defun}.
+That is, \code{(defla \var{name lambda-list .  body})} expands to
+\code{(defun \var{name lambda-list .  body})}.  However, \code{defla}
+forms are completely ignored by the compiler; no C-language code will be
+generated for \code{defla} forms.  The primary use of \code{defla} is
+to define a Lisp function in two ways within a single Lisp source file;
+one in the C language and the other in Lisp.  \code{defla} is short for
+{\emph DEF}ine {\emph L}isp {\emph A}lternative.
+\enddefmac
+
+Suppose you have a Lisp source file whose contents are:
+
+\begin{lisp} 
+;;; C version of TAK.
+(Clines "
+
+       int tak(x, y, z)                           
+       int x, y, z;
+       {       if (y >= x) return(z);
+               else return(tak(tak(x-1, y, z),
+                               tak(y-1, z, x),
+                               tak(z-1, x, y)));
+      }
+"
+)
+
+;;;  TAK calls the C function tak defined above.
+(defentry tak (int int int) (int tak))
+;;;  The alternative Lisp definition of TAK.
+(defla tak (x y z)
+   (if (>= y x)
+       z
+       (tak (tak (1- x) y z)
+            (tak (1- y) z x)
+            (tak (1- z) x y))))
+\end{lisp}
+
+When this file is loaded into \ecl{}, the interpreter uses the Lisp version
+of the \code{tak} definition.  Once this file has been compiled, and when
+the generated fasl file is loaded into \ecl{}, a function call to \code{tak}
+is actually the call to the C version of \code{tak}.
+
+
+\defun{defCbody}{\var{name} \var{args-types} \var{result-type} \var{C-expr}}
+The \ecl{} compiler produces a function named \var{name} with as many
+arguments as \var{arg-types}.
+The \var{C-expr} is an arbitrary C expression where the arguments to
+the function are denoted by \code{#{\emph i}}, where \code{{\emph i}} is
+the integer corresponding to the argument position.
+The \var{args-types} is the list of \clisp types of the arguments to the
+function, while \var{result-type} is the \clisp type of the result.
+The actual arguments are coerced to the required types before executing
+the \var{C-expr} and the result is converted into a Lisp object.
+\code{defCbody} is ignored by the interpreter.
+\enddefun
+
+For example, the logical AND of two integers could be defined as:
+\begin{lisp}
+(defCbody logand (fixnum fixnum) fixnum "(#0) & (#1)")
+\end{lisp}
+
+\defun{definline}{\var{name} \var{args-types} \var{result-type} \var{C-expr}}
+\code{definline} behaves exactly as \code{defCbody}.
+Moreover, after a \code{definline} definition has been supplied,
+the \ecl{} compiler will expand inline any call to function \var{name} into
+code corresponding to the C language expression \var{C-expr}, provided
+that the actual arguments are of the specified type.
+If the actual arguments cannot be coerced to those types, the inline
+expansion is not performed.
+\code{definline} is ignored by the interpreter.
+
+\enddefun
+
+For example, a function to access the n-th byte of a string and return it
+as an integer can be defined as follows:
+
+\begin{lisp}
+(definline aref-byte (string fixnum) fixnum
+   "(#0)->ust.ust_self[#1]")
+\end{lisp}
+
+The definitions of the C data structures used to represent \clisp
+objects can be found in file \code{ecl.h} in the directory \code{"src/h"}
+of the source distribution.
+
+\ecl{} converts a Lisp object into a C-language data by using the
+\clisp{} function \code{coerce}: For the C-type \code{int} (or
+\code{char}), the object is first coerced to a Lisp integer and the
+least significant 32-bit (or 8-bit) field is used as the C \code{int}
+(or \code{char}).  For the C-type \code{float} (or \code{double}),
+the object is coerced to a short-float (or a long-float) and this
+value is used as the \code{C float} (or \code{double}).  Conversion
+from a C data into a Lisp object is obvious: \code{C char, int,
+float,} and \code{double} become the equivalent Lisp
+\code{character}, \code{fixnum}, \code{short-float}, and
+\code{long-float}, respectively.
+
+Here we list the complete syntax of \code{Clines}, \code{defentry},
+\code{definline} and \code{defCbody} macro forms.
+
+\begin{example}
+Clines-form:
+        (Clines \mstar{ string } )
+
+defentry-form:
+        (defentry symbol
+                ( \mstar{ C-type } )
+                { C-function-name \mor ( { C-type \mor void } C-function-name ) } )
+
+defCbody-form:
+        (defCbody symbol ( \mstar{ type } ) type C-expr)
+
+definline-form:
+        (defCbody symbol ( \mstar{ type } ) type C-expr)
+
+C-function-name:
+C-expr:
+         { string \mor symbol }
+ 
+C-type:
+         { object \mor int \mor char \mor float \mor double }
+\end{example}
+
+\chapter{CLOS}
+
+\defgeneric{add-method}{\var{generic-function} \var{method}}
+\enddefgeneric
+\defmethod{add-method}{(\var{generic-function} standard-generic-function) (\var{method} method)}
+\enddefmethod
+
+\defmac{call-method}{\var{method} \var{next-method-list}}
+\enddefmac
+
+\defun{call-next-method}{\&rest args}
+\enddefun
+
+\defgeneric{change-class}{\var{instance} \var{new-class}}
+\enddefgeneric
+\defmethodx{change-class}{(\var{instance} standard-object) (\var{new-class} standard-class)}
+\enddefmethod
+\defmethodx{change-class}{(\var{instance} t) (\var{new-class} symbol)}
+\enddefmethod
+
+\defgeneric{class-name}{\var{class}}
+\enddefgeneric
+\defmethodx{class-name}{(\var{class} class)}
+\enddefmethod
+
+\defgeneric{(setf class-name)}{\var{new-value} \var{class}}
+\enddefgeneric
+\defmethodx{(setf class-name)}{new-value (class class)}
+\enddefmethod
+
+\defun{class-of}{\var{object}}
+The function \code{class-of} returns the class of which the given
+object is an instance.  The argument to class-of may be any \clisp{} object.
+\enddefun
+
+\defun{compute-applicable-methods}{\var{generic-function} \var{function-arguments}}
+\enddefun
+
+\defmac{defclass}{\var{class-name} (\mstar{superclass-name})}
+        (\mstar{slot-specifier}) \mopt{ ¯class-option }
+\begin{example}
+\var{class-name} ::= \var{symbol}
+\var{superclass-name} ::= \var{symbol}
+\var{slot-specifier} ::= \var{slot-name} \mor (\var{slot-name} \mopt{ \var{slot-option}})
+\var{slot-name} ::= \var{symbol}
+\var{slot-option} ::= \mstar{:reader \var{reader-function-name}}
+        \mor \mstar{:writer \var{writer-function-name}}
+        \mor \mstar{:accessor \var{reader-function-name}}
+        \mor {:allocation \var{allocation-type}}
+        \mor \mstar{:initarg \var{initarg-name}}
+        \mor {:initform \var{form}}
+        \mor {:type \var{type-specifier}}
+        \mor {:documentation \var{string}}
+\var{reader-function-name} ::= \var{symbol}
+\var{writer-function-name} ::= \var{function-name}
+\var{function-name} ::= \var{symbol} \mor(setf \var{symbol})
+\var{initarg-name} ::= \var{symbol}
+\var{allocation-type} ::= :instance \mor :class
+\var{class-option} ::= (:default-initargs \var{initarg-list})
+        \mor (:documentation \var{string})
+        \mor (:metaclass \var{class-name})
+\var{initarg-list} ::= \mstar{\var{initarg-name} \var{default-initial-value-form}} 
+\end{example}
+\enddefmac
+
+\defmac{defgeneric}{\var{function-name} \var{lambda-list}
+        \mopt{\var{option} \mor \mstar{\var{method-description}} }}
+\begin{example}
+\var{function-name} ::= \var{symbol} \mor  (setf \var{symbol})
+\var{lambda-list} ::= (\mstar{\var{var}}
+            \mopt{&optional \mstar{\var{var} \mor (\var{var})} }
+            \mopt{&rest \var{var} }
+            \mopt{&key \mstar{\var{keyword-parameter}} \mopt{&allow-other-keys}})
+\var{keyword-parameter} ::= \var{var} \mor ( {\var{var} \mor (\var{keywordvar} )})
+ \var{option} ::= (:argument-precedence-order \mplus{\var{parameter-name}})
+        \mor(declare \mplus{\var{declaration}})
+        \mor (:documentation \var{string})
+        \mor (:method-combination symbol \mstar{\var{arg}})
+        \mor (:generic-function-class \var{class-name})
+        \mor (:method-class \var{class-name})
+\var{method-description} ::= (:method \mstar{\var{method-qualifier}} \var{specialized-lambda-list}
+                       \mopt{ \mstar{\var{declaration} } \mor \var{documentation} }
+                       \mstar{\var{form}} )
+\var{method-qualifier} ::= \var{non-nil-atom}
+\var{specialized-lambda-list} ::= ( \mstar{\var{var} \mor (\var{var} \var{parameter-specializer-name})}
+            \mopt{&optional \mstar{\var{var} \mor (\var{var} \mopt{\var{initform} \mopt{\var{supplied-p-parameter}}})}}
+            \mopt{&rest \var{var} }
+            \mopt{&key \mstar{\var{specialized-keyword-parameter}} \mopt{&allow-other-keys}})
+            \mopt{&aux \mstar{\var{var} \mor (\var{var} \mopt{\var{initform} })}} )
+\var{specialized-keyword-parameter} ::= \var{var} \mor \mstar{({\var{var} \mor (\var{keywordvar} )} \mopt{\var{initform} \mopt{\var{supplied-p-parameter}}})}
+\var{parameter-specializer-name} ::= \var{symbol} \mor (eql \var{eql-specializer-form})
+\end{example}
+\enddefmac
+
+\defmac{define-method-combination}{\var{name} \mopt{\var{short-form-option} }}
+\enddefmac
+\defmacx{define-method-combination}{\var{name} \var{lambda-list}
+                                ( \mstar{\var{method-group-specifier}} )
+                                \mopt{(:arguments . \var{lambda-list})}
+                                \mopt{(:generic-function \var{generic-fn-symbol} )}
+                                 \mopt{ \mstar{\var{declaration}} \mor \var{doc-string} }
+                                \mstar{\var{form}}}
+\begin{example}
+\var{short-form-option} ::= :documentation \var{string} 
+                        \mor :identity-with-one-argument \var{boolean} 
+                        \mor :operator \var{operator} 
+\var{method-group-specifier} ::= (\var{variable}  {\mplus{\var{qualifier-pattern}}} \mor \var{predicate}
+                            \mopt{ \var{long-form-option}  })
+\var{long-form-option} ::= :description \var{format-string} 
+                        \mor :order \var{order} 
+                        \mor :required \var{boolean}
+\end{example}
+\enddefmac
+
+\defmac{defmethod}{\var{function-name} \mstar{\var{method-qualifier}} \var{specialized-lambda-list}
+        \mopt{ \mstar{\var{declaration}} \mor \var{doc-string} } \mstar{\var{form}}}
+\begin{example}
+\var{function-name} ::= \var{symbol} \mor (setf \var{symbol})
+\var{method-qualifier} ::= \var{non-nil-atom} 
+\var{parameter-specializer-name} ::= \var{symbol} \mor (eql \var{eql-specializer-form} )
+\end{example}
+\enddefmac
+
+\defgeneric{documentation}{\var{x} \&optional \var{doc-type}}
+\enddefgeneric
+\defmethodx{documentation}{(\var{method} standard-method) \&optional \var{doc-type}}
+\enddefmethod
+\defmethodx{documentation}{(\var{generic-function} \var{standard-generic-function})
+                        \keys{\&optional \var{doc-type}}}
+\enddefmethod
+\defmethodx{documentation}{(\var{class} standard-class) \&optional \var{doc-type}}
+\enddefmethod
+\defmethodx{doumentation}{(\var{method-combination} method-combination) \&optional \var{doc-type}}
+\enddefmethod
+\defmethodx{documentation}{(\var{slot-description} standard-slot-description)
+                             \keys{\&optional \var{doc-type}}}
+\enddefmethod
+\defmethodx{documentation}{(\var{symbol} symbol) \&optional \var{doc-type}}
+\enddefmethod
+\defmethodx{documentation}{(\var{list} list) \&optional \var{doc-type}}
+\enddefmethod
+
+\defgeneric{(setf documentation)}{\var{new-value} \var{x} \&optional \var{doc-type}}
+\enddefgeneric
+\defmethodx{(setf documentation)}{\var{new-value} (\var{method} \var{standard-method}) \&optional \var{doc-type}}
+\enddefmethod
+\defmethodx{(setf documentation)}{\var{new-value} (\var{class} standard-class) \&optional \var{doc-type}}
+\enddefmethod
+\defmethodx{(setf documentation)}{\var{new-value} (\var{method-combination} method-combination)}
+\enddefmethod
+\defmethodx{(setf documentation)}{\var{new-value}
+        (\var{slot-description} standard-slot-description) \&optional \var{doc-type}}
+\enddefmethod
+\defmethodx{(setf documentation)}{\var{new-value} (\var{symbol} symbol) \&optional \var{doc-type}}
+\enddefmethod
+\defmethodx{(setf documentation)}{\var{new-value} (\var{list} list) \&optional \var{doc-type}}
+\enddefmethod
+
+\defun{ensure-generic-function}{\var{function-name} \&key \var{lambda-list}
+\keys{:argument-precedence-order :declare :documentation :generic-function-class}
+\morekeys{:method-combination :method-class :environment}}
+\var{function-name} ::= \var{symbol} \mor (setf \var{symbol})
+\enddefun
+
+\defun{find-class}{symbol \&optional errorp environment}
+
+The function find-class returns the class object named by the given symbol in the given environment.
+The first argument to find-class is a symbol. 
+\enddefun
+
+\defgeneric{find-method}{\var{generic-function} \var{method-qualifiers} \var{specializers} \&optional \var{errorp}}
+\enddefgeneric
+\defmethodx{find-method}{(generic-function standard-generic-function)}
+                method-qualifiers specializers  \&optional errorp
+\enddefmethod
+
+\defgeneric{function-keywords}{\var{method}}
+\enddefgeneric
+\defmethodx{function-keywords}{(\var{method} standard-method)}
+\enddefmethod
+
+The generic function function-keywords is used to return the keyword parameter specifiers for a given method.
+
+\defmac{generic-function}{\var{lambda-list} \mchoice{\var{option} \mor \mstar{method-description}}}
+
+\begin{example}
+option ::= (:argument-precedence-order \mplus{parameter-name})
+        \mor (declare \mplus{declaration})
+        \mor (:documentation \var{string})
+        \mor (:method-combination \var{symbol} \mstar{arg} )
+        \mor (:generic-function-class \var{class-name})
+        \mor (:method-class \var{class-name})
+method-description ::= (:method \mstar{method-qualifier}
+                                \var{specialized-lambda-list}
+                                \mstar{\var{declaration} \mor \var{documentation}}
+                                \mstar{form} )
+\end{example}
+The \code{generic-function} macro creates an anonymous generic
+function. The generic function is created with the set of methods
+specified by its method descriptions.  The \var{option},
+\var{method-qualifier}, and \var{specialized-lambda-list} arguments are
+the same as for \code{defgeneric}.  The generic function object is
+returned as the result.  If no method descriptions are specified, an
+anonymous generic function with no methods is created.  See
+\macref{defgeneric}, \macref{generic-flet}, \macref{generic-labels},
+\macref{defmethod}.
+\enddefmac
+
+\defgeneric{initialize-instance}{\var{instance} \&rest \var{initargs}}
+\enddefgeneric
+\defmethodx{initialize-instance}{\var{(instance standard-object)} \&rest
+\var{initargs}}
+
+The generic function \code{initialize-instance} is called by
+\code{make-instance} to initialize a newly created instance.  The
+generic function \code{initialize-instance} is called with the new instance and
+the defaulted initialization arguments.
+\enddefmethod
+
+\defun{invalid-method-error}{\var{method} \var{format-string} \&rest \var{args}}
+
+The function \code{invalid-method-error} is used to signal an error when
+there is an applicable method whose qualifiers are not valid for the
+method combination type.  The error message is constructed by using a
+format string and any arguments to it.  Because an implementation may
+need to add additional contextual information to the error message,
+invalid-method-error should be called only within the dynamic extent
+of a method combination function.  The function invalid-method-error
+is called automatically when a method fails to satisfy every qualifier
+pattern and predicate in a define-method-combination form.  A method
+combination function that imposes additional restrictions should call
+invalid-method-error explicitly if it encounters a method it cannot
+accept.
+\enddefun
+
+\defgeneric{make-instance}{\var{class} \&rest\var{ initargs}}
+\enddefgeneric
+\defmethodx{make-instance}{(\var{class} standard-class) \&rest \var{initargs}}
+\enddefmethod
+\defmethodx{make-instance}{(\var{class} symbol) \&rest \var{initargs}}
+
+The generic function make-instance creates and returns a new instance of
+the given class.  The generic function make-instance may be used as
+described in section 1.9.  The class argument is a class object or a
+symbol that names a class.  The remaining arguments form a list of
+alternating initialization argument names and values.  If the second of
+the above methods is selected, that method invokes make-instance on the
+arguments (find-class class) and initargs.  The initialization arguments
+are checked within make-instance (see section 1.9).  The new instance is
+returned.
+\enddefmethod
+
+\defgeneric{make-instances-obsolete}{\var{class}}
+\enddefgeneric
+\defmethodx{make-instances-obsolete}{(\var{class} standard-class)}
+\enddefmethod
+\defmethodx{make-instances-obsolete}{(\var{class} symbol)}
+\enddefmethod
+
+\defun{method-combination-error}{\var{format-string} \&rest \var{args}}
+
+The function method-combination-error is used to signal an error in method combination.  The error message is constructed by using a format string and any arguments to it.  Because an implementation may need to add additional contextual information to the error message, method-combination-error should be called only within the dynamic extent of a method combination function.
+The format-string argument is a control string that can be given to format, and args are any arguments required by that string.
+\enddefun
+
+\defgeneric{method-qualifiers}{\var{method}}
+\enddefgeneric
+\defmethod{method-qualifiers}{(\var{method} standard-method)}
+
+The generic function method-qualifiers returns a list of the qualifiers of the given method.
+\enddefmethod
+
+\defun{next-method-p}{}
+
+The locally defined function next-method-p can be used within the body
+of a method defined by a method-defining form to determine whether a
+next method exists.
+\enddefun
+
+\defgeneric{no-applicable-method}{\var{generic-function} \&rest \var{function-arguments}}
+\enddefgeneric
+\defmethodx{no-applicable-method}{(\var{generic-function} t) \&rest \var{function-arguments}}
+
+The generic function no-applicable-method is called when a generic function of the class standard-generic-function is invoked and no method on that generic function is applicable. The default method signals an error.
+\enddefmethod
+
+\defgeneric{no-next-method}{\var{generic-function} \var{method} \&rest \var{args}}
+\enddefgeneric
+\defmethodx{no-next-method}{(\var{generic-function} standard-generic-function)
+                    (\var{method} standard-method) \&rest \var{args}}
+\enddefmethod
+
+\defgeneric{print-object}{\var{object} \var{stream}}
+\enddefgeneric
+\defmethodx{print-object}{(\var{object} standard-object) \var{stream}}
+
+The generic function print-object writes the printed representation of an object to a stream.  The function print-object is called by the print system; it should not be called by the user.
+\enddefmethod
+
+\defgeneric{reinitialize-instance}{\var{instance} \&rest \var{initargs}}
+\enddefgeneric
+\defmethodx{reinitialize-instance}{(\var{instance} standard-object) \&rest \var{initargs}}
+
+The generic function reinitialize-instance can be used to change the
+values of local slots according to initialization arguments.  This
+generic function is called by the Meta-Object Protocol.  It can also
+be called by users.
+\enddefmethod
+
+\defgeneric{remove-method}{\var{generic-function} \var{method}}
+\enddefgeneric
+\defmethodx{remove-method}{(\var{generic-function} standard-generic-function) \var{method}}
+
+The generic function remove-method removes a method from a generic
+function.  It destructively modifies the specified generic function
+and returns the modified generic function as its result.
+\enddefmethod
+
+\defgeneric{shared-initialize}{\var{instance slot-names \&rest \var{initargs}}}
+\enddefgeneric
+\defmethodx{shared-initialize}{(\var{instance} standard-object) \var{slot-names} \&rest \var{initargs}}
+
+The generic function shared-initialize is used to fill the slots of an
+instance using initialization arguments and :initform forms.  It is
+called when an instance is created, when an instance is re-initialized,
+when an instance is updated to conform to a redefined class, and when an
+instance is updated to conform to a different class.  The generic
+function \code{shared-initialize} is called by the system-supplied
+primary method for \code{initialize-instance},
+\code{reinitialize-instance},
+\code{update-instance-for-redefined-class}, and
+\code{update-instance-for-different-class}.
+\enddefmethod
+
+\defun{slot-boundp}{\var{instance} \var{slot-name}}
+
+The function slot-boundp tests whether a specific slot in an instance is bound.
+The arguments are the instance and the name of the slot.
+\enddefun
+
+\defun{slot-exists-p}{\var{object} \var{slot-name}}
+
+The function slot-exists-p tests whether the specified object has a
+slot of the given name.  The object argument is any object.  The
+slot-name argument is a symbol.
+\enddefun
+
+\defun{slot-makunbound}{\var{instance} \var{slot-name}}
+
+The function slot-makunbound restores a slot in an instance to the
+unbound state.  The arguments to slot-makunbound are the instance and
+the name of the slot.
+\enddefun
+
+\defgeneric{slot-missing}{\var{class} \var{object} \var{slot-name} \var{operation} \&optional \var{new-value}}
+\defmethodx{slot-missing}{(\var{class} t) \var{object} \var{slot-name} \var{operation} \&optional \var{new-value}}
+
+The generic function slot-missing is invoked when an attempt is made
+to access a slot in an object whose metaclass is standard-class and
+the name of the slot provided is not a name of a slot in that class.
+The default method signals an error.
+\enddefmethod
+
+\defgeneric{slot-unbound}{\var{class} \var{instance} \var{slot-name}}
+\enddefgeneric
+\defmethodx{slot-unbound}{(\var{class} t) \var{instance} \var{slot-name}}
+
+The generic function slot-unbound is called when an unbound slot is
+read in an instance whose metaclass is standard-class. The default
+method signals an error.
+\enddefmethod
+
+\defun{slot-value}{\var{object} \var{slot-name}}
+
+The function slot-value returns the value contained in the slot
+slot-name of the given object.  If there is no slot with that name,
+slot-missing is called.  If the slot is unbound, slot-unbound is
+called.  The macro setf can be used with slot-value to change the
+value of a slot.
+\enddefun
+
+\defgeneric{update-instance-for-different-class}
+        {\var{previous} \var{current} \&rest \var{initargs}}
+\enddefgeneric
+\defmethodx{update-instance-for-different-class}{(\var{previous} standard-object)
+        (\var{currentstandard-object}) \&rest \var{initargs}}
+\enddefmethod
+
+\defgeneric{update-instance-for-redefined-class}
+        {\var{instance} \var{added-slots} \var{discarded-slots} \var{property-list} \&rest \var{initargs}}
+\enddefgeneric
+\defmethodx{update-instance-for-redefined-class}{(\var{instance} standard-object)
+        \var{added-slots} \var{discarded-slots} \var{property-list} \&rest \var{initargs}}
+\enddefmethod
+
+\defmac{with-accessors}{(\mstar{slot-entry}) \var{instance-form} \mstar{\var{declaration}} \mstar{\var{form}}}
+
+The macro with-accessors creates a lexical environment in which
+specified slots are lexically available through their accessors as if
+they were variables.  The macro with-accessors invokes the appropriate
+accessors to access the specified slots.  Both setf and setq can be
+used to set the value of the slot.  The result returned is that
+obtained by executing the forms specified by the body argument.
+\enddefmac
+
+\defmac{with-slots}{(\mstar{\var{slot-entry}}) \var{instance-form} \mstar{declaration} \mstar{form}}
+\begin{example}
+\var{slot-entry} ::= \var{slot-name} \mor (\var{variable-name} \var{slot-name})
+\end{example}
+
+The macro \code{with-slots} creates a lexical context for referring to
+specified slots as though they were variables.  Within such a context
+the value of the slot can be specified by using its slot name, as if it
+were a lexically bound variable.  Both \code{setf} and \code{setq} can
+be used to set the value of the slot.
+\enddefmac
+
+\chapter{Multithread}
+
+The goals of the present design are to provide a minimal set of facilities,
+which stand directly on the core of the {\sc Lisp} computational model, and
+which provide the maximum degree of flexibility to build higher level
+concurrency and synchronization constructs.
+
+In particular we wanted a system which:
+\begin{itemize}
+\item is semantically based
+\item is flexible enough to allow freedom to experiment new constructs
+\item blends with the functional nature of {\sc Lisp}
+\item blends with object-oriented programming
+\end{itemize}
+
+We have achieved this by taking the fundamental concepts of denotational
+description of functional languages like {\sc Lisp} and making them accessible
+within the programming language itself according to the technique of
+reflection \cite{Smith:84}.
+
+We show several examples of how typical concurrent programming
+constructs can be implemented using these primitives.
+
+\section{Model}
+
+The computational model on which our design is based is the functional model
+described with continuation semantics.  Processing happens through steps of
+function application.  Each function invocation is supplied with a
+continuation, representing the continuation of the program.  Normally as the
+last step of each function execution, the continuation is invoked with
+arguments the values to be returned by the function. The continuation will
+then proceed execution with such values.  However the function can instead
+invoke an alternative continuation, discarding the continutation it has
+received. In this way, the function has the ability to alter the flow of
+control of the program.  The theory of denotational semantics shows that
+with this style of description, any arbitrary control construct can be
+programmed.
+
+Our approach has been to take this underlying model and to make it visible
+to the {\sc Lisp} programmer. Control flow proceed normally through function
+calls, unless the program requests to access its continuation. It can then
+decide whether it wants to resume such continuation at the end, thereby
+proceeding normally, or to discard that continuation and proceed in a
+different way. Continuations are first-class objects which can be passed as
+arguments or returned as values from functions.
+
+Given this model of computation, the only addition which is
+necessary to be able to handle concurrency is the ability to
+create multiple threads of execution.
+Control of flow among different threads is obtained just by
+the use of continuations.
+
+\subsection{Threads}
+
+A thread identifies one sequential flow of execution. A thread contains all
+the dynamic information needed by the {\sc Lisp} executor.  A list of active
+threads is managed by a scheduler, which switches execution among them at
+the expiration of a time slice or when a thread gets suspended.
+
+The structure of a thread is roughly as follows:
+\begin{center}
+Thread\\
+\begin{tabular}{|c|}\\
+Function\\
+Run Time Stack(s)\\
+Program Counter\\
+CPU Registers\\
+Next Thread\\
+\end{tabular}
+\end{center}
+
+\subsection{Continuations}
+
+A {\tindexed continuation} represents a thread suspended at a
+particular point in its execution, when it is expecting some
+return values from a procedure call or some arguments to a procedure.
+Since a continuation can be resumed only once, each continuation
+is unique.
+
+\subsection{Concurrency}
+
+Actors can be activated concurrently by means of the send primitive. When
+send is invoked, a new {\emph thread}, is created for processing the message
+by the actor, unless the {\emph actor} is already running. In the latter case,
+the message will be just enqueued within the actor.
+
+During the execution of the actor, any function called within the body of
+the actor will use the stack of the new thread. Only using one of the
+message passing primitives like {\emph send} and {\emph reply} the execution
+will switch to a different stack.
+
+\subsection{Mixed Computations}
+
+In our model computation can proceed in two ways. One way corresponds to the
+traditional sequential execution with function invocation and return, always
+running within a single thread; the second way enables parallel execution
+where function activations proceed concurrently, each one in a separate
+thread.  Activation and exchange of data is obtained with the primitive
+\code{resume}.
+
+A relevant feature or our approach is that the message passing
+primitives are just a generalization of the call/return mechanism,
+and therefore it is possible for the two mechanisms to cohexist
+easily and neatly.
+
+\section{Manual Section}
+
+The present design is structured in two levels.  The first level introduces
+the new data types continuation and thread, and provides a set of primitives
+to create and operate on them.  Using these primitives it is already
+possible to generate and control concurrent computations expressed in terms
+of \clisp{} functions.
+
+The second level is built on top of the facilities of the first level. By
+exploiting the capability to get a hold and manipulate continuations, the
+second level provides a set of constructs for concurrent object oriented
+programming.  Concurrent activities can be generated by using the
+asynchronous send construct.  Synchronization is provided through
+serialization of message processing by an actor.
+
+\subsection{Primitives}
+
+Two new data types are introduced into the language:
+\begin{itemize}
+\item thread
+\item continuation
+\end{itemize}
+
+\subsubsection{Threads}
+
+\defun{make-thread}{\var{function} \keys{:cont :name :size}}
+
+\var{function} may be a compiled-code object, or a lambda-expression, or a
+symbol; in the latter case the global functional value of that symbol is
+used (which cannot be a special form nor a macro). make-thread creates a new
+thread ready to execute \var{function}. The thread is in a
+\cindexed{SUSPENDED} status and does not run. A thread can be put into
+execution only by making a continuation for it and issuing a resume to such
+continuation with a list of arguments.
+
+\var{name} is a symbol or string used to identify the thread.  \var{size}
+is the dimension of the evaluation stack to be used by the thread.
+\enddefun
+
+\defun{deactivate}{\var{thread}}
+
+It stops a \cindexed{RUNNING} \code{thread}, removing it from the queue of
+active threads, and sets its status to \cindexed{STOPPED}. A stopped thread
+can be resumed with reactivate. Signals an error if the thread is not
+\cindexed{RUNNING}.
+\enddefun
+
+\defun{reactivate}{\var{thread}}
+
+Puts a \cindexed{STOPPED} \var{thread} back into the queue of active threads
+for further execution, and sets its status to \cindexed{RUNNING}.  Signals
+an error if the thread is not \cindexed{STOPPED}.
+
+\defun{kill-thread}{\var{thread}}
+
+Stops the thread execution and sets its status to \cindexed{DEAD} so that
+it will not be run by the scheduler any more. If the status of
+the \var{thread} is already \cindexed{DEAD} the function has no effect.
+Returns \nil.
+\enddefun
+
+\defun{thread-status}{\var{thread}}
+
+Returns the status of the \var{thread}, one of the symbols RUNNING,
+\cindexed{SUSPENDED}, \cindexed{STOPPED} or \cindexed{DEAD}.
+.enddefun
+
+\defun{current-thread}{}
+
+It returns the thread within which this function was called.
+.enddefun
+
+\subsubsection{Continuations}
+
+\defun{make-continuation}{\var{thread} \&key \var{cont}}
+
+Builds a unique new continuation for resuming the \var{thread}.
+\var{cont} is an optional continuation to be supplied to the thread.
+Further make-continuations on the same thread are disallowed
+until the last continuation created has been resumed.
+\enddefun
+
+\defun{resume}{\var{continuation} \&rest \var{args}}
+
+Resumes execution of \var{continuation} and passes it the \var{args}.  If
+\var{continuation} was created by make-continuation of a function, the
+behavior is similar to the behavior of a funcall to that function. However
+execution goes on in a separate thread, that is concurrently to the thread
+which is issuing the resume.  Resume returns immediately the thread which
+has been activated.  The thread for continuation must be
+\cindexed{SUSPENDED}, otherwise resume will produce an error. This could
+happen if continuation was created with the result of current-thread and
+that thread has not been suspended. If the continuation had already been
+resumed or timed-out, resume signals an error. If continuation is
+\nil, resume has no effect. Resume reenables make-continuation for the
+thread of \var{continuation}.
+\enddefun
+
+\defun{pass}{\var{continuation} \&rest \var{args}}
+
+same behaviour as \var{resume} except that suspends the current thread.
+\var{pass} does not return.
+\enddefun
+
+\defun{spawn}{\var{function} \&rest \var{args}}
+
+Creates a new thread where \var{function} is applied to the \var{args}.
+Returns immediately the new thread without waiting for the function
+to return.
+
+\code{Spawn} behaves like if it were defined as:
+\begin{lisp}
+(defmacro spawn (function \&rest args)
+        `(resume (make-continuation (make-thread ,function)) ,@ args))
+\end{lisp}
+
+\enddefun
+
+\defun{timeout}{\var{delay} \var{continuation} \var{alternative}}
+
+If after \var{delay} seconds \var{continuation} has not been
+resumed, the \var{alternative} continuation is resumed and
+\var{continuation} is marked as \cindexed{TIMED-OUT}.
+Returns \nil{} immediately.
+.enddefun
+
+\subsubsection{Scheduler}
+
+\defun{disable-scheduler}{}\c should be %disable-scheduler but latex complains.
+
+\code{%disable-scheduler} disables the scheduler, so that the execution
+of the current thread will not be interrupted by the scheduler until the
+function \code{%enable-scheduler} is called. Returns \nil.
+\enddefun
+
+\defun{enable-scheduler}{}\c should be %enable-scheduler but latex complains.
+
+\code{%enable-scheduler} enables the scheduler, so that it will
+time-slice execution among all the \cindexed{RUNNING} threads. Returns
+\nil.
+\enddefun
+
+\defun{suspend}{}\c should be %suspend but latex complains.
+
+\code{%suspend} sets the status of the current thread to
+\cindexed{SUSPENDED} and suspends its execution. The scheduler is
+enabled again in the same way as the function \code{%enable-scheduler}
+does. The thread will proceed execution {\emph only} when a continuation
+referring to the thread will be resumed. In that case \code{suspend}
+will return the values specified by \code{resume}.
+\enddefun
+
+\appendix
+\chapter{\ecl{} Summary}
+
+In this section we list all symbols defined in \ecl{}.
+
+\input{summary.tex}
+
+\begin{thebibliography}{99}
+
+\bibitem {Steele:84}
+Guy L. Steele Jr. et al. ``Common Lisp: the Language'',
+Digital Press, 1984.
+
+\bibitem {Steele:90}
+Guy L. Steele Jr. at al. ``Common Lisp: the Language II'', second edition,
+Digital Press, 1990.
+
+\bibitem {Yuasa:85}
+Taiichi Yuasa and Masami Hagiya ``Kyoto \clisp{} Report'',
+Research Institute for Mathematical Sciences, Kyoto University, 1988.
+
+\bibitem {Smith:84}
+B.C. Smith and J. des Rivieres  ``The Implementation of
+Procedurally Reflective Languages'', {\emph Proc. of the 1984 ACM
+Symposium on LISP and Functional Programming}, 1984.
+
+\end{thebibliography}
+
+\twocolumn
+\node Function Index, Top, First Chapter, Top
+\unnumbered{Function Index}
+\printindex{fn}
+
+\node Variable Index, Top, First Chapter, Top
+\unnumbered{Variable Index}
+\printindex{vr}
+
+\c\node Keyword Index, Top, First Chapter, Top
+\c\unnumbered{Keyword Index}
+\c\printindex{ky}
+
+\c\node Concept Index, Top, First Chapter, Top
+\c\unnumbered{Concept Index}
+\c\printindex{cp}
+
+\end{document}

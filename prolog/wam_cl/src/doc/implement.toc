@@ -1,0 +1,17 @@
+\contentsline {section}{\numberline {0.1}ECL is a full {\psc Common Lisp}{} system.}{1}
+\contentsline {section}{\numberline {0.2}ECL is written in C and Lisp}{1}
+\contentsline {section}{\numberline {0.3}Porting ECL}{2}
+\contentsline {subsection}{\numberline {0.3.1}Objects Representation}{2}
+\contentsline {subsection}{\numberline {0.3.2}The heap}{3}
+\contentsline {subsection}{\numberline {0.3.3}ECL stacks}{3}
+\contentsline {subsection}{\numberline {0.3.4}Procedure Call Conventions}{4}
+\contentsline {subsection}{\numberline {0.3.5}The interpreter}{4}
+\contentsline {subsection}{\numberline {0.3.6}The Invocation History Stack}{4}
+\contentsline {section}{\numberline {0.4}The ECL Compiler}{6}
+\contentsline {subsection}{\numberline {0.4.1}The compiler mimics human C programmer}{7}
+\contentsline {subsubsection}{\numberline {0.4.1.1}Implementation of Compiled Closures}{7}
+\contentsline {subsection}{\numberline {0.4.2}Use of Declarations to Improve Efficiency}{8}
+\contentsline {subsection}{\numberline {0.4.3}Inspecting generated C code}{9}
+\contentsline {section}{\numberline {0.5}The C language interface}{10}
+\contentsline {subsection}{\numberline {0.5.1}ECL size}{10}
+\contentsline {subsection}{\numberline {0.5.2}Gabriel's benchmark}{10}

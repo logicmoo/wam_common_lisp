@@ -1,0 +1,1780 @@
+\defunx{*}{\&rest \var{numbers} }
+\enddefun
+\defvarx{*}
+\enddefvar
+\defvarx{**}
+\enddefvar
+\defvarx{***}
+\enddefvar
+\defvarx{*applyhook*}
+\enddefvar
+\defvarx{*break-enable*}
+\enddefvar
+\defvarx{*break-on-warnings*}
+\enddefvar
+\defvarx{*cc*}[compiler]
+\enddefvar
+\defvarx{*compile-print*}[compiler]
+\enddefvar
+\defvarx{*compile-verbose*}[compiler]
+\enddefvar
+\defvarx{*gc-verbose*}[system]
+\enddefvar
+\defvarx{*debug-io*}
+\enddefvar
+\defvarx{*default-pathname-defaults*}
+\enddefvar
+\defvarx{*error-output*}
+\enddefvar
+\defvarx{*eval-when-compile*}
+\enddefvar
+\defvarx{*evalhook*}
+\enddefvar
+\defvarx{*features*}
+\enddefvar
+\defvarx{*ignore-eof-on-terminal-io*}[system]
+\enddefvar
+\defvarx{*ignore-maximum-pages*}
+\enddefvar
+\defvarx{*indent-formatted-output*}[system]
+\enddefvar
+\defvarx{*interrupt-enable*}[system]
+\enddefvar
+\defvarx{*lisp-init-file-list*}[system]
+\enddefvar
+\defvarx{*lisp-maxpages*}[system]
+\enddefvar
+\defvarx{*load-verbose*}
+\enddefvar
+\defvarx{*macroexpand-hook*}
+\enddefvar
+\defunx{*make-constant}[system]{\var{symbol} \var{value} }
+\enddefun
+\defunx{*make-special}[system]{\var{symbol} }
+\enddefun
+\defvarx{*modules*}
+\enddefvar
+\defvarx{*gc-verbose*}[system]
+\enddefvar
+\defvarx{*package*}
+\enddefvar
+\defvarx{*print-array*}
+\enddefvar
+\defvarx{*print-base*}
+\enddefvar
+\defvarx{*print-case*}
+\enddefvar
+\defvarx{*print-circle*}
+\enddefvar
+\defvarx{*print-escape*}
+\enddefvar
+\defvarx{*print-gensym*}
+\enddefvar
+\defvarx{*print-length*}
+\enddefvar
+\defvarx{*print-level*}
+\enddefvar
+\defvarx{*print-pretty*}
+\enddefvar
+\defvarx{*print-radix*}
+\enddefvar
+\defvarx{*query-io*}
+\enddefvar
+\defvarx{*random-state*}
+\enddefvar
+\defvarx{*read-base*}
+\enddefvar
+\defvarx{*read-default-float-format*}
+\enddefvar
+\defvarx{*read-suppress*}
+\enddefvar
+\defvarx{*readtable*}
+\enddefvar
+\defvarx{*standard-input*}
+\enddefvar
+\defvarx{*standard-output*}
+\enddefvar
+\defvarx{*suppress-compiler-notes*}[compiler]
+\enddefvar
+\defvarx{*suppress-compiler-warnings*}[compiler]
+\enddefvar
+\defvarx{*system-directory*}[system]
+\enddefvar
+\defvarx{*terminal-io*}
+\enddefvar
+\defvarx{*trace-output*}
+\enddefvar
+\defunx{+}{\&rest \var{numbers} }
+\enddefun
+\defvarx{+}
+\enddefvar
+\defvarx{++}
+\enddefvar
+\defvarx{+++}
+\enddefvar
+\defunx{-}{\var{number} \&rest \var{more-numbers} }
+\enddefun
+\defvarx{-}
+\enddefvar
+\defunx{/}{\var{number} \&rest \var{more-numbers} }
+\enddefun
+\defvarx{/}
+\enddefvar
+\defvarx{//}
+\enddefvar
+\defvarx{///}
+\enddefvar
+\defunx{/=}{\var{number} \&rest \var{more-numbers} }
+\enddefun
+\defunx{1+}{\var{number} }
+\enddefun
+\defunx{1-}{\var{number} }
+\enddefun
+\defunx{<}{\var{number} \&rest \var{more-numbers} }
+\enddefun
+\defunx{<=}{\var{number} \&rest \var{more-numbers} }
+\enddefun
+\defunx{=}{\var{number} \&rest \var{more-numbers} }
+\enddefun
+\defunx{>}{\var{number} \&rest \var{more-numbers} }
+\enddefun
+\defunx{>=}{\var{number} \&rest \var{more-numbers} }
+\enddefun
+\defunx{abs}{\var{number} }
+\enddefun
+\defunx{acons}{\var{key} \var{datum} \var{alist} }
+\enddefun
+\defunx{acos}{\var{number} }
+\enddefun
+\defunx{acosh}{\var{number} }
+\enddefun
+\defunx{adjoin}{\var{item} \var{list} \&key (\var{key} #'identity ) (\var{test} #'eql ) \var{test-not} }
+\enddefun
+\defunx{adjust-array}{\var{array} \var{dimensions} \&key (\var{element-type} (array-element-type array) ) \var{initial-element} (\var{initial-contents} nil ) (\var{fill-pointer} nil ) (\var{displaced-to} nil ) (\var{displaced-index-offset} 0 ) }
+\enddefun
+\defunx{adjustable-array-p}{\var{array} }
+\enddefun
+\defunx{allocate}[system]{\var{type} \var{number} \&optional (\var{really-allocate} nil ) }
+\enddefun
+\defunx{allocate-contiguous-pages}[system]{\var{number} \&optional (\var{really-allocate} nil ) }
+\enddefun
+\defunx{allocate-gfun}[system]{\var{name} \var{arity} \var{hash-table} }
+\enddefun
+\defunx{allocate-instance}[system]{\var{class} \var{length} }
+\enddefun
+\defunx{allocate-relocatable-pages}[system]{\var{number} }
+\enddefun
+\defunx{allocated-contiguous-pages}[system]{}
+\enddefun
+\defunx{allocated-pages}[system]{\var{type} }
+\enddefun
+\defunx{allocated-relocatable-pages}[system]{}
+\enddefun
+\defunx{alpha-char-p}{\var{char} }
+\enddefun
+\defunx{alphanumericp}{\var{char} }
+\enddefun
+\defspecx{and}{(and {form}*)}
+\enddefspec
+\defunx{append}{\&rest \var{lists} }
+\enddefun
+\defunx{apply}{\var{function} \var{arg} \&rest \var{more-args} }
+\enddefun
+\defunx{applyhook}{\var{function} \var{list} \var{evalhookfn} \var{applyhookfn} \&optional (\var{env} nil ) }
+\enddefun
+\defunx{apropos}{\var{string} \&optional (\var{package} nil ) }
+\enddefun
+\defunx{apropos-list}{\var{string} \&optional (\var{package} nil ) }
+\enddefun
+\defunx{aref}{\var{array} \&rest \var{indexes} }
+\enddefun
+\defunx{argc}[system]{}
+\enddefun
+\defunx{arglist}{(SYMBOL)}
+\enddefun
+\defunx{argv}[system]{\var{n} }
+\enddefun
+\deftypex{array}
+\enddeftype
+\defunx{array-dimension}{\var{array} \var{n} }
+\enddefun
+\defvarx{array-dimension-limit}
+\enddefvar
+\defunx{array-dimensions}{\var{array} }
+\enddefun
+\defunx{array-element-type}{\var{array} }
+\enddefun
+\defunx{array-has-fill-pointer-p}{\var{array} }
+\enddefun
+\defunx{array-in-bounds-p}{\var{array} \&rest \var{indexes} }
+\enddefun
+\defunx{array-rank}{\var{array} }
+\enddefun
+\defvarx{array-rank-limit}
+\enddefvar
+\defunx{array-row-major-index}{\var{array} \&rest \var{indexes} }
+\enddefun
+\defunx{array-total-size}{\var{array} }
+\enddefun
+\defvarx{array-total-size-limit}
+\enddefvar
+\defunx{arrayp}{\var{x} }
+\enddefun
+\defunx{ash}{\var{integer} \var{count} }
+\enddefun
+\defunx{asin}{\var{number} }
+\enddefun
+\defunx{asinh}{\var{number} }
+\enddefun
+\defmacx{assert}{(assert form [({place}*) [string {arg}*]])}
+\enddefmac
+\defunx{assoc}{\var{item} \var{alist} \&key (\var{test} #'eql ) \var{test-not} (\var{key} #'identity ) }
+\enddefun
+\defunx{assoc-if}{\var{test} \var{alist} }
+\enddefun
+\defunx{assoc-if-not}{\var{test} \var{alist} }
+\enddefun
+\defunx{atan}{\var{x} \&optional (\var{y} 1 ) }
+\enddefun
+\defunx{atanh}{\var{number} }
+\enddefun
+\deftypex{atom}
+\enddeftype
+\defunx{atom}{\var{x} }
+\enddefun
+\defunx{bds-val}[system]{\var{n} }
+\enddefun
+\defunx{bds-var}[system]{\var{n} }
+\enddefun
+\deftypex{bignum}
+\enddeftype
+\deftypex{bit}
+\enddeftype
+\defunx{bit}{\var{bit-array} \&rest \var{indexes} }
+\enddefun
+\defunx{bit-and}{\var{bit-array1} \var{bit-array2} \&optional (\var{result} nil ) }
+\enddefun
+\defunx{bit-andc1}{\var{bit-array1} \var{bit-array2} \&optional (\var{result} nil ) }
+\enddefun
+\defunx{bit-andc2}{\var{bit-array1} \var{bit-array2} \&optional (\var{result} nil ) }
+\enddefun
+\defunx{bit-eqv}{\var{bit-array1} \var{bit-array2} \&optional (\var{result} nil ) }
+\enddefun
+\defunx{bit-ior}{\var{bit-array1} \var{bit-array2} \&optional (\var{result} nil ) }
+\enddefun
+\defunx{bit-nand}{\var{bit-array1} \var{bit-array2} \&optional (\var{result} nil ) }
+\enddefun
+\defunx{bit-nor}{\var{bit-array1} \var{bit-array2} \&optional (\var{result} nil ) }
+\enddefun
+\defunx{bit-not}{\var{bit-array} \&optional (\var{result} nil ) }
+\enddefun
+\defunx{bit-orc1}{\var{bit-array1} \var{bit-array2} \&optional (\var{result} nil ) }
+\enddefun
+\defunx{bit-orc2}{\var{bit-array1} \var{bit-array2} \&optional (\var{result} nil ) }
+\enddefun
+\deftypex{bit-vector}
+\enddeftype
+\defunx{bit-vector-p}{\var{x} }
+\enddefun
+\defunx{bit-xor}{\var{bit-array1} \var{bit-array2} \&optional (\var{result} nil ) }
+\enddefun
+\defspecx{block}{(block name {form}*)}
+\enddefspec
+\defunx{boole}{\var{op} \var{integer1} \var{integer2} }
+\enddefun
+\defvarx{boole-1}
+\enddefvar
+\defvarx{boole-2}
+\enddefvar
+\defvarx{boole-and}
+\enddefvar
+\defvarx{boole-andc1}
+\enddefvar
+\defvarx{boole-andc2}
+\enddefvar
+\defvarx{boole-c1}
+\enddefvar
+\defvarx{boole-c2}
+\enddefvar
+\defvarx{boole-clr}
+\enddefvar
+\defvarx{boole-eqv}
+\enddefvar
+\defvarx{boole-ior}
+\enddefvar
+\defvarx{boole-nand}
+\enddefvar
+\defvarx{boole-nor}
+\enddefvar
+\defvarx{boole-orc1}
+\enddefvar
+\defvarx{boole-orc2}
+\enddefvar
+\defvarx{boole-set}
+\enddefvar
+\defvarx{boole-xor}
+\enddefvar
+\defunx{both-case-p}{\var{char} }
+\enddefun
+\defunx{boundp}{\var{symbol} }
+\enddefun
+\defunx{break}{\&optional (\var{format-string} nil ) \&rest \var{args} }
+\enddefun
+\defunx{butlast}{\var{list} \&optional (\var{n} 1 ) }
+\enddefun
+\defunx{quit}{}
+\enddefun
+\defunx{byte}{\var{size} \var{position} }
+\enddefun
+\defunx{byte-position}{\var{byte} }
+\enddefun
+\defunx{byte-size}{\var{byte} }
+\enddefun
+\defunx{caaaar}{\var{x} }
+\enddefun
+\defunx{caaadr}{\var{x} }
+\enddefun
+\defunx{caaar}{\var{x} }
+\enddefun
+\defunx{caadar}{\var{x} }
+\enddefun
+\defunx{caaddr}{\var{x} }
+\enddefun
+\defunx{caadr}{\var{x} }
+\enddefun
+\defunx{caar}{\var{x} }
+\enddefun
+\defunx{cadaar}{\var{x} }
+\enddefun
+\defunx{cadadr}{\var{x} }
+\enddefun
+\defunx{cadar}{\var{x} }
+\enddefun
+\defunx{caddar}{\var{x} }
+\enddefun
+\defunx{cadddr}{\var{x} }
+\enddefun
+\defunx{caddr}{\var{x} }
+\enddefun
+\defunx{cadr}{\var{x} }
+\enddefun
+\defvarx{call-arguments-limit}
+\enddefvar
+\defunx{car}{\var{x} }
+\enddefun
+\defspecx{case}{(case keyform {({key | ({key}*)} {form}*)}*)}
+\enddefspec
+\defspecx{catch}{(catch tag-form {form}*)}
+\enddefspec
+\defunx{catch-bad-signals}[system]{}
+\enddefun
+\defmacx{ccase}{(ccase place {({key | ({key}*)} {form}*)}*)}
+\enddefmac
+\defunx{cdaaar}{\var{x} }
+\enddefun
+\defunx{cdaadr}{\var{x} }
+\enddefun
+\defunx{cdaar}{\var{x} }
+\enddefun
+\defunx{cdadar}{\var{x} }
+\enddefun
+\defunx{cdaddr}{\var{x} }
+\enddefun
+\defunx{cdadr}{\var{x} }
+\enddefun
+\defunx{cdar}{\var{x} }
+\enddefun
+\defunx{cddaar}{\var{x} }
+\enddefun
+\defunx{cddadr}{\var{x} }
+\enddefun
+\defunx{cddar}{\var{x} }
+\enddefun
+\defunx{cdddar}{\var{x} }
+\enddefun
+\defunx{cddddr}{\var{x} }
+\enddefun
+\defunx{cdddr}{\var{x} }
+\enddefun
+\defunx{cddr}{\var{x} }
+\enddefun
+\defunx{cdr}{\var{x} }
+\enddefun
+\defunx{ceiling}{\var{number} \&optional (\var{divisor} 1 ) }
+\enddefun
+\defunx{cerror}{\var{continue-format-string} \var{error-format-string} \&rest \var{args} }
+\enddefun
+\defunx{change-instance}[system]{\var{instance} \var{class} \var{length} }
+\enddefun
+\defunx{char}{\var{string} \var{index} }
+\enddefun
+\defunx{char-bit}{\var{char} \var{name} }
+\enddefun
+\defunx{char-bits}{\var{char} }
+\enddefun
+\defvarx{char-bits-limit}
+\enddefvar
+\defunx{char-code}{\var{char} }
+\enddefun
+\defvarx{char-code-limit}
+\enddefvar
+\defvarx{char-control-bit}
+\enddefvar
+\defunx{char-downcase}{\var{char} }
+\enddefun
+\defunx{char-equal}{\var{char} \&rest \var{more-chars} }
+\enddefun
+\defunx{char-font}{\var{char} }
+\enddefun
+\defvarx{char-font-limit}
+\enddefvar
+\defunx{char-greaterp}{\var{char} \&rest \var{more-chars} }
+\enddefun
+\defvarx{char-hyper-bit}
+\enddefvar
+\defunx{char-int}{\var{char} }
+\enddefun
+\defunx{char-lessp}{\var{char} \&rest \var{more-chars} }
+\enddefun
+\defvarx{char-meta-bit}
+\enddefvar
+\defunx{char-name}{\var{char} }
+\enddefun
+\defunx{char-not-equal}{\var{char} \&rest \var{more-chars} }
+\enddefun
+\defunx{char-not-greaterp}{\var{char} \&rest \var{more-chars} }
+\enddefun
+\defunx{char-not-lessp}{\var{char} \&rest \var{more-chars} }
+\enddefun
+\defvarx{char-super-bit}
+\enddefvar
+\defunx{char-upcase}{\var{char} }
+\enddefun
+\defunx{char/=}{\var{char} \&rest \var{more-chars} }
+\enddefun
+\defunx{char<}{\var{char} \&rest \var{more-chars} }
+\enddefun
+\defunx{char<=}{\var{char} \&rest \var{more-chars} }
+\enddefun
+\defunx{char=}{\var{char} \&rest \var{more-chars} }
+\enddefun
+\defunx{char>}{\var{char} \&rest \var{more-chars} }
+\enddefun
+\defunx{char>=}{\var{char} \&rest \var{more-chars} }
+\enddefun
+\deftypex{character}
+\enddeftype
+\defunx{character}{\var{x} }
+\enddefun
+\defunx{characterp}{\var{x} }
+\enddefun
+\defunx{chdir}[system]{\var{filespec} }
+\enddefun
+\defmacx{check-type}{(check-type place typespec [string-form])}
+\enddefmac
+\defunx{cis}{\var{radians} }
+\enddefun
+\defunx{clear-input}{\&optional (\var{stream} *standard-input* ) }
+\enddefun
+\defunx{clear-output}{\&optional (\var{stream} *standard-output* ) }
+\enddefun
+\defmacx{clines}{(clines {string}*)}
+\enddefmac
+\defunx{close}{\var{stream} \&key (\var{abort} nil ) }
+\enddefun
+\defunx{clrhash}{\var{hash-table} }
+\enddefun
+\defunx{code-char}{\var{code} \&optional (\var{bits} 0 ) (\var{font} 0 ) }
+\enddefun
+\defunx{coerce}{\var{x} \var{type} }
+\enddefun
+\deftypex{common}
+\enddeftype
+\defunx{commonp}{\var{x} }
+\enddefun
+\defunx{compile}{\var{name} \&optional (\var{definition} nil ) }
+\enddefun
+\defunx{compile-file}{\var{input-pathname} \&key \var{output-file} (\var{load} nil ) (\var{o-file} t ) (\var{c-file} nil ) (\var{h-file} nil ) (\var{data-file} nil ) }
+\enddefun
+\deftypex{compiled-function}
+\enddeftype
+\defunx{compiled-function-name}[system]{\var{compiled-function} }
+\enddefun
+\defunx{compiled-function-p}{\var{x} }
+\enddefun
+\defspecx{compiler-let}{(compiler-let ({var | (var [value])}*) {form}*)}
+\enddefspec
+\deftypex{complex}
+\enddeftype
+\defunx{complex}{\var{realpart} \&optional (\var{imagpart} 0 ) }
+\enddefun
+\defunx{complexp}{\var{x} }
+\enddefun
+\defunx{concatenate}{\var{type} \&rest \var{sequences} }
+\enddefun
+\defspecx{cond}{(cond {(test {form}*)}*)}
+\enddefspec
+\defunx{conjugate}{\var{number} }
+\enddefun
+\deftypex{cons}
+\enddeftype
+\defunx{cons}{\var{x} \var{y} }
+\enddefun
+\defunx{consp}{\var{x} }
+\enddefun
+\defunx{constantp}{\var{x} }
+\enddefun
+\defunx{copy-alist}{\var{alist} }
+\enddefun
+\defunx{copy-list}{\var{list} }
+\enddefun
+\defunx{copy-readtable}{\&optional (\var{readtable} *readtable* ) (\var{to-readtable} nil ) }
+\enddefun
+\defunx{copy-seq}{\var{sequence} }
+\enddefun
+\defunx{copy-symbol}{\var{symbol} \&optional (\var{flag} nil ) }
+\enddefun
+\defunx{copy-tree}{\var{tree} }
+\enddefun
+\defunx{cos}{\var{radians} }
+\enddefun
+\defunx{cosh}{\var{number} }
+\enddefun
+\defunx{count}{\var{item} \var{sequence} \&key (\var{key} #'identity ) (\var{test} #'eql ) \var{test-not} (\var{start} 0 ) (\var{end} (length sequence) ) (\var{from-end} nil ) }
+\enddefun
+\defunx{count-if}{\var{test} \var{sequence} \&key (\var{key} #'identity ) (\var{start} 0 ) (\var{end} (length sequence) ) (\var{from-end} nil ) }
+\enddefun
+\defunx{count-if-not}{\var{test} \var{sequence} (\var{start} 0 ) (\var{end} (length sequence) ) (\var{from-end} nil ) }
+\enddefun
+\defmacx{ctypecase}{(ctypecase place {(type {form}*)}*)}
+\enddefmac
+\defunx{daylight-saving-time-p}[system]{}
+\enddefun
+\defspecx{decf}{(decf place [form])}
+\enddefspec
+\defspecx{declare}{(declare {decl-spec}*)}
+\enddefspec
+\defunx{decode-float}{\var{float} }
+\enddefun
+\defunx{decode-universal-time}{\var{integer} \&optional (\var{timezone} (get-local-time-zone) ) }
+\enddefun
+\defmacx{defcbody}{(defcbody symbol ({arg-type}*) value-type body)}
+\enddefmac
+\defmacx{defcfun}{(defcfun header n {element}*)}
+\enddefmac
+\defmacx{defconstant}{(defconstant symbol form [doc])}
+\enddefmac
+\defmacx{defentry}{(defentry symbol ({arg-type}*) (value-type function-name))}
+\enddefmac
+\defmacx{define-modify-macro}{(define-modify-macro symbol lambda-list function-name [doc])}
+\enddefmac
+\defmacx{define-setf-method}{(define-setf-method symbol defmacro-lambda-list {decl | doc}*
+          {form}*)}
+\enddefmac
+\defmacx{definline}{(definline symbol ({arg-type}*) value-type body)}
+\enddefmac
+\defmacx{defla}{(defla name lambda-list {decl | doc}* {form}*)}
+\enddefmac
+\defmacx{defmacro}{(defmacro name defmacro-lambda-list {decl | doc}* {form}*)}
+\enddefmac
+\defmacx{defparameter}{(defparameter name form [doc])}
+\enddefmac
+\defmacx{defsetf}{(defsetf symbol update-fun [doc] )}
+\enddefmac
+\defmacx{defstruct}{(defstruct
+         {name | (name {:conc-name | (:conc-name prefix-string) |
+                        :constructor | (:constructor symbol [lambda-list]) |
+                        :copier | (:copier symbol) |
+                        :predicate | (:predicate symbol) |
+                        (:include symbol) |
+                        (:print-function function) |
+                        (:type {vector | (vector type) | list}) |
+                        :named |
+                        (:initial-offset number)}*)}
+         [doc]
+         {slot-name |
+          (slot-name [default-value-form] {:type type | :read-only flag}*) }*
+         )}
+\enddefmac
+\defmacx{deftype}{(deftype name lambda-list {decl | doc}* {form}*)}
+\enddefmac
+\defspecx{defun}{(defun name lambda-list {decl | doc}* {form}*)}
+\enddefspec
+\defmacx{defunc}{(defunc symbol lambda-list {string}*)}
+\enddefmac
+\defmacx{defvar}{(defvar name [form [doc]])}
+\enddefmac
+\defunx{delete}{\var{item} \var{sequence} \&key (\var{key} #'identity ) (\var{test} #'eql ) \var{test-not} (\var{start} 0 ) (\var{end} (length sequence) ) (\var{count} most-positive-fixnum ) (\var{from-end} nil ) }
+\enddefun
+\defunx{delete-duplicates}{\var{sequence} \&key (\var{key} #'identity ) (\var{test} #'eql ) \var{test-not} (\var{start} 0 ) (\var{end} (length sequence) ) (\var{from-end} nil ) }
+\enddefun
+\defunx{delete-file}{\var{filespec} }
+\enddefun
+\defunx{delete-if}{\var{test} \var{sequence} \&key (\var{key} #'identity ) (\var{start} 0 ) (\var{end} (length sequence) ) (\var{count} most-positive-fixnum ) (\var{from-end} nil ) }
+\enddefun
+\defunx{delete-if-not}{\var{test} \var{sequence} \&key (\var{key} #'identity ) (\var{start} 0 ) (\var{end} (length sequence) ) (\var{count} most-positive-fixnum ) (\var{from-end} nil ) }
+\enddefun
+\defunx{denominator}{\var{rational} }
+\enddefun
+\defunx{deposit-field}{\var{integer1} \var{bytespec} \var{integer2} }
+\enddefun
+\defunx{describe}{\var{x} }
+\enddefun
+\defunx{digit-char}{\var{digit} \&optional (\var{n} 10 ) (\var{font} 0 ) }
+\enddefun
+\defunx{digit-char-p}{\var{char} \&optional (\var{n} 10 ) }
+\enddefun
+\defunx{directory}{\var{filespec} }
+\enddefun
+\defunx{directory-namestring}{\var{filespec} }
+\enddefun
+\defunx{disassemble}{\&optional (\var{thing} nil ) \&key (\var{h-file} nil ) (\var{data-file} nil ) }
+\enddefun
+\defunx{displaced-array-p}[system]{\var{array} }
+\enddefun
+\defspecx{do}{(do ({(var [init [step]])}*) (test {result}*)
+          {decl}* {tag | statement}*)}
+\enddefspec
+\defspecx{do*}{(do* ({(var [init [step]])}*) (test {result}*)
+          {decl}* {tag | statement}*)}
+\enddefspec
+\defmacx{do-all-symbols}{(do-all-symbols (var [result]) {decl}* {tag | statement}*)}
+\enddefmac
+\defmacx{do-external-symbols}{(do-external-symbols (var [package [result]])
+          {decl}* {tag | statement}*)}
+\enddefmac
+\defmacx{do-symbols}{(do-symbols (var [package [result]])
+          {decl}* {tag | statement}*)}
+\enddefmac
+\defunx{documentation}{\var{symbol} \var{doc-type} }
+\enddefun
+\defspecx{dolist}{(dolist (var form [result])
+          {decl}* {tag | statement}*)}
+\enddefspec
+\deftypex{double-float}
+\enddeftype
+\defspecx{dotimes}{(dotimes (var form [result])
+          {decl}* {tag | statement}*)}
+\enddefspec
+\defvarx{double-float-epsilon}
+\enddefvar
+\defvarx{double-float-negative-epsilon}
+\enddefvar
+\defunx{dpb}{\var{newbyte} \var{bytespec} \var{integer} }
+\enddefun
+\defunx{dribble}{\&optional \var{filespec} }
+\enddefun
+\defmacx{ecase}{(ecase keyform {({key | ({key}*)} {form}*)}*)}
+\enddefmac
+\defunx{ed}{\&optional \var{x} }
+\enddefun
+\defunx{eighth}{\var{x} }
+\enddefun
+\defunx{elt}{\var{sequence} \var{n} }
+\enddefun
+\defunx{encode-universal-time}{\var{second} \var{minute} \var{hour} \var{date} \var{month} \var{year} \&optional (\var{timezone} (get-local-time-zone) ) }
+\enddefun
+\defunx{endp}{\var{x} }
+\enddefun
+\defunx{enough-namestring}{\var{filespec} \&optional (\var{defaults} *default-pathname-defaults* ) }
+\enddefun
+\defunx{eq}{\var{x} \var{y} }
+\enddefun
+\defunx{eql}{\var{x} \var{y} }
+\enddefun
+\defunx{equal}{\var{x} \var{y} }
+\enddefun
+\defunx{equalp}{\var{x} \var{y} }
+\enddefun
+\defunx{error}{\var{format-string} \&rest \var{args} }
+\enddefun
+\defunx{error-set}[system]{\var{form} }
+\enddefun
+\defmacx{etypecase}{(etypecase keyform {(type {form}*)}*)}
+\enddefmac
+\defunx{eval}{\var{form} }
+\enddefun
+\defspecx{eval-when}{(eval-when ({situation}*) {form}*)}
+\enddefspec
+\defunx{evalhook}{\var{form} \var{fun1} \var{fun2} \&optional (\var{env} nil ) }
+\enddefun
+\defunx{evenp}{\var{integer} }
+\enddefun
+\defunx{every}{\var{predicate} \var{sequence} \&rest \var{more-sequences} }
+\enddefun
+\defunx{exp}{\var{number} }
+\enddefun
+\defunx{export}{\var{symbol} \&optional (\var{package} *package* ) }
+\enddefun
+\defunx{expt}{\var{number1} \var{number2} }
+\enddefun
+\defunx{faslink}[system]{\var{filespec} \var{string} }
+\enddefun
+\defunx{fboundp}{\var{symbol} }
+\enddefun
+\defunx{fceiling}{\var{number} \&optional (\var{divisor} 1 ) }
+\enddefun
+\defunx{ffloor}{\var{number} \&optional (\var{divisor} 1 ) }
+\enddefun
+\defunx{fifth}{\var{x} }
+\enddefun
+\defunx{file-author}{\var{filespec} }
+\enddefun
+\defunx{file-length}{\var{file-stream} }
+\enddefun
+\defunx{file-namestring}{\var{filespec} }
+\enddefun
+\defunx{file-position}{\var{file-stream} \&optional \var{file-position} }
+\enddefun
+\defunx{file-write-date}{\var{filespec} }
+\enddefun
+\defunx{fill}{\var{sequence} \var{item} \&key (\var{start} 0 ) (\var{end} (length sequence) ) }
+\enddefun
+\defunx{fill-pointer}{\var{vector} }
+\enddefun
+\defunx{find}{\var{item} \var{sequence} \&key (\var{key} #'identity ) (\var{test} #'eql ) \var{test-not} (\var{start} 0 ) (\var{end} (length sequence) ) (\var{from-end} nil ) }
+\enddefun
+\defunx{find-all-symbols}{\var{string} }
+\enddefun
+\defunx{find-if}{\var{test} \var{sequence} \&key (\var{key} #'identity ) (\var{start} 0 ) (\var{end} (length sequence) ) (\var{from-end} nil ) }
+\enddefun
+\defunx{find-if-not}{\var{test} \var{sequence} \&key (\var{key} #'identity ) (\var{start} 0 ) (\var{end} (length sequence) ) (\var{from-end} nil ) }
+\enddefun
+\defunx{find-package}{\var{name} }
+\enddefun
+\defunx{find-symbol}{\var{string} \&optional (\var{package} *package* ) }
+\enddefun
+\defunx{finish-output}{\&optional (\var{stream} *standard-output* ) }
+\enddefun
+\defunx{first}{\var{x} }
+\enddefun
+\defunx{fixnump}[system]{\var{x} }
+\enddefun
+\deftypex{fixnum}
+\enddeftype
+\defspecx{flet}{(flet ({(name lambda-list {decl | doc}* {form}*)}*) . body)}
+\enddefspec
+\deftypex{float}
+\enddeftype
+\defunx{float}{\var{number} \&optional \var{float} }
+\enddefun
+\defunx{float-digits}{\var{float} }
+\enddefun
+\defunx{float-precision}{\var{float} }
+\enddefun
+\defunx{float-radix}{\var{float} }
+\enddefun
+\defunx{float-sign}{\var{float1} \&optional (\var{float2} (float 1 float1) ) }
+\enddefun
+\defunx{floatp}{\var{x} }
+\enddefun
+\defunx{floor}{\var{number} \&optional (\var{divisor} 1 ) }
+\enddefun
+\defunx{fmakunbound}{\var{symbol} }
+\enddefun
+\defunx{force-output}{\&optional (\var{stream} *standard-output* ) }
+\enddefun
+\defunx{format}{\var{destination} \var{format-string} \&rest \var{args} }
+\enddefun
+\defunx{fourth}{\var{x} }
+\enddefun
+\defunx{fresh-line}{\&optional (\var{stream} *standard-output* ) }
+\enddefun
+\defunx{fround}{\var{number} \&optional (\var{divisor} 1 ) }
+\enddefun
+\defunx{frs-bds}[system]{\var{n} }
+\enddefun
+\defunx{frs-ihs}[system]{\var{n} }
+\enddefun
+\defunx{ftruncate}{\var{number} \&optional (\var{divisor} 1 ) }
+\enddefun
+\defunx{funcall}{\var{function} \&rest \var{args} }
+\enddefun
+\deftypex{function}
+\enddeftype
+\defspecx{function}{(function x) | #'x}
+\enddefspec
+\defunx{functionp}{\var{x} }
+\enddefun
+\defunx{gc}{\var{x} }
+\enddefun
+\defunx{gc-time}[system]{}
+\enddefun
+\defunx{gcd}{\&rest \var{integers} }
+\enddefun
+\defunx{gensym}{\&optional (\var{x} nil ) }
+\enddefun
+\defunx{gentemp}{\&optional (\var{string} \var{"t"} ) (\var{package} *package* ) }
+\enddefun
+\defunx{get}{\var{symbol} \var{property} \&optional (\var{default} nil ) }
+\enddefun
+\defunx{get-decoded-time}{}
+\enddefun
+\defunx{get-dispatch-macro-character}{\var{char} \var{subchar} \&optional (\var{readtable} *readtable* ) }
+\enddefun
+\defunx{get-hole-size}[system]{}
+\enddefun
+\defunx{get-internal-real-time}{}
+\enddefun
+\defunx{get-internal-run-time}{}
+\enddefun
+\defunx{get-local-time-zone}[system]{}
+\enddefun
+\defunx{get-macro-character}{\var{char} \&optional (\var{readtable} *readtable* ) }
+\enddefun
+\defunx{get-output-stream-string}{\var{string-output-stream} }
+\enddefun
+\defunx{get-properties}{\var{plist} \var{list} }
+\enddefun
+\defunx{get-setf-method}{\var{place} }
+\enddefun
+\defunx{get-setf-method-multiple-value}{\var{form} }
+\enddefun
+\defunx{get-string-input-stream-index}[system]{\var{string-input-stream} }
+\enddefun
+\defunx{get-universal-time}{}
+\enddefun
+\defunx{getenv}[system]{\var{string} }
+\enddefun
+\defunx{getf}{\var{plist} \var{property} \&optional (\var{default} nil ) }
+\enddefun
+\defunx{gethash}{\var{key} \var{hash-table} \&optional (\var{default} nil ) }
+\enddefun
+\defunx{gfun-instance}[system]{\var{gfun} }
+\enddefun
+\defunx{gfun-instance-set}[system]{\var{gfun} \var{instance} }
+\enddefun
+\defunx{gfun-name}[system]{\var{gfun} }
+\enddefun
+\defunx{gfun-name-set}[system]{\var{gfun} \var{name} }
+\enddefun
+\defunx{gfun-method-ht}[system]{\var{gfun} }
+\enddefun
+\defunx{gfun-method-ht-set}[system]{\var{gfun} \var{hash-table} }
+\enddefun
+\defunx{gfun-spec-how-ref}[system]{\var{gfun} \var{index} }
+\enddefun
+\defunx{gfun-spec-how-set}[system]{\var{gfun} \var{index} \var{specializer} }
+\enddefun
+\defunx{gfunp}[system]{\var{object} }
+\enddefun
+\defspecx{go}{(go tag)}
+\enddefspec
+\defunx{graphic-char-p}{\var{char} }
+\enddefun
+\deftypex{hash-table}
+\enddeftype
+\defunx{hash-table-count}{\var{hash-table} }
+\enddefun
+\defunx{hash-table-p}{\var{x} }
+\enddefun
+\defunx{help}{\&optional \var{symbol} }
+\enddefun
+\defunx{help*}{\var{string} \&optional (\var{package-spec} lisp ) }
+\enddefun
+\defunx{host-namestring}{\var{filespec} }
+\enddefun
+\defunx{identity}{\var{x} }
+\enddefun
+\defspecx{if}{(if test form1 [form2])}
+\enddefspec
+\defunx{ihs-fun}[system]{\var{n} }
+\enddefun
+\defunx{imagpart}{\var{number} }
+\enddefun
+\defunx{import}{\var{symbol} \&optional (\var{package} *package* ) }
+\enddefun
+\defunx{in-package}{\var{package-name} \&key (\var{nicknames} nil ) (\var{use} (lisp) ) }
+\enddefun
+\defspecx{incf}{(incf place [form])}
+\enddefspec
+\defunx{input-stream-p}{\var{stream} }
+\enddefun
+\defunx{inspect}{\var{x} }
+\enddefun
+\defunx{instancep}[system]{\var{object} }
+\enddefun
+\defunx{instance-ref}[system]{\var{instance} \var{index} }
+\enddefun
+\defunx{instance-set}[system]{\var{instance} \var{index} \var{value} }
+\enddefun
+\defunx{instance-class}[system]{\var{instance} }
+\enddefun
+\defunx{instance-class-set}[system]{\var{instance} \var{class} }
+\enddefun
+\defunx{int-char}{\var{integer} }
+\enddefun
+\deftypex{integer}
+\enddeftype
+\defunx{integer-decode-float}{\var{float} }
+\enddefun
+\defunx{integer-length}{\var{integer} }
+\enddefun
+\defunx{integerp}{\var{x} }
+\enddefun
+\defunx{intern}{\var{string} \&optional (\var{package} *package* ) }
+\enddefun
+\defvarx{internal-time-units-per-second}
+\enddefvar
+\defunx{intersection}{\var{list1} \var{list2} \&key (\var{key} #'identity ) (\var{test} #'eql ) \var{test-not} }
+\enddefun
+\defunx{isqrt}{\var{integer} }
+\enddefun
+\deftypex{keyword}
+\enddeftype
+\defunx{keywordp}{\var{x} }
+\enddefun
+\defspecx{labels}{(labels ({(name lambda-list {decl | doc}* {form}*)}*) . body)}
+\enddefspec
+\defvarx{lambda-list-keywords}
+\enddefvar
+\defvarx{lambda-parameters-limit}
+\enddefvar
+\defunx{last}{\var{list} }
+\enddefun
+\defunx{lcm}{\var{integer} \&rest \var{more-integers} }
+\enddefun
+\defunx{ldb}{\var{bytespec} \var{integer} }
+\enddefun
+\defunx{ldb-test}{\var{bytespec} \var{integer} }
+\enddefun
+\defunx{ldiff}{\var{list} \var{x} }
+\enddefun
+\defvarx{least-negative-double-float}
+\enddefvar
+\defvarx{least-negative-long-float}
+\enddefvar
+\defvarx{least-negative-short-float}
+\enddefvar
+\defvarx{least-negative-single-float}
+\enddefvar
+\defvarx{least-positive-double-float}
+\enddefvar
+\defvarx{least-positive-long-float}
+\enddefvar
+\defvarx{least-positive-short-float}
+\enddefvar
+\defvarx{least-positive-single-float}
+\enddefvar
+\defunx{length}{\var{sequence} }
+\enddefun
+\defspecx{let}{(let ({var | (var [init])}*) {decl}* {form}*)}
+\enddefspec
+\defspecx{let*}{(let* ({var | (var [init])}*) {decl}* {form}*)}
+\enddefspec
+\defunx{lisp-implementation-type}{}
+\enddefun
+\defunx{lisp-implementation-version}{}
+\enddefun
+\deftypex{list}
+\enddeftype
+\defunx{list}{\&rest \var{args} }
+\enddefun
+\defunx{list*}{\var{arg} \&rest \var{more-args} }
+\enddefun
+\defunx{list-all-packages}{}
+\enddefun
+\defunx{list-length}{\var{list} }
+\enddefun
+\defunx{listen}{\&optional (\var{stream} *standard-input* ) }
+\enddefun
+\defunx{listp}{\var{x} }
+\enddefun
+\defunx{load}{\var{filespec} \&key (\var{verbose} *load-verbose* ) (\var{print} nil ) (\var{if-does-not-exist} error ) }
+\enddefun
+\defspecx{locally}{(locally {decl}* {form}*)}
+\enddefspec
+\defunx{log}{\var{number1} \&optional \var{number2} }
+\enddefun
+\defunx{logand}{\&rest \var{integers} }
+\enddefun
+\defunx{logandc1}{\var{integer1} \var{integer2} }
+\enddefun
+\defunx{logandc2}{\var{integer1} \var{integer2} }
+\enddefun
+\defunx{logbitp}{\var{bit-position} \var{integer} }
+\enddefun
+\defunx{logcount}{\var{integer} }
+\enddefun
+\defunx{logeqv}{\&rest \var{integers} }
+\enddefun
+\defunx{logior}{\&rest \var{integers} }
+\enddefun
+\defunx{lognand}{\var{integer1} \var{integer2} }
+\enddefun
+\defunx{lognor}{\var{integer1} \var{integer2} }
+\enddefun
+\defunx{lognot}{\var{integer} }
+\enddefun
+\defunx{logorc1}{\var{integer1} \var{integer2} }
+\enddefun
+\defunx{logorc2}{\var{integer1} \var{integer2} }
+\enddefun
+\defunx{logtest}{\var{integer1} \var{integer2} }
+\enddefun
+\defunx{logxor}{\&rest \var{integers} }
+\enddefun
+\deftypex{long-float}
+\enddeftype
+\defvarx{long-float-epsilon}
+\enddefvar
+\defvarx{long-float-negative-epsilon}
+\enddefvar
+\defunx{long-site-name}{}
+\enddefun
+\defmacx{loop}{(loop {form}*)}
+\enddefmac
+\defunx{lower-case-p}{\var{char} }
+\enddefun
+\defunx{machine-instance}{}
+\enddefun
+\defunx{machine-type}{}
+\enddefun
+\defunx{machine-version}{}
+\enddefun
+\defunx{macro-function}{\var{symbol} }
+\enddefun
+\defunx{macroexpand}{\var{form} \&optional (\var{env} nil ) }
+\enddefun
+\defunx{macroexpand-1}{\var{form} \&optional (\var{env} nil ) }
+\enddefun
+\defspecx{macrolet}{(macrolet ({(name defmacro-lambda-list {decl | doc}* {form}*)}*)
+          . body)}
+\enddefspec
+\defunx{make-array}{\var{dimensions} \&key (\var{element-type} t ) \var{initial-element} (\var{initial-contents} nil ) (\var{adjustable} nil ) (\var{fill-pointer} nil ) (\var{displaced-to} nil ) (\var{displaced-index-offset} 0 ) (\var{static} nil ) }
+\enddefun
+\defunx{make-broadcast-stream}{\&rest \var{streams} }
+\enddefun
+\defunx{make-char}{\var{char} \&optional (\var{bits} 0 ) (\var{font} 0 ) }
+\enddefun
+\defunx{make-concatenated-stream}{\&rest \var{streams} }
+\enddefun
+\defunx{make-dispatch-macro-character}{\var{char} \&optional (\var{non-terminating-p} nil ) (\var{readtable} *readtable* ) }
+\enddefun
+\defunx{make-echo-stream}{\var{stream1} \var{stream2} }
+\enddefun
+\defunx{make-hash-table}{\&key (\var{test} eql ) (\var{size} 1024 ) (\var{rehash-size} 1.5 ) (\var{rehash-threshold} 0.7 ) }
+\enddefun
+\defunx{make-list}{\var{length} \&key (\var{initial-element} nil ) }
+\enddefun
+\defunx{make-package}{\var{package-name} \&key (\var{nicknames} nil ) (\var{use} (lisp) ) }
+\enddefun
+\defunx{make-pathname}{\&key (\var{defaults} (parse-namestring "" (pathname-host *default-pathname-defaults*)) ) (\var{host} (pathname-host defaults) ) (\var{device} (pathname-device defaults) ) (\var{directory} (pathname-directory defaults) ) (\var{name} (pathname-name defaults) ) (\var{type} (pathname-type defaults) ) (\var{version} (pathname-version defaults) ) }
+\enddefun
+\defunx{make-random-state}{\&optional (\var{random-state} nil ) }
+\enddefun
+\defunx{make-sequence}{\var{type} \var{length} \&key \var{initial-element} }
+\enddefun
+\defunx{make-string}{\var{length} \&key (\var{initial-element}   ) }
+\enddefun
+\defunx{make-string-input-stream}{\var{string} \&optional (\var{start} 0 ) (\var{end} (length string) ) }
+\enddefun
+\defunx{make-string-output-stream}{}
+\enddefun
+\defunx{make-string-output-stream-from-string}[system]{\var{string} }
+\enddefun
+\defunx{make-symbol}{\var{string} }
+\enddefun
+\defunx{make-synonym-stream}{\var{symbol} }
+\enddefun
+\defunx{make-two-way-stream}{\var{stream1} \var{stream2} }
+\enddefun
+\defunx{makunbound}{\var{symbol} }
+\enddefun
+\defunx{map}{\var{type} \var{function} \var{sequence} \&rest \var{more-sequences} }
+\enddefun
+\defunx{mapc}{\var{function} \var{list} \&rest \var{more-lists} }
+\enddefun
+\defunx{mapcan}{\var{function} \var{list} \&rest \var{more-lists} }
+\enddefun
+\defunx{mapcar}{\var{function} \var{list} \&rest \var{more-lists} }
+\enddefun
+\defunx{mapcon}{\var{function} \var{list} \&rest \var{more-lists} }
+\enddefun
+\defunx{maphash}{\var{function} \var{hash-table} }
+\enddefun
+\defunx{mapl}{\var{function} \var{list} \&rest \var{more-lists} }
+\enddefun
+\defunx{maplist}{\var{function} \var{list} \&rest \var{more-lists} }
+\enddefun
+\defunx{mask-field}{\var{bytespec} \var{integer} }
+\enddefun
+\defunx{max}{\var{number} \&rest \var{more-numbers} }
+\enddefun
+\defunx{maximum-allocatable-pages}[system]{\var{type} }
+\enddefun
+\defunx{maximum-contiguous-pages}[system]{}
+\enddefun
+\defunx{member}{\var{item} \var{list} \&key (\var{key} #'identity ) (\var{test} #'eql ) \var{test-not} }
+\enddefun
+\defunx{member-if}{\var{test} \var{list} \&key (\var{key} #'identity ) }
+\enddefun
+\defunx{member-if-not}{\var{test} \var{list} \&key (\var{key} #'identity ) }
+\enddefun
+\defunx{merge}{\var{type} \var{sequence1} \var{sequence2} \var{test} \&key (\var{key} #'identity ) }
+\enddefun
+\defunx{merge-pathnames}{\var{filespec} \&optional (\var{defaults} *default-pathname-defaults* ) \var{default-version} }
+\enddefun
+\defunx{min}{\var{number} \&rest \var{more-numbers} }
+\enddefun
+\defunx{minusp}{\var{number} }
+\enddefun
+\defunx{mismatch}{\var{sequence1} \var{sequence2} \&key (\var{key} #'identity ) (\var{test} #'eql ) \var{test-not} (\var{start1} 0 ) (\var{end1} (length sequence1) ) (\var{start2} 0 ) (\var{end2} (length sequence2) ) (\var{from-end} nil ) }
+\enddefun
+\defunx{mod}{\var{number} \var{divisor} }
+\enddefun
+\defvarx{most-negative-double-float}
+\enddefvar
+\defvarx{most-negative-fixnum}
+\enddefvar
+\defvarx{most-negative-long-float}
+\enddefvar
+\defvarx{most-negative-short-float}
+\enddefvar
+\defvarx{most-negative-single-float}
+\enddefvar
+\defvarx{most-positive-double-float}
+\enddefvar
+\defvarx{most-positive-fixnum}
+\enddefvar
+\defvarx{most-positive-long-float}
+\enddefvar
+\defvarx{most-positive-short-float}
+\enddefvar
+\defvarx{most-positive-single-float}
+\enddefvar
+\defspecx{multiple-value-bind}{(multiple-value-bind ({var}*) init {decl}* {form}*)}
+\enddefspec
+\defspecx{multiple-value-call}{(multiple-value-call function-form {form}*)}
+\enddefspec
+\defspecx{multiple-value-list}{(multiple-value-list form)}
+\enddefspec
+\defspecx{multiple-value-prog1}{(multiple-value-prog1 first-form {form}*)}
+\enddefspec
+\defspecx{multiple-value-setq}{(multiple-value-setq {var}* form)}
+\enddefspec
+\defvarx{multiple-values-limit}
+\enddefvar
+\defunx{nani}[system]{\var{fixnum} }
+\enddefun
+\defunx{name-char}{\var{name} }
+\enddefun
+\defunx{namestring}{\var{filespec} }
+\enddefun
+\defunx{nbutlast}{\var{list} \&optional (\var{n} 1 ) }
+\enddefun
+\defunx{nconc}{\&rest \var{lists} }
+\enddefun
+\deftypex{nil}
+\enddeftype
+\defvarx{nil}
+\enddefvar
+\defunx{nintersection}{\var{list1} \var{list2} \&key (\var{key} #'identity ) (\var{test} #'eql ) \var{test-not} }
+\enddefun
+\defunx{ninth}{\var{x} }
+\enddefun
+\defunx{not}{\var{x} }
+\enddefun
+\defunx{notany}{\var{predicate} \var{sequence} \&rest \var{more-sequences} }
+\enddefun
+\defunx{notevery}{\var{predicate} \var{sequence} \&rest \var{more-sequences} }
+\enddefun
+\defunx{nreconc}{\var{x} \var{y} }
+\enddefun
+\defunx{nreverse}{\var{sequence} }
+\enddefun
+\defunx{nset-difference}{\var{list1} \var{list2} \&key (\var{key} #'identity ) (\var{test} #'eql ) \var{test-not} }
+\enddefun
+\defunx{nset-exclusive-or}{\var{list1} \var{list2} \&key (\var{key} #'identity ) (\var{test} #'eql ) \var{test-not} }
+\enddefun
+\defunx{nstring-capitalize}{\var{string} \&key (\var{start} 0 ) (\var{end} (length string) ) }
+\enddefun
+\defunx{nstring-downcase}{\var{string} \&key (\var{start} 0 ) (\var{end} (length string) ) }
+\enddefun
+\defunx{nstring-upcase}{\var{string} \&key (\var{start} 0 ) (\var{end} (length string) ) }
+\enddefun
+\defunx{nsublis}{\var{alist} \var{tree} \&key (\var{key} #'identity ) (\var{test} #'eql ) \var{test-not} }
+\enddefun
+\defunx{nsubst}{\var{new} \var{old} \var{tree} \&key (\var{key} #'identity ) (\var{test} #'eql ) \var{test-not} }
+\enddefun
+\defunx{nsubst-if}{\var{new} \var{test} \var{tree} \&key (\var{key} #'identity ) }
+\enddefun
+\defunx{nsubst-if-not}{\var{new} \var{test} \var{tree} \&key (\var{key} #'identity ) }
+\enddefun
+\defunx{nsubstitute}{\var{new} \var{old} \var{sequence} \&key (\var{key} #'identity ) (\var{test} #'eql ) \var{test-not} (\var{start} 0 ) (\var{end} (length sequence) ) (\var{count} most-positive-fixnum ) (\var{from-end} nil ) }
+\enddefun
+\defunx{nsubstitute-if}{\var{new} \var{test} \var{sequence} \&key (\var{key} #'identity ) (\var{start} 0 ) (\var{end} (length sequence) ) (\var{count} most-positive-fixnum ) (\var{from-end} nil ) }
+\enddefun
+\defunx{nsubstitute-if-not}{\var{new} \var{test} \var{sequence} \&key (\var{key} #'identity ) (\var{start} 0 ) (\var{end} (length sequence) ) (\var{count} most-positive-fixnum ) (\var{from-end} nil ) }
+\enddefun
+\defunx{nth}{\var{n} \var{list} }
+\enddefun
+\defunx{nthcdr}{\var{n} \var{list} }
+\enddefun
+\deftypex{null}
+\enddeftype
+\defunx{null}{\var{x} }
+\enddefun
+\deftypex{number}
+\enddeftype
+\defunx{numberp}{\var{x} }
+\enddefun
+\defunx{numerator}{\var{rational} }
+\enddefun
+\defunx{nunion}{\var{list1} \var{list2} \&key (\var{key} #'identity ) (\var{test} #'eql ) \var{test-not} }
+\enddefun
+\defunx{oddp}{\var{integer} }
+\enddefun
+\defunx{open}{\var{filespec} \&key (\var{direction} input ) \var{element-type} \var{if-exists} \var{if-does-not-exist} }
+\enddefun
+\defunx{open-client-stream}[system]{\var{host} \var{port} }
+\enddefun
+\defunx{open-server-stream}[system]{\var{host} \var{port} }
+\enddefun
+\defspecx{or}{(or {form}*)}
+\enddefspec
+\defunx{output-stream-p}{\var{stream} }
+\enddefun
+\defunx{output-stream-string}[system]{\var{string-output-stream} }
+\enddefun
+\deftypex{package}
+\enddeftype
+\defunx{package-name}{\var{package} }
+\enddefun
+\defunx{package-nicknames}{\var{package} }
+\enddefun
+\defunx{package-shadowing-symbols}{\var{package} }
+\enddefun
+\defunx{package-use-list}{\var{package} }
+\enddefun
+\defunx{package-used-by-list}{\var{package} }
+\enddefun
+\defunx{packagep}{\var{x} }
+\enddefun
+\defunx{pairlis}{\var{keys} \var{items} \&optional (\var{alist} nil ) }
+\enddefun
+\defunx{parse-integer}{\var{string} \&key (\var{start} 0 ) (\var{end} (length string) ) (\var{radix} 10 ) (\var{junk-allowed} nil ) }
+\enddefun
+\defunx{parse-namestring}{\var{string} \&optional \var{host} \var{defaults} \&key (\var{start} 0 ) \var{end} (\var{junk-allowed} nil ) }
+\enddefun
+\deftypex{pathname}
+\enddeftype
+\defunx{pathname}{\var{filespec} }
+\enddefun
+\defunx{pathname-device}{\var{filespec} }
+\enddefun
+\defunx{pathname-directory}{\var{filespec} }
+\enddefun
+\defunx{pathname-host}{\var{filespec} }
+\enddefun
+\defunx{pathname-name}{\var{filespec} }
+\enddefun
+\defunx{pathname-type}{\var{filespec} }
+\enddefun
+\defunx{pathname-version}{\var{filespec} }
+\enddefun
+\defunx{pathnamep}{\var{x} }
+\enddefun
+\defunx{peek-char}{\&optional (\var{char-spec} nil ) (\var{stream} *standard-input* ) (\var{eof-error-p} t ) (\var{eof-value} nil ) (\var{recursive-p} nil ) }
+\enddefun
+\defunx{phase}{\var{number} }
+\enddefun
+\defvarx{pi}
+\enddefvar
+\defunx{pointer}[system]{\var{object} }
+\enddefun
+\defunx{plusp}{\var{number} }
+\enddefun
+\defspecx{pop}{(pop place)}
+\enddefspec
+\defunx{position}{\var{item} \var{sequence} \&key (\var{key} #'identity ) (\var{test} #'eql ) \var{test-not} (\var{start} 0 ) (\var{end} (length sequence) ) (\var{from-end} nil ) }
+\enddefun
+\defunx{position-if}{\var{test} \var{sequence} \&key (\var{key} #'identity ) (\var{start} 0 ) (\var{end} (length sequence) ) (\var{from-end} nil ) }
+\enddefun
+\defunx{position-if-not}{\var{test} \var{sequence} \&key (\var{key} #'identity ) (\var{start} 0 ) (\var{end} (length sequence) ) (\var{from-end} nil ) }
+\enddefun
+\defunx{pprint}{\var{object} \&optional (\var{stream} *standard-output* ) }
+\enddefun
+\defunx{prin1}{\var{object} \&optional (\var{stream} *standard-output* ) }
+\enddefun
+\defunx{prin1-to-string}{\var{object} }
+\enddefun
+\defunx{princ}{\var{object} \&optional (\var{stream} *standard-output* ) }
+\enddefun
+\defunx{princ-to-string}{\var{object} }
+\enddefun
+\defunx{print}{\var{object} \&optional (\var{stream} *standard-output* ) }
+\enddefun
+\defunx{probe-file}{\var{filespec} }
+\enddefun
+\defunx{proclaim}{\var{decl-spec} }
+\enddefun
+\defunx{proclamation}{\var{decl-spec} }
+\enddefun
+\defspecx{prog}{(prog ({var | (var [init])}*) {decl}* {tag | statement}*)}
+\enddefspec
+\defspecx{prog*}{(prog* ({var | (var [init])}*) {decl}* {tag | statement}*)}
+\enddefspec
+\defspecx{prog1}{(prog1 first-form {form}*)}
+\enddefspec
+\defspecx{prog2}{(prog2 first-form second-form {forms}*)}
+\enddefspec
+\defspecx{progn}{(progn {form}*)}
+\enddefspec
+\defspecx{progv}{(progv symbols-form values-form {form}*)}
+\enddefspec
+\defunx{provide}{\var{module-name} }
+\enddefun
+\defmacx{psetf}{(psetf {place form}*)}
+\enddefmac
+\defspecx{psetq}{(psetq {var form}*)}
+\enddefspec
+\defspecx{push}{(push form place)}
+\enddefspec
+\defmacx{pushnew}{(pushnew form place {keyword-form value-form}*)}
+\enddefmac
+\defspecx{quote}{(quote x) | 'x}
+\enddefspec
+\defunx{random}{\var{number} \&optional (\var{random-state} *random-state* ) }
+\enddefun
+\deftypex{random-state}
+\enddeftype
+\defunx{random-state-p}{\var{x} }
+\enddefun
+\defunx{rassoc}{\var{item} \var{alist} \&key (\var{test} #'eql ) \var{test-not} (\var{key} #'identity ) }
+\enddefun
+\defunx{rassoc-if}{\var{test} \var{alist} }
+\enddefun
+\defunx{rassoc-if-not}{\var{test} \var{alist} }
+\enddefun
+\deftypex{ratio}
+\enddeftype
+\deftypex{rational}
+\enddeftype
+\defunx{rational}{\var{number} }
+\enddefun
+\defunx{rationalize}{\var{number} }
+\enddefun
+\defunx{rationalp}{\var{x} }
+\enddefun
+\defunx{read}{\&optional (\var{stream} *standard-input* ) (\var{eof-error-p} t ) (\var{eof-value} nil ) (\var{recursivep} nil ) }
+\enddefun
+\defunx{read-byte}{\var{stream} \&optional (\var{eof-error-p} t ) (\var{eof-value} nil ) }
+\enddefun
+\defunx{read-bytes}[system]{\var{stream} \var{string} \var{start} \var{end} }
+\enddefun
+\defunx{read-char}{\&optional (\var{stream} *standard-input* ) (\var{eof-error-p} t ) (\var{eof-value} nil ) (\var{recursive-p} nil ) }
+\enddefun
+\defunx{read-char-no-hang}{\&optional (\var{stream} *standard-input* ) (\var{eof-error-p} t ) (\var{eof-value} nil ) (\var{recursive-p} nil ) }
+\enddefun
+\defunx{read-delimited-list}{\var{char} \&optional (\var{stream} *standard-input* ) (\var{recursive-p} nil ) }
+\enddefun
+\defunx{read-from-string}{\var{string} \&optional (\var{eof-error-p} t ) (\var{eof-value} nil ) \&key (\var{start} 0 ) (\var{end} (length string) ) (\var{preserve-whitespace} nil ) }
+\enddefun
+\defunx{read-line}{\&optional (\var{stream} *standard-input* ) (\var{eof-error-p} t ) (\var{eof-value} nil ) (\var{recursive-p} nil ) }
+\enddefun
+\defunx{read-preserving-whitespace}{\&optional (\var{stream} *standard-input* ) (\var{eof-error-p} t ) (\var{eof-value} nil ) (\var{recursive-p} nil ) }
+\enddefun
+\deftypex{readtable}
+\enddeftype
+\defunx{readtablep}{\var{x} }
+\enddefun
+\defunx{realpart}{\var{number} }
+\enddefun
+\defunx{reduce}{\var{function} \var{sequence} \&key (\var{from-end} nil ) (\var{start} 0 ) (\var{end} (length sequence) ) \var{initial-value} }
+\enddefun
+\defunx{rem}{\var{number} \var{divisor} }
+\enddefun
+\defmacx{remf}{(remf place form)}
+\enddefmac
+\defunx{remhash}{\var{key} \var{hash-table} }
+\enddefun
+\defunx{remove}{\var{item} \var{sequence} \&key (\var{key} #'identity ) (\var{test} #'eql ) \var{test-not} (\var{start} 0 ) (\var{end} (length sequence) ) (\var{count} most-positive-fixnum ) (\var{from-end} nil ) }
+\enddefun
+\defunx{remove-duplicates}{\var{sequence} \&key (\var{key} #'identity ) (\var{test} #'eql ) \var{test-not} (\var{start} 0 ) (\var{end} (length sequence) ) (\var{from-end} nil ) }
+\enddefun
+\defunx{remove-if}{\var{test} \var{sequence} \&key (\var{key} #'identity ) (\var{start} 0 ) (\var{end} (length sequence) ) (\var{count} most-positive-fixnum ) (\var{from-end} nil ) }
+\enddefun
+\defunx{remove-if-not}{\var{test} \var{sequence} \&key (\var{key} #'identity ) (\var{start} 0 ) (\var{end} (length sequence) ) (\var{count} most-positive-fixnum ) (\var{from-end} nil ) }
+\enddefun
+\defunx{remprop}{\var{symbol} \var{indicator} }
+\enddefun
+\defunx{rename-file}{\var{filespec} \var{new-filespec} }
+\enddefun
+\defunx{rename-package}{\var{package} \var{new-name} \&optional (\var{new-nicknames} nil ) }
+\enddefun
+\defunx{replace}{\var{sequence1} \var{sequence2} \&key (\var{start1} 0 ) (\var{end1} (length sequence1) ) (\var{start2} 0 ) (\var{end2} (length sequence2) ) }
+\enddefun
+\defunx{require}{\var{module-name} \&optional \var{pathname} }
+\enddefun
+\defunx{reset-gc-count}[system]{}
+\enddefun
+\defunx{reset-stack-limits}[system]{}
+\enddefun
+\defunx{rest}{\var{x} }
+\enddefun
+\defspecx{return}{(return [result])}
+\enddefspec
+\defspecx{return-from}{(return-from symbol [result])}
+\enddefspec
+\defunx{revappend}{\var{x} \var{y} }
+\enddefun
+\defunx{reverse}{\var{sequence} }
+\enddefun
+\defunx{room}{\&optional (\var{x} t ) }
+\enddefun
+\defmacx{rotatef}{(rotatef {place}*)}
+\enddefmac
+\defunx{round}{\var{number} \&optional (\var{divisor} 1 ) }
+\enddefun
+\defunx{rplaca}{\var{cons} \var{x} }
+\enddefun
+\defunx{rplacd}{\var{cons} \var{x} }
+\enddefun
+\defunx{save}[system]{(FILESPEC)}
+\enddefun
+\defunx{save-system}[system]{\var{pathname} }
+\enddefun
+\defunx{sbit}{\var{simple-bit-array} \&rest \var{subscripts} }
+\enddefun
+\defunx{scale-float}{\var{float} \var{integer} }
+\enddefun
+\defunx{schar}{\var{simple-string} \var{n} }
+\enddefun
+\defunx{search}{\var{sequence1} \var{sequence2} \&key (\var{key} #'identity ) (\var{test} #'eql ) \var{test-not} (\var{start1} 0 ) (\var{end1} (length sequence1) ) (\var{start2} 0 ) (\var{end2} (length sequence2) ) (\var{from-end} nil ) }
+\enddefun
+\defunx{second}{\var{x} }
+\enddefun
+\deftypex{sequence}
+\enddeftype
+\defunx{set}{\var{symbol} \var{object} }
+\enddefun
+\defunx{set-char-bit}{\var{char} \var{bit-name} \var{flag} }
+\enddefun
+\defunx{set-difference}{\var{list1} \var{list2} \&key (\var{key} #'identity ) (\var{test} #'eql ) \var{test-not} }
+\enddefun
+\defunx{set-dispatch-macro-character}{\var{char} \var{subchar} \var{function} \&optional (\var{readtable} *readtable* ) }
+\enddefun
+\defunx{set-exclusive-or}{\var{list1} \var{list2} \&key (\var{key} #'identity ) (\var{test} #'eql ) \var{test-not} }
+\enddefun
+\defunx{set-hole-size}[system]{\var{fixnum} }
+\enddefun
+\defunx{set-macro-character}{\var{char} \var{function} \&optional (\var{non-terminating-p} nil ) (\var{readtable} *readtable* ) }
+\enddefun
+\defunx{set-syntax-from-char}{\var{to-char} \var{from-char} \&optional (\var{to-readtable} *readtable* ) (\var{from-readtable} nil ) }
+\enddefun
+\defspecx{setf}{(setf {place form}*)}
+\enddefspec
+\defspecx{setq}{(setq {var form}*)}
+\enddefspec
+\defunx{seventh}{\var{x} }
+\enddefun
+\defunx{shadow}{\var{symbol} \&optional (\var{package} *package* ) }
+\enddefun
+\defunx{shadowing-import}{\var{symbol} \&optional (\var{package} *package* ) }
+\enddefun
+\defmacx{shiftf}{(shiftf {place}+ form)}
+\enddefmac
+\deftypex{short-float}
+\enddeftype
+\defvarx{short-float-epsilon}
+\enddefvar
+\defvarx{short-float-negative-epsilon}
+\enddefvar
+\defunx{short-site-name}{}
+\enddefun
+\deftypex{signed-byte}
+\enddeftype
+\defunx{signum}{\var{number} }
+\enddefun
+\deftypex{simple-array}
+\enddeftype
+\deftypex{simple-bit-vector}
+\enddeftype
+\defunx{simple-bit-vector-p}{\var{x} }
+\enddefun
+\deftypex{simple-string}
+\enddeftype
+\defunx{simple-string-p}{\var{x} }
+\enddefun
+\deftypex{simple-vector}
+\enddeftype
+\defunx{simple-vector-p}{\var{x} }
+\enddefun
+\defunx{sin}{\var{radians} }
+\enddefun
+\deftypex{single-float}
+\enddeftype
+\defvarx{single-float-epsilon}
+\enddefvar
+\defvarx{single-float-negative-epsilon}
+\enddefvar
+\defunx{sinh}{\var{number} }
+\enddefun
+\defunx{sixth}{\var{x} }
+\enddefun
+\defunx{sleep}{\var{n} }
+\enddefun
+\defunx{sl-boundp}[system]{\var{object} }
+\enddefun
+\defunx{sl-makunbound}[system]{\var{instance} \var{index} }
+\enddefun
+\defunx{software-type}{}
+\enddefun
+\defunx{software-version}{}
+\enddefun
+\defunx{some}{\var{predicate} \var{sequence} \&rest \var{more-sequences} }
+\enddefun
+\defunx{sort}{\var{sequence} \var{test} \&key (\var{key} #'identity ) }
+\enddefun
+\defunx{special-form-p}{\var{symbol} }
+\enddefun
+\defunx{specialp}[system]{\var{symbol} }
+\enddefun
+\defunx{sqrt}{\var{number} }
+\enddefun
+\defunx{stable-sort}{\var{sequence} \var{test} \&key (\var{key} #'identity ) }
+\enddefun
+\deftypex{standard-char}
+\enddeftype
+\defunx{standard-char-p}{\var{char} }
+\enddefun
+\defmacx{step}{(step form)}
+\enddefmac
+\deftypex{stream}
+\enddeftype
+\defunx{stream-element-type}{\var{stream} }
+\enddefun
+\defunx{streamp}{\var{x} }
+\enddefun
+\defunx{stream-read-char}{((OBJ STREAM-CLASS))}
+\enddefun
+\defunx{stream-read-line}{((OBJ STREAM-CLASS) &REST MAKE-ARRAY-OPTIONS)}
+\enddefun
+\defunx{stream-unread-char}{((OBJ STREAM-CLASS) CHARACTER)}
+\enddefun
+\defunx{stream-peek-char}{((OBJ STREAM-CLASS) PEEK-TYPE)}
+\enddefun
+\defunx{stream-listen}{((OBJ STREAM-CLASS))}
+\enddefun
+\defunx{stream-clear-input}{((OBJ STREAM-CLASS))}
+\enddefun
+\defunx{stream-write-char}{((OBJ STREAM-CLASS) CHARACTER)}
+\enddefun
+\defunx{stream-write-string}{((OBJ STREAM-CLASS) STRING &OPTIONAL START END)}
+\enddefun
+\defunx{stream-fresh-line}{((OBJ STREAM-CLASS))}
+\enddefun
+\defunx{stream-clear-output}{((OBJ STREAM-CLASS))}
+\enddefun
+\defunx{stream-force-output}{((OBJ STREAM-CLASS))}
+\enddefun
+\deftypex{string}
+\enddeftype
+\defunx{string}{\var{x} }
+\enddefun
+\defunx{string-capitalize}{\var{string} \&key (\var{start} 0 ) (\var{end} (length string) ) }
+\enddefun
+\deftypex{string-char}
+\enddeftype
+\defunx{string-char-p}{\var{char} }
+\enddefun
+\defunx{string-concatenate}[system]{\&rest \var{strings} }
+\enddefun
+\defunx{string-downcase}{\var{string} \&key (\var{start} 0 ) (\var{end} (length string) ) }
+\enddefun
+\defunx{string-equal}{\var{string1} \var{string2} \&key (\var{start1} 0 ) (\var{end1} (length string1) ) (\var{start2} 0 ) (\var{end2} (length string2) ) }
+\enddefun
+\defunx{string-greaterp}{\var{string1} \var{string2} \&key (\var{start1} 0 ) (\var{end1} (length string1) ) (\var{start2} 0 ) (\var{end2} (length string2) ) }
+\enddefun
+\defunx{string-left-trim}{\var{char-bag} \var{string} }
+\enddefun
+\defunx{string-lessp}{\var{string1} \var{string2} \&key (\var{start1} 0 ) (\var{end1} (length string1) ) (\var{start2} 0 ) (\var{end2} (length string2) ) }
+\enddefun
+\defunx{string-not-equal}{\var{string1} \var{string2} \&key (\var{start1} 0 ) (\var{end1} (length string1) ) (\var{start2} 0 ) (\var{end2} (length string2) ) }
+\enddefun
+\defunx{string-not-greaterp}{\var{string1} \var{string2} \&key (\var{start1} 0 ) (\var{end1} (length string1) ) (\var{start2} 0 ) (\var{end2} (length string2) ) }
+\enddefun
+\defunx{string-not-lessp}{\var{string1} \var{string2} \&key (\var{start1} 0 ) (\var{end1} (length string1) ) (\var{start2} 0 ) (\var{end2} (length string2) ) }
+\enddefun
+\defunx{string-right-trim}{\var{char-bag} \var{string} }
+\enddefun
+\defunx{string-to-object}[system]{\var{string} }
+\enddefun
+\defunx{string-trim}{\var{char-spec} \var{string} }
+\enddefun
+\defunx{string-upcase}{\var{string} \&key (\var{start} 0 ) (\var{end} (length string) ) }
+\enddefun
+\defunx{string/=}{\var{string1} \var{string2} \&key (\var{start1} 0 ) (\var{end1} (length string1) ) (\var{start2} 0 ) (\var{end2} (length string2) ) }
+\enddefun
+\defunx{string<}{\var{string1} \var{string2} \&key (\var{start1} 0 ) (\var{end1} (length string1) ) (\var{start2} 0 ) (\var{end2} (length string2) ) }
+\enddefun
+\defunx{string<=}{\var{string1} \var{string2} \&key (\var{start1} 0 ) (\var{end1} (length string1) ) (\var{start2} 0 ) (\var{end2} (length string2) ) }
+\enddefun
+\defunx{string=}{\var{string1} \var{string2} \&key (\var{start1} 0 ) (\var{end1} (length string1) ) (\var{start2} 0 ) (\var{end2} (length string2) ) }
+\enddefun
+\defunx{string>}{\var{string1} \var{string2} \&key (\var{start1} 0 ) (\var{end1} (length string1) ) (\var{start2} 0 ) (\var{end2} (length string2) ) }
+\enddefun
+\defunx{string>=}{\var{string1} \var{string2} \&key (\var{start1} 0 ) (\var{end1} (length string1) ) (\var{start2} 0 ) (\var{end2} (length string2) ) }
+\enddefun
+\defunx{stringp}{\var{x} }
+\enddefun
+\defunx{structurep}[system]{\var{x} }
+\enddefun
+\defunx{sublis}{\var{alist} \var{tree} \&key (\var{key} #'identity ) (\var{test} #'eql ) \var{test-not} }
+\enddefun
+\defunx{subseq}{\var{sequence} \var{start} \&optional (\var{end} (length sequence) ) }
+\enddefun
+\defunx{subsetp}{\var{list1} \var{list2} \&key (\var{key} #'identity ) (\var{test} #'eql ) \var{test-not} }
+\enddefun
+\defunx{subst}{\var{new} \var{old} \var{tree} \&key (\var{key} #'identity ) (\var{test} #'eql ) \var{test-not} }
+\enddefun
+\defunx{subst-if}{\var{new} \var{test} \var{tree} \&key (\var{key} #'identity ) }
+\enddefun
+\defunx{subst-if-not}{\var{new} \var{test} \var{tree} \&key (\var{key} #'identity ) }
+\enddefun
+\defunx{substitute}{\var{new} \var{old} \var{sequence} \&key (\var{key} #'identity ) (\var{test} #'eql ) \var{test-not} (\var{start} 0 ) (\var{end} (length sequence) ) (\var{count} most-positive-fixnum ) (\var{from-end} nil ) }
+\enddefun
+\defunx{substitute-if}{\var{new} \var{test} \var{sequence} \&key (\var{key} #'identity ) (\var{start} 0 ) (\var{end} (length sequence) ) (\var{count} most-positive-fixnum ) (\var{from-end} nil ) }
+\enddefun
+\defunx{substitute-if-not}{\var{new} \var{test} \var{sequence} \&key (\var{key} #'identity ) (\var{start} 0 ) (\var{end} (length sequence) ) (\var{count} most-positive-fixnum ) (\var{from-end} nil ) }
+\enddefun
+\defunx{subtypep}{\var{type1} \var{type2} }
+\enddefun
+\defunx{svref}{\var{simple-vector} \var{n} }
+\enddefun
+\defunx{sxhash}{\var{object} }
+\enddefun
+\deftypex{symbol}
+\enddeftype
+\defunx{symbol-function}{\var{symbol} }
+\enddefun
+\defunx{symbol-name}{\var{symbol} }
+\enddefun
+\defunx{symbol-package}{\var{symbol} }
+\enddefun
+\defunx{symbol-plist}{\var{symbol} }
+\enddefun
+\defunx{symbol-value}{\var{symbol} }
+\enddefun
+\defunx{symbolp}{\var{x} }
+\enddefun
+\defunx{system}{\var{string} }
+\enddefun
+\deftypex{t}
+\enddeftype
+\defvarx{t}
+\enddefvar
+\defspecx{tagbody}{(tagbody {tag | statement}*)}
+\enddefspec
+\defunx{tailp}{\var{x} \var{list} }
+\enddefun
+\defunx{tan}{\var{radians} }
+\enddefun
+\defunx{tanh}{\var{number} }
+\enddefun
+\defunx{tenth}{\var{x} }
+\enddefun
+\defunx{terpri}{\&optional (\var{stream} *standard-output* ) }
+\enddefun
+\defspecx{the}{(the type form)}
+\enddefspec
+\defunx{third}{\var{x} }
+\enddefun
+\defspecx{throw}{(throw tag form)}
+\enddefspec
+\defmacx{time}{(time form)}
+\enddefmac
+\defunx{top-level}[system]{}
+\enddefun
+\defmacx{trace}{(trace ({function-name | ({function-name}+)} {keyword [form]}*)}
+\enddefmac
+\defunx{tree-equal}{\var{x} \var{y} \&key (\var{test} #'eql ) \var{test-not} }
+\enddefun
+\defunx{truename}{\var{filespec} }
+\enddefun
+\defunx{truncate}{\var{number} \&optional (\var{divisor} 1 ) }
+\enddefun
+\defunx{type-of}{\var{x} }
+\enddefun
+\defmacx{typecase}{(typecase keyform {(type {form}*)}*)}
+\enddefmac
+\defunx{typep}{\var{x} \var{type} }
+\enddefun
+\defunx{uncatch-bad-signals}[system]{}
+\enddefun
+\defunx{unexport}{\var{symbol} \&optional (\var{package} *package* ) }
+\enddefun
+\defunx{unintern}{\var{symbol} \&optional (\var{package} *package* ) }
+\enddefun
+\defunx{union}{\var{list1} \var{list2} \&key (\var{key} #'identity ) (\var{test} #'eql ) \var{test-not} }
+\enddefun
+\defunx{universal-error-handler}[system]{\var{error-name} \var{continuable-p} \var{function-name} \var{continue-format-string} \var{error-format-string} \&rest \var{args} }
+\enddefun
+\defspecx{unless}{(unless test {form}*)}
+\enddefspec
+\defunx{unread-char}{\var{char} \&optional (\var{stream} *standard-input* ) }
+\enddefun
+\deftypex{unsigned-byte}
+\enddeftype
+\defmacx{untrace}{(untrace {function-name}*)}
+\enddefmac
+\defunx{unuse-package}{\var{package-spec} \&optional (\var{package} *package* ) }
+\enddefun
+\defspecx{unwind-protect}{(unwind-protect form {cleanup-form}*)}
+\enddefspec
+\defunx{upper-case-p}{\var{char} }
+\enddefun
+\defunx{use-package}{\var{package-spec} \&optional (\var{package} *package* ) }
+\enddefun
+\defunx{user-homedir-pathname}{\&optional \var{host} }
+\enddefun
+\defunx{values}{\&rest \var{args} }
+\enddefun
+\defunx{values-list}{\var{list} }
+\enddefun
+\deftypex{vector}
+\enddeftype
+\defunx{vector}{\&rest \var{objects} }
+\enddefun
+\defunx{vector-pop}{\var{vector} }
+\enddefun
+\defunx{vector-push}{\var{item} \var{vector} }
+\enddefun
+\defunx{vector-push-extend}{\var{item} \var{vector} \&optional (\var{n} (length vector) ) }
+\enddefun
+\defunx{vectorp}{\var{x} }
+\enddefun
+\defunx{warn}{\var{format-string} \&rest \var{args} }
+\enddefun
+\defspecx{when}{(when test {form}*)}
+\enddefspec
+\defmacx{with-input-from-string}{(with-input-from-string (var string-form {keyword value}*)
+           {decl}* {form}*)}
+\enddefmac
+\defmacx{with-open-file}{(with-open-file (var filespec-form {options}*) {decl}* {form}*)}
+\enddefmac
+\defmacx{with-open-stream}{(with-open-stream (var stream-form) {decl}* {form}*)}
+\enddefmac
+\defmacx{with-output-to-string}{(with-output-to-string (var [string-form]) {decl}* {form}*)}
+\enddefmac
+\defunx{write}{\var{object} \&key (\var{stream} *standard-output* ) (\var{escape} *print-escape* ) (\var{radix} *print-radix* ) (\var{base} *print-base* ) (\var{circle} *print-circle* ) (\var{pretty} *print-pretty* ) (\var{level} *print-level* ) (\var{length} *print-length* ) (\var{case} *print-case* ) (\var{array} *print-array* ) (\var{gensym} *print-gensym* ) }
+\enddefun
+\defunx{write-byte}{\var{integer} \var{stream} }
+\enddefun
+\defunx{write-bytes}[system]{\var{stream} \var{string} \var{start} \var{end} }
+\enddefun
+\defunx{write-char}{\var{char} \&optional (\var{stream} *standard-output* ) }
+\enddefun
+\defunx{write-line}{\var{string} \&optional (\var{stream} *standard-output* ) \&key (\var{start} 0 ) (\var{end} (length string) ) }
+\enddefun
+\defunx{write-string}{\var{string} \&optional (\var{stream} *standard-output* ) \&key (\var{start} 0 ) (\var{end} (length string) ) }
+\enddefun
+\defunx{write-to-string}{\var{object} \&key (\var{escape} *print-escape* ) (\var{radix} *print-radix* ) (\var{base} *print-base* ) (\var{circle} *print-circle* ) (\var{pretty} *print-pretty* ) (\var{level} *print-level* ) (\var{length} *print-length* ) (\var{case} *print-case* ) (\var{array} *print-array* ) (\var{gensym} *print-gensym* ) }
+\enddefun
+\defunx{y-or-n-p}{\&optional (\var{format-string} nil ) \&rest \var{args} }
+\enddefun
+\defunx{yes-or-no-p}{\&optional (\var{format-string} nil ) \&rest \var{args} }
+\enddefun
+\defunx{zerop}{\var{number} }
+\enddefun

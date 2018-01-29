@@ -1,0 +1,1292 @@
+%% TeX macros to handle latexinfo files
+%% \include{ 5 page GNU copyleft here }
+%   Copyright (C) 1985, 1986 Richard M. Stallman
+%   Copyleft  (C) 1988, 1989, 1990, 1991 Michael E. Clarkson
+
+\def\latexinfoversion{1.7}
+\message{Loading Latexinfo package [Version \latexinfoversion]:}
+\message{}
+
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{3}
+\def\textfraction{.1}
+\def\bottomfraction{.9}		% was .3
+\def\topfraction{.9}
+
+\newcommand{\BibTeX}{{\sc Bib}\TeX}
+
+\def\oddfoot#1{\def\@oddfoot{#1}}
+\def\evenfoot#1{\def\@evenfoot{#1}}
+
+% Save some parts of plain latex whose names we will redefine.
+
+\let\ptexlbrace=\{
+\let\ptexrbrace=\}
+\let\ptexdot=\.
+\let\ptexstar=\*
+\let\ptexend=\end
+\let\ptexbullet=\bullet
+\let\ptexb=\b
+\let\ptexc=\c
+\let\ptexi=\i
+\let\ptext=\t
+\let\ptexl=\l
+\let\ptexL=\L
+\let\ptexdq=\"
+\def\pline{\hbox to\hsize}
+\def\pleftline#1{\pline{#1\hss}}
+\def\prightline#1{\pline{\hss#1}}
+\def\centerline#1{\pline{\hss#1\hss}}
+
+\def\tie{\penalty 10000\ }     % Save plain tex definition of ~.
+
+\let\normal=\normalsize
+
+\message{Basics,}
+\chardef\other=12
+
+\hyphenation{ap-pen-dix}
+\hyphenation{mini-buf-fer mini-buf-fers}
+
+% Parse an argument, then pass it to #1.
+% The argument can be delimited with [...] or with "..." or braces
+% or it can be a whole line.
+% #1 should be a macro which expects
+% an ordinary undelimited TeX argument.
+
+\def\parsearg #1{\let\next=#1\begingroup\obeylines\futurelet\temp\parseargx}
+
+\def\parseargx{%
+\ifx \obeyedspace\temp \aftergroup\parseargdiscardspace \else%
+\aftergroup \parseargline %
+\fi \endgroup}
+
+{\obeyspaces %
+\gdef\parseargdiscardspace {\begingroup\obeylines\futurelet\temp\parseargx}}
+
+\gdef\obeyedspace{\ }
+
+\def\parseargline{\begingroup \obeylines \parsearglinex}
+{\obeylines %
+\gdef\parsearglinex #1^^M{\endgroup \next {#1}}}
+
+\def\flushcr{\ifx\par\lisppar \def\next##1{}\else \let\next=\relax \fi \next}
+
+% Single-spacing is done by various environments.
+
+\newskip\singlespaceskip
+\singlespaceskip = \baselineskip
+\def\singlespace{%
+{\advance \baselineskip by -\singlespaceskip
+\kern \baselineskip}%
+\baselineskip=\singlespaceskip
+}
+
+\def\arrow{$\rightarrow$}
+
+% Used to generate quoted braces.
+
+\def\mylbrace {{\tt \char '173}}
+\def\myrbrace {{\tt \char '175}}
+\let\{=\mylbrace
+\let\}=\myrbrace
+
+% \: forces normal size whitespace following.
+\def\:{\spacefactor=1000 }
+
+% \* forces a line break.
+\def\*{\hfil\break}
+
+% \. is an end-of-sentence period.
+\def\.{.\spacefactor=3000 }
+
+% \w prevents a word break
+\def\w#1{\hbox{#1}}
+
+% \need space-in-mils
+% forces a page break if there is not space-in-mils remaining.
+\newdimen\mil  \mil=0.001in
+
+\def\need#1{\par %
+% This method tries to make TeX break the page naturally
+% if the depth of the box does not fit.
+{\baselineskip=0pt%
+\vtop to #1\mil{\vfil}\kern -#1\mil\penalty 10000
+\prevdepth=-1000pt
+}}
+
+% \br   forces paragraph break
+
+\let\br = \par
+
+% \dots{}  output some dots
+
+\def\dots{$\ldots$}
+
+% \page    forces the start of a new page
+%\def\page{\clearpage}
+
+% \exdent text....
+% outputs text on separate line in roman font, starting at standard page margin
+
+\def\exdent{\errmessage{\back exdent in filled text}}
+  % \lisp, etc, define \exdent locally from \internalexdent
+
+{\obeyspaces
+\gdef\internalexdent{\exdentzzz}}
+
+\def\exdentzzz#1{{\advance \leftskip by -\lispnarrowing
+\advance \hsize by -\leftskip
+\advance \hsize by -\rightskip
+\leftline{{\rm#1}}}}
+
+% \sp n   outputs n lines of vertical space
+\def\sp#1{\par\vskip #1\baselineskip\relax}
+
+% \comment ...line which is ignored...
+% \c is the same as @comment
+% \begin{ignore} ... \end{ignore}  is another way to write a comment
+\def\comment{\parsearg \commentxxx}
+
+\def\commentxxx #1{}
+
+\let\c=\comment
+
+% Some texinfo constructs that are trivial in tex
+% \newenvironment{iftex}{\relax}{\relax}
+% \newcommand{\iflatex}{}
+% \newcommand{\endiflatex}{}
+\def\iftex{\relax}
+\let\endiftex=\relax
+
+\catcode`@=11
+
+\message{menus,}
+{\catcode`\^^M=13 \gdef\@gobblecr{\@ifnextchar
+{\@gobble}{\ignorespaces}}}
+
+\chardef\active=13
+
+{\catcode`\ =\active\gdef\@vobeyspaces{\catcode`\ \active \let \@xobeysp}}
+ 
+\begingroup \catcode `|=0 \catcode `[= 1
+\catcode`]=2 \catcode `\{=12 \catcode `\}=12
+\catcode`\\=12 
+|gdef|@xmenu#1\end{menu}[|end[menu]]
+|gdef|@xifinfo#1\end{ifinfo}[|end[ifinfo]]
+|gdef|@xignore#1\end{ignore}[|end[ignore]]
+|endgroup
+
+\def\@menu{\begingroup
+\@tempswafalse 
+\def\par{\if@tempswa\hbox{}\fi\@tempswatrue\@@par}
+\obeylines \let\do\@makeother \dospecials}
+
+\def\menu{\@menu\@xmenu }
+\let\endmenu=\endgroup
+\def\ifinfo{\@menu\@xifinfo }
+\let\endifinfo=\endgroup
+\def\ignore{\@menu\@xignore }
+\let\endignore=\endgroup
+
+%	18-Mar-91 by Niels :
+%
+%	Now you can use ",>,<,_,| in nodenames.
+%	The macros
+%	\node, \nodezzz, \pxref, \xref, \xrefX
+%	were changed,
+%	\label, \newlabel, \@testdef,
+%	were copied from latex.sty and slightly modified,
+%	new introduced are
+%	\@label, \@newlabel, \@@testdef, \@pxref, \@xref,
+%	\@ascii@doublequote, \@ascii@gtr, \@ascii@less,
+%		\@ascii@underscore, \@ascii@pipe,
+%	\@normal@doublequote, \@normal@gtr, \@normal@less,
+%		\@normal@underscore, \@normal@pipe,
+%	\doxrefnormalise, \doxrefspecials.
+%
+%	To achieve this the above listed chars were catcoded to active
+%	chars. For labelnames (written on the aux-file) the CHAR's
+%	macro is set to \@ascii@CHAR
+%	(i.e. self-insert-command respectively \catcode`\CHAR=12)
+%	using \@doxrefspecials.
+%	For Topics printed on paper the CHAR's macro is set to the
+%	\@normal@CHAR
+%	(i.e. the current macrodefinition of CHAR)
+%	using \@doxrefnormalise.
+%
+\def\node{%
+	\begingroup					% 18-Mar-91, Niels
+		\doxrefspecials				% 18-Mar-91, Niels
+		\parsearg\nodezzz}
+\def\nodezzz#1{\nodexxx [#1,]\endgroup}	% \endgroup added 18-Mar-91, Niels
+\def\nodexxx[#1,#2]{\gdef\lastnode{#1}}
+%\def\node#1#2#3#4{\gdef\lastnode{#1}}
+\let\lastnode=\relax
+
+\def\label{\begingroup\doxrefspecials\@label}		% 18-Mar-91, Niels
+\def\@label#1{%	this is mostly \label of latex.sty	  18-Mar-91, Niels
+	\@bsphack\if@filesw {\let\thepage\relax
+	\def\protect{\noexpand\noexpand\noexpand}%
+	\xdef\@gtempa{\write\@auxout{\string
+		\newlabel{#1}{{\@currentlabel}{\thepage}}}}}\@gtempa
+		\if@nobreak\ifvmode\nobreak\fi\fi\fi\@esphack
+	\endgroup}%			 \endgroup added, 18-Mar-91, Niels
+
+\def\newlabel{\begingroup\doxrefspecials\@newlabel}	% 18-Mar-91, Niels
+\def\@newlabel#1#2{% this is mostly \newlabel of latex.sty 18-Mar-91, Niels
+	\@ifundefined{r@#1}{}{\@warning{Label `#1' multiply
+	defined}}\global\@namedef{r@#1}{#2}%
+	\endgroup}			% \endgroup added, 18-Mar-91, Niels
+
+\def\@testdef{\begingroup\doxrefspecials\@@testdef}	% 18-Mar-91, Niels
+\def\@@testdef #1#2#3{% this is mostly \@testdef of latex.sty 18-Mar-91, Niels
+	\def\@tempa{#3}%
+	\expandafter \ifx \csname #1@#2\endcsname
+		\@tempa  \else \@tempswatrue \fi
+	\endgroup}			% \endgroup added, 18-Mar-91, Niels
+
+\let\refill=\relax
+\let\alwaysrefill=\relax
+\def\setfilename#1{}
+\def\paragraphindent#1{}
+\def\footnotestyle#1{}
+
+%\def\do{\noexpand\do\noexpand}
+%\edef\@preamblecmds{\@preamblecmds \do \setfilename footnotestyle}
+
+\def\inforef #1{\inforefzzz #1,,,,**}
+\def\inforefzzz #1,#2,#3,#4**{\@@See{} Info file
+	\file{\losespace#3{}}, node `\losespace#1{}'}
+\def\losespace #1{#1}
+
+\message{fonts,}
+
+\font\egttt  = cmtt8            % typewriter
+    \hyphenchar\egttt = -1      %  suppress hyphenation in \tt font
+\font\nintt  = cmtt9              % typewriter
+   \hyphenchar\nintt = -1         %  suppress hyphenation in \tt font
+\font\tentt  = cmtt10   % typewriter
+   \hyphenchar\tentt = -1         %  suppress hyphenation in \tt font
+\font\elvtt  = cmtt10   scaled \magstephalf % typewriter
+   \hyphenchar\elvtt = -1         %  suppress hyphenation in \tt font
+\font\twltt  = cmtt12               % typewriter
+   \hyphenchar\twltt = -1         %  suppress hyphenation in \tt font
+\global\hyphenchar\egttt = `\-
+\global\hyphenchar\nintt = `\-
+\global\hyphenchar\tentt = `\-
+\global\hyphenchar\elvtt = `\-
+\global\hyphenchar\twltt = `\-
+
+% Font-change commands.
+% Should depend on optional point size.
+%\font\defbf=cmbx10 scaled \magstep1 %was 1314
+%\font\deftt=cmtt10 scaled \magstep1
+\def\df{\bf\tt}
+
+\def\li{\sf}
+
+%% Add scribe-like font environments, plus \l for inline lisp (usually sans
+%% serif) and \ii for TeX italic
+
+% \smartitalic{ARG} outputs arg in italics, followed by an italic correction
+% unless the following character is such as not to need one.
+\def\smartitalicx{\ifx\next,\else\ifx\next-\else\ifx\next.\else\/\fi\fi\fi}
+\def\smartitalic#1{{\sl #1}\futurelet\next\smartitalicx}
+
+\let\i=\smartitalic
+\let\var=\smartitalic
+\let\dfn=\smartitalic
+\let\emph=\smartitalic
+
+\def\b#1{{\bf #1}}
+\let\strong=\b
+
+\def\t#1{{\tt \exhyphenpenalty=10000\rawbackslash \frenchspacing #1}\null}
+
+\def\key#1{{\tt \exhyphenpenalty=10000\uppercase{#1}}\null}
+\def\ctrl#1{$\uparrow${\tt #1}}
+%\def\ctrl#1{{\tt \rawbackslash \hat}#1}
+
+\def\samp #1{`\tclose{#1}'\null}
+\let\file=\samp
+% \code is a modification of \t,
+% which makes spaces the same size as normal in the surrounding text.
+\newdimen\tclosesave
+\newdimen\tcloserm
+\def\tclose#1{{\rm \tcloserm=\fontdimen2\font \tt \tclosesave=\fontdimen2\font
+\fontdimen2\font=\tcloserm
+% prevent breaking lines at hyphens.
+\exhyphenpenalty=10000
+\def\ {{\fontdimen2\font=\tclosesave{} }}%
+ \rawbackslash \frenchspacing #1\fontdimen2\font=\tclosesave}\null}
+\let\code=\tclose
+
+% \kbd is like \code, except that if the argument is just one \key command, 
+% then \kbd has no effect.
+\def\xkey{\key}
+\def\kbdfoo#1#2#3\par{\def\one{#1}\def\three{#3}\def\threex{??}%
+\ifx\one\xkey\ifx\threex\three \key{#2}%
+\else\tclose{\look}\fi
+\else\tclose{\look}\fi}
+\def\kbd#1{\def\look{#1}\expandafter\kbdfoo\look??\par}
+
+% Typeset a dimension, e.g., `in' or `pt'.  The only reason for the
+% argument is to make the input look right: \dmn{pt} instead of
+% \dmn{}pt.
+% 
+\def\dmn#1{\thinspace #1}
+
+\def\l#1{{\li #1}\null}
+\def\r#1{{\rm #1}}
+\def\scap#1{{\sc #1}}
+\def\ii#1{{\it #1}}
+\def\n#1{{\normalsize #1}}
+
+\def\bullet{$\ptexbullet$}
+\def\labelitemi{$\ptexbullet$}
+
+\def\minus{$-$}
+
+% Make altmode in file print out right
+\catcode `\^^[=\active \def^^[{$\diamondsuit$}
+
+%%% Fancy boxes from texinfo-2.11.tex
+% Since these characters are used in examples, it should be an even number of 
+% \tt widths. Each \tt character is 1en, so two makes it 1em.
+% Furthermore, these definitions must come after we define our fonts.
+\newbox\dblarrowbox    \newbox\longdblarrowbox
+\newbox\pushcharbox    \newbox\bullbox
+\newbox\equivbox       \newbox\errorbox
+
+\let\ptexequiv = \equiv
+
+{\tentt
+\global\setbox\dblarrowbox = \hbox to 1em{\hfil$\Rightarrow$\hfil}
+\global\setbox\longdblarrowbox = \hbox to 1em{\hfil$\mapsto$\hfil}
+\global\setbox\pushcharbox = \hbox to 1em{\hfil$\dashv$\hfil}
+\global\setbox\equivbox = \hbox to 1em{\hfil$\ptexequiv$\hfil}
+% Adapted from the manmac format (p.420 of TeXbook)
+\global\setbox\bullbox = \hbox to 1em{\kern.15em\vrule height .75ex width .85ex
+                                      depth .1ex\hfil}
+}
+
+\def\point{$\star$}
+\def\result{\leavevmode\raise.15ex\copy\dblarrowbox}
+\def\expansion{\leavevmode\raise.1ex\copy\longdblarrowbox}
+\def\print{\leavevmode\lower.1ex\copy\pushcharbox}
+\def\equiv{\leavevmode\lower.1ex\copy\equivbox}
+
+% Does anyone really want this?
+% \def\bull{\leavevmode\copy\bullbox}
+
+% Adapted from the TeXbook's \boxit.
+{\tentt \global\dimen0 = 3em}% Width of the box.
+\dimen2 = .55pt % Thickness of rules
+% The text. (`r' is open on the right, `e' somewhat less so on the left.)
+\setbox0 = \hbox{\kern-.75pt \tensf error\kern-1.5pt}
+
+\global\setbox\errorbox=\hbox to \dimen0{\hfil
+   \hsize = \dimen0 \advance\hsize by -5.8pt % Space to left+right.
+   \advance\hsize by -2\dimen2 % Rules.
+   \vbox{
+      \hrule height\dimen2
+      \hbox{\vrule width\dimen2 \kern3pt          % Space to left of text.
+         \vtop{\kern2.4pt \box0 \kern2.4pt}% Space above/below.
+         \kern3pt\vrule width\dimen2}% Space to right.
+      \hrule height\dimen2}
+    \hfil}
+
+% The \error{} command.
+\def\error{\leavevmode\lower.7ex\copy\errorbox}
+
+
+\message{indexing,}
+% Index generation facilities
+
+% Define the texinfo user-accessible indexing commands for backwrds 
+% compatability.
+
+\def\cindex{\cpindex}
+\def\pindex{\pgindex}
+\def\vindex{\vrindex}
+\def\tindex{\tpindex}
+\def\kindex{\kyindex}
+\def\findex{\fnindex}
+
+
+% \newindex {foo} defines an index named foo.
+% It automatically defines \fooindex such that
+% \fooindex ...rest of line... puts an entry in the index foo.
+% It also defines \fooindfile to be the number of the output channel for
+% the file that	accumulates this index.  The file's extension is foo.
+% The name of an index should be no more than 2 characters long
+% for the sake of vms.
+
+\def\newindex#1{\csname newindex#1\endcsname}
+
+% Yes I know this could be done shorter, but safer??
+
+\def\newindexcp{\if@filesw \newwrite\@cpindexfile
+  \immediate\openout\@cpindexfile=\jobname.cp
+  \def\cpindex{\@bsphack\begingroup
+             \def\protect####1{\string####1\space}\@sanitize
+             \@wrindex\@cpindexfile}%
+  \def\cpsubindex{\@bsphack\begingroup
+             \def\protect####1{\string####1\space}\@sanitize
+             \@wrsubindex\@cpindexfile}%
+  \def\cpindexbold{\@bsphack\begingroup
+             \def\protect####1{\string####1\space}\@sanitize
+             \@wrindexbold\@cpindexfile}
+   \typeout{Writing concepts index file \jobname.cp }%
+   \fi}
+
+\def\cpindex{\@bsphack\begingroup \@sanitize\@index}
+\def\cpsubindex{\@bsphack\begingroup \@sanitize\@index}
+\def\cpindexbold{\@bsphack\begingroup \@sanitize\@index}
+
+\def\@wrindex#1#2{\let\thepage\relax
+   \xdef\@gtempa{\write#1{\string \entry{#2}{\thepage}{#2}}}\endgroup
+   \def\@tempa{}\def\thing{#2}\ifx\thing\@tempa\relax\else\@gtempa\fi
+   \if@nobreak \ifvmode\nobreak\fi\fi\@esphack}
+
+\def\@wrindexbold#1#2{\let\thepage\relax \let\bf\relax
+   \xdef\@gtempa{\write#1{\string \entry{#2}{\b{\thepage}}{#2}}}\endgroup
+   \def\@tempa{}\def\thing{#2}\ifx\thing\@tempa\relax\else\@gtempa\fi
+   \if@nobreak \ifvmode\nobreak\fi\fi\@esphack}
+
+\def\@wrsubindex#1#2#3{\let\thepage\relax
+	\xdef\@gtempa{\write#1{\string \entry{#2 #3}{\thepage}{#2}{#3}}}\endgroup%
+	\@gtempa
+   \if@nobreak \ifvmode\nobreak\fi\fi\@esphack}
+
+\def\@index#1{\endgroup\@esphack}
+
+\def\pgindex{\@bsphack\begingroup \@sanitize\@index}
+\def\newindexpg{\if@filesw \newwrite\@pgindexfile
+  \immediate\openout\@pgindexfile=\jobname.pg
+  \def\pgindex{\@bsphack\begingroup
+             \def\protect####1{\string####1\space}\@sanitize
+             \@wrindex\@pgindexfile}
+  \def\pgindexbold{\@bsphack\begingroup
+             \def\protect####1{\string####1\space}\@sanitize
+             \@wrindexbold\@pgindexfile}
+	\typeout{Writing index file \jobname.pg }\fi}
+
+\def\pgindex{\@bsphack\begingroup \@sanitize\@index}
+\def\pgindexbold{\@bsphack\begingroup \@sanitize\@index}
+
+\def\newindexvr{\if@filesw \newwrite\@vrindexfile
+  \immediate\openout\@vrindexfile=\jobname.vr
+  \def\vrindex{\@bsphack\begingroup
+             \def\protect####1{\string####1\space}\@sanitize
+             \@wrindex\@vrindexfile}
+  \def\vrindexbold{\@bsphack\begingroup
+             \def\protect####1{\string####1\space}\@sanitize
+             \@wrindexbold\@vrindexfile}
+	\typeout{Writing variable index file \jobname.vr }\fi}
+
+\def\vrindex{\@bsphack\begingroup \@sanitize\@index}
+\def\vrindexbold{\@bsphack\begingroup \@sanitize\@index}
+
+\def\newindextp{\if@filesw \newwrite\@tpindexfile
+  \immediate\openout\@tpindexfile=\jobname.tp
+  \def\tpindex{\@bsphack\begingroup
+             \def\protect####1{\string####1\space}\@sanitize
+             \@wrindex\@tpindexfile}
+  \def\tpindexbold{\@bsphack\begingroup
+             \def\protect####1{\string####1\space}\@sanitize
+             \@wrindexbold\@tpindexfile}
+	\typeout{Writing datatype index file \jobname.tp }\fi}
+
+\def\tpindex{\@bsphack\begingroup \@sanitize\@index}
+\def\tpindexbold{\@bsphack\begingroup \@sanitize\@index}
+
+\def\newindexky{\if@filesw \newwrite\@kyindexfile
+  \immediate\openout\@kyindexfile=\jobname.ky
+  \def\kyindex{\@bsphack\begingroup
+             \def\protect####1{\string####1\space}\@sanitize
+             \@wrindex\@kyindexfile}\typeout{Writing key index file \jobname.ky }\fi}
+
+\def\kyindex{\@bsphack\begingroup \@sanitize\@index}
+\def\kyindexbold{\@bsphack\begingroup \@sanitize\@index}
+
+\def\newindexfn{\if@filesw \newwrite\@fnindexfile
+  \immediate\openout\@fnindexfile=\jobname.fn
+  \def\fnindex{\@bsphack\begingroup
+             \def\protect####1{\string####1\space}\@sanitize
+             \@wrindex\@fnindexfile}
+  \def\fnindexbold{\@bsphack\begingroup
+             \def\protect####1{\string####1\space}\@sanitize
+             \@wrindexbold\@fnindexfile}
+	\typeout{Writing function index file \jobname.fn }\fi}
+
+\def\fnindex{\@bsphack\begingroup \@sanitize\@index}
+\def\fnindexbold{\@bsphack\begingroup \@sanitize\@index}
+
+% \synindex{foo}{bar}    makes index foo feed into index bar.
+\def\synindex#1#2{\expandafter\xdef \csname @#1index\endcsname{%
+	\noexpand\csname @#2index\endcsname}%
+\expandafter \chardef \csname @#1indexfile\endcsname=\csname @#2indexfile\endcsname}
+
+% \syncodeindex{foo}{bar}   similar, but put all entries made for index foo
+% inside bold.
+\def\syncodeindex#1#2{%
+\expandafter\let\expandafter\synindexfoo\expandafter=\csname#2indfile\endcsname
+\expandafter\let\csname#1indfile\endcsname=\synindexfoo
+\expandafter\xdef\csname#1index\endcsname{%	% Define \xxxindex
+\csname#1boldindex\endcsname{#2}}%
+}
+
+% Define the macros used in formatting output of the sorted index material.
+% This is what you call to cause a particular index to get printed.
+% Write
+% \section*{Function Index}
+% \printindex{fn}
+
+\newskip\secondaryindent
+\secondaryindent=0.5cm
+
+\def\printindex#1{
+\def\indexbackslash{\rawbackslashxx}
+\tolerance=9500 \advance\baselineskip -1pt
+\openin 1 \jobname.#1s
+\ifeof 1 \else \closein 1 \input \jobname.#1s
+\fi
+}
+
+% These macros are used by the sorted index file itself.
+% Change them to control the appearance of the index.
+
+\def\Dotsbox{\hbox to 1em{\hss.\hss}} % Used by index macros
+
+\def\initial#1{%
+{\bigbreak\pline{\large\bf#1\hfill}\kern 2pt\penalty3000}}
+
+\def\entry #1#2{
+{\parfillskip=0in \parskip=0in \parindent=0in \small
+\hangindent=1in \hangafter=1%
+\noindent\hbox{#1}\leaders\Dotsbox\hskip 0pt plus 1filll\relax #2\par
+}}
+
+\def\primary #1{\pline{\small#1\hfil}}
+
+\def\secondary #1#2{
+{\parfillskip=0in \parskip=0in \small
+\hangindent =1in \hangafter=1
+\noindent\hskip\secondaryindent\hbox{#1}\leaders\Dotsbox\hskip 0pt plus 1filll#2\par
+}}
+
+%%% Args are the skip and penalty (usually negative)
+\def\dobreak#1#2{\par\ifdim\lastskip<#1\removelastskip\penalty#2\vskip#1\fi}
+
+\message{environments,}
+
+% \begin{tex} ... \end{tex}    escapes into raw Tex temporarily.
+
+\def\tex{\begingroup
+\catcode `\\=0 \catcode `\{=1 \catcode `\}=2
+\catcode `\$=3 \catcode `\&=4 \catcode `\#=6
+\catcode `\^=7 \catcode `\_=8 \catcode `\~=13 \let~=\tie
+\catcode `\%=14
+\catcode`\"=12
+\catcode`\|=12
+\catcode`\<=12
+\catcode`\>=12
+
+\let\{=\ptexlbrace
+\let\}=\ptexrbrace
+\let\.=\ptexdot
+\let\*=\ptexstar
+\let\bullet=\ptexbullet
+\let\b=\ptexb \let\c=\ptexc \let\i=\ptexi \let\t=\ptext \let\l=\ptexl
+\let\L=\ptexL
+
+\let\endtex=\endgroup}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \cartouche: draw rectangle w/rounded corners around argument
+\font\circfont=lcircle10
+\newdimen\circthick
+\newdimen\cartouter\newdimen\cartinner
+\newskip\normbskip\newskip\normpskip\newskip\normlskip
+\circthick=\fontdimen8\circfont
+%
+\def\ctl{{\circfont\char'013\hskip -6pt}}% 6pt from pl file: 1/2charwidth
+\def\ctr{{\hskip 6pt\circfont\char'010}}
+\def\cbl{{\circfont\char'012\hskip -6pt}}
+\def\cbr{{\hskip 6pt\circfont\char'011}}
+\def\carttop{\hbox to \cartouter{\hskip\lskip
+	\ctl\leaders\hrule height\circthick\hfil\ctr
+	\hskip\rskip}}
+\def\cartbot{\hbox to \cartouter{\hskip\lskip
+	\cbl\leaders\hrule height\circthick\hfil\cbr
+	\hskip\rskip}}
+%
+\newskip\lskip\newskip\rskip
+
+\long\def\cartouche{%
+\begingroup
+	\lskip=\leftskip \rskip=\rightskip
+	\leftskip=0pt\rightskip=0pt %we want these *outside*.
+	\cartinner=\hsize \advance\cartinner by-\lskip 
+		 	  \advance\cartinner by-\rskip
+	\cartouter=\hsize
+	\advance\cartouter by 18pt % allow for 3pt kerns on either
+%				     side, and for 6pt waste from
+%				     each corner char
+	\normbskip=\baselineskip \normpskip=\parskip \normlskip=\lineskip
+	\vbox\bgroup
+		\baselineskip=0pt\parskip=0pt\lineskip=0pt
+		\carttop
+		\hbox\bgroup
+			\hskip\lskip
+			\vrule\kern3pt
+			\vbox\bgroup
+				\hsize=\cartinner
+				\kern3pt
+				\begingroup
+					\baselineskip=\normbskip
+					\lineskip=\normlskip
+					\parskip=\normpskip
+					\vskip -\parskip
+\def\endcartouche{%
+				\endgroup
+				\kern3pt
+			\egroup
+			\kern3pt\vrule
+			\hskip\rskip
+		\egroup
+		\cartbot
+	\egroup
+\endgroup
+}}	
+
+% Define \lisp ... \endlisp.
+% Like example, but uses a smaller fixed-width font.
+% Wraps things in a \samepage.
+
+
+% Amount to narrow the margins by for \lisp.
+\newskip\lispnarrowing \lispnarrowing=\parindent
+
+% This is the definition that ^M gets inside \lisp
+% phr: changed space to \null, to avoid overfull hbox problems.
+{\obeyspaces%
+\gdef\lisppar{\null\endgraf}}
+
+% Cause \obeyspaces to make each Space cause a word-separation
+% rather than the default which is that it acts punctuation.
+% This is because space in tt font looks funny.
+{\obeyspaces %
+\gdef\sepspaces{\def {\ }}}
+
+\newskip\aboveenvskipamount \aboveenvskipamount= 0pt
+\def\aboveenvbreak{{\advance\aboveenvskipamount by \parskip
+\endgraf \ifdim\lastskip<\aboveenvskipamount
+\removelastskip \penalty-50 \vskip\aboveenvskipamount \fi}}
+
+\def\afterenvbreak{\endgraf \ifdim\lastskip<\aboveenvskipamount
+\removelastskip \penalty-50 \vskip\aboveenvskipamount \fi}
+
+%-----File: example.sty----------------------------------------------
+     
+% Copyright Denys Duchier, Yale University, 1988.
+%
+% \begin{example}...\end{example} is very much like verbatim, except
+% that it doesn't change the meaning of \, { or }. This makes it
+% possible to include commands (such as font changes) in otherwise
+% verbatim text.
+%
+% \begin{example*}{OFFSET}...\end{example*} is the same except that
+% everything is indented by OFFSET. This works even inside other list
+% environments.
+%
+% inside example, you can use \begin{comment}...\end{comment} to
+% include normal TeX text. \begin{comment}[OFFSET] will offset the
+% comment by the specified offset.
+     
+\newdimen\exampleleftmargin \exampleleftmargin\z@
+\def\examplesavespecials{\let\xmpl@space\ \let\xmpl@dollar\$
+\let\xmpl@amper\&\let\xmpl@hash\#\let\xmpl@caret\^\let\xmpl@cntlK\^^K
+\let\xmpl@dq\"
+\let\xmpl@underscore\_\let\xmpl@cntlA\^^A\let\xmpl@percent\%
+\let\xmpl@tilde\%}
+\def\examplerestorespecials{\let\ \xmpl@space\let\$\xmpl@dollar
+\let\&\xmpl@amper\let\#\xmpl@hash\let\^\xmpl@caret\let\^^K\xmpl@cntlK
+\let\"\xmpl@dq
+\let\_\xmpl@underscore\let\^^A\xmpl@cntlA\let\%\xmpl@percent
+\let\%\xmpl@tilde}
+\def\example@dospecials{\do\ \do\$\do\&\do\#\do\^\do\^^K\do\_\do\^^A\do\%\do\%}
+\def\example@verbatim{\let\comment\xmpl@comment\let\endcomment\xmpl@@endcomment
+  \let\back\xmpl@back
+  \list{}{\parsep\parskip
+  \leftmargin\exampleleftmargin
+  \labelwidth\z@
+  \itemindent\z@
+  \def\makelabel##1{##1}}\item[]\if@minipage\else\vskip\parskip\fi
+  \leftskip\@totalleftmargin
+  \rightskip\z@
+  \parindent\z@
+  \parfillskip\@flushglue
+  \parskip\z@
+  \@tempswafalse
+  \def\par{\if@tempswa\hbox{}\fi\@tempswatrue\@@par}
+  \obeylines
+\ifcase \@ptsize\relax\tentt\or\elvtt\or\twltt\fi
+\hyphenpenalty=\@M \exhyphenpenalty=\@M \brokenpenalty=\@M
+  \@noligs
+  \examplesavespecials
+  \let\do\@makeother\dospecials}
+%
+{\catcode`\ =\active
+\@vobeyspaces
+\gdef\xmpl@back{
+\let\@tempe \def\@tempa{\rawbackslashxx\@gobble}\def\@tempb{\rawbackslashxx}\futurelet\@tempc\@ifnch}
+}
+\def\xmpl@comment{\@ifnextchar [{\xmpl@@comment}{\xmpl@@comment[0pt]}}
+\def\xmpl@@comment[#1]{\begingroup
+  \examplerestorespecials
+  \catcode`\ =10 \catcode`\^^M=5
+  \list{}{\leftmargin\exampleleftmargin
+  \advance\leftmargin #1}\item[]\rm\ignorespaces}
+\def\xmpl@@endcomment{\endlist\endgroup\vskip-\baselineskip}
+
+\def\@example{%
+\ifcase \@ptsize\relax\tentt\or\elvtt\or\twltt\fi
+\let\dospecials\example@dospecials 
+  \example@verbatim\frenchspacing\@vobeyspaces}
+\def\example{\exampleleftmargin\lispnarrowing\@example}
+\let\endexample\endlist
+\@namedef{example*}#1{\exampleleftmargin#1\@example}
+\expandafter\let\csname endexample*\endcsname\endexample
+
+\def\@smallexample{%
+\ifcase \@ptsize\relax\nintt\or\tentt\or\elvtt\fi
+\let\dospecials\example@dospecials
+  \example@verbatim\frenchspacing\@vobeyspaces}
+\def\smallexample{\exampleleftmargin\lispnarrowing\@smallexample}
+\let\endsmallexample\endlist
+\@namedef{smallexample*}#1{\exampleleftmargin#1\@smallexample}
+\expandafter\let\csname endsmallexample*\endcsname\endsmallexample
+
+\def\lisp{\example}
+\def\endlisp{\endexample}
+
+\def\smalllisp{\smallexample}
+\def\endsmalllisp{\endsmallexample}
+
+\def\@display{%
+\let\dospecials\example@dospecials
+  \example@verbatim\frenchspacing\@vobeyspaces}
+\def\display{\exampleleftmargin\lispnarrowing\@display}
+\let\enddisplay\endlist
+
+\def\@format{%
+\let\dospecials\example@dospecials
+  \example@verbatim\frenchspacing\@vobeyspaces}
+\def\format{\exampleleftmargin\z@\@format}
+\let\endformat\endlist
+
+\def\exdent#1{\hskip -\leftmargin \hbox{#1\hss}}
+%end -----File: example.sty----------------------------------------------
+
+\newbox\@onepagebox
+\def\same{\global\setbox\@onepagebox\vbox\bgroup 
+%    \boxmaxdepth\z@     % commented out 15 Dec 87
+%    \hsize\columnwidth \@parboxrestore}
+\begin{minipage}[c]{\linewidth}}
+
+\def\endsame{\end{minipage}\par\vskip\z@\egroup %
+\ifdim \ht\@onepagebox >\textheight 
+\ht\@onepagebox\textheight \fi
+\unvbox\@onepagebox}
+
+\newskip\ruletonoteskip \ruletonoteskip=6pt plus 3pt minus 1pt
+\newskip\ruletotextskip \ruletotextskip=10pt plus 12pt minus 2pt
+\newdimen\thinrule   \thinrule=0.4pt
+
+\def\beforenoterule{\par\@tempskipb\lastskip \@tempdima\prevdepth
+  \ifdim 0pt>\@tempdima \@tempdima=0pt\fi
+  \ifdim 14pt>\@tempskipb \vskip-\@tempskipb \vskip 14pt \fi
+  \kern-\@tempdima\nointerlineskip
+       \hrule height \thinrule width 12pc
+  \nobreak\vskip 16pt\vskip-\baselineskip\hbox{}\nobreak}
+
+\def\betweennoterule{\par\@tempskipb\lastskip \@tempdima\prevdepth
+  \ifdim 0pt>\@tempdima \@tempdima=0pt\fi
+  \nobreak
+  \vskip-\@tempskipb \vskip 11pt
+  \kern-\@tempdima\nointerlineskip
+		     \hrule height \thinrule width 12pc\penalty-500\vskip -\thinrule
+       % The game here is to have *two* rules that normally coincide exactly,
+       % but if a page break occurs between them then you get one at the
+       % bottom of the first page and one at the top of the second page.
+       \hrule height \thinrule width 12pc
+		\nobreak\vskip 16pt\vskip-\baselineskip\hbox{}\nobreak}
+
+\def\afternoterule{\par\@tempskipb\lastskip \@tempdima\prevdepth
+  \ifdim 0pt>\@tempdima \@tempdima=0pt\fi
+  \nobreak
+  \vskip-\@tempskipb \vskip 11pt
+  \nobreak\kern-\@tempdima\nointerlineskip
+       \hrule height \thinrule width 12pc
+  \vskip 16pt}
+
+\def\afternoterule{\par\nobreak\vskip\ruletonoteskip
+		   \hrule height \thinrule width 12pc
+		   \vskip\ruletotextskip}
+
+
+\def\implementation{\par\small\noindent{\bf Implementation note:}}
+\def\endimplementation{\par}
+\def\rationale{\par\small\noindent{\bf Rationale:}}
+\def\endrationale{\par}
+\def\sideremark{\par\small\noindent{\bf Remark:}}
+\def\endsideremark{\par}
+\def\note{\par\small\noindent{\bf Note:}}
+\def\endnote{\par}
+
+\message{cross reference,}
+% Define cross-reference macros
+
+% \xref and \pxref generate cross references to specified points.
+\def\pxref{\begingroup\doxrefspecials\@pxref}%		18-Mar-91, Niels
+\def\@pxref #1{\@@see{} \xrefX [#1,,,,,,,]\endgroup}%	18-Mar-91, Niels
+\def\nxref{\begingroup\doxrefspecials\@nxref}%		18-Mar-91, Niels
+\def\@nxref #1{\xrefX [#1,,,,,,,]\endgroup}%	18-Mar-91, Niels
+\def\xref{\begingroup\doxrefspecials\@xref}%		18-Mar-91, Niels
+\def\@xref #1{\@@See{} \xrefX [#1,,,,,,,]\endgroup}%	18-Mar-91, Niels
+
+\def\MikesxrefX [#1,#2,#3,#4,#5,#6]{section \ref{#1} [%
+{\setbox0=\hbox{\losespace#3{}}%
+\ifdim \wd0 =0pt \losespace#1{}\else\unhbox0\fi}],
+page\tie \pageref{#1}}
+
+% In the following macro the sceleton isnt changed.
+% Instead of \setbox0 and \setbox1 the new boxes \@Topic and
+% \@APrintedManual are used.			18-Mar-91, Niels
+% Redefined out because it costs too many boxes 10-Nov-91  Mike.
+\newbox\@Topic
+\newbox\@APrintedManual
+\def\xrefX [#1,#2,#3,#4,#5,#6]{%
+	\setbox\@Topic=\hbox{\i{\losespace#5{}}}%
+	\setbox\@APrintedManual=\hbox{\losespace#3{}}%
+	\ifdim \wd\@Topic =0pt
+		\setbox\@Topic=\hbox{{\doxrefnormalise	% some what tricky
+			\losespace#1{}}}%
+	\fi
+	\@@section{} % print section in all cases just as the manual says.
+		% 18-Mar-91, Niels
+	\ifdim \wd\@APrintedManual >0pt%
+		\unhbox\@Topic{} in \unhbox\@APrintedManual%
+	\else	\ref{#1} [\unhbox\@Topic], \@@page\tie \pageref{#1}%
+	\fi}
+
+\message{sectioning,}
+% Define chapters, sections, etc.
+
+\def\@chapter[#1]#2{\ifnum \c@secnumdepth >\m@ne
+ \refstepcounter{chapter}
+ \typeout{\@chapapp\space\thechapter.}
+ \addcontentsline{toc}{chapter}{\protect
+ \numberline{\thechapter}#1}\else
+ \addcontentsline{toc}{chapter}{#1}\fi
+ \chaptermark{#1}
+\ifx\lastnode\relax\else\label{\lastnode}\fi
+\let\lastnode=\relax
+ \addtocontents{lof}{\protect\addvspace{10pt}}
+\addtocontents{lot}{\protect\addvspace{10pt}} \if@twocolumn
+\@topnewpage[\@makechapterhead{#2}] 
+ \else \@makechapterhead{#2}
+ \@afterheading \fi} 
+\def\@schapter#1{\if@twocolumn \@topnewpage[\@makeschapterhead{#1}]
+ \else \@makeschapterhead{#1} 
+ \@afterheading\fi}
+
+\def\@sect#1#2#3#4#5#6[#7]#8{\ifnum #2>\c@secnumdepth
+     \def\@svsec{}\else 
+     \refstepcounter{#1}
+	\edef\@svsec{\csname the#1\endcsname\hskip 1em }\fi
+     \@tempskipa #5\relax
+      \ifdim \@tempskipa>\z@ 
+        \begingroup #6\relax
+          \@hangfrom{\hskip #3\relax\@svsec}{\interlinepenalty \@M #8\par}
+        \endgroup
+       \csname #1mark\endcsname{#7}\addcontentsline
+         {toc}{#1}{\ifnum #2>\c@secnumdepth \else
+                      \protect\numberline{\csname the#1\endcsname}\fi
+                    #7}\else
+        \def\@svsechd{#6\hskip #3\@svsec #8\csname #1mark\endcsname
+                      {#7}\addcontentsline
+                           {toc}{#1}{\ifnum #2>\c@secnumdepth \else
+                             \protect\numberline{\csname the#1\endcsname}\fi
+                       #7}}\fi
+\ifx\lastnode\relax\else\label{\lastnode}\fi
+\let\lastnode=\relax
+     \@xsect{#5}}
+
+% Unnumbered
+\def\unnumbered#1{\chapter*{#1}\@mkboth{\uppercase{#1}}{\uppercase{#1}}
+\addcontentsline{toc}{chapter}{#1}}	 
+
+% This is bogus if you use it in a book or report style
+\def\unnumberedsec#1{\section*{#1}\@mkboth{\uppercase{#1}}{\uppercase{#1}}
+\addcontentsline{toc}{section}{#1}}	 
+
+\def\unnumberedsubsec#1{\subsection*{#1}\addcontentsline
+	{toc}{subsection}{#1}}	 
+
+\def\unnumberedsubsubsec#1{\subsubsection*{#1}\addcontentsline
+	{toc}{subsubsection}{#1}}	 
+
+
+\message{verbatim,}
+%       ****************************************
+%       *              VERBATIM                *
+%       ****************************************
+%
+%  The verbatim environment uses the fixed-width \tt font, turns blanks into 
+%  spaces, starts a new line for each carrige return (or sequence of 
+%  consecutive carriage returns), and interprets EVERY character literally.
+%  I.e., all special characters \, {, $, etc. are \catcode'd to 'other'.
+%
+%  The command \verb produces in-line verbatim text, where the argument
+%  is delimited by any pair of characters.  E.g., \verb #...# takes
+%  '...' as its argument, and sets it verbatim in \tt font.
+%
+%  The *-variants of these commands is the same, except that spaces
+%  print as the TeXbook's space character instead of as blank spaces.
+
+{\catcode`\^^M=13 \gdef\@gobblecr{\@ifnextchar
+{\@gobble}{\ignorespaces}}}
+
+{\catcode`\ =\active\gdef\@vobeyspaces{\catcode`\ \active\let \@xobeysp}}
+ 
+% Definition of \@xobeysp chaned on 19 Nov 86 from
+% \def\@xobeysp{\leavevmode{} }
+% to prevent line breaks at spaces.  Change suggested by
+% Nelson Beebe
+%
+\def\@xobeysp{\leavevmode\penalty10000\ }
+
+\begingroup \catcode `|=0 \catcode `[= 1
+\catcode`]=2 \catcode `\{=12 \catcode `\}=12
+\catcode`\\=12 |gdef|@smallxverbatim#1\end{smallverbatim}[#1|end[smallverbatim]]
+|gdef|@smallsxverbatim#1\end{smallverbatim*}[#1|end[smallverbatim*]]
+|endgroup
+
+\def\@gobble#1{}
+
+\def\@smallverbatim{\trivlist \item[]\if@minipage\else\vskip\parskip\fi
+\leftskip\@totalleftmargin\rightskip\z@
+\parindent\z@\parfillskip\@flushglue\parskip\z@
+\@tempswafalse \def\par{\if@tempswa\hbox{}\fi\@tempswatrue\@@par}
+\obeylines 	\ifcase \@ptsize\relax\nintt\or\tentt\or\elvtt\fi
+\catcode``=13 \@noligs \let\do\@makeother \dospecials}
+
+\def\smallverbatim{\@smallverbatim \frenchspacing\@vobeyspaces \@smallxverbatim}
+\def\endsmallverbatim{\endtrivlist%\def\baselinestretch{1.0}
+}
+
+\@namedef{smallverbatim*}{\@smallverbatim\@smallsxverbatim}
+\expandafter\let\csname endsmallverbatim*\endcsname =\endtrivlist
+
+% Wizardly incantation of the net to include files verbatim
+% Usage         \verbatimfile{filename}
+%               \end{verbatim}
+\newcommand{\beginverb}{\begin{verbatim}}
+\newcommand{\inputfile}[1]{\input{#1}}
+\newcommand{\verbatimfile}[1]{\expandafter\beginverb\inputfile{#1}}
+
+\newcommand{\beginsmallverb}{\begin{smallverbatim}}
+\newcommand{\smallverbatimfile}[1]{\expandafter\beginsmallverb\inputfile{#1}}
+
+% Now make all imbedded control L's <Form Feed> act like \newpage
+\catcode`^^L = \active
+\def^^L{\newpage}
+
+%% For a final copy, take out the rectangles
+%% that mark overfull boxes (in case you have decided
+%% that the text looks ok even though it passes the margin).
+\def\finalout{\overfullrule=0pt}
+
+\message{and turning on latexinfo input format.}
+
+{\catcode`\@=0
+
+% \rawbackslashxx output one backslash character in current font
+\global\chardef\rawbackslashxx=`\\
+%{\catcode`\\=\other
+%@gdef@rawbackslashxx{\}}
+
+% \rawbackslash redefines \ as input to do \rawbackslashxx.
+{\catcode`\\=\active
+@gdef@rawbackslash{@let\=@rawbackslashxx }}
+}
+
+% \back outputs one backslash in fixed width font.
+\def\back{{\tt\rawbackslashxx}}% inner {} forgotten,
+				% added at 18-Mar-91, Stefan&Eric
+				% \ignorespaces removed Feb 1992, mike
+
+\def\document{\endgroup
+  \@colht\textheight  \@colroom\textheight \vsize\textheight
+   \columnwidth\textwidth \@clubpenalty\clubpenalty
+   \if@twocolumn \advance\columnwidth -\columnsep 
+      \divide\columnwidth\tw@ \hsize\columnwidth \@firstcolumntrue 
+   \fi
+  \hsize\columnwidth \linewidth\hsize
+  \begingroup\@floatplacement\@dblfloatplacement
+   \makeatletter\let\@writefile\@gobbletwo
+   \@input{\jobname.aux}\endgroup 
+  \if@filesw \immediate\openout\@mainaux=\jobname.aux
+    \immediate\write\@mainaux{\relax}\fi
+  \def\do##1{\let ##1\@notprerr}
+  \@preamblecmds
+  \let\do\noexpand
+\@normalsize\everypar{}\nospecials}
+
+%	LaTeXinfo support for  \cite
+%
+%     CITE.STY -- compress numerical citations.
+%     See also OVERCITE.STY.
+%
+%     Copyright (C) 1989 by Donald Arseneau
+%     These macros may be freely transmitted, reproduced, or modified for
+%     non-commercial purposes provided that this notice is left intact.
+%
+\def\citen#1{%
+\if@filesw \immediate \write \@auxout {\string \citation {#1}}\fi 
+\@tempcntb\m@ne \let\@h@ld\relax \def\@citea{}%
+\@for \@citeb:=#1\do {%
+  \@ifundefined {b@\@citeb}%
+    {\@h@ld\@citea\@tempcntb\m@ne{\bf ?}%
+    \@warning {Citation `\@citeb ' on page \thepage \space undefined}}%
+% else
+    {\@tempcnta\@tempcntb \advance\@tempcnta\@ne
+    \setbox\z@\hbox\bgroup\ifcat0\csname b@\@citeb \endcsname \relax
+       \egroup \@tempcntb\number\csname b@\@citeb \endcsname \relax
+       \else \egroup \@tempcntb\m@ne \fi
+    \ifnum\@tempcnta=\@tempcntb %   Number follows previous--hold on to it
+       \ifx\@h@ld\relax 
+%         % first pair of successives
+          \edef \@h@ld{\@citea\csname b@\@citeb\endcsname}% 
+       \else
+%         % compressible list of successives
+%         % use \hbox to avoid easy \exhyphenpenalty breaks on-line
+          \edef\@h@ld{\hbox{--}\penalty\@highpenalty
+              \csname b@\@citeb\endcsname}%
+       \fi
+    \else   %  non-successor--dump what's held and do this one
+       \@h@ld\@citea\csname b@\@citeb \endcsname 
+       \let\@h@ld\relax
+    \fi}%     
+%%    To put space after the comma, use:
+ \def\@citea{,\penalty\@highpenalty\hskip.13em plus.13em minus.13em}%
+%%    For no space after comma, use:
+%% \def\@citea{,\penalty\@highpenalty}% penalty is for on-line with note.
+%%
+}\@h@ld}
+% 
+%     Replacement for \@citex:
+% 
+\def\@citex[#1]#2{\@cite{\citen{#2}}{#1}}%
+%
+%  Replacement for \@cite 
+%
+\def\@cite#1#2{\leavevmode\unskip
+  \ifnum\lastpenalty=\z@\penalty\@highpenalty\fi% highpenalty before
+  \ [{\multiply\@highpenalty 3 #1%              % triple-highpenalties within.
+  \if@tempswa,\penalty\@highpenalty\ #2\fi}]}   % and before note.
+%
+
+%
+%	LaTeXinfo support for the \tabular-environment
+%
+%% Some people want to use & and | as a normal char but tabulars too.
+%% So we define | to be electrical only within the preamble of the
+%% tabular-environment, and & in the body.
+%% To achieve this I use the \begingroup and \endgroup of the
+%% \begin{tabular} and \end{tabular} resp.
+%% "|" is catcoded to \other (12) before the preamble in \@tabular
+%% (see below) and after it to \active, yielding a vertbar within the
+%% body of the tabular-environment.
+%% The "&" is catcoded to 4 (tab char) after the preamble. So you can
+%% use "&" in the preamble as "self-insert-char".
+%%
+%% \@tabular is copied from latex.tex, 9-Apr-91,
+%% \@array is copied from latex.tex, 4-Sep-91,
+%% Niels-Holger Geske.
+%%
+
+\def\@tabular{% this macro is copied from latex.tex and slightly
+	      % changed. 
+	\catcode`\|=\other%	for use in preamble, 4-Sep-91 Niels
+	\leavevmode
+	\hbox \bgroup
+		$\let\@acol\@tabacol
+		\let\@classz\@tabclassz
+		\let\@classiv\@tabclassiv
+		\let\\\@tabularcr
+		\@tabarray}
+
+\def\@array[#1]#2{% this macro is copied from latex.tex and slightly
+	      % changed. 
+	\setbox\@arstrutbox=\hbox{\vrule 
+		height\arraystretch \ht\strutbox
+		depth\arraystretch \dp\strutbox
+		width\z@}%
+	\@mkpream{#2}%
+	\edef\@preamble{%
+		\halign
+		\noexpand\@halignto
+		\bgroup
+			\tabskip\z@
+			\@arstrut
+			\@preamble
+			\tabskip\z@
+			\cr}%
+	\let\@startpbox\@@startpbox
+	\let\@endpbox\@@endpbox
+	\catcode`\&=4%		for seperating columns, 4-Sep-91 Niels
+	\catcode`\|=\active%	for getting vertbar, 4-Sep-91 Niels
+	\if #1t\vtop
+	\else	\if#1b\vbox
+		\else	\vcenter
+	\fi	\fi
+	\bgroup	\let\par\relax
+		\let\@sharp##%
+		\let\protect\relax
+		\lineskip\z@
+		\baselineskip\z@
+		\@preamble}
+
+% Here is a list of the characters that have been specially catcoded:
+\def\dosomespecials{\do\$\do\&\do\#\do\%\do\~\do\^}
+
+\newcount\l@nguage
+% This will be re-declared as \language if the latter has not yet been
+% declared neither by Ferguson's ``Multilingual T^eX'' nor by TeX 3:
+% \ifundefined{language}
+\expandafter\ifx\csname language\endcsname\relax
+\global\let\language=\l@nguage
+\fi
+\newcount\USenglish  \global\USenglish=0
+\newcount\german     \global\german=1
+\newcount\austrian   \global\austrian=2
+\newcount\french     \global\french=3
+\newcount\english    \global\english=4
+
+% We want all these funny characters CHARs to appear in the printed
+% manual as themselves. So we catcode them to \active and \let them to
+% produce the character CHAR from the \tt font (see \nospecials
+% below). But when writing to the .aux-file, we must write the
+% ascii-code of the character, stored in \@ascii@CHAR, not the
+% activated macro, whose definition is saved in \@normal@CHAR (see
+% \doxrefspecials below). The macro \doxrefnormalise restores these
+% @normal@ definitions. 4-Sep-91  Niels-Holger Geske
+
+{\begingroup            % the following lines inserted at 18-Mar-91, Niels
+        \catcode`\"=\other
+        \gdef\@ascii@doublequote{"}
+        \catcode`\>=\other
+        \gdef\@ascii@gtr{>}
+        \catcode`\<=\other
+        \gdef\@ascii@less{<}
+        \catcode`\_=\other
+        \gdef\@ascii@underscore{_}
+        \catcode`\|=\other
+        \gdef\@ascii@pipe{|}%                   Fixed, was "
+\endgroup
+
+\catcode`\"=\active
+\catcode`\>=\active
+\catcode`\<=\active
+\catcode`\_=\active
+\catcode`\|=\active
+\gdef\doxrefnormalise{% the following lines inserted at 18-Mar-91, Niels
+	\catcode`\"=\active
+	\let"=\@normal@doublequote
+	\catcode`\>=\active
+	\let>=\@normal@gtr
+	\catcode`\<=\active
+	\let<=\@normal@less
+	\catcode`\_=\active
+	\let_=\@normal@underscore
+	\catcode`\|=\active
+	\let|=\@normal@pipe}
+\gdef\doxrefspecials{% the following lines inserted at 18-Mar-91, Niels
+	\let\@normal@doublequote="%
+	\let\@normal@gtr=>%
+	\let\@normal@less=<%
+	\let\@normal@underscore=_%
+	\let\@normal@pipe=|%
+	\catcode`\"=\active
+	\let"=\@ascii@doublequote
+	\catcode`\>=\active
+	\let>=\@ascii@gtr
+	\catcode`\<=\active
+	\let<=\@ascii@less
+	\catcode`\_=\active
+	\let_=\@ascii@underscore
+	\catcode`\|=\active
+	\let|=\@ascii@pipe}
+\gdef\@englishtext{%
+	\def\@@See{See}%
+	\def\@@see{see}%
+	\def\@@section{section}%
+	\def\@@page{page}%
+}
+\gdef\@germantext{%
+	\def\@@See{Siehe}%
+	\def\@@see{siehe}%
+	\def\@@section{Abschnitt}%
+	\def\@@page{Seite}%
+}
+\gdef\@frenchtext{%
+	\def\@@See{Voir}%
+	\def\@@see{voir}%
+	\def\@@section{section}%
+	\def\@@page{Page}%
+}
+\gdef\nospecials{%
+	\ifnum\language=\USenglish 
+		\@englishtext
+		\catcode`\"=\active
+		\gdef\activedoublequote{{\tt \char '042}}%
+		\let"=\activedoublequote
+	\else
+		\ifnum\language=\english
+		\@englishtext
+		\catcode`\"=\active
+		\gdef\activedoublequote{{\tt \char '042}}%
+		\let"=\activedoublequote
+	\else
+		\ifnum\language=\german
+		\@germantext
+		% \ifundefined{mdqon} or \mdqon=\relax
+		\expandafter\ifx\csname mdqon\endcsname\relax
+		% \then make " a "
+			\catcode`\"=\active
+			\gdef\activedoublequote{{\tt \char '042}}%
+			\let"=\activedoublequote
+		\fi
+	\else
+		\ifnum\language=\french
+		\@frenchtext
+		\fi\fi\fi\fi
+	\catcode`\>=\active
+	\gdef\activegtr{{\tt \char '076}}
+	\let>=\activegtr
+	\catcode`\<=\active
+	\gdef\activeless{{\tt \char '074}}
+	\let<=\activeless
+	\catcode`\_=\active
+	\gdef\activeunderscore{{\tt \char '137}}
+	\let_=\activeunderscore
+	\catcode`\|=\active
+	\gdef\activevertbar{{\tt \char '174}}
+	\let|=\activevertbar
+	\@noligs\let\do\@makeother \dosomespecials}
+}

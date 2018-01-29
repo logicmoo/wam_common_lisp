@@ -1,0 +1,191 @@
+\edef\defun{\the\catcode`@}%
+\catcode`@ = 11
+\let\@oldatcatcode = \defun
+
+\edef\defun{\the\catcode`&}%
+\catcode`& = 11
+\let\@oldandcatcode = \defun
+
+\def\empty{\t{()}}
+\def\false{\t{nil}}
+\def\true{\t{t}}
+\def\nil{\t{nil}}
+\def\FALSE{\t{nil}}
+\def\TRUE{\t{t}}
+\def\NIL{\t{nil}}
+
+\def\dlbrack{\lbrack\mskip-\thinmuskip\lbrack\mskip\thinmuskip}
+\def\drbrack{\mskip\thinmuskip\rbrack\mskip-\thinmuskip\rbrack}
+
+\def\mopt#1{{$\,\lbrack$}{\it #1\/}{$\rbrack\,$}}%
+\def\mchoice#1{{$\,\dlbrack$}{\it #1\/}{$\drbrack\,$}}%
+\def\mstar#1{{$\,\lbrace$}{\it #1\/}{$\rbrace^*\,$}}%
+\def\mplus#1{{$\,\lbrace$}{\it #1\/}{$\rbrace^+\,$}}%
+\def\mgroup#1{{$\,\lbrace$}{\it #1\/}{$\rbrace\,$}}%
+\def\mor{{$|$}}%
+\def\mind#1{$\downarrow${\it #1\/}}%
+
+%% FUNCTIONS
+
+{\catcode`&=11
+ \def\&optional{\t{\& optional}}
+ \def\&rest{\t{\& rest}}
+ \def\&key{\t{\& key}}
+}
+
+\def\defun@vspace{\ifhmode\unskip \par\fi\addvspace{18pt plus 12pt minus 6pt}}
+\def\defun@hspace{\ifhmode\unskip \par\fi\hskip1.5em}
+
+% name and arguments are required 
+% In between can be an optional package
+\def\defun{\defun@vspace\defunx}
+\def\defunx{\@defn{Function}}
+\def\defn{\defun@vspace\@defn}
+\def\defnx{\@defn}
+\def\enddefun{\enddfn}
+\def\enddefn{\enddfn}
+\def\enddfn{\relax}
+
+\def\@defunstart{\noindent\leavevmode     % Need this to trigger the \everypar for margin rules.
+  \begingroup \samepage \raggedright
+  \hyphenpenalty=-5  \exhyphenpenalty=\@M  \brokenpenalty=\@M}
+
+\def\@defunend{\par\endgroup}
+
+\def\above@defun{\@defunstart}
+\def\below@defun{\@defunend\nobreak\addvspace{2pt plus 2pt minus 2pt}}
+
+\def\@defn#1#2{\outer\def\defun@type{#1}\outer\def\defun@name{#2}%
+\fnindexbold{#2}%
+\@ifnextchar[{\@defunpackage}{\@defunnopackage}
+}
+
+\def\@defunpackage[#1]{%
+\setbox0\hbox{\defun@hspace$\lbrack$\it\defun@type\/$\rbrack$}\relax
+\setbox1\hbox{\tt#1:\defun@name\defun@hspace}\relax
+\@defun
+}
+
+\def\@defunnopackage{%
+\setbox0\hbox{\defun@hspace$\lbrack$\it\defun@type\/$\rbrack$}\relax
+\setbox1\hbox{\tt\defun@name\defun@hspace}\relax
+\@defun
+}
+
+\def\@defun#1{
+\above@defun
+\setbox2\hbox{\hskip\textwidth\hskip-1\wd0\hskip-1\wd1}\relax
+\def\args##1{##1}%
+\def\keys##1{{\tt \& key} \@settab {\tt ##1}}%
+\def\morekeys##1{\@stopline\@startline\>{\tt\ignorespaces ##1}}%
+\def\yetmorekeys##1{\@stopline\@startline\>{\tt\ignorespaces ##1}}%
+\leavevmode\hbox to 0pt{\hbox to \textwidth{\hss\box0}\hss}% [kind]
+{\box1\begin{minipage}[t]{1\wd2}
+                \vskip -20pt% Compensate line introduced by tabbing
+\begin{tabbing}#1\end{tabbing}\end{minipage}}
+\below@defun
+}
+
+
+%% MACROS
+
+\def\defmac{\defun@vspace\defmacx}
+\def\defmacx{\@defmc{Macro}}
+\def\defspec{\defun@vspace\defspecx}
+\def\defspecx{\@defmc{Special Form}}
+\def\enddefspec{\enddfn}
+\def\enddefmac{\enddfn}
+
+\def\@defmc#1#2{\outer\def\defun@type{#1}\outer\def\defun@name{#2}%
+\fnindexbold{#2}%
+\@ifnextchar[{\@defmacpackage}{\@defmacnopackage}
+}
+
+\def\@defmacpackage[#1]{
+\setbox0\hbox{\defun@hspace$\lbrack$\it\defun@type\/$\rbrack$}\relax
+\setbox1\hbox{\tt#1:\defun@name\defun@hspace}\relax
+\@defmac
+}
+
+\def\@defmacnopackage{
+\setbox0\hbox{\defun@hspace$\lbrack$\it\defun@type\/$\rbrack$}\relax
+\setbox1\hbox{\tt\defun@name\defun@hspace}\relax
+\@defmac
+}
+
+\def\@defmac#1{
+\above@defun
+\setbox2\hbox{\hskip\textwidth\hskip-1\wd0\hskip-1\wd1}\relax
+\def\args##1{##1}%
+\leavevmode\hbox to 0pt{\hbox 
+        to \textwidth{\hss\box0}\hss}{\box1\begin{minipage}[t]{1\wd2}
+                \vskip -20pt% Compensate line introduced by tabbing
+\begin{tabbing}#1\end{tabbing}\end{minipage}}
+\below@defun
+}
+
+%% Variables
+\def\defvar{\defun@vspace\defvarx}
+\def\defvarx{\@defvr{Variable}}
+\def\defconst{\defun@vspace\defconstx}
+\def\defconstx{\@defvr{Constant}}
+\def\defvr{\defun@vspace\@defvr}
+\def\defvrx{\@defvr}
+\def\enddefvar{\enddfn}
+\def\enddefvr{\enddfn}
+\def\enddefconst{\enddfn}
+
+\def\@defvr#1#2{\outer\def\defun@type{#1}\outer\def\defun@name{#2}%
+\vrindexbold{#2}%
+\@ifnextchar[{\@defvarpackage}{\@defvarnopackage}
+}
+
+\def\@defvarpackage[#1]{
+\setbox0\hbox{\defun@hspace$\lbrack$\it\defun@type\/$\rbrack$}\relax
+\setbox1\hbox{\tt#1:\defun@name\defun@hspace}\relax
+\@defvar
+}
+
+\def\@defvarnopackage{
+\setbox0\hbox{\defun@hspace$\lbrack$\it\defun@type\/$\rbrack$}\relax
+\setbox1\hbox{\tt\defun@name\defun@hspace}\relax
+\@defvar
+}
+
+\def\@defvar{
+\above@defun
+\setbox2\hbox{\hskip\textwidth\hskip-1\wd0\hskip-1\wd1}\relax
+\leavevmode\hbox to 0pt{\hbox 
+        to \textwidth{\hss\box0}\hss}{\box1}
+\below@defun
+}
+
+% The following is taken from /usr/local/lib/tex/macros/latex.tex
+% but corrects a scoping bug.
+
+\newdimen\@curtabmardimen
+\def\@startline{\global\@curtabmar\@nxttabmar\relax
+   \global\@curtabmardimen\dimen\@curtabmar
+   \global\@curtab\@curtabmar\global\setbox\@curline\hbox
+    {}\@startfield\strut}
+
+\def\@stopline{\unskip\@stopfield\if@rjfield \global\@rjfieldfalse
+   \@tempdima\@totalleftmargin \advance\@tempdima\linewidth
+   \hbox to\@tempdima{\@itemfudge\hskip\@curtabmardimen
+   \box\@curline\hfil\box\@curfield}\else\@addfield
+   \hbox{\@itemfudge\hskip\@curtabmardimen\box\@curline}\fi}
+
+% End of material from /usr/local/lib/tex/macros/latex.tex .
+
+% Assume Lisp is case insensitive and force to lower case.
+%\def\vindex#1{\vrindex{\lowercase{#1}}}
+%\def\findex#1{\fnindex{\lowercase{#1}}}
+
+% and restore @'s old catcode.
+%
+\catcode`@ = \@oldatcatcode
+
+% and restore &'s old catcode.
+%
+\catcode`& = \@oldandcatcode
+

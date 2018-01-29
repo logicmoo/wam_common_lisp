@@ -1,0 +1,666 @@
+.po 2.8c
+.fo '''%'
+.(b C
+.sz +3
+.b
+.sp 3
+The ECL Compiler
+.sp
+.sz
+.i
+Giuseppe Attardi
+Dipartimento di Informatica
+Universita\*` di Pisa
+.sp 3
+.)b
+
+.sh 1 "Overview of the ECL Compiler"
+
+Compilation consists of three passes.  The compiler is data driven, at
+each Pass, the appropriate function to be applied to carry out the
+Pass is determined from the argument.
+The first element of a form being processed is the identifier
+of the form and in its property list the corresponding processing
+function is stored.
+
+For Pass 1 the properties 't1, 'c1, 'c1conditional and 'c1special are
+used; for Pass 2, the properties 't2, 't3, 'c2, 'set-loc and 'wt-loc.
+
+.sh 2 "Pass 1"
+
+Pass 1 consists in a series of calls to t1expr for each form in the
+file.  It produces a list of top level forms which is stored in the
+global variable *top-level-forms*. Each element of this list is one of
+the following:
+.(l
+	( 'DEFUN        fun-name cfun lambda-expr doc-vv sp . .)
+	( 'DEFMACRO     macro-name cfun lambda-expr doc-vv sp)
+	( 'ORDINARY     expr)	; an expression at top level
+	( 'DECLARE      var-name-vv )
+	( 'DEFVAR	var expr doc-vv)
+	( 'CLINES	string* )
+	( 'DEFCFUN	header vs-size body)
+	( 'DEFENTRY	fun-name cfun cvspecs type cfun-name )
+	( 'SHARP-COMMA  vv )
+	( 'DEFCBODY	fun-name cfun arg-types type body )
+	( 'DEFUNC	fun-name cfun lambda-list string* )
+	( 'FUNCTION-CONSTANT'	vv-index fun )
+	( 'INIT-KEYWORDS'	nkeys cfun funob )
+.)l
+
+where in turn:
+
+.(l
+lambda-expr ::= ('lambda
+	        info
+        	(requireds optionals rest key-flag keywords allow-other-keys)
+	        doc
+	        body)
+
+expr ::=  ('VAR info vref)
+	| ('RETURN-FROM info blk clb ccb expr)
+	| ('BLOCK info blk body)
+	| funob
+	| ('CATCH info tag body)
+	| ('UNWIND-PROTECT info expr body)
+	| ('THROW info tag body)
+	| ('DECL-BODY info dl body)
+	| ('LOCATION info location)
+	| ('STRUCTURE-REF info expr symbol index)
+	| ('STRUCTURE-SET info expr symbol expr expr)
+	| ('INSTANCE-REF info expr index)
+	| ('PRINC info expr [ nil | location ] expr)
+	| ('APPLY info funob args)
+	| ('LET info (symbol*) (expr*) body)
+	| ('LET* info (symbol*) (expr*) body)
+	| ('FLET info (fun*) (closure*) body)
+	| ('LABELS info (fun*) (closure*) body)
+	| ('FUNCALL info funob args)
+	| ('RPLACA info args)
+	| ('RPLACD info args)
+	| ('MEMBER!2 info ['eq | 'eql | 'equal] args)
+	| ('ASSOC!2 info ['eq | 'eql | 'equal] args)
+	| ('INLINE nil string form args)
+	| ('GET info args)
+	| ('RPLACA-NTHCDR-IMMEDIATE info x args)
+	| ('LIST-NTH-IMMEDIATE info x args)
+	| ('IF info fmla expr [ nil | expr ])
+	| ('AND info args)
+	| ('OR info args)
+	| ('CASE info key-form ((keylist . body)*) [body | *c1nil*])
+	| ('MULTIPLE-VALUE-CALL info funob args)
+	| ('MULTIPLE-VALUE-PROG1 info form args)
+	| ('VALUES info args)
+	| ('MULTIPLE-VALUE-SETQ info (vrefs*) expr)
+	| ('MULTIPLE-VALUE-BIND info (var*) expr body)
+	| ('COMPILER-LET info (symbol*) (value*) args)
+	| ('FUNCTION info [ lambda-expr | ('call-global info symbol args) ])
+	| ('SETQ info vref expr)
+	| ('PSETQ info (vref*) (expr*))
+	| ('PROGV info (expr*) (expr*) body)
+	| ('TAGBODY info clb ccb body)
+	| ('GO info clb ccb tag)
+
+vref  ::= (var-object ccb-reference)
+
+funob ::= ('CALL-GLOBAL info symbol args loc ret-type [narg])
+	| ('CALL-LOCAL info symbol args [narg])
+	| ('CALL-LAMBDA info lambda-expr args cfun [narg])
+	| ('ORDINARY info expr)
+
+body  ::= ('PROGN info expr*) | expr
+
+tag   ::= expr
+ccb   ::= clb   ::= t | nil
+fmla  ::= t | nil | ('NOT fmla) | ('FMLA-NOT fmla)
+.)l
+
+.sh 2 "Pass 2"
+
+Pass 2 consists in two phases, initializers and C code generation.
+
+The main function of Pass 2 is ctop-write, which performs the
+following steps:
+.np
+it applies to each element in *top-level-forms* the corresponding Pass 2
+initializer, which is retrieved from property 't2 of the form's identifier.
+
+Within the Pass 2 initializers c2expr gets called to handle
+expressions. c2expr performs again a dispatch on the argument,
+invoking the function in the property 'c2 of the form's identifier.
+These functions produce various results which are held in the lists:
+*local-funs*, *global-entries*, *linking-calls*, *closures*, etc.
+
+.np
+for each element in *top-level-forms* the corresponding Pass 2 C
+function generator is applied, which is retrieved from property 't3 of
+the form's identifier.
+
+.np
+t3local-fun is applied to each element of *local-funs*.
+*local-funs* holds fun-objects for local functions and closures.
+A fun-object is a structure of type fun, as described below.
+
+.np
+wt-global-entry is applied to each element of *global-entries*.
+*global-entries* holds:
+	(... ( fname cfun return-types arg-type ) ...)
+for directly called functions.
+
+.np
+for each element in *linking-calls*, a linking call function is
+produced
+
+.np
+for each element of *closures* a declaration in the .h file is
+generated. This is just to avoid complaints by the C compiler about
+reference to functions occurring later in the file.
+
+.np
+various C macro definitions are produced in the .h file for names used
+in the code produced.
+.sp
+.lp
+
+Here is a list of various global variables used during Pass 2.
+.ip *objects* 16
+holds ( { object vv-index }* ).
+.ip *constants* 16
+holds ( { symbol vv-index }* ).
+.ip *sharp-commas* 16
+holds ( vv-index* ), indicating that the value
+of each vv should be turned into an object from a string before
+defining the current function during loading process, so that
+sharp-comma-macros may be evaluated correctly.
+.ip *global-funs* 16
+holds ( { global-fun-name cfun }* )
+.ip *linking-calls* 16
+holds ( { global-fun-name vv }* )
+.ip *closures* 16
+holds fun-objects for closures
+.ip *local-funs* 16
+holds fun-objects for local functions
+.sp
+.lp
+
+.sh 2 "Pass 3"
+
+Pass 3 consists of a call to the C compiler to compile the file
+produced in Pass 2.
+
+.sh 2 "Data Structures"
+
+.(l
+(defstruct (fun (:type vector) :named)
+           name			;;; Function name.
+           ref			;;; Referenced or not.
+           			;;; During Pass1, T or NIL.
+           			;;; During Pass2, the vs-address for the
+           			;;; function closure, or NIL.
+           ref-ccb		;;; Cross closure reference.
+           			;;; During Pass1, T or NIL.
+           			;;; During Pass2, the vs-address for the
+           			;;; function closure, or NIL.
+           cfun			;;; The cfun for the function.
+           level		;;; The level of the function.
+           )
+.)l
+
+
+During Pass 1, *funs* holds a list of fun objects, local macro definitions
+and the symbol 'CB' (Closure Boundary).  'CB' will be pushed on *funs*
+when the compiler begins to process a closure.  A local macro definition
+is a list ( macro-name expansion-function).
+
+.(l
+(defstruct (blk (:type vector) :named)
+           name			;;; Block name.
+           ref			;;; Referenced or not.  T or NIL.
+           ref-clb		;;; Cross local function reference.
+           			;;; During Pass1, T or NIL.
+           			;;; During Pass2, the vs-address for the
+           			;;; block id, or NIL.
+           ref-ccb		;;; Cross closure reference.
+           			;;; During Pass1, T or NIL.
+           			;;; During Pass2, the ccb-vs for the
+           			;;; block id, or NIL.
+           exit			;;; Where to return.  A label.
+           destination		;;; Where the value of the block to go.
+           var			;;; The block name holder.  Used only in
+           			;;; the error message.
+           )
+.)l
+
+During Pass 1, *blocks* holds a list of blk objects and the symbols 'CB'
+(Closure Boundary), 'LB' (Level Boundary) or 'UNWIND-PROTECT'.
+'CB' will be pushed on *blocks* when the compiler begins to process
+a closure.
+'LB' will be pushed on *blocks* when *level* is incremented.
+'UNWIND-PROTECT' is pushed when entering an unwind-protect.
+A dummy variable is created to hold the block identifier.
+When a reference to the block (via return-from) is found, the
+var-ref count for that variable is incremented only if the reference
+appears across a boundary (CB, LB or UNWIND-PROTECT), while
+the blk-ref is always incremented.
+Therefore blk-ref represents whether the block is used at all and var-ref
+for the dummy variable represents whether a block identifier must be
+created and stored in such variable.
+
+.(l
+(defstruct (info (:type vector) :named)
+  (changed-vars nil)	;;; List of var-objects changed by the form.
+  (referred-vars nil)	;;; List of var-objects referred in the form.
+  (type t)		;;; Type of the form.
+  (sp-change nil)	;;; Whether execution of the form may change
+			;;; the value of a special variable.
+  (volatile nil)	;;; whether there is a possible setjmp. Beppe
+  (local-referred nil)  ;;; directly referenced in the body:
+  )
+.)l
+
+Each reference operator (c1call-symbol, c1go, c1return-from, c1vref
+and c1setq1) adds the reference to the info-local-referred of the form
+they appear in.
+This information is not propagated to an enclosing function (see
+add-info) so that we can determine exactly which frame is used
+in the body of a function.
+
+.(l
+(defstruct (tag (:type vector) (:include ref) :named)
+  name			;;; Tag name.
+  (ref 0 :type fixnum)	;;; Number of references.
+  ref-ccb		;;; Cross closure reference.
+			;;; During Pass1, T or NIL.
+  ref-clb		;;; Cross local function reference.
+			;;; During Pass1, T or NIL.
+  label			;;; Where to jump.  A label.
+  unwind-exit		;;; Where to unwind-no-exit.
+  var			;;; Variable containing frame ID.
+  )
+.)l
+
+During Pass 1, *tags* holds a list of tag objects and the symbols 'CB'
+(Closure Boundary), 'LB' (Level Boundary) or 'UNWIND-PROTECT'.
+'CB' will be pushed on *tags* when the compiler begins to process
+a closure.
+'LB' will be pushed on *tags* when *level* is incremented.
+'UNWIND-PROTECT' is pushed when entering an unwind-protect.
+A dummy variable is created to hold the tag identifier and one tag
+structure (containing reference to such variable) is created for each
+label in the body.
+When a reference to a tag (go instruction) is found, the
+var-kind is stepped from NIL to OBJECT (if appearing inside an
+unwind-protect) to LEXICAL (if appearing across a boundary: with
+var-ref-ccb set to T in case of closure boundary).
+The tag-ref is also incremented.
+Therefore var-ref represents whether some tag is used at all and var-kind
+variable represents whether a tag identifier must be created and the
+kind of the dummy variable to store it.
+
+.(l
+(defstruct (var (:type vector) (:include ref) :named)
+  name		;;; Variable name.
+  (ref 0 :type fixnum)
+		;;; Number of references to the variable (-1 means IGNORE).
+		;;; During Pass 2: set below *register-min* for non register.
+  ref-ccb	;;; Cross closure reference: T or NIL.
+  kind		;;; One of LEXICAL, SPECIAL, GLOBAL, OBJECT, FIXNUM,
+  		;;; CHARACTER, LONG-FLOAT, SHORT-FLOAT, or REPLACED (used for
+		;;; LET variables).
+  (loc 'OBJECT)	;;; During Pass 1: indicates whether the variable can
+		;;; be allocated on the c-stack: OBJECT means
+		;;; the variable is declared as OBJECT, and CLB means
+		;;; the variable is referenced across Level Boundary and thus
+		;;; cannot be allocated on the C stack.  Note that OBJECT is
+		;;; set during variable binding and CLB is set when the
+		;;; variable is used later, and therefore CLB may supersede
+		;;; OBJECT.
+		;;; During Pass 2:
+  		;;; For REPLACED: the actual location of the variable.
+  		;;; For FIXNUM, CHARACTER, LONG-FLOAT, SHORT-FLOAT, OBJECT:
+  		;;;   the cvar for the C variable that holds the value.
+  		;;; For LEXICAL: the frame-relative address for the variable.
+		;;; For SPECIAL and GLOBAL: the vv-index for variable name.
+  (type t)	;;; Type of the variable.
+  )
+.)l
+
+A special binding creates a var object with the kind field SPECIAL,
+whereas a special declaration without binding creates a var object with
+the kind field GLOBAL.  Thus a reference to GLOBAL may need to make sure
+that the variable has a value.
+A variable in a LET is REPLACED if it is bound to another variable or location
+which is never modified in the body.
+
+.sh 1 "Lexical Environment for Closures"
+
+The lexical environment for closures is implemented as a list.
+If the closure is actually a funarg, i.e. it has dynamic rather then
+indefinite extent, the enviroment may be allocated directly on the value
+stack.
+
+.sh 1 "Locations"
+
+A "location" is used to denote a value produced during a computation.
+
+Valid locations are:
+
+.(l
+( 'VALUE' i )			VALUES(i)
+( 'VALUES' nr )			nr is number of values 
+( 'VAR' var-object )
+( 'VV' vv-index )
+( 'LCL' lcl )			local variable, type unboxed
+( 'TEMP' temp )			local variable, type object
+( 'CALL' fun narg locs fname )	locations containing the arguments
+( 'CALL-LOCAL' fun env narg locs fname )
+( 'INLINE' side-effect-p fun/string locs )	fun is applied to locs
+( 'INLINE-COND' side-effect-p fun/string locs )
+( 'INLINE-FIXNUM' side-effect-p fun/string locs )
+( 'INLINE-CHARACTER' side-effect-p fun/string locs )
+( 'INLINE-LONG-FLOAT' side-effect-p fun/string locs )
+( 'INLINE-SHORT-FLOAT' side-effect-p fun/string locs )
+( 'CAR' lcl )
+( 'CADR' lcl )
+( 'SYMBOL-FUNCTION' vv-index )
+( 'MAKE-CCLOSURE' fun )
+( 'FIXNUM-VALUE' fixnum-value )
+( 'FIXNUM->OBJECT' loc )
+( 'CHARACTER-VALUE' character-code )
+( 'CHARACTER->OBJECT' loc )
+( 'LONG-FLOAT-VALUE' long-float-value vv )
+( 'LONG-FLOAT->OBJECT' loc )
+( 'SHORT-FLOAT-VALUE' short-float-value vv )
+( 'SHORT-FLOAT->OBJECT' loc )
+.)l
+
+
+A *destination* location represents where the result of an evaluation
+should be stored.
+After c2expr has computed the location loc where the value of an expression
+will be found, (unwind-exit loc) gets called which in turn calls (set-loc loc)
+to store in *destination* such value.
+
+Valid *destination* locations are:
+
+.(l
+'RETURN'	The value is returned from the current function.
+'RETURN-FIXNUM'
+'RETURN-CHARACTER'
+'RETURN-LONG-FLOAT'
+'RETURN-SHORT-FLOAT'
+'RETURN-OBJECT
+'TRASH'		The value may be thrown away.
+( 'VALUES' nr )	Values go to VALUES, their number in nr.
+( 'VAR' var-object )
+( 'LCL' n )
+( 'LEX' lex-address )
+( 'BIND' var alternative )	alternative is optional
+( 'JUMP-TRUE' label )
+( 'JUMP-FALSE' label )
+( 'PUSH-CATCH-FRAME' nr )
+.)l
+
+The function (unwind-exit loc) is used to perform a non local transfer,
+either a return or a jump to a label.
+It must store the value in loc into *destination*, but also needs to perform
+clean up: unbind specials or pop frames. These actions are recorded in the
+list *unwind-exit*.
+
+
+
+
+.sh 2 "Code generation"
+
+Compiled code uses the following kinds of variables:
+.(l
+1. Vi, declared explicitely, either unboxed or register (*lcl*, next-lcl)
+2. Ti, declared collectively, of type object, may be reused (*temp*, next-temp)
+3. Ui, declared collectively, of type unboxed (*unboxed*, next-unboxed)
+4. lexi[j], for lexical variables in local functions
+5. CLVi, for lexical variables in closures
+.)l
+
+
+.sh 2 Optimizations
+
+Valid property names for open coded functions are:
+ INLINE-ALWAYS
+ INLINE-SAFE	safe-compile only
+ INLINE-UNSAFE	non-safe-compile only
+
+Each property is a list of 'inline-info's, where each inline-info is:
+( types { type | boolean } side-effect new-object { string | function } ).
+
+For each open-codable function, open coding will occur only if there exits
+an appropriate property with the argument types equal to 'types' and with
+the return-type equal to 'type'.  The third element
+is T if and only if side effects may occur by the call of the function.
+Even if *DESTINATION* is TRASH, open code for such a function with side
+effects must be included in the compiled code.
+The forth element is T if and only if the result value is a new Lisp
+object, i.e., it must be explicitly protected against GBC.
+
+(defvar *inline-functions* nil)
+(defvar *inline-blocks* 0)
+*inline-functions* holds:
+	(...( function-name . inline-info )...)
+
+*inline-blocks* holds the number of C blocks opend for declaring temporaries
+for intermediate results of the evaluation of inlined function calls.
+
+.sh 2 "Function Call"
+
+Calling conventions for Lisp functions are:
+.(l
+narg	integer: number of arguments in the call
+arg1
+...
+argn
+.)l
+The results are stored in:
+.(
+VALUES(0), VALUES(1), ... , VALUES(n)
+.)
+and the number of results is the value of the function itself.
+
+The compiler deals with the following cases of functions:
+.np 1
+global function: normal function defined by defun.
+The mechanism of "linking call" is used to link at run time to the actual
+code of the function, bypassing the access to the symbol name of the function.
+A global C variable (*LKi) is used to store the address of such code. 
+Initially this variable contains the address of a linking-call routine
+which looks up the symbol for its function slot, and if this is a
+compiled function, stores its address back into LKi and then calls it. 
+The address of LKi is saved in the property list of the symbol at the
+property SI:LINK-FROM, so that in case the function gets redefined, in
+LKi one can store back the initial linking-call routine.
+The mechanism can be disabled by setting to NIL the variable
+*compile-to-linking-calls*.
+The call is dealt by c2call-global.
+In most cases, c2call-global calls
+	(unwind-exit (call-loc fname fun args narg-loc))
+call-loc computes the arguments and storesthem in location values and
+returns the list:
+	(CALL fun narg values fname)
+In this way, if the value of the call is being returned, unwind-exit has the
+opportunity to perform clean up. For instance, if there has been a special
+binding, unwind-exit produces:
+	  { int nr; nr = fun(narg, arg1, ..., argn); bds_unwind1; RETURN(nr);}
+while normally it produces:
+	  RETURN(fun(narg, arg1, ..., argn))
+
+.np 2
+Ln local function: function defined by flet or labels. It is called with
+extra arguments (lex0, lex1, ...) followed by its regular arguments.
+Eack lexi is a reference to an array containing the lexical variables
+of level i referred in the function.
+The call is dealt by c2call-local.
+.np 3
+LCn closure: it is called with an argument env,
+which is a structure containing an array of references to the variables
+of the closure and possibly a pointer to another env of deeper
+nesting.
+The call is dealt by c2call-local.
+.np 3
+inline function: a function which can be open coded, i.e. a C expression
+can be replaced to the call. The C expression is stored in an inline-info,
+discussed in the section "Optimizations".
+The call is dealt by get-inline-loc, which returns the location where the
+value of the function is stored.
+.np 4
+LIn local entry: it is a function whose arguments and result types have been
+proclaimed. It is called directly passing only its its arguments
+(without narg), and returns its valued directly.
+For producing the call instruction, it is dealt by the compiler creating
+an inline-info description, similar to those for inline functions,
+which is added to the list *inline-functions*.
+The call is dealt by get-inline-loc, as for inline functions.
+.lp
+
+.sh 2 "Multiple Values"
+
+Multiples values are returned on a global array, actually one for each thread.
+
+When such values must bepreserved for later use, as for instance during
+evaluation of arguments in multiple-value-call, they are moved temporarily
+out of VALUES, using the macro MV_SAVE and then restored back with macro
+MV_RESTORE. MV_SAVE uses an array of variable size, as provided by GNUC,
+to store the VALUES: the array is immediately deallocated by MV_RESTORE.
+.(l
+#define MV_SAVE(nr) \
+   { object mv_values[nr]; /* __GNUC__ */ \
+       bcopy(&VALUES(0), mv_values, nr * sizeof(object))
+#define MV_RESTORE(nr) \
+       bcopy(mv_values, &VALUES(0), nr * sizeof(object));}
+.)l
+To evaluate (multiple-value-call fun expr1 ... exprn), we evaluate expr1,
+then save its values in the array mv_values, then evaluate expr2. We can now
+free mv_values by moving them back to VALUES, but we need first to make space
+for them by shifting down the values of expr2. For this purpose the macro
+MV_SHIFT is provided:
+.(l
+#define MV_SHIFT(nr, d) \
+   { int i; for (i = nr-1; i >= 0; i--) VALUES(i+d) = VALUES(i);}
+.)l
+In summary the multiple-value-call is dealt as follows:
+.(l
+expr1
+MV_SAVE
+MV_SHIFT
+MV_RESTORE
+expr2
+MV_SAVE
+MV_SHIFT
+MV_RESTORE
+expr3
+..
+exprn
+APPLY fun
+.)l
+
+.sh 2 "Closure Environments"
+
+To deal with closure environments the following variables are used:
+
+.ip
+'*env*': counts the number of closure variables bound in the current and
+its enclosing forms. It is incremented by 'bind'. Whoever calls 'bind' must
+rebind it. Notice though that bind may be called by unwind-exit (e.g.
+when *destination* is bound to '(BIND var)' or '(VAR var)), therefore
+one must ensure that 
+.ip
+'*max-env*': counts the maximum number of closure variables used in a function.
+It is the maximum value reached by '*env*' during the processing of each form
+in the function. Used to determine how many 'CLVi' to declare.
+.ip
+'*env-lvl*': it is incremented whenever a binding expression introduces a new
+closure variable, '*env*' is not 0 and the form is not the last one.
+For example, in:
+(defun foo (x)
+  (if x
+     (let (ccb)
+	  (bar #'(lambda () (list ccb))))
+     (bar #'(lambda () (car x)))))
+
+The environments for the two branches of 'if' are different.
+A new environment must be introduced for 'let', incrementing *env-lvl*.
+.lp
+
+.sh 2 "Eval-when"
+
+Handling of 'eval-when' clauses is dealt through two variables:
+
+.(l
+*compile-time-too*
+*not-compile-time*
+.)l
+
+Both are initially' NIL'.
+The first controls whether to process form in compile-time-too mode,
+while the second inhibits the first, e.g. inside an 'eval-when' with
+only 'load' as situation.
+The following macros are handled in compile-time-too mode directly
+by 't1expr':
+.(l
+defstruct
+deftype
+defsetf
+.)l
+
+through the following clause:
+
+.(l
+    (let ((*compile-time-too* t))
+      (t1expr (cmp-macroexpand-1 form)))
+.)l
+
+The following instead are dealt specially within t1ordinary:
+
+.(l
+SYS:*MAKE-CONSTANT
+SYS:*MAKE-SPECIAL
+LISP:PROCLAIM
+.)l
+
+The first two are the internal functions used by 'defconstant', 'defvar' and
+'defparameter'.
+
+Other toplevel forms are controlled by a clause like:
+
+.(l
+  (when *compile-time-too* (cmp-eval (cons 'DEFUN args)))
+.)l
+
+'eval-when is handled as follows:
+
+.(l
+(defun t1eval-when (args &aux (load-flag nil) (compile-flag nil))
+  (when (endp args) (too-few-args 'eval-when 1 0))
+  (dolist (situation (car args))
+    (case situation
+      ((LOAD #+ansi :LOAD-TOPLEVEL) (setq load-flag t))
+      ((COMPILE #+ansi :COMPILE-TOPLEVEL) (setq compile-flag t))
+      ((EVAL #+ansi :EXECUTE))
+      (otherwise (cmperr "The EVAL-WHEN situation ~s is illegal."
+			 situation))))
+  (let ((*not-compile-time* (not compile-flag))
+	(*compile-time-too* compile-flag))
+    (cond (load-flag
+	   (t1progn (rest args)))
+	  (compile-flag
+	   (cmp-eval (cons 'PROGN (cdr args))))))
+  )
+.)l
+
+'*not-compile-time*' inhibits 'cmp-eval' as follows:
+
+.(l
+(defun cmp-eval (form &aux (throw-flag t))
+  (unless *not-compile-time*
+   ...
+  )
+)
+.)l
+

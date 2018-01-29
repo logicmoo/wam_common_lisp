@@ -1,0 +1,759 @@
+\documentstyle[latexinfo,ecl]{report} % -*-latexinfo-*-
+\pagestyle{headings}
+\pagenumbering{roman}
+\begin{document}
+\alwaysrefill
+\newindex{cp}
+\newindex{ky}
+
+\def\theabstract{
+\ecl{} (ECL for short) is a full implementation of the \clisp{}
+language.  ECL is a highly portable \clisp{} system intended for
+several classes of machines, from mini/micro to mainframe.  The key
+idea behind the portability is the use of the C language and its
+standard libraries as the interface with the underlying machines and
+operating systems: The kernel of the system is written in C and the
+rest of the system is written in \clisp.  Even the compiler generates
+intermediate code in C.  ECL is also an efficient and compact system:
+ECL regards the runtime efficiency of interpreted code as important as
+the efficiency of compiled code.  The small size of the ECL system
+makes ECL suitable for the current computer technology, such as the
+use of virtual memory and cache memory.  This document reports the
+current status of ECL, its implementation, and system performance.
+}
+
+\begin{iftex}
+\pagestyle{empty}
+\title{ECoLisp Implementation}
+
+\author{Giuseppe Attardi\\
+Dipartimento di Informatica\\
+Universit\`a di Pisa\\
+} 
+\date{May 1994} 
+\abstract{\theabstract}
+
+\maketitle
+
+\clearpage
+\pagestyle{headings}
+\pagenumbering{roman}
+\tableofcontents
+\clearpage
+\pagenumbering{arabic}
+\end{iftex}
+
+\section{ECL is a full \clisp{} system.}
+
+ECL is a full implementation of the \clisp{} language described in
+the  \cltl{}:
+
+\begin{center}
+{\em \clisp: The Language.}
+by Guy L. Steele Jr. et al.
+Digital Press, 1984
+\end{center}
+
+ECL supports all \clisp{} functions, macros, and special forms defined
+in the \cltl{}.  All \clisp{} variables and constants are defined in ECL
+exactly as described in the \cltl{}.
+
+\section{ECL is written in C and Lisp}
+
+The kernel of ECL is written in C, including:
+
+\begin{itemize}
+\item memory management and garbage collection
+\item the evaluator (or interpreter)
+\item \clisp{} special forms
+\end{itemize}
+
+The ECL compiler is entirely written in \clisp.
+
+Each \clisp{} function or macro is written either in C or in Lisp.
+
+\begin{example}
+        in C:
+                418 \clisp{} functions
+                11 \clisp{} macros
+
+        in Lisp:
+                133 \clisp{} functions
+                59 \clisp{} macros
+\end{example}
+
+The size of the source code is:
+
+\begin{example}
+        C code         705 Kbytes
+        \clisp{} functions and macros written in Lisp
+                       173 Kbytes
+        The compiler   264 Kbytes
+        --------------------------- 
+        total         1142 Kbytes
+\end{example}
+
+Three routines in the kernel are partly written
+in assembly language.  These routines are:
+
+\begin{itemize}
+\item bignum multiplication
+\item bignum division
+\item function call
+\end{itemize}
+
+The total size of assembly code is 20 to 30 lines, depending on the
+version of ECL. C version of these routines are however also available.
+
+\section{Porting ECL}
+
+To port \ecl{} to a new architecture, the following steps are required:
+
+\begin{enumerate}
+\item Compile all source C code with a GCC compiler.
+
+\item Compile the Lisp libraries and the Lisp compiler,
+supplied already translated into C, except for one file in the compiler
+which contains machine dependencies.
+
+\item Link the binaries and create an executable.
+
+\item Use the executable to compile the machine dependent compiler file
+
+\item Build the full image
+\end{enumerate}
+
+
+\subsection{Objects Representation}
+
+ECL supports immediate data for representing {\tindexed fixnum}'s and
+{\code character}'s. The two less significant digits in a pointer are used as
+a tag for distinguishing immediate data from pointers.
+
+Fixnum and characters are represented as follows:
+
+\begin{example}
+                |-------------------|--| 
+                |    Fixnum value   |01|
+                |-------------------|--| 
+
+                |------------|------|--| 
+                |  Ctrl bits | char |10|
+                |------------|------|--| 
+\end{example}
+
+A third kind of immediate data is the {\code locative}, which constains
+an indirect pointer to another object. {\code locative} are useful for
+the efficient representation of logical variables when implementing
+unifcation or Prolog.
+
+Other ECL objects are represented as (a pointer to) a cell that is
+allocated on the heap.  Each cell consists of several words (1 word =
+32 bit) whose first half word is in the format common to all data types:
+half of the word is the type indicator and the other half is used as
+the mark by the garbage collector.  For instance, a cons cell consists
+of three words:
+
+\begin{example}
+             
+                |---------|----------| 
+                |CONS|mark|          |
+                |---------|----------| 
+                |     car-pointer    |
+                |--------------------| 
+                |     cdr-pointer    |
+                |--------------------| 
+\end{example}
+
+Array headers and compiled-function headers are represented
+in this way, and array elements and compiled code are placed
+elsewhere.
+
+Internally in compiled functions, certain Lisp objects may
+be represented simply by their values.  For example, a fixnum object
+may be represented by its fixnum value, and a character object may be
+represented by its character code.
+
+\subsection{The heap}
+
+The whole heap of ECL is divided into pages (1 page = 2048
+bytes).  Each page falls in one of the following classes:
+
+\begin{itemize}
+\item pages that contain {\em cells} consisting of the same number of words
+\item pages that contain {\em blocks} of variable size
+\item pages that contain {\em relocatable blocks}: i.e. blocks of variable size
+which can be moved in memory, such as array elements.
+\end{itemize}
+
+Free cells (i.e., those cells that are not used any more) consisting
+of the same number of words are linked together to form a free list.
+When a new cell is requested, the first cell in the free list (if it
+is not empty) is used and is removed from the list.  If the free list
+is empty, then the garbage collector is invoked to collect unused
+cells.  If the new free list is too short after the garbage
+collection, then new pages are allocated dynamically.  Free blocks are
+also linked together in the order of the size so that, when a block is
+being allocated on the heap, the smallest free area that is large
+enough to hold the block datum will be used.  Cell pages are never
+compactified.  Once a page is allocated for cells with {\em n} words,
+the page is used for cells with {\em n} words only, even after all the
+cells in the page become garbage.  The same rule holds for block
+pages.  In contrast, relocatable pages are sometimes compactified.
+That is, each relocatable datum may be moved to another place.
+
+The actual configuration of the ECL heap is:
+
+\vspace{1 em}
+
+\centerline{\code lower address \hspace*{3in}{}higher address}
+
+\centerline{\fbox{\code cell pages and block pages} {\code  hole} \fbox{\code relocatable pages}}
+
+\vspace{1 em}
+
+There is a ``hole'' between the area for cell/block pages
+and the area for relocatable pages.  New pages are allocated in the
+hole for cell/block pages, whereas new relocatable pages are
+allocated by expanding the heap to the higher address, i.e., to the
+right in this figure.  When the hole becomes empty, the area for
+relocatable pages are shifted to the right to reserve a certain number
+of pages as the hole.  During this process, the relocatable data in
+the relocatable pages are compactified.  No free list is maintained
+for relocatable data.
+
+Symbol print names and string bodies are usually allocated
+in relocatable pages.  However, when the ECL system is created, i.e.,
+when the object module of ECL is created, such relocatable data are
+moved towards the area for cell/block pages and then the pages for
+relocatable data are marked ``static''.  The garbage collector never
+tries to sweep static pages.  Thus, within the object module of ECL,
+the heap looks like:
+
+\vspace{1 em}
+
+\centerline{\code lower address \hspace*{3in}{}higher address}
+
+\centerline{\fbox{\code cell/block pages and static pages}}
+
+\vspace{1 em}
+
+Notice that the hole is not included in the object module;
+it is allocated only when the ECL system is started.  This saves
+secondary storage a little bit.  The maximum size of the hole is about
+100 pages (= 200 Kbytes).
+
+\subsection{ECL stacks}
+
+ECL uses the following stacks:
+
+\begin{itemize}
+\item[Frame Stack] consisting of catch, block, tagbody frames
+
+\item[Bind Stack] for shallow binding of dynamic variables
+
+\item[Invocation History Stack] maintaining information for debugging
+
+\item[C Control Stack] used for:
+\begin{itemize}
+\item[] arguments/values passing
+\item[] typed lexical variables
+\item[] temporary values
+\item[] function invocation
+\end{itemize}
+\end{itemize}
+
+\subsection{Procedure Call Conventions}
+ 
+\ecl{} employs standard C calling conventions to achieve efficiency and
+interoperability with other languages.
+Each Lisp function is implemented as a C function whcih takes as many
+argument as the Lisp original plus one additional integer argument
+which holds the number of actual arguments.  The function returns an
+integer which is the number of multiple Lisp values produced. The actual vales
+themselves are placed in a global (per thread) array ({\code VALUES}).
+
+To show the argument/value passing mechanism, here we list the actual
+code for the \clisp{} function {\code cons}.
+
+\begin{example}
+   Lcons(int narg, object car, object cdr)
+   {       object x;
+           check_arg(2);
+           x = alloc_object(t_cons);
+           CAR(x) = car;
+           CDR(x) = cdr;
+           VALUES(0) = x;
+           RETURN(1);
+   }
+\end{example}
+
+\ecl{} adopts the convention that the name of a function that
+implements a \clisp{} function begins with {\code L}, followed by the
+name of the \clisp{} function.  (Strictly speaking, `{\code -}' and
+`{\code *}' in the \clisp{} function name are replaced by `{\code \_}' and
+`{\code A}', respectively, to obey the syntax of C.)
+
+{\code check\_arg(2)} in the code of {\code Lcons} checks that exactly
+two arguments are supplied to {\code cons}.  That is, it checks that
+{\code narg} is 2, and otherwise, it causes an error.  {\code
+  allocate\_object(t\_cons)} allocates a cons cell in the heap and
+returns the pointer to the cell.  After the {\code CAR} and the {\code
+  CDR} fields of the cell are set, the cell pointer is put in the
+{\code VALUES} array. The integer returned by the function (1 in this
+case) represents the number of values of the function.
+
+\subsection{The interpreter}
+
+The ECL interpreter uses three A-lists (Association lists) to
+represent lexical environments.
+
+\begin{itemize}
+\item One for variable bindings
+\item One for local function/macro definitions
+\item One for tag/block bindings
+\end{itemize}
+
+When a function closure is created, the current three A-lists are
+saved in the closure along with the lambda expression.  Later, when the
+closure is invoked, the saved A-lists are
+used to recover the lexical environment.
+
+\subsection{The Invocation History Stack}
+ 
+The invocation history stack consists of two kinds of elements.  Each element
+may be either a pair of a Lisp form and a pointer to lexical environment:
+
+\vspace{1 em}
+
+\centerline{\fbox{\tt \hspace*{.5in}{}form \hspace*{.5in}{} |
+environment-pointer}}
+
+\vspace{1 em}
+ 
+or a pair of a function name and a pointer to the value stack:
+
+\vspace{1 em}
+
+\centerline{\fbox{\tt \hspace*{2 em}{}function-name \hspace*{2 em}{} |
+stack-pointer}}
+
+\vspace{1 em}
+
+The former is pushed on the invocation history stack when an
+interpreted code is evaluated.  The {\em form} is the interpreted code
+itself and the {\em environment-pointer} points to a three elements
+array which holds the three elements that represent the lexical
+environment.  The latter is pushed when a compiled function is
+invoked.  The {\em function-name} is the name of the called function
+and the {\em stack-pointer} points to the position of the first
+argument to the function.  For both kinds, the element on the
+invocation history stack is popped at the end of the evaluation.
+
+Let us see how the invocation history stack is used for debugging.
+
+\begin{example}
+>(defun fact (x)                ;;;  Wrong definition of the 
+   (if (= x 0)                  ;;;  factorial function. 
+       one                      ;;;  one  should be  1. 
+       (* x (fact (1- x)))))
+FACT
+
+>(fact 3)                       ;;;  Tries  3!
+Error: The variable ONE is unbound.
+Error signalled by IF.
+Broken at IF.
+>>:b                            ;;;  Backtrace. 
+Backtrace: eval > fact > if > fact > if > fact > if > fact > IF
+                                ;;;  Currently at the last  IF.
+>>:h                            ;;;  Help. 
+
+Break commands:
+:q(uit)         Return to some previous break level.
+:pop            Pop to previous break level.
+:c(ontinue)     Continue execution.
+:b(acktrace)    Print backtrace.
+:f(unction)     Show current function.
+:p(revious)     Go to previous function.
+:n(ext)         Go to next function.
+:g(o)           Go to next function.
+:fs             Search forward for function.
+:bs             Search backward for function.
+:v(ariables)    Show local variables, functions, blocks, and tags.
+:l(ocal)        Return the nth local value on the stack.
+:hide           Hide function.
+:unhide         Unhide function.
+:hp             Hide package.
+:unhp           Unhide package.
+:unhide-all     Unhide all variables and packages.
+:bds            Show binding stack.
+:m(essage)      Show error message.
+:hs             Help stack.
+Top level commands:
+:cf             Compile file.
+:exit or ^D     Exit Lisp.
+:ld             Load file.
+:step           Single step form.
+:tr(ace)        Trace function.
+:untr(ace)      Untrace function.
+
+Help commands:
+:apropos        Apropos.
+:doc(ument)     Document.
+:h(elp) or ?    Help.  Type ":help help" for more information.
+
+>>:p                        ;;;  Move to the last call of  FACT.
+Broken at IF.
+
+>>:b
+Backtrace: eval > fact > if > fact > if > fact > if > FACT > if
+                            ;;;  Now at the last  FACT.
+>>:v                        ;;;  The environment at the last call 
+Local variables:            ;;;  to  FACT  is recovered. 
+  X: 0                      ;;;  X  is the only bound variable. 
+Block names: FACT.          ;;;  The block  FACT  is established. 
+                   
+>>x
+0                           ;;;  The value of  x  is  0.
+        
+>>(return-from fact 1)      ;;;  Return from the last call of 
+6                           ;;;  FACT  with the value of  0.
+                            ;;;  The execution is resumed and 
+>                           ;;;  the value  6  is returned. 
+                            ;;;  Again at the top-level loop. 
+\end{example}
+
+\section{The ECL Compiler}
+ 
+The ECL compiler is essentially a translator from \clisp{} to C.  Given
+a Lisp source file, the compiler first generates three intermediate
+files:
+
+\begin{itemize}
+\item a C-file which consists of the C version of the Lisp program
+\item an H-file which consists of declarations referenced in the C-file
+\item a Data-file which consists of Lisp data to be used at load time
+\end{itemize}
+
+The ECL compiler then invokes the C compiler to compile the
+C-file into an object file.  Finally, the contents of the Data-file is
+appended to the object file to make a {\em Fasl-file}.  The generated
+Fasl-file can be loaded into the ECL system by the \clisp
+function {\code load}.  By default, the three intermediate files are
+deleted after the compilation, but, if asked, the compiler leaves
+them.
+
+The merits of the use of C as the intermediate language are:
+
+\begin{itemize}
+\item  The ECL compiler is highly portable.  Indeed the four versions
+of ECL share the same compiler.  Only the calling sequence
+of the C compiler and the handling of the intermediate files are different
+in these versions. 
+
+\item Cross compilation is possible, because the contents of the
+intermediate files are common to all versions of ECL.  For example,
+one can compile his or her Lisp program by the ECL compiler on
+a Sun, bring the intermediate files to DOS, compile the C-file with
+the gcc compiler under DOS, and then append the Data-file to the object
+file.  This procedure generates the Fasl-file for the ECL system on
+DOS.  This kind of cross compilation makes it easier to port ECL.
+
+\item Hardware-dependent optimizations such as register allocations
+are done by the C compiler.
+\end{itemize}
+
+The demerits are:
+
+\begin{itemize}
+\item  At those sites where no C compiler is available,
+the users cannot compile their Lisp programs.
+
+\item The compilation time is long.  70\% to 80\% of the
+compilation time is used by the C compiler.  The ECL compiler is
+therefore slower than compiler generating machine code directly.
+\end{itemize}
+
+\subsection{The compiler mimics human C programmer}
+ 
+The format of the intermediate C code generated by the ECL compiler is the
+same as the hand-coded C code of the ECL source programs.  For example,
+supposing that the Lisp source file contains the
+following function definition:
+
+\begin{example} 
+            (defun add1 (x) (1+ x))
+\end{example}
+
+The compiler generates the following intermediate C code.
+
+\begin{example}
+     init_code(char *start,int size,object data)
+     {      VT2
+            Cblock.cd_start=start;Cblock.cd_size=size;Cblock.cd_data=data;
+            set_VV(VV,VM1,data);
+            MF0(VV[0],L1);
+     }
+     /*     function definition for ADD1     */
+        
+     static L1(int narg, object V1)
+     {      
+            check_arg(1);
+            VALUES(0)=one_plus(V1);
+            RETURN(1);
+     }
+\end{example}
+
+The C function {\code L1} implements the Lisp function {\code
+add1}.  This relation is established by {\code MF0} in the
+initialization function {\code init\_code}, which is invoked at load
+time.  There, the vector {\code VV} consists of Lisp objects; {\code
+VV[0]} in this example holds the Lisp symbol {\code add1}.  {\code VM1} in
+the definition of {\code L1} is a C macro declared in the corresponding
+H-file.  The actual value of {\code VM1} is the number of value stack
+locations used by {\code L1}, i.e., 2 in this example.  Thus the
+following macro definition is found in the H-file.
+
+\begin{example}
+         #define VM1 2
+\end{example}
+
+\subsubsection{Implementation of Compiled Closures}
+ 
+The ECL compiler takes two passes before it invokes the C
+compiler.  The major role of the first pass is to detect function
+closures and to detect, for each function closure, those lexical
+objects (i.e., lexical variable, local function definitions, tags, and
+block-names) to be enclosed within the closure.  This check must be
+done before the C code generation in the second pass, because lexical
+objects to be enclosed in function closures are treated in a different
+way from those not enclosed.
+
+Ordinarily, lexical variables in a compiled function {\em f}
+are allocated on the C stack.  However, if a lexical variable is
+to be enclosed in function closures, it is allocated on a list, called
+the ``environment list'', which is local to {\em f}.  In addition, a
+local variable is created which points to the lexical
+variable's location (within the environment list), so that
+the variable may be accessed through an indirection rather than by list
+traversal.
+
+\bf{Rewrite this}
+
+The environment list is a pushdown list: It is empty when {\em f} is
+called.  An element is pushed on the environment list when a variable
+to be enclosed in closures is bound, and is popped when the binding is
+no more in effect.  That is, at any moment during execution of {\em
+f}, the environment list contains those lexical variables whose
+binding is still in effect and which should be enclosed in closures.
+When a compiled closure is created during execution of {\it f}, the
+compiled code for the closure is coupled with the environment list at
+that moment to form the compiled closure.
+
+Later, when the compiled closure is invoked, a pointer is set up
+to each lexical variable in the environment list, so that
+each object may be referenced through a memory indirection.
+
+Let us see an example.  Suppose the following function has been compiled.
+
+\begin{example}
+    (defun foo (x)
+        (let ((a #'(lambda () (incf x)))
+              (y x))
+          (values a #'(lambda () (incf x y)))))
+\end{example}
+
+{\code foo} returns two compiled closures.  The first closure
+increments \var{x} by one, whereas the second closure increments
+\var{x} by the initial value of \var{x}.  Both closures return the
+incremented value of \var{x}.
+
+\begin{example} 
+        >(multiple-value-setq (f g) (foo 10))
+        #<compiled-closure nil>
+
+        >(funcall f)
+        11
+
+        >(funcall g)
+        21
+
+        >
+\end{example}
+
+After this, the two compiled closures look like:
+
+\begin{example}
+second closure       y:                     x:
+|-------|------|      |-------|------|       |------|------| 
+|  **   |    --|----->|  10   |    --|------>|  21  | nil  |
+|-------|------|      |-------|------|       |------|------| 
+                                                ^
+                      first closure             |
+                      |-------|------|          |
+                      |   *   |    --|----------| 
+                      |-------|------| 
+
+ * : address of the compiled code for #'(lambda () (incf x))
+** : address of the compiled code for #'(lambda () (incf x y))
+\end{example}
+
+\subsection{Use of Declarations to Improve Efficiency}
+
+Declarations, especially  type  and  function  declarations,
+increase the efficiency of the compiled code.  For example, for the
+following Lisp source file, with two \clisp{} declarations added,
+
+\begin{example}
+   (eval-when (compile)
+     (proclaim '(function tak (fixnum fixnum fixnum) fixnum))
+
+   (defun tak (x y z)
+     (declare (fixnum x y z))
+     (if (not (< y x))
+         z
+         (tak (tak (1- x) y z)
+              (tak (1- y) z x)
+              (tak (1- z) x y))))
+\end{example}
+
+The compiler generates the following C code:
+
+\begin{example}
+   /*      local entry for function TAK                                  */
+   static int LI1(register int V1,register int V2,register int V3)
+   { VT3 VLEX3 CLSR3
+   TTL:
+           if (V2 < V1) {
+           goto L2;}
+           return(V3);
+   L2:
+           { int V5;
+             V5 = LI1((V1)-1,V2,V3);
+           { int V6;
+             V6 = LI1((V2)-1,V3,V1);
+             V3 = LI1((V3)-1,V1,V2);
+             V2 = V6;
+             V1 = V5;}}
+           goto TTL;
+   ;;; Note: Tail-recursive call of TAK was replaced by iteration.
+   }
+\end{example}
+
+\subsection{Inspecting generated C code}
+
+\clisp{} defines a function disassemble, which is
+supposed to disassemble a compiled function and to display the
+assembler code.  According to \cltl{},
+
+\vspace{1 em}
+
+     {\em This is primary useful for debugging the compiler}, ..\\
+ 
+This is, however, {\em useless} in our case, because we are
+not concerned with assembly language.  Rather, we are interested in
+the C code generated by the ECL compiler.  Thus the disassemble
+function in ECL accepts not-yet-compiled functions only and displays
+the translated C code.
+
+\begin{example}
+   > (defun add1 (x) (1+ x))
+   ADD1
+   > (disassemble *)
+   ;;; Compiling (DEFUN ADD1 ...).
+   ;;; Emitting code for ADD1.
+
+   /*      function definition for ADD1                                  */
+   static L1(int narg, object V1)
+   { VT3 VLEX3 CLSR3
+   TTL:
+           VALUES(0) = one_plus((V1));
+           RETURN(1);
+   }
+\end{example}
+
+\section{The C language interface}
+
+There are several mechanism to integrate C code within \ecl{}.
+
+The user can embed his/her own C code into Lisp source code.  The
+idea is quite simple: the specified C code is inserted in the intermediate
+C code that is generated by the ECL compiler.  In the following example,
+{\code Clines}  and {\code defentry}  are top-level macros specific
+to ECL.  The {\code Clines}  macro form specifies the C code to be embedded,
+in terms of strings, and the {\code defentry}  form defines an entry
+of the specified C function from ECL.
+
+\begin{example}
+    (Clines
+    "   int tak(x, y, z)                       "
+    "   int x, y, z;                           "
+    "   {   if (y >= x) return(z);             "
+    "       else return(tak(tak(x-1, y, z),    "
+    "                       tak(y-1, z, x),    "
+    "                       tak(z-1, x, y)));  "
+    "   }                                      "
+    )
+
+    (defentry tak (int int int) (int "tak"))
+\end{example}
+
+\subsection{ECL size}
+
+The size of the object module of the whole ECL system (including the Compiler)
+is
+\begin{example}
+     ECL/SUN      2.04 Mbytes
+\end{example}
+
+Since all system initialization (such as loading the
+database of the ECL compiler) has been done when the object module is
+created, the object module size roughly corresponds to the initial
+size of the ECL process when a ECL session is started, minus the
+initial size of the hole in the heap (about 200 Kbytes).
+
+\vspace{1 em}
+
+\subsection{Gabriel's benchmark}
+
+The following table shows the results of Richard Gabriel's Lisp
+benchmark tests in ECL.  The results with five other public domain
+\clisp{} implementation are also listed for comparison.  Each number
+represents the CPU time (in seconds) for the compiled program.
+The code for the benchmark is taken from:
+
+\begin{center}
+{\em Performance and Evaluation of Lisp Systems}
+by
+Richard P. Gabriel
+Computer Systems Ser. Research Reports
+MIT Press, 1985
+\end{center}
+
+\vspace{1 em}
+
+For the details of the benchmark tests, refer to the book above.
+
+\begin{tabular}{|l|l|} \hline
+Benchmark &   Sun ELC \\
+  Test    &           \\ \hline
+  Boyer  &        2.067 \\
+  Browse  &       3.750 \\
+  Ctak  &         0.967 \\
+  Dderiv  &       1.717 \\
+  Deriv  &        1.200 \\
+  Destru  &       0.350 \\
+  Div2  &         2.467 \\
+  Fft  &          2.317 \\
+  Fprint  &       0.167 \\
+  Fread  &        0.133 \\
+  Puzzle  &       1.833 \\
+  Stak  &         0.000 \\
+  Tak  &          0.200 \\
+  Takl  &         0.267 \\
+  Takr  &         0.233 \\
+  Tprint  &       0.117 \\
+  Traverse  &     6.783 \\
+  Triang  &       10.067 \\ \hline
+\end{tabular}
+\end{document}

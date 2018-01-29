@@ -1,0 +1,107 @@
+\input{clisp.sty}
+
+\def\deftype{\defun@vspace\@defn{Type}}
+\def\deftypex{\@defn{Type}}
+\def\enddeftype{\enddfn}
+
+%% METHODS
+
+\def\defgeneric{\defun@vspace\@defn{Generic Function}}
+\def\defgenericx{\@defn{Generic Function}}
+\def\enddefgeneric{\enddfn}
+\def\defmethod{\defun@vspace\@defn{Method}}
+\def\enddefmethod{\enddfn}
+\def\defmethodx{\@defn{Method}}
+
+\def\researchcredit{
+This research was sponsored in part by the Commission of the
+European Community, program Human Capital and Mobility,
+under the title \em{Virtual Multiprocessor}.
+}
+
+% See if we can squelch some of the noise in the default cross-reference
+% format.
+\def\xrefX [#1,#2,#3,#4,#5,#6]{section \ref{#1}, page\tie \pageref{#1}}
+
+% Commented because there are specials without *'s (e.g. ++). Beppe
+% Changed also vindexed below. Beppe
+% Wrap *'s around DEFVAR variables, but not in the vindex.
+%\def\defvar{\defun@vspace\defvarx}
+%\def\defvarx{\@defvrstar{Variable}}
+
+%\def\@defvrstar#1#2{\outer\def\defun@type{#1}\outer\def\defun@name{*#2*}%
+\def\@defvr#1#2{\outer\def\defun@type{#1}\outer\def\defun@name{#2}%
+\vrindexbold{#2}\label{VR:#2}%
+\@ifnextchar[{\@defvarpackage}{\@defvarnopackage}
+}
+
+%% Keywords
+\def\kwd#1{\code{:#1}}
+
+% Abbreviations..
+
+\def\clisp{{\sc Common Lisp}}
+\def\ecl{ECoLisp}
+
+\def\dash{---}
+\def\alien{{Alien}}
+\def\aliens{{Aliens}}
+\def\Aliens{{Aliens}}
+\def\Alien{{Alien}}
+\def\cltl{{\i{\clisp{}: The Language}}}
+
+% Indexing (from fvpindex.sty)
+
+\let\indexfont=\tt
+
+\def\findexed#1{\findex{#1}{\indexfont #1}}
+% \def\vindexed#1{\vindex{#1}{\indexfont *#1*}}
+\def\vindexed#1{\vindex{#1}{\indexfont *#1*}}
+\def\cindexed#1{\vindex{#1}{\indexfont #1}}
+\def\tindexed#1{\tindex{#1}{\indexfont #1}}
+
+\newindex{vr}
+\newindex{fn}
+\newindex{tp}
+
+% Cross referencing (from funref.sty)
+
+% Add support for referencing functions.  This assumes clisp.sty
+% and fvpindex.sty and must be loaded after clisp.sty
+\def\@defn#1#2{\outer\def\defun@type{#1}\outer\def\defun@name{#2}%
+\fnindexbold{#2}\label{FN:#2}%
+\@ifnextchar[{\@defunpackage}{\@defunnopackage}
+}
+
+\def\@defvr#1#2{\outer\def\defun@type{#1}\outer\def\defun@name{#2}%
+\vrindexbold{#2}\label{VR:#2}%
+\@ifnextchar[{\@defvarpackage}{\@defvarnopackage}
+}
+
+\def\@defmc#1#2{\outer\def\defun@type{#1}\outer\def\defun@name{#2}%
+\fnindexbold{#2}\label{FN:#2}%
+\@ifnextchar[{\@defmacpackage}{\@defmacnopackage}
+}
+
+\let\xlref=\xref        % the same indexes in LaTeX, but not in info
+\let\pxlref=\pxref      % the same indexes in LaTeX, but not in info
+% These are now supported.
+\def\funref#1{\findexed{#1} (page\tie\pageref{FN:#1})}
+\def\specref#1{\findexed{#1} (page\tie\pageref{FN:#1})}
+\def\macref#1{\findexed{#1} (page\tie\pageref{FN:#1})}
+\def\varref#1{\vindexed{#1} (page\tie\pageref{VR:#1})}
+\def\conref#1{\cindexed{#1} (page\tie\pageref{VR:#1})}
+
+% Formatting, from cmu-proc.sty:
+
+ \oddsidemargin -10pt \evensidemargin -10pt
+ \topmargin -40pt \headheight 12pt \headsep 25pt
+ \footheight 12pt \footskip 30pt 
+
+\textheight 9.25in \textwidth 6.75in \columnsep .375in \columnseprule 0pt 
+
+\def\@oddhead{}\def\@evenhead{}
+\def\@oddfoot{}
+\def\@evenfoot{\@oddfoot}
+
+\sloppy
