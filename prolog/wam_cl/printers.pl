@@ -49,7 +49,7 @@ lisp_qchar(X) --> {format(atom(NN),'#\\~w ',[X])},!,[NN].
 is_characterp_lisp(X):- compound(X),X='#\\'(_). %,is_characterp(X).
 
 sexpr1(X) --> {is_ftVar(X),(get_var_name(X,N)->format(atom(NN),'~w',[N]);format(atom(NN),'~w',[X]))},!,[NN].
-sexpr1(PN) --> {is_pathnamep(PN)},['#P'],{f_namestring(PN,NS),sformat(Out,'~w',NS)},[Out].
+sexpr1(PN) --> {is_pathnamep(PN)},['#P'],{f_namestring(PN,NS)},sexpr1(NS).
 sexpr1(Str)--> {is_stringp(Str),to_prolog_string(Str,PStr)},!,[PStr].
 sexpr1([]) --> !, ['(',')'].
 sexpr1(X)--> {atom(X)},!,[X].

@@ -168,20 +168,21 @@ package_import_symbol_step2(Package,Symbol,String,OldSymbol,kw_internal):-
 % @TODO Confirm symbol shadowing is correct 
 f_export(Symbol,Result):- reading_package(Package),f_export(Symbol,Package,Result).
 %f_export(String,Package,R):- to_prolog_string_if_needed(String,PlString),!,f_export(PlString,Package,R).
-f_export(Symbol,Pack,t):- 
-   find_package_or_die(Pack,Package),
+f_export(Symbol,Pack,t):-  
+  (Pack==[] -> reading_package(Package) ; find_package_or_die(Pack,Package)),
    pl_export(Package,Symbol).
 
-pl_export(Pack,List):- is_list(List),maplist(pl_export(Pack),List).
+pl_export(Pack,List):- is_list(List),!,maplist(pl_export(Pack),List).
 pl_export(Package,Symbol):- 
-   pl_symbol_name(Symbol,String),
+   pl_symbol_name(Symbol,String),!,
    package_find_symbol_or_missing(String,Package,OldSymbol,IntExt),!,
-   package_export_symbol_step2(Package,Symbol,String,OldSymbol,IntExt).
+   package_export_symbol_step2(Package,Symbol,String,OldSymbol,IntExt),!.
 
 package_export_symbol_step2(Package,Symbol,String,_OldSymbol,'$missing'):-
    assert_lsp(Symbol,package:package_external_symbols(Package,String,Symbol)).
 package_export_symbol_step2(_Package,Symbol,_String,OldSymbol,kw_exported):- Symbol == OldSymbol,!.
-package_export_symbol_step2(Package,Symbol,String,OldSymbol,kw_inheritied):-
+package_export_symbol_step2(pkg_cl,_Symbol,_String,_OldSymbol,kw_inherited):-!.
+package_export_symbol_step2(Package,Symbol,String,OldSymbol,kw_inherited):-
    assert_lsp(Symbol,package:package_shadowing_symbols(Package,OldSymbol)),
    assert_lsp(Symbol,package:package_external_symbols(Package,String,Symbol)).
 package_export_symbol_step2(Package,Symbol,String,OldSymbol,kw_external):-

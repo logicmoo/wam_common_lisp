@@ -142,7 +142,9 @@ to_prolog_pathname(Obj,PL):- string_to_prolog_atom(Obj,PL).
 string_to_prolog_atom(TXT,A):- to_prolog_string_anyways(TXT,T),!,always((text_to_string(T,S),atom_string(A,S))),!.
 %string_to_prolog_atom(TXT,A):- always((text_to_string(TXT,S),atom_string(A,S))),!.
 
-f_namestring(Pathname,String):- 
+
+f_namestring(Pathname,Out):- pl_namestring(Pathname,String),to_lisp_string(String,Out).
+pl_namestring(Pathname,String):- 
     get_opv(Pathname,pathname_directory,D),
     (D==[]->DS1='';(loc_to_pl(D,DS),atom_concat(DS,'/',DS1))),
     get_opv(Pathname,pathname_name,N),
@@ -150,13 +152,13 @@ f_namestring(Pathname,String):-
     get_opv(Pathname,pathname_type,E),
     (E==[]->sformat(String,'~w',[DS2]);(loc_to_pl(E,ES),sformat(String,'~w.~w',[DS2,ES]))),
     !.
-f_namestring(pathname_znst_3,_String):- break,!,fail.
-f_namestring(Atom,String):- f_string(Atom,String),!.
-f_namestring(In,Out):- trace,to_prolog_pathname(In,Atom),atom_string(Atom,String),to_lisp_string(String,Out).
-f_namestring(Pathname,String):-
+pl_namestring(pathname_znst_3,_String):- break,!,fail.
+pl_namestring(Atom,String):- to_prolog_string(Atom,String),!.
+pl_namestring(In,String):- trace,to_prolog_pathname(In,Atom),atom_string(Atom,String).
+pl_namestring(Pathname,String):-
     get_opv(Pathname,pathname_namestring,PN),!,
     string_to_prolog_atom(PN,Atom),atom_string(Atom,String).
-f_namestring(Pathname,String):-
+pl_namestring(Pathname,String):-
     throw(todo(f_namestring(Pathname,String))).
 
 f_pathname(S,P):- is_stream(S),stream_property(S,file(File)),!,f_pathname(File,P).

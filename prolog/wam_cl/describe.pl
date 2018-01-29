@@ -52,10 +52,10 @@ f_sys_apropos_symbol(Symbol,_Verbose,t):- f_prin1(Symbol,_),
   ((is_boundp(Symbol),f_symbol_value(Symbol,Value))->(write(' (bound) '),f_prin1(Value,_));true),!,
   nl.          
 
-f_describe(Obj,Ret):-
- pl_describe(Obj,[],Ret).
+f_describe(Obj,Opts,Ret):-
+ pl_describe(Obj,Opts,[],Ret).
 
-pl_describe(Obj,_Skipping,Ret):-
+pl_describe(Obj,Opts,_Skipping,Ret):-
    f_type_of(Obj,Type),
    f_class_of(Obj,Class),
    format('~N',[]),

@@ -123,9 +123,9 @@ package_external_symbols(pkg_cl,"&KEY",c38_key).
 package_external_symbols(pkg_cl,"&OPTIONAL",c38_optional).
 package_external_symbols(pkg_cl,"&REST",c38_rest).
 package_external_symbols(pkg_cl,"&WHOLE",c38_whole).
-package_external_symbols(pkg_cl,"*",xx).
-package_external_symbols(pkg_cl,"**",xx_xx).
-package_external_symbols(pkg_cl,"***",xx_xx_xx).
+package_external_symbols(pkg_cl,"*",*).
+package_external_symbols(pkg_cl,"**",'**').
+package_external_symbols(pkg_cl,"***",'***').
 package_external_symbols(pkg_cl,"*BREAK-ON-SIGNALS*",xx_break_on_signals_xx).
 package_external_symbols(pkg_cl,"*COMPILE-FILE-PATHNAME*",xx_compile_file_pathname_xx).
 package_external_symbols(pkg_cl,"*COMPILE-FILE-TRUENAME*",xx_compile_file_truename_xx).
@@ -2810,7 +2810,7 @@ package_external_symbols(pkg_sys,"*ARGS*",sys_xx_args_xx).
 package_external_symbols(pkg_sys,"*AUTOLOAD-VERBOSE*",sys_xx_autoload_verbose_xx).
 package_external_symbols(pkg_sys,"*BATCH-MODE*",sys_xx_batch_mode_xx).
 package_external_symbols(pkg_sys,"*BREAK-DRIVER*",sys_xx_break_driver_xx).
-package_external_symbols(pkg_sys,"*BREAK-ON-WARNINGS*",sys_xx_break_on_warnings_xx).
+package_external_symbols(pkg_cl,"*BREAK-ON-WARNINGS*",xx_break_on_warnings_xx).
 package_external_symbols(pkg_sys,"*BROWSER*",sys_xx_browser_xx).
 package_external_symbols(pkg_sys,"*BROWSERS*",sys_xx_browsers_xx).
 package_external_symbols(pkg_sys,"*CLHS-ROOT-DEFAULT*",sys_xx_clhs_root_default_xx).

@@ -313,7 +313,9 @@
 	(read stream t nil t)
 	(let ((*read-suppress* t)) (read stream t nil t) (values)))))
 
+#-WAM-CL
 (set-dispatch-macro-character #\# #\+ 'sharp-+-reader)
+#-WAM-CL
 (set-dispatch-macro-character #\# #\+ 'sharp-+-reader
                               (sys::standard-readtable))
 
@@ -324,7 +326,9 @@
 	(let ((*read-suppress* t)) (read stream t nil t) (values))
 	(read stream t nil t))))
 
+#-WAM-CL
 (set-dispatch-macro-character #\# #\- 'sharp---reader)
+#-WAM-CL
 (set-dispatch-macro-character #\# #\- 'sharp---reader
                               (sys::standard-readtable))
 

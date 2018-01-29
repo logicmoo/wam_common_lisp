@@ -51,6 +51,7 @@ to_prolog_string(S,SN):- is_symbolp(S),!,pl_symbol_name(S,S2),to_prolog_string(S
 to_prolog_string_if_needed(L,Loc):- \+ string(L),!,always(to_prolog_string_anyways(L,Loc)).
 % Always make a STRING
 to_prolog_string_anyways(I,O):- atom(I),upcase_atom(I,I),!,atom_string(I,O).
+to_prolog_string_anyways(I,O):- is_pathnamep(I),pl_namestring(I,O),!.
 to_prolog_string_anyways(I,O):- to_prolog_string(I,O),!.
 to_prolog_string_anyways(I,O):- is_classp(I),claz_to_symbol(I,Symbol),!,to_prolog_string_anyways(Symbol,O).
 to_prolog_string_anyways(I,O):- always(atom_string(I,O)),!.
