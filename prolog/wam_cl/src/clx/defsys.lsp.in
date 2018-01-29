@@ -1,0 +1,67 @@
+;;;;  Copyright (c) 1992, Giuseppe Attardi.
+;;;;
+;;;;    ECoLisp is free software; you can redistribute it and/or
+;;;;    modify it under the terms of the GNU Library General Public
+;;;;    License as published by the Free Software Foundation; either
+;;;;    version 2 of the License, or (at your option) any later version.
+;;;;
+;;;;    See file '../Copyright' for full details.
+;;
+(in-package 'user)
+;;
+(defparameter *pathname-types*	'("lsp" . "o"))
+# Leave the space below, or else configure will remove the line
+ #+PDE (setq si:*record-source-pathname-p* t)
+;;
+;;; ----------------------------------------------------------------------
+;;;	CLX
+;;; ----------------------------------------------------------------------
+;;
+(sbt:defsystem
+ clx
+;;
+ :modules
+;;
+;;; file           load             compile           files which force
+;;;                environment      environment       recompilations of
+;;;                                                   this file
+ '((package         t	            t                        ())
+   (ecldep         (package)        t	             	     ())
+   (depdefs        (package ecldep) (package ecldep)         (ecldep))
+   (clx		   (depdefs)        (depdefs)	             (depdefs))
+   (dependent	   (clx)	    (clx)	             (clx))
+   (macros    	   (dependent)      (dependent)	             (dependent))
+   (bufmac   	   (macros)	    (macros)		     (macros))
+   (buffer         t                (macros bufmac)          ())
+   (display        t                (macros bufmac buffer)   (macros))
+   (gcontext       (display)        (macros bufmac buffer
+					    display)         (display))
+   (input          (display depdefs)(macros bufmac buffer
+					    display depdefs) (display
+							      depdefs))
+   (requests       (display)        (macros bufmac buffer
+					    display gcontext)(display))
+   (fonts          (display)        (macros bufmac buffer
+					    display)         (display))
+   (graphics       (fonts)          (macros bufmac buffer
+					    fonts)           (display fonts))
+   (text           (fonts gcontext) (macros bufmac buffer
+					    fonts gcontext)  (gcontext fonts
+							       display))
+   (attributes     (display)        (macros bufmac buffer
+					    display)         (display))
+   (translate      (display)        (macros bufmac buffer
+					    display text)    (display))
+   (keysyms        (translate)      (buffer translate)       (translate
+							      display))
+   (manager        (clx)            (clx macros bufmac)      (display))
+   (image          (display)        (macros bufmac buffer
+					    display)         (display))
+   (resource       (display)        (macros bufmac buffer
+					    display)         (display)))
+;;
+ :directory '("@srcdir@/" . "./")
+;;
+ :pathname-types *pathname-types*)
+;;
+;;; ----------------------------------------------------------------------

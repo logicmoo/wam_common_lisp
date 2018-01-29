@@ -391,7 +391,7 @@
 
       (setq *lisp-initialized* t))
 
-    (in-package #:user)
+    (in-package "USER")
 
     (catch *quit-tag*
       (let ((*tpl-level* -1))
