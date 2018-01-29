@@ -24,8 +24,9 @@
 :- use_module(library(filestreams)).
 :- use_module(library(bugger)).
 
+:- if(exists_file(header)).
 :- include('header').
-
+:- endif.
 
 :- thread_local(t_l:sreader_options/2).
 kif_ok:- t_l:sreader_options(logicmoo_read_kif,true).
@@ -367,11 +368,11 @@ sread_dyn:plugin_read_dispatch_char([DispatCH],Form,In,Out):-
 
 signed_radix_2(W,V)--> signed_radix_2_noext(W,Number),extend_radix(W,Number,V).
 
-signed_radix_2_noext(W,Number) --> `-`,!,unsigned_radix_2(W,NumberP),{Number is - NumberP }.
+signed_radix_2_noext(W,Number) --> `-`,!,unsigned_radix_2(W,NumberP),{Number is - NumberP },!.
 signed_radix_2_noext(W,Number) --> `+`,!,unsigned_radix_2(W,Number).
 signed_radix_2_noext(W,Number) --> unsigned_radix_2(W,Number).
 
-unsigned_radix_2(W,Number) --> radix_digits(W,Xs),{mkvar_w(Xs,W,Number)}.
+unsigned_radix_2(W,Number) --> radix_digits(W,Xs),!,{mkvar_w(Xs,W,Number)},!.
 
 
 radix(Radix)-->`#`,integer(Radix),ci(`r`).
@@ -379,12 +380,12 @@ radix(16)-->`#`,ci(`X`).
 radix(8)-->`#`,ci(`O`).
 radix(2)-->`#`,ci(`B`).
 
-signed_radix_number(V)--> radix(Radix),signed_radix_2(Radix,V).
-unsigned_radix_number(V)--> radix(Radix),unsigned_radix_2(Radix,V).
+signed_radix_number(V)--> radix(Radix),!,signed_radix_2(Radix,V).
+unsigned_radix_number(V)--> radix(Radix),!,unsigned_radix_2(Radix,V).
 
 extend_radix(Radix,Number0,'$RATIO'(Number0,Number1)) --> `/`,unsigned_radix_2(Radix,Number1).
-%extend_radix(Radix,Number0,'/'(NumberB,Number1)) --> `.`,radix_number(Radix,Number1),{NumberB is (Number0*Number1)+1}.
-%extend_radix(Radix,Number0,'/'(NumberB,NumberR)) --> `.`,radix_number(Radix,Number1),{NumberR is Number1 * Radix, NumberB is (Number0*Number1)+1}.
+%extend_radix(Radix,Number0,'/'(NumberB,Number1)) --> `.`,radix_number(Radix,Number1),{NumberB is (Number0*Number1)+1},!.
+%extend_radix(Radix,Number0,'/'(NumberB,NumberR)) --> `.`,radix_number(Radix,Number1),{NumberR is Number1 * Radix, NumberB is (Number0*Number1)+1},!.
 extend_radix(_Radix,Number,Number) --> [].
 
 radix_digits(OF,[X|Xs]) --> xdigit(X),{X<OF},!,radix_digits(OF,Xs).
@@ -451,7 +452,9 @@ sexpr('$STRING'(S))             --> s_string(S).
 sexpr('#\\'(35))                 --> `#\\#`, swhite.
 sexpr(E)                      --> `#`,read_dispatch(E),!.
 
-sexpr('#\\'(C))                 --> `#\\`,ci(`u`),remove_optional_char(`+`),dcg_basics:xinteger(C),!.
+%sexpr('#\\'(C))                 --> `#\\`,ci(`u`),!,remove_optional_char(`+`),dcg_basics:xinteger(C),!.
+%sexpr('#\\'(C))                 --> `#\\`,dcg_basics:digit(S0), swhite,!,{atom_codes(C,[S0])}.
+sexpr('#\\'(32))                 --> `#\\ `,!.
 sexpr('#\\'(C))                 --> `#\\`,!,rsymbol(``,C), swhite.
 
 %sexpr(['#-',K,Out]) --> `#-`,!,sexpr(C),swhite,expr_with_comments(Out,sexpr(O),O),!,{as_keyword(C,K)}.
@@ -503,9 +506,9 @@ sym_or_num(('1-')) --> `1-`,swhite,!.
 sym_or_num(('#+')) --> `#+`,swhite,!.
 sym_or_num(('#-')) --> `#-`,swhite,!.
 sym_or_num(('-#+')) --> `-#+`,swhite,!.
-sym_or_num(E) --> dcg_and2(rsymbol_maybe(``,E),dcg_not(lnumber(_))),!.
 sym_or_num((E)) --> lnumber(E),swhite,!.
-sym_or_num('#'(E)) --> [C],{name(E,[C])}.
+sym_or_num(E) --> rsymbol_maybe(``,E),!.
+sym_or_num('#'(E)) --> [C],{atom_codes(E,[C])}.
 
 
 sblank --> [C], {var(C)},!.
@@ -625,6 +628,7 @@ string_vector([]) --> [], !.
 
 % . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+lnumber(_)--> [C],{code_type(C,alpha)},!,{fail}.
 lnumber(N)-->  lnumber0(N). % (peek_symbol_breaker;[]).
 
 oneof_ci(OneOf,[C])--> {member(C,OneOf)},ci([C]). 
@@ -650,38 +654,39 @@ float_e_type(`d`,claz_double_float).
 float_e_type(`L`,claz_long_float).
 float_e_type(`s`,claz_short_float).
 
-lnumber_exp('$EXP'(N,T,E))-->snumber(N),oneof_ci(`EsfdL`,TC),dcg_basics:integer(E),{exp:float_e_type(TC,T)},!.
-lnumber_exp('$EXP'(N,T,E))-->dcg_basics:integer(N),oneof_ci(`EsfdL`,TC),dcg_basics:integer(E),!,{float_e_type(TC,T)},!.
+lnumber_exp('$EXP'(N,T,E))-->snumber_no_exp(N),!,oneof_ci(`EsfdL`,TC),dcg_basics:integer(E),{exp:float_e_type(TC,T)},!.
+lnumber_exp('$EXP'(N,T,E))-->dcg_basics:integer(N),!,oneof_ci(`EsfdL`,TC),dcg_basics:integer(E),!,{float_e_type(TC,T)},!.
 
 
-lnumber0(N) --> lnumber_exp(N).
-lnumber0('$RATIO'(N,D)) --> sint(N),`/`,uint(D).
-lnumber0(N) --> snumber(N),!.
-lnumber0(N) --> dcg_basics:number(N),!.
+lnumber0(N) --> lnumber_exp(N),!.
+lnumber0('$RATIO'(N,D)) --> sint(N),`/`,uint(D),!.
+lnumber0(N) --> snumber_no_exp(N),!.
+%lnumber0(N) --> dcg_basics:number(N),!.
 
 
-snumber(N)--> `-`,!,unumber(S),{N is -S}.
-snumber(N)--> `-`,!,unumber(N).
-snumber(N)--> unumber(N).
-snumber(N)-->  sint(N).
+snumber_no_exp(N)--> `-`,!,unumber_no_exp(S),{N is -S},!.
+snumber_no_exp(N)--> `+`,!,unumber_no_exp(N).
+snumber_no_exp(N)--> unumber_no_exp(N),!.
+%snumber_no_exp(N)-->  sint(N),!.
 
 
 sint(N) --> signed_radix_number(N),!.
-sint(N)--> `-`,!,uint(S),{N is -S}.
+sint(N)--> `-`,!,uint(S),{N is -S},!.                          
 sint(N)--> `+`,!,uint(N).
-sint(N)--> uint(N).
+sint(N)--> uint(N),!.
 
-natural_int(N) --> dcg_and2(dcg_basics:digits(_),dcg_basics:integer(N)).
+natural_int(_) --> \+ dcg_basics:digit(_),!,{fail}.
+natural_int(N) --> dcg_basics:integer(N).
 
-unumber(N) --> dcg_and2((dcg_basics:digits(_),`.`,dcg_basics:digits(_)),dcg_basics:float(N)),!.
-unumber(N)--> dcg_basics:integer(E),`.`,dcg_basics:digits(S),{(notrace_catch_fail(number_codes(ND,[48,46|S]))),N is ND + E},!.
-unumber(N) --> `.`,dcg_basics:digits(S),{(notrace_catch_fail(number_codes(N,[48,46|S])))},!.
-unumber(N) --> natural_int(N),`.`.
-unumber(N) --> natural_int(N).
+digits_dot_digits --> natural_int(_),!,`.`,!,natural_int(_).
+
+unumber_no_exp(N) --> dcg_and2(digits_dot_digits,dcg_basics:float(N)),!.
+unumber_no_exp(N)--> natural_int(E),`.`,dcg_basics:digits(S),{(notrace_catch_fail(number_codes(ND,[48,46|S]))),N is ND + E},!.
+unumber_no_exp(N) --> `.`,!,dcg_basics:digit(S0),!,dcg_basics:digits(S),{(notrace_catch_fail(number_codes(N,[48,46,S0|S])))},!.
+unumber_no_exp(N) --> natural_int(N),!,remove_optional_char(`.`).
 
 uint(N) --> unsigned_radix_number(N).
-uint(N) --> dcg_basics:integer(N),`.`,!.
-uint(N) --> dcg_basics:integer(N).
+uint(N) --> natural_int(N),!,remove_optional_char(`.`).
 
 
 % . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -704,9 +709,16 @@ sexpr(E,C,X,Z) :- swhite([C|X],Y), sexpr(E,Y,Z).
 % Sym Char.  (not ";()#',` 
 % )
 %
-sym_char(C) :- nb_current('$maybe_string',t),!, bx(C >  32), \+ (member(C,[34,59,40,41,35,39,44,96|`.:;!%`])).  
-sym_char(46).
-sym_char(C) :- bx(C >  32), \+ (member(C,[34,59,40,41,35,39,44,96])).  
+
+sym_char(C):- C =<  32,!,fail.
+%sym_char(44). % allow comma in middle of symbol
+sym_char(C):- memberchk(C,`";()#'\``),!,fail.  % maybe 44 ? comma
+%sym_char(C):- nb_current('$maybe_string',t),memberchk(C,`,.:;!%`),!,fail.
+sym_char(_):- !.
+
+sym_char_start(C):- C\==44,C\==59,sym_char(C).
+
+
 
 :- nb_setval('$maybe_string',[]).
 
@@ -793,32 +805,68 @@ to_untyped(ExprI,ExprO):- always(ExprI=..Expr),
 to_number(S,S):-number(S),!.
 to_number(S,N):- text_to_string_safe(S,Str),number_string(N,Str),!.
 
+
 to_char(S,'#\\'(S)):- var(S),!.
 to_char('#'(S),C):- !, to_char(S,C).
 to_char('#\\'(S),C):- !, to_char(S,C).
-to_char(S,C):- atom(S),name(S,[N]),!,to_char(N,C).
+to_char(S,C):- atom(S),atom_concat('^',SS,S),upcase_atom(SS,SU),atom_codes(SU,[N64]),N is N64-64,N>=0,!,to_char(N,C).
+to_char(S,C):- atom(S),atom_codes(S,[N]),!,to_char(N,C).
+to_char(N,C):- text_to_string_safe(N,Str),name_to_charcode(Str,Code),to_char(Code,C),!.
+%to_char(N,'#\\'(S)):- to_number(N,NC),!,char_code_to_char(NC,S),!.
 to_char(N,'#\\'(S)):- integer(N),!,char_code_to_char(N,S),!.
-to_char(N,C):- text_to_string_safe(N,Str),char_code_from_name(Str,Code),to_char(Code,C),!.
-to_char(N,'#\\'(S)):- to_number(N,NC),!,char_code_to_char(NC,S),!.
-
-char_code_to_char(N,S):- char_type(N,alnum),name(S,[N]).
-char_code_to_char(32,' ').
-char_code_to_char(N,N):- \+ char_type(N,graph).
-char_code_to_char(N,N):- char_type(N,white).
-char_code_to_char(N,S):- name(S,[N]).
+to_char(N,'#\\'(N)).
 
 
+char_code_int(Char,Code):- notrace_catch_fail(char_code(Char,Code)),!.
+char_code_int(Char,Code):- notrace_catch_fail(atom_codes(Char,[Code])),!.
+char_code_int(Char,Code):- atom(Char),name_to_charcode(Char,Code),!.
+char_code_int(Char,Code):- var(Char),!,wdmsg(char_code_int(Char,Code)),break.
+char_code_int(Char,Code):- wdmsg(char_code_int(Char,Code)),break.
 
-char_code_from_name(Str,Code):-find_from_name(Str,Code),!.
-char_code_from_name(Str,Code):-text_upper(Str,StrU),find_from_name2(StrU,Code).
-char_code_from_name(Str,Code):-string_codes(Str,[S,H1,H2,H3,H4|HEX]),memberchk(S,`Uu`),char_type(H4,xdigit(_)),
+char_code_to_char(N,S):- atom(N),atom_codes(N,[_]),!,S=N.
+char_code_to_char(N,S):- atom(N),!,S=N.
+%char_code_to_char(N,S):- code_type(N,graph),atom_codes(S,[N]),atom(S),!.
+%char_code_to_char(N,O):- \+ integer(N),char_type(N,_),!,N=O.
+%char_code_to_char(32,' '):-!.
+%char_code_to_char(N,N):- \+ code_type(N,graph),!.
+%char_code_to_char(N,N):- code_type(N,white),!.
+char_code_to_char(N,S):-  notrace_catch_fail(atom_codes(S,[N])),!.
+
+
+
+name_to_charcode(Str,Code):-find_from_name(Str,Code),!.
+name_to_charcode(Str,Code):-text_upper(Str,StrU),find_from_name2(StrU,Code).
+name_to_charcode(Str,Code):-string_codes(Str,[S,H1,H2,H3,H4|HEX]),memberchk(S,`Uu`),char_type(H4,xdigit(_)),
    notrace_catch_fail(read_from_codes([48, 120,H1,H2,H3,H4|HEX],Code)).
-char_code_from_name(Str,Code):-string_codes(Str,[S,H1|BASE10]),memberchk(S,`nd`),char_type(H1,digit),
+name_to_charcode(Str,Code):-string_codes(Str,[S,H1|BASE10]),memberchk(S,`nd`),char_type(H1,digit),
    notrace_catch_fail(read_from_codes([H1|BASE10],Code)).
 
 find_from_name(Str,Code):-string_codes(Str,Chars),lisp_code_name_extra(Code,Chars).
 find_from_name(Str,Code):-lisp_code_name(Code,Str).
 find_from_name(Str,Code):-string_chars(Str,Chars),lisp_code_name(Code,Chars).
+
+make_lisp_character(I,O):-notrace(to_char(I,O)).
+
+f_code_char(CH,CC):- always(to_char(CH,CC)),!.
+f_name_char(Name,CC):- always((to_prolog_string(Name,CH),name_to_charcode(CH,Code),to_char(Code,CC))).
+f_char_name(CH,CC):- always(is_characterp(CH)),always(code_to_name(CH,CC)).
+f_char_int(CH,CC):-  always(is_characterp(CH)),always('#\\'(C)=CH),(integer(C)->CC=C;char_code_int(C,CC)).
+f_char_code(CH,CC):- f_char_int(CH,CC).
+
+to_prolog_char('#\\'(X),O):-!,to_prolog_char(X,O).
+to_prolog_char(Code,Char):- number(Code),!,always(char_code_int(Char,Code)),!.
+%to_prolog_char(S,S):- atom(S),char_type(S,_),!.
+to_prolog_char(Atom,Char):- name(Atom,[C|Odes]),!,
+  ((Odes==[] -> char_code_int(Char,C); 
+  always((text_to_string(Atom,String),name_to_charcode(String,Code),char_code_int(Char,Code))))).
+
+code_to_name(Char,Str):- number(Char),Char=Code,!,always((code_to_name0(Code,Name),!,text_to_string(Name,Str))).
+code_to_name(Char,Str):- always((to_prolog_char(Char,PC),char_code_int(PC,Code),code_to_name0(Code,Name),!,text_to_string(Name,Str))).
+
+code_to_name0(Code,Name):-lisp_code_name_extra(Code,Name).
+code_to_name0(Code,Name):-lisp_code_name(Code,Name).
+code_to_name0(Code,Name):- Code<32, Ascii is Code+64,atom_codes(Name,[94,Ascii]).
+code_to_name0(Code,Name):- code_type(Code,graph),!,atom_codes(Name,[Code]).
 
 
 find_from_name2(Str,Code):-find_from_name(Str,Code).
@@ -829,15 +877,20 @@ text_upper(T,U):-text_to_string_safe(T,S),string_upper(S,U).
 
 lisp_code_name_extra(0,`Null`).
 lisp_code_name_extra(1,`Soh`).
+lisp_code_name_extra(2,`^B`).
 lisp_code_name_extra(7,`Bell`).
 lisp_code_name_extra(7,`bell`).
 lisp_code_name_extra(8,`BCKSPC`).
 lisp_code_name_extra(10,`Newline`).
 lisp_code_name_extra(10,`LF`).
 lisp_code_name_extra(10,`Linefeed`).
+lisp_code_name_extra(11,`Vt`).
 lisp_code_name_extra(27,`Escape`).
+lisp_code_name_extra(27,`Esc`).
 lisp_code_name_extra(32,`Space`).
+lisp_code_name_extra(28,`fs`).
 lisp_code_name_extra(13,`Ret`).
+
 
 % @TODO undo this temp speedup
 :- set_prolog_flag(all_lisp_char_names,false).
@@ -846,7 +899,7 @@ lisp_code_name_extra(13,`Ret`).
 
 (with-open-file (strm "lisp_code_names.pl" :direction :output :if-exists :supersede :if-does-not-exist :create)
  (format  strm ":- module(lisp_code_names,[lisp_code_name/2]).~%:- set_prolog_flag(double_quotes,chars).~%~%")
- (loop for i from 0 to 655360 do (let ((cname (char-name (code-char i))) (uname4 (format ()  "U~4,'0X" i)) (uname8 (format ()  "U~8,'0X" i)))
+ (loop for i from 0 to 655360 do (let ((cname (char-atom_codes (code-char i))) (uname4 (format ()  "U~4,'0X" i)) (uname8 (format ()  "U~8,'0X" i)))
   (unless (equal cname uname4) (unless (equal cname uname8)  (format  strm "lisp_code_name(~A,~S).~%" i  cname ))))))
 */
     	 
@@ -901,7 +954,7 @@ copy_lvars(Term,Vars,NTerm,NVars):-
 
 %% svar( ?Var, ?NameU) is det.
 %
-% If this is a KIF var, convert to a name for prolog
+% If this is a KIF var, convert to a atom_codes for prolog
 %
 svar(_,_):- \+ kif_ok,!,fail.
 svar(SVAR,UP):- nonvar(UP),!,trace_or_throw(nonvar_svar(SVAR,UP)).
@@ -957,10 +1010,10 @@ svar_fixname(I,O):-
 % Fix Varcase.
 %
 fix_varcase(Word,Word):- atom_concat_or_rtrace('_',_,Word),!.
-fix_varcase(Word,WordC):- !, name(Word,[F|R]),to_upper(F,U),name(WordC,[U|R]).
+fix_varcase(Word,WordC):- !, atom_codes(Word,[F|R]),to_upper(F,U),atom_codes(WordC,[U|R]).
 % the cut above stops the rest 
 fix_varcase(Word,Word):-upcase_atom(Word,UC),UC=Word,!.
-fix_varcase(Word,WordC):-downcase_atom(Word,UC),UC=Word,!,name(Word,[F|R]),to_upper(F,U),name(WordC,[U|R]).
+fix_varcase(Word,WordC):-downcase_atom(Word,UC),UC=Word,!,atom_codes(Word,[F|R]),to_upper(F,U),atom_codes(WordC,[U|R]).
 fix_varcase(Word,Word). % mixed case
 
 :- export(ok_varname_or_int/1).

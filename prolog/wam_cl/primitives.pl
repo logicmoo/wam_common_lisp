@@ -43,7 +43,8 @@ f_equalp(A,B,Ret):- t_or_nil( is_equalp(A,B) , Ret).
 equal(A,B,Ret):- t_or_nil( is_equal(A,B) , Ret).
 
 
-is_eql(X,Y):- is_eq(X,Y)->true;f_type_of(X,T),f_type_of(Y,T), notrace(catch(X=:=Y,_,fail)).
+is_eql(X,Y):- is_eq(X,Y)->true;((f_type_of(X,T),f_type_of(Y,T)),
+  (T==character -> X=Y ; notrace(catch(X=:=Y,_,fail)))).
 is_eq(X,Y):- same_term(X,Y).
 % is_eq(X,Y):- X==Y, (\+ compound(X)-> true ; \+ \+ ((gensym(cookie,Cook),setarg(1,X,Cook),X==Y))).
 is_equal(X,Y):- (X=@=Y->true;is_eql(X,Y)).

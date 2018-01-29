@@ -137,7 +137,7 @@ lisp_add_history(Expression):- is_stringp(Expression),!,
         prolog:history(user_input, add(ExpressionS)).
 lisp_add_history(Expression):-
         with_output_to(string(S),writeExpression(Expression)),
-        (string_upper(S,S)->string_lower(S,Store);Store=S),
+        ((fail,string_upper(S,S))->string_lower(S,Store);Store=S),
         prolog:history(user_input, add(Store)).
 
 :- set_prolog_flag(lisp_no_compile,false).

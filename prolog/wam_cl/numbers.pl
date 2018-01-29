@@ -239,7 +239,12 @@ wl:interned_eval_todo(
 
 %f_c42(N1,N2,Ret):- Ret is (N1 + N2).
 '*'(N1,N2,Ret):- Ret is (N1 * N2).
-'f_*'(N1,N2,Ret):- Ret is (N1 * N2).
+%'f_*'(N1,N2,Ret):- Ret is (N1 * N2).
+'f_*'(ArgsIn,Ret):- 
+   (ArgsIn==[]-> Ret=1; 
+   (ArgsIn=[Ret]->true;
+   (ArgsIn=[N1|N2]->('f_*'(N2,R2),
+      Ret is (N1 * R2))))).
 
 %f_c47(N1,N2,Ret):- Ret is (N1 + N2).
 '/'(N1,N2,Ret):- Ret is (N1 / N2).

@@ -27,14 +27,23 @@ trim_full_stop(SPClosure,SPClosure).
 
 lisp_chars_to_pl_string(Str,Str):- string(Str),!.
 lisp_chars_to_pl_string(Str,SS):- \+ is_list(Str),!,always((atom_chars(Str,Codes),text_to_string(Codes,SS))).
-lisp_chars_to_pl_string(List,SS):- notrace((must_maplist(to_prolog_char,List,Codes),!,text_to_string(Codes,SS))).
+lisp_chars_to_pl_string(List,SS):- notrace(catch(((must_maplist(to_prolog_char,List,Codes),!,text_to_string(Codes,SS))),_,fail)).
 
 shrink_lisp_strings(Str,PStr):- \+ compound(Str),!,Str=PStr.
 %shrink_lisp_strings(Str,PStr):- is_stringp(Str),!,to_prolog_string(Str,PStr).
-shrink_lisp_strings([A|Str],PStr):- is_list(Str),maplist(is_characterp_lisp,[A|Str]),!,lisp_chars_to_pl_string([A|Str],PStr).
+shrink_lisp_strings([A|Str],PStr):- is_list(Str),maplist(is_characterp_lisp,[A|Str]),lisp_chars_to_pl_string([A|Str],PStr),!.
 shrink_lisp_strings(C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(shrink_lisp_strings,C1O,C2O),
   compound_name_arguments(C2,F,C2O). %%$C2=..[F|C2O].
 shrink_lisp_strings(Str,Str).
+
+
+lisp_qchar(X) --> {atom(X),atom_length(X,1),char_type(X,graph),format(atom(NN),'#\\~w',[X])},!,[NN].
+lisp_qchar(X) --> {atom(X),atom_length(X,1),atom_codes(X,[Code])},!,sexpr1('#\\'(Code)).
+lisp_qchar(X) --> {\+ number(X),!,format(atom(NN),'#\\~w ',[X])},!,[NN].
+lisp_qchar(X) --> {number(X),notrace_catch_fail((code_type(X,graph),format(atom(NN),'#\\~s',[[X]])))},!,[NN].
+lisp_qchar(X) --> {number(X),code_to_name(X,N),format(atom(NN),'#\\~w ',[N])},!,[NN].
+lisp_qchar(X) --> {number(X),format(atom(NN),'#\\U~|~`0t~16r~8+',[X])},!,[NN].
+lisp_qchar(X) --> {format(atom(NN),'#\\~w ',[X])},!,[NN].
 
 
 is_characterp_lisp(X):- compound(X),X='#\\'(_). %,is_characterp(X).
@@ -49,10 +58,10 @@ sexpr1(['quote', Expression]) --> [''''], !, sexpr1(Expression).
 sexpr1(['#COMMA',X]) --> [','],sexpr1(X).
 sexpr1(['#BQ',X])--> ['`'],!,sexpr1(X).
 sexpr1(['#BQ-COMMA-ELIPSE',X])--> [',@'],sexpr1(X).
+sexpr1('#\\'(X))--> lisp_qchar(X).
 sexpr1([X|Y]) --> ['('],  sexpr1(X), lisplist(Y,')').
 sexpr1([function,Expression]) --> ['#'''], !, sexpr1(Expression).
 sexpr1(function(Expression)) --> ['#'''], !, sexpr1(Expression).
-sexpr1('#\\'(X)) --> {format(atom(NN),'#\\~w ',[X])},!,[NN].
 sexpr1('$STRING'(X)) --> {format(atom(NN),'~q',[X])},!,[NN].
 sexpr1('$COMPLEX'(R,I)) --> ['#C('],sexpr1(R),sexpr1(I),[')'].
 sexpr1('$RATIO'(R,I)) --> [''],sexpr1(R),['/'],sexpr1(I),[''].
@@ -87,16 +96,27 @@ lisplist([],EQ) --> [EQ], !.
 lisplist([X|Xs],EQ) --> sexpr1(X), !, lisplist(Xs,EQ).
 lisplist(X,EQ) --> ['.'], sexpr1(X), [EQ].
 
-wl:init_args(0,format).
-f_format([Stream,Fmt],t):- !, f_print(f_format(Stream,Fmt),_).
-f_format([Stream,Fmt|ArgS],t):-f_print(f_format(Stream,Fmt,ArgS),_).
+wl:init_args(2,format).
+f_format(Stream,Fmt,ArgS,Result):-
+   (Stream==[]->
+      (with_output_to(string(String),lisp_format(Fmt,ArgS)),to_lisp_string(String,Result)) ;
+   (with_stream_opt([Stream],lisp_format(Fmt,ArgS)),Result=t)).
 
-f_prin1(X,X):- quietly((copy_term(X,Y),writeExpression(Y))).
-f_princ(X,X):- is_stringp(X),!,to_prolog_string(X,S),write(S).
-f_princ(X,X):- copy_term(X,Y),writeExpression(Y),nl.
-f_print(X,X):-quietly((f_prin1(X,X))),nl.
-f_terpri(t):-nl.
-f_write_line(X,Y):-f_princ(X,Y),nl.
+lisp_format(Fmt,ArgS):- writeq(lisp_format(Fmt,ArgS)).
+
+% TODO actually redirect stdout
+with_stream_opt(_StreamL,Goal):- always(Goal).
+
+f_prin1(X,R):- f_prin1(X,[],R).
+f_print(X,R):- f_print(X,[],R).
+f_princ(X,R):- f_princ(X,[],R).
+
+f_prin1(X,StreamL,X):- with_stream_opt(StreamL,quietly((copy_term(X,Y),writeExpression(Y)))).
+f_princ(X,StreamL,X):- is_stringp(X),!,with_stream_opt(StreamL,(to_prolog_string(X,S),write(S))).
+f_princ(X,StreamL,X):- copy_term(X,Y),with_stream_opt(StreamL,(writeExpression(Y),nl)).
+f_print(X,StreamL,X):- quietly((f_prin1(X,StreamL,X))),nl.
+f_terpri(StreamL,t):-  with_stream_opt(StreamL,nl).
+f_write_line(X,StreamL,Y):- with_stream_opt(StreamL,(f_princ(X,StreamL,Y),nl)).
 
 % writeExpression/1 displays a lisp expression
 writeExpression(X):- notrace(writeExpression0(X)).

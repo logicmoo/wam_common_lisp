@@ -1,8 +1,8 @@
 #!/usr/bin/env swipl
 %; WAM-CL translated Lisp File (see https://github.com/TeamSPoon/wam_common_lisp/tree/master/prolog/wam_cl )
-%; File: "lib/lsp/setf" (/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lib/lsp/setf.lsp)
+%; File: "lsp/setf" (/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lib/lsp/setf.lsp)
 %; PWD: /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/
-%; Start time: Sun Jan 28 04:49:20 2018
+%; Start time: Mon Jan 29 02:20:46 2018
 
 :-style_check(-discontiguous).
 :-style_check(-singleton).
@@ -111,12 +111,6 @@ by (documentation 'SYMBOL 'setf)."
 */
 /*
 :- side_effect(generate_function_or_macro_name([name='GLOBAL', environ=env_1],
-					       sys_find_documentation,
-					       kw_function,
-					       f_sys_find_documentation)).
-*/
-/*
-:- side_effect(generate_function_or_macro_name([name='GLOBAL', environ=env_1],
 					       sys_expand_set_documentation,
 					       kw_function,
 					       f_sys_expand_set_documentation)).
@@ -128,7 +122,7 @@ by (documentation 'SYMBOL 'setf)."
 					       sf_defsetf)).
 */
 doc: doc_string(defsetf,
-	      _6806,
+	      _6576,
 	      function,
 	      "Syntax: (defsetf symbol update-fun [doc])\n\tor\n\t(defsetf symbol lambda-list (store-var) {decl | doc}* {form}*)\nDefines an expansion\n\t(setf (SYMBOL arg1 ... argn) value)\n\t=> (UPDATE-FUN arg1 ... argn value)\n\t   or\n\t   (let* ((temp1 ARG1) ... (tempn ARGn) (temp0 value)) rest)\nwhere REST is the value of the last FORM with parameters in LAMBDA-LIST bound\nto the symbols TEMP1 ... TEMPn and with STORE-VAR bound to the symbol TEMP0.\nThe doc-string DOC, if supplied, is saved as a SETF doc and can be retrieved\nby (documentation 'SYMBOL 'setf).").
 
@@ -189,7 +183,7 @@ mf_defsetf([defsetf, Access_fn_In|RestNKeys], MacroEnv, MFResult) :-
 				],
 				[[quote, Access_fn_Get22]],
 				Bq_append_Ret),
-		      _6864=[eval_when, [compile, load, eval], [sys_put_sysprop, [quote, Access_fn_Get], [quote, sys_setf_update_fn], [quote, Car_Ret]], [sys_rem_sysprop, [quote, Access_fn_Get17], [quote, sys_setf_lambda]], [sys_rem_sysprop, [quote, Access_fn_Get17], [quote, sys_setf_method]]|Bq_append_Ret]
+		      _6634=[eval_when, [compile, load, eval], [sys_put_sysprop, [quote, Access_fn_Get], [quote, sys_setf_update_fn], [quote, Car_Ret]], [sys_rem_sysprop, [quote, Access_fn_Get17], [quote, sys_setf_lambda]], [sys_rem_sysprop, [quote, Access_fn_Get17], [quote, sys_setf_method]]|Bq_append_Ret]
 		  ;   get_var(GEnv, rest, Rest_Get26),
 		      f_second(Rest_Get26, Store_Init),
 		      LEnv=[bv(sys_store, Store_Init)|GEnv],
@@ -212,14 +206,14 @@ mf_defsetf([defsetf, Access_fn_In|RestNKeys], MacroEnv, MFResult) :-
 		      ;   IFTEST43=[]
 		      ),
 		      (   IFTEST43\==[]
-		      ->  _7732=[]
+		      ->  _7502=[]
 		      ;   f_error(
 				  [ '$ARRAY'([*],
 					     claz_base_character,
 					     "Single store-variable expected.")
 				  ],
 				  ElseResult),
-			  _7732=ElseResult
+			  _7502=ElseResult
 		      ),
 		      get_var(LEnv40, sys_args, Args_Get),
 		      set_var(LEnv40,
@@ -250,10 +244,10 @@ mf_defsetf([defsetf, Access_fn_In|RestNKeys], MacroEnv, MFResult) :-
 				],
 				[[quote, Access_fn_Get60]],
 				Bq_append_Ret73),
-		      _6864=[eval_when, [compile, load, eval], [sys_put_sysprop, [quote, Access_fn_Get54], [quote, sys_setf_lambda], function([lambda, [['#BQ-COMMA-ELIPSE', sys_store], ['#BQ-COMMA-ELIPSE', sys_args]], ['#BQ-COMMA-ELIPSE', sys_body]])], [sys_rem_sysprop, [quote, Access_fn_Get54], [quote, sys_setf_update_fn]], [sys_rem_sysprop, [quote, Access_fn_Get54], [quote, sys_setf_method]]|Bq_append_Ret73]
+		      _6634=[eval_when, [compile, load, eval], [sys_put_sysprop, [quote, Access_fn_Get54], [quote, sys_setf_lambda], function([lambda, [['#BQ-COMMA-ELIPSE', sys_store], ['#BQ-COMMA-ELIPSE', sys_args]], ['#BQ-COMMA-ELIPSE', sys_body]])], [sys_rem_sysprop, [quote, Access_fn_Get54], [quote, sys_setf_update_fn]], [sys_rem_sysprop, [quote, Access_fn_Get54], [quote, sys_setf_method]]|Bq_append_Ret73]
 		  )
 		),
-		_6864=MFResult
+		_6634=MFResult
 	      ),
 	      block_exit(defsetf, MFResult),
 	      true).
@@ -263,7 +257,7 @@ mf_defsetf([defsetf, Access_fn_In|RestNKeys], MacroEnv, MFResult) :-
 /*
 :- side_effect(assert_lsp(defsetf,
 			  doc_string(defsetf,
-				     _6806,
+				     _6576,
 				     function,
 				     "Syntax: (defsetf symbol update-fun [doc])\n\tor\n\t(defsetf symbol lambda-list (store-var) {decl | doc}* {form}*)\nDefines an expansion\n\t(setf (SYMBOL arg1 ... argn) value)\n\t=> (UPDATE-FUN arg1 ... argn value)\n\t   or\n\t   (let* ((temp1 ARG1) ... (tempn ARGn) (temp0 value)) rest)\nwhere REST is the value of the last FORM with parameters in LAMBDA-LIST bound\nto the symbols TEMP1 ... TEMPn and with STORE-VAR bound to the symbol TEMP0.\nThe doc-string DOC, if supplied, is saved as a SETF doc and can be retrieved\nby (documentation 'SYMBOL 'setf)."))).
 */
@@ -541,12 +535,6 @@ by (DOCUMENTATION 'SYMBOL 'SETF)."
 :-lisp_compile_to_prolog(pkg_sys,[defmacro,'define-setf-expander',['access-fn',args,'&rest',body],'$STRING'("Syntax: (define-setf-expander symbol defmacro-lambda-list {decl | doc}*\n          {form}*)\nDefines the SETF-method for generalized-variables (SYMBOL ...).\nWhen a form (setf (SYMBOL arg1 ... argn) value-form) is evaluated, the FORMs\ngiven in the DEFINE-SETF-EXPANDER are evaluated in order with the parameters in\nDEFMACRO-LAMBDA-LIST bound to ARG1 ... ARGn.  The last FORM must return five\nvalues\n\t(var1 ... vark)\n\t(form1 ... formk)\n\t(value-var)\n\tstoring-form\n\taccess-form\nin order.  These values are collectively called the five gangs of the\ngeneralized variable (SYMBOL arg1 ... argn).  The whole SETF form is then\nexpanded into\n\t(let* ((var1 from1) ... (vark formk)\n\t       (value-var value-form))\n\t  storing-form)\nThe doc-string DOC, if supplied, is saved as a SETF doc and can be retrieved\nby (DOCUMENTATION 'SYMBOL 'SETF)."),[let,[[env,[member,[quote,'&environment'],args,':test',function(eq)]]],[if,env,[setq,args,[cons,[second,env],[nconc,[ldiff,args,env],[cddr,env]]]],[progn,[setq,env,[gensym]],[setq,args,[cons,env,args]],[push,['#BQ',[declare,[ignore,['#COMMA',env]]]],body]]]],['#BQ',['eval-when',[compile,load,eval],['put-sysprop',[quote,['#COMMA','access-fn']],[quote,'SETF-METHOD'],function([lambda,['#COMMA',args],['#BQ-COMMA-ELIPSE',body]])],['rem-sysprop',[quote,['#COMMA','access-fn']],[quote,'SETF-LAMBDA']],['rem-sysprop',[quote,['#COMMA','access-fn']],[quote,'SETF-UPDATE-FN']],['rem-sysprop',[quote,['#COMMA','access-fn']],[quote,'SETF-SYMBOL']],['#BQ-COMMA-ELIPSE',['si::expand-set-documentation','access-fn',[quote,setf],['find-documentation',body]]],[quote,['#COMMA','access-fn']]]]])
 /*
 :- side_effect(generate_function_or_macro_name([name='GLOBAL', environ=env_1],
-					       sys_find_documentation,
-					       kw_function,
-					       f_sys_find_documentation)).
-*/
-/*
-:- side_effect(generate_function_or_macro_name([name='GLOBAL', environ=env_1],
 					       sys_expand_set_documentation,
 					       kw_function,
 					       f_sys_expand_set_documentation)).
@@ -558,7 +546,7 @@ by (DOCUMENTATION 'SYMBOL 'SETF)."
 					       sf_define_setf_expander)).
 */
 doc: doc_string(define_setf_expander,
-	      _5714,
+	      _5484,
 	      function,
 	      "Syntax: (define-setf-expander symbol defmacro-lambda-list {decl | doc}*\n          {form}*)\nDefines the SETF-method for generalized-variables (SYMBOL ...).\nWhen a form (setf (SYMBOL arg1 ... argn) value-form) is evaluated, the FORMs\ngiven in the DEFINE-SETF-EXPANDER are evaluated in order with the parameters in\nDEFMACRO-LAMBDA-LIST bound to ARG1 ... ARGn.  The last FORM must return five\nvalues\n\t(var1 ... vark)\n\t(form1 ... formk)\n\t(value-var)\n\tstoring-form\n\taccess-form\nin order.  These values are collectively called the five gangs of the\ngeneralized variable (SYMBOL arg1 ... argn).  The whole SETF form is then\nexpanded into\n\t(let* ((var1 from1) ... (vark formk)\n\t       (value-var value-form))\n\t  storing-form)\nThe doc-string DOC, if supplied, is saved as a SETF doc and can be retrieved\nby (DOCUMENTATION 'SYMBOL 'SETF).").
 
@@ -603,7 +591,7 @@ mf_define_setf_expander([define_setf_expander, Access_fn_In, Args_In|RestNKeys],
 		      TrueResult=[Second_Ret|Nconc_Ret],
 		      set_var(LEnv, sys_args, TrueResult),
 		      LetResult=TrueResult
-		  ;   f_gensym(Env),
+		  ;   f_gensym([], Env),
 		      set_var(LEnv, sys_env, Env),
 		      get_var(LEnv, sys_args, Args_Get21),
 		      get_var(LEnv, sys_env, Env_Get20),
@@ -644,7 +632,7 @@ mf_define_setf_expander([define_setf_expander, Access_fn_In, Args_In|RestNKeys],
 /*
 :- side_effect(assert_lsp(define_setf_expander,
 			  doc_string(define_setf_expander,
-				     _5714,
+				     _5484,
 				     function,
 				     "Syntax: (define-setf-expander symbol defmacro-lambda-list {decl | doc}*\n          {form}*)\nDefines the SETF-method for generalized-variables (SYMBOL ...).\nWhen a form (setf (SYMBOL arg1 ... argn) value-form) is evaluated, the FORMs\ngiven in the DEFINE-SETF-EXPANDER are evaluated in order with the parameters in\nDEFMACRO-LAMBDA-LIST bound to ARG1 ... ARGn.  The last FORM must return five\nvalues\n\t(var1 ... vark)\n\t(form1 ... formk)\n\t(value-var)\n\tstoring-form\n\taccess-form\nin order.  These values are collectively called the five gangs of the\ngeneralized variable (SYMBOL arg1 ... argn).  The whole SETF form is then\nexpanded into\n\t(let* ((var1 from1) ... (vark formk)\n\t       (value-var value-form))\n\t  storing-form)\nThe doc-string DOC, if supplied, is saved as a SETF doc and can be retrieved\nby (DOCUMENTATION 'SYMBOL 'SETF)."))).
 */
@@ -823,7 +811,7 @@ Checks if the third gang is a single-element list."
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lib/lsp/setf.lsp:3836 **********************/
 :-lisp_compile_to_prolog(pkg_sys,[defun,'get-setf-expansion',[form,'&optional',env],'$STRING'("Args: (place)\nReturns the 'five gangs' (see DEFINE-SETF-EXPANDER) for PLACE as five values.\nChecks if the third gang is a single-element list."),['multiple-value-bind',[vars,vals,stores,'store-form','access-form'],['get-setf-method-multiple-value',form,env],[unless,[=,['list-length',stores],1],[error,'$STRING'("Multiple store-variables are not allowed.")]],[values,vars,vals,stores,'store-form','access-form']]])
 doc: doc_string(get_setf_expansion,
-	      _3852,
+	      _3622,
 	      function,
 	      "Args: (place)\nReturns the 'five gangs' (see DEFINE-SETF-EXPANDER) for PLACE as five values.\nChecks if the third gang is a single-element list.").
 
@@ -855,14 +843,14 @@ f_get_setf_expansion(Form_In, RestNKeys, FnResult) :-
 		  get_var(LEnv, sys_stores, Stores_Get),
 		  f_list_length(Stores_Get, PredArg1Result),
 		  (   PredArg1Result=:=1
-		  ->  _4038=[]
+		  ->  _3808=[]
 		  ;   f_error(
 			      [ '$ARRAY'([*],
 					 claz_base_character,
 					 "Multiple store-variables are not allowed.")
 			      ],
 			      ElseResult),
-		      _4038=ElseResult
+		      _3808=ElseResult
 		  ),
 		  get_var(LEnv, sys_access_form, Access_form_Get),
 		  ( get_var(LEnv, sys_store_form, Store_form_Get),
@@ -887,7 +875,7 @@ f_get_setf_expansion(Form_In, RestNKeys, FnResult) :-
 /*
 :- side_effect(assert_lsp(get_setf_expansion,
 			  doc_string(get_setf_expansion,
-				     _3852,
+				     _3622,
 				     function,
 				     "Args: (place)\nReturns the 'five gangs' (see DEFINE-SETF-EXPANDER) for PLACE as five values.\nChecks if the third gang is a single-element list."))).
 */
@@ -992,7 +980,7 @@ Does not check if the third gang is a single-element list."
 					       f_sys_rename_arguments)).
 */
 doc: doc_string(sys_get_setf_method_multiple_value,
-	      _6990,
+	      _6760,
 	      function,
 	      "Args: (form)\nReturns the 'five gangs' (see DEFINE-SETF-EXPANDER) for PLACE as five values.\nDoes not check if the third gang is a single-element list.").
 
@@ -1015,7 +1003,7 @@ f_sys_get_setf_method_multiple_value(Form_In, RestNKeys, FnResult) :-
 		  assert_lsp(sys_rename_arguments,
 			     wl:init_args(1, f_sys_rename_arguments2)),
 		  assert_lsp(sys_rename_arguments,
-			     (f_sys_rename_arguments2(Vars_In, RestNKeys10, FnResult9):-GEnv=[bv(sys_vars, Vars_In), bv(sys_names, Names_In), bv(values, Values_In), bv(sys_all_args, All_args_In)], aux_var(Env8, sys_names, Names_In, true, []), aux_var(Env8, values, Values_In, true, []), aux_var(Env8, sys_all_args, All_args_In, true, []), catch(((get_var(GEnv, sys_vars, Vars_Get), BV=bv(sys_item, Ele), AEnv=[BV|GEnv], forall(member(Ele, Vars_Get),  (nb_setarg(2, BV, Ele), (get_var(AEnv, sys_item, Item_Get), f_sys_fixnump(Item_Get, FORM1_Res), FORM1_Res\==[], IFTEST=FORM1_Res->true;get_var(AEnv, sys_item, Item_Get19), f_keywordp(Item_Get19, Keywordp_Ret), IFTEST=Keywordp_Ret), (IFTEST\==[]->_7260=[];sf_push(AEnv, sys_item, values, Values), f_gensym(Item), set_var(AEnv, sys_item, Item), sf_push(AEnv, sys_item, sys_names, ElseResult), _7260=ElseResult), sf_push(AEnv, sys_item, sys_all_args, All_args))), f_gensym(Gensym_Ret), get_var(GEnv, sys_names, Names_Get), f_nreverse(Names_Get, Nreverse_Ret), get_var(GEnv, values, Values_Get), f_nreverse(Values_Get, Nreverse_Ret136), get_var(GEnv, sys_all_args, All_args_Get), f_nreverse(All_args_Get, Nreverse_Ret137), nb_setval('$mv_return', [Gensym_Ret, Nreverse_Ret, Nreverse_Ret136, Nreverse_Ret137])), Gensym_Ret=FnResult9), block_exit(sys_rename_arguments, FnResult9), true))),
+			     (f_sys_rename_arguments2(Vars_In, RestNKeys10, FnResult9):-GEnv=[bv(sys_vars, Vars_In), bv(sys_names, Names_In), bv(values, Values_In), bv(sys_all_args, All_args_In)], aux_var(Env8, sys_names, Names_In, true, []), aux_var(Env8, values, Values_In, true, []), aux_var(Env8, sys_all_args, All_args_In, true, []), catch(((get_var(GEnv, sys_vars, Vars_Get), BV=bv(sys_item, Ele), AEnv=[BV|GEnv], forall(member(Ele, Vars_Get),  (nb_setarg(2, BV, Ele), (get_var(AEnv, sys_item, Item_Get), f_sys_fixnump(Item_Get, FORM1_Res), FORM1_Res\==[], IFTEST=FORM1_Res->true;get_var(AEnv, sys_item, Item_Get19), f_keywordp(Item_Get19, Keywordp_Ret), IFTEST=Keywordp_Ret), (IFTEST\==[]->_7030=[];sf_push(AEnv, sys_item, values, Values), f_gensym([], Item), set_var(AEnv, sys_item, Item), sf_push(AEnv, sys_item, sys_names, ElseResult), _7030=ElseResult), sf_push(AEnv, sys_item, sys_all_args, All_args))), f_gensym([], Gensym_Ret), get_var(GEnv, sys_names, Names_Get), f_nreverse(Names_Get, Nreverse_Ret), get_var(GEnv, values, Values_Get), f_nreverse(Values_Get, Nreverse_Ret136), get_var(GEnv, sys_all_args, All_args_Get), f_nreverse(All_args_Get, Nreverse_Ret137), nb_setval('$mv_return', [Gensym_Ret, Nreverse_Ret, Nreverse_Ret136, Nreverse_Ret137])), Gensym_Ret=FnResult9), block_exit(sys_rename_arguments, FnResult9), true))),
 		  get_var(
 			  [ 
 			    [ fbound(sys_rename_arguments, kw_function)=function(f_sys_rename_arguments2)
@@ -1085,7 +1073,7 @@ f_sys_get_setf_method_multiple_value(Form_In, RestNKeys, FnResult) :-
 							   RetResult),
 		      throw(block_exit(sys_get_setf_method_multiple_value,
 				       RetResult)),
-		      _7098=ThrowResult
+		      _6868=ThrowResult
 		  ;   get_var(
 			      [ 
 				[ fbound(sys_rename_arguments, kw_function)=function(f_sys_rename_arguments2)
@@ -1095,7 +1083,7 @@ f_sys_get_setf_method_multiple_value(Form_In, RestNKeys, FnResult) :-
 			      sys_form,
 			      Form_Get45),
 		      (   is_symbolp(Form_Get45)
-		      ->  f_gensym(Store_Init),
+		      ->  f_gensym([], Store_Init),
 			  LEnv=[bv(sys_store, Store_Init), fbound(sys_rename_arguments, kw_function)=function(f_sys_rename_arguments2)|Env8],
 			  get_var(LEnv, sys_store, Store_Get),
 			  CAR=[Store_Get],
@@ -1319,10 +1307,10 @@ f_sys_get_setf_method_multiple_value(Form_In, RestNKeys, FnResult) :-
 			  ),
 			  ElseResult117=ElseResult115
 		      ),
-		      _7098=ElseResult117
+		      _6868=ElseResult117
 		  )
 		),
-		_7098=FnResult
+		_6868=FnResult
 	      ),
 	      block_exit(sys_get_setf_method_multiple_value, FnResult),
 	      true).
@@ -1333,7 +1321,7 @@ f_sys_get_setf_method_multiple_value(Form_In, RestNKeys, FnResult) :-
 /*
 :- side_effect(assert_lsp(sys_get_setf_method_multiple_value,
 			  doc_string(sys_get_setf_method_multiple_value,
-				     _6990,
+				     _6760,
 				     function,
 				     "Args: (form)\nReturns the 'five gangs' (see DEFINE-SETF-EXPANDER) for PLACE as five values.\nDoes not check if the third gang is a single-element list."))).
 */

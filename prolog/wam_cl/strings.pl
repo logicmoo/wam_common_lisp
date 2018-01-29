@@ -44,7 +44,7 @@ to_prolog_string(SS,SS):- notrace(var(SS)),!,break.
 to_prolog_string([],"").
 to_prolog_string('$ARRAY'(_N,claz_base_character,List),SS):- !,always(lisp_chars_to_pl_string(List,SS)),!.
 %to_prolog_string('$ARRAY'(_,_,List),SS):-  !,lisp_chars_to_pl_string(List,SS).
-to_prolog_string('#\\'(Code),Str):- !, (\+ number(Code)->Char=Code;char_code(Char,Code)),text_to_string(Char,Str).
+to_prolog_string('#\\'(Char),Str):- !, f_char_code('#\\'(Char),Code),text_to_string([Code],Str).
 to_prolog_string(S,SN):- is_symbolp(S),!,pl_symbol_name(S,S2),to_prolog_string(S2,SN).
 
 % Only Make a STRING if not already a Prolog String
@@ -56,36 +56,20 @@ to_prolog_string_anyways(I,O):- is_classp(I),claz_to_symbol(I,Symbol),!,to_prolo
 to_prolog_string_anyways(I,O):- always(atom_string(I,O)),!.
 
 
+
 % grabs ugly objects
 %to_prolog_string(S,SN):- atom_concat_or_rtrace(':',S0,S),!,to_prolog_string(S0,SN).% TODO add a warjing that hte keyword was somehow misrepresented
 %to_prolog_string(S,SN):- atom_concat_or_rtrace('kw_',S0,S),!,to_prolog_string(S0,SN). % TODO add a warjing that hte keyword was somehow missing
 %to_prolog_string(S,SN):- notrace(catch(text_to_string(S,SN),_,fail)),!.
 
 to_lisp_string('$ARRAY'([N],claz_base_character,List),'$ARRAY'([N],claz_base_character,List)):-!.
-to_lisp_string(Text,'$ARRAY'([*],claz_base_character,List)):- always((catch(text_to_string(Text,Str),E,(dumpST,userout(E),fail)),string_chars(Str,Chars),maplist(make_character,Chars,List))).
-
-make_character(I,O):-notrace(make_character0(I,O)).
-make_character0(S,'#\\'(S)):- var(S),!.
-make_character0('#\\'(S),C):- !, make_character0(S,C).
-make_character0(S,'#\\'(Char)):- number(S), S < 4096,char_code(Char,S).
-make_character0(S,'#\\'(S)):- atom(S),name(S,[_]),!.
-make_character0(S,'#\\'(S)):- atom(S),char_code(S,_),!.
-make_character0(N,'#\\'(S)):- integer(N),(char_type(N,alnum)->name(S,[N]);S=N),!.
-make_character0(N,C):- text_to_string_safe(N,Str),char_code_from_name(Str,Code),make_character0(Code,C),!.
-make_character0(C,'#\\'(C)).
-
-to_prolog_char('#\\'(X),O):-!,to_prolog_char(X,O).
-to_prolog_char((Code),Char):- number(Code),!,char_code(Char,Code).
-to_prolog_char((Atom),Char):- name(Atom,[C|Odes]),!,
-  ((Odes==[] -> char_code(Char,C); 
-  ((text_to_string(Atom,String),char_code_from_name(String,Code),char_code(Char,Code))))).
-
-
+to_lisp_string(Text,'$ARRAY'([*],claz_base_character,List)):- always((catch(text_to_string(Text,Str),E,
+  (dumpST,userout(E),fail)),string_chars(Str,Chars),maplist(make_lisp_character,Chars,List))).
 
 % SHARED SECTION
 wl:coercion(In, claz_prolog_string, Out):- to_prolog_string(In,Out).
 wl:coercion(In, claz_string, Out):- f_string(In,Out).
-wl:coercion(In, claz_character, Out):- make_character(In,Out).
+wl:coercion(In, claz_character, Out):- make_lisp_character(In,Out).
 wl:coercion(In, claz_string, Out):- f_string(In,Out).
 wl:coercion(In, claz_cons, Out):- functor(In,_F,A),arg(A,In,Out),is_list(Out).
 
