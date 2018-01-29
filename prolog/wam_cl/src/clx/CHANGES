@@ -1,0 +1,331 @@
+R5 changes: (see below for details)
+
+o Numerous bug fixes
+
+o Continued gradual conversion towards ANSI Common Lisp
+
+o Performance improvements to image code
+
+o Multiprocess locking and error reporting made more robust
+
+o Event queue consing reduced
+
+o ICCCM support
+
+Details of changes since R4:
+
+R4.1 changes:
+
+o Fix reported bugs and to include the vendor-specific
+  bug-fixing and performance-improving patches that I recently received.
+
+o Code compiled with the R4 CLX will work with the R4.1X CLX, but code
+  compiled with the R4.1X CLX will NOT work with the R4 CLX.  I made an effort
+  to ensure backward binary compatibility with R4 CLX so that old code doesn't
+  have to be recompiled to still work.  It does have to be recompiled to fix
+  an event-queue bug, since the fix involved a change to the event-loop macro.
+
+R4.2 changes:
+
+o Atoms and visuals are now correctly maintained in a separate namespace from 
+  windows, pixmaps, cursors, fonts, gcontexts, and colormaps.
+
+o I have made an attempt to make socket code work for kcl and ibcl.  I have
+  akcl here, but not kcl and ibcl, so it's only guesswork that kcl and ibcl 
+  works.
+
+o compile-clx and load-clx do more pathname merging to work around problems
+  in some lisp implementations. *default-pathname-defaults* is never bound 
+  anymore.
+
+o Some ansi common lisp stuff.  If you have :ansi-common-lisp on *features*,
+  CLX will:
+
+  - Use the common-lisp package instead of the lisp package.
+
+  - Use the common lisp condition system, being careful not to stomp on 
+    define-condition and type-error.
+
+  - Use declaim instead of proclaim.
+
+  - Use the dynamic-extent declaration for rest args and closures.
+
+  - Use print-unreadable-object.
+
+o Code compiled with the R4 and R4.1 CLX will work with the R4.2 CLX, provided
+  you don't have :ansi-common-lisp on your features list.  Code compiled with 
+  the R4.2 CLX will NOT work with the R4 CLX.
+
+R4.3 changes:
+
+o Changed the ansi-common-lisp feature to clx-ansi-common-lisp.
+
+o A new package.l file has been introduced.  All the package operations that
+  were in the other files have been moved to package.l.  Because of this, 
+  the compile-clx and load-clx functions which are defined in the defsystem.l
+  file have been moved to the user package from the xlib package, since the xlib 
+  package isn't defined when the defsystem.l file is loaded.
+
+o excldefsys.l has been merged into defsystem.l.  You don't have to rename
+  excldefsys.l to defsystem.l anymore.
+
+o User-specified-size/position-p hints are now set correctly.
+  These hints were being ignored if the size-hints structure did not
+  define the corresponding geometry slots. But ICCCM declares these
+  slots to be obsolete.
+
+o (setf wm-command) has been changed to use PRIN1 inside the ANSI Common Lisp
+  form WITH-STANDARD-IO-SYNTAX (or the equivalent defined in dependent.l), with
+  elements of command separated by NULL characters.  This enables 
+    (with-standard-io-syntax (mapcar #'read-from-string (wm-command window)))
+  to recover a lisp command.
+
+o A typo in X-TYPE-ERROR has been fixed.
+
+o The WITH-GCONTEXT macro has been changed so that if you supply nil for a
+  property value, WITH-GCONTEXT is will leave the property unchanged.  It used
+  to always change the property without regard for whether the supplied value
+  was nil.  This change to how the macro expands, so user code has to be 
+  recompiled for the change to take effect.
+
+o Since ANSI Common Lisp doesn't have CHAR-BIT, the implementation of
+  DEFAULT-KEYSYM-TRANSLATE is now implementation dependent in ANSI Common Lisp
+  implementations, with the default doing nothing to character objects.  In
+  non-ANSI Common Lisps and lispms, it still uses CHAR-BIT. The definition of
+  DEFAULT-KEYSYM-TRANSLATE has been moved to dependent.l.
+
+o The image putting, getting, and copying code has been sped up a bit for lispm, 
+  lcl3.0, and excl.
+
+o The lcl3.0 io code has been sped up a bit by using read-array instead of
+  fast-read-byte.
+
+o READ-RESOURCES now handles any lines that start with # and don't start with
+  #include as comments.
+
+R4.4 changes:
+
+o Fixed typo in DEFAULT-KEYSYM-TRANSLATE.
+
+o In events, CurrentTime (encoded as 0 in the protocol) decodes to NIL instead 
+  of 0.
+
+o NIL now translates to and from the atom-id of 0.
+
+o A new variable *OUTPUT-BUFFER-SIZE* has been introduced, with value 8192.
+  Now, instead of the buffer creating code always creating output buffers of 
+  length 8192 bytes, they create output buffers of length *OUTPUT-BUFFER-SIZE* 
+  bytes.
+
+o GCONTEXT-CACHE-P, COLORMAP-PLIST and CURSOR-PLIST have been exported.
+
+o If CREATE-GCONTEXT is given a rect-seq as a clip-mask, then a
+  SetClipRectangles request must be sent to initialize the clip-mask.  The logic
+  to do this is located in FORCE-GCONTEXT-CHANGES-INTERNAL, but this wasn't
+  being called because create-gcontext always forces local/server-state
+  timestamps equal.  Same problem for dash lists.  CREATE-GCONTEXT has been
+  fixed so that in these cases it makes the timestamps unequal so that
+  FORCE-GCONTEXT-CHANGES-INTERNAL is called.
+
+o ANGLEP type check sped up for excl.  Arc drawing should be lots faster.
+
+o RATIONAL type definition for kcl now takes the correct optional args.
+
+o (SETF FONT-PATH) changed to return the value
+
+o Fixed typo in the hex parsing in READ-BITMAP-FILE
+
+o Made READ-RESOURCES more robust about weird resource files.
+
+o New variable *DEF-CLX-CLASS-USE-DEFCLASS*, which controls whether DEF-CLX-CLASS
+  uses DEFCLASS.  If it is a list, it is interpreted by DEF-CLX-CLASS to be a list
+  of type names for which DEFCLASS should be used.  If it is not a list, DEFCLASS
+  is always used.  IF it is NIL, DEFCLASS is never used, since NIL is the empty
+  list.  By default, it's T in Genera, NIL otherwise.
+
+o Fixed typo in DEFINE-CONDITION for #-(or lispm clx-ansi-common-lisp excl lcl3.0).
+
+o Fixed typo in MERGE-RESOURCES 
+
+o In Lucid lisp, the functions aref-card8, aref-int8, aset-card8, aset-int8,
+  aref-card16, aref-int16, aref-card32, aref-int32, aref-card29, aset-card16,
+  aset-int16, aset-card32, aset-int32, and aset-card29 Have been fixed so that
+  they can be used inline with the development compiler.
+
+o The default value of the BYTE-LSB-FIRST-P argument to CREATE-IMAGE has been
+  changed from always T to T on LSBFirst machines and NIL on MSBFirst machines.
+
+o The order of the color values returned by ALLOC-COLOR when a color name is supplied
+  as an argument is fixed so that the screen color correctly is returned as the second 
+  value and the exact color is correctly returned as the third value.  The order was 
+  backwards.
+
+o The internal WITH-BUFFER-INPUT and WITH-BUFFER-OUTPUT macros have been
+  changed to wrap macrolet around body only when necessary.  This simplifies the
+  compiler's job for non lisp machines.
+
+o All uses of DEFINE-CONDITION have been changed to include a slots argument,
+  even if that argument is NIL -- the argument is not optional.
+
+o DEFINE-CONDITION is no longer exported from the XLIB package.
+
+o New functionality has been added to make-pixmap and make-window.  They may
+  now take a :PIXMAP or :WINDOW argument (respectively).  If non-NIL (default is
+  nil), they will use that argument as the pixmap or window object to be set.
+  Otherwise they will create a new pixmap/window object.  This whole schmeel is
+  necessary because creation of window and pixmap objects in CLX doesn't go
+  through the CLOS initialize-instance mechanism.
+
+o The DESCRIBE-WINDOW debug utility has been fixed to not use strange
+  lisp machine format codes.
+
+o Numerous Allegro specific changes in support of Allegro CL version 4.0.
+
+R4.5 changes:
+
+o Fixed READ-VECTOR-CARD8 and WRITE-VECTOR-CARD8 to work with arbitrary vectors.
+
+o Changed COMPILE-CLX and LOAD-CLX to use the verbose mode of COMPILE-FILE and LOAD.
+
+o Added a conditional for HPUX to COMPILE-CLX.
+
+o Changed DISPLAY-CONNECT to save the default colormap ID in the ID database.
+
+o Added new keyword arguments :PROGRAM-SPECIFIED-POSITION-P and :PROGRAM-SPECIFIED-SIZE-P
+  to SET-WM-PROPERTIES and corresponsing slots in the WM-SIZE-HINTS structure.
+  These control the appropriate flags in the size hints.  The old way of controlling these
+  flags, with the :X, :Y, :WIDTH, and :HEIGHT arguments, is now obsolete due to changes
+  in the ICCCM.
+
+o Removed bogus declarations from the SETF expander for WM-NAME.
+
+o Defined a proper SETF function for CUT-BUFFER when in ANSI Lisp.
+
+o Fix the encoding of the revert-to argument to SET-INPUT-FOCUS.
+
+o Fix a fencepost error in STORE-COLORS.
+
+o Fix TEXT-EXTENTS and TEXT-WIDTH to handle font changes properly.
+
+o Fix TEXT-EXTENTS-LOCAL to handle negative ascents and descents properly.
+
+o Fix DRAW-IMAGE-GLYPHS to not try to write more than 255 glyphs.
+
+o Added conditionalizations for Minima, a new operating system under development at Symbolics.
+
+o Some gratuitous changes in the Symbolics-specific code.
+
+o Removed *EVENT-LOOP-VERSION* and support for pre-R4.1 compiled code.
+
+o In Lucid, fixed HOLDING-LOCK to clean up on timeout.
+
+o Gcontexts and fonts without associated displays now print correctly.
+
+Requests that send "strings" of two byte font indices can *not* assume that
+the two byte objects are being written on two byte boundaries.  The simplest
+fix was just to modify the write-*-card16 functions to use a new macro that
+writes one half of the object at a time.  The only undesirable affect of
+this is that CLIENT-MESSAGE and CHANGE-PROPERTY are slightly slower for
+card16 data than they were before.
+    NEW macro
+	-- write-card16-by-bytes			bufmac.l
+    CHANGED functions:
+	-- write-list-card16				buffer.l
+	-- write-list-card16-with-transform		""
+	-- write-simple-array-card16			""
+	-- write-simple-array-card16-with-transform	""
+	-- write-vector-card16				""
+	-- write-vector-card16-with-transform		""
+
+Print functions changed to use write-string instead of princ where
+possible.  This allows for much cleaner printing when *print-circle* is
+true -- princ is required to use *print-circle*, even for strings!
+Write-string is, of course, not so burdened.
+	-- print-color					clx.l
+	-- print-display				""
+	-- print-drawable				""
+	-- print-visual-info				""
+	-- print-colormap				""
+	-- print-cursor					""
+	-- print-gcontext				""
+	-- print-screen					""
+	-- print-font					""
+	-- print-resource-database			resource.l
+	-- print-image					image.l
+
+Changes to display tracing: In a multiprocessing system is it very helpful
+to know what process wrote or read certain requests.  Thus I have modified
+the format of the trace-history list.  It is now an alist of: ((id .
+more-info) .  byte-vector).  (more-info is a list returned by the
+trace-more-info function).  Also added the ability to suspend and resume
+tracing without destroying the trace history.  Renamed 'display-trace' to
+'show-trace' to avoid confusion.  (Having both 'trace-display and
+'display-trace wasn't such a hot idea).
+	-- lots-o-stuff					debug/trace.l
+
+Image-glyph functions had a different argument order than non-image glyph
+functions.  Image-glyph functions changed to be compatible with others.
+Declarations in draw-glyphs* functions were wrong.
+	-- draw-image-glyphs				text.l
+	-- draw-image-glyphs8				text.l
+	-- draw-image-glyphs16				text.l
+	-- draw-glyphs8					text.l
+	-- draw-glyphs16				text.l
+
+Quote #.'ed arrays to accomodate CLTL1 lisps
+	-- empty-data constants				image.l
+
+Set-input-focus fix wasn't finished
+	-- set-input-focus				requests.l
+
+Standardized strange integer type specifier in keysym macro
+	-- keysym					translate.l
+
+===============================================================================
+Franz specific changes, applicable to Allegro and Extended Common Lisps:
+(note that all these changes are #+excl or #+allegro, so if you're not
+ using our product these changes are "commented" out)
+-----------------------------------------------------------------------
+Atom-cache hash table type changed to #'equal.  Resource-id-map has table
+type changed to #'equal.
+    NEW macro
+	-- atom-cache-map-test				depdefs.l
+    CHANGED def-clx-class
+	-- display					clx.l
+    CHANGED macro
+	-- resource-id-map-test				depdefs.l
+
+Don't bother to import require, provide, since we're using the CLTL1
+package.  Also put the requires and provides inside eval-when to make the
+compiler happy.  Don't redefine typep, instead push our customizations onto
+the typep handling list.
+	-- toplevel forms				excldep.l
+
+Old code removed from file
+	-- removed some cmacros				exclcmac.l
+
+Allegro >=4.0 now does support with-standard-io-syntax and
+print-unreadable-object.
+	-- with-standard-io-syntax{,-function}		dependent.l
+	-- print-unreadable-object{,-function}		depdefs.l
+
+Conditionalizations in Makefile cleaned up.
+	-- 						exclMakefile
+
+Descriptive comment added to holding-lock
+	-- holding-lock					dependent.l
+
+Added typep transformers for all CLX types.
+	--						excldep.cl
+
+R5.0 changes:
+
+o Changed occurrances STRING-CHAR to BASE-CHAR.
+
+o Fixed some type declarations to use type NULL instead of NIL.
+
+o Various fixes to vendor-specific code.
+
+o Detect attempts to use images an incorrect depth.
+
+o Stop doing case conversion on resource names be default.

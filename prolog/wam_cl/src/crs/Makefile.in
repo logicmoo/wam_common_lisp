@@ -1,0 +1,61 @@
+
+top_srcdir= @top_srcdir@
+srcdir	= @srcdir@
+VPATH	= @srcdir@
+
+MACHINE = @MACHINE@
+
+# Programs used by "make":
+#
+CC	= @CC@
+DEFS	= -D$(MACHINE)
+OFLAG	= @oflag@
+CFLAGS	= @cflags@ $(OFLAG)
+
+SHELL	= /bin/sh
+RM	= @RM@
+
+# Source Directories
+
+HDIR	= @HDIR@
+
+# Files
+
+#ifdef MSDOS
+RSYM	= rsym.exe
+#else
+RSYM	= rsym
+#endif
+
+OBJS	= @unexec@.o dld.o @setjmpo@ socket.o
+HFILES	= ../h/config.h $(srcdir)/objff.h
+
+SYSDIR	= ..
+
+all:	$(SYSDIR)/libcrs.a $(RSYM)
+
+$(SYSDIR)/libcrs.a:	$(OBJS)
+	ar r $(SYSDIR)/libcrs.a $(OBJS)
+	@RANLIB@ $(SYSDIR)/libcrs.a
+
+dld.o:	$(srcdir)/dld.c $(HFILES)
+	$(CC) -c $(CFLAGS) $(srcdir)/dld.c -o dld.o
+
+socket.o:	$(srcdir)/socket.c
+	$(CC) -c $(CFLAGS) $(srcdir)/socket.c -o socket.o
+
+@unexec@.o:	$(srcdir)/@unexec@.c $(HFILES)
+	$(CC) -c $(CFLAGS) $(srcdir)/@unexec@.c -o @unexec@.o
+
+setjmp.o: $(srcdir)/@setjmp@
+	as $(srcdir)/@setjmp@ -o setjmp.o
+
+rsym	: rsym.c ${HDIR}/machines.h
+	${CC} ${CFLAGS} -I${HDIR} -o rsym $(srcdir)/rsym.c 
+
+rsym.exe: rsym
+	coff2exe rsym
+	${RM} rsym
+
+clean:
+	$(RM) $(SYSDIR)/libcrs.a $(OBJS) core a.out

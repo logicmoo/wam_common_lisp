@@ -1,0 +1,19 @@
+
+This directory contains the components of the Common Runtime Support:
+
+1. memory management (files gbc.c alloc.c)
+2. dumping an image (files unex*.c and unixsave.c)
+3. dynamic loading (dld.c)
+4. networking support (tcp.c)
+
+These are built into a library (libcrs.a) which is searched when
+building a Lisp application.
+
+Implementations of unexec for various architectures is provided.
+Some of them are those provided with GNU Emacs.
+However we cannot use for instance unexsunos4, which expects a dynamic
+linked executable, since this prevents subsequent loading of files
+(procedures such as memcpy and _setjmp do not appear in the load map).
+
+As a fall back we use unixsave.c, which works for all Suns, HP9000/300,
+Vax, DOS/go32, Apollo, IBM/RT, Sequent.

@@ -1,0 +1,113 @@
+# 
+#  CLOS makefile
+#
+
+CL	= ../ecl
+
+#
+# Directories
+#
+top_srcdir = @top_srcdir@
+srcdir = @srcdir@
+# VPATH  = @srcdir@
+
+# Programs used by "make":
+#
+CC	= @CC@
+CFLAGS	= -c @lspcflags@ @oflag@
+
+SHELL	= /bin/sh
+CP	= @CP@
+MV	= mv
+RM	= @RM@
+CAT	= cat
+ECHO	= echo
+
+#
+# lisp files
+#
+CLOS_SRC= $(srcdir)/boot.lsp $(srcdir)/built-in.lsp \
+	$(srcdir)/change.lsp $(srcdir)/combin.lsp \
+	$(srcdir)/dcode-pre1.lsp $(srcdir)/defclass.lsp \
+	$(srcdir)/generic.lsp $(srcdir)/fixup.lsp \
+	$(srcdir)/inspect.lsp $(srcdir)/kernel.lsp \
+	$(srcdir)/macros.lsp $(srcdir)/method.lsp \
+	$(srcdir)/print.lsp $(srcdir)/slot.lsp \
+	$(srcdir)/standard.lsp $(srcdir)/std-method.lsp \
+	$(srcdir)/walk.lsp
+
+CLOS_OBJ= boot.o built-in.o \
+	change.o combin.o \
+	dcode-pre1.o defclass.o \
+	generic.o fixup.o \
+	inspect.o kernel.o \
+	macros.o method.o \
+	print.o slot.o \
+	standard.o std-method.o \
+	walk.o
+#
+# Make transformation rules
+#
+
+all	: ../clos.lsp $(CLOS_OBJ)
+
+../clos.lsp: $(srcdir)/load.lsp
+	$(CP) $(srcdir)/load.lsp ../clos.lsp
+
+boot.o	: $(srcdir)/boot.c
+	$(CC) $(CFLAGS) $(srcdir)/boot.c -o $@
+	$(CAT) $(srcdir)/boot.data >> $@
+built-in.o	: $(srcdir)/built-in.c
+	$(CC) $(CFLAGS) $(srcdir)/built-in.c -o $@
+	$(CAT) $(srcdir)/built-in.data >> $@
+change.o	: $(srcdir)/change.c
+	$(CC) $(CFLAGS) $(srcdir)/change.c -o $@
+	$(CAT) $(srcdir)/change.data >> $@
+combin.o	: $(srcdir)/combin.c
+	$(CC) $(CFLAGS) $(srcdir)/combin.c -o $@
+	$(CAT) $(srcdir)/combin.data >> $@
+dcode-pre1.o	: $(srcdir)/dcode-pre1.c
+	$(CC) $(CFLAGS) $(srcdir)/dcode-pre1.c -o $@
+	$(CAT) $(srcdir)/dcode-pre1.data >> $@
+defclass.o	: $(srcdir)/defclass.c
+	$(CC) $(CFLAGS) $(srcdir)/defclass.c -o $@
+	$(CAT) $(srcdir)/defclass.data >> $@
+generic.o	: $(srcdir)/generic.c
+	$(CC) $(CFLAGS) $(srcdir)/generic.c -o $@
+	$(CAT) $(srcdir)/generic.data >> $@
+fixup.o	: $(srcdir)/fixup.c
+	$(CC) $(CFLAGS) $(srcdir)/fixup.c -o $@
+	$(CAT) $(srcdir)/fixup.data >> $@
+inspect.o	: $(srcdir)/inspect.c
+	$(CC) $(CFLAGS) $(srcdir)/inspect.c -o $@
+	$(CAT) $(srcdir)/inspect.data >> $@
+kernel.o	: $(srcdir)/kernel.c
+	$(CC) $(CFLAGS) $(srcdir)/kernel.c -o $@
+	$(CAT) $(srcdir)/kernel.data >> $@
+macros.o	: $(srcdir)/macros.c
+	$(CC) $(CFLAGS) $(srcdir)/macros.c -o $@
+	$(CAT) $(srcdir)/macros.data >> $@
+method.o	: $(srcdir)/method.c
+	$(CC) $(CFLAGS) $(srcdir)/method.c -o $@
+	$(CAT) $(srcdir)/method.data >> $@
+print.o	: $(srcdir)/print.c
+	$(CC) $(CFLAGS) $(srcdir)/print.c -o $@
+	$(CAT) $(srcdir)/print.data >> $@
+slot.o	: $(srcdir)/slot.c
+	$(CC) $(CFLAGS) $(srcdir)/slot.c -o $@
+	$(CAT) $(srcdir)/slot.data >> $@
+standard.o	: $(srcdir)/standard.c
+	$(CC) $(CFLAGS) $(srcdir)/standard.c -o $@
+	$(CAT) $(srcdir)/standard.data >> $@
+std-method.o	: $(srcdir)/std-method.c
+	$(CC) $(CFLAGS) $(srcdir)/std-method.c -o $@
+	$(CAT) $(srcdir)/std-method.data >> $@
+walk.o	: $(srcdir)/walk.c
+	$(CC) $(CFLAGS) $(srcdir)/walk.c -o $@
+	$(CAT) $(srcdir)/walk.data >> $@
+
+clean	:
+	$(RM) *.o
+
+allclean: clean
+	$(RM) *.out core *~ #*#

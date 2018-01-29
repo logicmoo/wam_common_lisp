@@ -1,0 +1,65 @@
+# 
+#  CLX makefile
+#
+
+#
+# Directories
+#
+top_srcdir = @top_srcdir@
+srcdir = @srcdir@
+VPATH  = @srcdir@
+
+# Programs used by "make":
+#
+
+CL	= ../ecl
+RM	= @RM@
+MV	= mv -f
+CAT	= cat
+CP	= @CP@
+ECHO	= echo
+
+#
+# C definitions
+#
+
+CC	= @CC@
+OFLAG	= @oflag@
+CFLAGS	= -c @cflags@ $(OFLAG)
+
+#
+# lisp files
+#
+CLX_OBJ = attributes.o buffer.o bufmac.o clx.o \
+	depdefs.o dependent.o display.o ecldep.o fonts.o \
+	gcontext.o graphics.o image.o input.o keysyms.o macros.o \
+	package.o requests.o resource.o text.o translate.o
+
+.SUFFIXES: .o .c .lsp
+
+#
+# Make transformation rules
+#
+
+all	: ecl.clx
+	$(MV) ecl.clx ../ecl
+
+ecl.clx	: $(CLX_OBJ)
+	@$(ECHO) "(load \"$(srcdir)/../util/system\")		\
+		  (when (eq 'OK (catch sys::*quit-tag*		\
+		    (load \"defsys\")				\
+		    (sbt:build-system CLX) 'OK))       \
+		    (si:save-system \"ecl.clx\"))"		\
+	| $(CL)
+
+$(CLX_OBJ): defsys.lsp
+	@$(ECHO) "(load \"$(srcdir)/../util/system\")		\
+		  (load \"defsys\")			\
+		  (sbt:build-system CLX :compile)"              \
+	| $(CL)
+
+clean	:
+	$(RM) -f *.o
+
+allclean: clean
+	$(RM) -f *.out core *~ #*#

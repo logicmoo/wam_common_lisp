@@ -1,0 +1,198 @@
+# file cmp/Makefile
+
+top_srcdir= @top_srcdir@
+srcdir	= @srcdir@
+VPATH	= @srcdir@
+
+MACHINE = @MACHINE@
+
+# Programs used by "make":
+#
+CC	= @CC@
+DEFS	= -D$(MACHINE)
+OFLAG	= @oflag@
+CFLAGS	= -c @cflags@ @lspcflags@ $(OFLAG)
+LSPCFLAGS=@lspcflags@
+
+CL	= $(SYSDIR)/ecl
+SHELL	= /bin/sh
+RM	= @RM@
+MV	= mv
+CAT	= cat
+CP	= @CP@
+
+# Source Directories
+
+HDIR	= ../h
+SYSDIR	= ..
+
+# Files
+
+CMPOBJS	= @CMPOBJS@
+ALL	= $(SYSDIR)/compiler.o $(SYSDIR)/compiler.data $(SYSDIR)/sysfun.lsp
+
+.SUFFIXES: .o .c .lsp
+
+.lsp.c:
+	cd $(srcdir); $(CL) ./ $* $* S0111
+
+.lsp.o:
+	$(CL) ./ $* $* S0111
+	$(CC) $(CFLAGS) $*.c
+.c.o:
+	$(CC) $(CFLAGS) $*.c
+
+#ifdef CLOS
+CEXT	= wcc
+HEXT	= wch
+DEXT	= wcd
+#else
+CEXT	= ncc
+HEXT	= nch
+DEXT	= ncd
+#endif
+
+all:	$(ALL)
+
+$(SYSDIR)/compiler.o: init_cmp.o $(CMPOBJS)
+#ifdef MSDOS
+	> cmp.$$$$$$ $(CMPOBJS)
+	$(LD) init_cmp.o @cmp.$$$$$$ -o $(SYSDIR)/compiler.o
+	$(RM) cmp.$$$$$$
+#else
+	$(LD) -r @ildflags@ init_cmp.o $(CMPOBJS) -o $(SYSDIR)/compiler.o $(CLIBS)
+#endif
+	echo 00000000 >> $(SYSDIR)/compiler.o
+
+init_cmp.o: init_cmp.c
+	$(CC) $(CFLAGS) $(srcdir)/init_cmp.c -o init_cmp.o
+cmpdefs.o: cmpdefs.c $(HDIR)/ecl.h
+	$(CC) $(CFLAGS) $(srcdir)/cmpdefs.c -o cmpdefs.o
+cmputil.o: cmputil.c $(HDIR)/ecl.h
+	$(CC) $(CFLAGS) $(srcdir)/cmputil.c -o cmputil.o
+cmpbind.o: cmpbind.c $(HDIR)/ecl.h
+	$(CC) $(CFLAGS) $(srcdir)/cmpbind.c -o cmpbind.o
+cmpblock.o: cmpblock.c $(HDIR)/ecl.h
+	$(CC) $(CFLAGS) $(srcdir)/cmpblock.c -o cmpblock.o
+cmpcall.o: cmpcall.c $(HDIR)/ecl.h
+	$(CC) $(CFLAGS) $(srcdir)/cmpcall.c -o cmpcall.o
+cmpcatch.o: cmpcatch.c $(HDIR)/ecl.h
+	$(CC) $(CFLAGS) $(srcdir)/cmpcatch.c -o cmpcatch.o
+cmpenv.o: cmpenv.c $(HDIR)/ecl.h
+	$(CC) $(CFLAGS) $(srcdir)/cmpenv.c -o cmpenv.o
+cmpexit.o: cmpexit.c $(HDIR)/ecl.h
+	$(CC) $(CFLAGS) $(srcdir)/cmpexit.c -o cmpexit.o
+cmpflet.o: cmpflet.c $(HDIR)/ecl.h
+	$(CC) $(CFLAGS) $(srcdir)/cmpflet.c -o cmpflet.o
+cmpfun.o: cmpfun.c $(HDIR)/ecl.h
+	$(CC) $(CFLAGS) $(srcdir)/cmpfun.c -o cmpfun.o
+cmpif.o: cmpif.c $(HDIR)/ecl.h
+	$(CC) $(CFLAGS) $(srcdir)/cmpif.c -o cmpif.o
+cmplam.o: cmplam.c $(HDIR)/ecl.h
+	$(CC) $(CFLAGS) $(srcdir)/cmplam.c -o cmplam.o
+cmplet.o: cmplet.c $(HDIR)/ecl.h
+	$(CC) $(CFLAGS) $(srcdir)/cmplet.c -o cmplet.o
+cmploc.o: cmploc.c $(HDIR)/ecl.h
+	$(CC) $(CFLAGS) $(srcdir)/cmploc.c -o cmploc.o
+cmpmap.o: cmpmap.c $(HDIR)/ecl.h
+	$(CC) $(CFLAGS) $(srcdir)/cmpmap.c -o cmpmap.o
+cmpmulti.o: cmpmulti.c $(HDIR)/ecl.h
+	$(CC) $(CFLAGS) $(srcdir)/cmpmulti.c -o cmpmulti.o
+cmptag.o: cmptag.c $(HDIR)/ecl.h
+	$(CC) $(CFLAGS) $(srcdir)/cmptag.c -o cmptag.o
+cmptop.o: cmptop.c $(HDIR)/ecl.h
+	$(CC) $(CFLAGS) $(srcdir)/cmptop.c -o cmptop.o
+cmpvar.o: cmpvar.c $(HDIR)/ecl.h
+	$(CC) $(CFLAGS) $(srcdir)/cmpvar.c -o cmpvar.o
+cmpwt.o: cmpwt.c $(HDIR)/ecl.h
+	$(CC) $(CFLAGS) $(srcdir)/cmpwt.c -o cmpwt.o
+
+#
+# special rules for CLOS-dependent files
+#
+cmpeval.$(CEXT): $(srcdir)/cmpeval.lsp
+	(cd $(srcdir); $(CL) ./ cmpeval cmpeval S0111)
+	$(MV) $(srcdir)/cmpeval.c $(srcdir)/cmpeval.$(CEXT)
+	$(MV) $(srcdir)/cmpeval.h $(srcdir)/cmpeval.$(HEXT)
+	$(MV) $(srcdir)/cmpeval.data $(srcdir)/cmpeval.$(DEXT)
+cmpeval.o: $(srcdir)/cmpeval.$(CEXT) $(HDIR)/ecl.h
+	$(CP) $(srcdir)/cmpeval.$(CEXT) cmpeval.c
+	$(CP) $(srcdir)/cmpeval.$(HEXT) cmpeval.h
+	$(CC) -I. $(CFLAGS) cmpeval.c -o cmpeval.o
+	$(RM) cmpeval.c cmpeval.h
+cmpinline.$(CEXT): $(srcdir)/cmpinline.lsp
+	(cd $(srcdir); $(CL) ./ cmpinline cmpinline S0111)
+	$(MV) $(srcdir)/cmpinline.c $(srcdir)/cmpinline.$(CEXT)
+	$(MV) $(srcdir)/cmpinline.h $(srcdir)/cmpinline.$(HEXT)
+	$(MV) $(srcdir)/cmpinline.data $(srcdir)/cmpinline.$(DEXT)
+cmpinline.o: $(srcdir)/cmpinline.$(CEXT) $(HDIR)/ecl.h
+	$(CP) $(srcdir)/cmpinline.$(CEXT) cmpinline.c
+	$(CP) $(srcdir)/cmpinline.$(HEXT) cmpinline.h
+	$(CC) -I. $(CFLAGS) cmpinline.c -o cmpinline.o
+	$(RM) cmpinline.c cmpinline.h
+cmpspecial.$(CEXT): $(srcdir)/cmpspecial.lsp
+	(cd $(srcdir); $(CL) ./ cmpspecial cmpspecial S0111)
+	$(MV) $(srcdir)/cmpspecial.c $(srcdir)/cmpspecial.$(CEXT)
+	$(MV) $(srcdir)/cmpspecial.h $(srcdir)/cmpspecial.$(HEXT)
+	$(MV) $(srcdir)/cmpspecial.data $(srcdir)/cmpspecial.$(DEXT)
+cmpspecial.o: $(srcdir)/cmpspecial.$(CEXT) $(HDIR)/ecl.h
+	$(CP) $(srcdir)/cmpspecial.$(CEXT) cmpspecial.c
+	$(CP) $(srcdir)/cmpspecial.$(HEXT) cmpspecial.h
+	$(CC) -I. $(CFLAGS) cmpspecial.c -o cmpspecial.o
+	$(RM) cmpspecial.c cmpspecial.h
+cmptype.$(CEXT): $(srcdir)/cmptype.lsp
+	(cd $(srcdir); $(CL) ./ cmptype cmptype S0111)
+	$(MV) $(srcdir)/cmptype.c $(srcdir)/cmptype.$(CEXT)
+	$(MV) $(srcdir)/cmptype.h $(srcdir)/cmptype.$(HEXT)
+	$(MV) $(srcdir)/cmptype.data $(srcdir)/cmptype.$(DEXT)
+cmptype.o: $(srcdir)/cmptype.$(CEXT) $(HDIR)/ecl.h
+	$(CP) $(srcdir)/cmptype.$(CEXT) cmptype.c
+	$(CP) $(srcdir)/cmptype.$(HEXT) cmptype.h
+	$(CC) -I. $(CFLAGS) cmptype.c -o cmptype.o
+	$(RM) cmptype.c cmptype.h
+
+# This file has machine dependencies within lisp.
+# They are resolved by replacing suitable constants in compiler.data
+cmpmain.o: $(srcdir)/cmpmain.c $(HDIR)/ecl.h
+	$(CC) $(CFLAGS) $(srcdir)/cmpmain.c -o cmpmain.o
+
+$(SYSDIR)/compiler.data: $(CMPOBJS)
+	$(CAT) $(srcdir)/cmpdefs.data > compiler.data
+	$(CAT) $(srcdir)/cmpinline.$(DEXT) >> compiler.data
+	$(CAT) $(srcdir)/cmputil.data >> compiler.data
+	$(CAT) $(srcdir)/cmptype.$(DEXT) >> compiler.data
+	$(CAT) $(srcdir)/cmpbind.data >> compiler.data
+	$(CAT) $(srcdir)/cmpblock.data >> compiler.data
+	$(CAT) $(srcdir)/cmpcall.data >> compiler.data
+	$(CAT) $(srcdir)/cmpcatch.data >> compiler.data
+	$(CAT) $(srcdir)/cmpenv.data >> compiler.data
+	$(CAT) $(srcdir)/cmpeval.$(DEXT) >> compiler.data
+	$(CAT) $(srcdir)/cmpexit.data >> compiler.data
+	$(CAT) $(srcdir)/cmpflet.data >> compiler.data
+	$(CAT) $(srcdir)/cmpfun.data >> compiler.data
+	$(CAT) $(srcdir)/cmpif.data >> compiler.data
+	$(CAT) $(srcdir)/cmplam.data >> compiler.data
+	$(CAT) $(srcdir)/cmplet.data >> compiler.data
+	$(CAT) $(srcdir)/cmploc.data >> compiler.data
+	$(CAT) $(srcdir)/cmpmap.data >> compiler.data
+	$(CAT) $(srcdir)/cmpmulti.data >> compiler.data
+	$(CAT) $(srcdir)/cmpspecial.$(DEXT) >> compiler.data
+	$(CAT) $(srcdir)/cmptag.data >> compiler.data
+	$(CAT) $(srcdir)/cmptop.data >> compiler.data
+	$(CAT) $(srcdir)/cmpvar.data >> compiler.data
+	$(CAT) $(srcdir)/cmpwt.data >> compiler.data
+	sed -e 's%\\$$%\\\\%' $(HDIR)/ecl.h > ecl.h
+# Using  -e '/REPLACE ECL.H/a\^J\"' does not work on SGI:
+	sed -e "/REPLACE ECL.H/r ecl.h" -e 's/REPLACE ECL.H//' \
+	  -e "s/CCOMPILER/$(CC)/" -e "s/LSPCFLAGS/$(LSPCFLAGS)/" \
+	  $(srcdir)/cmpmain.data >> compiler.data
+	$(MV) compiler.data $(SYSDIR)
+	$(RM) ecl.h
+
+$(SYSDIR)/sysfun.lsp:
+	$(CP) $(srcdir)/sysfun.lsp $(SYSDIR)/sysfun.lsp
+clean:
+	$(RM) -f $(CMPOBJS) init_cmp.o $(ALL) core a.out
+
+allclean: clean
+	$(RM) -f *.h *.data *.c
