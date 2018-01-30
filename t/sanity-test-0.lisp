@@ -145,7 +145,7 @@ f_u_fifteen(MResult) :-
 
 (defun do-four () (DO ((temp-one 1 (1+ temp-one) )(temp-two 0 (1- temp-two) ) )((> (- temp-one temp-two) 5) temp-one)() ))
 
-(is = 4  (rtrace (do-four)))
+(is = 4  (do-four))
 
 (is eq 'string_l (DEFUN string_l (x )(COND ((STRINGP x )x )((SYMBOLP x )(symbol-name x ))(T (ERROR "type error" )))))
 

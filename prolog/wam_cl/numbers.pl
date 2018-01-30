@@ -230,16 +230,21 @@ wl:interned_eval_todo(
 'f_1-'(N,Ret):- Ret is N - 1.
 
 %f_c43(N1,N2,Ret):- '+'(N1,N2,Ret).
+wl:init_args(x,+).
 '+'(A1,A2,Ret):- coerce_to(A1, number, N1),coerce_to(A2, number, N2), Ret is (N1 + N2).
+%'f_+'(N1,[N2],Ret):-!, Ret is (N1 + N2).
 'f_+'(N1,N2,Ret):- '+'(N1,N2,Ret).
 
 %f_c45(N1,N2,Ret):- Ret is (N1 + N2).
+wl:init_args(x,-).
 '-'(N1,N2,Ret):- Ret is (N1 - N2).
+%'f_-'(N1,[N2],Ret):-!, Ret is (N1 - N2).
 'f_-'(N1,N2,Ret):- Ret is (N1 - N2).
 
 %f_c42(N1,N2,Ret):- Ret is (N1 + N2).
 '*'(N1,N2,Ret):- Ret is (N1 * N2).
 %'f_*'(N1,N2,Ret):- Ret is (N1 * N2).
+wl:init_args(0,*).
 'f_*'(ArgsIn,Ret):- 
    (ArgsIn==[]-> Ret=1; 
    (ArgsIn=[Ret]->true;
@@ -247,6 +252,7 @@ wl:interned_eval_todo(
       Ret is (N1 * R2))))).
 
 %f_c47(N1,N2,Ret):- Ret is (N1 + N2).
+wl: init_args(x,/).
 '/'(N1,N2,Ret):- Ret is (N1 / N2).
 'f_/'(N1,N2,Ret):- Ret is (N1 / N2).
 

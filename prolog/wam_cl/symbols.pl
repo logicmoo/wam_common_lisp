@@ -76,21 +76,24 @@ is_fboundp(Symbol):- get_opv(Symbol,symbol_function,_).
 
 
 
-wl:init_args(x,find_symbol).
-f_find_symbol(String,Result):- reading_package(Package)->f_find_symbol(String,Package,Result).
-f_find_symbol(String,Pack,Result):-  find_package_or_die(Pack,Package),
+wl:init_args(1,find_symbol).
+f_find_symbol(String,OptPackage,Result):-
+  optional_package(OptPackage,Package),
   package_find_symbol(String,Package,Symbol,IntExt),f_values_list([Symbol,IntExt],Result),!.
 f_find_symbol(_Var,_P,Result):- f_values_list([[],[]],Result).
 
 
-wl:init_args(x,intern).
-f_intern(String,Result):- reading_package(Package),f_intern(String,Package,Result).
+wl:init_args(1,intern).
 % f_intern(Symbol,Package,Result):- \+ is_keywordp(Symbol),is_symbolp(Symbol),!,f_intern_symbol(Symbol,Package,Result).
-f_intern(String,Pack,Result):-
-  find_package_or_die(Pack,Package),
+f_intern(String,OptPackage,Result):-
+  optional_package(OptPackage,Package),
   intern_symbol(String,Package,Symbol,IntExt),
   f_values_list([Symbol,IntExt],Result),!.
 
+optional_package([[]],[]):-!.
+optional_package([Pack],Package):-!, find_package_or_die(Pack,Package).
+optional_package([],Package):- reading_package(Package),!.
+optional_package(Package,Package):-!.
 
 intern_symbol(String,Package,Symbol,IntExt):- to_prolog_string_if_needed(String,PlString),!,intern_symbol(PlString,Package,Symbol,IntExt).
 intern_symbol(String,Package,Symbol,IntExt):- package_find_symbol(String,Package,Symbol,IntExt),!.
@@ -99,33 +102,20 @@ intern_symbol(String,Package,Symbol,IntExt):-
    always((package_find_symbol(String,Package,FoundSymbol,IntExt),FoundSymbol==Symbol)).
 
 
-f_unintern(Symbol,t):- 
-   f_symbol_package(Symbol,Package),
+wl:init_args(1,unintern).
+f_unintern(Symbol,OptPackage,t):- 
+   optional_package(OptPackage,Package),
+   f_symbol_package(Symbol,WasPackage),
    (Package\==[]-> package_unintern_symbol(Package,Symbol) ; true),
-   set_opv(Symbol,symbol_package,[]),
+   (Package==WasPackage-> set_opv(Symbol,symbol_package,[]);true),
    delete_obj(Symbol).
 
-
-
-f_unintern(String,Package,Symbol,IntExt):- package_find_symbol(String,Package,Symbol,IntExt),!.
-unintern_symbol(String,Package,Symbol,IntExt):- 
-   make_fresh_uninternal_symbol(Package,String,Symbol),
-   always((package_find_symbol(String,Package,FoundSymbol,IntExt),FoundSymbol==Symbol)).
-
-
-(wl:init_args(x,make_symbol)).
 
 f_make_symbol(String,Symbol):- to_prolog_string_if_needed(String,PlString),!,f_make_symbol(PlString,Symbol).
 f_make_symbol(SymbolName,Symbol):- 
    prologcase_name(SymbolName,ProposedName),
-   gensym(ProposedName,Symbol),
-   create_symbol(SymbolName,[],Symbol).
-
-f_make_symbol(String,Package,Symbol):- to_prolog_string_if_needed(String,PlString),!,f_make_symbol(PlString,Package,Symbol).
-f_make_symbol(SymbolName,Package,Symbol):- 
-   prologcase_name(SymbolName,ProposedName),
    gensym(ProposedName,Symbol),                
-   create_symbol(SymbolName,Package,Symbol).
+   create_symbol(SymbolName,[],Symbol).
 
 
 create_symbol(String,pkg_kw,Symbol):-!,create_keyword(String,Symbol).

@@ -103,11 +103,13 @@ type_named('$OBJ'(_,Type),Type):- atom(Type),!.
 type_named(Type,Type):- atomic(Type).
 
 
-f_typep(Obj,Type,Result):- t_or_nil(is_typep(Obj,Type),Result),f_values_list([Result,t],_).
-is_typep(Obj,Type):- i_type(Obj,SubType),is_subtypep(SubType,Type),!.
+f_typep(Obj,Type,OptEnv,Result):- t_or_nil(is_typep(Obj,OptEnv,Type),Result),f_values_list([Result,t],_).
+is_typep(Obj,Type,OptEnv):- i_type(Obj,SubType),is_subtypep(SubType,Type,OptEnv),!.
 
-f_subtypep(SubType,Type,Result):- t_or_nil(is_subtypep(SubType,Type),Result).
-is_subtypep(SubType,Type):- find_class(SubType,SubClass),find_class(Type,Class),is_subclass(SubClass,Class).
+f_subtypep(SubType,Type,OptEnv,Result):- t_or_nil(is_subtypep(SubType,Type,OptEnv),Result).
+is_subtypep(SubType,Type,OptEnv):- 
+  OptErrorOptEnv = [[]|OptEnv],
+  f_find_class(SubType,OptErrorOptEnv,SubClass),f_find_class(Type,OptErrorOptEnv,Class),is_subclass(SubClass,Class).
 
 is_subclass(SubClass,Class):- SubClass=Class; get_super_class(SubClass,Class).
 

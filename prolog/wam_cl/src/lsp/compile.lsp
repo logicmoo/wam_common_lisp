@@ -6,8 +6,8 @@
 ;;;
 ;;; Dump documentation
 ;;;
-(load "/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/reference/ecl-OLD/src/doc/help.lsp")
-(si::dump-documentation "/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/reference/ecl-OLD/build/help.doc")
+(load "/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/src/doc/help.lsp")
+(si::dump-documentation "/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/build/help.doc")
 
 ;;;
 ;;; Trick to make names shorter
@@ -26,8 +26,8 @@
 (progn
   (sbt::operate-on-system lsp :shared-library)
   (load "lsp"))
-(si::pathname-translations "SYS" '(("**;*.*" "/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/reference/ecl-OLD/build/**/*.*")))
-(setq compiler::*cc-flags* (concatenate 'string compiler::*cc-flags* " -I/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/reference/ecl-OLD/src/h -I/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/reference/ecl-OLD/src/gmp -I./h"))
+(si::pathname-translations "SYS" '(("**;*.*" "/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/build/**/*.*")))
+(setq compiler::*cc-flags* (concatenate 'string compiler::*cc-flags* " -I/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/src/h -I/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/src/gmp -I./h"))
 
 ;;;
 ;;; * Compile, load and link PCL based Common-Lisp Object System

@@ -10,7 +10,7 @@
 ;;; * Load Common-Lisp base library
 ;;;
 (if (member "ECL-MIN" *features* :test #'string-equal)
-  (load "/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/reference/ecl-OLD/build/lsp/load.lsp"))
+  (load "/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/build/lsp/load.lsp"))
 (defun si::process-command-args () )
 
 ;;;
@@ -18,23 +18,23 @@
 ;;;
 (setf sys::*gc-verbose* nil)
 #+(and wants-clos ecl-min)
-(load "/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/reference/ecl-OLD/build/clos/load.lsp")
+(load "/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/build/clos/load.lsp")
 
 ;;;
 ;;; * By redefining "SYS:" ECL will be able to
 ;;;   find headers and libraries in the build directory.
 ;;;
-(si::pathname-translations "SYS" '(("*.*" "/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/reference/ecl-OLD/build/*.*")))
+(si::pathname-translations "SYS" '(("*.*" "/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/build/*.*")))
 
 ;;;
 ;;; * Load the compiler.
 ;;;
-(load #+ecl-min "/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/reference/ecl-OLD/build/cmp/load.lsp" #-ecl-min "/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/reference/ecl-OLD/build/cmp.so")
+(load #+ecl-min "/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/build/cmp/load.lsp" #-ecl-min "/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/build/cmp.so")
 
 ;;;
 ;;; * Add include path to not yet installed headers
 ;;;
-(setq compiler::*cc-flags* (concatenate 'string compiler::*cc-flags* " -I/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/reference/ecl-OLD/src/h -I/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/reference/ecl-OLD/src/gmp "))
+(setq compiler::*cc-flags* (concatenate 'string compiler::*cc-flags* " -I/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/src/h -I/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/src/gmp "))
 
 ;;;
 ;;; * Remove documentation from compiled files
@@ -44,7 +44,7 @@
 ;;;
 ;;; * Beppe's defsystem utility
 ;;;
-(load "/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/reference/ecl-OLD/src/util/system.lsp")
+(load "/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/src/util/system.lsp")
 
 ;;;
 ;;; * We redefine this to force generation of source files

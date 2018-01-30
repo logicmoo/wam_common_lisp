@@ -160,18 +160,19 @@ get_init_args(F,Args):- nonvar(Args),!,get_init_args(F,ArgsV),ArgsV=Args.
 get_init_args(F,N):- quietly((premute_names(F,FF), exact_and_restkeys(FF,N))),!.
 
 
+get_ftype_lambda_list(F,List):- get_opv(F,ftype_lambda_list,List).
 get_ftype_lambda_list(F,List):- wl:lambda_def(_, F,_, List, _).
 get_ftype_lambda_list(F,List):- atom(F),wl:lambda_def(_, _,F, List, _).
-get_ftype_lambda_list(F,List):- get_opv(F,ftype_lambda_list,List).
 
 
-exact_and_restkeys_l(F,N):- get_ftype_lambda_list(F,List),
-  ((append(Left,[c38_optional|_],List);append(Left,[c38_rest|_],List);append(Left,[c38_key|_],List))->length(Left,N);(length(List,X),N=x(X))).
+exact_and_restkeys_l(F,N):- no_repeats(F,get_ftype_lambda_list(F,List)),
+  once(((append(Left,[c38_optional|_],List);append(Left,[c38_rest|_],List);
+     append(Left,[c38_key|_],List))->length(Left,N);(length(List,X),N=x(X)))).
 
-exact_and_restkeys(F,N):- wl:init_args(N,F),!.
-exact_and_restkeys(F,0):- wl:declared(F,lambda(['&rest'|_])),!.
+exact_and_restkeys(F,N):- wl:init_args(N,F),!,integer(N).
 exact_and_restkeys(F,N):- exact_and_restkeys_l(F,N),integer(N),!.
 exact_and_restkeys(F,N):- function_arg_info(F,ArgInfo),ArgInfo.req=L,ArgInfo.all\==L,!,arg_info_count(ArgInfo,req,N).
+exact_and_restkeys(F,0):- wl:declared(F,lambda(['&rest'|_])),!.
 exact_and_restkeys(F,0):- function_arg_info(F,ArgInfo),ArgInfo.req==0,ArgInfo.all\==0,!.
 exact_and_restkeys(FN,x):-  function_arg_info(FN,ArgInfo),!,
    ArgInfo.complex==0,ArgInfo.opt==0,ArgInfo.rest==0,ArgInfo.env==0,ArgInfo.whole==0,

@@ -17,10 +17,10 @@
 :- meta_predicate(maplist_not_tail(1,*)).
 
 %f_disassemble(Function, Code):- string(Function),downcase_atom(Function,DC),!,f_disassemble(DC, Code).
-f_disassemble(function(Symbol), Code):- !, f_disassemble(Symbol, Code).
-f_disassemble([quote,Symbol], Code):- !, f_disassemble(Symbol, Code).
-f_disassemble(StringL,Code):- \+ string(StringL),is_stringp(StringL),to_prolog_string_if_needed(StringL,String),!,f_disassemble(String,Code).
-f_disassemble(Function, Prolog):- 
+f_disassemble(function(Symbol),Options, Code):- !, f_disassemble(Symbol,Options, Code).
+f_disassemble([quote,Symbol], Options,Code):- !, f_disassemble(Symbol, Options,Code).
+f_disassemble(StringL,Options,Code):- \+ string(StringL),is_stringp(StringL),to_prolog_string_if_needed(StringL,String),!,f_disassemble(String,Options,Code).
+f_disassemble(Function,_Options, Prolog):- 
   writeln('#| DISASSEMBLY FOR':Function),
    make_holder(Holder),
    print_related_clauses(Holder,_Module,Function),

@@ -274,9 +274,7 @@ mf_sys_is([sys_is,Eqf_In, Expected_In, Actual_In],ReplEnv, MFResult) :-
               ),
               block_exit(sys_is, MFResult),
               true).
-:- set_opv(mf_sys_is,type_of,sys_macro),
-   set_opv(sf_sys_is,type_of,sys_special_operator),
-   set_opv(sys_is, symbol_function, sf_sys_is).
+:- rtrace(set_opv(sys_is, symbol_function, sf_sys_is)).
 
 :- fixup_exports.
 
