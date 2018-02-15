@@ -24649,7 +24649,7 @@ o_p_v(sys_xx_ffi_module_xx,type_of,symbol).
 o_p_v(sys_xx_file_search_xx,declared_as,defparameter).
 o_p_v(sys_xx_file_search_xx,symbol_name,"*FILE-SEARCH*").
 o_p_v(sys_xx_file_search_xx,symbol_package,pkg_sys).
-o_p_v(sys_xx_file_search_xx,symbol_value,["/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lib","/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl","/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t","/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/daydreamer"]).
+o_p_v(sys_xx_file_search_xx,symbol_value,["/opt/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lib","/opt/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl","/opt/logicmoo_workspace/packs_usr/wam_common_lisp/t","/opt/logicmoo_workspace/packs_usr/wam_common_lisp/t/daydreamer"]).
 o_p_v(sys_xx_file_search_xx,type_of,symbol).
 o_p_v(sys_xx_fill_indent_sexp_xx,declared_as,defparameter).
 o_p_v(sys_xx_fill_indent_sexp_xx,symbol_name,"*FILL-INDENT-SEXP*").

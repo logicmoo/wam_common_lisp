@@ -32,9 +32,9 @@ f_nthcdr(_,[],[]):-!.
 f_nthcdr(0,List,List).
 f_nthcdr(Index,[_|List],RetVal):- Next is Index-1,f_nthcdr(Next,List,RetVal).
 
-f_set_set_nthcdr(_,[],[]):-!.
-f_set_set_nthcdr(0,List,Tail):- nb_setarg(2,List,Tail).
-f_set_set_nthcdr(Index,[_|List],Tail):- Next is Index-1,f_set_set_nthcdr(Next,List,Tail).
+f_set_nthcdr(_,[],[]):-!.
+f_set_nthcdr(0,List,Tail):- nb_setarg(2,List,Tail).
+f_set_nthcdr(Index,[_|List],Tail):- Next is Index-1,f_set_nthcdr(Next,List,Tail).
 
 nth_index([Index],List,RetVal):- !, f_nth(Index,List,RetVal). 
 nth_index([],List,List):-!.

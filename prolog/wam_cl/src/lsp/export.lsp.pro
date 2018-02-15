@@ -1,8 +1,8 @@
 #!/usr/bin/env swipl
 %; WAM-CL translated Lisp File (see https://github.com/TeamSPoon/wam_common_lisp/tree/master/prolog/wam_cl )
-%; File: "src/lsp/export.lsp" (/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/src/lsp/export.lsp)
+%; File: "lsp/export" (/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lib/lsp/export.lsp)
 %; PWD: /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/
-%; Start time: Mon Jan 29 04:30:44 2018
+%; Start time: Mon Jan 29 02:19:08 2018
 
 :-style_check(-discontiguous).
 :-style_check(-singleton).
@@ -43,7 +43,7 @@
 
 */
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/src/lsp/export.lsp:510 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lib/lsp/export.lsp:510 **********************/
 :-lisp_compile_to_prolog(pkg_user,['si::select-package','$STRING'("CL")])
 :- f_sys_select_package('$ARRAY'([*], claz_base_character, "CL"), _Ignored).
 /*
@@ -321,7 +321,7 @@
 ;;;
 */
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/src/lsp/export.lsp:538 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lib/lsp/export.lsp:538 **********************/
 :-lisp_compile_to_prolog(pkg_cl,[export,[quote,['&whole','&environment','&body',*,**,***,'*break-enable*','*break-on-warnings*','*features*','*modules*',+,++,+++,-,/,//,///,'COMMON','KYOTO','KCL','ECL',abs,acos,acosh,'adjust-array','adjustable-array-p',apropos,'apropos-list',arglist,'array-dimension','array-dimensions','array-element-type','array-has-fill-pointer-p','array-in-bounds-p','array-rank','array-row-major-index',asin,asinh,assert,atanh,bit,'bit-and','bit-andc1','bit-andc2','bit-eqv','bit-ior','bit-nand','bit-nor','bit-not','bit-orc1','bit-orc2','bit-xor',break,byte,'byte-position','byte-size',ccase,cerror,'check-type',cis,coerce,compile,'compile-file',concatenate,cosh,count,'count-if','count-if-not',ctypecase,decf,'decode-universal-time',defconstant,'define-modify-macro','define-setf-method',defparameter,defsetf,defstruct,deftype,defvar,delete,'delete-duplicates','delete-if','delete-if-not','deposit-field',describe,disassemble,'do*','do-all-symbols','do-external-symbols','do-symbols',documentation,dolist,dotimes,dpb,dribble,ecase,ed,eighth,'encode-universal-time',error,etypecase,'eval-when',every,fceiling,ffloor,fifth,fill,'fill-pointer',find,'find-all-symbols','find-if','find-if-not',first,format,fourth,fround,ftruncate,'get-decoded-time','get-setf-method','get-setf-method-multiple-value','get-universal-time',getf,ignore,incf,inspect,intersection,isqrt,ldb,'ldb-test','lisp-implementation-type',logandc1,logandc2,lognand,lognor,lognot,logorc1,logorc2,logtest,'long-site-name',loop,'machine-instance','machine-type','machine-version','make-array','make-sequence',map,'mask-field',merge,mismatch,mod,'multiple-value-setq',nintersection,ninth,notany,notevery,'nset-difference','nset-exclusive-or',nsubstitute,'nsubstitute-if','nsubstitute-if-not',nunion,phase,pop,position,'position-if','position-if-not','prin1-to-string','princ-to-string','prog*',provide,psetf,push,pushnew,rational,rationalize,'read-from-string',reduce,rem,remf,remove,'remove-duplicates','remove-if','remove-if-not',replace,require,rotatef,room,sbit,search,second,'set-difference','set-exclusive-or',setf,seventh,shiftf,'short-site-name',signum,sinh,sixth,'software-type','software-version',some,sort,'stable-sort',step,structure,subsetp,substitute,'substitute-if','substitute-if-not',subtypep,tanh,tenth,third,time,trace,type,typecase,typep,union,untrace,variable,vector,'vector-pop','vector-push','vector-push-extend',warn,'with-input-from-string','with-open-file','with-open-stream','with-output-to-string','write-to-string','y-or-n-p','yes-or-no-p',proclaim,proclamation,special,type,ftype,function,inline,notinline,ignore,optimize,speed,space,safety,'compilation-speed',declaration,'*eval-when-compile*',clines,defcfun,defentry,defla,defcbody,definline,defunC,void,object,'char*',char,int,float,double]]])
 :- f_export(
 	    [ c38_whole,
@@ -331,7 +331,7 @@
 	      (**),
 	      ***,
 	      xx_break_enable_xx,
-	      xx_break_on_warnings_xx,
+	      sys_xx_break_on_warnings_xx,
 	      xx_features_xx,
 	      xx_modules_xx,
 	      (+),
@@ -621,8 +621,14 @@
 	((atom x) (error ""(defun eval-feature (x)\n  (cond ((symbolp x)\n         (member x *features*\n                 :test #'(lambda (a b)\n                           (or (eql a b)\n\t\t\t       (and (symbolp a) (symbolp b)\n\t\t\t\t    (string-equal (symbol-name a)\n\t\t\t\t\t\t  (symbol-name b)))))))\n\t((atom x) (error \"~ is not allowed as a feature\" x))\n        ((eq (car x) 'AND)\n         (dolist (x (cdr x) t) (unless (eval-feature x) (return nil))))\n        ((eq (car x) 'OR)\n         (dolist (x (cdr x) nil) (when (eval-feature x) (return t))))\n        ((eq (car x) 'NOT)\n\t (not (eval-feature (second x))))\n\t(t (error \"~S is not a feature expression.\" x))))\n\n;;; Revised by G. Attardi\n".
 */
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/src/lsp/export.lsp:4025 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lib/lsp/export.lsp:4025 **********************/
 :-lisp_compile_to_prolog(pkg_cl,[defun,'eval-feature',[x],[cond,[[symbolp,x],[member,x,'*features*',':test',function([lambda,[a,b],[or,[eql,a,b],[and,[symbolp,a],[symbolp,b],['string-equal',['symbol-name',a],['symbol-name',b]]]]])]],[[atom,x],[error,'$STRING'("~ is not allowed as a feature"),x]],[[eq,[car,x],[quote,'AND']],[dolist,[x,[cdr,x],t],[unless,['eval-feature',x],[return,[]]]]],[[eq,[car,x],[quote,'OR']],[dolist,[x,[cdr,x],[]],[when,['eval-feature',x],[return,t]]]],[[eq,[car,x],[quote,'NOT']],[not,['eval-feature',[second,x]]]],[t,[error,'$STRING'("~S is not a feature expression."),x]]]])
+/*
+:- side_effect(generate_function_or_macro_name([name='GLOBAL', environ=env_1],
+					       eval_feature,
+					       kw_function,
+					       f_eval_feature)).
+*/
 wl:lambda_def(defun, eval_feature, f_eval_feature, [x], [[cond, [[symbolp, x], [member, x, xx_features_xx, kw_test, function([lambda, [a, b], [or, [eql, a, b], [and, [symbolp, a], [symbolp, b], [string_equal, [symbol_name, a], [symbol_name, b]]]]])]], [[atom, x], [error, '$ARRAY'([*], claz_base_character, "~ is not allowed as a feature"), x]], [[eq, [car, x], [quote, and]], [dolist, [x, [cdr, x], t], [unless, [eval_feature, x], [return, []]]]], [[eq, [car, x], [quote, or]], [dolist, [x, [cdr, x], []], [when, [eval_feature, x], [return, t]]]], [[eq, [car, x], [quote, not]], [not, [eval_feature, [second, x]]]], [t, [error, '$ARRAY'([*], claz_base_character, "~S is not a feature expression."), x]]]]).
 wl:arglist_info(eval_feature, f_eval_feature, [x], arginfo{all:[x], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[x], opt:0, req:[x], rest:0, sublists:0, whole:0}).
 wl: init_args(x, f_eval_feature).
@@ -646,7 +652,7 @@ f_eval_feature(X_In, FnResult) :-
 					 Whole,
 					 LResult,
 					 [a, b],
-					 (get_var(ClosureEnvironment, a, A_Get), get_var(ClosureEnvironment, b, B_Get), f_eql(A_Get, B_Get, FORM1_Res), FORM1_Res\==[], LResult=FORM1_Res->true;get_var(ClosureEnvironment, a, A_Get14), (is_symbolp(A_Get14)->get_var(ClosureEnvironment, b, B_Get18), (is_symbolp(B_Get18)->get_var(ClosureEnvironment, a, A_Get21), f_symbol_name(A_Get21, String_equal_Param), get_var(ClosureEnvironment, b, B_Get22), f_symbol_name(B_Get22, Symbol_name_Ret), f_string_equal(String_equal_Param, Symbol_name_Ret, [], TrueResult), TrueResult24=TrueResult;TrueResult24=[]), _5318=TrueResult24;_5318=[]), LResult=_5318),
+					 (get_var(ClosureEnvironment, a, A_Get), get_var(ClosureEnvironment, b, B_Get), f_eql(A_Get, B_Get, FORM1_Res), FORM1_Res\==[], LResult=FORM1_Res->true;get_var(ClosureEnvironment, a, A_Get14), (is_symbolp(A_Get14)->get_var(ClosureEnvironment, b, B_Get18), (is_symbolp(B_Get18)->get_var(ClosureEnvironment, a, A_Get21), f_symbol_name(A_Get21, String_equal_Param), get_var(ClosureEnvironment, b, B_Get22), f_symbol_name(B_Get22, Symbol_name_Ret), f_string_equal(String_equal_Param, Symbol_name_Ret, [], TrueResult), TrueResult24=TrueResult;TrueResult24=[]), _5986=TrueResult24;_5986=[]), LResult=_5986),
 					 
 					 [ lambda,
 					   [a, b],
@@ -667,7 +673,7 @@ f_eval_feature(X_In, FnResult) :-
 					 ])
 			       ],
 			       TrueResult85),
-		      _5138=TrueResult85
+		      _5806=TrueResult85
 		  ;   get_var(GEnv, x, X_Get31),
 		      (   X_Get31\=[CAR|CDR]
 		      ->  get_var(GEnv, x, X_Get34),
@@ -693,9 +699,9 @@ f_eval_feature(X_In, FnResult) :-
 				       get_var(BlockExitEnv, x, X_Get45),
 				       f_eval_feature(X_Get45, IFTEST43),
 				       (   IFTEST43\==[]
-				       ->  _6170=[]
+				       ->  _6838=[]
 				       ;   throw(block_exit([], [])),
-					   _6170=ThrowResult
+					   _6838=ThrowResult
 				       )
 				     )),
 			      restore_special(sv(t,
@@ -717,8 +723,8 @@ f_eval_feature(X_In, FnResult) :-
 					   f_eval_feature(X_Get64, IFTEST62),
 					   (   IFTEST62\==[]
 					   ->  throw(block_exit([], t)),
-					       _6592=ThrowResult66
-					   ;   _6592=[]
+					       _7260=ThrowResult66
+					   ;   _7260=[]
 					   )
 					 )),
 				  ElseResult82=[]
@@ -747,10 +753,10 @@ f_eval_feature(X_In, FnResult) :-
 			  ),
 			  ElseResult86=ElseResult84
 		      ),
-		      _5138=ElseResult86
+		      _5806=ElseResult86
 		  )
 		),
-		_5138=FnResult
+		_5806=FnResult
 	      ),
 	      block_exit(eval_feature, FnResult),
 	      true).
@@ -875,8 +881,14 @@ f_eval_feature(X_In, FnResult) :-
     (error "Reading from "(defun check-no-infix (stream subchar arg)\n  (when arg\n    (error \"Reading from ~S: no number should appear between # and ~A\"\n\t   stream subchar)))\n\n".
 */
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/src/lsp/export.lsp:4676 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lib/lsp/export.lsp:4676 **********************/
 :-lisp_compile_to_prolog(pkg_cl,[defun,'check-no-infix',[stream,subchar,arg],[when,arg,[error,'$STRING'("Reading from ~S: no number should appear between # and ~A"),stream,subchar]]])
+/*
+:- side_effect(generate_function_or_macro_name([name='GLOBAL', environ=env_1],
+					       check_no_infix,
+					       kw_function,
+					       f_check_no_infix)).
+*/
 wl:lambda_def(defun, check_no_infix, f_check_no_infix, [stream, subchar, arg], [[when, arg, [error, '$ARRAY'([*], claz_base_character, "Reading from ~S: no number should appear between # and ~A"), stream, subchar]]]).
 wl:arglist_info(check_no_infix, f_check_no_infix, [stream, subchar, arg], arginfo{all:[stream, subchar, arg], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[stream, subchar, arg], opt:0, req:[stream, subchar, arg], rest:0, sublists:0, whole:0}).
 wl: init_args(x, f_check_no_infix).
@@ -899,11 +911,11 @@ f_check_no_infix(Stream_In, Subchar_In, Arg_In, FnResult) :-
 				Subchar_Get
 			      ],
 			      TrueResult),
-		      _8418=TrueResult
-		  ;   _8418=[]
+		      _8838=TrueResult
+		  ;   _8838=[]
 		  )
 		),
-		_8418=FnResult
+		_8838=FnResult
 	      ),
 	      block_exit(check_no_infix, FnResult),
 	      true).
@@ -963,8 +975,14 @@ f_check_no_infix(Stream_In, Subchar_In, Arg_In, FnResult) :-
 
 */
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/src/lsp/export.lsp:4825 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lib/lsp/export.lsp:4825 **********************/
 :-lisp_compile_to_prolog(pkg_cl,[defun,'sharp-+-reader',[stream,subchar,arg],['check-no-infix',stream,subchar,arg],[let,[[feature,[read,stream,t,[],t]]],[if,[and,[not,'*read-suppress*'],['eval-feature',feature]],[read,stream,t,[],t],[let,[['*read-suppress*',t]],[read,stream,t,[],t],[values]]]]])
+/*
+:- side_effect(generate_function_or_macro_name([name='GLOBAL', environ=env_1],
+					       sharp_c43_reader,
+					       kw_function,
+					       f_sharp_c43_reader)).
+*/
 wl:lambda_def(defun, sharp_c43_reader, f_sharp_c43_reader, [stream, subchar, arg], [[check_no_infix, stream, subchar, arg], [let, [[feature, [read, stream, t, [], t]]], [if, [and, [not, xx_read_suppress_xx], [eval_feature, feature]], [read, stream, t, [], t], [let, [[xx_read_suppress_xx, t]], [read, stream, t, [], t], [values]]]]]).
 wl:arglist_info(sharp_c43_reader, f_sharp_c43_reader, [stream, subchar, arg], arginfo{all:[stream, subchar, arg], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[stream, subchar, arg], opt:0, req:[stream, subchar, arg], rest:0, sublists:0, whole:0}).
 wl: init_args(x, f_sharp_c43_reader).
@@ -1062,21 +1080,32 @@ f_sharp_c43_reader(Stream_In, Subchar_In, Arg_In, FnResult) :-
 :- side_effect(assert_lsp(sharp_c43_reader, init_args(x, f_sharp_c43_reader))).
 */
 /*
-#-WAM-CL
 (set-dispatch-macro-character #\# #\+ 'sharp-+-reader)
 */
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/src/lsp/export.lsp:5093 **********************/
-:-lisp_compile_to_prolog(pkg_cl,'$COMMENT'([flag_removed,[-,':WAM-CL'],['set-dispatch-macro-character',#\(#),#\(+),[quote,'sharp-+-reader']]]))
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lib/lsp/export.lsp:5093 **********************/
+:-lisp_compile_to_prolog(pkg_cl,['set-dispatch-macro-character',#\(#),#\(+),[quote,'sharp-+-reader']])
+:- f_set_dispatch_macro_character(#\(#), #\(+), sharp_c43_reader, [], _Ignored).
 /*
-#-WAM-CL
 (set-dispatch-macro-character #\# #\+ 'sharp-+-reader
                               (sys::standard-readtable))
 
 */
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/src/lsp/export.lsp:5157 **********************/
-:-lisp_compile_to_prolog(pkg_cl,'$COMMENT'([flag_removed,[-,':WAM-CL'],['set-dispatch-macro-character',#\(#),#\(+),[quote,'sharp-+-reader'],['sys::standard-readtable']]]))
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lib/lsp/export.lsp:5148 **********************/
+:-lisp_compile_to_prolog(pkg_cl,['set-dispatch-macro-character',#\(#),#\(+),[quote,'sharp-+-reader'],['sys::standard-readtable']])
+/*
+:- side_effect(generate_function_or_macro_name([name='GLOBAL', environ=env_1],
+					       sys_standard_readtable,
+					       kw_function,
+					       f_sys_standard_readtable)).
+*/
+:- f_sys_standard_readtable(Standard_readtable_Ret),
+   f_set_dispatch_macro_character(#\(#),
+				  #\(+),
+				  sharp_c43_reader,
+				  [Standard_readtable_Ret],
+				  _Ignored).
 /*
 (defun sharp---reader (stream subchar arg)
   (check-no-infix stream subchar arg)
@@ -1087,8 +1116,14 @@ f_sharp_c43_reader(Stream_In, Subchar_In, Arg_In, FnResult) :-
 
 */
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/src/lsp/export.lsp:5278 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lib/lsp/export.lsp:5260 **********************/
 :-lisp_compile_to_prolog(pkg_cl,[defun,'sharp---reader',[stream,subchar,arg],['check-no-infix',stream,subchar,arg],[let,[[feature,[read,stream,t,[],t]]],[if,[or,'*read-suppress*',['eval-feature',feature]],[let,[['*read-suppress*',t]],[read,stream,t,[],t],[values]],[read,stream,t,[],t]]]])
+/*
+:- side_effect(generate_function_or_macro_name([name='GLOBAL', environ=env_1],
+					       sharp_reader,
+					       kw_function,
+					       f_sharp_reader)).
+*/
 wl:lambda_def(defun, sharp_reader, f_sharp_reader, [stream, subchar, arg], [[check_no_infix, stream, subchar, arg], [let, [[feature, [read, stream, t, [], t]]], [if, [or, xx_read_suppress_xx, [eval_feature, feature]], [let, [[xx_read_suppress_xx, t]], [read, stream, t, [], t], [values]], [read, stream, t, [], t]]]]).
 wl:arglist_info(sharp_reader, f_sharp_reader, [stream, subchar, arg], arginfo{all:[stream, subchar, arg], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[stream, subchar, arg], opt:0, req:[stream, subchar, arg], rest:0, sublists:0, whole:0}).
 wl: init_args(x, f_sharp_reader).
@@ -1189,14 +1224,13 @@ f_sharp_reader(Stream_In, Subchar_In, Arg_In, FnResult) :-
 :- side_effect(assert_lsp(sharp_reader, init_args(x, f_sharp_reader))).
 */
 /*
-#-WAM-CL
 (set-dispatch-macro-character #\# #\- 'sharp---reader)
 */
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/src/lsp/export.lsp:5539 **********************/
-:-lisp_compile_to_prolog(pkg_cl,'$COMMENT'([flag_removed,[-,':WAM-CL'],['set-dispatch-macro-character',#\(#),#\(-),[quote,'sharp---reader']]]))
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lib/lsp/export.lsp:5521 **********************/
+:-lisp_compile_to_prolog(pkg_cl,['set-dispatch-macro-character',#\(#),#\(-),[quote,'sharp---reader']])
+:- f_set_dispatch_macro_character(#\(#), #\(-), sharp_reader, [], _Ignored).
 /*
-#-WAM-CL
 (set-dispatch-macro-character #\# #\- 'sharp---reader
                               (sys::standard-readtable))
 
@@ -1204,8 +1238,20 @@ f_sharp_reader(Stream_In, Subchar_In, Arg_In, FnResult) :-
 
 */
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/src/lsp/export.lsp:5603 **********************/
-:-lisp_compile_to_prolog(pkg_cl,'$COMMENT'([flag_removed,[-,':WAM-CL'],['set-dispatch-macro-character',#\(#),#\(-),[quote,'sharp---reader'],['sys::standard-readtable']]]))
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lib/lsp/export.lsp:5576 **********************/
+:-lisp_compile_to_prolog(pkg_cl,['set-dispatch-macro-character',#\(#),#\(-),[quote,'sharp---reader'],['sys::standard-readtable']])
+/*
+:- side_effect(generate_function_or_macro_name([name='GLOBAL', environ=env_1],
+					       sys_standard_readtable,
+					       kw_function,
+					       f_sys_standard_readtable)).
+*/
+:- f_sys_standard_readtable(Standard_readtable_Ret),
+   f_set_dispatch_macro_character(#\(#),
+				  #\(-),
+				  sharp_reader,
+				  [Standard_readtable_Ret],
+				  _Ignored).
 /*
 ;; ----------------------------------------------------------------------
 */
@@ -1264,8 +1310,8 @@ f_sharp_reader(Stream_In, Subchar_In, Arg_In, FnResult) :-
 
 */
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/src/lsp/export.lsp:5800 **********************/
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lib/lsp/export.lsp:5764 **********************/
 :-lisp_compile_to_prolog(pkg_cl,'$COMMENT'([flag_removed,[+,':CLOS'],[export,[quote,['add-method','call-next-method','change-class','class-changed','class-name','class-of',defclass,defgeneric,'define-method-combination',defmethod,'ensure-generic-function','find-class','generic-flet','generic-function','generic-labels','get-method','initialize-instance','invalid-method-error','make-instance','make-instance-obsolete','make-method-call',method,'method-combination-error','method-qualifiers','next-method-p','no-applicable-method','print-object','remove-method','slot-boundp','slot-exists-p','slot-makunbound','slot-missing','slot-unbound','slot-value','symbol-macrolet','update-instance-structure','with-accessors','with-added-methods','with-slots',class,'built-in','standard-class','standard-generic-function','standard-method','standard-object','structure-class','structure-object']]]]))
 
-%; Total compilation time: 3.074 seconds
+%; Total compilation time: 3.658 seconds
 

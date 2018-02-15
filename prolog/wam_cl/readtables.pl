@@ -256,7 +256,7 @@ resolve_inlines(IO,IO).
 
 as_sexp(I,O):- as_sexp1(I,M),!,resolve_reader_macros(M,M2),!,remove_comments(M2,O),!.
 as_sexp_interned(I,OO):- is_list(I),!,I=OO.
-as_sexp_interned(I,OO):- as_sexp(I,O),!,reader_intern_symbols(O,OO).
+as_sexp_interned(I,OO):- as_sexp(I,O),!,reader_intern_symbols(O,OO),!.
 
 as_sexp1(Var,Var):-var(Var).
 as_sexp1(NIL,NIL):-NIL==[],!.

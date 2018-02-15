@@ -46,8 +46,8 @@ kif_ok:- t_l:sreader_options(logicmoo_read_kif,true).
 :- thread_local(t_l:s_reader_info/1).
 
 
+quietly_sreader(G):- !, call(G).
 quietly_sreader(G):- quietly(G).
-%quietly_sreader(G):- call(G).
 
 %notrace_catch_fail(G):- !, call(G).
 notrace_catch_fail(G):- notrace(catch(G,_,fail)),!.
@@ -59,27 +59,30 @@ notrace_catch_fail(G,E,C):- notrace(catch(G,E,C)),!.
 %
 % With File or Stream read all S-expressions submitting each to Pred1
 %
-with_lisp_translation(In,Pred1):- 
-   is_stream(In),!,
-   repeat,
-      once(lisp_read(In,O)),
-      (O== end_of_file -> (with_rest_info(Pred1),!) ; 
-      (must_det(once((call_proc(Pred1,O)))),fail)),!.
+with_lisp_translation(In,Pred1):-
+   is_stream(In),!,with_lisp_translation_stream(In,Pred1).
 with_lisp_translation(Other,Pred1):- 
    setup_call_cleanup(l_open_input(Other,In),
-     with_lisp_translation(In,Pred1),
-     ignore(notrace_catch_fail(close(In),_,true))),!.
+     with_lisp_translation_stream(In,Pred1),
+     ignore(notrace_catch_fail(close(In)))),!.
 
-call_proc(Pred1,O):- call(Pred1,O),!,with_rest_info(Pred1),!.
+with_lisp_translation_stream(In,Pred1):- 
+   repeat,
+      once(lisp_read(In,O)),
+      (O== end_of_file 
+         -> (with_all_rest_info(Pred1),!) ; 
+         (((once((always(call_proc(Pred1,O))))),fail))).
 
-with_rest_info(Pred1):- 
+call_proc(Pred1,O):- call(Pred1,O),!,with_all_rest_info(Pred1),!.
+
+with_all_rest_info(Pred1):- 
  forall(clause(t_l:s_reader_info(O2),_,Ref),
-  (must_det(call(Pred1,O2)),erase(Ref))).
+  (always(once(call(Pred1,O2))),erase(Ref))),!.
 
 parse_sexpr_untyped(I,O):- quietly_sreader((parse_sexpr(I,M))),!,quietly_sreader((to_untyped(M,O))),!.
 
 read_pending_whitespace(In):- repeat, peek_char(In,Code),
-   (( \+ char_type(Code,space), \+ char_type(Code,white))-> ! ; (get_char(In,_),fail)),!.
+   (( \+ char_type(Code,space), \+ char_type(Code,white))-> ! ; (get_char(In,_),fail)).
 
 
 make_tmpfile_name(Name,Temp):- 
@@ -142,44 +145,101 @@ lazy_forgotten(In,UnUsed,UnUsed):-
 % tstl(I):- with_lisp_translation(I,([O]>>(writeq(O),nl))).
 tstl(I):- with_lisp_translation(I,writeqnl).
 
+throw_reader_error(Error):- wdmsg(throw(reader_error(Error))),dumpST,wdmsg(throw(reader_error(Error))),throw(reader_error(Error)).
+
 supports_seek(In):- notrace_catch_fail(stream_property(In,reposition(true))).
 % supports_seek(In):- quietly_sreader(( notrace_catch_fail((notrace_catch_fail((seek(In, 1, current, _),seek(In, -1, current, _)),error(permission_error(reposition, stream, _), _Ctx),fail)),error(_,_),true))).
 
-phrase_from_stream_eof(Grammar, _):- Grammar=end_of_file,!.
-phrase_from_stream_eof(Grammar, _):- term_variables(Grammar,[end_of_file]),!.
-phrase_from_stream_eof(_, In):- throw(at_end_of_stream(In)).
+phrase_from_stream_eof(Grammar, _):- var(Grammar),!,unify_next_or_eof(Grammar),!.
+%phrase_from_stream_eof(Grammar, _):- compound(Grammar),!,arg(1,Grammar,TV),unify_next_or_eof(TV),!.
+phrase_from_stream_eof(Grammar, _):- term_variables(Grammar,[TV|_]),unify_next_or_eof(TV),!.
+phrase_from_stream_eof(_, In):- throw(end_of_stream_signal(In)).
 
-phrase_from_stream_part(Grammar, In) :- \+ supports_seek(In),!,phrase_from_pending_stream(Grammar, In).
-phrase_from_stream_part(Grammar, In) :- at_end_of_stream(In),!,phrase_from_stream_eof(Grammar, In).
+unify_next_or_eof(O) :- clause(t_l:s_reader_info(I),_,Ref),!,I=O,erase(Ref).
+unify_next_or_eof(end_of_file).
 
-phrase_from_stream_part(Grammar, In) :- phrase_from_stream_part_seekable(Grammar, In).
+% % % parse_sexpr_input_with_comments(Expr):- phrase_from_stream_part(file_sexpr_with_comments(Expr),current_input).
 
 
-phrase_from_stream_part_seekable(Grammar, In) :- 
-    always(sanity(stream_property(In,reposition(true)))),!,
-    %set_stream(In,buffer_size(16384)),!,% 
-    set_stream(In,buffer(full)),
-    character_count(In, FailToPosition),!,
-    (phrase_from_stream_lazy_part(Grammar, In) -> true ; 
-      (seek(In,FailToPosition,bof,_),!,fail)),!.
+%phrase_from_stream_part(Grammar, In) :-  at_end_of_stream(In),trace,!,phrase_from_stream_eof(Grammar, In).
+
+show_stream_info(In):-
+      forall(stream_property(In,(BUF)),
+    (writeq(show_stream_info(In,(BUF))),nl)),!.
+
+/*phrase_from_file_part_a(Grammar, In):-
+    b_setval('$is_file_stream',In),!,
+    phrase_from_pending_stream(Grammar, In).
+*/
+phrase_from_file_part_c(Grammar, In):-
+    show_stream_info(In),
+    read_stream_to_codes(In,Codes),
+    b_setval('$is_file_stream',In),!,
+    un_fake_buffer_codes(In,Prev),
+    append(Prev,Codes,NewCodes0),!,
+    phrase_from_file_part_cc(Grammar,NewCodes0,In).
+
+phrase_from_file_part_cc(Grammar,NewCodes0, In):-
+    re_fake_buffer_codes(In,NewCodes0),
+    repeat,
+    once((
+    un_fake_buffer_codes(In,NewCodes),
+    (NewCodes == [] -> throw(end_of_stream_signal(In)) ; true),
+    phrase(Grammar, NewCodes, More), 
+    re_fake_buffer_codes(In,More))).
+/*
+phrase_from_file_part_ccc(Grammar, In):-
+    b_setval('$is_file_stream',In),
+    un_fake_buffer_codes(In,Prev),
+   % show_stream_info(In),
+    read_stream_to_codes(In,Codes),
+    append([`(`,Prev,Codes,`)`],NewCodes),!,
+    %(NewCodes == [] -> throw(end_of_stream_signal(In)) ; true),
+   trace,
+   term_variables(Grammar,[Vs|_]),   
+   ((NewCodes=`()` -> Vs=end_of_file ;
+    ((copy_term(Grammar:Vs,GrammerC:VsC),!,
+    phrase(GrammerC, NewCodes, []),!,
+    member(Vs,VsC))))).
+*/
+
+phrase_from_stream_part(Grammar, In) :- stream_property(In,file_name(_Name)),!,phrase_from_file_part_c(Grammar, In).    
+phrase_from_stream_part(Grammar, _) :- clause(t_l:s_reader_info(I),_,Ref),!,I=Grammar,erase(Ref).
+phrase_from_stream_part(Grammar, In) :- \+ supports_seek(In),!, phrase_from_pending_stream(Grammar, In).
+%phrase_from_stream_part(Grammar, In) :- b_setval('$is_file_stream',In), quietly(phrase_from_stream_part(Grammar, In)).
+phrase_from_stream_part(Grammar, In) :- 
+    %set_stream(In,buffer_size(16384)), set_stream(In,encoding(octet)), set_stream(In,timeout(3.0)),    
+    %set_stream(In,buffer_size(5)), set_stream(In,encoding(octet)), set_stream(In,timeout(3.0)),    
+    %set_stream(In,type(text)),     
+    %set_stream(In,buffer(false)),    
+    %set_stream(In,buffer_size(819200)),
+    %show_stream_info(In),
+    %always(sanity(stream_property(In,reposition(true)))),!,
+    character_count(In, FailToPosition),
+    ((phrase_from_stream_lazy_part(Grammar, In) -> true ; (seek(In,FailToPosition,bof,_),!,fail))),!.
+
 
 phrase_from_stream_lazy_part(Grammar, In):- 
-    seek(In, 0, current, Prev),!,
-    stream_to_lazy_list(In, List),!,
-    nb_setval('$lisp_translation_line',Prev),
-    phrase(Grammar, List, More),!,
+    check_pending_buffer_codes(In),
+    seek(In, 0, current, Prev),
+    stream_to_lazy_list(In, List),
+    nb_setval('$lisp_translation_line',Prev),!,
+    phrase(Grammar, List, More) ->
     always((
        length(List,Used),!,
        length(More,UnUsed),!,
-       (Offset is Used - UnUsed + Prev),!,
+       wdmsg((Offset is Used - UnUsed + Prev)),
+       bx(always(Offset is Used - UnUsed + Prev)),
        % dbginfo((Offset is Used - UnUsed + Prev)) ->
-       seek(In,Offset,bof,_NewPos))),!.
+       seek(In,Offset,bof,_NewPos))).
+%phrase_from_stream_lazy_part(Grammar, In):- phrase_from_file_part_c(Grammar, In).
 
 phrase_from_pending_stream(Grammar, In):-
    un_fake_buffer_codes(In,CodesPrev),
    phrase_from_pending_stream(CodesPrev, Grammar, In),!.
 
 phrase_from_pending_stream(CodesPrev,Grammar,In):- 
+  b_setval('$is_file_stream',In),
   read_codes_from_pending_input(In,Codes),!,
   ((Codes==end_of_file ; Codes==[-1]) -> 
      phrase_from_stream_eof(Grammar, In); 
@@ -189,9 +249,10 @@ phrase_from_pending_stream(CodesPrev,Grammar,In):-
           phrase_from_pending_stream(NewCodes,Grammar,In)))),!.
 
 
-
-
 :- thread_local(t_l:fake_buffer_codes/2).
+
+check_pending_buffer_codes(In):- (t_l:fake_buffer_codes(In,Codes);Codes=[]),!,
+  (Codes==[]->true;(throw(un_fake_buffer_codes(In,Codes)))),!.
 
 un_fake_buffer_codes(In,Codes):- retract(t_l:fake_buffer_codes(In,Codes)),!.
 un_fake_buffer_codes(_In,[]). % for first read
@@ -237,13 +298,14 @@ txt_to_codes(Text,Codes):- notrace_catch_fail((text_to_string_safe(Text,String),
 %
 % Parse S-expression Codes.
 %
-parse_sexpr_ascii(S, Expr) :- is_stream(S),!,parse_sexpr_stream(S,Expr),!.
+parse_sexpr_ascii(S, Expr) :- is_stream(S),!,parse_sexpr_stream(S,Expr).
+parse_sexpr_ascii(S, Expr) :- open_string(S,SIS),!,parse_sexpr_stream(SIS,Expr).
 parse_sexpr_ascii(Text, Expr) :- txt_to_codes(Text,DCodes),
- clean_fromt_ws(DCodes,Codes),!, phrase(file_sexpr(Expr), Codes, []),!.
+ clean_fromt_ws(DCodes,Codes),!, phrase(file_sexpr(Expr), Codes, []).
 
 parse_sexpr_ascii_as_list(Text, Expr) :- txt_to_codes(Text,DCodes),
- clean_fromt_ws(DCodes,Codes),!,append(Codes,`)`,NCodes), 
- phrase(sexpr_rest(Expr), NCodes, []),!.
+ clean_fromt_ws(DCodes,Codes),!,append(Codes,`)`,NCodes),!, 
+ phrase(sexpr_rest(Expr), NCodes, []).
 
 
 
@@ -260,61 +322,73 @@ parse_sexpr_string(S,Expr):- nb_setval('$maybe_string',t),parse_sexpr(string(S),
 %
 % Parse S-expression from a Stream
 %
-parse_sexpr_stream(S,Expr):- at_end_of_stream(S),!,end_of_file=Expr.
 parse_sexpr_stream(S,Expr):- 
-  notrace_catch_fail(
-    phrase_from_stream_part(file_sexpr_with_comments(Expr),S),
-    at_end_of_stream(S),
-    Expr=end_of_file),!.
+  catch(
+    parse_sexpr_stream_1(S,Expr),
+    end_of_stream_signal(S),
+    Expr=end_of_file).
+parse_sexpr_stream_1(S,Expr):- 
+  phrase_from_stream_part(always(file_sexpr_with_comments(Expr)),S).
+
 
 
 :- export('//'(file_sexpr,1)).
 :- export('//'(sexpr,1)).
 
 
-comment_expr('$COMMENT'(Expr,I,CP)) --> line_comment(Expr,I,CP),!.
-comment_expr('$COMMENT'('#'(Txt))) --> `#|`, !, read_string_until(S,`|#`), swhite,{text_to_string_safe(S,Txt)}.
-comment_expr('$COMMENT'([])) --> sblank_lines,!.
-comment_expr('$COMMENT'(Expr,I,CP)) --> line_comment(Expr,I,CP),!.
-comment_expr('$COMMENT1'(Txt)) --> `#|`, !, read_string_until(S,`|#`), swhite,{text_to_string_safe(S,Txt)}.
-comment_expr('$COMMENT0'([])) --> sblank_lines,!.
 
 % Use DCG for parser.
 
-one_blank --> [C],{integer(C),!,C =< 32}.
-sexpr_dcgPeek(Grammer,List,List):- phrase(Grammer,List,_).
-sexpr_dcgUnless(Grammer,List,List):- \+ phrase(Grammer,List,_).
+one_blank --> [C],!,{C =< 32}.
+sexpr_dcgPeek(Grammer,List,List):- phrase(Grammer,List,_),!.
+sexpr_dcgUnless(Grammer,List,List):- \+ phrase(Grammer,List,_),!.
 
 file_eof(I,O):- I==end_of_file,!,O=[].
 file_eof --> [X],{ var(X), X = -1},!.
 file_eof --> [X],{ attvar(X), X = -1},!.
 file_eof --> [X],{ attvar(X), X = end_of_file},!.
 
+%file_sexpr_with_comments(O) --> [], {clause(t_l:s_reader_info(O),_,Ref),erase(Ref)},!.
 file_sexpr_with_comments(end_of_file) --> file_eof,!.
-file_sexpr_with_comments(O) --> one_blank,!,file_sexpr_with_comments(O).  % WANT? 
-file_sexpr_with_comments(C)                 --> sexpr_dcgPeek(`#|`),!, comment_expr(C).
-file_sexpr_with_comments(C)                 --> sexpr_dcgPeek(`;`),!, comment_expr(C).
+file_sexpr_with_comments(O) --> one_blank,!,file_sexpr_with_comments(O),!.  % WANT? 
+file_sexpr_with_comments(C)                 --> sexpr_dcgPeek(`#|`),!,always(comment_expr(C)),swhite,!.
+file_sexpr_with_comments(C)                 --> sexpr_dcgPeek(`;`),!, always(comment_expr(C)),swhite,!.
 file_sexpr_with_comments(Out,S,E):- \+ t_l:sreader_options(with_text,true),!,phrase(file_sexpr(Out),S,E),!.
-file_sexpr_with_comments(Out,S,E):- expr_with_comments(Out,file_sexpr(O),O,S,E).
- 
+file_sexpr_with_comments(Out,S,E):- expr_with_text(Out,file_sexpr(O),O,S,E),!.
 
-expr_with_comments(Out,DCG,O,S,E):- 
-   lazy_list_character_count(StartPos,S,M),
-   call(DCG,M,ME),!,
-   lazy_list_character_count(EndPos,ME,E),
-   Len is EndPos - StartPos,
-   length(Grabber,Len),!,
+% in Cyc there was a fitness heuristic that every time an logical axiom had a generated a unique consequent it was considered to have utility as it would expand the breadth of a search .. the problem often was those consequents would feed a another axiom's antecedant where that 
+:- asserta((system:'$and'(X,Y):- (X,Y))).
+
+expr_with_text(Out,DCG,O,S,E):- 
+   always(lazy_list_character_count(StartPos,S,M)),%integer(StartPos),
+   call(DCG,M,ME),
+   lazy_list_character_count(EndPos,ME,E),!,
+   expr_with_text2(Out,DCG,O,StartPos,M,ME,EndPos,S,E).
+
+expr_with_text2(Out,_ ,O,StartPos,M,ME,EndPos,_,_):- 
+   integer(StartPos),integer(EndPos),!,
+   bx(Len is EndPos - StartPos),length(Grabber,Len),!,
+   get_sexpr_with_comments(O,Grabber,Out,M,ME),!.
+expr_with_text2(Out,_ ,O,end_of_file-StartPos,M,ME,end_of_file-EndPos,_,_):- 
+   integer(StartPos),integer(EndPos),!,
+   bx(Len is StartPos - EndPos),length(Grabber,Len),!,
    get_sexpr_with_comments(O,Grabber,Out,M,ME),!.
 
+expr_with_text2(Out,DCG,O,StartPos,M,ME,EndPos,S,E):- 
+   writeq(expr_with_text2(Out,DCG,O,StartPos,EndPos,S,E)),nl,
+   get_sexpr_with_comments(O,_Grabber,Out,M,ME),!.
+
+%expr_with_text(Out,DCG,O,S,E):- 
+%   call(DCG,S,E) -> append(S,Some,E) -> get_sexpr_with_comments(O,Some,Out,S,E),!.
+
 get_sexpr_with_comments(O,_,O,_,_):- compound(O),functor(O,'$COMMENT',_),!.
-get_sexpr_with_comments(O,Txt,with_text(O,Str),S,_E):-append(Txt,_,S),text_to_string(Txt,Str).
+get_sexpr_with_comments(O,Txt,with_text(O,Str),S,_E):-append(Txt,_,S),!,text_to_string(Txt,Str).
 %file_sexpr_with_comments(O,with_text(O,Txt),S,E):- copy_until_tail(S,Copy),text_to_string_safe(Copy,Txt),!.
 
 
 file_sexpr(end_of_file) --> file_eof,!.
 % WANT? 
-file_sexpr(O) --> one_blank,!,file_sexpr(O).
-file_sexpr(C) --> comment_expr(C),!.
+file_sexpr(O) --> sblank,!,file_sexpr(O).
 % file_sexpr(planStepLPG(Name,Expr,Value)) --> swhite,sym_or_num(Name),`:`,swhite, sexpr(Expr),swhite, `[`,sym_or_num(Value),`]`,swhite.  %   0.0003:   (PICK-UP ANDY IBM-R30 CS-LOUNGE) [0.1000]
 % file_sexpr(Term,Left,Right):- eoln(EOL),append(LLeft,[46,EOL|Right],Left),read_term_from_codes(LLeft,Term,[double_quotes(string),syntax_errors(fail)]),!.
 % file_sexpr(Term,Left,Right):- append(LLeft,[46|Right],Left), ( \+ member(46,Right)),read_term_from_codes(LLeft,Term,[double_quotes(string),syntax_errors(fail)]),!.
@@ -404,7 +478,7 @@ mkvar_w([H|T], Base, W0, W) :-
 
 
 ci([])--> !, [].
-ci([U|Xs]) --> !,{to_lower(U,X)},alpha_to_lower(X),ci(Xs).
+ci([U|Xs]) --> {to_lower(U,X)},!,alpha_to_lower(X),ci(Xs).
   
 
 remove_optional_char(S)--> S,!.
@@ -413,71 +487,69 @@ remove_optional_char(_)-->[].
 implode_threse_vars([N='$VAR'(N)|Vars]):-!, implode_threse_vars(Vars).
 implode_threse_vars([]).
 
-ugly_sexpr('$OBJ'([S|V]))                 --> `#<`,rsymbol_maybe(``,S), sexpr_vector(V,`>`),swhite,!.
-ugly_sexpr('$OBJ'(V))                 --> `#<`, sexpr_vector(V,`>`),swhite,!.
-ugly_sexpr('$OBJ'(V))                 --> `#<`, sexpr_vector(V,`>`),swhite,!.
-ugly_sexpr('$OBJ'(V))                 --> `#<`, read_string_until_pairs(VS,`>`), swhite,{parse_sexpr_ascii_as_list(VS,V)},!.
-ugly_sexpr('$OBJ'(sugly,S))                 --> `#<`, read_string_until(S,`>`), swhite,!.
+ugly_sexpr_cont('$OBJ'([S|V]))                 --> rsymbol_maybe(``,S), sexpr_vector(V,`>`),swhite,!.
+ugly_sexpr_cont('$OBJ'(V))                 -->  sexpr_vector(V,`>`),swhite,!.
+ugly_sexpr_cont('$OBJ'(V))                 -->  sexpr_vector(V,`>`),swhite,!.
+ugly_sexpr_cont('$OBJ'(V))                 -->  read_string_until_pairs(VS,`>`), swhite,{parse_sexpr_ascii_as_list(VS,V)},!.
+ugly_sexpr_cont('$OBJ'(sugly,S))                 -->  read_string_until(S,`>`), swhite,!.
 
 %%  sexpr(L)// is det.
-%
-sexpr(L)                      --> sblank,!,sexpr(L),!.
-sexpr(L)                      --> `(`, !, swhite, sexpr_list(L),!, swhite.
-sexpr((Expr))                 --> `{`, !, read_string_until(S,`}.`),!, swhite,
+% 
+
+%sexpr(L)                   --> sblank,!,sexpr(L),!.
+%sexpr(_) --> `)`,!,{trace,break,throw_reader_error(": an object cannot start with #\\)")}.
+sexpr(X,H,T):- always(sexpr0(X),H,M),always(swhite,M,T), (wdmsg(sexpr(X))),!.
+%sexpr(X,H,T):- always(sexpr0(X,H,T)),!,swhite.
+
+sexpr0(L)                      --> sblank,!,sexpr(L),!.
+sexpr0(L)                      --> `(`, !, swhite, always(sexpr_list(L)),!, swhite.
+sexpr0((Expr))                 --> {fail}, `{`, !, read_string_until(S,`}.`),!, swhite,
   {read_term_from_codes(S,Expr,[cycles(true),module(baseKB),double_quotes(string),variable_names(Vars)]),implode_threse_vars(Vars)}.
 
-
-/*
-sexpr((Txt))                 --> sblank,sexpr((Txt)).
-sexpr((Txt))                 --> `#|`, lazy_list_location(file(_,_,I,CP)), 
-   read_string_until(S,`|#`), swhite,{text_to_string_safe(S,Txt)},line_comment(S,I,CP),
-  {assert(t_l:s_reader_info('$COMMENT'(Txt,I,CP)))},
-  sexpr((Txt)).
-*/
-sexpr(['#'(quote),E])              --> `'`, !, swhite, sexpr(E).
-sexpr(['#'(backquote),E])         --> [96] , !, swhite, sexpr(E).
-sexpr(['#BQ-COMMA-ELIPSE',E]) --> `,@`, !, swhite, sexpr(E).
-sexpr(['#COMMA',E])            --> `,`, !, swhite, sexpr(E).
-sexpr('$OBJ'(claz_bracket_vector,V))                 --> `[`, sexpr_vector(V,`]`),!, swhite.
-sexpr('#'(A))              --> `|`, !, read_string_until(S,`|`), swhite,{quietly_sreader(((atom_string(A,S))))}.
+sexpr0(['#'(quote),E])             --> `'`, !, sexpr(E).
+sexpr0(['#'(backquote),E])         --> ````, !, sexpr(E).
+sexpr0(['#BQ-COMMA-ELIPSE',E])     --> `,@`, !, sexpr(E).
+sexpr0(['#COMMA',E])               --> `,`, !, sexpr(E).
+sexpr0('$OBJ'(claz_bracket_vector,V))                 --> `[`, sexpr_vector(V,`]`),!, swhite.
+sexpr0('#'(A))              --> `|`, !, read_string_until(S,`|`), swhite,{quietly_sreader(((atom_string(A,S))))}.
 
 % maybe this is KIF
-sexpr('?'(E))              --> {kif_ok}, `?`, sexpr_dcgPeek(([C],{sym_char(C)})),!, rsymbol(`?`,E), swhite.
+% sexpr0('?'(E))              --> {kif_ok}, `?`, sexpr_dcgPeek(([C],{sym_char(C)})),!, rsymbol(`?`,E), swhite.
 % @TODO if KIF sexpr('#'(E))              --> `&%`, !, rsymbol(`#$`,E), swhite.
 
-sexpr('$STRING'(S))             --> s_string(S).
+sexpr0('$STRING'(S))             --> s_string(S),!.
 
 /******** BEGIN HASH ************/
 
-sexpr('#\\'(35))                 --> `#\\#`, swhite.
-sexpr(E)                      --> `#`,read_dispatch(E),!.
+sexpr0('#\\'(35))                 --> `#\\#`,!, swhite.
+sexpr0(E)                      --> `#`,read_dispatch(E),!.
 
 %sexpr('#\\'(C))                 --> `#\\`,ci(`u`),!,remove_optional_char(`+`),dcg_basics:xinteger(C),!.
 %sexpr('#\\'(C))                 --> `#\\`,dcg_basics:digit(S0), swhite,!,{atom_codes(C,[S0])}.
-sexpr('#\\'(32))                 --> `#\\ `,!.
-sexpr('#\\'(C))                 --> `#\\`,!,rsymbol(``,C), swhite.
+sexpr0('#\\'(32))                 --> `#\\ `,!.
+sexpr0('#\\'(C))                 --> `#\\`,!,always(rsymbol(``,C)), swhite.
 
-%sexpr(['#-',K,Out]) --> `#-`,!,sexpr(C),swhite,expr_with_comments(Out,sexpr(O),O),!,{as_keyword(C,K)}.
-%sexpr(['#+',K,Out]) --> `#+`,!,sexpr(C),swhite,expr_with_comments(Out,sexpr(O),O),!,{as_keyword(C,K)}.
+%sexpr(['#-',K,Out]) --> `#-`,!,sexpr(C),swhite,expr_with_text(Out,sexpr(O),O),!,{as_keyword(C,K)}.
+%sexpr(['#+',K,Out]) --> `#+`,!,sexpr(C),swhite,expr_with_text(Out,sexpr(O),O),!,{as_keyword(C,K)}.
 
-sexpr(['#-',K,O]) --> `#-`,!,sexpr(C),swhite,sexpr(O),!,{as_keyword(C,K)}.
-sexpr(['#+',K,O]) --> `#+`,!,sexpr(C),swhite,sexpr(O),!,{as_keyword(C,K)}.
+sexpr0(['#-',K,O]) --> `#-`,!,sexpr(C),swhite,sexpr(O),!,{as_keyword(C,K)},!.
+sexpr0(['#+',K,O]) --> `#+`,!,sexpr(C),swhite,sexpr(O),!,{as_keyword(C,K)},!.
 
-sexpr(P) --> `#`,ci(`p`),s_string(C),{f_pathname(C,P)}.
-sexpr('$S'(C)) -->                  (`#`, ci(`s`),`(`),!,sexpr_list(C),swhite,!.
+sexpr0(P) --> `#`,ci(`p`),!,always((sexpr(C),{f_pathname(C,P)})),!.
+sexpr0('$S'(C)) -->                  (`#`, ci(`s`),`(`),!,always(sexpr_list(C)),swhite,!.
 %sexpr('$COMPLEX'(R,I)) --> `#`,ci(`c`),`(`,!,  lnumber(R),lnumber(I),`)`.
-sexpr('$COMPLEX'(R,I)) -->         (`#`, ci(`c`),`(`),!,sexpr_list([R,I]),swhite,!.
-sexpr('$OBJ'(claz_bitvector,C)) --> `#*`,radix_digits(2,C),swhite,!.
+sexpr0('$COMPLEX'(R,I)) -->         (`#`, ci(`c`),`(`),!,always(sexpr_list([R,I])),swhite,!.
+sexpr0('$OBJ'(claz_bitvector,C)) --> `#*`,radix_digits(2,C),swhite,!.
 
-sexpr(function(E))                 --> `#\'`, sexpr(E), !. %, swhite.
-sexpr('$OBJ'(claz_vector,V))                 --> `#(`, !, sexpr_vector(V,`)`),!, swhite,!.
+sexpr0(function(E))                 --> `#\'`, sexpr(E), !. %, swhite.
+sexpr0('$OBJ'(claz_vector,V))                 --> `#(`, !, always(sexpr_vector(V,`)`)),!, swhite,!.
 
-sexpr(Number) --> `#`,integer(Radix),ci(`r`),!,signed_radix_2(Radix,Number0),extend_radix(Radix,Number0,Number).
-sexpr('$ARRAY'(Dims,V)) --> `#`,integer(Dims),ci(`a`),!,sexpr(V).
-sexpr(V)                    --> `#.`, !,sexpr(C),{to_untyped(C,UTC),reader_intern_symbols(UTC,M),lisp_compiled_eval(M,V)}.
-sexpr('#'(E))              --> `#:`, !, rsymbol(`#:`,E), swhite.
+sexpr0(Number) --> `#`,integer(Radix),ci(`r`),!,always((signed_radix_2(Radix,Number0),extend_radix(Radix,Number0,Number))),!.
+sexpr0('$ARRAY'(Dims,V)) --> `#`,integer(Dims),ci(`a`),!,sexpr(V).
+sexpr0(V)                    --> `#.`, !,sexpr(C),{to_untyped(C,UTC),!,reader_intern_symbols(UTC,M),!,lisp_compiled_eval(M,V)},!.
+sexpr0('#'(E))              --> `#:`, !,always(rsymbol(`#:`,E)), swhite.
 
-sexpr(OBJ)--> ugly_sexpr(OBJ),!.
+sexpr0(OBJ)--> `#<`,!,always(ugly_sexpr_cont(OBJ)),!.
 
 % @TODO if CYC sexpr('#'(E))              --> `#$`, !, rsymbol(`#$`,E), swhite.
 % @TODO if scheme sexpr('#'(t))                 --> `#t`, !, swhite.
@@ -487,13 +559,11 @@ sexpr(OBJ)--> ugly_sexpr(OBJ),!.
 
 /*********END HASH ***********/
 
-sexpr(E)                      --> sym_or_num(E), swhite.
+sexpr0(E)                      --> !,always(sym_or_num(E)), swhite,!.
 
-sexpr(('+1-')) --> `+1-`,!,swhite.
-sexpr(('-1+')) --> `-1+`,!,swhite.
+sym_or_num(('+1-')) --> `+1-`,!,swhite.
+sym_or_num(('-1+')) --> `-1+`,!,swhite.
 
-%sexpr(('#-')) --> `#-`,!,swhite.
-%sexpr(('#+')) --> `#+`,!,swhite.
 
 sym_or_num(('-1-')) --> `-1-`,swhite,!.
 sym_or_num(('-1+')) --> `-1+`,swhite,!.
@@ -508,18 +578,27 @@ sym_or_num(('#-')) --> `#-`,swhite,!.
 sym_or_num(('-#+')) --> `-#+`,swhite,!.
 sym_or_num((E)) --> lnumber(E),swhite,!.
 sym_or_num(E) --> rsymbol_maybe(``,E),!.
-sym_or_num('#'(E)) --> [C],{atom_codes(E,[C])}.
+%sym_or_num('#'(E)) --> [C],{atom_codes(E,[C])}.
+
+sym_or_num(E) --> dcg_xor(rsymbol(``,E),lnumber(E)),!.
+% sym_or_num('#'(E)) --> [C],{atom_codes(E,[C])}.
 
 
-sblank --> [C], {var(C)},!.
-sblank --> line_comment(S,I,CP),{assert(t_l:s_reader_info('$COMMENT'(S,I,CP)))},!, swhite.
-sblank --> [C], {nonvar(C),charvar(C),!,bx(C =< 32)},!, swhite.
+dcg_xor(DCG1,DCG2,S,E):- copy_term(DCG1,DCG1C),phrase(DCG1C,S,E),!,
+  (phrase(DCG2,S,[])->true;always(DCG1C=DCG1)),!.
+dcg_xor(_,DCG2,S,E):- phrase(DCG2,S,E),!.
+%sblank --> [C], {var(C)},!.
 
-sblank_lines --> {eoln(C)},[C],!.
-sblank_lines --> [C], {charvar(C),!,bx(C =< 32)}, sblank_lines.
+% sblank --> comment_expr(S,I,CP),!,{assert(t_l:s_reader_info('$COMMENT'(S,I,CP)))},!,swhite.
+sblank --> comment_expr(CMT),!,{assert(t_l:s_reader_info(CMT))},!,swhite.
+sblank --> [C], {nonvar(C),charvar(C),!,bx(C =< 32)},!,swhite.
 
-s_string((""))             --> `""`,!, swhite.
-s_string((Txt))                 --> `"`, !, sexpr_string(S), swhite,{text_to_string_safe(S,Txt)}.
+sblank_line --> eoln,!.
+sblank_line --> [C],{bx(C =< 32)},!, sblank_line.
+
+s_string(Text)                 --> `"`, !, always(s_string_cont(Text)),!.
+s_string_cont("")             --> `"`,!, swhite.
+s_string_cont(Txt)                 --> sexpr_string(S), swhite,{text_to_string_safe(S,Txt)}.
 
 
 swhite --> sblank,!.
@@ -552,21 +631,30 @@ eoln(10).
 eoln(13).
 
 
+my_lazy_list_location(Loc) --> lazy_list_location(Loc),!.
+my_lazy_list_location(file(_,_,-1,-1),L,L).
 
-line_comment(Txt,N,CharPOS) --> `#|`, !,lazy_list_location(file(_,_,N,CharPOS)), read_string_until(S,`|#`), swhite,{text_to_string_safe(S,Txt)}.
-line_comment(T,N,CharPOS) --> `;`,lazy_list_location(file(_,_,N,CharPOS)),l_line_comment(S),{text_to_string_safe(S,T)},!.
-line_comment(T,(-1),(-1)) --> `;`,!,l_line_comment(S),{text_to_string_safe(S,T)},!.
+comment_expr('$COMMENT'(Expr,I,CP)) --> comment_expr_3(Expr,I,CP),!.
 
-l_line_comment([]) --> eoln, !.
-l_line_comment([C|L]) --> [C], l_line_comment(L).
+comment_expr_3(T,N,CharPOS) --> `#|`, !, my_lazy_list_location(file(_,_,N,CharPOS)),!, always(read_string_until_no_esc(S,`|#`)),!,
+  {text_to_string_safe(S,T)},!.
+comment_expr_3(T,N,CharPOS) -->  `;`,!, my_lazy_list_location(file(_,_,N,CharPOS)),!,always(read_string_until_no_esc(S,eoln)),!,
+  {text_to_string_safe(S,T)},!.
 
-eoln --> [C],!, {charvar(C),eoln(C)}.
+
+eoln --> [C],!, {charvar(C),eoln(C)},!.
 
 sexprs([H|T]) --> sexpr(H), !, sexprs(T).
 sexprs([]) --> [].
 
+dcg_print_start_of(H):- (length(L,3000);length(L,300);length(L,30);length(L,10);length(L,1);length(L,0)),append(L,_,H),!,format('~NTEXT: ~s~n',[L]),!.
 
-always(G,H,T):- always(phrase(G,H,T)).
+
+% allow terminals to use partial input
+always(G,H,T):- ((nb_current('$is_file_stream',S),is_stream(S))->true;(dumpST,fail)),stream_property(S,tty(true)),!,phrase(G,H,T).
+always(G,H,T):- phrase(G,H,T),!.
+always(G,H,T):- H=[_|_],writeq(phrase_h(G,H,T)),dcg_print_start_of(H),writeq(phrase(G,H,T)),!,trace,ignore(rtrace(phrase(G,H,T))),!,notrace,dcg_print_start_of(H),writeq(phrase(G,H,T)), break,!,fail.
+always(G,H,T):- writeq(phrase(G,H,T)),dcg_print_start_of(H),writeq(phrase(G,H,T)),!,trace,ignore(rtrace(phrase(G,H,T))),!,notrace,dcg_print_start_of(H),writeq(phrase(G,H,T)), break,!,fail.
 
 :- export('//'(sexpr_list,1)).
  
@@ -577,68 +665,75 @@ peek_symbol_breaker --> one_blank.
 
 sexpr_list(X) --> one_blank,!,sexpr_list(X).
 sexpr_list([]) --> `)`, !.
-sexpr_list(_) --> `.`, [C], {\+ sym_char(C)}, !, {fail}.
-sexpr_list([Car|Cdr]) --> sexpr(Car), !, sexpr_rest(Cdr).
+%sexpr_list(_) --> `.`, [C], {\+ sym_char(C)}, {fail}.
+sexpr_list([Car|Cdr]) --> sexpr(Car), !, sexpr_rest(Cdr),!.
 
 sexpr_rest([]) --> `)`, !.
 sexpr_rest(E) --> `.`, [C], {\+ sym_char(C)}, !, sexpr(E,C), !, `)`.
-sexpr_rest(E) --> `@`, rsymbol(`?`,E), `)`.
-sexpr_rest([Car|Cdr]) --> sexpr(Car), !, sexpr_rest(Cdr).
+%sexpr_rest(E) --> `@`, rsymbol(`?`,E), `)`.
+sexpr_rest([Car|Cdr]) --> sexpr(Car), !, sexpr_rest(Cdr),!.
 
-sexpr_vector(O,End) --> sexpr_vector0(IO,End),!,{always(O=IO)}.
+sexpr_vector(O,End) --> always(sexpr_vector0(IO,End)),!,{always(O=IO)}.
 
 sexpr_vector0(X) --> one_blank,!,sexpr_vector0(X).
 sexpr_vector0([],End) --> End, !.
 sexpr_vector0([First|Rest],End) --> sexpr(First), !, sexpr_vector0(Rest,End).
 
-sexpr_string([C|S]) --> `\\`, lchar(C),!, sexpr_string(S).
-sexpr_string([]) --> `"`, !.
+sexpr_string(X)--> read_string_until(X,`"`).
+%sexpr_string([C|S],End) --> `\\`,!, always(escaped_char(C)),!, sexpr_string(S,End).
+%sexpr_string([],End) --> End, !.
 % sexpr_string([32|S]) --> [C],{eoln(C)}, sexpr_string(S).
 % sexpr_string([35, 36|S]) --> `&%`, !, sexpr_string(S).
-sexpr_string([C|S]) --> [C], sexpr_string(S).
+%sexpr_string([C|S],End) --> [C],!,sexpr_string(S,End).
 
-read_string_until([H|S],[H|B]) --> `\\`,[H],!, read_string_until(S,[H|B]).
-read_string_until([],HB) --> HB, !.
-read_string_until([C|S],HB) --> [C],read_string_until(S,HB).
+read_string_until_no_esc(String,End)--> read_string_until(noesc,String,End).
+
+read_string_until(String,End)--> read_string_until(esc,String,End).
+
+read_string_until(esc,[C|S],End) --> `\\`,!, always(escaped_char(C)),!, read_string_until(esc,S,End),!.
+read_string_until(_,[],HB) --> HB, !.
+read_string_until(Esc,[C|S],HB) --> [C],!,read_string_until(Esc,S,HB),!.
 
 
-read_string_until_pairs([H|S],[H|B]) --> `\\`,[H],!, read_string_until_pairs(S,[H|B]).
+read_string_until_pairs([C|S],End) --> `\\`,!, always(escaped_char(C)),!, read_string_until_pairs(S,End).
 read_string_until_pairs([],HB) --> HB, !.
 read_string_until_pairs([C|S],HB) --> [C],read_string_until_pairs(S,HB).
 
-lchar(92) --> `\\`, !.
-lchar(34) --> `"`, !.
-lchar(N)  --> [C], {bx(C >= 32), bx(N is C)}.
+escaped_char(C) --> eoln,!,[C].
+escaped_char(Code)  --> [C], {escape_to_char([C],Code)},!.
+escape_to_char(Txt,Code):- notrace_catch_fail((sformat(S,'_=`\\~s`',[Txt]),read_from_chars(S,_=[Code]))),!.
 
-bx(CT2):- notrace_catch_fail(CT2,E,(writeq(E),break)).
+bx(CT2):- notrace_catch_fail(CT2,E,(writeq(E:CT2),break)),!.
 
-rsymbol(Chars,E) --> [C], {sym_char(C)}, sym_continue(S), {append(Chars,[C|S],AChars),string_to_atom(AChars,E)}.
+rsymbol(Chars,E) --> [C], {sym_char(C)},!, sym_continue(S), {append(Chars,[C|S],AChars),string_to_atom(AChars,E)},!.
+rsymbol_cont(Prepend,E) --> sym_continue(S), {append(Prepend,S,AChars),string_to_atom(AChars,E)},!.
 
-rsymbol_maybe(Prepend,ES) --> rsymbol(Prepend,E),{maybe_string(E,ES)}.
+rsymbol_maybe(Prepend,ES) --> rsymbol(Prepend,E),{maybe_string(E,ES)},!.
 
-maybe_string(E,ES):- nb_current('$maybe_string',t),!,text_to_string_safe(E,ES).
+maybe_string(E,ES):- nb_current('$maybe_string',t),!,text_to_string_safe(E,ES),!.
 maybe_string(E,E).
 
 sym_continue([H|T]) --> [H], {sym_char(H)},!, sym_continue(T).
 sym_continue([]) --> peek_symbol_breaker,!.
 sym_continue([]) --> [].
 
-string_vector([First|Rest]) --> sexpr(First), !, string_vector(Rest).
+string_vector([First|Rest]) --> sexpr(First), !, string_vector(Rest),!.
 string_vector([]) --> [], !.
 
 % . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 lnumber(_)--> [C],{code_type(C,alpha)},!,{fail}.
-lnumber(N)-->  lnumber0(N). % (peek_symbol_breaker;[]).
+lnumber(N)-->  lnumber0(N),!. % (peek_symbol_breaker;[]).
 
 oneof_ci(OneOf,[C])--> {member(C,OneOf)},ci([C]). 
-dcg_and2(DCG1,DCG2,S,E) :- dcg_phrase(DCG1,S,E),dcg_phrase(DCG2,S,E).
+dcg_and2(DCG1,DCG2,S,E) :- dcg_phrase(DCG1,S,E),!,dcg_phrase(DCG2,S,E),!.
+dcg_each_call_cleanup(Setup,DCG,Cleanup,S,E) :- each_call_cleanup(Setup,dcg_phrase(DCG,S,E),Cleanup).
 dcg_phrase(\+ DCG1,S,E):- !, \+ phrase(DCG1,S,E).
-dcg_phrase(DCG1,S,E):- phrase(DCG1,S,E).
+dcg_phrase(DCG1,S,E):- phrase(DCG1,S,E),!.
 
 dcg_not(DCG1,S,E) :- \+ dcg_phrase(DCG1,S,E).
 
-enumber(N)--> lnumber(L),!,{to_untyped(L,N)}.
+enumber(N)--> lnumber(L),!,{to_untyped(L,N)},!.
 
 /*
 Format  Minimum Precision  Minimum Exponent Size  
@@ -665,28 +760,28 @@ lnumber0(N) --> snumber_no_exp(N),!.
 
 
 snumber_no_exp(N)--> `-`,!,unumber_no_exp(S),{N is -S},!.
-snumber_no_exp(N)--> `+`,!,unumber_no_exp(N).
+snumber_no_exp(N)--> `+`,!,unumber_no_exp(N),!.
 snumber_no_exp(N)--> unumber_no_exp(N),!.
 %snumber_no_exp(N)-->  sint(N),!.
 
 
 sint(N) --> signed_radix_number(N),!.
 sint(N)--> `-`,!,uint(S),{N is -S},!.                          
-sint(N)--> `+`,!,uint(N).
+sint(N)--> `+`,!,uint(N),!.
 sint(N)--> uint(N),!.
 
-natural_int(_) --> \+ dcg_basics:digit(_),!,{fail}.
-natural_int(N) --> dcg_basics:integer(N).
+natural_int(_) --> dcg_not(dcg_basics:digit(_)),!,{fail}.
+natural_int(N) --> dcg_basics:integer(N),!.
 
-digits_dot_digits --> natural_int(_),!,`.`,!,natural_int(_).
+digits_dot_digits --> natural_int(_),!,`.`,!,natural_int(_),!.
 
 unumber_no_exp(N) --> dcg_and2(digits_dot_digits,dcg_basics:float(N)),!.
-unumber_no_exp(N)--> natural_int(E),`.`,dcg_basics:digits(S),{(notrace_catch_fail(number_codes(ND,[48,46|S]))),N is ND + E},!.
 unumber_no_exp(N) --> `.`,!,dcg_basics:digit(S0),!,dcg_basics:digits(S),{(notrace_catch_fail(number_codes(N,[48,46,S0|S])))},!.
-unumber_no_exp(N) --> natural_int(N),!,remove_optional_char(`.`).
+unumber_no_exp(N)--> natural_int(E),`.`,natural_int(S),{(notrace_catch_fail(number_codes(ND,[48,46|S]))),N is ND + E},!.
+unumber_no_exp(N) --> natural_int(N),!,remove_optional_char(`.`),!.
 
-uint(N) --> unsigned_radix_number(N).
-uint(N) --> natural_int(N),!,remove_optional_char(`.`).
+uint(N) --> unsigned_radix_number(N),!.
+uint(N) --> natural_int(N),!,remove_optional_char(`.`),!.
 
 
 % . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -698,7 +793,7 @@ uint(N) --> natural_int(N),!,remove_optional_char(`.`).
 %
 % S-Expression.
 %
-sexpr(E,C,X,Z) :- swhite([C|X],Y), sexpr(E,Y,Z).
+sexpr(E,C,X,Z) :- swhite([C|X],Y), sexpr(E,Y,Z),!.
 
 % dquote semicolon parens  hash qquote  comma backquote
 
@@ -710,9 +805,9 @@ sexpr(E,C,X,Z) :- swhite([C|X],Y), sexpr(E,Y,Z).
 % )
 %
 
-sym_char(C):- C =<  32,!,fail.
+sym_char(C):- bx(C =<  32),!,fail.
 %sym_char(44). % allow comma in middle of symbol
-sym_char(C):- memberchk(C,`";()#'\``),!,fail.  % maybe 44 ? comma
+sym_char(C):- memberchk(C,`";()#'```),!,fail.  % maybe 44 ? comma
 %sym_char(C):- nb_current('$maybe_string',t),memberchk(C,`,.:;!%`),!,fail.
 sym_char(_):- !.
 
@@ -899,7 +994,7 @@ lisp_code_name_extra(13,`Ret`).
 
 (with-open-file (strm "lisp_code_names.pl" :direction :output :if-exists :supersede :if-does-not-exist :create)
  (format  strm ":- module(lisp_code_names,[lisp_code_name/2]).~%:- set_prolog_flag(double_quotes,chars).~%~%")
- (loop for i from 0 to 655360 do (let ((cname (char-atom_codes (code-char i))) (uname4 (format ()  "U~4,'0X" i)) (uname8 (format ()  "U~8,'0X" i)))
+ (loop for i from 0 to 655360 do (let ((cname (char-name (code-char i))) (uname4 (format ()  "U~4,'0X" i)) (uname8 (format ()  "U~8,'0X" i)))
   (unless (equal cname uname4) (unless (equal cname uname8)  (format  strm "lisp_code_name(~A,~S).~%" i  cname ))))))
 */
     	 
@@ -954,7 +1049,7 @@ copy_lvars(Term,Vars,NTerm,NVars):-
 
 %% svar( ?Var, ?NameU) is det.
 %
-% If this is a KIF var, convert to a atom_codes for prolog
+% If this is a KIF var, convert to a name for prolog
 %
 svar(_,_):- \+ kif_ok,!,fail.
 svar(SVAR,UP):- nonvar(UP),!,trace_or_throw(nonvar_svar(SVAR,UP)).
@@ -1084,12 +1179,13 @@ lisp_read(Input,Forms):-
 % Lisp Read, Expression models DCG
 %
 lisp_read_typed(In,Expr):- track_stream(In,parse_sexpr(In,Expr)),!.
+/*
 lisp_read_typed(In,Expr):- fail, % old_stream_read
  (read_line_to_codes(current_input,AsciiCodes),
       (AsciiCodes==[]-> (at_end_of_stream(In) -> (Expr=end_of_file); lisp_read_typed(In,Expr)); 
         once(always(parse_sexpr(AsciiCodes,Expr);lisp_read_typed(In,Expr));read_term_from_codes(AsciiCodes,Expr,[])))).
-
-
+*/
+track_stream(_In,G):- !,G.
 track_stream(In,G):- \+ is_stream(In),!,G.
 track_stream(In,G):- 
    b_setval('$lisp_translation_stream',In),

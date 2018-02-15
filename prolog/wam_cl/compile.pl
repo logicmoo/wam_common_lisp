@@ -22,7 +22,7 @@
 lisp_compiled_eval(SExpression):-
   quietly(as_sexp_interned(SExpression,Expression)),
   lisp_compiled_eval(Expression,Result),
-  userout(result(Result)).
+  userout(result(Result)),!.
 
 lisp_compiled_eval(SExpression,Result):-
   lquietly(as_sexp_interned(SExpression,Expression)),
@@ -45,15 +45,15 @@ lisp_compile(SExpression,Body):-
 
 lisp_compile(Result,SExpression,Body):-
    %debug_var('TLEnv',Env),
-   lisp_compile(_Env,Result,SExpression,Body).
+   lisp_compile(_Env,Result,SExpression,Body),!.
 
 lisp_compile(Env,Result,Expression,Body):-
    always(lisp_compile(_Ctx,Env,Result,Expression,(Body))).
 
 lisp_compile(Ctx,Env,Result,SExpression,BodyO):-
    quietly(as_sexp(SExpression,Expression)),
-   always(must_compile_progn(Ctx,Env,Result,[Expression],Body)),
-   body_cleanup_full(Ctx,Body,BodyO).
+   always(must_compile_progn(Ctx,Env,Result,[Expression],Body)),!,
+   body_cleanup_full(Ctx,Body,BodyO),!.
    
 
 :- nop( debug_var('FirstForm',Var)),

@@ -193,16 +193,16 @@ do_compile_1file_to_stream(_Keys,File0,Stream):-
    Total is (End - Start)/1000,
    format(Stream,'~n~n%; Total compilation time: ~w seconds~n~n',[Total]))).
   
-lisp_compile_to_prolog_output(Stream,COMMENTP):- is_comment(COMMENTP,Txt),!,with_output_to(Stream,fmt_lispcode(Txt)).
-lisp_compile_to_prolog_output(Stream,with_text(I,Txt)):-!,with_output_to(Stream,fmt_lispcode(Txt)),!,lisp_compile_to_prolog_output(Stream,I).
+lisp_compile_to_prolog_output(Stream,COMMENTP):- is_comment(COMMENTP,Txt),!,with_output_to(Stream,fmt_lispcode(Txt)),!.
+lisp_compile_to_prolog_output(Stream,with_text(I,Txt)):-!,with_output_to(Stream,fmt_lispcode(Txt)),!,lisp_compile_to_prolog_output(Stream,I),!.
 lisp_compile_to_prolog_output(Stream,PExpression):-  
   b_setval('$variable_names',[]),
   as_sexp(PExpression,Expression), !, % dbginfo(:- lisp_compile_to_prolog(Pkg,Expression)),
   with_output_to(Stream,lisp_compile_to_prolog(Expression)),!.
   
-lisp_compile_to_prolog(_,COMMENTP):- is_comment(COMMENTP,Txt),!,fmt_lispcode(Txt).
-lisp_compile_to_prolog(Pkg,with_text(I,Txt)):-!,fmt_lispcode(Txt),lisp_compile_to_prolog(Pkg,I).
-lisp_compile_to_prolog(Pkg,Forms):- source_location(_,_),reader_intern_symbols(Pkg,Forms,_),!.
+lisp_compile_to_prolog(_,COMMENTP):- is_comment(COMMENTP,Txt),!,fmt_lispcode(Txt),!.
+lisp_compile_to_prolog(Pkg,with_text(I,Txt)):-!,fmt_lispcode(Txt),!,lisp_compile_to_prolog(Pkg,I),!.
+lisp_compile_to_prolog(Pkg,Forms):- source_location(_,_),!,reader_intern_symbols(Pkg,Forms,_),!.
 lisp_compile_to_prolog(Pkg,Expression):- always(locally_let(xx_package_xx=Pkg,lisp_compile_to_prolog(Expression))),!.
 
 write_file_info:- 
@@ -213,41 +213,44 @@ write_file_info:-
   ignore(notrace_catch_fail((nb_current('$lisp_translation_stream',In),stream_property(In,file_name(File)),write(File)))),
   ignore(notrace_catch_fail((nb_current('$lisp_translation_line',LineChars),write(:),write(LineChars)))),
   writeln(' **********************/'),!,
-  flush_all_output_safe.
+  flush_all_output_safe,!.
 write_file_info.
 
 lisp_compile_to_prolog(PExpression):-   
  ((always((
-  as_sexp(PExpression,SExpression),  
-  both_outputs(write_file_info),
-  flush_all_output_safe,
-  set_md_lang(prolog),
-  reading_package(Pkg),
+  as_sexp(PExpression,SExpression),!,  
+  both_outputs(write_file_info),!,
+  flush_all_output_safe,!,
+  set_md_lang(prolog),!,
+  reading_package(Pkg),!,
   %cmpout(:- lisp_compile_to_prolog(Pkg,SExpression)),
-  writeq(:- lisp_compile_to_prolog(Pkg,SExpression)),
+  writeq(:- lisp_compile_to_prolog(Pkg,SExpression)), !,
   reader_intern_symbols(SExpression,Expression),  
   debug_var('_Ignored',Result))),
-  lisp_compile(Result,Expression,PrologCode))),
+  once((lisp_compile(Result,Expression,PrologCode))))),
   cmpout(:- PrologCode),!,
-  lisp_grovel(PrologCode),!.
+  ignore((always(lisp_grovel(PrologCode)))),!.
    
 grovel_time_called(do_when).
-%grovel_time_called(sf_in_package).
-%grovel_time_called(f_use_package).
-%grovel_time_called(sf_defpackage).
-grovel_time_called(CL_DEF):- atom(CL_DEF),atom_contains(CL_DEF,'_def').
-grovel_time_called(CL_DEF):- atom(CL_DEF),atom_contains(CL_DEF,'_package').
+grovel_time_called(sf_in_package).
+grovel_time_called(f_use_package).
+grovel_time_called(sf_defpackage).
+%grovel_time_called(sf_defmacro).
+%grovel_time_called(CL_DEF):- atom(CL_DEF),atom_concat(CL_DEF,'def').
+%grovel_time_called(CL_DEF):- atom(CL_DEF),atom_contains(CL_DEF,'_package').
 grovel_time_called(set_opv).
-%grovel_time_called(sys_trace).
+grovel_time_called(break).
+grovel_time_called(sf_sys_strace).
 
 grovel_file(File,Keys,Load_RetO):- wdmsg(:- f_compile_file(File,Keys,Load_RetO)).
 
 lisp_grovel(PrologCode):- ( \+ compound(PrologCode); \+ callable(PrologCode)),!.
+lisp_grovel(PAB):- PAB=..[F,A|_],grovel_time_called(F),!,(var(A)-> true;call(PAB)),!.
+lisp_grovel(_).
 lisp_grovel((A,B)):-!, lisp_grovel(A),lisp_grovel(B).
 lisp_grovel(f_load(File,Keys,_Load_Ret)):- !, grovel_file(File,Keys,_Load_RetO).
 lisp_grovel(f_require(File,Keys,_Load_Ret)):- !, grovel_file(File,Keys,_Load_RetO).
 lisp_grovel(A):- is_assert_op(A,Where,AA),!,lisp_grovel_assert(Where,AA).
-lisp_grovel(PAB):- PAB=..[F,A|_],grovel_time_called(F),!,(var(A)-> true;call(PAB)),!.
 %lisp_grovel(PAB):- grovel_time_called(PAB)->always(PAB);true.
 %lisp_grovel(f_compile_file(File,Keys,Load_Ret)):- !, f_compile_file(File,Keys,Load_Ret).
 lisp_grovel(_).
@@ -285,34 +288,34 @@ load_1file(_Keys,File):-
 
 
 lisp_reader_compiled_eval(COMMENTP):- is_comment(COMMENTP,Txt),!,fmt_lispcode(Txt).
-lisp_reader_compiled_eval(with_text(I,Txt)):-!,fmt_lispcode(Txt),lisp_reader_compiled_eval(I).
+lisp_reader_compiled_eval(with_text(I,Txt)):-!,fmt_lispcode(Txt),!,lisp_reader_compiled_eval(I),!.
 lisp_reader_compiled_eval(PExpression):- 
  always((
-  as_sexp(PExpression,SExpression),
-  both_outputs(write_file_info),
-  reading_package(Pkg),
-  dbginfo(flat(:- lisp_compile_to_prolog(Pkg,SExpression))),
-  reader_intern_symbols(SExpression,Expression),
+  as_sexp(PExpression,SExpression),!,
+  both_outputs(write_file_info),!,
+  reading_package(Pkg),!,
+  dbginfo(flat(:- lisp_compile_to_prolog(Pkg,SExpression))),!,
+  reader_intern_symbols(SExpression,Expression),!,
   process_load_expression(Expression))),!.
 
 process_load_expression(COMMENTP):- is_comment(COMMENTP,Txt),!,fmt_lispcode(Txt).
-process_load_expression(with_text(I,Txt)):-!,in_md(cl,fmt_lispcode(Txt)),process_load_expression(I).
+process_load_expression(with_text(I,Txt)):-!,in_md(cl,fmt_lispcode(Txt)),always(process_load_expression(I)),!.
 process_load_expression(Expression):- 
    b_setval('$variable_names',[]),
-   debug_var('_IgnoredResult',Result),
+   debug_var('_IgnoredResult',Result),!,
    lisp_compile(Result,Expression,PrologCode),
    dbginfo(:- PrologCode),
    with_output_to(user_error,
-      (setup_call_cleanup(format('~N/*~n',[]),always(PrologCode),format('~N*/~n',[])))).
+      (setup_call_cleanup(format('~N/*~n',[]),ignore(always(PrologCode)),format('~N*/~n',[])))),!.
 
-with_flist(How,List):- must_maplist(with1file(How),List).
+with_flist(How,List):- must_maplist(with1file(How),List),!.
 
 %with1file(How,File):- exists_file(File),file_name_extension(File,Ext,_Base),prolog_file_type(Ext,Type),Type==prolog,!,pl_load(File,[],_).
 with1file(How,File):- always(call(How,File)).
 
 with_each_form(How,File):- local_override(with_forms,What),What\==How,!,with_each_form(What,File).
 with_each_form(How,File):-
-   dbginfo(with_lisp_translation(file(File),How)),
+   dbginfo(with_lisp_translation(file(File),How)),!,
    with_lisp_translation(file(File),How),!.
 
 expand_directory_file_path(FDir,Ext,List):- directory_file_path(FDir,Ext,Mask),expand_file_name(Mask,List),List\==[Mask].

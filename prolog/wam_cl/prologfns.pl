@@ -72,13 +72,15 @@ f_sys_rtrace(t):- rtrace.
 
 % (sys:prolog)
 % (sys:break)
+wl:init_args(x, sys_prolog).
 wl:interned_eval('`sys:prolog').
-wl:interned_eval('`sys:break').
-compile_prolog_call(_Ctx,_Env,Prev,[sys_prolog],Prev, break).
-compile_prolog_call(_Ctx,_Env,Prev,[sys_break],Prev, break).
-compile_prolog_call(_Ctx,_Env,Prev,[break],Prev, break).
+compile_prolog_call(_Ctx,_Env,Prev,[sys_prolog],Prev, prolog).
 
-f_break([]):- break.
+wl:init_args(0, break).
+wl:interned_eval('`cl:break').
+%compile_prolog_call(_Ctx,_Env,Prev,[break],Prev, f_break).
+
+f_break(Options,[]):- wdmsg(Options), break.
 
 %compile_body_h(_Ctx,_Env,Result, nop(X),  nop(X)):- !, debug_var("_NopResult",Result).
 compile_prolog_call(Ctx,Env,Result,call_for(Body0,Result),Prev, Body):-!,
@@ -122,7 +124,7 @@ read_prolog_object(Operand):- read(Operand).
 do_interned_eval(MG):- strip_module(MG,_,G),G=call(_),!,call_interned_eval(MG).
 do_interned_eval(G):- call_interned_eval(lisp_compiled_eval(G,_)).
 
-call_interned_eval(G):- subst_castifies(G,GG),!,always(GG).
+call_interned_eval(G):- always(subst_castifies(G,GG)),!,always(GG),!.
 
 % call_interned_eval(M,G):- locally_let(xx_package_xx=pkg_prolog, M:G ).
 

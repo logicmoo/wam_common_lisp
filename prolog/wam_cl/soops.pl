@@ -205,7 +205,7 @@ get_slot_name0(Kind,SlotName,ZLOT):- get_struct_opv_i(Kind,name, Name, ZLOT),sam
 get_slot_name0(Kind,SlotName,ZLOT):- get_struct_opv_i(Kind,_,OneOf,ZLOT),notrace(e_member(SlotName,OneOf)),!.
 get_slot_name0(Kind,SlotName,ZLOT):- get_struct_opv_i(Super,_,OneOf,ZLOT),notrace(e_member(SlotName,OneOf)),!,
   wdmsg(always(get_slot_name0(Super->Kind,SlotName,ZLOT))).
-get_slot_name0(_,A,A).
+get_slot_name0(_,A,A).                                  
 
 same_symbol_names(S1,S2):- pl_symbol_name(S1,N1),pl_symbol_name(S2,N2),!,N1=N2.
 

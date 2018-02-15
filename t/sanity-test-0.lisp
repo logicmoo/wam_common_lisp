@@ -24,7 +24,7 @@
 
 (in-package "CL-USER")
 
-(load "sanity-util")
+' (load "sanity-util")
 '(require 'sanity-util)
 
 (write-line "Running smoke test!")

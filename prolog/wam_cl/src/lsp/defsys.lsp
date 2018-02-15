@@ -47,6 +47,6 @@
 (sbt:defsystem 
  lsp
  :modules *lsp-modules*
- :source-directory '("/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/src/lsp/" "/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/build/lsp/")
- :fasl-directory "/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/build/lsp/"
- :library-directory "/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/build/")
+ :source-directory '("/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/reference/ecl-OLD/src/lsp/" "/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/reference/ecl-OLD/build/lsp/")
+ :fasl-directory "/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/reference/ecl-OLD/build/lsp/"
+ :library-directory "/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/reference/ecl-OLD/build/")

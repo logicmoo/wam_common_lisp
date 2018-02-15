@@ -25,7 +25,7 @@ struct_opv(claz_arithmetic_error, name, sys_operands, sys_arithmetic_error_opera
 struct_opv(claz_arithmetic_error, name, sys_operation, sys_arithmetic_error_operation).
 struct_opv(claz_arithmetic_error, readers, [arithmetic_error_operands], sys_arithmetic_error_operands).
 struct_opv(claz_arithmetic_error, readers, [arithmetic_error_operation], sys_arithmetic_error_operation).
-struct_opv(claz_arithmetic_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_arithmetic_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_arithmetic_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_arithmetic_error, type_of, standard_class).
 struct_opv(claz_arithmetic_error, type_of, sys_condition_class).
@@ -127,8 +127,8 @@ struct_opv(claz_built_in_class, readers, [sys_eql_specializer_flag], sys_class_f
 struct_opv(claz_built_in_class, readers, [sys_slot_table], sys_class_slot_table).
 struct_opv(claz_built_in_class, readers, [sys_specializer_direct_generic_functions], sys_class_direct_generic_functions).
 struct_opv(claz_built_in_class, readers, [sys_specializer_direct_methods], sys_class_direct_methods).
-struct_opv(claz_built_in_class, sys_class_precedence_list, [ claz_class, claz_sys_potential_class, claz_sys_specializer, claz_sys_super_class, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
-struct_opv(claz_built_in_class, sys_class_precedence_list, [ claz_class, claz_sys_specializer, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_built_in_class, sys_class_precedence_list, [ claz_class, claz_sys_potential_class, claz_sys_specializer, claz_sys_super_class, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_t ]).
+struct_opv(claz_built_in_class, sys_class_precedence_list, [ claz_class, claz_sys_specializer, claz_sys_metaobject, claz_standard_object, claz_t ]).
 struct_opv(claz_built_in_class, sys_class_precedence_list, [ claz_sys_system_class, claz_sys_pcl_class, claz_class, claz_sys_dependent_update_mixin, claz_sys_plist_mixin, claz_sys_definition_source_mixin, claz_sys_standard_specializer, claz_sys_specializer, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_built_in_class, type_of, standard_class).
 struct_opv(claz_built_in_class, writers, [[setf, sys_class_default_initargs]], sys_class_default_initargs).
@@ -156,7 +156,7 @@ struct_opv(claz_cell_error, initargs,[kw_name], sys_cell_error_name).
 struct_opv(claz_cell_error, initform, /*sys_c43_initform_unsupplied_c43*/[], sys_cell_error_name).
 struct_opv(claz_cell_error, name, sys_name, sys_cell_error_name).
 struct_opv(claz_cell_error, readers, [cell_error_name], sys_cell_error_name).
-struct_opv(claz_cell_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_cell_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_cell_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_cell_error, type_of, standard_class).
 struct_opv(claz_cell_error, type_of, sys_condition_class).
@@ -233,8 +233,8 @@ struct_opv(claz_class, readers, [sys_slot_table], sys_class_slot_table).
 struct_opv(claz_class, readers, [sys_specializer_direct_generic_functions], sys_class_direct_generic_functions).
 struct_opv(claz_class, readers, [sys_specializer_direct_methods], sys_class_direct_methods).
 struct_opv(claz_class, sys_class_precedence_list, [ claz_sys_dependent_update_mixin, claz_sys_plist_mixin, claz_sys_definition_source_mixin, claz_sys_standard_specializer, claz_sys_specializer, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
-struct_opv(claz_class, sys_class_precedence_list, [ claz_sys_potential_class, claz_sys_specializer, claz_sys_super_class, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
-struct_opv(claz_class, sys_class_precedence_list, [ claz_sys_specializer, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_class, sys_class_precedence_list, [ claz_sys_potential_class, claz_sys_specializer, claz_sys_super_class, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_t ]).
+struct_opv(claz_class, sys_class_precedence_list, [ claz_sys_specializer, claz_sys_metaobject, claz_standard_object, claz_t ]).
 struct_opv(claz_class, type, [integer, 0, 6], sys_class_initialized).
 struct_opv(claz_class, type, [or, string, null], sys_class_documentation).
 struct_opv(claz_class, type, hash_table, sys_class_all_superclasses).
@@ -305,7 +305,7 @@ struct_opv(claz_condition, readers, [simple_condition_format_arguments], sys_con
 struct_opv(claz_condition, readers, [simple_condition_format_control], sys_condition_format_control).
 struct_opv(claz_condition, sys_allocation, sys_class, sys_condition_report_function).
 struct_opv(claz_condition, sys_class_direct_initargs, [[claz_kw_format_arguments, [], "FILTRACE"]]).
-struct_opv(claz_condition, sys_class_precedence_list, [claz_standard_object, claz_sys_slot_object, claz_t]).
+struct_opv(claz_condition, sys_class_precedence_list, [claz_standard_object, claz_t]).
 struct_opv(claz_condition, sys_class_precedence_list, [claz_sys_slot_object, claz_t]).
 struct_opv(claz_condition, sys_location, sys_class, sys_condition_report_function).
 struct_opv(claz_condition, type_of, standard_class).
@@ -317,14 +317,14 @@ struct_opv(claz_cons, type_of, built_in_class).
 struct_opv(claz_control_error, class_name, control_error).
 struct_opv(claz_control_error, default_initargs, [[claz_kw_format_arguments, [], "FILTRACE"]]).
 struct_opv(claz_control_error, include, claz_error).
-struct_opv(claz_control_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_control_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_control_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_control_error, type_of, standard_class).
 struct_opv(claz_control_error, type_of, sys_condition_class).
 struct_opv(claz_division_by_zero, class_name, division_by_zero).
 struct_opv(claz_division_by_zero, default_initargs, [[claz_kw_format_arguments, [], "FILTRACE"]]).
 struct_opv(claz_division_by_zero, include, claz_arithmetic_error).
-struct_opv(claz_division_by_zero, sys_class_precedence_list, [ claz_arithmetic_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_division_by_zero, sys_class_precedence_list, [ claz_arithmetic_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_division_by_zero, sys_class_precedence_list, [ claz_arithmetic_error, claz_error, claz_serious_condition, claz_condition, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_division_by_zero, type_of, standard_class).
 struct_opv(claz_division_by_zero, type_of, sys_condition_class).
@@ -361,14 +361,14 @@ struct_opv(claz_end_of_file, default_initargs, [[claz_kw_format_arguments, [], "
 struct_opv(claz_end_of_file, include, claz_stream_error).
 struct_opv(claz_end_of_file, initform, [ lambda, [condition, stream], [ format, stream, '$ARRAY'([*], claz_base_character, [ #\('U'), #\(n), #\(e), #\(x), #\(p), #\(e), #\(c), #\(t), #\(e), #\(d), #\(' '), #\(e), #\(n), #\(d), #\(' '), #\(o), #\(f), #\(' '), #\(f), #\(i), #\(l), #\(e), #\(' '), #\(o), #\(n), #\(' '), #\(~), #\('S'), #\('.') ]), [stream_error_stream, condition] ] ], sys_end_of_file_report_function).
 struct_opv(claz_end_of_file, name, sys_report_function, sys_end_of_file_report_function).
-struct_opv(claz_end_of_file, sys_class_precedence_list, [ claz_stream_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_end_of_file, sys_class_precedence_list, [ claz_stream_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_end_of_file, sys_class_precedence_list, [ claz_stream_error, claz_error, claz_serious_condition, claz_condition, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_end_of_file, type_of, standard_class).
 struct_opv(claz_end_of_file, type_of, sys_condition_class).
 struct_opv(claz_error, class_name, error).
 struct_opv(claz_error, default_initargs, [[claz_kw_format_arguments, [], "FILTRACE"]]).
 struct_opv(claz_error, include, claz_serious_condition).
-struct_opv(claz_error, sys_class_precedence_list, [ claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_error, sys_class_precedence_list, [ claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_error, sys_class_precedence_list, [ claz_serious_condition, claz_condition, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_error, type_of, standard_class).
 struct_opv(claz_error, type_of, sys_condition_class).
@@ -381,7 +381,7 @@ struct_opv(claz_file_error, initform, [ lambda, [condition, stream], [ format, s
 struct_opv(claz_file_error, name, pathname, sys_file_error_pathname).
 struct_opv(claz_file_error, name, sys_report_function, sys_file_error_report_function).
 struct_opv(claz_file_error, readers, [file_error_pathname], sys_file_error_pathname).
-struct_opv(claz_file_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_file_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_file_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_file_error, type_of, standard_class).
 struct_opv(claz_file_error, type_of, sys_condition_class).
@@ -405,28 +405,28 @@ struct_opv(claz_float, type_of, built_in_class).
 struct_opv(claz_floating_point_inexact, class_name, floating_point_inexact).
 struct_opv(claz_floating_point_inexact, default_initargs, [[claz_kw_format_arguments, [], "FILTRACE"]]).
 struct_opv(claz_floating_point_inexact, include, claz_arithmetic_error).
-struct_opv(claz_floating_point_inexact, sys_class_precedence_list, [ claz_arithmetic_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_floating_point_inexact, sys_class_precedence_list, [ claz_arithmetic_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_floating_point_inexact, sys_class_precedence_list, [ claz_arithmetic_error, claz_error, claz_serious_condition, claz_condition, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_floating_point_inexact, type_of, standard_class).
 struct_opv(claz_floating_point_inexact, type_of, sys_condition_class).
 struct_opv(claz_floating_point_invalid_operation, class_name, floating_point_invalid_operation).
 struct_opv(claz_floating_point_invalid_operation, default_initargs, [[claz_kw_format_arguments, [], "FILTRACE"]]).
 struct_opv(claz_floating_point_invalid_operation, include, claz_arithmetic_error).
-struct_opv(claz_floating_point_invalid_operation, sys_class_precedence_list, [ claz_arithmetic_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_floating_point_invalid_operation, sys_class_precedence_list, [ claz_arithmetic_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_floating_point_invalid_operation, sys_class_precedence_list, [ claz_arithmetic_error, claz_error, claz_serious_condition, claz_condition, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_floating_point_invalid_operation, type_of, standard_class).
 struct_opv(claz_floating_point_invalid_operation, type_of, sys_condition_class).
 struct_opv(claz_floating_point_overflow, class_name, floating_point_overflow).
 struct_opv(claz_floating_point_overflow, default_initargs, [[claz_kw_format_arguments, [], "FILTRACE"]]).
 struct_opv(claz_floating_point_overflow, include, claz_arithmetic_error).
-struct_opv(claz_floating_point_overflow, sys_class_precedence_list, [ claz_arithmetic_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_floating_point_overflow, sys_class_precedence_list, [ claz_arithmetic_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_floating_point_overflow, sys_class_precedence_list, [ claz_arithmetic_error, claz_error, claz_serious_condition, claz_condition, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_floating_point_overflow, type_of, standard_class).
 struct_opv(claz_floating_point_overflow, type_of, sys_condition_class).
 struct_opv(claz_floating_point_underflow, class_name, floating_point_underflow).
 struct_opv(claz_floating_point_underflow, default_initargs, [[claz_kw_format_arguments, [], "FILTRACE"]]).
 struct_opv(claz_floating_point_underflow, include, claz_arithmetic_error).
-struct_opv(claz_floating_point_underflow, sys_class_precedence_list, [ claz_arithmetic_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_floating_point_underflow, sys_class_precedence_list, [ claz_arithmetic_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_floating_point_underflow, sys_class_precedence_list, [ claz_arithmetic_error, claz_error, claz_serious_condition, claz_condition, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_floating_point_underflow, type_of, standard_class).
 struct_opv(claz_floating_point_underflow, type_of, sys_condition_class).
@@ -449,7 +449,7 @@ struct_opv(claz_generic_function, readers, [sys_generic_function_encapsulations]
 struct_opv(claz_generic_function, readers, [sys_generic_function_initial_methods], sys_generic_function_initial_methods).
 struct_opv(claz_generic_function, readers, [sys_gf_listeners], sys_generic_function_listeners).
 struct_opv(claz_generic_function, sys_class_precedence_list, [ claz_sys_dependent_update_mixin, claz_sys_plist_mixin, claz_sys_definition_source_mixin, claz_sys_metaobject, claz_sys_funcallable_standard_object, claz_function, claz_standard_object, claz_sys_slot_object, claz_t ]).
-struct_opv(claz_generic_function, sys_class_precedence_list, [ claz_sys_metaobject, claz_sys_funcallable_standard_object, claz_function, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_generic_function, sys_class_precedence_list, [ claz_sys_metaobject, claz_sys_funcallable_standard_object, claz_function, claz_standard_object, claz_t ]).
 struct_opv(claz_generic_function, sys_class_precedence_list, [ claz_sys_metaobject, claz_sys_funcallable_standard_object, claz_standard_object, claz_function, claz_t ]).
 struct_opv(claz_generic_function, type, list, sys_generic_function_listeners).
 struct_opv(claz_generic_function, type_of, sys_funcallable_standard_class).
@@ -511,8 +511,8 @@ struct_opv(claz_method, include, claz_sys_standard_stablehash).
 struct_opv(claz_method, name, sys_from_defgeneric, sys_method_from_defgeneric).
 struct_opv(claz_method, readers, [sys_method_from_defgeneric], sys_method_from_defgeneric).
 struct_opv(claz_method, sys_class_precedence_list, [ claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
-struct_opv(claz_method, sys_class_precedence_list, [ claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
-struct_opv(claz_method, sys_class_precedence_list, [claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t]).
+struct_opv(claz_method, sys_class_precedence_list, [ claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_t ]).
+struct_opv(claz_method, sys_class_precedence_list, [claz_sys_metaobject, claz_standard_object, claz_t]).
 struct_opv(claz_method, type, boolean, sys_method_from_defgeneric).
 struct_opv(claz_method, type_of, standard_class).
 struct_opv(claz_method, writers, [[setf, sys_method_from_defgeneric]], sys_method_from_defgeneric).
@@ -554,7 +554,7 @@ struct_opv(claz_method_combination, readers, [sys_method_combination_operator], 
 struct_opv(claz_method_combination, readers, [sys_method_combination_options], sys_method_combination_options).
 struct_opv(claz_method_combination, readers, [sys_method_combination_qualifiers], sys_method_combination_qualifiers).
 struct_opv(claz_method_combination, sys_class_precedence_list, [ claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
-struct_opv(claz_method_combination, sys_class_precedence_list, [claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t]).
+struct_opv(claz_method_combination, sys_class_precedence_list, [claz_sys_metaobject, claz_standard_object, claz_t]).
 struct_opv(claz_method_combination, type, [or, null, string], sys_method_combination_documentation).
 struct_opv(claz_method_combination, type, boolean, sys_method_combination_identity_with_one_argument).
 struct_opv(claz_method_combination, type, function, sys_method_combination_call_next_method_allowed).
@@ -638,14 +638,14 @@ struct_opv(claz_package_error, initargs,[kw_package], sys_package_error_package)
 struct_opv(claz_package_error, initform, /*sys_c43_initform_unsupplied_c43*/[], sys_package_error_package).
 struct_opv(claz_package_error, name, package, sys_package_error_package).
 struct_opv(claz_package_error, readers, [package_error_package], sys_package_error_package).
-struct_opv(claz_package_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_package_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_package_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_package_error, type_of, standard_class).
 struct_opv(claz_package_error, type_of, sys_condition_class).
 struct_opv(claz_parse_error, class_name, parse_error).
 struct_opv(claz_parse_error, default_initargs, [[claz_kw_format_arguments, [], "FILTRACE"]]).
 struct_opv(claz_parse_error, include, claz_error).
-struct_opv(claz_parse_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_parse_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_parse_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_parse_error, type_of, standard_class).
 struct_opv(claz_parse_error, type_of, sys_condition_class).
@@ -677,14 +677,14 @@ struct_opv(claz_print_not_readable, initform, [ lambda, [condition, stream], [ f
 struct_opv(claz_print_not_readable, name, sys_object, sys_print_not_readable_object).
 struct_opv(claz_print_not_readable, name, sys_report_function, sys_print_not_readable_report_function).
 struct_opv(claz_print_not_readable, readers, [print_not_readable_object], sys_print_not_readable_object).
-struct_opv(claz_print_not_readable, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_print_not_readable, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_print_not_readable, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_print_not_readable, type_of, standard_class).
 struct_opv(claz_print_not_readable, type_of, sys_condition_class).
 struct_opv(claz_program_error, class_name, program_error).
 struct_opv(claz_program_error, default_initargs, [[claz_kw_format_arguments, [], "FILTRACE"]]).
 struct_opv(claz_program_error, include, claz_error).
-struct_opv(claz_program_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_program_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_program_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_program_error, type_of, standard_class).
 struct_opv(claz_program_error, type_of, sys_condition_class).
@@ -705,7 +705,7 @@ struct_opv(claz_reader_error, class_name, reader_error).
 struct_opv(claz_reader_error, default_initargs, [[claz_kw_format_arguments, [], "FILTRACE"]]).
 struct_opv(claz_reader_error, include, claz_parse_error).
 struct_opv(claz_reader_error, include, claz_stream_error).
-struct_opv(claz_reader_error, sys_class_precedence_list, [ claz_parse_error, claz_stream_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_reader_error, sys_class_precedence_list, [ claz_parse_error, claz_stream_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_reader_error, sys_class_precedence_list, [ claz_parse_error, claz_stream_error, claz_error, claz_serious_condition, claz_condition, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_reader_error, type_of, standard_class).
 struct_opv(claz_reader_error, type_of, sys_condition_class).
@@ -766,7 +766,7 @@ struct_opv(claz_sequence, type_of, sys_system_class).
 struct_opv(claz_serious_condition, class_name, serious_condition).
 struct_opv(claz_serious_condition, default_initargs, [[claz_kw_format_arguments, [], "FILTRACE"]]).
 struct_opv(claz_serious_condition, include, claz_condition).
-struct_opv(claz_serious_condition, sys_class_precedence_list, [claz_condition, claz_standard_object, claz_sys_slot_object, claz_t]).
+struct_opv(claz_serious_condition, sys_class_precedence_list, [claz_condition, claz_standard_object, claz_t]).
 struct_opv(claz_serious_condition, sys_class_precedence_list, [claz_condition, claz_sys_slot_object, claz_t]).
 struct_opv(claz_serious_condition, type_of, standard_class).
 struct_opv(claz_serious_condition, type_of, sys_condition_class).
@@ -799,7 +799,7 @@ struct_opv(claz_simple_condition, name, sys_report_function, sys_simple_conditio
 struct_opv(claz_simple_condition, readers, [ sys_simple_condition_format_string, simple_condition_format_control ], sys_simple_condition_format_control).
 struct_opv(claz_simple_condition, readers, [simple_condition_format_arguments], sys_simple_condition_format_arguments).
 struct_opv(claz_simple_condition, readers, [simple_condition_format_control], sys_simple_condition_format_control).
-struct_opv(claz_simple_condition, sys_class_precedence_list, [claz_condition, claz_standard_object, claz_sys_slot_object, claz_t]).
+struct_opv(claz_simple_condition, sys_class_precedence_list, [claz_condition, claz_standard_object, claz_t]).
 struct_opv(claz_simple_condition, sys_class_precedence_list, [claz_condition, claz_sys_slot_object, claz_t]).
 struct_opv(claz_simple_condition, type_of, standard_class).
 struct_opv(claz_simple_condition, type_of, sys_condition_class).
@@ -809,7 +809,7 @@ struct_opv(claz_simple_error, class_name, simple_error).
 struct_opv(claz_simple_error, default_initargs, [[claz_kw_format_arguments, [], "FILTRACE"]]).
 struct_opv(claz_simple_error, include, claz_error).
 struct_opv(claz_simple_error, include, claz_simple_condition).
-struct_opv(claz_simple_error, sys_class_precedence_list, [ claz_simple_condition, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_simple_error, sys_class_precedence_list, [ claz_simple_condition, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_simple_error, sys_class_precedence_list, [ claz_simple_condition, claz_error, claz_serious_condition, claz_condition, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_simple_error, type_of, standard_class).
 struct_opv(claz_simple_error, type_of, sys_condition_class).
@@ -822,7 +822,7 @@ struct_opv(claz_simple_type_error, class_name, simple_type_error).
 struct_opv(claz_simple_type_error, default_initargs, [[claz_kw_format_arguments, [], "FILTRACE"]]).
 struct_opv(claz_simple_type_error, include, claz_simple_condition).
 struct_opv(claz_simple_type_error, include, claz_type_error).
-struct_opv(claz_simple_type_error, sys_class_precedence_list, [ claz_simple_condition, claz_type_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_simple_type_error, sys_class_precedence_list, [ claz_simple_condition, claz_type_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_simple_type_error, sys_class_precedence_list, [ claz_simple_condition, claz_type_error, claz_error, claz_serious_condition, claz_condition, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_simple_type_error, type_of, standard_class).
 struct_opv(claz_simple_type_error, type_of, sys_condition_class).
@@ -835,7 +835,7 @@ struct_opv(claz_simple_warning, class_name, simple_warning).
 struct_opv(claz_simple_warning, default_initargs, [[claz_kw_format_arguments, [], "FILTRACE"]]).
 struct_opv(claz_simple_warning, include, claz_simple_condition).
 struct_opv(claz_simple_warning, include, claz_warning).
-struct_opv(claz_simple_warning, sys_class_precedence_list, [ claz_simple_condition, claz_warning, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_simple_warning, sys_class_precedence_list, [ claz_simple_condition, claz_warning, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_simple_warning, sys_class_precedence_list, [ claz_simple_condition, claz_warning, claz_condition, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_simple_warning, type_of, standard_class).
 struct_opv(claz_simple_warning, type_of, sys_condition_class).
@@ -924,9 +924,9 @@ struct_opv(claz_standard_class, readers, [sys_eql_specializer_flag], standard_cl
 struct_opv(claz_standard_class, readers, [sys_slot_table], standard_class_slot_table).
 struct_opv(claz_standard_class, readers, [sys_specializer_direct_generic_functions], sys_class_direct_generic_functions).
 struct_opv(claz_standard_class, readers, [sys_specializer_direct_methods], sys_class_direct_methods).
-struct_opv(claz_standard_class, sys_class_precedence_list, [ claz_class, claz_sys_specializer, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
-struct_opv(claz_standard_class, sys_class_precedence_list, [ claz_standard_class, claz_sys_slotted_class, claz_class, claz_sys_potential_class, claz_sys_specializer, claz_sys_super_class, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
-struct_opv(claz_standard_class, sys_class_precedence_list, [ claz_sys_slotted_class, claz_class, claz_sys_potential_class, claz_sys_specializer, claz_sys_super_class, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_standard_class, sys_class_precedence_list, [ claz_class, claz_sys_specializer, claz_sys_metaobject, claz_standard_object, claz_t ]).
+struct_opv(claz_standard_class, sys_class_precedence_list, [ claz_standard_class, claz_sys_slotted_class, claz_class, claz_sys_potential_class, claz_sys_specializer, claz_sys_super_class, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_t ]).
+struct_opv(claz_standard_class, sys_class_precedence_list, [ claz_sys_slotted_class, claz_class, claz_sys_potential_class, claz_sys_specializer, claz_sys_super_class, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_t ]).
 struct_opv(claz_standard_class, sys_class_precedence_list, [ claz_sys_slotted_class, claz_sys_pcl_class, claz_class, claz_sys_dependent_update_mixin, claz_sys_plist_mixin, claz_sys_definition_source_mixin, claz_sys_standard_specializer, claz_sys_specializer, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_standard_class, type, [or, hash_table, sys_weak_list, null], sys_semi_sys_class_direct_instance_specializers).
 struct_opv(claz_standard_class, type, [or, hash_table, sys_weak_list, null], sys_standard_class_finalized_direct_subclasses).
@@ -1023,7 +1023,7 @@ struct_opv(claz_standard_generic_function, readers, [sys_standard_gf_method_comb
 struct_opv(claz_standard_generic_function, readers, [sys_standard_gf_methods], sys_standard_generic_function_methods).
 struct_opv(claz_standard_generic_function, readers, [sys_standard_gf_signature], sys_standard_generic_function_signature).
 struct_opv(claz_standard_generic_function, sys_class_precedence_list, [ claz_generic_function, claz_sys_dependent_update_mixin, claz_sys_plist_mixin, claz_sys_definition_source_mixin, claz_sys_metaobject, claz_sys_funcallable_standard_object, claz_function, claz_standard_object, claz_sys_slot_object, claz_t ]).
-struct_opv(claz_standard_generic_function, sys_class_precedence_list, [ claz_generic_function, claz_sys_metaobject, claz_sys_funcallable_standard_object, claz_function, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_standard_generic_function, sys_class_precedence_list, [ claz_generic_function, claz_sys_metaobject, claz_sys_funcallable_standard_object, claz_function, claz_standard_object, claz_t ]).
 struct_opv(claz_standard_generic_function, sys_class_precedence_list, [ claz_generic_function, claz_sys_metaobject, claz_sys_funcallable_standard_object, claz_standard_object, claz_function, claz_t ]).
 struct_opv(claz_standard_generic_function, type, [or, null, string], sys_standard_generic_function_documentation).
 struct_opv(claz_standard_generic_function, type, [simple_vector, 6], sys_standard_generic_function_signature).
@@ -1107,9 +1107,9 @@ struct_opv(claz_standard_method, readers, [sys_standard_method_qualifiers], sys_
 struct_opv(claz_standard_method, readers, [sys_standard_method_signature], sys_standard_method_signature).
 struct_opv(claz_standard_method, readers, [sys_standard_method_specializers], sys_standard_method_specializers).
 struct_opv(claz_standard_method, readers, [sys_standard_method_wants_next_method_p], sys_standard_method_wants_next_method_p).
-struct_opv(claz_standard_method, sys_class_precedence_list, [ claz_method, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_standard_method, sys_class_precedence_list, [ claz_method, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_t ]).
 struct_opv(claz_standard_method, sys_class_precedence_list, [ claz_sys_plist_mixin, claz_sys_definition_source_mixin, claz_method, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
-struct_opv(claz_standard_method, sys_class_precedence_list, [claz_method, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t]).
+struct_opv(claz_standard_method, sys_class_precedence_list, [claz_method, claz_sys_metaobject, claz_standard_object, claz_t]).
 struct_opv(claz_standard_method, type, [or, null, function], sys_standard_method_fast_function).
 struct_opv(claz_standard_method, type, [or, null, function], sys_standard_method_function).
 struct_opv(claz_standard_method, type, [or, null, generic_function], sys_standard_method_gf).
@@ -1145,7 +1145,7 @@ struct_opv(claz_standard_object, type_of, standard_class).
 struct_opv(claz_storage_condition, class_name, storage_condition).
 struct_opv(claz_storage_condition, default_initargs, [[claz_kw_format_arguments, [], "FILTRACE"]]).
 struct_opv(claz_storage_condition, include, claz_serious_condition).
-struct_opv(claz_storage_condition, sys_class_precedence_list, [ claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_storage_condition, sys_class_precedence_list, [ claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_storage_condition, sys_class_precedence_list, [ claz_serious_condition, claz_condition, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_storage_condition, type_of, standard_class).
 struct_opv(claz_storage_condition, type_of, sys_condition_class).
@@ -1164,7 +1164,7 @@ struct_opv(claz_stream_error, initargs,[kw_stream], sys_stream_error_stream).
 struct_opv(claz_stream_error, initform, /*sys_c43_initform_unsupplied_c43*/[], sys_stream_error_stream).
 struct_opv(claz_stream_error, name, stream, sys_stream_error_stream).
 struct_opv(claz_stream_error, readers, [stream_error_stream], sys_stream_error_stream).
-struct_opv(claz_stream_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_stream_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_stream_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_stream_error, type_of, standard_class).
 struct_opv(claz_stream_error, type_of, sys_condition_class).
@@ -1270,8 +1270,8 @@ struct_opv(claz_structure_class, readers, [sys_eql_specializer_flag], sys_class_
 struct_opv(claz_structure_class, readers, [sys_slot_table], sys_class_slot_table).
 struct_opv(claz_structure_class, readers, [sys_specializer_direct_generic_functions], sys_class_direct_generic_functions).
 struct_opv(claz_structure_class, readers, [sys_specializer_direct_methods], sys_class_direct_methods).
-struct_opv(claz_structure_class, sys_class_precedence_list, [ claz_class, claz_sys_specializer, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
-struct_opv(claz_structure_class, sys_class_precedence_list, [ claz_sys_slotted_class, claz_class, claz_sys_potential_class, claz_sys_specializer, claz_sys_super_class, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_structure_class, sys_class_precedence_list, [ claz_class, claz_sys_specializer, claz_sys_metaobject, claz_standard_object, claz_t ]).
+struct_opv(claz_structure_class, sys_class_precedence_list, [ claz_sys_slotted_class, claz_class, claz_sys_potential_class, claz_sys_specializer, claz_sys_super_class, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_t ]).
 struct_opv(claz_structure_class, sys_class_precedence_list, [ claz_sys_slotted_class, claz_sys_pcl_class, claz_class, claz_sys_dependent_update_mixin, claz_sys_plist_mixin, claz_sys_definition_source_mixin, claz_sys_standard_specializer, claz_sys_specializer, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_structure_class, sys_class_precedence_list, [claz_structure_object, claz_t]).
 struct_opv(claz_structure_class, type, cons, sys_class_names).
@@ -1314,7 +1314,7 @@ struct_opv(claz_structure_object, type_of, structure_class).
 struct_opv(claz_style_warning, class_name, style_warning).
 struct_opv(claz_style_warning, default_initargs, [[claz_kw_format_arguments, [], "FILTRACE"]]).
 struct_opv(claz_style_warning, include, claz_warning).
-struct_opv(claz_style_warning, sys_class_precedence_list, [claz_warning, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t]).
+struct_opv(claz_style_warning, sys_class_precedence_list, [claz_warning, claz_condition, claz_standard_object, claz_t]).
 struct_opv(claz_style_warning, sys_class_precedence_list, [claz_warning, claz_condition, claz_sys_slot_object, claz_t]).
 struct_opv(claz_style_warning, type_of, standard_class).
 struct_opv(claz_style_warning, type_of, sys_condition_class).
@@ -1358,7 +1358,7 @@ struct_opv(claz_sys_abort_failure, class_name, sys_abort_failure).
 struct_opv(claz_sys_abort_failure, include, claz_control_error).
 struct_opv(claz_sys_abort_failure, initform, '$ARRAY'([*], claz_base_character, [ #\('A'), #\(b), #\(o), #\(r), #\(t), #\(' '), #\(f), #\(a), #\(i), #\(l), #\(e), #\(d), #\('.') ]), sys_abort_failure_report_function).
 struct_opv(claz_sys_abort_failure, name, sys_report_function, sys_abort_failure_report_function).
-struct_opv(claz_sys_abort_failure, sys_class_precedence_list, [ claz_control_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_abort_failure, sys_class_precedence_list, [ claz_control_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_abort_failure, type_of, standard_class).
 struct_opv(claz_sys_accessor_dfun_info, class_name, sys_accessor_dfun_info).
 struct_opv(claz_sys_accessor_dfun_info, include, claz_sys_dfun_info).
@@ -1386,7 +1386,7 @@ struct_opv(claz_sys_arg_info, type_of, structure_class).
 struct_opv(claz_sys_argument_list_dotted, class_name, sys_argument_list_dotted).
 struct_opv(claz_sys_argument_list_dotted, include, claz_program_error).
 struct_opv(claz_sys_argument_list_dotted, include, claz_type_error).
-struct_opv(claz_sys_argument_list_dotted, sys_class_precedence_list, [ claz_program_error, claz_type_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_argument_list_dotted, sys_class_precedence_list, [ claz_program_error, claz_type_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_argument_list_dotted, type_of, standard_class).
 struct_opv(claz_sys_block_end, class_name, sys_block_end).
 struct_opv(claz_sys_block_end, include, claz_sys_queued_op).
@@ -1461,11 +1461,11 @@ struct_opv(claz_sys_case_failure, name, sys_possibilities, sys_case_failure_poss
 struct_opv(claz_sys_case_failure, name, sys_report_function, sys_case_failure_report_function).
 struct_opv(claz_sys_case_failure, readers, [sys_case_failure_name], sys_case_failure_name).
 struct_opv(claz_sys_case_failure, readers, [sys_case_failure_possibilities], sys_case_failure_possibilities).
-struct_opv(claz_sys_case_failure, sys_class_precedence_list, [ claz_type_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_case_failure, sys_class_precedence_list, [ claz_type_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_case_failure, type_of, standard_class).
 struct_opv(claz_sys_charset_type_error, class_name, sys_charset_type_error).
 struct_opv(claz_sys_charset_type_error, include, claz_type_error).
-struct_opv(claz_sys_charset_type_error, sys_class_precedence_list, [ claz_type_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_charset_type_error, sys_class_precedence_list, [ claz_type_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_charset_type_error, type_of, standard_class).
 struct_opv(claz_sys_checking, class_name, sys_checking).
 struct_opv(claz_sys_checking, include, claz_sys_dfun_info).
@@ -1511,10 +1511,12 @@ struct_opv(claz_sys_class_direct_slot_definition, readers, [sys_slot_definition_
 struct_opv(claz_sys_class_direct_slot_definition, readers, [sys_slot_definition_readers], sys_slot_definition_readers).
 struct_opv(claz_sys_class_direct_slot_definition, readers, [sys_slot_definition_type], sys_slot_definition_type).
 struct_opv(claz_sys_class_direct_slot_definition, readers, [sys_slot_definition_writers], sys_slot_definition_writers).
-struct_opv(claz_sys_class_direct_slot_definition, sys_class_precedence_list, [ claz_sys_class_direct_slot_definition, claz_sys_slot_definition, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
-struct_opv(claz_sys_class_direct_slot_definition, sys_class_precedence_list, [ claz_sys_class_direct_slot_definition, claz_sys_slot_definition, claz_sys_slot_definition, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_class_direct_slot_definition, sys_class_precedence_list, [ claz_sys_class_direct_slot_definition, claz_sys_slot_definition, claz_sys_metaobject, claz_standard_object, claz_t ]).
+struct_opv(claz_sys_class_direct_slot_definition, sys_class_precedence_list, [ claz_sys_class_direct_slot_definition, claz_sys_slot_definition, claz_sys_slot_definition, claz_sys_metaobject, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_class_direct_slot_definition, sys_class_precedence_list, [ claz_sys_slot_definition, claz_sys_class_direct_slot_definition, claz_sys_slot_definition, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_class_direct_slot_definition, sys_class_precedence_list, [ claz_sys_slot_definition, claz_sys_class_direct_slot_definition, claz_sys_slot_definition, claz_sys_metaobject, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_class_direct_slot_definition, sys_class_precedence_list, [ claz_sys_slot_definition, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_class_direct_slot_definition, sys_class_precedence_list, [ claz_sys_slot_definition, claz_sys_metaobject, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_class_direct_slot_definition, sys_class_precedence_list, [ claz_sys_structure_slot_definition, claz_sys_class_direct_slot_definition, claz_sys_slot_definition, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_sys_class_direct_slot_definition, type, list, sys_slot_definition_readers).
 struct_opv(claz_sys_class_direct_slot_definition, type, list, sys_slot_definition_writers).
@@ -1554,13 +1556,13 @@ struct_opv(claz_sys_class_prototype_specializer, sys_class_precedence_list, [ cl
 struct_opv(claz_sys_class_prototype_specializer, type_of, standard_class).
 struct_opv(claz_sys_clos_warning, class_name, sys_clos_warning).
 struct_opv(claz_sys_clos_warning, include, claz_warning).
-struct_opv(claz_sys_clos_warning, sys_class_precedence_list, [claz_warning, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t]).
+struct_opv(claz_sys_clos_warning, sys_class_precedence_list, [claz_warning, claz_condition, claz_standard_object, claz_t]).
 struct_opv(claz_sys_clos_warning, type_of, standard_class).
 struct_opv(claz_sys_code_block, include, claz_t).
 struct_opv(claz_sys_compiler_error, class_name, sys_compiler_error).
 struct_opv(claz_sys_compiler_error, default_initargs, [[claz_kw_format_arguments, [], "FILTRACE"]]).
 struct_opv(claz_sys_compiler_error, include, claz_error).
-struct_opv(claz_sys_compiler_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_compiler_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_compiler_error, type_of, standard_class).
 struct_opv(claz_sys_compiler_note, class_name, sys_compiler_note).
 struct_opv(claz_sys_compiler_note, include, claz_condition).
@@ -1569,7 +1571,7 @@ struct_opv(claz_sys_compiler_note, type_of, sys_condition_class).
 struct_opv(claz_sys_compiler_unsupported_feature_error, class_name, sys_compiler_unsupported_feature_error).
 struct_opv(claz_sys_compiler_unsupported_feature_error, default_initargs, [[claz_kw_format_arguments, [], "FILTRACE"]]).
 struct_opv(claz_sys_compiler_unsupported_feature_error, include, claz_sys_compiler_error).
-struct_opv(claz_sys_compiler_unsupported_feature_error, sys_class_precedence_list, [ claz_sys_compiler_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_compiler_unsupported_feature_error, sys_class_precedence_list, [ claz_sys_compiler_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_compiler_unsupported_feature_error, type_of, standard_class).
 struct_opv(claz_sys_condition_class, class_name, sys_condition_class).
 struct_opv(claz_sys_condition_class, include, claz_sys_slotted_class).
@@ -1749,8 +1751,8 @@ struct_opv(claz_sys_eql_specializer, readers, [sys_eql_specializer_object, sys_s
 struct_opv(claz_sys_eql_specializer, readers, [sys_eql_specializer_object], sys_eql_specializer_object).
 struct_opv(claz_sys_eql_specializer, readers, [sys_specializer_direct_generic_functions], sys_eql_specializer_direct_generic_functions).
 struct_opv(claz_sys_eql_specializer, readers, [sys_specializer_direct_methods], sys_eql_specializer_direct_methods).
-struct_opv(claz_sys_eql_specializer, sys_class_precedence_list, [ claz_sys_specializer, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
-struct_opv(claz_sys_eql_specializer, sys_class_precedence_list, [ claz_sys_specializer, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_eql_specializer, sys_class_precedence_list, [ claz_sys_specializer, claz_sys_metaobject, claz_standard_object, claz_t ]).
+struct_opv(claz_sys_eql_specializer, sys_class_precedence_list, [ claz_sys_specializer, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_eql_specializer, sys_class_precedence_list, [ claz_sys_standard_specializer, claz_sys_exact_class_specializer, claz_sys_specializer_with_object, claz_sys_specializer, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_sys_eql_specializer, type_of, standard_class).
 struct_opv(claz_sys_eql_specializer, writers, [[setf, sys_eql_specializer_flag]], sys_eql_specializer_flag).
@@ -1859,7 +1861,7 @@ struct_opv(claz_sys_format_error, name, sys_report_function, sys_format_error_re
 struct_opv(claz_sys_format_error, readers, [sys_format_error_control_string], sys_format_error_control_string).
 struct_opv(claz_sys_format_error, readers, [sys_format_error_offset], sys_format_error_offset).
 struct_opv(claz_sys_format_error, readers, [sys_format_error_print_banner], sys_format_error_print_banner).
-struct_opv(claz_sys_format_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_format_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_format_error, type_of, standard_class).
 struct_opv(claz_sys_forward_referenced_class, class_name, sys_forward_referenced_class).
 struct_opv(claz_sys_forward_referenced_class, include, claz_class).
@@ -1916,9 +1918,9 @@ struct_opv(claz_sys_forward_referenced_class, readers, [sys_eql_specializer_flag
 struct_opv(claz_sys_forward_referenced_class, readers, [sys_slot_table], sys_forward_referenced_class_slot_table).
 struct_opv(claz_sys_forward_referenced_class, readers, [sys_specializer_direct_generic_functions], sys_forward_referenced_class_direct_generic_functions).
 struct_opv(claz_sys_forward_referenced_class, readers, [sys_specializer_direct_methods], sys_forward_referenced_class_direct_methods).
-struct_opv(claz_sys_forward_referenced_class, sys_class_precedence_list, [ claz_class, claz_sys_specializer, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_forward_referenced_class, sys_class_precedence_list, [ claz_class, claz_sys_specializer, claz_sys_metaobject, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_forward_referenced_class, sys_class_precedence_list, [ claz_sys_pcl_class, claz_class, claz_sys_dependent_update_mixin, claz_sys_plist_mixin, claz_sys_definition_source_mixin, claz_sys_standard_specializer, claz_sys_specializer, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
-struct_opv(claz_sys_forward_referenced_class, sys_class_precedence_list, [ claz_sys_super_class, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_forward_referenced_class, sys_class_precedence_list, [ claz_sys_super_class, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_forward_referenced_class, type_of, standard_class).
 struct_opv(claz_sys_forward_referenced_class, writers, [[setf, sys_class_default_initargs]], sys_forward_referenced_class_default_initargs).
 struct_opv(claz_sys_forward_referenced_class, writers, [[setf, sys_class_dependents]], sys_forward_referenced_class_dependents).
@@ -2011,9 +2013,9 @@ struct_opv(claz_sys_funcallable_standard_class, readers, [sys_eql_specializer_fl
 struct_opv(claz_sys_funcallable_standard_class, readers, [sys_slot_table], sys_funcallable_standard_class_slot_table).
 struct_opv(claz_sys_funcallable_standard_class, readers, [sys_specializer_direct_generic_functions], sys_funcallable_sys_class_direct_generic_functions).
 struct_opv(claz_sys_funcallable_standard_class, readers, [sys_specializer_direct_methods], sys_funcallable_sys_class_direct_methods).
-struct_opv(claz_sys_funcallable_standard_class, sys_class_precedence_list, [ claz_class, claz_sys_specializer, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
-struct_opv(claz_sys_funcallable_standard_class, sys_class_precedence_list, [ claz_standard_class, claz_class, claz_sys_specializer, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
-struct_opv(claz_sys_funcallable_standard_class, sys_class_precedence_list, [ claz_standard_class, claz_sys_slotted_class, claz_class, claz_sys_potential_class, claz_sys_specializer, claz_sys_super_class, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_funcallable_standard_class, sys_class_precedence_list, [ claz_class, claz_sys_specializer, claz_sys_metaobject, claz_standard_object, claz_t ]).
+struct_opv(claz_sys_funcallable_standard_class, sys_class_precedence_list, [ claz_standard_class, claz_class, claz_sys_specializer, claz_sys_metaobject, claz_standard_object, claz_t ]).
+struct_opv(claz_sys_funcallable_standard_class, sys_class_precedence_list, [ claz_standard_class, claz_sys_slotted_class, claz_class, claz_sys_potential_class, claz_sys_specializer, claz_sys_super_class, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_funcallable_standard_class, sys_class_precedence_list, [ claz_standard_class, claz_sys_slotted_class, claz_sys_pcl_class, claz_class, claz_sys_dependent_update_mixin, claz_sys_plist_mixin, claz_sys_definition_source_mixin, claz_sys_standard_specializer, claz_sys_specializer, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_sys_funcallable_standard_class, type_of, standard_class).
 struct_opv(claz_sys_funcallable_standard_class, writers, [[setf, sys_class_default_initargs]], sys_funcallable_standard_class_default_initargs).
@@ -2040,18 +2042,18 @@ struct_opv(claz_sys_funcallable_standard_object, include, claz_standard_object).
 struct_opv(claz_sys_funcallable_standard_object, name, sys_name, sys_funcallable_standard_object_name).
 struct_opv(claz_sys_funcallable_standard_object, readers, [sys_funcallable_name], sys_funcallable_standard_object_name).
 struct_opv(claz_sys_funcallable_standard_object, sys_class_precedence_list, [ claz_function, claz_standard_object, claz_sys_slot_object, claz_t ]).
-struct_opv(claz_sys_funcallable_standard_object, sys_class_precedence_list, [claz_function, claz_standard_object, claz_sys_slot_object, claz_t]).
+struct_opv(claz_sys_funcallable_standard_object, sys_class_precedence_list, [claz_function, claz_standard_object, claz_t]).
 struct_opv(claz_sys_funcallable_standard_object, sys_class_precedence_list, [claz_standard_object, claz_function, claz_t]).
 struct_opv(claz_sys_funcallable_standard_object, type_of, standard_class).
 struct_opv(claz_sys_funcallable_standard_object, type_of, sys_funcallable_standard_class).
 struct_opv(claz_sys_funcallable_standard_object, writers, [[setf, sys_funcallable_name]], sys_funcallable_standard_object_name).
 struct_opv(claz_sys_gf_already_called_warning, class_name, sys_gf_already_called_warning).
 struct_opv(claz_sys_gf_already_called_warning, include, claz_sys_clos_warning).
-struct_opv(claz_sys_gf_already_called_warning, sys_class_precedence_list, [ claz_sys_clos_warning, claz_warning, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_gf_already_called_warning, sys_class_precedence_list, [ claz_sys_clos_warning, claz_warning, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_gf_already_called_warning, type_of, standard_class).
 struct_opv(claz_sys_gf_replacing_method_warning, class_name, sys_gf_replacing_method_warning).
 struct_opv(claz_sys_gf_replacing_method_warning, include, claz_sys_clos_warning).
-struct_opv(claz_sys_gf_replacing_method_warning, sys_class_precedence_list, [ claz_sys_clos_warning, claz_warning, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_gf_replacing_method_warning, sys_class_precedence_list, [ claz_sys_clos_warning, claz_warning, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_gf_replacing_method_warning, type_of, standard_class).
 struct_opv(claz_sys_global_boundp_method, class_name, sys_global_boundp_method).
 struct_opv(claz_sys_global_boundp_method, include, claz_sys_accessor_method).
@@ -2101,7 +2103,7 @@ struct_opv(claz_sys_initarg_error, sys_class_precedence_list, [ claz_sys_referen
 struct_opv(claz_sys_initarg_error, type_of, sys_condition_class).
 struct_opv(claz_sys_initargs_updater, class_name, sys_initargs_updater).
 struct_opv(claz_sys_initargs_updater, include, claz_standard_object).
-struct_opv(claz_sys_initargs_updater, sys_class_precedence_list, [claz_standard_object, claz_sys_slot_object, claz_t]).
+struct_opv(claz_sys_initargs_updater, sys_class_precedence_list, [claz_standard_object, claz_t]).
 struct_opv(claz_sys_initargs_updater, type_of, standard_class).
 struct_opv(claz_sys_initial, class_name, sys_initial).
 struct_opv(claz_sys_initial, include, claz_sys_dfun_info).
@@ -2151,11 +2153,11 @@ struct_opv(claz_sys_interactive_interrupt, type_of, sys_condition_class).
 struct_opv(claz_sys_internal_compiler_error, class_name, sys_internal_compiler_error).
 struct_opv(claz_sys_internal_compiler_error, default_initargs, [[claz_kw_format_arguments, [], "FILTRACE"]]).
 struct_opv(claz_sys_internal_compiler_error, include, claz_sys_compiler_error).
-struct_opv(claz_sys_internal_compiler_error, sys_class_precedence_list, [ claz_sys_compiler_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_internal_compiler_error, sys_class_precedence_list, [ claz_sys_compiler_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_internal_compiler_error, type_of, standard_class).
 struct_opv(claz_sys_interrupt_condition, class_name, sys_interrupt_condition).
 struct_opv(claz_sys_interrupt_condition, include, claz_serious_condition).
-struct_opv(claz_sys_interrupt_condition, sys_class_precedence_list, [ claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_interrupt_condition, sys_class_precedence_list, [ claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_interrupt_condition, type_of, standard_class).
 struct_opv(claz_sys_invalid_fasl, class_name, sys_invalid_fasl).
 struct_opv(claz_sys_invalid_fasl, include, claz_error).
@@ -2189,7 +2191,7 @@ struct_opv(claz_sys_io_timeout, type_of, sys_condition_class).
 struct_opv(claz_sys_keyword_error, class_name, sys_keyword_error).
 struct_opv(claz_sys_keyword_error, include, claz_program_error).
 struct_opv(claz_sys_keyword_error, include, claz_type_error).
-struct_opv(claz_sys_keyword_error, sys_class_precedence_list, [ claz_program_error, claz_type_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_keyword_error, sys_class_precedence_list, [ claz_program_error, claz_type_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_keyword_error, type_of, standard_class).
 struct_opv(claz_sys_late_deprecation_warning, include, claz_warning).
 struct_opv(claz_sys_logical_block, class_name, sys_logical_block).
@@ -2241,7 +2243,7 @@ struct_opv(claz_sys_long_method_combination, name, sys_lambda_list, sys_long_met
 struct_opv(claz_sys_long_method_combination, name, sys_method_group_specs, sys_long_method_combination_method_group_specs).
 struct_opv(claz_sys_long_method_combination, readers, [sys_long_method_combination_args_lambda_list], sys_long_method_combination_args_lambda_list).
 struct_opv(claz_sys_long_method_combination, readers, [sys_long_method_combination_function], sys_long_method_combination_function).
-struct_opv(claz_sys_long_method_combination, sys_class_precedence_list, [ claz_method_combination, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_long_method_combination, sys_class_precedence_list, [ claz_method_combination, claz_sys_metaobject, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_long_method_combination, sys_class_precedence_list, [ claz_sys_standard_method_combination, claz_sys_definition_source_mixin, claz_method_combination, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_sys_long_method_combination, type_of, standard_class).
 struct_opv(claz_sys_long_method_combination_error, class_name, sys_long_method_combination_error).
@@ -2297,6 +2299,7 @@ struct_opv(claz_sys_memory_fault_error, type_of, sys_condition_class).
 struct_opv(claz_sys_metaobject, class_name, sys_metaobject).
 struct_opv(claz_sys_metaobject, include, claz_standard_object).
 struct_opv(claz_sys_metaobject, sys_class_precedence_list, [claz_standard_object, claz_sys_slot_object, claz_t]).
+struct_opv(claz_sys_metaobject, sys_class_precedence_list, [claz_standard_object, claz_t]).
 struct_opv(claz_sys_metaobject, type_of, standard_class).
 struct_opv(claz_sys_metaobject_initialization_violation, class_name, sys_metaobject_initialization_violation).
 struct_opv(claz_sys_metaobject_initialization_violation, include, claz_simple_error).
@@ -2321,12 +2324,12 @@ struct_opv(claz_sys_method_call_error, name, sys_gf, sys_method_call_error_gf).
 struct_opv(claz_sys_method_call_error, readers, [sys_method_call_error_argument_list], sys_method_call_error_args).
 struct_opv(claz_sys_method_call_error, readers, [sys_method_call_error_generic_function], sys_method_call_error_gf).
 struct_opv(claz_sys_method_call_error, readers, [sys_method_call_error_method], sys_method_call_error_method).
-struct_opv(claz_sys_method_call_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_method_call_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_method_call_error, type_of, standard_class).
 struct_opv(claz_sys_method_call_type_error, class_name, sys_method_call_type_error).
 struct_opv(claz_sys_method_call_type_error, include, claz_simple_type_error).
 struct_opv(claz_sys_method_call_type_error, include, claz_sys_method_call_error).
-struct_opv(claz_sys_method_call_type_error, sys_class_precedence_list, [ claz_simple_type_error, claz_sys_method_call_error, claz_simple_error, claz_simple_condition, claz_type_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_method_call_type_error, sys_class_precedence_list, [ claz_simple_type_error, claz_sys_method_call_error, claz_simple_error, claz_simple_condition, claz_type_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_method_call_type_error, type_of, standard_class).
 struct_opv(claz_sys_method_function, class_name, sys_method_function).
 struct_opv(claz_sys_method_function, include, claz_function).
@@ -2335,14 +2338,14 @@ struct_opv(claz_sys_method_function, type_of, structure_class).
 struct_opv(claz_sys_misdesigned_forward_referenced_class, class_name, sys_misdesigned_forward_referenced_class).
 struct_opv(claz_sys_misdesigned_forward_referenced_class, include, claz_sys_forward_referenced_class).
 struct_opv(claz_sys_misdesigned_forward_referenced_class, include, claz_sys_potential_class).
-struct_opv(claz_sys_misdesigned_forward_referenced_class, sys_class_precedence_list, [ claz_sys_forward_referenced_class, claz_sys_potential_class, claz_sys_specializer, claz_sys_super_class, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_misdesigned_forward_referenced_class, sys_class_precedence_list, [ claz_sys_forward_referenced_class, claz_sys_potential_class, claz_sys_specializer, claz_sys_super_class, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_misdesigned_forward_referenced_class, type_of, standard_class).
 struct_opv(claz_sys_missing_load_form, class_name, sys_missing_load_form).
 struct_opv(claz_sys_missing_load_form, include, claz_error).
 struct_opv(claz_sys_missing_load_form, initargs,[kw_object], sys_missing_load_form_object).
 struct_opv(claz_sys_missing_load_form, name, sys_object, sys_missing_load_form_object).
 struct_opv(claz_sys_missing_load_form, readers, [sys_missing_load_form_object], sys_missing_load_form_object).
-struct_opv(claz_sys_missing_load_form, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_missing_load_form, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_missing_load_form, type_of, standard_class).
 struct_opv(claz_sys_n_n, class_name, sys_n_n).
 struct_opv(claz_sys_n_n, include, claz_sys_accessor_dfun_info).
@@ -2462,7 +2465,7 @@ struct_opv(claz_sys_plist_mixin, writers, [[setf, sys_object_plist]], sys_plist_
 struct_opv(claz_sys_potential_class, class_name, sys_potential_class).
 struct_opv(claz_sys_potential_class, include, claz_sys_specializer).
 struct_opv(claz_sys_potential_class, include, claz_sys_super_class).
-struct_opv(claz_sys_potential_class, sys_class_precedence_list, [ claz_sys_specializer, claz_sys_super_class, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_potential_class, sys_class_precedence_list, [ claz_sys_specializer, claz_sys_super_class, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_potential_class, type_of, standard_class).
 struct_opv(claz_sys_pprint_dispatch_entry, class_name, sys_pprint_dispatch_entry).
 struct_opv(claz_sys_pprint_dispatch_entry, include, claz_structure_object).
@@ -2543,155 +2546,155 @@ struct_opv(claz_sys_short_method_combination, name, sys_identity_with_one_argume
 struct_opv(claz_sys_short_method_combination, name, sys_operator, sys_short_method_combination_operator).
 struct_opv(claz_sys_short_method_combination, readers, [sys_short_combination_identity_with_one_argument], sys_short_method_combination_identity_with_one_argument).
 struct_opv(claz_sys_short_method_combination, readers, [sys_short_combination_operator], sys_short_method_combination_operator).
-struct_opv(claz_sys_short_method_combination, sys_class_precedence_list, [ claz_method_combination, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_short_method_combination, sys_class_precedence_list, [ claz_method_combination, claz_sys_metaobject, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_short_method_combination, sys_class_precedence_list, [ claz_sys_standard_method_combination, claz_sys_definition_source_mixin, claz_method_combination, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_sys_short_method_combination, type_of, standard_class).
 struct_opv(claz_sys_simd_pack, include, claz_t).
 struct_opv(claz_sys_simple_argument_list_dotted, class_name, sys_simple_argument_list_dotted).
 struct_opv(claz_sys_simple_argument_list_dotted, include, claz_simple_error).
 struct_opv(claz_sys_simple_argument_list_dotted, include, claz_sys_argument_list_dotted).
-struct_opv(claz_sys_simple_argument_list_dotted, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_sys_argument_list_dotted, claz_program_error, claz_type_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_argument_list_dotted, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_sys_argument_list_dotted, claz_program_error, claz_type_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_argument_list_dotted, type_of, standard_class).
 struct_opv(claz_sys_simple_arithmetic_error, class_name, sys_simple_arithmetic_error).
 struct_opv(claz_sys_simple_arithmetic_error, include, claz_arithmetic_error).
 struct_opv(claz_sys_simple_arithmetic_error, include, claz_simple_error).
-struct_opv(claz_sys_simple_arithmetic_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_arithmetic_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_arithmetic_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_arithmetic_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_arithmetic_error, type_of, standard_class).
 struct_opv(claz_sys_simple_cell_error, class_name, sys_simple_cell_error).
 struct_opv(claz_sys_simple_cell_error, include, claz_cell_error).
 struct_opv(claz_sys_simple_cell_error, include, claz_simple_error).
-struct_opv(claz_sys_simple_cell_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_cell_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_cell_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_cell_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_cell_error, type_of, standard_class).
 struct_opv(claz_sys_simple_clos_warning, class_name, sys_simple_clos_warning).
 struct_opv(claz_sys_simple_clos_warning, include, claz_simple_condition).
 struct_opv(claz_sys_simple_clos_warning, include, claz_sys_clos_warning).
-struct_opv(claz_sys_simple_clos_warning, sys_class_precedence_list, [ claz_simple_condition, claz_sys_clos_warning, claz_warning, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_clos_warning, sys_class_precedence_list, [ claz_simple_condition, claz_sys_clos_warning, claz_warning, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_clos_warning, type_of, standard_class).
 struct_opv(claz_sys_simple_control_error, class_name, sys_simple_control_error).
 struct_opv(claz_sys_simple_control_error, include, claz_control_error).
 struct_opv(claz_sys_simple_control_error, include, claz_simple_error).
-struct_opv(claz_sys_simple_control_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_control_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_control_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_control_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_control_error, type_of, standard_class).
 struct_opv(claz_sys_simple_division_by_zero, class_name, sys_simple_division_by_zero).
 struct_opv(claz_sys_simple_division_by_zero, include, claz_division_by_zero).
 struct_opv(claz_sys_simple_division_by_zero, include, claz_simple_error).
-struct_opv(claz_sys_simple_division_by_zero, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_division_by_zero, claz_arithmetic_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_division_by_zero, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_division_by_zero, claz_arithmetic_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_division_by_zero, type_of, standard_class).
 struct_opv(claz_sys_simple_end_of_file, class_name, sys_simple_end_of_file).
 struct_opv(claz_sys_simple_end_of_file, include, claz_end_of_file).
 struct_opv(claz_sys_simple_end_of_file, include, claz_simple_error).
-struct_opv(claz_sys_simple_end_of_file, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_end_of_file, claz_stream_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_end_of_file, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_end_of_file, claz_stream_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_end_of_file, type_of, standard_class).
 struct_opv(claz_sys_simple_file_error, class_name, sys_simple_file_error).
 struct_opv(claz_sys_simple_file_error, include, claz_file_error).
 struct_opv(claz_sys_simple_file_error, include, claz_simple_error).
-struct_opv(claz_sys_simple_file_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_file_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_file_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_file_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_file_error, type_of, standard_class).
 struct_opv(claz_sys_simple_floating_point_overflow, class_name, sys_simple_floating_point_overflow).
 struct_opv(claz_sys_simple_floating_point_overflow, include, claz_floating_point_overflow).
 struct_opv(claz_sys_simple_floating_point_overflow, include, claz_simple_error).
-struct_opv(claz_sys_simple_floating_point_overflow, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_floating_point_overflow, claz_arithmetic_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_floating_point_overflow, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_floating_point_overflow, claz_arithmetic_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_floating_point_overflow, type_of, standard_class).
 struct_opv(claz_sys_simple_floating_point_underflow, class_name, sys_simple_floating_point_underflow).
 struct_opv(claz_sys_simple_floating_point_underflow, include, claz_floating_point_underflow).
 struct_opv(claz_sys_simple_floating_point_underflow, include, claz_simple_error).
-struct_opv(claz_sys_simple_floating_point_underflow, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_floating_point_underflow, claz_arithmetic_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_floating_point_underflow, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_floating_point_underflow, claz_arithmetic_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_floating_point_underflow, type_of, standard_class).
 struct_opv(claz_sys_simple_gf_already_called_warning, class_name, sys_simple_gf_already_called_warning).
 struct_opv(claz_sys_simple_gf_already_called_warning, include, claz_simple_condition).
 struct_opv(claz_sys_simple_gf_already_called_warning, include, claz_sys_gf_already_called_warning).
-struct_opv(claz_sys_simple_gf_already_called_warning, sys_class_precedence_list, [ claz_simple_condition, claz_sys_gf_already_called_warning, claz_sys_clos_warning, claz_warning, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_gf_already_called_warning, sys_class_precedence_list, [ claz_simple_condition, claz_sys_gf_already_called_warning, claz_sys_clos_warning, claz_warning, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_gf_already_called_warning, type_of, standard_class).
 struct_opv(claz_sys_simple_gf_replacing_method_warning, class_name, sys_simple_gf_replacing_method_warning).
 struct_opv(claz_sys_simple_gf_replacing_method_warning, include, claz_simple_condition).
 struct_opv(claz_sys_simple_gf_replacing_method_warning, include, claz_sys_gf_replacing_method_warning).
-struct_opv(claz_sys_simple_gf_replacing_method_warning, sys_class_precedence_list, [ claz_simple_condition, claz_sys_gf_replacing_method_warning, claz_sys_clos_warning, claz_warning, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_gf_replacing_method_warning, sys_class_precedence_list, [ claz_simple_condition, claz_sys_gf_replacing_method_warning, claz_sys_clos_warning, claz_warning, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_gf_replacing_method_warning, type_of, standard_class).
 struct_opv(claz_sys_simple_interrupt_condition, class_name, sys_simple_interrupt_condition).
 struct_opv(claz_sys_simple_interrupt_condition, include, claz_simple_condition).
 struct_opv(claz_sys_simple_interrupt_condition, include, claz_sys_interrupt_condition).
-struct_opv(claz_sys_simple_interrupt_condition, sys_class_precedence_list, [ claz_simple_condition, claz_sys_interrupt_condition, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_interrupt_condition, sys_class_precedence_list, [ claz_simple_condition, claz_sys_interrupt_condition, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_interrupt_condition, type_of, standard_class).
 struct_opv(claz_sys_simple_keyword_error, class_name, sys_simple_keyword_error).
 struct_opv(claz_sys_simple_keyword_error, include, claz_simple_error).
 struct_opv(claz_sys_simple_keyword_error, include, claz_sys_keyword_error).
-struct_opv(claz_sys_simple_keyword_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_sys_keyword_error, claz_program_error, claz_type_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_keyword_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_sys_keyword_error, claz_program_error, claz_type_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_keyword_error, type_of, standard_class).
 struct_opv(claz_sys_simple_missing_load_form, class_name, sys_simple_missing_load_form).
 struct_opv(claz_sys_simple_missing_load_form, include, claz_simple_error).
 struct_opv(claz_sys_simple_missing_load_form, include, claz_sys_missing_load_form).
-struct_opv(claz_sys_simple_missing_load_form, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_sys_missing_load_form, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_missing_load_form, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_sys_missing_load_form, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_missing_load_form, type_of, standard_class).
 struct_opv(claz_sys_simple_os_error, class_name, sys_simple_os_error).
 struct_opv(claz_sys_simple_os_error, include, claz_simple_error).
 struct_opv(claz_sys_simple_os_error, include, claz_sys_os_error).
-struct_opv(claz_sys_simple_os_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_sys_os_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_os_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_sys_os_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_os_error, type_of, standard_class).
 struct_opv(claz_sys_simple_package_error, class_name, sys_simple_package_error).
 struct_opv(claz_sys_simple_package_error, include, claz_package_error).
 struct_opv(claz_sys_simple_package_error, include, claz_simple_error).
-struct_opv(claz_sys_simple_package_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_package_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_package_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_package_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_package_error, type_of, standard_class).
 struct_opv(claz_sys_simple_parse_error, class_name, sys_simple_parse_error).
 struct_opv(claz_sys_simple_parse_error, include, claz_parse_error).
 struct_opv(claz_sys_simple_parse_error, include, claz_simple_error).
-struct_opv(claz_sys_simple_parse_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_parse_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_parse_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_parse_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_parse_error, type_of, standard_class).
 struct_opv(claz_sys_simple_print_not_readable, class_name, sys_simple_print_not_readable).
 struct_opv(claz_sys_simple_print_not_readable, include, claz_print_not_readable).
 struct_opv(claz_sys_simple_print_not_readable, include, claz_simple_error).
-struct_opv(claz_sys_simple_print_not_readable, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_print_not_readable, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_print_not_readable, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_print_not_readable, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_print_not_readable, type_of, standard_class).
 struct_opv(claz_sys_simple_program_error, class_name, sys_simple_program_error).
 struct_opv(claz_sys_simple_program_error, include, claz_program_error).
 struct_opv(claz_sys_simple_program_error, include, claz_simple_error).
-struct_opv(claz_sys_simple_program_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_program_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_program_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_program_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_program_error, type_of, standard_class).
 struct_opv(claz_sys_simple_reader_error, class_name, sys_simple_reader_error).
 struct_opv(claz_sys_simple_reader_error, include, claz_reader_error).
 struct_opv(claz_sys_simple_reader_error, include, claz_simple_error).
-struct_opv(claz_sys_simple_reader_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_reader_error, claz_parse_error, claz_stream_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_reader_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_reader_error, claz_parse_error, claz_stream_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_reader_error, type_of, standard_class).
 struct_opv(claz_sys_simple_serious_condition, class_name, sys_simple_serious_condition).
 struct_opv(claz_sys_simple_serious_condition, include, claz_serious_condition).
 struct_opv(claz_sys_simple_serious_condition, include, claz_simple_condition).
-struct_opv(claz_sys_simple_serious_condition, sys_class_precedence_list, [ claz_simple_condition, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_serious_condition, sys_class_precedence_list, [ claz_simple_condition, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_serious_condition, type_of, standard_class).
 struct_opv(claz_sys_simple_source_program_error, class_name, sys_simple_source_program_error).
 struct_opv(claz_sys_simple_source_program_error, include, claz_simple_error).
 struct_opv(claz_sys_simple_source_program_error, include, claz_sys_source_program_error).
-struct_opv(claz_sys_simple_source_program_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_sys_source_program_error, claz_program_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_source_program_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_sys_source_program_error, claz_program_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_source_program_error, type_of, standard_class).
 struct_opv(claz_sys_simple_storage_condition, class_name, sys_simple_storage_condition).
 struct_opv(claz_sys_simple_storage_condition, include, claz_simple_condition).
 struct_opv(claz_sys_simple_storage_condition, include, claz_storage_condition).
-struct_opv(claz_sys_simple_storage_condition, sys_class_precedence_list, [ claz_simple_condition, claz_storage_condition, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_storage_condition, sys_class_precedence_list, [ claz_simple_condition, claz_storage_condition, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_storage_condition, type_of, standard_class).
 struct_opv(claz_sys_simple_stream_error, class_name, sys_simple_stream_error).
 struct_opv(claz_sys_simple_stream_error, include, claz_simple_error).
 struct_opv(claz_sys_simple_stream_error, include, claz_stream_error).
-struct_opv(claz_sys_simple_stream_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_stream_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_stream_error, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_stream_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_stream_error, type_of, standard_class).
 struct_opv(claz_sys_simple_style_warning, class_name, sys_simple_style_warning).
 struct_opv(claz_sys_simple_style_warning, include, claz_simple_condition).
 struct_opv(claz_sys_simple_style_warning, include, claz_style_warning).
-struct_opv(claz_sys_simple_style_warning, sys_class_precedence_list, [ claz_simple_condition, claz_style_warning, claz_warning, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
-struct_opv(claz_sys_simple_style_warning, sys_class_precedence_list, [ claz_style_warning, claz_warning, claz_simple_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_style_warning, sys_class_precedence_list, [ claz_simple_condition, claz_style_warning, claz_warning, claz_condition, claz_standard_object, claz_t ]).
+struct_opv(claz_sys_simple_style_warning, sys_class_precedence_list, [ claz_style_warning, claz_warning, claz_simple_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_style_warning, type_of, standard_class).
 struct_opv(claz_sys_simple_unbound_slot, class_name, sys_simple_unbound_slot).
 struct_opv(claz_sys_simple_unbound_slot, include, claz_simple_error).
 struct_opv(claz_sys_simple_unbound_slot, include, claz_unbound_slot).
-struct_opv(claz_sys_simple_unbound_slot, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_unbound_slot, claz_cell_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_unbound_slot, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_unbound_slot, claz_cell_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_unbound_slot, type_of, standard_class).
 struct_opv(claz_sys_simple_unbound_variable, class_name, sys_simple_unbound_variable).
 struct_opv(claz_sys_simple_unbound_variable, include, claz_simple_error).
 struct_opv(claz_sys_simple_unbound_variable, include, claz_unbound_variable).
-struct_opv(claz_sys_simple_unbound_variable, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_unbound_variable, claz_cell_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_unbound_variable, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_unbound_variable, claz_cell_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_unbound_variable, type_of, standard_class).
 struct_opv(claz_sys_simple_undefined_function, class_name, sys_simple_undefined_function).
 struct_opv(claz_sys_simple_undefined_function, include, claz_simple_error).
 struct_opv(claz_sys_simple_undefined_function, include, claz_undefined_function).
-struct_opv(claz_sys_simple_undefined_function, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_undefined_function, claz_cell_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_simple_undefined_function, sys_class_precedence_list, [ claz_simple_error, claz_simple_condition, claz_undefined_function, claz_cell_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_simple_undefined_function, type_of, standard_class).
 struct_opv(claz_sys_slot_definition, class_name, sys_slot_definition).
 struct_opv(claz_sys_slot_definition, include, claz_sys_metaobject).
@@ -2749,8 +2752,10 @@ struct_opv(claz_sys_slot_definition, readers, [sys_slot_definition_type], sys_sl
 struct_opv(claz_sys_slot_definition, readers, [sys_slot_definition_writers], sys_slot_definition_writers).
 struct_opv(claz_sys_slot_definition, sys_class_precedence_list, [ claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_sys_slot_definition, sys_class_precedence_list, [ claz_sys_slot_definition, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_slot_definition, sys_class_precedence_list, [ claz_sys_slot_definition, claz_sys_metaobject, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_slot_definition, sys_class_precedence_list, [ claz_sys_slot_definition, claz_sys_slot_definition, claz_sys_slot_definition, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
-struct_opv(claz_sys_slot_definition, sys_class_precedence_list, [claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t]).
+struct_opv(claz_sys_slot_definition, sys_class_precedence_list, [ claz_sys_slot_definition, claz_sys_slot_definition, claz_sys_slot_definition, claz_sys_metaobject, claz_standard_object, claz_t ]).
+struct_opv(claz_sys_slot_definition, sys_class_precedence_list, [claz_sys_metaobject, claz_standard_object, claz_t]).
 struct_opv(claz_sys_slot_definition, type, [or, null, integer, cons], sys_slot_definition_location).
 struct_opv(claz_sys_slot_definition, type, cons, sys_slot_definition_inheritable_doc).
 struct_opv(claz_sys_slot_definition, type, cons, sys_slot_definition_inheritable_initer).
@@ -2825,7 +2830,7 @@ struct_opv(claz_sys_slotted_class, name, sys_subclass_of_stablehash_p, sys_slott
 struct_opv(claz_sys_slotted_class, name, sys_valid_initargs_from_slots, sys_slotted_class_valid_initargs_from_slots).
 struct_opv(claz_sys_slotted_class, readers, [sys_class_direct_slots], sys_slotted_class_direct_slots).
 struct_opv(claz_sys_slotted_class, readers, [sys_class_slots], sys_slotted_class_slots).
-struct_opv(claz_sys_slotted_class, sys_class_precedence_list, [ claz_class, claz_sys_potential_class, claz_sys_specializer, claz_sys_super_class, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_slotted_class, sys_class_precedence_list, [ claz_class, claz_sys_potential_class, claz_sys_specializer, claz_sys_super_class, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_slotted_class, sys_class_precedence_list, [ claz_sys_pcl_class, claz_class, claz_sys_dependent_update_mixin, claz_sys_plist_mixin, claz_sys_definition_source_mixin, claz_sys_standard_specializer, claz_sys_specializer, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_sys_slotted_class, type, [integer, 1, *], sys_slotted_class_instance_size).
 struct_opv(claz_sys_slotted_class, type, boolean, sys_slotted_class_subclass_of_stablehash_p).
@@ -2844,8 +2849,8 @@ struct_opv(claz_sys_specializer, readers, [sys_specializer_direct_generic_functi
 struct_opv(claz_sys_specializer, readers, [sys_specializer_direct_methods], sys_specializer_direct_methods).
 struct_opv(claz_sys_specializer, readers, [sys_specializer_type], sys_specializer_type).
 struct_opv(claz_sys_specializer, sys_class_precedence_list, [ claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
-struct_opv(claz_sys_specializer, sys_class_precedence_list, [ claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
-struct_opv(claz_sys_specializer, sys_class_precedence_list, [claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t]).
+struct_opv(claz_sys_specializer, sys_class_precedence_list, [ claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_t ]).
+struct_opv(claz_sys_specializer, sys_class_precedence_list, [claz_sys_metaobject, claz_standard_object, claz_t]).
 struct_opv(claz_sys_specializer, type_of, standard_class).
 struct_opv(claz_sys_specializer, writers, [[setf, sys_eql_specializer_flag]], sys_specializer_flag).
 struct_opv(claz_sys_specializer, writers, [[setf, sys_specializer_direct_generic_functions]], sys_specializer_direct_generic_functions).
@@ -2885,8 +2890,8 @@ struct_opv(claz_sys_standard_accessor_method, readers, [sys_method_keywords], sy
 struct_opv(claz_sys_standard_accessor_method, readers, [sys_method_lambda_list], sys_standard_accessor_method_lambda_list).
 struct_opv(claz_sys_standard_accessor_method, readers, [sys_method_plist], sys_standard_accessor_method_plist).
 struct_opv(claz_sys_standard_accessor_method, readers, [sys_method_specializers], sys_standard_accessor_method_specializers).
-struct_opv(claz_sys_standard_accessor_method, sys_class_precedence_list, [ claz_standard_method, claz_method, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
-struct_opv(claz_sys_standard_accessor_method, sys_class_precedence_list, [ claz_standard_method, claz_method, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_standard_accessor_method, sys_class_precedence_list, [ claz_standard_method, claz_method, claz_sys_metaobject, claz_standard_object, claz_t ]).
+struct_opv(claz_sys_standard_accessor_method, sys_class_precedence_list, [ claz_standard_method, claz_method, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_standard_accessor_method, sys_class_precedence_list, [ claz_sys_accessor_method, claz_standard_method, claz_sys_plist_mixin, claz_sys_definition_source_mixin, claz_method, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_sys_standard_accessor_method, type, sys_class_direct_slot_definition, sys_standard_accessor_method_slot_definition).
 struct_opv(claz_sys_standard_accessor_method, type_of, standard_class).
@@ -2947,7 +2952,7 @@ struct_opv(claz_sys_standard_optimized_reader_method, readers, [sys_method_keywo
 struct_opv(claz_sys_standard_optimized_reader_method, readers, [sys_method_lambda_list], sys_standard_optimized_reader_method_lambda_list).
 struct_opv(claz_sys_standard_optimized_reader_method, readers, [sys_method_plist], sys_standard_optimized_reader_method_plist).
 struct_opv(claz_sys_standard_optimized_reader_method, readers, [sys_method_specializers], sys_standard_optimized_reader_method_specializers).
-struct_opv(claz_sys_standard_optimized_reader_method, sys_class_precedence_list, [ claz_sys_standard_reader_method, claz_sys_standard_accessor_method, claz_standard_method, claz_method, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_standard_optimized_reader_method, sys_class_precedence_list, [ claz_sys_standard_reader_method, claz_sys_standard_accessor_method, claz_standard_method, claz_method, claz_sys_metaobject, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_standard_optimized_reader_method, type_of, standard_class).
 struct_opv(claz_sys_standard_optimized_reader_method, writers, [[setf, method_qualifiers]], sys_standard_optimized_reader_method_qualifiers).
 struct_opv(claz_sys_standard_optimized_reader_method, writers, [[setf, sys_accessor_method_slot_definition]], sys_standard_optimized_reader_method_slot_definition).
@@ -2987,7 +2992,7 @@ struct_opv(claz_sys_standard_optimized_writer_method, readers, [sys_method_keywo
 struct_opv(claz_sys_standard_optimized_writer_method, readers, [sys_method_lambda_list], sys_standard_optimized_writer_method_lambda_list).
 struct_opv(claz_sys_standard_optimized_writer_method, readers, [sys_method_plist], sys_standard_optimized_writer_method_plist).
 struct_opv(claz_sys_standard_optimized_writer_method, readers, [sys_method_specializers], sys_standard_optimized_writer_method_specializers).
-struct_opv(claz_sys_standard_optimized_writer_method, sys_class_precedence_list, [ claz_sys_standard_writer_method, claz_sys_standard_accessor_method, claz_standard_method, claz_method, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_standard_optimized_writer_method, sys_class_precedence_list, [ claz_sys_standard_writer_method, claz_sys_standard_accessor_method, claz_standard_method, claz_method, claz_sys_metaobject, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_standard_optimized_writer_method, type_of, standard_class).
 struct_opv(claz_sys_standard_optimized_writer_method, writers, [[setf, method_qualifiers]], sys_standard_optimized_writer_method_qualifiers).
 struct_opv(claz_sys_standard_optimized_writer_method, writers, [[setf, sys_accessor_method_slot_definition]], sys_standard_optimized_writer_method_slot_definition).
@@ -3027,8 +3032,8 @@ struct_opv(claz_sys_standard_reader_method, readers, [sys_method_keywords], sys_
 struct_opv(claz_sys_standard_reader_method, readers, [sys_method_lambda_list], sys_standard_reader_method_lambda_list).
 struct_opv(claz_sys_standard_reader_method, readers, [sys_method_plist], sys_standard_reader_method_plist).
 struct_opv(claz_sys_standard_reader_method, readers, [sys_method_specializers], sys_standard_reader_method_specializers).
-struct_opv(claz_sys_standard_reader_method, sys_class_precedence_list, [ claz_sys_standard_accessor_method, claz_standard_method, claz_method, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
-struct_opv(claz_sys_standard_reader_method, sys_class_precedence_list, [ claz_sys_standard_accessor_method, claz_standard_method, claz_method, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_standard_reader_method, sys_class_precedence_list, [ claz_sys_standard_accessor_method, claz_standard_method, claz_method, claz_sys_metaobject, claz_standard_object, claz_t ]).
+struct_opv(claz_sys_standard_reader_method, sys_class_precedence_list, [ claz_sys_standard_accessor_method, claz_standard_method, claz_method, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_standard_reader_method, sys_class_precedence_list, [ claz_sys_standard_accessor_method, claz_sys_accessor_method, claz_standard_method, claz_sys_plist_mixin, claz_sys_definition_source_mixin, claz_method, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_sys_standard_reader_method, type_of, standard_class).
 struct_opv(claz_sys_standard_reader_method, writers, [[setf, method_qualifiers]], sys_standard_reader_method_qualifiers).
@@ -3045,7 +3050,7 @@ struct_opv(claz_sys_standard_specializer, sys_class_precedence_list, [ claz_sys_
 struct_opv(claz_sys_standard_specializer, type_of, standard_class).
 struct_opv(claz_sys_standard_stablehash, class_name, sys_standard_stablehash).
 struct_opv(claz_sys_standard_stablehash, include, claz_standard_object).
-struct_opv(claz_sys_standard_stablehash, sys_class_precedence_list, [claz_standard_object, claz_sys_slot_object, claz_t]).
+struct_opv(claz_sys_standard_stablehash, sys_class_precedence_list, [claz_standard_object, claz_t]).
 struct_opv(claz_sys_standard_stablehash, type_of, standard_class).
 struct_opv(claz_sys_standard_writer_method, class_name, sys_standard_writer_method).
 struct_opv(claz_sys_standard_writer_method, include, claz_sys_standard_accessor_method).
@@ -3077,8 +3082,8 @@ struct_opv(claz_sys_standard_writer_method, readers, [sys_method_keywords], sys_
 struct_opv(claz_sys_standard_writer_method, readers, [sys_method_lambda_list], sys_standard_writer_method_lambda_list).
 struct_opv(claz_sys_standard_writer_method, readers, [sys_method_plist], sys_standard_writer_method_plist).
 struct_opv(claz_sys_standard_writer_method, readers, [sys_method_specializers], sys_standard_writer_method_specializers).
-struct_opv(claz_sys_standard_writer_method, sys_class_precedence_list, [ claz_sys_standard_accessor_method, claz_standard_method, claz_method, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
-struct_opv(claz_sys_standard_writer_method, sys_class_precedence_list, [ claz_sys_standard_accessor_method, claz_standard_method, claz_method, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_standard_writer_method, sys_class_precedence_list, [ claz_sys_standard_accessor_method, claz_standard_method, claz_method, claz_sys_metaobject, claz_standard_object, claz_t ]).
+struct_opv(claz_sys_standard_writer_method, sys_class_precedence_list, [ claz_sys_standard_accessor_method, claz_standard_method, claz_method, claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_standard_writer_method, sys_class_precedence_list, [ claz_sys_standard_accessor_method, claz_sys_accessor_method, claz_standard_method, claz_sys_plist_mixin, claz_sys_definition_source_mixin, claz_method, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_sys_standard_writer_method, type_of, standard_class).
 struct_opv(claz_sys_standard_writer_method, writers, [[setf, method_qualifiers]], sys_standard_writer_method_qualifiers).
@@ -3141,7 +3146,7 @@ struct_opv(claz_sys_super_class, include, claz_sys_standard_stablehash).
 struct_opv(claz_sys_super_class, initargs,[kw_name], sys_super_class_classname).
 struct_opv(claz_sys_super_class, name, sys_class_direct_subclasses, sys_super_class_direct_subclasses).
 struct_opv(claz_sys_super_class, name, sys_classname, sys_super_class_classname).
-struct_opv(claz_sys_super_class, sys_class_precedence_list, [ claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_sys_super_class, sys_class_precedence_list, [ claz_sys_standard_stablehash, claz_sys_metaobject, claz_standard_object, claz_t ]).
 struct_opv(claz_sys_super_class, type, [or, hash_table, sys_weak_list, null], sys_super_class_direct_subclasses).
 struct_opv(claz_sys_super_class, type, symbol, sys_super_class_classname).
 struct_opv(claz_sys_super_class, type_of, standard_class).
@@ -3282,7 +3287,7 @@ struct_opv(claz_type_error, name, sys_expected_type, sys_type_error_expected_typ
 struct_opv(claz_type_error, name, sys_report_function, sys_type_error_report_function).
 struct_opv(claz_type_error, readers, [type_error_datum], sys_type_error_datum).
 struct_opv(claz_type_error, readers, [type_error_expected_type], sys_type_error_expected_type).
-struct_opv(claz_type_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_type_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_type_error, sys_class_precedence_list, [ claz_error, claz_serious_condition, claz_condition, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_type_error, type_of, standard_class).
 struct_opv(claz_type_error, type_of, sys_condition_class).
@@ -3295,7 +3300,7 @@ struct_opv(claz_unbound_slot, initform, [ lambda, [condition, stream], [ format,
 struct_opv(claz_unbound_slot, name, sys_instance, sys_unbound_slot_instance).
 struct_opv(claz_unbound_slot, name, sys_report_function, sys_unbound_slot_report_function).
 struct_opv(claz_unbound_slot, readers, [unbound_slot_instance], sys_unbound_slot_instance).
-struct_opv(claz_unbound_slot, sys_class_precedence_list, [ claz_cell_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_unbound_slot, sys_class_precedence_list, [ claz_cell_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_unbound_slot, sys_class_precedence_list, [ claz_cell_error, claz_error, claz_serious_condition, claz_condition, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_unbound_slot, type_of, standard_class).
 struct_opv(claz_unbound_slot, type_of, sys_condition_class).
@@ -3304,7 +3309,7 @@ struct_opv(claz_unbound_variable, default_initargs, [[claz_kw_format_arguments, 
 struct_opv(claz_unbound_variable, include, claz_cell_error).
 struct_opv(claz_unbound_variable, initform, [ lambda, [condition, stream], [ format, stream, '$ARRAY'([*], claz_base_character, [ #\('T'), #\(h), #\(e), #\(' '), #\(v), #\(a), #\(r), #\(i), #\(a), #\(b), #\(l), #\(e), #\(' '), #\(~), #\('S'), #\(' '), #\(i), #\(s), #\(' '), #\(u), #\(n), #\(b), #\(o), #\(u), #\(n), #\(d), #\('.') ]), [cell_error_name, condition] ] ], sys_unbound_variable_report_function).
 struct_opv(claz_unbound_variable, name, sys_report_function, sys_unbound_variable_report_function).
-struct_opv(claz_unbound_variable, sys_class_precedence_list, [ claz_cell_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_unbound_variable, sys_class_precedence_list, [ claz_cell_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_unbound_variable, sys_class_precedence_list, [ claz_cell_error, claz_error, claz_serious_condition, claz_condition, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_unbound_variable, type_of, standard_class).
 struct_opv(claz_unbound_variable, type_of, sys_condition_class).
@@ -3313,7 +3318,7 @@ struct_opv(claz_undefined_function, default_initargs, [[claz_kw_format_arguments
 struct_opv(claz_undefined_function, include, claz_cell_error).
 struct_opv(claz_undefined_function, initform, [ lambda, [condition, stream], [ format, stream, '$ARRAY'([*], claz_base_character, [ #\('T'), #\(h), #\(e), #\(' '), #\(f), #\(u), #\(n), #\(c), #\(t), #\(i), #\(o), #\(n), #\(' '), #\(~), #\('S'), #\(' '), #\(i), #\(s), #\(' '), #\(u), #\(n), #\(d), #\(e), #\(f), #\(i), #\(n), #\(e), #\(d), #\('.') ]), [cell_error_name, condition] ] ], sys_undefined_function_report_function).
 struct_opv(claz_undefined_function, name, sys_report_function, sys_undefined_function_report_function).
-struct_opv(claz_undefined_function, sys_class_precedence_list, [ claz_cell_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_sys_slot_object, claz_t ]).
+struct_opv(claz_undefined_function, sys_class_precedence_list, [ claz_cell_error, claz_error, claz_serious_condition, claz_condition, claz_standard_object, claz_t ]).
 struct_opv(claz_undefined_function, sys_class_precedence_list, [ claz_cell_error, claz_error, claz_serious_condition, claz_condition, claz_sys_slot_object, claz_t ]).
 struct_opv(claz_undefined_function, type_of, standard_class).
 struct_opv(claz_undefined_function, type_of, sys_condition_class).
@@ -3325,7 +3330,7 @@ struct_opv(claz_vector, type_of, built_in_class).
 struct_opv(claz_warning, class_name, warning).
 struct_opv(claz_warning, default_initargs, [[claz_kw_format_arguments, [], "FILTRACE"]]).
 struct_opv(claz_warning, include, claz_condition).
-struct_opv(claz_warning, sys_class_precedence_list, [claz_condition, claz_standard_object, claz_sys_slot_object, claz_t]).
+struct_opv(claz_warning, sys_class_precedence_list, [claz_condition, claz_standard_object, claz_t]).
 struct_opv(claz_warning, sys_class_precedence_list, [claz_condition, claz_sys_slot_object, claz_t]).
 struct_opv(claz_warning, type_of, standard_class).
 struct_opv(claz_warning, type_of, sys_condition_class).

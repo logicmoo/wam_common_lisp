@@ -107,7 +107,7 @@ f_sys_coerce_to_function(FN,ProposedName):- find_lisp_function(FN,_ARITY,Propose
 
 foc_operator(Ctx,Env,BindType,FN, Len, ProposedName):-  find_operator(Ctx,Env,BindType,FN, Len, ProposedName),!.
 foc_operator(Ctx,_Env,BindType,FN, _Len, ProposedName):- 
-  show_call_trace((generate_function_or_macro_name(Ctx,FN,BindType,ProposedName))),!.
+  always((generate_function_or_macro_name(Ctx,FN,BindType,ProposedName))),!.
 
 bind_type_naming_of(BindType,FN,Named):- wdmsg(bind_type_naming_of(BindType,FN,Named)).
 bind_type_naming(kw_function,FN,ProposedName):- (atom_concat('f_',FN,ProposedName)),!.
