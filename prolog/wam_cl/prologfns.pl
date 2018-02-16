@@ -121,8 +121,8 @@ as_prolog_object(PrologArg,PrologArg).
 
 read_prolog_object(Operand):- read(Operand).
 
-do_interned_eval(MG):- strip_module(MG,_,G),G=call(_),!,call_interned_eval(MG).
-do_interned_eval(G):- call_interned_eval(lisp_compiled_eval(G,_)).
+do_interned_eval(MG):- strip_module(MG,_,G),G=call(_),!,call_interned_eval(MG),!.
+do_interned_eval(G):- call_interned_eval(lisp_compiled_eval(G,_)),!.
 
 call_interned_eval(G):- always(subst_castifies(G,GG)),!,always(GG),!.
 
@@ -155,7 +155,7 @@ locally_let([],G):- !,call_interned_eval(G).
 subst_castifies(G,G):- \+ compound(G),!.
 subst_castifies(G,GG):- castify(G,GG),!.
 subst_castifies(C1,C2):- compound_name_arguments(C1,F,C1O),
-  must_maplist(subst_castifies,C1O,C2O),C2=..[F|C2O].
+  must_maplist(subst_castifies,C1O,C2O),C2=..[F|C2O],!.
 
 castify(O,O):- \+compound(O),!,fail.
 castify(str(O),S):-!, castify1(O,M),to_lisp_string(M,S).
