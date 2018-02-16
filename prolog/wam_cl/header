@@ -47,7 +47,7 @@
 :- use_module(library(dmsg)).
 
 
-:- multifile(wl:symbol_has_prop_get_set/4).
+:- multifile(wl:symbol_has_prop_set_get/4).
 :- multifile(wl:symbol_has_prop_getter/3).
 :- multifile(wl:symbol_has_prop_setter/3).
 :- dynamic(wl:symbol_has_prop_get_set/4).

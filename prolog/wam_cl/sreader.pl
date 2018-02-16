@@ -1,5 +1,5 @@
-:- if(\+ current_module(sxpr_reader)).
-:- module(sxpr,[
+:- if(\+ current_module(s3xpr)).
+:- module(s3xpr,[
   codelist_to_forms/2,
   svar_fixvarname/2,
   current_input_to_forms/2,
@@ -16,7 +16,7 @@
   svar_fixvarname/2,
   sexpr_sterm_to_pterm/2,
   lisp_read/2,
-  phrase_from_stream_part/2,
+  phrase_from_stream_nd/2,
   write_trans/4,
   parse_sexpr/2]).
 
@@ -35,7 +35,7 @@ kif_ok:- t_l:sreader_options(logicmoo_read_kif,true).
 :- meta_predicate((with_lisp_translation(+,1),input_to_forms_debug(+,2))).
 :- meta_predicate sexpr_vector(*,//,
  ?,?).
-:- meta_predicate phrase_from_stream_part(//,
+:- meta_predicate phrase_from_stream_nd(//,
   +).
 :- meta_predicate read_string_until(*,//,?,?
  ).
@@ -45,7 +45,7 @@ kif_ok:- t_l:sreader_options(logicmoo_read_kif,true).
 
 :- thread_local(t_l:s_reader_info/1).
 
-
+:- meta_predicate(quietly_sreader(0)).
 quietly_sreader(G):- !, call(G).
 quietly_sreader(G):- quietly(G).
 
@@ -150,47 +150,47 @@ throw_reader_error(Error):- wdmsg(throw(reader_error(Error))),dumpST,wdmsg(throw
 supports_seek(In):- notrace_catch_fail(stream_property(In,reposition(true))).
 % supports_seek(In):- quietly_sreader(( notrace_catch_fail((notrace_catch_fail((seek(In, 1, current, _),seek(In, -1, current, _)),error(permission_error(reposition, stream, _), _Ctx),fail)),error(_,_),true))).
 
-phrase_from_stream_eof(Grammar, _):- var(Grammar),!,unify_next_or_eof(Grammar),!.
-%phrase_from_stream_eof(Grammar, _):- compound(Grammar),!,arg(1,Grammar,TV),unify_next_or_eof(TV),!.
-phrase_from_stream_eof(Grammar, _):- term_variables(Grammar,[TV|_]),unify_next_or_eof(TV),!.
-phrase_from_stream_eof(_, In):- throw(end_of_stream_signal(In)).
+phrase_from_eof(Grammar, _):- var(Grammar),!,unify_next_or_eof(Grammar),!.
+%phrase_from_eof(Grammar, _):- compound(Grammar),!,arg(1,Grammar,TV),unify_next_or_eof(TV),!.
+phrase_from_eof(Grammar, _):- term_variables(Grammar,[TV|_]),unify_next_or_eof(TV),!.
+phrase_from_eof(_, In):- throw(end_of_stream_signal(In)).
 
 unify_next_or_eof(O) :- clause(t_l:s_reader_info(I),_,Ref),!,I=O,erase(Ref).
 unify_next_or_eof(end_of_file).
 
-% % % parse_sexpr_input_with_comments(Expr):- phrase_from_stream_part(file_sexpr_with_comments(Expr),current_input).
+% % % parse_sexpr_input_with_comments(Expr):- phrase_from_stream_nd(file_sexpr_with_comments(Expr),current_input).
 
 
-%phrase_from_stream_part(Grammar, In) :-  at_end_of_stream(In),trace,!,phrase_from_stream_eof(Grammar, In).
+%phrase_from_stream_nd(Grammar, In) :-  at_end_of_stream(In),trace,!,phrase_from_eof(Grammar, In).
 
 show_stream_info(In):-
       forall(stream_property(In,(BUF)),
     (writeq(show_stream_info(In,(BUF))),nl)),!.
 
 /*phrase_from_file_part_a(Grammar, In):-
-    b_setval('$is_file_stream',In),!,
+    b_setval('$lisp_translation_stream',In),!,
     phrase_from_pending_stream(Grammar, In).
 */
 phrase_from_file_part_c(Grammar, In):-
     show_stream_info(In),
     read_stream_to_codes(In,Codes),
-    b_setval('$is_file_stream',In),!,
-    un_fake_buffer_codes(In,Prev),
+    b_setval('$lisp_translation_stream',In),!,
+    remove_pending_buffer_codes(In,Prev),
     append(Prev,Codes,NewCodes0),!,
     phrase_from_file_part_cc(Grammar,NewCodes0,In).
 
 phrase_from_file_part_cc(Grammar,NewCodes0, In):-
-    re_fake_buffer_codes(In,NewCodes0),
+    append_buffer_codes(In,NewCodes0),
     repeat,
     once((
-    un_fake_buffer_codes(In,NewCodes),
+    remove_pending_buffer_codes(In,NewCodes),
     (NewCodes == [] -> throw(end_of_stream_signal(In)) ; true),
     phrase(Grammar, NewCodes, More), 
-    re_fake_buffer_codes(In,More))).
+    append_buffer_codes(In,More))).
 /*
 phrase_from_file_part_ccc(Grammar, In):-
-    b_setval('$is_file_stream',In),
-    un_fake_buffer_codes(In,Prev),
+    b_setval('$lisp_translation_stream',In),
+    remove_pending_buffer_codes(In,Prev),
    % show_stream_info(In),
     read_stream_to_codes(In,Codes),
     append([`(`,Prev,Codes,`)`],NewCodes),!,
@@ -203,18 +203,13 @@ phrase_from_file_part_ccc(Grammar, In):-
     member(Vs,VsC))))).
 */
 
-phrase_from_stream_part(Grammar, In) :- stream_property(In,file_name(_Name)),!,phrase_from_file_part_c(Grammar, In).    
-phrase_from_stream_part(Grammar, _) :- clause(t_l:s_reader_info(I),_,Ref),!,I=Grammar,erase(Ref).
-phrase_from_stream_part(Grammar, In) :- \+ supports_seek(In),!, phrase_from_pending_stream(Grammar, In).
-%phrase_from_stream_part(Grammar, In) :- b_setval('$is_file_stream',In), quietly(phrase_from_stream_part(Grammar, In)).
-phrase_from_stream_part(Grammar, In) :- 
-    %set_stream(In,buffer_size(16384)), set_stream(In,encoding(octet)), set_stream(In,timeout(3.0)),    
-    %set_stream(In,buffer_size(5)), set_stream(In,encoding(octet)), set_stream(In,timeout(3.0)),    
-    %set_stream(In,type(text)),     
-    %set_stream(In,buffer(false)),    
-    %set_stream(In,buffer_size(819200)),
-    %show_stream_info(In),
-    %always(sanity(stream_property(In,reposition(true)))),!,
+phrase_from_stream_nd(Grammar, In) :- stream_property(In,file_name(_Name)),!,phrase_from_file_part_c(Grammar, In).    
+phrase_from_stream_nd(Grammar, _) :- clause(t_l:s_reader_info(I),_,Ref),!,I=Grammar,erase(Ref).
+phrase_from_stream_nd(Grammar, In) :- \+ supports_seek(In),!, phrase_from_pending_stream(Grammar, In).
+%phrase_from_stream_nd(Grammar, In) :- b_setval('$lisp_translation_stream',In), quietly(phrase_from_stream_nd(Grammar, In)).
+phrase_from_stream_nd(Grammar, In) :- 
+    %set_stream(In,buffer_size(819200)),set_stream(In,buffer_size(16384)), set_stream(In,encoding(octet)), set_stream(In,timeout(3.0)),    
+    %set_stream(In,buffer_size(5)), set_stream(In,encoding(octet)), set_stream(In,timeout(3.0)),set_stream(In,type(text)),%set_stream(In,buffer(false)),    
     character_count(In, FailToPosition),
     ((phrase_from_stream_lazy_part(Grammar, In) -> true ; (seek(In,FailToPosition,bof,_),!,fail))),!.
 
@@ -228,42 +223,43 @@ phrase_from_stream_lazy_part(Grammar, In):-
     always((
        length(List,Used),!,
        length(More,UnUsed),!,
-       wdmsg((Offset is Used - UnUsed + Prev)),
+       if_debugging(sreader,wdmsg((Offset is Used - UnUsed + Prev))),
        bx(always(Offset is Used - UnUsed + Prev)),
        % dbginfo((Offset is Used - UnUsed + Prev)) ->
        seek(In,Offset,bof,_NewPos))).
 %phrase_from_stream_lazy_part(Grammar, In):- phrase_from_file_part_c(Grammar, In).
 
 phrase_from_pending_stream(Grammar, In):-
-   un_fake_buffer_codes(In,CodesPrev),
+   remove_pending_buffer_codes(In,CodesPrev),
    phrase_from_pending_stream(CodesPrev, Grammar, In),!.
 
 phrase_from_pending_stream(CodesPrev,Grammar,In):- 
-  b_setval('$is_file_stream',In),
+  b_setval('$lisp_translation_stream',In),
   read_codes_from_pending_input(In,Codes),!,
   ((Codes==end_of_file ; Codes==[-1]) -> 
-     phrase_from_stream_eof(Grammar, In); 
+     phrase_from_eof(Grammar, In); 
      (append(CodesPrev,Codes,NewCodes), !,
        (phrase(Grammar, NewCodes, NewBuffer) 
-        *-> re_fake_buffer_codes(In,NewBuffer);
+        *-> append_buffer_codes(In,NewBuffer);
           phrase_from_pending_stream(NewCodes,Grammar,In)))),!.
 
 
 :- thread_local(t_l:fake_buffer_codes/2).
 
 check_pending_buffer_codes(In):- (t_l:fake_buffer_codes(In,Codes);Codes=[]),!,
-  (Codes==[]->true;(throw(un_fake_buffer_codes(In,Codes)))),!.
+  (Codes==[]->true;(throw(remove_pending_buffer_codes(In,Codes)))),!.
 
-un_fake_buffer_codes(In,Codes):- retract(t_l:fake_buffer_codes(In,Codes)),!.
-un_fake_buffer_codes(_In,[]). % for first read
+remove_pending_buffer_codes(In,Codes):- retract(t_l:fake_buffer_codes(In,Codes)),!.
+remove_pending_buffer_codes(_In,[]). % for first read
 
-re_fake_buffer_codes(In,Codes):- retract(t_l:fake_buffer_codes(In,CodesPrev)),!,append(CodesPrev,Codes,NewCodes),assertz(t_l:fake_buffer_codes(In,NewCodes)),!.
-re_fake_buffer_codes(In,Codes):- assertz(t_l:fake_buffer_codes(In,Codes)),!.
+append_buffer_codes(In,Codes):- retract(t_l:fake_buffer_codes(In,CodesPrev)),!,append(CodesPrev,Codes,NewCodes),assertz(t_l:fake_buffer_codes(In,NewCodes)),!.
+append_buffer_codes(In,Codes):- assertz(t_l:fake_buffer_codes(In,Codes)),!.
 
 wait_on_input(In):- stream_property(In,end_of_stream(Not)),Not\==not,!.
 wait_on_input(In):- repeat,wait_for_input([In],List,1.0),List==[In],!.
 
-read_codes_from_pending_input(In,Out):- stream_property(In,end_of_stream(Not)),Not\==not,!,(Not==at->Out=end_of_file;Out=[-1]).
+read_codes_from_pending_input(In,Codes):- \+ is_stream(In),!,remove_pending_buffer_codes(In,Codes).
+read_codes_from_pending_input(In,Codes):- stream_property(In,end_of_stream(Not)),Not\==not,!,(Not==at->Codes=end_of_file;Codes=[-1]).
 read_codes_from_pending_input(In,Codes):-  stream_property(In, buffer(none)),!,
    repeat,
     once(( wait_on_input(In),
@@ -285,7 +281,7 @@ parse_sexpr(atom(String), Expr) :- !,txt_to_codes(String,Codes),!,parse_sexpr_as
 parse_sexpr(text(String), Expr) :- !,txt_to_codes(String,Codes),!,parse_sexpr_ascii(Codes, Expr).
 parse_sexpr((String), Expr) :- string(String),!, txt_to_codes(String,Codes),!,parse_sexpr_ascii(Codes, Expr).
 parse_sexpr([E|List], Expr) :- !, parse_sexpr_ascii([E|List], Expr),!.
-parse_sexpr(Other, Expr) :- quietly_sreader((l_open_input(Other,In),Other\=@=In)),!,parse_sexpr(In, Expr).
+parse_sexpr(Other, Expr) :- always(quietly_sreader((l_open_input(Other,In),Other\=@=In))),!,parse_sexpr(In, Expr).
 
 :- export(txt_to_codes/2).
 txt_to_codes(AttVar,AttVarO):-attvar(AttVar),!,AttVarO=AttVar.
@@ -328,7 +324,7 @@ parse_sexpr_stream(S,Expr):-
     end_of_stream_signal(S),
     Expr=end_of_file).
 parse_sexpr_stream_1(S,Expr):- 
-  phrase_from_stream_part(always(file_sexpr_with_comments(Expr)),S).
+  phrase_from_stream_nd(always(file_sexpr_with_comments(Expr)),S).
 
 
 
@@ -498,7 +494,7 @@ ugly_sexpr_cont('$OBJ'(sugly,S))                 -->  read_string_until(S,`>`), 
 
 %sexpr(L)                   --> sblank,!,sexpr(L),!.
 %sexpr(_) --> `)`,!,{trace,break,throw_reader_error(": an object cannot start with #\\)")}.
-sexpr(X,H,T):- always(sexpr0(X),H,M),always(swhite,M,T), (wdmsg(sexpr(X))),!.
+sexpr(X,H,T):- always(sexpr0(X),H,M),always(swhite,M,T), if_debugging(sreader,(wdmsg(sexpr(X)))),!.
 %sexpr(X,H,T):- always(sexpr0(X,H,T)),!,swhite.
 
 sexpr0(L)                      --> sblank,!,sexpr(L),!.
@@ -651,7 +647,7 @@ dcg_print_start_of(H):- (length(L,3000);length(L,300);length(L,30);length(L,10);
 
 
 % allow terminals to use partial input
-always(G,H,T):- ((nb_current('$is_file_stream',S),is_stream(S))->true;(dumpST,fail)),stream_property(S,tty(true)),!,phrase(G,H,T).
+always(G,H,T):- ((nb_current('$lisp_translation_stream',S),is_stream(S))->true;(dumpST,fail)),stream_property(S,tty(true)),!,phrase(G,H,T).
 always(G,H,T):- phrase(G,H,T),!.
 always(G,H,T):- H=[_|_],writeq(phrase_h(G,H,T)),dcg_print_start_of(H),writeq(phrase(G,H,T)),!,trace,ignore(rtrace(phrase(G,H,T))),!,notrace,dcg_print_start_of(H),writeq(phrase(G,H,T)), break,!,fail.
 always(G,H,T):- writeq(phrase(G,H,T)),dcg_print_start_of(H),writeq(phrase(G,H,T)),!,trace,ignore(rtrace(phrase(G,H,T))),!,notrace,dcg_print_start_of(H),writeq(phrase(G,H,T)), break,!,fail.
