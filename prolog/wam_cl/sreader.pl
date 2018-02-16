@@ -178,10 +178,10 @@ phrase_from_file_part_cc(Grammar,NewCodes0, In):-
 
     
 
-phrase_from_stream_nd(Grammar, In) :-  at_end_of_stream(In),peek_pending_codes(In,Pend),is_eof_codes(Pend),!,phrase_from_eof(Grammar, In).
+phrase_from_stream_nd(Grammar, In) :-  at_end_of_stream(In), peek_pending_codes(In,Pend),is_eof_codes(Pend),!,phrase_from_eof(Grammar, In). %
 %phrase_from_stream_nd(Grammar, _) :- clause(t_l:s_reader_info(I),_,Ref),I=Grammar,erase(Ref).
 phrase_from_stream_nd(Grammar, In) :- stream_property(In,file_name(_Name)),!,
-   show_stream_info(In),
+   if_debugging(sreader,show_stream_info(In)),
    read_stream_to_codes(In,Codes),
    b_setval('$lisp_translation_stream',In),!,
    remove_pending_buffer_codes(In,Prev),
