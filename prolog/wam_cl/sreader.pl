@@ -172,16 +172,6 @@ show_stream_info(In):-
       forall(stream_property(In,(BUF)),
     (writeq(show_stream_info(In,(BUF))),nl)),!.
 
-/*phrase_from_file_part_cc(Grammar,NewCodes0, In):-
-    append_buffer_codes(In,NewCodes0),
-    repeat,
-    once((
-    remove_pending_buffer_codes(In,NewCodes),
-    (NewCodes == [] -> throw(end_of_stream_signal(Grammar,In)) ; true),
-    phrase(Grammar, NewCodes, More), 
-    append_buffer_codes(In,More))).
-*/
-    
 phrase_from_stream_nd(Grammar,In):- 
    peek_pending_codes(In,Codes)->Codes=[_,_|_],
    remove_pending_buffer_codes(In,_),
@@ -196,20 +186,14 @@ phrase_from_stream_nd(Grammar, In) :- stream_property(In,file_name(_Name)),!,
     b_setval('$lisp_translation_stream',In),
     append_buffer_codes(In,Codes),!,
     phrase_from_buffer_codes(Grammar,In).
-/*
-phrase_from_stream_nd(Grammar, In) :- stream_property(In,file_name(_Name)),!,
-   if_debugging(sreader,show_stream_info(In)),
-   read_stream_to_codes(In,Codes),
-   b_setval('$lisp_translation_stream',In),!,
-   remove_pending_buffer_codes(In,Prev),
-   append(Prev,Codes,NewCodes0),!,
-   phrase_from_file_part_cc(Grammar,NewCodes0,In).  */
+
 phrase_from_stream_nd(Grammar, In) :- \+ supports_seek(In),!,
     if_debugging(sreader,show_stream_info(In)),
     read_stream_to_codes(In,Codes),
     b_setval('$lisp_translation_stream',In),
     append_buffer_codes(In,Codes),!,
     phrase_from_buffer_codes(Grammar,In).
+
 phrase_from_stream_nd(Grammar, In) :- \+ supports_seek(In),!, phrase_from_pending_stream(Grammar, In).
 %phrase_from_stream_nd(Grammar, In) :- b_setval('$lisp_translation_stream',In), quietly(phrase_from_stream_nd(Grammar, In)).
 phrase_from_stream_nd(Grammar, In) :-  supports_seek(In),

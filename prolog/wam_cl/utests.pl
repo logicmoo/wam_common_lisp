@@ -274,7 +274,8 @@ mf_sys_is([sys_is,Eqf_In, Expected_In, Actual_In],ReplEnv, MFResult) :-
               ),
               block_exit(sys_is, MFResult),
               true).
-:- rtrace(set_opv(sys_is, symbol_function, sf_sys_is)).
+
+:- always(set_opv(sys_is, symbol_function, sf_sys_is)).
 
 :- fixup_exports.
 
@@ -358,18 +359,18 @@ test(3):- if_script_file_time666(run666("
 
 % Higher-order programming and eval:
 test(4):- if_script_file_time666(run666("
-        (defun map (f xs)
+        (defun my-map (f xs)
           (if xs
-              (cons (eval (list f (car xs))) (map f (cdr xs)))
+              (cons (eval (list f (car xs))) (my-map f (cdr xs)))
             ()))
 
         (defun plus1 (x) (+ 1 x))
 
-        (map 'plus1 '(1 2 3))
+        (my-map 'plus1 '(1 2 3))
         "
         )).
 
-    %@ V = [map, plus1, [2, 3, 4]].
+    %@ V = [my-map, plus1, [2, 3, 4]].
  
 
 unused_ :- writeln('
