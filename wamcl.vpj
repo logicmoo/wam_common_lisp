@@ -692,6 +692,11 @@
 						<F N="prolog/wam_cl/src/util/defsys.lsp"/>
 						<F N="prolog/wam_cl/src/util/system.lsp"/>
 					</Folder>
+					<F
+						N="prolog/wam_cl/src/*.*"
+						Recurse="1"
+						Refilter="0"
+						Excludes=""/>
 					<F N="prolog/wam_cl/src/.gitignore"/>
 					<F N="prolog/wam_cl/src/wam-cl-init-00.lisp"/>
 					<F N="prolog/wam_cl/src/wam-cl-init-00.lisp.pro"/>

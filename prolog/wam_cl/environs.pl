@@ -188,10 +188,10 @@ set_env_attribute0(Env,Name,Value):-
   nb_setarg(2,Sub,SetT),
   nb_setarg(1,Sub,Name=Value).
 
-get_lambda_def(Ctx,Env,defmacro,ProcedureName,FormalParams,LambdaExpression):- get_symbol_fbounds(Ctx,Env,ProcedureName,kw_macro,[lambda,FormalParams|LambdaExpression]).
-get_lambda_def(Ctx,Env,defun,ProcedureName,FormalParams,LambdaExpression):- get_symbol_fbounds(Ctx,Env,ProcedureName,kw_function,[lambda,FormalParams|LambdaExpression]).
-get_lambda_def(_Ctx,_Env,DefType,ProcedureName,FormalParams,LambdaExpression):- wl:lambda_def(DefType,ProcedureName,_,FormalParams,LambdaExpression).
-get_lambda_def(_Ctx,_Env,DefType,ProcedureName,FormalParams,LambdaExpression):-  wl:lambda_def(DefType,_,ProcedureName,FormalParams,LambdaExpression).
+get_lambda_def(Ctx,Env,defmacro,ProcedureName,FormalParms,LambdaExpression):- get_symbol_fbounds(Ctx,Env,ProcedureName,kw_macro,[lambda,FormalParms|LambdaExpression]).
+get_lambda_def(Ctx,Env,defun,ProcedureName,FormalParms,LambdaExpression):- get_symbol_fbounds(Ctx,Env,ProcedureName,kw_function,[lambda,FormalParms|LambdaExpression]).
+get_lambda_def(_Ctx,_Env,DefType,ProcedureName,FormalParms,LambdaExpression):- wl:lambda_def(DefType,ProcedureName,_,FormalParms,LambdaExpression).
+get_lambda_def(_Ctx,_Env,DefType,ProcedureName,FormalParms,LambdaExpression):-  wl:lambda_def(DefType,_,ProcedureName,FormalParms,LambdaExpression).
 
 get_symbol(Sym,Symbol):- \+ compound(Sym),!,Sym=Symbol.
 get_symbol(Sym,Symbol):- arg(1,Sym,Mid),!,get_symbol(Mid,Symbol).

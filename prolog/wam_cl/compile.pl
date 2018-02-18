@@ -325,7 +325,7 @@ compile_body(Ctx,Env,Result,[compile|Forms], Body):- !,
    
    debug_var('LResult',CompileResult),
    debug_var('CompileEnvironment',CompileEnvironment),
-   % ClosureEnvironment,Whole,ClosureResult,FormalParams,ClosureBody,Symbol,ActualParams,ClosureResult
+   % ClosureEnvironment,Whole,ClosureResult,FormalParms,ClosureBody,Symbol,ActualParams,ClosureResult
    Result = closure(kw_function,[CompileEnvironment|Env],CompileResult,[],CompileBody),
    Body = true.
 
@@ -348,7 +348,7 @@ f_sys_lcompile(Form,Keys, ResultO):-
    Part3 = body_cleanup_full(Ctx,( (CompileEnvironment = Env,CompileBody,CResult=CompileResult)),Opt),
    Whole = [sys_lcompile,Form|Keys],
    Symbol = sys_lcompile,
-   % closure(FType,ClosureEnvironment,Whole,Result,FormalParams,ClosureBody,Symbol,ActualParams,ResultO)
+   % closure(FType,ClosureEnvironment,Whole,Result,FormalParms,ClosureBody,Symbol,ActualParams,ResultO)
    ResultO = closure(kw_function,[CompileEnvironment|Env],Whole,CompileResult,[],Opt,Symbol),   
    Body = (nl,nl,Part1,Part2,Part3,cmpout(:- Opt),maplist(f_sys_set_wam_cl_option,Names,Was)),
    always(Body),
@@ -370,7 +370,7 @@ compile_body(Ctx,Env,Result,Form1,Body):- compile_body_form(Ctx,Env,Result,Form1
 % INTERFACES
 % =============================================================================
 
-compile_body(Ctx,Env,Result,Form1,Body):- compile_closures(Ctx,Env,Result,Form1,Body).
+compile_body(Ctx,Env,Result,Form1,Body):- compile_closures(Ctx,Env,Result,Form1,Body),!.
 
 
 % Use a previous DEFMACRO

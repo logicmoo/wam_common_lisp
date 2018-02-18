@@ -151,8 +151,8 @@ function_arg_info(FN,ArgInfo):- wl:arglist_info(FN,_,_,_,ArgInfo).
 function_arg_info(FN,ArgInfo):- wl:arglist_info(_,FN,_,_,ArgInfo).
 
 
-eval_uses_whole(F):- quietly((premute_names(F,FF), get_init_args(FF,while))),!.
-eval_bind_parameters(F):- quietly((premute_names(F,FF), get_init_args(FF,bind_parameters))),!.
+%eval_uses_whole(F):- quietly((premute_names(F,FF), get_init_args(FF,whole))),!.
+%eval_bind_parameters(F):- quietly((premute_names(F,FF), get_init_args(FF,bind_parameters))),!.
 
 % get_init_args(FN,Requireds):- current_predicate(FN/N), Requireds is N-2,Requireds>0.
 get_init_args(F,_):- is_list(F),!,fail.
@@ -211,8 +211,7 @@ align_args(FN,ProposedName,Args,Result,ArgsPlusResult):-
   append(Left, [Rest,Result], ArgsPlusResult).
 
 % invoke([fn,r1,r2,r3],RET).
-align_args(FN,ProposedName,Args,Result,[[FN|Args],Result]):-
-  (eval_uses_whole(FN);eval_uses_whole(ProposedName)).
+%align_args(FN,ProposedName,Args,Result,[[FN|Args],Result]):- (eval_uses_whole(FN);eval_uses_whole(ProposedName)).
 
 
 % guess invoke(r1,RET).

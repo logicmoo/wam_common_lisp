@@ -57,8 +57,8 @@ not_fn(Value,A):- \+ call(Value,A).
 not_fn(Value,A,B):- \+ call(Value,A,B).
 not_fn(Value,A,B,C):- \+ call(Value,A,B,C).
 
-nth_param(Optionals,N,Default,Value):- nth1(N,Optionals,Value)->true;Default=Value.
-nth_param(Optionals,N,Default,Value,PresentP):- nth1(N,Optionals,Value)->(PresentP=t);(Default=Value,PresentP=[]).
+nth_param(Optionals,N,Default,Value):- (nonvar(Optionals),nth1(N,Optionals,Value))->true;Default=Value.
+nth_param(Optionals,N,Default,Value,PresentP):- (nonvar(Optionals),nth1(N,Optionals,Value))->(PresentP=t);(Default=Value,PresentP=[]).
 
 
 :- fixup_exports.

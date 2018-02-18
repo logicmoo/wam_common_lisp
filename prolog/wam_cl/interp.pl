@@ -70,20 +70,20 @@ apply_f(Bindings,if, [Test, Success, Failure], Result):-  !,
 	(TestResult \== [] -> eval(Success, Bindings, Result)
 			  ; eval(Failure, Bindings, Result)),
 	!.
-apply_f(Binds,[lambda, FormalParams, Body], ActualParams, Result):-
+apply_f(Binds,[lambda, FormalParms, Body], ActualParams, Result):-
 	!,
-	bind_formal_parameters(FormalParams, ActualParams,Binds, Bindings),!,
+	bind_formal_parameters(FormalParms, ActualParams,Binds, Bindings),!,
 	eval(Body, Bindings, Result),
 	!.
-apply_f(_Binds,[closure, FormalParams, Body, Bindings0], ActualParams, Result):-
+apply_f(_Binds,[closure, FormalParms, Body, Bindings0], ActualParams, Result):-
 	!,
-	bind_formal_parameters(FormalParams, ActualParams, Bindings0, Bindings),
+	bind_formal_parameters(FormalParms, ActualParams, Bindings0, Bindings),
 	eval(Body, Bindings, Result),
 	!.
 
 apply_f(_Binds,ProcedureName, ActualParams, Result):-
-	get_lambda_def(Ctx,Env,defun,ProcedureName,FormalParams, LambdaExpression),!,
-	bind_formal_parameters(FormalParams, ActualParams, Bindings),
+	get_lambda_def(Ctx,Env,defun,ProcedureName,FormalParms, LambdaExpression),!,
+	bind_formal_parameters(FormalParms, ActualParams, Bindings),
         eval(LambdaExpression, Bindings, Result),
 	!.
 apply_f(Bindings,ProcedureName, Args, Result):-

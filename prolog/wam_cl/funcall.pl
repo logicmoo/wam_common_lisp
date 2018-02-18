@@ -23,27 +23,25 @@
 f_eval(Form,Result):- lisp_compile(Result,Form,Body),always(Body).
 
 wl:init_args(1,funcall).
-f_funcall(function(F),More,R):-!,f_funcall(F,More,R).
+%f_funcall(function(F),More,R):-!,f_funcall(F,More,R).
 f_funcall(ProcedureName,Args,Result):- f_apply(ProcedureName, [Args], Result).
 % f_funcall([F|More],R):- append([More],[R],ARGS), lpa_apply(F,ARGS).
 
 
 
 wl:init_args(1,apply).
-f_apply(closure(kw_function,Environment,ClosureResult,FormalArgs,Body), [Arguments], Result):-!,
-  always(closure(kw_function,Environment,ClosureResult,FormalArgs,Body,Arguments,Result)).
-
-f_apply(function(FunctionName), Arguments, Result):-!,f_apply((FunctionName), Arguments, Result).
-f_apply(FunctionName,Arguments,Result):- FunctionName==[],!,lisp_dump_break,Result=Arguments.
-f_apply(FunctionName, Arguments, Result):- atom(FunctionName),!,
-  lisp_compiled_eval([FunctionName|Arguments],Result).
+f_apply(FunctionName,Arguments,Result):- (var(FunctionName);FunctionName==[]),!,lisp_dump_break,Result=Arguments.
 f_apply(FunctionName, Arguments, Result):- is_list(FunctionName),!,
-  append(FunctionName, Arguments,FunArguments),
-  lisp_compiled_eval(FunArguments,Result).
-f_apply(Compound, Arguments, Result):- compound(Compound),!,Compound=..FunctionName,
+  append(FunctionName, Arguments,FunWithArguments),
+  lisp_compiled_eval(FunWithArguments,Result).
+f_apply(function(FunctionName), Arguments, Result):-nonvar(FunctionName),!,f_apply((FunctionName), Arguments, Result).
+%f_apply(FunctionName, Arguments, Result):- atom(FunctionName),!,lisp_compiled_eval([FunctionName|Arguments],Result).
+%f_apply(closure(kw_function,Environment,ClosureResult,FormalArgs,Body), [Arguments], Result):-!,always(closure(kw_function,Environment,ClosureResult,FormalArgs,Body,Arguments,Result)).
+f_apply(Compound, Arguments, Result):- always(callable(Compound)),!, Compound=..FunctionName,
   append(FunctionName, [Arguments,Result],Funcall),
   Call=..Funcall,
   always(Call).
+
 
 
 

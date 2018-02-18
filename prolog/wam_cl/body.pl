@@ -179,6 +179,20 @@ compile_body_form(Ctx,Env,Result,[progv,VarsForm,ValuesForm|FormS],Code):- !,
 compiler_macro_left_right(prog,[Vars|Forms], [block,[],[let,Vars,[tagbody|Forms]]]).
 
 
+wl:init_args(2, destructuring_bind).
+%:- set_opv(destructuring_bind, symbol_function, sf_destructuring_bind).
+sf_destructuring_bind(ReplEnv, FormalParms, ArgList, Progn, Result) :-  break,
+  compile_closures(ReplEnv,ReplEnv,Result,[destructuring_bind, FormalParms, ArgList|Progn], Body),
+  always(Body).
+
+compile_body_form(Ctx,Env,Result,[destructuring_bind, FormalParms, ArgList|Progn],Code):-
+   must_compile_body(Ctx,Env,ArgListR,ArgList,Body1),
+   make_bind_parameters(Ctx,Env,FormalParms,Whole,Arguments,EnvForBody,Body2),   
+   must_compile_progn(Ctx,EnvForBody,Result,Progn,BodyS),
+   Code = (Body1, del_attr(Whole,freeze),del_attr(Arguments,freeze),Arguments=ArgListR, Body2 , BodyS).
+    % del_attr(RestNKeys,freeze).
+
+        
 % =============================================================================
 % = LET/EXT:LETF = 
 % =============================================================================

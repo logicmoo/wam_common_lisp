@@ -352,8 +352,8 @@ lpa_apply(Pred, Args) :-
         ->      Goal =.. [Pred|Args]
         ;       Pred = complement(Term)
         ->      Goal = complement(Term, Args)
-        ;       Pred = FormalParams ^ Term
-        ->      copy_term(FormalParams ^ Term, Args ^ Goal)
+        ;       Pred = FormalParms ^ Term
+        ->      copy_term(FormalParms ^ Term, Args ^ Goal)
         ;       Pred =.. OldList,
                 append(OldList, Args, NewList),
                 Goal =.. NewList        ),

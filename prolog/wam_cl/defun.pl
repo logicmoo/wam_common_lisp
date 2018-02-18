@@ -82,18 +82,18 @@ compile_function(Ctx,Env,[Symbol,FormalParms|FunctionBody0],Symbol,CtxFunction,C
    always(maybe_get_docs(function,Symbol,FunctionBody0,FunctionBody,DocCode)),
    
    debug_var("Env",Env),
-   debug_var('FnResult',Result),   
-   Whole=[Symbol|_],
-     (destructure_parameters(Ctx,Env,Symbol,CtxFunction,FormalParms,Whole, HeadParms,ZippedArgEnv,_ArgInfo, HeadDefCode,HeadCode),
+   debug_var('FnResult',Result),      
+     (make_head_params(Ctx,Env,Symbol,CtxFunction,FormalParms,Whole,RequiredArgs,RestNKeys,HeadParms,ZippedArgEnv,HeadDefCode,HeadCode),      
       must_compile_body(Ctx,HeadEnv,Result,[block,Symbol|FunctionBody],BodyCode))),      
    append([CtxFunction|HeadParms],[Result],HeadV),
    CallableHead =.. HeadV,
    make_env_append(Ctx,Env,HeadEnv,ZippedArgEnv,EnvAssign),
+   nop((contains_var(Whole,ZippedArgEnv)->append([Symbol|RequiredArgs],RestNKeys,Whole);true)),
  CompileBody = (
    DocCode,
    assert_lsp(Symbol,wl:lambda_def(defun,Symbol,CtxFunction, FormalParms, FunctionBody)),
    HeadDefCode,
-   assert_lsp(Symbol,CallableHead  :- (EnvAssign,  BodyCodeO))),
+   assert_lsp(Symbol,CallableHead  :- (EnvAssign,BodyCodeO))),
  debug_var('Result',Result), 
   body_cleanup_keep_debug_vars(Ctx,(HeadCode,BodyCode),BodyCodeO),
   body_cleanup_keep_debug_vars(Ctx,CompileBody,CompileBodyOpt))).
