@@ -358,7 +358,7 @@ no_init_form([]).
 
 % Parsing &key(s)
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,[[KWF,InitForm,Present]|FormalParms],Params,[Name,Present|Names],[V,PresentP|PVars],PCode):- !,
-   to_kw_and_name(KWF,KW, Name),
+   to_kw_and_name(KWF,Name,KW),
    arginfo_append(Name,key,ArgInfo),
    debug_var(Present,PresentP),   
    lisp_compile(Env,Else,InitForm,InitCode),
@@ -506,7 +506,7 @@ must_bind_ parameters(Ctx,Env,Whole,RestNKeys,FormalParms0,Symbol,Params,Env,Cod
 destructure_parameters(Ctx,Env,FormalParms0,ZippedArgEnv,RestNKeys,Whole,RequiredArgs,ArgInfo,Names,PVars,Code):-!,
    correct_formal_params(FormalParms0,FormalParms),
    freeze(Whole,break),freeze(RestNKeys,break),
-   ArgInfo = arginfo{req:0,all:0,sublists:0,opt:0,rest:0,whole:0,body:0,key:0,aux:0,env:0,allow_other_keys:0,names:Names,complex:0,outer:_},
+   ArgInfo = arginfo{req:0,all:0,sublists:0,opt:0,rest:0,whole:0,body:0,key:0,aux:0,env:0,allow_other_keys:0,names:Names,complex:0,outer:Env},
    enter_ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,required,FormalParms,RequiredArgs,Names,PVars,Code),
    zip_with(Names, PVars, [Var, Val, bv(Var,Val)]^true, ZippedArgEnv),!,
    nop(((ArgInfo.names == ArgInfo.req, ArgInfo.req\==0)-> RestNKeys=[] ; RestNKeys=_)).
