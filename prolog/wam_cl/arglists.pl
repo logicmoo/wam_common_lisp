@@ -178,28 +178,11 @@ f_sys_process_lambda_list(LambdaList,Context):- throw(f_sys_process_lambda_list(
 
 
 reserved_symbols(_Names,_PVars).
-as_rest(_,V,Count,RestNKeys):- ((nonvar(RestNKeys),length(Left,Count),append(Left,Right,RestNKeys))->V=Right;V=[]).
-as_body(F,V,Count,RestNKeys):- as_rest(F,V,Count,RestNKeys).
 
+/*
 get_env(Local,N,Env):- (get_var(Local,N,Env)->nonvar(Env))->true;
    (get_local_env(Local,Env)-> true ; (reenter_lisp(_Ctx,Env),set_local_env(Local,Env))).
-
-
-
-  
-
-/*kw_is_present(RestNKeys,F,KWP,KWPV):- 
-   ((append(_Left,[F,KWPV|More],RestNKeys),length(More,Nth),is_evenp(Nth)) ->
-     KWP=t ; KWP=[]).
 */
-   
-get_kw(_Env,RestNKeys,KW,F,Value,ElseInit,PresentP):- 
-   ((append(_Left,[KW,Value|More],RestNKeys),length(More,Nth), \+ is_oddp(Nth)) -> PresentP=t ;
-     ((F \== KW ,append(_Left,[KW,Value|More],RestNKeys),length(More,Nth), \+ is_oddp(Nth)) -> PresentP=t;
-      (PresentP=[],ElseInit))).
-     
-      
-
 
 enforce_atomic(F):- (simple_atom_var(F)->true;(lisp_dump_break)).
 arginfo_incr(Prop,ArgInfo):- arginfo_append(Prop,complex,ArgInfo),get_dict(Prop,ArgInfo,Old),New is Old +1, b_set_dict(Prop,ArgInfo,New).
@@ -228,29 +211,40 @@ add_param_var(Ctx,Name,PVar):-
 :- discontiguous ordinary_args/11.
 
 ordinary_args(_Ctx,_Env,__ArgInfo,_RestNKeys,_Whole,_, [],[],[],[],true):-!.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% &allow-other-keys
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,_,['c38_allow-other-keys'|FormalParms],Params,Names,PVars,Code):- !,
   arginfo_incr(allow_other_keys,ArgInfo),
   ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,aux,FormalParms,Params,Names,PVars,Code).
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,_,['c38_allow_other_keys'|FormalParms],Params,Names,PVars,Code):- !,
   arginfo_incr(allow_other_keys,ArgInfo),
   ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,aux,FormalParms,Params,Names,PVars,Code).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% switch to aux/option/key modes
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,_,['c38_aux'|FormalParms],Params,Names,PVars,Code):- !,
   ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,aux,FormalParms,Params,Names,PVars,Code).
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,_,['c38_optional'|FormalParms],Params,Names,PVars,Code):- !, 
   ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,'c38_optional',FormalParms,Params,Names,PVars,Code).
-
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,_,['c38_key'|FormalParms],Params,Names,PVars,Code):- !,
   always(ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,FormalParms,Params,Names,PVars,Code)).
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % &rest
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,_,['c38_rest',F|FormalParms],Params,[F|Names],[V|PVars],(as_rest(F,V,Count,RestNKeys),PCode)):- !, 
   arg_info_count(ArgInfo,opt,Count),
   arginfo_append(F,rest,ArgInfo),  
   arginfo_append(rest,complex,ArgInfo),
-
   ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,rest,FormalParms,Params,Names,PVars,PCode).
-  
+
+as_rest(_,V,Count,RestNKeys):- ((nonvar(RestNKeys),length(Left,Count),append(Left,Right,RestNKeys))->V=Right;V=[]).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % &body
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,_,['c38_body',F|FormalParms],Params,[F|Names],[V|PVars],PCode):- !, 
   arg_info_count(ArgInfo,opt,Count),
   arginfo_append(F,rest,ArgInfo),
@@ -259,15 +253,20 @@ ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,_,['c38_body',F|FormalParms],Param
   ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,rest,FormalParms,Params,Names,PVars,Code),
   PCode = (Code,as_body(F,V,Count,RestNKeys)).
 
+as_body(_,V,Count,RestNKeys):- ((nonvar(RestNKeys),length(Left,Count),append(Left,Right,RestNKeys))->V=Right;V=[]).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % &whole 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,MODE,['c38_whole',F|FormalParms],Params,[F|Names],[Whole|PVars],PCode):- !, 
   arginfo_append(F,whole,ArgInfo), 
   arginfo_append(whole,complex,ArgInfo),
-  ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,MODE,FormalParms,Params,Names,PVars,PCode).
-  
+  ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,MODE,FormalParms,Params,Names,PVars,PCode).  
 
  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % &environment
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 /*ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,Mode,['c38_environment',F|FormalParms],Params,[F|Names],[V|PVars],
   (parent_env(V),Code)):- fail, !,
   arginfo_append(F,env,ArgInfo),
@@ -285,7 +284,9 @@ ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,Mode,['c38_environment'],Params,Na
    ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,Mode,['c38_environment','$env'],Params,Names,PVars,Code).
 
 
-% Parsing required(s)  (defmacro dolist ((var listform &optional resultform) &body body) ... )
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Destructuring(s)  like: (defmacro dolist ((var listform &optional resultform) &body body) ... )
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,required,[F|FormalParms],[List|Params],Names12,PVars12,
   (Code2,Code)):-  
   %debug_var('Destructure',List),
@@ -297,7 +298,7 @@ ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,required,[F|FormalParms],[List|Par
 
   %HeadParms=Whole,
   debug_var('SubEnv',Env),
-  ArgInfo2 = arginfo{req:0,all:0,sublists:0,opt:0,rest:0,whole:0,body:0,key:0,aux:0,env:0,allow_other_keys:0,names:Names,complex:0},
+  ArgInfo2 = arginfo{req:0,all:0,sublists:0,opt:0,rest:0,whole:0,body:0,key:0,aux:0,env:0,allow_other_keys:0,names:Names,complex:0,outer:Env},
   %destructure_para eters(Ctx,Env,_,SubFormal,_ZippedArgEnv,_RestNKeys2,Whole2,_RequiredArgs2,ArgInfo2,Names2,PVars2,Code2),  
   enter_ordinary_args(Ctx,Env,ArgInfo2,RestNKeys2,Whole2,required,SubFormal,SubReqParams,Names2,PVars2,Code2),  
   %debug_var('SubRestNKeys',RestNKeys2),
@@ -309,7 +310,9 @@ ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,required,[F|FormalParms],[List|Par
   
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Parsing required(s)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,required,[F|FormalParms],[V|Params],[F|Names],[V|PVars],Code):- !,
   enforce_atomic(F),
   arginfo_append(F,all,ArgInfo),
@@ -317,7 +320,9 @@ ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,required,[F|FormalParms],[V|Params
   ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,required,FormalParms,Params,Names,PVars,Code).
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Parsing &optional(s)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,'c38_optional',[ [F,InitForm,Present]|FormalParms],Params,[F,Present|Names],[V,PresentP|PVars],(InitCode,Code)):- !,
    arginfo_append(F,opt,ArgInfo),arg_info_count(ArgInfo,opt,Count),arginfo_append(F,all,ArgInfo),
    compile_init_opt(Env,RestNKeys,F,V,[InitForm],Count,PresentP,InitCode),
@@ -330,7 +335,20 @@ ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,'c38_optional',[F|FormalParms],Par
    enforce_atomic(F),   
    ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,'c38_optional',[[F,[]]|FormalParms],Params,Names,PVars,Code).
 
+compile_init_opt(Env,RestNKeys,Var,FinalResult,[InitForm],Count,PresentP,
+  opt_var(Env,Var,FinalResult,Code,Result,Count,PresentP,RestNKeys)):- 
+    debug_var("Optionals",RestNKeys),
+    lisp_compile(Result,InitForm,Code),!.
+
+% opt_var(Env,Var,FinalResult,Code,Result,Count,RestNKeys).
+opt_var(Env,Var,FinalResult,Code,Result,Count,RestNKeys):- opt_var(Env,Var,FinalResult,Code,Result,Count,_PresentP,RestNKeys).
+opt_var(Env, Var, FinalResult, _G, _Default, Nth,t, Optionals):- nonvar(Optionals), nth1(Nth,Optionals,Value),nonvar(Value),FinalResult=Value,set_var(Env,Var,Value).
+opt_var(Env, Var, FinalResult, G, Default, _Nth,[],_Optionals):-  G, FinalResult=Value,FinalResult=Default,set_var(Env,Var,Value).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Parsing &aux(s)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,aux,[[F,InitForm]|FormalParms],Params,[F|Names],[V|PVars],PCode):- !,
    enforce_atomic(F),   
    arginfo_append(F,aux,ArgInfo),    
@@ -341,65 +359,6 @@ ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,aux,[F|FormalParms],Params,Names,P
    enforce_atomic(F),   
    ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,aux,[[F,[]]|FormalParms],Params,Names,PVars,Code).
 
-
-
-to_kw_and_name([KW,Name],Name,KW):- atom(Name),atom(KW).
-to_kw_and_name([Name],Name,KW):- atom(Name),to_kw(Name,KW).
-to_kw_and_name(Name,Name,KW):- atom(Name),to_kw(Name,KW).
-
-to_kw_form([F,InitForm,Present],KW,Name,InitForm,Present):- to_kw_and_name(F,Name,KW),!,break.
-to_kw_form([F,InitForm],KW,Name,InitForm,_Present):- to_kw_and_name(F,Name,KW),!.
-to_kw_form([[KW,F]],KW,Name, InitForm ,_Present):- to_kw_and_name([KW,F],Name,KW),!,no_init_form(InitForm).
-to_kw_form([F],KW,Name, InitForm ,_Present):- to_kw_and_name(F,Name,KW),!,no_init_form(InitForm).
-to_kw_form(F,KW,Name, InitForm ,_Present):- to_kw_and_name(F,Name,KW),!,no_init_form(InitForm).
-
-no_init_form([]).
-
-
-% Parsing &key(s)
-ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,[[KWF,InitForm,Present]|FormalParms],Params,[Name,Present|Names],[V,PresentP|PVars],PCode):- !,
-   to_kw_and_name(KWF,Name,KW),
-   arginfo_append(Name,key,ArgInfo),
-   debug_var(Present,PresentP),   
-   lisp_compile(Env,Else,InitForm,InitCode),
-   body_cleanup_keep_debug_vars(Ctx,(InitCode,Else=V),InitElse),
-   PCode = (get_kw(Env,RestNKeys,KW,Name,V,InitElse,PresentP),MoreCode),
-   ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,FormalParms,Params,Names,PVars,MoreCode).
-
-ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,[KWF|FormalParms],Params,[Name|Names],[V|PVars],PCode):- !,   
-   to_kw_form(KWF,KW,Name, InitForm ,_Present),
-   arginfo_append(Name,key,ArgInfo),
-   debug_var([Name,'_Present'],PresentP),   
-   lisp_compile(Env,Else,InitForm,InitCode),
-   body_cleanup_keep_debug_vars(Ctx,(InitCode,Else=V),InitElse), 
-   PCode = (get_kw(Env,RestNKeys,KW,Name,V,InitElse,PresentP),MoreCode),
-   ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,FormalParms,Params,Names,PVars,MoreCode).
-/*
-ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,[ [[KW0,F],InitForm]|FormalParms],Params,[F|Names],[V|PVars],PCode):- !,
-   enforce_atomic(F),arginfo_append(F,key,ArgInfo),
-   to_kw(KW0,KW),
-   lisp_compile(Env,Else,InitForm,InitCode),
-   body_cleanup_keep_debug_vars(Ctx,(InitCode,Else=V),InitElse),
-   debug_var([F,'_P'],PresentP),
-   PCode =(get_kw(Env,RestNKeys,KW,F,V,InitElse,PresentP),Code),
-   ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,FormalParms,Params,Names,PVars,Code).
-
-ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,[[F,InitForm]|FormalParms],Params,Names,PVars,Code):- !, 
-   enforce_atomic(F), % loops  back
-   to_kw(F,KW),
-   ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,[[[KW,F],InitForm]|FormalParms],Params,Names,PVars,Code).
-
-ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,[F|FormalParms],Params,Names,PVars,Code):- !, 
-   enforce_atomic(F),  % loops  back
-   to_kw(F,KW),
-   ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,[[[KW,F],[]]|FormalParms],Params,Names,PVars,Code).
-*/
-
-compile_init_opt(Env,RestNKeys,Var,FinalResult,[InitForm],Count,PresentP,
-  opt_var(Env,Var,FinalResult,Code,Result,Count,PresentP,RestNKeys)):- 
-    debug_var("Optionals",RestNKeys),
-    lisp_compile(Result,InitForm,Code),!.
-
 % compile_aux_or_key(Env,F,P,InitForm,InitCode)
 compile_aux_or_key(Env,Var,FinalResult,[InitForm],
   (aux_var(Env,Var,FinalResult,Code,Result))):- 
@@ -408,9 +367,6 @@ compile_aux_or_key(Env,Var,FinalResult,[InitForm|_More],
   (aux_var(Env,Var,FinalResult,Code,Result))):- 
     lisp_dump_break,
     lisp_compile(Result,InitForm,Code).
-   
-% [name, 'package-designator', 'c38_optional', [error, t]]
-
 
 aux_var(Env, Var, In, G, Thru):- var(In),!,G,set_var(Env,Var,Thru).
 aux_var(Env, Var, In, _, Thru):- set_var(Env,Var,In),!,In=Thru.
@@ -418,10 +374,47 @@ aux_var(Env, Var, In, _, Thru):- set_var(Env,Var,In),!,In=Thru.
 simple_atom_var(Atom):- atom(Atom), Atom\=nil,Atom\=[], correct_formal_params_c38(Atom,CAtom),
   \+ arg(_, v('c38_optional', 'c38_key', 'c38_aux', 'c38_rest', 'c38_body', 'c38_environment'),CAtom).
 
-% opt_var(Env,Var,FinalResult,Code,Result,Count,RestNKeys).
-opt_var(Env,Var,FinalResult,Code,Result,Count,RestNKeys):- opt_var(Env,Var,FinalResult,Code,Result,Count,_PresentP,RestNKeys).
-opt_var(Env, Var, FinalResult, _G, _Default, Nth,t, Optionals):- nonvar(Optionals), nth1(Nth,Optionals,Value),nonvar(Value),FinalResult=Value,set_var(Env,Var,Value).
-opt_var(Env, Var, FinalResult, G, Default, _Nth,[],_Optionals):-  G, FinalResult=Value,FinalResult=Default,set_var(Env,Var,Value).
+% [name, 'package-designator', 'c38_optional', [error, t]]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Parsing &key(s)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,[[KWF,InitForm,Present]|FormalParms],Params,[Name,Present|Names],[V,PresentP|PVars],PCode):- !,
+   from_kw_name(KWF,Name,KW),
+   arginfo_append(Name,key,ArgInfo),
+   debug_var(Present,PresentP),   
+   lisp_compile(Env,Else,InitForm,InitCode),
+   body_cleanup_keep_debug_vars(Ctx,(InitCode,Else=V),InitElse),
+   PCode = (get_kw(Env,RestNKeys,KW,Name,V,InitElse,PresentP),MoreCode),
+   ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,FormalParms,Params,Names,PVars,MoreCode).
+
+ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,[KWF|FormalParms],Params,[Name|Names],[V|PVars],PCode):- !,   
+   from_kw_form(KWF,KW,Name, InitForm ,_Present),
+   arginfo_append(Name,key,ArgInfo),
+   debug_var([Name,'_Present'],PresentP),   
+   lisp_compile(Env,Else,InitForm,InitCode),
+   body_cleanup_keep_debug_vars(Ctx,(InitCode,Else=V),InitElse), 
+   PCode = (get_kw(Env,RestNKeys,KW,Name,V,InitElse,PresentP),MoreCode),
+   ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,FormalParms,Params,Names,PVars,MoreCode).
+
+get_kw(_Env,RestNKeys,KW,F,Value,ElseInit,PresentP):- 
+   ((append(_Left,[KW,Value|More],RestNKeys),length(More,Nth), \+ is_oddp(Nth)) -> PresentP=t ;
+     ((F \== KW ,append(_Left,[KW,Value|More],RestNKeys),length(More,Nth), \+ is_oddp(Nth)) -> PresentP=t;
+      (PresentP=[],ElseInit))).
+     
+from_kw_name([KW,Name],Name,KW):- atom(Name),atom(KW).
+from_kw_name([Name],Name,KW):- atom(Name),to_kw(Name,KW).
+from_kw_name(Name,Name,KW):- atom(Name),to_kw(Name,KW).
+
+from_kw_form([F,InitForm,Present],KW,Name,InitForm,Present):- from_kw_name(F,Name,KW),!,break.
+from_kw_form([F,InitForm],KW,Name,InitForm,_Present):- from_kw_name(F,Name,KW),!.
+from_kw_form([[KW,F]],KW,Name, InitForm ,_Present):- from_kw_name([KW,F],Name,KW),!,no_init_form(InitForm).
+from_kw_form([F],KW,Name, InitForm ,_Present):- from_kw_name(F,Name,KW),!,no_init_form(InitForm).
+from_kw_form(F,KW,Name, InitForm ,_Present):- from_kw_name(F,Name,KW),!,no_init_form(InitForm).
+
+no_init_form([]).
+
+
 
 align_args_local(FN,RequiredArgs,RestNKeys,Whole,LB,_ArgInfo,PARAMS,wl:init_args(x,FN)):- 
   get_init_args(FN,x),!,
