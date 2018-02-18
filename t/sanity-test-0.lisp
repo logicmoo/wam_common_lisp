@@ -38,6 +38,9 @@
 (is eq t (= 1.0 1))
 (is eq nil (equal 1.0 1))
 
+'(is equal '(3 2 1) (destructuring-bind (a b &optional (c 3) ) '(1 2)(LIST c b a)(LIST c b a) ))
+'(is equal '(3 2 1) (destructuring-bind (a b &key (c 3) ) '(1 2 :c 3)(LIST c b a)(LIST c b a) ))
+
 (is eq t (keywordp :k))
 
 (is eq 10 (if t 10 20))

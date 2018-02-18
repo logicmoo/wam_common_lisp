@@ -31,7 +31,8 @@ f_funcall(ProcedureName,Args,Result):- f_apply(ProcedureName, [Args], Result).
 
 wl:init_args(1,apply).
 f_apply(closure(kw_function,Environment,ClosureResult,FormalArgs,Body), [Arguments], Result):-!,
-  closure(kw_function,Environment,ClosureResult,FormalArgs,Body,Arguments,Result).
+  always(closure(kw_function,Environment,ClosureResult,FormalArgs,Body,Arguments,Result)).
+
 f_apply(function(FunctionName), Arguments, Result):-!,f_apply((FunctionName), Arguments, Result).
 f_apply(FunctionName,Arguments,Result):- FunctionName==[],!,lisp_dump_break,Result=Arguments.
 f_apply(FunctionName, Arguments, Result):- atom(FunctionName),!,
@@ -39,6 +40,10 @@ f_apply(FunctionName, Arguments, Result):- atom(FunctionName),!,
 f_apply(FunctionName, Arguments, Result):- is_list(FunctionName),!,
   append(FunctionName, Arguments,FunArguments),
   lisp_compiled_eval(FunArguments,Result).
+f_apply(Compound, Arguments, Result):- compound(Compound),!,Compound=..FunctionName,
+  append(FunctionName, [Arguments,Result],Funcall),
+  Call=..Funcall,
+  always(Call).
 
 
 

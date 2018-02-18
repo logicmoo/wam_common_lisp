@@ -85,7 +85,8 @@ compile_closures(_Ctx,Env,Result,Closure,Body):-
    Body = true.  
 
 % Called by Incomplete Closures (Lambdas)
-closure(FType,ClosureEnvironment,Whole,Result,FormalParams,ClosureBody,Symbol,ActualParams,ResultO):-  
+closure(FType,ClosureEnvironment,Whole,Result,FormalParams,ClosureBody,Symbol,ActualParams,ResultO):- 
+  Result = ResultO,
   (FType==kw_function -> expand_arguments_maybe_macro(_Ctx,_Env,funcall,1,Params,ActualParams, ArgsBody);
   (FType==kw_macro -> (Params=ActualParams, ArgsBody = f_eval(Result,ResultO));
     true -> Params=ActualParams, ArgsBody = true,  =(Result,ResultO))),   
