@@ -227,7 +227,7 @@ add_param_var(Ctx,Name,PVar):-
 
 :- discontiguous ordinary_args/11.
 
-ordinary_args(_Ctx,_Env,_ArgInfo,_RestNKeys,_Whole,_, [],[],[],[],true):-!.
+ordinary_args(_Ctx,_Env,__ArgInfo,_RestNKeys,_Whole,_, [],[],[],[],true):-!.
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,_,['c38_allow-other-keys'|FormalParms],Params,Names,PVars,Code):- !,
   arginfo_incr(allow_other_keys,ArgInfo),
   ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,aux,FormalParms,Params,Names,PVars,Code).
@@ -506,7 +506,7 @@ must_bind_ parameters(Ctx,Env,Whole,RestNKeys,FormalParms0,Symbol,Params,Env,Cod
 destructure_parameters(Ctx,Env,FormalParms0,ZippedArgEnv,RestNKeys,Whole,RequiredArgs,ArgInfo,Names,PVars,Code):-!,
    correct_formal_params(FormalParms0,FormalParms),
    freeze(Whole,break),freeze(RestNKeys,break),
-   ArgInfo = arginfo{req:0,all:0,sublists:0,opt:0,rest:0,whole:0,body:0,key:0,aux:0,env:0,allow_other_keys:0,names:Names,complex:0},
+   ArgInfo = arginfo{req:0,all:0,sublists:0,opt:0,rest:0,whole:0,body:0,key:0,aux:0,env:0,allow_other_keys:0,names:Names,complex:0,outer:_},
    enter_ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,required,FormalParms,RequiredArgs,Names,PVars,Code),
    zip_with(Names, PVars, [Var, Val, bv(Var,Val)]^true, ZippedArgEnv),!,
    nop(((ArgInfo.names == ArgInfo.req, ArgInfo.req\==0)-> RestNKeys=[] ; RestNKeys=_)).
@@ -514,7 +514,7 @@ destructure_parameters(Ctx,Env,FormalParms0,ZippedArgEnv,RestNKeys,Whole,Require
 
 make_bind_parameters(Ctx,EnvIn,FormalParms,Whole,Arguments,EnvForBody,BinderCode):-
   freeze(Whole,break),freeze(RestNKeys,break),
-  destructure_parameters(Ctx,EnvIn,FormalParms,ZippedArgEnv,RestNKeys,Whole,RequiredArgs,_ArgInfo,_Names,_PVars,Code),
+  destructure_parameters(Ctx,EnvForBody,FormalParms,ZippedArgEnv,RestNKeys,Whole,RequiredArgs,_ArgInfo,_Names,_PVars,Code),
   %del_attr(Whole,freeze),  
   debug_var('RestNKeys',RestNKeys), debug_var('WholeArgs',Whole),    
   (BinderCode = ((append(RequiredArgs,RestNKeys,Arguments),EnvForBody=[ZippedArgEnv|EnvIn],del_attr(RestNKeys,freeze),Code))),!.
