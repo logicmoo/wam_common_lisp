@@ -343,12 +343,13 @@ ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,aux,[F|FormalParms],Params,Names,P
 
 
 
-to_kw_and_name(F,Name,KW):- atom(F),to_kw(F,KW),Name=F.
-to_kw_and_name([KW0,Name],Name,KW):- atom(Name),to_kw(KW0,KW).
+to_kw_and_name([KW,Name],Name,KW):- atom(Name),atom(KW).
+to_kw_and_name([Name],Name,KW):- atom(Name),to_kw(Name,KW).
+to_kw_and_name(Name,Name,KW):- atom(Name),to_kw(Name,KW).
 
 to_kw_form([F,InitForm,Present],KW,Name,InitForm,Present):- to_kw_and_name(F,Name,KW),!,break.
 to_kw_form([F,InitForm],KW,Name,InitForm,_Present):- to_kw_and_name(F,Name,KW),!.
-to_kw_form([[KW0,F]],KW,Name, InitForm ,_Present):- to_kw_and_name([KW0,F],Name,KW),!,no_init_form(InitForm).
+to_kw_form([[KW,F]],KW,Name, InitForm ,_Present):- to_kw_and_name([KW,F],Name,KW),!,no_init_form(InitForm).
 to_kw_form([F],KW,Name, InitForm ,_Present):- to_kw_and_name(F,Name,KW),!,no_init_form(InitForm).
 to_kw_form(F,KW,Name, InitForm ,_Present):- to_kw_and_name(F,Name,KW),!,no_init_form(InitForm).
 
@@ -357,20 +358,21 @@ no_init_form([]).
 
 % Parsing &key(s)
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,[[KWF,InitForm,Present]|FormalParms],Params,[Name,Present|Names],[V,PresentP|PVars],PCode):- !,
-   to_kw_and_name(KWF,KW, Name, InitForm ,Present),
+   to_kw_and_name(KWF,KW, Name),
    arginfo_append(Name,key,ArgInfo),
+   debug_var(Present,PresentP),   
    lisp_compile(Env,Else,InitForm,InitCode),
    body_cleanup_keep_debug_vars(Ctx,(InitCode,Else=V),InitElse),
-   debug_var([Name,'_Present'],PresentP),   
    PCode = (get_kw(Env,RestNKeys,KW,Name,V,InitElse,PresentP),MoreCode),
    ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,FormalParms,Params,Names,PVars,MoreCode).
 
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,[KWF|FormalParms],Params,[Name|Names],[V|PVars],PCode):- !,   
    to_kw_form(KWF,KW,Name, InitForm ,_Present),
    arginfo_append(Name,key,ArgInfo),
+   debug_var([Name,'_Present'],PresentP),   
    lisp_compile(Env,Else,InitForm,InitCode),
    body_cleanup_keep_debug_vars(Ctx,(InitCode,Else=V),InitElse), 
-   PCode = (get_kw(Env,RestNKeys,KW,Name,V,InitElse,_PresentP),MoreCode),
+   PCode = (get_kw(Env,RestNKeys,KW,Name,V,InitElse,PresentP),MoreCode),
    ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,FormalParms,Params,Names,PVars,MoreCode).
 /*
 ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,key,[ [[KW0,F],InitForm]|FormalParms],Params,[F|Names],[V|PVars],PCode):- !,
