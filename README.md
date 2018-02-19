@@ -1,104 +1,63 @@
-Common Lisp in Prolog 
-=================
+## Common Lisp in Prolog
+     
+* Translating Lisp to Prolog gives Prolog
+   * Metaobject Protocol
+   * Common Lisp Object System   
+   * Instant Prolog Ecosystem/Development Libraries (days, not years)
+      * Several decades of Common Lisp libraries may be translated to useable Prolog development libraries.       
+   * Maintain your code from original Lisp or translated Prolog (though wont translate back)
+   * Settings to try to emulate handwritten code ([Examples](https://github.com/TeamSPoon/wam_common_lisp/tree/master/prolog/wam_cl))      
+   * Forms (at REPL) are transpiled to Prolog, Compiled to WAM, Call/Executed.
+   *  *only* 2-3 slower than SBCL  
+* Simular to how CLISP is indespensable sometimes.
+   * _a_ Common Lisp used for sanity testing
+   * Makes debugging easy for Prolog and Lisp experts
+* Picks up freebies .. whatever the host Prolog system offers such as 
+  * Garbage Collection 
+  * Memoization/Coinduction
+  * Dynamic Extent
+  * Exception Handling
+  * Unwind-Protect/Cleanup
+  * Native Locatives
+  * Two-way calling and embedding from C/C++/Python/C#/Mono/Scala/Java/Haskell/LUA/Perl
+  * Makes Plaform Executables and. DLL/So files  ([Quick Start](https://github.com/TeamSPoon/wam_common_lisp/blob/master/README.md#makeanexecutableandrunit)) *
+  * (too enormous to go into)
+* Developed/Installed as a SWI-Prolog pack 
+  * [http://www.swi-prolog.org/pack/list?p=wam_common_lisp](http://www.swi-prolog.org/pack/list?p=wam_common_lisp) ``
 
-This library is designed to *not* be just another an ad-hoc, informally-specified, bug-ridden, slow implementation of half of Common Lisp.
-
-
-https://github.com/TeamSPoon/wam_common_lisp 
-## Copyright and License
-
-Copyright (c) 2017, [Douglas Miles](https://twitter.com/logicmoo)
-
-This project is licensed under the [MIT License](LICENSE.md).
-
-
-## Useful to Me?  [CONTRIBUTING.md]
-
-* Translates Lisp source files into Prolog source files.  ( compilation is done by Host prolog on the Translated source (from either disk or memory)) 
-
-* At the REPL, forms are converted from Lisp to Prolog then call/1d 
-
-* Being written as a SWI-Prolog "pack" 
-
-* Picks up freebies .. whatever the host prolog system offers such as 
-**Makes Plaform Executables and. DLL/So files 
-**Garbage Collection 
-**Memoization 
-**Embedding (from C/C++/Python/C#/Mono/Java)  
-
-* Gives MOP/CLOS to Prolog programmers 
- 
-* Goal is to ensure can run in YAP (which Lisp to Prolog benchmarking shows about 4x speedup over SWI)
-Very importantly we need to ensure we can run well in
-** Sicstus
-** PrologCafe
-** Yield-Prolog
-** Jekejeke
-** EcLiPSe Prolog
- 
-* Most simple functions optimize to how handwritten code might look.. *only* 2-3 slower than compiled SBCL
-* comp.lang.lisp thread https://groups.google.com/forum/#!topic/comp.lang.lisp/0G77ebK3DIw
-* comp.lang.prolog thread https://groups.google.com/forum/#!topic/comp.lang.prolog/85jyECdWTxc
-* other README.MD https://github.com/TeamSPoon/wam_common_lisp/tree/master/prolog/wam_cl
-* HOWTO https://github.com/TeamSPoon/wam_common_lisp/blob/master/README.md#howtoquickstart
-
-## Goals and TODOs
-* Document this pack!
-* Write tests
-* Untangle the 'pack' install deps
-* Still in progress (Moving predicates over here from logicmoo_base)
-* Keep later `copy_term/2's` cheap, 
-* Experment with way to passes entire term object object references as atoms  (nb_current/2 allows access to the object's property map)
-* Ensure passes most all CL-ANSI tests 
-** Hardest part is making sure it throws/complains about all the things it needs to
-* Using SWICLI as FFI (SWICLI itself still needs work) 
-* Ensure works with ASDF-INSTALL
-* Quicklisp 
+## Incompleteness 
+must fix for release worthiness
+* Bugs Running/Translating:
+  * Fully working LOOP (must-fix)
+  * SWANK (must-fix)
+  * PAIP Book code (bug in-progress)
+  * [DAYDREAMER](https://github.com/eriktmueller/daydreamer) (in-progress)
+  * [KNOWLEDGE MACHINE](http://www.cs.utexas.edu/users/mfkb/RKF/km.html)
+  * Quicklisp (bug must-fix)
+  * ASDF-INSTALL (bug must-fix)
+* Add missing impls
+  * delete-package (must-fix)
+  * (more to be Listed) (not here)
+* Tests ([in-progress](https://github.com/TeamSPoon/wam_common_lisp/tree/master/t))
+  * Must pass 70% or above CL-ANSI tests (bug in-progress)
+  * Ensure passes _all_ CL-ANSI tests (with --ansi) (feature always in-prgress)
+  * Hardest part is making sure it throws/complains about all the things it needs to
+  * need more tests!
+* FFI (bug in-progress)
+  * Use https://github.com/JanWielemaker/ffi ?
+  * Using SWICLI as FFI (SWICLI's FFI itself still needs work but works for YAP as well)
+  
+## TODO _Features_
+* Document prolog source-code this pack! (indeed, a feature!)
+* Keep later `copy_term/2's` cheap, (feature in-progress)
+  * Experment with way to passes entire term object object references as atoms  (nb_current/2 allows access to the object's property map)
 * [(FAKE TODO![Build Status](https://travis-ci.org/rla/simple-template.svg)](https://rlaanemets.com/post/show/adding-travis-to-swi-prolog-packs))
-
-
-
-## WHY ?!?!?!
-==============
-
-
-### Myth busting
-
-
-* Is it really super easy to implement _anything_ on Prolog?  Some junior Prolog programmers would be surprised by Prolog doing any OO let alone MOP.  After all, Prolog is very very simple when it comes to its types. 
-
-* If it can be done, in the end, will it look as ugly as trying to implement and maintain a CommonLisp in a programing language like LOGO?  Everyone who graduates with a CS degree was tasked with several disarming hour just trying to do something as simple as adding up a list of numbers in Prolog. In moments of horror they think how simple it would have been it has it been any other language than Prolog.  Most come away with the misunderstanding that Prolog is only capable of certain pure tasks. And too awkward for everything else.  Much like how LOGO is the best language for mornings you've woken desperately needing to draw a box inside a circle.  Not so much for those mornings, you need to implement an HTTP client. 
-
-* Other myths "prolog doesn't scale".. least will be busted that whenever a lisp program (that scales according to whatever "scale" means) is running on a lisp-in-prolog (like WAM-CL) 
-
-* Some people say it's absolutely absurd to try to implement common Lisp inside a Prolog because of the final result would be to inefficient run to slow use it too much memory etc .
-
-### Practical reasons: 
-
-* Several decades of Common Lisp development libraries can, within a matter of hours, be translated to useable Prolog development libraries. 
-
-* Also, DAYDREAMER, Knowledge Machine, SWALE, and CYC might perform differently and be more practical at non-toy domains. 
-
-
-## FUTHER MISTHOUGHT:
-
-I'll reply inline and correct some of the confusing misstatements I had made.
-> > 
-> >    I've only spent a week on it ...    I hope to recruit people that seem to know both Lisp and Prolog languages.
-> > 
-> >        The main purpose is this impl is it to run prolog-in-lisp 1000x  faster than the fastest lisps
-prolog-in-lisp(s) are *not* 1000x slower than prolog-in-c but certainly not as fast (I apologize, I should have said 5-10x time slower).  The problem arises for Prolog programs like: English to CommonLogic converters (used in Natural Language Understanding), large-scale ontology checkers, KL-ONE language interpreters, and PDDL planners (Planning Domain Definition Language).  Such programs perform fine when written entirely in Lisp or Prolog (neither better or worse).  The problem is that they more often perform unacceptably poor when written in Prolog and then ran on a prolog-in-lisp interpreter.    
-
-This leads to another class of programs 
-
-> > and be at least in the top 3 impls
-> >         for speed    Also the type of lisp programs I like to run (SWALE, DAYDREAMER) are buggy partial impl of Greenspun's rule as applied to Prolog (Instead of Lisp)
-
-I should clarify, SWALE and DAYDREAMER are *not* buggy implementations of Prolog! they are their own things.  But there are certain routines they contain that make extensive use of unification and backtracking.  The routines these programs use are examples where the domain had to be scaled back.  Only because they are under the penalties of the "prolog-in-lisp" scenario.  This scenario is similar to taking an assembly language program that twiddles bitmasks and using bignum math to emulate the registers of the  Intel-4930k CPU. You might just see some performance differences? Very lucky if it was only a 4x-10x slowdown   
-
-
-## HOWTO/QUICKSTART
-===================
+* Untangle the `pack` install deps
+  * Moving predicates to logicmoo_utils from logicmoo_base (Still in progress)
+* DEpackifed version for Portability?
+  * YAP-Prolog (in-progress) (which Lisp to Prolog benchmarking shows about 5x speedup)
+  * TODO: Sicstus, B-Prolog, Bin-Prolog, EcLiPSe Prolog and Jekejeke
+  * Low-Priority: PrologCafe, Yield-Prolog
 
 
 ## Installation 
@@ -454,3 +413,63 @@ fibp2(N, F) :-
 
 
 ````
+
+
+## Copyright and License
+
+Copyright (c) 2017, [Douglas Miles](https://twitter.com/logicmoo)
+
+This project is licensed under the [MIT License](LICENSE.md).
+
+## WTF?!? (also known as FAQ)
+* Was it easy to implement this in Prolog?
+
+Yes! Still junior Prolog programmers would be surprised by Prolog doing any OO let alone MOP.  After all, Prolog is very very simple when it comes to its types. 
+
+--------------------------------------------
+
+* If it can be done, in the end, will it look as ugly as trying to implement and maintain a CommonLisp in a programing language like LOGO?
+
+No! Everyone who graduates with a CS degree was tasked with several disarming hour just trying to do something as simple as adding up a list of numbers in Prolog. In moments of horror they think how simple it would have been it has it been any other language than Prolog.  Most come away with the misunderstanding that "Prolog is only capable of certain pure tasks. And too awkward for everything else."  Much like how LOGO is the best language for mornings you've woken desperately needing to draw a box inside a circle.  Not so much for those mornings, you need to implement an HTTP client. 
+
+--------------------------------------------
+
+* But prolog doesn't scale!
+
+Myth will be busted that whenever a lisp program (that scales according to whatever "scale" means) is running on a lisp-in-prolog (like WAM-CL) 
+
+--------------------------------------------
+
+* It wont be fast, and even then it will never be faster than SBCL.
+
+True when comparing WAM-CL to SBCL. But false about "slow".
+Some people say it's absolutely absurd to try to implement common Lisp inside a Prolog because of the final result would be to inefficient run to slow use it too much memory etc .
+Also, DAYDREAMER, Knowledge Machine, SWALE, and CYC might perform differently and be more practical at non-toy domains. 
+
+--------------------------------------------
+
+* Some things you said on eitehr of these thread [[comp.lang.lisp](https://groups.google.com/forum/#!topic/comp.lang.lisp/0G77ebK3DIw)] or [[comp.lang.prolog](https://groups.google.com/forum/#!topic/comp.lang.prolog/85jyECdWTxc)] are really misinformed!
+
+Maybe
+
+So I'll reply inline and correct some of the confusing misstatements I had made
+> > 
+> >    I've only spent a week on it ...    I hope to recruit people that seem to know both Lisp and Prolog languages.
+> > 
+> >        The main purpose is this impl is it to run prolog-in-lisp 1000x  faster than the fastest lisps
+prolog-in-lisp(s) are *not* 1000x slower than prolog-in-c but certainly not as fast (I apologize, I should have said 5-10x time slower).  The problem arises for Prolog programs like: English to CommonLogic converters (used in Natural Language Understanding), large-scale ontology checkers, KL-ONE language interpreters, and PDDL planners (Planning Domain Definition Language).  Such programs perform fine when written entirely in Lisp or Prolog (neither better or worse).  The problem is that they more often perform unacceptably poor when written in Prolog and then ran on a prolog-in-lisp interpreter.    
+
+This leads to another class of programs 
+
+> > and be at least in the top 3 impls
+> >         for speed    Also the type of lisp programs I like to run (SWALE, DAYDREAMER) are buggy partial impl of Greenspun's rule as applied to Prolog (Instead of Lisp)
+
+I should clarify, SWALE and DAYDREAMER are *not* buggy implementations of Prolog! they are their own things.  But there are certain routines they contain that make extensive use of unification and backtracking.  The routines these programs use are examples where the domain had to be scaled back.  Only because they are under the penalties of the "prolog-in-lisp" scenario.  This scenario is similar to taking an assembly language program that twiddles bitmasks and using bignum math to emulate the registers of the  Intel-4930k CPU. You might just see some performance differences? Very lucky if it was only a 4x-10x slowdown   
+
+> >  --------------------------------------------
+--------------------------------------------
+
+
+
+
+
