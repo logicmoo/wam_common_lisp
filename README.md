@@ -1,14 +1,16 @@
-## Common Lisp in Prolog
-     
+## Common Lisp in Prolog Goals
+Allow Lisp programs to stop implementing an ad-hoc, informally-specified, bug-ridden, slow implementation of half of ISO-Prolog.
+   
 * Translating Lisp to Prolog gives Prolog
    * Metaobject Protocol
-   * Common Lisp Object System   
+   * Common Lisp Object System    
    * Instant Prolog Ecosystem/Development Libraries (days, not years)
       * Several decades of Common Lisp libraries may be translated to useable Prolog development libraries.       
    * Maintain your code from original Lisp or translated Prolog (though wont translate back)
    * Settings to try to emulate handwritten code ([Examples](https://github.com/TeamSPoon/wam_common_lisp/tree/master/prolog/wam_cl))      
    * Forms (at REPL) are transpiled to Prolog, Compiled to WAM, Call/Executed.
    *  *only* 2-3 slower than SBCL  
+   * Gives to prolog more than we can list!
 * Simular to how CLISP is indespensable sometimes.
    * _a_ Common Lisp used for sanity testing
    * Makes debugging easy for Prolog and Lisp experts
@@ -24,7 +26,6 @@
   * (too enormous to go into)
 * Developed/Installed as a SWI-Prolog pack 
   * [http://www.swi-prolog.org/pack/list?p=wam_common_lisp](http://www.swi-prolog.org/pack/list?p=wam_common_lisp) ``
-
 ## Incompleteness 
 must fix for release worthiness
 * Bugs Running/Translating:
