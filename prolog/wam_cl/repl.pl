@@ -124,21 +124,26 @@ writeExtraValues(X):- maplist(writeExpressionEV,X),!.
 writeExpressionEV(X):- writeln(' ;'),writeExpression(X),flush_all_output_safe.
 
 
-
+lisp_add_history(Var):-var(Var),!.
 lisp_add_history(end_of_file):-!.
+lisp_add_history([]):-!.
 lisp_add_history(_):- prolog_load_context(reload,true),!.
 lisp_add_history(_):- prolog_load_context(reloading,true),!.
 lisp_add_history(Expression):- atom(Expression),!,
-        prolog:history(user_input, add(Expression)).
-lisp_add_history(Expression):- string(Expression),!,
-        prolog:history(user_input, add(Expression)).
-lisp_add_history(Expression):- is_stringp(Expression),!,
-       to_prolog_string(Expression,ExpressionS),
-        prolog:history(user_input, add(ExpressionS)).
-lisp_add_history(Expression):-
+        lisp_add_history_event(add(Expression)).
+lisp_add_history(Expression):- string(Expression),!,string_to_atom(Expression,Atom),lisp_add_history(Atom).
+lisp_add_history(Expression):- is_stringp(Expression),!,to_prolog_string(Expression,ExpressionS),lisp_add_history(ExpressionS).
+lisp_add_history(Expression):-  
         with_output_to(string(S),writeExpression(Expression)),
         ((fail,string_upper(S,S))->string_lower(S,Store);Store=S),
-        prolog:history(user_input, add(Store)).
+        lisp_add_history(Store).
+/*
+rtrace(rez_to_inventory(iRiker707,tFood,_Food)).
+*/
+
+lisp_add_history_event(Store):- thread_signal(main,prolog:history(user_input, (Store))),!.
+lisp_add_history_event(_Store):-!.
+%lisp_add_history_event(Store):- current_input(Input),prolog:history(Input, (Store)).
 
 :- set_prolog_flag(lisp_no_compile,false).
 

@@ -92,7 +92,7 @@ quietly_must_or_rtrace(G):-
   (catch((G),E,gripe_problem(uncaught(E),(rtrace(G),!,fail)))
    *-> true ; (gripe_problem(fail_must_or_rtrace_failed,G),!,fail)),!.
 
-nonquietly_must_or_rtrace(G):- dinterp(user,_ ,  G, 0 ).
+nonquietly_must_or_rtrace(G):- dinterp(m(0),user,_ ,  G, 0 ).
 
 :- '$hide'(lquietly/1).
 lquietly(G):- quietly((G)).
@@ -108,46 +108,45 @@ always(always(G)):-!,always(G).
 always(call(G)):-!,always(G).
 always(notrace(G)):- !, quietly_must_or_rtrace(G),!.
 always(G):- nonquietly_must_or_rtrace(G),!.
-%always(notrace(G)):- notrace(tracing),!, must(quietly(user:G)),!.
+%always(notrace(G)):- notrace(tracing),!, m(0)(quietly(user:G)),!.
 %always(quietly(G)):- notrace(tracing),!, always(user:G).
 
 %always(G):- !,(G-> true; (dbginfo(failed(G)),dumpST,dbginfo(failed(G)),trace,G,!,fail)),!.
 %always(G):- notrace(tracing),!,(G->true;break). % nonquietly_must_or_rtrace(G).
 :- module_transparent(dinterp/4).
-%dinterp(M,_,G,L):-L > -1,!,M:call(G).
-dinterp(N,C,M:G,L):-!,assertion(nonvar(G)),N:dinterp(M,C,G,L).
-%dinterp(_,_,compound_name_arity(G,F,A),_Level):-!,compound_name_arity(G,F,A).
-%dinterp(_,_,is_functionp(G),_Level):-!,rtrace(is_functionp(G)).
-dinterp(_,_,true,_).
-dinterp(M,_,call(G),L):-!,dinterp(M,_,G,L) .
-dinterp(M,C,(Cond *-> Then ; Else),L):-!,L2 is L +1,( dinterp(M,C,Cond,L2)  *->  dinterp(M,C,Then,L) ; dinterp(M,C,Else,L)).
-dinterp(M,C,(Cond -> Then ; Else),L):-!,L2 is L +1,( dinterp(M,C,Cond,L2) ->  dinterp(M,C,Then,L) ; dinterp(M,C,Else,L)).
-dinterp(M,_,(\+ G),L):-!,\+ dinterp(M,_,G,L).
-dinterp(M,C,(Cond -> Then ; Else),L):-!,( dinterp(M,C,Cond,L)  ->  dinterp(M,C,Then,L) ; dinterp(M,C,Else,L)).
-dinterp(M,C,(Cond -> Then),L):-!,(dinterp(M,C,Cond,L) -> dinterp(M,C,Then,L)).
-dinterp(M,C,(Cond *-> Then),L):-!,L2 is L +1,(dinterp(M,C,Cond,L2) *-> dinterp(M,C,Then,L)).
-dinterp(M,C,(GoalsL ; GoalsR),L):-!,L2 is L +1,(dinterp(M,C,GoalsL,L2) ; dinterp(M,C,GoalsR,L2)).
-dinterp(M,C,(Goals1,Goals2),L):-!,(dinterp(M,C,Goals1,L),dinterp(M,C,Goals2,L)).
-dinterp(M,_,  once(G),L):-!,dinterp(M,_,(G),L),!.
-dinterp(M,C,always(G),_):-!,dinterp(M,C,(G),0),!.
-dinterp(M,C,  must(G),_):-!,dinterp(M,C,G,0),!.
-dinterp(M,C,lquietly(G),L):-!,quietly(dinterp(M,C,G,L)).
-dinterp(M,C, quietly(G),L):-!,quietly(dinterp(M,C,G,L)).
-dinterp(M,C, notrace(G),L):-!,quietly(dinterp(M,C,G,L)).
-dinterp(M,_,findall(Template,G,Bag),L):-!,L2 is L +1,findall(Template,dinterp(M,_,G,L2),Bag).
-dinterp(M,_,setup_call_cleanup(T,G,Bag),L):-!,L2 is L +1,setup_call_cleanup(dinterp(M,_,T,L2),dinterp(M,_,G,L2),dinterp(M,_,Bag,L2)).
-dinterp(M,_,catch(G,E,F),L):-!,catch(dinterp(M,_,G,L),E,dinterp(M,_,F,L)).
+%dinterp(Must,M,_,G,L):-L > -1,!,M:call(G).
+dinterp(Must,N,C,M:G,L):-!,assertion(nonvar(G)),N:dinterp(Must,M,C,G,L).
+%dinterp(Must,_,_,compound_name_arity(G,F,A),_Level):-!,compound_name_arity(G,F,A).
+%dinterp(Must,_,_,is_functionp(G),_Level):-!,rtrace(is_functionp(G)).
+dinterp(_Must,_,_,true,_).
+dinterp(Must,M,_,call(G),L):-!,dinterp(Must,M,_,G,L) .
+dinterp(Must,M,C,(Cond *-> Then ; Else),L):-!,L2 is L +1,( dinterp(Must,M,C,Cond,L2)  *->  dinterp(Must,M,C,Then,L) ; dinterp(Must,M,C,Else,L)).
+dinterp(Must,M,C,(Cond -> Then ; Else),L):-!,L2 is L +1,( dinterp(Must,M,C,Cond,L2) ->  dinterp(Must,M,C,Then,L) ; dinterp(Must,M,C,Else,L)).
+dinterp(Must,M,_,(\+ G),L):-!,\+ dinterp(Must,M,_,G,L).
+dinterp(Must,M,C,(Cond -> Then ; Else),L):-!,( dinterp(Must,M,C,Cond,L)  ->  dinterp(Must,M,C,Then,L) ; dinterp(Must,M,C,Else,L)).
+dinterp(Must,M,C,(Cond -> Then),L):-!,(dinterp(Must,M,C,Cond,L) -> dinterp(Must,M,C,Then,L)).
+dinterp(Must,M,C,(Cond *-> Then),L):-!,L2 is L +1,(dinterp(Must,M,C,Cond,L2) *-> dinterp(Must,M,C,Then,L)).
+dinterp(Must,M,C,(GoalsL ; GoalsR),L):-!,L2 is L +1,(dinterp(Must,M,C,GoalsL,L2) ; dinterp(Must,M,C,GoalsR,L2)).
+dinterp(Must,M,C,(Goals1,Goals2),L):-!,(dinterp(Must,M,C,Goals1,L),dinterp(Must,M,C,Goals2,L)).
+dinterp(Must,M,_,  once(G),L):-!,dinterp(Must,M,_,(G),L),!.
+dinterp(Must,M,C,always(G),_):-!,dinterp(Must,M,C,(G),0),!.
+dinterp(Must,M,C,  must(G),_):-!,dinterp(Must,M,C,G,0),!.
+dinterp(Must,M,C,lquietly(G),L):-!,quietly(dinterp(Must,M,C,G,L)).
+dinterp(Must,M,C, quietly(G),L):-!,quietly(dinterp(Must,M,C,G,L)).
+dinterp(Must,M,C, notrace(G),L):-!,quietly(dinterp(Must,M,C,G,L)).
+dinterp(Must,M,_,findall(Template,G,Bag),L):-!,L2 is L +1,findall(Template,dinterp(Must,M,_,G,L2),Bag).
+dinterp(Must,M,_,setup_call_cleanup(T,G,Bag),L):-!,L2 is L +1,setup_call_cleanup(dinterp(Must,M,_,T,L2),dinterp(Must,M,_,G,L2),dinterp(Must,M,_,Bag,L2)).
+dinterp(Must,M,_,catch(G,E,F),L):-!,catch(dinterp(Must,M,_,G,L),E,dinterp(Must,M,_,F,L)).
 %d  i nterp(_,C,!,_):-!,(var(C);C=!).
-dinterp(_,C,!,_):-!,(nonvar(C)->true;C=!).
-dinterp(M,_,G,_):- notrace((\+ compound(G))),!,M:G.
-dinterp(M,C,G,L):- notrace((G=..[call,F|ARGS],atom(F),Call2=..[F|ARGS])),!,dinterp(M,C,Call2,L).
-
-dinterp(M,_,G, Level):- Level==0,!, (M:call(G)*-> true; (rtrace((M:call(G))),throw(failed_must(G)))).
-dinterp(M,_,G, _):- M:call(G).
-%dinterp(M,_, G,L):-L > -1,!,nonquietly_must_or_rtrace0(M:G).
+dinterp(_Must,_,C,!,_):-!,(nonvar(C)->true;C=!).
+dinterp(m(0),M,_,G, Level):- Level==0,!, (M:call(G)*-> true; (rtrace((M:call(G))),throw(failed_must(G)))).
+dinterp(m(0),M,_,G,_):- notrace((\+ compound(G))),!,M:G.
+dinterp(Must,M,C,G,L):- notrace((G=..[call,F|ARGS],atom(F),Call2=..[F|ARGS])),!,dinterp(Must,M,C,Call2,L).
+dinterp(m(0),M,_,G, _):- M:call(G).
+%dinterp(Must,M,_, G,L):-L > -1,!,nonquietly_must_or_rtrace0(M:G).
 /*
-dinterp(M,_,G,_):- quietly(just_call(M,G)),!,M:call(G).
-dinterp(M,C,G,L):- L2 is L +1,functor(G,F,A),functor(GG,F,A),!,dinterp_c(M,C,G,GG,L2).
+dinterp(Must,M,_,G,_):- quietly(just_call(M,G)),!,M:call(G).
+dinterp(Must,M,C,G,L):- L2 is L +1,functor(G,F,A),functor(GG,F,A),!,dinterp_c(M,C,G,GG,L2).
 */
 dinterp_c(M,_, G,_,L):-L > -1,!,nonquietly_must_or_rtrace0(M:G).
 dinterp_c(_,C,G,GG,L):- \+ clause(GG,_), 
@@ -155,7 +154,7 @@ dinterp_c(_,C,G,GG,L):- \+ clause(GG,_),
 
 dinterp_c(M,C,G,GG,L):- 
    clause(M:GG,Body),G=GG,
-   dinterp(M,C,Body,L),(var(C)-> true ; (!,C)).
+   dinterp(m(0),M,C,Body,L),(var(C)-> true ; (!,C)).
 
 just_call(_,G):- compound(G),functor(G,F,_),just_call_f(F).
 just_call(M,G):- predicate_property(M:G,nodebug).

@@ -16,7 +16,7 @@
 
 :- include('header').
 
-
+:- use_module(library(rbtrees)).
 
 
 :- nb_setval('$labels_suffix','').

@@ -24067,7 +24067,7 @@ o_p_v(sys_xx_active_restarts_xx,type_of,symbol).
 o_p_v(sys_xx_all_languages_xx,declared_as,defparameter).
 o_p_v(sys_xx_all_languages_xx,symbol_name,"*ALL-LANGUAGES*").
 o_p_v(sys_xx_all_languages_xx,symbol_package,pkg_sys).
-o_p_v(sys_xx_all_languages_xx,symbol_value,[[i18n_english],[i18n_dansk],[i18n_deutsch],[i18n_français],[i18n_español],[i18n_nederlands],[i18n_c63_c63_c63_c63_c63_c63_c63]]).
+o_p_v(sys_xx_all_languages_xx,symbol_value,[[i18n_english]]). % ,[i18n_dansk],[i18n_deutsch],[i18n_français],[i18n_español],[i18n_nederlands],[i18n_c63_c63_c63_c63_c63_c63_c63]]).
 o_p_v(sys_xx_all_languages_xx,type_of,symbol).
 o_p_v(sys_xx_allow_making_generic_xx,declared_as,defparameter).
 o_p_v(sys_xx_allow_making_generic_xx,symbol_name,"*ALLOW-MAKING-GENERIC*").
