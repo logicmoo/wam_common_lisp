@@ -21,9 +21,9 @@
 
 % :- cls.
 :- Six = 6, set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)).
-:- set_prolog_flag(occurs_check,error).
-:- set_prolog_flag(gc,true).
-:- set_prolog_flag(gc,false).
+%:- set_prolog_flag(occurs_check,error).
+%:- set_prolog_flag(gc,true).
+%:- set_prolog_flag(gc,false).
 
 :- meta_predicate maybe_ltrace(0).
 :- meta_predicate show_uncaught_or_fail(0).

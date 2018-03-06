@@ -217,6 +217,7 @@
 :- ensure_loaded(loptions).
 :- ensure_loaded(groveler).
 :- ensure_loaded(paramfns).
+:- ensure_loaded(socksrv).
 
 
 /*
