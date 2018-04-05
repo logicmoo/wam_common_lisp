@@ -22,7 +22,7 @@
  *******************************************************************/
 :- module(pnames, []).
 
-:- include('header').
+:- include('./header').
 %:- set_prolog_flag(verbose_load,full).
 :- set_prolog_flag(verbose,normal).
 %:- set_prolog_flag(verbose_autoload,true).

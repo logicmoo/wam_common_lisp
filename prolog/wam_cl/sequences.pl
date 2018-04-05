@@ -22,7 +22,7 @@
 
 :- set_module(class(library)).
 
-:- include('header').
+:- include('../wam_cl/header.pl').
 
 %:- ensure_loaded((utils_writef)).
 :- ensure_loaded(library(lists)).

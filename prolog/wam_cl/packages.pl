@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(package, []).
 :- set_module(class(library)).
-:- include('header').
+:- include('./header').
 
 :- multifile(xlisting_config:xlisting_always/1).
 :- dynamic(xlisting_config:xlisting_always/1).

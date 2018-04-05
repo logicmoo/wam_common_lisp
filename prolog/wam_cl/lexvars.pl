@@ -17,7 +17,7 @@
  *******************************************************************/
 :- module(v4rZ, []).
 :- set_module(class(library)).
-:- include('header').
+:- include('./header').
 
 % local symbol?
 rw_add(Ctx,Var,RW):- atom(Var), wam_cl_option(var_rw_counts,true),!,  get_var_tracker(Ctx,Var,Dict),arginfo_incr(RW,Dict).

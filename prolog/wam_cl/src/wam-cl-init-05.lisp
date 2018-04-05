@@ -480,5 +480,3 @@ DO:       Define a macro: (WITH-{NAME} object &body body)
                                  (intern (concatenate 'string (string ',conc-name) (string slot)))
                                  objv))) ',slot-names)
                     ,@body))))))))
-
-

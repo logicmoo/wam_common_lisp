@@ -16,7 +16,7 @@
 
 
 
-:- include('header').
+:- include('./header').
 
 cddd:- cd('/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/daydreamer/').
 cdkm:- cd('/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/km/').

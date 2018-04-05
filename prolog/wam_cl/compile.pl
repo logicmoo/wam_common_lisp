@@ -17,7 +17,7 @@
  *******************************************************************/
 :- module(comp, []).
 :- set_module(class(library)).
-:- include('header').
+:- include('./header').
 
 lisp_compiled_eval(SExpression):-
   quietly(as_sexp_interned(SExpression,Expression)),

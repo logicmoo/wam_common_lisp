@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(print, []).
 
-:- include('header').
+:- include('./header').
 
 
 % Grammar rules for printing Lisp s-expressions.

@@ -16,7 +16,7 @@
 
 :- set_module(class(library)).
 
-:- include('header').
+:- include('./header').
 
 /*
 [11:30] <dmiles> what i am trying to figurte out is if my macro's lambda list has &environment e  in it and if the e is passed to  macroexpand will that cause the same result if i had not passed it e

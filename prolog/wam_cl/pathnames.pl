@@ -16,7 +16,7 @@
 
 
 
-:- include('header').
+:- include('./header').
 
 wl:init_args(1,compile_file_pathname).
 f_compile_file_pathname(OSFile,Keys,PLFileOut):-

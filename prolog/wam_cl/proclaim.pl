@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(evil, []).
 :- set_module(class(library)).
-:- include('header').
+:- include('./header').
 
 sf_declare(_ReplEnv,_,_).
 sf_proclaim(_ReplEnv,Assert,t):- assert(is_proclaimed(Assert)).

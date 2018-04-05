@@ -16,7 +16,7 @@
 
 
 
-:- include('header').
+:- include('./header').
 
 % (defparameter cl::*error-output* (make-synonym-stream 'wam-cl::*stderr* ))
 f_make_synonym_stream(Name,Ret):-

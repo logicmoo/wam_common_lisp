@@ -17,7 +17,7 @@
  *******************************************************************/
 :- module(body, []).
 :- set_module(class(library)).
-:- include('header').
+:- include('./header').
 
 :- discontiguous(compile_body_form/5).
 

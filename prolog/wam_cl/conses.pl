@@ -22,7 +22,7 @@
 
 :- set_module(class(library)).
 
-:- include('header').
+:- include('./header').
 
 
 f_nth(Axis,List,RetVal):- nth0(Axis,List,RetVal).

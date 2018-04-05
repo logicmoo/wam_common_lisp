@@ -16,7 +16,7 @@
 :- module('os7r33M', []).
 
 
-:- include('header').
+:- include('./header').
 
 wl:interned_eval("(defparameter sys:*markdown* cl:t)").
 

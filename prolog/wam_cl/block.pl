@@ -20,7 +20,7 @@
 
 :- set_module(class(library)).
 
-:- include('header').
+:- include('./header').
 
 
 tst:is_local_test(do(0.0),

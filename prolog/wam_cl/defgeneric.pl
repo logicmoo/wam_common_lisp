@@ -16,7 +16,7 @@
 
 
 
-:- include('header').
+:- include('./header').
 
 compile_genericfs(_Ctx,_Env,Symbol,[Function,Symbol,A2|AMORE],assert_lsp(Symbol,P)):- 
    notrace(defgen(Function)),\+ is_implemented(Function),!,P=..[Function,Symbol,A2,AMORE].

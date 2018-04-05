@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(mizepro, []).
 :- set_module(class(library)).
-:- include('header').
+:- include('./header').
 
 debug_optimize(Msg):- wdmsg(Msg).
 

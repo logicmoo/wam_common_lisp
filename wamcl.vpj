@@ -163,6 +163,320 @@
 				</Folder>
 				<F N="../../packs_sys/lib_atts/pack.pl"/>
 			</Folder>
+			<Folder Name="logicmoo_base">
+				<Folder Name="prolog">
+					<Folder Name="logicmoo">
+						<Folder Name="common_logic">
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/common_logic/common_logic_boxlog.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/common_logic/common_logic_clif.pfc"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/common_logic/common_logic_compiler.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/common_logic/common_logic_convert.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/common_logic/common_logic_exists.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/common_logic/common_logic_kb_hooks.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/common_logic/common_logic_loader.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/common_logic/common_logic_modal.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/common_logic/common_logic_reordering.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/common_logic/common_logic_sanity.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/common_logic/common_logic_skolem.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/common_logic/common_logic_snark.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/common_logic/common_logic_sumo.pfc"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/common_logic/common_logic_theorist.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/common_logic/common_logic_unused.txt"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/common_logic/common_logic_utils.pl"/>
+						</Folder>
+						<Folder Name="motel">
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel/examples.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel/mpred_code_unused.txt"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel/mpred_expansion.pl.txt"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel/mpred_motel.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel/mpred_pfc_d.unused"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel/mpred_pfc_utils.unused"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel/test_motel_env.txt"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel/test_motel_examples_63.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel/test_motel_examples_76.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel/test_motel_fssKb.txt"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel/testMotel.pl"/>
+						</Folder>
+						<Folder Name="motel-0.8.12">
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel-0.8.12/ai93.dvi"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel-0.8.12/INSTALLATION"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel-0.8.12/int.c"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel-0.8.12/int.o"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel-0.8.12/int.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel-0.8.12/motel.dvi"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel-0.8.12/motel.lisp"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel-0.8.12/motel.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel-0.8.12/motel.ps"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel-0.8.12/README"/>
+						</Folder>
+						<Folder Name="pdt_server">
+							<Folder Name="org.cs3.pdt.analysis_3.1.2.201603251848">
+								<Folder Name="pl">
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.analysis_3.1.2.201603251848/pl/load.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.analysis_3.1.2.201603251848/pl/prolog_analysis_api.pl"/>
+								</Folder>
+							</Folder>
+							<Folder Name="org.cs3.pdt.builder_3.1.2.201603251848">
+								<Folder Name="prolog-src">
+									<Folder Name="analyzer">
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.builder_3.1.2.201603251848/prolog-src/analyzer/condor.graph.cycle.scc.pl"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.builder_3.1.2.201603251848/prolog-src/analyzer/dead_predicate_finder.pl"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.builder_3.1.2.201603251848/prolog-src/analyzer/edge_counter.pl"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.builder_3.1.2.201603251848/prolog-src/analyzer/loading_roots_finder.pl"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.builder_3.1.2.201603251848/prolog-src/analyzer/meta_pred_toplevel.pl"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.builder_3.1.2.201603251848/prolog-src/analyzer/metafile_referencer.pl"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.builder_3.1.2.201603251848/prolog-src/analyzer/metapred_finder.pl"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.builder_3.1.2.201603251848/prolog-src/analyzer/term_based_metapred_finder.pl"/>
+									</Folder>
+									<Folder Name="util">
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.builder_3.1.2.201603251848/prolog-src/util/ctc_admin_copy.pl"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.builder_3.1.2.201603251848/prolog-src/util/directive_finder.pl"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.builder_3.1.2.201603251848/prolog-src/util/walking_prolog_files.pl"/>
+									</Folder>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.builder_3.1.2.201603251848/prolog-src/cross_reference_builder.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.builder_3.1.2.201603251848/prolog-src/directive_handler.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.builder_3.1.2.201603251848/prolog-src/literal_parser.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.builder_3.1.2.201603251848/prolog-src/load_builder.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.builder_3.1.2.201603251848/prolog-src/load_graph.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.builder_3.1.2.201603251848/prolog-src/modules_and_visibility.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.builder_3.1.2.201603251848/prolog-src/new_pef_builder.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.builder_3.1.2.201603251848/prolog-src/parse_util.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.builder_3.1.2.201603251848/prolog-src/pdt_factbase.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.builder_3.1.2.201603251848/prolog-src/predicates.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.builder_3.1.2.201603251848/prolog-src/preparser.pl"/>
+								</Folder>
+							</Folder>
+							<Folder Name="org.cs3.pdt.common_3.1.2.201603251848">
+								<Folder Name="pl">
+									<Folder Name="callgraph">
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/callgraph/call_graph_examples.pl"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/callgraph/call_graph_test.pl"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/callgraph/load.pl"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/callgraph/pdt_call_analysis.pl"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/callgraph/pdt_call_graph.pl"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/callgraph/pdt_call_hierarchy.pl"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/callgraph/pdt_prolog_codewalk.pl"/>
+									</Folder>
+									<Folder Name="lgt">
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/lgt/loader.pl"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/lgt/logtalk_adapter.lgt"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/lgt/utils4entities.lgt"/>
+									</Folder>
+									<Folder Name="metainference">
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/metainference/load.pl"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/metainference/meta_inference_examples.pl"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/metainference/meta_inference_test.pl"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/metainference/pdt_meta_specification.pl"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/metainference/pdt_prolog_metainference.pl"/>
+									</Folder>
+									<Folder Name="xref">
+										<Folder Name="testcase">
+											<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/xref/testcase/other.pl"/>
+											<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/xref/testcase/sub.pl"/>
+											<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/xref/testcase/super.pl"/>
+											<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/xref/testcase/super2.pl"/>
+										</Folder>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/xref/pdt_xref.pl"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/xref/resolve_call.pl"/>
+									</Folder>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/load.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/pdt_common_reload_hook.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/pdt_entry_points.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/pdt_manual_entry.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/pdt_search.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/pdt_search_WORK_IN_PROGRESS.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/properties.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.common_3.1.2.201603251848/pl/source_files.pl"/>
+								</Folder>
+							</Folder>
+							<Folder Name="org.cs3.pdt.connector_3.1.2.201603251848">
+								<Folder Name="pl">
+									<Folder Name="lgt">
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.connector_3.1.2.201603251848/pl/lgt/loader.pl"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.connector_3.1.2.201603251848/pl/lgt/logtalk_reload_adapter.lgt"/>
+									</Folder>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.connector_3.1.2.201603251848/pl/load.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.connector_3.1.2.201603251848/pl/pdt_reload.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.connector_3.1.2.201603251848/pl/split_file_path.pl"/>
+								</Folder>
+								<Folder Name="schema">
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.connector_3.1.2.201603251848/schema/bootstrapContribution.exsd"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.connector_3.1.2.201603251848/schema/hooks.exsd"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.connector_3.1.2.201603251848/schema/prologContextTracker.exsd"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.connector_3.1.2.201603251848/schema/prologLibrary.exsd"/>
+								</Folder>
+							</Folder>
+							<Folder Name="org.cs3.pdt.console_3.1.2.201603251848">
+								<Folder Name="pl">
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.console_3.1.2.201603251848/pl/loader.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.console_3.1.2.201603251848/pl/pdt_console_server.pl"/>
+								</Folder>
+							</Folder>
+							<Folder Name="org.cs3.pdt.editor_3.1.2.201603251848">
+								<Folder Name="icons">
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.editor_3.1.2.201603251848/icons/module.jpg"/>
+								</Folder>
+								<Folder Name="org">
+									<Folder Name="cs3">
+										<Folder Name="pdt">
+											<Folder Name="editor">
+												<Folder Name="internal">
+													<Folder Name="views">
+														<Folder Name="testdata">
+															<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.editor_3.1.2.201603251848/org/cs3/pdt/editor/internal/views/testdata/testdata_00.pl"/>
+															<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.editor_3.1.2.201603251848/org/cs3/pdt/editor/internal/views/testdata/testdata_01.pl"/>
+															<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.editor_3.1.2.201603251848/org/cs3/pdt/editor/internal/views/testdata/testdata_02.pl"/>
+														</Folder>
+													</Folder>
+												</Folder>
+												<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.editor_3.1.2.201603251848/org/cs3/pdt/editor/ui.properties"/>
+											</Folder>
+										</Folder>
+									</Folder>
+								</Folder>
+								<Folder Name="pl">
+									<Folder Name="editor">
+										<Folder Name="lgt">
+											<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.editor_3.1.2.201603251848/pl/editor/lgt/loader.pl"/>
+											<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.editor_3.1.2.201603251848/pl/editor/lgt/logtalk_editor_adapter.lgt"/>
+										</Folder>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.editor_3.1.2.201603251848/pl/editor/load.pl"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.editor_3.1.2.201603251848/pl/editor/pdt_editor_breakpoints.pl"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.editor_3.1.2.201603251848/pl/editor/pdt_editor_edit_hook.pl"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.editor_3.1.2.201603251848/pl/editor/pdt_editor_files.pl"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.editor_3.1.2.201603251848/pl/editor/pdt_editor_highlighting.pl"/>
+									</Folder>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.editor_3.1.2.201603251848/pl/load.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.editor_3.1.2.201603251848/pl/pdt_smells.pl"/>
+								</Folder>
+							</Folder>
+							<Folder Name="org.cs3.pdt.graphicalviews_3.1.2.201603251848">
+								<Folder Name="pl">
+									<Folder Name="lgt">
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.graphicalviews_3.1.2.201603251848/pl/lgt/graphml_writer.lgt"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.graphicalviews_3.1.2.201603251848/pl/lgt/lgt_to_graphml.lgt"/>
+										<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.graphicalviews_3.1.2.201603251848/pl/lgt/loader.pl"/>
+									</Folder>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.graphicalviews_3.1.2.201603251848/pl/graphML_api.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.graphicalviews_3.1.2.201603251848/pl/load.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.graphicalviews_3.1.2.201603251848/pl/pl_ast_to_abba.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.graphicalviews_3.1.2.201603251848/pl/pl_to_graphML.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.graphicalviews_3.1.2.201603251848/pl/util_for_graphML.pl"/>
+								</Folder>
+							</Folder>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/consult_server.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/fp_1522012126371_0.6983157812319148"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/fp_1522012126371_0.8230701758113668"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/pdt_console_active_port.txt"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/process_observe.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/README.md"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/socketProcessXXX.tmp.pl"/>
+						</Folder>
+						<Folder Name="pfc">
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pfc/autoexec.pfc.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pfc/mpred_unused.txt"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pfc/README.md"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pfc/system_basic.pfc.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pfc/system_common.pfc.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pfc/system_constraints.pfc.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pfc/system_domains.pfc.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pfc/system_genls.pfc.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pfc/system_if_missing.pfc.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pfc/user_relationAllExists.pfc.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pfc/user_transitiveViaArg.pfc.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pfc/user_type_barriers.pfc.pl"/>
+						</Folder>
+						<Folder Name="plarkc">
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_cyc_kb.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_cyc_rewriting.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_i_cyc_xform.pfc"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_u_cyc_api.txt"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_u_cyc_flora_rules.pfc"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_u_cyc_kb_tinykb.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_u_dolce_2_1.kif"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_u_temporal.txt"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/plarkc/logicmoo_unused_plarkc.txt"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/plarkc/README.md"/>
+						</Folder>
+						<Folder Name="pttp">
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pttp/dbase_i_mpred_pttp.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pttp/dbase_i_mpred_pttp_compile_dalit.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pttp/dbase_i_mpred_pttp_compile_stickel_orig.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pttp/dbase_i_mpred_pttp_compile_tabling.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pttp/dbase_i_mpred_pttp_precompiled.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pttp/dbase_i_mpred_pttp_statics.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pttp/dbase_i_mpred_pttp_testing.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pttp/dbase_i_mpred_pttp_unused.pl"/>
+						</Folder>
+						<Folder Name="typesystem">
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/typesystem/mpred_agenda.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/typesystem/mpred_hooks.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/typesystem/mpred_props.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/typesystem/mpred_storage.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/typesystem/mpred_stubs.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/typesystem/mpred_type_args.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/typesystem/mpred_type_constraints.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/typesystem/mpred_type_isa.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/typesystem/mpred_type_naming.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/typesystem/mpred_type_wff.pl"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/typesystem/mpred_userkb.pl"/>
+						</Folder>
+						<Folder Name="xray">
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/xray/base.swi"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/xray/builtin.swi"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/xray/db.swi"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/xray/debug.swi"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/xray/dmiles.swi"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/xray/FIXES"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/xray/herbrand.swi"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/xray/hooks.swi"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/xray/hooks_config.swi"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/xray/io.swi"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/xray/lemma.swi"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/xray/lemma_config.swi"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/xray/lemmaflex.swi"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/xray/model.swi"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/xray/pttp-examples.swi"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/xray/pttp.swi"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/xray/TODO"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/xray/xray.swi"/>
+							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/xray/xray_config.swi"/>
+						</Folder>
+					</Folder>
+					<F N="../../packs_sys/logicmoo_base/prolog/.buildpath"/>
+					<F N="../../packs_sys/logicmoo_base/prolog/.project"/>
+					<F N="../../packs_sys/logicmoo_base/prolog/logicmoo_clif.pl"/>
+					<F N="../../packs_sys/logicmoo_base/prolog/logicmoo_cliop.pl"/>
+					<F N="../../packs_sys/logicmoo_base/prolog/logicmoo_cyc_exec.pl"/>
+					<F N="../../packs_sys/logicmoo_base/prolog/logicmoo_cycqlf.pl"/>
+					<F N="../../packs_sys/logicmoo_base/prolog/logicmoo_lib.pl"/>
+					<F N="../../packs_sys/logicmoo_base/prolog/logicmoo_motel.pl"/>
+					<F N="../../packs_sys/logicmoo_base/prolog/logicmoo_packs.pl"/>
+					<F N="../../packs_sys/logicmoo_base/prolog/logicmoo_pdt.pl"/>
+					<F N="../../packs_sys/logicmoo_base/prolog/logicmoo_plarkc.pl"/>
+					<F N="../../packs_sys/logicmoo_base/prolog/logicmoo_pldoc.pl"/>
+					<F N="../../packs_sys/logicmoo_base/prolog/logicmoo_plweb.pl"/>
+					<F N="../../packs_sys/logicmoo_base/prolog/logicmoo_pttp.pl"/>
+					<F N="../../packs_sys/logicmoo_base/prolog/logicmoo_repl.pl"/>
+					<F N="../../packs_sys/logicmoo_base/prolog/logicmoo_sumo.pl"/>
+					<F N="../../packs_sys/logicmoo_base/prolog/logicmoo_swilib.pl"/>
+					<F N="../../packs_sys/logicmoo_base/prolog/logicmoo_swish.pl"/>
+					<F N="../../packs_sys/logicmoo_base/prolog/logicmoo_typesystem.pl"/>
+					<F N="../../packs_sys/logicmoo_base/prolog/logicmoo_user.pl"/>
+					<F N="../../packs_sys/logicmoo_base/prolog/logicmoo_utils.pl"/>
+					<F N="../../packs_sys/logicmoo_base/prolog/logicmoo_wamcl.pl"/>
+					<F N="../../packs_sys/logicmoo_base/prolog/logicmoo_webbot.pl"/>
+					<F N="../../packs_sys/logicmoo_base/prolog/logicmoo_xray.pl"/>
+					<F N="../../packs_sys/logicmoo_base/prolog/LogicmooBase.vpj"/>
+				</Folder>
+				<F N="../../packs_sys/logicmoo_base/.buildpath"/>
+				<F N="../../packs_sys/logicmoo_base/.gitignore"/>
+				<F N="../../packs_sys/logicmoo_base/.pdtproperties"/>
+				<F N="../../packs_sys/logicmoo_base/.project"/>
+				<F N="../../packs_sys/logicmoo_base/LICENSE.md"/>
+				<F N="../../packs_sys/logicmoo_base/pack.pl"/>
+				<F N="../../packs_sys/logicmoo_base/README.md"/>
+			</Folder>
 			<Folder Name="logicmoo_utils">
 				<Folder Name="prolog">
 					<F N="../../packs_sys/logicmoo_utils/prolog/logicmoo_util_bb_env.pl"/>
@@ -266,6 +580,84 @@
 					<F N="../../packs_sys/predicate_streams/t/test123.pl"/>
 				</Folder>
 				<F N="../../packs_sys/predicate_streams/pack.pl"/>
+			</Folder>
+			<Folder Name="prologmud">
+				<Folder Name="prolog">
+					<Folder Name="prologmud">
+						<Folder Name="actions">
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/actions_conf.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/actions_db.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/any.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/as_agent.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/attack.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/chat.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/climb.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/create.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/drink.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/drop.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/eat.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/get_set.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/help.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/inventory.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/kiss.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/logon.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/look.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/move.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/planner.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/push.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/put_at.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/scansrc.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/showdebug.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/sit.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/stats.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/take.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/teleport.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/use.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/actions/where.pfc.pl"/>
+						</Folder>
+						<Folder Name="mobs">
+							<Folder Name="affordance">
+								<F N="../../packs_sys/prologmud/prolog/prologmud/mobs/affordance/improve.pfc.pl"/>
+								<F N="../../packs_sys/prologmud/prolog/prologmud/mobs/affordance/simbots.pfc.pl"/>
+							</Folder>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/mobs/explorer.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/mobs/mobs_conf.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/mobs/monster.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/mobs/pddl_agent.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/mobs/predator.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/mobs/prey.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/mobs/vacuum.pfc.pl"/>
+						</Folder>
+						<Folder Name="objs">
+							<F N="../../packs_sys/prologmud/prolog/prologmud/objs/basic_objs.pfc.pl"/>
+						</Folder>
+						<Folder Name="parsing">
+							<F N="../../packs_sys/prologmud/prolog/prologmud/parsing/parser_imperative.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/parsing/simple_decl_parser.pl"/>
+						</Folder>
+						<Folder Name="server">
+							<F N="../../packs_sys/prologmud/prolog/prologmud/server/mud_http_hmud.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/server/mud_irc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/server/mud_telnet.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/server/mud_testing.pl"/>
+						</Folder>
+						<Folder Name="vworld">
+							<F N="../../packs_sys/prologmud/prolog/prologmud/vworld/world.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/vworld/world_2d.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/vworld/world_agent.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/vworld/world_effects.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/vworld/world_events.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/vworld/world_npc.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/vworld/world_text.pfc.pl"/>
+							<F N="../../packs_sys/prologmud/prolog/prologmud/vworld/world_text_output.pfc.pl"/>
+						</Folder>
+						<F N="../../packs_sys/prologmud/prolog/prologmud/mud_builtin.pfc.pl"/>
+						<F N="../../packs_sys/prologmud/prolog/prologmud/mud_footer.pl"/>
+						<F N="../../packs_sys/prologmud/prolog/prologmud/mud_header.pl"/>
+						<F N="../../packs_sys/prologmud/prolog/prologmud/mud_loader.pl"/>
+						<F N="../../packs_sys/prologmud/prolog/prologmud/mud_startup.pl"/>
+					</Folder>
+				</Folder>
 			</Folder>
 			<Folder Name="s_expression">
 				<Folder Name="prolog">

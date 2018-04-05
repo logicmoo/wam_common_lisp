@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(clstructs, []).
 :- set_module(class(library)).
-:- include(header).
+:- include('./header').
 
 % :- use_module(library(pfc)).
 

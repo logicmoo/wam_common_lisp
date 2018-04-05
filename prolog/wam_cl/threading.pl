@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(thread1ng, []).
 
-:- include('header').
+:- include('./header').
 
 :- meta_predicate(call_engine(?,0,-,-)).
 call_engine(Templ,Goal,Engine,Det):-

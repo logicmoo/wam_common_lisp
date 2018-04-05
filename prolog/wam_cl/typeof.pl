@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(typ30f, []).
 
-:- include('header').
+:- include('./header').
 
 f_class_of(Obj,Class):- quietly(i_class(Obj,Class0)),!,Class=Class0.
 f_class_of(_,claz_t).

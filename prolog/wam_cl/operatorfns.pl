@@ -17,7 +17,7 @@
  *******************************************************************/
 :- module(decls, []).
 :- set_module(class(library)).
-:- include('header').
+:- include('./header').
 :- set_module(class(library)).
 
 wl:declared(f_special_operator_p,needs_env).

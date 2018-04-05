@@ -164,6 +164,6 @@ cl_special_form(quote).
 
 :- fixup_exports.
 
-:- include('header').
+:- include('./header').
 
 end_of_file.

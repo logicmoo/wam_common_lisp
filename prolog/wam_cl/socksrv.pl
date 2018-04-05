@@ -16,7 +16,7 @@
 
 
 
-:- include('header').
+:- include('./header').
 
 :- use_module(library(socket)).
 
@@ -81,7 +81,9 @@ resolve_host(Peer,Host):- compound(Peer),catch((Peer=..PeerL,atomic_list_concat(
 resolve_host(Peer,Host):- term_to_atom(Peer,Host),!.
 
 
-lsp_server_loop(ServerSocket, Options) :-
+
+lsp_server_loop_1(ServerSocket, Options) :-
+  always((
     tcp_accept(ServerSocket, ClientSock, Peer),
     tcp_open_socket(ClientSock, In, Out),
     set_stream(In, close_on_abort(false)),
@@ -93,17 +95,19 @@ lsp_server_loop(ServerSocket, Options) :-
     ;   between(2, 1000, Num),
         Postfix = [-, Num]
     ),
-    option(alias(ServerAlias),Options,lspsrv_server),
+    option(alias(ServerAlias),Options,lspsrv_server),!,
     atomic_list_concat(['client_',Host, '@', ServerAlias | Postfix], Alias),
-
     catch(thread_create(
               call_service_lsp_client(Host, Alias, ClientSock, In, Out, Peer, Options),
               _,
               [ alias(Alias),detached(true)
               ]),
           error(permission_error(create, thread, Alias), _),
-          fail),
-    !,
+          fail))).
+   
+
+lsp_server_loop(ServerSocket, Options):-
+    ignore(catch(lsp_server_loop_1(ServerSocket, Options),E,writeln(user_error,E))),
     lsp_server_loop(ServerSocket, Options).
 
 

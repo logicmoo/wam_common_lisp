@@ -16,7 +16,7 @@
 
 
 
-:- include('header').
+:- include('./header').
 
 
 wl:declared(f_error,inline(error)).

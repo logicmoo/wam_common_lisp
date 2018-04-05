@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(env, []).
 
-:- include('header').
+:- include('./header').
 
 :- use_module(library(rbtrees)).
 

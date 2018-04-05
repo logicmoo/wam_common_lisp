@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(symbol, []).
 :- set_module(class(library)).
-:- include('header').
+:- include('./header').
 
 wl:type_checked(f_symbol_name(claz_symbol,claz_string)).
 f_symbol_name(Symbol,Str):- pl_symbol_name(Symbol,Name),to_lisp_string(Name,Str).

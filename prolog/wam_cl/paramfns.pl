@@ -13,7 +13,7 @@
 *******************************************************************/
 :- module(kp4rms, []).
 
-:- include('header').
+:- include('./header').
 
 xform_with_ident([],_Ident,[]).
 xform_with_ident([Y0|YR0],Ident,[Y|YR]):-

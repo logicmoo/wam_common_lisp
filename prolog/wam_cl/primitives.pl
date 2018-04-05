@@ -22,7 +22,7 @@
 
 
 
-:- include('header').
+:- include('./header').
 
 %module(_,_).
 

@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(r3d3rz, []).
 
-:- include('header').
+:- include('./header').
 
 
 wl:symbol_has_prop_set_get(sys_xx_stdin_xx,claz_prolog_input_stream,set_input,current_input).

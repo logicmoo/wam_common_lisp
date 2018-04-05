@@ -16,7 +16,7 @@
 :- module('0pts', []).
 :- set_module(class(library)).
 
-:- include('header').
+:- include('./header').
 
 is_pl_atom_key(N):- wl:wam_cl_option_local(N,_).
 is_pl_atom_key(N):- \+ atom(N),!,fail.

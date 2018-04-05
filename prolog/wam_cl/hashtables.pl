@@ -16,7 +16,7 @@
 
 :- set_module(class(library)).
 
-:- include('header').
+:- include('./header').
 
 f_hash_table_p(HT,RetVal):- t_or_nil((f_class_of(HT,Claz),Claz==claz_hash_table),RetVal).
 

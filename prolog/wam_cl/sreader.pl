@@ -25,7 +25,7 @@
 :- use_module(library(bugger)).
 
 :- if(exists_file(header)).
-:- include('header').
+:- include('./header').
 :- endif.
 
 :- thread_local(t_l:sreader_options/2).

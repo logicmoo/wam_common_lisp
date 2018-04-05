@@ -17,7 +17,7 @@
 % some of this code will be moved to readers probably
 
 
-:- include('header').
+:- include('./header').
 
 
 f_sys_make_read_table(Out):-create_struct(read_table,Out).

@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(places, []).
 :- set_module(class(library)).
-:- include('header').
+:- include('./header').
 
 wl:init_args(2,defsetf).
 

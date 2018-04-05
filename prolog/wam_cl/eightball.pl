@@ -251,7 +251,7 @@ clause_asserted_local(H,R):- clause(H,true,R).
 %system:goal_expansion(certainly(G),G) :- wam_cl_option(safety,0).
 
 :- use_module(debugio).
-:- include('header').
+:- include('./header').
 
 wl:interned_eval("(defparameter sys:*markdown* cl:t)").
 

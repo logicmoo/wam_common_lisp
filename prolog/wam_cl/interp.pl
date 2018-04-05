@@ -36,7 +36,7 @@
 
 end_of_file.
 
-:- include('header').
+:- include('./header').
 
 
 evalL([], _, []):-!.

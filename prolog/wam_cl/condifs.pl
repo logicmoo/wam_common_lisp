@@ -17,7 +17,7 @@
  *******************************************************************/
 :- module(c0ndif, []).
 
-:- include('header').
+:- include('./header').
 
 
 :- discontiguous(compile_condifs/5).

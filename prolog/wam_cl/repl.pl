@@ -15,9 +15,10 @@
  *******************************************************************/
 :- module(cl, []).
 
-:- use_module(init).
+:- use_module('../wam_cl/init.pl').
+ 
 
-:- include('header').
+:- include('./header').
 
 % :- cls.
 :- Six = 6, set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)).
@@ -137,9 +138,7 @@ lisp_add_history(Expression):-
         with_output_to(string(S),writeExpression(Expression)),
         ((fail,string_upper(S,S))->string_lower(S,Store);Store=S),
         lisp_add_history(Store).
-/*
-rtrace(rez_to_inventory(iRiker707,tFood,_Food)).
-*/
+
 
 lisp_add_history_event(Store):- thread_signal(main,prolog:history(user_input, (Store))),!.
 lisp_add_history_event(_Store):-!.
@@ -264,12 +263,15 @@ lw:- f_load("wam-cl-params",_).
 
 :- use_module(library(shell)).
 
+:- if(false).
 :- if(getuid(1006)).
 :- use_module(library(eggdrop)).
 :- initialization((do_wamcl_inits,egg_go_fg),main).
 
-lisp_call([S|TERM],_Vs,R):- lisp_compiled_eval([S|TERM],R).
-
-:- endif.
+eggdrop:lisp_call([S|TERM],_Vs,R):- lisp_compiled_eval([S|TERM],R).
+    :- endif.
+    :- endif.
 %:- process_si.
 %:- cddd.
+
+

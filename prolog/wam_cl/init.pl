@@ -29,7 +29,7 @@
 :- set_prolog_flag(lisp_main,[]).
 :- create_prolog_flag(wamcl_init_level,0,[keep(true)]).
 
-:- include('header').
+:- include('./header').
 
 set_lisp_option(verbose):- 
    set_prolog_flag(verbose_load,full),
@@ -150,6 +150,8 @@ handle_program_args('--eval','-x',Form):- do_after_load(lisp_compiled_eval(Form,
 handle_program_args('--repl','-repl'):- set_interactive(true).
 handle_program_args('--norepl','-norepl'):- set_interactive(false).
 handle_program_args('--test','--markdown'):- set_prolog_flag(lisp_markdown,true).
+handle_program_args('--sock','--lispsock',Form):- atom_number(Form,Port),start_lspsrv(repl,Port,"Lisp Repl").
+
 
 
 % incomplete 

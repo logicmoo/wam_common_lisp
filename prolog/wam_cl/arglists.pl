@@ -145,7 +145,7 @@ method-combination-lambda-list::= (wholevar var*
 :- module(arglists, []).
 
 :- set_module(class(library)).
-:- include('header').
+:- include('./header').
 
 /*
  * (si::process-lambda-list lambda-list context)

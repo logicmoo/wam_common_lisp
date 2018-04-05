@@ -16,7 +16,7 @@
 
 :- set_module(class(library)).
 
-:- include('header').
+:- include('./header').
 
 :- discontiguous compile_defun_ops/5.
 

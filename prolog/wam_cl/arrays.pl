@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(aray, []).
 
-:- include('header').
+:- include('./header').
 
 % make-array dimensions &key element-type initial-element initial-contents adjustable fill-pointer displaced-to displaced-index-offset
 

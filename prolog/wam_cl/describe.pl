@@ -16,7 +16,7 @@
 
 
 
-:- include('header').
+:- include('./header').
 
 wl:init_args(1,apropos_list).
 f_apropos_list(StringLCI,RestNKeys,Symbols):-

@@ -22,7 +22,7 @@
 
 :- set_module(class(library)).
 
-:- include('header').
+:- include('./header').
 
 
 cl:f_trace(t):- rtrace,trace.

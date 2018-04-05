@@ -16,7 +16,7 @@
 
 :- set_module(class(library)).
 
-:- include('header').
+:- include('./header').
 
 % fast
 % wl:plugin_expand_progbody(Ctx,Env,Result,InstrS,_PreviousResult,Code):- compile_body_go_tagbody(Ctx,Env,Result,InstrS,Code),!.

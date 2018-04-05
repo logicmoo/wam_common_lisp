@@ -16,7 +16,7 @@
 
 
 
-:- include('header').
+:- include('./header').
 
 :- dynamic(tst:is_local_test/1).
 :- multifile(tst:is_local_test/1).

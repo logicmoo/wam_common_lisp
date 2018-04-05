@@ -17,7 +17,7 @@
  *******************************************************************/
 :- module(cl0z3rs, []).
 :- set_module(class(library)).
-:- include('header').
+:- include('./header').
 
 
 

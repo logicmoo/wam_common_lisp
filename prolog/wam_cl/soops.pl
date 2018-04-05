@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(soops, []).
 :- set_module(class(library)).
-:- include('header').
+:- include('./header').
 
 :- multifile(soops:struct_opv/3).
 :- discontiguous soops:struct_opv/3.
