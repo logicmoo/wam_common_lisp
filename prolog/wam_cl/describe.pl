@@ -55,7 +55,7 @@ f_sys_apropos_symbol(Symbol,_Verbose,t):- f_prin1(Symbol,_),
 f_describe(Obj,Opts,Ret):-
  pl_describe(Obj,Opts,[],Ret).
 
-pl_describe(Obj,Opts,_Skipping,Ret):-
+pl_describe(Obj,_TODO_Opts,_Skipping,Ret):-
    f_type_of(Obj,Type),
    f_class_of(Obj,Class),
    format('~N',[]),

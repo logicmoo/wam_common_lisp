@@ -139,8 +139,8 @@ to_prolog_pathname(Ref,Value):- atom(Ref),!,((is_symbolp(Ref),is_boundp(Ref),f_s
 to_prolog_pathname(Obj,PL):- string_to_prolog_atom(Obj,PL).
 %to_prolog_pathname0('$OBJ'(_T,TXT),PL):- to_prolog_string(TXT,STR),!,string_to_prolog_atom(STR,PL).
 %to_prolog_pathname0(TXT,PL):- string_to_prolog_atom(TXT,PL),!.
-string_to_prolog_atom(TXT,A):- to_prolog_string_anyways(TXT,T),!,always((text_to_string(T,S),atom_string(A,S))),!.
-%string_to_prolog_atom(TXT,A):- always((text_to_string(TXT,S),atom_string(A,S))),!.
+string_to_prolog_atom(TXT,A):- to_prolog_string_anyways(TXT,T),!,always((atom_string(T,S),atom_string(A,S))),!.
+%string_to_prolog_atom(TXT,A):- always((atom_string(TXT,S),atom_string(A,S))),!.
 
 
 f_namestring(Pathname,Out):- pl_namestring(Pathname,String),to_lisp_string(String,Out).

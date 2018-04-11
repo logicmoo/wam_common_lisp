@@ -41,7 +41,7 @@ show_call_trace(G):- G *-> dbginfo(:- side_effect(G)); ((dbginfo(:- failure(show
 is_must_show_msg(C):-compound(C),compound_name_arity(C,N,_),!,is_must_show_msg0(N). is_must_show_msg0(warn). is_must_show_msg0(error). is_must_show_msg0(failed).
 
 
-fmt_lispcode(Cmt):- is_comment(Cmt,Txt),clean_codes(Txt,Clean),text_to_string(Clean,Str),
+fmt_lispcode(Cmt):- is_comment(Cmt,Txt),clean_codes(Txt,Clean),atom_string(Clean,Str),
    (atom_contains(Str,'\n')->format('~N/*~n~w~N*/~n',[Str]), format('~N% ~w~n',[Str])).
 fmt_lispcode(Txt):- set_md_lang('common-lisp'),cmpout(comment(Txt)),set_md_lang(prolog).
 

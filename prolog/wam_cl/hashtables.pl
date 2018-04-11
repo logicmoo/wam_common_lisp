@@ -104,7 +104,7 @@ sf_with_hash_table_iterator(SubEnv, [Macroname_In, Hashtable_In|CDR], RestNKeys,
                                     MFResult),
         f_sys_env_eval(SubEnv, MFResult, FResult).
 
-mf_with_hash_table_iterator([with_hash_table_iterator, [Macroname_In, Hashtable_In|CDR]|RestNKeys], SubEnv, MFResult) :-
+mf_with_hash_table_iterator([with_hash_table_iterator, [Macroname_In, Hashtable_In|_CDR]|RestNKeys], _SubEnv, MFResult) :-
         nop(defmacro),
         GEnv=[bv(u_body, Body_In), bv(u_macroname, Macroname_In), bv(u_hashtable, Hashtable_In)],
         as_body(u_body, Body_In, RestNKeys),
@@ -159,7 +159,7 @@ f_sys_hash_table_iterator_function(Hash_table_In, FnResult) :-
                   f_u_hash_table_entries(Hash_table_Get, Entries_Init),
                   LEnv=[bv(u_entries, Entries_Init)|GEnv]
                 ),
-                closure(kw_function, [ClosureEnvironment|LEnv], Whole, LetResult12, [],  
+                closure(kw_function, [ClosureEnvironment|LEnv], _Whole, LetResult12, [],  
                   (get_var(ClosureEnvironment, u_entries, Entries_Get), 
                    f_car(Entries_Get, Entry_Init), 
                    LEnv13=[bv(u_entry, Entry_Init)|ClosureEnvironment],

@@ -71,7 +71,7 @@ sf_defpackage(_ReplEnv,Name,Keys,R):- f_make_package(Name,Keys,R).
 wl:init_args(1,make_package).
 f_make_package(L,B,T):- to_prolog_string_if_needed(L,Loc),!,f_make_package(Loc,B,T).
 f_make_package(AName,List,Package):-
-  text_to_string(AName,Name),  
+  atom_string(AName,Name),  
   atom_concat_or_rtrace(pkg_,Name,Down),prologcase_name(Down,Package),
   add_opv(Package,type_of,package),
   asserta_if_new(package_name(Package,Name)),
