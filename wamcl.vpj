@@ -68,13 +68,495 @@
 		</Folder>
 	</CustomFolders>
 	<Files AutoFolders="DirectoryView">
+		<Folder Name="../../lib">
+			<Folder Name="swipl">
+				<Folder Name="boot">
+					<F N="../../lib/swipl/boot/apply.pl"/>
+					<F N="../../lib/swipl/boot/attvar.pl"/>
+					<F N="../../lib/swipl/boot/autoload.pl"/>
+					<F N="../../lib/swipl/boot/bags.pl"/>
+					<F N="../../lib/swipl/boot/dcg.pl"/>
+					<F N="../../lib/swipl/boot/dicts.pl"/>
+					<F N="../../lib/swipl/boot/dwim.pl"/>
+					<F N="../../lib/swipl/boot/engines.pl"/>
+					<F N="../../lib/swipl/boot/expand.pl"/>
+					<F N="../../lib/swipl/boot/history.pl"/>
+					<F N="../../lib/swipl/boot/init.pl"/>
+					<F N="../../lib/swipl/boot/license.pl"/>
+					<F N="../../lib/swipl/boot/load.pl"/>
+					<F N="../../lib/swipl/boot/menu.pl"/>
+					<F N="../../lib/swipl/boot/messages.pl"/>
+					<F N="../../lib/swipl/boot/packs.pl"/>
+					<F N="../../lib/swipl/boot/parms.pl"/>
+					<F N="../../lib/swipl/boot/predopts.pl"/>
+					<F N="../../lib/swipl/boot/qlf.pl"/>
+					<F N="../../lib/swipl/boot/rc.pl"/>
+					<F N="../../lib/swipl/boot/syspred.pl"/>
+					<F N="../../lib/swipl/boot/toplevel.pl"/>
+					<F N="../../lib/swipl/boot/topvars.pl"/>
+				</Folder>
+				<Folder Name="library">
+					<Folder Name="chr">
+						<F N="../../lib/swipl/library/chr/a_star.pl"/>
+						<F N="../../lib/swipl/library/chr/binomialheap.pl"/>
+						<F N="../../lib/swipl/library/chr/builtins.pl"/>
+						<F N="../../lib/swipl/library/chr/chr_compiler_errors.pl"/>
+						<F N="../../lib/swipl/library/chr/chr_compiler_options.pl"/>
+						<F N="../../lib/swipl/library/chr/chr_compiler_utility.pl"/>
+						<F N="../../lib/swipl/library/chr/chr_debug.pl"/>
+						<F N="../../lib/swipl/library/chr/chr_hashtable_store.pl"/>
+						<F N="../../lib/swipl/library/chr/chr_integertable_store.pl"/>
+						<F N="../../lib/swipl/library/chr/chr_messages.pl"/>
+						<F N="../../lib/swipl/library/chr/chr_op.pl"/>
+						<F N="../../lib/swipl/library/chr/chr_runtime.pl"/>
+						<F N="../../lib/swipl/library/chr/chr_translate.pl"/>
+						<F N="../../lib/swipl/library/chr/clean_code.pl"/>
+						<F N="../../lib/swipl/library/chr/find.pl"/>
+						<F N="../../lib/swipl/library/chr/guard_entailment.pl"/>
+						<F N="../../lib/swipl/library/chr/listmap.pl"/>
+						<F N="../../lib/swipl/library/chr/pairlist.pl"/>
+						<F N="../../lib/swipl/library/chr/README"/>
+						<F N="../../lib/swipl/library/chr/README.TXT"/>
+					</Folder>
+					<Folder Name="clp">
+						<Folder Name="clpq">
+							<F N="../../lib/swipl/library/clp/clpq/bb_q.pl"/>
+							<F N="../../lib/swipl/library/clp/clpq/bv_q.pl"/>
+							<F N="../../lib/swipl/library/clp/clpq/fourmotz_q.pl"/>
+							<F N="../../lib/swipl/library/clp/clpq/ineq_q.pl"/>
+							<F N="../../lib/swipl/library/clp/clpq/itf_q.pl"/>
+							<F N="../../lib/swipl/library/clp/clpq/nf_q.pl"/>
+							<F N="../../lib/swipl/library/clp/clpq/store_q.pl"/>
+						</Folder>
+						<Folder Name="clpqr">
+							<F N="../../lib/swipl/library/clp/clpqr/class.pl"/>
+							<F N="../../lib/swipl/library/clp/clpqr/dump.pl"/>
+							<F N="../../lib/swipl/library/clp/clpqr/geler.pl"/>
+							<F N="../../lib/swipl/library/clp/clpqr/highlight.pl"/>
+							<F N="../../lib/swipl/library/clp/clpqr/itf.pl"/>
+							<F N="../../lib/swipl/library/clp/clpqr/ordering.pl"/>
+							<F N="../../lib/swipl/library/clp/clpqr/project.pl"/>
+							<F N="../../lib/swipl/library/clp/clpqr/README"/>
+							<F N="../../lib/swipl/library/clp/clpqr/README.TXT"/>
+							<F N="../../lib/swipl/library/clp/clpqr/redund.pl"/>
+						</Folder>
+						<Folder Name="clpr">
+							<F N="../../lib/swipl/library/clp/clpr/bb_r.pl"/>
+							<F N="../../lib/swipl/library/clp/clpr/bv_r.pl"/>
+							<F N="../../lib/swipl/library/clp/clpr/fourmotz_r.pl"/>
+							<F N="../../lib/swipl/library/clp/clpr/ineq_r.pl"/>
+							<F N="../../lib/swipl/library/clp/clpr/itf_r.pl"/>
+							<F N="../../lib/swipl/library/clp/clpr/nf_r.pl"/>
+							<F N="../../lib/swipl/library/clp/clpr/store_r.pl"/>
+						</Folder>
+						<F N="../../lib/swipl/library/clp/bounds.pl"/>
+						<F N="../../lib/swipl/library/clp/clp_distinct.pl"/>
+						<F N="../../lib/swipl/library/clp/clp_events.pl"/>
+						<F N="../../lib/swipl/library/clp/clpb.pl"/>
+						<F N="../../lib/swipl/library/clp/clpfd.pl"/>
+						<F N="../../lib/swipl/library/clp/clpq.pl"/>
+						<F N="../../lib/swipl/library/clp/clpr.pl"/>
+						<F N="../../lib/swipl/library/clp/simplex.pl"/>
+					</Folder>
+					<Folder Name="cql">
+						<F N="../../lib/swipl/library/cql/cql.pl"/>
+						<F N="../../lib/swipl/library/cql/cql.qlf"/>
+						<F N="../../lib/swipl/library/cql/cql_autoschema.pl"/>
+						<F N="../../lib/swipl/library/cql/cql_database.pl"/>
+						<F N="../../lib/swipl/library/cql/cql_hooks.pl"/>
+						<F N="../../lib/swipl/library/cql/sql_keywords.pl"/>
+						<F N="../../lib/swipl/library/cql/sql_parser.pl"/>
+						<F N="../../lib/swipl/library/cql/sql_tokenizer.pl"/>
+						<F N="../../lib/swipl/library/cql/sql_write.pl"/>
+					</Folder>
+					<Folder Name="dcg">
+						<F N="../../lib/swipl/library/dcg/basics.pl"/>
+					</Folder>
+					<Folder Name="dialect">
+						<Folder Name="eclipse">
+							<F N="../../lib/swipl/library/dialect/eclipse/test_util_iso.pl"/>
+						</Folder>
+						<Folder Name="hprolog">
+							<F N="../../lib/swipl/library/dialect/hprolog/format.pl"/>
+						</Folder>
+						<Folder Name="iso">
+							<F N="../../lib/swipl/library/dialect/iso/iso_predicates.pl"/>
+						</Folder>
+						<Folder Name="sicstus">
+							<F N="../../lib/swipl/library/dialect/sicstus/arrays.pl"/>
+							<F N="../../lib/swipl/library/dialect/sicstus/block.pl"/>
+							<F N="../../lib/swipl/library/dialect/sicstus/lists.pl"/>
+							<F N="../../lib/swipl/library/dialect/sicstus/sockets.pl"/>
+							<F N="../../lib/swipl/library/dialect/sicstus/swipl-lfr.pl"/>
+							<F N="../../lib/swipl/library/dialect/sicstus/system.pl"/>
+							<F N="../../lib/swipl/library/dialect/sicstus/terms.pl"/>
+							<F N="../../lib/swipl/library/dialect/sicstus/timeout.pl"/>
+						</Folder>
+						<Folder Name="swi">
+							<F N="../../lib/swipl/library/dialect/swi/syspred_options.pl"/>
+						</Folder>
+						<Folder Name="yap">
+							<F N="../../lib/swipl/library/dialect/yap/README.TXT"/>
+						</Folder>
+						<F N="../../lib/swipl/library/dialect/bim.pl"/>
+						<F N="../../lib/swipl/library/dialect/commons.pl"/>
+						<F N="../../lib/swipl/library/dialect/hprolog.pl"/>
+						<F N="../../lib/swipl/library/dialect/ifprolog.pl"/>
+						<F N="../../lib/swipl/library/dialect/sicstus.pl"/>
+						<F N="../../lib/swipl/library/dialect/yap.pl"/>
+					</Folder>
+					<Folder Name="DTD">
+						<F N="../../lib/swipl/library/DTD/HTML4.dcl"/>
+						<F N="../../lib/swipl/library/DTD/HTML4.dtd"/>
+						<F N="../../lib/swipl/library/DTD/HTML4.soc"/>
+						<F N="../../lib/swipl/library/DTD/HTML5.dtd"/>
+						<F N="../../lib/swipl/library/DTD/HTMLlat1.ent"/>
+						<F N="../../lib/swipl/library/DTD/HTMLspec.ent"/>
+						<F N="../../lib/swipl/library/DTD/HTMLsym.ent"/>
+					</Folder>
+					<Folder Name="http">
+						<Folder Name="web">
+							<Folder Name="css">
+								<F N="../../lib/swipl/library/http/web/css/dirindex.css"/>
+								<F N="../../lib/swipl/library/http/web/css/openid.css"/>
+								<F N="../../lib/swipl/library/http/web/css/plterm.css"/>
+							</Folder>
+							<Folder Name="icons">
+								<F N="../../lib/swipl/library/http/web/icons/back.png"/>
+								<F N="../../lib/swipl/library/http/web/icons/c.png"/>
+								<F N="../../lib/swipl/library/http/web/icons/compressed.png"/>
+								<F N="../../lib/swipl/library/http/web/icons/folder.png"/>
+								<F N="../../lib/swipl/library/http/web/icons/generic.png"/>
+								<F N="../../lib/swipl/library/http/web/icons/layout.png"/>
+								<F N="../../lib/swipl/library/http/web/icons/openid-logo-square.png"/>
+								<F N="../../lib/swipl/library/http/web/icons/openid-logo-tiny.png"/>
+							</Folder>
+							<Folder Name="js">
+								<F N="../../lib/swipl/library/http/web/js/jquery-1.11.3.min.js"/>
+								<F N="../../lib/swipl/library/http/web/js/pengines.js"/>
+							</Folder>
+						</Folder>
+						<F N="../../lib/swipl/library/http/ax.pl"/>
+						<F N="../../lib/swipl/library/http/dcg_basics.pl"/>
+						<F N="../../lib/swipl/library/http/html_head.pl"/>
+						<F N="../../lib/swipl/library/http/html_quasiquotations.pl"/>
+						<F N="../../lib/swipl/library/http/html_write.pl"/>
+						<F N="../../lib/swipl/library/http/http_authenticate.pl"/>
+						<F N="../../lib/swipl/library/http/http_client.pl"/>
+						<F N="../../lib/swipl/library/http/http_cookie.pl"/>
+						<F N="../../lib/swipl/library/http/http_cors.pl"/>
+						<F N="../../lib/swipl/library/http/http_digest.pl"/>
+						<F N="../../lib/swipl/library/http/http_dirindex.pl"/>
+						<F N="../../lib/swipl/library/http/http_dispatch.pl"/>
+						<F N="../../lib/swipl/library/http/http_error.pl"/>
+						<F N="../../lib/swipl/library/http/http_exception.pl"/>
+						<F N="../../lib/swipl/library/http/http_files.pl"/>
+						<F N="../../lib/swipl/library/http/http_header.pl"/>
+						<F N="../../lib/swipl/library/http/http_hook.pl"/>
+						<F N="../../lib/swipl/library/http/http_host.pl"/>
+						<F N="../../lib/swipl/library/http/http_json.pl"/>
+						<F N="../../lib/swipl/library/http/http_load.pl"/>
+						<F N="../../lib/swipl/library/http/http_log.pl"/>
+						<F N="../../lib/swipl/library/http/http_multipart_plugin.pl"/>
+						<F N="../../lib/swipl/library/http/http_open.pl"/>
+						<F N="../../lib/swipl/library/http/http_openid.pl"/>
+						<F N="../../lib/swipl/library/http/http_parameters.pl"/>
+						<F N="../../lib/swipl/library/http/http_path.pl"/>
+						<F N="../../lib/swipl/library/http/http_proxy.pl"/>
+						<F N="../../lib/swipl/library/http/http_pwp.pl"/>
+						<F N="../../lib/swipl/library/http/http_server_files.pl"/>
+						<F N="../../lib/swipl/library/http/http_session.pl"/>
+						<F N="../../lib/swipl/library/http/http_sgml_plugin.pl"/>
+						<F N="../../lib/swipl/library/http/http_ssl_plugin.pl"/>
+						<F N="../../lib/swipl/library/http/http_stream.pl"/>
+						<F N="../../lib/swipl/library/http/http_unix_daemon.pl"/>
+						<F N="../../lib/swipl/library/http/http_wrapper.pl"/>
+						<F N="../../lib/swipl/library/http/hub.pl"/>
+						<F N="../../lib/swipl/library/http/INDEX.pl"/>
+						<F N="../../lib/swipl/library/http/inetd_httpd.pl"/>
+						<F N="../../lib/swipl/library/http/jquery.pl"/>
+						<F N="../../lib/swipl/library/http/js_grammar.pl"/>
+						<F N="../../lib/swipl/library/http/js_write.pl"/>
+						<F N="../../lib/swipl/library/http/json.pl"/>
+						<F N="../../lib/swipl/library/http/json_convert.pl"/>
+						<F N="../../lib/swipl/library/http/mimepack.pl"/>
+						<F N="../../lib/swipl/library/http/mimetype.pl"/>
+						<F N="../../lib/swipl/library/http/mimetype.pl~"/>
+						<F N="../../lib/swipl/library/http/README"/>
+						<F N="../../lib/swipl/library/http/README.md"/>
+						<F N="../../lib/swipl/library/http/README.TXT"/>
+						<F N="../../lib/swipl/library/http/term_html.pl"/>
+						<F N="../../lib/swipl/library/http/thread_httpd.pl"/>
+						<F N="../../lib/swipl/library/http/websocket.pl"/>
+						<F N="../../lib/swipl/library/http/xpce_httpd.pl"/>
+						<F N="../../lib/swipl/library/http/yadis.pl"/>
+					</Folder>
+					<Folder Name="pldoc">
+						<F N="../../lib/swipl/library/pldoc/doc_access.pl"/>
+						<F N="../../lib/swipl/library/pldoc/doc_colour.pl"/>
+						<F N="../../lib/swipl/library/pldoc/doc_html.pl"/>
+						<F N="../../lib/swipl/library/pldoc/doc_htmlsrc.pl"/>
+						<F N="../../lib/swipl/library/pldoc/doc_index.pl"/>
+						<F N="../../lib/swipl/library/pldoc/doc_library.pl"/>
+						<F N="../../lib/swipl/library/pldoc/doc_man.pl"/>
+						<F N="../../lib/swipl/library/pldoc/doc_modes.pl"/>
+						<F N="../../lib/swipl/library/pldoc/doc_pack.pl"/>
+						<F N="../../lib/swipl/library/pldoc/doc_process.pl"/>
+						<F N="../../lib/swipl/library/pldoc/doc_register.pl"/>
+						<F N="../../lib/swipl/library/pldoc/doc_search.pl"/>
+						<F N="../../lib/swipl/library/pldoc/doc_util.pl"/>
+						<F N="../../lib/swipl/library/pldoc/doc_wiki.pl"/>
+						<F N="../../lib/swipl/library/pldoc/edit.png"/>
+						<F N="../../lib/swipl/library/pldoc/editpred.png"/>
+						<F N="../../lib/swipl/library/pldoc/favicon.ico"/>
+						<F N="../../lib/swipl/library/pldoc/h1-bg.png"/>
+						<F N="../../lib/swipl/library/pldoc/h2-bg.png"/>
+						<F N="../../lib/swipl/library/pldoc/hooks.pl"/>
+						<F N="../../lib/swipl/library/pldoc/multi-bg.png"/>
+						<F N="../../lib/swipl/library/pldoc/pldoc.css"/>
+						<F N="../../lib/swipl/library/pldoc/pldoc.js"/>
+						<F N="../../lib/swipl/library/pldoc/pldoc.sty"/>
+						<F N="../../lib/swipl/library/pldoc/pllisting.css"/>
+						<F N="../../lib/swipl/library/pldoc/priv-bg.png"/>
+						<F N="../../lib/swipl/library/pldoc/private.png"/>
+						<F N="../../lib/swipl/library/pldoc/pub-bg.png"/>
+						<F N="../../lib/swipl/library/pldoc/public.png"/>
+						<F N="../../lib/swipl/library/pldoc/README.md"/>
+						<F N="../../lib/swipl/library/pldoc/reload.png"/>
+						<F N="../../lib/swipl/library/pldoc/source.png"/>
+						<F N="../../lib/swipl/library/pldoc/up.gif"/>
+					</Folder>
+					<Folder Name="semweb">
+						<F N="../../lib/swipl/library/semweb/dc.rdfs"/>
+						<F N="../../lib/swipl/library/semweb/eor.rdfs"/>
+						<F N="../../lib/swipl/library/semweb/INDEX.pl"/>
+						<F N="../../lib/swipl/library/semweb/owl.owl"/>
+						<F N="../../lib/swipl/library/semweb/rdf11.pl"/>
+						<F N="../../lib/swipl/library/semweb/rdf11_containers.pl"/>
+						<F N="../../lib/swipl/library/semweb/rdf_cache.pl"/>
+						<F N="../../lib/swipl/library/semweb/rdf_compare.pl"/>
+						<F N="../../lib/swipl/library/semweb/rdf_db.pl"/>
+						<F N="../../lib/swipl/library/semweb/rdf_edit.pl"/>
+						<F N="../../lib/swipl/library/semweb/rdf_http_plugin.pl"/>
+						<F N="../../lib/swipl/library/semweb/rdf_library.pl"/>
+						<F N="../../lib/swipl/library/semweb/rdf_library.ttl"/>
+						<F N="../../lib/swipl/library/semweb/rdf_litindex.pl"/>
+						<F N="../../lib/swipl/library/semweb/rdf_ntriples.pl"/>
+						<F N="../../lib/swipl/library/semweb/rdf_persistency.pl"/>
+						<F N="../../lib/swipl/library/semweb/rdf_portray.pl"/>
+						<F N="../../lib/swipl/library/semweb/rdf_prefixes.pl"/>
+						<F N="../../lib/swipl/library/semweb/rdf_sandbox.pl"/>
+						<F N="../../lib/swipl/library/semweb/rdf_turtle.pl"/>
+						<F N="../../lib/swipl/library/semweb/rdf_turtle_write.pl"/>
+						<F N="../../lib/swipl/library/semweb/rdf_zlib_plugin.pl"/>
+						<F N="../../lib/swipl/library/semweb/rdfa.pl"/>
+						<F N="../../lib/swipl/library/semweb/rdfs.pl"/>
+						<F N="../../lib/swipl/library/semweb/rdfs.rdfs"/>
+						<F N="../../lib/swipl/library/semweb/README.md"/>
+						<F N="../../lib/swipl/library/semweb/sparql_client.pl"/>
+						<F N="../../lib/swipl/library/semweb/turtle.pl"/>
+					</Folder>
+					<Folder Name="tipc">
+						<F N="../../lib/swipl/library/tipc/tipc.pl"/>
+						<F N="../../lib/swipl/library/tipc/tipc_broadcast.pl"/>
+						<F N="../../lib/swipl/library/tipc/tipc_linda.pl"/>
+						<F N="../../lib/swipl/library/tipc/tipc_overview.txt"/>
+						<F N="../../lib/swipl/library/tipc/tipc_paxos.pl"/>
+					</Folder>
+					<Folder Name="unicode">
+						<F N="../../lib/swipl/library/unicode/blocks.pl"/>
+						<F N="../../lib/swipl/library/unicode/unicode_data.pl"/>
+					</Folder>
+					<F N="../../lib/swipl/library/aggregate.pl"/>
+					<F N="../../lib/swipl/library/ansi_term.pl"/>
+					<F N="../../lib/swipl/library/apply.pl"/>
+					<F N="../../lib/swipl/library/apply_macros.pl"/>
+					<F N="../../lib/swipl/library/archive.pl"/>
+					<F N="../../lib/swipl/library/arithmetic.pl"/>
+					<F N="../../lib/swipl/library/assoc.pl"/>
+					<F N="../../lib/swipl/library/backcomp.pl"/>
+					<F N="../../lib/swipl/library/base32.pl"/>
+					<F N="../../lib/swipl/library/base64.pl"/>
+					<F N="../../lib/swipl/library/bdb.pl"/>
+					<F N="../../lib/swipl/library/broadcast.pl"/>
+					<F N="../../lib/swipl/library/c14n2.pl"/>
+					<F N="../../lib/swipl/library/cgi.pl"/>
+					<F N="../../lib/swipl/library/charsio.pl"/>
+					<F N="../../lib/swipl/library/check.pl"/>
+					<F N="../../lib/swipl/library/check_installation.pl"/>
+					<F N="../../lib/swipl/library/checklast.pl"/>
+					<F N="../../lib/swipl/library/checkselect.pl"/>
+					<F N="../../lib/swipl/library/chr.pl"/>
+					<F N="../../lib/swipl/library/codesio.pl"/>
+					<F N="../../lib/swipl/library/coinduction.pl"/>
+					<F N="../../lib/swipl/library/console_input.pl"/>
+					<F N="../../lib/swipl/library/crypt.pl"/>
+					<F N="../../lib/swipl/library/crypto.pl"/>
+					<F N="../../lib/swipl/library/csv.pl"/>
+					<F N="../../lib/swipl/library/ctypes.pl"/>
+					<F N="../../lib/swipl/library/date.pl"/>
+					<F N="../../lib/swipl/library/dde.pl"/>
+					<F N="../../lib/swipl/library/debug.pl"/>
+					<F N="../../lib/swipl/library/dialect.pl"/>
+					<F N="../../lib/swipl/library/dicts.pl"/>
+					<F N="../../lib/swipl/library/dif.pl"/>
+					<F N="../../lib/swipl/library/doc_files.pl"/>
+					<F N="../../lib/swipl/library/doc_http.pl"/>
+					<F N="../../lib/swipl/library/doc_latex.pl"/>
+					<F N="../../lib/swipl/library/double_metaphone.pl"/>
+					<F N="../../lib/swipl/library/edinburgh.pl"/>
+					<F N="../../lib/swipl/library/edit.pl"/>
+					<F N="../../lib/swipl/library/editline.pl"/>
+					<F N="../../lib/swipl/library/error.pl"/>
+					<F N="../../lib/swipl/library/explain.pl"/>
+					<F N="../../lib/swipl/library/fastrw.pl"/>
+					<F N="../../lib/swipl/library/files.pl"/>
+					<F N="../../lib/swipl/library/filesex.pl"/>
+					<F N="../../lib/swipl/library/gensym.pl"/>
+					<F N="../../lib/swipl/library/git.pl"/>
+					<F N="../../lib/swipl/library/hash_stream.pl"/>
+					<F N="../../lib/swipl/library/heaps.pl"/>
+					<F N="../../lib/swipl/library/help.pl"/>
+					<F N="../../lib/swipl/library/helpidx.pl"/>
+					<F N="../../lib/swipl/library/hotfix.pl"/>
+					<F N="../../lib/swipl/library/INDEX.pl"/>
+					<F N="../../lib/swipl/library/iostream.pl"/>
+					<F N="../../lib/swipl/library/iso_639.pl"/>
+					<F N="../../lib/swipl/library/isub.pl"/>
+					<F N="../../lib/swipl/library/jpl.pl"/>
+					<F N="../../lib/swipl/library/lazy_lists.pl"/>
+					<F N="../../lib/swipl/library/listing.pl"/>
+					<F N="../../lib/swipl/library/lists.pl"/>
+					<F N="../../lib/swipl/library/main.pl"/>
+					<F N="../../lib/swipl/library/make.pl"/>
+					<F N="../../lib/swipl/library/mallocinfo.pl"/>
+					<F N="../../lib/swipl/library/MANUAL"/>
+					<F N="../../lib/swipl/library/md5.pl"/>
+					<F N="../../lib/swipl/library/memfile.pl"/>
+					<F N="../../lib/swipl/library/modules.pl"/>
+					<F N="../../lib/swipl/library/nb_rbtrees.pl"/>
+					<F N="../../lib/swipl/library/nb_set.pl"/>
+					<F N="../../lib/swipl/library/occurs.pl"/>
+					<F N="../../lib/swipl/library/odbc.pl"/>
+					<F N="../../lib/swipl/library/operators.pl"/>
+					<F N="../../lib/swipl/library/option.pl"/>
+					<F N="../../lib/swipl/library/optparse.pl"/>
+					<F N="../../lib/swipl/library/ordsets.pl"/>
+					<F N="../../lib/swipl/library/oset.pl"/>
+					<F N="../../lib/swipl/library/pairs.pl"/>
+					<F N="../../lib/swipl/library/pcre.pl"/>
+					<F N="../../lib/swipl/library/pdt_console.pl"/>
+					<F N="../../lib/swipl/library/pengines.pl"/>
+					<F N="../../lib/swipl/library/pengines_io.pl"/>
+					<F N="../../lib/swipl/library/pengines_sandbox.pl"/>
+					<F N="../../lib/swipl/library/persistency.pl"/>
+					<F N="../../lib/swipl/library/pio.pl"/>
+					<F N="../../lib/swipl/library/pldoc.pl"/>
+					<F N="../../lib/swipl/library/plunit.pl"/>
+					<F N="../../lib/swipl/library/porter_stem.pl"/>
+					<F N="../../lib/swipl/library/portray_text.pl"/>
+					<F N="../../lib/swipl/library/pprint.pl"/>
+					<F N="../../lib/swipl/library/predicate_options.pl"/>
+					<F N="../../lib/swipl/library/process.pl"/>
+					<F N="../../lib/swipl/library/progman.pl"/>
+					<F N="../../lib/swipl/library/prolog_autoload.pl"/>
+					<F N="../../lib/swipl/library/prolog_breakpoints.pl"/>
+					<F N="../../lib/swipl/library/prolog_clause.pl"/>
+					<F N="../../lib/swipl/library/prolog_codewalk.pl"/>
+					<F N="../../lib/swipl/library/prolog_colour.pl"/>
+					<F N="../../lib/swipl/library/prolog_format.pl"/>
+					<F N="../../lib/swipl/library/prolog_history.pl"/>
+					<F N="../../lib/swipl/library/prolog_install.pl"/>
+					<F N="../../lib/swipl/library/prolog_jiti.pl"/>
+					<F N="../../lib/swipl/library/prolog_metainference.pl"/>
+					<F N="../../lib/swipl/library/prolog_pack.pl"/>
+					<F N="../../lib/swipl/library/prolog_server.pl"/>
+					<F N="../../lib/swipl/library/prolog_source.pl"/>
+					<F N="../../lib/swipl/library/prolog_stack.pl"/>
+					<F N="../../lib/swipl/library/prolog_stream.pl"/>
+					<F N="../../lib/swipl/library/prolog_xref.pl"/>
+					<F N="../../lib/swipl/library/protobufs.pl"/>
+					<F N="../../lib/swipl/library/pure_input.pl"/>
+					<F N="../../lib/swipl/library/pwp.pl"/>
+					<F N="../../lib/swipl/library/qpforeign.pl"/>
+					<F N="../../lib/swipl/library/qsave.pl"/>
+					<F N="../../lib/swipl/library/quasi_quotations.pl"/>
+					<F N="../../lib/swipl/library/quintus.pl"/>
+					<F N="../../lib/swipl/library/random.pl"/>
+					<F N="../../lib/swipl/library/rbtrees.pl"/>
+					<F N="../../lib/swipl/library/rdf.pl"/>
+					<F N="../../lib/swipl/library/rdf_ntriples.pl"/>
+					<F N="../../lib/swipl/library/rdf_parser.pl"/>
+					<F N="../../lib/swipl/library/rdf_triple.pl"/>
+					<F N="../../lib/swipl/library/rdf_write.pl"/>
+					<F N="../../lib/swipl/library/readline.pl"/>
+					<F N="../../lib/swipl/library/readln.pl"/>
+					<F N="../../lib/swipl/library/readutil.pl"/>
+					<F N="../../lib/swipl/library/record.pl"/>
+					<F N="../../lib/swipl/library/registry.pl"/>
+					<F N="../../lib/swipl/library/rewrite.pl"/>
+					<F N="../../lib/swipl/library/rlimit.pl"/>
+					<F N="../../lib/swipl/library/saml.pl"/>
+					<F N="../../lib/swipl/library/sandbox.pl"/>
+					<F N="../../lib/swipl/library/settings.pl"/>
+					<F N="../../lib/swipl/library/sgml.pl"/>
+					<F N="../../lib/swipl/library/sgml_write.pl"/>
+					<F N="../../lib/swipl/library/sha.pl"/>
+					<F N="../../lib/swipl/library/shell.pl"/>
+					<F N="../../lib/swipl/library/shlib.pl"/>
+					<F N="../../lib/swipl/library/snowball.pl"/>
+					<F N="../../lib/swipl/library/socket.pl"/>
+					<F N="../../lib/swipl/library/solution_sequences.pl"/>
+					<F N="../../lib/swipl/library/sort.pl"/>
+					<F N="../../lib/swipl/library/ssl.pl"/>
+					<F N="../../lib/swipl/library/statistics.pl"/>
+					<F N="../../lib/swipl/library/streaminfo.pl"/>
+					<F N="../../lib/swipl/library/streampool.pl"/>
+					<F N="../../lib/swipl/library/syslog.pl"/>
+					<F N="../../lib/swipl/library/system.pl"/>
+					<F N="../../lib/swipl/library/table.pl"/>
+					<F N="../../lib/swipl/library/table_util.pl"/>
+					<F N="../../lib/swipl/library/tabling.pl"/>
+					<F N="../../lib/swipl/library/term_to_json.pl"/>
+					<F N="../../lib/swipl/library/terms.pl"/>
+					<F N="../../lib/swipl/library/test_cover.pl"/>
+					<F N="../../lib/swipl/library/test_wizard.pl"/>
+					<F N="../../lib/swipl/library/thread.pl"/>
+					<F N="../../lib/swipl/library/thread_pool.pl"/>
+					<F N="../../lib/swipl/library/threadutil.pl"/>
+					<F N="../../lib/swipl/library/time.pl"/>
+					<F N="../../lib/swipl/library/tty.pl"/>
+					<F N="../../lib/swipl/library/udp_broadcast.pl"/>
+					<F N="../../lib/swipl/library/ugraphs.pl"/>
+					<F N="../../lib/swipl/library/uid.pl"/>
+					<F N="../../lib/swipl/library/unicode.pl"/>
+					<F N="../../lib/swipl/library/unix.pl"/>
+					<F N="../../lib/swipl/library/uri.pl"/>
+					<F N="../../lib/swipl/library/url.pl"/>
+					<F N="../../lib/swipl/library/utf8.pl"/>
+					<F N="../../lib/swipl/library/uuid.pl"/>
+					<F N="../../lib/swipl/library/varnumbers.pl"/>
+					<F N="../../lib/swipl/library/vm.pl"/>
+					<F N="../../lib/swipl/library/when.pl"/>
+					<F N="../../lib/swipl/library/win_menu.pl"/>
+					<F N="../../lib/swipl/library/writef.pl"/>
+					<F N="../../lib/swipl/library/www_browser.pl"/>
+					<F N="../../lib/swipl/library/xmldsig.pl"/>
+					<F N="../../lib/swipl/library/xmlenc.pl"/>
+					<F N="../../lib/swipl/library/xpath.pl"/>
+					<F N="../../lib/swipl/library/xsdp_types.pl"/>
+					<F N="../../lib/swipl/library/yall.pl"/>
+					<F N="../../lib/swipl/library/yaml.pl"/>
+					<F N="../../lib/swipl/library/zlib.pl"/>
+				</Folder>
+			</Folder>
+		</Folder>
 		<Folder Name="../../packs_sys">
 			<Folder Name="clause_attvars">
 				<Folder Name="prolog">
 					<F N="../../packs_sys/clause_attvars/prolog/attvar_reader.pl"/>
 					<F N="../../packs_sys/clause_attvars/prolog/attvar_serializer.pl"/>
 					<F N="../../packs_sys/clause_attvars/prolog/clause_attvars.pl"/>
-					<F N="../../packs_sys/clause_attvars/prolog/INDEX.pl"/>
 					<F N="../../packs_sys/clause_attvars/prolog/toplevel_variable_names.pl"/>
 				</Folder>
 				<Folder Name="t">
@@ -97,7 +579,6 @@
 			<Folder Name="each_call_cleanup">
 				<Folder Name="prolog">
 					<F N="../../packs_sys/each_call_cleanup/prolog/each_call_cleanup.pl"/>
-					<F N="../../packs_sys/each_call_cleanup/prolog/INDEX.pl"/>
 				</Folder>
 				<Folder Name="t">
 					<F N="../../packs_sys/each_call_cleanup/t/sanity_tests.pl"/>
@@ -364,6 +845,86 @@
 									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.pdt.graphicalviews_3.1.2.201603251848/pl/util_for_graphML.pl"/>
 								</Folder>
 							</Folder>
+							<Folder Name="org.cs3.prolog.connector_3.1.2.201603251848">
+								<Folder Name="META-INF">
+									<Folder Name="maven">
+										<Folder Name="org.cs3.roots">
+											<Folder Name="org.cs3.prolog.connector">
+												<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.connector_3.1.2.201603251848/META-INF/maven/org.cs3.roots/org.cs3.prolog.connector/pom.properties"/>
+												<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.connector_3.1.2.201603251848/META-INF/maven/org.cs3.roots/org.cs3.prolog.connector/pom.xml"/>
+											</Folder>
+										</Folder>
+									</Folder>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.connector_3.1.2.201603251848/META-INF/MANIFEST.MF"/>
+								</Folder>
+								<Folder Name="org">
+									<Folder Name="cs3">
+										<Folder Name="prolog">
+											<Folder Name="connector">
+												<Folder Name="internal">
+													<Folder Name="cterm">
+														<Folder Name="parser">
+															<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.connector_3.1.2.201603251848/org/cs3/prolog/connector/internal/cterm/parser/canonical_term.jj"/>
+															<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.connector_3.1.2.201603251848/org/cs3/prolog/connector/internal/cterm/parser/canonical_term.jjt"/>
+														</Folder>
+													</Folder>
+													<Folder Name="process">
+														<Folder Name="socket">
+															<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.connector_3.1.2.201603251848/org/cs3/prolog/connector/internal/process/socket/consult_server.pl"/>
+														</Folder>
+													</Folder>
+												</Folder>
+												<Folder Name="process">
+													<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.connector_3.1.2.201603251848/org/cs3/prolog/connector/process/process_observe.pl"/>
+												</Folder>
+											</Folder>
+										</Folder>
+									</Folder>
+								</Folder>
+								<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.connector_3.1.2.201603251848/build.properties"/>
+								<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.connector_3.1.2.201603251848/epl-v10.html"/>
+								<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.connector_3.1.2.201603251848/pom.xml"/>
+							</Folder>
+							<Folder Name="org.cs3.prolog.library_3.1.2.201603251848">
+								<Folder Name="META-INF">
+									<Folder Name="maven">
+										<Folder Name="org.cs3.roots">
+											<Folder Name="org.cs3.prolog.library">
+												<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/META-INF/maven/org.cs3.roots/org.cs3.prolog.library/pom.properties"/>
+												<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/META-INF/maven/org.cs3.roots/org.cs3.prolog.library/pom.xml"/>
+											</Folder>
+										</Folder>
+									</Folder>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/META-INF/MANIFEST.MF"/>
+								</Folder>
+								<Folder Name="pl">
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/pl/_load.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/pl/compatibility.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/pl/compatiblitySWI.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/pl/contains.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/pl/count.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/pl/database.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/pl/database_cache.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/pl/files.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/pl/general.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/pl/junitadapter.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/pl/listing.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/pl/lists.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/pl/logging.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/pl/parse_term_from_atom.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/pl/pdt_support.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/pl/run_n_times.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/pl/time.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/pl/utils4modules - all backup.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/pl/utils4modules-backup.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/pl/utils4modules.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/pl/utils4modules_visibility.pl"/>
+									<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/pl/utils4modules_visibility_WORK_IN_PROGRESS.pl"/>
+								</Folder>
+								<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/build.properties"/>
+								<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/epl-v10.html"/>
+								<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/org.cs3.prolog.library_3.1.2.201603251848/plugin.xml"/>
+							</Folder>
 							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/consult_server.pl"/>
 							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/fp_1522012126371_0.6983157812319148"/>
 							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/pdt_server/fp_1522012126371_0.8230701758113668"/>
@@ -466,6 +1027,7 @@
 					<F N="../../packs_sys/logicmoo_base/prolog/logicmoo_utils.pl"/>
 					<F N="../../packs_sys/logicmoo_base/prolog/logicmoo_wamcl.pl"/>
 					<F N="../../packs_sys/logicmoo_base/prolog/logicmoo_webbot.pl"/>
+					<F N="../../packs_sys/logicmoo_base/prolog/logicmoo_xpce.pl"/>
 					<F N="../../packs_sys/logicmoo_base/prolog/logicmoo_xray.pl"/>
 					<F N="../../packs_sys/logicmoo_base/prolog/LogicmooBase.vpj"/>
 				</Folder>
@@ -479,6 +1041,7 @@
 			</Folder>
 			<Folder Name="logicmoo_utils">
 				<Folder Name="prolog">
+					<F N="../../packs_sys/logicmoo_utils/prolog/butterfly.pl"/>
 					<F N="../../packs_sys/logicmoo_utils/prolog/logicmoo_util_bb_env.pl"/>
 					<F N="../../packs_sys/logicmoo_utils/prolog/logicmoo_util_bb_gvar.pl"/>
 					<F N="../../packs_sys/logicmoo_utils/prolog/logicmoo_util_common.pl"/>
@@ -572,7 +1135,6 @@
 				<Folder Name="prolog">
 					<F N="../../packs_sys/predicate_streams/prolog/broadcast_streams.pl"/>
 					<F N="../../packs_sys/predicate_streams/prolog/concatenated_input_streams.pl"/>
-					<F N="../../packs_sys/predicate_streams/prolog/INDEX.pl"/>
 					<F N="../../packs_sys/predicate_streams/prolog/predicate_streams.pl"/>
 				</Folder>
 				<Folder Name="t">
@@ -670,7 +1232,6 @@
 			</Folder>
 			<Folder Name="subclause_expansion">
 				<Folder Name="prolog">
-					<F N="../../packs_sys/subclause_expansion/prolog/INDEX.pl"/>
 					<F N="../../packs_sys/subclause_expansion/prolog/script_files.pl"/>
 					<F N="../../packs_sys/subclause_expansion/prolog/subclause_expansion.pl"/>
 				</Folder>
@@ -683,7 +1244,6 @@
 				<Folder Name="prolog">
 					<F N="../../packs_sys/with_open_options/prolog/filestreams.pl"/>
 					<F N="../../packs_sys/with_open_options/prolog/filesystem.pl"/>
-					<F N="../../packs_sys/with_open_options/prolog/INDEX.pl"/>
 				</Folder>
 				<Folder Name="t">
 					<F N="../../packs_sys/with_open_options/t/sanity_tests.pl"/>
@@ -1187,6 +1747,190 @@
 			</Folder>
 			<F N="prolog/wamcl.pl"/>
 			<F N="prolog/wamcl_runtime.pl"/>
+		</Folder>
+		<Folder Name="../prologmud_samples">
+			<Folder Name="prolog">
+				<Folder Name="prologmud_sample_games">
+					<Folder Name="attic">
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/attic/daemon.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/attic/remote_swish.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/attic/server.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/attic/test_release.pl"/>
+					</Folder>
+					<Folder Name="btepisode">
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/btepisode/npc.pl"/>
+					</Folder>
+					<Folder Name="config-available - Copy">
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/auth_google.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/auth_http.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/auth_http_always.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/auth_stackoverflow.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/auth_unity.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/clpqr.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/data.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/debug.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/email.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/hdt.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/logging.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/network.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/notifications.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/provenance.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/r_serve.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/rdf.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/repack.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/rlimit.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/rpc.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/swish.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/user_profile.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/wordnet.pl"/>
+					</Folder>
+					<Folder Name="config-enabled - Copy">
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/auth_google.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/auth_http.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/auth_http_always.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/auth_stackoverflow.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/auth_unity.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/data.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/debug.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/email.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/hdt.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/logging.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/notifications.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/r_serve.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/rlimit.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/rpc.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/user_profile.pl"/>
+					</Folder>
+					<Folder Name="config-enabled-cliop">
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/010-packs.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/020-prefixes.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/025-amalgame.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/ag_lod.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/ag_menu.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/ag_modules.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/ag_preferences.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/ag_skin.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/ag_strat_prov_graph_viz.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/autocompletion.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/cloud.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/config.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/cpack_repository.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/cpack_server.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/econnect.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/EDM.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/find_resource.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/flint.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/foaf_user.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/isearch.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/lod.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/network.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/pengines.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/prov.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/rdfpath.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/skos.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/skos_browser.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/store.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/yui3.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/zlib.pl"/>
+					</Folder>
+					<Folder Name="config-enabled-swish">
+						<Folder Name="HIDE">
+							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/auth_google.pl"/>
+							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/auth_http.pl"/>
+							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/auth_stackoverflow.pl"/>
+							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/auth_unity.pl"/>
+							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/data.pl"/>
+							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/debug.pl"/>
+							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/email.pl"/>
+							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/hdt.pl"/>
+							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/logging.pl"/>
+							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/notifications.pl"/>
+							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/r_serve.pl"/>
+							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/rlimit.pl"/>
+							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/rpc.pl"/>
+							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/user_profile.pl"/>
+						</Folder>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/auth_google.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/auth_http.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/auth_stackoverflow.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/auth_unity.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/data.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/debug.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/email.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/hdt.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/logging.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/notifications.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/r_serve.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/rlimit.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/rpc.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/user_profile.pl"/>
+					</Folder>
+					<Folder Name="config-enabled-swish.orig">
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/auth_google.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/auth_http.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/auth_stackoverflow.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/auth_unity.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/data.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/debug.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/email.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/hdt.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/logging.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/notifications.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/r_serve.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/rlimit.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/rpc.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/user_profile.pl"/>
+					</Folder>
+					<Folder Name="src_game_nani">
+						<Folder Name="web">
+							<Folder Name="prolog">
+								<F N="../prologmud_samples/prolog/prologmud_sample_games/src_game_nani/web/prolog/mud_specific.pl"/>
+							</Folder>
+						</Folder>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/src_game_nani/a_nani_household.pfc.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/src_game_nani/andrew_ke.pfc.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/src_game_nani/annie_ke.pfc.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/src_game_nani/dmiles_ke.pfc.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/src_game_nani/jess_ke.pfc.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/src_game_nani/justin_ke.pfc.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/src_game_nani/meredith_ke.pfc.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/src_game_nani/objs_misc_household.pfc.pl"/>
+					</Folder>
+					<Folder Name="src_game_sims">
+						<Folder Name="web">
+							<Folder Name="prolog">
+								<F N="../prologmud_samples/prolog/prologmud_sample_games/src_game_sims/web/prolog/mud_specific.pl"/>
+							</Folder>
+						</Folder>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/src_game_sims/objs_misc_household.pfc.pl"/>
+					</Folder>
+					<Folder Name="src_game_startrek">
+						<Folder Name="holodeck">
+							<F N="../prologmud_samples/prolog/prologmud_sample_games/src_game_startrek/holodeck/maze.map.pfc.pl"/>
+							<F N="../prologmud_samples/prolog/prologmud_sample_games/src_game_startrek/holodeck/objs_misc_household.pfc.pl"/>
+							<F N="../prologmud_samples/prolog/prologmud_sample_games/src_game_startrek/holodeck/objs_misc_monster.pfc.pl"/>
+							<F N="../prologmud_samples/prolog/prologmud_sample_games/src_game_startrek/holodeck/predator.map.pfc.pl"/>
+							<F N="../prologmud_samples/prolog/prologmud_sample_games/src_game_startrek/holodeck/rooms_conf.pl"/>
+							<F N="../prologmud_samples/prolog/prologmud_sample_games/src_game_startrek/holodeck/vacuum.map.pfc.pl"/>
+						</Folder>
+						<Folder Name="mobs">
+							<F N="../prologmud_samples/prolog/prologmud_sample_games/src_game_startrek/mobs/federation.pl"/>
+						</Folder>
+						<Folder Name="web">
+							<Folder Name="prolog">
+								<F N="../prologmud_samples/prolog/prologmud_sample_games/src_game_startrek/web/prolog/mud_specific.pl"/>
+							</Folder>
+						</Folder>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/src_game_startrek/startrek.all.pfc.pl"/>
+					</Folder>
+					<Folder Name="src_game_wumpus">
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/src_game_wumpus/maze.map.pfc.pl"/>
+						<F N="../prologmud_samples/prolog/prologmud_sample_games/src_game_wumpus/objs_misc_monster.pfc.pl"/>
+					</Folder>
+					<F N="../prologmud_samples/prolog/prologmud_sample_games/init_mud_server.pl"/>
+					<F N="../prologmud_samples/prolog/prologmud_sample_games/run_mud_server.pl"/>
+				</Folder>
+			</Folder>
 		</Folder>
 		<Folder Name="t">
 			<Folder Name="daydreamer">
