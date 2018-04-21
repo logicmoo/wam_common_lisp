@@ -60,7 +60,9 @@ compile_test(Name,Code,Return,Expected):-
 
 
 
-
+:- export(tests:'$table_update'/4).
+:- export(tests:'$table_mode'/3).
+:- export(tests:'$tabled'/1).
 :- use_module(library(tabling)).
 :- table fibt/2.
 fibt(0, 1) :- !.

@@ -293,7 +293,8 @@ parse_sexpr_ascii(S, Expr) :- is_stream(S),!,parse_sexpr_stream(S,Expr).
 %parse_sexpr_ascii(S, Expr) :- open_string(S,SIS),!,parse_sexpr_stream(SIS,Expr).
 parse_sexpr_ascii(Text, Expr):- 
   txt_to_codes(Text,Codes),
-  =( ascii_,In),append_buffer_codes(In,Codes),!,
+  =( ascii_,In),
+  append_buffer_codes(In,Codes),!,
   phrase_from_buffer_codes_nd(file_sexpr_with_comments(Expr), In).
 
 phrase_from_buffer_codes_nd(Grammar, In) :- peek_pending_codes(In,Pend),is_eof_codes(Pend),!,phrase_from_eof(Grammar,In).
@@ -1047,22 +1048,20 @@ extract_lvars(A,B,After):-
 %= 	 	 
 
 %% copy_lvars( :TermVAR, ?Vars, :TermNV, ?NVars) is det.
-%
+%                        
 % Copy Lvars.
 %
-copy_lvars( VAR,Vars,NV,NVars):- svar(VAR,Name),always(atom(Name)),!,always(register_var(Name=NV,Vars,NVars)).
-copy_lvars([],Vars,[],Vars).
-copy_lvars(Term,Vars,Term,Vars):- \+compound(Term),!.
-copy_lvars('?'(Inner),Vars,Out,NVars):- !,
-    copy_lvars((Inner),Vars,(NInner),NVars),
-    (atom(NInner) -> atom_concat_or_rtrace('?',NInner,Out) ; Out = '?'(NInner)),!.
-
-copy_lvars([H|T],Vars,[NH|NT],NVars):- !, copy_lvars(H,Vars,NH,SVars), copy_lvars(T,SVars,NT,NVars).
-copy_lvars(Term,Vars,NTerm,NVars):-    
+copy_lvars(Term,Vars,Out,VarsO):- Term ==[],!,always((Out=Term,VarsO=Vars)).
+copy_lvars( VAR,Vars,Out,VarsO):- var(VAR),!,always((Out=VAR,VarsO=Vars)).
+copy_lvars([H|T],Vars,[NH|NT],VarsO):- !, copy_lvars(H,Vars,NH,SVars),!, copy_lvars(T,SVars,NT,VarsO).
+copy_lvars('?'(Inner),Vars,Out,VarsO):- !, copy_lvars(Inner,Vars,NInner,VarsO), always((atom(NInner) -> atom_concat_or_rtrace('?',NInner,Out) ; Out = '?'(NInner))),!.
+copy_lvars( VAR,Vars,Out,VarsO):- svar(VAR,Name)->always(atom(Name)),!,always(register_var(Name=Out,Vars,VarsO)).
+copy_lvars( VAR,Vars,Out,VarsO):- \+ compound(VAR),!,always((Out=VAR,VarsO=Vars)).
+copy_lvars(Term,Vars,NTerm,VarsO):-    
     Term=..[F|Args],    % decompose term
-    (svar(F,_)-> copy_lvars( [F|Args],Vars,NTerm,NVars);
+    (svar(F,_)-> copy_lvars( [F|Args],Vars,NTerm,VarsO);
     % construct copy term
-    (copy_lvars(Args,Vars,NArgs,NVars), NTerm=..[F|NArgs])).  
+       (copy_lvars(Args,Vars,NArgs,VarsO), NTerm=..[F|NArgs])),!.  
 
 
 %= 	 	 
@@ -1071,13 +1070,14 @@ copy_lvars(Term,Vars,NTerm,NVars):-
 %
 % If this is a KIF var, convert to a name for prolog
 %
-svar(_,_):- \+ kif_ok,!,fail.
 svar(SVAR,UP):- nonvar(UP),!,trace_or_throw(nonvar_svar(SVAR,UP)).
-svar(Var,Name):-var(Var),!,always(svar_fixvarname(Var,Name)).
-svar('#'(Name),NameU):-!,svar(Name,NameU),!.
-
+svar(Var,Name):- var(Var),!,always(svar_fixvarname(Var,Name)).
 svar('$VAR'(Var),Name):-number(Var),Var > -1, !, always(format(atom(Name),'~w',['$VAR'(Var)])),!.
 svar('$VAR'(Name),VarName):-!,always(svar_fixvarname(Name,VarName)).
+svar(_,_):- \+ kif_ok,!,fail.
+svar([],_):-!,fail.
+svar('#'(Name),NameU):-!,svar(Name,NameU),!.
+
 svar('?'(Name),NameU):-svar_fixvarname(Name,NameU),!.
 svar('@'(Name),NameU):-svar_fixvarname(Name,NameU),!.
 % svar(VAR,Name):-atom(VAR),atom_concat_or_rtrace('_',_,VAR),svar_fixvarname(VAR,Name),!.
@@ -1580,7 +1580,7 @@ set_variable_names_safe(Vars):-
 
 input_to_forms0(Codes,FormsOut,Vars):- 
     % is_openable(Codes),!,
-    !, parse_sexpr(Codes, Forms0),!,
+    parse_sexpr(Codes, Forms0),!,
     once((to_untyped(Forms0, Forms1),extract_lvars(Forms1,FormsOut,Vars))).
 input_to_forms0(Forms,FormsOut,Vars):-
     (to_untyped(Forms, Forms1) ->

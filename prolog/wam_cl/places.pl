@@ -192,7 +192,10 @@ compile_accessors(Ctx,Env,Result,[Getf|ValuePlace], Body):- fail, is_place_op_ve
         Body = (set_place(Env,Getf, Place, Value, Result)).
 
 
-portray(List):- notrace((nonvar(List),List=[_,_],sub_term(E,List),ground(E),E = ((environ=W)),write(environment(W)))).
+:- dynamic user:portray/1.
+:- multifile user:portray/1.
+:- module_transparent user:portray/1.
+user:portray(List):- notrace((nonvar(List),List=[_,_],sub_term(E,List),ground(E),E = ((environ=W)),write(environment(W)))).
 
 
 compile_accessors(Ctx,Env,Result,[Setf, Place|ValuesForms], (Part0,Body)):- is_place_write(Setf),
