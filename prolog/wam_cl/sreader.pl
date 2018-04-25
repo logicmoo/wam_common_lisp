@@ -24,7 +24,7 @@
 :- use_module(library(filestreams)).
 :- use_module(library(bugger)).
 
-:- if(exists_file(header)).
+:- if(exists_file('./header')).
 :- include('./header').
 :- endif.
 
