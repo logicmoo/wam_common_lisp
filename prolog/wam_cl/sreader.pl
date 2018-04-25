@@ -20,7 +20,7 @@
   write_trans/4,
   parse_sexpr/2]).
 
-
+:- use_module(library(logicmoo_util_startup)).
 :- use_module(library(filestreams)).
 :- use_module(library(bugger)).
 
