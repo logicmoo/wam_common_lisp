@@ -255,7 +255,7 @@ compile_body_form(Ctx,Env,Result,['values',R1|EvalList], (ArgBody,Body)):-!,
     Body = nb_setval('$mv_return',[Result|Results]).
 compile_body_form(_Ctx,_Env,[],['values'], nb_setval('$mv_return',[])):-!.
 
-:- nb_setval('$mv_return',[]).
+:- thread_initialization(nb_setval('$mv_return',[])).
 %reset_mv:- b_getval('$mv_return',[V1,_V2|_])->b_setval('$mv_return',[V1]);true.
 f_values_list([V1|Push],V1):- always(nonvar(Push)),nb_setval('$mv_return',[V1|Push]).
 

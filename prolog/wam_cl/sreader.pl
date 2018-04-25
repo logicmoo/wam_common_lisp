@@ -835,7 +835,7 @@ sym_char_start(C):- C\==44,C\==59,sym_char(C).
 
 
 
-:- nb_setval('$maybe_string',[]).
+:- thread_initialization(nb_setval('$maybe_string',[])).
 
 :- thread_local(t_l:s2p/1).
 :- thread_local(t_l:each_file_term/1).

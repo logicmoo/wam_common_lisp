@@ -43,6 +43,7 @@
 :- use_module(library(must_trace)).
 :- use_module(library(logicmoo_util_terms)).
 :- use_module(library(logicmoo_util_common)).
+:- use_module(library(logicmoo_util_startup)).
 :- user:use_module(library(each_call_cleanup)).
 :- use_module(library(with_thread_local)).
 :- user:use_module(library(globals_api)).

@@ -19,7 +19,7 @@
 :- use_module(library(rbtrees)).
 
 
-:- nb_setval('$labels_suffix','').
+:- thread_initialization(nb_setval('$labels_suffix','')).
 suffix_by_context(_Ctx,Atom,SuffixAtom):- nb_current('$labels_suffix',Suffix),atom_concat_suffix(Atom,Suffix,SuffixAtom).
 suffixed_atom_concat(Ctx,L,R,LRS):- atom_concat_or_rtrace(L,R,LR),suffix_by_context(Ctx,LR,LRS).
 push_labels_context(Ctx,Atom):- suffix_by_context(Ctx,Atom,SuffixAtom),b_setval('$labels_suffix',SuffixAtom).
@@ -312,4 +312,5 @@ add_alphas0(Ctx,Alphas):- Alphas=..[_|ARGS],maplist(add_alphas0(Ctx),ARGS).
 
 
 :- fixup_exports.
+:- thread_initialization(reset_env).
 
