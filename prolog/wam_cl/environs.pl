@@ -1,4 +1,4 @@
-/*******************************************************************
+/* ******************************************************************
  *
  * A Common Lisp compiler/interpretor, written in Prolog
  *
@@ -42,7 +42,7 @@ show_ctx_info3(Ctx):- fmt9(ctx=Ctx).
 
 set_el(O,Env,Name,Value):- HH=bv(Name,Value), H=[HH],ct(O,1,Env,H),ct(O,2,Env,H).
 
-/** PUSH-PREPEND-IF-NEW **/
+/* * PUSH-PREPEND-IF-NEW **/
 update_or_prepend(O,Env,Name,Value):- 
   Env=el(List,_) 
    -> (List==[]-> set_el(O,Env,Name,Value);update_lst_or_prepend(O,List,Name,Value))
@@ -52,7 +52,7 @@ update_lst_or_prepend(O,Env,Name,Value):- Env=[H|T],H=bv(Name,_),
   (ct(O,2,H,Value)->true;(T\==[],update_lst_or_prepend(O,T,Name,Value))),!.
 update_lst_or_prepend(O,Env,Name,Value):- Env=[H|T],!,ct(O,2,Env,[H|T]),ct(O,1,Env,bv(Name,Value)).
 
-/** PUSH-APPEND-IF-NEW **/
+/* * PUSH-APPEND-IF-NEW **/
 update_or_append(O,Env,Name,Value):- 
     Env=el(_,_) -> update_el_or_append(O,Env,Env,Name,Value); update_lst_or_append(O,Env,Name,Value).
 
@@ -71,13 +71,13 @@ update_el_tail_or_append(O,Env,Name,Value,TO):- Env=[H|T],
 
 ct(O,N,P,E):- var(E) -> true ; call(O,N,P,E).
   
-/** PUSH-APPEND **/
+/* PUSH-APPEND */
 push_append(O,Env,Name,Value):- Env=el(_,_)->push_el_append(O,Env,Env,Name,Value);push_lst_append(O,Env,Name,Value).
 push_el_append(O,Env,el(_,[]),Name,Value):- set_el(O,Env,Name,Value).
 push_el_append(O,Env,el(_,Tail),Name,Value):- T=[bv(Name,Value)],ct(O,2,Tail,T),ct(O,2,Env,T).
 push_lst_append(O,Env,Name,Value):- Env=[_|T],(T==[]->(ct(O,2,Env,[bv(Name,Value)]));push_lst_append(O,T,Name,Value)).
 
-/** PUSH-PREPEND **/
+/* * PUSH-PREPEND **/
 push_prepend(O,Env,Name,Value):- Env=el(List,_)->push_le_prepend(O,Env,List,Name,Value);push_list_prepend(O,Env,Name,Value).
 
 push_le_prepend(O,Env,[],Name,Value):- !, set_el(O,Env,Name,Value).

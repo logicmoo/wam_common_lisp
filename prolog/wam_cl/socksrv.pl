@@ -72,13 +72,17 @@ lspsrv_server(Port, Options) :-
     option(description(Desc),Options,Alias),
     dmsg(Port=Desc),
     thread_create(lsp_server_loop(ServerSocket, Options), _,
-                  [ alias(Alias)
-                  ]),!.
+                  [ alias(Alias),detached(true)]),!.
 
-resolve_host(Peer,Host):- catch(tcp_host_to_address(Host, Peer),_,fail),!.
-resolve_host(Peer,Host):- atom(Peer),Peer=Host,!.
-resolve_host(Peer,Host):- compound(Peer),catch((Peer=..PeerL,atomic_list_concat(PeerL,'.',Host)),_,fail),!.
-resolve_host(Peer,Host):- term_to_atom(Peer,Host),!.
+lsp_server_loop(ServerSocket, Options):-
+    ignore(catch(lsp_server_loop_1(ServerSocket, Options),E,writeln(user_error, lsp_server_loop_1(ServerSocket, Options,E)))),
+       lsp_server_loop(ServerSocket, Options).
+
+
+resolve_host_sksrv(Peer,Host):- catch(tcp_host_to_address(Host, Peer),_,fail),!.
+resolve_host_sksrv(Peer,Host):- atom(Peer),Peer=Host,!.
+resolve_host_sksrv(Peer,Host):- compound(Peer),catch((Peer=..PeerL,atomic_list_concat(PeerL,'.',Host)),_,fail),!.
+resolve_host_sksrv(Peer,Host):- term_to_atom(Peer,Host),!.
 
 
 
@@ -87,28 +91,19 @@ lsp_server_loop_1(ServerSocket, Options) :-
     tcp_accept(ServerSocket, ClientSock, Peer),
     tcp_open_socket(ClientSock, In, Out),
     set_stream(In, close_on_abort(false)),
-    set_stream(Out, close_on_abort(false)),
-    
-
-    resolve_host(Peer,Host),
-    (   Postfix = []
-    ;   between(2, 1000, Num),
-        Postfix = [-, Num]
-    ),
+    set_stream(Out, close_on_abort(false)),    
+    resolve_host_sksrv(Peer,Host),
+    gensym('_',PostFix),
     option(alias(ServerAlias),Options,lspsrv_server),!,
-    atomic_list_concat(['client_',Host, '@', ServerAlias | Postfix], Alias),
+    atomic_list_concat(['client_',Host,PostFix, '@', ServerAlias], Alias),
     catch(thread_create(
               call_service_lsp_client(Host, Alias, ClientSock, In, Out, Peer, Options),
-              _,
-              [ alias(Alias),detached(true)
-              ]),
+              _, [ alias(Alias),detached(true)]),
           error(permission_error(create, thread, Alias), _),
           fail))).
    
 
-lsp_server_loop(ServerSocket, Options):-
-    ignore(catch(lsp_server_loop_1(ServerSocket, Options),E,writeln(user_error,E))),
-    lsp_server_loop(ServerSocket, Options).
+
 
 
 call_service_lsp_client(Host, Alias, ClientSock, In, Out, Peer, Options):-

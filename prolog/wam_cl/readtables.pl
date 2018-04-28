@@ -176,8 +176,8 @@ readname_terms(Term,Term).
 
 
 fix_symbols:-
-  forall(symbol_overlap(sys(pkg_cl,S1),sys(pkg_clos,S2)),move_symbol_into(S2,sys(pkg_cl))),
-  forall(symbol_overlap(sys(pkg_sys,S1),sys(pkg_sys,S2)),move_symbol_into(S1,sys(pkg_sys))),
+  forall(symbol_overlap(sys(pkg_cl,_S1),sys(pkg_clos,S2)),move_symbol_into(S2,sys(pkg_cl))),
+  forall(symbol_overlap(sys(pkg_sys,S1),sys(pkg_sys,_S2)),move_symbol_into(S1,sys(pkg_sys))),
   forall(symbol_in(int(pkg_cl,S1)),move_symbol_into(S1,sys(pkg_sys))),
   forall(symbol_in(sys(pkg_sys,S1)),move_symbol_into(S1,sys(pkg_sys))).
 

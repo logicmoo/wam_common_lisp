@@ -96,6 +96,49 @@ is_place_op(psetf).
 is_place_op(incf).
 is_place_op(decf).
 /*
+
+(defun mapcar (f l)(cond ((null l) nil)(t (cons (funcall f (car l))(mapcar f (cdr l))))))
+(mapcar #'oddp '(1 2 3 4 5))
+(mapcar #'= '(1 2 3) '(3 2 1))
+
+
+(defun nconc (&optional lst &rest rest)
+  (if rest
+      (let ((rest-conc (apply #'nconc rest)))
+        (if (consp lst)
+            (progn (setf (cdr (last lst)) rest-conc)
+                   lst)
+            rest-conc))
+      lst))
+
+(defun mapcan (fn &rest lsts)
+  (apply #'nconc (apply #'mapcar fn lsts)))
+
+(mapcan #'(lambda (x) (and (numberp x) (list x)))
+          '(a 1 b c 3 4 d 5))
+
+(PRINT (permute '(A B Z) ) )
+
+(DEFUN permute (LIST)(IF LIST (MAPCAN #'(LAMBDA (x)(MAPCAR #'(LAMBDA (y)(CONS x y) )
+  (permute (REMOVE x LIST) ) ) ) LIST) '(NIL) ) )
+
+
+
+prolog.
+
+f_mapcan(Fn_In, RestNKeys, FnResult) :-
+        GEnv=[bv(u_fn, Fn_In), bv(u_lsts, Lsts_In)],
+        as_rest(u_lsts, Lsts_In, 0, RestNKeys),
+        catch(( ( get_var(GEnv, u_fn, Fn_Get),
+                  get_var(GEnv, u_lsts, Lsts_Get),
+                  f_apply(f_mapcar, [Fn_Get, Lsts_Get], Nconc_Param),
+                  f_nconc(Nconc_Param, Nconc_Ret)
+                ),
+                Nconc_Ret=FnResult
+              ),
+              block_exit(mapcan, FnResult),
+              true).
+
 is_place_op(rotatef).
 is_place_op(shiftf).
 
