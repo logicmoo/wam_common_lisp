@@ -40,10 +40,12 @@
 :- endif.
 :- endif.
 
+:- use_module(library(hook_database)).
 :- use_module(library(must_trace)).
 :- use_module(library(logicmoo_util_terms)).
 :- use_module(library(logicmoo_util_common)).
-:- use_module(library(logicmoo_util_startup)).
+%:- use_module(library(logicmoo_util_startup)).
+:- system:use_module(library(logicmoo_util_startup)).
 :- use_module(library(listing_vars)).
 
 :- user:use_module(library(each_call_cleanup)).

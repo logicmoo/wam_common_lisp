@@ -55,8 +55,8 @@ set_lisp_option(optimize):-
 
 
 lisp:-
- do_wamcl_inits,
- lisp_goal.
+ must(do_wamcl_inits), 
+ must(lisp_goal).
 
 lisp_goal:- is_using_lisp_main, call_lisp_main(Exit), !, main_exit(Exit).
 lisp_goal:- is_making_lisp_exe, make_exe,!,lisp_goal_pt2.
@@ -196,11 +196,13 @@ primordial_init:-
 % system sourcefile load hooks
 do_wamcl_inits:- current_prolog_flag(wamcl_init_level,N),N>5,!.
 do_wamcl_inits:-
+ must_det_l((
   primordial_init,
   set_prolog_flag(wamcl_init_level,6),
   clear_op_buffer,
   set_opv(xx_package_xx,symbol_value,pkg_user),
-  set_prolog_flag(wamcl_init_level,7).
+  set_prolog_flag(wamcl_gvars,true),
+  set_prolog_flag(wamcl_init_level,7))).
 
 % program inits
 clear_op_buffer:-   

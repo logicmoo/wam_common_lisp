@@ -95,7 +95,7 @@ find_package(S,Package):-
   (package_name(Package,SN) ; package_nicknames(Package,SN) ; get_opv_i(Package,nicknames,SN) ; (atom_concat('SB!',_,SN)->Package=pkg_sys)),!.
 
 find_package_or_die(X,Y):-
- find_package(X,Y) -> true ; break,trace_or_throw(find_package_or_die(X,Y)).  
+ find_package(X,Y) -> true ; (break,trace_or_throw(find_package_or_die(X,Y))).  
 
 as_package_object(Package,'$OBJ'(claz_package,Package)).
 

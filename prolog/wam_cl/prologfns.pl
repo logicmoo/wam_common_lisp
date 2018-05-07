@@ -142,7 +142,6 @@ locally_set(N,V,B):- locally_let(N=V,B).
 
 locally_let([N=V|More],G):- castify(V,Value),V\==Value,!,locally_let([N=Value|More],G).
 locally_let([N=V|More],G):- castify(N,Symbol),N\==Symbol,!,locally_let([Symbol=V|More],G).
-locally_let(N=V,G):-!,locally_let([N=V],G).
 locally_let([N=V|More],G):- 
  always(get_var(N,Was)),
   setup_call_cleanup(
@@ -151,6 +150,7 @@ locally_let([N=V|More],G):-
      (locally_let(More,G),set_opv(N,symbol_value,Was)),
         set_opv(N,symbol_value,Was)).
 locally_let([],G):- !,call_interned_eval(G). 
+locally_let(N=V,G):- locally_let([N=V],G).
 
 subst_castifies(G,G):- \+ compound(G),!.
 subst_castifies(G,GG):- castify(G,GG),!.
@@ -162,13 +162,14 @@ castify(str(O),S):-!, castify1(O,M),to_lisp_string(M,S).
 castify(plstr(O),S):-!, castify1(O,M),to_prolog_string(M,S).
 castify(path(O),S):-!, castify1(O,M),f_pathname(M,S).
 castify(sym(O),S):-!, castify1(O,M),reader_intern_symbols(M,S).
-castify(value(O),S):- castify1(O,M),always(get_opv(M,symbol_value,S)).
-castify(value(O),S):- castify1(O,M),always(get_opv(M,symbol_value,S)).
+castify(value(O),S):- castify1(O,M),get_opv(M,symbol_value,S),!.
+castify(val(O),S):- castify1(O,M),get_opv(M,symbol_value,S),!.
 castify(get_slot(Slot,O),S):- castify1(O,M),castify1(Slot,LSlot),always(get_opv(M,LSlot,S)).
+% castify(PO,S):- PO=..[Prop,O],castify1(O,M),always(get_opv(M,Prop,S)).
 
 castify1(O,O):- \+compound(O),!.
 castify1(O,O):- is_list(O),!.
-castify1(I,O):- castify(I,O).
+castify1(I,O):- castify(I,O),!.
 castify1(O,O).
 
 

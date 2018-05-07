@@ -34,7 +34,24 @@ wl:init_args(exact_only,cl_row_major_aref).
 wl:setf_inverse(slot_value,clos_pf_set_slot_value).
 wl:setf_inverse(car,rplaca).
 wl:setf_inverse(cdr,rplacd).
-wl:setf_inverse(aref,svref).
+[defsetf, elt, u_set_elt],
+[defsetf, car, sys_set_car],
+[defsetf, u_pf_car, u_set_pf_car],
+[defsetf, first, sys_set_car],
+[defsetf, cdr, sys_set_cdr],
+[defsetf, u_pf_cdr, u_set_pf_cdr],
+[defsetf, rest, sys_set_cdr],
+[defsetf, u_uvref, u_uvset],
+[defsetf, aref, sys_aset],
+[defsetf, svref, sys_svset],
+[defsetf, u_pf_svref, u_pf_svset],
+[defsetf, char, sys_set_char],
+[defsetf, schar, sys_set_schar],
+[defsetf, u_pf_scharcode, u_pf_set_scharcode],
+[defsetf, symbol_value, set],
+[defsetf, symbol_plist, u_set_symbol_plist],
+[defsetf, fill_pointer, u_set_fill_pointer],
+
 
 
 %setf_inverse_op(Sym,Inv):- setf_inverse_op0(Sym,Inv),!.

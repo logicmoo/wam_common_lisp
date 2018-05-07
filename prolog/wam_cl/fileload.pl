@@ -160,8 +160,8 @@ do_compile_1file(Keys,File0):-
       sym('sys::*compile-file-truename*')=path(str(OSFile)),
       sym('sys::*compiler-mode*')=sym(':compile-toplevel'),      
       sym('sys::*output-file-pathname*')=path(PLFilePath),
-      sym('cl:*package*')=value(sym('*package*')),
-      sym('cl:*readtable*')=value(sym('*readtable*'))], 
+      sym('cl:*package*')=value(sym('cl:*package*')),
+      sym('cl:*readtable*')=value(sym('cl:*readtable*'))], 
      setup_call_cleanup(
       open(PLFile,write,Stream),          
          do_compile_1file_to_stream(Keys,File0,Stream),
@@ -280,8 +280,8 @@ f_load(File,Keys,t):-
 
 load_1file(_Keys,File):- 
      always((locally_let(
-     [sym('cl:*readtable*')=value(sym('*readtable*')),
-      sym('cl:*package*')=value(sym('*package*')),
+     [sym('cl:*readtable*')=value(sym('cl:*readtable*')),
+      sym('cl:*package*')=value(sym('cl:*package*')),
       sym('sys::*compiler-mode*')=sym(':load-toplevel')], 
             locally(t_l:sreader_options(with_text,true), 
               with_each_form(lisp_reader_compiled_eval,File))))).

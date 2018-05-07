@@ -244,6 +244,31 @@ pl_subseq([_|Tail], Skip, Cmpl) :- Skip2 is Skip-1,
 	pl_subseq(Tail, Skip2, Cmpl).
 
 
+
+nth_index([Index],List,RetVal):- !, f_nth(Index,List,RetVal). 
+nth_index([],List,List):-!.
+nth_index([Index|Indexes],List,RetVal):- f_nth(Index,List,IndexedVal),nth_index(Indexes,IndexedVal,RetVal).
+nth_index(Index,List,RetVal):- !, f_nth(Index,List,RetVal). 
+
+set_nth_index([],_List,Value,Value):-!.
+set_nth_index([Index],List,Value,RetVal):- !, f_set_nth(Index,List,Value,RetVal). 
+set_nth_index([Index|Indexes],List,Value,RetVal):- f_nth(Index,List,IndexedVal),
+   set_nth_index(Indexes,IndexedVal,Value,RetVal).
+set_nth_index(Index,List,Value,RetVal):- !, f_set_nth(Index,List,Value,RetVal). 
+
+
+set_nth(0, List, Value):- !, nb_setarg(1,List,Value).
+set_nth(N, [_|List], Value):- M is N-1,!,set_nth(M, List, Value).
+set_nth(N, Vector, Value):-   M is N+1,nb_setarg(M, Vector, Value).
+
+f_set_nth(Index,Obj,Value,RetVal):- get_adata(Obj,List),set_nth(Index,List,Value), Value=RetVal.
+
+f_nth(Index,Obj,RetVal):- get_adata(Obj,List),data_nth0(Index,List,RetVal),!.
+
+data_nth0(Index,List,RetVal):- nth0(Index,List,RetVal),!.
+data_nth0(N, Vector, Value):-   M is N+1,arg(M, Vector, Value).
+
+
 :- fixup_exports.
 
       

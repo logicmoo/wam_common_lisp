@@ -163,4 +163,3 @@ f_u_fifteen(MResult) :-
 (is eql 'world (LET ((a 'b) )(LET ((a 'world) )
   (LET ((a 'hello) )(LET ((a a)(*package* (find-package :keyword) ) )(PRINT a) ) )(PRINT a) ) ))
 
-

@@ -675,7 +675,7 @@ not_shareble_prop0(sys_structure_class_conc_name).
                                                                          
 
 get_type_default(keyword,Name,symbol_name,Out):- atom(Name), string_concat(kw_,Str,Name),string_upper(Str,Out).
-get_type_default(keyword,_,symbol_package,pkg_keyword).
+get_type_default(keyword,_,symbol_package,pkg_kw).
 get_type_default(keyword,_,defined_as,defconstant).
 get_type_default(keyword,_,type_of,keyword).
 get_type_default(Kind,Obj,Prop,Value):- is_prop_class_alloc(Kind,Prop,Where),Obj\==Where,get_opv_iii(Kind,Where,Prop,Value).

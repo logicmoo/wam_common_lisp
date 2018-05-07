@@ -18,6 +18,8 @@
 
 :- include('./header').
 
+:- use_module(library(predicate_streams)).
+
 wl:interned_eval("(defparameter sys:*markdown* cl:t)").
 
 

@@ -25,7 +25,7 @@
 :- include('./header').
 
 
-f_nth(Axis,List,RetVal):- nth0(Axis,List,RetVal).
+
 f_elt(List,Axis,RetVal):- nth0(Axis,List,RetVal).
 
 f_nthcdr(_,[],[]):-!.
@@ -36,9 +36,6 @@ f_set_nthcdr(_,[],[]):-!.
 f_set_nthcdr(0,List,Tail):- nb_setarg(2,List,Tail).
 f_set_nthcdr(Index,[_|List],Tail):- Next is Index-1,f_set_nthcdr(Next,List,Tail).
 
-nth_index([Index],List,RetVal):- !, f_nth(Index,List,RetVal). 
-nth_index([],List,List):-!.
-nth_index([Index|Indexes],List,RetVal):- f_nth(Index,List,IndexedVal),nth_index(Indexes,IndexedVal,RetVal).
 
 % #'CONSP
 % GROVELED f_consp(Obj,RetVal):- t_or_nil(is_consp(Obj),RetVal).

@@ -440,7 +440,7 @@ align_args_local(FN,RequiredArgs,RestNKeys,Whole,LB,_ArgInfo,PARAMS,wl:init_args
 
 % invoke(r1,r2,[o3,key1,value1],RET).
 align_args_local(FN,RequiredArgs,RestNKeys,Whole,LB,_ArgInfo,ArgsPlus,wl:init_args(N,FN)):- 
-  get_init_args(FN,N),number(N),ignore(length(RequiredArgs,N)),
+  get_init_args(FN,N),number(N),length(RequiredArgs,NN),ignore(N=NN),
   RestNKeys = _,
   append(RequiredArgs,[RestNKeys],BetterArgs),
   append(RequiredArgs,RestNKeys,Whole),
@@ -449,7 +449,7 @@ align_args_local(FN,RequiredArgs,RestNKeys,Whole,LB,_ArgInfo,ArgsPlus,wl:init_ar
   BetterArgs = ArgsPlus.
 
 align_args_local(FN,RequiredArgs,RestNKeys,Whole,LB,_ArgInfo,GoodHeadParms,wl:init_args(Reqs,FN)):-
- always(is_list(RequiredArgs)),length(RequiredArgs,Reqs),
+ always(is_list(RequiredArgs)),length(RequiredArgs,NN), (Reqs=NN),
  append(RequiredArgs,[RestNKeys],RARGS), 
  append(RequiredArgs,RestNKeys,Whole),
  %  (ArgInfo.whole == 0 -> LB = true ; LB = append(RequiredArgs,RestNKeys,Whole)),
@@ -494,11 +494,12 @@ must_bind_ parameters(Ctx,Env,Whole,RestNKeys,FormalParms0,Symbol,Params,Env,Cod
    bind_each_param(Env,RestNKeys,Whole,FormalParms,Params,Code)))),!.
 */
 
+break_on(_RestNKeys):- !.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 destructure_parameters(Ctx,Env,FormalParms0,ZippedArgEnv,RestNKeys,Whole,RequiredArgs,ArgInfo,Names,PVars,Code):-!,
    correct_formal_params(FormalParms0,FormalParms),
-   freeze(Whole,break),freeze(RestNKeys,break),
+   freeze(Whole,break_on(Whole)),freeze(RestNKeys,break_on(RestNKeys)),
    ArgInfo = arginfo{req:0,all:0,sublists:0,opt:0,rest:0,whole:0,body:0,key:0,aux:0,env:0,allow_other_keys:0,names:Names,complex:0,outer:Env},
    enter_ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,required,FormalParms,RequiredArgs,Names,PVars,Code),
    zip_with(Names, PVars, [Var, Val, bv(Var,Val)]^true, ZippedArgEnv),!,
