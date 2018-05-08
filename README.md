@@ -1,6 +1,8 @@
 ## Common Lisp in Prolog Goals
-Allow Lisp programs to stop implementing an ad-hoc, informally-specified, bug-ridden, slow implementation of less than half of ISO-Prolog.
-   
+
+Stop implementing an ad-hoc, informally-specified, bug-ridden, slow implementation of less than half of ISO-Prolog.
+
+* Any sufficiently complicated Lisp or Scheme program contains an ad-hoc, informally-specified, bug-ridden, slow implementation of half of ISO Prolog.
 * Translating Lisp to Prolog gives Prolog
    * Metaobject Protocol
    * Common Lisp Object System    
