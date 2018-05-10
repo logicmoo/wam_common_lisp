@@ -104,7 +104,7 @@ create_object_instance(Kind,Type,Name,Obj):-
    nb_set_dict(ref,Obj,Ref).
 
 
-create_object_instance(Kind,Type,Name,Obj):- 
+create_object_instance(Kind,Type,Name,Obj):- sanity(atom(Name)),
   instance_prefix(Kind,Pre),!,atomic_list_concat([Pre,Name],'_',PName),
   prologcase_name(PName,Obj),to_prolog_string_anyways(Name,SName),
   add_opv_new(Obj,type_of,Type),
@@ -657,14 +657,28 @@ get_opv_ii(Kind,Obj,Prop,Value):- notrace(is_prop_class_alloc(Kind,Prop,Where))-
 get_opv_iii(symbol,Obj,Prop,Value):- nonvar(Obj),wl:symbol_has_prop_getter(Obj,Prop,Getter),call(Getter,Obj,Prop,Value).
 get_opv_iii(_Kind,Obj,Prop,Value):- get_opv_iiii(Obj,Prop,Value).
 
-get_opv_iiii(Obj,type_of,Value):- is_dict(Obj,Value).
-get_opv_iiii(Obj,Prop,Value):- is_dict(Obj),!,
- ((get_dict(Prop,Obj,Value)-> true;((guess_ref_name(Obj,Ref),get_opv_iiii(Ref,Prop,Value))))).
+get_opv_iiii_dict(Type,_Obj,type_of,Type).
+get_opv_iiii_dict(_,Obj,Prop,Value):- 
+  ((get_dict(Prop,Obj,Value)-> true;((guess_ref_name(Obj,Ref),get_opv_iiii(Ref,Prop,Value))))).
 
+get_opv_iiii(Obj,Prop,Value):- is_dict(Obj,Type),!,get_opv_iiii_dict(Type,Obj,Prop,Value).
+get_opv_iiii(Obj,Key,Value):- atom(Obj),atom(Key),!,get_opv_iiiii(Obj,Key,Value),!.
 get_opv_iiii(Obj,Key,Value):- get_opv_iiiii(Obj,Key,Value).
 
-get_opv_iiiii(Obj,Prop,Value):- current_prolog_flag(wamcl_gvars,true),(atom(Obj);var(Obj)),nb_current(Obj,Ref),nb_current_value(Ref,Prop,Value).
-get_opv_iiiii(Obj,Prop,Value):- soops:o_p_v(Obj,Prop,Value).
+/*get_opv_iiiii_ref(Obj,Prop,Value):- 
+  % current_prolog_flag(wamcl_gvars,true),
+  (atom(Obj)->nb_current(Obj,Ref);
+    (attvar(Obj)->Obj=Ref; fail)),
+  nb_current_value(Ref,Prop,Value).
+*/
+
+%get_opv_iiiii(Obj,Prop,Value):- current_prolog_flag(wamcl_gvars,true),(atom(Obj);var(Obj)),nb_current(Obj,Ref),nb_current_value(Ref,Prop,Value).
+
+get_opv_iiiii_ref(Obj,Prop,Value):- atom(Obj),nb_current(Obj,Ref),!,nb_current_value(Ref,Prop,Value).
+get_opv_iiiii_ref(Ref,Prop,Value):- (var(Ref)->attvar(Ref);true),nb_current_value(Ref,Prop,Value).
+
+get_opv_iiiii(Obj,Prop,Value):- (get_opv_iiiii_ref(Obj,Prop,Value)*->true;soops:o_p_v(Obj,Prop,Value)).
+%get_opv_iiiii(Obj,Prop,Value):- soops:o_p_v(Obj,Prop,Value), \+ get_opv_iiiii_ref(Obj,Prop,Value).
 get_opv_iiiii(Obj,Prop,Value):- soops:struct_opv(Obj,Prop,Value).
 
 not_shareble_prop(Prop):-notrace((nonvar(Prop),not_shareble_prop0(Prop))).
@@ -684,11 +698,12 @@ get_type_default(Kind,Obj,Prop,Value):- is_prop_class_alloc(Kind,Prop,Where),Obj
 %get_opv_pred(Obj,Prop,Value):- fail,fail,fail,fail,fail,fail,fail, get_obj_prefix(Obj,Prefix),atom_concat_or_rtrace(Prefix,DashKey,Prop),atom_concat_or_rtrace('_',Key,DashKey),!,get_opv_i(Kind,Obj,Key,Value).
   
 
-set_ref_object(Ref,Obj):- quietly(nb_setval(Ref,Obj)),!.
-release_ref_object(Ref):- dbginfo(release_ref_object(Ref)),quietly(nb_setval(Ref,[])),!.
-has_ref_object(Ref,Obj):- nb_current(Ref,Obj),Obj\==[].
+set_ref_object(Ref,Obj):- always(atom(Ref)),quietly(nb_setval(Ref,Obj)),!.
+release_ref_object(Ref):- dbginfo(release_ref_object(Ref)),sanity(atom(Ref)),quietly(nb_setval(Ref,[])),!.
+has_ref_object(Ref,Obj):- atom(Ref),nb_current(Ref,Obj),Obj\==[].
+
 get_ref_object(Ref,Obj):- has_ref_object(Ref,Obj),!.
-get_ref_object(Ref,Obj):- always(atom(Ref)), 
+get_ref_object(Ref,Obj):- sanity(atom(Ref)), 
    %oo_empty(Object0),
    %put_attr(Object0,type_of,ref),
    nb_put_attr(Object0,ref,Ref),
@@ -776,7 +791,7 @@ add_opv_maybe(Obj,Prop,Value):- add_opv_new(Obj,Prop,Value),!.
 
 update_opv(Obj,Prop,Value):- set_opv(Obj,Prop,Value).
 set_opv(Obj,Prop,Value):- 
-  retractall(soops:o_p_v(Obj,Prop,_)),
+  %(thread_self(main)->retractall(soops:o_p_v(Obj,Prop,_));true),
   /*delete_opvalues(Obj,Prop),*/ 
    add_opv_new(Obj,Prop,Value).
 
@@ -799,14 +814,32 @@ add_opv_new_ii(Kind,Obj,Prop,Val):-
    once((kind_attribute_pred(Kind,Prop,Pred),
    modulize(call(Pred,Obj,Val),OPred),
    predicate_property(OPred,dynamic),
+   to_removal(OPred,RPred),
+   retractall(RPred),
    show_call_trace(assert_lsp(OPred)))),fail.
 add_opv_new_ii(Kind,Obj,Prop,Value):-  builtin_slot(Kind,Prop),!,add_opv_new_iiii(Obj,Prop,Value).
 add_opv_new_ii(Kind, Obj,Prop,Value):- get_kind_or_supers_slot_name(Kind,Prop,Where) -> Where\==Prop,!, add_opv_new(Obj,Where,Value).
-add_opv_new_ii(_Kind,Obj,Prop,Value):- add_opv_new_iiii(Obj,Prop,Value).
+add_opv_new_ii(_Kind,Obj,Prop,Value):- add_opv_new_iiii(Obj,Prop,Value), nop(ensure_maybe_backed(Obj,Prop,Value,_Value)).
 %add_opv_new_i(Obj,Prop,Value):- Prop==value, nonvar(Obj),nb_setval(Obj,Value).
+
+to_removal(M:OPred,M:RPred):- !,copy_term(OPred,RPred),functor(RPred,_,A),nb_setarg(A,RPred,_).
+to_removal(OPred,RPred):- copy_term(OPred,RPred),functor(RPred,_,A),nb_setarg(A,RPred,_).
+
 
 
 % u_daft_point_znst_1,u_daft_point_znst_2,u_daft_point_z
+
+ensure_maybe_backed(Obj,_Prop,ValueM,Value):- 
+  ((\+ atom(Obj));(current_prolog_flag(wamcl_gvars,false);(current_prolog_flag(wamcl_init_level,N),N<3))),!,
+  Value=ValueM,
+  sanity(same_term(Value,ValueM)).  
+
+ensure_maybe_backed(Obj,Prop,ValueM,Value):-
+  current_prolog_flag(wamcl_gvars,true),
+  always(get_ref_object(Obj,RefObj)),
+  ((nb_current_value(RefObj,Prop,Value),same_term(Value,ValueM)) -> true ; 
+  (Value=ValueM,sanity(same_term(Value,ValueM)),nb_put_attr(RefObj,Prop,Value))).
+    
 
 add_opv_new_iiii(Obj,type_of,Type):- is_dict(Obj),!,nb_setarg(1,Obj,Type).
 %add_opv_new_iiii(Obj,Prop,Value):- assertion(ground(o_p_v(Obj,Prop,Value))),fail.
@@ -819,6 +852,12 @@ add_opv_new_iiii(Ref,Prop,Value):-current_prolog_flag(wamcl_gvars,true),!, alway
    (always(nb_put_attr(Obj,Prop,Value))).
 add_opv_new_iiii(Obj,Prop,Value):- % show_call_trace
    ((atom(Obj),(atom_concat_or_rtrace(sys_,_,Obj);atom_concat_or_rtrace(os_,_,Obj);true))->true;wdmsg(assert_lsp(o_p_v(Obj,Prop,Value)))),
+   assert_lsp_opv(Obj,Prop,Value).
+
+assert_lsp_opv(Obj,Prop,Value):- Prop==symbol_value,
+   retractall(soops:o_p_v(Obj,Prop,_)),   
+   assert_lsp(Obj,soops:o_p_v(Obj,Prop,Value)).
+assert_lsp_opv(Obj,Prop,Value):- 
    assert_lsp(Obj,soops:o_p_v(Obj,Prop,Value)).
 
 %delete_opvalues(Obj,Key):- Key == value, nb_delete(Obj),fail.
@@ -1074,6 +1113,7 @@ process_si(soops:o_p_v(X,Y,Z)):- X\==[], set_opv(X,Y,Z).
 :- load_si.
 :- endif.
 
+%:- set_prolog_flag(wamcl_gvars,true).
 %:- include('si2.data').
 
 :- fixup_exports.
