@@ -68,6 +68,26 @@
 		</Folder>
 	</CustomFolders>
 	<Files AutoFolders="DirectoryView">
+		<Folder Name="../flux">
+			<Folder Name="prolog">
+				<Folder Name="FluxVersion">
+					<Folder Name="Nonground">
+						<F N="../flux/prolog/FluxVersion/Nonground/fluent.chr"/>
+					</Folder>
+				</Folder>
+				<Folder Name="indigolog">
+					<Folder Name="Interpreters">
+						<Folder Name="flux">
+							<F N="../flux/prolog/indigolog/Interpreters/flux/fluent3.chr"/>
+							<F N="../flux/prolog/indigolog/Interpreters/flux/fluent_ecl.chr"/>
+							<F N="../flux/prolog/indigolog/Interpreters/flux/fluent_swi.chr"/>
+						</Folder>
+					</Folder>
+				</Folder>
+				<F N="../flux/prolog/fluent3.chr"/>
+				<F N="../flux/prolog/fluent_swi.chr"/>
+			</Folder>
+		</Folder>
 		<Folder Name="../../lib">
 			<Folder Name="swipl">
 				<F
@@ -116,18 +136,6 @@
 							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel/test_motel_examples_76.pl"/>
 							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel/test_motel_fssKb.txt"/>
 							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel/testMotel.pl"/>
-						</Folder>
-						<Folder Name="motel-0.8.12">
-							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel-0.8.12/ai93.dvi"/>
-							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel-0.8.12/INSTALLATION"/>
-							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel-0.8.12/int.c"/>
-							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel-0.8.12/int.o"/>
-							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel-0.8.12/int.pl"/>
-							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel-0.8.12/motel.dvi"/>
-							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel-0.8.12/motel.lisp"/>
-							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel-0.8.12/motel.pl"/>
-							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel-0.8.12/motel.ps"/>
-							<F N="../../packs_sys/logicmoo_base/prolog/logicmoo/motel-0.8.12/README"/>
 						</Folder>
 						<Folder Name="pdt_server">
 							<Folder Name="org.cs3.pdt.analysis_3.1.2.201603251848">
@@ -737,6 +745,17 @@
 				Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"
 				Refilter="1"/>
 		</Folder>
+		<Folder Name="../../packs_xtra">
+			<Folder Name="logicmoo_nlu">
+				<Folder Name="prolog">
+					<Folder Name="pldata">
+						<Folder Name="plkb7166">
+							<F N="../../packs_xtra/logicmoo_nlu/prolog/pldata/plkb7166/dir.header"/>
+						</Folder>
+					</Folder>
+				</Folder>
+			</Folder>
+		</Folder>
 		<Folder Name="prolog">
 			<Folder Name="wam_cl">
 				<Folder Name="compat">
@@ -767,22 +786,6 @@
 					<F N="prolog/wam_cl/reference/moo_ext_scheme_sis.pl"/>
 					<F N="prolog/wam_cl/reference/mop-graph.png"/>
 					<F N="prolog/wam_cl/reference/pjb-cl-definition.lisp"/>
-					<F N="prolog/wam_cl/reference/wam-cl-grovel-abcl.lisp"/>
-					<F N="prolog/wam_cl/reference/wam-cl-grovel-abcl.lisp.bak"/>
-					<F N="prolog/wam_cl/reference/wam-cl-grovel-ccl.lsp"/>
-					<F N="prolog/wam_cl/reference/wam-cl-grovel-ccl2.lsp"/>
-					<F N="prolog/wam_cl/reference/wam-cl-grovel-ccllib.lsp"/>
-					<F N="prolog/wam_cl/reference/wam-cl-grovel-ccllvl0.lsp"/>
-					<F N="prolog/wam_cl/reference/wam-cl-grovel-ccllvl1.lsp"/>
-					<F N="prolog/wam_cl/reference/wam-cl-grovel-cclxtra.lsp"/>
-					<F N="prolog/wam_cl/reference/wam-cl-grovel-clisp.lisp"/>
-					<F N="prolog/wam_cl/reference/wam-cl-grovel-ecl.lisp"/>
-					<F N="prolog/wam_cl/reference/wam-cl-grovel-emacs-cl.lisp"/>
-					<F N="prolog/wam_cl/reference/wam-cl-grovel-gcl.lisp"/>
-					<F N="prolog/wam_cl/reference/wam-cl-grovel-gcl.lisp.bak"/>
-					<F N="prolog/wam_cl/reference/wam-cl-grovel-lispworks.lisp"/>
-					<F N="prolog/wam_cl/reference/wam-cl-grovel-sbcl.lsp"/>
-					<F N="prolog/wam_cl/reference/wam-cl-grovel.sh"/>
 					<F N="prolog/wam_cl/reference/xref-patterns.lisp"/>
 				</Folder>
 				<Folder Name="src">
@@ -1116,7 +1119,6 @@
 					<F N="prolog/wam_cl/src/wam-cl-init-02.lisp"/>
 					<F N="prolog/wam_cl/src/wam-cl-init-05.lisp"/>
 					<F N="prolog/wam_cl/src/wam-cl-init-10.lisp"/>
-					<F N="prolog/wam_cl/src/wam-cl-init-10.lisp.bak"/>
 					<F N="prolog/wam_cl/src/wam-cl-init-10.lisp.pro"/>
 					<F N="prolog/wam_cl/src/wam-cl-init-11.lisp"/>
 					<F N="prolog/wam_cl/src/wam-cl-init-20.lisp"/>
@@ -1214,47 +1216,6 @@
 					<Folder Name="btepisode">
 						<F N="../prologmud_samples/prolog/prologmud_sample_games/btepisode/npc.pl"/>
 					</Folder>
-					<Folder Name="config-available - Copy">
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/auth_google.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/auth_http.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/auth_http_always.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/auth_stackoverflow.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/auth_unity.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/clpqr.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/data.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/debug.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/email.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/hdt.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/logging.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/network.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/notifications.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/provenance.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/r_serve.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/rdf.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/repack.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/rlimit.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/rpc.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/swish.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/user_profile.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-available - Copy/wordnet.pl"/>
-					</Folder>
-					<Folder Name="config-enabled - Copy">
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/auth_google.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/auth_http.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/auth_http_always.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/auth_stackoverflow.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/auth_unity.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/data.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/debug.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/email.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/hdt.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/logging.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/notifications.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/r_serve.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/rlimit.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/rpc.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled - Copy/user_profile.pl"/>
-					</Folder>
 					<Folder Name="config-enabled-cliop">
 						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/010-packs.pl"/>
 						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/020-prefixes.pl"/>
@@ -1288,22 +1249,6 @@
 						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-cliop/zlib.pl"/>
 					</Folder>
 					<Folder Name="config-enabled-swish">
-						<Folder Name="HIDE">
-							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/auth_google.pl"/>
-							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/auth_http.pl"/>
-							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/auth_stackoverflow.pl"/>
-							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/auth_unity.pl"/>
-							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/data.pl"/>
-							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/debug.pl"/>
-							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/email.pl"/>
-							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/hdt.pl"/>
-							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/logging.pl"/>
-							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/notifications.pl"/>
-							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/r_serve.pl"/>
-							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/rlimit.pl"/>
-							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/rpc.pl"/>
-							<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/HIDE/user_profile.pl"/>
-						</Folder>
 						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/auth_google.pl"/>
 						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/auth_http.pl"/>
 						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/auth_stackoverflow.pl"/>
@@ -1318,22 +1263,6 @@
 						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/rlimit.pl"/>
 						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/rpc.pl"/>
 						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish/user_profile.pl"/>
-					</Folder>
-					<Folder Name="config-enabled-swish.orig">
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/auth_google.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/auth_http.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/auth_stackoverflow.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/auth_unity.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/data.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/debug.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/email.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/hdt.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/logging.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/notifications.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/r_serve.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/rlimit.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/rpc.pl"/>
-						<F N="../prologmud_samples/prolog/prologmud_sample_games/config-enabled-swish.orig/user_profile.pl"/>
 					</Folder>
 					<Folder Name="src_game_nani">
 						<Folder Name="web">
