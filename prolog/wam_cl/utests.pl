@@ -277,7 +277,9 @@ mf_sys_is([sys_is,Eqf_In, Expected_In, Actual_In],ReplEnv, MFResult) :-
               block_exit(sys_is, MFResult),
               true).
 
+
 :- always(set_opv(sys_is, symbol_function, sf_sys_is)).
+
 
 :- fixup_exports.
 

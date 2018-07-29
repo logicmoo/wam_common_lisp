@@ -338,7 +338,10 @@ plist_to_names_values([Name,Value|Keys],[Name|Names],[Value|Values]):-
 
 % (lcompile ...)
 %wl:interned_eval("(sys:set-opv `SYS:LCOMPILE :compile-as :function)").
-init_args(1,sys_lcompile).
+:- multifile(wl:init_args/2).
+:- dynamic(wl:init_args/2).
+:- discontiguous(wl:init_args/2).
+wl:init_args(1,sys_lcompile).
 f_sys_lcompile(Form,Keys, ResultO):- 
    lisp_compile(Ctx,Env,FormValue,Form,Part1),
    plist_to_names_values(Keys,Names,Values),
@@ -358,7 +361,7 @@ f_sys_lcompile(Form,Keys, ResultO):-
 
 % (lcompilen ...)
 % wl:interned_eval("(sys:set-opv `SYS:LCOMPILEN :compile-as :function)").
-init_args(1,sys_lcompile).
+wl:init_args(1,sys_lcompile).
 f_sys_lcompilen(Form,Forms, Result):- 
   ((append(Progn,[KW|More],Forms),is_keywordp(KW))->Keys=[KW|More];(Progn=Forms,Keys=[])),
     f_sys_lcompile([progn,Form|Progn],Keys,Result).
@@ -438,7 +441,8 @@ compile_body(Ctx,Env,Result,BodyForms, Body):- compile_accessors(Ctx,Env,Result,
 compile_body(Ctx,Env,Result,BodyForms, Body):- compile_direct_assertions(Ctx,Env,Result,BodyForms, Body),!.
 
 % FUNCALL,EVAL,APPLY, and everything else
-compile_body(Ctx,Env,Result,BodyForms, Body):- always(compile_funop(Ctx,Env,Result,BodyForms, Body)),!.
+compile_body(Ctx,Env,Result,BodyForms, Body):- 
+   always(once(compile_funop(Ctx,Env,Result,BodyForms, Body))),!.
 
 
 

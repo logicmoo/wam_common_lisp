@@ -3,13 +3,16 @@
 % Tests Emulation of assertable attributed variables
 % :- include(test_header).
 
-
-:- use_module(library(wamcl)).
-
 :- ensure_loaded(library(pfc_test)).
 
+%:- set_prolog_flag(logicmoo_message_hook, break).
+:- set_prolog_flag(gc, false).
 
-:- cl_load("sanity-test",_).
+:- use_module(library(wamcl)).
+% 7.26094900
+% 7,991.83946480
+
+:- f_load("sanity-test",_).
 
 
 

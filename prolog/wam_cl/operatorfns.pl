@@ -66,7 +66,7 @@ find_lisp_function(FN,ARITY,ProposedName):- fail,
 
 /*
 make_function_or_macro_call(Ctx,Env,FN,Args,Result,ExpandedFunction):-
-   (is_list(Args)->length(Args,ArgsLen);true),
+   (is_list(Args)->length_safe(Args,ArgsLen);true),
    foc_ope rator(Ctx,Env,symbol_function,FN,ArgsLen, ProposedName),!,
    align_ args  _or_fallback(Ctx,Env,FN, ProposedName,Args,Result,ArgsPlusResult),
    ExpandedFunction =.. [ ProposedName | ArgsPlusResult].
@@ -165,10 +165,12 @@ get_ftype_lambda_list(F,List):- wl:lambda_def(_, F,_, List, _).
 get_ftype_lambda_list(F,List):- atom(F),wl:lambda_def(_, _,F, List, _).
 
 
-exact_and_restkeys_l(F,N):- no_repeats(F,get_ftype_lambda_list(F,List)),
+exact_and_restkeys_l(F,NN):- no_repeats(F,get_ftype_lambda_list(F,List)),
   once(((append(Left,[c38_optional|_],List);append(Left,[c38_rest|_],List);
-     append(Left,[c38_key|_],List))->length(Left,N);(length(List,X),N=x(X)))).
+     append(Left,[c38_key|_],List))->length_safe(Left,N);(length_safe(List,X),N=x(X)))),!,
+  N=NN.
 
+exact_and_restkeys(F,N):- nonvar(N),!,exact_and_restkeys(F,NN),!,N=NN.
 exact_and_restkeys(F,N):- wl:init_args(N,F),!,integer(N).
 exact_and_restkeys(F,N):- exact_and_restkeys_l(F,N),integer(N),!.
 exact_and_restkeys(F,N):- function_arg_info(F,ArgInfo),ArgInfo.req=L,ArgInfo.all\==L,!,arg_info_count(ArgInfo,req,N).
@@ -176,17 +178,18 @@ exact_and_restkeys(F,0):- wl:declared(F,lambda(['&rest'|_])),!.
 exact_and_restkeys(F,0):- function_arg_info(F,ArgInfo),ArgInfo.req==0,ArgInfo.all\==0,!.
 exact_and_restkeys(FN,x):-  function_arg_info(FN,ArgInfo),!,
    ArgInfo.complex==0,ArgInfo.opt==0,ArgInfo.rest==0,ArgInfo.env==0,ArgInfo.whole==0,
-   length(ArgInfo.names,NN),
+   length_safe(ArgInfo.names,NN),
    arg_info_count(ArgInfo,req,N),!,
    N==NN.
 
 
-arg_info_count(ArgInfo,Prop,N):- 
-  Value=ArgInfo.Prop,
+arg_info_count(ArgInfo,Prop,NN):- 
+  (Value=ArgInfo.Prop,
    (number(Value)->N=Value;
-     (is_list(Value)->length(Value,N);
+     (is_list(Value)->length_safe(Value,N);
        (atom(Value)->N=1;
-         (throw(arg_info_count(ArgInfo,Prop,Value)))))).
+         (throw(arg_info_count(ArgInfo,Prop,Value))))))),!,
+   N=NN.
 
 premute_names(F,F).
 premute_names(F,FF):- atom_concat_or_rtrace('f_',F,FF).
@@ -195,6 +198,7 @@ premute_names(F,FF):- atom_concat_or_rtrace('f_',F,FF).
 premute_names(F,FF):- atom_concat_or_rtrace('f_',FF,F).
 % premute_names(F,FF):- atom_concat_or_rtrace('mf_',FF,F).
 %premute_names(F,FF):- atom_concat_or_rtrace('sf_',FF,F).
+
 
 
 % Non built-in function expands into an explicit function call
@@ -206,8 +210,9 @@ align_args(FN,ProposedName,Args,Result,ArgsPlusResult):-
 
 % invoke(r1,r2,[o3,key1,value1],RET).
 align_args(FN,ProposedName,Args,Result,ArgsPlusResult):- 
-  (get_init_args(FN,N);get_init_args(ProposedName,N)),number(N),
-  always(length(Left,N)),append(Left,Rest,Args),
+  (get_init_args(FN,N);get_init_args(ProposedName,N)),
+  number(N),
+  always(length_safe(Left,N)),append(Left,Rest,Args),
   append(Left, [Rest,Result], ArgsPlusResult).
 
 % invoke([fn,r1,r2,r3],RET).
@@ -268,7 +273,7 @@ some_defined_function_or_macro(FN,ArgLen,[Name|NameS],NewName):-
     \+ predicate_property(user:P,imported_from(system)))-> ProposedName=NewName;
    some_defined_function_or_macro(FN,ArgLen,NameS,NewName)).
 
-guess_lisp_functor(P,F,ArgLen):- (number(ArgLen)->A is ArgLen+1; A= _),!,guess_prolog_functor(P,F,A). 
+guess_lisp_functor(P,F,ArgLen):- (number(ArgLen) -> A is ArgLen+1;  A= _),!,call_call(guess_prolog_functor(P,F,A)). 
 guess_prolog_functor(P,F,A):- (var(F);var(A)),!,current_predicate(F/A),functor(P,F,A).
 guess_prolog_functor(P,F,A):- functor(P,F,A).
 

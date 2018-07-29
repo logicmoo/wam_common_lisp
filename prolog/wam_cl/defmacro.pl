@@ -245,9 +245,11 @@ unify_conj((CA,(CB,CC)),(A,B)):- var(A),nonplainvar(B),!, unify_conj(((CA,CB),CC
 unify_conj((CA,(CB,CC)), AB):- unify_conj(((CA,CB),CC),AB).
 
 wl:declared(sys_is,interpret).
-macroexpand_1_or_fail(_Ctx,Env,Symbol,Macro):- atom(Symbol),!,expand_symbol_macro(Env,Symbol,Macro),!,Symbol\==Macro.
+macroexpand_1_or_fail(_Ctx,Env,Symbol,Macro):- atom(Symbol),!,
+  expand_symbol_macro(Env,Symbol,Macro),!,Symbol\==Macro.
 
-macroexpand_1_or_fail(_Ctx,_Env,[Procedure|_],_):-  atom(Procedure),wl:declared(Procedure,interpret),!,fail.
+macroexpand_1_or_fail(_Ctx,_Env,[Procedure|_],_):-  
+  atom(Procedure),wl:declared(Procedure,interpret),!,fail.
 
 macroexpand_1_or_fail(Ctx,Env,[Procedure|Arguments],MFResult):- atom(Procedure),
    get_symbol_fbounds(Ctx,Env,Procedure,kw_macro,EXEPR),
@@ -269,7 +271,8 @@ macroexpand_1_or_fail(Ctx,Env,[Procedure|Arguments],MFResult):- atom(Procedure),
    find_operator(Ctx,Env,kw_macro,Procedure,Arguments,MFName), atom(MFName),
    is_defined(MFName,3),!,call(MFName,[Procedure|Arguments],[Ctx,Env],MFResult).
 
-macroexpand_1_or_fail(Ctx,Env,[Procedure|Arguments],CompileBody0Result):- atom(Procedure), nonplainvar(Procedure),
+macroexpand_1_or_fail(Ctx,Env,[Procedure|Arguments],CompileBody0Result):- 
+   atom(Procedure), nonplainvar(Procedure),
    get_lambda_def(Ctx,Env,defmacro,Procedure, FormalParms, LambdaExpression),!,
    debug_var('MEnv',Env),debug_var('NewEnv',NewEnv),debug_var('CommaResult',CommaResult),
    make_bind_parameters(Ctx,Env,FormalParms,Whole,Arguments,NewEnv,BinderCode),!,   
@@ -280,9 +283,10 @@ macroexpand_1_or_fail(Ctx,Env,[Procedure|Arguments],CompileBody0Result):- atom(P
    wdmsg(LambdaExpression),
    always(expand_commas(Ctx,1,NewEnv,CommaResult,LambdaExpression,CodeS)),
    body_cleanup_keep_debug_vars(Ctx,CodeS,Code),
-   wdmsg(Code),
+   wdmsg(:- (Code)),
    % (local_override(with_forms,lisp_grovel)-> (lisp_dumpST) ; true),
-   trace,always(Code),
+   % trace,
+   always(Code),
    must_compile_body(Ctx,NewEnv,CompileBody0Result,CommaResult, MCBR),
    always(MCBR),
    dbginfo((macroResult([Procedure|Arguments],Code,CommaResult,CompileBody0Result))),!.

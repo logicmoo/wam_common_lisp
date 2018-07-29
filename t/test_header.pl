@@ -109,7 +109,7 @@ add_pack_path(Rel):-
 :- ensure_loaded(library(script_files)).
 :- if(( \+ current_module(pfc_lib) )).
 :- use_module(library(pfc)).
-:- prolog_load_context(source,File),(atom_contains(File,'.pfc')-> sanity(is_pfc_file) ; must_not_be_pfc_file).
+%:- prolog_load_context(source,File),(atom_contains(File,'.pfc')-> sanity(is_pfc_file) ; must_not_be_pfc_file).
 :- endif.
 
 :- ensure_loaded(library(pfc_test)).

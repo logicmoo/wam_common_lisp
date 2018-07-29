@@ -68,7 +68,7 @@ compile_funop(Ctx,Env,Result,LispCode,CompileBody):-
   %fail, %DISABLED
   macroexpand_1_or_fail(Ctx,Env,LispCode,CompileBody0Result),
   dbginfo(macroexpand:-LispCode),
-  dbginfo(into:-CompileBody0Result),
+  dbginfo(into:-CompileBody0Result),!,
   must_compile_body(Ctx,Env,Result,CompileBody0Result, CompileBody),
   !.
       
@@ -105,7 +105,8 @@ compile_funop(Ctx,Env,Result,[apply, FN, FunctionArgs], Body):-
       Body = (ArgsBody1,ArgsBody2,Code).
 
 % malformed call
-compile_funop(Ctx,Env,Result,[FN| FunctionArgs], Body):- \+ is_list(FunctionArgs),trace,
+compile_funop(Ctx,Env,Result,[FN| FunctionArgs], Body):- \+ is_list(FunctionArgs),
+   % trace,
      compile_funop(Ctx,Env,Result,[apply, [quote, FN], [list|FunctionArgs]], Body).
 
 
@@ -167,7 +168,7 @@ do_check_foc_operator(_Ctx,_Env,_BindType,_F,_Args,ProposedName, ProposedName,[]
   
 compile_apply_function_or_macro_call(Ctx,Env,FN,Args,Result,ExpandedFunction):-
  always((
-   (is_list(Args)->length(Args,ArgsLen);(integer(Args)->ArgsLen=Args;true)),
+   (is_list(Args)->length_safe(Args,ArgsLen);(integer(Args)->ArgsLen=Args;true)),
    check_foc_operator(Ctx,Env,BindType,FN,ArgsLen, ProposedName,Extra),!,  
    (BindType == kw_function -> true ; wdmsg(BindType->ProposedName)),
    align_args_or_fallback1(Ctx,Env,FN, ProposedName,Args,Result,ArgsPlusResult),!,
@@ -185,7 +186,7 @@ compile_apply0(Ctx,Env,F,Args,Result,ExpandedFunction):-
 
 compile_apply1(Ctx,Env,F,Args,Result,ExpandedFunction):- atom(F),
  ((get_init_args(F,N),integer(N)); ( F==list,N=0)),
- length(Left,N),
+ length_safe(Left,N),
  append(Left,IntoList,Args),
  append(Left,[IntoList,Result],NewArgs),
  check_foc_operator(Ctx,Env,_Non_Macro_kw_function,F,_, ProposedName, Extra),!,

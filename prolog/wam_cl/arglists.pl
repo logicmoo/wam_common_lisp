@@ -406,7 +406,8 @@ from_kw_name([KW,Name],Name,KW):- atom(Name),atom(KW).
 from_kw_name([Name],Name,KW):- atom(Name),to_kw(Name,KW).
 from_kw_name(Name,Name,KW):- atom(Name),to_kw(Name,KW).
 
-from_kw_form([F,InitForm,Present],KW,Name,InitForm,Present):- from_kw_name(F,Name,KW),!,break.
+from_kw_form([F,InitForm,Present],KW,Name,InitForm,Present):- from_kw_name(F,Name,KW),!,
+  break.
 from_kw_form([F,InitForm],KW,Name,InitForm,_Present):- from_kw_name(F,Name,KW),!.
 from_kw_form([[KW,F]],KW,Name, InitForm ,_Present):- from_kw_name([KW,F],Name,KW),!,no_init_form(InitForm).
 from_kw_form([F],KW,Name, InitForm ,_Present):- from_kw_name(F,Name,KW),!,no_init_form(InitForm).
@@ -455,7 +456,8 @@ align_args_local(FN,RequiredArgs,RestNKeys,Whole,LB,_ArgInfo,GoodHeadParms,wl:in
  %  (ArgInfo.whole == 0 -> LB = true ; LB = append(RequiredArgs,RestNKeys,Whole)),
  LB = true,
  align_args(FN,FN,RARGS,kILLiTT,HeadParms),!,
- break,append(GoodHeadParms,[kILLiTT],HeadParms).
+ break,
+ append(GoodHeadParms,[kILLiTT],HeadParms).
 
 align_args_local(FN,RequiredArgs,RestNKeys,Whole,LB,_ArgInfo,HeadParms,wl:init_args(Reqs,FN)):-
  always(is_list(RequiredArgs)),length(RequiredArgs,Reqs),
@@ -507,7 +509,7 @@ destructure_parameters(Ctx,Env,FormalParms0,ZippedArgEnv,RestNKeys,Whole,Require
         
 
 make_bind_parameters(Ctx,EnvIn,FormalParms,Whole,Arguments,EnvForBody,BinderCode):-
-  freeze(Whole,break),freeze(RestNKeys,break),
+  %freeze(Whole,break),freeze(RestNKeys,break),
   destructure_parameters(Ctx,EnvForBody,FormalParms,ZippedArgEnv,RestNKeys,Whole,RequiredArgs,_ArgInfo,_Names,_PVars,Code),
   %del_attr(Whole,freeze),  
   debug_var('RestNKeys',RestNKeys), debug_var('WholeArgs',Whole),    

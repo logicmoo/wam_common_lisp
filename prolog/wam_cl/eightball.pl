@@ -35,9 +35,6 @@ di_test:- lisp_compile_to_prolog(pkg_user,
                           ]).
 
 
-slow_trace:- stop_rtrace,nortrace,trace,wdmsg(slow_trace).
-
-on_x_rtrace(G):- catch(G,E,(dbginfo(E),rtrace(G),break)).
 atom_concat_or_rtrace(X,Y,Z):- tracing->atom_concat(X,Y,Z);catch(atom_concat(X,Y,Z),_,break).
 
 
@@ -50,12 +47,14 @@ bind_breaks(More):- put_attr(More,bind_breaks,break).
 :- meta_predicate bind_breaks:attr_unify_hook(0,*).
 bind_breaks:attr_unify_hook(G,_):-G.
 
-lisp_dump_break:- both_outputs(dumpST),!,trace,throw(lisp_dump_break).
+lisp_dump_break:- both_outputs(dumpST),!,trace,!,throw(lisp_dump_break).
 %lisp_dump_break:- trace,throw(lisp_dump_break).
-lisp_dump_break:- lisp_dumpST,break.
+lisp_dump_break:- lisp_dumpST,!,break.
 lisp_dumpST:- both_outputs(dumpST).
 
 true_or_die(Goal):-functor(Goal,_,A),arg(A,Goal,Ret),always((Goal,Ret\==[])).
+
+always_skip_always:- true.
 
 % Must offer_rtrace succeed (or else there is a bug in the lisp impl!)
 offer_rtrace((A->B;C)):- !, (A-> offer_rtrace(B);offer_rtrace(C)).
@@ -73,6 +72,8 @@ offer_rtrace(G):- !,( G-> true; (dbginfo(failed(G)),dumpST,dbginfo(failed(G)),tr
 %offer_rtrace(G):- notrace(tracing),!,(G->true;break). % nonquietly_must_or_rtrace(G).
 offer_rtrace(G):- nonquietly_must_or_rtrace(G),!.
 */
+
+length_safe(X,Y):- catch(length(X,Y),E,(dmsg(length(X,Y)=E),break)).
 
 % Must certainly succeed (or else there is a bug in the users code!)
 certainly((A,B)):-!,certainly(A),certainly(B).
@@ -92,83 +93,279 @@ quietly_must_or_rtrace(G):-
   (catch((G),E,gripe_problem(uncaught(E),(rtrace(G),!,fail)))
    *-> true ; (gripe_problem(fail_must_or_rtrace_failed,G),!,fail)),!.
 
-nonquietly_must_or_rtrace(G):- dinterp(m(0),user,_ ,  G, 0 ).
+nonquietly_must_or_rtrace(MG):- always_skip_always,!,call(MG).
+nonquietly_must_or_rtrace(MG):- 
+  strip_module(MG,M,G),
+   dinterp(w_tr_lvl(_),M, Cut ,  G, 0 ),
+   (callable(Cut)->(!,call(Cut));true).
 
 :- '$hide'(lquietly/1).
 lquietly(G):- quietly((G)).
 
+slow_trace:- stop_rtrace,nortrace,trace,wdmsg(slow_trace).
+on_x_rtrace(G):- catch(G,E,(dbginfo(E),rtrace(G),break)).
+
+
+
+% nonquietly_must_or_rtrace
+nmot1 :- true,true,fail,true.
+
+nmot2 :- true,true,call_fail,true.
+
+call_fail:- dmsg(fail),fail.
+
+incr_arg(N,Redo):- arg(N,Redo,Val),ValNext is 1 + Val,nb_setarg(N,Redo,ValNext).
+
+show_call_trace(Info,Goal):-
+  Redo = sol(0,0),
+  dmsg(call:Info),!, 
+  ( ((call((Goal,deterministic(YN))),
+      nb_setarg(Redo,2,YN),
+      (YN==yes -> dmsg(exit_det:Info);dmsg(exit_nd:Info)))) 
+   *-> 
+      (incr_arg(1,Redo);((arg(1,Redo,Stage),dmsg(Stage:Info),fail)))
+   ;
+  dmsg(fail(Redo):Info)),
+
+  (Redo == sol(0,0) -> (!,fail) ; (Redo=sol(_,yes) -> ! ; true)).
+
 % Must always succeed (or else there is a bug in the lisp impl!)
-always(Var):- var(Var),!,throw(var_always(Var)).
+always(Var):- notrace(var(Var)),!,throw(var_always(Var)).
 always([]):-!.
-always([A|B]):-!,always(A),always(B).
+always([A|B]):-!,always(A),always(B),!.
+%always(MG):- strip_module(MG,M,G),!,rtrace(M:G).
+
+always(MG):- always_skip_always, !, call(MG).
+/*
+always(MG):- always_skip_always, !, (MG*->true;throw(failed_always(MG))).
+always(MG):- copy_term(MG,MGC),call(MG),once(always_borked(MGC)).
+always_borked(MG):-
+  strip_module(MG,M,G),
+   w_dinterp(true,dinterp(w_tr_lvl(_),M, Cut , G, 0 )),
+(callable(Cut)->(!,call(Cut));true).
+*/
+
+/*
+
 always((A->B;C)):- !, (on_x_rtrace(user:A) -> always(B);always(C)).
+always((A*->B;C)):- !, (on_x_rtrace(user:A) *-> always(B);always(C)).
 always((A,!,B)):-!,always(A),!,always(B).
 always((A,B)):-!,always(A),always(B).
 always(always(G)):-!,always(G).
 always(call(G)):-!,always(G).
 always(notrace(G)):- !, quietly_must_or_rtrace(G),!.
 always(G):- nonquietly_must_or_rtrace(G),!.
+*/
 %always(notrace(G)):- notrace(tracing),!, m(0)(quietly(user:G)),!.
 %always(quietly(G)):- notrace(tracing),!, always(user:G).
 
+cross_cut(_Cut,_Cut2).
+
 %always(G):- !,(G-> true; (dbginfo(failed(G)),dumpST,dbginfo(failed(G)),trace,G,!,fail)),!.
 %always(G):- notrace(tracing),!,(G->true;break). % nonquietly_must_or_rtrace(G).
-:- module_transparent(dinterp/4).
-%dinterp(Must,M,_,G,L):-L > -1,!,M:call(G).
-dinterp(Must,N,C,M:G,L):-!,assertion(nonvar(G)),N:dinterp(Must,M,C,G,L).
+:- module_transparent(dinterp/5).
+%dinterp(Must,M,Cut,G,L):-L > -1,!,M:call(G).
+dinterp(Must,N,Cut,M:G,L):-!,assertion(callable(G)),N:dinterp(Must,M,Cut,G,L).
 %dinterp(Must,_,_,compound_name_arity(G,F,A),_Level):-!,compound_name_arity(G,F,A).
 %dinterp(Must,_,_,is_functionp(G),_Level):-!,rtrace(is_functionp(G)).
-dinterp(_Must,_,_,true,_).
-dinterp(Must,M,_,call(G),L):-!,dinterp(Must,M,_,G,L) .
-dinterp(Must,M,C,(Cond *-> Then ; Else),L):-!,L2 is L +1,( dinterp(Must,M,C,Cond,L2)  *->  dinterp(Must,M,C,Then,L) ; dinterp(Must,M,C,Else,L)).
-dinterp(Must,M,C,(Cond -> Then ; Else),L):-!,L2 is L +1,( dinterp(Must,M,C,Cond,L2) ->  dinterp(Must,M,C,Then,L) ; dinterp(Must,M,C,Else,L)).
-dinterp(Must,M,_,(\+ G),L):-!,\+ dinterp(Must,M,_,G,L).
-dinterp(Must,M,C,(Cond -> Then ; Else),L):-!,( dinterp(Must,M,C,Cond,L)  ->  dinterp(Must,M,C,Then,L) ; dinterp(Must,M,C,Else,L)).
-dinterp(Must,M,C,(Cond -> Then),L):-!,(dinterp(Must,M,C,Cond,L) -> dinterp(Must,M,C,Then,L)).
-dinterp(Must,M,C,(Cond *-> Then),L):-!,L2 is L +1,(dinterp(Must,M,C,Cond,L2) *-> dinterp(Must,M,C,Then,L)).
-dinterp(Must,M,C,(GoalsL ; GoalsR),L):-!,L2 is L +1,(dinterp(Must,M,C,GoalsL,L2) ; dinterp(Must,M,C,GoalsR,L2)).
-dinterp(Must,M,C,(Goals1,Goals2),L):-!,(dinterp(Must,M,C,Goals1,L),dinterp(Must,M,C,Goals2,L)).
-dinterp(Must,M,_,  once(G),L):-!,dinterp(Must,M,_,(G),L),!.
-dinterp(Must,M,C,always(G),_):-!,dinterp(Must,M,C,(G),0),!.
-dinterp(Must,M,C,  must(G),_):-!,dinterp(Must,M,C,G,0),!.
-dinterp(Must,M,C,lquietly(G),L):-!,quietly(dinterp(Must,M,C,G,L)).
-dinterp(Must,M,C, quietly(G),L):-!,quietly(dinterp(Must,M,C,G,L)).
-dinterp(Must,M,C, notrace(G),L):-!,quietly(dinterp(Must,M,C,G,L)).
-dinterp(Must,M,_,findall(Template,G,Bag),L):-!,L2 is L +1,findall(Template,dinterp(Must,M,_,G,L2),Bag).
-dinterp(Must,M,_,setup_call_cleanup(T,G,Bag),L):-!,L2 is L +1,setup_call_cleanup(dinterp(Must,M,_,T,L2),dinterp(Must,M,_,G,L2),dinterp(Must,M,_,Bag,L2)).
-dinterp(Must,M,_,catch(G,E,F),L):-!,catch(dinterp(Must,M,_,G,L),E,dinterp(Must,M,_,F,L)).
-%d  i nterp(_,C,!,_):-!,(var(C);C=!).
-dinterp(_Must,_,C,!,_):-!,(nonvar(C)->true;C=!).
-dinterp(m(0),M,_,G, Level):- Level==0,!, (M:call(G)*-> true; (rtrace((M:call(G))),throw(failed_must(G)))).
-dinterp(m(0),M,_,G,_):- notrace((\+ compound(G))),!,M:G.
-dinterp(Must,M,C,G,L):- notrace((G=..[call,F|ARGS],atom(F),Call2=..[F|ARGS])),!,dinterp(Must,M,C,Call2,L).
-dinterp(m(0),M,_,G, _):- M:call(G).
-%dinterp(Must,M,_, G,L):-L > -1,!,nonquietly_must_or_rtrace0(M:G).
+dinterp(_,_,_,true,_):-!.
+dinterp(_Must,_M, Cut, (!),_):-!,(nonvar(Cut)->true;Cut=!).
+
+% dinterp(Must,M,Cut, G,L):- notrace(tracing),!,notrace,call_cleanup(dinterp(tracing(Must),M,Cut,G,L),trace).
+dinterp(Must,M,Cut,call(G),L):- cross_cut(Cut,Cut2),!,dinterp(Must,M,Cut2,G,L) .
+dinterp(_Must,_M,_Cut,dbginfo(G),_L):-!,dbginfo(G),!.
+dinterp(_Must,_M,_Cut,compound(G),_L):-!,compound(G),!.
+
+dinterp(Must,M,Cut,(repeat,G),L):- cross_cut(Cut,Cut2),!,repeat,dinterp(Must,M,Cut2,G,L),(callable(Cut2)->(!,call(Cut2));true),(callable(Cut)->(!,call(Cut));true).
+
+%dinterp(_Must,_M, Cut,CutFail,_L):- CutFail==(!,fail),!,ignore(Cut=fail),!.
+dinterp(_Must,_M,_Cut,fail,_):- !,fail.
+
+
+dinterp(Must,M,Cut,once(G),L):-!,cross_cut(Cut,Cut2),dinterp(Must,M,Cut2,G,L),!.
+
+dinterp(Must,M,Cut, ( \+ \+ G),L):- L2 is L +1, cross_cut(Cut,Cut2), !, \+ \+ dinterp(Must,M,Cut2,G,L2).
+dinterp(Must,M,Cut, ( \+ G),L):- L2 is L +1, cross_cut(Cut,Cut2), !, \+ dinterp(Must,M,Cut2,G,L2).
+dinterp(Must,M,Cut,  not(G),L):- L2 is L +1, cross_cut(Cut,Cut2), !, \+ dinterp(Must,M,Cut2,G,L2).
+
+dinterp(Must,M,Cut,(Cond *-> Then ; Else),L):-!,L2 is L +1,
+   (dinterp(Must,M,Cut,Cond,L2) *-> dinterp(Must,M,Cut,Then,L) ; dinterp(Must,M,Cut,Else,L)).
+dinterp(Must,M,Cut,(Cond  -> Then ; Else),L):-!,L2 is L +1,
+   (dinterp(Must,M,Cut,Cond,L2) -> dinterp(Must,M,Cut,Then,L) ; dinterp(Must,M,Cut,Else,L)).
+
+dinterp(Must,M,Cut,(Cond  -> Then),L):-!, (dinterp(Must,M,Cut,Cond,L) -> dinterp(Must,M,Cut,Then,L)).
+
+dinterp(Must,M,Cut,(Cond *-> Then),L):-!, (dinterp(Must,M,Cut,Cond,L)*-> dinterp(Must,M,Cut,Then,L)).
+
+dinterp(Must,M,Cut,(GoalsL;GoalsR),L):-!,L2 is L +1,
+   (dinterp(Must,M,Cut,GoalsL,L2);dinterp(Must,M,Cut,GoalsR,L)).
+
+dinterp(Must,M,Cut,(Goals1,Goals2),L):- !,          
+  (dinterp(Must,M,Cut,Goals1,L ),dinterp(Must,M,Cut,Goals2,L)).
+
+dinterp(_Must,M,_Cut, always(G),_):- !, always(M:G). % cross_cut(Cut,Cut2),!,dinterp(Must,M,Cut2,G,0),!.
+dinterp(_Must,M,_Cut, must(G),_):- !, always(M:G).
+dinterp(_Must,M,_Cut, call_call(G),_):- !, call(M:G).
+dinterp(_Must,M,_Cut, call(call,G),_):- !, call(M:G).
+% RESOTRE  dinterp(Must,M,Cut,  must(G),_):- cross_cut(Cut,Cut2),!,dinterp(Must,M,Cut2,G,0),!.
+dinterp(Must,M,Cut,lquietly(G),L):- cross_cut(Cut,Cut2),!,quietly(dinterp(Must,M,Cut2,G,L)).
+% RESOTRE dinterp(Must,M,Cut, quietly(G),L):-!,quietly(dinterp(Must,M,Cut,G,L)).
+%dinterp(Must,M,Cut, quietly(G),L):-!,quietly(dinterp(Must,M,Cut,G,L)).
+dinterp(Must,M,Cut, quietly(G),L):- cross_cut(Cut,Cut2),!, dinterp(Must,M,Cut2,G,L).
+% RESOTRE  dinterp(Must,M,Cut, notrace(G),L):-!,quietly(dinterp(Must,M,Cut,G,L)).
+dinterp(Must,M,Cut, notrace(G),L):- !, %wo_trace
+   (((cross_cut(Cut,Cut2), dinterp(Must,M,Cut2,G,L)))).
+dinterp(Must,M,Cut,findall(Template,G,Bag),L):-cross_cut(Cut,Cut2),!,L2 is L +1,findall(Template,dinterp(Must,M,Cut2,G,L2),Bag).
+dinterp(Must,M,Cut,call_cleanup(G,Cleanup),L):-cross_cut(Cut,Cut2),!,call_cleanup(dinterp(Must,M,Cut2,G,L),Cleanup).
+
+
+%wo_trace
+% RESOTRE dinterp(Must,M,Cut,setup_call_cleanup(S,G,Cleanup),L):- cross_cut(Cut,Cut2),cross_cut(Cut,Cut3),!,setup_call_cleanup(dinterp(Must,M,_Cut,S,L),dinterp(Must,M,Cut2,G,L),dinterp(Must,M,Cut3,Cleanup,L)).
+
+
+dinterp(_Must,M,_Cut,catch(G,E,F),_L):- !,M:catch(G,E,F).
+
+% RESOTRE dinterp(Must,M,Cut,catch(G,E,F),L):-cross_cut(Cut,Cut2),cross_cut(Cut,Cut3),!,catch(dinterp(Must,M,Cut2,G,L),E,dinterp(Must,M,Cut3,F,L)).
+%d  i nterp(_,Cut,!,_):-!,(var(Cut);Cut=!).
+
+dinterp(Must,M,Cut,CallN,L):- 
+  notrace((fix_callables(CallN,CallNew)->CallN\=@=CallNew)),!,
+  dinterp(Must,M,Cut,CallNew,L).
+
+%dinterp(_Must,M,_Cut,Goal,_L):- notrace(tracing),!,M:call(M:Goal).
+dinterp(Must,M,Cut,Goal,L):- dinterp_c(Must,M,Cut,Goal,L).
+
+
+fix_callables(Atom,Atom):- \+ compound(Atom),!.
+fix_callables(call(In),Out):- !, fix_callables(In,Out).
+fix_callables(\+ (In), \+ Out):- !, fix_callables(In,Out).
+fix_callables(apply(F,ARGS),NewCall2):- !, assertion(callable(F)),
+   F=..FL,append(FL,ARGS,NewCallL),NewCall=..NewCallL,!,fix_callables(NewCall,NewCall2).
+fix_callables(CallN,NewCall2):- CallN=..[call,F|ARGS],!,assertion(callable(F)),
+   F=..FL,append(FL,ARGS,NewCallL),NewCall=..NewCallL,!,fix_callables(NewCall,NewCall2).
+fix_callables(NewCall,NewCall).
+
+:- meta_predicate(wo_trace(0)).
+wo_trace(G):- !, call(G).
+%wo_trace(G):- notrace(tracing)->each_call_cleanup(notrace,G,notrace(trace)); call(G).
 /*
-dinterp(Must,M,_,G,_):- quietly(just_call(M,G)),!,M:call(G).
-dinterp(Must,M,C,G,L):- L2 is L +1,functor(G,F,A),functor(GG,F,A),!,dinterp_c(M,C,G,GG,L2).
+wo_trace(G):- !, 
+  (notrace(tracing)->
+   (visible(-all),visible(+exception),leash(-all),leash(+exception),call_cleanup(G,(visible(+full),leash(+full))));
+    call(G)).
+%wo_trace(G):- notrace(tracing)->(visible(-all),visible(+exception),call_cleanup(G,(visible(+full),leash(+full))));call(G).
+%wo_trace(G):- notrace(tracing)->(visible(-all),visible(+exception),call_cleanup(G,(visible(+full),leash(+full))));call(G).
 */
-dinterp_c(M,_, G,_,L):-L > -1,!,nonquietly_must_or_rtrace0(M:G).
-dinterp_c(_,C,G,GG,L):- \+ clause(GG,_), 
-  notrace(( current_module(MM),clause(MM:GG,_),\+ clause(MM:GG,imported_from(_)))),!,trace,dinterp_c(MM,C,G,G,L).
+dinterp_c(Must,M,Cut, G,L):-  notrace((fail,tracing)),!,  
+  wo_trace(dinterp_c(tracing(Must),M,Cut,G,L)),
+(callable(Cut)->(!,call(Cut));true).
 
-dinterp_c(M,C,G,GG,L):- 
-   clause(M:GG,Body),G=GG,
-   dinterp(m(0),M,C,Body,L),(var(C)-> true ; (!,C)).
+dinterp_c(tracing(Must),M,Cut, G,L):- !, 
+  show_call_trace((Must->M:G),dinterp_d(Must,M,Cut, G,L)),
+(callable(Cut)->(!,call(Cut));true).
 
-just_call(_,G):- compound(G),functor(G,F,_),just_call_f(F).
-just_call(M,G):- predicate_property(M:G,nodebug).
-just_call(M,G):- M:predicate_property(_:G,nodebug).
-just_call(M,G):- notrace(catch( (M:clause(G,_),fail), _, true)).
+dinterp_c(Must,M,Cut,G,Level):-   
+  notrace((Must = rtrace(TraceLvl), Level==TraceLvl,
+  next_trace_level(Must,_NewTraceLevel))),!,
+   rtrace(M:G),
+(callable(Cut)->(!,call(Cut));true).
+
+
+dinterp_c(Must,M,Cut,G,Level):-
+  notrace((compound(Must),arg(1,Must,TraceLvl),Level==TraceLvl, !,     
+   next_trace_level(Must,NextMust))),
+   show_call_trace((Must->M:G),dinterp_d(NextMust,M,Cut,G,Level)),
+(callable(Cut)->(!,call(Cut));true).
+
+dinterp_c(Must,M,Cut,G, Level):-
+  next_trace_level(Must,NextMust),
+  dinterp_d(NextMust,M,Cut,G, Level),
+(callable(Cut)->(!,call(Cut));true).
+
+/*
+*/
+
+dinterp_d(Must,M,Cut,G,L):- 
+  (compound(G)->
+    (compound_name_arity(G,F,A),compound_name_arity(GG,F,A)) ;
+    GG =G),
+ dinterp_e(Must,M,Cut,G,GG,L),
+(callable(Cut)->(!,call(Cut));true).
+                         
+/*
+*/
+
+dinterp_e(_Must,M,_Cut,G, GG, _L):- 
+  (((nb_current('$w_dinterp',false) ; just_call(M,GG)))),!,
+  (call(M:G)).
+% (callable(Cut)->(!,call(Cut));true).
+:- '$hide'(rtrace:trace).
+%dinterp_e(_Must,M,_UnseenCut,G,_GG,_L):- !, rtrace(M:G).
+dinterp_e(Must,M,_UnseenCut,G,GG,L):- 
+   notrace((L2 is L -1,predicate_property(M:GG,number_of_clauses(_)))),!,
+   (( M:clause(GG,Body), G=GG)),
+   dinterp(Must,M,Cut2,Body,L2),
+(callable(Cut2)->(!,call(Cut2));true).
+
+dinterp_e(_Must,M,Cut,G,GG,_L):- 
+   predicate_property(M:GG,defined),!,
+   M:call(M:G),
+(callable(Cut)->(!,call(Cut));true).
+
+dinterp_e(Must,_M,Cut,G,GG,L):-  
+  notrace(( current_module(MM),    
+    predicate_property(MM:GG,number_of_clauses(_)),
+    \+ predicate_property(MM:GG,imported_from(_)))),!,
+  dmsg("Found Inaccessable predicate!"),
+  trace,G=GG,dinterp_e(Must,MM,Cut,G,GG,L).
+
+dinterp_e(_Must,M,Cut,G,_GG,_L):- 
+   M:on_x_rtrace(M:G),
+(callable(Cut)->(!,call(Cut));true).
+
+next_trace_level(In,Out):- notrace((In=@=w_tr_lvl(_),In=Out)),!.
+next_trace_level(In,Out):- compound(In),arg(1,In,Mid),!,
+  next_trace_level(Mid,MidOut),ignore(In=Out),!,setarg(1,Out,MidOut).
+next_trace_level(In,Out):- number(In),!, Out is In+1.
+next_trace_level(In,In).
+
+
+w_dinterp(V,G):- (nb_current('$w_dinterp',Was);Was=[]),!,
+ ((V = Was) -> G ; 
+    (b_setval('$w_dinterp',V),G,b_setval('$w_dinterp',Was))).
+
+just_call(_,G):- var(G),!.
+just_call(_,=(_,_)):-!.
+just_call(_,call_call(_)):-!.
+just_call(_,G):- compound(G),functor(G,F,_),just_call_f(F),!.
+just_call(M,G):- predicate_property(M:G,nodebug),!.
+just_call(M,G):- M:predicate_property(_:G,nodebug),!.
+just_call(M,G):- \+ \+ (predicate_property(M:G,meta_predicate(GG)),arg(_,GG,N),integer(N)),!.
+just_call(M,G):-  predicate_property(M:G,number_of_clauses(_)),notrace(catch( (M:clause(G,_),fail), _, true)),!.
+
+
 just_call_f('$sig_atomic').
-just_call_f(maplist).
-just_call_f(dinterp).
+%%just_call_f(maplist).
+
+%set_prolog_flag(gc,false),
+just_call_f(F):- atom_concat(_,ii,F).
+just_call_f(F):- atom_concat(atom_,_,F).
+
+just_call_f(F):- atom_concat(get_opv,_,F).
+just_call_f(F):- atom_concat(nb_,_,F).
+just_call_f(F):- atom_concat(package_,_,F).
+just_call_f(F):- atom_concat(is_,_,F).
+just_call_f(F):- atom_concat(dinterp,_,F).
+just_call_f(F):- atom_concat(filter_var_chars,_,F).
+
 just_call_f(with_mutex).
 just_call_f(flag).
 just_call_f(is).
+just_call_f(=).
+just_call_f(call_call).
 just_call_f(gensym).
 
-nonquietly_must_or_rtrace0(G):- 
+nonquietly_must_or_rtrace_now(G):- 
   (catch((G),E,gripe_problem(uncaught(E),(rtrace(G),!,fail)))
    *-> true ; (gripe_problem(fail_must_or_rtrace_failed,rtrace((slow_trace,G))),!,fail)),!.
                         
@@ -180,10 +377,11 @@ gripe_problem0(Problem,G):-
      dumpST,
      dbginfo((Problem=G)))),
      nortrace,
-     trace,
+     trace,!,
      lisp_dump_break,
      slow_trace,
-     ((G)*->(slow_trace,lisp_dump_break);(dbginfo(warn(failed_rtrace(G))),notrace,lisp_dump_break,!,fail)).
+     ((G)*->(slow_trace,lisp_dump_break);
+       (dbginfo(warn(failed_rtrace(G))),notrace,lisp_dump_break,!,fail)).
 
 
 :- meta_predicate(timel(+,:)).
@@ -233,7 +431,7 @@ trim_off(_,A,A).
 
 assert_lsp(G):- assert_lsp(u,G).
 assert_lsp(S,(G1,G2)):- !,assert_lsp(S,G1),assert_lsp(S,G2).
-assert_lsp(_,G):-  notrace((copy_term_nat(G,GG),assert_local(GG))).
+assert_lsp(_,G):-  wo_trace((copy_term_nat(G,GG),assert_local(GG))).
 
 assert_local(user:G):-!,assert_local(G).
 assert_local(user:G:-B):-!,assert_local(G:-B).
@@ -242,8 +440,9 @@ assert_local(G:-B):- B==true,!,assert_local(G).
 assert_local(G):- assert_local0(G).
 assert_local0(G):- \+ \+ (clause_asserted_local(G,_)),!.
 assert_local0(G):- doall((clause_asserted_local(G,E),erase(E),fail)),!,user:asserta(G),!.
-clause_asserted_local((H:-_),R):-!, clause(H,_,R).
-clause_asserted_local(H,R):- clause(H,true,R).
+
+clause_asserted_local((H:-_),R):-!,  predicate_property(H,number_of_clauses(_)),clause(H,_,R).
+clause_asserted_local(H,R):-  predicate_property(H,number_of_clauses(_)),clause(H,true,R).
 
 :- fixup_exports.
 

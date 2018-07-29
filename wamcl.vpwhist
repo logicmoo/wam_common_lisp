@@ -3,16 +3,241 @@
 [Global]
 CurrentProject=wamcl.vpj
 [ProjectDates]
-wamcl.vpj=20180611194252357
+wamcl.vpj=20180613213940847
 [TreeExpansion2]
 - wamcl.vpj
-  + ..\alpprolog
+  + ..\bitfly
+    + bitflyer-api-dotnet-client\.vs
+      + BitFlyer.Apis
+        + DesignTimeBuild
+        + v14
+        + v15
+          + Server
+            + sqlite3
+    + BitflyerApi\.vs
+      + BitflyerApi
+        + v14
+        + v15
+          + Server
+            + sqlite3
+    + BitflyerSIM\.vs
+      + BitflyerSIM
+        + v14
+        + v15
+          + Server
+            + sqlite3
+    + BitflyerApi
+      + BitflyerApi
+        + ApiBridge
+        + bin
+          + Debug
+        + obj
+          + Debug
+        + Properties
+      + BitflyerApiSample
+        + bin
+          + Debug
+        + obj
+          + Debug
+        + Properties
+      + packages
+        + Newtonsoft.Json.9.0.1
+          + lib
+            + net20
+            + net35
+            + net40
+            + net45
+            + netstandard1.0
+            + portable-net40+sl5+wp80+win8+wpa81
+            + portable-net45+wp80+win8+wpa81
+          + tools
+    + BitflyerSIM
+      + bin
+        + Debug
+      + obj
+        + Debug
+      + Properties
+    + bitflyer
+    + bitflyer-api-dotnet-client
+      + BitFlyer.Apis
+        + bin
+          + Debug
+            + net45
+            + netstandard2.0
+        + Extensions
+        + obj
+          + Debug
+            + net45
+            + netstandard2.0
+        + PrivateApis
+        + PublicApis
+        + RequestData
+        + ResponseData
+      + BitFlyer.Apis.Test
+        + bin
+          + Debug
+        + obj
+          + Debug
+        + Properties
+      + BitFlyer.Sample
+        + bin
+          + Debug
+        + obj
+          + Debug
+        + Properties
+      + BitFlyer.Sample.NETCore
+        + bin
+          + Debug
+            + netcoreapp2.0
+        + obj
+          + Debug
+            + netcoreapp2.0
+      + nuget
+      + packages
+        + System.Reflection.Emit.4.3.0
+          + lib
+            + MonoAndroid10
+            + monotouch10
+            + net45
+            + xamarinios10
+            + xamarinmac20
+            + xamarintvos10
+            + xamarinwatchos10
+          + ref
+            + MonoAndroid10
+            + net45
+            + netstandard1.1
+              + de
+              + es
+              + fr
+              + it
+              + ja
+              + ko
+              + ru
+              + zh-hans
+              + zh-hant
+            + xamarinmac20
+        + System.Reflection.Emit.Lightweight.4.3.0
+          + lib
+            + MonoAndroid10
+            + MonoTouch10
+            + net45
+            + portable-net45+wp8
+            + wp80
+            + xamarinios10
+            + xamarinmac20
+            + xamarintvos10
+            + xamarinwatchos10
+          + ref
+            + MonoAndroid10
+            + MonoTouch10
+            + net45
+            + netstandard1.0
+              + de
+              + es
+              + fr
+              + it
+              + ja
+              + ko
+              + ru
+              + zh-hans
+              + zh-hant
+            + portable-net45+wp8
+            + wp80
+            + xamarinios10
+            + xamarinmac20
+            + xamarintvos10
+            + xamarinwatchos10
+          + runtimes
+            + aot
+              + lib
+                + netcore50
+        + System.Threading.Tasks.Extensions.4.4.0
+          + lib
+            + netcoreapp2.0
+            + netstandard1.0
+            + netstandard2.0
+            + portable-net45+win8+wp8+wpa81
+          + ref
+            + netcoreapp2.0
+        + System.ValueTuple.4.4.0
+          + lib
+            + MonoAndroid10
+            + MonoTouch10
+            + net461
+            + net47
+            + netcoreapp2.0
+            + netstandard1.0
+            + netstandard2.0
+            + portable-net40+sl4+win8+wp8
+            + xamarinios10
+            + xamarinmac20
+            + xamarintvos10
+            + xamarinwatchos10
+          + ref
+            + MonoAndroid10
+            + MonoTouch10
+            + net461
+            + net47
+            + netcoreapp2.0
+            + netstandard2.0
+            + portable-net40+sl4+win8+wp8
+            + xamarinios10
+            + xamarinmac20
+            + xamarintvos10
+            + xamarinwatchos10
+        + Utf8Json.1.3.7
+          + lib
+            + net45
+            + net47
+            + netstandard2.0
+        + xunit.2.3.1
+        + xunit.abstractions.2.0.1
+          + lib
+            + net35
+            + netstandard1.0
+        + xunit.analyzers.0.8.0
+          + tools
+        + xunit.assert.2.3.1
+          + lib
+            + netstandard1.1
+        + xunit.core.2.3.1
+          + build
+          + buildMultiTargeting
+        + xunit.extensibility.core.2.3.1
+          + lib
+            + netstandard1.1
+        + xunit.extensibility.execution.2.3.1
+          + lib
+            + net452
+            + netstandard1.1
+        + xunit.runner.visualstudio.2.3.1
+          + build
+            + net20
+            + netcoreapp1.0
+            + uap10.0
+  + ..\clause_attvars
+    + prolog
+    + t
+  + ..\dictoo
+    + prolog
+    + t
+  + ..\each_call_cleanup
+    + prolog
+    + t
+  + ..\eggdrop
+    - conf
+    + prolog
+    + t
+  + ..\file_scope
+    - prolog
+    + t
+  + ..\flux
     - prolog
       + FluxVersion
         + Ground
         + Nonground
-      - flux
-      + indigolog
+      - indigolog
         + Doc
           + source
         + Env
@@ -30,36 +255,47 @@ wamcl.vpj=20180611194252357
             + WumpusApplet
           + Wumpus-KBAT
             + WumpusApplet
-        + flux_WumpusApplet
+        - flux_WumpusApplet
         + Interpreters
           + flux
         + lib
-  + ..\clause_attvars
-    + prolog
-    + t
-  + ..\dictoo
-    + prolog
-    + t
-  + ..\each_call_cleanup
-    + prolog
-    + t
-  + ..\eggdrop
-    - conf
-    + prolog
-    + t
-  - ..\file_scope
-    - prolog
-    + t
+  + ..\flux-frdcsa
+    + amzi
+      + amzi-tutorial
+    + data-git
+      + capsules
+        + 6_nursebot
+        + amzibot
+        + security
+    + eclipse-pl
+    + julian
+      + prolog
+        + julian
+          + calendar
+      + t
+        + calendar
+        + form
+    + misc
+    + prolog-planning-library
+      + charts
+      + docs
+      + output
+      + test
+        + blocks
+        + elevators
+        + gripper
+        + hanoi
+    + state
   + ..\gvar_syntax
     + prolog
     + t
-  - ..\hook_hybrid
+  + ..\hook_hybrid
     - prolog
     + t
   + ..\instant_prolog_docs
     + prolog
     + t
-  - ..\..\lib
+  + ..\..\lib
     - swipl
       + boot
       + demo
@@ -121,10 +357,34 @@ wamcl.vpj=20180611194252357
             + swi
             + trace
             + xref
-  + ..\logicmoo_base
-    + prolog
-      + logicmoo
+  - ..\logicmoo_base
+    - prolog
+      - logicmoo
         + common_logic
+        + equations
+          + lpdir
+            + misc
+            + test
+          - pressdir
+            + axioms
+            - methods
+            - misc
+            - package
+            - pressjunk
+            - probs
+            - toplevel
+          + testing
+            + press_handout_document
+          - util
+        + KRBOOK_PROGRAMS
+          + __MACOSX
+            + KRBOOK_PROGRAMS
+          + KRBOOK_PROGRAMS
+        + mathnotes
+          - files.bak
+            - orig
+            - pms
+              + orig
         + motel
         + pdt_server
           + org.cs3.pdt.analysis_3.1.2.201603251848
@@ -182,7 +442,21 @@ wamcl.vpj=20180611194252357
                   + org.cs3.prolog.library
             + pl
         + pfc
-        + plarkc
+        - plarkc
+        - plog
+          + doc
+          - example
+            - BlockWorld
+            - BloodType
+            - Grid
+            + InPaper
+            + Poker
+            + ProfessorStudents
+            + RCS
+            - SandCastle
+            + SoccerGame
+            + ToiletBomb
+          - src
         + pttp
         + tptp
           + leancop
@@ -451,8 +725,8 @@ wamcl.vpj=20180611194252357
               + TOP
         + user
       + KBs
-  + ..\logicmoo_utils
-    + prolog
+  - ..\logicmoo_utils
+    - prolog
     + t
   + ..\loop_check
     + prolog
@@ -463,130 +737,805 @@ wamcl.vpj=20180611194252357
   + ..\multivar
     + prolog
     + t
-  + ..\must_trace
+  - ..\must_trace
+    - prolog
+    + t
+  + ..\no_repeats
     + prolog
     + t
-  - ..\no_repeats
-    + prolog
-    + t
-  + ..\..\packs_sys
-    + logicmoo_base
-      + prolog
-        + logicmoo
-          + common_logic
-          + motel
-          + pdt_server
-            + org.cs3.pdt.analysis_3.1.2.201603251848
-              + pl
-            + org.cs3.pdt.builder_3.1.2.201603251848
-              + prolog-src
-                + analyzer
-                + util
-            + org.cs3.pdt.common_3.1.2.201603251848
-              + pl
-                + callgraph
-                + lgt
-                + metainference
-                + xref
-                  + testcase
-            + org.cs3.pdt.connector_3.1.2.201603251848
-              + pl
-                + lgt
-              + schema
-            + org.cs3.pdt.console_3.1.2.201603251848
-              + pl
-            + org.cs3.pdt.editor_3.1.2.201603251848
-              + icons
-              + org
-                + cs3
-                  + pdt
-                    + editor
-                      + internal
-                        + views
-                          + testdata
-              + pl
-                + editor
-                  + lgt
-            + org.cs3.pdt.graphicalviews_3.1.2.201603251848
-              + pl
-                + lgt
-            + org.cs3.prolog.connector_3.1.2.201603251848
-              + META-INF
-                + maven
-                  + org.cs3.roots
-                    + org.cs3.prolog.connector
-              + org
-                + cs3
-                  + prolog
-                    + connector
-                      + internal
-                        + cterm
+  - ..\..\packs_lib
+    + ffi
+  + ..\..\packs_usr
+    - test_programs_wam_common_lisp
+      + development
+        + doc
+        + experimental-code
+        + experiments
+          + arithmetic-jun-10
+          + banana-slug-jun-10
+          + banana-slug-may-13
+          + inconsistency-jun-13
+          + inconsistency-jun-15
+            + altitude-distance
+            + contains-partlyLocated
+            + equivalentContentInstance-subsumesContentInstance
+            + superficialPart-part
+          + inconsistency-jun-16
+            + before-earlier
+            + causes-relatedEvent
+            + during-temporalPart
+            + parent-relative
+            + spouse-relative
+          + inconsistency-may-18
+          + inconsistency-may-19
+          + inconsistency-may-23
+          + inconsistency-may-24
+          + inconsistency-may-26
+          + relations-jun-17
+          + subclass-jun-11
+          + sumo-test-cases
+            + TQG14
+            + TQG15
+            + TQG16
+            + TQG34
+            + TQG8
+          + ttf-fof
+        + sample
+      - programs
+        + ansi-test
+          + arrays
+          + auxiliary
+          + beyond-ansi
+          + characters
+          + conditions
+          + cons
+          + data-and-control-flow
+          + doc
+          + environment
+          + eval-and-compile
+          + files
+          + hash-tables
+          + iteration
+          + misc
+          + numbers
+          + objects
+          + packages
+          + pathnames
+          + printer
+            + format
+          + random
+          + rctest
+          + reader
+          + sequences
+          + streams
+          + strings
+          + structures
+          + symbols
+          + system-construction
+          + types-and-classes
+        + baby2015
+          + clII
+          + doc
+          + fmcs
+          + kernel
+            + common
+            + consat
+              + basic
+              + mini
+              + normal
+            + frames
+              + basic
+              + mini
+              + normal
+            + freetext
+            + meta
+            + modules
+            + prolog
+              + basic
+              + mini
+              + normal
+            + rules
+              + basic
+              + mini
+              + normal
+          + mac
+            + io
+              + normal
+            + modules
+            + tools
+          + model-k
+            + configs
+            + kbs
+              + floor
+              + kads
+          + samples
+            + axsets
+            + configs
+            + kbs
+          + texi
+            + configs
+            + k1
+            + k3
+          + tty
+            + basic
+            + cmds
+            + mini
+            + modules
+        + daydreamer
+        + daydreamer~
+        + forward-chaining-reasoning
+          + lib
+            + aima
+              + logic
+                + algorithms
+          + src
+          + test
+        + fricas_snark
+          + docs
+            + _sources
+            + _static
+          + input
+          + lib
+          + sphinx
+          + src
+          + test
+        + graph-algorithms
+        + km
+          + Free-KMgen
+            + bin
+              + foil
+                + com
+                  + richhickey
+                    + foil
+              + web
+            + data
+              + log
+                + error
+              + temp
+              + u
+                + system
+                  + 10.0.0.180
+            + demo
+            + home
+              + KMgen
+            + patch
+              + 1.22
+            + tools
+          + rkf-clib
+            + components
+              + bsp
+                + CVS
+                + specs
+                  + CVS
+              + commitinfo
+                + CVS
+              + core
+                + CVS
+                + specs
+                  + CVS
+              + CVSROOT
+                + CVS
+              + databases
+                + CVS
+              + modules
+                + CVS
+              + office
+                + CVS
+                + specs
+                  + CVS
+                + tm
+                  + CVS
+              + science
+                + bio-halo
+                  + CVS
+                  + specs
+                    + CVS
+                + bio-lbr
+                  + CVS
+                + biology
+                  + CVS
+                  + specs
+                    + CVS
+                + chem-halo
+                  + CVS
+                  + specs
+                    + CVS
+                + chemistry
+                  + CVS
+                  + specs
+                    + CVS
+                + CVS
+                + engine-lbr
+                  + CVS
+                + obo
+                  + CVS
+                + phys-halo
+                  + CVS
+                  + specs
+                    + CVS
+                + physics
+                  + CVS
+                + shared
+                  + CVS
+                  + specs
+                    + CVS
+                + SME-bio
+                  + CVS
+                + SME-chem
+                  + CVS
+                + SME-phys
+                  + CVS
+              + specs
+                + CVS
+                + gpd
+                  + Aggregates
+                    + CVS
+                  + Communication
+                    + CVS
+                  + Critique-Scores
+                    + CVS
+                  + CVS
+                  + Military-Units
+                    + CVS
+                  + NL-Slot-Group
+                    + CVS
+                  + Organization-and-Equipment
+                    + CVS
+                  + Properties
+                    + CVS
+                  + Roles
+                    + CVS
+                + ontologies
+                  + CVS
+              + tools
+                + bps
+                  + CVS
+                  + data
+                    + CVS
+                  + debugger
+                    + CVS
+                    + docs
+                      + CVS
+                  + eq-solver
+                    + CVS
+                  + loosespeak
+                    + CVS
+                  + QA
+                    + CVS
+                  + rule-engine
+                    + CVS
+                  + utility
+                    + CVS
+                  + vp-matcher
+                    + CVS
+                + CVS
+                + tester
+                  + CVS
+          + www.cs.utexas.edu
+            + users
+              + mfkb
+                + RKF
+                  + papers
+                  + presentations
+                  + projects
+                  + tree
+                    + components
+                      + specs
+                  + trunktree
+        + logic.stanford.edu
+          + epilog
+            + archive
+              + data
+              + documentation
+              + examples
+              + experimental
+              + javascript
+              + library
+              + source
+              + tests
+            + homepage
+            + javascript
+          + logicprogramming
+            + notes
+        + MicroPrologII
+        + paip-sanity
+          + UNUSED
+        + PowerLOOM
+          + cl-kme
+            + src
+            + t
+          + CLIPSmsc
+            + clp-pvm
+              + c
+                + mk
+              + clp
+            + csd.auth.gr
+              + o-device
+              + R-DEVICE
+                + test
+          + kmp
+            + components
+              + pprj
+            + s
+              + sparql-query
+            + src
+          + kmst
+          + powerloom-4.0.10
+            + htdocs
+              + ontosaurus
+                + help
+            + kbs
+              + scec
+            + native
+              + cpp
+                + lib
+                + logic
+                  + extensions
+                    + PaxHeaders.22412
+                  + PaxHeaders.22412
+                + PaxHeaders.22412
+                + powerloom
+                  + PaxHeaders.22412
+                + rdbms
+                  + PaxHeaders.22412
+                + sdbc
+                  + PaxHeaders.22412
+                + stella
+                  + cpp-lib
+                    + gc-7.2\.libs
+                    + gc
+                      + cord
+                      + doc
+                      + extra
+                        + PaxHeaders.22412
+                      + include
+                        + extra
+                        + private
+                      + libatomic_ops
+                        + doc
+                        + PaxHeaders.22412
+                        + pkgconfig
+                        + src
+                          + atomic_ops
+                            + PaxHeaders.22412
+                            + sysdeps
+                              + armcc
+                              + gcc
+                              + hpc
+                              + ibmc
+                              + icc
+                              + msftc
+                              + sunc
+                          + PaxHeaders.22412
+                        + tests
+                          + PaxHeaders.22412
+                      + m4
+                      + Mac_files
+                      + PaxHeaders.22412
+                      + tests
+                        + PaxHeaders.22412
+                    + gc-7.2
+                      + cord\.deps
+                      + cord
+                      + doc
+                      + extra
+                      + include
+                        + extra
+                        + private
+                      + libatomic_ops
+                        + src\.deps
+                        + doc
+                        + pkgconfig
+                        + src
+                          + atomic_ops
+                            + sysdeps
+                              + armcc
+                              + gcc
+                              + hpc
+                              + ibmc
+                              + icc
+                              + msftc
+                              + sunc
+                        + tests
+                      + m4
+                      + Mac_files
+                      + tests
+                    + gc6.7
+                      + cord
+                      + doc
+                      + extra
+                        + PaxHeaders.22412
+                      + include
+                        + extra
+                        + private
+                      + libatomic_ops
+                        + doc
+                        + PaxHeaders.22412
+                        + pkgconfig
+                        + src
+                          + atomic_ops
+                            + PaxHeaders.22412
+                            + sysdeps
+                              + armcc
+                              + gcc
+                              + hpc
+                              + ibmc
+                              + icc
+                              + msftc
+                              + sunc
+                          + PaxHeaders.22412
+                        + tests
+                          + PaxHeaders.22412
+                      + m4
+                      + Mac_files
+                      + PaxHeaders.22412
+                      + tests
+                        + PaxHeaders.22412
+                    + PaxHeaders.22412
+                  + PaxHeaders.22412
+                + utilities
+                  + PaxHeaders.22412
+              + java
+                + edu
+                  + isi
+                    + ontosaurus
+                      + PaxHeaders.22412
+                    + PaxHeaders.22412
+                    + powerloom
+                      + extensions
+                        + PaxHeaders.22412
+                        + timepoint
+                          + PaxHeaders.22412
+                        + units
+                          + PaxHeaders.22412
+                      + gui
+                        + PaxHeaders.22412
+                      + logic
+                        + PaxHeaders.22412
+                      + PaxHeaders.22412
+                      + pl_kernel_kb
+                        + loom_api
+                          + PaxHeaders.22412
+                        + PaxHeaders.22412
+                      + rdbms
+                        + PaxHeaders.22412
+                      + server
+                        + gui
+                          + PaxHeaders.22412
+                        + PaxHeaders.22412
+                        + plsoap
+                          + PaxHeaders.22412
+                    + sdbc
+                      + PaxHeaders.22412
+                    + stella
+                      + javalib
+                        + PaxHeaders.22412
+                      + PaxHeaders.22412
+                      + utilities
+                        + PaxHeaders.22412
+                    + webtools
+                      + examples
+                        + addressdemo
+                          + PaxHeaders.22412
+                        + addressexample
+                          + PaxHeaders.22412
+                        + fetch
+                          + PaxHeaders.22412
+                        + fetchcontent
+                          + PaxHeaders.22412
+                        + PaxHeaders.22412
+                        + sample
+                          + PaxHeaders.22412
+                      + http
+                        + PaxHeaders.22412
+                        + sun
+                          + PaxHeaders.22412
+                        + tomcat
+                          + PaxHeaders.22412
+                      + objects
+                        + apachesoap
+                          + PaxHeaders.22412
+                        + PaxHeaders.22412
+                        + soap_env
+                          + PaxHeaders.22412
+                        + xml_objects
+                          + PaxHeaders.22412
+                        + xmlschema
+                          + PaxHeaders.22412
+                        + xmlschemainstance
+                          + PaxHeaders.22412
+                      + PaxHeaders.22412
+                      + soap
+                        + PaxHeaders.22412
+                  + PaxHeaders.22412
+                + PaxHeaders.22412
+              + lisp
+                + bin
+                  + acl4.1
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + acl4.2
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + acl4.3
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + acl5.0
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + acl5.0-sun
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + acl5.1
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + acl6.0
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + acl6.0-sun
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + acl6.1
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + acl6.1-sun
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + acl6.2
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + acl6.2-sun
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + acl7.0
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + acl8.0
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + acl8.1
+                    + logic
+                      + PaxHeaders.22412
+                    + PaxHeaders.22412
+                    + powerloom-server
+                      + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                    + webtools
+                      + PaxHeaders.22412
+                  + acl8.2
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + acl9.0
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + acl9.1
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + acl9.2
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + aclx.x
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + clisp
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + cmu
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + cmu18
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + cmu19
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + lcl
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + lcl4.0
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + lcl4.1
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + lisp
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + lw4.0
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + lw4.1
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + mcl
+                    + PaxHeaders.22412
+                    + stella
+                      + PaxHeaders.22412
+                  + PaxHeaders.22412
+                  + sbcl
+                    + logic
+                      + extensions
+                    + PaxHeaders.22412
+                    + powerloom
+                    + stella
+                      + cl-lib
+                      + PaxHeaders.22412
+                    + utilities
+                + logic
+                  + extensions
+                    + PaxHeaders.22412
+                  + PaxHeaders.22412
+                + ontosaurus
+                  + PaxHeaders.22412
+                + PaxHeaders.22412
+                + powerloom
+                  + PaxHeaders.22412
+                + powerloom-server
+                  + gui
+                    + PaxHeaders.22412
+                  + PaxHeaders.22412
+                  + plsoap
+                    + PaxHeaders.22412
+                + rdbms
+                  + PaxHeaders.22412
+                + sdbc
+                  + PaxHeaders.22412
+                + stella
+                  + cl-lib
+                    + PaxHeaders.22412
+                  + PaxHeaders.22412
+                + utilities
+                  + PaxHeaders.22412
+                + webtools
+                  + aserve
+                    + PaxHeaders.22412
+                  + examples
+                    + PaxHeaders.22412
+                  + objects
+                    + PaxHeaders.22412
+                  + PaxHeaders.22412
+              + PaxHeaders.22412
+            + PaxHeaders.22412
+            + sources
+              + hello-world
+              + logic
+                + demos
+                + doc
+                + extensions
+              + ontosaurus
+              + powerloom
+                + doc
+              + powerloom-gui
+                + doc
+                  + api
+                    + edu
+                      + isi
+                        + powerloom
+                          + gui
+                            + common
+                              + class-use
+                            + components
+                              + class-use
+                            + parser
+                              + class-use
+                            + plgui
+                              + class-use
+                            + serverinterface
+                              + class-use
+                            + xmlobject
+                              + class-use
+                  + images
+                  + manuals
+                + META-INF
+                + resources
+                  + conf
+                  + images
+                + src
+                  + edu
+                    + isi
+                      + powerloom
+                        + gui
+                          + common
+                          + components
                           + parser
-                        + process
-                          + socket
-                      + process
-            + org.cs3.prolog.library_3.1.2.201603251848
-              + META-INF
-                + maven
-                  + org.cs3.roots
-                    + org.cs3.prolog.library
-              + pl
-          + pfc
-          + plarkc
-          + pttp
-          + typesystem
-          + xray
-    + logicmoo_utils
-      + prolog
-      + t
-    + loop_check
-      + prolog
-    + multimodal_dcg
-      + prolog
-    + must_trace
-      + prolog
-      + t
-    + no_repeats
-      + prolog
-      + t
-    + pfc
-      + prolog
-        + pfc2.0
-        + pfclib
-    + predicate_streams
-      + prolog
-      + t
-    + prologmud
-      + prolog
-        + prologmud
-          + actions
-          + mobs
-            + affordance
-          + objs
-          + parsing
-          + server
-          + vworld
-    + s_expression
-      + prolog
-      + t
-    + subclause_expansion
-      + prolog
-      + t
-    + with_open_options
-      + prolog
-      + t
-    + with_thread_local
-      + prolog
-      + t
-    + xlisting
-      + prolog
-      + t
-    + xlisting_web
-      + prolog
-        + swish_lib
-          + render
-  - ..\..\packs_xtra
-    - logicmoo_nlu
+                          + plgui
+                          + serverinterface
+                          + xmlobject
+                + tools
+                  + JLex
+                + www
+              + powerloom-server
+                + gui
+                + plsoap
+              + rdbms
+              + sdbc
+              + stella
+                + cl-lib
+                + cpp-lib
+                + doc
+                + emacs
+                + javalib
+              + systems
+              + utilities
+              + webtools
+                + aserve
+                + cl-http
+                + examples
+                + objects
+                + sun
+                + tomcat
+          + PowerLoomEditor
+            + bundles
+              + com.bmstu.powerloom.editor\.settings
+              + com.bmstu.powerloom.editor
+                + icons
+                + META-INF
+                + OSGI-INF
+                + src
+                  + com
+                    + bmstu
+                      + powerloom
+                        + editor
+                          + paneControllers
+                          + panes
+            + features
+              + com.bmstu.powerloom.editor.feature\.settings
+              + com.bmstu.powerloom.editor.feature
+            + products
+              + com.bmstu.powerloom.editor.product
+            + setup-com.bmstu.powerloom.editor
+            + targets
+              + com.bmstu.powerloom.editor.target\.settings
+              + com.bmstu.powerloom.editor.target
+        + reference
+          + lisp_8500
+          + r6rs-plt-redex-model
+        + snark
+          + examples
+          + src
+          + tutorial
+        + TalespinOccam
+        + test_1000
+        + test_cisp
+          + addition
+          + comments
+          + demo
+          + print
+  + ..\..\packs_web
+    - swish
+      - lib
+  + ..\..\packs_xtra
+    + logicmoo_nlu
       - prolog
         - pldata
           - plkb7166
@@ -601,11 +1550,725 @@ wamcl.vpj=20180611194252357
     + pfc2.2
       + src
     + prolog
+      - pfc2.0
+      - pfclib
+    + prolog22
       + pfc2.0
       + pfclib
-    + t
-      + sanity_base
+    - t
+      - sanity_base
         + feature_inherit_kb
+        + xsb-src
+          + altmttest
+            + basic_tests
+            + prolog_tests
+          + mttests
+            + assert_tests
+            + benches
+              + anssub-benches
+              + answer_completion_benches
+              + petri
+              + prolog_benches
+                + consttest
+              + shared_benches
+              + synth_benches
+              + tab_benches
+            + comp_tests
+            + deadlock_tests
+            + io_tests
+            + loader_tests
+            + negation_tests
+            + prolog_tests
+            + shared_tests
+            + symbol_tests
+            + table_tests
+          + XSB
+            + admin
+              + macosx
+              + windows
+            + bin
+            + build
+              + odbc
+              + windows
+              + windows64
+            + cmplib
+            + config
+              + x86_64-unknown-linux-gnu
+                + bin
+                + lib
+            + docs
+              + homepage
+              + old-homepage
+                + flora
+              + techman
+                + figures
+              + userman
+                + cdf
+                + odbc_man
+            + emu
+              + dde
+              + debugs
+              + orastuff
+            + etc
+              + images
+            + examples
+              + c_calling_XSB
+              + chr
+              + chr_d
+              + curl
+                + certificates
+                + expectedoutput
+              + incremental
+              + libwww
+                + files
+              + rdf
+                + expectedoutput
+                + suite
+              + sgml
+                + expectedoutput
+                + files
+              + socket
+                + select
+              + subprocess
+              + threads
+              + xmc
+                + ABP
+                + Iproto
+                + Leader
+                + Metalock
+                + Needham
+                + Rether
+                + Sieve
+                + Tests
+              + xpath
+                + expectedoutput
+                + files
+              + XSB_calling_c
+            + gpp
+            + installer
+              + docs
+            + lib
+            + misc
+              + installation
+            + packages
+              + altCDF
+                + cdf
+                + cdfpt
+                + cdftp
+                  + curtest
+                  + ontologies
+                    + ont1
+                + doc
+                  + Figures
+                + mknf
+                  + tests
+                    + chkCon
+                    + ex_disj
+                + mytest
+                  + cdftest1
+                + scripts
+                + tests
+                  + ce_tests
+                  + onto_tests
+                    + ont1
+              + bounds
+              + CDF
+                + doc
+                + rdf
+                + test
+                  + test2dir
+                  + test3dir
+                  + test5dir
+                  + test6dir
+                + theoremprover
+              + chr
+              + chr_d
+              + clpqr
+              + curl
+                + cc
+                  + bin
+                  + bin64
+                  + curl
+                + Misc
+              + dbdrivers
+                + cc
+                  + windows
+                  + windows64
+                + mysql
+                  + cc
+                    + windows
+                    + windows64
+                  + Misc
+                + mysqlembedded
+                  + cc
+                  + Misc
+                + odbc
+                  + cc
+                    + windows
+                    + windows64
+                  + Misc
+              + gap
+              + justify
+              + libwww
+                + cc
+              + pcre
+                + cc
+                  + bin
+                  + bin64
+                  + pcre
+                + Misc
+              + perlmatch
+                + cc
+              + persistent_tables
+                + doc
+                + examples
+              + pita
+                + examples
+              + rdf
+              + regmatch
+                + cc
+              + sgml
+                + cc
+                  + bin
+                  + bin64
+                  + dtd
+              + slx
+              + viewsys
+                + doc
+                + examples
+                  + viewsys_toy
+              + w4
+              + wildmatch
+                + cc
+              + xasp
+                + doc
+                + intf_examples
+                + makefiles
+                + smodels
+                + tests
+                  + basic_tests
+              + xmc
+                + GUI
+              + xpath
+                + cc
+                  + bin
+                  + bin64
+                  + libxml
+                + Misc
+              + xref
+              + xsbdoc
+                + doc
+            + prolog-commons
+            + prolog_includes
+            + syslib
+          + xsbtests
+            + ai_tests
+            + attv_tests
+            + basic_tests
+            + benches
+              + prolog_benches
+              + synth_benches
+              + xmc
+            + cdf_tests
+              + cdftp_testdir
+              + ce_testdir
+              + check_testdir
+              + comp_testdir
+                + test
+                + test_0
+                + test_int
+                + testo1
+                + testo1_0
+              + comp_testdir2
+                + test
+                + testo1
+              + dl_testdir
+              + io_testdir
+              + type0_testdir
+            + compiler_tests
+            + constraint_tests
+            + delay_tests
+            + float_tests
+            + flora_tests
+              + apptests
+              + datafiles
+              + general_tests
+              + pending_bugs
+            + foreign_tests
+            + incremental_tests
+            + io_tests
+            + neg_tests
+            + nonmt_tests
+            + prolog_tests
+              + parmod_tests
+                + pm_subdir
+            + ptq
+            + regmatch_tests
+            + retract_tests
+            + sem_tests
+              + CSH
+              + tests
+            + socket_tests
+              + auxiliary
+            + sub_table_tests
+            + sub_tests
+              + Data
+              + Programs
+            + table_tests
+            + wfs_tests
+        + yap-6.3
+          + autoconf
+          + BEAM
+          + C
+          + CMakeFiles
+            + 3.5.1
+              + CompilerIdC
+              + CompilerIdCXX
+            + CheckTypeSize
+            + CMakeRelink.dir
+            + git-data
+            + libYap.dir
+            + run_install.dir
+            + yap-bin.dir
+          + cmake
+            + library
+              + system
+            + os
+          + console
+            + LGPL
+            + Qt
+              + build-untitled-Desktop_Qt_5_4_2_clang_64bit-Debug
+                + untitled.app
+                  + Contents
+                    + MacOS
+                    + Resources
+              + untitled
+            + terminal
+              + images
+          + CVSROOT
+          + CXX
+            + CMakeFiles
+              + YAP++.dir
+          + docs
+            + CMakeFiles
+              + docs.dir
+            + custom
+            + icons
+            + md
+            + source
+              + union
+                + d2
+                  + d77
+                + d4
+                  + da6
+                + d5
+                  + dc7
+                + d9
+                  + db2
+                + da
+                  + ded
+                + db
+                  + de7
+                + dd
+                  + d52
+                  + de1
+                + df
+                  + d0e
+                  + d1b
+                  + dfa
+            + sx
+          + H
+            + CMakeFiles
+            + generated
+          + include
+          + info
+          + JIT
+            + examples
+            + HPP
+          + LGPL
+            + pillow
+              + doc
+                + pillow_doc_html
+              + examples
+          + library
+            + clp
+              + CMakeFiles
+            + CMakeFiles
+            + dialect
+              + bprolog
+                + fli
+              + CMakeFiles
+                + dialects.dir
+              + swi
+                + fli
+                  + CMakeFiles
+                    + libswi.dir
+                + os
+                  + libtai
+                  + windows
+            + examples
+            + lammpi
+              + CMakeFiles
+                + yap_mpi.dir
+              + examples
+            + matlab
+              + CMakeFiles
+            + matrix
+              + CMakeFiles
+                + matrix.dir
+            + mpi
+              + examples
+            + random
+              + CMakeFiles
+                + yap_random.dir
+            + regex
+              + CMakeFiles
+                + regexp.dir
+            + rltree
+              + CMakeFiles
+                + yap_rl.dir
+            + system
+              + CMakeFiles
+                + sys.dir
+              + crypto
+            + tries
+              + CMakeFiles
+                + itries.dir
+                + tries.dir
+            + ytest
+              + CMakeFiles
+                + ytest_helpers.dir
+          + misc
+            + editors
+              + AtTmSuCo
+                + Syntax
+              + language-yap
+                + grammars
+                + settings
+                + snippets
+              + sublimeyap
+              + yap.tmbundle
+                + Preferences
+            + tmp
+          + mkdocs
+          + OPTYap
+            + CMakeFiles
+              + libOPTYap.dir
+          + os
+            + CMakeFiles
+              + libYAPOs.dir
+          + packages
+            + bdd
+              + CMakeFiles
+              + cmake
+              + examples
+              + simplecudd
+              + simplecudd_lfi
+            + chr
+              + Benchmarks
+              + Examples
+            + clp_examples
+            + CLPBN
+              + benchmarks
+                + city
+                + comp_workshops
+                + school
+                + social_network2
+                + social_network2_evidence
+                + workshop_attrs
+              + clpbn
+              + CMakeFiles
+              + examples
+                + HMMer
+                + learning
+                + School
+              + horus
+                + CMakeFiles
+                  + CMakeRelink.dir
+                  + horus.dir
+                  + HorusCli.dir
+                + unit_tests
+              + html
+              + learning
+            + clpqr
+              + clpq
+              + clpqr
+              + clpr
+              + CMakeFiles
+            + cplint
+              + approx
+                + simplecuddLPADs
+              + CMakeFiles
+              + doc
+              + em
+              + examples
+              + lemur
+              + rib
+              + slipcase
+              + slipcover
+            + cuda
+              + hippy
+              + old
+            + examples
+            + gecode
+              + 3.6.0
+              + 3.7.0
+              + 3.7.1
+              + 3.7.2
+              + 3.7.3
+              + 4.0.0
+              + 4.2.0
+              + 4.2.1
+              + 4.4.0
+              + 5.0.0
+              + 5.1.0
+              + 6.0.0
+              + 6.0.1
+              + clp_examples
+              + CMakeFiles
+              + dev
+                + extractor
+                  + xml
+              + examples
+            + jpl
+              + CMakeFiles
+              + src
+                + c
+                  + CMakeFiles
+                    + jplYap.dir
+                + java
+                  + CMakeFiles
+                    + jpl.dir
+                  + jpl
+                    + fli
+                    + test
+                    + util
+              + web
+                + jpl
+            + meld
+              + examples
+                + pagerank
+                + temperature
+            + myddas
+              + CMakeFiles
+                + myddas.dir
+              + examples
+              + mysql
+                + CMakeFiles
+              + odbc
+                + CMakeFiles
+                  + YAPodbc.dir
+              + pl
+                + CMakeFiles
+                  + plmyddas.dir
+              + postgres
+                + CMakeFiles
+                  + YAPpostgres.dir
+              + sqlite3
+                + CMakeFiles
+                  + YAPsqlite3.dir
+                + src
+            + packages
+              + python
+            + prism
+              + exs
+                + jtree
+                + noisy_or
+              + src
+                + c
+                  + core
+                  + makefiles
+                  + mp
+                  + up
+                + prolog
+                  + bp
+                  + core
+                  + mp
+                  + trans
+                  + up
+            + ProbLog
+              + CMakeFiles
+              + problog
+              + problog_examples
+            + prosqlite
+              + c
+              + doc
+              + examples
+              + prolog
+            + pyswip
+              + examples
+                + coins
+                + draughts
+                + hanoi
+                + sendmoremoney
+                + sudoku
+              + pyswip
+            + python
+              + CMakeFiles
+                + Py4YAP.dir
+                + YAPPython.dir
+              + examples
+                + pyx
+              + swig
+                + prolog
+                + yap4py
+              + yap_kernel
+                + backcall
+                + core
+                  + yap_kernel
+                + docs
+                + examples
+                  + embedding
+                + yap_ipython
+                  + core
+                    + magics
+                    + tests
+                      + daft_extension
+                  + extensions
+                    + tests
+                  + external
+                    + decorators
+                  + kernel
+                  + lib
+                    + tests
+                  + prolog
+                  + sphinxext
+                  + terminal
+                    + pt_inputhooks
+                    + tests
+                  + testing
+                    + plugin
+                    + tests
+                  + utils
+                    + tests
+                + yap_kernel
+                  + comm
+                  + gui
+                  + inprocess
+                    + tests
+                  + pylab
+                  + tests
+            + raptor
+              + CMakeFiles
+                + libxml2.dir
+              + cmake
+              + doc
+                + CMakeFiles
+                + source
+            + real
+              + CMakeFiles
+              + doc
+              + examples
+            + swi-minisat2
+              + C
+                + CMakeFiles
+                  + minisat2.dir
+              + CMakeFiles
+              + examples
+            + swig
+              + android
+              + java
+              + jni
+              + js
+              + python
+            + udi
+              + b+tree
+              + cmake
+              + rtree
+              + uthash
+            + xml
+              + CMakeFiles
+                + xmlpl.dir
+              + xml_example
+            + yap-lbfgs
+              + doc
+              + liblbfgs-1.10
+                + include
+                + lib
+          + pl
+            + CMakeFiles
+              + STARTUP.dir
+          + PrologCommons
+          + regression
+            + dados
+            + modules
+            + parse
+          + swi
+            + console
+            + library
+              + clp
+              + dcg
+          + swiLibrary
+            + CMakeFiles
+          + utf8proc
+            + bench
+            + CMakeFiles
+              + utf8proc.dir
+            + data
+            + test
+          + utils
+            + analysis
+            + tmp
+  + ..\planner_api
+    + docs
+      + images
+    - prolog
+    - t
+      + domains_ocl
+        + assTaxi
+        + c0251943_WashingMachine
+        - chameleonWorld
+        - icons
+        + library
+        + robot
+        - toasterWorldv2
+      - pddl_files
+        - elearning
+        + psr-large
+        - psr-middle
+        + psr-small
+        + ZenoTravel
+      - prolog_files
+        - delrob
+      + uw-yale-pddl
+        + doc
+        + domains
+          + transplan
+          + washington
+        + src
+        + strict-domains
+          + art
+          + art-1d
+          + art-1d-rd
+          + art-md
+          + art-md-ns
+          + art-md-ns-rd
+          + art-md-rd
+          + assembly
+          + blocks-world
+          + briefcase
+          + d1s1
+          + eight
+          + ferry
+          + fridge
+          + gripper
+          + homeowner
+          + logistics
+          + meet-pass
+          + molgen
+          + monkey
+          + montlake
+          + morris
+          + movie
+          + mystery
+          + occam
+          + safety-domain
+          + tire-world
+          + trains
+          + transplan
+          + travel
+          + truckworld
+          + woodshop
   + ..\predicate_streams
     + prolog
     + t
@@ -625,15 +2288,15 @@ wamcl.vpj=20180611194252357
         + pcl
         - util
   + ..\prologmud
-    + prolog
-      + prologmud
-        + actions
+    - prolog
+      - prologmud
+        - actions
         + mobs
           + affordance
         + objs
-        + parsing
-        + server
-        + vworld
+        - parsing
+        - server
+        - vworld
       + prologmud_web
         + src_assets
         + src_webui
@@ -651,8 +2314,7 @@ wamcl.vpj=20180611194252357
       + prologmud_sample_games\.config
         + butterfly
       + prologmud_sample_games\.swipl-dir-history
-      + prologmud_sample_games\.xpce
-      + prologmud_sample_games
+      - prologmud_sample_games
         + tempDir\.swipl-dir-history
         + tempDir\.xpce
         + attic
@@ -661,149 +2323,6 @@ wamcl.vpj=20180611194252357
         + config-enabled-cliop
         + config-enabled-swish
           + gitty
-        + data
-          + avatars
-          + chat
-            + a3
-              + 8a
-        + gv.git
-          + hooks
-          + info
-        + log
-        + RDF-store
-          + 00
-            + 98
-          + 04
-            + e1
-          + 05
-            + f0
-          + 0c
-            + 3b
-            + e9
-          + 0d
-            + 50
-          + 15
-            + c9
-          + 17
-            + 38
-            + 91
-          + 1b
-            + 33
-            + 3e
-            + 8b
-          + 1d
-            + 08
-          + 20
-            + 15
-          + 21
-            + ee
-          + 26
-            + c0
-          + 27
-            + 02
-          + 2c
-            + eb
-          + 31
-            + 10
-            + 40
-            + 5d
-          + 35
-            + e4
-          + 36
-            + 5e
-          + 3e
-            + b5
-          + 43
-            + 0c
-          + 46
-            + 60
-            + 87
-          + 4d
-            + 0b
-          + 54
-            + ba
-          + 5c
-            + 1f
-          + 5e
-            + 42
-            + ab
-            + e3
-          + 63
-            + 49
-          + 6b
-            + 7a
-          + 6c
-            + cf
-          + 71
-            + 03
-            + 35
-          + 77
-            + 7e
-          + 80
-            + c7
-          + 82
-            + 84
-          + 84
-            + 02
-          + 87
-            + d1
-          + 89
-            + 72
-          + 92
-            + 6a
-          + 95
-            + ab
-            + d2
-          + 98
-            + 2b
-            + 2c
-          + 9d
-            + e9
-          + a2
-            + d6
-            + e5
-          + b1
-            + 72
-          + b8
-            + b1
-            + e2
-          + bb
-            + f9
-          + be
-            + 4f
-          + ca
-            + 32
-          + cd
-            + df
-          + ce
-            + 32
-          + d1
-            + b5
-          + d5
-            + f1
-          + d6
-            + db
-          + d9
-            + c3
-          + dd
-            + 7c
-          + e6
-            + 39
-            + 4a
-          + e9
-            + 54
-          + f1
-            + 9d
-          + f6
-            + 83
-            + df
-          + fc
-            + 2e
-          + fd
-            + f9
-          + ff
-            + 24
-            + 82
         + src_game_nani
           + web
             + css
@@ -983,6 +2502,20 @@ wamcl.vpj=20180611194252357
     + reference
       + lisp_8500
       + r6rs-plt-redex-model
+  + ..\tabling_dra
+    + prolog
+    + t
+      + Bench
+        + aspclp
+        + clpfd
+        + prolog
+        + tabling
+      + examples
+        + LTL
+        + XSB
+      + mttests
+      + negation_tests
+      + table_tests
   + ..\with_open_options
     + prolog
     + t
@@ -998,41 +2531,164 @@ wamcl.vpj=20180611194252357
       + swish_lib
         + render
     + t
-scroll:30
+scroll:0
 [State]
-SCREEN: 1680 1050 -683 811 1678 1048 0 0 M 0 0 0 0 1156 413
-CWD: ..\alpprolog\prolog
-BUFFER: BN="..\alpprolog\prolog\alpprolog.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.12452 CL=56 LE=0 CX=55 CY=5 WI=5 BI=20 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\logicmoo_base\t\examples\api\chr_01.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.1968 CL=65 LE=0 CX=64 CY=9 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
-BUFFER: BN="..\alpprolog\prolog\wumpus_world_big.pl"
-BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=32 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
-VIEW: LN=.4223 CL=32 LE=0 CX=31 CY=8 WI=5 BI=19 HT=0 HN=0 HF=0 HC=4
-WINDOW: 44 44 1024 281 -1 -1 N  WF=0 WT=5 ",,,"
-BUFFER: BN="..\logicmoo_base\t\examples\api\chr_01.pl"
-VIEW: LN=.1968 CL=65 LE=0 CX=64 CY=9 WI=152 BI=17 HT=0 HN=0 HF=0 HC=4
-WINDOW: 0 0 1024 281 -1 -1 N  WF=0 WT=3 "Default Fixed Font,14,0,1"
-BUFFER: BN="..\logicmoo_base\t\examples\api\chr_01.pl"
-VIEW: LN=.1968 CL=65 LE=0 CX=64 CY=9 WI=86 BI=17 HT=0 HN=0 HF=0 HC=4
-WINDOW: 132 132 1024 281 -1 -1 N  WF=0 WT=2 "Default Fixed Font,14,0,1"
-BUFFER: BN="..\alpprolog\prolog\alpprolog.pl"
-VIEW: LN=.12452 CL=56 LE=0 CX=55 CY=5 WI=83 BI=20 HT=0 HN=0 HF=0 HC=4
-WINDOW: 22 22 1024 281 -1 -1 M  WF=0 WT=4 "Default Fixed Font,14,0,1"
-BUFFER: BN="..\alpprolog\prolog\wumpus_world_big.pl"
-VIEW: LN=.4282 CL=45 LE=0 CX=44 CY=10 WI=87 BI=19 HT=0 HN=0 HF=0 HC=4
+SCREEN: 1920 1200 1097 285 1440 669 0 0 N 0 0 0 0 1126 303
+CWD: D:\Office\SlickEdit\win
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\util\imisce.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.929 CL=5 LE=0 CX=4 CY=18 WI=5 BI=28 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\swiload.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.2607 CL=32 LE=0 CX=31 CY=23 WI=5 BI=22 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\must_trace\prolog\dumpst.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.7865 CL=19 LE=0 CX=18 CY=18 WI=5 BI=30 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\util\betwee.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.415 CL=8 LE=0 CX=7 CY=22 WI=5 BI=27 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\util\files.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.480 CL=48 LE=0 CX=47 CY=23 WI=5 BI=26 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\pressdir\package\int.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=25 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\pressdir\package\diff.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.666 CL=46 LE=0 CX=45 CY=12 WI=5 BI=24 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\logicmoo_utils\prolog\logicmoo_util_startup.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.9426 CL=6 LE=0 CX=5 CY=19 WI=5 BI=35 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\pressdir\pressjunk\press.def"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=34 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\pressdir\pressjunk\press"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.206342 CL=123 LE=4 CX=118 CY=18 WI=5 BI=33 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\pressdir\methods\chunk.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=5 BI=32 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\must_trace\prolog\frames.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.4342 CL=47 LE=0 CX=46 CY=6 WI=5 BI=31 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\pressdir\toplevel\solve.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.299 CL=2 LE=0 CX=1 CY=8 WI=5 BI=23 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\pressdir\methods\poly.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.229 CL=1 LE=0 CX=0 CY=7 WI=5 BI=21 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\pressdir\methods\homog_trg.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1949 CL=1 LE=0 CX=0 CY=23 WI=5 BI=20 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\pressdir\methods\nasty.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1524 CL=2 LE=0 CX=1 CY=23 WI=5 BI=19 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\pressdir\misc\misc.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.8042 CL=24 LE=0 CX=23 CY=18 WI=5 BI=18 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\lpdir\sol.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.18875 CL=13 LE=0 CX=12 CY=16 WI=5 BI=17 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\util\tidy.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.10307 CL=2 LE=0 CX=1 CY=4 WI=5 BI=16 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\util\gensym.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1123 CL=12 LE=0 CX=11 CY=23 WI=5 BI=15 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\pressdir\pressjunk\filin"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.2779 CL=37 LE=0 CX=36 CY=18 WI=5 BI=14 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\pressdir\pressjunk\filin.dist"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=1 ST=0 IN=1 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=Fundamental	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.2610 CL=37 LE=0 CX=36 CY=18 WI=5 BI=13 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\symdiff2.pl"
+BI: MA=1 74 1  TABS=1 9  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=pl	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0 E=0 ESBU2=-1
+VIEW: LN=.1153 CL=13 LE=0 CX=12 CY=10 WI=5 BI=29 HT=0 HN=0 HF=0 HC=4
+WINDOW: 154 154 1350 578 -1 -1 N  WF=0 WT=12 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\pressdir\pressjunk\filin.dist"
+VIEW: LN=.2610 CL=37 LE=0 CX=36 CY=18 WI=133 BI=13 HT=0 HN=0 HF=0 HC=4
+WINDOW: 132 132 1350 578 -1 -1 N  WF=0 WT=11 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\pressdir\pressjunk\filin"
+VIEW: LN=.2779 CL=37 LE=0 CX=36 CY=18 WI=132 BI=14 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1350 578 -1 -1 N  WF=0 WT=10 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\util\gensym.pl"
+VIEW: LN=.1123 CL=12 LE=0 CX=11 CY=23 WI=131 BI=15 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1350 578 -1 -1 N  WF=0 WT=9 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\util\tidy.pl"
+VIEW: LN=.10307 CL=2 LE=0 CX=1 CY=4 WI=130 BI=16 HT=0 HN=0 HF=0 HC=4
+WINDOW: 66 66 1350 578 -1 -1 N  WF=0 WT=8 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\lpdir\sol.pl"
+VIEW: LN=.18875 CL=13 LE=0 CX=12 CY=16 WI=129 BI=17 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1350 578 -1 -1 N  WF=0 WT=7 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\pressdir\misc\misc.pl"
+VIEW: LN=.8042 CL=24 LE=0 CX=23 CY=18 WI=128 BI=18 HT=0 HN=0 HF=0 HC=4
+WINDOW: 22 22 1350 578 -1 -1 N  WF=0 WT=6 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\pressdir\methods\nasty.pl"
+VIEW: LN=.1524 CL=2 LE=0 CX=1 CY=23 WI=127 BI=19 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1350 578 -1 -1 N  WF=0 WT=5 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\pressdir\methods\homog_trg.pl"
+VIEW: LN=.1949 CL=1 LE=0 CX=0 CY=23 WI=126 BI=20 HT=0 HN=0 HF=0 HC=4
+WINDOW: 264 264 1350 578 -1 -1 N  WF=0 WT=4 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\pressdir\methods\poly.pl"
+VIEW: LN=.229 CL=1 LE=0 CX=0 CY=7 WI=125 BI=21 HT=0 HN=0 HF=0 HC=4
+WINDOW: 220 220 1350 578 -1 -1 N  WF=0 WT=2 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\pressdir\toplevel\solve.pl"
+VIEW: LN=.299 CL=2 LE=0 CX=1 CY=8 WI=124 BI=23 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1038 215 -1 -1 N  WF=0 WT=14 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\must_trace\prolog\frames.pl"
+VIEW: LN=.4342 CL=47 LE=0 CX=46 CY=6 WI=123 BI=31 HT=0 HN=0 HF=0 HC=4
+WINDOW: 66 66 1038 215 -1 -1 N  WF=0 WT=15 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\must_trace\prolog\frames.pl"
+VIEW: LN=.4342 CL=47 LE=0 CX=46 CY=6 WI=122 BI=31 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1038 215 -1 -1 N  WF=0 WT=16 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\pressdir\methods\chunk.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=121 BI=32 HT=0 HN=0 HF=0 HC=4
+WINDOW: 44 44 1350 578 -1 -1 N  WF=0 WT=17 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\pressdir\pressjunk\press"
+VIEW: LN=.206342 CL=123 LE=4 CX=118 CY=18 WI=120 BI=33 HT=0 HN=0 HF=0 HC=4
+WINDOW: 66 66 1350 578 -1 -1 N  WF=0 WT=18 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\pressdir\pressjunk\press.def"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=119 BI=34 HT=0 HN=0 HF=0 HC=4
+WINDOW: 88 88 1350 578 -1 -1 N  WF=0 WT=19 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\logicmoo_utils\prolog\logicmoo_util_startup.pl"
+VIEW: LN=.9426 CL=6 LE=0 CX=5 CY=19 WI=118 BI=35 HT=0 HN=0 HF=0 HC=4
+WINDOW: 176 176 1350 578 -1 -1 N  WF=0 WT=1 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\pressdir\package\diff.pl"
+VIEW: LN=.666 CL=46 LE=0 CX=45 CY=12 WI=117 BI=24 HT=0 HN=0 HF=0 HC=4
+WINDOW: 110 110 1350 578 -1 -1 N  WF=0 WT=20 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\pressdir\package\int.pl"
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=0 WI=116 BI=25 HT=0 HN=0 HF=0 HC=4
+WINDOW: 132 132 1350 578 -1 -1 N  WF=0 WT=21 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\util\files.pl"
+VIEW: LN=.480 CL=48 LE=0 CX=47 CY=23 WI=115 BI=26 HT=0 HN=0 HF=0 HC=4
+WINDOW: 154 154 1350 578 -1 -1 N  WF=0 WT=22 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\util\betwee.pl"
+VIEW: LN=.415 CL=8 LE=0 CX=7 CY=22 WI=114 BI=27 HT=0 HN=0 HF=0 HC=4
+WINDOW: 198 198 1350 578 -1 -1 N  WF=0 WT=24 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\must_trace\prolog\dumpst.pl"
+VIEW: LN=.7865 CL=19 LE=0 CX=18 CY=18 WI=113 BI=30 HT=0 HN=0 HF=0 HC=4
+WINDOW: 220 220 1350 578 -1 -1 N  WF=0 WT=25 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\must_trace\prolog\frames.pl"
+VIEW: LN=.4171 CL=63 LE=0 CX=62 CY=23 WI=112 BI=31 HT=0 HN=0 HF=0 HC=4
+WINDOW: 242 242 1350 578 -1 -1 N  WF=0 WT=3 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\swiload.pl"
+VIEW: LN=.2607 CL=32 LE=0 CX=31 CY=23 WI=111 BI=22 HT=0 HN=0 HF=0 HC=4
+WINDOW: 176 176 1350 578 -1 -1 N  WF=0 WT=23 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\util\imisce.pl"
+VIEW: LN=.929 CL=5 LE=0 CX=4 CY=18 WI=110 BI=28 HT=0 HN=0 HF=0 HC=4
+WINDOW: 242 242 1350 578 -1 -1 M  WF=0 WT=13 "Default Fixed Font,14,0,1"
+BUFFER: BN="..\logicmoo_base\prolog\logicmoo\equations\symdiff2.pl"
+VIEW: LN=.1153 CL=18 LE=0 CX=17 CY=10 WI=134 BI=29 HT=0 HN=0 HF=0 HC=4
 FILEHIST: 9
-..\alpprolog\FluxVersion\Nonground\fluent.chr
-..\hook_hybrid\pack.pl
-..\alpprolog\pack.pl
-..\alpprolog\prolog\wumpus_world_big.ecl
-..\alpprolog\prolog\alpprolog.ecl
-..\alpprolog\prolog\alpprolog.pl
-..\logicmoo_base\t\examples\api\chr_01.pl
-..\alpprolog\prolog\flux\swi_fd.pl
-..\alpprolog\prolog\wumpus_world_big.pl
+..\logicmoo_base\prolog\logicmoo\equations\pressdir\package\diff.pl
+..\logicmoo_base\prolog\logicmoo\equations\pressdir\package\int.pl
+..\logicmoo_base\prolog\logicmoo\equations\util\files.pl
+..\logicmoo_base\prolog\logicmoo\equations\util\betwee.pl
+..\must_trace\prolog\dumpst.pl
+..\logicmoo_base\prolog\logicmoo\equations\util\imisce.pl
+..\must_trace\prolog\frames.pl
+..\logicmoo_base\prolog\logicmoo\equations\swiload.pl
+..\logicmoo_base\prolog\logicmoo\equations\symdiff2.pl
 DEBUG: 0 0 0 0 5 0
 java.*
 javax.*

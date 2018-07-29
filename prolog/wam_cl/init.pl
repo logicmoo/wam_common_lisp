@@ -23,7 +23,7 @@
 :- set_prolog_flag(toplevel_print_anon,true).
 :- set_prolog_flag(last_call_optimisation,false).
 :- set_prolog_flag(lisp_verbose,1).
-:- set_prolog_flag(lisp_primordial,true).
+:- set_prolog_flag(lisp_primordial,starting).
 :- set_prolog_flag(lisp_markdown,false).
 :- set_prolog_flag(lisp_exe,[]).
 :- set_prolog_flag(lisp_main,[]).
@@ -54,7 +54,7 @@ set_lisp_option(optimize):-
   set_prolog_flag(last_call_optimisation,true).
 
 
-lisp:-
+lisp:- 
  must(do_wamcl_inits), 
  must(lisp_goal).
 
@@ -180,37 +180,53 @@ __        ___    __  __        ____ _
 primordial_init:- current_prolog_flag(wamcl_init_level,N),N>0,!.
 primordial_init:- 
  set_prolog_flag(wamcl_init_level,1),
- always((
+   set_prolog_flag(logicmoo_message_hook, break),
+   set_prolog_flag(gc, false),
+ must_det_l((
   % allows "PACKAGE:SYM" to be created on demand (could this be an initials a default)  
   set_opv(xx_package_xx,symbol_value, pkg_sys),
   ensure_env,
   set_opv(xx_package_xx,symbol_value,pkg_sys),
-  set_prolog_flag(lisp_primordial,true),
-  current_prolog_flag(os_argv,Y),handle_all_os_program_args(Y),
-  clear_op_buffer,  
+  set_prolog_flag(lisp_primordial,true),  
+  current_prolog_flag(os_argv,Y),handle_all_os_program_args(Y),  
+  show_must(set_opv(sym('sys:*LISP-HOME*'), symbol_value, ".")),  
+  (clear_op_buffer),
   set_prolog_flag(wamcl_init_level,2),
   current_prolog_flag(argv,Y2),handle_all_program_args(Y2),
-  clear_op_buffer,
+  (clear_op_buffer),
   set_prolog_flag(wamcl_init_level,3))). 
 
 % system sourcefile load hooks
 do_wamcl_inits:- current_prolog_flag(wamcl_init_level,N),N>5,!.
 do_wamcl_inits:-
- must_det_l((
-  primordial_init,
-  set_prolog_flag(wamcl_init_level,6),
-  clear_op_buffer,
+ set_prolog_flag(logicmoo_message_hook, break),
+ set_prolog_flag(gc, false),
+ current_prolog_flag(access_level, W),
+ set_prolog_flag(access_level, system),
+ must_det_l((  
+  
+  (primordial_init),
+  set_prolog_flag(wamcl_init_level,6),  
+  (clear_op_buffer),
   set_opv(xx_package_xx,symbol_value,pkg_user),
   set_prolog_flag(wamcl_gvars,true),
-  set_prolog_flag(wamcl_init_level,7))).
+  set_prolog_flag(wamcl_init_level,7))),
+ set_prolog_flag(access_level, W).
+
+:- ensure_loaded(eightball).
 
 % program inits
-clear_op_buffer:-   
-   forall(clause(wl:interned_eval(G),Body,R),
-    (forall(Body,always(do_interned_eval(G))),
-     erase(R))).
-clear_op_buffer.
+clear_op_buffer:- % trace('8ball':always/1,[+call,+exit,+fail]),
+   forall((clause(wl:interned_eval(G),Body,R),dmsg(wl:interned_eval(G):-Body)),
+         (forall((show_must((Body))),(show_must((do_interned_eval(G))))),
+           erase(R))),
+   fail.
+clear_op_buffer:- % trace('8ball':always/1,[-call,-exit,+fail]), 
+   dmsg(clear_op_buffer_complete),!.
+clear_op_buffer:- true.
 
+show_must(true):-!.
+show_must(G):-dmsg(doing(G)),(G*->dmsg(did(G));must(G)).
 
 show_help:- writeln(
 'WAM-CL (https://github.com/TeamSPoon/wam_common_lisp) is an ANSI Common Lisp implementation.

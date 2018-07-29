@@ -556,10 +556,10 @@ maybe_inline(C1):- \+ predicate_property(C1,dynamic),!,fail.
 clause_has_cuts(P):- clause_interface(P,I),contains_var(!,I).
 clause_calls_self(P):- clause_interface(P,I),functor(P,F,A),functor(C,F,A),contains_term(E,I),compound(E),E=C.
 
-clause_interface(P,I):-clause(P,I).
+clause_interface(P,I):- predicate_property(P,number_of_clauses(_)), clause(P,I).
 clause_interface(P,I):- wl:pass_clause(_,P,I).
 
-clause_interface(P,I,R):-clause(P,I,R).
+clause_interface(P,I,R):- predicate_property(P,number_of_clauses(_)),clause(P,I,R).
 clause_interface(P,I,R):- wl:pass_clause(R,P,I).
 
 
