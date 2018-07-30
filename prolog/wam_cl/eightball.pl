@@ -135,9 +135,8 @@ always([]):-!.
 always([A|B]):-!,always(A),always(B),!.
 %always(MG):- strip_module(MG,M,G),!,rtrace(M:G).
 
-always(MG):- always_skip_always, !, call(MG).
+always(MG):- always_skip_always, !, (call(MG) *->true;throw(failed_always(MG))).
 /*
-always(MG):- always_skip_always, !, (MG*->true;throw(failed_always(MG))).
 always(MG):- copy_term(MG,MGC),call(MG),once(always_borked(MGC)).
 always_borked(MG):-
   strip_module(MG,M,G),

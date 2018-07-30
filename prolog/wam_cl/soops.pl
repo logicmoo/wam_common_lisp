@@ -113,14 +113,14 @@ create_object_instance(Kind,Type,Name,Obj):- sanity(atom(Name)),
 
 
 new_init_instance_pt2(_SKind,_Name,Attrs,Obj,Kind):-
-  always((     
+  must_det_l((     
    init_instance_slots(Kind,1,Obj,Attrs),
    call_init_slot_props(Kind,Obj))).  
 
 call_init_slot_props(Kind,Obj):- get_opv_iiii(Obj,sys_initialized,Kind),!.
-call_init_slot_props(Kind,Obj):- add_opv_new_iiii(Obj,sys_initialized,Kind),
- always((
-  forall(get_kind_supers(Kind,Sup),call_init_slot_props(Sup,Obj)),
+call_init_slot_props(Kind,Obj):- 
+  must_det_l((add_opv_new_iiii(Obj,sys_initialized,Kind), 
+  % forall(get_kind_supers(Kind,Sup),always(call_init_slot_props(Sup,Obj))),
   ensure_opv_type_inited(Kind),
    forall(get_struct_opv(Kind,sys_initform,Value,ZLOT),
       (  get_opv_iii(Kind,Obj,ZLOT,_)-> true ; 
