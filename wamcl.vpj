@@ -68,6 +68,14 @@
 		</Folder>
 	</CustomFolders>
 	<Files AutoFolders="DirectoryView">
+		<Folder Name="../body_reordering">
+			<Folder Name="prolog">
+				<F N="../body_reordering/prolog/logicmoo_util_autocut.pl"/>
+				<F N="../body_reordering/prolog/logicmoo_util_body_nauts.pl"/>
+				<F N="../body_reordering/prolog/logicmoo_util_body_reorder.pl"/>
+				<F N="../body_reordering/prolog/logicmoo_util_body_textstr.pl"/>
+			</Folder>
+		</Folder>
 		<Folder Name="../flux">
 			<Folder Name="prolog">
 				<Folder Name="FluxVersion">

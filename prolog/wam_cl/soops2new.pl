@@ -118,9 +118,9 @@ new_init_instance_pt2(_SKind,_Name,Attrs,Obj,Kind):-
    call_init_slot_props(Kind,Obj))).  
 
 call_init_slot_props(Kind,Obj):- get_opv_iiii(Obj,sys_initialized,Kind),!.
-call_init_slot_props(Kind,Obj):- 
-  must_det_l((add_opv_new_iiii(Obj,sys_initialized,Kind), 
-  % forall(get_kind_supers(Kind,Sup),always(call_init_slot_props(Sup,Obj))),
+call_init_slot_props(Kind,Obj):- add_opv_new_iiii(Obj,sys_initialized,Kind),
+ must_det_l((
+  forall(get_kind_supers(Kind,Sup),call_init_slot_props(Sup,Obj)),
   ensure_opv_type_inited(Kind),
    forall(get_struct_opv(Kind,sys_initform,Value,ZLOT),
       (  get_opv_iii(Kind,Obj,ZLOT,_)-> true ; 
@@ -153,13 +153,13 @@ f_sys_set_class_slot_value(Kind,Obj,Slot,Value,Value):- set_kind_object_slot_val
 
 get_kind_object_slot_value(Kind,Obj,Key,Value):- 
   always(( (nonvar(Kind),get_kind_or_supers_slot_name(Kind,Key,SlotName)) 
-     ->get_opv(Obj,SlotName,Value);
-       (get_object_slot_name(Obj,Key,SlotName), get_opv(Obj,SlotName,Value)))),!.
+     ->always((get_opv(Obj,SlotName,Value)));
+       always(((get_object_slot_name(Obj,Key,SlotName), get_opv(Obj,SlotName,Value)))))),!.
 
 set_kind_object_slot_value(Kind,Obj,Key,Value):- 
   always(( (nonvar(Kind),get_kind_or_supers_slot_name(Kind,Key,SlotName)) 
-     ->set_opv(Obj,SlotName,Value);
-       (get_object_slot_name(Obj,Key,SlotName), set_opv(Obj,SlotName,Value)))),!.
+     ->always((set_opv(Obj,SlotName,Value)));
+       always(((get_object_slot_name(Obj,Key,SlotName), set_opv(Obj,SlotName,Value)))))),!.
 
 
 get_object_slot_name(Obj,Key,SlotName):- 
@@ -579,16 +579,9 @@ personal_props(ref).
 personal_props(sys_initialized).
 
 
-wl:init_args(x,sys_show_iprops).
-wl:interned_eval('`sys:show-iprops').
-f_sys_show_iprops(Obj,Result):- nonvar(Obj),findall([Prop|Value],get_opv_i(Obj,Prop,Value),ResultL),
-  wdmsg(ResultL),
-  list_to_set(ResultL,Result).
-
 wl:init_args(x,sys_get_iprops).
 wl:interned_eval('`sys:get-iprops').
 f_sys_get_iprops(Obj,Result):- nonvar(Obj),findall([Prop|Value],get_opv_i(Obj,Prop,Value),ResultL),list_to_set(ResultL,Result).
-
 wl:init_args(x,sys_get_opv).
 wl:interned_eval('`sys:get-opv').
 f_sys_get_opv(Obj,Prop,Value):- get_opv(Obj,Prop,Value).
@@ -939,7 +932,6 @@ add_slot_def(_DefType,N,Kind,[Prop|Keys]):- add_slot_def_props(N,Kind,Prop,Keys)
 
 add_slot_def_props(N,Kind,SlotSym,MoreInfo):-
    always((gen_slot_name('',Kind,SlotSym,ZLOT),
-     wdmsg(assert_struct_opv4(Kind,name,SlotSym,ZLOT)),
      assert_struct_opv4(Kind,name,SlotSym,ZLOT), 
    to_prolog_string_anyways(SlotSym,SName),
 

@@ -2,7 +2,9 @@
 <Workspace Version="10.0" VendorName="SlickEdit">
 	<Projects>
 		<Project File="../../packs_xtra/packs_xtra.vpj"/>
+		<Project File="../../prolog.vpj"/>
 		<Project File="../PrologMUDDebug.vpj"/>
+		<Project File="../../taupl/qulog0.4/QuProlog/qp.vpj"/>
 		<Project File="../../taupl/SxxLog/SxxLog.vpj"/>
 		<Project File="wamcl.vpj"/>
 	</Projects>

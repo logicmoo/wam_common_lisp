@@ -18,7 +18,8 @@
 :- module(comp, []).
 :- set_module(class(library)).
 :- include('./header').
-:- use_module(library(pce)).
+
+% :- use_module(library(pce)).
 
 lisp_eval(SExpression):- lisp_compiled_eval(SExpression),!.
 
