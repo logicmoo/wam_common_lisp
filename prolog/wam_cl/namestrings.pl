@@ -24,8 +24,8 @@
 
 :- include('./header').
 
-%:- if(exists_source(library(hybrid_db/portray_vars))).
-%:- reexport(library(hybrid_db/portray_vars)).
+%:- if(exists_source(library(logicmoo/portray_vars))).
+%:- reexport(library(logicmoo/portray_vars)).
 
 
 

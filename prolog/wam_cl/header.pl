@@ -40,7 +40,7 @@
 :- endif.
 :- endif.
 
-%:- use_module(library(hybrid_db/portray_vars)).
+%:- use_module(library(logicmoo/portray_vars)).
 
 :- multifile(wl:symbol_has_prop_set_get/4).
 :- multifile(wl:symbol_has_prop_getter/3).
@@ -159,7 +159,7 @@
 
 :- ensure_loaded('init').
 :- use_module(library(logicmoo_common)).
-:- user:ensure_loaded(library(hybrid_db/portray_vars)).
+:- user:ensure_loaded(library(logicmoo/portray_vars)).
 :- ensure_loaded(eightball).
 :- ensure_loaded(utests).
 :- ensure_loaded(places).
