@@ -13,15 +13,17 @@
  * The program is a *HUGE* common-lisp compiler/interpreter. It is written for YAP/SWI-Prolog .
  *
  *******************************************************************/
-:- module(cl, []).
-
-:- use_module('../wam_cl/init.pl').
- 
+:- module(cl, []). 
 
 :- include('./header').
 
 % :- cls.
-:- Six = 6, set_prolog_stack(global, limit(Six*10**9)),set_prolog_stack(local, limit(Six*10**9)),set_prolog_stack(trail, limit(Six*10**9)).
+set_stack_gb:- Six = 6, 
+   Size is Six*10**9,
+   set_prolog_flag(stack_limit, Size),
+   set_prolog_stack(global, limit(Size)),
+   set_prolog_stack(local, limit(Size)),
+   set_prolog_stack(trail, limit(Size)).
 %:- set_prolog_flag(occurs_check,error).
 %:- set_prolog_flag(gc,true).
 %:- set_prolog_flag(gc,false).

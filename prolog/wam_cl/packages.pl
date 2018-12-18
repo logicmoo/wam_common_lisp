@@ -449,6 +449,8 @@ package_use_list(pkg_xp, pkg_cl).
 
 :- decl_mapped_opv(claz_package,[uses=package_use_list]).
 
+atom_concat_if_new(Prefix,Atom,NewAtom):-
+  (atom_concat_or_rtrace(Prefix,_,Atom)-> NewAtom=Atom ; atom_concat_or_rtrace(Prefix,Atom,NewAtom)).
 
 
 symbol_case_name(Name,Package,ProposedName):- 

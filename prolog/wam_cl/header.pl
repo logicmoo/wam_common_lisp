@@ -16,6 +16,7 @@
  *
  *******************************************************************/
 
+
 :- set_prolog_flag(generate_debug_info, true).
 
 % :- require([colormsg1/1]).
@@ -23,7 +24,6 @@
 :- multifile(user:portray/1).
 :- dynamic(user:portray/1).
 :- discontiguous(user:portray/1).
-
 
 
 :- if(current_prolog_flag(debug,false)).
@@ -40,19 +40,7 @@
 :- endif.
 :- endif.
 
-:- use_module(library(hook_database)).
-:- use_module(library(must_trace)).
-:- use_module(library(logicmoo_util_terms)).
-:- use_module(library(logicmoo_util_common)).
-%:- use_module(library(logicmoo_util_startup)).
-:- system:use_module(library(logicmoo_util_startup)).
-:- use_module(library(listing_vars)).
-
-:- user:use_module(library(each_call_cleanup)).
-:- use_module(library(with_thread_local)).
-:- user:use_module(library(globals_api)).
-:- use_module(library(dmsg)).
-
+%:- use_module(library(hybrid_db/portray_vars)).
 
 :- multifile(wl:symbol_has_prop_set_get/4).
 :- multifile(wl:symbol_has_prop_getter/3).
@@ -169,7 +157,9 @@
 :- multifile(ssip_define/2).
 :- discontiguous(ssip_define/2).
 
-
+:- ensure_loaded('init').
+:- use_module(library(logicmoo_common)).
+:- user:ensure_loaded(library(hybrid_db/portray_vars)).
 :- ensure_loaded(eightball).
 :- ensure_loaded(utests).
 :- ensure_loaded(places).

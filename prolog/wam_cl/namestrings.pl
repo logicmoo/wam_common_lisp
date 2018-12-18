@@ -23,11 +23,33 @@
 :- module(pnames, []).
 
 :- include('./header').
-%:- set_prolog_flag(verbose_load,full).
-:- set_prolog_flag(verbose,normal).
-%:- set_prolog_flag(verbose_autoload,true).
+
+%:- if(exists_source(library(hybrid_db/portray_vars))).
+%:- reexport(library(hybrid_db/portray_vars)).
 
 
+
+atom_concat_suffix('',Result,Result):-!.
+atom_concat_suffix(Result,'',Result):-!.
+atom_concat_suffix(Root,Suffix,Root):- atom_concat(_,Suffix,Root),!.
+atom_concat_suffix(Root,Suffix,Result):- 
+  atom_trim_prefix(Suffix,'_',Suffix2),
+  atom_trim_suffix(Root,'_',Root2),
+  atomic_list_concat([Root2,Suffix2],'_',Result),!.
+   
+
+:- fixup_exports.
+
+end_of_file.
+
+:- else.
+
+atom_concat_if_new(Prefix,Atom,NewAtom):-
+  (atom_concat_or_rtrace(Prefix,_,Atom)-> NewAtom=Atom ; atom_concat_or_rtrace(Prefix,Atom,NewAtom)).
+
+
+atom_trim_prefix(Root,Prefix,Result):- atom_concat(Prefix,Result,Root) -> true ; Result=Root.
+atom_trim_suffix(Root,Suffix,Result):- atom_concat(Result,Suffix,Root) -> true ; Result=Root.
 
 % debug_var(_A,_Var):-!.
 debug_var(X,Y):- notrace(catch(debug_var0(X,Y),_,fail)) -> true ; rtrace(debug_var0(X,Y)).
@@ -143,22 +165,6 @@ prologcase_name0(String,ProposedName):-
   string_lower(String,In),string_codes(In,Was),!,filter_var_chars(Was,CS),!,name(ProposedName,CS),!.
 
 
-atom_concat_if_new(Prefix,Atom,NewAtom):-
-  (atom_concat_or_rtrace(Prefix,_,Atom)-> NewAtom=Atom ; atom_concat_or_rtrace(Prefix,Atom,NewAtom)).
+:- endif.
 
-
-atom_trim_prefix(Root,Prefix,Result):- atom_concat(Prefix,Result,Root) -> true ; Result=Root.
-atom_trim_suffix(Root,Suffix,Result):- atom_concat(Result,Suffix,Root) -> true ; Result=Root.
-
-atom_concat_suffix('',Result,Result):-!.
-atom_concat_suffix(Result,'',Result):-!.
-atom_concat_suffix(Root,Suffix,Root):- atom_concat(_,Suffix,Root),!.
-atom_concat_suffix(Root,Suffix,Result):- 
-  atom_trim_prefix(Suffix,'_',Suffix2),
-  atom_trim_suffix(Root,'_',Root2),
-  atomic_list_concat([Root2,Suffix2],'_',Result),!.
-   
-
-
-:- fixup_exports.
 

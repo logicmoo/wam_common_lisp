@@ -15,10 +15,9 @@
 :- module(in1t, []).
 
 
-
 :- set_prolog_flag(backtrace,true).
 :- set_prolog_flag(backtrace_depth,500).
-:- set_prolog_flag(backtrace_goal_depth,30).
+%:- set_prolog_flag(backtrace_goal_depth,30).
 :- set_prolog_flag(backtrace_show_lines,true).
 :- set_prolog_flag(toplevel_print_anon,true).
 :- set_prolog_flag(last_call_optimisation,false).
@@ -28,8 +27,6 @@
 :- set_prolog_flag(lisp_exe,[]).
 :- set_prolog_flag(lisp_main,[]).
 :- create_prolog_flag(wamcl_init_level,0,[keep(true)]).
-
-:- include('./header').
 
 set_lisp_option(verbose):- 
    set_prolog_flag(verbose_load,full),
@@ -298,6 +295,9 @@ $ swipl -x wamcl.prc
 :- set_opv(xx_package_xx,symbol_value,pkg_sys).
 
 :- fixup_exports.
+
+:- include('./header').
+
 
 %:- set_prolog_flag(verbose_autoload,false).
 

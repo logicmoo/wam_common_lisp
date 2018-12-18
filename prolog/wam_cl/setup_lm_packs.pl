@@ -1,4 +1,5 @@
 
+end_of_file.
 
 
 :- if(\+ current_predicate(setup_hist0/0)).
@@ -74,7 +75,7 @@ add_pack_path(Rel):-
 attach_packs_n_utils:-
    attach_packs,
    use_module(library(logicmoo_utils)),
-   use_module(library(must_trace)).
+   use_module(library(sanity_must)).
 :- initialization(attach_packs_n_utils,now).
 
 :- pack_list_installed.
