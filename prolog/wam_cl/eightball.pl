@@ -298,7 +298,7 @@ dinterp_e(_Must,M,_Cut,G, GG, _L):-
   (((nb_current('$w_dinterp',false) ; just_call(M,GG)))),!,
   (call(M:G)).
 % (callable(Cut)->(!,call(Cut));true).
-:- '$hide'(rtrace:trace).
+%:- '$hide'(rtrace:trace).
 %dinterp_e(_Must,M,_UnseenCut,G,_GG,_L):- !, rtrace(M:G).
 dinterp_e(Must,M,_UnseenCut,G,GG,L):- 
    notrace((L2 is L -1,predicate_property(M:GG,number_of_clauses(_)))),!,
