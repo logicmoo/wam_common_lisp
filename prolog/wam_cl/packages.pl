@@ -74,7 +74,7 @@ f_make_package(AName,List,Package):-
   atom_string(AName,Name),  
   atom_concat_or_rtrace(pkg_,Name,Down),prologcase_name(Down,Package),
   add_opv(Package,type_of,package),
-  asserta_if_new(package_name(Package,Name)),
+  asserta_if_new(package:package_name(Package,Name)),
   init_instance_slots(claz_package,2,Package,List), 
   string_upper(Name,UName),
   (Name==UName -> true ; add_opv(Package,kw_nicknames,UName)).
@@ -92,7 +92,8 @@ find_package('$OBJ'(claz_package,UP),Package):- !, find_package(UP,Package),!.
 find_package(Obj,Res):- to_prolog_string_if_needed(Obj,F),!,find_package(F,Res).
 find_package(S,Package):- 
   as_string_upper(S,SN),!,
-  (package_name(Package,SN) ; package_nicknames(Package,SN) ; get_opv_i(Package,nicknames,SN) ; (atom_concat('SB!',_,SN)->Package=pkg_sys)),!.
+  (package_name(Package,SN) ; package_nicknames(Package,SN) ; get_opv_i(Package,nicknames,SN) ; 
+   (atom_concat('SB!',_,SN)->Package=pkg_sys)),!.
 
 find_package_or_die(X,Y):-
  find_package(X,Y) -> true ; (break,trace_or_throw(find_package_or_die(X,Y))).  
