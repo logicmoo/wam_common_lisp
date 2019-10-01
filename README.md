@@ -147,6 +147,7 @@ $ swipl -x wamcl --debug
 $ echo '(print (cons "hello" *ARGS*))' > hello.lisp
 $ swipl -x wamcl hello.lisp world
 ````
+outputs:
 `(HELLO WORLD)`
 
 
@@ -178,6 +179,9 @@ $ echo '(print (cons "hello" *ARGS*))' > hello.lisp
 $ ./wamcl -c hello.lisp -o hello.pl --exe hello
 $ ./hello world
 ```` 
+outputs:
+`(HELLO WORLD)`
+
 
 ### Attach to your image
 ````
@@ -188,6 +192,9 @@ $ swipl -x hello --repl
 ````
 $ swipl hello.pl world
 ````
+outputs:
+`(HELLO WORLD)`
+
 
 ### See the source
 ````
