@@ -180,12 +180,14 @@ $ ./wamcl -c hello.lisp -o hello.pl --exe hello
 $ ./hello world
 ```` 
 outputs:
-`(HELLO WORLD)`
-
+````
+(HELLO WORLD)
+````
 
 ### Attach to your image
 ````
 $ swipl -x hello --repl
+CL-USER> 
 ````
 
 ### Run your translated lisp
@@ -193,7 +195,9 @@ $ swipl -x hello --repl
 $ swipl hello.pl world
 ````
 outputs:
-`(HELLO WORLD)`
+````
+(HELLO WORLD)
+````
 
 
 ### See the source
