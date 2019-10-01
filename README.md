@@ -161,7 +161,7 @@ CL-USER>
 ### Open PceEmacs on a translated file
 ````
 CL-USER> (edit (compile-file "hello.lisp"))
-.... Opens PCEMACS ....
+.... Opens  hello.pl  ....
 ````
 
 ### Load a file
