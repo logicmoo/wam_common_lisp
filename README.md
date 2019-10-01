@@ -147,6 +147,7 @@ $ swipl -x wamcl --debug
 $ echo '(print (cons "hello" *ARGS*))' > hello.lisp
 $ swipl -x wamcl hello.lisp world
 ````
+`(HELLO WORLD)`
 
 
 ### Translate a file to prolog
