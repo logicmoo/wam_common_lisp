@@ -147,6 +147,8 @@ $ swipl -x wamcl --debug
 $ echo '(print (cons "hello" *ARGS*))' > hello.lisp
 $ swipl -x wamcl hello.lisp world
 ````
+outputs:
+`(HELLO WORLD)`
 
 
 ### Translate a file to prolog
@@ -161,7 +163,7 @@ CL-USER>
 ### Open PceEmacs on a translated file
 ````
 CL-USER> (edit (compile-file "hello.lisp"))
-.... Opens PCEMACS ....
+.... Opens  hello.pl  ....
 ````
 
 ### Load a file
@@ -177,16 +179,26 @@ $ echo '(print (cons "hello" *ARGS*))' > hello.lisp
 $ ./wamcl -c hello.lisp -o hello.pl --exe hello
 $ ./hello world
 ```` 
+outputs:
+````
+(HELLO WORLD)
+````
 
 ### Attach to your image
 ````
 $ swipl -x hello --repl
+CL-USER> 
 ````
 
 ### Run your translated lisp
 ````
 $ swipl hello.pl world
 ````
+outputs:
+````
+(HELLO WORLD)
+````
+
 
 ### See the source
 ````
