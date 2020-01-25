@@ -3,6 +3,7 @@
 :- ensure_loaded(wamcl).
 :- create_prolog_flag(lisp_repl_goal,true,[keep(true),type(term)]).
 :- initialization((do_wamcl_inits),now).
+:- initialization((do_wamcl_inits),restore).
 
 load_wamcl_runtime.
 

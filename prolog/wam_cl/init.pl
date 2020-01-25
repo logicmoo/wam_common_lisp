@@ -61,7 +61,7 @@ lisp_goal:- lisp_goal_pt2.
 
 lisp_goal_pt2:-   % so we can get in on a break 
   % current_prolog_flag(wamcl_init_level,7),
-  current_prolog_flag(lisp_repl_goal,Else),Else\==[],call(Else),!.
+  current_prolog_flag(lisp_repl_goal,Else),Else\==[],rtrace,call(Else),!.
 lisp_goal_pt2:- repl.
 
 call_lisp_main(Exit):- 
