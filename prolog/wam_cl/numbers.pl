@@ -75,7 +75,10 @@ define_cl_math(F,2):- atom_concat_or_rtrace('f_',F,CLN), P=..[CLN,X,Y,R],FP=..[F
 define_cl_math(_,_).
 
 wl:type_checked(P):- current_predicate(_,mth:P), \+ predicate_property(mth:P,imported_from(_)),
-   P=..[_|List],maplist( =(number),List).
+   P=..[_|List],fill_list(number,List).
+% fill_list(Value,List)
+fill_list( Value,[Value|List]):- !, fill_list(Value,List).
+fill_list(_Value,[]).
 
 % Lisp COERCE
 wl:coercion(In, number, Out):- is_numberp(In),to_prolog_number(In,Out).

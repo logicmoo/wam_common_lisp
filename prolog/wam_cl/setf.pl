@@ -1,7 +1,130 @@
 
 :- style_check(-singleton).
 
+/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init.lisp:4948 **********************/
+:-lisp_compile_to_prolog(pkg_sys,[defmacro,pushnew,['&environment',env,item,place,'&rest',keys],[if,[and,[symbolp,place],[eq,place,[macroexpand,place,env]]],['#BQ',[setq,['#COMMA',place],[adjoin,['#COMMA',item],['#COMMA',place],['#BQ-COMMA-ELIPSE',keys]]]],['multiple-value-bind',[dummies,vals,newval,setter,getter],['get-setf-expansion',place,env],[let,[[g,[gensym]]],['#BQ',['let*',[[['#COMMA',g],['#COMMA',item]],['#BQ-COMMA-ELIPSE',[mapcar,function(list),dummies,vals]],[['#COMMA',[car,newval]],[adjoin,['#COMMA',g],['#COMMA',getter],['#BQ-COMMA-ELIPSE',keys]]]],['#COMMA',setter]]]]]]]).
+wl:lambda_def(defmacro, pushnew, mf_pushnew, [c38_environment, env, item, sys_place, c38_rest, sys_keys], [progn, [if, [and, [symbolp, sys_place], [eq, sys_place, [macroexpand, sys_place, env]]], ['#BQ', [setq, ['#COMMA', sys_place], [adjoin, ['#COMMA', item], ['#COMMA', sys_place], ['#BQ-COMMA-ELIPSE', sys_keys]]]], [multiple_value_bind, [sys_dummies, sys_vals, sys_newval, sys_setter, sys_getter], [get_setf_expansion, sys_place, env], [let, [[sys_g, [gensym]]], ['#BQ', [let_xx, [[['#COMMA', sys_g], ['#COMMA', item]], ['#BQ-COMMA-ELIPSE', [mapcar, function(list), sys_dummies, sys_vals]], [['#COMMA', [car, sys_newval]], [adjoin, ['#COMMA', sys_g], ['#COMMA', sys_getter], ['#BQ-COMMA-ELIPSE', sys_keys]]]], ['#COMMA', sys_setter]]]]]]]).
+wl: declared(mf_pushnew, env_arg1).
+
+wl:arglist_info(pushnew, mf_pushnew, [c38_environment, env, item, sys_place, c38_rest, sys_keys], arginfo{all:[item, sys_place], allow_other_keys:0, aux:0, body:0, complex:[environment, rest], env:[env], key:0, names:[env, item, sys_place, sys_keys], opt:0, req:[item, sys_place], rest:[sys_keys], sublists:0, whole:0}).
+wl: init_args(2,op_pushnew).
+wl: init_args(0,mf_pushnew).
+wl: init_args(2,pushnew).
+
+/*
+
+### Compiled:  `CL:PUSHNEW` 
+*/
+:- export(sf_pushnew/5).
+sf_pushnew(Env,Item_In, Place_In, RestNKeys, FnResult):- 
+  mf_pushnew([(pushnew), Item_In, Place_In|RestNKeys],Env, MFResult),
+  f_eval(MFResult, FnResult).
+mf_pushnew([pushnew, Item_In, Place_In|RestNKeys], Env_In, MFResult) :-
+        nop(defmacro),
+        GEnv=[bv(u_env, Env_In), bv(u_item, Item_In), bv(u_place, Place_In), bv(u_keys, RestNKeys)],
+        catch(( ( get_var(GEnv, u_place, Place_Get),
+                  (   is_symbolp(Place_Get)
+                  ->  get_var(GEnv, u_env, Env_Get),
+                      get_var(GEnv, u_place, Place_Get14),
+                      f_macroexpand([Place_Get14, Env_Get], Macroexpand_Ret),
+                      f_eq(Place_Get14, Macroexpand_Ret, TrueResult),
+                      IFTEST=TrueResult
+                  ;   IFTEST=[]
+                  ),
+                  (   IFTEST\==[]
+                  ->  get_var(GEnv, u_item, Item_Get),
+                      ( get_var(GEnv, u_keys, Keys_Get),
+                        get_var(GEnv, u_place, Place_Get18)
+                      ),
+                      get_var(GEnv, u_place, Place_Get20),
+                      _2292=[setq, Place_Get18, [adjoin, Item_Get, Place_Get20|Keys_Get]]
+                  ;   LEnv=[bv(u_dummies, []), bv(u_vals, []), bv(u_newval, []), bv(u_setter, []), bv(u_getter, [])|GEnv],
+                      get_var(LEnv, u_env, Env_Get26),
+                      get_var(LEnv, u_place, Place_Get25),
+                      f_get_setf_expansion(Place_Get25,
+                                           [Env_Get26],
+                                           Setf_expansion_Ret),
+                      setq_from_values(LEnv,
+
+                                       [ u_dummies,
+                                         u_vals,
+                                         u_newval,
+                                         u_setter,
+                                         u_getter
+                                       ]),
+                      f_gensym(G_Init),
+                      LEnv29=[bv(u_g, G_Init)|LEnv],
+                      get_var(LEnv29, u_dummies, Dummies_Get),
+                      get_var(LEnv29, u_g, G_Get),
+                      get_var(LEnv29, u_item, Item_Get32),
+                      get_var(LEnv29, u_vals, Vals_Get),
+                      f_mapcar(f_list, [Dummies_Get, Vals_Get], Mapcar_Ret),
+                      get_var(LEnv29, u_newval, Newval_Get),
+                      f_car(Newval_Get, Car_Ret),
+                      get_var(LEnv29, u_g, G_Get36),
+                      get_var(LEnv29, u_getter, Getter_Get),
+                      get_var(LEnv29, u_keys, Keys_Get38),
+                      bq_append([[G_Get, Item_Get32]|Mapcar_Ret],
+
+                                [
+                                  [ Car_Ret,
+                                    [adjoin, G_Get36, Getter_Get|Keys_Get38]
+                                  ]
+                                ],
+                                Bq_append_Ret),
+                      get_var(LEnv29, u_setter, Setter_Get),
+                      _2292=[let_xx, Bq_append_Ret, Setter_Get]
+                  )
+                ),
+                _2292=MFResult
+              ),
+              block_exit(pushnew, MFResult),
+              true).
+:- set_opv(mf_pushnew, type_of, sys_macro),
+   set_opv(pushnew, symbol_function, mf_pushnew),
+   DefMacroResult=pushnew.
+
 end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+ SO WE CAN SEE IT!
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+end_of_file.
+
 
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init-1.lisp:8170 **********************/
 %:-lisp_compile_to_prolog(pkg_sys,['in-package','$STRING'("SYSTEM")]).
@@ -526,87 +649,6 @@ wl:interned_eval_devel("
 
 ").
 
-/*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init.lisp:4948 **********************/
-:-lisp_compile_to_prolog(pkg_sys,[defmacro,pushnew,['&environment',env,item,place,'&rest',keys],[if,[and,[symbolp,place],[eq,place,[macroexpand,place,env]]],['#BQ',[setq,['#COMMA',place],[adjoin,['#COMMA',item],['#COMMA',place],['#BQ-COMMA-ELIPSE',keys]]]],['multiple-value-bind',[dummies,vals,newval,setter,getter],['get-setf-expansion',place,env],[let,[[g,[gensym]]],['#BQ',['let*',[[['#COMMA',g],['#COMMA',item]],['#BQ-COMMA-ELIPSE',[mapcar,function(list),dummies,vals]],[['#COMMA',[car,newval]],[adjoin,['#COMMA',g],['#COMMA',getter],['#BQ-COMMA-ELIPSE',keys]]]],['#COMMA',setter]]]]]]]).
-wl:lambda_def(defmacro, pushnew, mf_pushnew, [c38_environment, env, item, sys_place, c38_rest, sys_keys], [progn, [if, [and, [symbolp, sys_place], [eq, sys_place, [macroexpand, sys_place, env]]], ['#BQ', [setq, ['#COMMA', sys_place], [adjoin, ['#COMMA', item], ['#COMMA', sys_place], ['#BQ-COMMA-ELIPSE', sys_keys]]]], [multiple_value_bind, [sys_dummies, sys_vals, sys_newval, sys_setter, sys_getter], [get_setf_expansion, sys_place, env], [let, [[sys_g, [gensym]]], ['#BQ', [let_xx, [[['#COMMA', sys_g], ['#COMMA', item]], ['#BQ-COMMA-ELIPSE', [mapcar, function(list), sys_dummies, sys_vals]], [['#COMMA', [car, sys_newval]], [adjoin, ['#COMMA', sys_g], ['#COMMA', sys_getter], ['#BQ-COMMA-ELIPSE', sys_keys]]]], ['#COMMA', sys_setter]]]]]]]).
-wl: declared(mf_pushnew, env_arg1).
-
-wl:arglist_info(pushnew, mf_pushnew, [c38_environment, env, item, sys_place, c38_rest, sys_keys], arginfo{all:[item, sys_place], allow_other_keys:0, aux:0, body:0, complex:[environment, rest], env:[env], key:0, names:[env, item, sys_place, sys_keys], opt:0, req:[item, sys_place], rest:[sys_keys], sublists:0, whole:0}).
-wl: init_args(2,op_pushnew).
-wl: init_args(0,mf_pushnew).
-wl: init_args(2,pushnew).
-
-/*
-
-### Compiled:  `CL:PUSHNEW` 
-*/
-sf_pushnew(Env,Item_In, Place_In, RestNKeys, FnResult):- 
-  mf_pushnew([pushnew, Item_In, Place_In|RestNKeys],Env, MFResult),
-  f_eval(MFResult, FnResult).
-mf_pushnew([pushnew, Item_In, Place_In|RestNKeys], Env_In, MFResult) :-
-        nop(defmacro),
-        GEnv=[bv(u_env, Env_In), bv(u_item, Item_In), bv(u_place, Place_In), bv(u_keys, RestNKeys)],
-        catch(( ( get_var(GEnv, u_place, Place_Get),
-                  (   is_symbolp(Place_Get)
-                  ->  get_var(GEnv, u_env, Env_Get),
-                      get_var(GEnv, u_place, Place_Get14),
-                      f_macroexpand([Place_Get14, Env_Get], Macroexpand_Ret),
-                      f_eq(Place_Get14, Macroexpand_Ret, TrueResult),
-                      IFTEST=TrueResult
-                  ;   IFTEST=[]
-                  ),
-                  (   IFTEST\==[]
-                  ->  get_var(GEnv, u_item, Item_Get),
-                      ( get_var(GEnv, u_keys, Keys_Get),
-                        get_var(GEnv, u_place, Place_Get18)
-                      ),
-                      get_var(GEnv, u_place, Place_Get20),
-                      _2292=[setq, Place_Get18, [adjoin, Item_Get, Place_Get20|Keys_Get]]
-                  ;   LEnv=[bv(u_dummies, []), bv(u_vals, []), bv(u_newval, []), bv(u_setter, []), bv(u_getter, [])|GEnv],
-                      get_var(LEnv, u_env, Env_Get26),
-                      get_var(LEnv, u_place, Place_Get25),
-                      f_get_setf_expansion(Place_Get25,
-                                           [Env_Get26],
-                                           Setf_expansion_Ret),
-                      setq_from_values(LEnv,
-
-                                       [ u_dummies,
-                                         u_vals,
-                                         u_newval,
-                                         u_setter,
-                                         u_getter
-                                       ]),
-                      f_gensym(G_Init),
-                      LEnv29=[bv(u_g, G_Init)|LEnv],
-                      get_var(LEnv29, u_dummies, Dummies_Get),
-                      get_var(LEnv29, u_g, G_Get),
-                      get_var(LEnv29, u_item, Item_Get32),
-                      get_var(LEnv29, u_vals, Vals_Get),
-                      f_mapcar(f_list, [Dummies_Get, Vals_Get], Mapcar_Ret),
-                      get_var(LEnv29, u_newval, Newval_Get),
-                      f_car(Newval_Get, Car_Ret),
-                      get_var(LEnv29, u_g, G_Get36),
-                      get_var(LEnv29, u_getter, Getter_Get),
-                      get_var(LEnv29, u_keys, Keys_Get38),
-                      bq_append([[G_Get, Item_Get32]|Mapcar_Ret],
-
-                                [
-                                  [ Car_Ret,
-                                    [adjoin, G_Get36, Getter_Get|Keys_Get38]
-                                  ]
-                                ],
-                                Bq_append_Ret),
-                      get_var(LEnv29, u_setter, Setter_Get),
-                      _2292=[let_xx, Bq_append_Ret, Setter_Get]
-                  )
-                ),
-                _2292=MFResult
-              ),
-              block_exit(pushnew, MFResult),
-              true).
-:- set_opv(mf_pushnew, type_of, sys_macro),
-   set_opv(pushnew, symbol_function, mf_pushnew),
-   DefMacroResult=pushnew.
 
 wl:interned_eval_devel("
 ; Adapted from SBCL.

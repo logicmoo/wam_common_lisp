@@ -33,20 +33,20 @@ atom_concat_suffix('',Result,Result):-!.
 atom_concat_suffix(Result,'',Result):-!.
 atom_concat_suffix(Root,Suffix,Root):- atom_concat(_,Suffix,Root),!.
 atom_concat_suffix(Root,Suffix,Result):- 
-  atom_trim_prefix(Suffix,'_',Suffix2),
-  atom_trim_suffix(Root,'_',Root2),
+  atom_trim_prefix1(Suffix,'_',Suffix2),
+  atom_trim_suffix1(Root,'_',Root2),
   atomic_list_concat([Root2,Suffix2],'_',Result),!.
-   
+
+
+atom_trim_prefix1(Root,Prefix,Result):- atom_concat(Prefix,Result,Root) -> true ; Result=Root.
+atom_trim_suffix1(Root,Suffix,Result):- atom_concat(Result,Suffix,Root) -> true ; Result=Root.
+
 
 :- fixup_exports.
 
 end_of_file.
 
 :- else.
-
-atom_concat_if_new(Prefix,Atom,NewAtom):-
-  (atom_concat_or_rtrace(Prefix,_,Atom)-> NewAtom=Atom ; atom_concat_or_rtrace(Prefix,Atom,NewAtom)).
-
 
 atom_trim_prefix(Root,Prefix,Result):- atom_concat(Prefix,Result,Root) -> true ; Result=Root.
 atom_trim_suffix(Root,Suffix,Result):- atom_concat(Result,Suffix,Root) -> true ; Result=Root.
