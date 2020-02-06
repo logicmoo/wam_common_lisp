@@ -104,6 +104,43 @@
 					Excludes="e2c/;elFinder/;.HIDE~/;HIDE~/;pldata/;*.qlf;*.class;.git/;~*;*~;~*/;*~/;.svn/;*.*r;*.*o;*.dll;*.exe;*.bak;*.jpg;*.xp*;*.gif;*.b?*"/>
 			</Folder>
 		</Folder>
+		<Folder Name="../logicmoo_nlu">
+			<Folder Name="ext">
+				<Folder Name="pldata">
+					<Folder Name="plkb7166">
+						<F N="../logicmoo_nlu/ext/pldata/plkb7166/.gitignore"/>
+						<F N="../logicmoo_nlu/ext/pldata/plkb7166/add_header.script"/>
+						<F N="../logicmoo_nlu/ext/pldata/plkb7166/dir.header"/>
+						<F N="../logicmoo_nlu/ext/pldata/plkb7166/kb7166.pl"/>
+						<F N="../logicmoo_nlu/ext/pldata/plkb7166/kb7166_pt7_constant_renames_NEW.pl"/>
+						<F N="../logicmoo_nlu/ext/pldata/plkb7166/sumo_renames.pl"/>
+					</Folder>
+					<F N="../logicmoo_nlu/ext/pldata/.gitignore"/>
+					<F N="../logicmoo_nlu/ext/pldata/ac_xnl_7166_nlkb.pl"/>
+					<F N="../logicmoo_nlu/ext/pldata/ac_xnl_iface.pl"/>
+					<F N="../logicmoo_nlu/ext/pldata/clex_iface.pl"/>
+					<F N="../logicmoo_nlu/ext/pldata/clex_lexicon_user1.nldata"/>
+					<F N="../logicmoo_nlu/ext/pldata/el_assertions.plincl"/>
+					<F N="../logicmoo_nlu/ext/pldata/kb_7166.pl"/>
+					<F N="../logicmoo_nlu/ext/pldata/kb_7166_supports.pl"/>
+					<F N="../logicmoo_nlu/ext/pldata/make_nl_data.sh"/>
+					<F N="../logicmoo_nlu/ext/pldata/mworld0_declpreds.pl"/>
+					<F N="../logicmoo_nlu/ext/pldata/nl_iface.pl"/>
+					<F N="../logicmoo_nlu/ext/pldata/nldata_cycl_pos0.pl"/>
+					<F N="../logicmoo_nlu/ext/pldata/nldata_dictionary_some01.pl"/>
+					<F N="../logicmoo_nlu/ext/pldata/posm_cached_data.pl"/>
+					<F N="../logicmoo_nlu/ext/pldata/README.md"/>
+					<F N="../logicmoo_nlu/ext/pldata/talk_db.pl"/>
+					<F N="../logicmoo_nlu/ext/pldata/tiny_kb.pl"/>
+					<F N="../logicmoo_nlu/ext/pldata/trans_header.pl"/>
+					<F N="../logicmoo_nlu/ext/pldata/transform_dump.pl"/>
+					<F N="../logicmoo_nlu/ext/pldata/tt0_00022_cycl.pl"/>
+					<F N="../logicmoo_nlu/ext/pldata/tt0_iface.pl"/>
+					<F N="../logicmoo_nlu/ext/pldata/wn30_iface.pl"/>
+					<F N="../logicmoo_nlu/ext/pldata/wn_frames.pl"/>
+				</Folder>
+			</Folder>
+		</Folder>
 		<Folder Name="../../packs_lib">
 			<Folder Name="ffi">
 				<F

@@ -3,6 +3,7 @@
   codelist_to_forms/2,
   svar_fixvarname/2,
   current_input_to_forms/2,
+  input_to_forms/2,
   input_to_forms/3,
   input_to_forms_debug/1,
   input_to_forms_debug/2,
@@ -21,12 +22,13 @@
   parse_sexpr/2]).
 
 :- use_module(library(logicmoo_common)).
-%:- use_module(library(filestreams)).
+:- use_module(library(logicmoo/filestreams)).
 %:- use_module(library(bugger)).
 
 :- if(exists_file('./header')).
-:- include('./header').
+% :- include('./header').
 :- endif.
+:- use_module(eightball).
 
 :- thread_local(t_l:sreader_options/2).
 kif_ok:- t_l:sreader_options(logicmoo_read_kif,true).
@@ -354,7 +356,10 @@ parse_sexpr_stream_1(S,Expr):-
 :- export('//'(file_sexpr,1)).
 :- export('//'(sexpr,1)).
 
-
+% for offline use of this lisp reader
+intern_and_eval(UTC,V):- current_predicate(lisp_compiled_eval/2),!,
+  call(call,(reader_intern_symbols(UTC,M),!,lisp_compiled_eval(M,V))).
+intern_and_eval(UTC,'$intern_and_eval'(UTC)).
 
 % Use DCG for parser.
 
@@ -565,7 +570,7 @@ sexpr0('$OBJ'(claz_vector,V))                 --> `#(`, !, always(sexpr_vector(V
 
 sexpr0(Number) --> `#`,integer(Radix),ci(`r`),!,always((signed_radix_2(Radix,Number0),extend_radix(Radix,Number0,Number))),!.
 sexpr0('$ARRAY'(Dims,V)) --> `#`,integer(Dims),ci(`a`),!,sexpr(V).
-sexpr0(V)                    --> `#.`, !,sexpr(C),{to_untyped(C,UTC),!,reader_intern_symbols(UTC,M),!,lisp_compiled_eval(M,V)},!.
+sexpr0(V)                    --> `#.`, !,sexpr(C),{to_untyped(C,UTC),!,intern_and_eval(UTC,V)},!.
 sexpr0('#'(E))              --> `#:`, !,always(rsymbol(`#:`,E)), swhite.
 
 sexpr0(OBJ)--> `#<`,!,always(ugly_sexpr_cont(OBJ)),!.
@@ -1530,8 +1535,7 @@ input_to_forms_debug("(documentation Predicate EnglishLanguage \"A &%Predicate i
 
 // ==================================================================== */
 :- export(current_input_to_forms/2).
-
-%= 	 	 
+ 	 
 
 %% input_to_forms( ?FormsOut, ?Vars) is det.
 %
@@ -1544,14 +1548,20 @@ current_input_to_forms(FormsOut,Vars):-
 
 % input_to_forms_debug(String):- sumo_to_pdkb(String,Wff),dbginfo(Wff),!.
 input_to_forms_debug(String):-input_to_forms(String,Wff,Vs),
-  b_setval('$variable_names',Vs),userout(Wff),!.
+  b_setval('$variable_names',Vs),fmt(Wff),!.
 
-input_to_forms_debug(String,Decoder):-input_to_forms(String,Wff,Vs),
-  b_setval('$variable_names',Vs),call(Decoder,Wff,WffO),userout(WffO),!.
-
-:- export(input_to_forms/3).
-
-	 	 
+input_to_forms_debug(String,Decoder):-
+  input_to_forms(String,Wff),
+  call(Decoder,Wff,WffO),fmt(WffO),!.
+  
+:- export(input_to_forms/2).
+%% input_to_forms( ?In, ?FormsOut) is det.
+%
+% Get Input Converted To Forms.
+%
+input_to_forms(Codes,FormsOut):- push_varnames(_) ->
+  quietly_sreader((input_to_forms0(Codes,FormsOut,Vars))) ->
+  add_variable_names(Vars).	 	 
 
 :- export(input_to_forms/3).
 
@@ -1560,9 +1570,8 @@ input_to_forms_debug(String,Decoder):-input_to_forms(String,Wff,Vs),
 % Get Input Converted To Forms.
 %
 input_to_forms(Codes,FormsOut,Vars):- 
-  b_setval('$variable_names',[])-> 
-  quietly_sreader((input_to_forms0(Codes,FormsOut,Vars))) ->
-  nop(set_variable_names_safe(Vars)).
+  push_varnames(_) ->
+  quietly_sreader((input_to_forms0(Codes,FormsOut,Vars))).
   
 is_variable_names_safe(Vars):- var(Vars),!.
 is_variable_names_safe([N=V|Vars]):- !,
@@ -1572,7 +1581,24 @@ is_variable_names_safe([]).
 
 is_name_variable_safe(N,V):- 
   ok_var_name(N)-> var(V).
-   
+     
+
+get_varnames(Was):- nb_current('$variable_names',Was)->true;Was=[].
+
+push_varnames(New):-  
+  (nonvar(New)-> b_setval('$variable_names',New)
+    ; (get_varnames(Was), Was = New, b_setval('$variable_names',Was))).
+
+add_variable_names(Vars):- var(Vars),!.
+add_variable_names(N=V):- !, set_varname_s(N,V).
+add_variable_names([NV|Vars]):- add_variable_names(NV), add_variable_names(Vars).
+
+set_varname_s(N,V):- get_varnames(Was), set_varname4(Was,N,V,New),b_setval('$variable_names',New).
+
+set_varname4(Was,N,V,New):- member(NV,Was),NV=(NN=VV), NN==N,!, (V=VV->true;setarg(2,NV,V)), New = Was.
+set_varname4(Was,N,V,New):- member(NV,Was),NV=(NN=VV), VV==V,!, (N=NN->true;setarg(1,NV,N)), New = Was.
+set_varname4(Was,N,V,[N=V|Was]).
+
 
 set_variable_names_safe(Vars):-
   is_variable_names_safe(Vars)->
@@ -1593,8 +1619,8 @@ input_to_forms0(Forms,FormsOut,Vars):-
     Public domain code.
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
-:- style_check(-singleton).
-:- style_check(-discontiguous).
+%:- style_check(-singleton).
+%:- style_check(-discontiguous).
 % :- style_check(-atom).
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
    Parsing

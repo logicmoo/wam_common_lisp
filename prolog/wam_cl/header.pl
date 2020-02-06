@@ -29,7 +29,7 @@
 :- if(current_prolog_flag(debug,false)).
 
 %:- set_prolog_flag(last_call_optimisation,true).
- :- set_prolog_flag(compile_meta_arguments,false).
+:- set_prolog_flag(compile_meta_arguments,false).
 %:- set_prolog_flag(access_level,system).
 
 :- endif.
