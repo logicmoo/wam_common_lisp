@@ -157,10 +157,10 @@
 :- multifile(ssip_define/2).
 :- discontiguous(ssip_define/2).
 
-:- ensure_loaded('init').
 :- use_module(library(logicmoo_common)).
 :- user:ensure_loaded(library(logicmoo/portray_vars)).
 :- ensure_loaded(eightball).
+:- ensure_loaded('init').
 :- ensure_loaded(utests).
 :- ensure_loaded(places).
 :- ensure_loaded(environs).

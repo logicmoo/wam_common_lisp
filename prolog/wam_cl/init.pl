@@ -211,6 +211,7 @@ do_wamcl_inits:-
  set_prolog_flag(access_level, W).
 
 :- ensure_loaded(eightball).
+:- include(header).
 
 % program inits
 clear_op_buffer:- % trace('8ball':always/1,[+call,+exit,+fail]),

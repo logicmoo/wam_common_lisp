@@ -114,6 +114,7 @@ call_fail:- dmsg(fail),fail.
 
 incr_arg(N,Redo):- arg(N,Redo,Val),ValNext is 1 + Val,nb_setarg(N,Redo,ValNext).
 
+
 show_call_trace(Info,Goal):-
   Redo = sol(0,0),
   dmsg(call:Info),!, 
@@ -448,7 +449,7 @@ clause_asserted_local(H,R):-  predicate_property(H,number_of_clauses(_)),clause(
 %system:goal_expansion(always(G),G) :- wam_cl_option(speed,S),S>2.
 %system:goal_expansion(certainly(G),G) :- wam_cl_option(safety,0).
 
-%:- use_module(debugio).
+:- use_module(debugio).
 %:- include('./header').
 
 wl:interned_eval("(defparameter sys:*markdown* cl:t)").
