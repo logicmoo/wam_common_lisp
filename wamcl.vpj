@@ -116,6 +116,8 @@
 						<F N="../logicmoo_nlu/ext/pldata/plkb7166/sumo_renames.pl"/>
 					</Folder>
 					<F N="../logicmoo_nlu/ext/pldata/.gitignore"/>
+					<F N="../logicmoo_nlu/ext/pldata/ac_xnl_7166.header"/>
+					<F N="../logicmoo_nlu/ext/pldata/ac_xnl_7166.pl"/>
 					<F N="../logicmoo_nlu/ext/pldata/ac_xnl_7166_nlkb.pl"/>
 					<F N="../logicmoo_nlu/ext/pldata/ac_xnl_iface.pl"/>
 					<F N="../logicmoo_nlu/ext/pldata/clex_iface.pl"/>

@@ -1,5 +1,5 @@
 name(wam_common_lisp).
-version('1.2.111').
+version('1.3.111').
 title('ANSI Common Lisp implemented in Prolog').
 keywords([interpreters,lisp,sexpr,logicmoo]).
 author( 'Douglas Miles', 'http://www.linkedin.com/in/logicmoo' ).

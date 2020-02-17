@@ -23,6 +23,8 @@
 :- discontiguous soops:struct_opv/4.
 :- dynamic((soops:struct_opv/4)).
 
+:- system:use_module(library(gvar_globals_api)).
+
 :- multifile(xlisting_config:xlisting_always/1).
 :- dynamic(xlisting_config:xlisting_always/1).
 
