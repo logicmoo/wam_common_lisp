@@ -2,6 +2,7 @@
 <Workspace Version="10.0" VendorName="SlickEdit">
 	<Projects>
 		<Project File="/cyc/CYCRTL.vpj"/>
+		<Project File="../logicmoo_nlu/NomicMU.vpj"/>
 		<Project File="../../packs_xtra/packs_xtra.vpj"/>
 		<Project File="../../prolog.vpj"/>
 		<Project File="../PrologMUDDebug.vpj"/>
