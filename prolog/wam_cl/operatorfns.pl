@@ -20,7 +20,7 @@
 :- include('./header').
 :- set_module(class(library)).
 
-wl:declared(f_special_operator_p,needs_env).
+wl:declared_as(f_special_operator_p,needs_env).
 f_special_operator_p(Env,Obj,RetVal):- t_or_nil(is_special_operator_p(Env,Obj),RetVal).
 f_special_operator_p(Obj,RetVal):- t_or_nil(is_special_operator_p(Obj),RetVal).
 
@@ -142,7 +142,7 @@ generate_function_or_macro_name(Ctx,FN,BindType,NewProposedName):-
    suffix_by_context(Ctx,ProposedName,NewProposedName),!.
 
 
-eval_uses_env_arg1(F):- quietly((premute_names(F,FF),wl:declared(FF,env_arg1))).
+eval_uses_env_arg1(F):- quietly((premute_names(F,FF),wl:declared_as(FF,env_arg1))).
 
    
 
@@ -174,7 +174,7 @@ exact_and_restkeys(F,N):- nonvar(N),!,exact_and_restkeys(F,NN),!,N=NN.
 exact_and_restkeys(F,N):- wl:init_args(N,F),!,integer(N).
 exact_and_restkeys(F,N):- exact_and_restkeys_l(F,N),integer(N),!.
 exact_and_restkeys(F,N):- function_arg_info(F,ArgInfo),ArgInfo.req=L,ArgInfo.all\==L,!,arg_info_count(ArgInfo,req,N).
-exact_and_restkeys(F,0):- wl:declared(F,lambda(['&rest'|_])),!.
+exact_and_restkeys(F,0):- wl:declared_as(F,lambda(['&rest'|_])),!.
 exact_and_restkeys(F,0):- function_arg_info(F,ArgInfo),ArgInfo.req==0,ArgInfo.all\==0,!.
 exact_and_restkeys(FN,x):-  function_arg_info(FN,ArgInfo),!,
    ArgInfo.complex==0,ArgInfo.opt==0,ArgInfo.rest==0,ArgInfo.env==0,ArgInfo.whole==0,
@@ -286,13 +286,13 @@ is_lisp_operator(_,_,G):- notrace(lisp_operator(G)).
 
 
 lisp_operator(FN):- \+ atom(FN),!,fail.
-lisp_operator(FN):- wl:declared(FN,kw_function),!,fail.
+lisp_operator(FN):- wl:declared_as(FN,kw_function),!,fail.
 lisp_operator(X):- atom_concat_or_rtrace('mf_',Symbol,X),symbol_foperator(Symbol).
 lisp_operator(X):- atom_concat_or_rtrace('sf_',Symbol,X),symbol_foperator(Symbol).
 lisp_operator(defpackage).
-lisp_operator(FN):- wl:declared(FN,kw_operator).
-lisp_operator(FN):- wl:declared(FN,kw_special).
-lisp_operator(FN):- wl:declared(FN,kw_macro).
+lisp_operator(FN):- wl:declared_as(FN,kw_operator).
+lisp_operator(FN):- wl:declared_as(FN,kw_special).
+lisp_operator(FN):- wl:declared_as(FN,kw_macro).
 lisp_operator(if).
 lisp_operator('data-assrt').
 lisp_operator('define-caller-pattern').

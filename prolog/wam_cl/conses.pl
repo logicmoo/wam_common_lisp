@@ -49,14 +49,14 @@ f_null(Obj,Ret):- t_or_nil(Obj == [] , Ret).
 f_atom(Obj,Ret):-  t_or_nil( Obj\=[_|_] , Ret).
 
 % #'CONS
-wl:declared(f_cons,inline(cons)).
+wl:declared_as(f_cons,inline(cons)).
 f_cons(Item, List, Result):- Result = [Item|List].
 
 % #'APPEND
 f_append(A,B,R):- append(A,B,R),!.
 
 % #'LIST
-wl:declared(f_list,inline(list)).
+wl:declared_as(f_list,inline(list)).
 wl:init_args(0,list).
 f_list(ListI,ListO):- ListI=ListO.
 

@@ -1169,7 +1169,7 @@ alpha_list([E|T1],[C|T2],Env) :- alpha(E,C,Env), alpha_list(T1,T2,Env).
 % expression, compute the set of closed variables of the procedure
 % and the set of parameters which are referenced in the procedure
 % and augment the procedure definition by these sets.  A closed variable
-% is a variable that is declared in a lambda-expression and used
+% is a variable that is declared_as in a lambda-expression and used
 % in a sub-lambda-expression.  For example, the expression:
 %
 % (lambda (x y z) (map (lambda (n) (+ y n)) x))
@@ -1608,7 +1608,7 @@ The compiler itself is written in a fairly portable fashion.  The main
 system dependent code is for I/O.  Interface procedures have been written
 for I/O so only these have to be modified.  The compiler uses 'retract'
 and 'assert' statements (to generate symbols and so forth), which means
-that some of the clauses have been declared 'dynamic'.  On other Prologs
+that some of the clauses have been declared_as 'dynamic'.  On other Prologs
 the 'dynamic' declarations might have to be removed.
 
 

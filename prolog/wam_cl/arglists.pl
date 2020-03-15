@@ -163,7 +163,7 @@ method-combination-lambda-list::= (wholevar var*
  * MKCL_VALUES(6) = (N aux1 init1 ... )         ; auxiliary variables
  *
  * 1) The prefix "N" is an integer value denoting the number of
- * variables which are declared within this section of the lambda
+ * variables which are declare'd within this section of the lambda
  * list.
  *
  * 2) The INIT* arguments are lisp forms which are evaluated when
@@ -472,7 +472,7 @@ make_head_p arams(Ctx,Env,Symbol,Macro,FormalParms,RestNKeys,Whole, HeadParms,Zi
   (ArgInfo.env==0 -> 
     ((HeadCode=(global_env(Env),HeadCode0),HeadDefCode=HeadDefCode0,HeadParms=HeadParms0)) 
     ; 
-    ((HeadCode=(global_env(Env),HeadCode0),HeadDefCode=(assert_lsp(Symbol,wl:declared(Macro,env_arg1)),HeadDefCode0), 
+    ((HeadCode=(global_env(Env),HeadCode0),HeadDefCode=(assert_lsp(Symbol,wl:declared_as(Macro,env_arg1)),HeadDefCode0), 
        HeadParms=HeadParms0))).
     */
 

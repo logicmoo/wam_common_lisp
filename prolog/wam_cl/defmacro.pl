@@ -244,12 +244,12 @@ unify_conj(Conj,To):- nonplainvar(Conj),Conj=To,!.
 unify_conj((CA,(CB,CC)),(A,B)):- var(A),nonplainvar(B),!, unify_conj(((CA,CB),CC),(A,B)).
 unify_conj((CA,(CB,CC)), AB):- unify_conj(((CA,CB),CC),AB).
 
-wl:declared(sys_is,interpret).
+wl:declared_as(sys_is,interpret).
 macroexpand_1_or_fail(_Ctx,Env,Symbol,Macro):- atom(Symbol),!,
   expand_symbol_macro(Env,Symbol,Macro),!,Symbol\==Macro.
 
 macroexpand_1_or_fail(_Ctx,_Env,[Procedure|_],_):-  
-  atom(Procedure),wl:declared(Procedure,interpret),!,fail.
+  atom(Procedure),wl:declared_as(Procedure,interpret),!,fail.
 
 macroexpand_1_or_fail(Ctx,Env,[Procedure|Arguments],MFResult):- atom(Procedure),
    get_symbol_fbounds(Ctx,Env,Procedure,kw_macro,EXEPR),

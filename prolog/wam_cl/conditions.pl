@@ -19,7 +19,7 @@
 :- include('./header').
 
 
-wl:declared(f_error,inline(error)).
+wl:declared_as(f_error,inline(error)).
 wl:init_args(0,error).
 f_error(Args,Res):- f_format(t,"~a",Args,Res),throw(f_error(Args,Res)).
 

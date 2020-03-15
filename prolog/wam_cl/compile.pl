@@ -390,17 +390,17 @@ compile_body(Ctx,Env,Result,LispCode,CompileBody):-
   !.
 
 
-wl:declared(=,binpred).
-wl:declared(<,binpred).
-wl:declared(>,binpred).
-wl:declared('<=',binpred).
-wl:declared('>=',binpred).
+wl:declared_as(=,binpred).
+wl:declared_as(<,binpred).
+wl:declared_as(>,binpred).
+wl:declared_as('<=',binpred).
+wl:declared_as('>=',binpred).
 
 % BinPRED-1   (< 1)
-compile_body(Ctx,Env,t,[BinPRED,Form],Code):- wl:declared(BinPRED,binpred),
+compile_body(Ctx,Env,t,[BinPRED,Form],Code):- wl:declared_as(BinPRED,binpred),
    must_compile_body(Ctx,Env,_Result,Form,Code),!.
 % BinPRED-3+  (<  1 2 3 ...)
-compile_body(Ctx,Env,Result,[BinPRED,Form1,Form2,Form3|FormS],Code):- wl:declared(BinPRED,binpred),
+compile_body(Ctx,Env,Result,[BinPRED,Form1,Form2,Form3|FormS],Code):- wl:declared_as(BinPRED,binpred),
   must_compile_body(Ctx,Env,Result,[and,[BinPRED,Form1,Form2],[BinPRED,Form2,Form3|FormS]],Code).
 
 

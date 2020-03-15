@@ -23,7 +23,7 @@
 
 
 % =============================================================================
-% Body TRANSFORMATIONS declared throughout the file as..
+% Body TRANSFORMATIONS declare d throughout the file as..
 %
 %   compiler_macro_left_right/2
 %
@@ -226,7 +226,7 @@ compile_body_form(Ctx,Env,Result,['dolist'|Rest], Code):- !,
   always(compile_dolist(Ctx,Env,Result,['dolist'|Rest], Code)).
 
 wl: init_args(1,dolist).
-wl: declared(dolist,inlined).
+wl: declared_as(dolist,inlined).
 sf_dolist(ReplEnv,VarList,FormS,Result):-
    compile_dolist(_Ctx,ReplEnv,Result,['dolist',VarList|FormS], Code),
    always(Code).

@@ -271,8 +271,8 @@ lw:- f_load("wam-cl-params",_).
 :- initialization((do_wamcl_inits,egg_go_fg),main).
 
 eggdrop:lisp_call([S|TERM],_Vs,R):- lisp_compiled_eval([S|TERM],R).
-:- endif. %% getuid(1006)
-:- endif. %% false
+:- endif. % getuid(1006)
+:- endif. % false
 %:- process_si.
 %:- cddd.
 

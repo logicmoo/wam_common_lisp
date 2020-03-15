@@ -100,9 +100,9 @@ end_of_file.
 [17:07] <dmiles> https://www.cs.toronto.edu/~sheila/2542/s14/A1/introtopddl2.pdf
 [17:09] <dmiles> which gives a way to describe how actions afftect the world
 [17:11] <dmiles> still everthing is declarative which is what makes it easy for the system and slightly harder for human programmers
-[17:13] <dmiles> but at least humans can still ellaborate on the declared
-[17:14] <dmiles> and interact with a declared world
-[17:16] <dmiles> i been toying with having non player agents with goals that have been declared try to acommplish them.. my cat right now is out of sorts because he saw another cat outside and feels something is not right
+[17:13] <dmiles> but at least humans can still ellaborate on the declared_as
+[17:14] <dmiles> and interact with a declared_as world
+[17:16] <dmiles> i been toying with having non player agents with goals that have been declared_as try to acommplish them.. my cat right now is out of sorts because he saw another cat outside and feels something is not right
 [17:16] <dmiles> so he walked over to his food dish and decided the big problem muct be that the dish is not covered up
 [17:16] <dmiles> must be*
 [17:17] <dmiles> the reason he walked over to it is not out of thi9nking of protecting it.. but because he is hungry

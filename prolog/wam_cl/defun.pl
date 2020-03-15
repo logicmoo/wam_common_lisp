@@ -30,7 +30,7 @@ wl:init_args(2,defun).
 sf_defun(Env,Symbol,FormalParms,FunctionBody,Return):- reenter_lisp(Ctx,Env),compile_defun_ops(Ctx,Env,Return,[defun,Symbol,FormalParms|FunctionBody],Code),cmpout(Code).
 compile_defun_ops(Ctx0,Env,Result,[defun,[setf,Name],FormalParms|FunctionBody], (PushDecl,CODE)):-
   combine_setfs([setf,Name],Symbol),
-  PushDecl = assert_lsp(Name,wl:declared(Name,defun_setf(Symbol))),
+  PushDecl = assert_lsp(Name,wl:declared_as(Name,defun_setf(Symbol))),
   %compile_defun_ops(Ctx0,Env,Result,[defun,Symbol,['&environment','$env'|FormalParms]|FunctionBody], CODE),!. 
   compile_defun_ops(Ctx0,Env,Result,[defun,Symbol,FormalParms|FunctionBody], CODE),!. 
 compile_defun_ops(Ctx0,Env,Result,[defun,Symbol,FormalParms|FunctionBody], (Code,FunDef,Result=Symbol)):-  

@@ -603,7 +603,7 @@ f_pathname_directory(Object_In, RestNKeys15, FnResult14) :-
 				      readers,
 				      [pathname_directory],
 				      pathname_directory))).
-wl: declared(pathname_directory, defun_setf(setf_pathname_directory)).
+wl: declared_as(pathname_directory, defun_setf(setf_pathname_directory)).
 
 wl:lambda_def(defun, setf_pathname_directory, f_setf_pathname_directory, [sys_object, sys_value], [[progn, [sys_set_class_slot_value, claz_pathname, sys_object, [quote, pathname_directory], sys_value]]]).
 wl:arglist_info(setf_pathname_directory, f_setf_pathname_directory, [sys_object, sys_value], arginfo{all:[sys_object, sys_value], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_object, sys_value], opt:0, outer:Env23, req:[sys_object, sys_value], rest:0, sublists:0, whole:0}).
@@ -657,7 +657,7 @@ f_pathname_device(Object_In, RestNKeys15, FnResult14) :-
 				      readers,
 				      [pathname_device],
 				      pathname_device))).
-wl: declared(pathname_device, defun_setf(setf_pathname_device)).
+wl: declared_as(pathname_device, defun_setf(setf_pathname_device)).
 
 wl:lambda_def(defun, setf_pathname_device, f_setf_pathname_device, [sys_object, sys_value], [[progn, [sys_set_class_slot_value, claz_pathname, sys_object, [quote, pathname_device], sys_value]]]).
 wl:arglist_info(setf_pathname_device, f_setf_pathname_device, [sys_object, sys_value], arginfo{all:[sys_object, sys_value], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_object, sys_value], opt:0, outer:Env23, req:[sys_object, sys_value], rest:0, sublists:0, whole:0}).
@@ -711,7 +711,7 @@ f_pathname_host(Object_In, RestNKeys15, FnResult14) :-
 				      readers,
 				      [pathname_host],
 				      pathname_host))).
-wl: declared(pathname_host, defun_setf(setf_pathname_host)).
+wl: declared_as(pathname_host, defun_setf(setf_pathname_host)).
 
 wl:lambda_def(defun, setf_pathname_host, f_setf_pathname_host, [sys_object, sys_value], [[progn, [sys_set_class_slot_value, claz_pathname, sys_object, [quote, pathname_host], sys_value]]]).
 wl:arglist_info(setf_pathname_host, f_setf_pathname_host, [sys_object, sys_value], arginfo{all:[sys_object, sys_value], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_object, sys_value], opt:0, outer:Env23, req:[sys_object, sys_value], rest:0, sublists:0, whole:0}).
@@ -765,7 +765,7 @@ f_pathname_name(Object_In, RestNKeys15, FnResult14) :-
 				      readers,
 				      [pathname_name],
 				      pathname_name))).
-wl: declared(pathname_name, defun_setf(setf_pathname_name)).
+wl: declared_as(pathname_name, defun_setf(setf_pathname_name)).
 
 wl:lambda_def(defun, setf_pathname_name, f_setf_pathname_name, [sys_object, sys_value], [[progn, [sys_set_class_slot_value, claz_pathname, sys_object, [quote, pathname_name], sys_value]]]).
 wl:arglist_info(setf_pathname_name, f_setf_pathname_name, [sys_object, sys_value], arginfo{all:[sys_object, sys_value], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_object, sys_value], opt:0, outer:Env23, req:[sys_object, sys_value], rest:0, sublists:0, whole:0}).
@@ -819,7 +819,7 @@ f_pathname_version(Object_In, FnResult14) :-
 				      readers,
 				      [pathname_version],
 				      pathname_version))).
-wl: declared(pathname_version, defun_setf(setf_pathname_version)).
+wl: declared_as(pathname_version, defun_setf(setf_pathname_version)).
 
 wl:lambda_def(defun, setf_pathname_version, f_setf_pathname_version, [sys_object, sys_value], [[progn, [sys_set_class_slot_value, claz_pathname, sys_object, [quote, pathname_version], sys_value]]]).
 wl:arglist_info(setf_pathname_version, f_setf_pathname_version, [sys_object, sys_value], arginfo{all:[sys_object, sys_value], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_object, sys_value], opt:0, outer:Env23, req:[sys_object, sys_value], rest:0, sublists:0, whole:0}).
@@ -873,7 +873,7 @@ f_pathname_type(Object_In, RestNKeys15, FnResult14) :-
 				      readers,
 				      [pathname_type],
 				      pathname_type))).
-wl: declared(pathname_type, defun_setf(setf_pathname_type)).
+wl: declared_as(pathname_type, defun_setf(setf_pathname_type)).
 
 wl:lambda_def(defun, setf_pathname_type, f_setf_pathname_type, [sys_object, sys_value], [[progn, [sys_set_class_slot_value, claz_pathname, sys_object, [quote, pathname_type], sys_value]]]).
 wl:arglist_info(setf_pathname_type, f_setf_pathname_type, [sys_object, sys_value], arginfo{all:[sys_object, sys_value], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_object, sys_value], opt:0, outer:Env23, req:[sys_object, sys_value], rest:0, sublists:0, whole:0}).
@@ -923,7 +923,7 @@ f_pathname_host(Object_In, RestNKeys15, FnResult14) :-
 	      block_exit(pathname_host, FnResult14),
 	      true).
 :- was_info((set_opv(pathname_host, symbol_function, f_pathname_host), DefunResult20=pathname_host)).
-wl: declared(pathname_host, defun_setf(setf_pathname_host)).
+wl: declared_as(pathname_host, defun_setf(setf_pathname_host)).
 
 wl:lambda_def(defun, setf_pathname_host, f_setf_pathname_host, [sys_object, sys_value], [[progn, [sys_set_class_slot_value, claz_pathname, sys_object, [quote, pathname_host], sys_value]]]).
 wl:arglist_info(setf_pathname_host, f_setf_pathname_host, [sys_object, sys_value], arginfo{all:[sys_object, sys_value], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_object, sys_value], opt:0, outer:Env23, req:[sys_object, sys_value], rest:0, sublists:0, whole:0}).
@@ -969,7 +969,7 @@ f_pathname_device(Object_In, RestNKeys15, FnResult14) :-
 	      block_exit(pathname_device, FnResult14),
 	      true).
 :- was_info((set_opv(pathname_device, symbol_function, f_pathname_device), DefunResult20=pathname_device)).
-wl: declared(pathname_device, defun_setf(setf_pathname_device)).
+wl: declared_as(pathname_device, defun_setf(setf_pathname_device)).
 
 wl:lambda_def(defun, setf_pathname_device, f_setf_pathname_device, [sys_object, sys_value], [[progn, [sys_set_class_slot_value, claz_pathname, sys_object, [quote, pathname_device], sys_value]]]).
 wl:arglist_info(setf_pathname_device, f_setf_pathname_device, [sys_object, sys_value], arginfo{all:[sys_object, sys_value], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_object, sys_value], opt:0, outer:Env23, req:[sys_object, sys_value], rest:0, sublists:0, whole:0}).
@@ -1015,7 +1015,7 @@ f_pathname_directory(Object_In, RestNKeys15, FnResult14) :-
 	      block_exit(pathname_directory, FnResult14),
 	      true).
 :- was_info((set_opv(pathname_directory, symbol_function, f_pathname_directory), DefunResult20=pathname_directory)).
-wl: declared(pathname_directory, defun_setf(setf_pathname_directory)).
+wl: declared_as(pathname_directory, defun_setf(setf_pathname_directory)).
 
 wl:lambda_def(defun, setf_pathname_directory, f_setf_pathname_directory, [sys_object, sys_value], [[progn, [sys_set_class_slot_value, claz_pathname, sys_object, [quote, pathname_directory], sys_value]]]).
 wl:arglist_info(setf_pathname_directory, f_setf_pathname_directory, [sys_object, sys_value], arginfo{all:[sys_object, sys_value], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_object, sys_value], opt:0, outer:Env23, req:[sys_object, sys_value], rest:0, sublists:0, whole:0}).
@@ -1061,7 +1061,7 @@ f_pathname_name(Object_In, RestNKeys15, FnResult14) :-
 	      block_exit(pathname_name, FnResult14),
 	      true).
 :- was_info((set_opv(pathname_name, symbol_function, f_pathname_name), DefunResult20=pathname_name)).
-wl: declared(pathname_name, defun_setf(setf_pathname_name)).
+wl: declared_as(pathname_name, defun_setf(setf_pathname_name)).
 
 wl:lambda_def(defun, setf_pathname_name, f_setf_pathname_name, [sys_object, sys_value], [[progn, [sys_set_class_slot_value, claz_pathname, sys_object, [quote, pathname_name], sys_value]]]).
 wl:arglist_info(setf_pathname_name, f_setf_pathname_name, [sys_object, sys_value], arginfo{all:[sys_object, sys_value], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_object, sys_value], opt:0, outer:Env23, req:[sys_object, sys_value], rest:0, sublists:0, whole:0}).
@@ -1107,7 +1107,7 @@ f_pathname_type(Object_In, RestNKeys15, FnResult14) :-
 	      block_exit(pathname_type, FnResult14),
 	      true).
 :- was_info((set_opv(pathname_type, symbol_function, f_pathname_type), DefunResult20=pathname_type)).
-wl: declared(pathname_type, defun_setf(setf_pathname_type)).
+wl: declared_as(pathname_type, defun_setf(setf_pathname_type)).
 
 wl:lambda_def(defun, setf_pathname_type, f_setf_pathname_type, [sys_object, sys_value], [[progn, [sys_set_class_slot_value, claz_pathname, sys_object, [quote, pathname_type], sys_value]]]).
 wl:arglist_info(setf_pathname_type, f_setf_pathname_type, [sys_object, sys_value], arginfo{all:[sys_object, sys_value], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_object, sys_value], opt:0, outer:Env23, req:[sys_object, sys_value], rest:0, sublists:0, whole:0}).
@@ -1132,7 +1132,7 @@ f_setf_pathname_type(Object_In27, Value_In, FnResult24) :-
 	      block_exit(setf_pathname_type, FnResult24),
 	      true).
 :- was_info((set_opv(setf_pathname_type, symbol_function, f_setf_pathname_type), DefunResult32=setf_pathname_type)).
-wl: declared(pathname_version, defun_setf(setf_pathname_version)).
+wl: declared_as(pathname_version, defun_setf(setf_pathname_version)).
 
 wl:lambda_def(defun, setf_pathname_version, f_setf_pathname_version, [sys_object, sys_value], [[progn, [sys_set_class_slot_value, claz_pathname, sys_object, [quote, pathname_version], sys_value]]]).
 wl:arglist_info(setf_pathname_version, f_setf_pathname_version, [sys_object, sys_value], arginfo{all:[sys_object, sys_value], allow_other_keys:0, aux:0, body:0, complex:0, env:0, key:0, names:[sys_object, sys_value], opt:0, outer:Env13, req:[sys_object, sys_value], rest:0, sublists:0, whole:0}).
