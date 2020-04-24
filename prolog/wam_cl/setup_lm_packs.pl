@@ -38,7 +38,7 @@ setup_hist0:-  '$toplevel':setup_history.
 :- meta_predicate '$attvar':run_crv(0,*,*,*).
 :- meta_predicate '$expand':expand_term_list(4,*,*,*,*).
 :- meta_predicate '$parms':cached_library_directory(*,0,*).
-:- meta_predicate '$toplevel':residue_vars(0,-).
+%:- meta_predicate '$toplevel':residue_vars(0,-).
 :- meta_predicate '$toplevel':toplevel_call(0).
 :- meta_predicate '$toplevel':run_initialize(0,*).
 % :- meta_predicate '$toplevel':run_init_goal(0,*).
