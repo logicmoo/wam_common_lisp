@@ -1,6 +1,6 @@
 ## Common Lisp in Prolog Goals
 
-````The resulting Translation of CommonLisp into Prolog who's non-special forms are treated special (operands are always passed unevaluated!) give us the simplest model: it has no types, no data, and no environments and yet the refection is powerful enough to make all resulting optimizations and program self-repairs trivial/obvious. (This Method works for Curry-lang, Haskell, ALL languages)````
+````The resulting Translation of CommonLisp into Prolog who's non-special forms become special FEXPRs (operands are always passed unevaluated!) give us the simplest model: it has no types, no data, and no environments and yet the refection is powerful enough to make all resulting optimizations and program self-repairs trivial/obvious. (This Method works for Curry-lang, Haskell, JavaScript, C, C++, etc - ALL languages)````
 
 Stop implementing an ad-hoc, informally-specified, bug-ridden, slow implementation of less than half of ISO-Prolog.
 
