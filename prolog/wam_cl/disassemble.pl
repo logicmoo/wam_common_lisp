@@ -86,13 +86,8 @@ print_related_clauses(ExceptFor,_OModule,P):-
    once(print_clause_plain(PC)),
    fail)).
 
-
-make_pretty(I,O):- !,notrace((shrink_lisp_strings(I,O), pretty1(O),pretty2(O),pretty3(O))).
-%make_pretty(I,O):- is_user_output,!,shrink_lisp_strings(I,O), pretty1(O),pretty2(O),pretty3(O).
-%make_pretty(I,O):- I=O, pretty1(O),pretty2(O),pretty3(O).
-
 print_clause_plain(I):-
-  current_prolog_flag(color_term, Was),
+  (current_prolog_flag(color_term, Was);Was=[]),!,
   make_pretty(I,O),
     setup_call_cleanup(set_prolog_flag(color_term, false),
      (nl,lcolormsg1((O))),
@@ -102,6 +97,12 @@ print_clause_plain(I):-
 lcolormsg1(Msg):- mesg_color(Msg,Ctrl),!,ansicall_maybe(Ctrl,fmt9(Msg)).
 
 % print_clause_plain(C):- portray_clause_w_vars(O).
+
+
+
+make_pretty(I,O):- !,call_each(must_or_rtrace,((shrink_lisp_strings(I,O), pretty1(O),pretty2(O),pretty3(O)))).
+%make_pretty(I,O):- is_user_output,!,shrink_lisp_strings(I,O), pretty1(O),pretty2(O),pretty3(O).
+%make_pretty(I,O):- I=O, pretty1(O),pretty2(O),pretty3(O).
 
 
 may_debug_var(_,_,V):- nonvar(V),!.

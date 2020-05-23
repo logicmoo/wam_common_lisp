@@ -193,22 +193,25 @@ primordial_init:-
   (clear_op_buffer),
   set_prolog_flag(wamcl_init_level,3))). 
 
+%must_or_rtrace(X):- on_x_rtrace(X)->true;rtrace(X).
+
 % system sourcefile load hooks
 do_wamcl_inits:- current_prolog_flag(wamcl_init_level,N),N>5,!.
 do_wamcl_inits:-
  set_prolog_flag(logicmoo_message_hook, break),
  set_prolog_flag(gc, false),
  current_prolog_flag(access_level, W),
- set_prolog_flag(access_level, system),
- must_det_l((  
+ setup_call_cleanup(set_prolog_flag(access_level, system),
+ call_each(must_or_rtrace,
+ ((  
   
-  (primordial_init),
+  primordial_init,
   set_prolog_flag(wamcl_init_level,6),  
-  (clear_op_buffer),
+  clear_op_buffer,
   set_opv(xx_package_xx,symbol_value,pkg_user),
   set_prolog_flag(wamcl_gvars,true),
-  set_prolog_flag(wamcl_init_level,7))),
- set_prolog_flag(access_level, W).
+  set_prolog_flag(wamcl_init_level,7)))),
+ set_prolog_flag(access_level, W)).
 
 :- ensure_loaded(eightball).
 :- include(header).
@@ -224,7 +227,9 @@ clear_op_buffer:- % trace('8ball':always/1,[-call,-exit,+fail]),
 clear_op_buffer:- true.
 
 show_must(true):-!.
-show_must(G):-dmsg(doing(G)),(G*->dmsg(did(G));must(G)).
+
+show_must(G):-dmsg(doing(G)),!, (must_or_rtrace(G)*->dmsg(did(G));must(G)).
+show_must(G):-dmsg(doing(G)),(catch(G,Err,(dmsg(Err->G),rtrace(G)))*->dmsg(did(G));must(G)).
 
 show_help:- writeln(
 'WAM-CL (https://github.com/TeamSPoon/wam_common_lisp) is an ANSI Common Lisp implementation.

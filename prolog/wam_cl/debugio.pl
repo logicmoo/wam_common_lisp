@@ -50,7 +50,8 @@ fmt_lispcode(Txt):- set_md_lang('common-lisp'),cmpout(comment(Txt)),set_md_lang(
 % Lisp Informational Message (depends on verbosity level)
 dbginfo(X):- dnotrace(ignore((is_verbose;is_must_show_msg(X))->userout(X))).
 
-dnotrace(G):- notrace(G).
+%dnotrace(G):- !, notrace(G).
+dnotrace(G):- call(G).
 
 % User Message (intended to be seen)
 userout(flat(X)):- !,write_flat(X).
