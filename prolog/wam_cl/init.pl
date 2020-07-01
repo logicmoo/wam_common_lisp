@@ -14,6 +14,12 @@
  *******************************************************************/
 :- module(in1t, []).
 
+:- meta_predicate show_must(0).
+:- meta_predicate without_gc(0).
+:- meta_predicate set_interactive(0).
+:- meta_predicate imply_interactive(0).
+
+:- use_module(library(backcomp)).
 
 :- set_prolog_flag(backtrace,true).
 :- set_prolog_flag(backtrace_depth,500).
@@ -45,24 +51,33 @@ set_lisp_option(quiet):-
 
 set_lisp_option(debug):-
   set_lisp_option(verbose),
-  set_prolog_flag(debug,true).
+  set_prolog_flag(debug,true),
+  set_prolog_flag(lisp_pre_goal,rtrace).
 
 set_lisp_option(optimize):- 
   set_prolog_flag(last_call_optimisation,true).
 
+lisp:- lisp_repl.
 
-lisp:- 
+lisp_repl:- 
  must(do_wamcl_inits), 
  must(lisp_goal).
 
 lisp_goal:- is_using_lisp_main, call_lisp_main(Exit), !, main_exit(Exit).
-lisp_goal:- is_making_lisp_exe, make_exe,!,lisp_goal_pt2.
-lisp_goal:- lisp_goal_pt2.
+lisp_goal:- is_making_lisp_exe, lisp_goal_pt1, make_exe,!,lisp_goal_pt2.
+lisp_goal:- lisp_goal_pt1, lisp_goal_pt2.
 
-lisp_goal_pt2:-   % so we can get in on a break 
-  % current_prolog_flag(wamcl_init_level,7),
-  current_prolog_flag(lisp_repl_goal,Else),Else\==[],rtrace,call(Else),!.
-lisp_goal_pt2:- repl.
+lisp_goal_pt1:-   % so we can add debug switches?
+  current_prolog_flag(lisp_pre_goal,Else),Else\==[],
+  call(Else),!.
+lisp_goal_pt1:- !.
+
+lisp_goal_pt2:-   % so we can get in on a break % current_prolog_flag(wamcl_init_level,7),
+  current_prolog_flag(lisp_repl_goal,Else),Else\==[],
+  call(Else),!.
+
+%lisp_goal_pt2:- repl.
+lisp_goal_pt2:- !.
 
 call_lisp_main(Exit):- 
   get_lisp_main(Name),!,
@@ -92,11 +107,13 @@ make_exe :-
   qsave_program(File,[goal((true)),autoload(false)]).
 
 
+:- set_prolog_flag(lisp_pre_goal,true).
+
 do_after_load(G):- assertz(wl:interned_eval(call(G))).
 % set if already set
 set_interactive(TF):-
  (TF -> set_prolog_flag(lisp_repl_goal,repl);
-    set_prolog_flag(lisp_repl_goal,halt)).
+    set_prolog_flag(lisp_repl_goal,true)).
 % doesnt set if already set
 imply_interactive(TF):- current_prolog_flag(lisp_repl_goal,_)->true;set_interactive(TF).
 imply_flag(Name,Value):- atom_concat(lisp_,Name,LName), ((current_prolog_flag(LName,N),N\==1,N\==[])->true;set_prolog_flag(LName,Value)).
@@ -137,8 +154,8 @@ handle_program_args('--quiet','--silent'):- set_lisp_option(quiet).
 % compiler
 handle_program_args('--exe','-o',File):- set_prolog_flag(lisp_exe,File),imply_interactive(false).
 handle_program_args('--main','-main',Main):- set_prolog_flag(lisp_main,Main),imply_interactive(false).
-handle_program_args('--compile','-c',File):- do_after_load(f_compile_file(File,[],_)),imply_interactive(false).
-handle_program_args('--l','-l',File):- do_after_load(pl_load(File,[],_)),imply_interactive(false).
+handle_program_args('--compile','-c',File):- do_after_load(f_compile_file(File,[],_)),nop(imply_interactive(false)).
+handle_program_args('--l','-l',File):- do_after_load(pl_load(File,[],_)). % ,imply_interactive(false).
 handle_program_args('--quit','-quit'):- set_interactive(false).
 
 % interactive
@@ -147,7 +164,7 @@ handle_program_args('--eval','-x',Form):- do_after_load(lisp_compiled_eval(Form,
 handle_program_args('--repl','-repl'):- set_interactive(true).
 handle_program_args('--norepl','-norepl'):- set_interactive(false).
 handle_program_args('--test','--markdown'):- set_prolog_flag(lisp_markdown,true).
-handle_program_args('--sock','--lispsock',Form):- atom_number(Form,Port),start_lspsrv(repl,Port,"Lisp Repl").
+handle_program_args('--sock','--lispsock',Form):- atom_number(Form,Port)->start_lspsrv(repl,Port,"Lisp Repl");start_lspsrv(repl,3301,"Lisp Repl").
 
 
 
@@ -172,14 +189,24 @@ __        ___    __  __        ____ _
    \\_/\\_/_/   \\_\\_|  |_|      \\____|_____|
 '),nl, write('Common Lisp, written in Prolog'),nl.
 
+:- module_transparent(without_gc/1).
+without_gc(Goal):-
+  current_prolog_flag(gc,Was),
+  set_prolog_flag(gc, true),
+  garbage_collect,
+  trim_stacks,
+  cleanup_strings,
+  garbage_collect_atoms,
+  garbage_collect_clauses,
+  set_prolog_flag(gc, false),
+  call_cleanup(Goal,set_prolog_flag(gc, Was)).
 
 % primordial inits
 primordial_init:- current_prolog_flag(wamcl_init_level,N),N>0,!.
 primordial_init:- 
  set_prolog_flag(wamcl_init_level,1),
-   set_prolog_flag(logicmoo_message_hook, break),
-   set_prolog_flag(gc, false),
- must_det_l((
+   set_prolog_flag(logicmoo_message_hook, break),   
+  without_gc(must_det_l((
   % allows "PACKAGE:SYM" to be created on demand (could this be an initials a default)  
   set_opv(xx_package_xx,symbol_value, pkg_sys),
   ensure_env,
@@ -191,7 +218,8 @@ primordial_init:-
   set_prolog_flag(wamcl_init_level,2),
   current_prolog_flag(argv,Y2),handle_all_program_args(Y2),
   (clear_op_buffer),
-  set_prolog_flag(wamcl_init_level,3))). 
+  set_prolog_flag(wamcl_init_level,3)))).
+ 
 
 %must_or_rtrace(X):- on_x_rtrace(X)->true;rtrace(X).
 
@@ -199,9 +227,8 @@ primordial_init:-
 do_wamcl_inits:- current_prolog_flag(wamcl_init_level,N),N>5,!.
 do_wamcl_inits:-
  set_prolog_flag(logicmoo_message_hook, break),
- set_prolog_flag(gc, false),
  current_prolog_flag(access_level, W),
- setup_call_cleanup(set_prolog_flag(access_level, system),
+ without_gc((setup_call_cleanup(set_prolog_flag(access_level, system),
  call_each(must_or_rtrace,
  ((  
   
@@ -211,7 +238,7 @@ do_wamcl_inits:-
   set_opv(xx_package_xx,symbol_value,pkg_user),
   set_prolog_flag(wamcl_gvars,true),
   set_prolog_flag(wamcl_init_level,7)))),
- set_prolog_flag(access_level, W)).
+ set_prolog_flag(access_level, W)))).
 
 :- ensure_loaded(eightball).
 :- include(header).

@@ -14,6 +14,9 @@
  *******************************************************************/
 :- module(pathname, []).
 
+:- meta_predicate or_nil(0).
+:- meta_predicate or_die(0).
+
 
 
 :- include('./header').

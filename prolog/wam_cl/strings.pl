@@ -16,6 +16,9 @@
  *******************************************************************/
 :- module(string, []).
 
+:- meta_predicate index_of_first_failure(*,2,*,*,*).
+:- meta_predicate index_of_first_success(*,2,*,*,*).
+
 
 
 % base-string == (vector base-character) 

@@ -21,6 +21,16 @@
 
 % :- require([colormsg1/1]).
 
+:- system:use_module(library(apply),[exclude/3]).
+:- system:use_module(library(apply),[maplist/2,maplist/3]).
+:- system:use_module(library(error),[existence_error/2]).
+:- system:use_module(library(gensym),[gensym/2]).
+:- system:use_module(library(lists),[member/2,append/3,nth1/3,select/3]).
+:- system:use_module(library(occurs),[sub_term/2,contains_var/2]).
+:- system:use_module(library(backcomp)).
+:- system:use_module(library(rbtrees)).
+:- system:use_module(library(lists),[member/2,append/3,nth1/3,select/3]).
+
 :- multifile(user:portray/1).
 :- dynamic(user:portray/1).
 :- discontiguous(user:portray/1).

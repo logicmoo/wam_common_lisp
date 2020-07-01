@@ -15,6 +15,16 @@
  *******************************************************************/
 :- module('os7r33M', []).
 
+:- meta_predicate in_comment(0).
+:- meta_predicate both_outputs(0).
+:- meta_predicate split_user_output_to_file(*,0).
+:- meta_predicate in_md2(*,0).
+:- meta_predicate in_md(*,0).
+:- meta_predicate on_first_write_old_goal(*,0,*,*).
+:- meta_predicate show_call_trace(0).
+:- meta_predicate dnotrace(0).
+:- meta_predicate ansicall_maybe(*,0).
+
 
 :- include('./header').
 

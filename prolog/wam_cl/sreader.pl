@@ -22,8 +22,40 @@
   parse_sexpr/2]).
 
 :- use_module(library(logicmoo_common)).
+:- use_module(library(backcomp)).
+:- use_module(library(rbtrees)).
 
+:- meta_predicate always_b(//,?,?).
+:- meta_predicate bx(0).
+:- meta_predicate call_proc(1,?).
+:- meta_predicate dcg_and2(//,//,?,?).
+:- meta_predicate dcg_each_call_cleanup(0,//,0,?,?).
+:- meta_predicate dcg_not(//,?,?).
+:- meta_predicate dcg_phrase(//,?,?).
+:- meta_predicate dcg_xor(//,//,?,?).
+:- meta_predicate expr_with_text(*,2,*,*,*).
+:- meta_predicate locally_setval(*,*,0).
+:- meta_predicate notrace_catch_fail(0).
+:- meta_predicate notrace_catch_fail(0,?,0).
+:- meta_predicate phrase_from_buffer_codes(//,*).
+:- meta_predicate phrase_from_buffer_codes_nd(//,*).
+:- meta_predicate phrase_from_pending_stream(*,//,*).
+:- meta_predicate phrase_from_pending_stream(//,?).
+:- meta_predicate phrase_from_stream_lazy_part(//,*).
+:- meta_predicate read_string_until(*,*,//,?,?).
+:- meta_predicate read_string_until_no_esc(*,//,?,?).
+:- meta_predicate read_string_until_pairs(*,//,?,?).
+:- meta_predicate remove_optional_char(//,?,?).
+:- meta_predicate sexpr_dcgPeek(//,?,?).
+:- meta_predicate sexpr_dcgUnless(//,?,?).
+:- meta_predicate sexpr_vector0(*,//,?,?).
+:- meta_predicate track_stream(*,0).
+:- meta_predicate with_all_rest_info(1).
+:- meta_predicate with_lisp_translation_stream(*,1).
+:- meta_predicate write_trans(+,*,2,?).
+:- meta_predicate zalwayz(//,?,?).
 :- meta_predicate(zalwayz(0)).
+
 zalwayz(G):- must(G).
 
 def_is_characterp(CH):- current_predicate(is_characterp/1),!,call(call,is_characterp,CH).

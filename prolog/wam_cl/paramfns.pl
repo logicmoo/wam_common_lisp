@@ -15,6 +15,17 @@
 
 :- include('./header').
 
+:- meta_predicate apply_as_pred(2,?).
+:- meta_predicate apply_as_pred(3,?,?).
+:- meta_predicate apply_as_pred(4,?,?,?).
+:- meta_predicate call_as_ident(2,?,?).
+:- meta_predicate function(*,2,?,?).
+:- meta_predicate function(2,?,?).
+:- meta_predicate not_fn(1,?).
+:- meta_predicate not_fn(2,?,?).
+:- meta_predicate not_fn(3,?,?,?).
+:- meta_predicate xform_with_ident(*,2,*).
+
 xform_with_ident([],_Ident,[]).
 xform_with_ident([Y0|YR0],Ident,[Y|YR]):-
    call_as_ident(Ident,Y0,Y),

@@ -6,6 +6,7 @@
  *
  *
  * Douglas'' Notes:
+ *   some of this code will be moved to readers probably
  *
  * (c) Douglas Miles, 2017
  *
@@ -14,7 +15,7 @@
  *******************************************************************/
 :- module(readtables, []).
 
-% some of this code will be moved to readers probably
+:- meta_predicate rewrite_some(2,*,*).
 
 
 :- include('./header').

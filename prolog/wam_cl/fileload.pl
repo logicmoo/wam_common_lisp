@@ -14,7 +14,8 @@
  *******************************************************************/
 :- module(loadfile, []).
 
-
+:- meta_predicate lisp_grovel(0).
+:- meta_predicate with_each_form(1,*).
 
 :- include('./header').
 

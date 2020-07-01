@@ -258,12 +258,11 @@ lw:- f_load("wam-cl-params",_).
 
 :- fixup_exports.
 
-:- set_prolog_flag(verbose_autoload,false).
-
-:- initialization((lisp),main).
-
+% :- set_prolog_flag(verbose_autoload,false).
 
 :- use_module(library(shell)).
+
+:- initialization((in1t:lisp_repl),main).
 
 :- if(false).
 :- if(getuid(1006)).

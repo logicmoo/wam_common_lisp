@@ -16,6 +16,22 @@
 
 :- include('./header').
 
+:- meta_predicate ct(3,?,?,?).
+:- meta_predicate push_append(3,?,?,?).
+:- meta_predicate push_el_append(3,?,*,*,*).
+:- meta_predicate push_le_prepend(3,?,*,?,?).
+:- meta_predicate push_list_prepend(3,?,*,*).
+:- meta_predicate push_lst_append(3,?,*,*).
+:- meta_predicate push_prepend(3,?,?,?).
+:- meta_predicate set_el(3,?,*,*).
+:- meta_predicate update_el_or_append(3,?,*,*,?).
+:- meta_predicate update_el_tail_or_append(3,?,*,?,?).
+:- meta_predicate update_lst_or_append(3,?,*,?).
+:- meta_predicate update_lst_or_prepend(3,*,*,*).
+:- meta_predicate update_or_append(3,?,?,?).
+:- meta_predicate update_or_prepend(3,?,?,?).
+:- meta_predicate within_labels_context(*,*,0).
+
 :- use_module(library(rbtrees)).
 
 

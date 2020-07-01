@@ -12,7 +12,9 @@
  * The program is a *HUGE* common-lisp compiler/interpreter. It is written for YAP/SWI-Prolog .
  *
  *******************************************************************/
-:- module(docs, []).
+:- module(d0c5, []).
+
+:- meta_predicate note_if_matches(*,*,0).
 
 
 
