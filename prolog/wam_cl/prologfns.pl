@@ -116,7 +116,7 @@ compile_prolog_call(Ctx,Env,Result,[sys_rtrace|Progn],Prev, rtrace(Body) ):-
    rtrace(must_compile_progn(Ctx,Env,Result, Progn, Prev, Body)).
 
 as_prolog_object(Operand,PrologArg):- is_stringp(Operand),to_prolog_string(Operand,PrologArg).
-as_prolog_object(Operand,PrologArg):- is_unmberp(Operand),to_prolog_number(Operand,PrologArg).
+as_prolog_object(Operand,PrologArg):- is_numberp(Operand),to_prolog_number(Operand,PrologArg).
 as_prolog_object(PrologArg,PrologArg).
 
 read_prolog_object(Operand):- read(Operand).

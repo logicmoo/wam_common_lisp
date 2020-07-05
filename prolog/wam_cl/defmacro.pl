@@ -182,6 +182,8 @@ f_sys_set_symbol_macro_function(Symbol,FunctionSpec,ResultIsMacro):-
   as_symbol_macro_function(_Ctx,_Env,Symbol,FunctionSpec,ResultIsMacro),
   set_opv(Symbol,symbol_function,ResultIsMacro),set_opv(ResultIsMacro,type_of,sys_macro).
 
+eval(_Ctx, Env, Eval,Result):- eval(Eval, Env, Result).
+
 as_symbol_macro_function(Ctx,Env,_Symbol,function(MF),ResultIsMacro):-eval(Ctx,Env,function(MF),ResultIsMacro).
 as_symbol_macro_function(Ctx,Env,_Symbol,MF,ResultIsMacro):- \+ is_list(MF),eval(Ctx,Env,MF,ResultIsMacro).
 as_symbol_macro_function(Ctx,Env,Symbol,FormalParmsMacroBody,Macro):- assertion(is_list(FormalParmsMacroBody)),    
