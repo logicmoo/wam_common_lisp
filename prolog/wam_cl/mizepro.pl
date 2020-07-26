@@ -16,7 +16,7 @@
 :- set_module(class(library)).
 :- include('./header').
 
-debug_optimize(Msg):- wdmsg(Msg).
+debug_optimize(Msg):- dmsg(Msg).
 
 
 allowed_level(X):- wam_cl_option(safety,V),V\==1,!,Lvl is 4-V,  X =< Lvl.

@@ -140,7 +140,7 @@ do_check_foc_operator(_Ctx,Env,_BindType,_F,_Args,ProposedName, BetterName,[Env]
   atom_concat('mf_',Root,ProposedName),  
   atom_concat('sf_',Root,BetterName),
   current_predicate(BetterName/N),N>=1,
-  wdmsg(rename(ProposedName,BetterName)),!.
+  dmsg(rename(ProposedName,BetterName)),!.
 
 do_check_foc_operator(_Ctx,Env,_BindType,_F,_Args,ProposedName, BetterName,[Env]):-
   atom_concat('sf_',Root,ProposedName),  
@@ -152,12 +152,12 @@ do_check_foc_operator(_Ctx,_Env,_BindType,_F,_Args,ProposedName, BetterName,[]):
   atom_concat('mf_',Root,ProposedName),  
   atom_concat('f_',Root,BetterName),
   current_predicate(BetterName/N),N>=1,
-  wdmsg(rename(ProposedName,BetterName)),!.
+  dmsg(rename(ProposedName,BetterName)),!.
 
 do_check_foc_operator(_Ctx,Env,_BindType,_F,_Args,ProposedName, BetterName,[Env]):-
   atom_concat('mf_',Root,ProposedName),  
   atom_concat('sf_',Root,BetterName),
-  wdmsg(rename(ProposedName,BetterName)),!.
+  dmsg(rename(ProposedName,BetterName)),!.
 
 do_check_foc_operator(_Ctx,_Env,_BindType,_F,_Args,ProposedName, BetterName,[]):-   
    current_predicate(ProposedName/N),N>=1,!,ProposedName= BetterName.
@@ -170,7 +170,7 @@ compile_apply_function_or_macro_call(Ctx,Env,FN,Args,Result,ExpandedFunction):-
  always((
    (is_list(Args)->length_safe(Args,ArgsLen);(integer(Args)->ArgsLen=Args;true)),
    check_foc_operator(Ctx,Env,BindType,FN,ArgsLen, ProposedName,Extra),!,  
-   (BindType == kw_function -> true ; wdmsg(BindType->ProposedName)),
+   (BindType == kw_function -> true ; dmsg(BindType->ProposedName)),
    align_args_or_fallback1(Ctx,Env,FN, ProposedName,Args,Result,ArgsPlusResult),!,
    append(Extra,ArgsPlusResult,ExtraArgsPlusResult),
    ExpandedFunction =.. [ ProposedName | ExtraArgsPlusResult])),!.

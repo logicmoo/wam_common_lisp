@@ -199,12 +199,12 @@ get_slot_name0(Kind,Key,SlotName):- builtin_slot(Kind,Key),!,Key=SlotName.
 %get_slot_name0(claz_u_aardvark, kw_legs, u_mammal_legs):-!.
 %get_slot_name0(claz_u_aardvark, kw_comes_from, u_mammal_comes_from):-!.
 %get_slot_name0(claz_symbol,value,symbol_value).
-get_slot_name0(Kind,Key,SlotName):- sys_hash_table_index_vector==Key,!,wdmsg(get_slot_name0(Kind,Key,SlotName)),break.
+get_slot_name0(Kind,Key,SlotName):- sys_hash_table_index_vector==Key,!,dmsg(get_slot_name0(Kind,Key,SlotName)),break.
 get_slot_name0(Kind,SlotName,ZLOT):- get_struct_opv_i(Kind,initarg, Name, ZLOT),same_symbol_names(SlotName,Name),!.
 get_slot_name0(Kind,SlotName,ZLOT):- get_struct_opv_i(Kind,name, Name, ZLOT),same_symbol_names(SlotName,Name),!.
 get_slot_name0(Kind,SlotName,ZLOT):- get_struct_opv_i(Kind,_,OneOf,ZLOT),notrace(e_member(SlotName,OneOf)),!.
 get_slot_name0(Kind,SlotName,ZLOT):- get_struct_opv_i(Super,_,OneOf,ZLOT),notrace(e_member(SlotName,OneOf)),!,
-  wdmsg(always(get_slot_name0(Super->Kind,SlotName,ZLOT))).
+  dmsg(always(get_slot_name0(Super->Kind,SlotName,ZLOT))).
 get_slot_name0(_,A,A).                                  
 
 same_symbol_names(S1,S2):- pl_symbol_name(S1,N1),pl_symbol_name(S2,N2),!,N1=N2.
@@ -851,7 +851,7 @@ add_opv_new_iiii(Ref,Prop,Value):-current_prolog_flag(wamcl_gvars,true),!, alway
    %show_call_trace
    (always(nb_put_attr(Obj,Prop,Value))).
 add_opv_new_iiii(Obj,Prop,Value):- % show_call_trace
-   ((atom(Obj),(atom_concat_or_rtrace(sys_,_,Obj);atom_concat_or_rtrace(os_,_,Obj);true))->true;wdmsg(assert_lsp(o_p_v(Obj,Prop,Value)))),
+   ((atom(Obj),(atom_concat_or_rtrace(sys_,_,Obj);atom_concat_or_rtrace(os_,_,Obj);true))->true;dmsg(assert_lsp(o_p_v(Obj,Prop,Value)))),
    assert_lsp_opv(Obj,Prop,Value).
 
 assert_lsp_opv(Obj,Prop,Value):- Prop==symbol_value,

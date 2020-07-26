@@ -197,7 +197,7 @@ move_symbol_into(S1,sys(P2)):- f_symbol_package(S1,P1),pl_symbol_name(S1,N1),int
 %  forall(retract(soops:o_p_v(S1,X,Y)),(skipped_p(X)->true;assert(soops:o_p_v(S2,X,Y)))),
 add_rename(S1,P1,INEXT,S2):-
    assert_if_new(is_rename_w(S1,P1,INEXT,S2)),
-   wdmsg(add_rename(S1,P1,INEXT,S2)).
+   dmsg(add_rename(S1,P1,INEXT,S2)).
 
 skipped_p(symbol_package).
 

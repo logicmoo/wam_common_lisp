@@ -69,7 +69,7 @@ grovel_system_symbols(File):-
   known_symbol(Symbol,Package),f_export(Symbol,Package,_),
   (get_opv(Symbol,symbol_function,F)-> true ;show_call_trace(set_opv(Symbol,symbol_function,F))),
   pl_symbol_name(Symbol,String),
-  wdmsg((grovelled_source_file_symbols(String,Package,Symbol,M,F)))))),fail))).
+  dmsg((grovelled_source_file_symbols(String,Package,Symbol,M,F)))))),fail))).
 
 pkg_search_order(Package):- package_use_list(pkg_user, Package).
 

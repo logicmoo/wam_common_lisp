@@ -238,7 +238,7 @@ f_sys_put_sysprop(Symbol,Prop,Value,Optionals,Ret):- %assertion(is_symbolp(Symbo
    (Ret=Value, set_opv(Symbol,sysprops,[Prop,Value|PList]))))).
 
 correct_missing_symbols:- 
- wdmsg(correct_missing_symbols),
+ dmsg(correct_missing_symbols),
      ignore(((package_external_symbols(Pkg,Str,Sym);package_internal_symbols(Pkg,Str,Sym)),
   Pkg\==pkg_kw,atom(Sym),create_symbol(Str,Pkg,Sym),fail)).
 

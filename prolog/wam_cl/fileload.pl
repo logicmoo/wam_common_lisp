@@ -243,7 +243,7 @@ grovel_time_called(set_opv).
 grovel_time_called(break).
 grovel_time_called(sf_sys_strace).
 
-grovel_file(File,Keys,Load_RetO):- wdmsg(:- f_compile_file(File,Keys,Load_RetO)).
+grovel_file(File,Keys,Load_RetO):- dmsg(:- f_compile_file(File,Keys,Load_RetO)).
 
 lisp_grovel(PrologCode):- ( \+ compound(PrologCode); \+ callable(PrologCode)),!.
 lisp_grovel(PAB):- PAB=..[F,A|_],grovel_time_called(F),!,(var(A)-> true;call(PAB)),!.

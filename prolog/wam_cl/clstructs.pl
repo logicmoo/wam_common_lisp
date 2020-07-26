@@ -41,7 +41,7 @@ sf_sys_add_ci(_ReplEnv,_Str,Claz0,S0,LspObj,LspKey,LspValue,t):-
   to_claz(Claz0,Claz),add_ci_p2(Claz,S0,LspObj,LspKey,LspValue).
 
 notify_assert(G):- clause(G,_),!.
-notify_assert(G):- assertz(G),wdmsg(G).
+notify_assert(G):- assertz(G),dmsg(G).
 
 is_class_prop(class_name).
 is_class_prop(type_of).

@@ -58,14 +58,16 @@ fmt_lispcode(Cmt):- is_comment(Cmt,Txt),clean_codes(Txt,Clean),atom_string(Clean
 fmt_lispcode(Txt):- set_md_lang('common-lisp'),cmpout(comment(Txt)),set_md_lang(prolog).
 
 % Lisp Informational Message (depends on verbosity level)
+
 dbginfo(X):- dnotrace(ignore((is_verbose;is_must_show_msg(X))->userout(X))).
 
 %dnotrace(G):- !, notrace(G).
 dnotrace(G):- call(G).
 
+userout(X):- notrace(userout0(X)).
 % User Message (intended to be seen)
-userout(flat(X)):- !,write_flat(X).
-userout(X):- simplify_goal_printed(X,XX),!,in_md(cl,dnotrace(dbmsg(comment(XX)))).
+userout0(flat(X)):- !,write_flat(X).
+userout0(X):- simplify_goal_printed(X,XX),!,in_md(cl,dnotrace(dbmsg(comment(XX)))).
 
 write_flat(X):- !, dnotrace((make_pretty(X,X0),writeq(X0),writeln('.'))),!.
 
@@ -73,6 +75,7 @@ write_flat(X):- !, dnotrace((make_pretty(X,X0),writeq(X0),writeln('.'))),!.
 cmpout(X):- in_md(prolog,dnotrace(dbmsg(X))).
 
 
+dbmsg(_):- notrace(current_prolog_flag(dmsg_level,never)),!.
 dbmsg(X):- make_pretty(X,X0),both_outputs(dbmsg0(X0)).
 dbmsg0(Var):- var(Var),!,in_comment(colormsg1(dbmsg_var(Var))).
 dbmsg0(Str):- string(Str),!,in_comment(colormsg1(Str)).
