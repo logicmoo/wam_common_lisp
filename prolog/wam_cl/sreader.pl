@@ -2,6 +2,7 @@
 :- module(s3xpr,[
   codelist_to_forms/2,
   svar_fixvarname/2,
+  with_kifvars/1,
   current_input_to_forms/2,
   input_to_forms/2,
   input_to_forms/3,
@@ -84,7 +85,7 @@ def_compile_all(I,O):- wdmsg(undefined_compile_all(I)),I=O.
 kif_ok:- t_l:sreader_options(logicmoo_read_kif,true).
 
 
-:- meta_predicate((with_lisp_translation(+,1),input_to_forms_debug(+,2))).
+:- meta_predicate((with_lisp_translation(+,1),input_to_forms_debug(+,:))).
 :- meta_predicate sexpr_vector(*,//,
  ?,?).
 :- meta_predicate phrase_from_stream_nd(//,
@@ -195,7 +196,10 @@ lazy_forgotten(In,UnUsed,UnUsed):-
 % :- use_module(library(yall)).
 % :- rtrace.
 % tstl(I):- with_lisp_translation(I,([O]>>(writeq(O),nl))).
-tstl(I):- with_lisp_translation(I,writeqnl).
+tstl(I):- with_kifvars(with_lisp_translation(I,writeqnl)).
+
+with_kifvars(Goal):- 
+  locally(t_l:sreader_options(logicmoo_read_kif,true),Goal).
 
 throw_reader_error(Error):- wdmsg(throw(reader_error(Error))),dumpST,wdmsg(throw(reader_error(Error))),throw(reader_error(Error)).
 
@@ -322,6 +326,7 @@ charvar(C):- integer(C)-> true; (writeln(charvar(C)),break,fail).
 %
 % Parse S-expression.
 %
+
 parse_sexpr(S, Expr) :- is_stream(S),!,parse_sexpr_stream(S,Expr).
 parse_sexpr(string(String), Expr) :- !,parse_sexpr_ascii(String, Expr).
 parse_sexpr(atom(String), Expr) :- !,parse_sexpr_ascii(String, Expr).
@@ -330,12 +335,13 @@ parse_sexpr((String), Expr) :- string(String),!,parse_sexpr_ascii(String, Expr).
 parse_sexpr([E|List], Expr) :- !, parse_sexpr_ascii([E|List], Expr).
 parse_sexpr(Other, Expr) :- zalwayz(quietly_sreader((l_open_input(Other,In)->Other\=@=In))),!,parse_sexpr(In, Expr).
 
+
 :- export(txt_to_codes/2).
-txt_to_codes(AttVar,AttVarO):-attvar(AttVar),!,AttVarO=AttVar.
 txt_to_codes(S,Codes):- is_stream(S),!,stream_to_lazy_list(S,Codes),!.
-txt_to_codes([C|Text],[C|Text]):- integer(C),is_list(Text),!.
+txt_to_codes(AttVar,AttVarO):-attvar(AttVar),!,AttVarO=AttVar.
+% txt_to_codes([C|Text],[C|Text]):- integer(C),is_list(Text),!.
 % txt_to_codes([C|Text],_):- atom(C),atom_length(C,1),!,throw(txt_to_codes([C|Text])).
-txt_to_codes(Text,Codes):- notrace_catch_fail((text_to_string_safe(Text,String),!,string_codes(String,Codes))).
+txt_to_codes(Text,Codes):- notrace_catch_fail((text_to_string_safe(Text,String),!,string_codes(String,Codes))),!.
 
 %% parse_sexpr_ascii( +Codes, -Expr) is det.
 %
@@ -745,7 +751,7 @@ sexpr_list([Car|Cdr]) --> sexpr(Car), !, sexpr_rest(Cdr),!.
 
 sexpr_rest([]) --> `)`, !.
 sexpr_rest(E) --> `.`, [C], {\+ sym_char(C)}, !, sexpr(E,C), !, `)`.
-%sexpr_rest(E) --> `@`, rsymbol(`?`,E), `)`.
+sexpr_rest(E) --> {kif_ok}, `@`, rsymbol(`?`,E), `)`.
 sexpr_rest([Car|Cdr]) --> sexpr(Car), !, sexpr_rest(Cdr),!.
 
 sexpr_vector(O,End) --> zalwayz(sexpr_vector0(IO,End)),!,{zalwayz(O=IO)}.
@@ -758,7 +764,6 @@ sexpr_string(X)--> read_string_until(X,`"`).
 %sexpr_string([C|S],End) --> `\\`,!, zalwayz(escaped_char(C)),!, sexpr_string(S,End).
 %sexpr_string([],End) --> End, !.
 % sexpr_string([32|S]) --> [C],{eoln(C)}, sexpr_string(S).
-% sexpr_string([35, 36|S]) --> `&%`, !, sexpr_string(S).
 %sexpr_string([C|S],End) --> [C],!,sexpr_string(S,End).
 
 read_string_until_no_esc(String,End)--> read_string_until(noesc,String,End).
@@ -767,6 +772,7 @@ read_string_until(String,End)--> read_string_until(esc,String,End).
 
 read_string_until(esc,[C|S],End) --> `\\`,!, zalwayz(escaped_char(C)),!, read_string_until(esc,S,End),!.
 read_string_until(_,[],HB) --> HB, !.
+%read_string_until(Esc,[35, 36|S],HB) --> {kif_ok}, `&%`, !,read_string_until(Esc,S,HB),!.
 read_string_until(Esc,[C|S],HB) --> [C],!,read_string_until(Esc,S,HB),!.
 
 
@@ -1132,7 +1138,6 @@ svar('$VAR'(Name),VarName):-!,zalwayz(svar_fixvarname(Name,VarName)).
 svar(_,_):- \+ kif_ok,!,fail.
 svar([],_):-!,fail.
 svar('#'(Name),NameU):-!,svar(Name,NameU),!.
-
 svar('?'(Name),NameU):-svar_fixvarname(Name,NameU),!.
 svar('@'(Name),NameU):-svar_fixvarname(Name,NameU),!.
 % svar(VAR,Name):-atom(VAR),atom_concat_or_rtrace('_',_,VAR),svar_fixvarname(VAR,Name),!.
@@ -1432,6 +1437,14 @@ maybe_var(S,Name,'$VAR'(Name)):- S=='?',atom(Name),!.
 %
 sexpr_sterm_to_pterm(S,P):- sexpr_sterm_to_pterm(0,S,P).
 
+
+sexpr_sterm_to_pterm_pre_list(_,STERM,STERM):- \+ compound(STERM), !.
+sexpr_sterm_to_pterm_pre_list(_,STERM,STERM):- \+ is_list(STERM), !.
+% sexpr_sterm_to_pterm_pre_list(_,[S|STERM],[S|STERM]):- STERM == [], !.
+sexpr_sterm_to_pterm_pre_list(TD,[S0|STERM0],[S|STERM]):- 
+ (is_list(S0)->sexpr_sterm_to_pterm(TD,S0,S);sexpr_sterm_to_pterm_pre_list(TD,S0,S)),
+ sexpr_sterm_to_pterm_pre_list(TD,STERM0,STERM).
+
 sexpr_sterm_to_pterm(_TD,VAR,VAR):-is_ftVar(VAR),!.
 sexpr_sterm_to_pterm(_TD,S,P):- is_exact_symbol(S,P),!.
 sexpr_sterm_to_pterm(_TD,'#'(S),P):- is_exact_symbol(S,P),!.
@@ -1447,10 +1460,11 @@ sexpr_sterm_to_pterm(TD,[S,Vars|TERM],PTERM):- nonvar(S),
    PTERM=..[S,Vars|PLIST])),!.
 */
 
-sexpr_sterm_to_pterm(TD,[S|STERM],PTERM):- var(S),  TD1 is TD+1, sexpr_sterm_to_pterm_list(TD1,STERM,PLIST),s_univ(TD,PTERM,[S|PLIST]),!.
-sexpr_sterm_to_pterm(_,[S,STERM],PTERM):- is_quoter(S), !,PTERM=..[S,STERM],!.
-sexpr_sterm_to_pterm(_,[S|STERM],PTERM):- is_quoter(S), !,PTERM=..[S,STERM],!.
-sexpr_sterm_to_pterm(TD,[S|STERM],PTERM):- is_list(STERM),next_args_are_lists_unless_string(S,NonList),
+sexpr_sterm_to_pterm(TD,[S|STERM0],PTERM):- var(S),  TD1 is TD + 1, sexpr_sterm_to_pterm_pre_list(TD1,STERM0,STERM), sexpr_sterm_to_pterm_list(TD1,STERM,PLIST),s_univ(TD,PTERM,[S|PLIST]),!.
+sexpr_sterm_to_pterm(_,[S,STERM0],PTERM):- is_quoter(S),sexpr_sterm_to_pterm_pre_list(0,STERM0,STERM), !,PTERM=..[S,STERM],!.
+sexpr_sterm_to_pterm(_,[S|STERM0],PTERM):- is_quoter(S),sexpr_sterm_to_pterm_pre_list(0,STERM0,STERM), !,PTERM=..[S,STERM],!.
+sexpr_sterm_to_pterm(TD,[S|STERM0],PTERM):- sexpr_sterm_to_pterm_pre_list(TD,STERM0,STERM), is_list(STERM),
+  next_args_are_lists_unless_string(S,NonList),
   length(LEFT,NonList),append(LEFT,[List|RIGHT],STERM),is_list(List),
   TD1 is TD+1,
   sexpr_sterm_to_pterm_list(TD1,LEFT,PLEFTLIST),  
@@ -1458,7 +1472,8 @@ sexpr_sterm_to_pterm(TD,[S|STERM],PTERM):- is_list(STERM),next_args_are_lists_un
   append(PLEFTLIST,[List|PRIGHTLIST],PLIST),
   s_univ(TD,PTERM,[S|PLIST]),!.
 
-sexpr_sterm_to_pterm(TD,STERM,PTERM):- TD1 is TD+1, is_list(STERM),!, sexpr_sterm_to_pterm_list(TD1,STERM,PLIST),s_univ(TD,PTERM,PLIST),!.
+sexpr_sterm_to_pterm(TD,STERM0,PTERM):- TD1 is TD+1,sexpr_sterm_to_pterm_pre_list(TD,STERM0,STERM), 
+  is_list(STERM),!, sexpr_sterm_to_pterm_list(TD1,STERM,PLIST),s_univ(TD,PTERM,PLIST),!.
 sexpr_sterm_to_pterm(_TD,VAR,VAR).
 
 is_quoter('#BQ').
@@ -1595,22 +1610,41 @@ current_input_to_forms(FormsOut,Vars):-
     current_input(In),
     input_to_forms(In, FormsOut,Vars).
 
+show_wff_debug(Wff,Vs):- nonvar(Wff),Wff=(H=B),!,show_wff_debug((H:-B),Vs).
+show_wff_debug(Wff,Vs):- fmt("\n"),
+  must_or_rtrace(portray_clause_w_vars(Wff,Vs,[])),!.  
 
 % input_to_forms_debug(String):- sumo_to_pdkb(String,Wff),dbginfo(Wff),!.
-input_to_forms_debug(String):-input_to_forms(String,Wff,Vs),
-  b_setval('$variable_names',Vs),fmt(Wff),!.
+input_to_forms_debug(String):-
+  input_to_forms_debug(String,['=']).
 
-input_to_forms_debug(String,Decoder):-
-  input_to_forms(String,Wff),
-  call(Decoder,Wff,WffO),fmt(WffO),!.
+input_to_forms_debug(String,M:Decoders):-
+  setup_call_cleanup(
+    fmt("% ========================\n"),
+    (get_varnames(Was), show_wff_debug(input=String,Was),
+     input_to_forms(String,Wff,Vs),
+     b_setval('$variable_names',Vs),
+     show_wff_debug(to_forms=Wff,Vs),
+     do_decoders(Wff,Vs,M,Decoders),!,
+     ignore((nonvar(Vs),Vs\==[], show_wff_debug(vars=Vs,Vs)))),
+    fmt("\n% ========================\n")).
+
+do_decoders(_,_,_,[]):-!.
+do_decoders(Wff,Vs,M,[Decoder|Decoders]):- !,  
+  ((M:call(Decoder,Wff,WffO), ignore((Wff \== WffO , show_wff_debug((M:Decoder:-WffO),Vs))))
+  -> do_decoders(WffO,Vs,M,Decoders)
+  ; 
+  (fmt(decoder_failed(M:Decoder)),
+   do_decoders(Wff,Vs,M,Decoders))). 
+do_decoders(Wff,Vs,M,Decoder):- do_decoders(Wff,Vs,M,[Decoder]).  
   
 :- export(input_to_forms/2).
 %% input_to_forms( ?In, ?FormsOut) is det.
 %
 % Get Input Converted To Forms.
 %
-input_to_forms(Codes,FormsOut):- push_varnames(_) ->
-  quietly_sreader((input_to_forms0(Codes,FormsOut,Vars))) ->
+input_to_forms(Codes,FormsOut):- 
+  input_to_forms(Codes,FormsOut,Vars) ->
   add_variable_names(Vars).	 	 
 
 :- export(input_to_forms/3).
@@ -1640,8 +1674,9 @@ push_varnames(New):-
     ; (get_varnames(Was), Was = New, b_setval('$variable_names',Was))).
 
 add_variable_names(Vars):- var(Vars),!.
-add_variable_names(N=V):- !, set_varname_s(N,V).
-add_variable_names([NV|Vars]):- add_variable_names(NV), add_variable_names(Vars).
+add_variable_names(N=V):- !, ignore(set_varname_s(N,V)).
+add_variable_names([NV|Vars]):- add_variable_names(NV),!, add_variable_names(Vars).
+add_variable_names([]).
 
 set_varname_s(N,V):- get_varnames(Was), set_varname4(Was,N,V,New),b_setval('$variable_names',New).
 
@@ -1657,7 +1692,9 @@ set_variable_names_safe(Vars):-
 input_to_forms0(Codes,FormsOut,Vars):- 
     % is_openable(Codes),!,
     parse_sexpr(Codes, Forms0),!,
-    once((to_untyped(Forms0, Forms1),extract_lvars(Forms1,FormsOut,Vars))).
+    once((to_untyped(Forms0, Forms1),
+      extract_lvars(Forms1,FormsOut,Vars))).
+
 input_to_forms0(Forms,FormsOut,Vars):-
     (to_untyped(Forms, Forms1) ->
     extract_lvars(Forms1,FormsOut,Vars)-> true),!.
@@ -1677,11 +1714,11 @@ input_to_forms0(Forms,FormsOut,Vars):-
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
 
-tstl:- tstl('./games/ontologyportal_sumo/Merge.kif'),
-         tstl('./games/ontologyportal_sumo/Translations/relations-en.txt'),
-         tstl('./games/ontologyportal_sumo/english_format.kif'),
-         tstl('./games/ontologyportal_sumo/domainEnglishFormat.kif'),
-         tstl('./games/ontologyportal_sumo/Mid-level-ontology.kif'),
+tstl:- tstl('./ontologyportal_sumo/Merge.kif'),
+         tstl('./ontologyportal_sumo/Translations/relations-en.txt'),
+         tstl('./ontologyportal_sumo/english_format.kif'),
+         tstl('./ontologyportal_sumo/domainEnglishFormat.kif'),
+         tstl('./ontologyportal_sumo/Mid-level-ontology.kif'),
          !.
 
 writeqnl(O):-writeq(O),nl.
