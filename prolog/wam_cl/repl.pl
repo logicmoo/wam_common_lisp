@@ -130,7 +130,6 @@ writeExpressionEV(X):- writeln(' ;'),writeExpression(X),flush_all_output_safe.
 lisp_add_history(Var):-var(Var),!.
 lisp_add_history(end_of_file):-!.
 lisp_add_history([]):-!.
-lisp_add_history(_):- prolog_load_context(reload,true),!.
 lisp_add_history(_):- prolog_load_context(reloading,true),!.
 lisp_add_history(Expression):- atom(Expression),!,
         lisp_add_history_event(add(Expression)).
