@@ -241,7 +241,7 @@ compile_accessors(Ctx,Env,Result,[setf, Place, ValuesForms], (Part1, set_var(Env
      must_compile_body(Ctx,Env,Result,ValuesForms,Part1).
 
 
-compile_accessors(Ctx,Env,Result,[Getf|ValuePlace], Body):- fail, is_place_op_verbatum(Getf),     
+compile_accessors(Ctx,Env,Result,[Getf|ValuePlace], Body):- fail, load_and_call(is_place_op_verbatum(Getf)),
         debug_var([Getf,'_R'],Result),
         debug_var([Getf,'_Env'],Env),
         place_extract(ValuePlace,Value,Place),

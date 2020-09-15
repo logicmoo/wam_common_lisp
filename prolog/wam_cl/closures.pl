@@ -99,7 +99,7 @@ compile_closures(Ctx,Env,ResultO,Closure,(ArgsBody,BinderCode,ClosureBody)):-
    (FType==kw_macro -> (Params=ActualParams, ArgsBody = f_eval(Result,ResultO));
      true -> Params=ActualParams, ArgsBody = true,  =(Result,ResultO))), 
   WholeVar = Whole,
-  must_bind_parameters(WholeVar,ClosureEnvironment,Whole,FormalParams,Symbol,Params,_EnvOut, BinderCode),!.
+  must(make_bind_parameters(WholeVar,ClosureEnvironment,Whole,FormalParams,Symbol,Params,_EnvOut, BinderCode)),!.
   
 
 % Incomplete (closure .) 

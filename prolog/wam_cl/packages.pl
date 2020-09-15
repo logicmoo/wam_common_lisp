@@ -37,7 +37,7 @@ wl:interned_eval("
   `(print ,(string name)))
 ").
 sf_in_package(C, A, E) :-
-        mf_in_package([in_package, A], C, D),
+        load_and_call(mf_in_package([in_package, A], C, D)),
         f_sys_env_eval(C, D, E).
 % SYS::SELECT-PACKAGE
 f_sys_select_package(S,Package):- find_package_or_die(S,Package),

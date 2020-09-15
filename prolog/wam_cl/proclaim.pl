@@ -43,7 +43,7 @@ set_deftype(O,P,V):- atom_concat(P,'_deftype',PP), set_opv(O,PP,V).
 
 
 sf_defsetf(_ReplEnv,Get,Set,[],Res):- trace,
-   f_defsetf(Get,Set,Res),!.
+   load_and_call(f_defsetf(Get,Set,Res)),!.
 
 wl:init_args(3,sys_defknown).
 %wl:interned_eval("(sys:set-opv `SYS:defknown :compile-as :operator)").

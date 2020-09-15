@@ -153,6 +153,9 @@ oper_mize(W,Ctx,F,always(C1),always(C2)):-!,oper_mize(W,Ctx,F,(C1),(C2)).
 oper_mize(W,Ctx,F,call(C1),call(C2)):-!,oper_mize(W,Ctx,F,(C1),(C2)).
 oper_mize(W,Ctx,F,C1,C2):- body_mize([],W,Ctx,F,C1,C2).
 
+oper_mize(_Skip,W,Ctx,F,C2,C2O):- oper_mize(W,Ctx,F,C2,C2O).
+
+
 body_mize(_Skip,_Whole,_Ctx,_,Code,Out):- skip_optimize(Code),Out=Code.
 body_mize(Skip,_Whole,_Ctx,_,Code,Out):- functor(Code,F,N),member(F/N,Skip),Out=Code.
 %body_mize(_Skip,W,_Ctx,_,Var = Ground, true):- var(Var),ground(Ground), trace, occurrences_of_var(Var,W,N)-> N==2.

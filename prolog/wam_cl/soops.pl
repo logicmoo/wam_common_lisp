@@ -138,7 +138,7 @@ init_instance_slots(Kind,_Ord,Obj,PProps):-always(init_instance_kv(Kind,Obj,PPro
 init_slot_props_iv(_,_N,_Obj,[]):-!.
 init_slot_props_iv(Kind,N,Obj,[Value|Props]):-
   add_i_opv(Kind,Obj,N,Value), N2 is N + 1,
-  init_instance_kv(Kind,N2,Obj,Props).
+  init_slot_props_iv(Kind,N2,Obj,Props).
 
 add_i_opv(Kind,Obj,N,Value):- 
   always((get_struct_opv(Kind,sys_location,N,ZLOT),

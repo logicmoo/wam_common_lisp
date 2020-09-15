@@ -16,6 +16,8 @@
 :- module('8ball', []).
 :- set_module(class(library)).
 
+:- use_module(library(logicmoo_common)).
+
 
 di_test:- lisp_compile_to_prolog(pkg_user,
 

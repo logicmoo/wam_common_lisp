@@ -113,7 +113,7 @@ define_each_macro(Ctx,Env,_MacroLet,[Symbol,Params|Body],fbound(Symbol,kw_macro)
 
 compile_macro(Ctx,Env,[Symbol|FormalParmsMacroBody], Macro, (CompileBody,assert_lsp(Symbol,MacroAssert))):-
   debug_var('MFResult',MFResult),
-  compile_macro_function(Ctx,Env,Symbol,FormalParmsMacroBody,Macro,HeadParms,EnvAssign,HeadCode,MFBody,MFResult,CompileBody),       
+  compile_macro_function(Ctx,Env,Symbol,FormalParmsMacroBody,Macro,HeadParms,_Whole,EnvAssign,HeadCode,MFBody,MFResult,CompileBody),       
   append([Macro|HeadParms],[MFResult],CallableHeadV), CallableMF =.. CallableHeadV,   
     % CallableMF =.. [MF,Whole,Env],
   body_cleanup_keep_debug_vars(Ctx,
@@ -188,7 +188,7 @@ as_symbol_macro_function(Ctx,Env,_Symbol,function(MF),ResultIsMacro):-eval(Ctx,E
 as_symbol_macro_function(Ctx,Env,_Symbol,MF,ResultIsMacro):- \+ is_list(MF),eval(Ctx,Env,MF,ResultIsMacro).
 as_symbol_macro_function(Ctx,Env,Symbol,FormalParmsMacroBody,Macro):- assertion(is_list(FormalParmsMacroBody)),    
   % debug_var('MFResult',MFResult),debug_var('FnResult',FResult),
-  compile_macro_function(Ctx,Env,Symbol,FormalParmsMacroBody,Macro,HeadParms,EnvAssign,HeadCode,MFBody,MFResult,CompileBody),
+  compile_macro_function(Ctx,Env,Symbol,FormalParmsMacroBody,Macro,HeadParms,_Whole,EnvAssign,HeadCode,MFBody,MFResult,CompileBody),
   MFResult=FResult,
      append([Macro|HeadParms],[FResult],CallableHeadV), CallableMF =.. CallableHeadV,   
      % CallableMF =.. [MF,Whole,Env],

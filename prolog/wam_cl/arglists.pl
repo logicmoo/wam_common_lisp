@@ -254,6 +254,7 @@ ordinary_args(Ctx,Env,ArgInfo,RestNKeys,Whole,_,['c38_body',F|FormalParms],Param
   PCode = (Code,as_body(F,V,Count,RestNKeys)).
 
 as_body(_,V,Count,RestNKeys):- ((nonvar(RestNKeys),length(Left,Count),append(Left,Right,RestNKeys))->V=Right;V=[]).
+as_body(V,Count,RestNKeys):- ((nonvar(RestNKeys),length(Left,Count),append(Left,Right,RestNKeys))->V=Right;V=[]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % &whole 

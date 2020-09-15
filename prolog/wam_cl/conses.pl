@@ -68,7 +68,7 @@ f_first(List, Result):-f_car(List, Result).
 f_car(List, Result):- 
   (List = [Result|_] -> true;
   (List==[] -> Result=[];
-  (	error(first_not_cons, ErrNo, _),
+  (	load_and_call(error(first_not_cons, ErrNo, _)),
 		throw(ErrNo)))).
 
 wl:op_replacement(rest,cdr).
@@ -77,7 +77,7 @@ wl:op_replacement(sys_pf_cdr,cdr).
 %f_u_pf_cdr(List, Result):-f_cdr(List, Result).
 f_cdr(List, Result):- List==[]->Result=[];
 	once( (	List = [_|Result]
-	    ;	error(rest_not_cons, ErrNo, _),
+	    ;	load_and_call(error(rest_not_cons, ErrNo, _)),
 		throw(ErrNo)	)).
 
 %f_u_pf_cddr(A,C):-f_u_pf_cdr(A,B),f_u_pf_cdr(B,C).
@@ -161,6 +161,9 @@ f_last_1([_,H|List],R):- !, f_last_1([H|List],R).
 f_last_1([A|R],[A|R]):-!.
 f_last_1(_,[]).
 
+f_sys_pf_cdr(A,B):- f_cdr(A,B).
+f_sys_pf_cadr(A,B):- f_cadr(A,B).
+f_u_pf_cddr(A,B):- f_cddr(A,B).
 
 /*
 ensure_cl_contains([

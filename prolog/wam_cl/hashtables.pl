@@ -111,10 +111,10 @@ mf_with_hash_table_iterator([with_hash_table_iterator, [Macroname_In, Hashtable_
         catch(( ( get_var(GEnv, u_macroname, Macroname_Get),
                   (   is_symbolp(Macroname_Get)
                   ->  _2126=[]
-                  ;   f_sys_text('$ARRAY'([*],
+                  ;   load_and_call(f_sys_text('$ARRAY'([*],
                                         claz_base_character,
                                         "~S: macro name should be a symbol, not ~S"),
-                               Text_Ret),
+                               Text_Ret)),
                       get_var(GEnv, u_macroname, Macroname_Get13),
                       f_error(
                               [ Text_Ret,
@@ -156,7 +156,7 @@ ht_match(Test,Key,Matcher):- (call(Test,Key,Matcher,R)->R=t).
 f_sys_hash_table_iterator_function(Hash_table_In, FnResult) :-
         GEnv=[bv(hash_table, Hash_table_In)],
         catch(( ( get_var(GEnv, hash_table, Hash_table_Get),
-                  f_u_hash_table_entries(Hash_table_Get, Entries_Init),
+                 load_and_call( f_u_hash_table_entries(Hash_table_Get, Entries_Init)),
                   LEnv=[bv(u_entries, Entries_Init)|GEnv]
                 ),
                 closure(kw_function, [ClosureEnvironment|LEnv], _Whole, LetResult12, [],  

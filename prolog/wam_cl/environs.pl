@@ -34,6 +34,7 @@
 
 :- use_module(library(rbtrees)).
 
+load_and_call(G):- current_predicate(_,G) -> call(G) ; throw(load_and_call(G)).
 
 :- thread_initialization(nb_setval('$labels_suffix','')).
 suffix_by_context(_Ctx,Atom,SuffixAtom):- nb_current('$labels_suffix',Suffix),atom_concat_suffix(Atom,Suffix,SuffixAtom).

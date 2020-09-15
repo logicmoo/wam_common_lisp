@@ -25,7 +25,7 @@ is_pl_atom_key(N):- \+ is_symbolp(N),\+ atomic_list_concat([_,_|_],'-',N),downca
 
 to_pl_atom_key(N,K):- var(N),!,K=N. 
 to_pl_atom_key(N,K):- is_pl_atom_key(N),!,N=K.
-to_pl_atom_key(N,K):- to_prolog_string(N,S),!,atom_downcase(S,DC),atomic_list_concat(HC,'-',DC),!,atomic_list_concat(HC,'_',K).
+to_pl_atom_key(N,K):- to_prolog_string(N,S),!,downcase_atom(S,DC),atomic_list_concat(HC,'-',DC),!,atomic_list_concat(HC,'_',K).
 to_pl_atom_key(N,N).
 
 to_pl_atom_value(N,K):- var(N),!,K=N. 
@@ -33,7 +33,7 @@ to_pl_atom_value(N,K):- number(N),!,K=N.
 to_pl_atom_value(N,K):- current_prolog_flag(_,N),N=K.
 to_pl_atom_value(N,K):- is_pl_atom_key(N),!,N=K.
 to_pl_atom_value(kw_missing,kw_missing).
-to_pl_atom_value(N,K):- to_prolog_string(N,S),!,atom_downcase(S,DC),atomic_list_concat(HC,'-',DC),!,atomic_list_concat(HC,'_',K).
+to_pl_atom_value(N,K):- to_prolog_string(N,S),!,downcase_atom(S,DC),atomic_list_concat(HC,'-',DC),!,atomic_list_concat(HC,'_',K).
 to_pl_atom_value(N,N).
 
 :- dynamic(wam_cl_option/2).
@@ -43,7 +43,7 @@ f_sys_get_wam_cl_option(N,V):- to_pl_atom_key(N,K),to_pl_atom_value(V,VV),wam_cl
 
 wam_cl_option(N,V):- V==true,!,wam_cl_option(N,t).
 wam_cl_option(N,V):- nonvar(N), wl:wam_cl_option_local(N,VV),!,V=VV.
-wam_cl_option(N,V):- var(N), wam_cl_option_local(N,VV),V=VV.
+wam_cl_option(N,V):- var(N), wl:wam_cl_option_local(N,VV),V=VV.
 wam_cl_option(speed,V):- !, (current_prolog_flag(runtime_speed,V)->true;V=1).
 wam_cl_option(safety,V):- !, (current_prolog_flag(runtime_safety,V)->true;V=1).
 wam_cl_option(debug,V):- !, (current_prolog_flag(runtime_debug,V)->true;V=1).

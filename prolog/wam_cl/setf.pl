@@ -1,6 +1,9 @@
 
 :- style_check(-singleton).
 
+% :- export(f_get_setf_expansion/3).
+
+
 /*********** /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/wam-cl-init.lisp:4948 **********************/
 :-lisp_compile_to_prolog(pkg_sys,[defmacro,pushnew,['&environment',env,item,place,'&rest',keys],[if,[and,[symbolp,place],[eq,place,[macroexpand,place,env]]],['#BQ',[setq,['#COMMA',place],[adjoin,['#COMMA',item],['#COMMA',place],['#BQ-COMMA-ELIPSE',keys]]]],['multiple-value-bind',[dummies,vals,newval,setter,getter],['get-setf-expansion',place,env],[let,[[g,[gensym]]],['#BQ',['let*',[[['#COMMA',g],['#COMMA',item]],['#BQ-COMMA-ELIPSE',[mapcar,function(list),dummies,vals]],[['#COMMA',[car,newval]],[adjoin,['#COMMA',g],['#COMMA',getter],['#BQ-COMMA-ELIPSE',keys]]]],['#COMMA',setter]]]]]]]).
 wl:lambda_def(defmacro, pushnew, mf_pushnew, [c38_environment, env, item, sys_place, c38_rest, sys_keys], [progn, [if, [and, [symbolp, sys_place], [eq, sys_place, [macroexpand, sys_place, env]]], ['#BQ', [setq, ['#COMMA', sys_place], [adjoin, ['#COMMA', item], ['#COMMA', sys_place], ['#BQ-COMMA-ELIPSE', sys_keys]]]], [multiple_value_bind, [sys_dummies, sys_vals, sys_newval, sys_setter, sys_getter], [get_setf_expansion, sys_place, env], [let, [[sys_g, [gensym]]], ['#BQ', [let_xx, [[['#COMMA', sys_g], ['#COMMA', item]], ['#BQ-COMMA-ELIPSE', [mapcar, function(list), sys_dummies, sys_vals]], [['#COMMA', [car, sys_newval]], [adjoin, ['#COMMA', sys_g], ['#COMMA', sys_getter], ['#BQ-COMMA-ELIPSE', sys_keys]]]], ['#COMMA', sys_setter]]]]]]]).
@@ -41,9 +44,9 @@ mf_pushnew([pushnew, Item_In, Place_In|RestNKeys], Env_In, MFResult) :-
                   ;   LEnv=[bv(u_dummies, []), bv(u_vals, []), bv(u_newval, []), bv(u_setter, []), bv(u_getter, [])|GEnv],
                       get_var(LEnv, u_env, Env_Get26),
                       get_var(LEnv, u_place, Place_Get25),
-                      f_get_setf_expansion(Place_Get25,
+                      load_and_call(f_get_setf_expansion(Place_Get25,
                                            [Env_Get26],
-                                           Setf_expansion_Ret),
+                                           Setf_expansion_Ret)),
                       setq_from_values(LEnv,
 
                                        [ u_dummies,
