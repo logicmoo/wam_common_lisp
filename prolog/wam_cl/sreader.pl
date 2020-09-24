@@ -373,7 +373,7 @@ sexpr0('$OBJ'(claz_bracket_vector,V))                 --> `[`, sexpr_vector(V,`]
 sexpr0('#'(A))              --> `|`, !, read_string_until(S,`|`), swhite,{quietly_sreader(((atom_string(A,S))))}.
 
 % maybe this is KIF
-% sexpr0('?'(E))              --> {kif_ok}, `?`, dcg_peek(([C],{sym_char(C)})),!, rsymbol(`?`,E), swhite.
+sexpr0('?'(E))              --> {kif_ok}, `?`, dcg_peek(([C],{sym_char(C)})),!, rsymbol(``,E), swhite.
 % @TODO if KIF sexpr('#'(E))              --> `&%`, !, rsymbol(`#$`,E), swhite.
 
 sexpr0('$STRING'(S))             --> s_string(S),!.
