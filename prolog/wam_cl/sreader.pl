@@ -898,6 +898,7 @@ svar_fixname(Var,NameO):-var(Var),variable_name_or_ref(Var,Name),sanity(nonvar(N
 svar_fixname('$VAR'(Name),UP):- !,svar_fixvarname(Name,UP).
 svar_fixname('@'(Name),UP):- !,svar_fixvarname(Name,UP).
 svar_fixname('?'(Name),UP):- !,svar_fixvarname(Name,UP).
+svar_fixname('block'(Name),UP):- !,svar_fixvarname(Name,UP).
 svar_fixname(SVAR,SVARO):- ok_var_name(SVAR),!,SVARO=SVAR.
 svar_fixname('??','_'):-!.
 svar_fixname(QA,AU):-atom_concat_or_rtrace('??',A,QA),non_empty_atom(A),!,svar_fixvarname(A,AO),atom_concat_or_rtrace('_',AO,AU).
