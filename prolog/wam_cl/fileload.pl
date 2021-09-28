@@ -176,15 +176,16 @@ do_compile_1file_to_stream(_Keys,File0,Stream):-
   get_time(Epoch),format_time(string(EpochS), '%+', Epoch),
   working_directory(PWD,PWD),
   statistics(runtime,[Start,_]),
-  format(Stream,'#!/usr/bin/env swipl
-%; WAM-CL translated Lisp File (see https://github.com/TeamSPoon/wam_common_lisp/tree/master/prolog/wam_cl )
+  format(Stream,
+'#!/usr/bin/env swipl
+%; WAM-CL translated Lisp File (see https://github.com/logicmoo/wam_common_lisp/tree/master/prolog/wam_cl )
 %; File: ~q (~w)
 %; PWD: ~w
 %; Start time: ~w
 
 :-style_check(-discontiguous).
 :-style_check(-singleton).
-:-use_module(library(wamcl_runtime)).
+:-use_module(library(wamclrt)).
 
 ',[Name,File,PWD,EpochS]),
   with_output_to(Stream,statistics),

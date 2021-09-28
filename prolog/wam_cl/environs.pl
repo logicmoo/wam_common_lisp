@@ -120,10 +120,12 @@ hide_portray_g(var_tracker(_)=_Dict).
 
 % user:portray(List):- notrace((nonvar(List),List=[_|_],sub_term(E,List),ground(E),E = ((environ=W)),write(environment(W)))).
 
-user:portray(X):- is_rbtree(X),!,writeq(is_rbtree).
+wamcl_portray:- fail.
+
+user:portray(X):- wamcl_portray, is_rbtree(X),!,writeq(wamcl_portray_is_rbtree).
 %user:portray(List):- nonvar(List),List=[_|_],member(E,List),hide_portray(E),!,write('[{'),ignore(my_portray_list(List)),write('}]'),!.
 %user:portray(Hide):- hide_portray(Hide),!,write('.').
-user:portray(environment{name:N, tracker:_}):-!,writeq(e(N)).
+user:portray(environment{name:N, tracker:_}):- wamcl_portray, !,writeq(wamcl_portray_e(N)).
 %user:portray(env(RB,_)):- get_env_attribute(RB,name,Value),!, writeq(Value).
 %user:portray(env(_,_)):- writeq(env/2).
 

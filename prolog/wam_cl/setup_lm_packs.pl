@@ -31,6 +31,7 @@ setup_hist0:-  '$toplevel':setup_history.
 % =====================
 % System metapredicates
 % =====================
+/*
 :- meta_predicate '$syspreds':bit(2,?,?).
 :- meta_predicate '$bags':findnsols_loop(*,*,0,*,*).
 :- meta_predicate '$bags':findall_loop(*,0,*,*).
@@ -45,7 +46,7 @@ setup_hist0:-  '$toplevel':setup_history.
 % :- meta_predicate '$attvar':uhook(*,0,*,*).
 % :- meta_predicate '$attvar':uhook(*,0,*).
 :- meta_predicate '$toplevel':'$execute_goal2'(0,*).
-
+*/
 
 % =====================
 % Add Pack Directories

@@ -1,4 +1,4 @@
-#!/usr/bin/env swipl
+#!/usr/bin/env clif
 
 :- use_module(library(must_trace)).
 :- use_module(library(dmsg)).

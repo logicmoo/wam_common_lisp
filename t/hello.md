@@ -1,5 +1,5 @@
 
-% WAM-CL translated Lisp File (see https://github.com/TeamSPoon/wam_common_lisp/tree/master/prolog/wam_cl )
+% WAM-CL translated Lisp File (see https://github.com/logicmoo/wam_common_lisp/tree/master/prolog/wam_cl )
 % File: "hello.lisp" (/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/hello.lisp)
 % PWD: /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/
 % Start time: Mon Dec 11 12:48:38 2017

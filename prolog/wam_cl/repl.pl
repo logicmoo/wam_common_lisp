@@ -1,4 +1,4 @@
-#!/usr/bin/env swipl
+#!/usr/bin/env clif
 /*******************************************************************
  *
  * A Common Lisp compiler/interpretor, written in Prolog

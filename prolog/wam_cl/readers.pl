@@ -71,7 +71,7 @@ end_of_file.
 [04:47] <dmiles> i been taqking too long at the infenrce engine (the thing that creates new worlds from ideas) so i decided to convert the source code of CYC to prolog
 [04:47] <dmiles> (Cycorp implemented McCarhties ideas)
 [04:48] <dmiles> right now i been focusing on the new tranlator that lets me port lisp applicaitons (like CYC, Daydreamer, etc) to prolog
-[04:48] <dmiles> https://github.com/TeamSPoon/wam_common_lisp/blob/master/t/sanity-test.lisp_load.md#compiled--ufifteen
+[04:48] <dmiles> https://github.com/logicmoo/wam_common_lisp/blob/master/t/sanity-test.lisp_load.md#compiled--ufifteen
 [04:49] <dmiles> that is an example output of the tranapiter.. i am haivng it generate .md files so i can find little bugs
 [04:50] <dmiles> i hav eot take a 6 hour nap before resumeing work
 [04:50] <dmiles> hope to talk soon

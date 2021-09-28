@@ -1,5 +1,5 @@
 #!/usr/bin/env swipl
-%; WAM-CL translated Lisp File (see https://github.com/TeamSPoon/wam_common_lisp/tree/master/prolog/wam_cl )
+%; WAM-CL translated Lisp File (see https://github.com/logicmoo/wam_common_lisp/tree/master/prolog/wam_cl )
 %; File: "sanity-test-0" (/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/sanity-test-0.lisp)
 %; PWD: /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/
 %; Start time: Sat Aug 17 13:31:07 2013

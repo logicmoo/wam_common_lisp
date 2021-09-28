@@ -11,7 +11,7 @@ Stop implementing an ad-hoc, informally-specified, bug-ridden, slow implementati
    * Instant Prolog Ecosystem/Development Libraries (days, not years)
       * Several decades of Common Lisp libraries may be translated to useable Prolog development libraries.       
    * Maintain your code from original Lisp or translated Prolog (though wont translate back)
-   * Settings to try to emulate handwritten code ([Examples](https://github.com/TeamSPoon/wam_common_lisp/tree/master/prolog/wam_cl/README.md))      
+   * Settings to try to emulate handwritten code ([Examples](https://github.com/logicmoo/wam_common_lisp/tree/master/prolog/wam_cl/README.md))      
    * Forms (at REPL) are transpiled to Prolog, Compiled to WAM, Call/Executed.
    *  *only* 2-3 slower than SBCL  
    * Gives to prolog more than we can list!
@@ -26,7 +26,7 @@ Stop implementing an ad-hoc, informally-specified, bug-ridden, slow implementati
   * Unwind-Protect/Cleanup
   * Native Locatives
   * Two-way calling and embedding from C/C++/Python/C#/Mono/Scala/Java/Haskell/LUA/Perl
-  * Makes Plaform Executables and. DLL/So files  ([Quick Start](https://github.com/TeamSPoon/wam_common_lisp/blob/master/README.md#makeanexecutableandrunit)) *
+  * Makes Plaform Executables and. DLL/So files  ([Quick Start](https://github.com/logicmoo/wam_common_lisp/blob/master/README.md#makeanexecutableandrunit)) *
   * (too enormous to go into)
 * Developed/Installed as a SWI-Prolog pack 
   * [http://www.swi-prolog.org/pack/list?p=wam_common_lisp](http://www.swi-prolog.org/pack/list?p=wam_common_lisp) ``
@@ -43,7 +43,7 @@ must fix for release worthiness
 * Add missing impls
   * delete-package (must-fix)
   * (more to be Listed) (not here)
-* Tests ([in-progress](https://github.com/TeamSPoon/wam_common_lisp/tree/master/t))
+* Tests ([in-progress](https://github.com/logicmoo/wam_common_lisp/tree/master/t))
   * Must pass 70% or above CL-ANSI tests (bug in-progress)
   * Ensure passes _all_ CL-ANSI tests (with --ansi) (feature always in-prgress)
   * Hardest part is making sure it throws/complains about all the things it needs to
@@ -207,7 +207,7 @@ outputs:
 $ cat hello.pl
 ````
 ````
-% WAM-CL translated Lisp File (see https://github.com/TeamSPoon/wam_common_lisp/tree/master/prolog/wam_cl )
+% WAM-CL translated Lisp File (see https://github.com/logicmoo/wam_common_lisp/tree/master/prolog/wam_cl )
 % File: "hello.lisp" (/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/hello.lisp)
 % PWD: /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/t/
 % Start time: Mon Dec 11 12:48:38 2017
@@ -250,7 +250,7 @@ CL-USER>
 
 ## Usaage output of --help)
 ````
-'WAM-CL (https://github.com/TeamSPoon/wam_common_lisp) is an ANSI Common Lisp implementation.
+'WAM-CL (https://github.com/logicmoo/wam_common_lisp) is an ANSI Common Lisp implementation.
 Usage:  wamcl [prolog-options] [wamcl-options] [lispfile [argument ...]]
 
 Host Prolog options:

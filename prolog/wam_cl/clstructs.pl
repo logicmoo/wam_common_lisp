@@ -16,7 +16,7 @@
 :- set_module(class(library)).
 :- include('./header').
 
-% :- use_module(library(pfc)).
+% :- expects_dialect(pfc).
 
 to_claz(C1,C1):- var(C1),!.
 to_claz(S0,S1):- is_stringp(S0),!,to_prolog_string(S0,S1),!.

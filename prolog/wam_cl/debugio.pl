@@ -62,9 +62,9 @@ fmt_lispcode(Txt):- set_md_lang('common-lisp'),cmpout(comment(Txt)),set_md_lang(
 dbginfo(X):- dnotrace(ignore((is_verbose;is_must_show_msg(X))->userout(X))).
 
 %dnotrace(G):- !, notrace(G).
-dnotrace(G):- call(G).
+dnotrace(G):- call(G),!.
 
-userout(X):- notrace(userout0(X)).
+userout(X):- dnotrace(userout0(X)).
 % User Message (intended to be seen)
 userout0(flat(X)):- !,write_flat(X).
 userout0(X):- simplify_goal_printed(X,XX),!,in_md(cl,dnotrace(dbmsg(comment(XX)))).
@@ -133,7 +133,7 @@ is_user_output:- current_output(O),!,
 is_markdown:- is_user_output, true.
 
 in_comment(X):- (t_l:in_print_cmt;is_user_output),!,call(X).
-in_comment(X):- locally(t_l:in_print_cmt, quietly(setup_call_cleanup(format('~N/*~n',[]),in_md(cl,X),format('~N*/~n',[])))).
+in_comment(X):- locally(t_l:in_print_cmt, setup_call_cleanup(format('~N/*~n',[]),in_md(cl,X),format('~N*/~n',[]))).
 
 :- thread_local(t_l:inside_lang/1).
 
@@ -149,7 +149,7 @@ in_md2(Lang,G):- current_md_lang(Was),Was==Lang,!,call(G).
 in_md2(Lang,G):- current_md_lang(Was),!,
       locally(t_l:inside_lang(Lang),
       (
-       (quietly(setup_call_cleanup(format('~N```~n```~w~n',[Lang]),
+       ((setup_call_cleanup(format('~N```~n```~w~n',[Lang]),
           call(G),
             set_md_lang(Was)))))).
 

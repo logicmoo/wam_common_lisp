@@ -128,7 +128,9 @@ handle_all_os_program_args(ARGV):-
 
 handle_all_program_args([N,V|More]):- handle_1program_arg(N=V),!,handle_all_program_args(More).
 handle_all_program_args([N|More]):- handle_1program_arg(N),!,handle_all_program_args(More).
-handle_all_program_args([N|More]):- exists_file(N),imply_flag(verbose,0),imply_interactive(false),!,do_after_load(((set_program_args(More),f_load(N,_)))).
+handle_all_program_args([N|More]):- 
+ exists_file(N),imply_flag(verbose,0),imply_interactive(false),!,
+ do_after_load(((set_program_args(More),f_load(N,_)))).
 handle_all_program_args(More):- do_after_load(((set_program_args(More)))).
 
 set_program_args(More):- maplist(to_lisp_string,More,List),set_var(sys_xx_args_xx,List).
@@ -259,7 +261,7 @@ show_must(G):-dmsg(doing(G)),!, (must_or_rtrace(G)*->dmsg(did(G));must(G)).
 show_must(G):-dmsg(doing(G)),(catch(G,Err,(dmsg(Err->G),rtrace(G)))*->dmsg(did(G));must(G)).
 
 show_help:- writeln(
-'WAM-CL (https://github.com/TeamSPoon/wam_common_lisp) is an ANSI Common Lisp implementation.
+'WAM-CL (https://github.com/logicmoo/wam_common_lisp) is an ANSI Common Lisp implementation.
 Usage:  wamcl [prolog-options] [wamcl-options] [lispfile [argument ...]]
 
 Host Prolog options:

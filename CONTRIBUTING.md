@@ -2,7 +2,7 @@
 
 (Why feel obligated to maintain a git fork just to contribute ?)
 
-Please ask to be added to TeamSPoon !
+Please ask to be added to logicmoo !
 
 
 
@@ -72,6 +72,6 @@ git push origin master
 [BSD 2-Clause License](LICENSE.md)
 
 Copyright (c) 2017, 
-Douglas Miles <logicmoo@gmail.com> and TeamSPoon
+Douglas Miles <logicmoo@gmail.com> and logicmoo
 All rights reserved.
 

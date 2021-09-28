@@ -33,7 +33,7 @@ shrink_lisp_strings(Str,PStr):- \+ compound(Str),!,Str=PStr.
 %shrink_lisp_strings(Str,PStr):- is_stringp(Str),!,to_prolog_string(Str,PStr).
 shrink_lisp_strings([A|Str],PStr):- is_list(Str),maplist(is_characterp_lisp,[A|Str]),lisp_chars_to_pl_string([A|Str],PStr),!.
 shrink_lisp_strings(C1,C2):- compound_name_arguments(C1,F,C1O),must_maplist(shrink_lisp_strings,C1O,C2O),
-  compound_name_arguments(C2,F,C2O). %%$C2=..[F|C2O].
+  compound_name_arguments(C2,F,C2O),!. %%$C2=..[F|C2O].
 shrink_lisp_strings(Str,Str).
 
 

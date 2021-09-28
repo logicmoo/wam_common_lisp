@@ -130,8 +130,8 @@ show_call_trace(Info,Goal):-
 
   (Redo == sol(0,0) -> (!,fail) ; (Redo=sol(_,yes) -> ! ; true)).
 
-:- export(always/1).
-:- module_transparent(always/1).
+:- export(((always)/1)).
+:- module_transparent(((always)/1)).
 % Must always succeed (or else there is a bug in the lisp impl!)
 always(Var):- notrace(var(Var)),!,throw(var_always(Var)).
 always([]):-!.

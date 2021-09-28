@@ -14,7 +14,7 @@
  *******************************************************************/
 :- module(dasm, []).
 
-:- meta_predicate(maplist_not_tail(1,*)).
+%:- meta_predicate(maplist_not_tail(1,*)).
 
 %f_disassemble(Function, Code):- string(Function),downcase_atom(Function,DC),!,f_disassemble(DC, Code).
 f_disassemble(function(Symbol),Options, Code):- !, f_disassemble(Symbol,Options, Code).
@@ -100,11 +100,17 @@ lcolormsg1(Msg):- mesg_color(Msg,Ctrl),!,ansicall_maybe(Ctrl,fmt9(Msg)).
 
 
 
-make_pretty(I,O):- !,call_each(must_or_rtrace,((shrink_lisp_strings(I,O), pretty1(O),pretty2(O),pretty3(O)))).
+make_pretty(I,O):- !,call_each(must_or_rtrace,(shrink_lisp_strings(I,M), pretty_numbervars(M,O))).
 %make_pretty(I,O):- is_user_output,!,shrink_lisp_strings(I,O), pretty1(O),pretty2(O),pretty3(O).
 %make_pretty(I,O):- I=O, pretty1(O),pretty2(O),pretty3(O).
 
+%maplist_not_tail(_,ArgS):- var(ArgS),!.
+%maplist_not_tail(G,[X|ArgS]):-call(G,X),maplist_not_tail(G,ArgS).
 
+
+
+
+/*
 may_debug_var(_,_,V):- nonvar(V),!.
 may_debug_var(_,_,V):- variable_name(V,_),!.
 may_debug_var(L,_,_):- upcase_atom(L,L),!.
@@ -133,9 +139,6 @@ pretty1(debug_var(R,V)):- may_debug_var(R,V).
 pretty1(bv(R,V)):- may_debug_var(R,V).
 pretty1(H):-H=..[_|ARGS],must_maplist_det(pretty1,ARGS).
 
-
-maplist_not_tail(_,ArgS):- var(ArgS),!.
-maplist_not_tail(G,[X|ArgS]):-call(G,X),maplist_not_tail(G,ArgS).
 
 pretty2(H):- \+ compound(H),!. % may_debug_var(F,'_Call',H).
 %pretty2([H|T]):-!,maplist_not_tail(pretty2,[H|T]).
@@ -167,7 +170,7 @@ pretty5(H):-
    nop(may_debug_var(F,'_Param',P1)),
    must_maplist_det(pretty5,[P1|ARGS]))),!. 
 
-
+*/
 :- fixup_exports.
 
       
