@@ -34,6 +34,7 @@ set_stack_gb:- Six = 6,
               
 
 repl:- 
+ force_repl_tty,
  in_md(cl,(
    lisp_banner,   
    set_prolog_flag(lisp_primordial,false), % requires  "PACKAGE:SYM" to already externally exists
@@ -41,6 +42,13 @@ repl:-
    ((	repeat,
         catch(read_eval_print(Result),'$aborted',fail),
    	quietly(Result == end_of_file)))))),!.
+
+% Force the standard REPL streams to report tty(true) so ANSI colour and
+% interactive behaviour work even when they are not real terminals -- e.g. a
+% Windows console that mis-reports tty, a pipe, or a telnet/socket connection.
+force_repl_tty:-
+   forall(member(S, [user_input, user_output, user_error]),
+          ignore(catch(set_stream(S, tty(true)), _, true))).
 
 
 
@@ -193,27 +201,7 @@ eval(Expression, Env, Result):-
 flush_all_output_safe:- notrace((forall(stream_property(S,mode(write)),quietly(catch(flush_output(S),_,true))))).
 
 read_no_parse(Expr):- flush_all_output_safe,current_input(In), read_no_parse(In,Expr).
-read_no_parse(In, ExprO):- parse_sexpr_untyped(In,ExprS),
-   ( ExprS = '$COMMENT'(_) -> (!, read_no_parse(In, ExprO))
-   ; ExprS == end_of_file -> read_no_parse_eof(In, ExprO)
-   ; ExprS = ExprO
-   ).
-
-% Distinguish a genuine end-of-stream (Ctrl-D / closed input), which should end
-% the REPL, from a blank / whitespace-only line at an interactive prompt, which
-% should NOT return end_of_file but simply expect more input. parse_sexpr_untyped
-% yields end_of_file for both cases, so we branch on the stream itself:
-%  - Non-interactive input (a file, pipe or string): end_of_file is real; return
-%    it so file loading / batch input terminates exactly as before.
-%  - Interactive input (a tty REPL): a blank line is not eof. Consume the pending
-%    whitespace and block for more input; only a true Ctrl-D ends the REPL.
-read_no_parse_eof(In, ExprO):-
-   ( \+ stream_property(In, tty(true))
-   -> ExprO = end_of_file
-   ;  ( read_pending_whitespace(In),
-        ( at_end_of_stream(In) -> ExprO = end_of_file ; read_no_parse(In, ExprO) )
-      )
-   ).
+read_no_parse(In, ExprO):- parse_sexpr_untyped(In,ExprS),(ExprS='$COMMENT'(_) -> (!,read_no_parse(In, ExprO)); ExprS=ExprO).
 
 read_and_parse(Expr):-  flush_all_output_safe,current_input(In),read_and_parse(In, Expr).
 read_and_parse(In, Expr):- read_no_parse(In, ExprS),as_sexp(ExprS,ExprS1),!,reader_intern_symbols(ExprS1,Expr),!.
