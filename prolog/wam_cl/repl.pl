@@ -118,7 +118,7 @@ read_eval_print(Result):-
         ignore(catch(lquietly(set_prompt_from_package),_,true)),
         set_md_lang(cl),
         get_prompt_from_package('> ',Prompt),prompt1(Prompt),
-        lquietly(show_uncaught_or_fail(read_no_parse(Expression))),!,       
+        lquietly(show_uncaught_or_fail(read_repl_sexpr(Expression))),!,       
         lquietly(show_uncaught_or_fail(lisp_add_history(Expression))),!,
         nb_linkval('$mv_return',[Result]),
         set_md_lang(prolog),
@@ -202,6 +202,53 @@ flush_all_output_safe:- notrace((forall(stream_property(S,mode(write)),quietly(c
 
 read_no_parse(Expr):- flush_all_output_safe,current_input(In), read_no_parse(In,Expr).
 read_no_parse(In, ExprO):- parse_sexpr_untyped(In,ExprS),(ExprS='$COMMENT'(_) -> (!,read_no_parse(In, ExprO)); ExprS=ExprO).
+
+% ---------------------------------------------------------------------------
+% Interactive REPL reader (stream-agnostic).
+%
+% The raw stream reader only reads incrementally when stream_property(In,tty(true))
+% holds and treats a soft end-of-line as end-of-file -- both false-negative on
+% Windows consoles and socket/telnet streams, so pressing Enter or typing a
+% half-finished form like "(+" dropped out of the REPL.
+%
+% read_repl_sexpr/2 reads a line at a time with read_line_to_string (which strips
+% CR/LF and returns the end_of_file atom only at a genuine end of stream) and
+% keeps reading until the buffer holds a complete, *balanced* s-expression:
+%   - blank / whitespace-only buffer  -> keep prompting for more input
+%   - a complete s-expression parses  -> return it (leave the rest for next read)
+%   - an incomplete/unbalanced form   -> read another line and retry
+%   - end_of_file with an empty buffer -> end the REPL (Ctrl-D / Ctrl-Z / hangup)
+% Works the same on a console, pipe, file or telnet/socket stream.
+% ---------------------------------------------------------------------------
+read_repl_sexpr(Expr):- current_input(In), read_repl_sexpr(In, Expr).
+read_repl_sexpr(In, Expr):- read_repl_sexpr(In, "", Expr).
+read_repl_sexpr(In, Acc, Expr):-
+   read_line_to_string(In, Line),
+   ( Line == end_of_file
+   -> ( repl_buffer_blank(Acc)
+      -> Expr = end_of_file
+      ;  ( repl_try_parse(Acc, E) -> Expr = E ; Expr = end_of_file ) )
+   ;  string_concat(Acc, Line, T0), string_concat(T0, "\n", Acc1),
+      ( repl_buffer_blank(Acc1)
+      -> read_repl_sexpr(In, "", Expr)
+      ;  ( repl_try_parse(Acc1, E)
+         -> Expr = E
+         ;  read_repl_sexpr(In, Acc1, Expr) ) )
+   ).
+
+% A complete, non-comment s-expression parsed from Text. Fails (rather than
+% erroring) when Text is an incomplete/unbalanced form, so the caller keeps
+% reading more input.
+repl_try_parse(Text, Expr):-
+   catch(parse_sexpr_untyped(string(Text), E), _, fail),
+   E \== end_of_file,
+   E \= '$COMMENT'(_),
+   Expr = E.
+
+% True when Text holds no readable content (whitespace only).
+repl_buffer_blank(Text):-
+   string_codes(Text, Cs),
+   forall(member(C, Cs), code_type(C, space)).
 
 read_and_parse(Expr):-  flush_all_output_safe,current_input(In),read_and_parse(In, Expr).
 read_and_parse(In, Expr):- read_no_parse(In, ExprS),as_sexp(ExprS,ExprS1),!,reader_intern_symbols(ExprS1,Expr),!.

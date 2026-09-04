@@ -544,7 +544,10 @@ escaped_char(Code)  --> [C], {escape_to_char([C],Code)},!.
 
 escape_to_char(Txt,Code):- notrace_catch_fail((sformat(S,'_=`\\~s`',[Txt]),read_from_chars(S,_=[Code]))),!.
 
-zalwayz_debug:-!.
+% Only drop into the reader's interactive trace/break machinery when explicitly
+% requested (set_prolog_flag(zalwayz,debug)). Previously this was hard-wired on
+% (`zalwayz_debug:-!.`), so any incomplete/failed parse traced or broke instead
+% of failing cleanly -- which breaks trying a parse to test if a form is balanced.
 zalwayz_debug:- current_prolog_flag(zalwayz,debug).
 
 never_zalwayz(Goal):-
