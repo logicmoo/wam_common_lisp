@@ -117,8 +117,8 @@ set_prompt_from_package:-
 read_eval_print(Result):-
         ignore(catch(lquietly(set_prompt_from_package),_,true)),
         set_md_lang(cl),
-        get_prompt_from_package('> ',Prompt),prompt1(Prompt),
-        lquietly(show_uncaught_or_fail(read_repl_sexpr(Expression))),!,       
+        get_prompt_from_package('> ',Prompt),
+        lquietly(show_uncaught_or_fail(read_repl_sexpr(Prompt, Expression))),!,       
         lquietly(show_uncaught_or_fail(lisp_add_history(Expression))),!,
         nb_linkval('$mv_return',[Result]),
         set_md_lang(prolog),
@@ -220,9 +220,12 @@ read_no_parse(In, ExprO):- parse_sexpr_untyped(In,ExprS),(ExprS='$COMMENT'(_) ->
 %   - end_of_file with an empty buffer -> end the REPL (Ctrl-D / Ctrl-Z / hangup)
 % Works the same on a console, pipe, file or telnet/socket stream.
 % ---------------------------------------------------------------------------
-read_repl_sexpr(Expr):- current_input(In), read_repl_sexpr(In, Expr).
-read_repl_sexpr(In, Expr):- read_repl_sexpr(In, "", Expr).
-read_repl_sexpr(In, Acc, Expr):-
+read_repl_sexpr(Prompt, Expr):- current_input(In), read_repl_sexpr(In, Prompt, "", Expr).
+read_repl_sexpr(In, Prompt, Acc, Expr):-
+   % Reprint the main prompt only when starting a fresh form (Acc==""), which also
+   % covers re-prompting after a blank line; while accumulating an incomplete form
+   % use an empty continuation prompt so we don't repeat "CL-USER>" on each line.
+   ( Acc == "" -> prompt1(Prompt) ; prompt1('') ),
    read_line_to_string(In, Line),
    ( Line == end_of_file
    -> ( repl_buffer_blank(Acc)
@@ -230,10 +233,10 @@ read_repl_sexpr(In, Acc, Expr):-
       ;  ( repl_try_parse(Acc, E) -> Expr = E ; Expr = end_of_file ) )
    ;  string_concat(Acc, Line, T0), string_concat(T0, "\n", Acc1),
       ( repl_buffer_blank(Acc1)
-      -> read_repl_sexpr(In, "", Expr)
+      -> read_repl_sexpr(In, Prompt, "", Expr)
       ;  ( repl_try_parse(Acc1, E)
          -> Expr = E
-         ;  read_repl_sexpr(In, Acc1, Expr) ) )
+         ;  read_repl_sexpr(In, Prompt, Acc1, Expr) ) )
    ).
 
 % A complete, non-comment s-expression parsed from Text. Fails (rather than
