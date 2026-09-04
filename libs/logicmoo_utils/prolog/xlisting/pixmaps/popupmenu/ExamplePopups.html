@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<!-- This is an example html page to show how the popup menus would look/work -->
+	<head>
+		<meta charset="utf-8">
+		<title>Example Pop-Up Icon Menus</title>
+		<link rel="stylesheet" type="text/css" href="styles/Popup-plugin.css">
+		<link rel="stylesheet" type="text/css" href="styles/Example.css">
+
+		<!--Use either font-awesome icons or Google icons with these links. Other icons could also be used if preferred-->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+	</head>
+	<body>
+  <div>
+  
+		<div class="displayBox">
+
+			<div class="header"><h1>Example Pop-Up Icon Menus</h1></div>
+
+			<div class="icon-box-top">
+				<div id="defaultTest" style="margin-left: 75px">
+					<i class="fa fa-cog leftBorder rightBorder"></i>
+				</div>
+				<p class="icon-text">
+					Menu set with default settings and nothing passed through to the plugin. Will result in a menu with 2 items that give information on how to set up menus.
+					<br />
+					Contains 3 icons. Uses Font Awesome icons.
+				</p>
+			</div>
+
+			<div class="icon-box">
+				<div id="myPopUp" name="menu1">
+					<i class="fa fa-cog leftBorder rightBorder"></i>
+				</div>
+				<p class="icon-text">
+					Menu using a settings icon. Default styling color, position on top, activated by click, animation: bounce, disappears on click outside of the menu. Set to show an alert box but could be set to a link.
+					<br />
+					Contains 4 icons. Uses Font Awesome icons.
+				</p>
+			</div>
+
+			<div class="icon-box">
+				<div id="myPopUp2">
+					<i class="fa fa-bars leftBorder rightBorder"></i>
+				</div>
+				<p class="icon-text">
+					Menu using a hamburger icon. Red theme styling, position to the left, activated by click, animation: flip, disappears on click outside of the menu. Set to show/hide an area of the screen.
+					<br />
+					Contains 3 icons. Uses Font Awesome icons.
+				</p>
+			</div>
+
+			<div class="icon-box">
+				<div id="myPopUp3">
+					<i class="fa fa-thumbs-up leftBorder rightBorder"></i>
+				</div>
+				<p class="icon-text">
+					Menu using a thumbs-up icon. Custom styling, position to the right, activated by hover, animation: grow, appears on mouseover the menu and disappears on mouse leaving the popup menu. Set to append a div to the screen.
+					<br />
+					Contains 5 icons. Uses Google Material Icons. Button can be moved around the screen for a movable menu thanks to jQuery's "draggable" ui (if you link it).
+				</p>
+			</div>
+
+			<div class="icon-box">
+				<div id="myPopUp4">
+					<i class="material-icons leftBorder rightBorder">more_vert</i>
+				</div>
+				<p class="icon-text">
+					Menu using 3 vertical dots. Green theme styling, position to the bottom, activated by click, animation: standard, disappears only when clicked again (not outside of the icon). Set to show an alert box but could be set to a link.
+					<br />
+					Contains 5 icons. Uses Google Material Icons. Button can be moved around the screen for a movable menu thanks to jQuery's "draggable" ui (if you link it).
+				</p>
+			</div>
+
+			<div class="icon-box">
+				<p id="textPopup">Menu</p>
+				<p class="menuText">
+					A text type menu. Blue theme styling, position to the bottom, activated by hover, animation: standard, appears on mouseover the menu and disappears on mouse leaving the popup menu. Set to show an alert box but could be set to a link.
+					<br />
+					Contains 4 icons. Uses Font Awesome icons.
+				</p>
+			</div>
+
+		</div>
+
+		<div id="starWarsIcons" title="Click the icon to clear it.">
+			<div id="rebel">
+				<i class="fa fa-ra swIcon"></i>
+				<p>Rebel Alliance</p>
+			</div>
+
+			<div id="empire">
+				<i class="fa fa-empire swIcon"></i>
+				<p>Empire</p>
+			</div>
+
+			<div id="firstOrderIcon">
+				<i class="fa fa-first-order swIcon"></i>
+				<p>First Order</p>
+			</div>
+
+		</div>
+
+		<script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script> <!-- necessary for the "draggable" ui  -->
+		<script src="scripts/Popup-plugin.js"></script>
+		<script src="scripts/Example.js"></script>
+  </div>
+
+	</body>
+</html>

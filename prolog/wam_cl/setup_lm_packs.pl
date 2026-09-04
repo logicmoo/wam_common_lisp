@@ -1,86 +1,110 @@
+:- module(setup_lm_packs,
+          [ setup_lm_packs/0,
+            wamcl_check_packs/0,
+            wamcl_required_packs/1,
+            wamcl_local_libs_dir/1
+          ]).
 
-end_of_file.
+/*******************************************************************
+ *
+ * setup_lm_packs.pl
+ *
+ * Make WAM-CL's Prolog pack dependencies available *without* relying on
+ * a user or global (~/AppData or ~/.local) pack installation.
+ *
+ * The required packs are bundled inside this repository under  <repo>/libs/
+ * (one sub-directory per pack).  This file registers that directory as a
+ * pack search path, attaches the packs found there, and then checks that
+ * every required pack actually resolved.  If a pack is still missing it
+ * falls back to installing it from the web.
+ *
+ *******************************************************************/
 
-
-:- if(\+ current_predicate(setup_hist0/0)).
-
-% =====================
-% Enable History
-% =====================
-:- if(exists_source(library(editline))).
-%:- use_module(library(editline)).
-:- else.
-:- if(exists_source(library(readline))).
-:- use_module(library(readline)).
-:- endif.
-:- endif.
-setup_hist0:-  '$toplevel':setup_history.
-:- setup_hist0.
-:- endif.
-
-% =====================
-% Easier to trace while access_level system
-% =====================
-:- '$hide'('$toplevel':restore_debug).
-:- '$hide'('$toplevel':save_debug).
-:- '$hide'('$toplevel':residue_vars/2).
-:- '$hide'('system':deterministic/1).
-:- '$hide'(toplevel_call/2).
-:- '$hide'('$toplevel':'$query_loop'/0).
-
-% =====================
-% System metapredicates
-% =====================
-/*
-:- meta_predicate '$syspreds':bit(2,?,?).
-:- meta_predicate '$bags':findnsols_loop(*,*,0,*,*).
-:- meta_predicate '$bags':findall_loop(*,0,*,*).
-:- meta_predicate '$attvar':unfreeze(0).
-:- meta_predicate '$attvar':run_crv(0,*,*,*).
-:- meta_predicate '$expand':expand_term_list(4,*,*,*,*).
-:- meta_predicate '$parms':cached_library_directory(*,0,*).
-%:- meta_predicate '$toplevel':residue_vars(0,-).
-:- meta_predicate '$toplevel':toplevel_call(0).
-:- meta_predicate '$toplevel':run_initialize(0,*).
-% :- meta_predicate '$toplevel':run_init_goal(0,*).
-% :- meta_predicate '$attvar':uhook(*,0,*,*).
-% :- meta_predicate '$attvar':uhook(*,0,*).
-:- meta_predicate '$toplevel':'$execute_goal2'(0,*).
-*/
-
-% =====================
-% Add Pack Directories
-% =====================
 :- use_module(library(prolog_pack)).
 
+% ---------------------------------------------------------------------------
+% Suppress the (benign) "Local definition of M:P overrides weak import from M2"
+% warnings. WAM-CL's header.pl is `include`d into many modules and declares
+% shared multifile predicates (e.g. ssip_define/2); SWI emits one weak-import
+% override warning per module/predicate (~1200 of them) which is pure noise.
+% This message class only reports that a local clause shadows a weak/autoload
+% import, so suppressing it is safe. Loaded early (header.pl loads this file
+% first) so the hook is active before those warnings are emitted.
+% ---------------------------------------------------------------------------
+:- multifile(user:message_hook/3).
+user:message_hook(ignored_weak_import(_,_), _, _).
 
 
 :- multifile(user:file_search_path/2).
-:-   dynamic(user:file_search_path/2).
-dir_from(Rel,Y):-
-    ((getenv('LOGICMOO_WS',Dir);
-     prolog_load_context(directory,Dir);
-     '~/logicmoo_workspace'=Dir;
-     '/opt/logicmoo_workspace/'=Dir)),
-    absolute_file_name(Rel,Y,[relative_to(Dir),file_type(directory),file_errors(fail)]),
-    exists_directory(Y),!.
-add_pack_path(Rel):- 
-   dir_from(Rel,Y),
-   (( \+ user:file_search_path(pack,Y)) ->asserta(user:file_search_path(pack,Y));true).
-:- add_pack_path(packs_sys).
-:- add_pack_path(packs_usr).
-:- add_pack_path(packs_web).
-:- add_pack_path(packs_xtra).
-:- add_pack_path(packs_lib).
+:- dynamic(user:file_search_path/2).
+:- dynamic(setup_lm_packs:wamcl_setup_dir/1).
 
-attach_packs_n_utils:-
-   attach_packs,
-   use_module(library(logicmoo_utils)),
-   use_module(library(sanity_must)).
-:- initialization(attach_packs_n_utils,now).
+% Remember the directory this file was loaded from (prolog/wam_cl/).
+:- ( prolog_load_context(directory, Dir)
+   -> retractall(setup_lm_packs:wamcl_setup_dir(_)),
+      asserta(setup_lm_packs:wamcl_setup_dir(Dir))
+   ; true ).
 
-:- pack_list_installed.
+%!  wamcl_required_packs(-Packs) is det.
+%   The packs WAM-CL needs in order to load.
+wamcl_required_packs([predicate_streams, dictoo, logicmoo_utils]).
 
+%!  wamcl_local_libs_dir(-Dir) is semidet.
+%   Absolute path to the bundled  <repo>/libs/  directory, computed
+%   relative to this source file (prolog/wam_cl/ -> ../../libs).
+wamcl_local_libs_dir(Libs) :-
+    setup_lm_packs:wamcl_setup_dir(Here),
+    absolute_file_name('../../libs', Libs,
+        [ relative_to(Here), file_type(directory), file_errors(fail) ]),
+    exists_directory(Libs),
+    !.
 
+%!  wamcl_add_local_packs is det.
+%   Register the bundled libs/ dir as a pack path and attach its packs.
+wamcl_add_local_packs :-
+    ( wamcl_local_libs_dir(Libs)
+    -> ( \+ user:file_search_path(pack, Libs)
+       -> asserta(user:file_search_path(pack, Libs))
+       ; true ),
+       catch(attach_packs(Libs, [duplicate(replace)]),
+             _,
+             catch(attach_packs, _, true)),
+       print_message(informational,
+                     format('WAM-CL: using bundled packs from ~w', [Libs]))
+    ;  print_message(warning,
+                     format('WAM-CL: bundled libs/ dir not found; '+
+                            'falling back to user/global packs', []))
+    ).
 
+%!  wamcl_pack_available(+Pack) is semidet.
+%   True when Pack is attached/known to the pack system.
+wamcl_pack_available(Pack) :-
+    ( catch(prolog_pack:current_pack(Pack), _, fail) -> true
+    ; catch(pack_property(Pack, version(_)), _, fail)
+    ).
 
+%!  wamcl_check_pack(+Pack) is det.
+%   Report on one required pack; try a web install if it is missing.
+wamcl_check_pack(Pack) :-
+    ( wamcl_pack_available(Pack)
+    -> print_message(informational, format('WAM-CL: pack ~w ... OK', [Pack]))
+    ;  print_message(warning,
+                     format('WAM-CL: pack ~w NOT found - attempting install', [Pack])),
+       ( catch(pack_install(Pack, [interactive(false), upgrade(true)]), _, fail),
+         wamcl_pack_available(Pack)
+       -> print_message(informational, format('WAM-CL: pack ~w installed', [Pack]))
+       ;  print_message(warning, format('WAM-CL: pack ~w still missing', [Pack]))
+       )
+    ).
+
+%!  wamcl_check_packs is det.
+%   Attach bundled packs then verify all required packs are present.
+wamcl_check_packs :-
+    wamcl_add_local_packs,
+    wamcl_required_packs(Packs),
+    forall(member(Pack, Packs), wamcl_check_pack(Pack)).
+
+%!  setup_lm_packs is det.
+setup_lm_packs :- wamcl_check_packs.
+
+:- initialization(wamcl_check_packs, now).

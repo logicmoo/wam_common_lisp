@@ -34,6 +34,7 @@ set_stack_gb:- Six = 6,
               
 
 repl:- 
+ force_repl_tty,
  in_md(cl,(
    lisp_banner,   
    set_prolog_flag(lisp_primordial,false), % requires  "PACKAGE:SYM" to already externally exists
@@ -41,6 +42,21 @@ repl:-
    ((	repeat,
         catch(read_eval_print(Result),'$aborted',fail),
    	quietly(Result == end_of_file)))))),!.
+
+% Our own "this is an interactive read" flag. The interactive entry point (the
+% wam_cl launcher, or a telnet/socket handler) sets lisp_interactive to true so
+% the REPL prints prompts even when the stream is not a detectable tty (Windows
+% console, socket). Batch / file input leaves it false -> no prompts.
+:- create_prolog_flag(lisp_interactive, false, [keep(true), type(boolean)]).
+% Continuation prompt shown while reading an incomplete multi-line form.
+:- create_prolog_flag(lisp_prompt_continue, '...> ', [keep(true), type(atom)]).
+
+% Force the standard OUTPUT streams to report tty(true) so ANSI colour works even
+% over pipes and telnet/socket connections. Input is left as-is; prompt display
+% is governed by repl_should_prompt (the lisp_interactive flag or a real tty).
+force_repl_tty:-
+   forall(member(S, [user_output, user_error]),
+          ignore(catch(set_stream(S, tty(true)), _, true))).
 
 
 
@@ -109,8 +125,8 @@ set_prompt_from_package:-
 read_eval_print(Result):-
         ignore(catch(lquietly(set_prompt_from_package),_,true)),
         set_md_lang(cl),
-        get_prompt_from_package('> ',Prompt),prompt1(Prompt),
-        lquietly(show_uncaught_or_fail(read_no_parse(Expression))),!,       
+        get_prompt_from_package('> ',Prompt),
+        lquietly(show_uncaught_or_fail(read_repl_sexpr(Prompt, Expression))),!,       
         lquietly(show_uncaught_or_fail(lisp_add_history(Expression))),!,
         nb_linkval('$mv_return',[Result]),
         set_md_lang(prolog),
@@ -194,6 +210,83 @@ flush_all_output_safe:- notrace((forall(stream_property(S,mode(write)),quietly(c
 
 read_no_parse(Expr):- flush_all_output_safe,current_input(In), read_no_parse(In,Expr).
 read_no_parse(In, ExprO):- parse_sexpr_untyped(In,ExprS),(ExprS='$COMMENT'(_) -> (!,read_no_parse(In, ExprO)); ExprS=ExprO).
+
+% ---------------------------------------------------------------------------
+% Interactive REPL reader (stream-agnostic).
+%
+% The raw stream reader only reads incrementally when stream_property(In,tty(true))
+% holds and treats a soft end-of-line as end-of-file -- both false-negative on
+% Windows consoles and socket/telnet streams, so pressing Enter or typing a
+% half-finished form like "(+" dropped out of the REPL.
+%
+% read_repl_sexpr/2 reads a line at a time with read_line_to_string (which strips
+% CR/LF and returns the end_of_file atom only at a genuine end of stream) and
+% keeps reading until the buffer holds a complete, *balanced* s-expression:
+%   - blank / whitespace-only buffer  -> keep prompting for more input
+%   - a complete s-expression parses  -> return it (leave the rest for next read)
+%   - an incomplete/unbalanced form   -> read another line and retry
+%   - end_of_file with an empty buffer -> end the REPL (Ctrl-D / Ctrl-Z / hangup)
+% Works the same on a console, pipe, file or telnet/socket stream.
+% ---------------------------------------------------------------------------
+read_repl_sexpr(Prompt, Expr):- current_input(In), read_repl_sexpr(In, Prompt, "", Expr).
+read_repl_sexpr(In, Prompt, Acc, Expr):-
+   % Decide whether/what prompt to show. Main prompt for a fresh form (Acc==""),
+   % which also re-prompts after a blank line; the (configurable) continuation
+   % prompt while accumulating an incomplete multi-line form.
+   prompt1(''),                 % suppress SWI's own tty-gated prompt; we print our own
+   repl_emit_prompt(Prompt, Acc),
+   read_line_to_string(In, Line),
+   ( Line == end_of_file
+   -> ( repl_buffer_blank(Acc)
+      -> Expr = end_of_file
+      ;  ( repl_try_parse(Acc, E) -> Expr = E ; Expr = end_of_file ) )
+   ;  string_concat(Acc, Line, T0), string_concat(T0, "\n", Acc1),
+      ( repl_buffer_blank(Acc1)
+      -> read_repl_sexpr(In, Prompt, "", Expr)
+      ;  ( repl_try_parse(Acc1, E)
+         -> Expr = E
+         ;  read_repl_sexpr(In, Prompt, Acc1, Expr) ) )
+   ).
+
+% Print the prompt only when we should (interactive console, or forced for a
+% non-interactive reader such as a telnet/socket session). The continuation
+% prompt (Acc \== "") defaults to "...> " and is settable via the
+% lisp_prompt_continue flag.
+repl_emit_prompt(Prompt, Acc):-
+   ( repl_should_prompt
+   -> ( Acc == "" -> P = Prompt ; repl_continue_prompt(P) ),
+      flush_all_output_safe, write(user_output, P), flush_output(user_output)
+   ;  true ).
+
+repl_should_prompt:- current_prolog_flag(lisp_interactive, true), !.
+repl_should_prompt:- catch(stream_property(user_input, tty(true)), _, fail).
+
+% Continuation prompt: prefer the Lisp special sys:*continue-prompt*, then the
+% lisp_prompt_continue flag, then a hard default.
+repl_continue_prompt(P):-
+   ( catch(f_symbol_value(sys_xx_continue_prompt_xx, V), _, fail),
+     repl_prompt_text(V, P), P \== ''
+   -> true
+   ; current_prolog_flag(lisp_prompt_continue, P0), P0 \== '' -> P = P0
+   ; P = '...> ' ).
+
+repl_prompt_text(V, V):- string(V), !.
+repl_prompt_text(V, V):- atom(V), !.
+repl_prompt_text(V, T):- catch(to_prolog_string(V, T), _, fail), !.
+
+% A complete, non-comment s-expression parsed from Text. Fails (rather than
+% erroring) when Text is an incomplete/unbalanced form, so the caller keeps
+% reading more input.
+repl_try_parse(Text, Expr):-
+   catch(parse_sexpr_untyped(string(Text), E), _, fail),
+   E \== end_of_file,
+   E \= '$COMMENT'(_),
+   Expr = E.
+
+% True when Text holds no readable content (whitespace only).
+repl_buffer_blank(Text):-
+   string_codes(Text, Cs),
+   forall(member(C, Cs), code_type(C, space)).
 
 read_and_parse(Expr):-  flush_all_output_safe,current_input(In),read_and_parse(In, Expr).
 read_and_parse(In, Expr):- read_no_parse(In, ExprS),as_sexp(ExprS,ExprS1),!,reader_intern_symbols(ExprS1,Expr),!.

@@ -1,0 +1,4800 @@
+{
+  "http": {
+    "locations": {
+      "avatar":"/avatar/",
+      "changelog":"/changelog",
+      "changes":"/changes",
+      "chat_messages":"/chat/messages",
+      "chat_status":"/chat/status",
+      "cm_highlight":"/cm/",
+      "download":"/download",
+      "follow_file_options":"/follow/options",
+      "help":"/help",
+      "login":"/login",
+      "markdown":"/markdown",
+      "on_mail_link":"/mail/action/",
+      "pengines":"/pengine",
+      "pldoc_doc_for":"/pldoc/doc_for",
+      "plugin":"/plugin/",
+      "save_follow_file":"/follow/save",
+      "source_list":"/source_list",
+      "source_modified":"/source_modified",
+      "swish":"/",
+      "swish_chat":"/chat",
+      "swish_examples":"/list_examples",
+      "swish_help_index":"/help_index",
+      "swish_typeahead":"/typeahead",
+      "user_info":"/user_info",
+      "user_profile":"/user_profile",
+      "versions":"/versions",
+      "web_storage":"/p/"
+    }
+  },
+  "plugins": [
+    {
+      "css":"/plugin/bootstrap-slider/dist/css/bootstrap-slider.min.css",
+      "js":"/plugin/bootstrap-slider/dist/bootstrap-slider.min.js",
+      "name":"slider"
+    },
+    {"css":"/css/scasp.css", "js":"/js/scasp.js", "name":"scasp"}
+  ],
+  "swish": {
+    "application":"swish",
+    "avatars":"svg",
+    "chat":true,
+    "chat_spam_protection":true,
+    "cm_hover_style": {},
+    "cm_style": {},
+    "community_examples":false,
+    "csv_formats": ["prolog" ],
+    "default_query":"user:\"me\"",
+    "fullscreen": {"hide_navbar":true},
+    "hangout":"Hangout.swinb",
+    "include_alias":"example",
+    "notebook": {"eval_script":true, "fullscreen":false},
+    "ping":10,
+    "profiles": [
+      {
+	"label":"Empty",
+	"title":"Empty",
+	"type": ["pl", "swinb" ],
+	"value":"00-Empty"
+      },
+      {
+	"label":"Student",
+	"title":"Student exercise profile",
+	"type": ["pl", "swinb" ],
+	"value":"10-Student"
+      },
+      {
+	"label":"CLP",
+	"title":"Constraint Logic Programming",
+	"type": ["pl", "swinb" ],
+	"value":"30-CLP"
+      },
+      {
+	"label":"s(CASP)",
+	"title":"s(CASP) Programming",
+	"type": ["pl", "swinb" ],
+	"value":"40-s(CASP)"
+      }
+    ],
+    "public_access":false,
+    "residuals_var":"_residuals",
+    "scasp_justification_var":"_swish__scasp_justification",
+    "scasp_model_var":"_swish__scasp_model",
+    "show_beware":false,
+    "tabled_results":false,
+    "templates": [
+      {
+	"displayText":"use_module(library(...))",
+	"template":"use_module(library(${Library})).",
+	"type":"directive",
+	"varTemplates": {
+	  "Library": [
+	    {
+	      "displayText":"r/",
+	      "template":"r/${Rlib}",
+	      "varTemplates": {"Rlib": ["r_call", "r_data" ]}
+	    },
+	    "aggregate",
+	    "apply",
+	    "assoc",
+	    "base32",
+	    "base64",
+	    "charsio",
+	    "clpb",
+	    "clpfd",
+	    "codesio",
+	    "coinduction",
+	    "date",
+	    "debug",
+	    "dif",
+	    "error",
+	    "gensym",
+	    "heaps",
+	    "lists",
+	    "occurs",
+	    "option",
+	    "ordsets",
+	    "pairs",
+	    "pengines",
+	    "random",
+	    "rbtrees",
+	    "solution_sequences",
+	    "sort",
+	    "statistics",
+	    "terms",
+	    "ugraph",
+	    "utf8",
+	    "varnumbers",
+	    "when"
+	  ]
+	}
+      },
+      {
+	"displayText":"use_rendering(+Renderer).",
+	"template":"use_rendering(${Renderer}).",
+	"type":"directive",
+	"varTemplates": {
+	  "Renderer": [
+	    {"displayText":"Render RDF terms", "text":"rdf"},
+	    {"displayText":"Show WordNet synsets", "text":"wordnet"},
+	    {"displayText":"Render a sudoku matrix", "text":"sudoku"},
+	    {
+	      "displayText":"Render chess board representations",
+	      "text":"chess"
+	    },
+	    {"displayText":"Render data as tables", "text":"table"},
+	    {
+	      "displayText":"Render a list of character codes",
+	      "text":"codes"
+	    },
+	    {"displayText":"Render term as a tree", "text":"svgtree"},
+	    {
+	      "displayText":"Render data using graphviz",
+	      "text":"graphviz"
+	    },
+	    {"displayText":"Render data as tables", "text":"c3"},
+	    {"displayText":"Make URLs clickable", "text":"url"},
+	    {
+	      "displayText":"Render BDDs corresponding to CLP(B) constraints",
+	      "text":"bdd"
+	    },
+	    {
+	      "displayText":"Render mathematical formulas",
+	      "text":"mathjax"
+	    },
+	    {
+	      "displayText":"Render term structure as a graph",
+	      "text":"term"
+	    }
+	  ]
+	}
+      },
+      {
+	"displayText":"use_rendering(+Renderer, +Options).",
+	"template":"use_rendering(${Renderer}).",
+	"type":"directive",
+	"varTemplates": {
+	  "Renderer": [
+	    {"displayText":"Render RDF terms", "text":"rdf"},
+	    {"displayText":"Show WordNet synsets", "text":"wordnet"},
+	    {"displayText":"Render a sudoku matrix", "text":"sudoku"},
+	    {
+	      "displayText":"Render chess board representations",
+	      "text":"chess"
+	    },
+	    {"displayText":"Render data as tables", "text":"table"},
+	    {
+	      "displayText":"Render a list of character codes",
+	      "text":"codes"
+	    },
+	    {"displayText":"Render term as a tree", "text":"svgtree"},
+	    {
+	      "displayText":"Render data using graphviz",
+	      "text":"graphviz"
+	    },
+	    {"displayText":"Render data as tables", "text":"c3"},
+	    {"displayText":"Make URLs clickable", "text":"url"},
+	    {
+	      "displayText":"Render BDDs corresponding to CLP(B) constraints",
+	      "text":"bdd"
+	    },
+	    {
+	      "displayText":"Render mathematical formulas",
+	      "text":"mathjax"
+	    },
+	    {
+	      "displayText":"Render term structure as a graph",
+	      "text":"term"
+	    }
+	  ]
+	}
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"+Expr1 =\\= +Expr2",
+	"name":"=\\=",
+	"summary":"True if expression Expr1 evaluates to a number non-equal to Expr2.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"between(+Low, +High, ?Value)",
+	"name":"between",
+	"summary":"Low and High are integers, High >=Low.",
+	"type":"built_in"
+      },
+      {
+	"arity":0,
+	"iso":true,
+	"mode":"false",
+	"name":"false",
+	"summary":"Same as fail, but the name has a more declarative connotation.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"+Expr1 < +Expr2",
+	"name":"<",
+	"summary":"True if expression Expr1 evaluates to a smaller number than Expr2.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"cancel_halt(+Reason)",
+	"name":"cancel_halt",
+	"summary":"If this predicate is called from a hook registered with at_halt/1, halting Prolog is cancelled and an informational message is printed that includes Reason.",
+	"type":"built_in"
+      },
+      {
+	"arity":0,
+	"mode":"compiling",
+	"name":"compiling",
+	"summary":"True if the system is compiling source files with the -c option or qcompile/1 into an intermediate code file.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"+Expr1 =< +Expr2",
+	"name":"=<",
+	"summary":"True if expression Expr1 evaluates to a smaller or equal number to Expr2.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"call_dcg(:DCGBody, ?State0, ?State)",
+	"name":"call_dcg",
+	"summary":"As phrase/3, but without type checking State0 and State.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":":Condition *-> :Action ; :Else",
+	"name":"*->",
+	"summary":"This construct implements the so-called‘soft-cut'.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"open_resource(+Name, -Stream)",
+	"name":"open_resource",
+	"summary":"Opens the resource specified by Name.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"iso":true,
+	"mode":"phrase(:DCGBody, ?List, ?Rest)",
+	"name":"phrase",
+	"summary":"True when DCGBody applies to the difference List/Rest.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"open_resource(+Name, -Stream)",
+	"name":"open_resource",
+	"summary":"Opens the resource specified by Name.",
+	"type":"built_in"
+      },
+      {
+	"arity":0,
+	"iso":true,
+	"mode":"fail",
+	"name":"fail",
+	"summary":"Always fail.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"phrase(:DCGBody, ?List)",
+	"name":"phrase",
+	"summary":"Equivalent to phrase(DCGBody, InputList, []).",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"+Term1 =@= +Term2",
+	"name":"=@=",
+	"summary":"True if Term1 is a variant of (or structurally equivalent to) Term2.",
+	"type":"built_in"
+      },
+      {
+	"arity":5,
+	"mode":"sub_string(+String, ?Before, ?Length, ?After, ?SubString)",
+	"name":"sub_string",
+	"summary":"This predicate is functionally equivalent to sub_atom/5, but operates on strings.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"dcg_translate_rule(+In, -Out)",
+	"name":"dcg_translate_rule",
+	"summary":"This predicate performs the translation of a term Head-->Body into a normal Prolog clause.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"iso":true,
+	"mode":"arg(?Arg, +Term, ?Value)",
+	"name":"arg",
+	"summary":"Term should be instantiated to a term, Arg to an integer between 1 and the arity of Term.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"iso":true,
+	"mode":"float(@Term)",
+	"name":"float",
+	"summary":"True if Term is bound to a floating point number.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"float_class(+Float, -Class)",
+	"name":"float_class",
+	"summary":"Wraps C99 fpclassify() to access the class of a floating point number.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"copy_term(+In, -Out)",
+	"name":"copy_term",
+	"summary":"Create a version of In with renamed (fresh) variables and unify it to Out.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"rational(@Term, -Numerator, -Denominator)",
+	"name":"rational",
+	"summary":"True if Term is a rational number with given Numerator and Denominator.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"iso":true,
+	"mode":":- initialization(:Goal)",
+	"name":"initialization",
+	"summary":"Call Goal after loading the source file in which this directive appears has been completed.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"asserta(+Term)",
+	"name":"assert",
+	"summary":"Assert a clause (fact or rule) into the database.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"atom_string(?Atom, ?String)",
+	"name":"atom_string",
+	"summary":"Bi-directional conversion between an atom and a string.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"iso":true,
+	"mode":"asserta(+Term)",
+	"name":"asserta",
+	"summary":"Assert a clause (fact or rule) into the database.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"iso":true,
+	"mode":"op(+Precedence, +Type, :Name)",
+	"name":"op",
+	"summary":"Declare Name to be an operator of type Type with precedence Precedence.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"iso":true,
+	"mode":"asserta(+Term)",
+	"name":"assertz",
+	"summary":"Assert a clause (fact or rule) into the database.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"iso":true,
+	"mode":"current_op(?Precedence, ?Type, ?:Name)",
+	"name":"current_op",
+	"summary":"True if Name is currently defined as an operator of type Type with precedence Precedence.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"string_code(?Index, +String, ?Code)",
+	"name":"string_code",
+	"summary":"True when Code represents the character at the 1-based Index position in String.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"string_codes(?String, ?Codes)",
+	"name":"string_codes",
+	"summary":"Bi-directional conversion between a string and a list of character codes.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"initialization(:Goal, +When)",
+	"name":"initialization",
+	"summary":"Similar to initialization/1, but allows for specifying when Goal is executed while loading the program text: nowExecute Goal immediately.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"string_chars(?String, ?Chars)",
+	"name":"string_chars",
+	"summary":"Bi-directional conversion between a string and a list of characters.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"at_halt(:Goal)",
+	"name":"at_halt",
+	"summary":"Register Goal to be run from PL_cleanup(), which is called when the system halts.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"@Term1 == @Term2",
+	"name":"==",
+	"summary":"True if Term1 is equivalent to Term2.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"+Expr1 =:= +Expr2",
+	"name":"=:=",
+	"summary":"True if expression Expr1 evaluates to a number equal to Expr2.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"nb_setarg(+Arg, +Term, +Value)",
+	"name":"nb_setarg",
+	"summary":"Assigns the Arg-th argument of the compound term Term with the given Value as setarg/3, but on backtracking the assignment is not reversed.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"compile_predicates(:ListOfPredicateIndicators)",
+	"name":"compile_predicates",
+	"summary":"Compile a list of specified dynamic predicates (see dynamic/1 and assert/1) into normal static predicates.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"iso":true,
+	"mode":"atom(@Term)",
+	"name":"atom",
+	"summary":"True if Term is bound to an atom.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"asserta(+Term, -Reference)",
+	"name":"assert",
+	"summary":"Equivalent to asserta/1, assertz/1, assert/1, but in addition unifies Reference with a handle to the asserted clauses.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"nb_linkarg(+Arg, +Term, +Value)",
+	"name":"nb_linkarg",
+	"summary":"As nb_setarg/3, but like nb_linkval/2 it does not duplicate Value.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"iso":true,
+	"mode":"atomic(@Term)",
+	"name":"atomic",
+	"summary":"True if Term is bound (i.e., not a variable) and is not compound.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"asserta(+Term, -Reference)",
+	"name":"assertz",
+	"summary":"Equivalent to asserta/1, assertz/1, assert/1, but in addition unifies Reference with a handle to the asserted clauses.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"asserta(+Term, -Reference)",
+	"name":"asserta",
+	"summary":"Equivalent to asserta/1, assertz/1, assert/1, but in addition unifies Reference with a handle to the asserted clauses.",
+	"type":"built_in"
+      },
+      {
+	"arity":4,
+	"mode":"split_string(+String, +SepChars, +PadChars, -SubStrings)",
+	"name":"split_string",
+	"summary":"Break String into SubStrings.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"iso":true,
+	"mode":"ground(@Term)",
+	"name":"ground",
+	"summary":"True if Term holds no free variables.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"-Number is +Expr",
+	"name":"is",
+	"summary":"True when Number is the value to which Expr evaluates.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"tnot(:Goal)",
+	"name":"tnot",
+	"summary":"Tabled negation.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"predicate_property(:Head, ?Property)",
+	"name":"predicate_property",
+	"summary":"True when Head refers to a predicate that has property Property.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"dwim_predicate(+Term, -Dwim)",
+	"name":"dwim_predicate",
+	"summary":"‘Do What I Mean' (`dwim') support predicate.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"call_residue_vars(:Goal, -Vars)",
+	"name":"call_residue_vars",
+	"summary":"Find residual attributed variables left by Goal.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"setarg(+Arg, +Term, +Value)",
+	"name":"setarg",
+	"summary":"Extra-logical predicate.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"iso":true,
+	"mode":"retract(+Term)",
+	"name":"retract",
+	"summary":"When Term is an atom or a term it is unified with the first unifying fact or clause in the database.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"sub_atom_icasechk(+Haystack, ?Start, +Needle)",
+	"name":"sub_atom_icasechk",
+	"summary":"True when Needle is a sub atom of Haystack starting at Start.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"string_length(+String, -Length)",
+	"name":"string_length",
+	"summary":"Unify Length with the number of characters in String.",
+	"type":"built_in"
+      },
+      {
+	"arity":4,
+	"mode":"nth_integer_root_and_remainder(+N, +I, -Root, -Remainder)",
+	"name":"nth_integer_root_and_remainder",
+	"summary":"True when Root ** N + Remainder = I.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"iso":true,
+	"mode":"throw(+Exception)",
+	"name":"throw",
+	"summary":"Raise an exception.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":":Condition -> :Action",
+	"name":"->",
+	"summary":"If-then and If-Then-Else.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"atomics_to_string(+List, -String)",
+	"name":"atomics_to_string",
+	"summary":"List is a list of strings, atoms, or number types.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"string_concat(?String1, ?String2, ?String3)",
+	"name":"string_concat",
+	"summary":"Similar to atom_concat/3, but the unbound argument will be unified with a string object rather than an atom.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"iso":true,
+	"mode":"integer(@Term)",
+	"name":"integer",
+	"summary":"True if Term is bound to an integer.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"string(@Term)",
+	"name":"string",
+	"summary":"True if Term is bound to a string.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"deterministic(-Boolean)",
+	"name":"deterministic",
+	"summary":"Unifies its argument with true if no choice point exists that is more recent than the entry of the clause in which it appears.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"statistics(+Key, -Value)",
+	"name":"statistics",
+	"summary":"Unify system statistics determined by Key with Value.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"clause(:Head, ?Body)",
+	"name":"clause",
+	"summary":"True if Head can be unified with a clause head and Body with the corresponding clause body.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"autoload(:File)",
+	"name":"autoload",
+	"summary":"Declare that possibly missing predicates in the module in which this declaration occurs are to be resolved by using use_module/2 on File to (possibly) load the file and make the target predicate available.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"atomics_to_string(+List, +Separator, -String)",
+	"name":"atomics_to_string",
+	"summary":"Creates a string just like atomics_to_string/2, but inserts Separator between each pair of inputs.",
+	"type":"built_in"
+      },
+      {
+	"arity":4,
+	"mode":"copy_term(+VarsIn, +In, -VarsOut, -Out)",
+	"name":"copy_term",
+	"summary":"Similar to copy_term/2, but only rename the variables in VarsIn that appear in In.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"iso":true,
+	"mode":"var(@Term)",
+	"name":"var",
+	"summary":"True if Term currently is a free variable.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"iso":true,
+	"mode":"callable(@Term)",
+	"name":"callable",
+	"summary":"True if Term is bound to an atom or a compound term.",
+	"type":"built_in"
+      },
+      {
+	"arity":5,
+	"iso":true,
+	"mode":"sub_atom(+Atom, ?Before, ?Length, ?After, ?SubAtom)",
+	"name":"sub_atom",
+	"summary":"ISO predicate for breaking atoms.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"variant_sha1(+Term, -SHA1)",
+	"name":"variant_sha1",
+	"summary":"Compute a SHA1-hash from Term.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"is_list(+Term)",
+	"name":"is_list",
+	"summary":"True if Term is bound to the empty list ([]) or a compound term with name‘[|]’133The traditional list functor name is the dot (’.').",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"term_string(?Term, ?String, +Options)",
+	"name":"term_string",
+	"summary":"As term_string/2, passing Options to either read_term/2 or write_term/2.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"term_hash(+Term, -HashKey)",
+	"name":"term_hash",
+	"summary":"If Term is a ground term (see ground/1), HashKey is unified with a positive integer value that may be used as a hash key to the value.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"get_attr(+Var, +Module, -Value)",
+	"name":"get_attr",
+	"summary":"Request the current value for the attribute named Module.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"variant_hash(+Term, -HashKey)",
+	"name":"variant_hash",
+	"summary":"Similar to variant_sha1/2, but using a non-cryptographic hash and produces an integer result like term_hash/2.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"forall(:Cond, :Action)",
+	"name":"forall",
+	"summary":"For all alternative bindings of Cond, Action can be proven.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"del_attrs(+Var)",
+	"name":"del_attrs",
+	"summary":"If Var is an attributed variable, delete all its attributes.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"atom_prefix(+Atom, +Prefix)",
+	"name":"atom_prefix",
+	"summary":"True if Atom starts with the characters from Prefix.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"del_attr(+Var, +Module)",
+	"name":"del_attr",
+	"summary":"Delete the named attribute.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"snapshot(:Goal)",
+	"name":"snapshot",
+	"summary":"Similar to transaction/1, but always discards the local modifications.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"iso":true,
+	"mode":"call(:Goal)",
+	"name":"call",
+	"summary":"Call Goal.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"rule(:Head, -Rule)",
+	"name":"rule",
+	"summary":"True when Rule is a rule/clause that implements Head.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"with_output_to(+Output, :Goal)",
+	"name":"with_output_to",
+	"summary":"Run Goal as once/1, while characters written to the current output are sent to Output.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"sig_unblock(:Pattern)",
+	"name":"sig_unblock",
+	"summary":"Remove any effect of sig_block/1 for patterns that are more specific (see subsumes_term/2).",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"get_attrs(+Var, -Attributes)",
+	"name":"get_attrs",
+	"summary":"Get all attributes of Var.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"call_with_inference_limit(:Goal, +Limit, -Result)",
+	"name":"call_with_inference_limit",
+	"summary":"Equivalent to call(Goal), but limits the number of inferences for each solution of Goal.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"is_stream(+Term)",
+	"name":"is_stream",
+	"summary":"True if Term is a stream name or valid stream handle.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"attvar(@Term)",
+	"name":"attvar",
+	"summary":"Succeeds if Term is an attributed variable.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"atom_to_term(+Atom, -Term, -Bindings)",
+	"name":"atom_to_term",
+	"summary":"Use Atom as input to read_term/2 using the option variable_names and return the read term in Term and the variable bindings in Bindings.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"current_predicate(?Name, :Head)",
+	"name":"current_predicate",
+	"summary":"Classical pre-ISO implementation of current_predicate/1, where the predicate is represented by the head term.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"msort(+List, -Sorted)",
+	"name":"msort",
+	"summary":"Equivalent to sort/2, but does not remove duplicates.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"?=(@Term1, @Term2)",
+	"name":"?=",
+	"summary":"Succeeds if the syntactic equality of Term1 and Term2 can be decided safely, i.e.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"iso":true,
+	"mode":"catch(:Goal, +Catcher, :Recover)",
+	"name":"catch",
+	"summary":"Behaves as call/1 if no exception is raised when executing Goal.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"sort(+List, -Sorted)",
+	"name":"sort",
+	"summary":"True if Sorted can be unified with a list holding the elements of List, sorted to the standard order of terms (see section 4.6).",
+	"type":"built_in"
+      },
+      {
+	"arity":0,
+	"iso":true,
+	"mode":"true",
+	"name":"true",
+	"summary":"Always succeed.",
+	"type":"built_in"
+      },
+      {
+	"arity":4,
+	"mode":"sort(+Key, +Order, +List, -Sorted)",
+	"name":"sort",
+	"summary":"True when Sorted can be unified with a list holding the element of List.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"term_to_atom(?Term, ?Atom)",
+	"name":"term_to_atom",
+	"summary":"True if Atom describes a term that unifies with Term.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"prompt(-Old, +New)",
+	"name":"prompt",
+	"summary":"Set prompt associated with reading from the user_input stream.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"+Expr1 >= +Expr2",
+	"name":">=",
+	"summary":"True if expression Expr1 evaluates to a larger or equal number to Expr2.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"+Expr1 > +Expr2",
+	"name":">",
+	"summary":"True if expression Expr1 evaluates to a larger number than Expr2.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"term_string(?Term, ?String)",
+	"name":"term_string",
+	"summary":"Bi-directional conversion between a term and a string.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"thread_create(:Goal, -Id)",
+	"name":"thread_create",
+	"summary":"Shorthand for thread_create(Goal, Id, []).",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"catch_with_backtrace(:Goal, +Catcher, :Recover)",
+	"name":"catch_with_backtrace",
+	"summary":"As catch/3, but if library library(prolog_stack) is loaded and an exception of the shape error(Format, Context) is raised Context is extended with a backtrace.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"iso":true,
+	"mode":"compound(@Term)",
+	"name":"compound",
+	"summary":"True if Term is bound to a compound term.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"stream_position_data(?Field, +Pos, -Data)",
+	"name":"stream_position_data",
+	"summary":"Extracts information from the opaque stream position term as returned by stream_property/2 requesting the position(Pos) property.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"sleep(+Time)",
+	"name":"sleep",
+	"summary":"Suspend execution Time seconds.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"@(:Goal, +Module)",
+	"name":"@",
+	"summary":"Execute Goal, setting the calling context to Module.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"iso":true,
+	"mode":"once(:Goal)",
+	"name":"once",
+	"summary":"Make a possibly nondet goal semidet, i.e., succeed at most once.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"dynamic(:ListOfPredicateIndicators, +Options)",
+	"name":"dynamic",
+	"summary":"As dynamic/1, but allows for setting additional properties.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"ignore(:Goal)",
+	"name":"ignore",
+	"summary":"Calls Goal as once/1, but succeeds, regardless of whether Goal succeeded or not.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"keysort(+List, -Sorted)",
+	"name":"keysort",
+	"summary":"Sort a list of pairs.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"require(+Predicates)",
+	"name":"require",
+	"summary":"Declare that this file/module requires the specified predicates to be defined “with their commonly accepted definition''.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"qcompile(:File, +Options)",
+	"name":"qcompile",
+	"summary":"As qcompile/1, but processes additional options as defined by load_files/2.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"import_module(+Module, -Import)",
+	"name":"import_module",
+	"summary":"True if Module inherits directly from Import.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"sig_atomic(:Goal)",
+	"name":"sig_atomic",
+	"summary":"Execute Goal as once/1 while blocking both thread signals (see thread_signal/2) and OS signals (see on_signal/3).",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"copy_term_nat(+Term, -Copy)",
+	"name":"copy_term_nat",
+	"summary":"As copy_term/2.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"not(:Goal)",
+	"name":"not",
+	"summary":"True if Goal cannot be proven.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"copy_term(+Term, -Copy, -Gs)",
+	"name":"copy_term",
+	"summary":"Create a regular term Copy as a copy of Term (without any attributes), and a list Gs of goals that represents the attributes.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"setup_call_cleanup(:Setup, :Goal, :Cleanup)",
+	"name":"setup_call_cleanup",
+	"summary":"Calls (once(Setup), Goal).",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"notrace(:Goal)",
+	"name":"notrace",
+	"summary":"Call Goal, but suspend the debugger while Goal is executing.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"duplicate_term(+In, -Out)",
+	"name":"duplicate_term",
+	"summary":"Version of copy_term/2 that also copies ground terms and therefore ensures that destructive modification using setarg/3 does not affect the copy.",
+	"type":"built_in"
+      },
+      {
+	"arity":0,
+	"mode":"abort",
+	"name":"abort",
+	"summary":"Abort the Prolog execution and restart the top level.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"prolog_frame_attribute(+Frame, +Key, :Value)",
+	"name":"prolog_frame_attribute",
+	"summary":"Obtain information about the local stack frame Frame.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":":Goal1 , :Goal2",
+	"name":",",
+	"summary":"Conjunction (and).",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"call_cleanup(:Goal, :Cleanup)",
+	"name":"call_cleanup",
+	"summary":"Same as setup_call_cleanup(true, Goal, Cleanup).",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"undo(:Goal)",
+	"name":"undo",
+	"summary":"Add Goal to the trail.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"strip_module(+Term, -Module, -Plain)",
+	"name":"strip_module",
+	"summary":"Used in module-transparent predicates or meta-predicates to extract the referenced module and plain term.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"rule(:Head, -Rule)",
+	"name":"rule",
+	"summary":"True when Rule is a rule/clause that implements Head.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"set_prolog_flag(:Key, +Value)",
+	"name":"set_prolog_flag",
+	"summary":"Define a new Prolog flag or change its value.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"call_with_depth_limit(:Goal, +Limit, -Result)",
+	"name":"call_with_depth_limit",
+	"summary":"If Goal can be proven without recursion deeper than Limit levels, call_with_depth_limit/3 succeeds, binding Result to the deepest recursion level used during the proof.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"call(:Goal, +ExtraArg1, ...)",
+	"name":"call",
+	"summary":"Append ExtraArg1, ExtraArg2, ... to the argument list of Goal and call the result.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"transaction(:Goal)",
+	"name":"transaction",
+	"summary":"Run Goal as once/1 in a transaction.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"size_abstract_term(+Size, +Term, -Abstract)",
+	"name":"size_abstract_term",
+	"summary":"The size of a term is defined as the number of compound subterms (function symbols) that appear in term.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"source_file(:Pred, ?File)",
+	"name":"source_file",
+	"summary":"True if the predicate specified by Pred is owned by file File, where File is an absolute path name (see absolute_file_name/2).",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"current_signal(?Name, ?Id, ?Handler)",
+	"name":"current_signal",
+	"summary":"Enumerate the currently defined signal handling.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"call_cleanup(:Goal, +Catcher, :Cleanup)",
+	"name":"call_cleanup",
+	"summary":"Same as setup_call_catcher_cleanup(true, Goal, Catcher, Cleanup).",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"cyclic_term(@Term)",
+	"name":"cyclic_term",
+	"summary":"True if Term contains cycles, i.e.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"subsumes_term(@Generic, @Specific)",
+	"name":"subsumes_term",
+	"summary":"True if Generic can be made equivalent to Specific by only binding variables in Generic.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"load_files(:Files)",
+	"name":"load_files",
+	"summary":"Equivalent to load_files(Files,[]).",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"nb_link_dict(+Key, !Dict, +Value)",
+	"name":"nb_link_dict",
+	"summary":"Destructively update the value associated with Key in Dict to Value.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"prolog_listen(+Channel, :Closure)",
+	"name":"prolog_listen",
+	"summary":"Call Closure if an event that matches Channel happens inside Prolog.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"nonground(+Term, -Var)",
+	"name":"nonground",
+	"summary":"True when Var is a variable in Term.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"iso":true,
+	"mode":"\\+ :Goal",
+	"name":"\\+",
+	"summary":"True if‘Goal' cannot be proven (mnemonic: + refers to provable and the backslash (\\) is normally used to indicate negation in Prolog).",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"get_dict(?Key, +Dict, -Value)",
+	"name":"get_dict",
+	"summary":"Unify the value associated with Key in dict with Value.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"@Term1 \\= @Term2",
+	"name":"\\=",
+	"summary":"Equivalent to \\+Term1 = Term2.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"reexport(+Files)",
+	"name":"reexport",
+	"summary":"Load and import predicates as use_module/1 and re-export all imported predicates.",
+	"type":"built_in"
+      },
+      {
+	"arity":4,
+	"mode":"findall(+Template, :Goal, -Bag, +Tail)",
+	"name":"findall",
+	"summary":"As findall/3, but returns the result as the difference list Bag-Tail.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"b_set_dict(+Key, !Dict, +Value)",
+	"name":"b_set_dict",
+	"summary":"Destructively update the value associated with Key in Dict to Value.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"sig_block(:Pattern)",
+	"name":"sig_block",
+	"summary":"Block thread signals queued using thread_signal/2 that match Pattern.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"iso":true,
+	"mode":"acyclic_term(@Term)",
+	"name":"acyclic_term",
+	"summary":"True if Term does not contain cycles, i.e.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"unify_with_occurs_check(+Term1, +Term2)",
+	"name":"unify_with_occurs_check",
+	"summary":"As =/2, but using sound unification.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"iso":true,
+	"mode":"nonvar(@Term)",
+	"name":"nonvar",
+	"summary":"True if Term currently is not a free variable.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"write_term(+Term, +Options)",
+	"name":"write_term",
+	"summary":"The predicate write_term/2 is the generic form of all Prolog term-write predicates.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"nb_set_dict(+Key, !Dict, +Value)",
+	"name":"nb_set_dict",
+	"summary":"Destructively update the value associated with Key in Dict to a copy of Value.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"with_tty_raw(:Goal)",
+	"name":"with_tty_raw",
+	"summary":"Run goal with the user input and output streams set in raw mode, which implies the terminal makes the input available immediately instead of line-by-line and input that is read is not echoed.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"use_foreign_library(+FileSpec)",
+	"name":"use_foreign_library",
+	"summary":"Load and install a foreign library as load_foreign_library/1,2 and register the installation using initialization/2 with the option now.",
+	"type":"built_in"
+      },
+      {
+	"arity":4,
+	"mode":"numbervars(+Term, +Start, -End, +Options)",
+	"name":"numbervars",
+	"summary":"As numbervars/3, providing the following options: functor_name(+Atom)Name of the functor to use instead of $VAR.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"on_signal(+Signal, -Old, :New)",
+	"name":"on_signal",
+	"summary":"Determines how Signal is processed.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"put_dict(+New, +DictIn, -DictOut)",
+	"name":"put_dict",
+	"summary":"DictOut is a new dict created by replacing or adding key-value pairs from New to Dict.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"prolog_unlisten(+Channel, :Closure)",
+	"name":"prolog_unlisten",
+	"summary":"Remove matching closures registered with prolog_listen/3.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"use_foreign_library(+FileSpec)",
+	"name":"use_foreign_library",
+	"summary":"Load and install a foreign library as load_foreign_library/1,2 and register the installation using initialization/2 with the option now.",
+	"type":"built_in"
+      },
+      {
+	"arity":0,
+	"iso":true,
+	"mode":"!",
+	"name":"!",
+	"summary":"Cut.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"not_exists(:Goal)",
+	"name":"not_exists",
+	"summary":"Handles tabled negation for non-ground (floundering) Goal as well as non tabled goals.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"dict_create(-Dict, +Tag, +Data)",
+	"name":"dict_create",
+	"summary":"Create a dict in Tag from Data.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"iso":true,
+	"mode":"number(@Term)",
+	"name":"number",
+	"summary":"True if Term is bound to a rational number (including integers) or a floating point number.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"thread_initialization(:Goal)",
+	"name":"thread_initialization",
+	"summary":"Run Goal when thread is started.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"iso":true,
+	"mode":"numbervars(+Term, +Start, -End)",
+	"name":"numbervars",
+	"summary":"Unify the free variables in Term with a term $VAR(N), where N is the number of the variable.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"message_to_string(+Term, -String)",
+	"name":"message_to_string",
+	"summary":"Translates a message term into a string object (see section 5.2).",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"prolog_listen(+Channel, :Closure)",
+	"name":"prolog_listen",
+	"summary":"Call Closure if an event that matches Channel happens inside Prolog.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"dict_pairs(?Dict, ?Tag, ?Pairs)",
+	"name":"dict_pairs",
+	"summary":"Bi-directional mapping between a dict and an ordered list of pairs (see section A.32).",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"@Term1 @=< @Term2",
+	"name":"@=<",
+	"summary":"True if both terms are equal (==/2) or Term1 is before Term2 in the standard order of terms.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"engine_create(+Template, :Goal, ?Engine)",
+	"name":"engine_create",
+	"summary":"Create a new engine and unify Engine with a handle to it.",
+	"type":"built_in"
+      },
+      {
+	"arity":0,
+	"mode":"version",
+	"name":"version",
+	"summary":"Write the SWI-Prolog banner message as well as additional messages registered using version/1.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"thread_wait(:Goal, :Options)",
+	"name":"thread_wait",
+	"summary":"Block execution of the calling thread until Goal becomes true.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"@Term1 @> @Term2",
+	"name":"@>",
+	"summary":"True if Term1 is after Term2 in the standard order of terms.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"current_table(:Variant, -Trie)",
+	"name":"current_table",
+	"summary":"True when Trie is the answer table for Variant.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"thread_update(:Goal, :Options)",
+	"name":"thread_update",
+	"summary":"Update a module (typically using assert/1 and/or retract/1 and friends) and on completion signal threads waiting for this module using thread_wait/2 to reevaluate their Goal.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"@Term1 \\== @Term2",
+	"name":"\\==",
+	"summary":"Equivalent to \\+Term1 == Term2.",
+	"type":"built_in"
+      },
+      {
+	"arity":4,
+	"mode":"functor(?Term, ?Name, ?Arity, ?Type)",
+	"name":"functor",
+	"summary":"As functor/3, but designed to work with zero-arity terms (e.g., a(), see section 5).",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"@Term1 @< @Term2",
+	"name":"@<",
+	"summary":"True if Term1 is before Term2 in the standard order of terms.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"writeln(+Term)",
+	"name":"writeln",
+	"summary":"Equivalent to write(Term), nl.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"load_files(:Files, +Options)",
+	"name":"load_files",
+	"summary":"The predicate load_files/2 is the parent of all the other loading predicates except for include/1.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"transaction(:Goal, :Constraint, +Mutex)",
+	"name":"transaction",
+	"summary":"Similar to transaction/1, but allows verifying Constraint during the commit phase.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"freeze(+Var, :Goal)",
+	"name":"freeze",
+	"summary":"Delay the execution of Goal until Var is bound (i.e., is not a variable or attributed variable).",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"reexport(+File, +Import)",
+	"name":"reexport",
+	"summary":"Import from File as use_module/2 and re-export the imported predicates.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"select_dict(+Select, +From, -Rest)",
+	"name":"select_dict",
+	"summary":"True when the tags of Select and From have been unified, all keys in Select appear in From and the corresponding values have been unified.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"iso":true,
+	"mode":"compare(?Order, @Term1, @Term2)",
+	"name":"compare",
+	"summary":"Determine or test the Order between two terms in the standard order of terms.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"+Select :< +From",
+	"name":":<",
+	"summary":"True when Select is a‘sub dict' of From: the tags must unify and all keys in Select must appear with unifying values in From.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"+Dict1 >:< +Dict2",
+	"name":">:<",
+	"summary":"This operator specifies a partial unification between Dict1 and Dict2.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"is_dict(@Term)",
+	"name":"is_dict",
+	"summary":"True if Term is a dict.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"b_getval(+Name, -Value)",
+	"name":"b_getval",
+	"summary":"Get the value associated with the global variable Name and unify it with Value.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"iso":true,
+	"mode":"functor(?Term, ?Name, ?Arity)",
+	"name":"functor",
+	"summary":"True when Term is a term with functor Name/Arity.",
+	"type":"built_in"
+      },
+      {
+	"arity":0,
+	"mode":"undefined",
+	"name":"undefined",
+	"summary":"Unknown represents neither true nor false in the well formed model.",
+	"type":"built_in"
+      },
+      {
+	"arity":4,
+	"mode":"del_dict(+Key, +DictIn, ?Value, -DictOut)",
+	"name":"del_dict",
+	"summary":"True when Key-Value is in DictIn and DictOut contains all associations of DictIn except for Key.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"?Term =.. ?List",
+	"name":"=..",
+	"summary":"List is a list whose head is the functor of Term and the remaining arguments are the arguments of the term.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"thread_signal(+ThreadId, :Goal)",
+	"name":"thread_signal",
+	"summary":"Make thread ThreadId execute Goal at the first opportunity.",
+	"type":"built_in"
+      },
+      {
+	"arity":5,
+	"mode":"get_dict(+Key, +Dict, -Value, -NewDict, +NewValue)",
+	"name":"get_dict",
+	"summary":"Create a new dict after updating the value for Key.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"compound_name_arity(?Compound, ?Name, ?Arity)",
+	"name":"compound_name_arity",
+	"summary":"Version of functor/3 that only works for compound terms and can examine and create compound terms with zero arguments (e.g, name()).",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"iso":true,
+	"mode":"findall(+Template, :Goal, -Bag)",
+	"name":"findall",
+	"summary":"Create a list of the instantiations Template gets successively on backtracking over Goal and unify the result with Bag.",
+	"type":"built_in"
+      },
+      {
+	"arity":0,
+	"mode":"answer_count_restraint",
+	"name":"answer_count_restraint",
+	"summary":"This predicate is undefined in the sense of well founded semantics (see section 7.6 and undefined/0).",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"compound_name_arguments(?Compound, ?Name, ?Arguments)",
+	"name":"compound_name_arguments",
+	"summary":"Rationalized version of =../2 that can compose and decompose compound terms with zero arguments.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"length(?List, ?Length)",
+	"name":"length",
+	"summary":"True if Length represents the number of elements in List.",
+	"type":"built_in"
+      },
+      {
+	"arity":5,
+	"mode":"hdt_suggestions(+HDT, +Base, +Role, +MaxResults, -Results:list)",
+	"name":"hdt_suggestions",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"nb_getval(+Name, -Value)",
+	"name":"nb_getval",
+	"summary":"The nb_getval/2 predicate is a synonym for b_getval/2, introduced for compatibility and symmetry.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"@Term1 @>= @Term2",
+	"name":"@>=",
+	"summary":"True if both terms are equal (==/2) or Term1 is after Term2 in the standard order of terms.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"nb_current(?Name, ?Value)",
+	"name":"nb_current",
+	"summary":"Enumerate all defined variables with their value.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"print_message(+Kind, +Term)",
+	"name":"print_message",
+	"summary":"The predicate print_message/2 is used by the system and libraries to print messages.",
+	"type":"built_in"
+      },
+      {
+	"arity":4,
+	"mode":"put_dict(+Key, +DictIn, +Value, -DictOut)",
+	"name":"put_dict",
+	"summary":"DictOut is a new dict created by replacing or adding Key-Value to DictIn.",
+	"type":"built_in"
+      },
+      {
+	"arity":0,
+	"mode":"trace",
+	"name":"trace",
+	"summary":"Start the tracer.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"autoload(:File)",
+	"name":"autoload",
+	"summary":"Declare that possibly missing predicates in the module in which this declaration occurs are to be resolved by using use_module/2 on File to (possibly) load the file and make the target predicate available.",
+	"type":"built_in"
+      },
+      {
+	"arity":4,
+	"mode":"engine_create(+Template, :Goal, ?Engine)",
+	"name":"engine_create",
+	"summary":"Create a new engine and unify Engine with a handle to it.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"term_variables(+Term, -List)",
+	"name":"term_variables",
+	"summary":"Unify List with a list of variables, each sharing with a unique variable of Term.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"qcompile(:File)",
+	"name":"qcompile",
+	"summary":"Takes a file specification as consult/1, etc., and, in addition to the normal compilation, creates a Quick Load File from File.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"abolish_table_subgoals(:Subgoal)",
+	"name":"abolish_table_subgoals",
+	"summary":"Abolish all tables that unify with SubGoal.",
+	"type":"built_in"
+      },
+      {
+	"arity":0,
+	"iso":true,
+	"mode":"repeat",
+	"name":"repeat",
+	"summary":"Always succeed, provide an infinite number of choice points.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"term_variables(+Term, -List, ?Tail)",
+	"name":"term_variables",
+	"summary":"Difference list version of term_variables/2.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":":- table(:Specification)",
+	"name":"table",
+	"summary":"Prepare the predicates specified by Specification for tabled execution.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"is_dict(@Term, -Tag)",
+	"name":"is_dict",
+	"summary":"True if Term is a dict of Tag.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"format(+Format, :Arguments)",
+	"name":"format",
+	"summary":"Format is an atom, list of character codes, or a Prolog string.",
+	"type":"built_in"
+      },
+      {
+	"arity":0,
+	"mode":"notrace",
+	"name":"notrace",
+	"summary":"Stop the tracer.",
+	"type":"built_in"
+      },
+      {
+	"arity":0,
+	"mode":"tracing",
+	"name":"tracing",
+	"summary":"True if the tracer is currently switched on.",
+	"type":"built_in"
+      },
+      {
+	"arity":0,
+	"mode":"radial_restraint",
+	"name":"radial_restraint",
+	"summary":"This predicate is undefined in the sense of well founded semantics (see section 7.6 and undefined/0).",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"get_time(-TimeStamp)",
+	"name":"get_time",
+	"summary":"Return the current time as a TimeStamp.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"current_prolog_flag(?Key, -Value)",
+	"name":"current_prolog_flag",
+	"summary":"The predicate current_prolog_flag/2 defines an interface to installation features: options compiled in, version, home, etc.",
+	"type":"built_in"
+      },
+      {
+	"arity":4,
+	"mode":"setup_call_catcher_cleanup(:Setup, :Goal, +Catcher, :Cleanup)",
+	"name":"setup_call_catcher_cleanup",
+	"summary":"Similar to setup_call_cleanup(Setup, Goal, Cleanup) with additional information on the reason for calling Cleanup.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"format_time(+Out, +Format, +StampOrDateTime)",
+	"name":"format_time",
+	"summary":"Modelled after POSIX strftime(), using GNU extensions.",
+	"type":"built_in"
+      },
+      {
+	"arity":0,
+	"mode":"license",
+	"name":"license",
+	"summary":"Evaluate the license conditions of all loaded components.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"iso":true,
+	"mode":"setof(+Template, +Goal, -Set)",
+	"name":"setof",
+	"summary":"Equivalent to bagof/3, but sorts the result using sort/2 to get a sorted list of alternatives without duplicates.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"reset(:Goal, ?Ball, -Continuation)",
+	"name":"reset",
+	"summary":"Call Goal.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"term_attvars(+Term, -AttVars)",
+	"name":"term_attvars",
+	"summary":"AttVars is a list of all attributed variables in Term and its attributes.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"rational(@Term)",
+	"name":"rational",
+	"summary":"True if Term is bound to a rational number.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"unifiable(@X, @Y, -Unifier)",
+	"name":"unifiable",
+	"summary":"If X and Y can unify, unify Unifier with a list of Var = Value, representing the bindings required to make X and Y equivalent.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"name(?Atomic, ?CodeList)",
+	"name":"name",
+	"summary":"CodeList is a list of character codes representing the same text as Atomic.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"date_time_stamp(+DateTime, -TimeStamp)",
+	"name":"date_time_stamp",
+	"summary":"Compute the timestamp from a date/9 term.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"atom_length(+Atom, -Length)",
+	"name":"atom_length",
+	"summary":"True if Atom is an atom of Length characters.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"default_module(+Module, -Default)",
+	"name":"default_module",
+	"summary":"True if predicates and operators in Default are visible in Module.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"normalize_space(-Out, +In)",
+	"name":"normalize_space",
+	"summary":"Normalize white space in In.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"license(+LicenseId, +Component)",
+	"name":"license",
+	"summary":"Register the fact that Component is distributed under a license identified by LicenseId.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"format(+Output, +Format, :Arguments)",
+	"name":"format",
+	"summary":"As format/2, but write the output on the given Output.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"string_upper(+String, -UpperCase)",
+	"name":"string_upper",
+	"summary":"Convert String to upper case and unify the result with UpperCase.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"iso":true,
+	"mode":"retractall(+Head)",
+	"name":"retractall",
+	"summary":"All facts or clauses in the database for which the head unifies with Head are removed.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"string_lower(+String, LowerCase)",
+	"name":"string_lower",
+	"summary":"Convert String to lower case and unify the result with LowerCase.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"stamp_date_time(+TimeStamp, -DateTime, +TimeZone)",
+	"name":"stamp_date_time",
+	"summary":"Convert a TimeStamp to a DateTime in the given timezone.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"upcase_atom(+AnyCase, -UpperCase)",
+	"name":"upcase_atom",
+	"summary":"Converts, similar to downcase_atom/2, an atom to uppercase.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"format_predicate(+Char, +Head)",
+	"name":"format_predicate",
+	"summary":"If a sequence ~c (tilde, followed by some character) is found, the format/3 and friends first check whether the user has defined a predicate to handle the format.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"iso":true,
+	"mode":"bagof(+Template, :Goal, -Bag)",
+	"name":"bagof",
+	"summary":"Unify Bag with the alternatives of Template.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"downcase_atom(+AnyCase, -LowerCase)",
+	"name":"downcase_atom",
+	"summary":"Converts the characters of AnyCase into lowercase as char_type/2 does (i.e.",
+	"type":"built_in"
+      },
+      {
+	"arity":0,
+	"mode":"abolish_all_tables",
+	"name":"abolish_all_tables",
+	"summary":"Remove all tables, both private and shared (see section 7.9).",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"code_type(?Code, ?Type)",
+	"name":"code_type",
+	"summary":"As char_type/2, but uses character codes rather than one-character atoms.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"volatile +Name/Arity, ...",
+	"name":"volatile",
+	"summary":"Declare that the clauses of specified predicates should not be saved to the program.",
+	"type":"built_in"
+      },
+      {
+	"arity":4,
+	"mode":"findnsols(+N, @Template, :Goal, -List)",
+	"name":"findnsols",
+	"summary":"As findall/3 and findall/4, but generates at most N solutions.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"char_code(?Atom, ?Code)",
+	"name":"char_code",
+	"summary":"Convert between a single character (an atom of length 1), and its character code (an integer denoting the corresponding character).",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"atomic_concat(+Atomic1, +Atomic2, -Atom)",
+	"name":"atomic_concat",
+	"summary":"Atom represents the text after converting Atomic1 and Atomic2 to text and concatenating the result: ?- atomic_concat(name, 42, X).",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"char_type(?Char, ?Type)",
+	"name":"char_type",
+	"summary":"Tests or generates alternative Types or Chars.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"iso":true,
+	"mode":"discontiguous :PredicateIndicator, ...",
+	"name":"discontiguous",
+	"summary":"Informs the system that the clauses of the specified predicate(s) might not be together in the source file.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"number_string(?Number, ?String)",
+	"name":"number_string",
+	"summary":"Bi-directional conversion between a number and a string.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"iso":true,
+	"mode":"atom_concat(?Atom1, ?Atom2, ?Atom3)",
+	"name":"atom_concat",
+	"summary":"Atom3 forms the concatenation of Atom1 and Atom2.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":":- module_transparent(+Preds)",
+	"name":"module_transparent",
+	"summary":"Preds is a comma-separated list of name/arity pairs (like dynamic/1).",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"memberchk(?Elem, +List)",
+	"name":"memberchk",
+	"summary":"True when Elem is an element of List.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"number_codes(?Number, ?CodeList)",
+	"name":"number_codes",
+	"summary":"As number_chars/2, but converts to a list of character codes rather than characters.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"public :PredicateIndicator, ...",
+	"name":"public",
+	"summary":"Instructs the cross-referencer that the predicate can be called.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"number_chars(?Number, ?CharList)",
+	"name":"number_chars",
+	"summary":"Similar to atom_chars/2, but converts between a number and its representation as a list of characters (atoms of length 1).",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"non_terminal :PredicateIndicator, ...",
+	"name":"non_terminal",
+	"summary":"Sets the non_terminal property on the predicate.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"thread_idle(:Goal, +Duration)",
+	"name":"thread_idle",
+	"summary":"Indicates to the system that the calling thread will idle for some time while calling Goal as once/1.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"noprofile(+Name/+Arity, ...)",
+	"name":"noprofile",
+	"summary":"Declares the predicate Name/Arity to be invisible to the profiler.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"atom_codes(?Atom, ?CodeList)",
+	"name":"atom_codes",
+	"summary":"Convert between an atom and a list of character codes (integers denoting characters).",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"thread_local +Functor/+Arity, ...",
+	"name":"thread_local",
+	"summary":"This directive is related to the dynamic/1 directive.",
+	"type":"built_in"
+      },
+      {
+	"arity":5,
+	"mode":"findnsols(+N, @Template, :Goal, -List)",
+	"name":"findnsols",
+	"summary":"As findall/3 and findall/4, but generates at most N solutions.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"with_mutex(+MutexId, :Goal)",
+	"name":"with_mutex",
+	"summary":"Execute Goal while holding MutexId.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"iso":true,
+	"mode":"thread_create(:Goal, -Id, +Options)",
+	"name":"thread_create",
+	"summary":"Create a new Prolog thread (and underlying operating system thread) and start it by executing Goal.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"atom_chars(?Atom, ?CharList)",
+	"name":"atom_chars",
+	"summary":"Similar to atom_codes/2, but CharList is a list of characters (atoms of length 1) rather than a list of character codes (integers denoting characters).",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"atomic_list_concat(+List, -Atom)",
+	"name":"atomic_list_concat",
+	"summary":"List is a list of strings, atoms, integers, floating point numbers or non-integer rationals.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"plus(?Int1, ?Int2, ?Int3)",
+	"name":"plus",
+	"summary":"True if Int3 = Int1 + Int2.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"blob(@Term, ?Type)",
+	"name":"blob",
+	"summary":"True if Term is a blob of type Type.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"apply(:Goal, +List)",
+	"name":"apply",
+	"summary":"Append the members of List to the arguments of Goal and call the resulting term.",
+	"type":"built_in"
+      },
+      {
+	"arity":4,
+	"mode":"term_hash(+Term, +Depth, +Range, -HashKey)",
+	"name":"term_hash",
+	"summary":"As term_hash/2, but only considers Term to the specified Depth.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":":Goal1 ; :Goal2",
+	"name":";",
+	"summary":"Disjunction (or).",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"atom_number(?Atom, ?Number)",
+	"name":"atom_number",
+	"summary":"Realises the popular combination of atom_codes/2 and number_codes/2 to convert between atom and number (integer, float or non-integer rational) in one predicate, avoiding the intermediate list.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"?Term1 = ?Term2",
+	"name":"=",
+	"summary":"Unify Term1 with Term2.",
+	"type":"built_in"
+      },
+      {
+	"arity":0,
+	"mode":"known_licenses",
+	"name":"known_licenses",
+	"summary":"List all licenses known to the system.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"iso":true,
+	"mode":"multifile :PredicateIndicator, ...",
+	"name":"multifile",
+	"summary":"Informs the system that the specified predicate(s) may be defined over more than one file.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"file_directory_name(+File, -Directory)",
+	"name":"file_directory_name",
+	"summary":"Extracts the directory part of File.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"consult(:File)",
+	"name":"consult",
+	"summary":"Read File as a Prolog source file.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"iso":true,
+	"mode":"thread_self(-Id)",
+	"name":"thread_self",
+	"summary":"Get the Prolog thread identifier of the running thread.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"iso":true,
+	"mode":"dynamic :PredicateIndicator, ...",
+	"name":"dynamic",
+	"summary":"Informs the interpreter that the definition of the predicate(s) may change during execution (using assert/1 and/or retract/1).",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"file_base_name(+Path, -File)",
+	"name":"file_base_name",
+	"summary":"Extracts the file name part from a path.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"untable(:Specification)",
+	"name":"untable",
+	"summary":"Remove the tables and tabling instrumentation for the specified predicates.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"atomic_list_concat(+List, +Separator, -Atom)",
+	"name":"atomic_list_concat",
+	"summary":"Creates an atom just like atomic_list_concat/2, but inserts Separator between each pair of inputs.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"succ(?Int1, ?Int2)",
+	"name":"succ",
+	"summary":"True if Int2 = Int1 + 1 and Int1 >= 0.",
+	"type":"built_in"
+      },
+      {
+	"arity":4,
+	"mode":"format_time(+Out, +Format, +StampOrDateTime, +Locale)",
+	"name":"format_time",
+	"summary":"Format time given a specified Locale.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"file_name_extension(?Base, ?Extension, ?Name)",
+	"name":"file_name_extension",
+	"summary":"This predicate is used to add, remove or test filename extensions.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"mode":"ensure_loaded(:File)",
+	"name":"ensure_loaded",
+	"summary":"If the file is not already loaded, this is equivalent to consult/1.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"register_iri_scheme(+Scheme, :Hook, +Options)",
+	"name":"register_iri_scheme",
+	"summary":"Register Hook to be called by all file handling predicates if a name that starts with Scheme:// is encountered.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"foreach(:Generator, :Goal)",
+	"name":"foreach",
+	"summary":"True when the conjunction of instances of Goal created from solutions for Generator is true."
+      },
+      {
+	"arity":3,
+	"mode":"aggregate(+Template, :Goal, -Result)",
+	"name":"aggregate",
+	"summary":"Aggregate bindings in Goal according to Template."
+      },
+      {
+	"arity":4,
+	"mode":"aggregate(+Template, +Discriminator, :Goal, -Result)",
+	"name":"aggregate",
+	"summary":"Aggregate bindings in Goal according to Template."
+      },
+      {
+	"arity":3,
+	"mode":"aggregate_all(+Template, :Goal, -Result)",
+	"name":"aggregate_all",
+	"summary":"Aggregate bindings in Goal according to Template."
+      },
+      {
+	"arity":4,
+	"mode":"aggregate_all(+Template, +Discriminator, :Goal, -Result)",
+	"name":"aggregate_all",
+	"summary":"Aggregate bindings in Goal according to Template."
+      },
+      {
+	"arity":4,
+	"mode":"free_variables(:Generator, +Template, +VarList0, -VarList)",
+	"name":"free_variables",
+	"summary":"Find free variables in bagof/setof template."
+      },
+      {
+	"arity":3,
+	"mode":"include(:Goal, +List1, ?List2)",
+	"name":"include",
+	"summary":"Filter elements for which Goal succeeds."
+      },
+      {
+	"arity":3,
+	"mode":"exclude(:Goal, +List1, ?List2)",
+	"name":"exclude",
+	"summary":"Filter elements for which Goal fails."
+      },
+      {
+	"arity":4,
+	"mode":"partition(:Pred, +List, ?Included, ?Excluded)",
+	"name":"partition",
+	"summary":"Filter elements of List according to Pred."
+      },
+      {
+	"arity":5,
+	"mode":"partition(:Pred, +List, ?Less, ?Equal, ?Greater)",
+	"name":"partition",
+	"summary":"Filter List according to Pred in three sets."
+      },
+      {
+	"arity":2,
+	"mode":"maplist(:Goal, ?List1)",
+	"name":"maplist",
+	"summary":"True if Goal is successfully applied on all matching elements of the list."
+      },
+      {
+	"arity":3,
+	"mode":"maplist(:Goal, ?List1)",
+	"name":"maplist",
+	"summary":"True if Goal is successfully applied on all matching elements of the list."
+      },
+      {
+	"arity":4,
+	"mode":"maplist(:Goal, ?List1)",
+	"name":"maplist",
+	"summary":"True if Goal is successfully applied on all matching elements of the list."
+      },
+      {
+	"arity":5,
+	"mode":"maplist(:Goal, ?List1)",
+	"name":"maplist",
+	"summary":"True if Goal is successfully applied on all matching elements of the list."
+      },
+      {
+	"arity":3,
+	"mode":"convlist(:Goal, +ListIn, -ListOut)",
+	"name":"convlist",
+	"summary":"Similar to maplist/3, but elements for which call(Goal, ElemIn, _) fails are omitted from ListOut."
+      },
+      {
+	"arity":4,
+	"mode":"foldl(:Goal, +List, +V0, -V)",
+	"name":"foldl",
+	"summary":"Fold an ensemble of m (0 <= m <= 4) lists of length n head-to-tail (\"fold-left\"), using columns of m list elements as arguments for Goal."
+      },
+      {
+	"arity":5,
+	"mode":"foldl(:Goal, +List, +V0, -V)",
+	"name":"foldl",
+	"summary":"Fold an ensemble of m (0 <= m <= 4) lists of length n head-to-tail (\"fold-left\"), using columns of m list elements as arguments for Goal."
+      },
+      {
+	"arity":6,
+	"mode":"foldl(:Goal, +List, +V0, -V)",
+	"name":"foldl",
+	"summary":"Fold an ensemble of m (0 <= m <= 4) lists of length n head-to-tail (\"fold-left\"), using columns of m list elements as arguments for Goal."
+      },
+      {
+	"arity":7,
+	"mode":"foldl(:Goal, +List, +V0, -V)",
+	"name":"foldl",
+	"summary":"Fold an ensemble of m (0 <= m <= 4) lists of length n head-to-tail (\"fold-left\"), using columns of m list elements as arguments for Goal."
+      },
+      {
+	"arity":4,
+	"mode":"scanl(:Goal, +List, +V0, -Values)",
+	"name":"scanl",
+	"summary":"Scan an ensemble of m (0 <= m <= 4) lists of length n head-to-tail (\"scan-left\"), using columns of m list elements as arguments for Goal."
+      },
+      {
+	"arity":5,
+	"mode":"scanl(:Goal, +List, +V0, -Values)",
+	"name":"scanl",
+	"summary":"Scan an ensemble of m (0 <= m <= 4) lists of length n head-to-tail (\"scan-left\"), using columns of m list elements as arguments for Goal."
+      },
+      {
+	"arity":6,
+	"mode":"scanl(:Goal, +List, +V0, -Values)",
+	"name":"scanl",
+	"summary":"Scan an ensemble of m (0 <= m <= 4) lists of length n head-to-tail (\"scan-left\"), using columns of m list elements as arguments for Goal."
+      },
+      {
+	"arity":7,
+	"mode":"scanl(:Goal, +List, +V0, -Values)",
+	"name":"scanl",
+	"summary":"Scan an ensemble of m (0 <= m <= 4) lists of length n head-to-tail (\"scan-left\"), using columns of m list elements as arguments for Goal."
+      },
+      {
+	"arity":1,
+	"mode":"empty_assoc(?Assoc)",
+	"name":"empty_assoc",
+	"summary":"Is true if Assoc is the empty association list."
+      },
+      {
+	"arity":1,
+	"mode":"is_assoc(+Assoc)",
+	"name":"is_assoc",
+	"summary":"True if Assoc is an association list."
+      },
+      {
+	"arity":2,
+	"mode":"assoc_to_list(+Assoc, -Pairs)",
+	"name":"assoc_to_list",
+	"summary":"Translate Assoc to a list Pairs of Key-Value pairs."
+      },
+      {
+	"arity":2,
+	"mode":"assoc_to_keys(+Assoc, -Keys)",
+	"name":"assoc_to_keys",
+	"summary":"True if Keys is the list of keys in Assoc."
+      },
+      {
+	"arity":2,
+	"mode":"assoc_to_values(+Assoc, -Values)",
+	"name":"assoc_to_values",
+	"summary":"True if Values is the list of values in Assoc."
+      },
+      {
+	"arity":3,
+	"mode":"gen_assoc(?Key, +Assoc, ?Value)",
+	"name":"gen_assoc",
+	"summary":"True if Key-Value is an association in Assoc."
+      },
+      {
+	"arity":3,
+	"mode":"get_assoc(+Key, +Assoc, -Value)",
+	"name":"get_assoc",
+	"summary":"True if Key-Value is an association in Assoc."
+      },
+      {
+	"arity":5,
+	"mode":"get_assoc(+Key, +Assoc0, ?Val0, ?Assoc, ?Val)",
+	"name":"get_assoc",
+	"summary":"True if Key-Val0 is in Assoc0 and Key-Val is in Assoc."
+      },
+      {
+	"arity":2,
+	"mode":"list_to_assoc(+Pairs, -Assoc)",
+	"name":"list_to_assoc",
+	"summary":"Create an association from a list Pairs of Key-Value pairs."
+      },
+      {
+	"arity":2,
+	"mode":"map_assoc(:Pred, +Assoc)",
+	"name":"map_assoc",
+	"summary":"True if Pred(Value) is true for all values in Assoc."
+      },
+      {
+	"arity":3,
+	"mode":"map_assoc(:Pred, +Assoc0, ?Assoc)",
+	"name":"map_assoc",
+	"summary":"Map corresponding values."
+      },
+      {
+	"arity":3,
+	"mode":"max_assoc(+Assoc, -Key, -Value)",
+	"name":"max_assoc",
+	"summary":"True if Key-Value is in Assoc and Key is the largest key."
+      },
+      {
+	"arity":3,
+	"mode":"min_assoc(+Assoc, -Key, -Value)",
+	"name":"min_assoc",
+	"summary":"True if Key-Value is in assoc and Key is the smallest key."
+      },
+      {
+	"arity":2,
+	"mode":"ord_list_to_assoc(+Pairs, -Assoc)",
+	"name":"ord_list_to_assoc",
+	"summary":"Assoc is created from an ordered list Pairs of Key-Value pairs."
+      },
+      {
+	"arity":4,
+	"mode":"put_assoc(+Key, +Assoc0, +Value, -Assoc)",
+	"name":"put_assoc",
+	"summary":"Assoc is Assoc0, except that Key is associated with Value."
+      },
+      {
+	"arity":4,
+	"mode":"del_assoc(+Key, +Assoc0, ?Value, -Assoc)",
+	"name":"del_assoc",
+	"summary":"True if Key-Value is in Assoc0."
+      },
+      {
+	"arity":4,
+	"mode":"del_min_assoc(+Assoc0, ?Key, ?Val, -Assoc)",
+	"name":"del_min_assoc",
+	"summary":"True if Key-Value is in Assoc0 and Key is the smallest key."
+      },
+      {
+	"arity":4,
+	"mode":"del_max_assoc(+Assoc0, ?Key, ?Val, -Assoc)",
+	"name":"del_max_assoc",
+	"summary":"True if Key-Value is in Assoc0 and Key is the greatest key."
+      },
+      {"arity":2, "mode":"base32(+Plain, -Encoded)", "name":"base32"},
+      {
+	"arity":3,
+	"mode":"base64_encoded(+Plain, -Encoded, +Options)",
+	"name":"base64_encoded"
+      },
+      {"arity":2, "mode":"base64(+Plain, -Encoded)", "name":"base64"},
+      {
+	"arity":2,
+	"mode":"base64url(+Plain, -Encoded)",
+	"name":"base64url"
+      },
+      {
+	"arity":3,
+	"mode":"format_to_chars(+Format, +Args, -Codes)",
+	"name":"format_to_chars",
+	"summary":"Use format/2 to write to a list of character codes."
+      },
+      {
+	"arity":4,
+	"mode":"format_to_chars(+Format, +Args, -Codes, ?Tail)",
+	"name":"format_to_chars",
+	"summary":"Use format/2 to write to a difference list of character codes."
+      },
+      {
+	"arity":2,
+	"mode":"write_to_chars(+Term, -Codes)",
+	"name":"write_to_chars",
+	"summary":"Write a term to a code list."
+      },
+      {
+	"arity":3,
+	"mode":"write_to_chars(+Term, -Codes, ?Tail)",
+	"name":"write_to_chars",
+	"summary":"Write a term to a code list."
+      },
+      {
+	"arity":2,
+	"mode":"atom_to_chars(+Atom, -Codes)",
+	"name":"atom_to_chars",
+	"summary":"Convert Atom into a list of character codes."
+      },
+      {
+	"arity":3,
+	"mode":"atom_to_chars(+Atom, -Codes, ?Tail)",
+	"name":"atom_to_chars",
+	"summary":"Convert Atom into a difference list of character codes."
+      },
+      {
+	"arity":2,
+	"mode":"number_to_chars(+Number, -Codes)",
+	"name":"number_to_chars",
+	"summary":"Convert Atom into a list of character codes."
+      },
+      {
+	"arity":3,
+	"mode":"number_to_chars(+Number, -Codes, ?Tail)",
+	"name":"number_to_chars",
+	"summary":"Convert Number into a difference list of character codes."
+      },
+      {
+	"arity":2,
+	"mode":"read_from_chars(+Codes, -Term)",
+	"name":"read_from_chars",
+	"summary":"Read Codes into Term."
+      },
+      {
+	"arity":3,
+	"mode":"read_term_from_chars(+Codes, -Term, +Options)",
+	"name":"read_term_from_chars",
+	"summary":"Read Codes into Term."
+      },
+      {
+	"arity":2,
+	"mode":"open_chars_stream(+Codes, -Stream)",
+	"name":"open_chars_stream",
+	"summary":"Open Codes as an input stream."
+      },
+      {
+	"arity":2,
+	"mode":"with_output_to_chars(:Goal, -Codes)",
+	"name":"with_output_to_chars",
+	"summary":"Run Goal as with once/1."
+      },
+      {
+	"arity":3,
+	"mode":"with_output_to_chars(:Goal, -Codes, ?Tail)",
+	"name":"with_output_to_chars",
+	"summary":"Run Goal as with once/1."
+      },
+      {
+	"arity":4,
+	"mode":"with_output_to_chars(:Goal, -Stream, -Codes, ?Tail)",
+	"name":"with_output_to_chars",
+	"summary":"Same as with_output_to_chars/3 using an explicit stream."
+      },
+      {
+	"arity":1,
+	"mode":"sat(+Expr)",
+	"name":"sat",
+	"summary":"True iff Expr is a satisfiable Boolean expression."
+      },
+      {
+	"arity":2,
+	"mode":"taut(+Expr, -T)",
+	"name":"taut",
+	"summary":"Tautology check."
+      },
+      {
+	"arity":1,
+	"mode":"labeling(+Vs)",
+	"name":"labeling",
+	"summary":"Enumerate concrete solutions."
+      },
+      {
+	"arity":2,
+	"mode":"sat_count(+Expr, -Count)",
+	"name":"sat_count",
+	"summary":"Count the number of admissible assignments."
+      },
+      {
+	"arity":3,
+	"mode":"weighted_maximum(+Weights, +Vs, -Maximum)",
+	"name":"weighted_maximum",
+	"summary":"Enumerate weighted optima over admissible assignments."
+      },
+      {
+	"arity":2,
+	"mode":"random_labeling(+Seed, +Vs)",
+	"name":"random_labeling",
+	"summary":"Select a single random solution."
+      },
+      {
+	"arity":2,
+	"mode":"?X #> ?Y",
+	"name":"#>",
+	"summary":"Same as Y #< X."
+      },
+      {
+	"arity":2,
+	"mode":"?X #< ?Y",
+	"name":"#<",
+	"summary":"The arithmetic expression X is less than Y."
+      },
+      {
+	"arity":2,
+	"mode":"?X #>= ?Y",
+	"name":"#>=",
+	"summary":"Same as Y #=< X."
+      },
+      {
+	"arity":2,
+	"mode":"?X #=< ?Y",
+	"name":"#=<",
+	"summary":"The arithmetic expression X is less than or equal to Y."
+      },
+      {
+	"arity":2,
+	"mode":"?X #= ?Y",
+	"name":"#=",
+	"summary":"The arithmetic expression X equals Y."
+      },
+      {
+	"arity":2,
+	"mode":"?X #\\= ?Y",
+	"name":"#\\=",
+	"summary":"The arithmetic expressions X and Y evaluate to distinct integers."
+      },
+      {
+	"arity":1,
+	"mode":"#\\ +Q",
+	"name":"#\\",
+	"summary":"Q does not hold."
+      },
+      {
+	"arity":2,
+	"mode":"?P #<==> ?Q",
+	"name":"#<==>",
+	"summary":"P and Q are equivalent."
+      },
+      {
+	"arity":2,
+	"mode":"?P #==> ?Q",
+	"name":"#==>",
+	"summary":"P implies Q."
+      },
+      {
+	"arity":2,
+	"mode":"?P #<== ?Q",
+	"name":"#<==",
+	"summary":"Q implies P."
+      },
+      {"arity":2, "mode":"#\\/(?P, ?Q)", "name":"#\\/"},
+      {
+	"arity":2,
+	"mode":"?P #\\ ?Q",
+	"name":"#\\",
+	"summary":"Either P holds or Q holds, but not both."
+      },
+      {
+	"arity":2,
+	"mode":"?P #/\\ ?Q",
+	"name":"#/\\",
+	"summary":"P and Q hold."
+      },
+      {
+	"arity":2,
+	"mode":"?Var in +Domain",
+	"name":"in",
+	"summary":"Var is an element of Domain."
+      },
+      {
+	"arity":2,
+	"mode":"+Vars ins +Domain",
+	"name":"ins",
+	"summary":"The variables in the list Vars are elements of Domain."
+      },
+      {
+	"arity":1,
+	"mode":"all_different(+Vars)",
+	"name":"all_different",
+	"summary":"Like all_distinct/1, but with weaker propagation."
+      },
+      {
+	"arity":1,
+	"mode":"all_distinct(+Vars)",
+	"name":"all_distinct",
+	"summary":"True iff Vars are pairwise distinct."
+      },
+      {
+	"arity":3,
+	"mode":"sum(+Vars, +Rel, ?Expr)",
+	"name":"sum",
+	"summary":"The sum of elements of the list Vars is in relation Rel to Expr."
+      },
+      {
+	"arity":4,
+	"mode":"scalar_product(+Cs, +Vs, +Rel, ?Expr)",
+	"name":"scalar_product",
+	"summary":"True iff the scalar product of Cs and Vs is in relation Rel to Expr."
+      },
+      {
+	"arity":2,
+	"mode":"tuples_in(+Tuples, +Relation)",
+	"name":"tuples_in",
+	"summary":"True iff all Tuples are elements of Relation."
+      },
+      {
+	"arity":2,
+	"mode":"labeling(+Options, +Vars)",
+	"name":"labeling",
+	"summary":"Assign a value to each variable in Vars."
+      },
+      {
+	"arity":1,
+	"mode":"label(+Vars)",
+	"name":"label",
+	"summary":"Equivalent to labeling([], Vars)."
+      },
+      {
+	"arity":1,
+	"mode":"indomain(?Var)",
+	"name":"indomain",
+	"summary":"Bind Var to all feasible values of its domain on backtracking."
+      },
+      {
+	"arity":1,
+	"mode":"lex_chain(+Lists)",
+	"name":"lex_chain",
+	"summary":"Lists are lexicographically non-decreasing."
+      },
+      {
+	"arity":2,
+	"mode":"serialized(+Starts, +Durations)",
+	"name":"serialized",
+	"summary":"Describes a set of non-overlapping tasks."
+      },
+      {
+	"arity":2,
+	"mode":"global_cardinality(+Vs, +Pairs)",
+	"name":"global_cardinality",
+	"summary":"Global Cardinality constraint."
+      },
+      {
+	"arity":3,
+	"mode":"global_cardinality(+Vs, +Pairs, +Options)",
+	"name":"global_cardinality",
+	"summary":"Global Cardinality constraint."
+      },
+      {
+	"arity":1,
+	"mode":"circuit(+Vs)",
+	"name":"circuit",
+	"summary":"True iff the list Vs of finite domain variables induces a Hamiltonian circuit."
+      },
+      {
+	"arity":1,
+	"mode":"cumulative(+Tasks)",
+	"name":"cumulative",
+	"summary":"Equivalent to cumulative(Tasks, [limit(1)])."
+      },
+      {
+	"arity":2,
+	"mode":"cumulative(+Tasks, +Options)",
+	"name":"cumulative",
+	"summary":"Schedule with a limited resource."
+      },
+      {
+	"arity":1,
+	"mode":"disjoint2(+Rectangles)",
+	"name":"disjoint2",
+	"summary":"True iff Rectangles are not overlapping."
+      },
+      {
+	"arity":3,
+	"mode":"element(?N, +Vs, ?V)",
+	"name":"element",
+	"summary":"The N-th element of the list of finite domain variables Vs is V."
+      },
+      {
+	"arity":3,
+	"mode":"automaton(+Vs, +Nodes, +Arcs)",
+	"name":"automaton",
+	"summary":"Describes a list of finite domain variables with a finite automaton."
+      },
+      {
+	"arity":8,
+	"mode":"automaton(+Sequence, ?Template, +Signature, +Nodes, +Arcs, +Counters, +Initials, ?Finals)",
+	"name":"automaton",
+	"summary":"Describes a list of finite domain variables with a finite automaton."
+      },
+      {
+	"arity":2,
+	"mode":"transpose(+Matrix, ?Transpose)",
+	"name":"transpose",
+	"summary":"Transpose a list of lists of the same length."
+      },
+      {
+	"arity":3,
+	"mode":"zcompare(?Order, ?A, ?B)",
+	"name":"zcompare",
+	"summary":"Analogous to compare/3, with finite domain variables A and B."
+      },
+      {
+	"arity":2,
+	"mode":"chain(+Zs, +Relation)",
+	"name":"chain",
+	"summary":"Zs form a chain with respect to Relation."
+      },
+      {
+	"arity":1,
+	"mode":"fd_var(+Var)",
+	"name":"fd_var",
+	"summary":"True iff Var is a CLP(FD) variable."
+      },
+      {
+	"arity":2,
+	"mode":"fd_inf(+Var, -Inf)",
+	"name":"fd_inf",
+	"summary":"Inf is the infimum of the current domain of Var."
+      },
+      {
+	"arity":2,
+	"mode":"fd_sup(+Var, -Sup)",
+	"name":"fd_sup",
+	"summary":"Sup is the supremum of the current domain of Var."
+      },
+      {
+	"arity":2,
+	"mode":"fd_size(+Var, -Size)",
+	"name":"fd_size",
+	"summary":"Reflect the current size of a domain."
+      },
+      {
+	"arity":2,
+	"mode":"fd_dom(+Var, -Dom)",
+	"name":"fd_dom",
+	"summary":"Dom is the current domain (see in/2) of Var."
+      },
+      {
+	"arity":2,
+	"mode":"fd_degree(+Var, -Degree)",
+	"name":"fd_degree",
+	"summary":"Degree is the number of constraints currently attached to Var."
+      },
+      {
+	"arity":2,
+	"mode":"?Var in_set +Set",
+	"name":"in_set",
+	"summary":"Var is an element of the FD set Set."
+      },
+      {
+	"arity":2,
+	"mode":"fd_set(?Var, -Set)",
+	"name":"fd_set",
+	"summary":"Set is the FD set representation of the current domain of Var."
+      },
+      {
+	"arity":1,
+	"mode":"is_fdset(@Set)",
+	"name":"is_fdset",
+	"summary":"Set is currently bound to a valid FD set."
+      },
+      {
+	"arity":1,
+	"mode":"empty_fdset(-Set)",
+	"name":"empty_fdset",
+	"summary":"Set is the empty FD set."
+      },
+      {
+	"arity":4,
+	"mode":"fdset_parts(?Set, ?Min, ?Max, ?Rest)",
+	"name":"fdset_parts",
+	"summary":"Set is a non-empty FD set representing the domain Min..Max \\/ Rest, where Min..Max is a non-empty interval (see fdset_interval/3) and Rest is another FD set (possibly empty)."
+      },
+      {
+	"arity":2,
+	"mode":"empty_interval(+Min, +Max)",
+	"name":"empty_interval",
+	"summary":"Min..Max is an empty interval."
+      },
+      {
+	"arity":3,
+	"mode":"fdset_interval(?Interval, ?Min, ?Max)",
+	"name":"fdset_interval",
+	"summary":"Interval is a non-empty FD set consisting of the single interval Min..Max."
+      },
+      {
+	"arity":2,
+	"mode":"fdset_singleton(?Set, ?Elt)",
+	"name":"fdset_singleton",
+	"summary":"Set is the FD set containing the single integer Elt."
+      },
+      {
+	"arity":2,
+	"mode":"fdset_min(+Set, -Min)",
+	"name":"fdset_min",
+	"summary":"Min is the lower bound (infimum) of the non-empty FD set Set."
+      },
+      {
+	"arity":2,
+	"mode":"fdset_max(+Set, -Max)",
+	"name":"fdset_max",
+	"summary":"Max is the upper bound (supremum) of the non-empty FD set Set."
+      },
+      {
+	"arity":2,
+	"mode":"fdset_size(+Set, -Size)",
+	"name":"fdset_size",
+	"summary":"Size is the number of elements of the FD set Set, or the atom sup if Set is infinite."
+      },
+      {
+	"arity":2,
+	"mode":"list_to_fdset(+List, -Set)",
+	"name":"list_to_fdset",
+	"summary":"Set is an FD set containing all elements of List, which must be a list of integers."
+      },
+      {
+	"arity":2,
+	"mode":"fdset_to_list(+Set, -List)",
+	"name":"fdset_to_list",
+	"summary":"List is a list containing all elements of the finite FD set Set, in ascending order."
+      },
+      {
+	"arity":2,
+	"mode":"range_to_fdset(+Domain, -Set)",
+	"name":"range_to_fdset",
+	"summary":"Set is an FD set equivalent to the domain Domain."
+      },
+      {
+	"arity":2,
+	"mode":"fdset_to_range(+Set, -Domain)",
+	"name":"fdset_to_range",
+	"summary":"Domain is a domain equivalent to the FD set Set."
+      },
+      {
+	"arity":3,
+	"mode":"fdset_add_element(+Set1, +Elt, -Set2)",
+	"name":"fdset_add_element",
+	"summary":"Set2 is the same FD set as Set1, but with the integer Elt added."
+      },
+      {
+	"arity":3,
+	"mode":"fdset_del_element(+Set1, +Elt, -Set2)",
+	"name":"fdset_del_element",
+	"summary":"Set2 is the same FD set as Set1, but with the integer Elt removed."
+      },
+      {
+	"arity":2,
+	"mode":"fdset_disjoint(+Set1, +Set2)",
+	"name":"fdset_disjoint",
+	"summary":"The FD sets Set1 and Set2 have no elements in common."
+      },
+      {
+	"arity":2,
+	"mode":"fdset_intersect(+Set1, +Set2)",
+	"name":"fdset_intersect",
+	"summary":"The FD sets Set1 and Set2 have at least one element in common."
+      },
+      {
+	"arity":3,
+	"mode":"fdset_intersection(+Set1, +Set2, -Intersection)",
+	"name":"fdset_intersection",
+	"summary":"Intersection is an FD set (possibly empty) of all elements that the FD sets Set1 and Set2 have in common."
+      },
+      {
+	"arity":2,
+	"mode":"fdset_member(?Elt, +Set)",
+	"name":"fdset_member",
+	"summary":"The integer Elt is a member of the FD set Set."
+      },
+      {
+	"arity":2,
+	"mode":"fdset_eq(+Set1, +Set2)",
+	"name":"fdset_eq",
+	"summary":"True if the FD sets Set1 and Set2 are equal, i."
+      },
+      {
+	"arity":2,
+	"mode":"fdset_subset(+Set1, +Set2)",
+	"name":"fdset_subset",
+	"summary":"The FD set Set1 is a (non-strict) subset of Set2, i."
+      },
+      {
+	"arity":3,
+	"mode":"fdset_subtract(+Set1, +Set2, -Difference)",
+	"name":"fdset_subtract",
+	"summary":"The FD set Difference is Set1 with all elements of Set2 removed, i."
+      },
+      {
+	"arity":3,
+	"mode":"fdset_union(+Set1, +Set2, -Union)",
+	"name":"fdset_union",
+	"summary":"The FD set Union is the union of FD sets Set1 and Set2."
+      },
+      {
+	"arity":2,
+	"mode":"fdset_union(+Sets, -Union)",
+	"name":"fdset_union",
+	"summary":"The FD set Union is the n-ary union of all FD sets in the list Sets."
+      },
+      {
+	"arity":2,
+	"mode":"fdset_complement(+Set, -Complement)",
+	"name":"fdset_complement",
+	"summary":"The FD set Complement is the complement of the FD set Set."
+      },
+      {
+	"arity":3,
+	"mode":"format_to_codes(+Format, +Args, -Codes)",
+	"name":"format_to_codes"
+      },
+      {
+	"arity":4,
+	"mode":"format_to_codes(+Format, +Args, -Codes, ?Tail)",
+	"name":"format_to_codes"
+      },
+      {
+	"arity":2,
+	"mode":"write_to_codes(+Term, -Codes)",
+	"name":"write_to_codes"
+      },
+      {
+	"arity":3,
+	"mode":"write_to_codes(+Term, -Codes, ?Tail)",
+	"name":"write_to_codes"
+      },
+      {
+	"arity":3,
+	"mode":"write_term_to_codes(+Term, -Codes, +Options)",
+	"name":"write_term_to_codes"
+      },
+      {
+	"arity":4,
+	"mode":"write_term_to_codes(+Term, -Codes, ?Tail, +Options)",
+	"name":"write_term_to_codes"
+      },
+      {
+	"arity":2,
+	"mode":"read_from_codes(+Codes, -Term)",
+	"name":"read_from_codes"
+      },
+      {
+	"arity":3,
+	"mode":"read_term_from_codes(+Codes, -Term, +Options)",
+	"name":"read_term_from_codes"
+      },
+      {
+	"arity":2,
+	"mode":"open_codes_stream(+Codes, -Stream)",
+	"name":"open_codes_stream"
+      },
+      {
+	"arity":2,
+	"mode":"with_output_to_codes(:Goal, Codes)",
+	"name":"with_output_to_codes"
+      },
+      {
+	"arity":3,
+	"mode":"with_output_to_codes(:Goal, -Codes, ?Tail)",
+	"name":"with_output_to_codes"
+      },
+      {
+	"arity":4,
+	"mode":"with_output_to_codes(:Goal, -Stream, -Codes, ?Tail)",
+	"name":"with_output_to_codes"
+      },
+      {
+	"arity":3,
+	"mode":"date_time_value(?Key, +DateTime, ?Value)",
+	"name":"date_time_value",
+	"summary":"Extract values from a date/9 term."
+      },
+      {
+	"arity":2,
+	"mode":"parse_time(+Text, -Stamp)",
+	"name":"parse_time",
+	"summary":"Same as parse_time(Text, _Format, Stamp)."
+      },
+      {
+	"arity":3,
+	"mode":"parse_time(+Text, ?Format, -Stamp)",
+	"name":"parse_time",
+	"summary":"Parse a textual time representation, producing a time-stamp."
+      },
+      {
+	"arity":2,
+	"mode":"day_of_the_week(+Date,-DayOfTheWeek)",
+	"name":"day_of_the_week",
+	"summary":"Computes the day of the week for a given date."
+      },
+      {
+	"arity":2,
+	"mode":"day_of_the_year(+Date, -DayOfTheYear)",
+	"name":"day_of_the_year"
+      },
+      {
+	"arity":3,
+	"mode":"debug(+Topic, +Format, :Args)",
+	"name":"debug",
+	"summary":"Format a message if debug topic is enabled."
+      },
+      {
+	"arity":1,
+	"mode":"debug(+Topic)",
+	"name":"debug",
+	"summary":"Add/remove a topic from being printed."
+      },
+      {
+	"arity":1,
+	"mode":"debug(+Topic)",
+	"name":"nodebug",
+	"summary":"Add/remove a topic from being printed."
+      },
+      {
+	"arity":1,
+	"mode":"debugging(+Topic)",
+	"name":"debugging",
+	"summary":"Examine debug topics."
+      },
+      {
+	"arity":2,
+	"mode":"debugging(+Topic)",
+	"name":"debugging",
+	"summary":"Examine debug topics."
+      },
+      {
+	"arity":0,
+	"mode":"list_debug_topics",
+	"name":"list_debug_topics",
+	"summary":"List currently known debug topics and their setting."
+      },
+      {
+	"arity":1,
+	"mode":"debug_message_context(+What)",
+	"name":"debug_message_context",
+	"summary":"Specify additional context for debug messages."
+      },
+      {
+	"arity":1,
+	"mode":"assertion(:Goal)",
+	"name":"assertion",
+	"summary":"Acts similar to C assert() macro."
+      },
+      {
+	"arity":2,
+	"mode":"dif(@A, @B)",
+	"name":"dif",
+	"summary":"The dif/2 predicate is a constraint that is true if and only if A and B are different terms."
+      },
+      {
+	"arity":1,
+	"mode":"instantiation_error(+FormalSubTerm)",
+	"name":"instantiation_error",
+	"summary":"An argument is under-instantiated."
+      },
+      {
+	"arity":1,
+	"mode":"uninstantiation_error(+Culprit)",
+	"name":"uninstantiation_error",
+	"summary":"An argument is over-instantiated."
+      },
+      {
+	"arity":2,
+	"mode":"type_error(+ValidType, +Culprit)",
+	"name":"type_error",
+	"summary":"Tell the user that Culprit is not of the expected ValidType."
+      },
+      {
+	"arity":2,
+	"mode":"domain_error(+ValidDomain, +Culprit)",
+	"name":"domain_error",
+	"summary":"The argument is of the proper type, but has a value that is outside the supported values."
+      },
+      {
+	"arity":2,
+	"mode":"existence_error(+ObjectType, +Culprit)",
+	"name":"existence_error",
+	"summary":"Culprit is of the correct type and correct domain, but there is no existing (external) resource of type ObjectType that is represented by it."
+      },
+      {
+	"arity":3,
+	"mode":"existence_error(+ObjectType, +Culprit, +Set)",
+	"name":"existence_error",
+	"summary":"Culprit is of the correct type and correct domain, but there is no existing (external) resource of type ObjectType that is represented by it in the provided set."
+      },
+      {
+	"arity":3,
+	"mode":"permission_error(+Operation, +PermissionType, +Culprit)",
+	"name":"permission_error",
+	"summary":"It is not allowed to perform Operation on (whatever is represented by) Culprit that is of the given PermissionType (in fact, the ISO Standard is confusing and vague about these terms' meaning)."
+      },
+      {
+	"arity":1,
+	"mode":"representation_error(+Flag)",
+	"name":"representation_error",
+	"summary":"A representation error indicates a limitation of the implementation."
+      },
+      {
+	"arity":1,
+	"mode":"resource_error(+Resource)",
+	"name":"resource_error",
+	"summary":"A goal cannot be completed due to lack of resources."
+      },
+      {
+	"arity":1,
+	"mode":"syntax_error(+Culprit)",
+	"name":"syntax_error",
+	"summary":"A text has invalid syntax."
+      },
+      {
+	"arity":2,
+	"mode":"must_be(+Type, @Term)",
+	"name":"must_be",
+	"summary":"True if Term satisfies the type constraints for Type."
+      },
+      {
+	"arity":2,
+	"mode":"is_of_type(+Type, @Term)",
+	"name":"is_of_type",
+	"summary":"True if Term satisfies Type."
+      },
+      {
+	"arity":3,
+	"mode":"current_type(?Type, @Var, -Body)",
+	"name":"current_type",
+	"summary":"True when Type is a currently defined type and Var satisfies Type of the body term Body succeeds."
+      },
+      {
+	"arity":0,
+	"mode":"reset_gensym",
+	"name":"reset_gensym",
+	"summary":"Reset gensym for all registered keys."
+      },
+      {
+	"arity":1,
+	"mode":"reset_gensym(+Base)",
+	"name":"reset_gensym",
+	"summary":"Restart generation of identifiers from Base at <Base>1."
+      },
+      {
+	"arity":2,
+	"mode":"gensym(+Base, -Unique)",
+	"name":"gensym",
+	"summary":"Generate <Base>1, <Base>2, etc atoms on each subsequent call."
+      },
+      {
+	"arity":4,
+	"mode":"add_to_heap(+Heap0, +Priority, ?Key, -Heap)",
+	"name":"add_to_heap",
+	"summary":"Adds Key with priority Priority to Heap0, constructing a new heap in Heap."
+      },
+      {
+	"arity":4,
+	"mode":"delete_from_heap(+Heap0, -Priority, +Key, -Heap)",
+	"name":"delete_from_heap",
+	"summary":"Deletes Key from Heap0, leaving its priority in Priority and the resulting data structure in Heap."
+      },
+      {
+	"arity":1,
+	"mode":"empty_heap(?Heap)",
+	"name":"empty_heap",
+	"summary":"True if Heap is an empty heap."
+      },
+      {
+	"arity":4,
+	"mode":"get_from_heap(?Heap0, ?Priority, ?Key, -Heap)",
+	"name":"get_from_heap",
+	"summary":"Retrieves the minimum-priority pair Priority-Key from Heap0."
+      },
+      {
+	"arity":2,
+	"mode":"heap_size(+Heap, -Size:int)",
+	"name":"heap_size",
+	"summary":"Determines the number of elements in Heap."
+      },
+      {
+	"arity":2,
+	"mode":"heap_to_list(+Heap, -List:list)",
+	"name":"heap_to_list",
+	"summary":"Constructs a list List of Priority-Element terms, ordered by (ascending) priority."
+      },
+      {
+	"arity":1,
+	"mode":"is_heap(+X)",
+	"name":"is_heap",
+	"summary":"Returns true if X is a heap."
+      },
+      {
+	"arity":2,
+	"mode":"list_to_heap(+List:list, -Heap)",
+	"name":"list_to_heap",
+	"summary":"If List is a list of Priority-Element terms, constructs a heap out of List."
+      },
+      {
+	"arity":3,
+	"mode":"merge_heaps(+Heap0, +Heap1, -Heap)",
+	"name":"merge_heaps",
+	"summary":"Merge the two heaps Heap0 and Heap1 in Heap."
+      },
+      {
+	"arity":3,
+	"mode":"min_of_heap(+Heap, ?Priority, ?Key)",
+	"name":"min_of_heap",
+	"summary":"Unifies Key with the minimum-priority element of Heap and Priority with its priority value."
+      },
+      {
+	"arity":5,
+	"mode":"min_of_heap(+Heap, ?Priority1, ?Key1, ?Priority2, ?Key2)",
+	"name":"min_of_heap",
+	"summary":"Gets the two minimum-priority elements from Heap."
+      },
+      {
+	"arity":3,
+	"mode":"singleton_heap(?Heap, ?Priority, ?Key)",
+	"name":"singleton_heap",
+	"summary":"True if Heap is a heap with the single element Priority-Key."
+      },
+      {
+	"arity":2,
+	"mode":"member(?Elem, ?List)",
+	"name":"member",
+	"summary":"True if Elem is a member of List."
+      },
+      {
+	"arity":2,
+	"mode":"memberchk(?Elem, +List)",
+	"name":"memberchk",
+	"summary":"True when Elem is an element of List.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"append(+ListOfLists, ?List)",
+	"name":"append",
+	"summary":"Concatenate a list of lists."
+      },
+      {
+	"arity":3,
+	"mode":"append(?List1, ?List2, ?List1AndList2)",
+	"name":"append",
+	"summary":"List1AndList2 is the concatenation of List1 and List2"
+      },
+      {
+	"arity":2,
+	"mode":"prefix(?Part, ?Whole)",
+	"name":"prefix",
+	"summary":"True iff Part is a leading substring of Whole."
+      },
+      {
+	"arity":3,
+	"mode":"select(?Elem, ?List1, ?List2)",
+	"name":"select",
+	"summary":"Is true when List1, with Elem removed, results in List2."
+      },
+      {
+	"arity":3,
+	"mode":"selectchk(+Elem, +List, -Rest)",
+	"name":"selectchk",
+	"summary":"Semi-deterministic removal of first element in List that unifies with Elem."
+      },
+      {
+	"arity":4,
+	"mode":"select(?X, ?XList, ?Y, ?YList)",
+	"name":"select",
+	"summary":"Select from two lists at the same position."
+      },
+      {
+	"arity":4,
+	"mode":"selectchk(?X, ?XList, ?Y, ?YList)",
+	"name":"selectchk",
+	"summary":"Semi-deterministic version of select/4."
+      },
+      {
+	"arity":3,
+	"mode":"nextto(?X, ?Y, ?List)",
+	"name":"nextto",
+	"summary":"True if Y directly follows X in List."
+      },
+      {
+	"arity":3,
+	"mode":"delete(+List1, @Elem, -List2)",
+	"name":"delete",
+	"summary":"Delete matching elements from a list."
+      },
+      {
+	"arity":3,
+	"mode":"nth0(?Index, ?List, ?Elem)",
+	"name":"nth0",
+	"summary":"True when Elem is the Index’th element of List."
+      },
+      {
+	"arity":3,
+	"mode":"nth1(?Index, ?List, ?Elem)",
+	"name":"nth1",
+	"summary":"Is true when Elem is the Index’th element of List."
+      },
+      {
+	"arity":4,
+	"mode":"nth0(?N, ?List, ?Elem, ?Rest)",
+	"name":"nth0",
+	"summary":"Select/insert element at index."
+      },
+      {
+	"arity":4,
+	"mode":"nth1(?N, ?List, ?Elem, ?Rest)",
+	"name":"nth1",
+	"summary":"As nth0/4, but counting starts at 1."
+      },
+      {
+	"arity":2,
+	"mode":"last(?List, ?Last)",
+	"name":"last",
+	"summary":"Succeeds when Last is the last element of List."
+      },
+      {
+	"arity":2,
+	"mode":"proper_length(@List, -Length)",
+	"name":"proper_length",
+	"summary":"True when Length is the number of elements in the proper list List."
+      },
+      {
+	"arity":2,
+	"mode":"same_length(?List1, ?List2)",
+	"name":"same_length",
+	"summary":"Is true when List1 and List2 are lists with the same number of elements."
+      },
+      {
+	"arity":2,
+	"mode":"reverse(?List1, ?List2)",
+	"name":"reverse",
+	"summary":"Is true when the elements of List2 are in reverse order compared to List1."
+      },
+      {
+	"arity":2,
+	"mode":"permutation(?Xs, ?Ys)",
+	"name":"permutation",
+	"summary":"True when Xs is a permutation of Ys."
+      },
+      {
+	"arity":2,
+	"mode":"flatten(+NestedList, -FlatList)",
+	"name":"flatten",
+	"summary":"Is true if FlatList is a non-nested version of NestedList."
+      },
+      {
+	"arity":2,
+	"mode":"clumped(+Items, -Pairs)",
+	"name":"clumped",
+	"summary":"Pairs is a list of Item-Count pairs that represents the run length encoding of Items."
+      },
+      {
+	"arity":2,
+	"mode":"max_member(-Max, +List)",
+	"name":"max_member",
+	"summary":"True when Max is the largest member in the standard order of terms."
+      },
+      {
+	"arity":2,
+	"mode":"min_member(-Min, +List)",
+	"name":"min_member",
+	"summary":"True when Min is the smallest member in the standard order of terms."
+      },
+      {
+	"arity":3,
+	"mode":"max_member(:Pred, -Max, +List)",
+	"name":"max_member",
+	"summary":"True when Max is the largest member according to Pred, which must be a 2-argument callable that behaves like (@=<)/2."
+      },
+      {
+	"arity":3,
+	"mode":"min_member(:Pred, -Min, +List)",
+	"name":"min_member",
+	"summary":"True when Min is the smallest member according to Pred, which must be a 2-argument callable that behaves like (@=<)/2."
+      },
+      {
+	"arity":2,
+	"mode":"sum_list(+List, -Sum)",
+	"name":"sum_list",
+	"summary":"Sum is the result of adding all numbers in List."
+      },
+      {
+	"arity":2,
+	"mode":"max_list(+List:list(number), -Max:number)",
+	"name":"max_list",
+	"summary":"True if Max is the largest number in List."
+      },
+      {
+	"arity":2,
+	"mode":"min_list(+List:list(number), -Min:number)",
+	"name":"min_list",
+	"summary":"True if Min is the smallest number in List."
+      },
+      {
+	"arity":3,
+	"mode":"numlist(+Low, +High, -List)",
+	"name":"numlist",
+	"summary":"List is a list [Low, Low+1, ... High]."
+      },
+      {
+	"arity":1,
+	"mode":"is_set(@Set)",
+	"name":"is_set",
+	"summary":"True if Set is a proper list without duplicates."
+      },
+      {
+	"arity":2,
+	"mode":"list_to_set(+List, ?Set)",
+	"name":"list_to_set",
+	"summary":"True when Set has the same elements as List in the same order."
+      },
+      {
+	"arity":3,
+	"mode":"intersection(+Set1, +Set2, -Set3)",
+	"name":"intersection",
+	"summary":"True if Set3 unifies with the intersection of Set1 and Set2."
+      },
+      {
+	"arity":3,
+	"mode":"union(+Set1, +Set2, -Set3)",
+	"name":"union",
+	"summary":"True if Set3 unifies with the union of the lists Set1 and Set2."
+      },
+      {
+	"arity":2,
+	"mode":"subset(+SubSet, +Set)",
+	"name":"subset",
+	"summary":"True if all elements of SubSet belong to Set as well."
+      },
+      {
+	"arity":3,
+	"mode":"subtract(+Set, +Delete, -Result)",
+	"name":"subtract",
+	"summary":"Delete all elements in Delete from Set."
+      },
+      {
+	"arity":2,
+	"mode":"contains_term(+Sub, +Term)",
+	"name":"contains_term",
+	"summary":"Succeeds if Sub is contained in Term (=, deterministically)"
+      },
+      {
+	"arity":2,
+	"mode":"contains_var(+Sub, +Term)",
+	"name":"contains_var",
+	"summary":"Succeeds if Sub is contained in Term (==, deterministically)"
+      },
+      {
+	"arity":2,
+	"mode":"free_of_term(+Sub, +Term)",
+	"name":"free_of_term",
+	"summary":"Succeeds of Sub does not unify to any subterm of Term"
+      },
+      {
+	"arity":2,
+	"mode":"free_of_var(+Sub, +Term)",
+	"name":"free_of_var",
+	"summary":"Succeeds of Sub is not equal (==) to any subterm of Term"
+      },
+      {
+	"arity":3,
+	"mode":"occurrences_of_term(+SubTerm, +Term, ?Count)",
+	"name":"occurrences_of_term",
+	"summary":"Count the number of SubTerms in Term"
+      },
+      {
+	"arity":3,
+	"mode":"occurrences_of_var(+SubTerm, +Term, ?Count)",
+	"name":"occurrences_of_var",
+	"summary":"Count the number of SubTerms in Term"
+      },
+      {
+	"arity":2,
+	"mode":"sub_term(-Sub, +Term)",
+	"name":"sub_term",
+	"summary":"Generates (on backtracking) all subterms of Term."
+      },
+      {
+	"arity":2,
+	"mode":"sub_var(-Sub, +Term)",
+	"name":"sub_var",
+	"summary":"Generates (on backtracking) all subterms (==) of Term."
+      },
+      {
+	"arity":3,
+	"mode":"sub_term_shared_variables(+Sub, +Term, -Vars)",
+	"name":"sub_term_shared_variables",
+	"summary":"If Sub is a sub term of Term, Vars is bound to the list of variables in Sub that also appear outside Sub in Term."
+      },
+      {
+	"arity":2,
+	"mode":"option(?Option, +OptionList)",
+	"name":"option",
+	"summary":"Get an Option from OptionList."
+      },
+      {
+	"arity":3,
+	"mode":"option(?Option, +OptionList, +Default)",
+	"name":"option",
+	"summary":"Get an Option from OptionList."
+      },
+      {
+	"arity":3,
+	"mode":"select_option(?Option, +Options, -RestOptions)",
+	"name":"select_option",
+	"summary":"Get and remove Option from an option list."
+      },
+      {
+	"arity":4,
+	"mode":"select_option(?Option, +Options, -RestOptions, +Default)",
+	"name":"select_option",
+	"summary":"Get and remove Option with default value."
+      },
+      {
+	"arity":3,
+	"mode":"merge_options(+New, +Old, -Merged)",
+	"name":"merge_options",
+	"summary":"Merge two option lists."
+      },
+      {
+	"arity":3,
+	"mode":"meta_options(+IsMeta, :Options0, -Options)",
+	"name":"meta_options",
+	"summary":"Perform meta-expansion on options that are module-sensitive."
+      },
+      {
+	"arity":2,
+	"mode":"dict_options(?Dict, ?Options)",
+	"name":"dict_options",
+	"summary":"Convert between an option list and a dictionary."
+      },
+      {
+	"arity":1,
+	"mode":"is_ordset(@Term)",
+	"name":"is_ordset",
+	"summary":"True if Term is an ordered set."
+      },
+      {
+	"arity":2,
+	"mode":"list_to_ord_set(+List, -OrdSet)",
+	"name":"list_to_ord_set",
+	"summary":"Transform a list into an ordered set."
+      },
+      {
+	"arity":3,
+	"mode":"ord_add_element(+Set1, +Element, ?Set2)",
+	"name":"ord_add_element",
+	"summary":"Insert an element into the set."
+      },
+      {
+	"arity":3,
+	"mode":"ord_del_element(+Set, +Element, -NewSet)",
+	"name":"ord_del_element",
+	"summary":"Delete an element from an ordered set."
+      },
+      {
+	"arity":3,
+	"mode":"ord_selectchk(+Item, ?Set1, ?Set2)",
+	"name":"ord_selectchk",
+	"summary":"Selectchk/3, specialised for ordered sets."
+      },
+      {
+	"arity":2,
+	"mode":"ord_intersect(+Set1, +Set2)",
+	"name":"ord_intersect",
+	"summary":"True if both ordered sets have a non-empty intersection."
+      },
+      {
+	"arity":3,
+	"mode":"ord_intersect(+Set1, +Set2, -Intersection)",
+	"name":"ord_intersect",
+	"summary":"Intersection holds the common elements of Set1 and Set2."
+      },
+      {
+	"arity":3,
+	"mode":"ord_intersection(+Set1, +Set2, -Intersection)",
+	"name":"ord_intersection",
+	"summary":"Intersection holds the common elements of Set1 and Set2."
+      },
+      {
+	"arity":4,
+	"mode":"ord_intersection(+Set1, +Set2, ?Intersection, ?Difference)",
+	"name":"ord_intersection",
+	"summary":"Intersection and difference between two ordered sets."
+      },
+      {
+	"arity":2,
+	"mode":"ord_disjoint(+Set1, +Set2)",
+	"name":"ord_disjoint",
+	"summary":"True if Set1 and Set2 have no common elements."
+      },
+      {
+	"arity":3,
+	"mode":"ord_subtract(+InOSet, +NotInOSet, -Diff)",
+	"name":"ord_subtract",
+	"summary":"Diff is the set holding all elements of InOSet that are not in NotInOSet."
+      },
+      {
+	"arity":2,
+	"mode":"ord_union(+SetOfSets, -Union)",
+	"name":"ord_union",
+	"summary":"True if Union is the union of all elements in the superset SetOfSets."
+      },
+      {
+	"arity":3,
+	"mode":"ord_union(+Set1, +Set2, -Union)",
+	"name":"ord_union",
+	"summary":"Union is the union of Set1 and Set2"
+      },
+      {
+	"arity":4,
+	"mode":"ord_union(+Set1, +Set2, -Union, -New)",
+	"name":"ord_union",
+	"summary":"True iff ord_union(Set1, Set2, Union) and ord_subtract(Set2, Set1, New)."
+      },
+      {
+	"arity":2,
+	"mode":"ord_subset(+Sub, +Super)",
+	"name":"ord_subset",
+	"summary":"Is true if all elements of Sub are in Super"
+      },
+      {
+	"arity":1,
+	"mode":"ord_empty(?List)",
+	"name":"ord_empty",
+	"summary":"True when List is the empty ordered set."
+      },
+      {
+	"arity":2,
+	"mode":"ord_memberchk(+Element, +OrdSet)",
+	"name":"ord_memberchk",
+	"summary":"True if Element is a member of OrdSet, compared using ==."
+      },
+      {
+	"arity":3,
+	"mode":"ord_symdiff(+Set1, +Set2, ?Difference)",
+	"name":"ord_symdiff",
+	"summary":"Is true when Difference is the symmetric difference of Set1 and Set2."
+      },
+      {
+	"arity":2,
+	"mode":"ord_seteq(+Set1, +Set2)",
+	"name":"ord_seteq",
+	"summary":"True if Set1 and Set2 have the same elements."
+      },
+      {
+	"arity":2,
+	"mode":"ord_intersection(+PowerSet, -Intersection)",
+	"name":"ord_intersection",
+	"summary":"Intersection of a powerset."
+      },
+      {
+	"arity":3,
+	"mode":"pairs_keys_values(?Pairs, ?Keys, ?Values)",
+	"name":"pairs_keys_values",
+	"summary":"True if Keys holds the keys of Pairs and Values the values."
+      },
+      {
+	"arity":2,
+	"mode":"pairs_values(+Pairs, -Values)",
+	"name":"pairs_values",
+	"summary":"Remove the keys from a list of Key-Value pairs."
+      },
+      {
+	"arity":2,
+	"mode":"pairs_keys(+Pairs, -Keys)",
+	"name":"pairs_keys",
+	"summary":"Remove the values from a list of Key-Value pairs."
+      },
+      {
+	"arity":2,
+	"mode":"group_pairs_by_key(+Pairs, -Joined:list(Key-Values))",
+	"name":"group_pairs_by_key",
+	"summary":"Group values with equivalent (==/2) consecutive keys."
+      },
+      {
+	"arity":2,
+	"mode":"transpose_pairs(+Pairs, -Transposed)",
+	"name":"transpose_pairs",
+	"summary":"Swap Key-Value to Value-Key."
+      },
+      {
+	"arity":3,
+	"mode":"map_list_to_pairs(:Function, +List, -Keyed)",
+	"name":"map_list_to_pairs",
+	"summary":"Create a Key-Value list by mapping each element of List."
+      },
+      {
+	"arity":1,
+	"mode":"pengine_create(:Options)",
+	"name":"pengine_create",
+	"summary":"Creates a new pengine."
+      },
+      {
+	"arity":3,
+	"mode":"pengine_ask(+NameOrID, @Query, +Options)",
+	"name":"pengine_ask",
+	"summary":"Asks pengine NameOrID a query Query."
+      },
+      {
+	"arity":2,
+	"mode":"pengine_next(+NameOrID, +Options)",
+	"name":"pengine_next",
+	"summary":"Asks pengine NameOrID for the next solution to a query started by pengine_ask/3."
+      },
+      {
+	"arity":2,
+	"mode":"pengine_stop(+NameOrID, +Options)",
+	"name":"pengine_stop",
+	"summary":"Tells pengine NameOrID to stop looking for more solutions to a query started by pengine_ask/3."
+      },
+      {
+	"arity":2,
+	"mode":"pengine_event(?EventTerm)",
+	"name":"pengine_event"
+      },
+      {
+	"arity":2,
+	"mode":"pengine_input(+Prompt, -Term)",
+	"name":"pengine_input",
+	"summary":"Sends Prompt to the master (parent) pengine and waits for input."
+      },
+      {
+	"arity":1,
+	"mode":"pengine_output(+Term)",
+	"name":"pengine_output",
+	"summary":"Sends Term to the parent pengine or thread."
+      },
+      {
+	"arity":3,
+	"mode":"pengine_respond(+Pengine, +Input, +Options)",
+	"name":"pengine_respond",
+	"summary":"Sends a response in the form of the term Input to a slave (child) pengine that has prompted its master (parent) for input."
+      },
+      {
+	"arity":2,
+	"mode":"pengine_debug(+Format, +Args)",
+	"name":"pengine_debug",
+	"summary":"Create a message using format/3 from Format and Args and send this to the client."
+      },
+      {
+	"arity":1,
+	"mode":"pengine_self(-Id)",
+	"name":"pengine_self",
+	"summary":"True if the current thread is a pengine with Id."
+      },
+      {
+	"arity":2,
+	"mode":"pengine_pull_response(+Pengine, +Options)",
+	"name":"pengine_pull_response",
+	"summary":"Pulls a response (an event term) from the slave Pengine if Pengine is a remote process, else does nothing at all."
+      },
+      {
+	"arity":1,
+	"mode":"pengine_destroy(+NameOrID)",
+	"name":"pengine_destroy",
+	"summary":"Destroys the pengine NameOrID."
+      },
+      {
+	"arity":2,
+	"mode":"pengine_destroy(+NameOrID)",
+	"name":"pengine_destroy",
+	"summary":"Destroys the pengine NameOrID."
+      },
+      {
+	"arity":1,
+	"mode":"pengine_abort(+NameOrID)",
+	"name":"pengine_abort",
+	"summary":"Aborts the running query."
+      },
+      {
+	"arity":1,
+	"mode":"pengine_application(+Application)",
+	"name":"pengine_application",
+	"summary":"Directive that must be used to declare a pengine application module."
+      },
+      {
+	"arity":1,
+	"mode":"current_pengine_application(?Application)",
+	"name":"current_pengine_application",
+	"summary":"True when Application is a currently defined application."
+      },
+      {
+	"arity":2,
+	"mode":"pengine_property(?Pengine, ?Property)",
+	"name":"pengine_property",
+	"summary":"True when Property is a property of the given Pengine."
+      },
+      {
+	"arity":1,
+	"mode":"pengine_user(-User)",
+	"name":"pengine_user",
+	"summary":"True when the pengine was create by an HTTP request that authorized User."
+      },
+      {
+	"arity":2,
+	"mode":"pengine_event_loop(:Closure, +Options)",
+	"name":"pengine_event_loop",
+	"summary":"Starts an event loop accepting event terms sent to the current pengine or thread."
+      },
+      {
+	"arity":2,
+	"mode":"pengine_rpc(+URL, +Query)",
+	"name":"pengine_rpc",
+	"summary":"Semantically equivalent to the sequence below, except that the query is executed in (and in the Prolog context of) the pengine server referred to by URL, rather than locally."
+      },
+      {
+	"arity":3,
+	"mode":"pengine_rpc(+URL, +Query)",
+	"name":"pengine_rpc",
+	"summary":"Semantically equivalent to the sequence below, except that the query is executed in (and in the Prolog context of) the pengine server referred to by URL, rather than locally."
+      },
+      {
+	"arity":1,
+	"mode":"random(-R:float)",
+	"name":"random",
+	"summary":"Binds R to a new random float in the open interval (0.0,1.0)."
+      },
+      {
+	"arity":3,
+	"mode":"random_between(+L:int, +U:int, -R:int)",
+	"name":"random_between",
+	"summary":"Binds R to a random integer in [L,U] (i.e., including both L and U)."
+      },
+      {
+	"arity":1,
+	"mode":"setrand(+State)",
+	"name":"getrand",
+	"summary":"Query/set the state of the random generator."
+      },
+      {
+	"arity":1,
+	"mode":"setrand(+State)",
+	"name":"setrand",
+	"summary":"Query/set the state of the random generator."
+      },
+      {
+	"arity":0,
+	"mode":"maybe",
+	"name":"maybe",
+	"summary":"Succeed/fail with equal probability (variant of maybe/1)."
+      },
+      {
+	"arity":1,
+	"mode":"maybe(+P)",
+	"name":"maybe",
+	"summary":"Succeed with probability P, fail with probability 1-P"
+      },
+      {
+	"arity":2,
+	"mode":"maybe(+K, +N)",
+	"name":"maybe",
+	"summary":"Succeed with probability K/N (variant of maybe/1)"
+      },
+      {
+	"arity":4,
+	"mode":"random_perm2(?A, ?B, ?X, ?Y)",
+	"name":"random_perm2",
+	"summary":"Does X=A,Y=B or X=B,Y=A with equal probability."
+      },
+      {
+	"arity":2,
+	"mode":"random_member(-X, +List:list)",
+	"name":"random_member",
+	"summary":"X is a random member of List."
+      },
+      {
+	"arity":3,
+	"mode":"random_select(-X, +List, -Rest)",
+	"name":"random_select",
+	"summary":"Randomly select or insert an element."
+      },
+      {
+	"arity":3,
+	"mode":"random_subseq(+List, -Subseq, -Complement)",
+	"name":"random_subseq",
+	"summary":"Selects a random subsequence Subseq of List, with Complement containing all elements of List that were not selected."
+      },
+      {
+	"arity":3,
+	"mode":"randseq(+K:int, +N:int, -List:list(int))",
+	"name":"randseq",
+	"summary":"S is a list of K unique random integers in the range 1..N."
+      },
+      {
+	"arity":3,
+	"mode":"randset(+K:int, +N:int, -S:list(int))",
+	"name":"randset",
+	"summary":"S is a sorted list of K unique random integers in the range 1..N."
+      },
+      {
+	"arity":2,
+	"mode":"random_permutation(+List, -Permutation)",
+	"name":"random_permutation",
+	"summary":"Permutation is a random permutation of List."
+      },
+      {
+	"arity":4,
+	"mode":"random_numlist(+P, +L, +U, -List)",
+	"name":"random_numlist",
+	"summary":"Unify List with an ascending list of integers between L and U (inclusive)."
+      },
+      {
+	"arity":3,
+	"mode":"random(+L:int, +U:int, -R:int)",
+	"name":"random",
+	"summary":"Generate a random integer or float in a range."
+      },
+      {
+	"arity":1,
+	"mode":"rb_new(-Tree)",
+	"name":"rb_new",
+	"summary":"Create a new Red-Black tree Tree."
+      },
+      {
+	"arity":1,
+	"mode":"rb_empty(?Tree)",
+	"name":"rb_empty",
+	"summary":"Succeeds if Tree is an empty Red-Black tree."
+      },
+      {
+	"arity":3,
+	"mode":"rb_lookup(+Key, -Value, +Tree)",
+	"name":"rb_lookup",
+	"summary":"True when Value is associated with Key in the Red-Black tree Tree."
+      },
+      {
+	"arity":4,
+	"mode":"rb_update(+Tree, +Key, ?NewVal, -NewTree)",
+	"name":"rb_update",
+	"summary":"Tree NewTree is tree Tree, but with value for Key associated with NewVal."
+      },
+      {
+	"arity":5,
+	"mode":"rb_update(+Tree, +Key, -OldVal, ?NewVal, -NewTree)",
+	"name":"rb_update",
+	"summary":"Same as rb_update(Tree, Key, NewVal, NewTree) but also unifies OldVal with the value associated with Key in Tree."
+      },
+      {
+	"arity":4,
+	"mode":"rb_apply(+Tree, +Key, :G, -NewTree)",
+	"name":"rb_apply",
+	"summary":"If the value associated with key Key is Val0 in Tree, and if call(G,Val0,ValF) holds, then NewTree differs from Tree only in that Key is associated with value ValF in tree NewTree."
+      },
+      {
+	"arity":4,
+	"mode":"rb_insert(+Tree, +Key, ?Value, -NewTree)",
+	"name":"rb_insert",
+	"summary":"Add an element with key Key and Value to the tree Tree creating a new red-black tree NewTree."
+      },
+      {
+	"arity":4,
+	"mode":"rb_insert_new(+Tree, +Key, ?Value, -NewTree)",
+	"name":"rb_insert_new",
+	"summary":"Add a new element with key Key and Value to the tree Tree creating a new red-black tree NewTree."
+      },
+      {
+	"arity":3,
+	"mode":"rb_delete(+Tree, +Key, -NewTree)",
+	"name":"rb_delete",
+	"summary":"Delete element with key Key from the tree Tree, returning the value Val associated with the key and a new tree NewTree."
+      },
+      {
+	"arity":4,
+	"mode":"rb_delete(+Tree, +Key, -Val, -NewTree)",
+	"name":"rb_delete",
+	"summary":"Same as rb_delete(Tree, Key, NewTree), but also unifies Val with the value associated with Key in Tree."
+      },
+      {
+	"arity":2,
+	"mode":"rb_visit(+Tree, -Pairs)",
+	"name":"rb_visit",
+	"summary":"Pairs is an infix visit of tree Tree, where each element of Pairs is of the form Key-Value."
+      },
+      {
+	"arity":2,
+	"mode":"rb_keys(+Tree, -Keys)",
+	"name":"rb_keys",
+	"summary":"Keys is unified with an ordered list of all keys in the Red-Black tree Tree."
+      },
+      {
+	"arity":2,
+	"mode":"rb_map(+T, :Goal)",
+	"name":"rb_map",
+	"summary":"True if call(Goal, Value) is true for all nodes in T."
+      },
+      {
+	"arity":3,
+	"mode":"rb_map(+Tree, :G, -NewTree)",
+	"name":"rb_map",
+	"summary":"For all nodes Key in the tree Tree, if the value associated with key Key is Val0 in tree Tree, and if call(G,Val0,ValF) holds, then the value associated with Key in NewTree is ValF."
+      },
+      {
+	"arity":4,
+	"mode":"rb_partial_map(+Tree, +Keys, :G, -NewTree)",
+	"name":"rb_partial_map",
+	"summary":"For all nodes Key in Keys, if the value associated with key Key is Val0 in tree Tree, and if call(G,Val0,ValF) holds, then the value associated with Key in NewTree is ValF, otherwise it is the value associated with the key in Tree."
+      },
+      {
+	"arity":4,
+	"mode":"rb_fold(:Goal, +Tree, +State0, -State)",
+	"name":"rb_fold",
+	"summary":"Fold the given predicate over all the key-value pairs in Tree, starting with initial state State0 and returning the final state State."
+      },
+      {
+	"arity":3,
+	"mode":"rb_clone(+TreeIn, -TreeOut, -Pairs)",
+	"name":"rb_clone",
+	"summary":"‘Clone' the red-back tree TreeIn into a new tree TreeOut with the same keys as the original but with all values set to unbound values."
+      },
+      {
+	"arity":3,
+	"mode":"rb_min(+Tree, -Key, -Value)",
+	"name":"rb_min",
+	"summary":"Key is the minimum key in Tree, and is associated with Val."
+      },
+      {
+	"arity":3,
+	"mode":"rb_max(+Tree, -Key, -Value)",
+	"name":"rb_max",
+	"summary":"Key is the maximal key in Tree, and is associated with Val."
+      },
+      {
+	"arity":4,
+	"mode":"rb_del_min(+Tree, -Key, -Val, -NewTree)",
+	"name":"rb_del_min",
+	"summary":"Delete the least element from the tree Tree, returning the key Key, the value Val associated with the key and a new tree NewTree."
+      },
+      {
+	"arity":4,
+	"mode":"rb_del_max(+Tree, -Key, -Val, -NewTree)",
+	"name":"rb_del_max",
+	"summary":"Delete the largest element from the tree Tree, returning the key Key, the value Val associated with the key and a new tree NewTree."
+      },
+      {
+	"arity":4,
+	"mode":"rb_next(+Tree, +Key, -Next, -Value)",
+	"name":"rb_next",
+	"summary":"Next is the next element after Key in Tree, and is associated with Val."
+      },
+      {
+	"arity":4,
+	"mode":"rb_previous(+Tree, +Key, -Previous, -Value)",
+	"name":"rb_previous",
+	"summary":"Previous is the previous element after Key in Tree, and is associated with Val."
+      },
+      {
+	"arity":2,
+	"mode":"list_to_rbtree(+List, -Tree)",
+	"name":"list_to_rbtree",
+	"summary":"Tree is the red-black tree corresponding to the mapping in List, which should be a list of Key-Value pairs."
+      },
+      {
+	"arity":2,
+	"mode":"ord_list_to_rbtree(+List, -Tree)",
+	"name":"ord_list_to_rbtree",
+	"summary":"Tree is the red-black tree corresponding to the mapping in list List, which should be a list of Key-Value pairs."
+      },
+      {
+	"arity":1,
+	"mode":"is_rbtree(@Term)",
+	"name":"is_rbtree",
+	"summary":"True if Term is a valid Red-Black tree."
+      },
+      {
+	"arity":2,
+	"mode":"rb_size(+Tree, -Size)",
+	"name":"rb_size",
+	"summary":"Size is the number of elements in Tree."
+      },
+      {
+	"arity":3,
+	"mode":"rb_in(?Key, ?Value, +Tree)",
+	"name":"rb_in",
+	"summary":"True when Key-Value is a key-value pair in red-black tree Tree."
+      },
+      {
+	"arity":1,
+	"mode":"distinct(:Goal)",
+	"name":"distinct",
+	"summary":"True if Goal is true and no previous solution of Goal bound Witness to the same value."
+      },
+      {
+	"arity":2,
+	"mode":"distinct(:Goal)",
+	"name":"distinct",
+	"summary":"True if Goal is true and no previous solution of Goal bound Witness to the same value."
+      },
+      {
+	"arity":1,
+	"mode":"reduced(:Goal)",
+	"name":"reduced",
+	"summary":"Similar to distinct/1, but does not guarantee unique results in return for using a limited amount of memory."
+      },
+      {
+	"arity":3,
+	"mode":"reduced(:Goal)",
+	"name":"reduced",
+	"summary":"Similar to distinct/1, but does not guarantee unique results in return for using a limited amount of memory."
+      },
+      {
+	"arity":2,
+	"mode":"limit(+Count, :Goal)",
+	"name":"limit",
+	"summary":"Limit the number of solutions."
+      },
+      {
+	"arity":2,
+	"mode":"offset(+Count, :Goal)",
+	"name":"offset",
+	"summary":"Ignore the first Count solutions."
+      },
+      {
+	"arity":2,
+	"mode":"call_nth(:Goal, ?Nth)",
+	"name":"call_nth",
+	"summary":"True when Goal succeeded for the Nth time."
+      },
+      {
+	"arity":2,
+	"mode":"order_by(+Spec, :Goal)",
+	"name":"order_by",
+	"summary":"Order solutions according to Spec."
+      },
+      {
+	"arity":4,
+	"mode":"group_by(+By, +Template, :Goal, -Bag)",
+	"name":"group_by",
+	"summary":"Group bindings of Template that have the same value for By."
+      },
+      {
+	"arity":3,
+	"mode":"predsort(+Pred, +List, -Sorted)",
+	"name":"predsort",
+	"summary":"Sorts similar to sort/2, but determines the order of two terms by calling Pred(-Delta, +E1, +E2) ."
+      },
+      {
+	"arity":2,
+	"mode":"locale_sort(+List, -Sorted)",
+	"name":"locale_sort",
+	"summary":"Sort a list of atoms using the current locale."
+      },
+      {
+	"arity":0,
+	"mode":"statistics",
+	"name":"statistics",
+	"summary":"Print information about resource usage using print_message/2."
+      },
+      {
+	"arity":1,
+	"mode":"statistics(-Stats:dict)",
+	"name":"statistics",
+	"summary":"Stats is a dict representing the same information as statistics/0."
+      },
+      {
+	"arity":2,
+	"mode":"thread_statistics(?Thread, -Stats:dict)",
+	"name":"thread_statistics",
+	"summary":"Obtain statistical information about a single thread."
+      },
+      {
+	"arity":1,
+	"mode":"time(:Goal)",
+	"name":"time",
+	"summary":"Execute Goal, reporting statistics to the user."
+      },
+      {
+	"arity":2,
+	"mode":"call_time(:Goal, -Time:dict)",
+	"name":"call_time",
+	"summary":"Call Goal as call/1, unifying Time with a dict that provides information on the resource usage."
+      },
+      {
+	"arity":3,
+	"mode":"call_time(:Goal, -Time:dict)",
+	"name":"call_time",
+	"summary":"Call Goal as call/1, unifying Time with a dict that provides information on the resource usage."
+      },
+      {
+	"arity":1,
+	"mode":"profile(:Goal)",
+	"name":"profile",
+	"summary":"Execute Goal just like once/1, collecting profiling statistics, and call show_profile([])."
+      },
+      {
+	"arity":2,
+	"mode":"profile(:Goal, +Options)",
+	"name":"profile",
+	"summary":"Execute Goal just like once/1."
+      },
+      {
+	"arity":1,
+	"mode":"show_profile(+Options)",
+	"name":"show_profile",
+	"summary":"This predicate first calls prolog:show_profile_hook/1."
+      },
+      {
+	"arity":1,
+	"mode":"profile_data(-Data)",
+	"name":"profile_data",
+	"summary":"Gather all relevant data from profiler."
+      },
+      {
+	"arity":2,
+	"mode":"profile_procedure_data(?Pred, -Data:dict)",
+	"name":"profile_procedure_data",
+	"summary":"Collect data for Pred."
+      },
+      {
+	"arity":2,
+	"mode":"term_hash(+Term, -HashKey)",
+	"name":"term_hash",
+	"summary":"If Term is a ground term (see ground/1), HashKey is unified with a positive integer value that may be used as a hash key to the value.",
+	"type":"built_in"
+      },
+      {
+	"arity":4,
+	"mode":"term_hash(+Term, +Depth, +Range, -HashKey)",
+	"name":"term_hash",
+	"summary":"As term_hash/2, but only considers Term to the specified Depth.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"term_size(@Term, -Size)",
+	"name":"term_size",
+	"summary":"True if Size is the size in cells occupied by Term on the global (term) stack."
+      },
+      {
+	"arity":2,
+	"iso":true,
+	"mode":"term_variables(+Term, -List)",
+	"name":"term_variables",
+	"summary":"Unify List with a list of variables, each sharing with a unique variable of Term.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"term_variables(+Term, -List, ?Tail)",
+	"name":"term_variables",
+	"summary":"Difference list version of term_variables/2.",
+	"type":"built_in"
+      },
+      {
+	"arity":2,
+	"mode":"variant(@Term1, @Term2)",
+	"name":"variant",
+	"summary":"Same as SWI-Prolog Term1 =@= Term2."
+      },
+      {
+	"arity":2,
+	"mode":"subsumes(+Generic, @Specific)",
+	"name":"subsumes",
+	"summary":"True if Generic is unified to Specific without changing Specific."
+      },
+      {
+	"arity":2,
+	"mode":"subsumes_chk(@Generic, @Specific)",
+	"name":"subsumes_chk",
+	"summary":"True if Generic can be made equivalent to Specific without changing Specific."
+      },
+      {
+	"arity":1,
+	"mode":"cyclic_term(@Term)",
+	"name":"cyclic_term",
+	"summary":"True if Term contains cycles, i.e.",
+	"type":"built_in"
+      },
+      {
+	"arity":1,
+	"iso":true,
+	"mode":"acyclic_term(@Term)",
+	"name":"acyclic_term",
+	"summary":"True if Term does not contain cycles, i.e.",
+	"type":"built_in"
+      },
+      {
+	"arity":3,
+	"mode":"term_subsumer(+Special1, +Special2, -General)",
+	"name":"term_subsumer",
+	"summary":"General is the most specific term that is a generalisation of Special1 and Special2."
+      },
+      {
+	"arity":3,
+	"mode":"term_factorized(+Term, -Skeleton, -Substiution)",
+	"name":"term_factorized",
+	"summary":"Is true when Skeleton is Term where all subterms that appear multiple times are replaced by a variable and Substitution is a list of Var=Value that provides the subterm at the location Var."
+      },
+      {
+	"arity":3,
+	"mode":"mapargs(:Goal, ?Term1, ?Term2)",
+	"name":"mapargs",
+	"summary":"Term1 and Term2 have the same functor (name/arity) and for each matching pair of arguments call(Goal, A1, A2) is true."
+      },
+      {
+	"arity":3,
+	"mode":"mapsubterms(:Goal, +Term1, -Term2)",
+	"name":"mapsubterms",
+	"summary":"Recursively map sub terms of Term1 into subterms of Term2 for every pair for which call(Goal, ST1, ST2) succeeds."
+      },
+      {
+	"arity":3,
+	"mode":"mapsubterms(:Goal, +Term1, -Term2)",
+	"name":"mapsubterms_var",
+	"summary":"Recursively map sub terms of Term1 into subterms of Term2 for every pair for which call(Goal, ST1, ST2) succeeds."
+      },
+      {
+	"arity":4,
+	"mode":"foldsubterms(:Goal3, +Term1, +State0, -State)",
+	"name":"foldsubterms",
+	"summary":"The predicate foldsubterms/5 calls call(Goal4, SubTerm1, SubTerm2, StateIn, StateOut) for each subterm, including variables, in Term1."
+      },
+      {
+	"arity":5,
+	"mode":"foldsubterms(:Goal3, +Term1, +State0, -State)",
+	"name":"foldsubterms",
+	"summary":"The predicate foldsubterms/5 calls call(Goal4, SubTerm1, SubTerm2, StateIn, StateOut) for each subterm, including variables, in Term1."
+      },
+      {
+	"arity":2,
+	"mode":"same_functor(?Term1, ?Term2)",
+	"name":"same_functor",
+	"summary":"True when Term1 and Term2 are terms that have the same functor (Name/Arity)."
+      },
+      {
+	"arity":3,
+	"mode":"same_functor(?Term1, ?Term2)",
+	"name":"same_functor",
+	"summary":"True when Term1 and Term2 are terms that have the same functor (Name/Arity)."
+      },
+      {
+	"arity":4,
+	"mode":"same_functor(?Term1, ?Term2)",
+	"name":"same_functor",
+	"summary":"True when Term1 and Term2 are terms that have the same functor (Name/Arity)."
+      },
+      {
+	"arity":1,
+	"mode":"numbervars(+Term)",
+	"name":"numbervars",
+	"summary":"Number variables in Term using $VAR(N)."
+      },
+      {
+	"arity":2,
+	"mode":"varnumbers(+Term, -Copy)",
+	"name":"varnumbers",
+	"summary":"Inverse of numbervars/1."
+      },
+      {
+	"arity":3,
+	"mode":"max_var_number(+Term, +Start, -Max)",
+	"name":"max_var_number",
+	"summary":"True when Max is the max of Start and the highest numbered $VAR(N) term."
+      },
+      {
+	"arity":3,
+	"mode":"varnumbers(+Term, +Start, -Copy)",
+	"name":"varnumbers",
+	"summary":"Inverse of numbervars/3."
+      },
+      {
+	"arity":3,
+	"mode":"varnumbers_names(+Term, -Copy, -VariableNames)",
+	"name":"varnumbers_names",
+	"summary":"If Term is a term with numbered and named variables using the reserved term’$VAR'(X), Copy is a copy of Term where each’$VAR'(X) is consistently replaced by a fresh variable and Bindings is a list X = Var, relating the X terms with the variable it is mapped to."
+      },
+      {
+	"arity":2,
+	"mode":"when(@Condition, :Goal)",
+	"name":"when",
+	"summary":"Execute Goal when Condition becomes true."
+      },
+      {"arity":2, "mode":"<-(Var, Expression)", "name":"<-"},
+      {"arity":1, "mode":"<-(Expression)", "name":"<-"},
+      {"arity":2, "mode":"r_call(+Fun, +Options)", "name":"r_call"},
+      {
+	"arity":4,
+	"mode":"r(+Content, +Vars, +VarDict, -Goal)",
+	"name":"r"
+      },
+      {
+	"arity":3,
+	"mode":"r_execute(+Assignments, +Command, -Result)",
+	"name":"r_execute"
+      },
+      {
+	"arity":2,
+	"mode":"r_setup_graphics(+Rconn, +Format)",
+	"name":"r_setup_graphics"
+      },
+      {
+	"arity":3,
+	"mode":"r_data_frame(+Rvar, +Columns, :Goal)",
+	"name":"r_data_frame"
+      },
+      {
+	"arity":2,
+	"mode":"r_data_frame_from_rows(+DataFrame, +Rows)",
+	"name":"r_data_frame_from_rows"
+      },
+      {
+	"arity":2,
+	"mode":"r_data_frame_from_dicts(+DataFrame, +Rows)",
+	"name":"r_data_frame_from_dicts"
+      },
+      {
+	"arity":2,
+	"mode":"r_data_frame_to_dicts(+DataFrame, -Dicts)",
+	"name":"r_data_frame_to_dicts"
+      },
+      {
+	"arity":3,
+	"mode":"r_data_frame_to_rows(+DataFrame, +Functor, -Rows)",
+	"name":"r_data_frame_to_rows"
+      },
+      {
+	"arity":2,
+	"mode":"r_data_frame_colnames(+DataFrame, -ColNames:list(atom))",
+	"name":"r_data_frame_colnames"
+      },
+      {
+	"arity":2,
+	"mode":"r_data_frame_rownames(+DataFrame, -RowNames:list(atom))",
+	"name":"r_data_frame_rownames"
+      },
+      {"arity":2, "mode":"put_attr(+Var, :Value)", "name":"put_attr"},
+      {
+	"arity":1,
+	"mode":"parameters(+Spec:list)",
+	"name":"parameters"
+      },
+      {
+	"arity":2,
+	"mode":"data_source(:Id, +Source)",
+	"name":"data_source"
+      },
+      {
+	"arity":2,
+	"mode":"record(:Id, -Record)",
+	"name":"data_record"
+      },
+      {"arity":2, "mode":"record(:Id, -Record)", "name":"record"},
+      {
+	"arity":2,
+	"mode":"data_property(:Id, ?Property)",
+	"name":"data_property"
+      },
+      {"arity":2, "mode":"data_row(:Id, -Row)", "name":"data_row"},
+      {"arity":4, "mode":"data_row(:Id, -Row)", "name":"data_row"},
+      {
+	"arity":3,
+	"mode":"data_dump(:Id, +Range, -Table)",
+	"name":"data_dump"
+      },
+      {"arity":1, "mode":"data_flush(+Hash)", "name":"data_flush"},
+      {
+	"arity":3,
+	"mode":"data materialized(+Hash, +Signature, +SourceVersion)",
+	"name":"data materialized"
+      },
+      {"arity":1, "mode":"html(+Spec)", "name":"html"},
+      {
+	"arity":4,
+	"mode":"html(+Content, +Vars, +VarDict, -DOM)",
+	"name":"html"
+      },
+      {
+	"arity":1,
+	"mode":"safe_raw_html(+Raw0)",
+	"name":"safe_raw_html"
+      },
+      {
+	"arity":2,
+	"mode":"jquery(+Selector, +Function)",
+	"name":"jquery"
+      },
+      {
+	"arity":3,
+	"mode":"jquery(+Selector, +Function)",
+	"name":"jquery"
+      },
+      {
+	"arity":1,
+	"mode":"swish_provides(?Term)",
+	"name":"swish_provides"
+      },
+      {
+	"arity":1,
+	"mode":"projection(+Spec:list)",
+	"name":"projection"
+      },
+      {"arity":0, "mode":"r_download", "name":"r_download"},
+      {"arity":1, "mode":"r_download(File)", "name":"r_download"},
+      {
+	"arity":2,
+	"mode":"register_renderer(:Name, +Comment)",
+	"name":"register_renderer"
+      },
+      {
+	"arity":2,
+	"mode":"current_renderer(Name, Comment)",
+	"name":"current_renderer"
+      },
+      {
+	"arity":1,
+	"mode":"pengine_stale_module(-M)",
+	"name":"pengine_stale_module"
+      },
+      {
+	"arity":2,
+	"mode":"pengine_stale_module(-M)",
+	"name":"pengine_stale_module"
+      },
+      {
+	"arity":1,
+	"mode":"stale_pengine(-Pengine)",
+	"name":"stale_pengine"
+      },
+      {
+	"arity":1,
+	"mode":"swish_statistics(?State)",
+	"name":"swish_statistics"
+      },
+      {
+	"arity":0,
+	"mode":"start_swish_stat_collector",
+	"name":"start_swish_stat_collector"
+      },
+      {
+	"arity":2,
+	"mode":"swish_stats(?Period, ?Stats:list(dict))",
+	"name":"swish_stats"
+      },
+      {
+	"arity":1,
+	"mode":"swish_save_stats(?File)",
+	"name":"swish_save_stats"
+      },
+      {
+	"arity":2,
+	"mode":"swish_died_thread(TID, Status)",
+	"name":"swish_died_thread"
+      },
+      {
+	"arity":2,
+	"mode":"$swish wrapper(:Goal, ?ContextVars)",
+	"name":"$swish wrapper"
+      }
+    ],
+    "wfs_residual_program_var":"_wfs_residual_program"
+  }
+}

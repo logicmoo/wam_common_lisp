@@ -21,6 +21,10 @@
 
 % :- require([colormsg1/1]).
 
+% Make WAM-CL's bundled Prolog packs (see <repo>/libs/) available and
+% verify the required dependency packs are installed before we use them.
+:- ensure_loaded(setup_lm_packs).
+
 :- system:use_module(library(apply),[exclude/3]).
 :- system:use_module(library(apply),[maplist/2,maplist/3]).
 :- system:use_module(library(error),[existence_error/2]).
@@ -168,7 +172,14 @@
 :- discontiguous(ssip_define/2).
 
 :- use_module(library(logicmoo_common)).
-:- user:ensure_loaded(library(logicmoo/portray_vars)).
+% portray_vars is already pulled in by logicmoo_common (via pretty_clauses's
+% `:- include(portray_vars)`). Loading it a second time here re-defines those
+% predicates and triggers ~89 "redefine imported_procedure" errors on SWI 10.x,
+% so only load it if it isn't present yet.
+:- ( current_predicate(pretty_clauses:debug_var/2)
+   -> true
+   ;  user:ensure_loaded(library(logicmoo/portray_vars))
+   ).
 :- ensure_loaded(eightball).
 :- ensure_loaded('init').
 :- ensure_loaded(utests).

@@ -2905,6 +2905,7 @@ package_external_symbols(pkg_sys,"*PRINT-UNREADABLE-ANSI*",sys_xx_print_unreadab
 package_external_symbols(pkg_sys,"*PROMPT-BODY*",sys_xx_prompt_body_xx).
 package_external_symbols(pkg_sys,"*PROMPT-BREAK*",sys_xx_prompt_break_xx).
 package_external_symbols(pkg_sys,"*PROMPT-FINISH*",sys_xx_prompt_finish_xx).
+package_external_symbols(pkg_sys,"*CONTINUE-PROMPT*",sys_xx_continue_prompt_xx).
 package_external_symbols(pkg_sys,"*PROMPT-START*",sys_xx_prompt_start_xx).
 package_external_symbols(pkg_sys,"*PROMPT-STEP*",sys_xx_prompt_step_xx).
 package_external_symbols(pkg_sys,"*REOPEN-OPEN-FILE*",sys_xx_reopen_open_file_xx).

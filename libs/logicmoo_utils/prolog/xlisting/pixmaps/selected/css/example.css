@@ -1,0 +1,27 @@
+#content {
+    position: relative;
+    max-width: 728px;
+    padding: 20px 0px 50px 0px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.demo {
+    border: 1px solid;
+    margin-top: 10px;
+    padding: 10px;
+    min-height: 200px;
+    box-sizing: border-box;
+}
+
+.demoGroup {
+    display: inline-block;
+    width: calc(50% - 2px);
+    min-height: 120px;
+}
+
+ul.list {
+    columns: 3;
+    -webkit-columns: 3;
+    -moz-columns: 3;
+}

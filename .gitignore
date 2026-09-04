@@ -25,4 +25,7 @@ build
 #*/
 *.trans.pl
 
+# SWI-Prolog pack status (generated at attach time)
+libs/*/status.db
+
 
