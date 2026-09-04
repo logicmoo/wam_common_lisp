@@ -1,0 +1,332 @@
+diff --git a/boot/attvar.pl b/boot/attvar.pl
+index aa5f29a..9b6a969 100644
+--- a/boot/attvar.pl
++++ b/boot/attvar.pl
+@@ -52,13 +52,27 @@ in pl-attvar.c
+ %
+ %   Called from the kernel if assignments have been made to
+ %   attributed variables.
++:- module_transparent('$wakeup'/1).
++:- module_transparent(call_all_attr_uhooks/2).
++:- module_transparent(user:meta_unify/3). 
++:- module_transparent(uhook/3). 
++:- module_transparent(user:attvar_variant/2). 
+ 
+ '$wakeup'([]).
+ '$wakeup'(wakeup(Attribute, Value, Rest)) :-
+     call_all_attr_uhooks(Attribute, Value),
+     '$wakeup'(Rest).
++'$wakeup'(unify(Attribute, Value, Rest)) :-
++    call_all_attr_uhooks(Attribute, Value),
++    '$wakeup'(Rest).
++'$wakeup'(variant(AttVar, Value, Rest)) :- 
++   user:attvar_variant(AttVar,Value),
++  '$wakeup'(Rest).
++
++
+ 
+ call_all_attr_uhooks([], _).
++call_all_attr_uhooks(att(unify, AttVal, Rest), Value) :- !, user:meta_unify(AttVal,Rest,Value).
+ call_all_attr_uhooks(att(Module, AttVal, Rest), Value) :-
+     uhook(Module, AttVal, Value),
+     call_all_attr_uhooks(Rest, Value).
+diff --git a/boot/toplevel.pl b/boot/toplevel.pl
+index cd6bcfe..6f3f901 100644
+--- a/boot/toplevel.pl
++++ b/boot/toplevel.pl
+@@ -1072,6 +1072,7 @@ toplevel_call(Goal) :-
+     no_lco.
+ 
+ no_lco.
++:- '$hide'(no_lco).
+ 
+ %!  write_bindings(+Bindings, +ResidueVars, +Deterministic) is semidet.
+ %
+diff --git a/src/ATOMS b/src/ATOMS
+index 0e200d7..afbd5c4 100644
+--- a/src/ATOMS
++++ b/src/ATOMS
+@@ -768,6 +768,7 @@ A var_prefix		"var_prefix"
+ A variable		"variable"
+ A variable_names	"variable_names"
+ A variables		"variables"
++A variant		"variant"
+ A very_deep		"very_deep"
+ A vmi			"vmi"
+ A volatile		"volatile"
+@@ -1062,6 +1063,9 @@ F undefinterc		4
+ F unify_determined	2
+ F uninstantiation_error	1
+ F var			1
++F references		3
++F unify		3
++F variant		3
+ F wakeup		3
+ F warning		3
+ F write_errors		1
+diff --git a/src/pl-attvar.c b/src/pl-attvar.c
+old mode 100644
+new mode 100755
+index f570309..54ddd12
+--- a/src/pl-attvar.c
++++ b/src/pl-attvar.c
+@@ -99,16 +99,15 @@ which must run in constant space.
+ SHIFT-SAFE: Caller must ensure 6 global and 4 trail-cells
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+ 
+-static void
+-registerWakeup(Word name, Word value ARG_LD)
++void
++registerWakeup(word functor, Word name, Word value ARG_LD)
+ { Word wake;
+   Word tail = valTermRef(LD->attvar.tail);
+-
+   assert(gTop+6 <= gMax && tTop+4 <= tMax);
+ 
+   wake = gTop;
+   gTop += 4;
+-  wake[0] = FUNCTOR_wakeup3;
++  wake[0] = functor;
+   wake[1] = needsRef(*name) ? makeRef(name) : *name;
+   wake[2] = needsRef(*value) ? makeRef(value) : *value;
+   wake[3] = ATOM_nil;
+@@ -178,20 +177,30 @@ assignAttVar(Word av, Word value ARG_LD)
+ 		   print_addr(av, buf2));
+ 	});
+ 
+-  if ( isAttVar(*value) )
+-  { if ( value > av )
+-    { Word tmp = av;
+-      av = value;
+-      value = tmp;
+-    } else if ( av == value )
+-      return;
++  bool both = isAttVar(*value);
++  if (both && av == value ) return;
++  
++  { Word vp;
++    if(find_attr(av,ATOM_unify, &vp PASS_LD)) 
++      { Word g0;
++        deRef2(vp, g0);
++        if(g0==av) 
++        {
++          a = valPAttVar(*av);
++          registerWakeup(FUNCTOR_unify3, a, value PASS_LD);
++        } else
++        {
++          TrailAssignment(av);
+   }
++        return;
++   }}
++ 
+ 
+   a = valPAttVar(*av);
+-  registerWakeup(a, value PASS_LD);
++  registerWakeup(FUNCTOR_wakeup3, a, value PASS_LD);
+ 
+   TrailAssignment(av);
+-  if ( isAttVar(*value) )
++  if ( both )
+   { DEBUG(1, Sdprintf("Unifying two attvars\n"));
+     *av = makeRef(value);
+   } else
+@@ -324,7 +333,7 @@ list is invalid.
+ Caller must ensure 4 cells space on global stack.
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+ 
+-static int
++int
+ find_attr(Word av, atom_t name, Word *vp ARG_LD)
+ { Word l;
+ 
+@@ -1389,6 +1398,33 @@ PRED_IMPL("$call_residue_vars_end", 0, call_residue_vars_end, 0)
+ 
+ #endif /*O_CALL_RESIDUE*/
+ 
++/* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
++ attv_bind_trail(+AttVar, +Value, +NilOrTrail) is det.  
++    Binds AttVar with Value without calling wakeup
++ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
++static
++PRED_IMPL("attv_bind_trail", 3, attv_bind_trail, 0)
++{ PRED_LD
++  Word av;
++
++  /* Maybe Not needed */ 
++  if ( !hasGlobalSpace(0) )
++  { int rc;
++    if ( (rc=ensureGlobalSpace(0, ALLOW_GC)) != TRUE )
++      return raiseStackOverflow(rc);
++  }
++  
++  deRef2(valTermRef(A1), av);
++  if (!isAttVar(*av) )
++  { return PL_error("attvar_bind_trail", 3, NULL, ERR_UNINSTANTIATION, 1, A1);
++  }
++  
++  /* 3rd arg is for a little experiment */
++  if(!PL_get_nil(A3)) TrailAssignment(av);
++  *av = linkVal(valTermRef(A2));
++  return TRUE;
++}
++
+ 
+ 		 /*******************************
+ 		 *	    REGISTRATION	*
+@@ -1410,6 +1446,7 @@ BeginPredDefs(attvar)
+   PRED_DEF("$call_residue_vars_start", 0, call_residue_vars_start, 0)
+   PRED_DEF("$call_residue_vars_end", 0, call_residue_vars_end, 0)
+ #endif
++  PRED_DEF("attv_bind_trail", 3, attv_bind_trail, 0)
+ EndPredDefs
+ 
+ #endif /*O_ATTVAR*/
+diff --git a/src/pl-funcs.h b/src/pl-funcs.h
+index eb5ffab..d54c314 100644
+--- a/src/pl-funcs.h
++++ b/src/pl-funcs.h
+@@ -43,6 +43,8 @@ symbol lookup and relocations.
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+ 
+ /* pl-attvar.c */
++COMMON(void) registerWakeup(word functor, Word name, Word value ARG_LD);
++COMMON(int) find_attr(Word av, atom_t name, Word *vp ARG_LD);
+ COMMON(void)		assignAttVar(Word av, Word value ARG_LD);
+ COMMON(int)		saveWakeup(wakeup_state *state, int forceframe ARG_LD);
+ COMMON(void)		restoreWakeup(wakeup_state *state ARG_LD);
+diff --git a/src/pl-variant.c b/src/pl-variant.c
+index 5526605..fc1d8ad 100644
+--- a/src/pl-variant.c
++++ b/src/pl-variant.c
+@@ -204,6 +204,11 @@ reset_terms(node * r)
+ { *(r->bp)  =  r->orig;
+ }
+ 
++
++#ifndef ATTVAR_ISOMORPIC
++#define ATTVAR_ISOMORPIC
++#endif
++
+ /* isomorphic (==) */
+ 
+ static int
+@@ -239,6 +244,17 @@ isomorphic(argPairs *a, int i, int j, Buffer buf ARG_LD)
+     wl = *l;
+     wr = *r;
+ 
++#ifdef ATTVAR_ISOMORPIC
++    if(tag(wr) == TAG_ATTVAR) 
++    {
++      Word swap0 = l;
++      l = r;
++      r = swap0;
++      wl = *l;
++      wr = *r;
++    } else /*skip difference tests */
++
++#endif
+     if ( tag(wl) != tag(wr) )
+       return FALSE;
+ 
+@@ -249,7 +265,21 @@ isomorphic(argPairs *a, int i, int j, Buffer buf ARG_LD)
+     }
+ 
+     if ( tag(wl) == TAG_ATTVAR )
+-    { l = valPAttVar(wl);
++    { 
++#ifdef ATTVAR_ISOMORPIC
++      { Word vp;
++      if(find_attr(l,ATOM_references, &vp PASS_LD)) 
++        { registerWakeup(FUNCTOR_references3, l, r PASS_LD);
++        continue;
++     }}
++        if(!isAttVar(wr)) return FALSE;
++        { Word vp;
++        if(find_attr(r,ATOM_references, &vp PASS_LD)) 
++          { registerWakeup(FUNCTOR_references3, r, l PASS_LD);
++          continue;
++       }}
++#endif
++      l = valPAttVar(wl);
+       r = valPAttVar(wr);
+       goto attvar;
+     }
+@@ -325,6 +355,12 @@ variant(argPairs *agenda, Buffer buf ARG_LD)
+    wl = *l;
+    wr = *r;
+ 
++   if(tag(*r) == TAG_ATTVAR) 
++   {
++     Word swap0 = l;
++     l = r; wl = *l;
++     r = swap0; wr = *r;         
++   } else /*skip difference tests */
+    if ( tag(wl) != tag(wr) )
+      return FALSE;
+ 
+@@ -356,7 +392,20 @@ variant(argPairs *agenda, Buffer buf ARG_LD)
+     }
+ 
+     if ( tag(wl) == TAG_ATTVAR )
+-    { l = valPAttVar(wl);
++    { 
++      { Word vp;
++      if(find_attr(l,ATOM_variant, &vp PASS_LD)) 
++        { registerWakeup(FUNCTOR_variant3, vp, r PASS_LD);
++        continue;
++     }}
++        if(!isAttVar(wr)) return FALSE;
++        { Word vp;
++        if(find_attr(r,ATOM_variant, &vp PASS_LD)) 
++          { registerWakeup(FUNCTOR_variant3, vp, l PASS_LD);
++          continue;
++       }}
++
++      l = valPAttVar(wl);
+       r = valPAttVar(wr);
+       goto attvar;
+     }
+@@ -429,21 +478,41 @@ PRED_IMPL("=@=", 2, variant, 0)
+   Word p2 = valTermRef(A2);
+   node new = {NULL, 0, 0, 0};   /* dummy node as 0-th element*/
+ 
++attvar:
++
+   deRef(p1);
+   deRef(p2);
+ 
+   if ( *p1 == *p2 )                     /* same term */
+     return TRUE;
++  if(tag(*p2) == TAG_ATTVAR) 
++  {
++    Word swap0 = p2;
++    p2 = p1;
++    p1 = swap0;
++  } else /*skip difference tests */
+   if ( tag(*p1) != tag(*p2) )           /* different type */
+     return FALSE;
+-again:
++/*again: not gone to anymore*/
+   switch(tag(*p1))                      /* quick tests */
+   { case TAG_VAR:
+       return TRUE;
+     case TAG_ATTVAR:
++      { Word vp;
++      if(find_attr(p1,ATOM_variant, &vp PASS_LD)) 
++        { registerWakeup(FUNCTOR_variant3, p1, p2 PASS_LD);
++          return TRUE;
++     }}
++        if(!isAttVar(*p2)) return FALSE;
++        { Word vp;
++        if(find_attr(p2,ATOM_variant, &vp PASS_LD)) 
++          { registerWakeup(FUNCTOR_variant3, p2, p1 PASS_LD);
++            return TRUE;
++       }}
++
+       p1 = valPAttVar(*p1);
+       p2 = valPAttVar(*p2);
+-      goto again;
++      goto attvar;
+     case TAG_ATOM:
+       return FALSE;
+     case TAG_INTEGER:

@@ -1,0 +1,85 @@
+
+div.selectionTooltip {
+    text-align: center;
+    position: absolute;
+    border: 1px solid #999;
+    border-radius: 5px;
+    background: #fff;
+    display: inline-block;
+    // width: fit-content;
+    box-shadow: #00000088 2px 2px 2px, #00000088 0 0 5px;
+}
+div.selectionTooltip::before {
+    content: "";
+    width: 10px;
+    height: 10px;
+    background: #fff;
+    box-shadow: #00000088 2px 2px 2px, #00000088 0 3px 5px;
+    border-bottom-left-radius: 100%;
+    border-bottom-right-radius: 0;
+    position: absolute;
+    bottom: -11px;
+    left: 40%;
+    border: 1px solid #999;
+    border-top: 0;
+}
+div.selectionTooltip.bottom::before {
+    bottom: 100%;
+    border-radius: 0;
+    border-top-left-radius: 100%;
+    border-top-right-radius: 0;
+    box-shadow: #00000088 0px -2px 2px;
+}
+div.selectionTooltip.bottom.right::before {
+    border-top-left-radius: 0;
+    border-top-right-radius: 100%;
+    border-bottom-right-radius: 0;
+}
+div.selectionTooltip.left::before {
+    left: 10%;
+}
+div.selectionTooltip.right::before {
+    left: calc(90% - 10px);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 100%;
+}
+div.selectionTooltip.hide {
+    display: none;
+}
+
+div.selectionTooltip div.comps {
+    background-size: 30px 30px;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 40px;
+    width: 30px;
+    display: inline-block;
+    cursor: pointer;
+    padding: 0px 5px;
+    transition: 0.2s linear;
+}
+
+div.selectionTooltip div.comps:hover {
+    background-color: #eee
+}
+
+div.selectionTooltip div.compsgroup {
+    padding-left: 30px;
+    position: relative;
+    text-align: left;
+}
+
+div.selectionTooltip div.compsgroup + div.compsgroup {
+    border-top: 1px solid #ddd;
+}
+
+div.selectionTooltip div.compsgroup::before {
+    content: " ";
+    background-size: 20px 20px;
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: 50%;
+    left: 5px;
+    transform: translateY(-50%);
+}

@@ -1,0 +1,232 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>jQuery Social Selection Examples</title>
+<link href="https://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+    <script src="../js/social.selection.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/social.selection.css">
+    <link rel="stylesheet" type="text/css" href="../css/example.css">
+</head>
+
+<body>
+    <div id="content">
+        <h1>jQuery Social Selection Examples</h1><div id="carbon-block"></div>
+        <div id="default" class="demo">
+            <h3>Default</h3>
+            <p>Lorem ipsum dolor sit amet </p>
+        </div>
+        <div id="search" class="demo">
+            <h3>Search Engines</h3>
+            <p>Lorem ipsum dolor sit amet </p>
+        </div>
+        <div id="share" class="demo">
+            <h3>Social Share</h3>
+            <p>Lorem ipsum dolor sit amet </p>
+        </div>
+        <div id="visit" class="demo">
+            <h3>Quick links</h3>
+            <p>Lorem ipsum dolor sit amet </p>
+        </div>
+        <div class="demo">
+            <h3>Customize The Plugin</h3>
+            <div id="custom0" class="demo demoGroup">
+                <h4>Default</h4>
+                <p>Lorem ipsum dolor sit amet </p>
+            </div>
+            <div id="custom1" class="demo demoGroup">
+                <h4>Custom Icons</h4>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            </div>
+            <div id="custom2" class="demo demoGroup">
+                <h4>5 Icons Per Row</h4>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            </div>
+            <div id="custom3" class="demo demoGroup">
+                <h4>Change Search Keywords</h4>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            </div>
+            <div id="custom4" class="demo demoGroup">
+                <h4>Localization</h4>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            </div>
+            <div id="custom5" class="demo demoGroup">
+                <h4>Add New Platform</h4>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            </div>
+        </div>
+        <div id="new" class="demo">
+            <h3>QR Code</h3>
+            <p>Lorem ipsum dolor sit amet  </p>
+        </div>
+        <div id="html" class="demo">
+            <h3>HTML</h3>
+            <p>You can also use pure HTML to initiation the plugin.</p>
+            <selecton-tooltip data-target="#html" data-comps="foo">
+                <component-search>
+                    <google></google>
+                </component-search>
+                <component-share>
+                    <facebook></facebook>
+                </component-share>
+                <component-visit data-github="abc"></component-visit>
+                <component-foo data-icon-path="../img/qrcode.svg" data-text="123">
+                    <bar1 data-name="Bar1" data-link="{{bar1}}"  data-icon-path="../img/wechat.svg" data-require="qrcode"></bar1>
+                </component-foo>
+            </selecton-tooltip>
+        </div>
+    </div>
+<script>
+    let search = {
+        components: {
+            search: {
+                enabled: "all"
+            },
+            share: {
+                enabled: "none"
+            },
+            visit: {
+                enabled: "none"
+            },
+        }
+    }
+    let share = {
+        components: {
+            search: {
+                enabled: "none"
+            },
+            share: {
+                enabled: "all"
+            },
+            visit: {
+                enabled: "none"
+            },
+        }
+    }
+    let visit = {
+        dev: true,
+        components: {
+            search: {
+                enabled: "none"
+            },
+            share: {
+                enabled: "none"
+            },
+            visit: {
+                enabled: "all"
+            },
+        }
+    }
+    let custom = {
+        components: {
+            search: {
+                enabled: "all"
+            },
+            share: {
+                enabled: "none"
+            },
+            visit: {
+                enabled: "none"
+            },
+        }
+    }
+    let newComp = {
+        components: {
+            search: {
+                enabled: ["google", "bing"]
+            },
+            share: {
+                enabled: ["facebook", "line"]
+            },
+            visit: {
+                facebook: "default",
+                youtube: "default"
+            },
+
+            foo: {
+                enabled: ["bar1"],
+                url: "google.com",
+                iconPath: "../img/qrcode.svg",
+                platforms: {
+                    bar1: {
+                        link: "{{url}}",
+                        iconPath: "../img/wechat.svg",
+                        require: ["qrcode"]
+                    }
+                }
+            }
+        },
+        locale: {
+            components: {
+                foo: {
+                    title: "Share QR Code to {{platform}}",
+                    platforms: {
+                        bar1: "Bar1"
+                    },
+                }
+            }
+        },
+    }
+    let customConfig = [
+        {},
+        {
+            components: {
+                search: {
+                    iconPath: "../img/wikipedia.svg",
+                    platforms: {
+                        wikipedia: {
+                            iconPath: "../img/search.svg"
+                        }
+                    }
+                },
+            }
+        },
+        { itemsPerColumn: 5 },
+        {
+            components: {
+                search: {
+                    text: "Hello World",
+                }
+            }
+        },
+        {
+            locale: {
+                components: {
+                    search: {
+                        title: "{{platform}} Custom Search",
+                    }
+                },
+                platforms: {
+                    google: "New Google"
+                }
+            }
+        },
+        {
+            components: {
+                search: {
+                    platforms: {
+                        google2: {
+                            link: "https://www.google.com/search?q={{text}}",
+                            name: "Google2",
+                            iconPath: "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png"
+                        },
+                    },
+                }
+            }
+        },
+    ]
+    $("#default").socialSelection();
+    $("#search").socialSelection(search);
+    $("#share").socialSelection(share);
+    $("#visit").socialSelection(visit);
+    $("#new").socialSelection(newComp);
+    customConfig.map((v, i) => {
+        $("#custom" + i).socialSelection($.fn.deepExtend(v, custom));
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+
+before_script:
+ - sudo apt-add-repository ppa:swi-prolog/devel -y
+ - sudo apt-get update -q
+ - sudo apt-get install swi-prolog-nox -y
+   #- swipl -g "pack_install(logicmoo_utils,[interactive(false),upgrade(true)]),halt" -t 'halt(0)'
+
+script:
+  #- swipl -g "pack_install(logicmoo_utils,[interactive(false),upgrade(true)]),halt" -t 'halt(0)' 
+   - swipl -s t/each_call_cleanup.plt -g run_tests,halt -t 'halt(0)'
+   - swipl -s t/loop_check_tests.plt 
+   - swipl -s t/sanity_tests_cav.plt -g run_tests,halt
+   - swipl -s t/sce_sanity_tests.plt -g "run_tests,halt(0)" -t 'halt(1)'
+   - swipl -s t/test_no_repeats.plt

@@ -1,0 +1,140 @@
+body {
+	font-family: Helvetica, sans-serif;
+}
+
+.displayBox {
+	background-color: #efefef;
+	padding:  0px 0px 30px 0px;
+	display: inline-block;
+	width: 100%;
+}
+
+.header {
+	text-align: center;
+	font-size: 12px;
+	border-bottom: 1px solid #fff;
+	width: 100%;
+	color: #fff;
+	background-color: #130e5a;
+}
+
+.header h1 {
+	margin: 0px;
+	padding: 5px 0px;
+}
+
+div.icon-box-top {
+	margin: 50px 0px 25px 0px;
+	display: block;
+	float: left;
+	clear: both;
+}
+
+div.icon-box {
+	margin: 25px 0px 25px 0px;
+	display: block;
+	float: left;
+	clear: both;
+}
+
+p.icon-text, p.menuText {
+	display: block;
+	margin-left: 45px;
+	margin-bottom: 0px;
+	float: left;
+}
+
+p.menuText {
+	margin-left: 20px !important;
+	margin-top: 0px;
+}
+
+.textPopup {	/*When attaching popups to text menus, style text menu separately*/
+	display: block;
+	font-size: 28px;
+	font-weight: bold;
+	color: #130e5a;
+	margin: 0px 0px 0px 75px;
+	-webkit-box-sizing: content-box;
+	-moz-box-sizing: content-box;
+	box-sizing: content-box;
+	cursor: pointer;
+	float: left;
+	z-index: 1;
+}
+
+p.textPopup.pressed {
+	color: #02baf2 !important;
+}
+
+div#myPopUp, 
+div#myPopUp2, 
+div#myPopUp3,
+div#myPopUp4 {
+	margin-left: 75px;
+	display: inline-block;
+}
+
+.very-happy, .happy, .neutral, .unhappy, .upset {
+	font-size: 256px !important;
+	background-color: #666;
+	cursor: pointer;
+}
+
+.very-happy {
+	color: #ffff00;
+}
+
+.happy {
+	color: #f7931e;
+}
+
+.neutral {
+	color: #af9292;
+}
+
+.unhappy {
+	color: #8b0000;
+}
+
+.upset {
+	color: #ff0000;
+}
+
+i.swIcon {
+	font-size: 208px !important;
+	margin: 10px;
+}
+
+div#starWarsIcons {
+	display: block;
+	margin-left: 75px;
+}
+
+div#starWarsIcons p {
+	margin-block-start: 0.5em;
+}
+
+a {
+	text-decoration: none;
+}
+
+#rebel, #empire, #firstOrderIcon {
+	text-align: center;
+	font-size: 18px;
+	font-weight: bold;
+	float: left;
+	display: none;
+}
+
+#rebel {
+	color: #f7931e;
+}
+
+#empire {
+	color: #333;
+}
+
+#firstOrderIcon {
+	color: #8b0000;
+}

@@ -1,0 +1,334 @@
+:- module(dictoo, [
+  oo/1,
+  oo_bind/2,
+  is_oo/1,
+  is_oo_invokable/2,
+  oo_call/3,
+  oo_call_first/3,
+  oo_jpl_call/3,
+  oo_deref/2,
+  oo_inner_class_begin/1,
+  oo_inner_class_end/1,
+  oo_class_field/1,
+  oo_class_begin/1,
+  oo_class_end/1,
+
+          oo_get_attr/3,
+          oo_put_attr/3,
+          oo_get_attrs/2,
+          oo_put_attrs/2
+  ]).
+
+/** <module> dictoo - Dict-like OO Syntax Pack
+
+    Author:        Douglas R. Miles
+    E-mail:        logicmoo@gmail.com
+    WWW:           http://www.logicmoo.org
+    Copyright (C): 2017
+                       
+    This program is free software; you can redistribute it and/or
+    modify it.
+
+*/
+
+:- use_module(library(gvar_syntax)).
+:- use_module(library(dicts)).
+
+:- set_module(class(library)).
+
+
+
+
+% :- use_module(library(jpl),[jpl_set/3,jpl_get/3,jpl_call/4]).
+% :- use_module(atts).
+% :- use_module(multivar).
+
+:- meta_predicate(fail_on_missing(*)).
+% fail_on_missing(G):-current_predicate(G),!,call(G).
+fail_on_missing(G):- notrace(catch(G,error(existence_error(_,_),_),fail)).
+
+was_dictoo(_).
+
+%% is_oo(+Self) is det.
+%
+%  Tests to see if Self
+%   Has  Member Functions
+%    
+is_oo(_):- !. % assume we''ll take care of dicts as well
+is_oo(O):-  
+ notrace((((var(O),!,attvar(O));
+  (((O=was_dictoo(_);
+     O=jclass(_);
+     O=jpl(_);
+     O= class(_);
+     O='&'(_) ;
+     O='&'(_,_) ;
+     functor(O,'.',2) ;
+     O='$'(_) ;
+     is_dict(O) ;
+     is_logtalk_object(O),
+  fail_on_missing(jpl_is_ref(O));
+  fail_on_missing(cli_is_object(O));
+  fail_on_missing(cli_is_struct(O)))))))),!.
+
+
+oo(O):- call(ignore,multivar(O)).
+oo_bind(O,Value):- oo(O),put_attr(O,oo,binding(O,Value)).
+oo:attr_unify_hook(B,Value):- B = binding(_Var,Prev),Prev.equals(Value).
+
+logtalk_ready :- current_predicate(logtalk:current_logtalk_flag/2).
+
+is_logtalk_object(O):- logtalk_ready, call(logtalk:current_object(O)).
+
+
+
+oo_set(UDT,Key, Value):- attvar(UDT),!,put_attr(UDT,Key, Value).
+oo_set(UDT,Key, Value):- fail_on_missing(jpl_is_ref(UDT)),jpl_set(UDT,Key,Value).
+
+
+put_oo(Key, UDT, Value, NewUDT):- is_dict(UDT),!,put_dict(Key, UDT, Value, NewUDT).
+put_oo(Key, UDT, Value, NewUDT):- oo_copy_term(UDT,NewUDT),put_oo(NewUDT,Key, Value).
+
+oo_copy_term(UDT,NewUDT):- copy_term(UDT,NewUDT).
+
+put_oo(Key, UDT, Value):- is_dict(UDT),!,put_dict(Key, UDT, Value).
+put_oo(Key, UDT, Value):- oo_set(UDT,Key, Value).
+
+
+get_oo(Key, UDT, Value):- oo_call(UDT,Key, Value).
+
+oo_jpl_call(A,B,C):- (integer(B);B==length; B= (_-_)),!,jpl_get(A,B,C).
+oo_jpl_call(A,B,C):- B=..[H|L], fail_on_missing(jpl_call(A,H,L,C)),!.
+oo_jpl_call(A,B,C):- fail_on_missing(jpl_get(A,B,C)).
+
+
+
+%% is_oo_invokable(+Self,-DeRef) is det.
+%
+%  DeRef''s an OO Whatnot and ckecks if invokable
+%    
+
+is_oo_invokable(Was,Was):- is_oo(Was),!.
+% is_oo_invokable(Was,Was):- nb_current('$oo_stack',[Was|_])
+is_oo_invokable(Was,Ref):- oo_deref(Was,Ref),!,(Was\==Ref;is_oo(Ref)).
+
+:- module_transparent(oo_call/3).
+:- module_transparent(oo_call_first/3).
+
+:- nb_setval('$oo_stack',[]).
+oo_call_first(Self, Func, Value):- is_dict(Self),!,dot_dict(Self, Func, Value).
+oo_call_first(A,B,C):-  (nb_current('$oo_stack',Was)->true;Was=[]),b_setval('$oo_stack',['.'(A,B,C)|Was]),oo_call(A,B,C).
+
+oo_call(Self,Memb,Value):- notrace((atom(Memb),(get_attr(Self, Memb, Value);var(Self)))),!,freeze(Value,put_oo(Self, Memb, Value)).
+oo_call('$'(Self),Memb,Value):- gvar_call(Self,Memb,Value),!.
+oo_call('$'(GVar),add(Memb,V),was_gvar($GVar)):- atom(GVar),nb_current(GVar,Self),!,put_dict(Memb,Self,V,NewSelf),nb_setval(GVar,NewSelf).
+oo_call('$'(GVar),Memb,Value):- atom(GVar),nb_current(GVar,Self),!,oo_call(Self,Memb,Value),nb_setval(GVar,Self).
+oo_call('&'(Self,_),Memb,Value):- gvar_call(Self,Memb,Value),!.
+oo_call('&'(_,Self),Memb,Value):- oo_call(Self,Memb,Value),!.
+oo_call(Self,set(Memb,Value),'&'(Self)):- is_dict(Self),!,nb_set_dict(Memb,Self,Value).
+
+oo_call(Self,Memb,Value):- is_dict(Self),!, dot_dict(Self, Memb, Value).
+oo_call('&'(Self),Memb,Value):- !,oo_call(Self,Memb,Value).
+oo_call(jpl(Self),Memb,Value):- !, oo_jpl_call(Self, Memb, Value).
+oo_call(jclass(Self),Memb,Value):- !, oo_jpl_call(Self, Memb, Value).
+oo_call(class(Self),Memb,Value):- fail_on_missing(cli_call(Self, Memb, Value)),!.
+oo_call(Self,Memb,Value):- notrace((oo_deref(Self,NewSelf)-> NewSelf\=Self)),!,oo_call(NewSelf,Memb,Value).
+
+oo_call(Self,Memb,Value):- fail_on_missing(jpl_is_ref(Self)),!,oo_jpl_call(Self, Memb, Value).
+
+oo_call(Self,Memb,Value):-  fail_on_missing(cli_is_object(Self)),!,fail_on_missing(cli_call(Self, Memb, Value)).
+oo_call(Self,Memb,Value):-  fail_on_missing(cli_is_struct(Self)),!,fail_on_missing(cli_call(Self, Memb, Value)).
+oo_call(Class,Inner,Value):- notrace(is_oo_class(inner(Class,Inner))),!,oo_call(inner(Class,Inner),Value,_).
+
+oo_call('&'(_,DeRef),Memb,Value):- oo_call(DeRef,Memb,Value).
+
+%oo_call(Self,deref,Value):- var(Self),nonvar(Value),!,oo_call(Value,deref,Self).
+%oo_call(Self,deref,Self):-!.
+
+% oo_call(Self,Memb,Value):- gvar_interp(Self,Self,Memb,Value).
+oo_call(Self,Memb,Value):- var(Value),!,freeze(Value,put_oo(Self, Memb, Value)).
+oo_call(Self,Memb,Value):- var(Value),!,Value='&'(Self,Memb).
+oo_call(Self,Memb,Value):- throw(oo_call(Self,Memb,Value)).
+
+/*
+oo_call(Self,Memb,Value):- nb_linkval(Self,construct(Self,Memb,Value)),!,oo_call(Self,Memb,Value).
+oo_call(Self,Memb,Value):- to_member_path(Memb,[F|Path]),append(Path,[Value],PathWValue),
+   Call =.. [F,Self|PathWValue],
+   oo_call(Call).
+
+to_member_path(C,[F|ARGS]):-compound(C),!,compound_name_args(C,F,ARGS).
+to_member_path(C,[C]).
+
+*/
+
+oo_deref(Obj,RObj):- var(Obj),!,once(get_attr(Obj,oo,binding(_,RObj));Obj=RObj),!.
+% oo_deref('$'(GVar),'&'(GVar,Value)):- atom(GVar),nb_current(GVar,Value),!.
+oo_deref('&'(GVar),Value):- atom(GVar),nb_current(GVar,ValueM),!,oo_deref(ValueM,Value).
+oo_deref(Value,Value):- \+ compound(Value),!.
+oo_deref(cl_eval(Call),Result):-is_list(Call),!,fail_on_missing(cl_eval(Call,Result)).
+oo_deref(cl_eval(Call),Result):-!,nonvar(Call),oo_deref(Call,CallE),!,call(CallE,Result).
+oo_deref(Value,Value):- fail_on_missing(jpl_is_ref(Value)),!.
+%%oo_deref([A|B],Result):-!, maplist(oo_deref,[A|B],Result).
+%%oo_deref(Call,Result):- call(Call,Result),!.
+oo_deref(Head,HeadE):- Head=..B,maplist(oo_deref,B,A),HeadE=..A,!.
+oo_deref(Value,Value):- is_logtalk_object(Value).
+oo_deref(Value,Value).
+
+
+get_oo(Key, Dict, Value, NewDict, NewDict) :- is_dict(Dict),!,
+   get_dict(Key, Dict, Value, NewDict, NewDict).
+get_oo(Key, Dict, Value, NewDict, NewDict) :-
+        get_oo(Key, Dict, Value),
+        put_oo(Key, Dict, NewDict, NewDict).
+
+
+
+%!  eval_oo_function(+Func, +Tag, +UDT, -Value)
+%
+%   Test for predefined functions on Objects or evaluate a user-defined
+%   function.
+
+eval_oo_function(Func, Tag, UDT, Value) :- is_dict(UDT),!,
+   '$dicts':eval_dict_function(Func, Tag, UDT, Value).
+
+eval_oo_function(get(Key), _, UDT, Value) :-
+    !,
+    get_oo(Key, UDT, Value).
+eval_oo_function(put(Key, Value), _, UDT, NewUDT) :-
+    !,
+    (   atomic(Key)
+    ->  put_oo(Key, UDT, Value, NewUDT)
+    ;   put_oo_path(Key, UDT, Value, NewUDT)
+    ).
+eval_oo_function(put(New), _, UDT, NewUDT) :-
+    !,
+    put_oo(New, UDT, NewUDT).
+eval_oo_function(Func, Tag, UDT, Value) :-
+    call(Tag:Func, UDT, Value).
+
+
+%!  put_oo_path(+KeyPath, +UDT, +Value, -NewUDT)
+%
+%   Add/replace  a  value  according  to  a  path  definition.  Path
+%   segments are separated using '/'.
+
+put_oo_path(Key, UDT, Value, NewUDT) :-
+    atom(Key),
+    !,
+    put_oo(Key, UDT, Value, NewUDT).
+put_oo_path(Path, UDT, Value, NewUDT) :-
+    get_oo_path(Path, UDT, _Old, NewUDT, Value).
+
+get_oo_path(Path, _, _, _, _) :-
+    var(Path),
+    !,
+    '$instantiation_error'(Path).
+get_oo_path(Path/Key, UDT, Old, NewUDT, New) :-
+    !,
+    get_oo_path(Path, UDT, OldD, NewUDT, NewD),
+    (   get_oo(Key, OldD, Old, NewD, New),
+        is_oo(Old)
+    ->  true
+    ;   Old = _{},
+        put_oo(Key, OldD, New, NewD)
+    ).
+get_oo_path(Key, UDT, Old, NewUDT, New) :-
+    get_oo(Key, UDT, Old, NewUDT, New),
+    is_oo(Old),
+    !.
+get_oo_path(Key, UDT, _{}, NewUDT, New) :-
+    put_oo(Key, UDT, New, NewUDT).
+
+
+
+:- dynamic(is_oo_class/1).
+:- dynamic(is_oo_class_field/2).
+
+oo_class_begin(Name):-asserta(is_oo_class(Name)).
+oo_class_end(Name):- is_oo_class(Name),!,retract(is_oo_class(Name)),assertz(is_oo_class(Name)).
+
+oo_inner_class(Name,Inner):-asserta(is_oo_class(inner(Name,Inner))).
+
+oo_inner_class_begin(Inner):- is_oo_class(Name),!,oo_class_begin(inner(Name,Inner)).
+oo_inner_class_end(Inner):- is_oo_class(inner(Name,Inner)),!,oo_class_end(inner(Name,Inner)).
+
+oo_class_field(Inner):- is_oo_class(Name),!,asserta(is_oo_class_field(Name,Inner)).
+
+
+
+oo_get_attr(V,A,Value):- var(V),!,get_attr(V,A,Value),!.
+oo_get_attr('$VAR'(Name),VN,Value):- var(Name), !, VN = vn, get_var_name('$VAR'(Name),Value).
+oo_get_attr('$VAR'(Name:Att3),A,Value):- !, (oo_get_attr(Att3,A,Value);oo_get_attr('$VAR'(Name),A,Value)).
+oo_get_attr(Self,Memb,Value):- oo_call(Self,Memb,Value).
+% oo_get_attr(V,A,Value):- trace_or_throw(oo_get_attr(V,A,Value)).
+
+oo_get_attrs(V,Att3s):- var(V),!,get_attrs(V,Att3s),!.
+oo_get_attrs('$VAR'(Name),_):- atomic(Name),!,fail.
+oo_get_attrs('$VAR'(Var),Att3s),Att3):-var(Var),!,get_attrs(Var,Att3s),!.
+oo_get_attrs('$VAR'(Att3s),Att3sO):-!,oo_get_attrs(Att3s,Att3sO).
+
+oo_put_attrs(V,Att3s):- var(V),!,put_attrs(V,Att3s),!.
+oo_put_attrs(Var,Att3s):- Var='$VAR'(VN), 
+   (atomic(VN)->setarg(1,Var, att(vn, VN, Att3s));
+   (var(VN)-> (get_varname_or_ref(VN,Name),setarg(1,Var, att(vn, Name, Att3s)));
+    (get_var_name('$VAR'(VN),Name),setarg(1,Var, att(vn, Name, Att3s))))).
+oo_put_attrs(V,Att3s):- trace_or_throw(oo_put_attrs(V,Att3s)).
+
+oo_put_attr(V,A,Value):- var(V),!,put_attr(V,A,Value),!.
+oo_put_attr(Var,A,Value):- oo_get_attrs(Var,Att3s),add_attrs_att(A,Value,Att3s,Att3New),!,oo_put_attrs(Var,Att3New).
+oo_put_attr(V,A,Value):- trace_or_throw(oo_put_attr(V,A,Value)).
+
+
+
+
+%% this_file_file_predicates_are_exported() is det.
+%
+% All Module Predicates Are Exported.
+
+:- module_transparent(this_file_file_predicates_are_exported/0).
+this_file_file_predicates_are_exported:- current_prolog_flag(xref,true),!.
+this_file_file_predicates_are_exported:-
+ source_location(S,_), prolog_load_context(module,LC),
+ this_file_file_predicates_are_exported(S,LC).
+
+:- module_transparent(this_file_file_predicates_are_exported/2).
+this_file_file_predicates_are_exported(S,LC):-
+ forall(source_file(M:H,S),
+ ignore((functor(H,F,A), \+ atom_concat('$',_,F),
+  ((ignore(((atom(LC),atom(M), LC\==M,M:export(M:F/A),LC:multifile(M:F/A),fail,atom_concat('$',_,F),LC:import(M:F/A)))))),
+  ignore(((\+ atom_concat('$',_,F),\+ atom_concat('__aux',_,F),LC:export(M:F/A), 
+  (current_predicate(system:F/A)->true; system:import(M:F/A)))))))).
+
+%% this_file_file_predicates_are_transparent() is det.
+%
+% All Module Predicates Are Transparent.
+:- module_transparent(this_file_file_predicates_are_transparent/0).
+this_file_file_predicates_are_transparent:-
+ source_location(S,_), prolog_load_context(module,LC),
+ this_file_file_predicates_are_transparent(S,LC).
+
+:- module_transparent(this_file_file_predicates_are_transparent/2).
+this_file_file_predicates_are_transparent(S,_LC):- 
+ forall(source_file(M:H,S),
+ (functor(H,F,A),
+  ignore(((\+ predicate_property(M:H,transparent), module_transparent(M:F/A), 
+  \+ atom_concat('__aux',_,F),debug(modules,'~N:- module_transparent((~q)/~q).~n',[F,A])))))).
+
+
+:- multifile(gvar_syntax:dot_syntax_hook/3).
+:- dynamic(gvar_syntax:dot_syntax_hook/3).
+:- module_transparent(gvar_syntax:dot_syntax_hook/3).
+gvar_syntax:dot_syntax_hook(NewName, Memb, Value):-oo_call_first(NewName, Memb, Value).
+
+
+:- multifile(gvar_syntax:is_dot_hook/2).
+:- dynamic(gvar_syntax:is_dot_hook/2).
+:- module_transparent(gvar_syntax:is_dot_hook/2).
+% gvar_syntax:is_dot_hook(I,O):-is_oo_invokable(I,O).
+
+
+:- 
+   this_file_file_predicates_are_exported,
+   this_file_file_predicates_are_transparent.
+
+

@@ -21,6 +21,10 @@
 
 % :- require([colormsg1/1]).
 
+% Make WAM-CL's bundled Prolog packs (see <repo>/libs/) available and
+% verify the required dependency packs are installed before we use them.
+:- ensure_loaded(setup_lm_packs).
+
 :- system:use_module(library(apply),[exclude/3]).
 :- system:use_module(library(apply),[maplist/2,maplist/3]).
 :- system:use_module(library(error),[existence_error/2]).

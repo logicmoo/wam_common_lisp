@@ -25,6 +25,17 @@
 
 :- system:use_module(library(gvar_globals_api)).
 
+% get_kv/3 was previously exported by the dictoo pack (v1.x). Newer dictoo
+% (v3.x, bundled under <repo>/libs/) keeps it module-private, so define the
+% key/value destructuring helper locally to keep soops self-contained.
+:- (   current_predicate(get_kv/3)
+   ->  true
+   ;   assertz((get_kv(X=Y,X,Y):- !)),
+       assertz((get_kv(X-Y,X,Y):- !)),
+       assertz((get_kv(KV,X,Y):- functor(KV,_,1),KV=..[X,Y],!)),
+       assertz((get_kv(KV,X,Y):- compound(KV),arg(1,KV,X),arg(2,KV,Y),!))
+   ).
+
 :- multifile(xlisting_config:xlisting_always/1).
 :- dynamic(xlisting_config:xlisting_always/1).
 
