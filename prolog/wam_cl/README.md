@@ -1,46 +1,26 @@
-````
-root@gitlab:/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl# swipl repl.pl
-Installed packages (38):
+# WAM-CL - ANSI Common Lisp implemented in Prolog
 
-i clause_attvars@1.1.118    - An alternate interface to the clause database to allow attributed variables to be asserted
-i dictoo@1.1.118            - Dict-like OO Syntax
-i each_call_cleanup@1.1.118 - Each Call Redo Setup and Cleanup
-i eggdrop@1.1.118           - Hook up to an existing IRC Client called an Eggdrop
-i file_scope@1.1.118        - File local scoped efects
-i fluxplayer-prolog-engine@0.0.1 - Prolog interface to Slack http://www.slack.com
-i gvar_syntax@1.1.118       - Global Variable Syntax
-i hook_hybrid@1.1.118       - Hook assert retract call of *specific* predicates
-i instant_prolog_docs@1.1.118 - Magically document prolog source files based on predicate and variable naming conventions
-i lib_atts@1.1.118          - Common atts.pl interface like https://sicstus.sics.se/sicstus/docs/4.0.0/html/sicstus/lib_002datts.html
-i logicmoo_base@1.1.118     - LogicMOO - Extends Prolog Programming to support Dynamic Epistemic Logic (DEL) with Constraints
-i logicmoo_experimental@1.1.118 - Various experimental packages - warning: HUGE amount of test data
-i logicmoo_nlu@1.1.114      - Various English to Logic Convertors - warning: HUGE amount of test data
-i logicmoo_packages@1.1.118 - Various packages - warning: HUGE amount of test data
-i logicmoo_planner@1.1.118  - Various PDDLish planners - warning: HUGE amount of test data
-i logicmoo_planners@1.1.118 - Various Hybrid HTN Planners speaking PDDLish and OCLh
-i logicmoo_utils@1.1.118    - Common predicates used by external Logicmoo Utils and Base
-i loop_check@1.1.118        - New simple loop checking
-i mpi@1.0                   - Porting of the LAMMPI library of Yap Prolog to SWI-Prolog
-i multimodal_dcg@1.1.118    - Reduce floundering of DCGs by constraining and narrowing search
-i multivar@1.1.118          - User defined datatypes
-i must_trace@1.1.118        - Trace with your eyeballs instead of your fingers
-i no_repeats@1.1.118        - New ways to avoid duplicate solutions
-i pfc@1.1.118               - Pfc -- a package for forward chaining in Prolog
-i predicate_streams@1.1.118 - Implement your own Abstract Predicate Streams
-i prologmud@1.1.118         - Online text adventure game - MUD Server
-i prologmud_samples@1.1.118 - Online text adventure game - Sample
-i s_expression@1.1.118      - Utilities for Handling of S-Expression Lisp/Scheme-Like forms and parsing of KIF, GDL, PDDL, CLIF
-i slack_prolog@1.1.118      - Prolog interface to Slack http://www.slack.com
-i subclause_expansion@1.1.118 - More use specific versions of term/goal expansion hooks
-i tabling_dra@1.1.118       - SWI-Prolog interface to Table-handling procedures for the "dra" interpreter. Written by Feliks Kluzniak at UTD (March 2009)
-i transpiler@0.1            - A universal translator for programming languages
-i trill@4.1.0               - A tableau probabilistic reasoner in three different versions
-i wam_common_lisp@1.1.118   - ANSI Common Lisp implemented in Prolog
-i with_open_options@1.1.118 - Utilities to open various objects for read/write
-i with_thread_local@1.1.118 - Call a Goal with local assertions
-i xlisting@1.1.118          - Selective Interactive Non-Deterministic Tracing
-i xlisting_web@1.1.118      - Manipulate and browse prolog runtime over www
+WAM-CL compiles/interprets Common Lisp by translating it to Prolog (SWI-Prolog).
+See the [top-level README](../../README.md) for the full overview.
 
+## Install / run
+
+The Prolog pack dependencies (`dictoo`, `logicmoo_utils`, `predicate_streams`)
+are **bundled in this repository under `libs/`**, so no separate `pack_install`
+or global install is needed. From the repository root:
+
+    wam_cl.cmd     # Windows
+    ./wam_cl.sh    # Unix
+
+Both start the Common Lisp REPL. Equivalently:
+
+    swipl -p library=prolog -g "set_prolog_flag(lisp_interactive,true),lisp" prolog/wamcl.pl
+
+The bundled packs are attached automatically by `setup_lm_packs.pl`.
+
+## Sample REPL session
+
+```
 __        ___    __  __        ____ _
 \ \      / / \  |  \/  |      / ___| |
  \ \ /\ / / _ \ | |\/| |_____| |   | |
@@ -1265,244 +1245,6 @@ Warning: /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl
 % /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:67
 % [[bind, summer, [function, [lambda, [n], [setq, running_total, [plus, running_total, n]]]]], '_Ret']=error(type_error(character, bind), context(system:code_type/2, _19698)).
 ERROR: /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/tests.pl:67:
-        =../2: Type error: `atom' expected, found `[bind,summer,[function,[lambda,[n],[setq,running_total,[plus,running_total,n]]]]]' (a list)
+```
 
-
-% fact==lambda([n], if(n=0, 1, n*fact(sub1(n)))).
-% fact(A, E) :- !,
-%       B=[[bv(n, [A|_])]],
-%       sym_arg_val_env(n, A, C, B),
-%       =(C, 0, D),
-%       (   D\=[]
-%       ->  E=1
-%       ;   sub1(A, F),
-%           fact(F, G),
-%           *(A, G, H),
-%           E=H
-%       ).
-% fact(_, _) :-
-%       fail,
-%       ( <<==([fact, n], [if, [=, n, 0], 1, [*, n, [fact, [sub1, n]]]])
-%       ).
-
-
-% add1==lambda([n], n+1).
-% add1(A, D) :- !,
-%       B=[[bv(n, [A|_])]],
-%       sym_arg_val_env(n, A, C, B),
-%       plus(C, 1, D).
-% add1(_, _) :-
-%       fail,
-%       ( <<==([add1, n], [+, n, 1])
-%       ).
-
-
-% sub1==lambda([n], n-1).
-% sub1(A, D) :- !,
-%       B=[[bv(n, [A|_])]],
-%       sym_arg_val_env(n, A, C, B),
-%       minus(C, 1, D).
-% sub1(_, _) :-
-%       fail,
-%       ( <<==([sub1, n], [-, n, 1])
-%       ).
-
-
-% mapcar==lambda([f, l], if(null(l), nil, cons(f(car(l)), mapcar(f, cdr(l))))).
-% mapcar2(A, B, E) :- !,
-%       C=[[bv(f, [A|_]), bv(l, [B|_])]],
-%       sym_arg_val_env(l, B, D, C),
-%       (   D==[]
-%       ->  E=[]
-%       ;   car(B, F),
-%           f(F, I),
-%           sym_arg_val_env(f, A, G, C),
-%           cdr(B, H),
-%           mapcar2(G, H, J),
-%           K=[I|J],
-%           E=K
-%       ).
-% mapcar2(_, _, _) :-
-%       fail,
-%       ( <<==([mapcar2, f, l], [if, [null, l], nil, [cons, [f, [car, l]], [mapcar2, f, [cdr, l]]]])
-%       ).
-
-
-% length==lambda([l], if(null(l), 0, add1(length(cdr(l))))).
-% length2(A, D) :- !,
-%       B=[[bv(l, [A|_])]],
-%       sym_arg_val_env(l, A, C, B),
-%       (   C==[]
-%       ->  D=0
-%       ;   cdr(A, E),
-%           length2(E, F),
-%           add1(F, G),
-%           D=G
-%       ).
-% length2(_, _) :-
-%       fail,
-%       ( <<==([length2, l], [if, [null, l], 0, [add1, [length2, [cdr, l]]]])
-%       ).
-
-
-% append==lambda([l1, l2], if(null(l1), l2, cons(car(l1), append(cdr(l1), l2)))).
-% append2(A, B, E) :- !,
-%       C=[[bv(l1, [A|_]), bv(l2, [B|_])]],
-%       sym_arg_val_env(l1, A, D, C),
-%       (   D==[]
-%       ->  sym_arg_val_env(l2, B, F, C),
-%           E=F
-%       ;   car(A, H),
-%           cdr(A, G),
-%           append2(G, B, I),
-%           J=[H|I],
-%           E=J
-%       ).
-% append2(_, _, _) :-
-%       fail,
-%       ( <<==([append2, l1, l2], [if, [null, l1], l2, [cons, [car, l1], [append2, [cdr, l1], l2]]])
-%       ).
-
-
-% filter==lambda([f, s], if('emptyStream?'(s), s, if(f(head(s)), consStream(head(s), filter(f, tail(s))), filter(f, tail(s))))).
-% filter2(A, B, F) :- !,
-%       C=[[bv(f, [A|_]), bv(s, [B|_])]],
-%       sym_arg_val_env(s, B, D, C),
-%       'emptyStream?'(D, E),
-%       (   E\=[]
-%       ->  F=B
-%       ;   head(B, G),
-%           f(G, H),
-%           (   H\=[]
-%           ->  head(B, K),
-%               sym_arg_val_env(f, A, I, C),
-%               tail(B, J),
-%               filter2(I, J, L),
-%               consStream(K, L, M),
-%               O=M
-%           ;   tail(B, N),
-%               filter2(A, N, P),
-%               O=P
-%           ),
-%           F=O
-%       ).
-% filter2(_, _, _) :-
-%       fail,
-%       ( <<==([filter2, f, s], [if, ['emptyStream?', s], s, [if, [f, [head, s]], [consStream, [head, s], [filter2, f, [tail, s]]], [filter2, f, [tail, s]]]])
-%       ).
-
-
-% /home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl/lisp_compiler.pl:578
-% <<==(from(n), consStream(n, from(n+1))).
-% from(N_In4, ConsStream_Ret) :- !,
-%       Env=[[bv(n, [N_In4|__])]],
-%       sym_arg_val_env(n, N_In4, N_Thru, Env),
-%       plus(N_In4, 1, Plus_Ret),
-%       from(Plus_Ret, From_Ret),
-%       consStream(N_Thru, From_Ret, ConsStream_Ret).
-% from(N_In4, ConsStream_Ret) :-
-%       fail,
-%       ( <<==([from, n], [consStream, n, [from, [+, n, 1]]])
-%       ).
-
-
-% nthStream==lambda([s, n], if(n=1, head(s), nthStream(tail(s), n-1))).
-% nthStream(A, B, G) :- !,
-%       C=[[bv(s, [A|_]), bv(n, [B|_])]],
-%       sym_arg_val_env(n, B, D, C),
-%       =(D, 1, E),
-%       (   E\=[]
-%       ->  sym_arg_val_env(s, A, F, C),
-%           head(F, H),
-%           G=H
-%       ;   tail(A, I),
-%           minus(B, 1, J),
-%           nthStream(I, J, K),
-%           G=K
-%       ).
-% nthStream(_, _, _) :-
-%       fail,
-%       ( <<==([nthStream, s, n], [if, [=, n, 1], [head, s], [nthStream, [tail, s], [-, n, 1]]])
-%       ).
-
-
-% integers==from(1).
-% ssip_define(integers, from(1)).
-
-
-% makeCounter==lambda([], begin(counter==0, lambda([], setq(counter, 1+counter)))).
-% makeCounter(G) :- !,
-%       A=[[]],
-%       sym_arg_val_env(counter, _, B, A),
-%       ==(B, 0, C),
-%       begin(C,
-%
-%             [ closure,
-%               [],
-%               [D, F]^(sym_arg_val_env(counter, _, E, D), plus(1, E, F), symbol_setq(counter, F, D)),
-%               A
-%             ],
-%             G).
-% makeCounter(_) :-
-%       fail,
-%       ( <<==(makeCounter, [begin, [==, counter, 0], [lambda, [], [setq, counter, [+, 1, counter]]]])
-%       ).
-
-
-% caaaar==lambda([x], car(car(car(car(x))))).
-% caaaar(A, G) :- !,
-%       B=[[bv(x, [A|_])]],
-%       sym_arg_val_env(x, A, C, B),
-%       car(C, D),
-%       car(D, E),
-%       car(E, F),
-%       car(F, G).
-% caaaar(_, _) :-
-%       fail,
-%       ( <<==([caaaar, x], [car, [car, [car, [car, x]]]])
-%       ).
-
-
-% caar==lambda([x], car(car(x))).
-% caar(A, E) :- !,
-%       B=[[bv(x, [A|_])]],
-%       sym_arg_val_env(x, A, C, B),
-%       car(C, D),
-%       car(D, E).
-% caar(_, _) :-
-%       fail,
-%       ( <<==([caar, x], [car, [car, x]])
-%       ).
-
-
-% reverse==lambda([l], if(null(l), l, append(reverse(cdr(l)), cons(car(l), nil)))).
-% reverse2(A, D) :- !,
-%       B=[[bv(l, [A|_])]],
-%       sym_arg_val_env(l, A, C, B),
-%       (   C==[]
-%       ->  D=A
-%       ;   cdr(A, E),
-%           reverse2(E, G),
-%           car(A, F),
-%           H=[F],
-%           append(G, H, I),
-%           D=I
-%       ).
-% reverse2(_, _) :-
-%       fail,
-%       ( <<==([reverse2, l], [if, [null, l], l, [append, [reverse2, [cdr, l]], [cons, [car, l], nil]]])
-%       ).
-Welcome to SWI-Prolog (threaded, 64 bits, version 7.3.13-2174-gd865daf-DIRTY)
-SWI-Prolog comes with ABSOLUTELY NO WARRANTY. This is free software.
-Please run ?- license. for legal details.
-
-For online help and background, visit http://www.swi-prolog.org
-For built-in help, use ?- help(Topic). or ?- apropos(Word).
-
-?- ^D
-% halt
-root@gitlab:/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl# vi ISSUES
-root@gitlab:/home/dmiles/logicmoo_workspace/packs_usr/wam_common_lisp/prolog/wam_cl#
-
-````
-
+_Transcript truncated to keep this file under the swi-prolog.org 50 KB display limit; see the git history for the complete session._
