@@ -250,8 +250,11 @@ theString(String) --> theString(String, " ").
 atomic_to_string(S,S):- string(S),!.
 atomic_to_string(S,Str):-sformat(Str,'~w',[S]).
 
-atomics_to_string_str(L,S,A):-catch(atomics_to_string(L,S,A),_,fail).
-atomics_to_string_str(L,S,A):-atomics_to_string_str0(L,S,A).
+atomics_to_string_str(L,S,A):-
+   (  catch(atomics_to_string(L,S,A),_,fail)
+   *-> true
+   ;  atomics_to_string_str0(L,S,A)
+   ).
 
 atomics_to_string_str0([],_Sep,""):-!.
 atomics_to_string_str0([S],_Sep,String):-atom(S),!,string_to_atom(String,S).
