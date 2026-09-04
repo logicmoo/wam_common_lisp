@@ -261,8 +261,18 @@ repl_emit_prompt(Prompt, Acc):-
 repl_should_prompt:- current_prolog_flag(lisp_interactive, true), !.
 repl_should_prompt:- catch(stream_property(user_input, tty(true)), _, fail).
 
+% Continuation prompt: prefer the Lisp special sys:*continue-prompt*, then the
+% lisp_prompt_continue flag, then a hard default.
 repl_continue_prompt(P):-
-   ( current_prolog_flag(lisp_prompt_continue, P0), P0 \== '' -> P = P0 ; P = '...> ' ).
+   ( catch(f_symbol_value(sys_xx_continue_prompt_xx, V), _, fail),
+     repl_prompt_text(V, P), P \== ''
+   -> true
+   ; current_prolog_flag(lisp_prompt_continue, P0), P0 \== '' -> P = P0
+   ; P = '...> ' ).
+
+repl_prompt_text(V, V):- string(V), !.
+repl_prompt_text(V, V):- atom(V), !.
+repl_prompt_text(V, T):- catch(to_prolog_string(V, T), _, fail), !.
 
 % A complete, non-comment s-expression parsed from Text. Fails (rather than
 % erroring) when Text is an incomplete/unbalanced form, so the caller keeps

@@ -25215,6 +25215,11 @@ o_p_v(sys_xx_prompt_finish_xx,symbol_name,"*PROMPT-FINISH*").
 o_p_v(sys_xx_prompt_finish_xx,symbol_package,pkg_sys).
 o_p_v(sys_xx_prompt_finish_xx,symbol_value,"> ").
 o_p_v(sys_xx_prompt_finish_xx,type_of,symbol).
+o_p_v(sys_xx_continue_prompt_xx,declared_as,defparameter).
+o_p_v(sys_xx_continue_prompt_xx,symbol_name,"*CONTINUE-PROMPT*").
+o_p_v(sys_xx_continue_prompt_xx,symbol_package,pkg_sys).
+o_p_v(sys_xx_continue_prompt_xx,symbol_value,"...> ").
+o_p_v(sys_xx_continue_prompt_xx,type_of,symbol).
 o_p_v(sys_xx_prompt_start_xx,declared_as,defparameter).
 o_p_v(sys_xx_prompt_start_xx,symbol_name,"*PROMPT-START*").
 o_p_v(sys_xx_prompt_start_xx,symbol_package,pkg_sys).
