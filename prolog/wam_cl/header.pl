@@ -172,7 +172,14 @@
 :- discontiguous(ssip_define/2).
 
 :- use_module(library(logicmoo_common)).
-:- user:ensure_loaded(library(logicmoo/portray_vars)).
+% portray_vars is already pulled in by logicmoo_common (via pretty_clauses's
+% `:- include(portray_vars)`). Loading it a second time here re-defines those
+% predicates and triggers ~89 "redefine imported_procedure" errors on SWI 10.x,
+% so only load it if it isn't present yet.
+:- ( current_predicate(pretty_clauses:debug_var/2)
+   -> true
+   ;  user:ensure_loaded(library(logicmoo/portray_vars))
+   ).
 :- ensure_loaded(eightball).
 :- ensure_loaded('init').
 :- ensure_loaded(utests).
