@@ -1,0 +1,1101 @@
+
+          RELEASE NOTES FOR KM VERSION 2.5.45
+          ===================================
+NOTE: 
+ - 2nd level version changes (e.g., 2.0 -> 2.1) mean that some of
+   the existing semantics/behavior has CHANGED with respect to the
+   KM User Manual.
+ - 3rd level version changes (e.g., 2.0.4 -> 2.0.5) mean that there
+   has either been ADDED functionality or bug fixes.
+Thus it is particularly important to look at the RELEASE-NOTES for 
+the 2.*.0 changes, as these may supercede documentation in the KM User
+Guide. In addition, the 3rd level version changes provide many nifty
+new functions and capabilities.
+
+For your convenience, the 2.*.0 changes are listed HERE at the start.
+Then, the full list of changes is given subsequently (including repeating
+the 2.*.0 changes).
+
+======================================================================
+	2nd level version changes: RELEASE NOTES
+======================================================================
+
+2.5.0 - With Allegro 8.2 Lisp and later
+	-------------------------------
+        Under Allegro 8.2 Lisp and later, *ALL* Lisp files using KM's #$ dispatch 
+	macro needs to include the following two lines before the first 
+	use of #$ in that file (e.g., at the start of the file):
+
+	  (eval-when (:execute :load-toplevel :compile-toplevel)
+	    (setq *readtable* *km-readtable*))	; So #$ is recognized
+
+	Without this declaration, the #$ macro will *NOT* be recognized. 
+	This is to correct KM's previous illegal (wrt. the Lisp spec) use of 
+	dispatch macros that is no longer permitted in Allegro 8.2. This is 
+	only needed in Lisp files using #$, not in the .km KB files nor Lisp 
+	files that don't use #$.
+
+	If you are using Lisp packages, and you used the #$ macro in a
+	package other than the KM package, then you will need to prefix
+	*km-readtable* with km:: in the files with those usages, e.g.,:
+
+	  (in-package <some non-KM-package>)
+	  (eval-when (:execute :load-toplevel :compile-toplevel)
+	    (setq *readtable* km::*km-readtable*)) ; So #$ is recognized
+	    
+        In addition, #$ is not automatically recognized at the Lisp prompt
+	after loading KM. To make it recognized, type:
+
+	   	   (hash-dollar) 
+
+        at the Lisp prompt.
+
+	With Allegro 8.1 and earlier
+	----------------------------
+	KM 2.5.1 is now backward compatible with earlier Allegro versions.
+
+	With other Lisps
+	----------------
+	If your Lisp allows you to change the default system readtable, then 
+	KM 2.5.1 is backward compatible and no changes are needed. If KM
+	compiles without a problem, then it is backward compatible.
+
+	If your Lisp does not allow you to change the default system readtable,
+	then you will receive an error during compiling KM along the lines of:
+
+`	   Error: Attempt to set dispatch macro in system readtable...
+
+        If that occurs, the error is caused by the lines (at the end of
+	case.lisp in the unpacked KM):
+
+#-(and allegro-version>= (version>= 8.2))
+(eval-when
+      (:compile-toplevel :load-toplevel :execute)
+      (set-dispatch-macro-character #\# #\$ #'hash-dollar-reader *readtable*))
+
+        If that occurs, you will have to delete these lines, recompile,
+	and then make the same changes as above for Allegro 8.2. If that 
+	happens, please let me know and I'll extend the #- switch above to 
+	also exclude the Lisp version that you have found the problem with.
+
+2.4.0 - The semantics of KM expressions:
+		   (the instances of <class>)
+		   (the all-instances of <class>)
+        and the equivalent Lisp functions:
+	           (all-instances <class>)
+		   (immediate-instances <class>)
+        have been slightly changed so that these expressions no longer include
+	protoinstances (instances that are part of KM prototypes, i.e., have
+	a value on the prototype-participant-of slot) in their returned values.
+	This change only affects people using KM's prototype mechanism.
+	This change is to avoid users accidentally triggering inference with
+	protoinstances (not allowed) when using the above constructs in a KB.
+	(Note that protoinstances still have an instance-of assertion on
+	their frames, they are just not returned by the above functions).
+
+	The three instance-retrieving functions are now:
+	 (the all-instances of <class>)      ; "real" (non-proto) instances
+	 (the all-prototypes of <class>)     ; prototype participant instances
+	 (the full-all-instances of <class>) ; all (real + proto participants)
+        and the equivalent Lisp functions:
+	 (all-instances <class>)
+	 (all-prototypes <class>)
+	 (full-all-instances <class>)
+
+2.3.0 - KM did eager classification for traditional has-definitions, but lazy 
+        classification for prototype-scope definitions. 2.3.0 changes this
+	to make both eager.
+2.2.0 - The parameters controlling behavior on errors have been rationalized
+	to a single parameter. *abort-on-error-report*, *error-report-silent*,
+	and *silently-abort-on-error-report* NO LONGER DO ANYTHING.
+
+	Instead use the NEW variable *on-error* to define behavior on errors, 
+	with the following allowed values:
+	   VALUE	      KM'S BEHAVIOR ON ERRORS
+	   =====	       =======================
+   	   abort    	      Report error and do not continue, instead
+			      immediately return NIL.
+ 	   abort-silently     Don't report error and do not continue, instead 
+			      immediately return NIL.
+	   continue 	      Report error and continue
+	   continue-silently  Don't report error and continue
+	   ignore   	          [ synonym for continue-silently ]
+	   debug    	      Report error and turn on debugger [DEFAULT]
+	   break    	      Report error and break to Lisp
+
+	e.g., (setq *on-error* 'continue)
+
+        NOTE that with continuation (*on-error* = continue or ignore), KM will
+	(as before when *error-report-silent* was t) assume a value of NIL 
+	for the computation where the error occurred. Again as before, this
+	may cascade to cause other errors and may make the results of 
+	computation invalid, so use these two values with care.
+2.1.0 - inherit-with-overrides behavior has changed. For queries on an 
+        instance's inherit-with-overrides slots:
+
+        OLD behavior (2.0.*):
+        If there is already a value on the instance's slot, stop and 
+        return that. If not, find the "most specific inherited
+        value", i.e., climb the class hierarchy until a value is 
+        found and return that.
+
+        NEW behavior (2.1.*):
+        Find any value on the instance's slot AND the most specific 
+        inherited value. If the inherited value can be unified with
+        the local value, return the unification. Otherwise, just
+        return the local value (i.e., the value on the instance's slot).
+
+        The OLD behavior is still available using a renamed slot called
+        simple-inherit-with-overrides. 
+
+======================================================================
+	3rd level version changes: RELEASE NOTES
+======================================================================
+
+2.5.45 - bug fixes for compatibility with CLisp
+2.5.43 - rebundle the release
+2.5.42 - bug fixes and efficiency optimizations
+2.5.41 - locked-instance-of: If an instance _IC in class C also has 
+   (locked-instance-of (C)), then KM will not perform any *heuristic* (set)
+   unifications that would remove C as a class of _IC. Specifically, if
+   _ISubC is an instance of subclass SubC of C, then normally 
+   ((_IC) && (_ISubC)) would heuristically unify to (_ISubC), thus removing
+   C as a class of the unification. But if C is locked, then 
+   ((_IC) && (_ISubC)) = (_IC _ISubC). Note that *forced* unification will
+   still allow (_IC & _ISubC) to unify - locked-instance-of just affects
+   heuristic unification of sets.
+
+   For example, ((_Vehicle1) && (_Car1)) won't unify the two objects if
+   _Vehicle1's class Vehicle is locked:
+
+	KM> (_Vehicle1 has
+	      (instance-of (Vehicle))
+	      (locked-instance-of (Vehicle)))
+
+        KM> (_Car1 has
+ 	      (instance-of (Car)))	      
+
+	KM> (Car has 
+	      (superclasses (Vehicle)))
+
+        KM> ((_Car1) && (_Vehicle1))
+	(_Car1 _Vehicle1)		; note they don't heuristically unify
+
+	KM> (_Car1 &+? _Vehicle1)	; Are they heuristically unifiable?
+	NIL				; No
+
+	KM> (_Car1 &? _Vehicle1)	; Are they forcibly unifiable?
+	(t)				; Yes
+
+	KM> (_Car1 & _Vehicle1)		; Can forcibly unify them
+	(COMMENT: (_Car1 & _Vehicle1) unified to be _Car1)
+	(_Car1)
+
+2.5.34-40 - Minor efficiency improvements
+2.5.33 - Re-release under the Simplified BSD licence
+2.5.24-32 - Bug fixes
+2.5.23 - These new forms allow changing of a definition:
+	         (every <class> now-has-definition <slotvals>*)
+	         (<instance> now-has-definition <slotvals>*)
+         Note, the previous definition (if any) is completely removed. To delete
+	 a definition, do this:
+	         (every <class> now-has-definition)
+	         (<instance> now-has-definition)
+2.5.22 - Bug fix
+2.5.21 - Additional rollback mechanism which is not so memory-intensive as
+         (undo) or get-kb/put-kb/store-kb/restore-kb: 
+	 You can set a checkpoint and then delete all instances
+	 created since that checkpoint, excluding instances that have
+	 been unified with other instances outside this set. There are
+	 some minor risks: If you create a new class causing the
+	 taxonomy to be changed, then a deletion of this class may leave
+	 a hole in the taxonomy. 
+	 Below, :with-comment nil silences the default tracing output that
+	 the functions print out.
+	   (reset-creations)
+	      Clear the record of created instances and checkpoints.
+	   (start-creations-logging [:with-comment nil])
+	      Switch on the logging of concept creations, required for this
+	      utility.
+	   (stop-creations-logging [:with-commment nil])
+	      Switch off the logging of concept creations (saves memory)
+	   (set-creations-checkpoint [:with-comment nil] [:checkpoint-id id] 
+	   			     		    [:multiple-checkpoints t])
+              Create a checkpoint. By default previous checkpoints (and
+	      hence creation histories) are removed, but you can keep multiple 
+	      checkpoints by :multiple-checkpoints t.
+	      If you try and set a checkpoint without first starting creations
+	      logging, then (start-creations-logging) is automatically called.
+           (undo-creations [:with-comment nil] [:checkpoint-id id]
+				[:remove-checkpoint t])
+              Delete instances created since the last checkpoint (or the 
+	      checkpoint with id), except for those that have been unified
+	      with other instances outside this set.By default 
+	      the checkpoint itself is not removed, 
+	      so you can then create more instances and undo back to
+	      the same checkpoint. If you do remove it (:remove-checkpoint t) 
+	      and multiple checkpoints were set (via set-creations-checkpoint
+	      :multiple-checkpoints t), then you can do subsequent 
+	      undo-creations to undo back to the next prior checkpoints.
+2.5.20 - Two new compute slots added:
+	(the most-specific of <classes>)
+	(the most-general of <classes>)
+	Removes subsuming and subsumed classes respectively, e.g.,:
+	KM> (the most-specific of (:set Pet Fish Pet-Fish Car Vehicle))
+	(Pet-Fish Car)
+	KM> (the most-general of (:set Pet Fish Pet-Fish Car Vehicle))
+	(Pet Fish Vehicle)
+       - (list-definitions [<class>])
+        Will list all the concept definitions in the KB (has-definition/
+	prototype-scope) for <class> and all its subclasses. <class> defaults
+	to Thing, and thus (list-definitions) lists all definitions in the KB.
+2.5.14-15 - Bug fixes
+2.5.13 - You can now switch off the use of "called" tags for guiding unification
+         by doing (setq *called-forces-unification* NIL)
+2.5.6-12 - Bug fixes
+2.5.4 - Default *output-precision* is now 3, rather than 2 (p60 User Manual)
+2.5.3 - (X includes Y) no longer reports a KB error if Y evaluates to NIL.
+	(Instead the expression simply evaluates to NIL).
+2.5.2 - bug fix (combine-values-by-appending slot)
+2.5.1 - Remove incompatibilities with LispWorks. (Thanks to Rainer Joswig
+        for reporting the incompatibilities).
+2.4.6 - Background:
+        The User Guide states that in KM's explanation mechanism, KM explains 
+        the proof of a triple (:triple x r y) using the text in a comment 
+	assertion:
+	   (comment <tag> <exit-text> <entry-text> <subgoals>)
+
+        New Feature:	   
+	In the structures for <exit-text>, <entry-text>, and <subgoals>, 
+	you may want to refer to components of the triple being proved.
+	The keywords Value1, TheSlot, and Value2 can be used to refer to 
+	x, r, and y respectively. For example, note Value1 and Value2 below:
+
+  	KM> (every Person has (loves ((the likes of Self [tag1]))))
+	KM> (comment [tag1] nil (:seq "I know that" Value1 "likes" Value2 ".") 
+				     (:triple Value1 likes Value2))
+	KM> (the loves of (a Person with (likes ((a Dog)))))
+	(_Dog1)
+	KM> (justify)
+	The loves of the person = the dog because:
+	I know that the person likes the dog.
+
+      - Justifications now start with an introductory sentence, e.g.,:
+	"The loves of the person = the dog because:"
+	To suppress this, do:
+		(setq *start-justifications-with-because* nil)
+
+      - Improved documentation here: Note that the Lisp function (taxonomy)
+        takes (optionally) a concept and a relation to recursively descend. 
+	By default, the concept is #$Thing and the relation is #$subclasses, 
+	but you can use this for other purposes e.g., printing out the 
+	partonomy of a cell as follows:
+          KM(11): (taxonomy '#$_Cell3314 '#$has-part)
+          _Cell3314
+             _Chromosome3321
+                _Centromere3343
+                   _Kinetochore3373
+                      _DNA3371
+                         _Adenine3432
+                         _Cytosine3429
+                         _Deoxyribose3414
+                            _Pentose-sugar3424
+                         _Gene3422
+                         _Guanine3430
+                         _Nitrogen-Base3426
+                         _Nucleotide3420
+                            _Nitrogen-Base3426
+                            _Pentose-sugar3423
+                            _Phosphate3421
+                         _Polymer3413
+                            _Adenine3411
+                            _Cytosine3419
+                            _Guanine3418
+                            _Nucleotide3420
+                               ...
+                            _Thymine3410
+                         _Strand3404
+                         _Thymine3431
+                      _Protein3370
+                         _Polymer3389
+                            _Amino-Acid3388
+                _Gene3344
+                _Protein3346
+                   _Polymer3355
+                      _Amino-Acid3354
+             _Cytoplasm3320
+             _Plasma-membrane3318
+                _Protein3332
+                   _Carbohydrate3333
+                   _Polymer3330
+                      _Amino-Acid3331
+             _Ribosome3316
+2.4.5 - bug fix
+2.4.4 - bug fix
+2.4.3 - (record-explanations [slots])
+        eg. (record-explanations '#$(has-part is-inside))
+	record-explanations now takes an optional argument, which, if 
+	provided, should be a list of slots. If given, only explanations for
+	those slots (and their inverses) are recorded. This is to optionally
+	reduce the size of the explanation database built during reasoning.
+2.4.2 - Added some extra error checking with prototype functions
+2.4.1 - bug fix
+2.4.0 - The semantics of KM expressions:
+		   (the instances of ...)
+		   (the all-instances of ...)
+        and the equivalent Lisp functions:
+	           (all-instances <class>)
+		   (immediate-instances <class>)
+        have been slightly changed so that these expressions no longer include
+	protoinstances (instances that are part of KM prototypes, i.e., have
+	a value on the prototype-participant-of slot) in their returned values.
+	This change only affects people using KM's prototype mechanism.
+	This change is to avoid users accidentally triggering inference with
+	protoinstances (not allowed) when using the above constructs in a KB.
+	(Note that protoinstances still have an instance-of assertion on
+	their frames, they are just not returned by the above functions).
+2.3.2-4 - Bug fixes.
+2.3.1 - Small efficiency improvement.
+2.3.0 - KM did eager classification for traditional has-definitions, but lazy 
+        classification for prototype-scope definitions. 2.3.0 changes this
+	to make both eager.
+2.2.33 - Bug fix.
+2.2.32 - Improved implementation of multidepth paths. 
+2.2.31 - Bug fix.
+2.2.30 - Bug fixes for the Theory mechanism.
+  Note that if you are in theory T, and (see-theory T2), then information
+  may be (irreversibly) transferred from T2 to T when queries are issued.
+2.2.29 
+ - :include-explanationsp keyword added to save-kb, e.g.,
+   KM> (save-kb "file.km" :include-explanationsp t)
+   This option causes the explanation database to be included in the
+   .km file (see Chapter 19 of the User Manual)
+2.2.26-28 - Bug fixes
+ - Typo in User Manual: The parameter *automatic-classification* (line 2
+   on p67) should be *recursive-classification*
+2.2.25
+ - Extend explanation mechanism to explain number and string slot-values
+   (not previously covered)
+ - Error in User Manual: The query at the end of p63 (Section 17.2.2):
+    KM> (the sum of (the cost of (the Wheel parts of (a Nissan))))
+   should instead read
+    KM> (the sum of (the cost of (the bag of (the Wheel parts of (a Nissan)))))
+   as described in Section 14.2.4 (Arithmetic).
+   Thanks to Andre Renard for reporting this!
+2.2.24 - Bug fix for AURA.
+2.2.22 - Bug fix.
+2.2.21 - Unification preferences updated. The full list is:
+     ((X1 Y1) && (Y2 X2)) - prefer (X1 & X2), even if Y is sub/superclass of X
+     ((X1 X2) && (X4 X3)) - prefer (X1 & X3) if X1's slots+values are a 
+		            subset/superset of X3's (and not of X4's)
+     ((X1 X2) && (X4 X3)) - prefer (X1 & X3) if X1 and X3 use the same set of
+		            slots on their instances (and X1 and X4 do not)
+     Otherwise: match according to the ordering in each list
+2.2.20 - Plug a couple of gaps in the explanation database (HLO-2447)
+2.2.19 - Fixed: Constraints *don't* override normal expressions with 
+         inherit-with-overrides
+2.2.18 - Bug fix
+2.2.16-7 - Updates for AURA
+2.2.15 - Minor changes (eq -> eql, =) to make KM compatible with ABCL --
+         Thank you to Nate Blaylock!
+2.2.6-14 - Bug fixes
+2.2.5 - Changed behavior for (trace-to-file-on "trace.txt") (see 2.0.65 below):
+        - Interactive tracing is now written BOTH to file AND the console.
+        - If interactive tracing is switched off (trace option "z"), then output
+	   is to file ONLY until interactive tracing is switched back on
+	   again (e.g., triggered by a KM error message). This way, long traces
+	   can be written to file, but controlled at the console.
+      - Tracing parameter *show-inference-numbers*:
+        As normal, option "g" when tracing, or (show-goal-stack) at the Lisp
+	prompt, lists KM's goal stack. New: If *show-inference-numbers* is set 
+	to t (default NIL), then the stack listing is modified to also show
+	the inference number of each item (printed in the left-hand margin). 
+	This allows you to see how early each call was placed on the stack 
+	during reasoning.
+2.2.4 - Bug fix
+2.2.3 - Added KM and Lisp command (ophans), returns frames which have no
+        taxonomic information (subclasses,superclasses,instances,instance-of)
+	declared for them.
+      - Added *on-error* option 'continue-silently, a synonym for 'ignore.
+        The full list of *on-error* options below (2.2.0) has been updated
+	to include this synonym.
+      - Minor manual correction:
+        range2 and range3, briefly mentioned in Section 29.1.2, are not
+	implemented in or used by KM.
+      - Slightly updated handling of errors:
+
+  (km <expr>) and (km-unique <expr>) return FOUR arguments:
+    - result of evaluating <expr>
+    - if errors occurred, a list of strings describing then (1 per error)
+    - if errors occurred, a list of structures describing them (1 per error)
+    - if any warnings occurred, a list of strings (1 per warning)
+
+  CHANGES in 2.2.3 are as follows:
+    - arguments 2 and 3 are now a LIST of errors, not a SINGLE error
+    - args 2 and 3 will ALWAYS contain a list of errors that occurred, even
+      if *on-error* = continue/continue-silently/ignore.
+    - For arg 3 (the error structure), if no special structure is defined
+      to describe it (see notes for KM 2.0.62 below), then arg3 will be
+      the KM call that generated the error.
+
+2.2.2 - Bug fix for AURA
+      - Added extra *on-error* option of "break", see below under 2.2.0
+2.2.1 - Bug fix for AURA
+2.2.0 - **NOTE** 
+        The parameters controlling behavior on errors have been rationalized
+	to a single parameter. *abort-on-error-report*, *error-report-silent*,
+	and *silently-abort-on-error-report* NO LONGER DO ANYTHING.
+
+	Instead use the NEW variable *on-error* to define behavior on errors, 
+	with the following allowed values:
+	   VALUE	      KM'S BEHAVIOR ON ERRORS
+	   =====	       =======================
+   	   abort    	      Report error and do not continue, instead
+			      immediately return NIL.
+ 	   abort-silently     Don't report error and do not continue, instead 
+			      immediately return NIL.
+	   continue 	      Report error and continue
+	   continue-silently  Don't report error and continue
+	   ignore   	          [ synonym for continue-silently ]
+	   debug    	      Report error and turn on debugger [DEFAULT]
+	   break    	      Report error and break to Lisp
+
+	e.g., (setq *on-error* 'continue)
+
+        NOTE that with continuation (*on-error* = continue or ignore), KM will
+	(as before when *error-report-silent* was t) assume a value of NIL 
+	for the computation where the error occurred. Again as before, this
+	may cascade to cause other errors and may make the results of 
+	computation invalid, so use these two values with care.
+
+2.1.39 - Change to the way prototypes are indexed:
+         Previously: If you query an instance's slot, KM searches all
+	 prototypes whose PROTOTYPE-OF class(es) cover the instance,
+	 to see if those prototypes apply (and if so clones and unifies 
+	 them in).
+	 New:        If you query an instance's slot, KM searches all
+	 prototypes whose PROTOTYPE-SCOPE class(es) cover the instance,
+	 to see if those prototypes apply (and if so clones and unifies 
+	 them in).
+2.1.38 - API additions for use in the AURA system (no base KM changes)
+2.1.37 - (setq *active-obj-stack* t) will make KM place objects more
+         aggressively on the object stack, namely whenever they are encountered
+	 in an assertion to the KB (even if they are not new instances).
+       - (<instance> also-hasnt (<slot> (<value>)))
+         This will DELETE <value> on <instance>'s <slot>. If <value> 
+	 doesn't exist, KM will print a (non-interrupting) warning to the 
+	 console. NOTE: KM won't undo inferences that depend on <value>, 
+	 i.e., there's no truth maintenance. Use with great care.
+2.1.36 - User Manual Section 15.1 clarification: 
+         When do objects get placed on the object stack? Only when a *new*
+	 instance is created (has an assertion made about it):
+	      (X has (Y (Z))) - X will be added if X is a new instance.
+			        Z will be added if Z is a new instance.
+2.1.32-35 - API additions for use in the AURA system (no base KM changes)
+2.1.31 - (undo) will now unwind changes to the object stack.
+2.1.30 - Bug fix (get-kb/put-kb failed to save the classification
+         enabled/disabled state, now fixed).
+2.1.28,29 - API additions/fixes for use in the AURA system (no base KM changes)
+2.1.27 - Bug fix (save-kb/load-kb failed to save the classification
+         enabled/disabled state, now fixed).
+       - Tiny tweaks to allow KM to load under SBCL (Thanks to Tim Menzies)
+2.1.24-26 - API additions for use in the AURA system (no base KM changes)
+2.1.20-23 - Bug fixes.
+2.1.19 - (km <expr>) and (km-unique <expr>) now return FOUR arguments:
+         - result of evaluating <expr>
+         - if an error occurred, a string describing it
+         - if an error occurred, a structure describing it
+	 - if any warnings occurred, a list of strings (1 per warning) <- NEW
+
+   - Below notes an incompleteness in KM, caused by (i) KM replacing a path
+     with the result of evaluating a path and (ii) caching that the
+     expression containing the path no longer needs to be re-inherited.
+     If the KB changes so the path result is different, the path has been
+     lost and thus won't be re-evaluated.
+
+    KM> (every Person has 
+	   (spouse ((a Spouse))) 
+	   (likes ((a Thing with (owned-by ((the spouse of Self)))))))
+    KM> (a Person)
+    (_Person16)
+    KM> (the owned-by of (the likes of _Person16))
+    (_Spouse18)    ; NOTE: has evaluated and replaced the path 
+		   ; (the spouse of _Person16) with the result _Spouse18
+
+    KM> (_Person16 has (spouse (*Sue)))  ; now add new info to the KB [1]
+    KM> (showme _Person16)
+    (_Person16 has 
+       (instance-of (Person))
+       (likes (_Thing17))
+       (spouse (((_Spouse18) && (*Sue)))))
+    KM> (the owned-by of (the likes of _Person16))
+    (_Spouse18)	
+
+        As the path (the spouse of Self) was earlier replaced by the result, 
+	_Spouse18, the last query does not re-evaluate the path and trigger
+	unification of the &&. Note also that the last query (the likes of
+	_Person16) won't re-inherit and re-evaluate the (a Thing...) expression
+	to the likes slot of Person16 (which would allow the path (the spouse 
+	of _Person16) to be re-inherited to owned-by slot on _Thing17), as KM 
+	has already cached that _Thing17 was derived from that expression, 
+	blocking re-inheriting it. We can overcome this latter issue by 
+	clearing the entire cache after the KB changes (i.e., after [1]), 
+        at the expense of efficiency, via:
+
+		    (clear-evaluation-cache)
+
+        Then we will get the desired result:
+  
+    KM> (the owned-by of (the likes of _Person16))
+    (*Sue)
+
+2.1.18 - Bug fix
+2.1.17 - Check that an instance/class doesn't have mutually inconsistent
+         classes/superclasses (defined by Partitions) when asserting it 
+	 into the KB, and report an error if a problem is found.
+
+	 If a partition violation occurs, and the tracer is switched off
+	 (by setting *abort-on-error-report* to t), then a structured error 
+	 is returned (see comments under 2.0.62 below) of the form:
+         (partition-violation <frame> <slot> <values> <violated-partitions>)
+	 where <slot> is either |instance-of| or |superclasses|. For example:
+
+	 USER: (setq *abort-on-error-report* t)
+	 USER: (km '#$(a Partition with (members (Male Female))))
+	 USER: (km '#$(X has (instance-of (Male Female))))
+	 Returns THREE values:
+val1->	 nil
+val2->	 "ERROR! Partition violation! X instance-of (Male Female):
+	    Some of these classes are mutually exclusive, _Partition1 violated"
+val3->  (partition-violation X instance-of (Male Female) (_Partition1))
+
+	 NOTE (KM 2.1.20 and later): For a partition violation like this:
+  	    USER: (km '#$(a Partition with (members (Male Female))))
+	    USER: (km '#$(Male has (superclasses (Female))))
+         The structured val3 will look like this:
+	    (partition-violation Male superclasses (Male Female) (_Partition1))
+	 Note that here the <values> include Male, i.e., show how the partition
+	 was violated (rather than just list the asserted value Female). Thus
+	 in this case don't read <frame> <slot> <values> as meaning the user 
+	 asserted (<frame> has (<slot> <values>)).
+
+2.1.16 - ***EXPERIMENTAL AND MAY CHANGE***
+
+         Retaining expressions on instances: Normally after KM evaluates
+         an expression on an instance's slot, the expression is replaced
+         with the result, e.g.,
+
+              KM> (_Car1 has (parts ((a Engine))))
+              KM> (the parts of _Car1)
+              (_Engine1)
+              KM> (showme _Car1)
+              (_Car1 has (parts (_Engine1)))
+
+         However, we can make KM retain the original expression by wrapping
+         it in a (retain-expr <expr>) wrapper like this:
+
+              KM> (_Car1 has (parts ((retain-expr (a Engine)))))
+              KM> (the parts of _Car1)
+              (_Engine1)
+              KM> (showme _Car1)
+              (_Car1 has (parts (_Engine1 (retain-expr (a Engine)))))
+              KM> (the parts of _Car1)
+              (_Engine1)
+
+         This capability has been added for special reasons for the AURA
+         system, and should NOT be used otherwise without good reason.
+
+         NOTES AND LIMITATIONS:
+
+           - Each time the slot is queried, the retain-expr will be
+             re-evaluated UNLESS there is already a value on that slot
+             that was created by an earlier evaluation of the retained
+             expression. In this case, KM considers the retained 
+             expression "used", and won't reapply it. (The motivation
+             for this is to avoid repeatedly creating new instances 
+             for instance-creating (retain-expr (a ...)) structures)
+
+           - KM tells whether a value "was created by an earlier evaluation
+             of the retained expression" by looking in KM's explanation
+             database. Thus the explanation facility should not be switched off
+             while using retain-expr (or, if it is switched off, then
+             the retained expr will ALWAYS be re-evaluated each time the
+             slot it is on is queried).
+
+           - Unlike normal slot-value expressions, duplicate retain-exprs
+             WILL be removed. Thus do not write:
+             (_Person1 has (parts ((retain-expr (a Leg)) (retain-expr (a Leg)) 
+             as this will be simplified to
+             (_Person1 has (parts ((retain-expr (a Leg)))))
+             resulting in a one-legged person. Instead, you should write:
+             (_Person1 has (parts ((retain-expr (:set (a Leg) (a Leg))))))
+       
+2.1.15 - API modifications for use in the AURA system (save-prototype tweak).
+2.1.14 - Minor bug fix (looping detector with constraints)
+2.1.13 - Removed the distinction between Lisp calls (km ...) and (km0 ...)
+         (Section 25 of the KM User Manual).
+         It is no longer necessary to call (km0 ...) rather than (km ...)
+         for recursive calls to KM -- now (km ...) can be universally
+         called and KM itself will keep track of whether it is a recursive
+         call or not. Users should phase out use of (km0 ...) and just use 
+         (km ...), although it is not an error to keep using km0.
+         Similarly, km-unique0 can be phased out (just use km-unique instead).
+
+      - (forall-seq nil ...) now returns nil (rather than generates an error)
+      - (forall-bag nil ...) now returns nil (rather than generates an error)
+
+2.1.12 - Fix typo (only affects unpacking KM into separate files, no functional
+         change)
+2.1.11 - Added a simple profiling mechanism:
+         
+         KM> (profile (the parts of (a Car)))
+         CPU-TIME  # CALLS
+         0.12      1         (the parts of (a Car))
+         0.03      1         (a Engine)
+
+         For the evaluation of this expression, the system reports the 
+         total CPU time that each subgoal was on the stack, and also 
+         the number of times it was on the stack (top 100 entries shown).
+         This allows the user to see which the time-consuming items 
+         in the evaluation. (Note that CPU time is summed over all times an
+         expression was on the stack, i.e., average CPU time per call is
+         CPU time / # calls). CPU time is in seconds.
+
+         KM> (profile-report)
+         KM> (profile-report 200)
+         Reprint the profile from the last (profile <expr>) call, showing
+         the top n (default 100) entries.
+         
+2.1.10 - Very special-case extension for unifying prototypes:
+         inherit-with-overrides slots normally does NOT apply to unifying 
+         (clones of) prototypes. If there is an error, then the 
+         unification is aborted potentially leaving two partially
+         unified structures. However, a very limited form of
+         inherit-with-overrides for prototypes has been implemented as follows:
+
+           IF values from two clones C1 and C2 are being unified
+           AND the slot is declared as an inherit-with-overrides slot
+           AND the values are NOT KB objects (frames)
+               (for example: 1, (:pair 2 *kg), "hello")
+           THEN the value(s) from C1 will override the value(s) from C2
+                  i.e., the values from C2 are dropped
+
+         When KM unifies clones of an instance's class's prototypes, it
+         does so in a specific-to-general order. As a result, the above
+         rule has the effect that values on the more specific class's
+         prototype override the values on the more general class's prototype.
+         
+2.1.3-9 - Bug fixes and API modifications
+2.1.2 - Missing from the original KM Documentation:
+        (evaluate '<expr>): evaluates a quoted KM expression.
+                KM> (evaluate '(1 + 2))
+                (3)
+
+2.1.1 - *ONLY* for (the-class ...) expressions: Introduced the use of 
+        variables to express coreference. A variable starts with a "?".
+        It can be used to denote a slot value OR can be used in the special
+        form (<var> == (a ...)) to denote a slot value of a particular type.
+        For example:
+          (the-class Rectangle with (length (?x)) (width (?x)))
+          (the-class Rectangle with (length ((?x == (a Number)))) (width (?x)))
+        both denote the class of Rectangles with equal length and width 
+        (i.e., squares). A variable binds to a single slot value.
+        IMPORTANT NOTES:
+        - This use of variables is ONLY for the-class expressions, and can't
+          be used elsewhere (e.g., in has-definition or has expression).
+        - For slots with multiple values, if there is ambiguity about which
+          value maches which variable KM will *NOT BACKTRACK* to retry 
+          different bindings if the first one fails (This is a limitation
+          of the current implementation). As a result, try to make the 
+          bindings unambiguous by qualifying variables with type 
+          information, e.g., 
+          (the-class Car with (parts ((?x == (a Engine)) (?y == (a Chassis)))))
+          rather than:
+          (the-class Car with (parts (?x ?y))) 
+
+2.1.0 - inherit-with-overrides behavior has changed. For queries on an 
+        instance's inherit-with-overrides slots:
+
+        OLD behavior (2.0.*):
+        If there is already a value on the instance's slot, stop and 
+        return that. If not, find the "most specific inherited
+        value", i.e., climb the class hierarchy until a value is 
+        found and return that.
+
+        NEW behavior (2.1.*):
+        Find any value on the instance's slot AND the most specific 
+        inherited value. If the inherited value can be unified with
+        the local value, return the unification. Otherwise, just
+        return the local value (i.e., the value on the instance's slot).
+
+        The OLD behavior is still available using a renamed slot called
+        simple-inherit-with-overrides. 
+
+      - NOW-HAS expressions (additional info, no functional change):
+        If the same slot is used multiple times in the same (every ...) expr,
+        later values will overwrite earlier values:
+         KM> (every Car now-has 
+                (parts ((a Engine) (a Seat))) 
+                (parts ((a Wheel) (a Chassis))))
+         KM> (showme Car)
+         (every Car has 
+            (parts ((a Wheel) (a Chassis))))
+
+       - New Lisp function 
+           (save-frame <concept> [:stream <stream> :slots-to-show <slots>
+                                :include-explanationsp <t/nil>])
+         Writes the frame for <concept> to <stream> (default t). Default is
+         to show all slots and no explanations; keyword arguments change this.
+         e.g.,   (save-frame '#$Car :slots-to-show '#$(parts age))
+
+2.0.66 - bug fix for handling prototypes
+2.0.65 - (trace-to-file-on "trace.txt")
+         (trace-to-file-off)
+         Redirects KM tracing output to a file, rather than the console.
+         These can be issued both at the Lisp and KM prompts.
+2.0.64 - (check-for-cycles) [Lisp function]
+         Returns NIL if there are no cycles in the taxonomy, or the
+         cycle as a list of successive superclasses, with the first and last
+         elements being the same, if there are:
+                USER: (km '#$(Car has (superclasses (Vehicle))))
+                USER: (km '#$(Vehicle has (superclasses (Car))))
+                USER: (check-for-cycles)
+                (Car Vehicle Car)
+         If there is more than one cycle, only the first encountered is
+         returned.
+2.0.63 - API modifications for use in the AURA system.
+2.0.62 -
+   - Extra keyword argument added to
+         (put-kb <var> [:unintern-symbols t])
+         (restore-kb [:unintern-symbols t])
+     If unintern-symbols = t, KM uninterns (removes from the symbol table)
+     any symbols used in the current (to be reset) KB, but not used in the
+     to-be-restored KB. NOTES: 
+           - only uninterns anonymous instance symbols (starting with "_") to
+             avoid symbols in use elsewhere
+           - use with caution if KM's anonymous instances are stored outside
+             KM (e.g., in a global variable, e.g., if multiple KBs are stored
+             in memory from (get-kb) calls), as these symbols will lose their
+             package information if uninterned.
+
+   - (km <expr>) now returns THREE rather than TWO values:
+           - result of evaluating <expr>
+           - if an error occurred, a string describing it
+           - if an error occurred, a structure describing it     <-- NEW
+     For this new third value, currently only constraint violation errors are 
+     returned as a structure with the following formats:
+
+     1. set constraint violations (error-type = '|set-constraint|)
+
+        (set-constraint <frame> <slot> <offending-values> <set-constraint>)
+     eg (set-constraint _Car1 parts (_Engine1 _Engine3) (exactly 1 Engine))
+        (set-constraint _Car1 parts (_Engine1 _Engine3) (at-most 1 Engine))
+
+     (note, there may be other slot-values, but these aren't returned)
+
+     2. val constraint violations (error-type = '|constraint|)
+
+        (constraint <frame> <slot> <offending-value> <val-constraint>)
+     eg (constraint _Car1 parts _Person2 (must-be-a Artifact))
+        (constraint _Car1 parts _Move3 (mustnt-be-a Event))
+        (constraint (_Car1 maker *Foo (possible-values *GM *Ford *Mercedes)))
+
+     USAGE: From the Lisp prompt, ensure that the global variables controlling
+     errors are set correctly (see Section 26.2, p85-86 in the User Manual):
+            (let ((*abort-on-error-report* t)
+                  (*error-report-silent* nil))
+              (km <expr>))
+
+2.0.61 - API modifications for use in the AURA system.
+2.0.60 - (clear-situations) - clears all situation-specific info from memory
+         and takes KM out of situations mode.
+       - (keeping-kb <expr> ... <expr>)
+         keeping-kb (a Lisp macro) evals all <expr>, but then undoes (using 
+         KM's undo mechanism) any side-effects in the KB. It returns the 
+         results of evaluating the last <expr>.
+         e.g., USER: (reset-kb)
+               USER: (keeping-kb (km '#$(a Car)))
+               (_Car1)
+               USER: (showme '#$_Car1)
+               ;;; (Concept _Car1 is not declared anywhere in the KB)
+         Thanks to Francis Leboutte for this utility.
+       - Bug fix: (delete <instance>) now works with (undo)
+
+2.0.56-59 - API modifications for use in the AURA system.
+2.0.55 - API modifications for use in the AURA system.
+         A few small optimizations (thanks to Francis Leboutte).
+2.0.54 - Minor extension to explanations with prototypes.
+2.0.53 - Tiny bug fix to get-explanations with constraints.
+2.0.52 - Bug fixes. Thanks to Fabien Dubail, Jason Chaw, and Sam (sds). 
+2.0.51 - Fix inefficiency in (get-all-concepts) introduced in 2.0.50
+2.0.50 - Already in KM:
+         (save-kb "tmp.km")       saves the KB as a .km file
+         (fastsave-kb "tmp.fkm")  saves the KB as a faster-loading .fkm file
+
+         KM 2.0.50 adds a third option:
+         (faslsave-kb "tmp.fkm")  does fastsave-kb AND Lisp-compiles it for
+                                  even faster loading (.fasl extension in 
+                                  Allegro Lisp).     
+
+         (load-newest-kb <file>)  loads the most recently written version of 
+                                  <file> (.km, .fkm, or .fasl).
+                                  <file> does not need an extension (KM works
+                                  out the most recent extension, and given 
+                                  extension is ignored).
+         Thanks to Francis Leboutte for these additions.
+
+2.0.49 - Modification of experimental functions, no KM change
+2.0.48 - New optional keyword argument (... :reset-kb nil) added to save-kb and
+         fastsave-kb. By default, save-kb and fastsave-kb include a 
+         (reset-kb) at the start of the saved KB. This keyword suppresses this.
+
+               (save-kb "myfile.km" [:reset-kb nil])
+               (fastsave-kb "myfile.fkm" [:reset-kb nil])
+
+2.0.{45,46,47} - Modification of experimental functions, no KM change
+2.0.44 - New experimental functions added for prototypes, to be documented later.
+         No functional change to KM's normal behavior.
+2.0.43 - Improved heuristics for unifying prototype clones together
+2.0.42 - Obscure bug fix
+2.0.41 - Extended and added the new KM commands for situation-based simulation:
+
+               (do <action> [<next-situation>])
+               (do-and-next <action> [<next-situation>])
+               (try-do <action> [<next-situation>])
+               (try-do-and-next <action> [<next-situation>])
+               (do-concurrently <action(s)> [<next-situation>])
+               (do-concurrently-and-next <action(s)> [<next-situation>])
+
+          * (do ...) and (try-do ...) are as documented in the Situations 
+             manual, executing and testing executability of an action. 
+          * (do-concurrently ...) executes <action(s)> all from the same 
+            current situation, with a single resulting next situation. (Caveat:
+            KM will not recognize or handle interference between <action(s)>).
+          * The subsequent situation following the action is <next-situation> 
+            if given, or a newly generated situation if not.
+          * (...-and-next ...) causes KM to also change to the next situation;
+            otherwise, KM remains in the current situation.
+
+2.0.40 - Internal code changes to make KM run more smoothly on LispWorks. 
+         (Thanks to Raphael Van Dyck and Francis Leboutte)
+2.0.39 - Added:
+         (the seq2bag of <seq>) - converts a single sequence to a bag
+         (the bag2seq of <bag>) - converts a single bag to a sequence
+       - To remove an incompleteness, there is a minor change in the way 
+         backward chaining and classification are interleaved in KM: 
+         Classifications on newly created instances for a slot are now 
+         postponed until those values have actually been asserted on that slot 
+         (previously, classification kicked in at creation time rather than 
+         after assert time). 
+2.0.38 - Before: If you asserted a slot as an instance of a class, KM 
+         automatically asserted that the inverse slot was also a member of 
+         that class.
+         Now: This has been removed, the assumption is not always valid.
+2.0.37 - slight relaxation of caching in KM to overcome a reported bug
+2.0.36 - bug fix
+         (reset-kb) only removes KM info from property lists, rather than all
+2.0.35 - Change prev-situation to be a multi-valued slot
+2.0.34 - bug fix
+2.0.33 - (setq *classify-slotless-instances* nil) will prevent KM trying
+         to classify newly created instances which have no explicit 
+         slot-values. This is an optional efficiency improvement (default 
+         value is t).
+2.0.32 - bug fix
+2.0.31 - allow :incomplete keyword on slots, which informs KM more values
+         may be arriving. This blocks definitions based on (exactly ..)
+         or (at-most ...) constraints being satisfied, as :incomplete
+         suggests new values may be added.
+         This is an experimental addition for use in the AURA project.
+2.0.30 - speed up reasoning with large numbers of defined concepts
+2.0.29 - speed up reasoning with large numbers of defined concepts
+       - add has-clones slot, the inverse of cloned-from
+2.0.28 - bug fix (tiny change to unification algorithm)
+2.0.27 - speed up reasoning with large numbers of defined concepts.
+         NOTE: KM's implementation of Partition only assumes the partition's
+         members are mutually exclusive, but not necessarily exhaustive.
+2.0.26 - update to KM's explanation mechanism
+2.0.25 - rename (install-all-subclasses) as (clean-taxonomy)
+       - prevent KM adding in potentially redundant superclasses with
+         has-definition expressions.
+2.0.24 - bug fix
+2.0.23 - KM's explanation mechanism has been extended for use with prototypes.
+
+         Note that to add comment tags within prototypes, the user would
+	 need to work directly with the internal prototype representation.
+	 As with explanations in traditional KM, comment tags can be placed
+	 on slot-value expressions, e.g.,:
+
+                (Black-Cat has (superclasses (Cat)))
+
+                (_Black-Cat1 has
+                  (instance-of (Black-Cat))
+                  (prototype-of (Cat))
+                  (prototype-scope (Black-Cat))
+                  (prototype-participants (_Black-Cat1))
+                  (color ((*black [Comment1]))))
+
+                (comment [Comment1] 
+                     (:seq "Therefore," Self "is black.") 
+                     (:seq "All black cats are black."))
+
+                (*Suzie == (a Black-Cat))
+                (the color of *Suzie)
+
+                ;;; Now:
+                (justify (:triple *Suzie color *))
+                ;;; Produces:
+		All black cats are black.
+		Therefore, suzie is black.
+
+        Comment tags can also be attached to prototype-scope expressions (i.e.,
+	the definitional properties of the prototype). If an instance
+	satisfies the prototype-scope class definition, and thus the prototype 
+	is applied and the instance becomes an instance-of that class, then 
+	the comment tag explains why that instance is an instance-of the class:
+
+                (Black-Cat has (superclasses (Cat)))
+
+                (_Black-Cat1 has
+                  (instance-of (Black-Cat))
+                  (prototype-of (Cat))
+                  (prototype-scope ((the-class Cat with 
+                                        (color (*black)) [Comment2])))
+                  (prototype-participants (_Black-Cat1))
+                  (color (*black)))
+
+                (comment [Comment2] 
+                     (:seq "Therefore," Self "is a black cat.") 
+                     (:seq "All cats which are black are black cats"))
+
+                (*Suzie == (a Cat with (color (*black))))
+                (the color of *Suzie)
+
+                ;;; Now:
+                (justify (:triple *Suzie instance-of *))
+                ;;; Produces:
+                All cats which are black are black cats
+                Therefore, suzie is a black cat.
+
+         NOTE: The justification is applied ONLY IF the prototype causes the
+         class of the instance to change (specialize). Above, if *Suzie was
+         already an instance-of Black-Cat, the justification would not be 
+         passed to *Suzie.
+2.0.22 - (disable-classification) now also disables classification through
+         the prototype mechanism
+       - Code modification for load-exprs to avoid stack overflow in Lispworks
+         (thanks to Francis Leboutte)
+2.0.21 - Bug fix in simpleload-kb. 
+         Small extension to the explanation engine.
+2.0.20 - Bug fix for (in-every-situation ...) construct
+2.0.19 - Fix bug in error reporting accidentally introduced in 2.0.18
+       - KM now reports an error if there are cycles in the taxonomy
+2.0.18 - bug fix for KM's explanation mechanism
+2.0.17 - New parameter: *silently-abort-on-error-report* 
+         Like *abort-on-error-report*, except this also suppresses the
+         error message printed in the console (Thanks to Francis Leboutte)
+       - #t reader macro added (thanks to Francis Leboutte)
+         Allows expressions within a #$ expression to be written just as
+         at the normal Lisp prompt, rather than needing special package/case 
+         info.
+         For example, as well as writing: 
+         (let ((car-instance (first (km '#$(the all-instances of Car)))))
+           (km `#$(the parts of ,USER::CAR-INSTANCE)))
+         you can now write equivalently:
+         (let ((car-instance (first (km '#$(the all-instances of Car)))))
+           (km `#$(the parts of ,#tcar-instance)))
+       - modification to prototype application. Now KM will not attempt to
+         unify in a prototype while unifying in a prototype (no recursive
+         prototype application).
+       - (showme-strings <frame>) - Lisp function (not available at KM prompt).
+         Like showme, except returns a string or list of strings describing 
+         <frame>, rather than just the list of <frame>s shown.
+2.0.16 - Bug fix
+2.0.15 - Bug fix for domains/ranges with multiple classes
+2.0.14 - New built-in classes Pair, Triple, Sequence, and Bag added. Instances
+         of these classes (and their superclasses) will now unify with 
+         :pair, :triple, :sequence, and :bag structures respectively. 
+         (Pair and Triple are subclasses of Sequence). Note that if such
+         unifications occur, any slot-values on those instances will be
+         dropped.
+       - Redundant superclasses are now removed at assertion time, e.g.:
+         KM> (Super2 has (superclasses (Super1)))
+         KM> (Super3 has (superclasses (Super1 Super2))) ; Super1 redundant
+         KM> (the superclasses of Super3)
+         (Super2)                       ; note redundant Super1 removed
+2.0.13 - Code changes to make KM loadable under Lispworks and SBCL
+         (Thanks to Brian Mastenbrook and Francis Leboutte)
+       - Remove hyphens printed by (get-justification [triple]) 
+2.0.12 - KM no longer needs to be preloaded before compiling!
+         (Thanks to Brian Mastenbrook for explaining how to do this).
+       - Explanation (comment tag) text is now formatted with make-phrase,
+         rather than make-sentence, meaning that a period (".") is no longer
+         automatically appended to explanation strings.
+       - Small code tweaks so KM compiles under Lispworks (thanks to Francis 
+         Leboutte)
+2.0.11 - no functional change (internal tweaks for CALO added)
+2.0.6-10 - bug fixes and efficiency improvements
+2.0.5 - Load-order independence for multifile KBs:
+        (load-kb <file> :load-patterns <patterns>)
+        <patterns> can now include a wildcard ?* denoting zero or more 
+        elements in a list. To ensure load order independence when loading
+        multifile KBs, doing the following multipass load should work:
+          (reset-kb)
+          (load-kb <file> :load-patterns '#$((?x has ?* (inverse ?y) ?*)))
+          (load-kb <file> :load-patterns '#$((?x has ?* (superclasses ?y) ?*)))
+          (load-kb <file> :load-patterns '#$((every &rest)))
+          (load-kb <file>)
+        where the 4 passes above correspond to loading: slot inverses,
+        ontology, class axioms, and everything else. (Each pass should be
+        applied to *all* files to be loaded, before moving onto the next pass).
+2.0.4 - tweaks for compatibility with CLISP
+2.0.3 - bug fixes 
+2.0.2 - bug fixes
+2.0.1 - Prototypes: prototype-scope slot: Now allows multiple definitions
+        for a prototype
+2.0 - A new KM Manual has just been released and is up to date.
+
+SITUATIONS MANUAL
+=================
+ - IMPORTANT!!: The default fluent-status of slots is now *Fluent, *NOT* 
+   *Inertial-Fluent.
+   Make sure the fluent-status of your slots are set correctly -- See the 
+   KM Situations Manual, Section 6.2, p23-24 for the rules to follow.
+ - (do-script <expr>).  Obsolete. This is equivalent to 
+                (forall (the actions of <expr>) (do-and-next It))
+ - (try-do <action>) (try-do-and-next <action>) 
+   Behaves like (do <action>), (do-and-next <action>) except it *tests* rather
+   than *asserts* the preconditions of <action>, and returns NIL if the 
+   preconditions are not satisfied.
+   Set the global variable *interactive-preconditions* to t if you 
+   would like KM to then interactively ask the user whether to assume
+   any unsatisfied preconditions are true.
+ Section 10.3 - Changing instance-of relations between situations:
+ - For efficiency, instance-of and instances are now, by default, *Non-Fluent 
+   slots (previously were *Inertial-Fluent). Their fluent status can be set
+   to be *Inertial-Fluent using the special commands:
+                (instance-of-is-fluent)
+   This means that the example given here needs to be preceded by this command.
+   (reset-kb) sets it back again.
+
+Peter Clark
+peterc@vulcan.com
+
+======================================================================
+        APPENDIX: NOTING KM ERRORS DURING REASONING
+======================================================================
+When an error occurs, as well as (by default) reporting it to the user and 
+switching on the debugger, KM also stores a note of the error in a global 
+variable.
+
+        (km-errors) - returns the list of errors that have occurred
+        (clear-km-errors) - clears this list
+
+This allows a program calling KM to see a structured form of the errors
+which occurred during reasoning, if any. (In addition to the text string
+value returned by (km ...) if an error occurs - see User Manual).
+
+NOTES: 
+ - Error recording is NOT part of KM's undo mechanism, i.e., an (undo) will
+   not remove a recorded error from the list.
+ - Errors are still recorded even if *error-report-silent* is set to t (= no
+   textual error report and debugger activation)
