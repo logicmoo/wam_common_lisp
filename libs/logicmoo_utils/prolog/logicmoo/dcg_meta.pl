@@ -262,7 +262,11 @@ atomics_to_string_str0([S|Text],Sep,String):-
    new_a2s([StrL,StrR],Sep,String).
 
 % theString(String,Sep) --> [S|Text], {atomic_list_concat_catch([S|Text],Sep,String),!}.
-theString(String,Sep) --> [S|Text], {atomics_to_string_str([S|Text],Sep,String),!}.
+% NOTE: `--> [S|Text]` is a partial-list terminal (Text unbound), which SWI's
+% DCG translator rejects ("`list' expected ... a partial_list"), leaving
+% theString//2 undefined. Written out as its explicit difference-list clause,
+% which is the faithful expansion of the original DCG body.
+theString(String,Sep,S0,Rem) :- append([S|Text], Rem, S0), atomics_to_string_str([S|Text],Sep,String),!.
 
 decl_dcgTest_startsWith([a,b|_],theCode(X=1),X==1).
 decl_dcgTest_startsWith("anything",theCode(X=1),X==1).
