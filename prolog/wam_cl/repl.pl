@@ -43,11 +43,19 @@ repl:-
         catch(read_eval_print(Result),'$aborted',fail),
    	quietly(Result == end_of_file)))))),!.
 
-% Force the standard REPL streams to report tty(true) so ANSI colour and
-% interactive behaviour work even when they are not real terminals -- e.g. a
-% Windows console that mis-reports tty, a pipe, or a telnet/socket connection.
+% Our own "this is an interactive read" flag. The interactive entry point (the
+% wam_cl launcher, or a telnet/socket handler) sets lisp_interactive to true so
+% the REPL prints prompts even when the stream is not a detectable tty (Windows
+% console, socket). Batch / file input leaves it false -> no prompts.
+:- create_prolog_flag(lisp_interactive, false, [keep(true), type(boolean)]).
+% Continuation prompt shown while reading an incomplete multi-line form.
+:- create_prolog_flag(lisp_prompt_continue, '...> ', [keep(true), type(atom)]).
+
+% Force the standard OUTPUT streams to report tty(true) so ANSI colour works even
+% over pipes and telnet/socket connections. Input is left as-is; prompt display
+% is governed by repl_should_prompt (the lisp_interactive flag or a real tty).
 force_repl_tty:-
-   forall(member(S, [user_input, user_output, user_error]),
+   forall(member(S, [user_output, user_error]),
           ignore(catch(set_stream(S, tty(true)), _, true))).
 
 
@@ -222,10 +230,11 @@ read_no_parse(In, ExprO):- parse_sexpr_untyped(In,ExprS),(ExprS='$COMMENT'(_) ->
 % ---------------------------------------------------------------------------
 read_repl_sexpr(Prompt, Expr):- current_input(In), read_repl_sexpr(In, Prompt, "", Expr).
 read_repl_sexpr(In, Prompt, Acc, Expr):-
-   % Reprint the main prompt only when starting a fresh form (Acc==""), which also
-   % covers re-prompting after a blank line; while accumulating an incomplete form
-   % use an empty continuation prompt so we don't repeat "CL-USER>" on each line.
-   ( Acc == "" -> prompt1(Prompt) ; prompt1('') ),
+   % Decide whether/what prompt to show. Main prompt for a fresh form (Acc==""),
+   % which also re-prompts after a blank line; the (configurable) continuation
+   % prompt while accumulating an incomplete multi-line form.
+   prompt1(''),                 % suppress SWI's own tty-gated prompt; we print our own
+   repl_emit_prompt(Prompt, Acc),
    read_line_to_string(In, Line),
    ( Line == end_of_file
    -> ( repl_buffer_blank(Acc)
@@ -238,6 +247,22 @@ read_repl_sexpr(In, Prompt, Acc, Expr):-
          -> Expr = E
          ;  read_repl_sexpr(In, Prompt, Acc1, Expr) ) )
    ).
+
+% Print the prompt only when we should (interactive console, or forced for a
+% non-interactive reader such as a telnet/socket session). The continuation
+% prompt (Acc \== "") defaults to "...> " and is settable via the
+% lisp_prompt_continue flag.
+repl_emit_prompt(Prompt, Acc):-
+   ( repl_should_prompt
+   -> ( Acc == "" -> P = Prompt ; repl_continue_prompt(P) ),
+      flush_all_output_safe, write(user_output, P), flush_output(user_output)
+   ;  true ).
+
+repl_should_prompt:- current_prolog_flag(lisp_interactive, true), !.
+repl_should_prompt:- catch(stream_property(user_input, tty(true)), _, fail).
+
+repl_continue_prompt(P):-
+   ( current_prolog_flag(lisp_prompt_continue, P0), P0 \== '' -> P = P0 ; P = '...> ' ).
 
 % A complete, non-comment s-expression parsed from Text. Fails (rather than
 % erroring) when Text is an incomplete/unbalanced form, so the caller keeps

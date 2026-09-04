@@ -4,5 +4,5 @@ rem Works from any directory; resolves paths relative to this script.
 setlocal
 set "HERE=%~dp0"
 set "HERE=%HERE:\=/%"
-swipl -p "library=%HERE%prolog" -g lisp "%HERE%prolog/wamcl.pl" %*
+swipl -p "library=%HERE%prolog" -g "set_prolog_flag(lisp_interactive,true),lisp" "%HERE%prolog/wamcl.pl" %*
 endlocal
