@@ -22,6 +22,19 @@
 
 :- use_module(library(prolog_pack)).
 
+% ---------------------------------------------------------------------------
+% Suppress the (benign) "Local definition of M:P overrides weak import from M2"
+% warnings. WAM-CL's header.pl is `include`d into many modules and declares
+% shared multifile predicates (e.g. ssip_define/2); SWI emits one weak-import
+% override warning per module/predicate (~1200 of them) which is pure noise.
+% This message class only reports that a local clause shadows a weak/autoload
+% import, so suppressing it is safe. Loaded early (header.pl loads this file
+% first) so the hook is active before those warnings are emitted.
+% ---------------------------------------------------------------------------
+:- multifile(user:message_hook/3).
+user:message_hook(ignored_weak_import(_,_), _, _).
+
+
 :- multifile(user:file_search_path/2).
 :- dynamic(user:file_search_path/2).
 :- dynamic(setup_lm_packs:wamcl_setup_dir/1).
