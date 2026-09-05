@@ -126,8 +126,8 @@ where_where(Where,Where).
 
 :- thread_local(t_l:in_print_cmt/0).
   
-is_verbose :- !.
-is_verbose :- \+ set_prolog_flag(lisp_verbose,0); \+ current_prolog_flag(debug,false).
+is_verbose :- current_prolog_flag(lisp_verbose, V), V \== 0, !.
+is_verbose :- \+ current_prolog_flag(debug, false).
 is_user_output:- current_output(O),!,
   (is_predicate_stream(O)-> true ; (stream_property(O,alias(user_output))-> true ; stream_property(O,alias(user_error)))).
 is_markdown:- is_user_output, true.
