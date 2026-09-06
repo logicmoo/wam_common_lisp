@@ -28,7 +28,8 @@
          (format t "OK: ~a is ~a to ~a~%" ',expected ',eqf ',actual)
          (progn
            (format t "FAILED: when matching ~a and ~a~%" ,a ,b)
-	   #+WAM-CL (prolog-inline "trace")
+	   ;; NOTE: do not drop into the Prolog tracer on failure -- it makes a
+	   ;; non-interactive/CI run (make test) hang. Just report the failure.
 	   #+CLISP (BREAK)
 	   #+CLISP (quit 1))
          ))))

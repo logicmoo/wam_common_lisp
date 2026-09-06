@@ -697,7 +697,10 @@ phrase_from_stream_nd(Grammar, In) :-  supports_seek(In),
     ignore(notrace_catch_fail(sset_stream(In,buffer_size(819200)))),
     ignore(notrace_catch_fail(sset_stream(In,buffer_size(16384)))),
     ignore(notrace_catch_fail(sset_stream(In,encoding(octet)))),
-    ignore(notrace_catch_fail(sset_stream(In,timeout(3.0)))),
+    % NOTE: do NOT set a read timeout here. This clause only handles seekable
+    % streams (files); a timeout forces SWI to use select()/wait_for_input, which
+    % on Windows fails on a non-socket file stream with io_error(read, 'not a socket').
+    %ignore(notrace_catch_fail(sset_stream(In,timeout(3.0)))),
     %sset_stream(In,buffer_size(5)), sset_stream(In,encoding(octet)), sset_stream(In,timeout(3.0)),sset_stream(In,type(text)),%sset_stream(In,buffer(false)),
    repeat, (at_end_of_stream(In)->(!,fail);true),
 
