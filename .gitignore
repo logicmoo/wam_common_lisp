@@ -28,4 +28,7 @@ build
 # SWI-Prolog pack status (generated at attach time)
 libs/*/status.db
 
+# Local scratch (not for commit)
+tmp_libs_compare/
+
 
