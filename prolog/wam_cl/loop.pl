@@ -1,18 +1,16 @@
 /*******************************************************************
  *
- * Practical ANSI Common Lisp LOOP macro expansion.
+ * ANSI Common Lisp LOOP macro expansion.
  *
  * Expands LOOP forms into the WAM-CL primitives LET*, BLOCK, TAGBODY,
  * GO, SETQ and ordinary function calls.  Keeping the implementation at
  * macro-expansion time avoids adding another evaluator/compiler path.
  *
  * Implemented here: simple LOOP; NAMED; WITH; REPEAT; numeric, IN, ON,
- * ACROSS and =/THEN drivers; destructuring; FOR/AS ... AND; INITIALLY and
- * FINALLY; DO; RETURN; list/numeric/extreme accumulation; WHILE/UNTIL;
- * ALWAYS/NEVER/THEREIS; conditional AND/ELSE/END and IT; LOOP-FINISH.
- *
- * Hash-table and package iteration paths remain unavailable because their
- * underlying WAM-CL runtime iterators are incomplete.
+ * ACROSS, =/THEN, hash-table and package drivers; destructuring; FOR/AS ...
+ * AND; INITIALLY and FINALLY; DO; RETURN; list/numeric/extreme accumulation;
+ * WHILE/UNTIL; ALWAYS/NEVER/THEREIS; conditional AND/ELSE/END and IT;
+ * LOOP-FINISH.
  *
  *******************************************************************/
 
@@ -69,8 +67,14 @@ loop_expand_simple(Forms0, Expansion) :-
            TagBody),
     Expansion = [block, [], [tagbody|TagBody], []].
 
-loop_validate_simple_form([_|_]) :-
+loop_validate_simple_form(Form) :-
+    Form=[_|_],
+    \+ loop_form_contains_finish(Form),
     !.
+loop_validate_simple_form(Form) :-
+    Form=[_|_],
+    !,
+    loop_syntax_error(loop_finish_not_allowed_in_simple_loop,Form).
 loop_validate_simple_form(Form) :-
     loop_syntax_error(simple_loop_requires_compound_form, Form).
 
@@ -97,16 +101,19 @@ loop_initial_state(Name,
                        variables:[],
                        initial:[],
                        checks:[],
+                       prefix_prologue:[],
                        prefix:[],
                        body:[],
                        steps:[],
                        final:[],
+                       resets:[],
                        result:[],
                        result_set:false,
                        default_acc:none,
                        accumulators:[],
                        source_vars:[],
-                       prefix_items:[]
+                       prefix_items:[],
+                       phase:prologue
                    }) :-
     gensym(loop_start_, Start),
     gensym(loop_finish_, Finish).
@@ -117,7 +124,9 @@ loop_build_expansion(State, Expansion) :-
     get_dict(finish, State, Finish),
     get_dict(bindings, State, Bindings),
     get_dict(initial, State, Initial),
+    get_dict(resets, State, Resets),
     get_dict(checks, State, Conditions),
+    get_dict(prefix_prologue, State, PrefixPrologue),
     get_dict(prefix, State, Prefix),
     get_dict(body, State, Body),
     get_dict(steps, State, Steps),
@@ -125,12 +134,14 @@ loop_build_expansion(State, Expansion) :-
     get_dict(result, State, Result0),
     loop_final_result(Name, Final0, Result0, Final, Result),
     maplist(loop_exit_check(Finish), Conditions, Checks),
-    append(Initial, [[label, Start]|Checks], TagStart),
-    append(TagStart, Prefix, Tag0),
+    append(Resets,Initial,Prologue),
+    append(Prologue, [[label, Start]|Checks], TagStart),
+    append(TagStart, PrefixPrologue, TagPrologue),
+    append(TagPrologue, Prefix, Tag0),
     append(Tag0, Body, Tag1),
     append(Tag1, Steps, Tag2),
-    append(Tag2, [[go, Start], [label, Finish]], TagBody),
-    append([[tagbody|TagBody]|Final], [Result], LetBody),
+    append(Tag2, [[go, Start], [label, Finish]|Final], TagBody),
+    LetBody=[[tagbody|TagBody],Result],
     Expansion = [block, Name, [let_xx, Bindings|LetBody]].
 
 loop_exit_check(Finish, Condition, [when, Condition, [go, Finish]]).
@@ -163,9 +174,22 @@ loop_parse_clauses(Tokens, _State0, _State) :-
 loop_parse_clause([Token|Tokens], Rest, State0, State) :-
     loop_token_is(Token, Keyword),
     !,
-    loop_parse_clause_kind(Keyword, Tokens, Rest, State0, State).
+    loop_clause_phase(Keyword, State0, State1),
+    loop_parse_clause_kind(Keyword, Tokens, Rest, State1, State).
 loop_parse_clause(Tokens, _Rest, _State0, _State) :-
     loop_syntax_error(unsupported_or_malformed_clause, Tokens).
+
+loop_clause_phase(Keyword, State0, State) :-
+    memberchk(Keyword,[with,for,as]),!,
+    get_dict(phase,State0,Phase),
+    ( Phase == prologue
+    -> State=State0
+    ;  loop_syntax_error(variable_clause_after_main_clause,Keyword)
+    ).
+loop_clause_phase(Keyword,State,State):-
+    memberchk(Keyword,[initially,finally,repeat]),!.
+loop_clause_phase(_Keyword,State0,State):-
+    put_dict(phase,State0,body,State).
 
 loop_parse_clause_kind(with, Tokens, Rest, State0, State) :-
     loop_parse_with(Tokens, Rest, State0, State).
@@ -247,18 +271,20 @@ loop_parse_clause_kind(Keyword, Tokens, _Rest, _State0, _State) :-
 
 loop_parse_with(Tokens, Rest, State0, State) :-
     get_dict(bindings, State0, BindingsBefore),
+    get_dict(source_vars, State0, SourceVarsBefore),
     loop_parse_with_one(Tokens, Rest0, State0, State1),
     loop_parse_with_more(Rest0, Rest, State1, State2, 1, BindingCount),
-    loop_parallelize_group_bindings(BindingCount,
-                                    BindingsBefore,
-                                    State2,
-                                    State).
+    loop_parallelize_group_sources(BindingCount,
+                                   BindingsBefore,
+                                   SourceVarsBefore,
+                                   State2,
+                                   State).
 
 loop_parse_with_one([Var|Tokens0], Rest, State0, State) :-
-    loop_validate_variable(Var),
+    loop_validate_pattern(Var),
     loop_optional_type(Tokens0, Type, Tokens1),
-    loop_optional_initial_value(Tokens1, Type, Init, Rest),
-    loop_add_new_binding(Var, Init, State0, State).
+    loop_optional_initial_value(Tokens1, Var, Type, Init, Rest),
+    loop_add_with_binding(Var, Init, State0, State).
 loop_parse_with_one(Tokens, _Rest, _State0, _State) :-
     loop_syntax_error(malformed_with_clause, Tokens).
 
@@ -288,10 +314,27 @@ loop_bare_type(Token) :-
     loop_token_is(Token, Type),
     memberchk(Type, [fixnum, float, t, nil]).
 
-loop_optional_initial_value(['=', Init|Rest], _Type, Init, Rest) :-
+loop_optional_initial_value(['=', Init|Rest], _Pattern, _Type, Init, Rest) :-
     !.
-loop_optional_initial_value(Rest, Type, Init, Rest) :-
+loop_optional_initial_value(Rest, Pattern, Type, [quote, Init], Rest) :-
+    Pattern=[_|_],!,
+    loop_pattern_default(Pattern, Type, Init).
+loop_optional_initial_value(Rest, Pattern, Type, Init, Rest) :-
+    loop_pattern_default(Pattern, Type, Init).
+
+loop_pattern_default([], _Type, []) :- !.
+loop_pattern_default(Var, Type, Init) :-
+    atom(Var),!,
     loop_type_default(Type, Init).
+loop_pattern_default([Head|Tail], Type, [HeadInit|TailInit]) :-
+    !,
+    loop_destructuring_types(Type, HeadType, TailType),
+    loop_pattern_default(Head, HeadType, HeadInit),
+    loop_pattern_default(Tail, TailType, TailInit).
+loop_pattern_default(_Pattern, _Type, []).
+
+loop_destructuring_types([HeadType|TailType], HeadType, TailType) :- !.
+loop_destructuring_types(Type, Type, Type).
 
 loop_type_default(fixnum, 0) :- !.
 loop_type_default(float, 0.0) :- !.
@@ -305,7 +348,7 @@ loop_float_type(Type) :-
     atom(Type),
     loop_token_is(Type, Canonical),
     memberchk(Canonical,
-              [short_float, single_float, double_float, long_float]).
+              [float, short_float, single_float, double_float, long_float]).
 
 loop_numeric_type([Head|_]) :-
     !,
@@ -316,6 +359,27 @@ loop_numeric_type(Type) :-
     memberchk(Canonical,
               [integer, fixnum, bignum, bit, number, real, rational,
                signed_byte, unsigned_byte, mod]).
+
+loop_add_with_binding(Var, Init, State0, State) :-
+    atom(Var),!,
+    loop_add_source_binding(Var, Init, State0, State1),
+    loop_add_visible_variable(Var, State1, State).
+loop_add_with_binding(Pattern, Init, State0, State) :-
+    gensym(loop_with_source_, Source),
+    loop_pattern_assignments(Pattern, Source, Variables, Assignments),
+    loop_add_source_binding(Source, Init, State0, State1),
+    loop_pattern_initial_bindings(Variables,
+                                  Assignments,
+                                  State1,
+                                  State).
+
+loop_pattern_initial_bindings([], [], State, State).
+loop_pattern_initial_bindings([Var|Vars],
+                              [[setq,Var,Initial]|Assignments],
+                              State0,
+                              State) :-
+    loop_add_new_binding(Var,Initial,State0,State1),
+    loop_pattern_initial_bindings(Vars,Assignments,State1,State).
 
 loop_add_repeat(Count, State0, State) :-
     gensym(loop_repeat_limit_, Limit),
@@ -385,6 +449,10 @@ loop_parse_for_more(Mode,
                         Count).
 loop_parse_for_more(_Mode, Rest, Rest, State, State, Count, Count).
 
+loop_parse_for_driver(_Mode, [Token|Tokens], Rest, Var, State0, State) :-
+    loop_token_is(Token, being),
+    !,
+    loop_parse_being_driver(_Mode, Tokens, Rest, Var, State0, State).
 loop_parse_for_driver(Mode, [Token, Sequence|Tokens0], Rest, Var, State0, State) :-
     loop_token_is(Token, in),
     !,
@@ -448,12 +516,14 @@ loop_parse_for_driver(Mode, ['=', Init, ThenToken, Step|Rest], Rest, Var, State0
     loop_add_forms(steps, Steps, State2, State).
 loop_parse_for_driver(sequential, ['=', Init|Rest], Rest, Var, State0, State) :-
     !,
-    loop_add_pattern_driver(sequential, Var, Init, State0, State1,
-                            Item, Assignments, First),
-    append([[setq, Item, Init]|Assignments],
-           [[setq, First, []]],
-           Steps),
-    loop_add_forms(steps, Steps, State1, State).
+    loop_add_pattern_driver(parallel,
+                            Var,
+                            Init,
+                            State0,
+                            State,
+                            _Item,
+                            _Assignments,
+                            _First).
 loop_parse_for_driver(parallel, ['=', Init|Rest], Rest, Var, State0, State) :-
     !,
     loop_parse_for_driver(parallel,
@@ -468,6 +538,158 @@ loop_parse_for_driver(_Mode, Tokens0, Rest, Var, State0, State) :-
     !.
 loop_parse_for_driver(_Mode, Tokens, _Rest, Var, _State0, _State) :-
     loop_syntax_error(malformed_for_driver(Var), Tokens).
+
+loop_parse_being_driver(Mode, Tokens0, Rest, Pattern, State0, State) :-
+    loop_optional_each_the(Tokens0, Tokens1),
+    Tokens1=[KindToken|Tokens2],
+    loop_package_iteration_kind(KindToken, Kind),
+    !,
+    loop_parse_package_designator(Tokens2,
+                                  Rest0,
+                                  PackageDesignator),
+    Sequence=[sys_package_symbols,
+              [quote, Kind],
+              PackageDesignator],
+    loop_parse_for_driver(Mode,
+                          [in, Sequence|Rest0],
+                          Rest,
+                          Pattern,
+                          State0,
+                          State).
+loop_parse_being_driver(_Mode, Tokens0, Rest, Pattern, State0, State) :-
+    loop_optional_each_the(Tokens0, Tokens1),
+    Tokens1=[KindToken, Connector, HashTable|Tokens2],
+    loop_hash_iteration_kind(KindToken, Primary, Counterpart),
+    loop_hash_connector(Connector),
+    loop_parse_hash_using(Tokens2, Rest, Counterpart, UsingPattern),
+    gensym(loop_hash_iterator_, Iterator),
+    gensym(loop_hash_more_, More),
+    gensym(loop_hash_key_, Key),
+    gensym(loop_hash_value_, Value),
+    loop_add_source_binding(Iterator,
+                            [sys_hash_table_iterator, HashTable],
+                            State0,
+                            State1),
+    loop_add_hidden_binding(More, [], State1, State2),
+    loop_add_hidden_binding(Key, [], State2, State3),
+    loop_add_hidden_binding(Value, [], State3, State4),
+    get_dict(finish, State4, Finish),
+    loop_add_forms(prefix_prologue,
+                   [[multiple_value_setq,
+                     [More, Key, Value],
+                     [sys_hash_table_iterate, Iterator]],
+                    [unless, More, [go, Finish]]],
+                   State4,
+                   State5),
+    loop_hash_component(Primary, Key, Value, PrimaryValue),
+    loop_add_pattern_driver(parallel,
+                            Pattern,
+                            PrimaryValue,
+                            State5,
+                            State6,
+                            _PrimaryItem,
+                            _PrimaryAssignments,
+                            _PrimaryFirst),
+    loop_add_hash_counterpart(UsingPattern,
+                              Key,
+                              Value,
+                              State6,
+                              State).
+loop_parse_being_driver(_Mode, Tokens, _Rest, _Pattern, _State0, _State) :-
+    loop_syntax_error(malformed_being_driver, Tokens).
+
+loop_package_iteration_kind(Token, all) :-
+    ( loop_token_is(Token, symbol)
+    ; loop_token_is(Token, symbols)
+    ),
+    !.
+loop_package_iteration_kind(Token, present) :-
+    ( loop_token_is(Token, present_symbol)
+    ; loop_token_is(Token, present_symbols)
+    ),
+    !.
+loop_package_iteration_kind(Token, external) :-
+    ( loop_token_is(Token, external_symbol)
+    ; loop_token_is(Token, external_symbols)
+    ),
+    !.
+
+loop_parse_package_designator([Token,Package|Rest],Rest,Package):-
+    ( loop_token_is(Token, of)
+    ; loop_token_is(Token, in)
+    ),
+    !.
+loop_parse_package_designator(Rest,Rest,xx_package_xx).
+
+loop_optional_each_the([Token|Tokens], Tokens) :-
+    ( loop_token_is(Token, each)
+    ; loop_token_is(Token, the)
+    ),
+    !.
+loop_optional_each_the(Tokens, Tokens).
+
+loop_hash_iteration_kind(Token, key, value) :-
+    loop_token_is(Token, hash_key),
+    !.
+loop_hash_iteration_kind(Token, key, value) :-
+    loop_token_is(Token, hash_keys),
+    !.
+loop_hash_iteration_kind(Token, value, key) :-
+    loop_token_is(Token, hash_value),
+    !.
+loop_hash_iteration_kind(Token, value, key) :-
+    loop_token_is(Token, hash_values),
+    !.
+
+loop_hash_connector(Token) :-
+    ( loop_token_is(Token, of)
+    ; loop_token_is(Token, in)
+    ),
+    !.
+
+loop_parse_hash_using([UsingToken, [KindToken, Pattern]|Rest],
+                      Rest,
+                      Expected,
+                      some(Expected, Pattern)) :-
+    loop_token_is(UsingToken, using),
+    !,
+    loop_hash_using_kind(KindToken, Expected),
+    loop_validate_pattern(Pattern).
+loop_parse_hash_using(Rest, Rest, _Expected, none).
+
+loop_hash_using_kind(Token, key) :-
+    ( loop_token_is(Token, hash_key)
+    ; loop_token_is(Token, hash_keys)
+    ),
+    !.
+loop_hash_using_kind(Token, value) :-
+    ( loop_token_is(Token, hash_value)
+    ; loop_token_is(Token, hash_values)
+    ),
+    !.
+
+loop_hash_component(key, Key, _Value, Key).
+loop_hash_component(value, _Key, Value, Value).
+
+loop_add_hash_counterpart(none, _Key, _Value, State, State).
+loop_add_hash_counterpart(some(key, Pattern), Key, _Value, State0, State) :-
+    loop_add_pattern_driver(parallel,
+                            Pattern,
+                            Key,
+                            State0,
+                            State,
+                            _Item,
+                            _Assignments,
+                            _First).
+loop_add_hash_counterpart(some(value, Pattern), _Key, Value, State0, State) :-
+    loop_add_pattern_driver(parallel,
+                            Pattern,
+                            Value,
+                            State0,
+                            State,
+                            _Item,
+                            _Assignments,
+                            _First).
 
 loop_optional_by([Token, Function|Rest], Function, Rest) :-
     loop_token_is(Token, by),
@@ -764,7 +986,16 @@ loop_validate_numeric_phrases(Phrases,
     loop_unique_numeric_phrase(start, Phrases, StartSpec),
     loop_unique_numeric_phrase(end, Phrases, EndSpec),
     loop_unique_numeric_phrase(step, Phrases, StepSpec),
+    loop_validate_numeric_step(Phrases),
     loop_numeric_direction(StartSpec, EndSpec, Direction).
+
+loop_validate_numeric_step(Phrases):-
+    ( member(phrase(step,by,Step),Phrases),
+      number(Step),
+      Step =< 0
+    -> loop_syntax_error(non_positive_numeric_step,Step)
+    ;  true
+    ).
 
 loop_unique_numeric_phrase(Category, Phrases, Spec) :-
     findall(Kind,
@@ -861,8 +1092,9 @@ loop_parse_accumulation(Kind,
                         State0,
                         State,
                         Action) :-
-    loop_optional_into(Tokens0, Destination, Rest),
-    loop_accumulator(Kind, Destination, State0, State, Var, Extra),
+    loop_optional_into(Tokens0, Destination, Tokens1),
+    loop_optional_accumulator_type(Kind, Tokens1, Type, Rest),
+    loop_accumulator(Kind, Destination, Type, State0, State, Var, Extra),
     loop_accumulation_action(Kind, Var, Extra, Expression, Action).
 loop_parse_accumulation(Kind, Tokens, _Rest, _State0, _State, _Action) :-
     loop_syntax_error(malformed_accumulation(Kind), Tokens).
@@ -873,48 +1105,93 @@ loop_optional_into([Token, Var|Rest], explicit(Var), Rest) :-
     loop_validate_variable(Var).
 loop_optional_into(Rest, implicit, Rest).
 
-loop_accumulator(Kind, implicit, State0, State, Var, Extra) :-
+loop_optional_accumulator_type(Kind, Tokens, Type, Rest):-
+    loop_accumulator_family(Kind,Family),
+    Family \== list,!,
+    loop_optional_type(Tokens,Type,Rest).
+loop_optional_accumulator_type(_Kind,Tokens,none,Tokens).
+
+loop_accumulator(Kind, implicit, Type, State0, State, Var, Extra) :-
     loop_accumulator_family(Kind, Family),
     get_dict(default_acc, State0, Default),
     ( Default == none
     -> gensym(loop_result_, Var),
-       loop_create_accumulator(Kind, Var, State0, State1, Extra),
+       loop_create_accumulator(Kind, Var, Type, State0, State1, Extra),
        put_dict(default_acc, State1, acc(Family, Var), State2),
        loop_set_result(Var, State2, State)
     ; Default = acc(Family, Var)
     -> loop_find_accumulator(Var, State0, Extra),
-       State = State0
+       loop_reconcile_accumulator_type(Type,Var,State0,State)
     ;  loop_syntax_error(incompatible_implicit_accumulators, Kind)
     ).
-loop_accumulator(Kind, explicit(Var), State0, State, Var, Extra) :-
+loop_accumulator(Kind, explicit(Var), Type, State0, State, Var, Extra) :-
     get_dict(accumulators, State0, Accumulators),
     ( memberchk(acc(ExistingKind, Var, Extra0), Accumulators)
     -> ( loop_accumulator_family(ExistingKind, Family),
          loop_accumulator_family(Kind, Family)
        -> Extra = Extra0,
-          State = State0
+          loop_reconcile_accumulator_type(Type,Var,State0,State)
        ;  loop_syntax_error(incompatible_accumulator(Var), Kind)
        )
-    ;  loop_create_accumulator(Kind, Var, State0, State, Extra)
+    ;  loop_create_accumulator(Kind, Var, Type, State0, State, Extra)
     ).
 
-loop_create_accumulator(Kind, Var, State0, State, Extra) :-
-    loop_accumulator_initial(Kind, Initial, Extra0),
-    loop_ensure_binding(Var, Initial, State0, State1),
-    loop_add_accumulator_extra(Extra0, State1, State2, Extra),
-    get_dict(accumulators, State2, Accumulators),
+loop_create_accumulator(Kind, Var, Type, State0, State, Extra) :-
+    loop_accumulator_initial(Kind, Type, Initial, Extra0),
+    loop_add_new_binding(Var, Initial, State0, State1),
+    loop_add_forms(resets,[[setq,Var,Initial]],State1,State2),
+    loop_add_accumulator_extra(Extra0, State2, State3, Extra),
+    get_dict(accumulators, State3, Accumulators),
     put_dict(accumulators,
-             State2,
+             State3,
              [acc(Kind, Var, Extra)|Accumulators],
              State).
 
-loop_accumulator_initial(collect, [], none).
-loop_accumulator_initial(append, [], none).
-loop_accumulator_initial(nconc, [], none).
-loop_accumulator_initial(sum, 0, none).
-loop_accumulator_initial(count, 0, none).
-loop_accumulator_initial(maximize, [], seen).
-loop_accumulator_initial(minimize, [], seen).
+loop_accumulator_initial(collect, _Type, [], none).
+loop_accumulator_initial(append, _Type, [], none).
+loop_accumulator_initial(nconc, _Type, [], none).
+loop_accumulator_initial(sum, Type, Initial, none):-
+    loop_numeric_accumulator_zero(Type,Initial).
+loop_accumulator_initial(count, Type, Initial, none):-
+    loop_numeric_accumulator_zero(Type,Initial).
+loop_accumulator_initial(maximize, _Type, [], seen).
+loop_accumulator_initial(minimize, _Type, [], seen).
+
+loop_numeric_accumulator_zero(none,0):-!.
+loop_numeric_accumulator_zero(Type,0.0):-
+    loop_float_type(Type),!.
+loop_numeric_accumulator_zero(_Type,0).
+
+loop_reconcile_accumulator_type(Type,Var,State0,State):-
+    ( loop_float_type(Type)
+    -> loop_replace_binding_initial(Var,0.0,State0,State1),
+       loop_replace_reset_initial(Var,0.0,State1,State)
+    ;  State=State0
+    ).
+
+loop_replace_binding_initial(Var,Initial,State0,State):-
+    get_dict(bindings,State0,Bindings0),
+    loop_replace_var_form(Var,Initial,Bindings0,Bindings),
+    put_dict(bindings,State0,Bindings,State).
+
+loop_replace_reset_initial(Var,Initial,State0,State):-
+    get_dict(resets,State0,Resets0),
+    loop_replace_setq_form(Var,Initial,Resets0,Resets),
+    put_dict(resets,State0,Resets,State).
+
+loop_replace_var_form(_Var,_Initial,[],[]).
+loop_replace_var_form(Var,Initial,[[Var,_]|Forms],
+                      [[Var,Initial]|Forms]):-!.
+loop_replace_var_form(Var,Initial,[Form|Forms],
+                      [Form|Updated]):-
+    loop_replace_var_form(Var,Initial,Forms,Updated).
+
+loop_replace_setq_form(_Var,_Initial,[],[]).
+loop_replace_setq_form(Var,Initial,[[setq,Var,_]|Forms],
+                       [[setq,Var,Initial]|Forms]):-!.
+loop_replace_setq_form(Var,Initial,[Form|Forms],
+                       [Form|Updated]):-
+    loop_replace_setq_form(Var,Initial,Forms,Updated).
 
 loop_accumulator_family(collect, list).
 loop_accumulator_family(append, list).
@@ -927,7 +1204,8 @@ loop_accumulator_family(minimize, extreme).
 loop_add_accumulator_extra(none, State, State, none).
 loop_add_accumulator_extra(seen, State0, State, seen(Seen)) :-
     gensym(loop_seen_, Seen),
-    loop_add_hidden_binding(Seen, [], State0, State).
+    loop_add_hidden_binding(Seen, [], State0, State1),
+    loop_add_forms(resets,[[setq,Seen,[]]],State1,State).
 
 loop_find_accumulator(Var, State, Extra) :-
     get_dict(accumulators, State, Accumulators),
@@ -1319,6 +1597,36 @@ loop_finish_symbol('loop-finish').
 loop_finish_symbol(u_loop_finish).
 loop_finish_symbol(sys_loop_finish).
 
+loop_form_contains_finish([quote|_]):-!,fail.
+loop_form_contains_finish([function|_]):-!,fail.
+loop_form_contains_finish([lambda|_]):-!,fail.
+loop_form_contains_finish([loop|_]):-!,fail.
+loop_form_contains_finish(['#BQ',Template]):-!,
+    loop_backquote_contains_finish(1,Template).
+loop_form_contains_finish([Operator]):-
+    loop_finish_symbol(Operator),!.
+loop_form_contains_finish([Head|Tail]):-
+    ( loop_form_contains_finish(Head)
+    ; member(Form,Tail),
+      loop_form_contains_finish(Form)
+    ).
+
+loop_backquote_contains_finish(Depth,['#BQ',Template]):-!,
+    NextDepth is Depth+1,
+    loop_backquote_contains_finish(NextDepth,Template).
+loop_backquote_contains_finish(1,[Operator,Form]):-
+    loop_comma_operator(Operator),!,
+    loop_form_contains_finish(Form).
+loop_backquote_contains_finish(Depth,[Operator,Form]):-
+    loop_comma_operator(Operator),!,
+    NextDepth is Depth-1,
+    loop_backquote_contains_finish(NextDepth,Form).
+loop_backquote_contains_finish(Depth,[Head|Tail]):-
+    ( loop_backquote_contains_finish(Depth,Head)
+    ; member(Form,Tail),
+      loop_backquote_contains_finish(Depth,Form)
+    ).
+
 % LOOP keywords are compared by print name, not package identity.  The reader
 % represents non-CL symbols as u_* (CL-USER) or sys_* (SYSTEM), while some
 % words such as DO and RETURN are inherited CL symbols.
@@ -1338,6 +1646,11 @@ loop_token_is(Token, Canonical) :-
     atom(Token),
     catch(get_opv(Token, symbol_name, Name), _, fail),
     prologcase_name(Name, Canonical),
+    !.
+loop_token_is(Token, Canonical) :-
+    atom(Token),
+    prologcase_name(Token, Canonical),
+    Canonical \== Token,
     !.
 loop_token_is(Token, Token) :-
     atom(Token).

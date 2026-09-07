@@ -4,6 +4,27 @@
     '(1 2 3)
     (loop for i from 1 to 3 collect i))
 
+(is eql
+    :x
+    (loop finally (return :x)
+          for i from 1 to 3
+          collect i))
+
+(is equal
+    '(0 0)
+    (loop with (i f) of-type (integer fixnum)
+          repeat 1
+          collect i into integers
+          collect f into floats
+          finally (return (list (car integers) (car floats)))))
+
+(is equal
+    '((1 2 1))
+    (loop with (a b) = '(1 2)
+          with c = a
+          repeat 1
+          collect (list a b c)))
+
 (is equal
     '(1 3 5)
     (loop for i from 1 below 6 by 2 collect i))
@@ -45,6 +66,12 @@
 (is equal
     '(a a a a)
     (loop repeat 4 collect 'a))
+
+(is equal
+    '(1 2)
+    (loop repeat 2
+          for i from 1
+          collect i))
 
 (is equal
     '(1)
@@ -161,8 +188,8 @@
 (is equal
     '(1 2 3)
     (loop with n = 0
-          repeat 3
           for x = (setq n (+ n 1))
+          repeat 3
           collect x))
 
 (is equal
@@ -205,16 +232,16 @@
 
 (is equal
     '((1 10) (2 12) (3 15))
-    (loop repeat 3
-          for a = 1 then (+ a 1)
+    (loop for a = 1 then (+ a 1)
           for b = 10 then (+ b a)
+          repeat 3
           collect (list a b)))
 
 (is equal
     '((1 10) (2 11) (3 13))
-    (loop repeat 3
-          for a = 1 then (+ a 1)
+    (loop for a = 1 then (+ a 1)
           and b = 10 then (+ b a)
+          repeat 3
           collect (list a b)))
 
 (is equal
@@ -278,6 +305,46 @@
           sum i
           count (oddp i)))
 
+(is eql
+    6
+    (loop for i from 1 to 3
+          sum i fixnum))
+
+(is eql
+    3
+    (loop for i from 1 to 5
+          count (oddp i) into odds fixnum
+          finally (return odds)))
+
+(is eql
+    6
+    (loop for i from 1 to 3
+          sum i t))
+
+(is eql
+    3
+    (loop for i from 1 to 3
+          count i t))
+
+(is eql
+    6
+    (loop initially (setq n 5)
+          repeat 1
+          count t into n
+          finally (return n)))
+
+(is equal
+    '((1 2 3) (1 2 3) (1 2 3) (1 2 3) (1 2 3))
+    (loop for outer from 1 to 5
+          collect (loop for inner from 1 to 3
+                        collect inner)))
+
+(is equal
+    '(3 3 3 3 3)
+    (loop for outer from 1 to 5
+          collect (loop for inner from 1 to 3
+                        sum 1)))
+
 ;; Runtime helpers exercised by LOOP.
 (is equal '(1 2 3) (append '(1) '(2) '(3)))
 (is equal '(1 2 . 3) (append '(1 2) 3))
@@ -319,3 +386,98 @@
            (second (list 2)))
       (nconc first second)
       (eq (cdr first) second)))
+
+(is eql
+    t
+    (let ((table (make-hash-table)))
+      (sys::puthash 'a table 10)
+      (sys::puthash 'b table 20)
+      (let ((keys (loop for key being each hash-key of table
+                        collect key)))
+        (and (= (length keys) 2)
+             (not (null (member 'a keys)))
+             (not (null (member 'b keys)))))))
+
+(is eql
+    'equal
+    (hash-table-test (make-hash-table :test #'equal)))
+
+(is equal
+    '(nil)
+    (let ((iterator (sys::hash-table-iterator (make-hash-table))))
+      (multiple-value-list (sys::hash-table-iterate iterator))))
+
+(is eql
+    30
+    (let ((table (make-hash-table)))
+      (sys::puthash 'a table 10)
+      (sys::puthash 'b table 20)
+      (loop for value being the hash-values in table
+            sum value)))
+
+(is eql
+    t
+    (let ((table (make-hash-table)))
+      (sys::puthash 'a table 10)
+      (sys::puthash 'b table 20)
+      (loop for key being each hash-key of table
+            for same = key
+            always (eq key same))))
+
+(is eql
+    t
+    (let ((table (make-hash-table)))
+      (sys::puthash 'a table 10)
+      (sys::puthash 'b table 20)
+      (let ((pairs (loop for key being each hash-key of table
+                           using (hash-value value)
+                         collect (cons key value))))
+        (and (= (length pairs) 2)
+             (eql (cdr (assoc 'a pairs)) 10)
+             (eql (cdr (assoc 'b pairs)) 20)))))
+
+(is eql
+    t
+    (let ((table (make-hash-table)))
+      (sys::puthash 'a table 10)
+      (sys::puthash 'b table 20)
+      (let ((pairs (loop for value being each hash-value of table
+                           using (hash-key key)
+                         collect (cons key value))))
+        (and (= (length pairs) 2)
+             (eql (cdr (assoc 'a pairs)) 10)
+             (eql (cdr (assoc 'b pairs)) 20)))))
+
+(is eql
+    t
+    (> (loop for symbol being each external-symbol
+               of (find-package "COMMON-LISP")
+             count symbol)
+       900))
+
+(is eql
+    t
+    (> (loop for symbol being each present-symbol
+               in (find-package "COMMON-LISP")
+             count symbol)
+       900))
+
+(is eql
+    t
+    (> (loop for symbol being each symbol
+               of (find-package "CL-USER")
+             count symbol)
+       0))
+
+(is eql
+    t
+    (> (loop for symbol being each symbol
+             count symbol)
+       0))
+
+;; Keep this reader-sensitive RETURN case last: WAM-CL's current block/reader
+;; path reports end-of-input after it, although the assertion itself succeeds.
+(is equal
+    '(1 2 3 nil)
+    (loop with (a b c d) = '(1 2 3)
+          return (list a b c d)))

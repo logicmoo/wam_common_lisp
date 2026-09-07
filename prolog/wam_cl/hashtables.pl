@@ -20,12 +20,34 @@
 
 f_hash_table_p(HT,RetVal):- t_or_nil((f_class_of(HT,Claz),Claz==claz_hash_table),RetVal).
 
-f_hash_table_test(HT,RetVal):-get_opv(HT,hash_table_test,RetVal).
+f_hash_table_test(HT,RetVal):-
+   get_opv(HT,hash_table_test,Raw),
+   canonical_hash_table_test(Raw,RetVal).
 
 (wl:init_args(0,make_hash_table)).
 f_make_hash_table(Keys,HT):- 
   create_object(claz_hash_table,Keys,HT),
-  ((get_opv(HT,sys_hash_table_data,Tree),Tree\==[])->true;(rb_new(Tree),set_opv(HT,sys_hash_table_data,'$OBJ'(clz_rb_tree,Tree)))).
+  ( get_opv(HT,sys_hash_table_data,'$OBJ'(_,Tree)),
+    nonvar(Tree)
+  -> true
+  ;  rb_new(Tree),
+     set_opv(HT,sys_hash_table_data,'$OBJ'(claz_sys_rb_tree,Tree))
+  ),
+  ( get_opv(HT,hash_table_test,_)
+  -> true
+  ;  set_opv(HT,hash_table_test,eql)
+  ),
+  get_opv(HT,hash_table_test,RawTest),
+  canonical_hash_table_test(RawTest,Test),
+  ( RawTest==Test -> true ; set_opv(HT,hash_table_test,Test) ).
+
+canonical_hash_table_test(function(Test),Canonical):-!,
+  canonical_hash_table_test(Test,Canonical).
+canonical_hash_table_test(f_eq,eq):-!.
+canonical_hash_table_test(f_eql,eql):-!.
+canonical_hash_table_test(f_equal,equal):-!.
+canonical_hash_table_test(f_equalp,equalp):-!.
+canonical_hash_table_test(Test,Test).
 
 wl:setf_inverse(gethash,sys_puthash).
 get_table(HT,Tree,Data):- get_opv(HT,sys_hash_table_data,Data),arg(2,Data,Tree).
@@ -80,6 +102,24 @@ f_sys_maphash_iter(Function, Hash_table, FnResult) :-
                                     ],
                                     Table_iterator_Ret),
         Table_iterator_Ret=FnResult.
+
+% Snapshot the current entries.  CL leaves most concurrent mutation during
+% iteration undefined; a private mutable cell is enough to provide the
+% required repeated three-value iterator protocol.
+f_sys_hash_table_iterator(HashTable,
+                          '$OBJ'(claz_sys_hash_table_iterator,State)) :-
+    get_table(HashTable,Tree,_),
+    rb_visit(Tree,Entries),
+    State=hash_iterator_state(Entries).
+
+f_sys_hash_table_iterate('$OBJ'(claz_sys_hash_table_iterator,State),
+                         Result) :-
+    arg(1,State,Entries),
+    ( Entries=[Key-Value|Rest]
+    -> nb_linkarg(1,State,Rest),
+       f_values_list([t,Key,Value],Result)
+    ;  f_values_list([[]],Result)
+    ).
 
 
 /*

@@ -87,6 +87,42 @@ pl_package_name(S,Name):- find_package(S,Package),(get_opv(Package,name,Name)->t
 
 f_package_name(P,N):- pl_package_name(P,S),to_lisp_string(S,N).
 
+% Materialize the symbols visible through one package for ANSI LOOP package
+% iteration.  Present symbols win over inherited symbols with the same name.
+f_sys_package_symbols(Kind,PackageDesignator,Symbols):-
+   loop_package_designator(PackageDesignator,Package),
+   loop_package_symbol_pairs(Kind,Package,Pairs),
+   loop_unique_symbol_names(Pairs,[],Symbols).
+
+loop_package_designator(Designator,Package):-
+   find_package_or_die(Designator,Package).
+
+loop_package_symbol_pairs(external,Package,Pairs):-!,
+   findall(Name-Symbol,
+           package_external_symbols(Package,Name,Symbol),
+           Pairs).
+loop_package_symbol_pairs(present,Package,Pairs):-!,
+   findall(Name-Symbol,
+           ( package_internal_symbols(Package,Name,Symbol)
+           ; package_external_symbols(Package,Name,Symbol)
+           ),
+           Pairs).
+loop_package_symbol_pairs(all,Package,Pairs):-
+   loop_package_symbol_pairs(present,Package,Present),
+   findall(Name-Symbol,
+           ( package_use_list(Package,UsedPackage),
+             package_external_symbols(UsedPackage,Name,Symbol)
+           ),
+           Inherited),
+   append(Present,Inherited,Pairs).
+
+loop_unique_symbol_names([],_,[]).
+loop_unique_symbol_names([Name-Symbol|Pairs],Seen,Symbols):-
+   ( memberchk(Name,Seen)
+   -> loop_unique_symbol_names(Pairs,Seen,Symbols)
+   ;  Symbols=[Symbol|Rest],
+      loop_unique_symbol_names(Pairs,[Name|Seen],Rest)
+   ).
 find_package(S,S):- is_packagep(S),!.
 find_package('$OBJ'(claz_package,UP),Package):- !, find_package(UP,Package),!.
 find_package(Obj,Res):- to_prolog_string_if_needed(Obj,F),!,find_package(F,Res).

@@ -460,7 +460,7 @@ struct_opv(claz_hash_table, class_name, hash_table).
 struct_opv(claz_hash_table, include, claz_structure_object).
 struct_opv(claz_hash_table, include, claz_t).
 struct_opv(claz_hash_table, initform, 0, sys_hash_table_data).
-struct_opv(claz_hash_table, initform, [ threads_make_mutex, name, '$ARRAY'([*], claz_base_character, [ #\(h), #\(a), #\(s), #\(h), #\(-), #\(t), #\(a), #\(b), #\(l), #\(e), #\(' '), #\(l), #\(o), #\(c), #\(k) ]) ], sys_hash_table_lock).
+struct_opv(claz_hash_table, initform, [], sys_hash_table_lock).
 struct_opv(claz_hash_table, name, sys_data, sys_hash_table_data).
 struct_opv(claz_hash_table, name, sys_hash_fun, sys_hash_table_hash_fun).
 struct_opv(claz_hash_table, name, sys_lock, sys_hash_table_lock).
