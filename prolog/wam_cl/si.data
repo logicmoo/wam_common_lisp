@@ -4416,6 +4416,7 @@ o_p_v(mf_sys_multiple_value_setf,type_of,sys_macro).
 o_p_v(mf_sys_pf_optimize_function_lambda,type_of,sys_macro).
 o_p_v(mf_sys_predeftype_macro,type_of,sys_macro).
 o_p_v(mf_sys_predefun,type_of,sys_macro).
+o_p_v(mf_sys_practical_loop,type_of,sys_macro).
 o_p_v(mf_sys_program_error_reporter,type_of,sys_macro).
 o_p_v(mf_sys_prompt_to_string,type_of,sys_macro).
 o_p_v(mf_sys_return_if_foldable,type_of,sys_macro).
@@ -19038,6 +19039,10 @@ o_p_v(sys_pprint_logical_block_suffix_not_string_error,type_of,symbol).
 o_p_v(sys_preamble,symbol_name,"PREAMBLE").
 o_p_v(sys_preamble,symbol_package,pkg_sys).
 o_p_v(sys_preamble,type_of,symbol).
+o_p_v(sys_practical_loop,symbol_function,mf_sys_practical_loop).
+o_p_v(sys_practical_loop,symbol_name,"PRACTICAL-LOOP").
+o_p_v(sys_practical_loop,symbol_package,pkg_sys).
+o_p_v(sys_practical_loop,type_of,symbol).
 o_p_v(sys_precedence_list,symbol_name,"PRECEDENCE-LIST").
 o_p_v(sys_precedence_list,symbol_package,pkg_sys).
 o_p_v(sys_precedence_list,type_of,symbol).

@@ -23,7 +23,9 @@ wamcl_sanity_tests(
     "sanity-test-1",
     "sanity-test-2",
     "sanity-test-4",
-    "sanity-test-5" ]).
+    "sanity-test-5",
+    "sanity-loop",
+    "sanity-loop-version-a" ]).
 
 % Locate the repository root (the directory that holds prolog/ and t/).
 wamcl_repo_root(Root) :-

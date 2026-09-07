@@ -35,12 +35,33 @@ f_apply(FunctionName, Arguments, Result):- is_list(FunctionName),!,
   append(FunctionName, Arguments,FunWithArguments),
   lisp_compiled_eval(FunWithArguments,Result).
 f_apply(function(FunctionName), Arguments, Result):-nonvar(FunctionName),!,f_apply((FunctionName), Arguments, Result).
+f_apply(FunctionName, Arguments, Result):- atom(FunctionName),!,
+  dynamic_function_predicate(FunctionName, Predicate),
+  dynamic_function_arguments(Predicate, Arguments, Result, CallArgs),
+  Call=..[Predicate|CallArgs],
+  always(Call).
 %f_apply(FunctionName, Arguments, Result):- atom(FunctionName),!,lisp_compiled_eval([FunctionName|Arguments],Result).
 %f_apply(closure(kw_function,Environment,ClosureResult,FormalArgs,Body), [Arguments], Result):-!,always(closure(kw_function,Environment,ClosureResult,FormalArgs,Body,Arguments,Result)).
 f_apply(Compound, Arguments, Result):- always(callable(Compound)),!, Compound=..FunctionName,
   append(FunctionName, [Arguments,Result],Funcall),
   Call=..Funcall,
   always(Call).
+
+dynamic_function_predicate(FunctionName,FunctionName):-
+  atom_concat(f_,_,FunctionName),!.
+dynamic_function_predicate(FunctionName,Predicate):-
+  find_lisp_function(FunctionName,_Arity,Predicate),!.
+dynamic_function_predicate(FunctionName,FunctionName).
+
+dynamic_function_arguments(Predicate,Arguments,Result,CallArgs):-
+  atom_concat(f_,Root,Predicate),
+  get_init_args(Root,N),
+  integer(N),!,
+  length(Left,N),
+  append(Left,Rest,Arguments),
+  append(Left,[Rest,Result],CallArgs).
+dynamic_function_arguments(_Predicate,Arguments,Result,CallArgs):-
+  append(Arguments,[Result],CallArgs).
 
 
 

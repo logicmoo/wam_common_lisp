@@ -230,6 +230,8 @@
 :- ensure_loaded(streams).
 :- ensure_loaded(block).
 :- ensure_loaded(tagbody).
+:- ensure_loaded(loop).
+:- ensure_loaded(loop_version_a).
 :- ensure_loaded(typecheck).
 :- ensure_loaded(typeof).
 :- ensure_loaded(loptions).

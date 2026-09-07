@@ -4478,6 +4478,7 @@ package_internal_symbols(pkg_sys,"PPRINT-DISPATCH-TABLE-ENTRIES",sys_pprint_disp
 package_internal_symbols(pkg_sys,"PPRINT-DISPATCH-TABLE-READ-ONLY-P",sys_pprint_dispatch_table_read_only_p).
 package_internal_symbols(pkg_sys,"PREAMBLE",sys_preamble).
 package_internal_symbols(pkg_sys,"PREDICATE",sys_predicate).
+package_internal_symbols(pkg_sys,"PRACTICAL-LOOP",sys_practical_loop).
 package_internal_symbols(pkg_sys,"PREFIX",sys_prefix).
 package_internal_symbols(pkg_sys,"PREFIX-LENGTH",sys_prefix_length).
 package_internal_symbols(pkg_sys,"PRINT-BANNER",sys_print_banner).

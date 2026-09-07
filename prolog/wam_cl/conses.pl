@@ -53,6 +53,13 @@ wl:declared_as(f_cons,inline(cons)).
 f_cons(Item, List, Result):- Result = [Item|List].
 
 % #'APPEND
+% APPEND is declared with &REST arguments, so compiled calls pass all source
+% arguments as one list plus the result argument.  Fold from the right so the
+% final argument is preserved verbatim, including a non-list dotted tail.
+f_append([],[]):-!.
+f_append([Last],Last):-!.
+f_append([List|Lists],R):- f_append(Lists,Tail),append(List,Tail,R),!.
+% Keep the fixed-arity helper for existing internal callers.
 f_append(A,B,R):- append(A,B,R),!.
 
 % #'LIST

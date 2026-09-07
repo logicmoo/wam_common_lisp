@@ -166,11 +166,11 @@ f_position_if_not(E,Seq,Keys,Result):- f_position(E,Seq,[kw_test_not,f_funcall|K
 
 % #'REVERSE
 f_reverse(Xs, Ys) :-
-    lists:reverse(Xs, [], Ys, Ys).
+    lists:reverse(Xs, Ys).
 
 % #'NREVERSE
 f_nreverse(Xs, Ys) :-
-    lists:reverse(Xs, [], Ys, Ys).
+    lists:reverse(Xs, Ys).
 
 
 
@@ -194,17 +194,35 @@ f_mapcar(_, [[]|_], []).
 
 
 (wl:init_args(0,nconc)).
-f_nconc([L1,L2],Ret):- !, append(L1,L2,Ret).
-f_nconc([L1],L1):-!.
-f_nconc([L1,L2|Lists],Ret):- !,f_nconc([L2|Lists],LL2), append(L1,LL2,Ret).
+f_nconc([],[]):-!.
+f_nconc([Last],Last):-!.
+f_nconc([List|Lists],Ret):-
+    f_nconc(Lists,Tail),
+    nconc_attach(List,Tail,Ret),!.
 f_nconc(X,X):-!.
+
+nconc_attach([],Tail,Tail):-!.
+nconc_attach(List,Tail,List):-
+    List=[_|Rest],
+    nconc_last_cell(Rest,List,Tail).
+
+nconc_last_cell([],Cell,Tail):-!,
+    nb_linkarg(2,Cell,Tail).
+nconc_last_cell([_|Rest],Cell,Tail):-
+    arg(2,Cell,Next),
+    nconc_last_cell(Rest,Next,Tail).
 
 f_copy_list(List,List):- \+ compound(List),!.
 f_copy_list([M|List],[M|Copy]):-f_copy_list(List,Copy).
 
 
 wl:type_checked(f_length(claz_cons,integer)).
-f_length(Sequence,Len):- always(length(Sequence,Len)).
+f_length(Sequence,Len):-
+    get_opv(Sequence,fill_pointer,Len),
+    integer(Len),!.
+f_length(Sequence,Len):-
+    get_adata(Sequence,Elements),!,
+    always(length(Elements,Len)).
 
 f_list_length(Sequence,Len):- always(length(Sequence,Len)).
 
