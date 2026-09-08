@@ -50,6 +50,11 @@ wl:init_args(x,use_package).
 f_use_package(Package,R):- reading_package(CurrentPackage),
                        f_use_package(Package,CurrentPackage,R).
 
+f_use_package(Packages,CurrentArg,t):- is_list(Packages),!,
+  package_argument(CurrentArg,CurrentPackage),
+  maplist(use_package_into(CurrentPackage),Packages).
+f_use_package(Package,[CurrentPackage],R):-!,
+  f_use_package(Package,CurrentPackage,R).
 f_use_package(Package,CurrentPackage, t):- Package==CurrentPackage,!.
 f_use_package(Package,CurrentPackage, R):- 
   find_package(Package,Package0),
@@ -62,6 +67,9 @@ f_use_package(Package,CurrentPackage, R):-
 f_use_package(Package,CurrentPackage, t):- 
    assert_lsp([Package,CurrentPackage],package_use_list(CurrentPackage,Package)),
    dbginfo(todo(check_for+package_symbolconflicts(package_use_list(CurrentPackage,Package)))).
+
+use_package_into(CurrentPackage,Package):-
+  f_use_package(Package,CurrentPackage,t).
 
  
 wl:init_args(1,defpackage).
@@ -76,8 +84,40 @@ f_make_package(AName,List,Package):-
   add_opv(Package,type_of,package),
   asserta_if_new(package:package_name(Package,Name)),
   init_instance_slots(claz_package,2,Package,List), 
+  initialize_package_options(Package,List),
   string_upper(Name,UName),
   (Name==UName -> true ; add_opv(Package,kw_nicknames,UName)).
+
+initialize_package_options(Package,Keys):-
+  package_options(kw_shadow,Keys,Shadows),
+  forall(member(Shadow,Shadows),f_shadow(Shadow,Package,_)),
+  package_options(kw_use,Keys,Uses),
+  forall(member(Used,Uses),f_use_package(Used,Package,_)),
+  package_options(kw_nicknames,Keys,Nicknames),
+  forall(member(Nickname,Nicknames),
+         add_package_nickname(Package,Nickname)).
+
+package_options(Key,Keys,Values):-
+  ( Keys=[First|_],is_list(First)
+  -> findall(Items,
+             (member([OptionKey|Items],Keys),OptionKey==Key),
+             Groups)
+  ;  findall(Items,flat_package_option(Key,Keys,Items),Groups)
+  ),
+  append(Groups,Values).
+
+flat_package_option(Key,[Found,Value|_],Values):-
+  Found==Key,
+  package_option_values(Value,Values).
+flat_package_option(Key,[_,_|Rest],Values):-
+  flat_package_option(Key,Rest,Values).
+
+package_option_values(Value,Value):- is_list(Value),!.
+package_option_values(Value,[Value]).
+
+add_package_nickname(Package,Nickname0):-
+  to_prolog_string(Nickname0,Nickname),
+  asserta_if_new(package:package_nicknames(Package,Nickname)).
   %instance_opv(Package,claz_package,[]).
 
 f_find_package(S,Obj):- find_package(S,Package),!,always(as_package_object(Package,Obj)).
@@ -86,6 +126,33 @@ f_find_package(_,[]).
 pl_package_name(S,Name):- find_package(S,Package),(get_opv(Package,name,Name)->true;package_name(Package,Name)).
 
 f_package_name(P,N):- pl_package_name(P,S),to_lisp_string(S,N).
+
+f_package_nicknames(P,Nicknames):-
+   find_package_or_die(P,Package),
+   findall(Nickname,
+           package_nicknames(Package,Nickname),
+           Names),
+   maplist(to_lisp_string,Names,Nicknames).
+
+f_package_use_list(P,Packages):-
+   find_package_or_die(P,Package),
+   findall(Object,
+           ( package_use_list(Package,Used),
+             as_package_object(Used,Object)
+           ),
+           Packages).
+
+f_package_used_by_list(P,Packages):-
+   find_package_or_die(P,Package),
+   findall(Object,
+           ( package_use_list(User,Package),
+             as_package_object(User,Object)
+           ),
+           Packages).
+
+f_package_shadowing_symbols(P,Symbols):-
+   find_package_or_die(P,Package),
+   findall(Symbol,package_shadowing_symbols(Package,Symbol),Symbols).
 
 % Materialize the symbols visible through one package for ANSI LOOP package
 % iteration.  Present symbols win over inherited symbols with the same name.
@@ -176,10 +243,14 @@ grab_missing_symbols:-
 f_import(Symbol,Result):- reading_package(Package),f_import(Symbol,Package,Result).
 %f_import(String,Package,R):- to_prolog_string_if_needed(String,PlString),!,f_import(PlString,Package,R).
 f_import(Symbol,Pack,t):- 
-   find_package_or_die(Pack,Package),
+   package_argument(Pack,Package),
    pl_import(Package,Symbol).
 
-pl_import(Pack,List):- is_list(List),maplist(pl_import(Pack),List).
+package_argument([],Package):-!,reading_package(Package).
+package_argument([Pack],Package):-!,find_package_or_die(Pack,Package).
+package_argument(Pack,Package):-find_package_or_die(Pack,Package).
+
+pl_import(Pack,List):- is_list(List),!,maplist(pl_import(Pack),List).
 pl_import(Package,Symbol):-
    pl_symbol_name(Symbol,String),
    package_find_symbol_or_missing(String,Package,OldSymbol,IntExt),!,
@@ -206,7 +277,7 @@ package_import_symbol_step2(Package,Symbol,String,OldSymbol,kw_internal):-
 f_export(Symbol,Result):- reading_package(Package),f_export(Symbol,Package,Result).
 %f_export(String,Package,R):- to_prolog_string_if_needed(String,PlString),!,f_export(PlString,Package,R).
 f_export(Symbol,Pack,t):-  
-  (Pack==[] -> reading_package(Package) ; find_package_or_die(Pack,Package)),
+   package_argument(Pack,Package),
    pl_export(Package,Symbol).
 
 pl_export(Pack,List):- is_list(List),!,maplist(pl_export(Pack),List).
@@ -235,7 +306,7 @@ package_export_symbol_step2(Package,Symbol,String,OldSymbol,kw_internal):-
 f_unexport(Symbol,Result):- reading_package(Package),f_unexport(Symbol,Package,Result).
 f_unexport(List,Pack,t):- is_list(List),maplist([Symbol]>>f_unexport(Symbol,Pack,_),List).
 f_unexport(Symbol,Pack,t):- 
-   find_package_or_die(Pack,Package),
+   package_argument(Pack,Package),
    pl_symbol_name(Symbol,String),
    package_find_symbol_or_missing(String,Package,OldSymbol,IntExt),!,
    package_unexport_symbol_step2(Package,Symbol,String,OldSymbol,IntExt).
@@ -249,21 +320,37 @@ package_unexport_symbol_step2(Package,Symbol,String,OldSymbol,_):-
 
 
 f_shadow(Symbol,Result):- reading_package(Package),f_shadow(Symbol,Package,Result).
-f_shadow(List,Pack,t):- is_list(List),maplist([Symbol]>>f_shadow(Symbol,Pack,_),List).
+f_shadow(List,Pack,t):- is_list(List),!,
+   package_argument(Pack,Package),
+   maplist(shadow_into(Package),List).
 f_shadow(Symbol,Pack,t):- 
-   find_package_or_die(Pack,Package),
-   pl_symbol_name(Symbol,String),
+   package_argument(Pack,Package),
+   package_symbol_designator_name(Symbol,String),
    package_find_symbol_or_missing(String,Package,OldSymbol,IntExt),!,
    package_shadow_symbol_step2(Package,String,OldSymbol,IntExt).
 
+package_symbol_designator_name(Designator,String):-
+   to_prolog_string(Designator,String),!.
+package_symbol_designator_name(Symbol,String):-
+   pl_symbol_name(Symbol,String).
 
-package_shadow_symbol_step2(_Package,_String,_OldSymbol,kw_external).
-package_shadow_symbol_step2(_Package,_String,_OldSymbol,kw_internal).
+shadow_into(Package,Symbol):-
+   f_shadow(Symbol,Package,t).
+
+
+package_shadow_symbol_step2(Package,_String,Symbol,kw_external):-
+   mark_shadowing_symbol(Package,Symbol).
+package_shadow_symbol_step2(Package,_String,Symbol,kw_internal):-
+   mark_shadowing_symbol(Package,Symbol).
 package_shadow_symbol_step2( Package,String,_OldSymbol,'$missing'):-
-   make_fresh_internal_symbol(Package,String,_Symbol).
-package_shadow_symbol_step2(Package,String,OldSymbol,kw_inherited):-
-   assert_lsp(OldSymbol,package:package_shadowing_symbols(Package,OldSymbol)),
-   make_fresh_internal_symbol(Package,String,_Symbol).
+   make_fresh_internal_symbol(Package,String,Symbol),
+   mark_shadowing_symbol(Package,Symbol).
+package_shadow_symbol_step2(Package,String,_OldSymbol,kw_inherited):-
+   make_fresh_internal_symbol(Package,String,Symbol),
+   mark_shadowing_symbol(Package,Symbol).
+
+mark_shadowing_symbol(Package,Symbol):-
+   asserta_if_new(package:package_shadowing_symbols(Package,Symbol)).
 
 
 % caller is responsible for avoiding conflicts
@@ -382,7 +469,8 @@ package_nicknames(pkg_os, "OS").
 package_nicknames(pkg_tl, "TPL").
 package_nicknames(pkg_precompiler, "PRE").
 package_nicknames(pkg_profiler, "PROF").
-*/
+
+*/
 
 
 :- decl_mapped_opv(claz_package,[nicknames=package_nicknames]).

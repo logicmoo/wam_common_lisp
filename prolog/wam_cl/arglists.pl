@@ -523,6 +523,9 @@ must_or(Goal,Else):- Goal->true;Else.
 correct_formal_params(Mode,ReMode):-  correct_formal_params_c38(Mode,RMode1),
   must(correct_formal_params_destructuring(RMode1,ReMode)).
 correct_formal_params_c38(Mode,ReMode):- atom(Mode),atom_concat('&',Sym,Mode),!,atom_concat_or_rtrace('c38_',Sym,ReMode).
+correct_formal_params_c38(Mode,ReMode):- atom(Mode),
+  get_opv(Mode,symbol_name,Name0),to_prolog_string(Name0,Name),
+  string_concat("&",_,Name),!,prologcase_name(Name,ReMode).
 correct_formal_params_c38(Mode,Mode):- \+ compound(Mode),!.
 correct_formal_params_c38([F0|FormalParms0],[F|FormalParms]):- 
   correct_formal_params_c38(F0,F),correct_formal_params_c38(FormalParms0,FormalParms).
@@ -543,5 +546,4 @@ append_open_list(EnvList,Value):- member(Env,EnvList),append(_,[Value|_],Env),!.
 append_open_list(ClosedList,Value):- ClosedList = [_Env|List], setarg(2,ClosedList,[Value|List]).
 
 :- fixup_exports.
-
 

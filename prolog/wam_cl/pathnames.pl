@@ -115,7 +115,7 @@ found_strem(Path0,File0,SearchTypes,Found):-
    to_prolog_pathname(Path0,Path),!, to_prolog_pathname(File0,File),    !,
    ((absolute_file_name(File,Found,[relative_to(Path),
      extensions(SearchTypes),access(read),file_errors(fail),expand(true),solutions(all)]),exists_file(Found))-> true;
-   (fail,absolute_file_name(File,Found,[relative_to(Path),
+   (absolute_file_name(File,Found,[relative_to(Path),
      access(read),file_type(directory),file_errors(fail),expand(true),solutions(all)]),exists_directory(Found))).
 
 
@@ -166,8 +166,19 @@ pl_namestring(Pathname,String):-
 
 f_pathname(S,P):- is_stream(S),stream_property(S,file(File)),!,f_pathname(File,P).
 f_pathname(P,P):- is_pathnamep(P),!.
+f_pathname(String,Pathname):- is_stringp(String),!,f_sys_string_to_pathname(String,Pathname).
 f_pathname(P,L):- to_prolog_pathname(P,M),atom_string(M,S),!,f_sys_string_to_pathname(S,L).
 f_pathname(String,Pathname):- f_sys_string_to_pathname(String,Pathname).
+f_sys_reader_pathname('$STRING'(Source),Pathname):-!,
+  text_to_string_safe(Source,Text),
+  to_lisp_string(Text,String),
+  f_sys_string_to_pathname(String,Pathname).
+f_sys_reader_pathname(Source,Pathname):-
+  f_sys_string_to_pathname(Source,Pathname).
+f_sys_string_to_pathname(String,Pathname):-
+  to_prolog_string(String,String0),atom_string(PlPath,String0),
+  pathname_directory_designator(PlPath,LispDir),!,
+  f_make_pathname([kw_name,[],kw_type,[],kw_directory,LispDir],Pathname).
 f_sys_string_to_pathname(String,Pathname):- 
   to_prolog_string(String,String0),atom_string(PlPath,String0),
   file_base_name(PlPath,BaseExt),
@@ -177,19 +188,66 @@ f_sys_string_to_pathname(String,Pathname):-
   file_directory_name(PlPath,PlDir),lisp_dir_list(PlDir,PlPath,LispDir),
   f_make_pathname([kw_name,Name,kw_type,Type,kw_directory,LispDir],Pathname).
 
+pathname_directory_designator(PlPath,LispDir):-
+  normalize_path_separators(PlPath,Normalized),
+  atom_codes(Normalized,Codes),
+  append(DirectoryCodes,[0'/],Codes),
+  atom_codes(Directory,DirectoryCodes),
+  lisp_dir_list(Directory,Normalized,RawDir),
+  ( absolute_path_name(PlPath,Normalized)
+  -> ( RawDir=[kw_absolute|_] -> LispDir=RawDir
+     ; LispDir=[kw_absolute|RawDir] )
+  ; RawDir=[kw_relative|_]
+  -> LispDir=RawDir
+  ;  LispDir=[kw_relative|RawDir]
+  ).
+
 file_name_extension_lisp(Base, Ext,BaseExt):- file_name_extension(Base0,Ext,BaseExt),(Ext==''->Base=BaseExt;Base=Base0).
 
+lisp_dir_list(PlDir,PlPath,LispDir):-
+  normalize_path_separators(PlDir,NormalizedDir),
+  normalize_path_separators(PlPath,NormalizedPath),
+  (PlDir\==NormalizedDir;PlPath\==NormalizedPath),!,
+  lisp_dir_list(NormalizedDir,NormalizedPath,LispDir).
+lisp_dir_list('',PlPath,[kw_absolute]):- absolute_path_name(PlPath,PlPath),!.
 lisp_dir_list('.',PlPath,[kw_relative]):- atom_concat('.',_,PlPath),!.
 lisp_dir_list('.',_PlPath,[]).
 lisp_dir_list('/',_,[kw_absolute]).
 lisp_dir_list(PlDir,_,LispDir):- 
-  ((is_absolute_file_name(PlDir),atomic_list_concat([_|List],'/',PlDir))
+  ((absolute_path_name(PlDir,PlDir),absolute_path_components(PlDir,List))
      -> LispDir = [kw_absolute|DirStrs] ; 
     (atomic_list_concat(List,'/',PlDir),LispDir = DirStrs)),
   must_maplist(maybe_nil_dirname('.'),List,DirStrs).
 
+normalize_path_separators(Path,Normalized):-
+  atom_codes(Path,Codes),
+  maplist(normalize_path_separator,Codes,NormalizedCodes),
+  atom_codes(Normalized,NormalizedCodes).
+
+normalize_path_separator(0'\\,0'/):-!.
+normalize_path_separator(Code,Code).
+
+absolute_path_name(Original,Normalized):-
+  ( is_absolute_file_name(Original)
+  ; is_absolute_file_name(Normalized)
+  ; atom_concat('/',_,Normalized)
+  ),!.
+
+absolute_path_components(Path,Components):-
+  ( atom_concat('/',Rest,Path)
+  -> atomic_list_concat(Components,'/',Rest)
+  ;  atomic_list_concat(Components,'/',Path)
+  ).
+
 loc_to_pl([kw_relative],'.').
 loc_to_pl([kw_relative,kw_up|More],Out):-!,loc_to_pl([kw_up|More],Out).
+loc_to_pl([kw_absolute,Drive|More],Out):-
+  to_prolog_string(Drive,DriveString),
+  sub_string(DriveString,_,1,0,":"),
+  !,
+  atom_string(DriveAtom,DriveString),
+  must_maplist(loc_to_pl,More,Parts),
+  atomic_list_concat([DriveAtom|Parts],'/',Out).
 loc_to_pl(L,A):- a_2_l(A,L),!.
 loc_to_pl(L,A):- is_list(L),must_maplist(loc_to_pl,L,LL),atomic_list_concat(LL,'/',A).
 loc_to_pl(S,A):- atom_string(A,S).

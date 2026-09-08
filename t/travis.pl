@@ -24,6 +24,7 @@ wamcl_sanity_tests(
     "sanity-test-2",
     "sanity-test-4",
     "sanity-test-5",
+    "sanity-ansi-bootstrap",
     "sanity-loop-version-a",
     "sanity-loop" ]).
 

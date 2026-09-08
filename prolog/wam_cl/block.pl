@@ -107,6 +107,41 @@ compile_body_block(Ctx,Env,Result,[DO_MAYBE_STAR,LoopVars,[EndTest|ResultForms]|
            ]
         ]
      ],  Code).
+
+compile_body_block(Ctx,Env,Result,[Catch,TagForm|Forms],Code) :-
+   same_symbol(Catch,'catch'),
+   !,
+   must_compile_body(Ctx,Env,Tag,TagForm,TagCode),
+   must_compile_body(Ctx,Env,BodyResult,[progn|Forms],BodyCode),
+   Code = ( TagCode,
+            nb_linkval('$mv_return',[BodyResult]),
+            catch((BodyCode,Result=BodyResult),
+                  lisp_throw(ThrownTag,Values),
+                  wamcl_catch_transfer(Tag,ThrownTag,Values,Result)) ).
+
+compile_body_block(Ctx,Env,Result,[Throw,TagForm,ValueForm],Code) :-
+   same_symbol(Throw,'throw'),
+   !,
+   must_compile_body(Ctx,Env,Tag,TagForm,TagCode),
+   must_compile_body(Ctx,Env,Value,ValueForm,ValueCode),
+   debug_var('ThrowResult',Result),
+   Code = ( TagCode,
+            nb_linkval('$mv_return',[Value]),
+            ValueCode,
+            nb_current('$mv_return',Values),
+            throw(lisp_throw(Tag,Values)) ).
+
+wamcl_catch_transfer(Tag,ThrownTag,Values,Result) :-
+   (   is_eql(Tag,ThrownTag)
+   ->  wamcl_restore_values(Values,Result)
+   ;   throw(lisp_throw(ThrownTag,Values))
+   ).
+
+wamcl_restore_values([],[]) :-
+   nb_linkval('$mv_return',[]).
+wamcl_restore_values([Result|Rest],Result) :-
+   nb_linkval('$mv_return',[Result|Rest]).
+
 /*
 compile_body_block(Ctx,Env,Result,[DO_MAYBE_STAR,LoopVars,[EndTest|ResultForms]|TagBody], Code):- 
    (DO_MAYBE_STAR==do_xx -> LET=let_xx ; 
@@ -194,4 +229,3 @@ tst:is_local_test(block3,
    [block,block3,setq(b,2),[go,tag1],setq(a,1),(tag1),setq(a,4),print(plus(a,b)),return_from(block3,plus(a,b))],6).
 
 :- fixup_exports.
-

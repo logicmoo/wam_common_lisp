@@ -67,9 +67,7 @@ f_make_array(Dims,Keys,RetVal):- listify(Dims,DimsL),
  create_object(claz_array,[dims=DimsL|Keys],RetVal).
 
 wl:init_args(0,vector).
-f_vector(Size,RetVal):-
- create_array_data([Size],Elements),
- create_struct(claz_array,[dims=[Size],data=Elements],RetVal).
+f_vector(Elements,'$OBJ'(claz_vector,Elements)).
 
 % GROVELED f_vectorp(Obj,RetVal):- t_or_nil(is_vectorp(Obj),RetVal).
 % GROVELED f_arrayp(Obj,RetVal):- t_or_nil(is_arrayp(Obj),RetVal).

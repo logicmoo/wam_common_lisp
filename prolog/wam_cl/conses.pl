@@ -67,6 +67,14 @@ wl:declared_as(f_list,inline(list)).
 wl:init_args(0,list).
 f_list(ListI,ListO):- ListI=ListO.
 
+wl:init_args(1,list_xx).
+f_list_xx(First,Rest,Result):-
+   list_star([First|Rest],Result).
+
+list_star([Last],Last):-!.
+list_star([Head|Tail],[Head|Rest]):-
+   list_star(Tail,Rest).
+
 
 %:- dynamic(op_replacement/2).
 wl:op_replacement(first,car).

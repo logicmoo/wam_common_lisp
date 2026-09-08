@@ -19,6 +19,12 @@
 sf_declare(_ReplEnv,_,_).
 sf_proclaim(_ReplEnv,Assert,t):- assert(is_proclaimed(Assert)).
 
+mf_declaim([declaim|Declarations],_Env,[progn|Forms]):-
+  maplist(declaim_proclaim_form,Declarations,Forms).
+
+declaim_proclaim_form(Declaration,
+                      [proclaim,[quote,Declaration]]).
+
 f_sxhash(O,H):- term_hash(O,H).
 
 :- f_intern("PSXHASH",pkg_sys,_).
@@ -64,5 +70,4 @@ store_meta_info(With,Name,ArgumentTypes,ResultType,List,Name):-
 
 
 :- fixup_exports.
-
 

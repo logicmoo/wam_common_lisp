@@ -33,6 +33,10 @@ f_make_hash_table(Keys,HT):-
   ;  rb_new(Tree),
      set_opv(HT,sys_hash_table_data,'$OBJ'(claz_sys_rb_tree,Tree))
   ),
+  ( get_opv(HT,sys_hash_table_entries,_)
+  -> true
+  ;  set_opv(HT,sys_hash_table_entries,[])
+  ),
   ( get_opv(HT,hash_table_test,_)
   -> true
   ;  set_opv(HT,hash_table_test,eql)
@@ -52,15 +56,25 @@ canonical_hash_table_test(Test,Test).
 wl:setf_inverse(gethash,sys_puthash).
 get_table(HT,Tree,Data):- get_opv(HT,sys_hash_table_data,Data),arg(2,Data,Tree).
 
-ht_match_key_value(Tree,Test,Key,Name,Value):-
-  rb_in(Name,Value,Tree),
-  ht_match(Test,Key,Name).
+get_hash_entries(HT,Entries):-
+  get_opv(HT,sys_hash_table_entries,Entries).
+
+ht_match_key_value(Entries,Test,Key,Entry,Value):-
+  member(Entry,Entries),
+  arg(1,Entry,StoredKey),
+  ht_match(Test,Key,StoredKey),
+  arg(2,Entry,Value).
+
+remove_hash_entry([Head|Tail],Entry,Tail):-
+  Head==Entry,!.
+remove_hash_entry([Head|Tail],Entry,[Head|Rest]):-
+  remove_hash_entry(Tail,Entry,Rest).
 
 (wl:init_args(x,gethash)).
 f_gethash(Key,HT,RetVal):- f_gethash(Key,HT,[],RetVal).
 f_gethash(Key,HT,Default,RetVal):- 
-  get_table(HT,Tree,_),ht_test_fn(HT,TestFn),
-  (ht_match_key_value(Tree,TestFn,Key,_Name,Value)->f_values_list([Value,t],RetVal);f_values_list([Default,[]],RetVal)).
+  get_hash_entries(HT,Entries),ht_test_fn(HT,TestFn),
+  (ht_match_key_value(Entries,TestFn,Key,_Entry,Value)->f_values_list([Value,t],RetVal);f_values_list([Default,[]],RetVal)).
 
 ht_test_fn(HT,TestFn):- get_opv(HT,hash_table_test,Test),!,as_lisp_binary_fn(Test,TestFn).
 
@@ -68,22 +82,28 @@ as_lisp_binary_fn(Test,TestFn):- as_funcallable(Test,Test,TestFn).
 
 f_sys_puthash(Key,HT,RetVal,RetVal):-
   set_prolog_flag(wamcl_gvars,true),
-   get_table(HT,Tree,_),ht_test_fn(HT,TestFn),!,
-   (ht_match_key_value(Tree,TestFn,Key,Name,_OldValue)-> 
-      (nb_rb_get_node(Tree,Name,Node),nb_rb_set_node_value(Node,RetVal));
-      nb_rb_insert(Tree,Key,RetVal)).
+   get_hash_entries(HT,Entries),ht_test_fn(HT,TestFn),!,
+   (ht_match_key_value(Entries,TestFn,Key,Entry,_OldValue)->
+      nb_linkarg(2,Entry,RetVal);
+      set_opv(HT,sys_hash_table_entries,[hash_entry(Key,RetVal)|Entries])).
    
 f_remhash(Key,HT,RetVal):-  
-  get_table(HT,Tree,BV),ht_test_fn(HT,TestFn),!,
-  t_or_nil(( ht_match_key_value(Tree,TestFn,Key,Name,_OldValue),rb_delete(Tree,Name,NT),nb_setarg(2,BV,NT)),RetVal).
+  get_hash_entries(HT,Entries),ht_test_fn(HT,TestFn),!,
+  t_or_nil(( ht_match_key_value(Entries,TestFn,Key,Entry,_OldValue),
+             remove_hash_entry(Entries,Entry,Rest),
+             set_opv(HT,sys_hash_table_entries,Rest)),
+           RetVal).
 
 f_clrhash(HT,RetVal):-  RetVal=t,
   set_prolog_flag(wamcl_gvars,true),
-  rb_new(Tree),set_opv(HT,sys_hash_table_data,'$OBJ'(claz_sys_rb_tree,Tree)).
+  set_opv(HT,sys_hash_table_entries,[]).
 
 f_maphash(Fn,HT,RetVal):-  RetVal=[],
-  get_table(HT,Tree,_),as_lisp_binary_fn(Fn,MapFn),
-  forall(rb_in(Name,Value,Tree),ignore(ht_match(MapFn,Name,Value))).
+  get_hash_entries(HT,Entries),as_lisp_binary_fn(Fn,MapFn),
+  forall((member(Entry,Entries),
+         arg(1,Entry,Key),
+         arg(2,Entry,Value)),
+        ignore(call(MapFn,Key,Value,_))).
 
 
 f_sys_maphash_iter(Function, Hash_table, FnResult) :-
@@ -108,15 +128,16 @@ f_sys_maphash_iter(Function, Hash_table, FnResult) :-
 % required repeated three-value iterator protocol.
 f_sys_hash_table_iterator(HashTable,
                           '$OBJ'(claz_sys_hash_table_iterator,State)) :-
-    get_table(HashTable,Tree,_),
-    rb_visit(Tree,Entries),
+    get_hash_entries(HashTable,Entries),
     State=hash_iterator_state(Entries).
 
 f_sys_hash_table_iterate('$OBJ'(claz_sys_hash_table_iterator,State),
                          Result) :-
     arg(1,State,Entries),
-    ( Entries=[Key-Value|Rest]
+    ( Entries=[Entry|Rest]
     -> nb_linkarg(1,State,Rest),
+       arg(1,Entry,Key),
+       arg(2,Entry,Value),
        f_values_list([t,Key,Value],Result)
     ;  f_values_list([[]],Result)
     ).
@@ -179,7 +200,9 @@ mf_with_hash_table_iterator([with_hash_table_iterator, [Macroname_In, Hashtable_
               true).
 
 
-f_hash_table_count(HT,RetVal):-get_table(HT,Tree,_),rb_size(Tree,RetVal).
+f_hash_table_count(HT,RetVal):-
+  get_hash_entries(HT,Entries),
+  length(Entries,RetVal).
 
 ht_match(Test,Key,Matcher):- (call(Test,Key,Matcher,R)->R=t).
 
@@ -219,4 +242,3 @@ f_sys_hash_table_iterator_function(Hash_table_In, FnResult) :-
 :- fixup_exports.
 
 end_of_file.
-

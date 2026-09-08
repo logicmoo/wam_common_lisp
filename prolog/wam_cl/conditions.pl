@@ -23,6 +23,31 @@ wl:declared_as(f_error,inline(error)).
 wl:init_args(0,error).
 f_error(Args,Res):- f_format(t,"~a",Args,Res),throw(f_error(Args,Res)).
 
+mf_ignore_errors([ignore_errors|Forms],_Env,
+                 [sys_ignore_errors|Forms]).
+
+mf_handler_bind([handler_bind,[]|Forms],_Env,
+                [progn|Forms]).
+
+wl:plugin_expand_progbody_1st(Ctx,Env,Result,
+    [sys_ignore_errors|Forms],_PreviousResult,
+    catch((nb_linkval('$mv_return',[Result]),Body),
+          Error,wamcl_ignore_error(Error,Result))):-
+  must_compile_body(Ctx,Env,Result,[progn|Forms],Body).
+
+wamcl_ignore_error(Error,_Result):-
+  wamcl_control_transfer(Error),!,
+  throw(Error).
+wamcl_ignore_error(Error,Result):-
+  f_values_list([[],Error],Result).
+
+wamcl_control_transfer(block_exit(_,_)).
+wamcl_control_transfer(goto(_,_)).
+wamcl_control_transfer(goto(_,_,_)).
+wamcl_control_transfer(goto(_,_,_,_)).
+wamcl_control_transfer(lisp_throw(_,_)).
+wamcl_control_transfer('$aborted').
+
 % Connection to LPA's built-in error handler
 
 '?ERROR?'(Error, Form):-

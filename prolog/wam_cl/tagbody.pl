@@ -26,7 +26,12 @@ wl:plugin_expand_progbody(Ctx,Env,Result,InstrS,_PreviousResult,Code):- compile_
 
 compile_body_select_tagbody(_Ctx,_Env,Result,[label, Tag|_], push_label(Tag) ):- debug_var("_LABELRES",Result).
 compile_body_select_tagbody(_Ctx,_Env,Result,[u_label, Tag|_], push_label(Tag) ):- debug_var("_LABELRES",Result).
-compile_body_select_tagbody(_Ctx,Env,Result,[go, Tag], goto(Tag,Env) ):- debug_var("_GORES",Result),debug_var("GoEnv",Env).
+compile_body_select_tagbody(_Ctx,Env,Result,[go, Tag],
+                            (get_var(Env,ActivationVar,Activation),
+                             goto(Target,Activation,Tag,Env))):-
+   tagbody_target(Tag,Target,ActivationVar),
+   debug_var("_GORES",Result),
+   debug_var("GoEnv",Env).
 %compile_body_select_tagbody(_Ctx,Env,Result,[go,Label,TB,Pred],  Code ):- create_goto(TB,Label,Pred,Env,Code),!, debug_var("_GoThree",Result).
 %compile_body_select_tagbody(_Ctx,Env,Result,[go,Label,TB|_],  Code ):- create_goto(TB,Label,_Pred,Env,Code),!, debug_var("_GoTwo",Result).
 %compile_body_select_tagbody(_Ctx,Env,Result,[go,Label,TB], Code):- compute_new_address(TB,Label,Pred), debug_var("_GORES",Result),debug_var("GoEnv",Env),create_jump(TB,Label,Pred,Env,Code).
@@ -35,13 +40,33 @@ compile_body_select_tagbody(_Ctx,Env,Result,[go, Tag], goto(Tag,Env) ):- debug_v
 %compile_body_select_tagbody(Ctx,Env,Result,go(Tag), Body ):- !,compile_body_select_tagbody(Ctx,Env,Result,[go, Tag],Body).
 compile_body_select_tagbody(Ctx,Env,[],[tagbody| InstrS], Code):- debug_var("_TBResult",Result),!,  
    gensym(addr_tagbody_,TB),
+   gensym(tagbody_activation_,ActivationVar),
+   TagEnv=[bv(ActivationVar,Activation)|Env],
    always(get_go_points(TB,InstrS,Gos)),
-   always(get_tags(TB,Env,InstrS,Gos,Addrs)), 
+   always(get_tags(TB,TagEnv,InstrS,Gos,Addrs)),
+   tagbody_labels(InstrS,Tags),
+   current_tagbody_scopes(OuterScopes),
+   Scopes=[tagbody_scope(TB,ActivationVar,Tags)|OuterScopes],
    % check_missing_gos(Gos),   
-   compile_addrs(TB,Ctx,Env,Result,Addrs),
-   compile_tagbodys(TB,Ctx,Env,Result,InstrS,CInstrS),
+   locally(local_override('$tagbody_scopes',Scopes),
+           ( compile_addrs(TB,Ctx,TagEnv,Result,Addrs),
+             compile_tagbodys(TB,Ctx,TagEnv,Result,InstrS,CInstrS)
+           )),
    copy_term(Addrs,Addrs2),
-   Code = call_addr_block(Env,CInstrS,Addrs2).
+   Code = (f_gensym(Activation),
+           call_addr_block(TB,Activation,TagEnv,CInstrS,Addrs2)).
+
+current_tagbody_scopes(Scopes):-
+   (local_override('$tagbody_scopes',Scopes)->true;Scopes=[]).
+
+tagbody_labels(InstrS,Tags):-
+   findall(Tag,(member(Instr,InstrS),is_label(Instr,Tag)),Tags).
+
+tagbody_target(Tag,Target,ActivationVar):-
+   current_tagbody_scopes(Scopes),
+   member(tagbody_scope(Target,ActivationVar,Tags),Scopes),
+   memberchk(Tag,Tags),!.
+tagbody_target(_Tag,unresolved_tagbody,unresolved_tagbody_activation).
 
 push_label(_).
 goto(Tag,Env):- quietly(throw(goto(Tag,Env))).
@@ -49,10 +74,35 @@ call_addr_block(EnvCatch,Start,Addrs):-
   catch(Start,
       goto(Tag,EnvCatch),
            ((always((member(addr(_Pred, Tag,_,NewEnv,NewCode),Addrs);member(addr(Tag, _,_,NewEnv,NewCode),Addrs)))->!;
-              (slow_trace,throw(goto(Tag,EnvCatch)))),
+             (slow_trace,throw(goto(Tag,EnvCatch)))),
            copy_term(NewEnv:NewCode,NewEnvCopy:NewCodeCopy),
            NewEnvCopy = EnvCatch,
            call_addr_block(EnvCatch,NewCodeCopy,Addrs))).
+
+goto(Target,Tag,Env):- quietly(throw(goto(Target,Tag,Env))).
+call_addr_block(Target,EnvCatch,Start,Addrs):-
+  catch(Start,
+        goto(Target,Tag,_GoEnv),
+        ( (member(addr(_Pred,Tag,_,NewEnv,NewCode),Addrs);
+           member(addr(Tag,_,_,NewEnv,NewCode),Addrs))
+        -> copy_term(NewEnv:NewCode,NewEnvCopy:NewCodeCopy),
+           NewEnvCopy=EnvCatch,
+           call_addr_block(Target,EnvCatch,NewCodeCopy,Addrs)
+        ;  throw(goto(Target,Tag,EnvCatch))
+        )).
+
+goto(Target,Activation,Tag,Env):-
+  quietly(throw(goto(Target,Activation,Tag,Env))).
+call_addr_block(Target,Activation,EnvCatch,Start,Addrs):-
+  catch(Start,
+        goto(Target,Activation,Tag,_GoEnv),
+        ( (member(addr(_Pred,Tag,_,NewEnv,NewCode),Addrs);
+           member(addr(Tag,_,_,NewEnv,NewCode),Addrs))
+        -> copy_term(NewEnv:NewCode,NewEnvCopy:NewCodeCopy),
+           NewEnvCopy=EnvCatch,
+           call_addr_block(Target,Activation,EnvCatch,NewCodeCopy,Addrs)
+        ;  throw(goto(Target,Activation,Tag,EnvCatch))
+        )).
 
 
 

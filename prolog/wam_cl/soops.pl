@@ -383,12 +383,13 @@ define_kind(DefType,Name,KeyWords,SlotsIn,Kind):-
 get_struct_offset(Kind,W):- get_struct_opv(Kind,sys_structure_class_initial_offset,W).
 get_struct_offset(_,0).
 
-generate_missing_claz_functions(_KindKind,Kind):-
+generate_missing_claz_functions(KindKind,Kind):-
   always(( claz_to_symbol(Kind,Name),
   to_prolog_string_anyways(Name,SName),
  % define keyword defaults now
  show_call_trace(make_default_constructor(Kind,Code)),
  always(Code),
+ (KindKind==structure_class -> make_default_copier(Kind,SName) ; true),
  show_call_trace(maybe_add_kw_function(Kind,SName,"-P",kw_predicate, [obj],( eq('type-of'(obj),quote(Name))))),
  % make accessors
  struct_opv_else(Kind,sys_structure_class_conc_name,ConcatName,(string_concat(SName,"-",ConcatName))),
@@ -400,6 +401,46 @@ generate_missing_claz_functions(_KindKind,Kind):-
     add_slot_accessor_functions(Kind,Accessor,ZLOT)),
  forall(get_struct_opv(Kind,kw_accessor,Accessor,ZLOT),
     add_slot_accessor_functions(Kind,Accessor,ZLOT)))).
+
+make_default_copier(Kind,_SName) :-
+  get_struct_opv(Kind,kw_copier,Copier),
+  Copier == [],
+  !.
+make_default_copier(Kind,_SName) :-
+  get_struct_opv(Kind,kw_copier,Copier),
+  !,
+  register_structure_copier(Kind,Copier).
+make_default_copier(Kind,SName) :-
+  atom_concat_or_rtrace("COPY-",SName,Copier),
+  register_structure_copier(Kind,Copier).
+
+register_structure_copier(Kind,CopierName) :-
+  claz_to_symbol(Kind,Name),
+  force_symbol_package(Name,Package),
+  structure_copier_symbol(CopierName,Package,Copier),
+  set_opv(Copier,symbol_function,f_copy_structure),
+  assert_lsp(Copier,wl:init_args(1,Copier)).
+
+structure_copier_symbol(Copier,_Package,Copier):-
+  is_symbolp(Copier),!.
+structure_copier_symbol(CopierName,Package,Copier):-
+  f_intern(CopierName,Package,Copier).
+
+f_copy_structure(Object,Copy) :-
+  type_or_class_nameof(Object,Type),
+  find_class(Type,Kind),
+  is_structure_classp(Kind),
+  gensym('znst_',Name),
+  new_partly_named_opv_pt1(Kind,Name,[],Copy,_),
+  forall(get_kind_supers3(Kind,[],SlotKind),
+         forall(get_struct_opv(SlotKind,name,_Slot,Storage),
+                (   get_opv(Object,Storage,Value)
+                ->  set_opv(Copy,Storage,Value)
+                ;   true
+                ))),
+  add_opv_new_iiii(Copy,sys_initialized,Kind).
+f_copy_structure(Object,[],Copy) :-
+  f_copy_structure(Object,Copy).
 
 % % % % % % 
 always_ignore(G):- always(ignore(G)).
@@ -444,13 +485,41 @@ add_slot_accessor_functions(Kind,Accessor,ZLOT):-
 
 
 add_slot_getter_function(Kind,Accessor,ZLOT):-
-  maybe_add_function(Accessor,[object],['class-slot-value',Kind,object,[quote,ZLOT]],Added1), 
+  add_slot_getter_function_1(Kind,Accessor,ZLOT,Added1),
  (Added1\==[]-> push_struct_opv(Kind,readers,Added1,ZLOT) ; true).
 
 add_slot_setter_function(Kind,Accessor,ZLOT):-
-  SETTER = [setf,Accessor],
-  maybe_add_function(SETTER,[object,value],['set-class-slot-value',Kind,object,[quote,ZLOT],value],Added1), 
+  add_slot_setter_function_1(Kind,Accessor,ZLOT,Added1),
  (Added1\==[]-> push_struct_opv(Kind,writers,Added1,ZLOT) ; true).
+
+add_slot_getter_function_1(_Kind,Accessor,_ZLOT,[]) :-
+  is_implemented(Accessor),
+  !.
+add_slot_getter_function_1(Kind,Accessor,ZLOT,Accessor) :-
+  foc_operator(_,_,kw_function,Accessor,2,Function),
+  Head =.. [Function,Object,Value],
+  RestHead =.. [Function,Object,[],Value],
+  Body = get_kind_object_slot_value(Kind,Object,ZLOT,Value),
+  set_opv(Accessor,symbol_function,Function),
+  assert_lsp(Accessor,wl:init_args(1,Accessor)),
+  assert_lsp(Accessor,(user:Head:-Body)),
+  assert_lsp(Accessor,(user:RestHead:-Body)).
+
+add_slot_setter_function_1(_Kind,Accessor,_ZLOT,[]) :-
+  combine_setfs([setf,Accessor],Setter),
+  is_implemented(Setter),
+  !.
+add_slot_setter_function_1(Kind,Accessor,ZLOT,Setter) :-
+  combine_setfs([setf,Accessor],Setter),
+  foc_operator(_,_,kw_function,Setter,3,Function),
+  Head =.. [Function,Object,Value,Value],
+  RestHead =.. [Function,Object,Value,[],Value],
+  Body = set_kind_object_slot_value(Kind,Object,ZLOT,Value),
+  set_opv(Setter,symbol_function,Function),
+  assert_lsp(Setter,wl:init_args(2,Setter)),
+  assert_lsp(Accessor,wl:declared_as(Accessor,defun_setf(Setter))),
+  assert_lsp(Setter,(user:Head:-Body)),
+  assert_lsp(Setter,(user:RestHead:-Body)).
 
 
 member_element_list(kw_writer,writers).
@@ -858,7 +927,7 @@ ensure_maybe_backed(Obj,Prop,ValueM,Value):-
   current_prolog_flag(wamcl_gvars,true),
   always(get_ref_object(Obj,RefObj)),
   ((nb_current_value(RefObj,Prop,Value),same_term(Value,ValueM)) -> true ; 
-  (Value=ValueM,sanity(same_term(Value,ValueM)),nb_put_attr(RefObj,Prop,Value))).
+  (Value=ValueM,sanity(same_term(Value,ValueM)),nb_link_put_attr(RefObj,Prop,Value))).
     
 
 add_opv_new_iiii(Obj,type_of,Type):- is_dict(Obj),!,nb_setarg(1,Obj,Type).
@@ -869,7 +938,7 @@ add_opv_new_iiii(Obj,Prop,Value):- is_dict(Obj),!,always(((get_dict(Prop,Obj,_)-
    ((guess_ref_name(Obj,Ref),add_opv_new_iiii(Ref,Prop,Value)))))).
 add_opv_new_iiii(Ref,Prop,Value):-current_prolog_flag(wamcl_gvars,true),!, always(get_ref_object(Ref,Obj)),!,   
    %show_call_trace
-   (always(nb_put_attr(Obj,Prop,Value))).
+   (always(nb_link_put_attr(Obj,Prop,Value))).
 add_opv_new_iiii(Obj,Prop,Value):- % show_call_trace
    ((atom(Obj),(atom_concat_or_rtrace(sys_,_,Obj);atom_concat_or_rtrace(os_,_,Obj);true))->true;dmsg(assert_lsp(o_p_v(Obj,Prop,Value)))),
    assert_lsp_opv(Obj,Prop,Value).
@@ -879,6 +948,21 @@ assert_lsp_opv(Obj,Prop,Value):- Prop==symbol_value,
    assert_lsp(Obj,soops:o_p_v(Obj,Prop,Value)).
 assert_lsp_opv(Obj,Prop,Value):- 
    assert_lsp(Obj,soops:o_p_v(Obj,Prop,Value)).
+
+nb_link_put_attr(Object,Name,Value) :-
+   (   get_attrs(Object,Attrs)
+   ->  nb_link_attr_value(Attrs,Name,Value)
+   ;   put_attrs(Object,att(Name,Value,[]))
+   ).
+
+nb_link_attr_value(Attrs,Name,Value) :-
+   Attrs = att(OldName,_,Rest),
+   (   OldName == Name
+   ->  nb_linkarg(2,Attrs,Value)
+   ;   Rest == []
+   ->  nb_linkarg(3,Attrs,att(Name,Value,[]))
+   ;   nb_link_attr_value(Rest,Name,Value)
+   ).
 
 %delete_opvalues(Obj,Key):- Key == value, nb_delete(Obj),fail.
 delete_opvalues(Obj,Prop):- 
@@ -1138,7 +1222,3 @@ process_si(soops:o_p_v(X,Y,Z)):- X\==[], set_opv(X,Y,Z).
 %:- include('si2.data').
 
 :- fixup_exports.
-
-
-
-

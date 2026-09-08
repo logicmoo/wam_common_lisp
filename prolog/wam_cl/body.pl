@@ -273,7 +273,10 @@ compile_body_form(Ctx,Env,Result,[OP,Vars,Eval], Body):- same_symbol(OP,'multipl
   must_compile_body(Ctx,Env,Result,[progn,Eval,['#setqFromValues',Vars]],Body).
 
 % Macro MULTIPLE-VALUE-LIST
-compile_body_form(Ctx,Env,Result,[OP,Eval1], (Body,nb_current('$mv_return',Result))):-
+compile_body_form(Ctx,Env,Result,[OP,Eval1],
+                  (nb_linkval('$mv_return',[IResult]),
+                   Body,
+                   nb_current('$mv_return',Result))):-
   same_symbol(OP,'multiple-value-list'),
   debug_var('MV_RETURN',Result),
   debug_var('IgnoredRet',IResult),
@@ -337,4 +340,3 @@ compile_body_form(Ctx,Env,Result,[BinOP,Form1,Form2,Form3|FormS],Code):- binop_i
 
 
 :- fixup_exports.
-

@@ -1,0 +1,3 @@
+Repository: https://gitlab.common-lisp.net/ansi-test/ansi-test.git
+Revision: ca06bd919661af162c67407c9d994e881870bdb3
+License: MIT (see ../ansi-test/LICENSE)

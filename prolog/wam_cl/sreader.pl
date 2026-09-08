@@ -424,7 +424,7 @@ sexpr0('#\\'(C))                 --> `#\\`,!,zalwayz(rsymbol(``,C)), swhite.
 sexpr0(['#-',K,O]) --> `#-`,!,sexpr(C),swhite,sexpr(O),!,{as_keyword(C,K)},!.
 sexpr0(['#+',K,O]) --> `#+`,!,sexpr(C),swhite,sexpr(O),!,{as_keyword(C,K)},!.
 
-sexpr0(P) --> `#`,ci(`p`),!,zalwayz((sexpr(C),{f_pathname(C,P)})),!.
+sexpr0(['$PATHNAME-LITERAL',C]) --> `#`,ci(`p`),!,zalwayz(sexpr(C)),!.
 sexpr0('$S'(C)) -->                  (`#`, ci(`s`),`(`),!,zalwayz(sexpr_list(C)),swhite,!.
 %sexpr('$COMPLEX'(R,I)) --> `#`,ci(`c`),`(`,!,  lnumber(R),lnumber(I),`)`.
 sexpr0('$COMPLEX'(R,I)) -->         (`#`, ci(`c`),`(`),!,zalwayz(sexpr_list([R,I])),swhite,!.
@@ -556,7 +556,7 @@ sexpr_vector0([First|Rest],End) --> sexpr(First), !, sexpr_vector0(Rest,End).
 
 %s_string_cont(Until,"")             --> Until,!, swhite.
 :- encoding(iso_latin_1).
-sexpr_string(Text)                 --> `“`, !, zalwayz(read_string_until_no_esc(Text,`”`)),!.
+sexpr_string(Text)                 --> `ï¿½`, !, zalwayz(read_string_until_no_esc(Text,`ï¿½`)),!.
 sexpr_string(Text)                 --> `"`, !, zalwayz(read_string_until_no_esc(Text,`"`)),!.
 sexpr_string(Text)                 --> `#|`, !, zalwayz(read_string_until_no_esc(Text,`|#`)),!.
 %sexpr_string([C|S],End) --> `\\`,!, zalwayz(escaped_char(C)),!, sexpr_string(S,End).
@@ -1488,4 +1488,3 @@ writeqnl(O):-writeq(O),nl.
 
 :- fixup_exports.
 :- endif.
-

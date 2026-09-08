@@ -82,6 +82,8 @@ quotify_each(Ctx,Env,[VarR|Result],[Var|Eval],Code):-
   quotify_each(Ctx,Env,Result,Eval,Code1),
   conjoin_0(Ctx,Code0,Code1,Code),!.
 
+must_quotify(_Ctx,_Env,Pathname,['$PATHNAME-LITERAL',Source],
+             f_sys_reader_pathname(Source,Pathname)):-!.
 must_quotify(_Ctx,_Env,SelfEval,SelfEval,true):- var(SelfEval),!.
 must_quotify(_Ctx,_Env,SelfEval,SelfEval,true):- quietly(is_self_evaluating_object(SelfEval)),!.
 must_quotify(_Ctx,_Env,[quote,Var],Var,true).
@@ -229,6 +231,8 @@ compile_body(_Cx,_Ev, [],[],true):- !.
 compile_body(_Cx,_Ev, [],nil,true):- !.
 
 compile_body(_Ctx,_Env,Result,'$S'([Type|Args]),create_struct([Type|Args],Result)).
+compile_body(_Ctx,_Env,Result,['$PATHNAME-LITERAL',Source],
+             f_sys_reader_pathname(Source,Result)).
 
 % numbers
 compile_body(_Cx,_Ev,Result,SelfEval,Body):- quietly(is_self_evaluating_object(SelfEval)),!,
@@ -239,7 +243,31 @@ compile_body(_Cx,_Ev,Result,SelfEval,Body):- quietly(is_self_evaluating_object(S
 % =============================================================================
 
 % QUOTE
+compile_body(_Cx,_Ev,Result,[quote,Item],Code):-
+  contains_pathname_literal(Item),!,
+  materialize_pathname_literals(Item,Result,Code).
+compile_body(_Cx,_Ev,Pathname,
+             [quote,['$PATHNAME-LITERAL',Source]],
+             f_sys_reader_pathname(Source,Pathname)):-!.
 compile_body(_Cx,_Ev,Item,[quote, Item],  true):- !.
+
+contains_pathname_literal(Item):-
+  sub_term(Literal,Item),
+  nonvar(Literal),
+  Literal=['$PATHNAME-LITERAL',_],!.
+
+materialize_pathname_literals(['$PATHNAME-LITERAL',Source],Pathname,
+                              f_sys_reader_pathname(Source,Pathname)):-!.
+materialize_pathname_literals([Head|Tail],[NewHead|NewTail],Code):-!,
+  materialize_pathname_literals(Head,NewHead,HeadCode),
+  materialize_pathname_literals(Tail,NewTail,TailCode),
+  list_to_conjuncts([true,HeadCode,TailCode],Code).
+materialize_pathname_literals(Item,Result,Code):-
+  compound(Item),!,
+  Item=..[Functor|Arguments],
+  materialize_pathname_literals(Arguments,NewArguments,Code),
+  Result=..[Functor|NewArguments].
+materialize_pathname_literals(Item,Item,true).
    
    % COMMENTS
    is_comment([COMMENT,String|_],String):- atom(COMMENT),!,atom_concat_or_rtrace('$COMMENT',_,COMMENT).

@@ -326,6 +326,14 @@ wl:interned_eval_e(
              (,new-sym (cons ,el-sym ,place)))
         (setf ,place ,new-sym)))))').
 
+sf_push(ReplEnv,ElementForm, Place, FnResult) :-
+        atom(Place),
+        !,
+        f_sys_env_eval(ReplEnv,ElementForm,Element),
+        get_var(ReplEnv,Place,Old),
+        FnResult=[Element|Old],
+        set_var(ReplEnv,Place,FnResult),
+        nb_linkval('$mv_return',[FnResult]).
 sf_push(ReplEnv,Element, Place, FnResult) :-
         Env=[bv(u_element, Element), bv(u_place, Place)|ReplEnv],
         f_gensym(El_sym_Init),
@@ -336,7 +344,62 @@ sf_push(ReplEnv,Element, Place, FnResult) :-
         get_var(LEnv, u_new_sym, New_sym_Get15),
         get_var(LEnv, u_place, Place_Get14),
         [let_xx, [[El_sym_Get12, Element_Get], [New_sym_Get15, [cons, El_sym_Get12, Place_Get14]]], [setf, Place_Get14, New_sym_Get15]]=MFResult,
-        f_eval(MFResult, FnResult).
+        f_sys_env_eval(ReplEnv,MFResult,FnResult),
+        nb_linkval('$mv_return',[FnResult]).
+
+sf_pop(Env, Place, Result) :-
+        atom(Place),
+        !,
+        get_var(Env, Place, Old),
+        (   Old = [Result|New]
+        ->  true
+        ;   Old == [],
+            Result = [],
+            New = []
+        ),
+        set_var(Env, Place, New),
+        nb_linkval('$mv_return',[Result]).
+sf_pop(Env, [Accessor,ContainerForm], Result) :-
+        (same_symbol(Accessor,car);same_symbol(Accessor,cdr)),
+        !,
+        eval_place_container(Env,ContainerForm,Container),
+        ( same_symbol(Accessor,car)
+        -> f_car(Container,Old),
+           pop_list_value(Old,Result,New),
+           f_rplaca(Container,New,_)
+        ;  f_cdr(Container,Old),
+           pop_list_value(Old,Result,New),
+           f_rplacd(Container,New,_)
+        ),
+        nb_linkval('$mv_return',[Result]).
+sf_pop(Env, [Accessor,ArrayForm|IndexForms], Result) :-
+        same_symbol(Accessor,aref),
+        !,
+        eval_place_form(Env,ArrayForm,Array),
+        maplist(eval_place_form(Env),IndexForms,Indexes),
+        f_aref(Array,Indexes,Old),
+        pop_list_value(Old,Result,New),
+        f_aset(Array,Indexes,New,_),
+        nb_linkval('$mv_return',[Result]).
+sf_pop(Env, Place, Result) :-
+        reenter_lisp(Ctx,Env),
+        compile_accessors(Ctx,Env,Result,[pop,Place],Code),
+        always(Code),
+        nb_linkval('$mv_return',[Result]).
+
+pop_list_value([Result|New],Result,New):-!.
+pop_list_value([],[],[]).
+
+eval_place_container(Env,Form,Container):-
+        eval_place_form(Env,Form,Container).
+
+eval_place_form(_Env,Form,Form):-
+        is_self_evaluating_object(Form),!.
+eval_place_form(Env,Form,Value):-
+        atom(Form),!,
+        get_var(Env,Form,Value).
+eval_place_form(Env,Form,Value):-
+        f_sys_env_eval(Env,Form,Value).
 
 
 /*
