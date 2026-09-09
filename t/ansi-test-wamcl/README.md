@@ -52,9 +52,61 @@ needed by `iteration/loop.lsp`. The generated error tests are intentionally
 not selected yet because they require `SIGNALS-ERROR` and complete condition
 handling. They must not be counted as passes until those facilities work.
 
+## Random auxiliary bootstrap
+
+```powershell
+swipl -s t\ansi-test-wamcl\run-random.pl -g run_random_tests,halt -t "halt(1)"
+```
+
+This gate concatenates the unmodified shared sources through `universe.lsp`
+and `auxiliary/random-aux.lsp`, followed by `random-bootstrap.lsp`. It requires
+all **8 source-end markers**, **zero failed forms**, and **9 passing assertions**.
+The assertions exercise both macro expansion and execution of `RCASE` and
+`RANDOM-CASE`, cumulative weights, sequence selection, and universe values.
+The child timeout is ten minutes; `results/random-latest.log` is ignored.
+
+The runtime fixes include checked random-state copying and isolation,
+`INTEGER-LENGTH`, `BUTLAST`, `EVERY`/`SOME`, and a bounded `COERCE` subset.
+`ASSERT` supports empty/omitted places, custom conditions, and retry through
+the `CONTINUE` restart; interactive place correction is not implemented and
+nonempty places are rejected. `COERCE` supports the simple string/list/vector
+type names, real-to-float conversions, character designators, and functions;
+this is not a complete implementation of compound type specifiers.
+Coercion preserves existing sequence identity when the supported target type
+already matches; lambda coercion creates a runtime closure that receives
+argument data without re-evaluating it. `EVERY` and `SOME` return exactly one
+value, even when their predicates return multiple values.
+
+Compiler diagnostics no longer install printed, numbered-variable clauses.
+Top-level macros (including those in top-level `PROGN`, active `EVAL-WHEN`,
+and macro expansions) are installed by compilation, independent of verbosity.
+Nested `DEFMACRO` forms install their definitions only when executed. `LIST`
+allocates fresh cons cells at runtime instead of retaining compiler argument
+templates. `TYPEP` uses the correct argument order and subtype checks cannot
+backtrack through failed class lookups to spuriously succeed.
+
 ## Next compliance barrier
 
-Implement `HANDLER-BIND`, `HANDLER-CASE`, and condition construction, then
-load the upstream `SIGNALS-ERROR` helper and enable the LOOP macro-error tests.
-After that, extend the manifest by chapter while keeping each file
-subprocess-isolated.
+Passing these gates does not establish full ANSI compliance or a successful
+load of the complete shared `ansi-aux.lsp`/symbol-name/notes bootstrap.
+The full auxiliary gate must be checked separately before enabling the
+maintained suite's generated macro-error tests.
+
+A quiet, bounded full-load probe reached `auxiliary/ansi-aux.lsp:548`,
+`(defparameter *displaced* (make-int-array 100000))`, after seven complete
+upstream source markers and zero failed forms, but did not finish within
+240 seconds. A prefix probe verified the base-, standard-, and code-character
+sequence lengths as **95**, **96**, and **256**, respectively. Accessing those
+global strings with `ELT` still fails: globals can contain native Prolog
+strings, but `f_elt/3` delegates to `get_adata/2`, which lacks that representation.
+The same probe also stalled on a three-element `MAKE-INT-ARRAY`; the full-load
+stall therefore cannot be attributed to large-array performance alone.
+Direct three-element construction, `FUNCALL` construction, and `f_aset/4`
+storage probes succeed, leaving the Lisp-level array-update/iteration path
+to investigate. Neither this prefix nor the full shared bootstrap is a
+passing gate. Diagnostic transcripts are retained in ignored
+`results/ansi-aux-latest.log` and `results/ansi-aux-prefix.log`.
+
+The project sanity suite currently passes **256/256** assertions (including
+**123** bootstrap assertions, up from 47); the maintained LOOP adapter remains
+**7/7**, independently of the nine random-bootstrap assertions above.

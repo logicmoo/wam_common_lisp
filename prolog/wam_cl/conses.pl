@@ -66,9 +66,10 @@ f_append([List|Lists],R):- f_append(Lists,Tail),append(List,Tail,R),!.
 f_append(A,B,R):- append(A,B,R),!.
 
 % #'LIST
-wl:declared_as(f_list,inline(list)).
 wl:init_args(0,list).
-f_list(ListI,ListO):- ListI=ListO.
+% Allocate the result spine at run time, not in the compiler's argument template.
+f_list([],[]).
+f_list([Head|Tail],[Head|Rest]):- f_list(Tail,Rest).
 
 wl:init_args(1,list_xx).
 f_list_xx(First,Rest,Result):-
@@ -160,6 +161,39 @@ f_cadr(List,R):- List=[_,R|_]->true;R=[].
 
 
 (wl:init_args(1,last)).
+wl:init_args(1,butlast).
+f_butlast(List,Options,Result):-
+  ( Options==[] -> N=1
+  ; Options=[N] -> true
+  ; f_error([program_error],_)
+  ),
+  ( integer(N),N>=0 -> true
+  ; throw(error(type_error([integer,0,*],N),butlast))
+  ),
+  ( (List==[] ; nonvar(List),List=[_|_]),acyclic_term(List) -> true
+  ; throw(error(type_error(list,List),butlast))
+  ),
+  ( N=:=0 -> copy_cons_spine(List,Result)
+  ; cons_spine_length(List,Length),
+    Keep is max(0,Length-N),
+    butlast_prefix(Keep,List,Result)
+  ).
+
+cons_spine_length(List,Length):-
+  ( nonvar(List),List=[_|Tail]
+  -> cons_spine_length(Tail,Rest),Length is Rest+1
+  ; Length=0
+  ).
+copy_cons_spine(List,Result):-
+  ( nonvar(List),List=[Head|Tail]
+  -> Result=[Head|Copy],copy_cons_spine(Tail,Copy)
+  ; Result=List
+  ).
+butlast_prefix(0,_,[]):-!.
+butlast_prefix(N,[Head|Tail],[Head|Rest]):-
+  Next is N-1,
+  butlast_prefix(Next,Tail,Rest).
+
 f_last(List,[],Tail):-  !, f_last_1(List,Tail).
 f_last(List,[N],Ret):- 
   (N=1 -> f_last_1(List,Ret);

@@ -480,7 +480,7 @@ plistify(H,[H]).
 
 wl:plugin_expand_progbody_1st(Ctx,Env,Result,[incf,Symbol|Delta],_PreviousResult,(Code,
  place_op(Env,incf, Symbol,symbol_value, CDelta,  Result))):-
-   compile_each(Ctx,Env,Delta,CDelta,Code).
+   compile_each(Ctx,Env,CDelta,Delta,Code).
 
 
 %place_op(Env,getf,Obj,Place,[Value],Value):-!,get_place_value(Env, Obj, Place, Value).

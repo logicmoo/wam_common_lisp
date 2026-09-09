@@ -42,6 +42,22 @@ mf_handler_case([handler_case,Form|Clauses],_Env,
 mf_restart_case([restart_case,Form|Clauses],_Env,
                 [sys_restart_case,Form|Clauses]).
 
+% The bootstrap uses ASSERT without interactive place correction.
+mf_assert([assert,Test|Options],_Env,
+          [loop,[when,Test,[return,[]]],
+           [restart_case,[error|ErrorArgs],[continue,[]]]]):-
+  assert_error_arguments(Options,Test,ErrorArgs).
+
+assert_error_arguments([],Test,Args):-!,
+  assert_error_arguments([[]],Test,Args).
+assert_error_arguments([Places|Rest],Test,Args):-
+  ( Places==[] -> true ; f_error([program_error],_) ),
+  ( Rest==[] ; Rest==[[]] ),!,
+  to_lisp_string("Assertion failed: ~S",Message),
+  Args=[Message,[quote,Test]].
+assert_error_arguments([Places,Datum|Arguments],_Test,[Datum|Arguments]):-
+  ( Places==[] -> true ; f_error([program_error],_) ).
+
 wl:plugin_expand_progbody_1st(Ctx,Env,Result,
     [sys_ignore_errors|Forms],_PreviousResult,
     catch((nb_linkval('$mv_return',[Result]),Body),

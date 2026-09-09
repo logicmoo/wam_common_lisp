@@ -58,6 +58,7 @@ c_class('$ARRAY'(_,_,_),claz_array):-!.
 c_class('$OBJ'(Type,_Data),Type).
 c_class('#\\'(_),claz_character).
 c_class('$COMPLEX'(_,_),claz_complex).
+c_class('$RATIO'(_,_),claz_ratio).
 c_class('$NUMBER'(Type,_),Type).
 c_class(Dict,Class):- is_dict(Dict,Class).
 c_class(Str,claz_string):- is_stringp(Str).
@@ -110,13 +111,17 @@ type_named('$OBJ'(_,Type),Type):- atom(Type),!.
 type_named(Type,Type):- atomic(Type).
 
 
-f_typep(Obj,Type,OptEnv,Result):- t_or_nil(is_typep(Obj,OptEnv,Type),Result),f_values_list([Result,t],_).
-is_typep(Obj,Type,OptEnv):- i_type(Obj,SubType),is_subtypep(SubType,Type,OptEnv),!.
+f_typep(Obj,Type,OptEnv,Result):- t_or_nil(is_typep(Obj,Type,OptEnv),Result).
+is_typep(Obj,Type,OptEnv):- once(i_type(Obj,SubType)),is_subtypep(SubType,Type,OptEnv),!.
 
 f_subtypep(SubType,Type,OptEnv,Result):- t_or_nil(is_subtypep(SubType,Type,OptEnv),Result).
 is_subtypep(SubType,Type,OptEnv):- 
   OptErrorOptEnv = [[]|OptEnv],
-  f_find_class(SubType,OptErrorOptEnv,SubClass),f_find_class(Type,OptErrorOptEnv,Class),is_subclass(SubClass,Class).
+  once(f_find_class(SubType,OptErrorOptEnv,SubClass)),
+  SubClass\==[],
+  once(f_find_class(Type,OptErrorOptEnv,Class)),
+  Class\==[],
+  is_subclass(SubClass,Class).
 
 is_subclass(SubClass,Class):-
   subclass_frontier([SubClass],Class,[]).

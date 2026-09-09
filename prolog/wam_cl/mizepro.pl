@@ -322,7 +322,6 @@ mize_body_1e(_Ctx,_,C1,C1):- non_compound_code(C1),!.
 mize_body_1e(_Ctx,_,C1,C2):- idiom_replace(C1,C2).
 mize_body_1e(_Ctx,_F,(A=B),true):- A==B,allowed_level(1),!.
 mize_body_1e(_Ctx,_F,(A==B),true):- A==B,allowed_level(1),!.
-mize_body_1e(_Ctx,_,f_list(G, R),R=G):- allowed_level(1),!.
 mize_body_1e(_Ctx,_,C1,L=[R]):- structure_applies(C1 , (L=[R, []])). % wam_cl_option(elim_vars,true).
 
 mize_body_1e(Ctx,F,(C1,C2,C4),C5):- conjoinment(Ctx,C1,C2,C3),!,mize_body_1e(Ctx,F,(C3,C4),C5).
@@ -513,7 +512,6 @@ simple_inline(In,_Out):- \+ compound(In),!,fail.
 simple_inline(set_var(E, OP, N, V),set_var(E, N, V)):- atom(N),atom(OP),memberchk(OP,[psetq,setq]).
 simple_inline(set_place(E, OP, N, V),set_var(E, N, V)):- var(V), atom(N),atom(OP),memberchk(OP,[psetq,setq]).
 %simple_inline(set_var(E, OP, [PLACE, N], V),set_place(E, OP, [PLACE, N], V)):- var(V), atom(N),atom(OP),memberchk(OP,[setf]).
-simple_inline(f_list(A,B),B=A).
 %simple_inline(f_sys_pf_set_slot_value(A,B,C,D),set_slot(A,B,C)):-C=D.
 simple_inline(f_cdr(I,O),(I==[]->O=[];I=[_|O])):- wam_cl_option(debug,0).
 simple_inline(f_car(I,O),(I==[]->O=[];I=[O|_])):- wam_cl_option(debug,0).

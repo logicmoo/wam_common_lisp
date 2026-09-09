@@ -30,6 +30,113 @@
 is_listp(Obj):- compound(Obj)-> Obj=[_|_] ; Obj == [].
 is_endp(Obj):- Obj == [].
 
+f_coerce(Object,ResultType,Result):-
+  ( atom(ResultType), coerce_bootstrap(Object,ResultType,Result) -> true
+  ; throw(error(type_error(ResultType,Object),coerce))
+  ).
+
+coerce_bootstrap(Object,ResultType,Result):-
+  ( same_symbol(ResultType,string)
+  ; same_symbol(ResultType,simple_string)
+  ; same_symbol(ResultType,base_string)
+  ; same_symbol(ResultType,simple_base_string)
+  ),!,
+  ( is_stringp(Object) -> Result=Object
+  ; sequence_elements(Object,Source),
+    maplist(is_characterp,Source),
+    f_copy_list(Source,Elements),
+    length(Elements,Length),
+    Result='$ARRAY'([Length],claz_base_character,Elements)
+  ).
+coerce_bootstrap(Object,ResultType,Result):-
+  same_symbol(ResultType,list),!,
+  ( is_listp(Object) -> Result=Object
+  ; sequence_elements(Object,Elements),
+    f_copy_list(Elements,Result)
+  ).
+coerce_bootstrap(Object,ResultType,Result):-
+  ( same_symbol(ResultType,vector)
+  ; same_symbol(ResultType,simple_vector)
+  ),!,
+  ( coerce_vector_identity(Object,ResultType) -> Result=Object
+  ; sequence_elements(Object,Source),
+    f_copy_list(Source,Elements),
+    Result='$OBJ'(claz_vector,Elements)
+  ).
+coerce_bootstrap(Object,ResultType,Result):-
+  ( same_symbol(ResultType,float)
+  ; same_symbol(ResultType,short_float)
+  ; same_symbol(ResultType,single_float)
+  ; same_symbol(ResultType,double_float)
+  ; same_symbol(ResultType,long_float)
+  ),!,
+  coerce_real_number(Object),
+  ( same_symbol(ResultType,float),coerce_float_number(Object)
+  -> Result=Object
+  ; to_prolog_number(Object,Number),
+    Float is float(Number),
+    coerce_float_result(ResultType,Float,Result)
+  ).
+coerce_bootstrap(Object,ResultType,Result):-
+  same_symbol(ResultType,character),!,
+  ( is_characterp(Object) -> Result=Object
+  ; ( is_stringp(Object) ; is_symbolp(Object) ),
+    to_prolog_string(Object,String),
+    string_chars(String,[Char]),
+    make_lisp_character(Char,Result)
+  ).
+coerce_bootstrap(Object,ResultType,Result):-
+  same_symbol(ResultType,function),!,
+  ( is_runtime_functionp(Object) -> Result=Object
+  ; Object=[lambda|_]
+  -> ensure_ctx(Ctx),
+     compile_closures(Ctx,[],Result,Object,Code),
+     always(Code)
+  ; is_symbolp(Object),
+    ( find_lisp_function(Object,_Arity,_Predicate) -> Result=function(Object)
+    ; f_error([undefined_function,kw_name,Object],_)
+    )
+  ).
+coerce_bootstrap(Object,ResultType,Object):-
+  atom(ResultType),
+  is_typep(Object,ResultType,[]).
+
+coerce_vector_identity(Object,_Type):-
+  compound(Object),Object='$OBJ'(claz_vector,Elements),is_list(Elements),!.
+coerce_vector_identity(Object,Type):-
+  same_symbol(Type,vector),
+  ( string(Object)
+  ; compound(Object),Object='$ARRAY'([_],_,Elements),is_list(Elements)
+  ).
+
+coerce_real_number(Object):- number(Object),!.
+coerce_real_number(Object):-
+  compound(Object),
+  Object='$RATIO'(_,_),!.
+coerce_real_number(Object):- coerce_float_number(Object).
+
+coerce_float_number(Object):- float(Object),!.
+coerce_float_number(Object):-
+  compound(Object),
+  Object='$NUMBER'(Class,Value),
+  memberchk(Class,[claz_short_float,claz_single_float,claz_double_float,claz_long_float]),
+  float(Value).
+
+coerce_float_result(Type,Float,'$NUMBER'(Class,Float)):-
+  member(Name-Class,[short_float-claz_short_float,
+                     double_float-claz_double_float,long_float-claz_long_float]),
+  same_symbol(Type,Name),!.
+coerce_float_result(_,Float,Float).
+
+% Only rank-one arrays are sequences; get_adata/2 also accepts other objects.
+sequence_elements(Sequence,Elements):-
+  ( is_list(Sequence) -> Elements=Sequence
+  ; string(Sequence) -> to_lisp_string(Sequence,String),get_adata(String,Elements)
+  ; compound(Sequence),Sequence='$ARRAY'([_],_,Elements),is_list(Elements) -> true
+  ; compound(Sequence),Sequence='$OBJ'(claz_vector,Elements),is_list(Elements) -> true
+  ; throw(error(type_error(sequence,Sequence),sequence))
+  ).
+
 wl:init_args(1,concatenate).
 
 f_concatenate(ResultType,Sequences,'$ARRAY'([*],claz_base_character,Elements)):-
@@ -240,7 +347,19 @@ f_sequence_predicate(Predicate,Element,Result):-
 
 % #'REVERSE
 f_reverse(Xs, Ys) :-
-    lists:reverse(Xs, Ys).
+    is_list(Xs),!,lists:reverse(Xs,Ys).
+f_reverse(Xs,Ys):-
+    string(Xs),!,
+    string_chars(Xs,Chars),
+    lists:reverse(Chars,Reversed),
+    to_lisp_string(Reversed,Ys).
+f_reverse('$ARRAY'(Dims,Type,Elements),'$ARRAY'(Dims,Type,Reversed)):-
+    Dims=[_],!,
+    lists:reverse(Elements,Reversed).
+f_reverse('$OBJ'(claz_vector,Elements),'$OBJ'(claz_vector,Reversed)):-!,
+    lists:reverse(Elements,Reversed).
+f_reverse(Sequence,_):-
+    throw(error(type_error(sequence,Sequence),reverse)).
 
 % #'NREVERSE
 f_nreverse(Xs, Ys) :-
@@ -265,6 +384,52 @@ f_mapcar(P, [[H|T]], [RH|RT]) :- !, f_funcall(P, [H], RH),f_mapcar(P, [T], RT).
 f_mapcar(P, [[H|T],[H2|T2]], [RH|RT]) :- !, f_funcall(P, [H,H2], RH),f_mapcar(P, [T,T2], RT).
 f_mapcar(P, [[H|T],[H2|T2],[H3|T3]], [RH|RT]) :- !, f_funcall(P, [H,H2,H3], RH),f_mapcar(P, [T,T2,T3], RT).
 f_mapcar(_, [[]|_], []).
+
+wl:init_args(1,every).
+f_every(Predicate,Sequences,Result):-
+  predicate_sequence_arguments(Sequences,Elements),
+  every_sequences(Predicate,Elements,Result),
+  nb_linkval('$mv_return',[Result]).
+
+every_sequences(_Predicate,Sequences,t):-
+  sequence_exhausted(Sequences),!.
+every_sequences(Predicate,Sequences,Result):-
+  sequence_heads_tails(Sequences,Arguments,Rest),
+  f_funcall(Predicate,Arguments,Truth),
+  ( Truth==[]
+  -> Result=[]
+  ;  every_sequences(Predicate,Rest,Result)
+  ).
+
+wl:init_args(1,some).
+f_some(Predicate,Sequences,Result):-
+  predicate_sequence_arguments(Sequences,Elements),
+  some_sequences(Predicate,Elements,Result),
+  nb_linkval('$mv_return',[Result]).
+
+some_sequences(_Predicate,Sequences,[]):-
+  sequence_exhausted(Sequences),!.
+some_sequences(Predicate,Sequences,Result):-
+  sequence_heads_tails(Sequences,Arguments,Rest),
+  f_funcall(Predicate,Arguments,Truth),
+  ( Truth==[]
+  -> some_sequences(Predicate,Rest,Result)
+  ;  Result=Truth
+  ).
+
+sequence_exhausted(Sequences):-
+  memberchk([],Sequences).
+
+predicate_sequence_arguments(Sequences,Elements):-
+  ( Sequences=[_|_] -> maplist(sequence_elements,Sequences,Elements)
+  ; f_error([program_error],_)
+  ).
+
+sequence_heads_tails([],[],[]).
+sequence_heads_tails([[Head|Tail]|Sequences],
+                     [Head|Arguments],
+                     [Tail|Rest]):-
+  sequence_heads_tails(Sequences,Arguments,Rest).
 
 
 (wl:init_args(0,nconc)).
@@ -299,6 +464,8 @@ f_copy_seq(List,Copy):- f_copy_list(List,Copy).
 
 
 wl:type_checked(f_length(claz_cons,integer)).
+f_length(Sequence,Len):-
+    string(Sequence),!,string_length(Sequence,Len).
 f_length(Sequence,Len):-
     get_opv(Sequence,fill_pointer,Len),
     integer(Len),!.

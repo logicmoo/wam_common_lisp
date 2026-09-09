@@ -71,17 +71,17 @@ sf_define_compiler_macro(Env,Symbol,FormalParms,MacroBody,Return):- reenter_lisp
 compile_macro_ops(Ctx,Env,Result,[defmacro,Symbol,FormalParms|MacroBody], (Code,FunDef,Result=Symbol)):-
   compile_defmacro(Ctx,Env,[Symbol,FormalParms|MacroBody],Macro,Code),
   debug_var('DefMacroResult',Result),
-  FunDef = (set_opv(Macro,type_of,sys_macro),set_opv(Symbol,symbol_function,Macro)).  
+  FunDef = (set_opv(Macro,type_of,sys_macro),set_opv(Symbol,symbol_function,Macro)).
 
 compile_defmacro(Ctx,Env,[Symbol|FormalParmsMacroBody], Macro, (CompileBody,assert_lsp(Symbol,MacroAssert))):-
   debug_var('MFResult',MFResult),debug_var('FResult',FResult),
-  compile_macro_function(Ctx,Env,Symbol,FormalParmsMacroBody,Macro,HeadParms,Whole,EnvAssign,HeadCode,MFBody,MFResult,CompileBody),
+  compile_macro_function(Ctx,Env,MacroEnv,Symbol,FormalParmsMacroBody,Macro,HeadParms,Whole,EnvAssign,HeadCode,MFBody,MFResult,CompileBody),
   foc_operator(Ctx,Env,kw_special,Symbol,_Len, Special),
-  debug_var('MacroEnv',Env),  
-  append([Macro|[Whole,Env]],[MFResult],CallableHeadMF), CallableMF =.. CallableHeadMF,
-  append([Special,Env|HeadParms],[FResult],CallableHeadSF), CallableSF =.. CallableHeadSF,
+  debug_var('MacroEnv',MacroEnv),
+  append([Macro|[Whole,MacroEnv]],[MFResult],CallableHeadMF), CallableMF =.. CallableHeadMF,
+  append([Special,MacroEnv|HeadParms],[FResult],CallableHeadSF), CallableSF =.. CallableHeadSF,
   body_cleanup_keep_debug_vars(Ctx,
-     (((CallableSF  :- ((CallableMF,f_sys_env_eval(Env,MFResult,FResult))))),
+     (((CallableSF  :- ((CallableMF,f_sys_env_eval(MacroEnv,MFResult,FResult))))),
       ((CallableMF  :- ((nop(defmacro),EnvAssign,HeadCode,MFBody))))),
        MacroAssert).
 
@@ -121,7 +121,12 @@ compile_macro(Ctx,Env,[Symbol|FormalParmsMacroBody], Macro, (CompileBody,assert_
        MacroAssert).
    
 
-compile_macro_function(Ctx,Env,Symbol,[FormalParms|MacroBody0],Macro,HeadParms,Whole,EnvAssign,HeadCode,MFBody,MFResult,CompileBody):-
+compile_macro_function(Ctx,Env,Symbol,Definition,Macro,HeadParms,Whole,EnvAssign,HeadCode,MFBody,MFResult,CompileBody):-
+   compile_macro_function(Ctx,Env,Env,Symbol,Definition,Macro,HeadParms,Whole,EnvAssign,HeadCode,MFBody,MFResult,CompileBody).
+
+% The expansion environment is supplied when the macro is called, not when
+% a surrounding function executes its DEFMACRO installation.
+compile_macro_function(Ctx,Env,MacroEnv,Symbol,[FormalParms|MacroBody0],Macro,HeadParms,Whole,EnvAssign,HeadCode,MFBody,MFResult,CompileBody):-
    maybe_get_docs(function,Symbol,MacroBody0,MacroBody,DocCode),
 
    (var(Macro) -> (always(foc_operator(Ctx,Env,kw_macro,Symbol,_Len, Macro0)),suffix_by_context(Ctx,Macro0,Macro)); 
@@ -130,7 +135,7 @@ compile_macro_function(Ctx,Env,Symbol,[FormalParms|MacroBody0],Macro,HeadParms,W
 
    LabelSymbol = '', % LabelSymbol =Symbol       
  within_labels_context(Ctx,LabelSymbol,((
-   make_head_params(Ctx,Env,Symbol,Macro,FormalParms,Whole,RequiredArgs,RestNKeys,HeadParms,ZippedArgEnv,HeadDefCode,HeadCode), 
+   make_head_params(Ctx,MacroEnv,Symbol,Macro,FormalParms,Whole,RequiredArgs,RestNKeys,HeadParms,ZippedArgEnv,HeadDefCode,HeadCode),
    del_attr(Whole,freeze),
    nop((contains_var(Whole,ZippedArgEnv)->append([Symbol|RequiredArgs],RestNKeys,Whole);true)),
    append([Symbol|RequiredArgs],RestNKeys,Whole),
@@ -341,4 +346,3 @@ macroexpand_1_or_fail(Ctx,Env,[Procedure|Arguments],CompileBody0Result):- atom(P
 
 
 :- fixup_exports.
-

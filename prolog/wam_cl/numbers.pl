@@ -150,9 +150,95 @@ f_ash(Integer,Count,Result):-
      Result is Integer >> Shift
   ).
 
+f_integer_length(Integer,Length):-
+  ( integer(Integer) -> true
+  ; throw(error(type_error(integer,Integer),integer_length))
+  ),
+  ( Integer>=0 -> Magnitude=Integer ; Magnitude is \Integer ),
+  ( Magnitude=:=0 -> Length=0 ; Length is msb(Magnitude)+1 ).
+
+wl:interned_eval(call(init_random_state)).
+init_random_state:-
+  getrand(State),
+  get_ref_object(xx_random_state_xx,Reference),
+  nb_link_put_attr(Reference,symbol_value,'$OBJ'(claz_random_state,State)).
+
+wl:init_args(1,random).
+f_random(Limit,Options,Result):-
+  ( Options==[] -> f_symbol_value(xx_random_state_xx,RandomState)
+  ; Options=[RandomState] -> true
+  ; f_error([program_error],_)
+  ),
+  random_with_state(RandomState,Limit,Result).
+
+random_below(Limit,Result):-
+  integer(Limit),
+  Limit>0,!,
+  Upper is Limit-1,
+  random_between(0,Upper,Result).
+random_below(Limit,Result):-
+  float(Limit),
+  Limit>0,!,
+  random_float_below(Limit,Result).
+random_below(Limit,'$NUMBER'(Class,Result)):-
+  compound(Limit),
+  Limit='$NUMBER'(Class,Value),
+  memberchk(Class,[claz_short_float,claz_single_float,claz_double_float,claz_long_float]),
+  float(Value),
+  Value>0,!,
+  random_float_below(Value,Result).
+random_below(Limit,_):-
+  throw(error(type_error([or,[integer,1,*],[float,[0],*]],Limit),random)).
+
+random_float_below(Limit,Result):-
+  Candidate is random_float*Limit,
+  ( Candidate<Limit -> Result=Candidate ; random_float_below(Limit,Result) ).
+
+random_with_state(RandomState,Limit,Result):-
+  checked_random_state(RandomState,State),
+  getrand(CurrentState),
+  setup_call_cleanup(
+      setrand(State),
+      ( random_below(Limit,Result),
+        getrand(NextState),
+        nb_setarg(2,RandomState,NextState)
+      ),
+      setrand(CurrentState)).
+
+checked_random_state(RandomState,State):-
+  ( nonvar(RandomState),
+    RandomState='$OBJ'(claz_random_state,State),
+    integer(State)
+  -> true
+  ; throw(error(type_error(random_state,RandomState),random))
+  ).
+
+is_random_state_p(RandomState):-
+  nonvar(RandomState),
+  RandomState='$OBJ'(claz_random_state,State),
+  integer(State).
+
 wl:init_args(0,make_random_state).
-f_make_random_state(_Options,'$OBJ'(claz_random_state,State)):-
-  getrand(State).
+f_make_random_state(Options,Result):-
+  ( Options==[] -> State=[]
+  ; Options=[State] -> true
+  ; f_error([program_error],_)
+  ),
+  make_random_state(State,Result).
+
+make_random_state(t,Result):-!,
+  getrand(CurrentState),
+  setup_call_cleanup(set_random(seed(random)),getrand(State),setrand(CurrentState)),
+  Result='$OBJ'(claz_random_state,State).
+make_random_state([],Result):-!,
+  f_symbol_value(xx_random_state_xx,State),
+  copy_random_state(State,Result).
+make_random_state(State,Result):-
+  copy_random_state(State,Result).
+
+copy_random_state(RandomState,Result):-
+  checked_random_state(RandomState,State),
+  Result='$OBJ'(claz_random_state,State).
 
 f_sys_random_posfixnum(Res):- Res is random(2147483647)+1.
 

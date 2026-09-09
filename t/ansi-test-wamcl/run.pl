@@ -94,6 +94,11 @@ wamcl_run_child(Root, TestNames, Input, Status, Output) :-
     format(atom(Goal),
            'catch(set_prolog_flag(lisp_verbose,0),_,true),catch(cl:set_wam_cl_option(call_statistics,false),_,true),catch(lisp,_,true),(wamcl_ansi_run(~w)->halt;halt(1))',
            [TestNamesText]),
+    wamcl_spawn_child(LibraryArg, WamclFile, ChildFile, Goal, 180,
+                      Input, Status, Output).
+
+wamcl_spawn_child(LibraryArg, WamclFile, ChildFile, Goal, Timeout,
+                  Input, Status, Output) :-
     tmp_file_stream(utf8, OutFile, Out0), close(Out0),
     tmp_file_stream(utf8, ErrFile, Err0), close(Err0),
     open(OutFile, write, OutStream, [encoding(utf8)]),
@@ -108,7 +113,7 @@ wamcl_run_child(Root, TestNames, Input, Status, Output) :-
                          process(PID)
                        ]),
         ( thread_create(wamcl_write_child_input(InPipe,Input),Writer,[]),
-          process_wait(PID, WaitStatus, [timeout(180)]),
+          process_wait(PID, WaitStatus, [timeout(Timeout)]),
           (   WaitStatus == timeout
           ->  process_kill(PID, term),
               process_wait(PID, _),

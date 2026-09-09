@@ -56,8 +56,36 @@ lisp_compile(Env,Result,Expression,Body):-
 
 lisp_compile(Ctx,Env,Result,SExpression,BodyO):-
    quietly(as_sexp(SExpression,Expression)),
-   always(must_compile_progn(Ctx,Env,Result,[Expression],Body)),!,
+   ensure_ctx(Ctx),
+   always(compile_toplevel_form(Ctx,Env,Result,Expression,Body)),!,
    body_cleanup_full(Ctx,Body,BodyO),!.
+
+% Only top-level definitions are available to subsequent compiled forms.
+% Ordinary recursive compilation still emits their runtime installation.
+compile_toplevel_form(Ctx,Env,Result,[defmacro|Definition],Body):-!,
+   must_compile_progn(Ctx,Env,Result,[[defmacro|Definition]],Body),
+   always(Body).
+compile_toplevel_form(Ctx,Env,Result,[progn|Forms],Body):-!,
+   compile_toplevel_forms(Ctx,Env,Result,Forms,Body).
+compile_toplevel_form(Ctx,Env,Result,[Op,Flags|Forms],Body):-
+   atom(Op),same_symbol(Op,'eval-when'),!,
+   ( is_when(Flags)
+   -> compile_toplevel_forms(Ctx,Env,Result,Forms,Code),
+      Body=do_when(Flags,Code,Result)
+   ; Result=[],Body=true
+   ).
+compile_toplevel_form(Ctx,Env,Result,Form,Body):-
+   macroexpand_1_or_fail(Ctx,Env,Form,Expansion),!,
+   compile_toplevel_form(Ctx,Env,Result,Expansion,Body).
+compile_toplevel_form(Ctx,Env,Result,Form,Body):-
+   must_compile_progn(Ctx,Env,Result,[Form],Body).
+
+compile_toplevel_forms(_Ctx,_Env,[],[],true).
+compile_toplevel_forms(Ctx,Env,Result,[Form],Body):-!,
+   compile_toplevel_form(Ctx,Env,Result,Form,Body).
+compile_toplevel_forms(Ctx,Env,Result,[Form|Forms],(First,Rest)):-
+   compile_toplevel_form(Ctx,Env,_Ignored,Form,First),
+   compile_toplevel_forms(Ctx,Env,Result,Forms,Rest).
    
 
 :- nop( debug_var('FirstForm',Var)),

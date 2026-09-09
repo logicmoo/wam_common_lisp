@@ -368,3 +368,361 @@
     (let ((string (make-string 3 :initial-element #\x)))
       (setf (subseq string 1) "abcd")
       (string= "xab" string)))
+
+(is equal
+    '(1 3)
+    (let ((sum 0))
+      (loop for weight in '(1 2)
+            collect (incf sum weight))))
+
+(is equal
+    '(t nil t)
+    (list (every #'plusp '(1 2))
+          (every #'plusp '(1 0))
+          (some #'plusp '(0 2))))
+
+(is equal
+    '(t nil)
+    (list (every #'< '(1 2) '(2 3))
+          (some #'> '(1 2) '(2 3))))
+
+(is equal '(0 1 2 2 3 0 1 2 2 3 101)
+    (mapcar #'integer-length
+            (list 0 1 2 3 4 -1 -2 -3 -4 -5 (ash 1 100))))
+
+(is equal '(1.5 integer)
+    (handler-case (integer-length 1.5)
+      (type-error (condition)
+        (list (type-error-datum condition)
+              (type-error-expected-type condition)))))
+
+(is equal '(t nil)
+    (list (random-state-p (make-random-state t))
+          (random-state-p nil)))
+
+(is equal '(nil t)
+    (let* ((state (make-random-state))
+           (copy (make-random-state state)))
+      (list (eq state copy)
+            (equal (loop repeat 5 collect (random 100000 state))
+                   (loop repeat 5 collect (random 100000 copy))))))
+
+(is equal t
+    (let* ((*random-state* (make-random-state))
+           (copy (make-random-state nil)))
+      (make-random-state t)
+      (equal (loop repeat 5 collect (random 100000))
+             (loop repeat 5 collect (random 100000 copy)))))
+
+(is equal t
+    (let* ((state (make-random-state))
+           (alias state)
+           (copy (make-random-state state)))
+      (random 100000 state)
+      (random 100000 copy)
+      (= (random 100000 alias) (random 100000 copy))))
+
+(is equal '(t t t)
+    (list (= 0 (random 1))
+          (let ((value (random (ash 1 100))))
+            (and (integerp value) (<= 0 value) (if (< value (ash 1 100)) t nil)))
+          (let ((value (random 2.5)))
+            (and (eq 'single-float (type-of value))
+                 (<= 0 value) (if (< value 2.5) t nil)))))
+
+(is equal '(double-float short-float long-float)
+    (list (type-of (random 2.0d0))
+          (type-of (random 2.0s0))
+          (type-of (random 2.0l0))))
+
+(is equal '(t t t t t t)
+    (mapcar #'(lambda (limit)
+                (handler-case (progn (random limit) nil)
+                  (type-error () t)))
+            '(0 -1 0.0 -1.0 1/2 bad-limit)))
+
+(is equal '(t t t t)
+    (list (handler-case (random 3 nil) (type-error () t))
+          (handler-case (make-random-state 7) (type-error () t))
+          (handler-case (random 3 nil nil) (program-error () t))
+          (handler-case (make-random-state nil nil) (program-error () t))))
+
+(is equal t
+    (let* ((state (make-random-state))
+           (copy (make-random-state state)))
+      (handler-case (random 0 state) (type-error () nil))
+      (= (random 100000 state) (random 100000 copy))))
+
+(is equal '(t nil t nil :found)
+    (list (every #'identity nil)
+          (some #'identity nil)
+          (every #'< '(1 2 999) #(2 3))
+          (some #'> #(1 2) '(2 3 0))
+          (some #'identity '(nil :found :later))))
+
+(is equal '(nil 2)
+    (let ((calls 0))
+      (list (every #'(lambda (value) (incf calls) (< value 2)) #(1 2 3))
+            calls)))
+
+(is equal '(:found 2)
+    (let ((calls 0))
+      (list (some #'(lambda (value) (incf calls) value) '(nil :found :later))
+            calls)))
+
+(is equal t
+    (every #'characterp "abc"))
+
+(is equal '(t t t t)
+    (list (handler-case (every #'identity) (program-error () t))
+          (handler-case (some #'identity) (program-error () t))
+          (handler-case (every #'identity 42) (type-error () t))
+          (handler-case (some #'identity '(1 . 2)) (type-error () t))))
+
+(is equal '(t t t t)
+    (list (string= "abc" (coerce '(#\a #\b #\c) 'string))
+          (string= "abc" (coerce "abc" 'simple-base-string))
+          (string= "abc" (coerce #(#\a #\b #\c) 'simple-string))
+          (string= "" (coerce nil 'base-string))))
+
+(is equal '(#\a #\b #\c) (coerce "abc" 'list))
+(is equal '(1 2 3) (coerce (coerce '(1 2 3) 'vector) 'list))
+(is equal '(1 2) (coerce (coerce '(1 2) 'simple-vector) 'list))
+
+(is equal '(t nil)
+    (let* ((element (list 'shared))
+           (source (list element))
+           (vector (coerce source 'vector))
+           (copy (coerce vector 'list)))
+      (list (eq element (car copy)) (eq source copy))))
+
+(is equal '(1.0 0.5 short-float double-float long-float)
+    (list (coerce 1 'float)
+          (coerce 1/2 'single-float)
+          (type-of (coerce 1 'short-float))
+          (type-of (coerce 1 'double-float))
+          (type-of (coerce 1 'long-float))))
+
+(is equal '(short-float double-float long-float)
+    (list (type-of (coerce 1.0s0 'float))
+          (type-of (coerce 1.0d0 'float))
+          (type-of (coerce 1.0l0 'float))))
+
+(is equal '(#\a #\b #\C)
+    (list (coerce #\a 'character)
+          (coerce "b" 'character)
+          (coerce 'c 'character)))
+
+(is equal '(7 8 9)
+    (list (funcall (coerce #'identity 'function) 7)
+          (funcall (coerce 'identity 'function) 8)
+          (funcall (coerce '(lambda (x) x) 'function) 9)))
+
+(is equal '(t t t t t t)
+    (list (handler-case (coerce '(1 2) 'string) (type-error () t))
+          (handler-case (coerce 1 'list) (type-error () t))
+          (handler-case (coerce 65 'character) (type-error () t))
+          (handler-case (coerce "ab" 'character) (type-error () t))
+          (handler-case (coerce 'abc 'float) (type-error () t))
+          (handler-case (coerce 1 'function) (type-error () t))))
+
+(is equal '(3 1)
+    (let ((value 1) (calls 0))
+      (list (incf value (progn (incf calls) 2)) calls)))
+
+(defparameter *ansi-coerced-string* (coerce '(#\a #\b #\c) 'simple-base-string))
+
+(is equal '(3 t)
+    (list (length *ansi-coerced-string*)
+          (string= "cba" (reverse *ansi-coerced-string*))))
+
+(is equal '(t (3 2 1) (3 2 1))
+    (list (string= "cba" (reverse (coerce '(#\a #\b #\c) 'string)))
+          (coerce (reverse (coerce '(1 2 3) 'vector)) 'list)
+          (reverse '(1 2 3))))
+
+(is equal 3 (length #.(coerce "abc" 'simple-base-string)))
+
+(is equal t
+    (progn
+      (prolog-inline "getrand(S),f_make_random_state([],A),f_make_random_state([A],B),f_random(1000,[A],X),f_random(1000,[B],X),getrand(S),catch(f_random(0,[A],_),error(type_error(_,_),_),true),getrand(S),f_random(1000,[A],Y),f_random(1000,[B],Y)")
+      t))
+
+(is equal '(nil 1)
+    (let ((calls 0))
+      (list (assert (progn (incf calls) t)) calls)))
+
+(is equal t
+    (handler-case (assert nil)
+      (simple-error () t)))
+
+(is equal 42
+    (handler-case (assert nil () 'type-error :datum 42 :expected-type 'string)
+      (type-error (condition) (type-error-datum condition))))
+
+(is equal '(nil 0)
+    (let ((calls 0))
+      (list (assert t () (progn (incf calls) "unused")) calls)))
+
+(is equal '(nil t)
+    (let ((ready nil))
+      (list (handler-bind ((simple-error #'(lambda (condition)
+                                             (declare (ignore condition))
+                                             (setq ready t)
+                                             (invoke-restart 'continue))))
+              (assert ready))
+            ready)))
+
+(defmacro ansi-bootstrap-body (&body forms)
+  `(progn ,@forms))
+
+(is equal '(progn 1 2)
+    (macroexpand-1 '(ansi-bootstrap-body 1 2)))
+
+(is equal '(2 3)
+    (list (ansi-bootstrap-body 1 2)
+          (ansi-bootstrap-body 3)))
+
+(is equal '((a b) (a) nil nil (a) (a b . c))
+    (list (butlast '(a b c))
+          (butlast '(a b c) 2)
+          (butlast '(a b) 9)
+          (butlast nil)
+          (butlast '(a b . c))
+          (butlast '(a b . c) 0)))
+
+(is equal '(nil t)
+    (let* ((element (list 'shared))
+           (source (list element 'last))
+           (copy (butlast source)))
+      (list (eq source copy) (eq element (car copy)))))
+
+(is equal '(t t t)
+    (list (handler-case (butlast '(a) -1) (type-error () t))
+          (handler-case (butlast 'atom) (type-error () t))
+          (handler-case (butlast '(a) 1 2) (program-error () t))))
+
+(is equal '(nil t t nil)
+    (list (typep 3 'ratio) (typep 1/2 'ratio)
+          (typep 3 'integer) (typep 1/2 'integer)))
+
+(is equal '(t) (multiple-value-list (typep 3 'integer)))
+
+;; Compiling a nested DEFMACRO must not execute it.
+(if nil (defmacro ansi-never-if () 33) nil)
+(is equal nil (macro-function 'ansi-never-if))
+(is equal '(ansi-never-if) (macroexpand-1 '(ansi-never-if)))
+
+(defun ansi-install-runtime-macro ()
+  (defmacro ansi-runtime-macro () 34))
+(is equal nil (macro-function 'ansi-runtime-macro))
+(ansi-install-runtime-macro)
+(is equal 34 (ansi-runtime-macro))
+
+(if t (defmacro ansi-executed-if () 35) nil)
+(is equal 35 (ansi-executed-if))
+
+(let () (if nil (defmacro ansi-never-let () 36) nil))
+(is equal nil (macro-function 'ansi-never-let))
+
+(progn
+  (defmacro ansi-top-progn () 37)
+  (is equal 37 (ansi-top-progn)))
+
+(defmacro ansi-top-definition ()
+  '(defmacro ansi-expanded-top () 38))
+(progn
+  (ansi-top-definition)
+  (is equal 38 (ansi-expanded-top)))
+
+(eval-when ()
+  (defmacro ansi-never-eval-when () 39))
+(is equal nil (macro-function 'ansi-never-eval-when))
+
+(eval-when (:execute)
+  (defmacro ansi-top-eval-when () 40)
+  (is equal 40 (ansi-top-eval-when)))
+
+;; COERCE-created closures receive values, not expressions to evaluate again.
+(is equal '(quote abc)
+    (funcall (coerce '(lambda (x) x) 'function) '(quote abc)))
+(is equal 'ansi-unbound-data
+    (funcall (coerce '(lambda (x) x) 'function) 'ansi-unbound-data))
+(is equal '(t t t 7 8)
+    (let* ((fn (coerce '(lambda (x) x) 'function))
+           (data (list 'quote 'abc)))
+      (list (eq data (funcall fn data))
+            (eq 'ansi-unbound-data (funcall fn 'ansi-unbound-data))
+            (eq data (funcall fn data))
+            (funcall fn 7)
+            (funcall fn 8))))
+(is equal '(changed)
+    (let* ((fn (coerce '(lambda (x) x) 'function))
+           (data (list 'original))
+           (alias (funcall fn data)))
+      (rplaca alias 'changed)
+      data))
+
+;; Predicate secondary values must not escape EVERY or SOME.
+(is equal '(t)
+    (multiple-value-list (every #'(lambda (x) (values 123 456)) '(t))))
+(is equal '(123)
+    (multiple-value-list (some #'(lambda (x) (values 123 456)) '(t))))
+(is equal '(nil)
+    (multiple-value-list (every #'(lambda (x) (values nil 456)) '(t t))))
+(is equal '(nil)
+    (multiple-value-list (some #'(lambda (x) (values nil 456)) '(t t))))
+(is equal '(t)
+    (multiple-value-list (every #'identity (values nil :stale))))
+(is equal '(nil)
+    (multiple-value-list (some #'identity (values nil :stale))))
+(is equal '(t)
+    (multiple-value-list
+      (every #'(lambda (x) (if x (values t :extra) (values nil :extra)))
+             '(t t))))
+(is equal '(:found)
+    (multiple-value-list
+      (some #'(lambda (x) (if x (values :found :extra) (values nil :extra)))
+            '(nil :found :later))))
+
+;; Coercion to an already satisfied sequence type preserves mutable identity.
+(is equal '(t (changed))
+    (let* ((source (list 'a))
+           (alias (coerce source 'list)))
+      (rplaca alias 'changed)
+      (list (eq source alias) source)))
+(is equal '(t t t t t)
+    (let ((source (make-string 2 :initial-element #\a)))
+      (list (eq source (coerce source 'string))
+            (eq source (coerce source 'simple-string))
+            (eq source (coerce source 'base-string))
+            (eq source (coerce source 'simple-base-string))
+            (eq source (coerce source 'vector)))))
+(is equal '(t t)
+    (let* ((source (make-string 2 :initial-element #\a))
+           (alias (coerce source 'string)))
+      (setf (aref alias 0) #\b)
+      (list (eq source alias) (string= source "ba"))))
+(is equal '(t t (9 2))
+    (let* ((source (coerce '(1 2) 'vector))
+           (alias (coerce source 'simple-vector)))
+      (setf (aref alias 0) 9)
+      (list (eq source (coerce source 'vector))
+            (eq source alias)
+            (coerce source 'list))))
+(is equal '(t t t)
+    (list (handler-case (coerce '(a) '(vector t 1)) (type-error () t))
+          (handler-case (coerce "a" '(string 1)) (type-error () t))
+          (handler-case (coerce '(a) '(cons t t)) (type-error () t))))
+
+(defparameter *ansi-saved-random-states* (list (make-random-state)))
+(is equal t (random-state-p (car *ansi-saved-random-states*)))
+
+(is equal '(nil t)
+    (let ((element (list 'shared)))
+      (let ((first (list element)) (second (list element)))
+        (list (eq first second) (eq (car first) (car second))))))
+
+(is equal t
+    (every #'(lambda (value) (if (< value 5.0e-324) t nil))
+           (loop repeat 10 collect (random 5.0e-324))))
