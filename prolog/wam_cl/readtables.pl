@@ -22,7 +22,10 @@
 
 
 f_sys_make_read_table(Out):-create_struct(read_table,Out).
-  
+
+wl:init_args(0,copy_readtable).
+f_copy_readtable(_Options,Copy):- f_sys_make_read_table(Copy).
+
 
 % reader_intern_symbols(ExprS1,ExprS1):- current_prolog_flag(no_symbol_fix,true),!.
 reader_intern_symbols(ExprS1,Expr):-
@@ -230,6 +233,7 @@ feature_member(Flag0,Features):- reader_intern_symbols(pkg_kw,Flag0,Flag),!,feat
 feature_member0(Flag,Features):- memberchk(Flag,Features).
 feature_member0([kw_or|X],Features):- member(E,X), feature_member0(E,Features).
 feature_member0([kw_and|X],Features):- \+ ( member(E,X), \+ feature_member0(E,Features)).
+feature_member0([kw_not,Flag],Features):- \+ feature_member0(Flag,Features).
 
 
 resolve_1inline([OP,_Flag,_Form], _Code):- \+ atomic(OP),!,fail.
@@ -305,6 +309,3 @@ keep_as_pl_term(D):-atom_concat_or_rtrace('$',_,D).
 :- fixup_exports.
 
 end_of_file.
-
-
-

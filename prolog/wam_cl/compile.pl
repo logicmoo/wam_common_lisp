@@ -311,27 +311,14 @@ compile_body(Ctx,Env,Result,[OP,Flag,Form|MORE], Code):- same_symbol(OP,'#-'),!,
              compile_body(Ctx,Env,Result,MORE, Code)))).
 
 % EVAL-WHEN
-compile_body(Ctx,Env,Result,[OP,Flags,Forms], OutCode):-  same_symbol(OP,'eval-when'), !,
+compile_body(Ctx,Env,Result,[OP,Flags|Forms], OutCode):-  same_symbol(OP,'eval-when'), !,
   (is_when(Flags) ->
-    (must_compile_body(Ctx,Env,Result,[progn,Forms],Code),OutCode = do_when(Flags,Code,Result));
+    (must_compile_body(Ctx,Env,Result,[progn|Forms],Code),OutCode = do_when(Flags,Code,Result));
     (Result=[],OutCode=dbginfo(skipping([OP,Flags,Forms])))).
 
    do_when(Flags,Code,Result):- 
       (is_when(Flags) -> locally_let(sym('sys::*compiler-mode*')=sym(':execute'),Code);Result=[]).
    
-% assume always true (debugging) 
-compile_body(Ctx,Env,Result,[OP,_Flags|Forms], Code):-   same_symbol(OP,'eval-when'), !,must_compile_body(Ctx,Env,Result,[progn,Forms],Code).
-
-% Maybe later we'll try something simular?
-compile_body(Ctx,Env,Result,[OP,Flags|Forms], Code):-  same_symbol(OP,'eval-when'), !,
- always((
- (member(X,Flags),is_when(X))
-  -> must_compile_body(Ctx,Env,Result,
-    [let,[[sys_xx_compiler_mode_xx,sys_xx_compiler_mode_xx]],
-     [progn,[sys_removef_list_value,sys_xx_compiler_mode_xx,kw_compile_toplevel],
-            [sys_insertf_list_value,sys_xx_compiler_mode_xx,kw_execute]|Forms]],Code)
-   ; (Result=[],Code = true))).
-
    f_sys_removef_list_value(Symbol,Value,New):- get_var(Symbol,Was),delete(Was,Value,New),set_var(Symbol,New).
    f_sys_insertf_list_value(Symbol,Value,New):- get_var(Symbol,Was),list_to_set([Value|Was],New),set_var(Symbol,New).
    % COMPILE-TOPLEVEL LOAD-TOPLEVEL EXECUTE

@@ -50,9 +50,11 @@ a_class(t,claz_symbol).
 a_class(symbol,claz_symbol).
 a_class(Obj,Class):- b_type(Obj,Type),always_find_class(Type,Class).
 % compounds
-c_class(function(OP),Class):- atom(OP),get_opv(OP,symbol_function,Obj),f_class_of(Obj,Class).
-c_class(function(_),claz_function).
+c_class(function(_),claz_function):-!.
+c_class(Closure,claz_function):- compound_name_arity(Closure,closure,_),!.
 c_class([_|_],claz_cons):-!.
+c_class('$ARRAY'([_],claz_base_character,Elements),claz_string):-nonvar(Elements),!.
+c_class('$ARRAY'(_,_,_),claz_array):-!.
 c_class('$OBJ'(Type,_Data),Type).
 c_class('#\\'(_),claz_character).
 c_class('$COMPLEX'(_,_),claz_complex).
@@ -62,6 +64,8 @@ c_class(Str,claz_string):- is_stringp(Str).
 
 always_find_class(keyword,claz_symbol).
 always_find_class(boolean,claz_symbol).
+always_find_class(Type,Type):- atom(Type),atom_concat('claz_',_,Type),!.
+always_find_class(Type,Class):- atom(Type),atom_concat('claz_',Type,Class),!.
 always_find_class(Type,Class):- find_class(Type,Class),!.
 always_find_class(Type,Class):- atom_concat_or_rtrace('claz_',Type,Class).
 
@@ -87,9 +91,12 @@ b_type(Obj,_):- \+ atom(Obj),!,fail.
 b_type(Obj,keyword):- package_external_symbols(pkg_kw,_,Obj).
 b_type(Obj,symbol):- package_external_symbols(_,_,Obj).
 b_type(Obj,symbol):- package_internal_symbols(_,_,Obj).
-b_type(Obj,Type):- get_opv_iiii(Obj,type_of,Type),!.
-b_type(Obj,Type):- get_opv_iiii(Obj,dims,List),(List=[N] -> Type = [simple_vector,N]; Type = [array,List]),!.
 b_type(Atom,Type):- atomic_list_concat([Type,_Name],'_znst_',Atom),!.
+b_type(Obj,Type):-
+  get_opv_iiii(Obj,type_of,StoredType),
+  nonvar(StoredType),!,
+  Type=StoredType.
+b_type(Obj,Type):- get_opv_iiii(Obj,dims,List),(List=[N] -> Type = [simple_vector,N]; Type = [array,List]),!.
 b_type(Atom,Type):- atomic_list_concat([Prefix|Rest],'_',Atom),prefix_to_typeof(Prefix,Rest,Atom,Type),!.
 
 type_ges(function(_),function).
@@ -111,7 +118,18 @@ is_subtypep(SubType,Type,OptEnv):-
   OptErrorOptEnv = [[]|OptEnv],
   f_find_class(SubType,OptErrorOptEnv,SubClass),f_find_class(Type,OptErrorOptEnv,Class),is_subclass(SubClass,Class).
 
-is_subclass(SubClass,Class):- SubClass=Class; get_super_class(SubClass,Class).
+is_subclass(SubClass,Class):-
+  subclass_frontier([SubClass],Class,[]).
+
+subclass_frontier([],_,_):-fail.
+subclass_frontier([Class|_],Class,_):-!.
+subclass_frontier([SubClass|Rest],Class,Seen):-
+  memberchk(SubClass,Seen),!,
+  subclass_frontier(Rest,Class,Seen).
+subclass_frontier([SubClass|Rest],Class,Seen):-
+  findall(SuperClass,get_super_class(SubClass,SuperClass),SuperClasses),
+  append(Rest,SuperClasses,Frontier),
+  subclass_frontier(Frontier,Class,[SubClass|Seen]).
 
 
 f_type_of(O,T):- i_type(O,T),!.
@@ -141,4 +159,3 @@ number_type_of(_Obj,number).
 
 
 :- fixup_exports.
-

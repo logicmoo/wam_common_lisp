@@ -30,6 +30,7 @@ f_array_dimension(Obj,Axis,RetVal):- get_opv(Obj,dims,Elements),nth0(Axis,Elemen
 wl:init_args(1,aref).
 f_aref(Obj,Indexes,RetVal):- get_adata(Obj,Elements),!,nth_index(Indexes,Elements,RetVal).
 f_aset(Obj,Indexes,Value,RetVal):- get_adata(Obj,Elements),!,set_nth_index(Indexes,Elements,Value,RetVal).
+f_sys_set_elt(Obj,Index,Value,Value):- f_aset(Obj,[Index],Value,_).
 %f_aref(Elements,Index,RetVal):- f_nthcdr(Elements,Index,RetVal).
 
 
@@ -77,6 +78,5 @@ is_vectorp(Obj):- get_opv(Obj,dims,Dims),Dims=[_].
 is_arrayp(Obj):- get_opv(Obj,type_of,array).
 
 :- fixup_exports.
-
 
 

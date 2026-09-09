@@ -53,7 +53,8 @@ compile_closures(Ctx,Env,Result,[lambda,FormalParms|LambdaBody], Body):- Symbol=
    must_compile_closure_body(Ctx,ClosureEnvironment,ClosureResult,[progn|LambdaBody],  ClosureBody),
    debug_var('LArgs',FormalParms),debug_var('LResult',ClosureResult),debug_var('LambdaResult',Result),
    debug_var('ClosureEnvironment',ClosureEnvironment),debug_var('Whole',Whole),debug_var('Symbol',Symbol),
-   Result = closure(kw_function,ClosureEnvironment,Whole,ClosureResult,FormalParms,(BinderCode,ClosureBody),Symbol),
+   Result = closure(kw_function,closure_environment(ClosureEnvironment,Env),
+                    Whole,ClosureResult,FormalParms,(BinderCode,ClosureBody),Symbol),
    Body = true.
 
 
@@ -110,9 +111,63 @@ compile_closures(_Ctx,Env,Result,Closure,Body):-
 
 
 
-closure(kw_function,_ClosureEnvironment,Whole,Result,_FormalParms,ClosureBody,_Symbol,Params,Result):-
- always(Whole=Params),
- always(ClosureBody).
+closure(kw_function,EnvironmentSpec,Whole,Result,_FormalParms,ClosureBody,_Symbol,Params,ResultOut):-
+  closure_environment_parts(EnvironmentSpec,_ActivationEnvironment,OuterEnvironment),
+  ResultBox=closure_result(no_result),
+  ( once(( always(Whole=Params),
+           always(ClosureBody),
+           preserve_closure_result(ResultBox,Result,Params,
+                                   OuterEnvironment,ClosureBody)
+         )),
+    fail
+  ; true
+  ),
+  arg(1,ResultBox,ResultDescriptor),
+  restore_closure_result(ResultDescriptor,Params,OuterEnvironment,ResultOut).
+
+closure_environment_parts(closure_environment(ActivationEnvironment,OuterEnvironment),
+                          ActivationEnvironment,OuterEnvironment):-!.
+closure_environment_parts(ActivationEnvironment,ActivationEnvironment,[]).
+
+preserve_closure_result(ResultBox,Result,Params,_OuterEnvironment,_ClosureBody):-
+  nth0(Index,Params,Parameter),
+  same_term(Result,Parameter),!,
+  nb_setarg(1,ResultBox,parameter(Index)).
+preserve_closure_result(ResultBox,Result,_Params,OuterEnvironment,_ClosureBody):-
+  closure_environment_binding(OuterEnvironment,Name,Captured),
+  same_term(Result,Captured),!,
+  nb_setarg(1,ResultBox,captured(Name)).
+preserve_closure_result(ResultBox,Result,_Params,_OuterEnvironment,ClosureBody):-
+  closure_body_global_source(ClosureBody,Result,Name),!,
+  nb_setarg(1,ResultBox,global(Name)).
+preserve_closure_result(ResultBox,Result,_Params,_OuterEnvironment,_ClosureBody):-
+  nb_setarg(1,ResultBox,value(Result)).
+
+restore_closure_result(parameter(Index),Params,_OuterEnvironment,Result):-
+  nth0(Index,Params,Result).
+restore_closure_result(captured(Name),_Params,OuterEnvironment,Result):-
+  get_var(OuterEnvironment,Name,Result).
+restore_closure_result(global(Name),_Params,_OuterEnvironment,Result):-
+  get_var(Name,Result).
+restore_closure_result(value(Result),_Params,_OuterEnvironment,Result).
+
+closure_environment_binding(bv(Name,Value),Name,Value).
+closure_environment_binding([Head|_],Name,Value):-
+  nonvar(Head),
+  closure_environment_binding(Head,Name,Value).
+closure_environment_binding([_|Tail],Name,Value):-
+  nonvar(Tail),
+  closure_environment_binding(Tail,Name,Value).
+
+closure_body_global_source(get_var(_,Name,Source),Result,Name):-
+  atom(Name),
+  same_term(Result,Source).
+closure_body_global_source(Term,Result,Name):-
+  compound(Term),
+  compound_name_arguments(Term,_,Arguments),
+  member(Argument,Arguments),
+  nonvar(Argument),
+  closure_body_global_source(Argument,Result,Name).
 
 
 % Called by Incomplete Closures (Lambdas)
@@ -170,4 +225,3 @@ apply_c(EnvIn,X, _, R):- ignore(R=[]),
 	!.
 
 :- fixup_exports.
-

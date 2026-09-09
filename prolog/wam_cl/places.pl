@@ -38,7 +38,7 @@ wl:init_args(x,row_major_aref).
 wl:setf_inverse(slot_value,sys_pf_set_slot_value).
 wl:setf_inverse(car,rplaca).
 wl:setf_inverse(cdr,rplacd).
-wl:setf_inverse(elt, u_set_elt).
+wl:setf_inverse(elt, sys_set_elt).
 wl:setf_inverse(car, sys_set_car).
 wl:setf_inverse(first, sys_set_car).
 wl:setf_inverse(cdr, sys_set_cdr).
@@ -46,6 +46,7 @@ wl:setf_inverse(rest, sys_set_cdr).
 wl:setf_inverse(sys_uvref, sys_uvset).
 wl:setf_inverse(aref, sys_aset).
 wl:setf_inverse(svref, sys_svset).
+wl:setf_inverse(subseq, sys_set_subseq).
 wl:setf_inverse(sys_pf_svref, sys_pf_svset).
 wl:setf_inverse(char, sys_set_char).
 wl:setf_inverse(schar, sys_set_schar).

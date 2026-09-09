@@ -19,6 +19,10 @@
 sf_declare(_ReplEnv,_,_).
 sf_proclaim(_ReplEnv,Assert,t):- assert(is_proclaimed(Assert)).
 
+wl:plugin_expand_progbody_1st(Ctx,Env,Result,
+    [locally|Forms],_PreviousResult,Code):-
+  must_compile_body(Ctx,Env,Result,[progn|Forms],Code).
+
 mf_declaim([declaim|Declarations],_Env,[progn|Forms]):-
   maplist(declaim_proclaim_form,Declarations,Forms).
 
@@ -70,4 +74,3 @@ store_meta_info(With,Name,ArgumentTypes,ResultType,List,Name):-
 
 
 :- fixup_exports.
-

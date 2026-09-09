@@ -30,6 +30,77 @@
 is_listp(Obj):- compound(Obj)-> Obj=[_|_] ; Obj == [].
 is_endp(Obj):- Obj == [].
 
+wl:init_args(1,concatenate).
+
+f_concatenate(ResultType,Sequences,'$ARRAY'([*],claz_base_character,Elements)):-
+  same_symbol(ResultType,string),!,
+  maplist(get_adata,Sequences,Parts),
+  append(Parts,Elements).
+f_concatenate(ResultType,Sequences,Result):-
+  same_symbol(ResultType,list),!,
+  maplist(get_adata,Sequences,Parts),
+  append(Parts,Result).
+f_concatenate(ResultType,Sequences,'$OBJ'(claz_vector,Elements)):-
+  same_symbol(ResultType,vector),!,
+  maplist(get_adata,Sequences,Parts),
+  append(Parts,Elements).
+
+wl:init_args(1,remove_duplicates).
+
+f_remove_duplicates(Sequence,Keys,Result):-
+  get_identity_pred(Keys,kw_key,Identity),
+  get_test_pred(f_eql,Keys,Test),
+  key_value(Keys,kw_from_end,FromEnd,[]),
+  ( FromEnd==[]
+  -> remove_duplicate_elements(Sequence,Identity,Test,Result)
+  ;  remove_duplicate_elements_from_end(Sequence,Identity,Test,[],Result)
+  ).
+
+remove_duplicate_elements([],_,_,[]).
+remove_duplicate_elements([Head|Tail],Identity,Test,Result):-
+  ( sequence_duplicate_member(Head,Tail,Identity,Test)
+  -> Result=Rest
+  ;  Result=[Head|Rest]
+  ),
+  remove_duplicate_elements(Tail,Identity,Test,Rest).
+
+remove_duplicate_elements_from_end([],_,_,_,[]).
+remove_duplicate_elements_from_end([Head|Tail],Identity,Test,Seen,Result):-
+  ( sequence_duplicate_member(Head,Seen,Identity,Test)
+  -> Result=Rest,
+     NextSeen=Seen
+  ;  Result=[Head|Rest],
+     NextSeen=[Head|Seen]
+  ),
+  remove_duplicate_elements_from_end(Tail,Identity,Test,NextSeen,Rest).
+
+sequence_duplicate_member(Element,[Candidate|_],Identity,Test):-
+  call_as_ident(Identity,Element,ElementKey),
+  call_as_ident(Identity,Candidate,CandidateKey),
+  apply_as_pred(Test,ElementKey,CandidateKey),!.
+sequence_duplicate_member(Element,[_|Rest],Identity,Test):-
+  sequence_duplicate_member(Element,Rest,Identity,Test).
+
+wl:init_args(2,remove_if).
+wl:init_args(2,remove_if_not).
+
+f_remove_if(Predicate,Sequence,_Keys,Result):-
+  remove_if_elements(Predicate,Sequence,false,Result).
+f_remove_if_not(Predicate,Sequence,_Keys,Result):-
+  remove_if_elements(Predicate,Sequence,true,Result).
+
+remove_if_elements(_Predicate,[],_KeepTrue,[]).
+remove_if_elements(Predicate,[Head|Tail],KeepTrue,Result):-
+  f_funcall(Predicate,[Head],Truth),
+  ( keep_predicate_result(KeepTrue,Truth)
+  -> Result=[Head|Rest]
+  ;  Result=Rest
+  ),
+  remove_if_elements(Predicate,Tail,KeepTrue,Rest).
+
+keep_predicate_result(true,Truth):- Truth\==[].
+keep_predicate_result(false,Truth):- Truth==[].
+
 % GROVELED f_listp(Obj,RetVal):- t_or_nil(is_listp(Obj),RetVal).
 % GROVELED f_endp(Obj,RetVal):- t_or_nil(is_endp(Obj), RetVal).
 
@@ -103,11 +174,11 @@ f_member(_,_,_,[]).
 
 % #'MEMBER-IF
 wl:init_args(2,member_if).
-f_member_if(E,Seq,Keys,Result):- f_member(E,Seq,[kw_test,f_funcall|Keys],Result).  
+f_member_if(E,Seq,Keys,Result):- f_member(E,Seq,[kw_test,f_sequence_predicate|Keys],Result).
 
 % #'MEMBER-IF-NOT
 wl:init_args(2,member_if_not).
-f_member_if_not(E,Seq,Keys,Result):- f_member(E,Seq,[kw_test_not,f_funcall|Keys],Result).
+f_member_if_not(E,Seq,Keys,Result):- f_member(E,Seq,[kw_test_not,f_sequence_predicate|Keys],Result).
 
 wl:init_args(2,find).
 f_find(E,Seq,Keys,Result):-
@@ -115,10 +186,10 @@ f_find(E,Seq,Keys,Result):-
    f_car(MemberResult,Result).
 
 wl:init_args(2,find_if).
-f_find_if(E,Seq,Keys,Result):- f_find(E,Seq,[kw_test,f_funcall|Keys],Result).  
+f_find_if(E,Seq,Keys,Result):- f_find(E,Seq,[kw_test,f_sequence_predicate|Keys],Result).
 
 wl:init_args(2,find_if_not).
-f_find_if_not(E,Seq,Keys,Result):- f_find(E,Seq,[kw_test_not,f_funcall|Keys],Result).
+f_find_if_not(E,Seq,Keys,Result):- f_find(E,Seq,[kw_test_not,f_sequence_predicate|Keys],Result).
 
 
 % #'SEARCH  - http://www.lispworks.com/documentation/HyperSpec/Body/f_search.htm
@@ -157,11 +228,14 @@ f_position(_,_,_,[]).
 
 % #'POSITION-IF
 wl:init_args(2,position_if).
-f_position_if(E,Seq,Keys,Result):- f_position(E,Seq,[kw_test,f_funcall|Keys],Result).  
+f_position_if(E,Seq,Keys,Result):- f_position(E,Seq,[kw_test,f_sequence_predicate|Keys],Result).
 
 % #'POSITION-IF-NOT
 wl:init_args(2,position_if_not).
-f_position_if_not(E,Seq,Keys,Result):- f_position(E,Seq,[kw_test_not,f_funcall|Keys],Result).
+f_position_if_not(E,Seq,Keys,Result):- f_position(E,Seq,[kw_test_not,f_sequence_predicate|Keys],Result).
+
+f_sequence_predicate(Predicate,Element,Result):-
+  f_funcall(Predicate,[Element],Result).
 
 
 % #'REVERSE
@@ -187,9 +261,9 @@ replace_each(Count,XR,[Y|YR]):- nb_setarg(1,XR,Y),arg(2,XR,XT),Count2 is Count-1
    
 
 wl:init_args(1,mapcar).
-f_mapcar(P, [[H|T]], [RH|RT]) :- !, f_apply(P, [H], RH),f_mapcar(P, [T], RT).
-f_mapcar(P, [[H|T],[H2|T2]], [RH|RT]) :- !, f_apply(P, [H,H2], RH),f_mapcar(P, [T,T2], RT).
-f_mapcar(P, [[H|T],[H2|T2],[H3|T3]], [RH|RT]) :- !, f_apply(P, [H,H2,H3], RH),f_mapcar(P, [T,T2,T3], RT).
+f_mapcar(P, [[H|T]], [RH|RT]) :- !, f_funcall(P, [H], RH),f_mapcar(P, [T], RT).
+f_mapcar(P, [[H|T],[H2|T2]], [RH|RT]) :- !, f_funcall(P, [H,H2], RH),f_mapcar(P, [T,T2], RT).
+f_mapcar(P, [[H|T],[H2|T2],[H3|T3]], [RH|RT]) :- !, f_funcall(P, [H,H2,H3], RH),f_mapcar(P, [T,T2,T3], RT).
 f_mapcar(_, [[]|_], []).
 
 
@@ -214,6 +288,14 @@ nconc_last_cell([_|Rest],Cell,Tail):-
 
 f_copy_list(List,List):- \+ compound(List),!.
 f_copy_list([M|List],[M|Copy]):-f_copy_list(List,Copy).
+
+f_copy_seq('$ARRAY'(Dimensions,Type,Elements),
+           '$ARRAY'(Dimensions,Type,Copy)):-!,
+  f_copy_list(Elements,Copy).
+f_copy_seq('$OBJ'(claz_vector,Elements),
+           '$OBJ'(claz_vector,Copy)):-!,
+  f_copy_list(Elements,Copy).
+f_copy_seq(List,Copy):- f_copy_list(List,Copy).
 
 
 wl:type_checked(f_length(claz_cons,integer)).
@@ -255,6 +337,28 @@ f_subseq(Seq,Start,End,Result):-
   range_subseq(Mid,Start,End,MOut),
   always(coerce_to(MOut, object(Was,Info),Result)).
 
+f_sys_set_subseq(Sequence,Start,Value,Value):-
+  get_adata(Value,Source),
+  length(Source,Count),
+  get_adata(Sequence,Target),
+  length(Target,TargetLength),
+  End is min(Start+Count,TargetLength),
+  set_subsequence_elements(Target,Start,End,Source).
+f_sys_set_subseq(Sequence,Start,End,Value,Value):-
+  get_adata(Value,Source),
+  set_subsequence_range(Sequence,Start,End,Source).
+
+set_subsequence_range(Sequence,Start,End,Source):-
+  get_adata(Sequence,Target),
+  set_subsequence_elements(Target,Start,End,Source).
+
+set_subsequence_elements(_Target,Index,End,_Source):- Index>=End,!.
+set_subsequence_elements(_Target,_Index,_End,[]):-!.
+set_subsequence_elements(Target,Index,End,[Value|Values]):-
+  set_nth(Index,Target,Value),
+  Next is Index+1,
+  set_subsequence_elements(Target,Next,End,Values).
+
 pl_subseq([], Skip, []):- Skip =:=0 -> true ; throw('should not be greater than :END').
 pl_subseq([Head|Tail], Skip, [Head|Cmpl]) :- Skip<1,!,
 	pl_subseq(Tail, Skip, Cmpl).
@@ -291,5 +395,3 @@ data_nth0(N, Vector, Value):-   M is N+1,arg(M, Vector, Value).
 
       
 end_of_file.
-
-

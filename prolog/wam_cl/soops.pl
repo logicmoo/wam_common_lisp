@@ -311,6 +311,11 @@ find_class(Name,Claz):- atom(Name),atom_concat_or_rtrace('claz_',Name,Claz).
 f_find_class(Name,_Opts,Claz):- always(is_symbolp(Name)),
   once((find_class(Name,Claz),claz_to_symbol(Claz,Sym),Name==Sym,always(is_classp(Claz)))).
 f_find_class(_,_,[]).
+
+wl:init_args(3,find_method).
+f_find_method(GenericFunction,Qualifiers,Specializers,_Options,
+              '$OBJ'(claz_standard_method,
+                     method(GenericFunction,Qualifiers,Specializers))).
   
 is_classp(C):-f_type_of(C,T),is_class_classp(T),!.
 is_classp(C):-atom(C),atom_concat_or_rtrace('claz_',_,C).

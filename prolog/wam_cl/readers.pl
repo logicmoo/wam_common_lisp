@@ -29,6 +29,42 @@ wl:symbol_has_prop_set_get(sys_xx_stderr_xx,claz_prolog_output_stream,set_output
 % &optional INPUT_STREAM EOF_ERROR_P EOF_VALUE RECURSIVE_P => OBJECT
 
 wl:init_args(0,read).
+wl:init_args(1,read_from_string).
+
+f_read_from_string(String,Arguments,Result):-
+  read_from_string_arguments(Arguments,EofError,EofValue,Keys),
+  to_prolog_string(String,Text0),
+  key_value(Keys,kw_start,Start,0),
+  string_length(Text0,Length),
+  key_value(Keys,kw_end,End0,Length),
+  ( End0==[] -> End=Length ; End=End0 ),
+  Count is End-Start,
+  sub_string(Text0,Start,Count,_,Text),
+  string_codes(Text,Codes),
+  ( phrase(sexpr(Typed),Codes,Remaining),
+    to_untyped(Typed,Untyped),
+    reader_intern_symbols(Untyped,Object)
+  -> length(Remaining,RemainingLength),
+     Consumed is Count-RemainingLength,
+     Index is Start+Consumed,
+     f_values_list([Object,Index],Result)
+  ;  ( read_from_string_eof(Text)
+     -> ( EofError==[]
+        -> f_values_list([EofValue,End],Result)
+        ;  f_error(["End of string"],Result)
+        )
+     ;  f_error(["Malformed reader input"],Result)
+     )
+  ).
+
+read_from_string_arguments([],t,[],[]).
+read_from_string_arguments([EofError],EofError,[],[]).
+read_from_string_arguments([EofError,EofValue|Keys],
+                          EofError,EofValue,Keys).
+
+read_from_string_eof(Text):-
+  string_codes(Text,Codes),
+  forall(member(Code,Codes),code_type(Code,space)).
 
 %f_read(Obj):-
 %  current_input(Input),
@@ -136,6 +172,3 @@ end_of_file.
 [17:59] <dmiles> (Logicmoo is a "Nomic Game")
 [18:00] <dmiles> Nomic is a game in which changing the rules is a move. In that respect it differs from almost every other game. The primary activity of Nomic is proposing changes in the rules, debating the wisdom of changing them in that way, voting on the changes, deciding what can and cannot be done afterwards, and doing it. Even this core of the game, of course, can be changed.
 [20:30] * aindilis (~aindilis@172-12-3-117.lightspeed.sgnwmi.sbcglobal.net) has joined #logicmoo
-
-
-

@@ -143,6 +143,17 @@ f_exp(N,Ret):- Ret is exp(N).
 
 f_expt(N1,N2,Ret):- Ret is (N1 ^ N2).
 
+f_ash(Integer,Count,Result):-
+  ( Count>=0
+  -> Result is Integer << Count
+  ;  Shift is -Count,
+     Result is Integer >> Shift
+  ).
+
+wl:init_args(0,make_random_state).
+f_make_random_state(_Options,'$OBJ'(claz_random_state,State)):-
+  getrand(State).
+
 f_sys_random_posfixnum(Res):- Res is random(2147483647)+1.
 
 
@@ -286,5 +297,3 @@ end_of_file.
  (expt #c(2 2) 4) =>  -64 
 
   (expt -8 1/3) => #C(1.0 1.7320508)
-
-

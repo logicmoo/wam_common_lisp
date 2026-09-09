@@ -99,7 +99,13 @@ with_input_from_stream(In,Goal):-
 % :- '$hide'(show_uncaught_or_fail/1).
 show_uncaught_or_fail((A,B)):-!,show_uncaught_or_fail(A),show_uncaught_or_fail(B).
 show_uncaught_or_fail(G):- quietly(flush_all_output_safe),
-  (catch(G,E,quietly((wdmsg(uncaught(E)),rtrace(G),!,fail)))*->true;quietly((wdmsg(failed(G)),!,fail))).
+  ( catch(G,E,quietly((wdmsg(uncaught(E)),maybe_rtrace(G),!,fail)))
+  *-> true
+  ;  quietly((wdmsg(failed(G)),maybe_rtrace(G),!,fail))
+  ).
+
+maybe_rtrace(G):- repl_should_prompt,!,rtrace(G).
+maybe_rtrace(_).
 
 prompts(Old1,_Old2):- var(Old1) -> prompt(Old1,Old1) ; prompt(_,Old1).
 with_prompt_str(Str,G):- 
@@ -127,7 +133,7 @@ read_eval_print(Result):-
         set_md_lang(cl),
         get_prompt_from_package('> ',Prompt),
         lquietly(show_uncaught_or_fail(read_repl_sexpr(Prompt, Expression))),!,       
-        lquietly(show_uncaught_or_fail(lisp_add_history(Expression))),!,
+        ignore(catch(lquietly(lisp_add_history(Expression)),_,true)),
         nb_linkval('$mv_return',[Result]),
         set_md_lang(prolog),
         show_uncaught_or_fail(eval_at_repl(Expression,Result)),!,
@@ -146,6 +152,7 @@ writeExpressionEV(X):- writeln(' ;'),writeExpression(X),flush_all_output_safe.
 lisp_add_history(Var):-var(Var),!.
 lisp_add_history(end_of_file):-!.
 lisp_add_history([]):-!.
+lisp_add_history(_):- \+ repl_should_prompt,!.
 lisp_add_history(_):- prolog_load_context(reloading,true),!.
 lisp_add_history(Expression):- atom(Expression),!,
         lisp_add_history_event(add(Expression)).
@@ -366,5 +373,3 @@ eggdrop:lisp_call([S|TERM],_Vs,R):- lisp_compiled_eval([S|TERM],R).
 :- endif. % false
 %:- process_si.
 %:- cddd.
-
-

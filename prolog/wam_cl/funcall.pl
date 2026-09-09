@@ -22,15 +22,34 @@
 
 f_eval(Form,Result):- lisp_compile(Result,Form,Body),always(Body).
 
+wl:init_args(1,compile).
+
+f_compile(Name,Options,Result):-
+  compile_function_designator(Name,Options,Result),
+  f_values_list([Result,[],[]],Result).
+
+compile_function_designator(Name,[],Result):-
+  Name\==[],
+  ( f_symbol_function(Name,Result) -> true ; Result=function(Name) ).
+compile_function_designator([], [Definition],function(Definition)).
+compile_function_designator(Name,[Definition],Result):-
+  Name\==[],
+  Result=function(Definition),
+  set_opv(Name,symbol_function,Result).
+
 wl:init_args(1,funcall).
 %f_funcall(function(F),More,R):-!,f_funcall(F,More,R).
-f_funcall(ProcedureName,Args,Result):- f_apply(ProcedureName, [Args], Result).
+f_funcall(ProcedureName,Args,Result):- f_apply(ProcedureName, Args, Result).
 % f_funcall([F|More],R):- append([More],[R],ARGS), lpa_apply(F,ARGS).
 
 
 
 wl:init_args(1,apply).
 f_apply(FunctionName,Arguments,Result):- (var(FunctionName);FunctionName==[]),!,lisp_dump_break,Result=Arguments.
+f_apply(Lambda,ActualArgs,Result):-
+  Lambda=[lambda|_],
+  is_list(ActualArgs),!,
+  lisp_compiled_eval([Lambda|ActualArgs],Result).
 f_apply(FunctionName, Arguments, Result):- is_list(FunctionName),!,
   append(FunctionName, Arguments,FunWithArguments),
   lisp_compiled_eval(FunWithArguments,Result).
@@ -249,5 +268,3 @@ f_sys_env_eval(Env, Expression, Result):-
   user:always(Body).
 
 :- fixup_exports.
-
-

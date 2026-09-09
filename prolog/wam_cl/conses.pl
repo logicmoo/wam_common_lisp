@@ -26,6 +26,9 @@
 
 
 
+f_elt(Sequence,Axis,RetVal):-
+  get_adata(Sequence,Elements),!,
+  nth0(Axis,Elements,RetVal).
 f_elt(List,Axis,RetVal):- nth0(Axis,List,RetVal).
 
 f_nthcdr(_,[],[]):-!.

@@ -22,6 +22,7 @@
 
 :- include('./header').
 
+:- discontiguous compile_body_block/5.
 
 tst:is_local_test(do(0.0),
 "(do ((temp-one 1 (1+ temp-one))
@@ -54,6 +55,35 @@ loop_1var_n_step(Variable,[bind, Variable, []],[]).
 
 wl:plugin_expand_progbody(Ctx,Env,Result,InstrS,_PreviousResult,Code):- 
   compile_body_block(Ctx,Env,Result,InstrS,Code),!.
+
+:- meta_predicate wamcl_unwind_protect(0, ?, 0, -).
+
+compile_body_block(Ctx,Env,Result,[UnwindProtect,Protected|CleanupForms],Code):-
+   same_symbol(UnwindProtect,'unwind-protect'),
+   !,
+   must_compile_body(Ctx,Env,ProtectedResult,Protected,ProtectedCode),
+   must_compile_body(Ctx,Env,_CleanupResult,[progn|CleanupForms],CleanupCode),
+   Code=wamcl_unwind_protect(ProtectedCode,ProtectedResult,CleanupCode,Result).
+
+wamcl_unwind_protect(ProtectedGoal,ProtectedResult,CleanupGoal,Result):-
+   catch(( nb_linkval('$mv_return',[ProtectedResult]),
+          ( once(ProtectedGoal)
+          -> nb_current('$mv_return',RawValues),
+             wamcl_result_values(ProtectedResult,RawValues,Values),
+             Outcome=normal(ProtectedResult,Values)
+          ;  Outcome=failed
+          )
+        ),
+        Error,
+        Outcome=error(Error)),
+   once(CleanupGoal),
+   ( Outcome=normal(Result,Values)
+   -> wamcl_restore_values(Values,Result)
+   ; Outcome=error(Error),
+     throw(Error)
+   ; Outcome=failed,
+     fail
+   ).
 
 
 % (DO ((temp-var 1 (1+ temp-var) ) )((> temp-var 3) (print :done)) (PRINT temp-var) )

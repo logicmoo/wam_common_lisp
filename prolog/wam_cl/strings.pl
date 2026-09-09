@@ -41,6 +41,13 @@ is_lisp_string('$ARRAY'([_N],claz_base_character,List)):- nonvar(List).
 
 f_string(O,S):- to_prolog_string(O,PLS),to_lisp_string(PLS,S).
 
+wl:init_args(1,make_string).
+
+f_make_string(Size,Keys,'$ARRAY'([Size],claz_base_character,Characters)):-
+  key_value(Keys,kw_initial_element,Initial,'#\\'(0)),
+  length(Characters,Size),
+  maplist(=(Initial),Characters).
+
 % only handles the same things as #'STRING
 to_prolog_string(SS,SS):- notrace(string(SS)),!.
 to_prolog_string(SS,SS):- notrace(var(SS)),!,break.
@@ -208,6 +215,5 @@ f_char(String,Index,Char):-f_aref(String,[Index],Char).
 
 
 :- fixup_exports.
-
 
 

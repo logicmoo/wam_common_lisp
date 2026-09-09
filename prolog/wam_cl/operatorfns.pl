@@ -29,7 +29,11 @@ is_special_operator_p(Obj):- is_lisp_operator(_,_,Obj).
 
 symbol_foperator(_Symbol).
 
-% GROVELED f_functionp(Obj,RetVal):- t_or_nil(is_functionp(Obj),RetVal).
+f_functionp(Obj,RetVal):- t_or_nil(is_runtime_functionp(Obj),RetVal).
+
+is_runtime_functionp(function(_)).
+is_runtime_functionp(X):- compound(X),compound_name_arity(X,closure,_).
+is_runtime_functionp(X):- is_functionp(X).
 
 is_functionp(X):-  atom(X),is_functionp0(X),!.
 is_functionp0(X):- atom_concat_or_rtrace('sf_',Symbol,X),!,symbol_foperator(Symbol).
@@ -93,9 +97,10 @@ find_operator(Ctx,Env,BindType,FN, Len, ProposedName):-
 
 find_operator_else_function(Ctx,Env,BindType,Symbol,ProposedName,true):- 
   find_operator(Ctx,Env,BindType,Symbol, _Len, ProposedName),!.
+find_operator_else_function(_Ctx,_Env,kw_function,Symbol,function(Symbol),true):-
+   atom(Symbol),!.
 find_operator_else_function(_Ctx,Env,BindType,Symbol,ProposedName,Pre):- 
    Pre = find_operator_or_die(Env,BindType,Symbol, ProposedName),!.
-%find_operator_else_function(_Cxt,_Env,_BindType,Symbol,function(Symbol),true).
 
 find_operator_or_die(Env,BindType,Symbol, ProposedName):- nonvar(Symbol), find_operator(Env,Env,BindType,Symbol, _Len, ProposedName),!.
 %find_operator_or_die(_Env,kw_function,Symbol, function(Symbol)).
@@ -365,6 +370,3 @@ is_special_op(defclass, pkg_cl).
 is_special_op(defstruct, pkg_cl).
  
 :- fixup_exports.
-
-
-

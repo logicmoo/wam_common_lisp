@@ -416,6 +416,7 @@ sexpr0(E)                      --> `#`,read_dispatch(E),!.
 %sexpr('#\\'(C))                 --> `#\\`,ci(`u`),!,remove_optional_char(`+`),dcg_basics:xinteger(C),!.
 %sexpr('#\\'(C))                 --> `#\\`,dcg_basics:digit(S0), swhite,!,{atom_codes(C,[S0])}.
 sexpr0('#\\'(32))                 --> `#\\ `,!.
+sexpr0('#\\'(C))                  --> `#\\`,[C],{\+ sym_char(C)},!,swhite.
 sexpr0('#\\'(C))                 --> `#\\`,!,zalwayz(rsymbol(``,C)), swhite.
 
 %sexpr(['#-',K,Out]) --> `#-`,!,sexpr(C),swhite,expr_with_text(Out,sexpr(O),O),!,{as_keyword(C,K)}.
@@ -557,8 +558,12 @@ sexpr_vector0([First|Rest],End) --> sexpr(First), !, sexpr_vector0(Rest,End).
 %s_string_cont(Until,"")             --> Until,!, swhite.
 :- encoding(iso_latin_1).
 sexpr_string(Text)                 --> `�`, !, zalwayz(read_string_until_no_esc(Text,`�`)),!.
-sexpr_string(Text)                 --> `"`, !, zalwayz(read_string_until_no_esc(Text,`"`)),!.
+sexpr_string(Text)                 --> `"`, !, zalwayz(read_lisp_string_until(Text,`"`)),!.
 sexpr_string(Text)                 --> `#|`, !, zalwayz(read_string_until_no_esc(Text,`|#`)),!.
+
+read_lisp_string_until([],End) --> End,!.
+read_lisp_string_until([C|Rest],End) --> `\\`,!,[C],!,read_lisp_string_until(Rest,End).
+read_lisp_string_until([C|Rest],End) --> [C],!,read_lisp_string_until(Rest,End).
 %sexpr_string([C|S],End) --> `\\`,!, zalwayz(escaped_char(C)),!, sexpr_string(S,End).
 %sexpr_string([],End) --> End, !.
 % sexpr_string([32|S]) --> [C],{eoln(C)}, sexpr_string(S).
@@ -585,7 +590,12 @@ string_vector([]) --> [], !.
 % . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 lnumber(_)--> [C],{code_type(C,alpha)},!,{fail}.
-lnumber(N)-->  lnumber0(N),!. % (peek_symbol_breaker;[]).
+lnumber(N,S,E):-
+  lnumber0(N,S,E),
+  number_token_end(E).
+
+number_token_end([]).
+number_token_end([C|_]):- \+ sym_char(C).
 
 oneof_ci(OneOf,[C])--> {member(C,OneOf)},ci([C]). 
 dcg_and2(DCG1,DCG2,S,E) :- dcg_phrase(DCG1,S,E),!,dcg_phrase(DCG2,S,E),!.
